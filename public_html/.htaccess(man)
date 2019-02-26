@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REMOTE_ADDR} !^189\.6\.243\.89
+RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+RewriteRule ^(.*)$ http://domain.com/maintenance.html [R=307,L]

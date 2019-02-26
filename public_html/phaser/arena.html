@@ -1,0 +1,127 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title></title>
+    <script src="phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var str_json = "{\"simtime\":0.1,\"glads\":[{\"name\":\"Arch\",\"id\":0,\"lvl\":1,\"xp\":0,\"STR\":3,\"AGI\":9,\"INT\":1,\"spd\":1.90,\"as\":1.40,\"cs\":0.60,\"x\":12.50,\"y\":22.50,\"head\":0.0,\"lockedfor\":0.00,\"hp\":160.00,\"maxhp\":160.00,\"ap\":120.00,\"maxap\":120.00,\"action\":10,\"buffs\":{\"burn\":{\"value\":0.00,\"timeleft\":0.0},\"movement\":{\"value\":0.00,\"timeleft\":0.0},\"resist\":{\"value\":0.00,\"timeleft\":0.0},\"invisible\":{\"value\":0.00,\"timeleft\":0.0},\"stun\":{\"value\":0.00,\"timeleft\":0.0}}},{\"name\":\"Runner\",\"id\":1,\"lvl\":1,\"xp\":0,\"STR\":1,\"AGI\":5,\"INT\":8,\"spd\":1.50,\"as\":1.00,\"cs\":1.30,\"x\":22.50,\"y\":12.50,\"head\":270.0,\"lockedfor\":0.00,\"hp\":120.00,\"maxhp\":120.00,\"ap\":260.00,\"maxap\":260.00,\"action\":10,\"buffs\":{\"burn\":{\"value\":0.00,\"timeleft\":0.0},\"movement\":{\"value\":0.00,\"timeleft\":0.0},\"resist\":{\"value\":0.00,\"timeleft\":0.0},\"invisible\":{\"value\":0.00,\"timeleft\":0.0},\"stun\":{\"value\":0.00,\"timeleft\":0.0}}},{\"name\":\"Patient\",\"id\":2,\"lvl\":1,\"xp\":0,\"STR\":10,\"AGI\":0,\"INT\":0,\"spd\":1.00,\"as\":0.50,\"cs\":0.50,\"x\":12.50,\"y\":2.50,\"head\":180.0,\"lockedfor\":0.00,\"hp\":300.00,\"maxhp\":300.00,\"ap\":100.00,\"maxap\":100.00,\"action\":10,\"buffs\":{\"burn\":{\"value\":0.00,\"timeleft\":0.0},\"movement\":{\"value\":0.00,\"timeleft\":0.0},\"resist\":{\"value\":0.00,\"timeleft\":0.0},\"invisible\":{\"value\":0.00,\"timeleft\":0.0},\"stun\":{\"value\":0.00,\"timeleft\":0.0}}},{\"name\":\"Wanderer\",\"id\":3,\"lvl\":1,\"xp\":0,\"STR\":5,\"AGI\":6,\"INT\":5,\"spd\":1.60,\"as\":1.10,\"cs\":1.00,\"x\":2.50,\"y\":12.50,\"head\":90.0,\"lockedfor\":0.00,\"hp\":200.00,\"maxhp\":200.00,\"ap\":200.00,\"maxap\":200.00,\"action\":10,\"buffs\":{\"burn\":{\"value\":0.00,\"timeleft\":0.0},\"movement\":{\"value\":0.00,\"timeleft\":0.0},\"resist\":{\"value\":0.00,\"timeleft\":0.0},\"invisible\":{\"value\":0.00,\"timeleft\":0.0},\"stun\":{\"value\":0.00,\"timeleft\":0.0}}}],\"projectiles\":[],\"poison\":17.68}";
+
+var screenD = 768;
+var arenaStart = 64;
+var arenaEnd = screenD - 64;
+var arenaD = arenaEnd - arenaStart;
+var arenaRate = arenaD / 25;
+var json = JSON.parse(str_json);
+var nglad = json.glads.length;
+
+var game = new Phaser.Game(screenD, screenD, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+
+function preload() {
+
+    game.load.tilemap('tilemap', 'tile.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('tiles', 'wall_sheet.png');
+	game.load.spritesheet('glad', 'glad.png', 64, 64);
+
+}
+
+var map;
+var layer_walls, layer_ground;
+
+var sprite = new Array();
+
+function create() {
+
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    map = game.add.tilemap('tilemap'); //variavel map liga ao recurso json tilemap
+
+    map.addTilesetImage('map', 'tiles'); //tileset map do json liga ao recurso tiles
+
+    layer_ground = map.createLayer('ground'); //liga o layer ground a variavel layer
+    layer_walls = map.createLayer('walls'); //liga o layer ground a variavel layer
+
+    layer_ground.resizeWorld();
+
+	for (i=0 ; i<nglad ; i++){
+		//alert(json.glads[i].x);
+		sprite[i] = game.add.sprite(arenaStart + parseFloat(json.glads[i].x) * arenaRate, arenaStart + parseFloat(json.glads[i].y) * arenaRate, 'glad');
+		sprite[i].anchor.setTo(0.5, 0.5);
+		
+		//sprite[i].animations.add('walk-down', [130,131,132,133,134,135,136,137,138], 15, true);
+		//sprite[i].animations.add('walk-up', [104,105,106,107,108,109,110,111,112], 15, true);
+		//sprite[i].animations.add('walk-left', [117,118,119,120,121,122,123,124,125], 15, true);
+		//sprite[i].animations.add('walk-right', [143,144,145,146,147,148,149,150,151], 15, true);
+		
+	}
+
+}
+
+
+function update() {
+	for (i=0 ; i<nglad ; i++){
+		sprite[i].x = arenaStart + parseFloat(json.glads[i].x) * arenaRate;
+		sprite[i].y = arenaStart + parseFloat(json.glads[i].y) * arenaRate;
+	}
+	
+	
+/*
+	var velx = 0;
+	var vely = 0;
+	var inc = 1;
+	
+    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+    {
+		velx -= inc;
+    }
+    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+    {
+		velx += inc;
+    }
+
+    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
+    {
+		vely -= inc;
+    }
+    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
+    {
+		vely += inc;
+    }
+	
+	if (velx != 0 || vely != 0){
+        sprite.x += velx;
+        sprite.y += vely;
+		
+		if (velx > 0)
+			sprite.animations.play('walk-right');
+		else if (velx < 0)
+			sprite.animations.play('walk-left');
+			
+		else if (vely > 0)
+			sprite.animations.play('walk-down');
+		else if (vely < 0)
+			sprite.animations.play('walk-up');
+			
+	}
+	else
+		sprite.animations.stop();
+*/
+}
+
+function render() {
+
+}
+
+</script>
+
+</body>
+</html>

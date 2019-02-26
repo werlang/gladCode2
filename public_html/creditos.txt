@@ -1,0 +1,47 @@
+--- Créditos ---
+
+1. Sistema
+
+Sistema desenvolvido por Pablo Werlang
+email: pswerlang@gmail.com
+facebook: https://www.facebook.com/pswerlang
+
+2. Sprites
+
+Os sprites usados neste projeto foram criados por diversas pessoas, baseados nos sprites da "Liberated Pixel Cup", da Open Game Art.
+Para saber mais sobre acesse:
+http://lpc.opengameart.org
+
+Os usuários do GitHub @makrohn, @gaurav0 e @jrconway3 compilaram todo trabalho criado pelos artistas, e disponibilizaram em suas respectivas páginas.
+Para saber mais acesse:
+https://github.com/jrconway3/Universal-LPC-spritesheet
+
+Para conhecer sobre a licensa de uso dos sprites acesse:
+http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/LICENSE
+
+A lista dos autores e seus créditos pode ser acessada em:
+http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/Universal-LPC-spritesheet/AUTHORS.txt
+
+3. Ícones
+
+Os ícones utilizados foram baixados do site:
+https://game-icons.net/
+
+A licensa dos ícones utilizados pode ser acessada em:
+https://creativecommons.org/licenses/by/3.0/legalcode
+
+A lista dos autores e seus créditos pode ser acessada em:
+https://gladcode.tk/icon-authors.txt
+
+4. Audio
+
+As músicas e sons foram baixados do site:
+https://freesound.org/
+
+A lista dos autores pode ser acessada em:
+https://gladcode.tk/audio-authors.txt
+
+5. Outros
+
+Alguns dos itens utilizados não foi possível determinar a autoria. Caso eu esteja utilizando a sua arte, favor entrar em contato através do email:
+pswerlang@gmail.com
