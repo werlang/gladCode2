@@ -26,7 +26,7 @@
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="sprite/assets.js"></script>
-	<script type="text/javascript" src="script/profile.js"></script>
+	<script type="text/javascript" src="script/profile.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 	<script type="text/javascript" src="script/croppie.js"></script>
