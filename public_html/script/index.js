@@ -1,4 +1,6 @@
 $(document).ready( function() {
+	console.log("teste");
+
 	$('#header').addClass('big');
 	$('#header-container').addClass('small');
 	
