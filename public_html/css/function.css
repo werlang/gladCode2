@@ -1,0 +1,47 @@
+h1 {
+	text-align: left;
+	margin-bottom: 40px;
+}
+
+h2 {
+	margin-bottom: 15px;
+}
+
+h3 {
+	color: #00638d;
+    width: 100%;
+    box-shadow: 0px -1px 0px rgba(0,0,0,0.2);
+    padding-top: 15px;
+    margin: 10px 0px 20px;
+}
+
+p.syntax {
+	font-family: consolas;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background-color: rgba(0,0,0,0.1);
+    padding: 2px 15px;
+	display: inline-block;
+}
+
+pre {
+	max-width: 100%;
+}
+
+.table.t-funcs {
+	width: 100vw;
+	margin-left: -15px;
+}
+
+#temp-seealso tr {
+	width: 100vw;
+    box-sizing: border-box;	
+}
+
+@media only screen and (min-width: 600px) {
+.table.t-funcs {
+	width: 100%;
+	margin-left: 0px;
+}
+
+}
