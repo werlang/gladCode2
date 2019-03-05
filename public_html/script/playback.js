@@ -52,7 +52,7 @@ $(document).ready( function() {
 						stab = [];
 						gender = [];
 						
-						console.log(log);
+						//console.log(log);
 						for (var i in glads){
 							//console.log(glads[i].skin);
 							var skin = glads[i].skin;

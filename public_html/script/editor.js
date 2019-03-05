@@ -366,6 +366,7 @@ $(document).ready( function() {
 	});
 		
 	$('#fog-battle #btn-cancel').click( function(){
+		progbtn.kill();
 		$('#fog-battle').hide();
 	});
 
