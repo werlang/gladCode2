@@ -365,14 +365,20 @@ $(document).ready( function() {
 		}
 	});
 		
+	var progbtn;
 	$('#fog-battle #btn-cancel').click( function(){
-		progbtn.kill();
-		$('#fog-battle').hide();
+		if (progbtn && progbtn.isActive()){
+			progbtn.kill();
+			if (ajaxcall)
+				ajaxcall.abort();
+		}
+		else
+			$('#fog-battle').hide();
 	});
 
 	$('#fog-battle #btn-battle').click( function(){
-		$('#fog-battle #btn-cancel').prop('disabled',true);
-		var progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
+		//$('#fog-battle #btn-cancel').prop('disabled',true);
+		progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
 		var glads = [];
 		var gladsReady = 0;
 		$.each( $('#fog-battle #list .glad.selected'), function(){
@@ -385,8 +391,6 @@ $(document).ready( function() {
 
 		var waitGlad = setInterval( function(){
 			if (gladsReady == $('#fog-battle #list .glad.selected').length){
-				var setup = "setup(){\n\tsetName(\""+ loadGlad.name +"\");\n\tsetSTR("+ loadGlad.vstr +");\n\tsetAGI("+ loadGlad.vagi +");\n\tsetINT("+ loadGlad.vint +");\n\tsetSkin(\""+ JSON.stringify(pieces) +"\");\n\tsetUser(\""+ loadGlad.user +"\");\n}\n\n";
-				loadGlad.code = setup + loadGlad.code;
 				glads.push(loadGlad.code);
 
 				clearInterval(waitGlad);
@@ -398,7 +402,7 @@ $(document).ready( function() {
 					//console.log(data);
 					if (data == "ERROR"){
 						progbtn.kill();
-						$('#fog-battle #btn-cancel').removeProp('disabled');
+						//$('#fog-battle #btn-cancel').removeProp('disabled');
 						$('#fog-battle').hide();
 					}
 					else{
@@ -424,7 +428,7 @@ $(document).ready( function() {
 						});
 						tested = true;
 						progbtn.kill();
-						$('#fog-battle #btn-cancel').removeProp('disabled');
+						//$('#fog-battle #btn-cancel').removeProp('disabled');
 						$('#fog-battle').hide();
 					}
 				});
@@ -529,7 +533,10 @@ function setLoadGlad(){
 	loadGlad.vstr = $('#distribuicao .slider').eq(0).val();
 	loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
 	loadGlad.vint = $('#distribuicao .slider').eq(2).val();
-	loadGlad.code = editor.getValue();
+
+	var setup = "setup(){\n\tsetName(\""+ loadGlad.name +"\");\n\tsetSTR("+ loadGlad.vstr +");\n\tsetAGI("+ loadGlad.vagi +");\n\tsetINT("+ loadGlad.vint +");\n\tsetSkin(\""+ loadGlad.skin +"\");\n\tsetUser(\""+ loadGlad.user +"\");\n}\n\n";
+	loadGlad.code = setup + editor.getValue();
+	
 }
 
 function getGladFromFile(filename){
