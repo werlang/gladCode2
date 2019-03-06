@@ -4,6 +4,8 @@
 var ajaxcall;
 
 function runSimulation(params) {
+	if (ajaxcall)
+		ajaxcall.abort();
 	var glads = params.glads;
 	var savecode = params.savecode;
 	var single = params.single;
@@ -113,10 +115,10 @@ class progressButton {
 				roul = (roul + 1) % text.length;
 			if (obj.find('#bar').width() >= obj.width()){
 				self.kill();
-				//showTerminal("ERRO DE CONEXÃO","Falha ao obter resposta do servidor. Verifique sua conexão com a internet.");	
+				showTerminal("ERRO DE CONEXÃO","Falha ao obter resposta do servidor dentro do tempo limite.");	
 				if (ajaxcall)
 					ajaxcall.abort();
-				obj.click();
+				//obj.click();
 				
 			}
 		}, 10);
@@ -138,6 +140,13 @@ class progressButton {
 		$('#oldcontent').css({'margin':this.obj.css('margin'),'display':'flex','align-items':'center','justify-content':'center','position':'absolute','top':this.obj.position().top,'left':this.obj.position().left,'width':this.obj.width(),'height':this.obj.height()});
 		this.bsize = this.obj.width() / 100 * porc;
 		this.obj.find('#bar').width(this.bsize.toFixed(0));
+	}
+
+	isActive(){
+		if (this.obj.find('#oldcontent').length > 0)
+			return true;
+		else
+			return false;
 	}
 }
 
