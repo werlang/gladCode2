@@ -87,6 +87,9 @@
 			<div id='download' class='mrow disabled'>
 				<img src='icon/cloud_download.png' title='Baixar o código do gladiador'>
 			</div>
+			<div id='settings' class='mrow'>
+				<img src='icon/settings.png' title='Preferências'>
+			</div>
 			<div id='help' class='mrow'>
 				<img src='icon/question.png' title='Ajuda'>
 			</div>

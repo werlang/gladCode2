@@ -26,6 +26,8 @@
 				$info['xp'] = $row['xp'];
 				$info['silver'] = $row['silver'];
 				$info['tutor'] = $row['showTutorial'];
+				$info['theme'] = $row['editor_theme'];
+				$info['font'] = $row['editor_font'];
 				$info['preferences'] = array();
 				$info['preferences']['message'] = $row['pref_message'];
 				$info['preferences']['friend'] = $row['pref_friend'];
@@ -89,21 +91,29 @@
 			$pref_update = $preferences['update'];
 			$pref_duel = $preferences['duel'];
 			
-			$sql = "SELECT pasta FROM usuarios WHERE email = '$email'";
+			$sql = "SELECT email FROM usuarios WHERE apelido = '$nickname' AND email != '$email'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-			$row = $result->fetch_assoc();
-			$pasta = $row['pasta'];
 
-			$pattern = '#^data:image/\w+;base64,#i';
-			if ($picture != "profpics/$pasta.png"){
-				$picture = base64_decode(preg_replace($pattern, '', $picture));
-				file_put_contents("profpics/$pasta.png",$picture);
-				$picture = "profpics/$pasta.png";
+			if ($result->num_rows == 0){
+				$sql = "SELECT pasta FROM usuarios WHERE email = '$email'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$row = $result->fetch_assoc();
+				$pasta = $row['pasta'];
+
+				$pattern = '#^data:image/\w+;base64,#i';
+				if ($picture != "profpics/$pasta.png"){
+					$picture = base64_decode(preg_replace($pattern, '', $picture));
+					file_put_contents("profpics/$pasta.png",$picture);
+					$picture = "profpics/$pasta.png";
+				}
+				
+				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel' WHERE email = '$email'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+				echo "DONE";
 			}
-						
-			$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel' WHERE email = '$email'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-			echo "DONE";
+			else
+				echo "EXISTS";
 		}
 		else
 			echo "NULL";
@@ -115,5 +125,13 @@
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			echo "DONE";
 		}
+	}
+	elseif ($action == "EDITOR"){
+		$user = $_SESSION['user'];
+		$theme = mysql_escape_string($_POST['theme']);
+		$font = mysql_escape_string($_POST['font']);
+
+		$sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE email = '$user'";
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	}
 ?>

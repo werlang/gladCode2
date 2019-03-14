@@ -2,7 +2,8 @@
     background-color: #00638d;
     width: 100%;
     height: 250px;
-    position: absolute;
+	position: absolute;
+	box-shadow: 0px 1px 3px black;
 }
 
 #header-container.small {
@@ -164,6 +165,9 @@
 	right: 0;
 	left: 0;
 	background-color: rgba(0,0,0,0.5);
+	display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #fog #menu {
@@ -234,53 +238,320 @@
 #footer-wrapper {
 	background-color: #00638d;
 	width: 100%;
-	height: 250px;
+	height: 390px;
 	margin-top: -75px;
 	padding-top: 100px;
 	box-sizing: border-box;
+	box-shadow: 0px -1px 3px black;
 }
 
-#footer-wrapper.short {
+#footer-wrapper.white {
 	background-color: transparent;
+	box-shadow: none;
 }
 
 #footer {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
 	color: white;
 	height: 100%;
+	font-family: consolas;
+	line-height: 1.8em;
 }
 
-#footer div {
-	margin: 0px 15px;
-	margin-bottom: 20px
+#footer .row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	width: 100%;
+}
+
+#footer .col {
+	max-width: 180px;
+	padding-top: 20px;
+	box-sizing: border-box;
+}
+
+#footer .col .title{
+	font-size: 1.1em;
+    font-weight: bold;
+	text-transform: uppercase;
+	margin-left: -5px;
 }
 
 #footer a {
-	color: #c5e1f8;
+	color: #daf4ff;
 	text-decoration: none;
 }
 
-#footer-wrapper.short #footer {
-	color: #646464;
+#footer a:hover {
+	color: #55ccff;
 }
 
-#footer-wrapper.short #footer a {
+#footer-wrapper.white #footer {
+	color: #646464;
+	box-shadow: 0px -1px 3px #00000012;
+    background-color: #f8f9fa;
+}
+
+#footer-wrapper.white #footer a {
 	color: #00638d;
 }
 
+#footer-wrapper.white #footer a:hover {
+    color: #0e95ce;
+}
+
+#footer .donate {
+	width: 180px;
+    display: flex;
+    justify-content: flex-end;
+	align-items: center;
+    border-radius: 3px;
+	margin-top: 5px;
+	height: 30px;
+	padding: 0px 1px;
+	box-sizing: border-box;
+	border: 1px solid;
+	background-color: #eeeeee;
+	box-shadow: 0px 0px 3px black;
+	cursor: pointer;
+}
+
+#footer-wrapper.white #footer .donate {
+	background-color: #6c97a9;
+    color: #98c5d8;
+}
+
+#footer .donate.small {
+	width: auto;
+}
+
+#footer .donate .inner-box img{
+	height: 100%;
+	width: 100%;
+}
+
+#footer .donate span {
+	flex-grow: 1;
+    font-style: italic;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 0.8em;
+	text-align: center;
+	color: #646464;
+}
+
+#footer-wrapper.white #footer .donate span{
+	color: white;
+}
+
+#footer .donate:hover span{
+	text-shadow: 0px 0px 3px;
+}
+
+#footer-wrapper.white #footer .donate:hover .inner-box{
+	background-color: #eefaff;
+}
+
+#footer .donate:hover .inner-box{
+	background-color: white;
+}
+
+#footer .donate .inner-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #e0e0e0;
+	border-radius: 3px;
+	width: 100px;
+	height: 26px;
+	box-shadow: 1px 1px 2px 0px black inset;
+	box-sizing: border-box;
+	padding: 3px 5px;
+	transition: 0.3s all;
+}
+
+#footer-wrapper.white #footer .donate .inner-box {
+	background-color: #c7d6dc;
+}
+
+#footer .donate.small .inner-box {
+	width: 40px;
+}
+
+#footer .donate.small .inner-box img {
+	width: auto;
+}
+
+#footer .donate .inner-box.left {
+	order: -1;
+}
+
+#footer #social {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+
+#footer #social div {
+    background-color: #00638d;
+    border-radius: 5px;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#footer-wrapper.white #footer #social div {
+	background-color: #6c97a9;
+}
+
+#footer #social div:hover {
+	opacity: 0.7;
+}
+
+#footer #social img {
+	width: 30px;
+	margin-top: 10px;
+}
+
+#footer #copyright {
+	border-top: 2px solid #0f7099;
+    width: 95%;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+}
+
+#footer-wrapper.white #footer #copyright {
+	border-top-color: #ebebeb;
+}
+
+#crypto-box {
+    background-color: white;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px black;
+    color: #646464;
+	font-family: roboto;
+	cursor: default;
+	display: flex;
+	flex-direction: column;
+}
+
+#crypto-box.size-8 {
+	width: 270px;
+}
+
+#crypto-box.size-10 {
+	width: 300px;
+}
+
+#crypto-box #close {
+	cursor: pointer;
+	background-color: #fbaeae;
+	font-family: sans-serif;
+	font-weight: bold;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 20px;
+	border: 1px solid black;
+	width: 25px;
+	height: 25px;
+	margin-bottom: -22px;
+    margin-left: calc(100% - 20px);
+	margin-top: -5px;
+	transition: all 0.3s;
+	color: #785656;
+	z-index: 1;
+}
+
+#crypto-box #close:hover {
+	background-color: #ff8585;
+}
+
+#crypto-box #wallet {
+    padding: 50px 0px 10px;
+    margin-top: -40px;
+    font-family: consolas;
+    text-align: center;
+    background-color: #6c97a9;
+    font-weight: bold;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	width: 100%;
+}
+
+#crypto-box #wallet span {
+    color: white;
+    text-shadow: 0px 0px 3px black;
+    font-style: normal;
+    border: 1px solid #88adbd;
+    border-radius: 5px;
+    margin-right: 20px;
+    margin-left: -15px;
+    padding-left: 10px;
+	background-color: #7a9dac;
+	height: 60px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.3s, text-shadow 0.3s, color 0.3s;
+}
+
+#crypto-box #wallet img {
+	width: 35px;
+    margin-left: 10px;
+	z-index: 1;
+	transition: transform 0.3s;
+}
+
+#crypto-box #wallet.copied img {
+	transform: rotate(360deg);
+}
+
+#crypto-box #wallet:hover span {
+	color: #ffffff29;
+	background-color: #00638d;
+	text-shadow: none;
+	background-image: url('../icon/copy.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 35px;
+}
+
+#crypto-box #wallet.copied span {
+    color: white;
+    text-shadow: 0px 0px 3px black;
+    font-style: normal;
+	background-color: #db9696;
+	background-image: none;
+}
+
+#crypto-box #title {
+	font-size: 1.5em;
+    background-color: #c7d6dc;
+    padding: 15px 20px 55px;
+}
+
+#crypto-box #qrcode {
+	display: flex;
+    justify-content: center;
+    margin-top: -40px;
+    z-index: 1;
+}
+
+#crypto-box #qrcode img{
+	width: 200px;
+    height: 200px;
+    box-shadow: 0px 0px 3px black;
+    padding: 5px;
+    border-radius: 3px;
+    background-color: #fff;
+}
+
 @media only screen and (min-width: 600px) {
-#footer-wrapper {
-	margin-top: -100px;
-}
-
-#footer {
-	flex-direction: row;	
-}
-
-#footer div {
-	margin-bottom: 0px
-}
 }

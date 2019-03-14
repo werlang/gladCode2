@@ -7,10 +7,11 @@
         $user = $_SESSION['user'];
         
         if ($action == "GET"){
+            $output = array();
+
             $sql = "SELECT d.id, d.time, u.apelido, u.foto, u.lvl FROM duels d INNER JOIN usuarios u ON u.email = d.user1 WHERE d.user2 = '$user' AND d.log IS NULL";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-            $output = array();
             while($row = $result->fetch_assoc()){
                 $duel = array();
                 $duel['id'] = $row['id'];
@@ -52,13 +53,13 @@
         }
         elseif ($action == "DELETE"){
             $id = mysql_escape_string($_POST['id']);
-            $sql = "DELETE FROM duels WHERE id = '$id' AND user2 = '$user'";
+            $sql = "DELETE FROM duels WHERE id = '$id' AND (user1 = '$user' OR user2 = '$user')";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
             echo "OK";
         }
         elseif ($action == "REPORT"){
-            $sql = "SELECT d.id FROM duels d WHERE (d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL";
+            $sql = "SELECT d.id FROM duels d WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL)";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
             $total = $result->num_rows;
 
@@ -78,14 +79,14 @@
 				$page--;
 			}
 			
+            $sql = "SELECT d.id, d.time, d.log, d.isread, g1.name AS glad1, g2.name AS glad2, u1.apelido AS nick1, u2.apelido AS nick2, u1.email AS user1, u2.email AS user2 FROM duels d LEFT JOIN gladiators g1 ON g1.cod = d.gladiator1 LEFT JOIN gladiators g2 ON g2.cod = d.gladiator2 INNER JOIN usuarios u1 ON u1.email = d.user1 INNER JOIN usuarios u2 ON u2.email = d.user2 WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL) ORDER BY d.time DESC LIMIT $units OFFSET $offset";
+            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
             $info = array();
 			$info['page'] = $page;
 			$info['total'] = $total;
 			$info['start'] = $offset + 1;
 			$info['end'] = $offset + $result->num_rows;
-
-            $sql = "SELECT d.time, d.log, d.isread, g1.name AS glad1, g2.name AS glad2, u1.apelido AS nick1, u2.apelido AS nick2, u1.email AS user1, u2.email AS user2 FROM duels d INNER JOIN gladiators g1 ON g1.cod = d.gladiator1 INNER JOIN gladiators g2 ON g2.cod = d.gladiator2 INNER JOIN usuarios u1 ON u1.email = d.user1 INNER JOIN usuarios u2 ON u2.email = d.user2 WHERE (d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL ORDER BY d.time DESC LIMIT $units OFFSET $offset";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
             $output = array();
             while($row = $result->fetch_assoc()){
@@ -100,6 +101,7 @@
                     $duel['user'] = $row['nick1'];
                     $duel['enemy'] = $row['glad1'];;
                 }
+                $duel['id'] = $row['id'];
                 $duel['time'] = $row['time'];
                 $duel['log'] = $row['log'];
                 $duel['isread'] = $row['isread'];
@@ -113,7 +115,7 @@
                 'output' => $output
             );
 
-            $sql = "UPDATE duels SET isread = '1' WHERE (user1 = '$user' OR user2 = '$user') AND log IS NOT NULL";
+            $sql = "UPDATE duels SET isread = '1' WHERE user1 = '$user' AND log IS NOT NULL";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
             
             echo json_encode($output);

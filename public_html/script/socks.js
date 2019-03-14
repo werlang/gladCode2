@@ -13,6 +13,8 @@ var tries;
 $(document).ready( function() {
 	$('#canvas-container').hide();
 
+	$('#footer-wrapper').addClass('white');
+
 	$('#preview-container').sortable({
 		axis: "y",
 		scroll: false

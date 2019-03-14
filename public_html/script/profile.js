@@ -129,11 +129,20 @@ $(document).ready( function(){
 		})
 		.done( function(data){
 			//console.log(data);
-			showMessage("Informações atualizadas");
-			$('#profile-panel .button').removeProp('disabled');
-			user.apelido = $('#nickname .input').val();
-			$('#profile-ui #nickname').html(user.apelido);
-			$('#profile-ui #picture img').attr('src',user.foto);
+			if (data == "DONE"){
+				showMessage("Informações atualizadas");
+				$('#profile-panel .button').removeProp('disabled');
+				user.apelido = $('#nickname .input').val();
+				$('#profile-ui #nickname').html(user.apelido);
+				$('#profile-ui #picture img').attr('src',user.foto);
+			}
+			else if (data == "EXISTS"){
+				showMessage("Outro usuário já escolheu este nome").then( function(){
+					$('#nickname .input').focus().select();
+				});
+				$('#profile-panel .button').removeProp('disabled');
+				
+			}
 		});
 	});
 
@@ -255,11 +264,19 @@ $(document).ready( function(){
 		favorites: 1
 	};
 	$('#battle-container #prev').click( function(){
-		reportpage.battles--;
+		if ($('#bhist-container .tab.selected').html() == "Batalhas")
+			reportpage.battles--;
+		else if ($('#bhist-container .tab.selected').html() == "Duelos")
+			reportpage.duels--;
+
 		reload_reports();
 	});
 	$('#battle-container #next').click( function(){
-		reportpage.battles++;
+		if ($('#bhist-container .tab.selected').html() == "Batalhas")
+			reportpage.battles++;
+		else if ($('#bhist-container .tab.selected').html() == "Duelos")
+			reportpage.duels++;
+
 		reload_reports();
 	});
 	$('#menu #battle').click( function() {
@@ -486,12 +503,37 @@ $(document).ready( function(){
 					data = data.output;
 					$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell'>Oponente</div><div class='cell'>Mestre</div><div class='cell time'>Data</div></div>");
 					for (var i in data){
-						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].glad +"</div><div class='cell'>"+ data[i].enemy +"</div><div class='cell'>"+ data[i].user +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='playback.php?log="+ data[i].log +"'><img src='icon/eye.png'></a></div></div>");							
+						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].glad +"</div><div class='cell enemy'>"+ data[i].enemy +"</div><div class='cell'>"+ data[i].user +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='playback.php?log="+ data[i].log +"'><img src='icon/eye.png'></a></div></div>");							
+
 						if (data[i].isread == "0")
 							$('#bhist-container .table .row').last().addClass('unread');
 						else
 							$('#bhist-container .table .row').last().removeClass('unread');
+
+						if (data[i].glad == null)
+							$('#bhist-container .table .row .glad').last().html("Gladiador Esquecido").addClass('forgotten');
+						if (data[i].enemy == null){
+							if (data[i].log == null){
+								$('#bhist-container .table .row .enemy').last().html("???");
+								$('#bhist-container .table .row').last().find('.playback').remove();
+								$('#bhist-container .table .row').last().append("<div class='remove' title='Cancelar desafio'>X</div>")
+								$('#bhist-container .table .row').last().find('.remove').data('id',data[i].id).click(function(){
+									var id = $(this).data('id');
+									$.post("back_duel.php",{
+										action: "DELETE",
+										id: id,
+									}).done(function(data){
+										showMessage("Desafio cancelado");
+										reload_reports();
+									});
+								});
+							}
+							else
+								$('#bhist-container .table .row .enemy').last().html("Gladiador Esquecido").addClass('forgotten');
+						}
+						
 					}
+
 				}
 			});
 
@@ -907,7 +949,7 @@ $(document).ready( function(){
 			}).done( function(data){
 				$('#fog').remove();
 				if (data == "EXISTS"){
-					showMessage("Já existe um desafio de duelo para <span class='highlight'>"+ nick +"</span> usando o gladiador <span class='highlight'>"+ gladname +"</span>.");					
+					showMessage("Já existe um desafio de duelo contra <span class='highlight'>"+ nick +"</span> usando o gladiador <span class='highlight'>"+ gladname +"</span>.");					
 				}
 				else if (data == "OK"){
 					showMessage("Desafio enviado para <span class='highlight'>"+ nick +"</span>. Assim que uma resposta for dada você será notificado.");

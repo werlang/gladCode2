@@ -1,4 +1,7 @@
 $(document).ready( function() {
+
+	$('#footer-wrapper').addClass('white');
+
 	$( "#date-str, #date-end" ).datepicker({
 		showAnim: "slideDown",
 		dateFormat: "dd/mm/yy",

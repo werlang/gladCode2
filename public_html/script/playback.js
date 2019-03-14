@@ -10,6 +10,9 @@ var istep;
 var tournHash;
 
 $(document).ready( function() {
+
+	$('#footer-wrapper').addClass('white');
+
 	if ($('#tourn').html().length){
 		tournHash = $('#tourn').html();
 	}

@@ -15,6 +15,7 @@ body {
 	margin-top: 60px;
 	width: 0px;
 	transition: width 0.5s;
+	z-index: 1;
 }
 
 #editor {
@@ -181,8 +182,9 @@ body {
     filter: brightness(85%);
 }
 
+#fog #settings-window,
 #fog-battle #battle-window {
-    width: 600px;
+		width: 600px;
     background-color: white;
     border-radius: 3px;
     box-shadow: 1px 1px 5px black;
@@ -230,8 +232,9 @@ body {
     margin-right: 20px;
 }
 
+#settings-window #list,
 #fog-battle #list {
-    width: 250px;
+	width: 250px;
     min-height: 100px;
     background-color: #f3f5ff;
     border-radius: 3px;
@@ -244,6 +247,7 @@ body {
     margin-bottom: 20px;
 }
 
+#settings-window #list .theme,
 #fog-battle #list .glad {
 	padding: 2px 10px;
 	font-size: 1.2em;
@@ -253,15 +257,18 @@ body {
 	margin: 0px 3px;
 }
 
+#settings-window #list .theme:hover ,
 #fog-battle #list .glad:hover {
 	background-color: #dadff7;
 }
 
+#settings-window #list .theme.selected ,
 #fog-battle #list .glad.selected {
 	background-color: #d0f5da;
 	font-weight: bold;
 }
 
+#settings-window #list .theme.selected:hover ,
 #fog-battle #list .glad.selected:hover {
 	background-color: #c3dfcb;
 }
@@ -404,4 +411,47 @@ body {
 
 #help-window .button:hover {
 	background-color: #9ebac6;
+}
+
+#settings-window #title h2{
+	margin: 20px 0px 10px 20px;
+}
+
+#settings-window #settings-content{
+	display: flex;
+	margin: 0px 20px;
+}
+
+#settings-window #list {
+	width: auto;
+	margin-right: 10px;
+}
+
+#settings-window #sample {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+#settings-window #code-sample {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+}
+
+#settings-window #font-size .button {
+    height: 30px;
+    width: 50px;
+    margin: 0px 10px;
+}
+
+#settings-window #button-container {
+	margin-top: 15px;
+}
+
+#settings-window #button-container .button{
+	width: 50%;
+	border-radius: 0px;
+	height: 50px;
+	font-size: 1.3em;
 }

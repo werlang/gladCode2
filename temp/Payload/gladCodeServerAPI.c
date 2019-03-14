@@ -818,7 +818,7 @@ int fireball(int gladid, float x, float y){
 				(g+gladid)->ap -= abilitycost[ABILITY_FIREBALL];
 				float spdx, spdy;
 				calcSidesFromAngleDist(&spdx, &spdy, 1, (g+gladid)->head);
-				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->INT * 0.5, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
+				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->INT * 0.7, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
 				r = 1;
 				
 				(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
@@ -893,29 +893,29 @@ int charge(int gladid){
 			addBuff(gladid, BUFF_MOVEMENT, 1/(g+gladid)->cs, 4);
 
 			//se move em direcao ao alvo
-			int stopcharge = 0;
-			while(getDistUnsafe(gladid, (g+target)->x, (g+target)->y) > 1 && !stopcharge ){
+			float destx = (g+target)->x;
+			float desty = (g+target)->y;
+			while(getDistUnsafe(gladid, destx, desty) > 1){
 				if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft <= timeInterval){
 					addBuff(gladid, BUFF_MOVEMENT, timeInterval*2, 4);
 				}
-				moveToUnsafe(gladid, (g+target)->x, (g+target)->y);
+				moveToUnsafe(gladid, destx, desty);
 				(g+gladid)->action = ABILITY_CHARGE;
 				(g+gladid)->lockedfor = timeInterval;
 
-				//para a charge se o alvo esta invisivel ou saiu do alcance (teleport)
-				if ( (g+target)->buffs[BUFF_INVISIBLE].timeleft > 0 || getDistUnsafe(gladid, (g+target)->x, (g+target)->y) > (g+gladid)->vis )
-					stopcharge = 1;
+				if ( (g+target)->buffs[BUFF_INVISIBLE].timeleft <= 0 && getDistUnsafe(gladid, (g+target)->x, (g+target)->y) <= (g+gladid)->vis ){
+					destx = (g+target)->x;
+					desty = (g+target)->y;
+				}
 				
 				waitForLockedStatus(gladid);
 			}
 
-			if (!stopcharge){
-				attackMeleeUnsafe(gladid);
-				(g+gladid)->action = ABILITY_CHARGE;
-				if ((g+target)->buffs[BUFF_MOVEMENT].timeleft <= 0 || (g+target)->buffs[BUFF_MOVEMENT].value < 1)
-					addBuff(target , BUFF_MOVEMENT, 5, exp(-0.067 * (g+gladid)->STR));
-				r = 1;
-			}
+			attackMeleeUnsafe(gladid);
+			(g+gladid)->action = ABILITY_CHARGE;
+			if ((g+target)->buffs[BUFF_MOVEMENT].timeleft <= 0 || (g+target)->buffs[BUFF_MOVEMENT].value < 1)
+				addBuff(target , BUFF_MOVEMENT, 5, exp(-0.067 * (g+gladid)->STR));
+			r = 1;
 
 			if ( (g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0){
 				(g+gladid)->lockedfor = (g+gladid)->buffs[BUFF_MOVEMENT].timeleft;
@@ -942,7 +942,7 @@ int block(int gladid){
 			(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
 			waitForLockedStatus(gladid);
 
-			addBuff(gladid, BUFF_RESIST, 5, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 8));
+			addBuff(gladid, BUFF_RESIST, 7, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 8));
 
 			(g+gladid)->ap -= abilitycost[ABILITY_BLOCK];
 			r = 1;

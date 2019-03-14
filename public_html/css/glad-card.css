@@ -208,6 +208,7 @@
     box-sizing: border-box;
     display: flex;
     cursor: pointer;
+    z-index: 1;
 }
 
 .glad-preview .delete:hover {
