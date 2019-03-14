@@ -1,0 +1,26 @@
+{
+	"name": "getTargetHead",
+	"ptname": "pegaDirecaoAlvo",
+	"syntax": "float getTargetHead ( void );",
+	"description": {
+		"long": "Retorna o ângulo da direção que o alvo selecionado está posicionado, de acordo com a <a href='manual.php#nav-sim'>convenção da simulação</a>. O ângulo retornado é relativo à arena, e não ao gladiador. Caso o gladiador não tenha selecionado um alvo antes de chamar esta função, ou o alvo não esteja dentro do campo de visão do gladiador esta função retorna -1.",
+		"brief": "Retorna a direção do alvo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo o ângulo que o alvo está direcionado, ou -1 caso o alvo não esteja dentro do campo de visão do gladiador.",
+	"sample": "loop(){\n    if (!isTargetVisible())\n        getLowHp();\n    else{\n        if (abs(getHead() - getTargetHead()) >= 90){\n            stepLeft();\n            turnToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível determina a direção relativa do alvo e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
+	"seealso": [
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"isTargetVisible",
+		"getHead",
+		"doYouSeeMe",
+		"stepLeft",
+		"turnToTarget"
+	]
+}

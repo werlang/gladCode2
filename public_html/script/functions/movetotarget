@@ -1,0 +1,32 @@
+{
+	"name": "moveToTarget",
+	"ptname": "moveParaAlvo",
+	"syntax": "int moveToTarget ( void );",
+	"description": {
+		"long": "Faz com que o gladiador se mova para o ponto da arena onde está o alvo fixado. Primeiramente o gladiador vira-se na direção do alvo e após isso começa a se locomover em sua direção. Caso o gladiador já esteja em cima do ponto do alvo, a função retorna 1.",
+		"brief": "Move o gladiador em direção ao alvo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Retorna 0 caso o gladiador não esteja no ponto de destino, ou 1 caso contrário.",
+	"sample": "loop(){\n    if (getLowHp()){\n        if (getSpeed() > getTargetSpeed()){\n            if(getDistToTarget() <= 1)\n                attackMelee();\n            else\n                moveToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n    else\n        turnLeft(5);\n}",
+	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
+	"seealso": [
+		"getSpeed",
+		"getDistToTarget",
+		"getLowHp",
+		"attackRanged",
+		"attackMelee",
+		"getTargetX",
+		"getTargetY",
+		"getTargetSpeed",
+		"turnLeft",
+		"moveTo",
+		"stepForward",
+		"stepBack",
+		"stepLeft",
+		"stepRight"
+	]
+	
+}

@@ -1,0 +1,21 @@
+{
+	"name": "upgradeINT",
+	"ptname": "melhoraINT",
+	"syntax": "void upgradeINT ( void );",
+	"description": {
+		"long": "Altera a prioridade de melhoria de atributo do gladiador para Inteligência. Esta melhoria acontece toda vez que o gladiador <a href='manual.php#xp-table'>sobe de nível</a>. Caso as funções upgradeAGI ou upgradeSTR forem chamadas, o atributo melhorado não será mais a Inteligência, até que upgradeINT seja chamado novamente.",
+		"brief": "Indica que o gladiador deve aprimorar o atributo Inteligência."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "loop(){\n    if (getINT() >= 15)\n        upgradeSTR();\n    else\n        upgradeINT();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"explain": "Este exemplo analisa o valor do atributo Inteligência do gladiador, e caso ele seja pelo menos 15, chama a função upgradeSTR(), indicando que ele deseja aumentar sua Força. Até isso acontecer, a prioridade de melhoria de atributo é para a Inteligência. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+	"seealso": [
+		"upgradeSTR",
+		"upgradeAGI",
+		"getINT",
+		"moveTo"
+	]
+}

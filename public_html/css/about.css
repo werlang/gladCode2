@@ -1,0 +1,58 @@
+body{
+    margin: 0;
+    background-color: #edf1f3;
+    font-family: consolas, arial, sans-serif;
+    font-size: 16px;
+}
+
+#frame {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 50px;
+}
+
+#mission-container {
+    width: 100%;
+    background-color: #00638d;
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
+    z-index: 1;
+    margin-bottom: 100px;
+}
+
+#mission {
+    color: white;
+    z-index: 1;
+    font-family: roboto;
+    max-width: 700px;
+    font-size: 3em;
+    margin-bottom: 80px;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#mission #line2{
+    font-size: 0.8em;
+    color: #beecff;
+}
+
+.info-card {
+    display: flex;
+    background-color: white;
+    box-shadow: 1px 1px 5px 0px black;
+    border-radius: 3px;
+    z-index: 1;
+    width: 900px;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: roboto, helvetica, arial, sans-serif;
+    color: #616161;
+    align-items: flex-start;
+}
+
+#myself {
+    width: 200px;
+}

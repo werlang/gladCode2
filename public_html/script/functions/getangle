@@ -1,0 +1,23 @@
+{
+	"name": "getAngle",
+	"ptname": "pegaAngulo",
+	"syntax": "float getAngle ( float x, float y );",
+	"description": {
+		"long": "Retorna o ângulo entre o ponto definido pelas coordenadas x e y informadas por parãmetro e a localização do gladiador.",
+		"brief": "Retorna o ângulo até o ponto."
+	},
+	"param": [
+		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto."},
+		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto."}
+	],
+	"treturn": "Float contendo o ângulo entre o gladiador e o ponto informado.",
+	"sample": "float v = 1;\nloop(){\n    while(getX() != v || getY() != v){\n        turnToAngle(getAngle(v,v));\n        stepForward();\n    }\n    if (v == 1)\n        v = 24;\n    else\n        v = 1;\n}",
+	"explain": "No exemplo o gladiador se movimenta pela arena em diagonal.",
+	"seealso": [
+		"getX",
+		"getY",
+		"turnToAngle",
+		"stepForward",
+		"getDist"
+	]
+}

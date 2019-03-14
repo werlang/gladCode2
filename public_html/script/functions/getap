@@ -1,0 +1,23 @@
+{
+	"name": "getAp",
+	"ptname": "pegaPa",
+	"syntax": "float getAp ( void );",
+	"description": {
+		"long": "Retorna a quantidade de pontos de habilidade restantes do gladiador.",
+		"brief": "Retorna os pontos de habilidade do gladiador."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo a quantidade de pontos de habilidade restantes do gladiador.",
+	"sample": "loop(){\n\tif(getLowHp()){\n\t\tif (getAp() >= 40)\n\t\t\tfireball(getTargetX(), getTargetY());\n\t\telse\n\t\t\tattackRanged(getTargetX(), getTargetY());\n\t}\n\telse{\n\t\twhile(getX() != 12.5 || getY() != 12.5)\n\t\t\tteleport(12.5,12.5);\n\t\tturn(50);\n\t}\n}",
+	"explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
+	"seealso": [
+		"getLowHp",
+		"getTargetX",
+		"getTargetY",
+		"attackRanged",
+		"turn",
+		"teleport"
+	]
+}

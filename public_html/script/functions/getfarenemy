@@ -1,0 +1,26 @@
+{
+	"name": "getFarEnemy",
+	"ptname": "pegaInimigoDistante",
+	"syntax": "int getFarEnemy ( void );",
+	"description": {
+		"long": "Analisa o campo de visão do gladiador e caso haja pelo menos um inimigo seleciona o que estiver mais distante do gladiador e retorna 1. Um inimigo selecionado desta maneira vira o alvo do gladiador, e todas funções que acessam informações sobre o alvo irão interagir com o gladiador selecionado. Caso não haja nenhum inimigo no campo de visão a função retorna 0.",
+		"brief": "Procura um inimigo distante."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1.",
+	"sample": "loop(){\n    if (getLastHitTime() <= 2.0)\n        stepLeft();\n    else if (getFarEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else\n        turnLeft(5);\n}",
+	"explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo distante e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
+	"seealso": [
+		"getLastHitTime",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"turnLeft",
+		"stepLeft",
+		"getCloseEnemy",
+		"getLowHp",
+		"getHighHp"
+	]
+}
