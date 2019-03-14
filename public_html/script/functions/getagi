@@ -1,0 +1,23 @@
+{
+	"name": "getAGI",
+	"ptname": "pegaAGI",
+	"syntax": "int getAGI ( void );",
+	"description": {
+		"long": "Retorna o valor do atributo Agilidade (AGI) do gladiador.",
+		"brief": "Retorna o valor do atributo Agilidade (AGI) do gladiador."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Inteiro contendo o valor do atributo Agilidade do gladiador.",
+	"sample": "loop(){\n    if (getAGI() >= 15)\n        upgradeINT();\n    else\n        upgradeAGI();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"explain": "Este exemplo analisa o valor do atributo Agilidade do gladiador, e caso ele seja pelo menos 15, chama a função upgradeINT(), indicando que ele deseja aumentar sua Inteligência. Até isso acontecer, a prioridade de melhoria de atributo é para a Agilidade. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+	"seealso": [
+		"setAGI",
+		"getSTR",
+		"getINT",
+		"upgradeINT",
+		"upgradeAGI",
+		"moveTo"
+	]
+}

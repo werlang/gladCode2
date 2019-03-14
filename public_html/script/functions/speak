@@ -1,0 +1,28 @@
+{
+	"name": "speak",
+	"ptname": "fala",
+	"syntax": "void speak ( char * mensagem );",
+	"description": {
+		"long": "Faz com que apareça próximo ao gladiador uma caixa com a mensagem enviada por parâmetro, representando a fala do gladiador. A mensagem fica visível por 3 segundos e então desaparece. Esta função não possui propósito para efeitos da simulação, e é útil somente para fins de debug no código ou efeito costmético durante a batalha",
+		"brief": "Mostra um balão de fala com uma mensagem."
+	},
+	"param": [
+		{"name": "nome", "description": "String contendo a mensagem a ser mostrada."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "loop(){\r\n\tif (getHit()){\r\n\t\tspeak(\"Aieeee\");\r\n\t\tambush();\r\n\t\tturnToLastHit();\r\n\t}\r\n\telse if (getCloseEnemy()){\r\n\t\tattackRanged(getTargetX(), getTargetY());\r\n\t}\r\n\telse{\r\n\t\tif(getX() == 12.5 && getY() == 12.5){\r\n\t\t\tturn(30);\r\n\t\t\tspeak(\"Roda roda roda...\");\r\n\t\t}\r\n\t\telse\r\n\t\t\tmoveTo(12.5,12.5);\r\n\t}\r\n}",
+	"explain": "No exemplo o gladiador se move até o centro da arena, e quando chega fica girando enquanto diz uma mensagem. Caso veja um inimigo, atira contra ele. Caso seja acertado, se vira em direção ao inimigo usa a habilidade ambush e fala outra mensagem.",
+	"seealso": [
+		"getHit",
+		"ambush",
+		"turnToLastHit",
+		"getCloseEnemy",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"getX",
+		"getY",
+		"turn",
+		"moveTo"
+	]
+}

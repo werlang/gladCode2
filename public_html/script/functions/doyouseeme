@@ -1,0 +1,24 @@
+{
+	"name": "doYouSeeMe",
+	"ptname": "voceMeVe",
+	"syntax": "int doYouSeeMe ( void );",
+	"description": {
+		"long": "Verifica se o alvo selecionado está enxergando o gladiador. Em caso afirmativo retorna 1, ou 0 caso contrário. O alvo enxerga o gladiador caso o gladiador esteja dentro do campo de visão dele. Caso o alvo selecionado não esteja no campo de visão do gladiador a função também retorna 0.",
+		"brief": "Descobre se o alvo enxerga o gladiador."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Retorna 1 caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna 0.",
+	"sample": "loop(){\n    if (!isTargetVisible())\n        getLowHp();\n    else{\n        if (doYouSeeMe()){\n            stepLeft();\n            turnToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível verifica se o alvo enxerga o gladiador e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
+	"seealso": [
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"isTargetVisible",
+		"stepLeft",
+		"turnToTarget"
+	]
+}

@@ -1,0 +1,26 @@
+{
+	"name": "attackMelee",
+	"ptname": "ataqueCorpo",
+	"syntax": "void attackMelee ( void );",
+	"description": {
+		"long": "Realiza um ataque corpo-a-corpo. Todos gladiadores inimigos que estiverem à uma distância de até 1 passo e num arco de 180 graus da frente do gladiador atacante são acertados. Todos gladiadores acertados pelo ataque recebem dano igual ao valor do <a href='manual.php#nav-glad'>atributo dano corpo-a-copo</a> do gladiador atacante.",
+		"brief": "Realiza um ataque corpo-a-corpo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "loop(){\n    if (getLowHp()){\n        if (getSpeed() > getTargetSpeed()){\n            if(getDistToTarget() <= 1)\n                attackMelee();\n            else\n                moveToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n    else\n        turnLeft(5);\n}",
+	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
+	"seealso": [
+		"getDistToTarget",
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"getSpeed",
+		"getTargetSpeed",
+		"turnLeft",
+		"moveToTarget"
+	]
+}

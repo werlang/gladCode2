@@ -1,0 +1,26 @@
+{
+	"name": "getAmbushTimeLeft",
+	"ptname": "tempoEmboscada",
+	"syntax": "float getAmbushTimeLeft ( void );",
+	"description": {
+		"long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> expire.",
+		"brief": "Retorna o tempo restante para expirar o efeito Invisibilidade."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo o tempo restante até o efeito proteção expirar.",
+	"sample": "int start = 1;\nloop(){\n\tif (start){\n\t\tif(moveTo(12.5,12.5))\n\t\t\tstart = 0;\n\t}\n\tif (getLowHp()){\n\t\tif(doYouSeeMe()){\n\t\t\tturnToTarget();\n\t\t\tstepLeft();\n\t\t}\n\t\telse{\n\t\t\tif (getAmbushTimeLeft() > 0)\n\t\t\t\tassassinate(getTargetX(), getTargetY());\n\t\t\telse\n\t\t\t\tambush();\n\t\t}\n\t}\n\telse if (!start)\n\t\tturn(50);\n}",
+	"explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
+	"seealso": [
+		"getLowHp",
+		"getAp",
+		"moveTo",
+		"doYouSeeMe",
+		"turnToTarget",
+		"stepLeft",
+		"turn",
+		"ambush",
+		"assassinate"
+	]
+}

@@ -1,0 +1,25 @@
+{
+	"name": "teleport",
+	"ptname": "teletransporte",
+	"syntax": "int teleport ( float x, float y );",
+	"description": {
+		"long": "Transporta instantaneamente o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro. A direção do gladiador ao chegar ao ponto de destino dependerá do ponto onde ele estava antes de lançar a habilidade, como se ele estivesse olhando para o destino ao lançar a habilidade. A distância máxima que o gladiador poderá transpor ao lançar esta habilidade será de 5 passos + 1 passo para cada ponto de <a href='manual.php#nav-glad'>Inteligência</a> que ele possuir. Caso o ponto de destino seja mais distante que a distância máxima alcançada pela habilidade, a habilidade deslocará o gladiador a maior distância possível, levando em consideração uma trajetória em linha reta até o ponto de destino.",
+		"brief": "Transporta instantaneamente o gladiador."
+	},
+	"param": [
+		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+	],
+	"treturn": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
+	"sample": "loop(){\n\tif(getLowHp()){\n\t\tif (getAp() >= 40)\n\t\t\tfireball(getTargetX(), getTargetY());\n\t\telse\n\t\t\tattackRanged(getTargetX(), getTargetY());\n\t}\n\telse{\n\t\twhile(getX() != 12.5 || getY() != 12.5)\n\t\t\tteleport(12.5,12.5);\n\t\tturn(50);\n\t}\n}",
+	"explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
+	"seealso": [
+		"getLowHp",
+		"getAp",
+		"getTargetX",
+		"getTargetY",
+		"attackRanged",
+		"turn",
+		"fireball"
+	]
+}

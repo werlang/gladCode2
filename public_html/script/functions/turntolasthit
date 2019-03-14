@@ -1,0 +1,30 @@
+{
+	"name": "turnToLastHit",
+	"ptname": "viraFuiAcertado",
+	"syntax": "void turnToLastHit ( void );",
+	"description": {
+		"long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do ponto de onde originou o último ataque recebido. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá travar na ação até que complete a rotação.",
+		"brief": "Rotaciona o gladiador para a origem do último ataque recebido."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "loop(){\n    if (getHit()){\n        turnToLastHit();\n\t\tgetCloseEnemy();\n\r\n\t\tif(isTargetVisible())\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"explain": "No exemplo o gladiador espera até sofrer um ataque, e quando isso acontecer, ele se vira para a direção onde recebeu o ataque, fixa no alvo e começa a atacá-lo.",
+	"seealso": [
+		"getLowHp",
+		"moveTo",
+		"doYouSeeMe",
+		"stepLeft",
+		"getAmbushTimeLeft",
+		"assassinate",
+		"ambush",
+		"getHit",
+		"turnLeft",
+		"turnRight",
+		"turn",
+		"turnTo",
+		"turnToAngle"
+	]
+}

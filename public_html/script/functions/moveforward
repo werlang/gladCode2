@@ -1,0 +1,21 @@
+{
+	"name": "moveForward",
+	"ptname": "moveFrente",
+	"syntax": "void moveForward ( float passos );",
+	"description": {
+		"long": "Faz com que o gladiador se mova para frente na arena uma distância específica. A distância será o número de passos determinado pelo parâmetro recebido. Esta função trava o gladiador na ação de movimento até que ele tenha completado todo o percurso.",
+		"brief": "Move o gladiador para frente uma quantidade de passos."
+	},
+	"param": [
+		{"name": "passos", "description": "Float contendo a quantidade de passos que o gladiador irá se deslocar."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "int start = 1;\r\n\r\nloop(){\r\n\tif (start){\r\n\t    while(!moveTo(7.5,12.5));\r\n\t    turnTo(12.5,12.5);\r\n\t    start = 0;\r\n\t}\r\n    moveForward(10);\r\n    turn(180);\r\n}",
+	"explain": "No exemplo o gladiador se desloca até um ponto da arena, e a partir dali ele fica andando de um lado para o outro.",
+	"seealso": [
+		"moveTo",
+		"turnTo",
+		"turn",
+		"stepForward"
+	]
+}
