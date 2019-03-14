@@ -203,11 +203,11 @@
 					<tr>
 						<td><a href='function.php?f=fireball'>Fireball</a></td>
 						<td>50</td>
-						<td>Arremessa um projétil que causa (0.5 x INT) de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem (1.5 x INT) de dano de queimadura ao longo de 3s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
+						<td>Arremessa um projétil que causa (0.7 x INT) de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem (1.6 x INT) de dano de queimadura ao longo de 3s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
 					</tr>
 					<tr>
 						<td><a href='function.php?f=teleport'>Teleport</a></td>
-						<td>70</td>
+						<td>50</td>
 						<td>O gladiador imediatamente se transporta para outra localização. A distância máxima percorrida é limitada em 5p + (1p x INT)</td>
 					</tr>
 					<tr>
@@ -218,7 +218,7 @@
 					<tr>
 						<td><a href='function.php?f=block'>Block</a></td>
 						<td>50</td>
-						<td>Reduz todo dano levado em 10% + (STR/(STR+8))% por 5s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
+						<td>Reduz todo dano levado em 10% + (STR/(STR+8))% por 7s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
 					</tr>
 					<tr>
 						<td><a href='function.php?f=assassinate'>Assassinate</a></td>
@@ -227,8 +227,8 @@
 					</tr>
 					<tr>
 						<td><a href='function.php?f=ambush'>Ambush</a></td>
-						<td>60</td>
-						<td>Torna-se invisível por 2s + (0.4s x AGI). O efeito da habilidade é cancelado ao realizar um ataque ou lançar uma habilidade. Ataques realizados enquanto invisível atordoam o alvo por 2s</td>
+						<td>70</td>
+						<td>Torna-se invisível por 2s + (0.4s x AGI). O efeito da habilidade é cancelado ao realizar um ataque ou lançar uma habilidade. Ataques realizados enquanto invisível atordoam o alvo por 1.5s</td>
 					</tr>
 				</tbody>
 			</table>

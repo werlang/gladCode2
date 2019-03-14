@@ -8,7 +8,7 @@ globais do ambiente, herdado do gladCode1
 #define GLAD_HITBOX 0.5
 #define XP_FACTOR 0.2
 #define XP_FIRSTLVL 25
-#define POISON_TIME 45 //quanto tempo ele começa a aparecer
+#define POISON_TIME 45 //quanto tempo ele comeï¿½a a aparecer
 #define POISON_SPEED 10 //quanto tempo leva para andar 1p
 
 #define PROJECTILE_TYPE_ATTACK 0
@@ -35,8 +35,8 @@ globais do ambiente, herdado do gladCode1
 #define ACTION_WAITING 9
 #define ACTION_NONE 10
 
-//custos de cada habilidade. os índices batem com as constantes dos buffs
-int abilitycost[6] = {50,70,30,50,30,60};
+//custos de cada habilidade. os ï¿½ndices batem com as constantes dos buffs
+int abilitycost[6] = {50,50,30,50,30,70};
 
 struct buff {
     float timeleft;
@@ -65,7 +65,7 @@ struct gladiador{
 	char user[50];
     float x; //pos horizontal
     float y; //pos vertical
-    float head; //angulo da cabeca 0..360, cresce no sentido horário,
+    float head; //angulo da cabeca 0..360, cresce no sentido horï¿½rio,
 
     int STR; //forca
     float hp; //vida
@@ -87,11 +87,11 @@ struct gladiador{
     float vrad; //raio de visao, em g
     float vis; //alcance de visao, em p
     float lockedfor; //tempo que esta trancado em uma acao
-    float lasthitangle; //angulo que recebeu o último ataque
+    float lasthitangle; //angulo que recebeu o ï¿½ltimo ataque
 	float lasthittime; //guarda quanto tempo atras o gladiador recebeu ataque
 	int lasthitnotification; //se houve um hit desde a ultima verificacao
-    int targetlocked; //porta do gladiador que está fixado
-	int targetsaved; //porta do gladiador salvo na memória
+    int targetlocked; //porta do gladiador que estï¿½ fixado
+	int targetsaved; //porta do gladiador salvo na memï¿½ria
     int xp; //experiencia do gladiador (em %)
     int up; //qual atributo vai ganhar upgrade quando subir de nivel
     struct buff buffs[N_BUFFS]; //vetor de buffs
@@ -111,7 +111,7 @@ FILE *outArq;
 float screenW = 25;
 float screenH = 25;
 float timeInterval = 0.1; //intervalo de tempo da simulacao
-float timeLimit = 200; //tempo limite da para o evento de fim da simulação
+float timeLimit = 200; //tempo limite da para o evento de fim da simulaï¿½ï¿½o
 //int rounds, estado;
 //int winners[3];
 int readytostart = 0;

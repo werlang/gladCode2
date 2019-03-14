@@ -82,30 +82,31 @@
 			$code = mysql_escape_string($_SESSION['code']);
 
 			if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
-				if ($_POST['action'] == "INSERT"){
-					$sql = "SELECT * FROM gladiators WHERE master = '$user'";
-					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-					if ($result->num_rows >= $limit)
-						echo "{\"LIMIT\":$limit}";
-					else{
-						$sql = "SELECT cod FROM gladiators WHERE master = '$user' AND name = '$name'";
+				$sql = "SELECT cod FROM gladiators WHERE name = '$name'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				if ($result->num_rows == 0){
+					if ($_POST['action'] == "INSERT"){
+						$sql = "SELECT * FROM gladiators WHERE master = '$user'";
 						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-						if ($result->num_rows == 0){
+						if ($result->num_rows >= $limit)
+							echo "{\"LIMIT\":$limit}";
+						else{
 							$sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$version')";
 							if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 							echo "{\"ID\":". $conn->insert_id ."}";
 						}
-						else
-							echo "EXISTS";
+					}
+					elseif ($_POST['action'] == "UPDATE"){
+						$id = mysql_escape_string($_POST['id']);
+						$user = $_SESSION['user'];
+
+						$sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', version = '$version' WHERE cod = '$id' AND master = '$user'";
+						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+						echo "{\"ID\":". $id ."}";
 					}
 				}
-				elseif ($_POST['action'] == "UPDATE"){
-					$id = mysql_escape_string($_POST['id']);
-					$user = $_SESSION['user'];
-					$sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', version = '$version' WHERE cod = '$id' AND master = '$user'";
-					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-					echo "{\"ID\":". $id ."}";
-				}
+				else
+					echo "EXISTS";
 			}
 			else {
 				echo "INVALID";

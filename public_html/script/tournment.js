@@ -15,6 +15,8 @@ var istep;
 
 $(document).ready( function() {
 	$('#canvas-container').hide();
+
+	$('#footer-wrapper').addClass('white');
 	
 	var dz = new Dropzone("#code-box", {
 		url: "back_upload.php",

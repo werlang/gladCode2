@@ -1,5 +1,4 @@
 var editor;
-var fontsize = 18;
 var saved = true;
 var tested = true;
 var gladid;
@@ -17,6 +16,7 @@ $(document).ready( function() {
 		action: "GET"
 	})
 	.done( function(data){
+		//console.log(data);
 		if (data != "NULL"){
 			user = JSON.parse(data);
 			$('#login').html(user.nome);
@@ -31,6 +31,9 @@ $(document).ready( function() {
 			pic.onerror = function(){
 				$('#profile-icon img').attr('src', "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");
 			}
+
+			editor.setTheme("ace/theme/"+ user.theme);
+			editor.setFontSize(user.font +"px");
 		}
 	});
 	
@@ -57,8 +60,6 @@ $(document).ready( function() {
 	load_editor();
 	editor.focus();
 
-	$('#code').css('font-size', fontsize + 'px');
-	
 	$('#float-card .glad-preview').click( function(){
 		$('#skin').click();
 	});
@@ -97,6 +98,7 @@ $(document).ready( function() {
 				["Sim","Não"])
 			.then( function(data){
 				if (data == "Sim")
+					saved = true;
 					window.location.href = "editor.php";
 			});
 		}
@@ -192,6 +194,7 @@ $(document).ready( function() {
 				["Sim","Não"])
 			.then( function(data){
 				if (data == "Sim"){
+					saved = true;
 					var id = $('#fog-glads .glad-preview.selected').data('id');
 					window.location.href = "editor.php?g="+id;
 				}
@@ -210,7 +213,7 @@ $(document).ready( function() {
 					if (gladid)
 						action = "UPDATE";
 					var nome = $('#distribuicao #nome').val();
-					$.post( "../back_glad.php", {
+					$.post( "back_glad.php", {
 						action: action,
 						id: gladid,
 						nome: nome,
@@ -223,7 +226,7 @@ $(document).ready( function() {
 						if (data.search("LIMIT") != -1)
 							showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
 						else if (data == "EXISTS")
-							showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por um de seus gladiadores");
+							showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
 						else if (data == "INVALID")
 							showMessage("CHEATER");
 						else if (data.search("ID") != -1){
@@ -461,6 +464,66 @@ $(document).ready( function() {
 		}
 	});
 
+	$('#settings').click( function(){
+		var themes = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn", "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic", "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal", "textmate", "tomorrow", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "tomorrow_night", "twilight", "vibrant_ink", "xcode"];
+
+		$('body').append("<div id='fog'><div id='settings-window'><div id='title'><h2>Preferências do editor</h2></div><div id='settings-content'><div id='options'><h3>Temas</h3><div id='list'></div><h3>Tamanho da fonte</h3><div id='font-size'><button class='button font-small'><img src='icon/font_minus.png'></button><button class='button font-big'><img src='icon/font_plus.png'></button></div></div><div id='sample'><h3>Visualização</h3><pre id='code-sample'></pre></div></div><div id='button-container'><button class='button' id='cancel'>Cancelar</button><button class='button' id='change'>ALTERAR</button></div></div></div>");
+
+		for (var i in themes){
+			$('#settings-window #list').append("<div class='theme'>"+ themes[i] +"</div>");
+			if (user.theme == themes[i])
+			$('#settings-window #list .theme').last().addClass('selected');
+		}
+
+		var sample = ace.edit("code-sample");
+		sample.setTheme("ace/theme/"+ user.theme);
+		sample.setFontSize(user.font +"px");
+		sample.getSession().setMode("ace/mode/c_cpp");
+		sample.setReadOnly(true);
+
+		sample.setValue("int start = 1;\n\nloop(){\n\tupgradeSTR();\n\tif (getCloseEnemy()){\n\t\tfloat dist = getDist(getTargetX(), getTargetY());\n\t\tif (dist < 0.8 && isTargetVisible()){\n\t\t\tattackMelee();\n\t\t}\n\t\telse\n\t\t\tmoveToTarget();\n\t}\n\telse{\n\t\tif (start){\n\t\t\tif(moveTo(12.5,12.5))\n\t\t\t\tstart = 0;\n\t\t}\n\t\telse\n\t\t\tturnLeft(50);\n\t}\n}", -1);
+
+		$('#settings-window #list .theme').click( function(){
+			$('#settings-window #list .theme').removeClass('selected');
+			$(this).addClass('selected');
+
+			var theme = $(this).html();
+			sample.setTheme("ace/theme/"+theme);
+		});
+
+		$('#settings-window #font-size .button').click( function(){
+			var font = parseInt(sample.getFontSize());
+			if ($(this).hasClass('font-small')){
+				sample.setFontSize(font-2);
+			}
+			else if ($(this).hasClass('font-big')){
+				sample.setFontSize(font+2);
+			}
+			sample.resize();
+		});
+
+		$('#settings-window #cancel').click( function(){
+			$('#fog').remove();
+		});
+		$('#settings-window #change').click( function(){
+			var theme = sample.getTheme().split("/")[2];
+			var font = parseInt(sample.getFontSize());
+
+			editor.setTheme(sample.getTheme());
+			editor.setFontSize(sample.getFontSize());
+			$('#fog').remove();
+
+			$.post("back_login.php",{
+				action: "EDITOR",
+				theme: theme,
+				font: font
+			}).done( function(){
+				user.theme = theme;
+				user.font = font;
+			});
+		});
+	});
+
 	$('#help').click( function(){
 		$('body').append("<div id='fog'><div id='help-window'><div id='title'>Que tipo de ajuda você gostaria?</div><div id='cat-container'><div id='docs' class='categories'><img src='icon/document.png'><span>Leitura</span></div><div id='video' class='categories'><img src='icon/video.png'><span>Vídeo</span></div><div id='tutorial' class='categories'><img src='icon/tutor.png'><span>Tutorial</span></div></div>");
 		
@@ -558,7 +621,8 @@ function getGladFromFile(filename){
 function load_editor(){
 	ace.require("ace/ext/language_tools");
     editor = ace.edit("code");
-    editor.setTheme("ace/theme/dreamweaver");
+	editor.setTheme("ace/theme/dreamweaver");
+	editor.setFontSize(18);
     editor.session.setMode("ace/mode/c_cpp");
 	editor.getSession().setUseWrapMode(true);
 	editor.$blockScrolling = Infinity;
@@ -1350,4 +1414,9 @@ function setGladImage(index, skin){
 	});
 }
 
-
+window.onbeforeunload = function() {
+	if (saved)
+		return null;
+	else
+    	return true;
+};

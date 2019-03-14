@@ -203,7 +203,7 @@ void addBuff(int id, int code, float timeleft, float value){
 void dealDamage(int gladid, int id, float value){
     //se estiver invisivel, causa stun
     if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft > 0){
-        addBuff(id, BUFF_STUN, 2 , 0);
+        addBuff(id, BUFF_STUN, 1.5 , 0);
     }
 	
     //caso a vitima tenha o buff de resistencia e esteja virado para o atacante, leva menos dano
@@ -338,7 +338,7 @@ void updateProjectiles(){
                     float dy = (g+m)->y - a->y;
                     float dist = sqrt( pow(dx,2) + pow(dy,2) );
                     if (dist <= 2){
-                        float dmg = (1-(dist/2)) * a->dmg * 3; //dano = 0.5*INT, burn= 1.0*INT = 0.5*3
+                        float dmg = (1-(dist/2)) * a->dmg * 2.2857; //dano = 0.7*INT, burn= 1.6*INT = 1.6/0.7=2.2857
                         addBuff(m, BUFF_BURN, 3, dmg / 3 * timeInterval); //3 segundos
 						setXp(a->owner, dmg, m); //xp pelo burn
                         (g+m)->lasthitangle = getNormalAngle(getAngleFromAB((g+m)->x, (g+m)->y, a->x - a->spdx / travelunit, a->y - a->spdy / travelunit));
@@ -346,7 +346,7 @@ void updateProjectiles(){
                 }
             }
             else if (hitglad && a->type == PROJECTILE_TYPE_STUN){
-                addBuff(j, BUFF_STUN, 2 , 0);
+                addBuff(j, BUFF_STUN, 1.5 , 0);
             }
 			
             struct projectile *t = a->next;
