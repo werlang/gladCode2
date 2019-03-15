@@ -151,7 +151,7 @@ body {
 	display: flex;
 }
 
-#fog-battle .button,
+#fog-battle #button-container .button,
 #fog-glads .button {
     width: 100%;
     border-radius: 0px;
@@ -454,4 +454,43 @@ body {
 	border-radius: 0px;
 	height: 50px;
 	font-size: 1.3em;
+}
+
+#code-box {
+    background-color: #eee;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px black;
+    max-width: 100%;
+    width: 600px;
+    overflow: hidden;
+}
+
+#code-box pre {
+    max-height: 90vh;
+    margin: 0;
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
+#code-box #button-container {
+    display: flex;
+    justify-content: center;
+}
+
+#code-box .button {
+    font-size: 1.2em;
+    font-family: roboto;
+    border: none;
+    padding: 5px 0px;
+    outline: none;
+    color: white;
+    background-color: #00638d;
+    width: 100%;
+    border-radius: 0px 0px 3px 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#code-box .button:hover {
+    background-color: #1e86d8;
 }

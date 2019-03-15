@@ -50,13 +50,6 @@
 			</div>
 		</div>
 	</div>
-	<div id='footer-wrapper' class='short'>
-		<div id='footer'>
-			<div>© 2018 gladcode.tk</div>
-			<div>Pablo Werlang</div>
-			<div><a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></div>
-			<div><a target='_blank' href='creditos.txt'>Créditos</a></div>
-		</div>
-	</div>
+	<?php include("footer.php"); ?>
 </body>
 </html>

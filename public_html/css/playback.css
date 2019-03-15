@@ -634,23 +634,36 @@ body{
     height: 50px;
 }
 
-#url {
-	font-size: 1.3em;
-    padding: 15px;
-    box-sizing: border-box;
-    cursor: pointer;
-	transition: all 1s;
-    justify-content: center;
+#end-message .button.small {
+    width: 80px;
 }
 
-#url.clicked {
-    background-color: #2ca62291;
-    border-color: #3c9e4a;
+#end-message #button-container img {
+    height: 100%;
+    padding: 8px 0px;
+    box-sizing: border-box;
+}
+
+
+#url {
+	font-size: 1.3em;
+    padding: 15px 5px;
+    box-sizing: border-box;
+    justify-content: center;
+    cursor: default;
+}
+
+#url #link {
+    width: 100%;
+}
+
+#url #site {
+    margin-left: 10px;
 }
 
 #url #hash {
 	background-color: #02364c;
-    padding: 5px 10px;
+    padding: 15px 10px;
     border-radius: 3px;
     margin-top: 5px;
     height: 1em;
@@ -658,7 +671,38 @@ body{
     align-items: center;
     justify-content: center;
     width: 100%;
-	font-family: consolas;
+    font-family: consolas;
+    box-sizing: border-box;
+    margin: 5px 0px 15px 0px;
+	transition: all 1s;
+}
+
+#url #hash.clicked {
+    background-color: #2ca62291;
+    border-color: #3c9e4a;
+    opacity: 0;
+}
+
+#url #social {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+#url #social .button {
+    background-color: transparent;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    padding: 5px 10px;
+}
+
+#url #social img {
+    height: 30px;
+}
+
+#url #social .button:hover {
+    background-color: #1e86d8;
 }
 
 #fps{

@@ -480,10 +480,10 @@ int isSlowed(){
 	return atoi(r);
 }
 void speak(char *message){
-	char m[1000], r[10];
+	char m[1000], apiMessage[1000], r[10];
 	strncpy(m, message, 1000);
-	m[999] = '\0';
-	sprintf(m, "speak %s", m);
-	sendMessage(m, r);
+	sprintf(apiMessage, "speak %s", m);
+	apiMessage[999] = '\0';
+	sendMessage(apiMessage, r);
 }
 

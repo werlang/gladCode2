@@ -7,7 +7,7 @@ var timestep = 0;
 var pausesim = true;
 var stepIncrement = 1;
 var istep;
-var tournHash;
+var tournHash, loghash;
 
 $(document).ready( function() {
 
@@ -23,13 +23,15 @@ $(document).ready( function() {
 		
 		if ($('#log').html().length > 32)
 			showMessage('Erro na URL');
-		else
+		else{
+			loghash = $('#log').html();
 			queryLog();
+		}
 		
 		function queryLog(){
 			$.post( "back_log.php", { 
 				action: "GET",
-				loghash: $('#log').html()
+				loghash: loghash
 			}).done( function(data){
 				//console.log(data);
 				if (data == "NULL"){
@@ -281,13 +283,37 @@ function start_timer(steps){
 						name = "Empate";
 						team = "";
 					}
-					$('#canvas-container').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button></div></div></div>");
+					$('#canvas-container').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
 					$('#end-message #retornar').click( function() {
 						show_final_score = false;
 						$('#fog').remove();
 						if (tournHash)
 							window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
 					});
+
+					$('#end-message #share').click( function() {
+						$('#end-message').hide();
+
+						var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://gladcode.tk/playback.php?log="+ loghash +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
+
+						var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=https://gladcode.tk/playback.php?log="+ loghash +"' target='_blank'><img src='icon/facebook.png'></a>";
+
+						var whatsapp = "<div id='whatsapp' class='button' title='Compartilhar pelo Whatsapp'><img src='icon/whatsapp.png'></div>";
+
+						$('#fog').append("<div id='url'><div id='link'><span id='site'>https://gladcode.tk/playback.php?log=</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='link' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div></div>");
+						
+						$('#url #social #link').click( function(){
+							copyToClipboard('https://gladcode.tk/playback.php?log='+ loghash);
+							$('#url #hash').html('Link copiado');
+							$('#url #hash').addClass('clicked');
+							setTimeout(function(){
+								$('#url #hash').removeClass('clicked');
+								$('#url #hash').html(loghash);
+							},500);
+						});
+						
+					});
+
 					if (id)
 						$('#end-message #image').html(getSpriteThumb(hashes[newindex[id]],'walk','down'));
 					$('#end-message').hide();
@@ -313,7 +339,7 @@ function create_ui(nglad){
 	$('#ui-container').html("");
 	for (i=0 ; i<nglad ; i++){
 		$('#ui-container').append("<div class='ui-glad'></div>");
-		$('.ui-glad').last().load("../ui_template.html", function(){
+		$('.ui-glad').last().load("ui_template.html", function(){
 		});
 	}
 }

@@ -19,6 +19,10 @@
 			<div id='line2'>É nisso que a gladCode acredita</div>
 		</div></div>
 		<div class='info-card'>
+			<div id='title'>A História</div>
+			<div>A ideia por trás da gladCode surgiu no fim de 2016 </div>
+		</div>
+		<div class='info-card'>
 			<img class='image' id='myself' src='image/pablo.jpg'>
 			<div class='text'>
 				Sou Pablo Werlang. Graduado em <a href='ecomp.c3.furg.br'>Engenharia de Computação</a> em 2011 pela <a href='furg.br'>Universidade Federal do Rio Grande (FURG)</a>, sou fascinado por games desde muito pequeno. Cresci jogando coisas como <a href='https://pt.wikipedia.org/wiki/The_Legend_of_Zelda_(s%C3%A9rie)'>Zelda</a>, <a href='https://pt.wikipedia.org/wiki/Chrono_Trigger'>Chrono Trigger</a>, <a href='https://pt.wikipedia.org/wiki/Final_Fantasy'>Final Fantasy</a>, <a href='https://pt.wikipedia.org/wiki/Warcraft'>Warcraft</a>, <a href='https://pt.wikipedia.org/wiki/Age_of_Empires'>Age of Empires</a>, <a href='https://pt.wikipedia.org/wiki/Monkey_Island'>Monkey Island</a>, etc. Sempre fui o nerd da turma, e com muito orgulho.
