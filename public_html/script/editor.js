@@ -97,9 +97,10 @@ $(document).ready( function() {
 				"Deseja criar um novo gladiador e perder as alterações feitas no gladiador atual?",
 				["Sim","Não"])
 			.then( function(data){
-				if (data == "Sim")
+				if (data == "Sim"){
 					saved = true;
 					window.location.href = "editor.php";
+				}
 			});
 		}
 	});
@@ -471,13 +472,15 @@ $(document).ready( function() {
 
 		for (var i in themes){
 			$('#settings-window #list').append("<div class='theme'>"+ themes[i] +"</div>");
-			if (user.theme == themes[i])
-			$('#settings-window #list .theme').last().addClass('selected');
+			if (user && user.theme == themes[i] || !user && themes[i] == "dreamweaver")
+				$('#settings-window #list .theme').last().addClass('selected');
 		}
 
 		var sample = ace.edit("code-sample");
-		sample.setTheme("ace/theme/"+ user.theme);
-		sample.setFontSize(user.font +"px");
+		if (user){
+			sample.setTheme("ace/theme/"+ user.theme);
+			sample.setFontSize(user.font +"px");
+		}
 		sample.getSession().setMode("ace/mode/c_cpp");
 		sample.setReadOnly(true);
 
@@ -513,14 +516,16 @@ $(document).ready( function() {
 			editor.setFontSize(sample.getFontSize());
 			$('#fog').remove();
 
-			$.post("back_login.php",{
-				action: "EDITOR",
-				theme: theme,
-				font: font
-			}).done( function(){
-				user.theme = theme;
-				user.font = font;
-			});
+			if (user){
+				$.post("back_login.php",{
+					action: "EDITOR",
+					theme: theme,
+					font: font
+				}).done( function(){
+					user.theme = theme;
+					user.font = font;
+				});
+			}
 		});
 	});
 
