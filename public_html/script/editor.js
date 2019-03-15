@@ -333,6 +333,7 @@ $(document).ready( function() {
 	
 	$('#fog-battle #list .glad').click( function(){
 		var filename = "samples/gladbots/"+ $(this).data('filename') +".c";
+		var code;
 		if ($(this).hasClass('selected')){
 			$(this).removeClass('selected');
 			$('#fog-battle .glad-card-container').html("");
@@ -352,11 +353,23 @@ $(document).ready( function() {
 					$('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
 					$('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
 					$('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
+					code = data.code;
 				});
-				$('#fog-battle .glad-preview .delete').remove()
-				$('#fog-battle .glad-preview .code').remove();
+				$('#fog-battle .glad-preview .delete').remove();
+
+				$('#fog-battle .glad-preview .code .button').click( function(){
+					$('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
+					Prism.highlightElement($('code')[0]);
+		
+					$('#code-box #close').click( function(e){
+						$('#fog').remove();
+					});
+		
+				});
+		
 			});
 		}
+
 		
 		if ($('#fog-battle #list .glad.selected').length > 0){
 			var length = $('#fog-battle #list .glad.selected').length;

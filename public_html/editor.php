@@ -12,6 +12,7 @@
 	<link type='text/css' rel='stylesheet' href='css/slider.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/glad-card.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
 	<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script src="jquery-ui/jquery-ui.js"></script>
@@ -22,6 +23,7 @@
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/runSim.js"></script>
 	<script type="text/javascript" src="script/tutorial.js"></script>
+	<script type="text/javascript" src="script/prism.js"></script>
 </head>
 <body>
 	<?php
