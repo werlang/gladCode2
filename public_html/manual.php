@@ -131,7 +131,7 @@
 			<p>Existem também alguns atributos fixos dos gladiadores, que não sofrem mudanças em seus valores ao longo da simulação:</p>
 			
 			<ul>
-				<li><strong>Raio de visão</strong>: 60 graus - Arco de visão do gladiador</li>
+				<li><strong>Raio de visão</strong>: 120 graus - Arco de visão do gladiador</li>
 				<li><strong>Distância de visão</strong>: 9 passos - Distância máxima que o gladiador enxerga</li>
 			</ul>
 			

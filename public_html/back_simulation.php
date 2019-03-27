@@ -235,7 +235,7 @@
 
 	function save_log($conn, $log){
 		$version = file_get_contents("version");
-		$hash = md5('log'.microtime()*rand());
+		$hash = substr(md5('log'.microtime()*rand()), 0,16);
 
 		$single = "0";
 		if (isset($_POST['single']) && $_POST['single'] == "true"){

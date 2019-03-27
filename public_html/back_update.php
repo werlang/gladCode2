@@ -13,13 +13,12 @@
 			else{
 				$version = $_POST['version'];
 				$keepup = $_POST['keepup'];
-				file_put_contents("version", $version);
-				
 				if ($keepup == "true"){
 					$oldversion = file_get_contents("version");
 					$sql = "UPDATE gladiators SET version = '$version' WHERE version = '$oldversion'";
 					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				}
+				file_put_contents("version", $version);
 				echo "OK";
 			}
 		}

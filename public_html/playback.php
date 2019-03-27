@@ -6,11 +6,16 @@
 		$loghash = mysql_escape_string( $_GET['log']);
 	if (isset($_GET['t']))
 		$tnm = mysql_escape_string($_GET['t']);
+
+	if (strpos($_SERVER['REQUEST_URI'], "playback.php?log=") !== false){
+		header("Location: play/". $loghash);
+	}
 ?>
 <html>
 <head>
 	<meta charset='utf-8' />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<BASE href="../">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Visualizar batalha</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
@@ -26,8 +31,7 @@
 	<script type="text/javascript" src="script/phaser.js"></script>
 	<script type="text/javascript" src="script/assets.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
-	
-	<script src="script/dropzone.js"></script>
+	<script type="text/javascript" src="script/dropzone.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>

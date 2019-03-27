@@ -2,8 +2,13 @@
 
 <?php
 	session_start();
-	if(!isset($_SESSION['user']))
-		header("Location: https://gladcode.tk");
+	if(!isset($_SESSION['user'])){
+		if (isset($_GET['t'])){
+			header("Location: index.php?login=". $_GET['t']);
+		}
+		else
+			header("Location: index.php");
+	}
 ?>
 
 <html>

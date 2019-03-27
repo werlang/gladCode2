@@ -1,0 +1,6 @@
+RewriteEngine On
+
+RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
+
+RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
