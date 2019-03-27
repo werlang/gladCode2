@@ -7,29 +7,143 @@
 	<title>gladCode - Sobre</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link type='text/css' rel='stylesheet' href='css/about.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/radio.css'/> 
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="script/about.js"></script>
+	<script type="text/javascript" src="script/radio.js"></script>
 </head>
 <body>
     <?php include("header.php"); ?>
 	<div id='frame'>
 		<div id='mission-container'><div id='mission'>
 			<div id='line1'>Programar pode ser divertido</div>
-			<div id='line2'>É nisso que a gladCode acredita</div>
+			<div id='line2'>É nisso que a gladCode acredita. Trazendo o ambiente de programação para uma temática interessante como dos jogos, em que o usuário veja graficamente o resultado de seus esforços através das ações de seu avatar, a gladCode buscar incitar iniciantes e experts em programação para competirem e melhorarem suas habilidades. Diversão e aprendizado é o nosso objetivo.</div>
 		</div></div>
-		<div class='info-card'>
-			<div id='title'>A História</div>
-			<div>A ideia por trás da gladCode surgiu no fim de 2016 </div>
-		</div>
-		<div class='info-card'>
-			<img class='image' id='myself' src='image/pablo.jpg'>
-			<div class='text'>
-				Sou Pablo Werlang. Graduado em <a href='ecomp.c3.furg.br'>Engenharia de Computação</a> em 2011 pela <a href='furg.br'>Universidade Federal do Rio Grande (FURG)</a>, sou fascinado por games desde muito pequeno. Cresci jogando coisas como <a href='https://pt.wikipedia.org/wiki/The_Legend_of_Zelda_(s%C3%A9rie)'>Zelda</a>, <a href='https://pt.wikipedia.org/wiki/Chrono_Trigger'>Chrono Trigger</a>, <a href='https://pt.wikipedia.org/wiki/Final_Fantasy'>Final Fantasy</a>, <a href='https://pt.wikipedia.org/wiki/Warcraft'>Warcraft</a>, <a href='https://pt.wikipedia.org/wiki/Age_of_Empires'>Age of Empires</a>, <a href='https://pt.wikipedia.org/wiki/Monkey_Island'>Monkey Island</a>, etc. Sempre fui o nerd da turma, e com muito orgulho.
+		<div id='author'>
+			<div class='row title'>Pablo Werlang</div>
+			<div class='row subtitle'>Idealizador e criador da gladCode</div>
+			<div class='row'>
+				<div class='col' id='myself'>
+					<img class='image' src='image/pablo.jpg'>
+				</div>
+				<div class='col' id='info'>
+					<div class='feats'>
+						<img src='icon/run_code.png'><a href='http://www.ecomp.c3.furg.br/' target='_blank'>Engenheiro de Computação</a>
+					</div>
+					<div class='feats'>
+						<img src='icon/teacher.png'><a href='http://www.ifsul.edu.br/' target='_blank'>Professor do IFSUL</a>
+					</div>
+					<div class='feats'>
+						<img src='icon/gamepad.png'><a>Apaixonado por jogos e programação</a>
+					</div>
+				</div>
+			</div>
+			<div class='row' id='social'>
+				<a href='mailto:pswerlang@gmail.com'><img src='icon/gmail.png'><span>pswerlang@gmail.com</span></a>
+				<a href='https://facebook.com/pswerlang' target='_blank'><img src='icon/facebook_blue.png'><span>facebook.com/pswerlang</span></a>
 			</div>
 		</div>
+		<div id='timeline'>
+			<div id='background'></div>
+			<div class='title'>História</div>
+			<div class='row'>
+				<span class='text'>Concepção da ideia da gladCode durante o evento <a href='http://charcode.tk' target='_blank'>Charcode</a>, como uma versão customizada da simulação <a href='https://robocode.sourceforge.io/' target='_blank'>Robocode</a>. A ideia do projeto era utilizam a linguagem C e criar um sistema de personagens que lembrasse um rpg.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Out 2016</span>
+			</div>
+			<div class='row'>
+				<span class='text'>Lançamento da primeira versão da gladCode como modalidadede de competição na Charcode. O projeto rodava localmente na máquina, e requeria a cópia dos códigos, imagens e informações das equipes. Disponível no <a href='https://github.com/werlang/gladCode/' target='_blank'>GitHub</a>.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Nov 2017</span>
+			</div>
+			<div class='row'>
+				<span class='text'>Versão Alpha da gladCode 2 é lançada, permitindo a execução das simulações no servidor e a criação da aparência dos gladiadores pelo site.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Mar 2018</span>
+			</div>
+			<div class='row'>
+				<span class='text'>O sistema da gladCode 2 foi usado no evento Charcode usando a interface hoje chamada de modo <a href='tournment.php' target='_blank'>Torneio Clássico</a>.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Out 2018</span>
+			</div>
+			<div class='row'>
+				<span class='text'>Lançamento da <a href='https://www.reddit.com/r/gladcode/comments/auttt3/atualiza%C3%A7%C3%A3o_gladcode_251beta/' target='_blank'>versão Beta</a>, que proporciona a criação e teste de gladiadores de maneira integrada através do editor, além de perfis de usuários e batalhas contra outros usuários e ranking.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Jan 2019</span>
+			</div>
+		</div>
+		<div id='know'>
+			<div class='info'>
+				<div class='title'>Conheça mais</div>
+				<div class='text'>Na gladCode você cria gladiadores, configurando sua aparência e comportamento. Eles possuem atributos físicos e mentais que determinam o quão fortes eles são correndo, usando ataques ou lançando magias. Para configurar o comportamento de seus gladiadores você precisa usar seus conhecimentos de lógica de programação. Uma vez criados, seus gladiadores podem ser colocados para participar de disputas contra outros gladiadores, onde só os melhores conseguem chegar ao topo do ranking.</div>
+				<a href='manual.php' class='button'>Visite o Manual</a>
+				<a href='docs.php' class='button'>Veja as funções</a>
+			</div>
+			<iframe frameborder="0" width="100%" height="100%" src="https://www.youtube.com/embed/lUR3CszStUg?autoplay=1&controls=0&showinfo=0&autohide=1&modestbranding=1&loop=1&playlist=lUR3CszStUg&mute=1"></iframe>
+		</div>
+		<div id='support'>
+			<div class='video'>
+				<video width='100%' height='100%' autoplay loop>
+					<source src='image/battle-movie.mp4'>
+				</video>
+			</div>
+			<div class='col'>
+				<div class='title'>Apoie o projeto</div>
+				<div class='text'>
+					<p>Para participar da gladCode você não precisa pagar nada, mas ainda assim existem gastos com o servidor que hospeda o sistema, além do grande investimento de tempo que existe para desenvolvimento de novas funcionalidades e correção de bugs.</p>
+					<p>Por isso, caso você goste da gladCode, reconhece o trabalho realizado e gostaria de apoiar o projeto, pode fazer uma doação.</p>
+					<div id='icons'>
+						<img src='icon/server.png'>
+						<img src='icon/time.png'>
+						<img src='icon/money.png'>
+					</div>
+				</div>
+				<div class='payment'>
+					<div class='question'>
+						<span>Que tipo de doação você deseja fazer?</span>
+						<label><input type="radio" name="pay-time" id="one-time" class='radio'>Uma única vez</label>
+						<label><input type="radio" name="pay-time" id="monthly" class='radio'>Recorrente mensal</label>
+					</div>
 
-		<div>
+					<div class='question' id='method'>
+						<span>Qual método de pagamento deseja usar?</span>
+						<label><input type="radio" class='radio' name="pay-method" id="card">Cartão de crédito/débito</label>
+						<label><input type="radio" class='radio' name="pay-method" id="boleto">Boleto</label>
+						<label><input type="radio" class='radio' name="pay-method" id="crypto">Criptomoedas</label>
+					</div>					
+					
+					<div id='buttons'>
+						<a id='pagseguro' class='donate hidden big' href='https://pag.ae/7UGrqxqw3' target='_blank' title='Pague com boleto, cartão ou transferência bancária'>
+							<span>Doar com</span>
+							<div class='inner-box'><img src='icon/pagseguro.png'></div>
+						</a>
+						<a id='paypal' class='donate hidden big' href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5C6SCZTEEEGT2&source=url' target='_blank' title='Doe uma única vez ou mensalmente com cartão de crédito ou débito'>
+							<span>Doar com</span>
+							<div class='inner-box'><img src='icon/paypal.png'></div>
+						</a>
+						<div id='bitcoin' class='donate small hidden big' title=''>
+							<span>Doar Bitcoin</span>
+							<div class='inner-box left'><img src='icon/bitcoin.png'></div>
+						</div>
+						<div id='ethereum' class='donate small hidden big' title=''>
+							<span>Doar Ethereum</span>
+							<div class='inner-box left'><img src='icon/ethereum.png'></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id='contact'>
+			<div class='title'>Entre em contato</div>
+			<div class='subtitle'>Adoraríamos saber o que você pensa sobre o projeto</div>
+			<div id='social'>
+				<a href='mailto:contato@gladcode.tk' title='Enviar Email' target='_blank'><img src='icon/at-sign.png'></a>
+				<a href='https://facebook.com/gladcode' title='Página do Facebook' target='_blank'><img src='icon/facebook.png'></a>
+				<a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
+			</div>
+		</div>
 			<div id='long' hidden>
 				Ainda durante a faculdade um professor apresentou para a turma um programa traria a inspiração para a gladCode anos mais tarde. Este programa possuía uma linguagem própria, e nele, nós alunos deveríamos programar a inteligência de um robô virtual, que deveria batalhar contra os robôs dos outros alunos em um mini torneio realizado após a entrega do trabalho da disciplina.
 				Os anos se passaram. Hoje sou professor do <a href='ifsul.edu.br'>Instituto Federal Sul-Riograndense (IFSul)</a> - Campus Charqueadas e ministro principalmente disciplinas de lógica de programação e linguagem de programação C.
@@ -52,7 +166,7 @@
 				
 				Na Charcode 2018 a modalidade gladCode utilizou a hoje chamada interface de <a href='tournment.php'>torneio clássico</a> para realizar a competição, que permitiu a geração dos logs das batalhas para visualização posterior.
 
-				Os próximos passos da gladCode seriam torná-la um sistema multiplayer online, onde os usuários criariam seu perfil, salvariam seus códigos e seus gladiadores no servidor, e os colocariam para batalhar contra os gladiadores de outros usuários em um sistema de ranking online da plataforma. Desta forma nasceu o <a href='editor.php'>editor de gladiadores</a>, que une o editor da aparência do gladiador com o editor de texto do compilador C da gladCode. A página de perfil do usuário foi criada permitindo ao usuário comunicar-se com seus amigos, visualizar seu ranking, e inscrver seus gladiadores em batalhas.
+				Os próximos passos da gladCode seriam torná-la um sistema multiplayer online, onde os usuários criariam seu perfil, salvariam seus códigos e seus gladiadores no servidor, e os colocariam para batalhar contra os gladiadores de outros usuários em um sistema de ranking online da plataforma. Desta forma nasceu o <a href='editor.php'>editor de gladiadores</a>, que une o editor da aparência do gladiador com o editor de texto do compilador C da gladCode. A página de perfil do usuário foi criada permitindo ao usuário comunicar-se com seus amigos, visualizar seu ranking, e inscrever seus gladiadores em batalhas.
 			</div>
         </div>
 	</div>

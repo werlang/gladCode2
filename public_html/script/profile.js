@@ -419,7 +419,7 @@ $(document).ready( function(){
 						$('#fog').remove();
 						var log = data;
 						showMessage("Duelo concluído. Clique para visualizar a batalha.").then( function(){
-							window.open("playback.php?log="+ log);
+							window.open("play/"+ log);
 						});
 						$('#battle').click();
 					});
@@ -461,7 +461,7 @@ $(document).ready( function(){
 
 					$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
 					for (var i in data){
-						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].gladiator +"</div><div class='cell reward'>"+ (parseFloat(data[i].reward)).toFixed(1) +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='playback.php?log="+ data[i].hash +"'><img src='icon/eye.png'></a></div></div>")
+						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].gladiator +"</div><div class='cell reward'>"+ (parseFloat(data[i].reward)).toFixed(1) +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a></div></div>")
 						if (data[i].isread == "0")
 							$('#bhist-container .table .row').last().addClass('unread');
 						else
@@ -503,7 +503,7 @@ $(document).ready( function(){
 					data = data.output;
 					$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell'>Oponente</div><div class='cell'>Mestre</div><div class='cell time'>Data</div></div>");
 					for (var i in data){
-						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].glad +"</div><div class='cell enemy'>"+ data[i].enemy +"</div><div class='cell'>"+ data[i].user +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='playback.php?log="+ data[i].log +"'><img src='icon/eye.png'></a></div></div>");							
+						$('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].glad +"</div><div class='cell enemy'>"+ data[i].enemy +"</div><div class='cell'>"+ data[i].user +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='play/"+ data[i].log +"'><img src='icon/eye.png'></a></div></div>");							
 
 						if (data[i].isread == "0")
 							$('#bhist-container .table .row').last().addClass('unread');
@@ -604,7 +604,7 @@ $(document).ready( function(){
 					clearInterval(preBattleInt);
 					$('#pre-battle-show').addClass('complete');
 					$('#pre-battle-show').click( function(){
-						window.open("playback.php?log="+ hash);
+						window.open("play/"+ hash);
 						$('#fog').remove();
 						$('#menu #battle').click();
 					});

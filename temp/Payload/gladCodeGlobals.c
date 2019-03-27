@@ -3,10 +3,10 @@ globais do ambiente, herdado do gladCode1
 */
 
 #define PROJECTILE_MAX_DISTANCE 15
-#define AP_REC_BASE 5
-#define AP_REC_INT 0.5
-#define GLAD_HITBOX 0.5
-#define XP_FACTOR 0.2
+#define AP_REC_BASE 5 //recuperacao de ap
+#define AP_REC_INT 0.5 //AP_REC+BASE + AP_REC_INT * INT
+#define GLAD_HITBOX 0.5 //raio do hitbox do gladiador
+#define XP_FACTOR 0.2 
 #define XP_FIRSTLVL 25
 #define POISON_TIME 45 //quanto tempo ele come�a a aparecer
 #define POISON_SPEED 10 //quanto tempo leva para andar 1p

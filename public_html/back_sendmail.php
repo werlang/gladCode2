@@ -94,7 +94,7 @@
 		$summary = $_POST['summary'];
 		$postlink = $_POST['postlink'];
 		
-		$sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1'";// AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
+		$sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1'"; //AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$receiveremail = array();
 		$receivername = array();
@@ -173,7 +173,7 @@
 		 
 		if (is_array($receiveremail)){
 			foreach($receiveremail as $i => $value)
-				$mail->AddAddress($receiveremail[$i],utf8_decode($receivername[$i]));
+				$mail->AddBCC($receiveremail[$i],utf8_decode($receivername[$i]));
 		}
 		else
 			$mail->AddAddress($receiveremail,utf8_decode($receivername));

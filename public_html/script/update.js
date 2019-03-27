@@ -34,11 +34,15 @@ $(document).ready( function(){
 			keepup: $('#keep-updated input').prop('checked'),
 			pass: $('#pass-div input').val(),
 		}).done( function(data){
+			//console.log(data);
 			if (data != "WRONGPASS"){
+				var changes = $('#changes textarea').val();
+				changes = changes.replace(/\r?\n/g, '<br/>');
+				//console.log(changes);
 				$.post("back_sendmail.php",{
 					action: "UPDATE",
 					version: $('#version #new').html(),
-					summary: $('#changes textarea').val(),
+					summary: changes,
 					postlink: $('#postlink input').val()
 				}).done( function(data){
 					showMessage("Versão do sistema atualizada");

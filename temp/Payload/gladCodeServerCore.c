@@ -807,7 +807,7 @@ void setStartingPos(int gladid){
 }
 
 void registerGlad(int gladid){
-    (g+gladid)->vrad = 60; //raio de visao 60 graus
+    (g+gladid)->vrad = 120; //raio de visao 120 graus
     (g+gladid)->vis = 9; //alcance da visao 9 passos
     (g+gladid)->lockedfor = 0;
     setStartingPos(gladid); //inicializa a posicao inicial de cada gladiador formando um circulo

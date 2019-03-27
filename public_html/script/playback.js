@@ -294,16 +294,18 @@ function start_timer(steps){
 					$('#end-message #share').click( function() {
 						$('#end-message').hide();
 
-						var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://gladcode.tk/playback.php?log="+ loghash +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
+						var link = "gladcode.tk/play/"+ loghash;
 
-						var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=https://gladcode.tk/playback.php?log="+ loghash +"' target='_blank'><img src='icon/facebook.png'></a>";
+						var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://"+ link +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
 
-						var whatsapp = "<div id='whatsapp' class='button' title='Compartilhar pelo Whatsapp'><img src='icon/whatsapp.png'></div>";
+						var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u="+ link +"' target='_blank'><img src='icon/facebook.png'></a>";
 
-						$('#fog').append("<div id='url'><div id='link'><span id='site'>https://gladcode.tk/playback.php?log=</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='link' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div></div>");
+						var whatsapp = "<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a"+ link +"%0a%23gladcode' target='_blank'><img src='icon/whatsapp.png'></a>";
+
+						$('#fog').append("<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div><button id='close' class='button'>OK</button></div>");
 						
-						$('#url #social #link').click( function(){
-							copyToClipboard('https://gladcode.tk/playback.php?log='+ loghash);
+						$('#url #social #getlink').click( function(){
+							copyToClipboard(link);
 							$('#url #hash').html('Link copiado');
 							$('#url #hash').addClass('clicked');
 							setTimeout(function(){
@@ -312,6 +314,10 @@ function start_timer(steps){
 							},500);
 						});
 						
+						$('#url #close').click( function(){
+							$('#url').remove();
+							$('#end-message').show();
+						});
 					});
 
 					if (id)

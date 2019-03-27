@@ -3,7 +3,7 @@
 <?php
 	session_start();
 	if(!isset($_SESSION['user']) || $_SESSION['user'] != 'pswerlang@gmail.com') 
-		header("Location: https://gladcode.tk");
+		header("Location: index.php");
 ?>
 
 <html>
