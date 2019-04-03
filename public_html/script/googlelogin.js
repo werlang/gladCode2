@@ -1,7 +1,7 @@
 /*
 how to include google login in your page:
 1 - add the following tags in the php page:
-	<meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
+	<meta name="google-signin-client_id" content="108043684563-uhl9ui9p47r5fadmu31mr3mmg7g4936n.apps.googleusercontent.com">
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script type="text/javascript" src="script/googlelogin.js"></script>
 	
@@ -30,7 +30,7 @@ function initGoogleLogin(){
 			gapi.load('auth2', function(){
 				// Retrieve the singleton for the GoogleAuth library and set up the client.
 				auth2 = gapi.auth2.init({
-					client_id: '1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com',
+					client_id: '108043684563-uhl9ui9p47r5fadmu31mr3mmg7g4936n.apps.googleusercontent.com',
 					cookiepolicy: 'single_host_origin',
 					// Request scopes in addition to 'profile' and 'email'
 					//scope: 'additional_scope'
