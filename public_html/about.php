@@ -26,7 +26,7 @@
 			<div class='row subtitle'>Idealizador e criador da gladCode</div>
 			<div class='row'>
 				<div class='col' id='myself'>
-					<img class='image' src='image/pablo.jpg'>
+					<img class='image' src='image/pablo2.jpg'>
 				</div>
 				<div class='col' id='info'>
 					<div class='feats'>
