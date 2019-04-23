@@ -118,6 +118,7 @@ p {
 
 #side-menu ul {
 	list-style: none;
+	padding-left: 35px;
 }
 
 #side-menu #search {
@@ -145,4 +146,25 @@ p {
 
 #side-menu a {
 	color: #646464;
+}
+
+#side-menu li {
+	margin-bottom: 15px;
+	transition: 0.3s all;
+}
+
+#side-menu li:hover {
+	background-color: white;
+}
+
+#side-menu li i {
+	font-size: 1em;
+	transition: 0.3s all;
+	margin-left: -25px;
+	margin-right: 10px;
+	color: #b9b9b9;
+}
+
+#side-menu li i.open {
+	transform: rotate(90deg);
 }
