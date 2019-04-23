@@ -35,30 +35,30 @@
 
 			<h2 id='nav-setup'>Setup</h2>
 			
-				<p>As funções de setup servem para definir as características do gladiador, como nome e atributos básicos. Elas podem ser chamadas somente dentro da função setup() no <a href='manual.php#nav-prog'>código do gladiador</a>.</p>
+				<p>As funções de setup servem para definir as características do gladiador, como nome e atributos básicos. Elas podem ser chamadas somente dentro da função setup() no <a href='manual#nav-prog'>código do gladiador</a>.</p>
 			
-				<p><b>OBS: A função setup, bem como todas funções que devem estar contidas dentro da mesma, só devem estar presentes caso o modo clássico de <a href='socks.php' target='_blank'>batalha</a> ou <a href='tournment.php' target='_blank'>torneio</a> esteja sendo executado. Caso contrário, o <a href='editor.php' target='_blank'>editor de gladiadores</a> se encarrega de adicionar as informações do gladiador para o servidor.</b></p>
+				<p><b>OBS: A função setup, bem como todas funções que devem estar contidas dentro da mesma, só devem estar presentes caso o modo clássico de <a href='socks' target='_blank'>batalha</a> ou <a href='tournment' target='_blank'>torneio</a> esteja sendo executado. Caso contrário, o <a href='editor' target='_blank'>editor de gladiadores</a> se encarrega de adicionar as informações do gladiador para o servidor.</b></p>
 			
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=setname&l=pt'>mudaNome</a></td>
+							<td><a href='funcao/setname'>mudaNome</a></td>
 							<td>Atribui um nome para o gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=setstr&l=pt'>mudaFOR</a></td>
+							<td><a href='funcao/setstr'>mudaFOR</a></td>
 							<td>Atribui um valor para o atributo Força (STR) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=setagi&l=pt'>mudaAGI</a></td>
+							<td><a href='funcao/setagi'>mudaAGI</a></td>
 							<td>Atribui um valor para o atributo Agilidade (AGI) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=setint&l=pt'>mudaINT</a></td>
+							<td><a href='funcao/setint'>mudaINT</a></td>
 							<td>Atribui um valor para o atributo Inteligência (INT) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=setspritesheet&l=pt'>mudaAparencia</a></td>
+							<td><a href='funcao/setspritesheet'>mudaAparencia</a></td>
 							<td>Atribui ao gladiador uma aparência.</td>
 						</tr>
 					</tbody>
@@ -66,20 +66,20 @@
 			
 			<h2 id='nav-up'>Melhorias</h2>
 			
-				<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual.php#xp-table'>sobe de nível</a>, ele ganha um ponto em um atributo básico. As funções de melhoria indicam qual atributo será aprimorado na próxima vez que ele subir de nível. Estas funções podem ser chamadas tanto no setup() quanto no loop().</p>
+				<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual#xp-table'>sobe de nível</a>, ele ganha um ponto em um atributo básico. As funções de melhoria indicam qual atributo será aprimorado na próxima vez que ele subir de nível. Estas funções podem ser chamadas tanto no setup() quanto no loop().</p>
 			
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=upgradestr&l=pt'>melhoraFOR</a></td>
+							<td><a href='funcao/upgradestr'>melhoraFOR</a></td>
 							<td>Indica que o gladiador deve aprimorar o atributo Força.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=upgradeagi&l=pt'>melhoraAGI</a></td>
+							<td><a href='funcao/upgradeagi'>melhoraAGI</a></td>
 							<td>Indica que o gladiador deve aprimorar o atributo Agilidade.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=upgradeint&l=pt'>melhoraINT</a></td>
+							<td><a href='funcao/upgradeint'>melhoraINT</a></td>
 							<td>Indica que o gladiador deve aprimorar o atributo Inteligência.</td>
 						</tr>
 					</tbody>
@@ -95,59 +95,59 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=moveforward&l=pt'>moveFrente</a></td>
+							<td><a href='funcao/moveforward'>moveFrente</a></td>
 							<td>Move o gladiador para frente uma quantidade de passos.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=moveto&l=pt'>movePara</a></td>
+							<td><a href='funcao/moveto'>movePara</a></td>
 							<td>Move o gladiador para um ponto.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=movetotarget&l=pt'>moveParaAlvo</a></td>
+							<td><a href='funcao/movetotarget'>moveParaAlvo</a></td>
 							<td>Move o gladiador para o alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=stepforward&l=pt'>passoFrente</a></td>
+							<td><a href='funcao/stepforward'>passoFrente</a></td>
 							<td>Move o gladiador para frente.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=stepback&l=pt'>passoTras</a></td>
+							<td><a href='funcao/stepback'>passoTras</a></td>
 							<td>Move o gladiador para trás.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=stepleft&l=pt'>passoEsquerda</a></td>
+							<td><a href='funcao/stepleft'>passoEsquerda</a></td>
 							<td>Move o gladiador para esquerda.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=stepright&l=pt'>passoDireita</a></td>
+							<td><a href='funcao/stepright'>passoDireita</a></td>
 							<td>Move o gladiador para direita.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turnleft&l=pt'>viraEsquerda</a></td>
+							<td><a href='funcao/turnleft'>viraEsquerda</a></td>
 							<td>Rotaciona o gladiador no sentido anti-horário.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turnright&l=pt'>viraDireita</a></td>
+							<td><a href='funcao/turnright'>viraDireita</a></td>
 							<td>Rotaciona o gladiador no sentido horário.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turn&l=pt'>vira</a></td>
+							<td><a href='funcao/turn'>vira</a></td>
 							<td>Rotaciona o gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turnto&l=pt'>viraPara</a></td>
+							<td><a href='funcao/turnto'>viraPara</a></td>
 							<td>Rotaciona o gladiador para um ponto.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turntotarget&l=pt'>viraParaAlvo</a></td>
+							<td><a href='funcao/turntotarget'>viraParaAlvo</a></td>
 							<td>Rotaciona o gladiador para o alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turntolasthit&l=pt'>viraFuiAcertado</a></td>
+							<td><a href='funcao/turntolasthit'>viraFuiAcertado</a></td>
 							<td>Rotaciona o gladiador para a origem do último ataque recebido.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=turntoangle&l=pt'>viraParaAngulo</a></td>
+							<td><a href='funcao/turntoangle'>viraParaAngulo</a></td>
 							<td>Rotaciona o gladiador para um ângulo.</td>
 						</tr>
 					</tbody>
@@ -162,11 +162,11 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=attackmelee&l=pt'>ataqueCorpo</a></td>
+							<td><a href='funcao/attackmelee'>ataqueCorpo</a></td>
 							<td>Realiza um ataque corpo-a-corpo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=attackranged&l=pt'>ataqueDistancia</a></td>
+							<td><a href='funcao/attackranged'>ataqueDistancia</a></td>
 							<td>Realiza um ataque de longa distância.</td>
 						</tr>
 					</tbody>
@@ -179,63 +179,67 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=getstr&l=pt'>pegaFOR</a></td>
+							<td><a href='funcao/getstr'>pegaFOR</a></td>
 							<td>Retorna o valor do atributo Força (STR) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getagi&l=pt'>pegaAGI</a></td>
+							<td><a href='funcao/getagi'>pegaAGI</a></td>
 							<td>Retorna o valor do atributo Agilidade (AGI) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getint&l=pt'>pegaINT</a></td>
+							<td><a href='funcao/getint'>pegaINT</a></td>
 							<td>Retorna o valor do atributo Inteligência (INT) do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getx&l=pt'>pegaX</a></td>
+							<td><a href='funcao/getlvl'>pegaNivel</a></td>
+							<td>Retorna o nível do gladiador.</td>
+						</tr>
+						<tr>
+							<td><a href='funcao/getx'>pegaX</a></td>
 							<td>Retorna a coordenada x do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gety&l=pt'>pegaY</a></td>
+							<td><a href='funcao/gety'>pegaY</a></td>
 							<td>Retorna a coordenada y do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gethp&l=pt'>pegaPv</a></td>
+							<td><a href='funcao/gethp'>pegaPv</a></td>
 							<td>Retorna os pontos de vida do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getap&l=pt'>pegaPa</a></td>
+							<td><a href='funcao/getap'>pegaPa</a></td>
 							<td>Retorna os pontos de habilidade do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getspeed&l=pt'>pegaVelocidade</a></td>
+							<td><a href='funcao/getspeed'>pegaVelocidade</a></td>
 							<td>Retorna a velocidade do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gethead&l=pt'>pegaDirecao</a></td>
+							<td><a href='funcao/gethead'>pegaDirecao</a></td>
 							<td>Retorna a direção do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gethit&l=pt'>fuiAcertado</a></td>
+							<td><a href='funcao/gethit'>fuiAcertado</a></td>
 							<td>Descobre se o gladiador foi atacado.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getlasthittime&l=pt'>tempoFuiAcertado</a></td>
+							<td><a href='funcao/getlasthittime'>tempoFuiAcertado</a></td>
 							<td>Retorna o tempo desde o último ataque recebido.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getlasthitangle&l=pt'>anguloFuiAcertado</a></td>
+							<td><a href='funcao/getlasthitangle'>anguloFuiAcertado</a></td>
 							<td>Retorna o ângulo de onde veio o último ataque.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getblocktimeleft&l=pt'>tempoBloqueio</a></td>
+							<td><a href='funcao/getblocktimeleft'>tempoBloqueio</a></td>
 							<td>Retorna o tempo restante para expirar o efeito Proteção.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getambushtimeleft&l=pt'>tempoEmboscada</a></td>
+							<td><a href='funcao/getambushtimeleft'>tempoEmboscada</a></td>
 							<td>Retorna o tempo restante para expirar o efeito Invisibilidade.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=speak&l=pt'>fala</a></td>
+							<td><a href='funcao/speak'>fala</a></td>
 							<td>Mostra um balão de fala com uma mensagem.</td>
 						</tr>
 					</tbody>
@@ -248,84 +252,88 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=issafehere&l=pt'>seguroAqui</a></td>
+							<td><a href='funcao/issafehere'>seguroAqui</a></td>
 							<td>Descobre se o gladiador está dentro da nuvem tóxica.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=issafethere&l=pt'>seguroLa</a></td>
+							<td><a href='funcao/issafethere'>seguroLa</a></td>
 							<td>Descobre se o ponto está dentro da nuvem tóxica.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getsaferadius&l=pt'>pegaRaioSeguro</a></td>
+							<td><a href='funcao/getsaferadius'>pegaRaioSeguro</a></td>
 							<td>Retorna o raio da área livre de nuvem tóxica.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=howmanyenemies&l=pt'>quantosInimigos</a></td>
+							<td><a href='funcao/howmanyenemies'>quantosInimigos</a></td>
 							<td>Retorna a quantidade de inimigos no campo de visão.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getcloseenemy&l=pt'>pegaInimigoProximo</a></td>
+							<td><a href='funcao/getcloseenemy'>pegaInimigoProximo</a></td>
 							<td>Procura um inimigo próximo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getfarenemy&l=pt'>pegaInimigoDistante</a></td>
+							<td><a href='funcao/getfarenemy'>pegaInimigoDistante</a></td>
 							<td>Procura um inimigo distante.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getlowhp&l=pt'>pegaVidaBaixa</a></td>
+							<td><a href='funcao/getlowhp'>pegaVidaBaixa</a></td>
 							<td>Procura um inimigo com menos vida.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gethighhp&l=pt'>pegaVidaAlta</a></td>
+							<td><a href='funcao/gethighhp'>pegaVidaAlta</a></td>
 							<td>Procura um inimigo com mais vida.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gettargetx&l=pt'>pegaXAlvo</a></td>
+							<td><a href='funcao/gettargetx'>pegaXAlvo</a></td>
 							<td>Retorna o valor da coordenada x do alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gettargety&l=pt'>pegaYAlvo</a></td>
+							<td><a href='funcao/gettargety'>pegaYAlvo</a></td>
 							<td>Retorna o valor da coordenada y do alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gettargethealth&l=pt'>pegaSaudeAlvo</a></td>
+							<td><a href='funcao/gettargethealth'>pegaSaudeAlvo</a></td>
 							<td>Retorna a vida do alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gettargetspeed&l=pt'>pegaVelocidadeAlvo</a></td>
+							<td><a href='funcao/gettargetspeed'>pegaVelocidadeAlvo</a></td>
 							<td>Retorna a velocidade do alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=gettargethead&l=pt'>pegaDirecaoAlvo</a></td>
+							<td><a href='funcao/gettargethead'>pegaDirecaoAlvo</a></td>
 							<td>Retorna a direção do alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=doyouseeme&l=pt'>voceMeVe</a></td>
+							<td><a href='funcao/doyouseeme'>voceMeVe</a></td>
 							<td>Descobre se o alvo enxerga o gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=istargetvisible&l=pt'>alvoVisivel</a></td>
+							<td><a href='funcao/istargetvisible'>alvoVisivel</a></td>
 							<td>Descobre se alvo está no campo de visão.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=isstunned&l=pt'>estaAtordoado</a></td>
+							<td><a href='funcao/isstunned'>estaAtordoado</a></td>
 							<td>Verifica se o alvo está atordoado.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=isburning&l=pt'>estaQueimando</a></td>
+							<td><a href='funcao/isburning'>estaQueimando</a></td>
 							<td>Verifica se o alvo está queimando.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=isprotected&l=pt'>estaProtegido</a></td>
+							<td><a href='funcao/isprotected'>estaProtegido</a></td>
 							<td>Verifica se o alvo está protegido.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=isrunning&l=pt'>estaCorrendo</a></td>
+							<td><a href='funcao/isrunning'>estaCorrendo</a></td>
 							<td>Verifica se o alvo está correndo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=isslowed&l=pt'>estaLento</a></td>
+							<td><a href='funcao/isslowed'>estaLento</a></td>
 							<td>Verifica se o alvo está lento.</td>
+						</tr>
+						<tr>
+							<td><a href='funcao/getsimtime'>pegaTempo</a></td>
+							<td>Retorna o tempo da simulação.</td>
 						</tr>
 					</tbody>
 				</table>
@@ -337,15 +345,15 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=getdist&l=pt'>pegaDistancia</a></td>
+							<td><a href='funcao/getdist'>pegaDistancia</a></td>
 							<td>Retorna a distância até o ponto.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getdisttotarget&l=pt'>pegaDistanciaAlvo</a></td>
+							<td><a href='funcao/getdisttotarget'>pegaDistanciaAlvo</a></td>
 							<td>Retorna a distância até o alvo fixado.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=getangle&l=pt'>pegaAngulo</a></td>
+							<td><a href='funcao/getangle'>pegaAngulo</a></td>
 							<td>Retorna o ângulo até o ponto.</td>
 						</tr>
 					</tbody>
@@ -360,27 +368,27 @@
 				<table class='table t-funcs'>
 					<tbody>
 						<tr>
-							<td><a href='function.php?f=fireball&l=pt'>bolaFogo</a></td>
+							<td><a href='funcao/fireball'>bolaFogo</a></td>
 							<td>Arremessa um projétil flamejante.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=teleport&l=pt'>teletransporte</a></td>
+							<td><a href='funcao/teleport'>teletransporte</a></td>
 							<td>Transporta instantaneamente o gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=charge&l=pt'>investida</a></td>
+							<td><a href='funcao/charge'>investida</a></td>
 							<td>Corre em direção ao alvo e o ataca.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=block&l=pt'>bloqueio</a></td>
+							<td><a href='funcao/block'>bloqueio</a></td>
 							<td>Aumenta a defesa do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=assassinate&l=pt'>assassinar</a></td>
+							<td><a href='funcao/assassinate'>assassinar</a></td>
 							<td>Dispara um ataque que pode causar dano e efeito adicional no alvo.</td>
 						</tr>
 						<tr>
-							<td><a href='function.php?f=ambush&l=pt'>emboscada</a></td>
+							<td><a href='funcao/ambush'>emboscada</a></td>
 							<td>Torna-se invisível.</td>
 						</tr>
 					</tbody>
@@ -388,13 +396,6 @@
 				
 		</div>
 	</div>
-	<div id='footer-wrapper'>
-		<div id='footer'>
-			<div>© 2018 gladcode.tk</div>
-			<div>Pablo Werlang</div>
-			<div><a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></div>
-			<div><a target='_blank' href='creditos.txt'>Créditos</a></div>
-		</div>
-	</div>
+	<?php include("footer.php"); ?>
 </body>
 </html>

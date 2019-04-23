@@ -3,7 +3,7 @@
 		<div class='row'>
 			<div class='col'>
 				<div class='title'>Sobre a gladCode</div>
-				<div><a href='about.php'>O projeto</a></div>
+				<div><a href='about'>O projeto</a></div>
 				<div><a href='creditos.txt'>Créditos</a></div>
 			</div>
 			<div class='col'>

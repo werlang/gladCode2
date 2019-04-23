@@ -54,7 +54,7 @@
 						</div>
 						<div class='video'><img class='play' src='icon/youtube-play.png'><img class='thumb' src="https://img.youtube.com/vi/te1M98UDKiM/mqdefault.jpg"></div>
 					</div>
-					<div class='a-wrapper'><a href='manual.php'>Conheça a simulação</a></div>
+					<div class='a-wrapper'><a href='manual'>Conheça a simulação</a></div>
 				</div>
 			</div>
 			<div class='card-wrapper'>
@@ -66,7 +66,7 @@
 						</div>
 						<div class='video'><img class='play' src='icon/youtube-play.png'><img class='thumb' src="https://img.youtube.com/vi/tjMjqQ14AS8/mqdefault.jpg"></div>
 					</div>
-					<div class='a-wrapper'><a href='editor.php'>Crie seu gladiador</a></div>
+					<div class='a-wrapper'><a href='editor'>Crie seu gladiador</a></div>
 				</div>
 			</div>
 			<div class='card-wrapper'>
@@ -78,7 +78,7 @@
 						</div>
 						<div class='video'><img class='play' src='icon/youtube-play.png'><img class='thumb' src="https://img.youtube.com/vi/5QQtfruq8_8/mqdefault.jpg"></div>
 					</div>
-					<div class='a-wrapper'><a href='ranking.php'>Veja o ranking</a></div>
+					<div class='a-wrapper'><a href='ranking'>Veja o ranking</a></div>
 				</div>
 			</div>
 			<div class='card-wrapper'>
@@ -90,7 +90,7 @@
 						</div>
 						<div class='video'><img class='play' src='icon/youtube-play.png'><img class='thumb' src="https://img.youtube.com/vi/Wrc-0_Kq-_4/mqdefault.jpg"></div>
 					</div>
-					<div class='a-wrapper'><a href='docs.php'>Aprenda mais</a></div>
+					<div class='a-wrapper'><a href='docs'>Aprenda mais</a></div>
 				</div>
 			</div>
 		</div>
@@ -106,8 +106,8 @@
 				<div class='card'>
 					<div class='title'><img src='image/warrior.png'>Engaje-se nas batalhas</div>
 					<div class='body'>Nos modos clássicos de batalha e torneio, você não precisa possuir um perfil na gladCode, basta fazer upload do código dos gladiadores e deixarem eles lutarem até a morte.</div>
-					<div class='a-wrapper'><a href='socks.php'>Teste as batalhas clássicas</a></div>
-					<div class='a-wrapper'><a href='tournment.php'>Crie um torneio clássico</a></div>
+					<div class='a-wrapper'><a href='socks'>Teste as batalhas clássicas</a></div>
+					<div class='a-wrapper'><a href='tournment'>Crie um torneio clássico</a></div>
 				</div>
 			</div>
 			<div class='card-wrapper'>

@@ -41,27 +41,32 @@
 			$user = $_SESSION['user'];
 			unset($_SESSION['code']);
 			$id = mysql_escape_string($_GET['g']);
-			$sql = "SELECT * FROM gladiators INNER JOIN usuarios ON email = master WHERE master = '$user' AND cod = $id";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-			if ($result->num_rows > 0){
-				$row = $result->fetch_assoc();
-				$name = $row['name'];
-				$vstr = $row['vstr'];
-				$vagi = $row['vagi'];
-				$vint = $row['vint'];
-				$skin = $row['skin'];
-				$nick = $row['apelido'];
-				$code = htmlspecialchars($row['code']);
-				echo "<div id='glad-code' hidden>
-					<div id='idglad'>$id</div>
-					<div id='name'>$name</div>
-					<div id='vstr'>$vstr</div>
-					<div id='vagi'>$vagi</div>
-					<div id='vint'>$vint</div>
-					<div id='skin'>$skin</div>
-					<div id='code'>$code</div>
-					<div id='user'>$nick</div>
-				</div>";
+			if ($id == 0){
+				echo "<div id='newglad'></div>";
+			}
+			else{
+				$sql = "SELECT * FROM gladiators INNER JOIN usuarios ON email = master WHERE master = '$user' AND cod = $id";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				if ($result->num_rows > 0){
+					$row = $result->fetch_assoc();
+					$name = $row['name'];
+					$vstr = $row['vstr'];
+					$vagi = $row['vagi'];
+					$vint = $row['vint'];
+					$skin = $row['skin'];
+					$nick = $row['apelido'];
+					$code = htmlspecialchars($row['code']);
+					echo "<div id='glad-code' hidden>
+						<div id='idglad'>$id</div>
+						<div id='name'>$name</div>
+						<div id='vstr'>$vstr</div>
+						<div id='vagi'>$vagi</div>
+						<div id='vint'>$vint</div>
+						<div id='skin'>$skin</div>
+						<div id='code'>$code</div>
+						<div id='user'>$nick</div>
+					</div>";
+				}
 			}
 		}
 		include("header.php");
@@ -111,6 +116,10 @@
 	<div id='fog-skin' class='fog'></div>
 	<div id='fog-glads' class='fog'>
 		<div id='open-glad'>
+			<div id='message'>
+				<h2>Editar gladiador</h2>
+				<h3>Selecione um de seus gladiadores</h3>
+			</div>
 			<div class='glad-card-container'></div>
 			<div id='button-container'>
 				<button id='btn-glad-cancel' class='button'>CANCELAR</button>

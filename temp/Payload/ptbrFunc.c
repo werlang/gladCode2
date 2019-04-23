@@ -1,3 +1,7 @@
+float pegaTempo(){
+	return getSimTime();
+}
+
 void mudaFOR(int arg){
 	setSTR(arg);
 }
@@ -274,4 +278,8 @@ int estaLento(){
 
 void fala(char *message){
 	speak(message);
+}
+
+int pegaNivel(){
+	return getLvl();
 }

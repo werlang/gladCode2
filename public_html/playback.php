@@ -23,37 +23,36 @@
 	<link type='text/css' rel='stylesheet' href='jquery-ui/jquery-ui.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/playback.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/checkboxes.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/scrollTo.js"></script>
 	<script type="text/javascript" src="script/playback.js"></script>
 	<script type="text/javascript" src="script/phaser.min.js"></script>
 	<script type="text/javascript" src="script/phaser.js"></script>
 	<script type="text/javascript" src="script/assets.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/dropzone.js"></script>
+	<script type="text/javascript" src="script/checkboxes.js"></script>
 </head>
 <body>
-	<?php include("header.php"); ?>
 	<div id='log' hidden><?php echo $loghash; ?></div>
 	<div id='tourn' hidden><?php echo $tnm; ?></div>
 	<div id='frame'>
 		<div id='canvas-container'>
 			<div id='ui-container'></div>
-			<div id='ui-right-side'>
-				<div id='canvas-div'></div>
-				<div id='button-container'>
-					<div id='time-container' title='Selecionar um ponto da simulação'><div id='time'></div></div>
-					<div class='row'>
-						<button class='button' id='fullscreen' title='Modo tela cheia'><img src='icon/full_screen.png'></button>
-						<button class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></button>
-						<button class='button' id='fowd-step' title='Avançar simulação'><div class='speed'>1x</div></button>
-						<button class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png' hidden><img id='img-pause' src='icon/pause.png'></button>
-					</div>
+			<div id='canvas-div'></div>
+			<div id='button-container'>
+				<div id='time-container' title='Selecionar um ponto da simulação'><div id='time'></div></div>
+				<div class='row'>
+					<div class='button' id='settings' title='Preferências'><img src='icon/settings.png'></div>
+					<div class='button' id='fullscreen' title='Modo tela cheia'><img src='icon/full_screen.png'></div>
+					<div class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></div>
+					<div class='button' id='fowd-step' title='Avançar simulação'><div class='speed'>1x</div></div>
+					<div class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png' hidden><img id='img-pause' src='icon/pause.png'></div>
+					<div class='button' id='help' title='Ajuda'><img src='icon/question.png'></div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<?php include("footer.php"); ?>
 </body>
 </html>

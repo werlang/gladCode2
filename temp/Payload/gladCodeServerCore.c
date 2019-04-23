@@ -146,12 +146,12 @@ void setXp(int gladid, float dmg, int enemy){
 	(g+gladid)->xp += round(xp);
 	int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
 	if ((g+gladid)->xp >= tonext && (g+gladid)->hp > 0){
-		(g+gladid)->lvl++;
-		(g+gladid)->xp -= round(tonext);
-		(g+gladid)->hp += (g+gladid)->maxhp * 0.2;
+		float expected = 200 + ((g+gladid)->lvl - 1) * 10;
+		
+		(g+gladid)->hp += expected * 0.5;
 		if ((g+gladid)->hp > (g+gladid)->maxhp)
 			(g+gladid)->hp = (g+gladid)->maxhp;
-		(g+gladid)->ap += (g+gladid)->maxap * 0.2;
+		(g+gladid)->ap += expected * 0.2;
 		if ((g+gladid)->ap > (g+gladid)->maxap)
 			(g+gladid)->ap = (g+gladid)->maxap;
 		
@@ -162,9 +162,10 @@ void setXp(int gladid, float dmg, int enemy){
 			(g+gladid)->mdmg += 1.5;
 		}
 		if ((g+gladid)->up == 2){
+			float d = (g+gladid)->AGI - (5 + ((g+gladid)->lvl - 1)*0.5);
 			(g+gladid)->AGI++;
 			(g+gladid)->spd += 0.1;
-			(g+gladid)->as += 0.1;
+			(g+gladid)->as = 3 * d / (d + 10) + 0,5;
 			(g+gladid)->ts += 18;
 			(g+gladid)->rdmg += 1;
 		}
@@ -174,6 +175,9 @@ void setXp(int gladid, float dmg, int enemy){
 			(g+gladid)->maxap += 20;
 			(g+gladid)->cs += 0.1;
 		}
+
+		(g+gladid)->lvl++;
+		(g+gladid)->xp -= round(tonext);
 	}
 }
 

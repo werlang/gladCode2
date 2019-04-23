@@ -201,32 +201,32 @@
 						<th>Descrição</th>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=fireball'>Fireball</a></td>
+						<td><a href='function/fireball'>Fireball</a></td>
 						<td>50</td>
 						<td>Arremessa um projétil que causa (0.7 x INT) de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem (1.6 x INT) de dano de queimadura ao longo de 3s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=teleport'>Teleport</a></td>
+						<td><a href='function/teleport'>Teleport</a></td>
 						<td>50</td>
 						<td>O gladiador imediatamente se transporta para outra localização. A distância máxima percorrida é limitada em 5p + (1p x INT)</td>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=charge'>Charge</a></td>
+						<td><a href='function/charge'>Charge</a></td>
 						<td>30</td>
 						<td>Corre em direção ao alvo com velocidade 4x. Ao alcançá-lo, realiza um ataque corpo-a-corpo reduzindo sua velocidade de movimento por 5s. O valor da velocidade será alterado de acordo com a equação <a href='https://www.wolframalpha.com/input/?i=Plot%5BE%5E(-0.067+X),+%7BX,+0,+30%7D%5D' target='_blank'>Vel=e<sup>-0.067 STR</sup></a></td>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=block'>Block</a></td>
+						<td><a href='function/block'>Block</a></td>
 						<td>50</td>
 						<td>Reduz todo dano levado em 10% + (STR/(STR+8))% por 7s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=assassinate'>Assassinate</a></td>
+						<td><a href='function/assassinate'>Assassinate</a></td>
 						<td>30</td>
 						<td>Realiza um ataque à distância contra o alvo. Ao acertar, causa dano normal do ataque mais um adicional de (AGI) caso o alvo não esteja lhe enxergando. Caso o alvo esteja atordoado a habilidade também causa o dano adicional de (AGI).</td>
 					</tr>
 					<tr>
-						<td><a href='function.php?f=ambush'>Ambush</a></td>
+						<td><a href='function/ambush'>Ambush</a></td>
 						<td>70</td>
 						<td>Torna-se invisível por 2s + (0.4s x AGI). O efeito da habilidade é cancelado ao realizar um ataque ou lançar uma habilidade. Ataques realizados enquanto invisível atordoam o alvo por 1.5s</td>
 					</tr>
@@ -274,7 +274,7 @@
 			
 			<p>O ambiente da simulação foi criado especialmente para a gladCode portanto existem funções específicas de entrada, que fazem com que o gladiador perceba o que está acontecendo na arena, e funções de saída que fazem com que o gladiador interaja com os elementos presentes na arena.</p>
 			
-			<p>Para programar um gladiador, o código-fonte do programa deverá conter a função <strong>loop()</strong>. Muito importante também é que seu código não possua a função main(). Utilize o <a href='editor.php' target='_blank'>editor de gladiadores</a> para criar o código de seu gladiador</p>
+			<p>Para programar um gladiador, o código-fonte do programa deverá conter a função <strong>loop()</strong>. Muito importante também é que seu código não possua a função main(). Utilize o <a href='editor' target='_blank'>editor de gladiadores</a> para criar o código de seu gladiador</p>
 			
 			<p>O funcionamento é bem simples. Na função loop() será colocado todo o comportamento do gladiador. A cada intervalo de tempo (0.1s) o gladiador irá executar todas as tarefas descritas dentro desta função:</p>
 			
@@ -282,7 +282,7 @@
     stepForward(); //função que faz mover para frente
 }</code></pre>
 
-			<p>No código acima, a cada intervalo de tempo (0.1s) o gladiador irá mover-se o quanto conseguir (depende de sua agilidade) para frente, resultando em sucessivas chamadas da função <a href='function.php?f=stepforward' target='_blank'>stepForward</a> ao longo do tempo.</p>
+			<p>No código acima, a cada intervalo de tempo (0.1s) o gladiador irá mover-se o quanto conseguir (depende de sua agilidade) para frente, resultando em sucessivas chamadas da função <a href='function/stepforward' target='_blank'>stepForward</a> ao longo do tempo.</p>
 			
 			<p>Porém, existem situações em que o gladiador não consegue executar todos os comando da função loop() em um único intervalo da simulação, como no caso abaixo:</p>
 			
@@ -293,11 +293,11 @@
 	turnLeft(); //função que rotaciona no sentido anti-horário
 }</code></pre>
 			
-			<p>Neste caso o gladiador executa o que conseguir (1 chamada da função que move para frente), e a cada novo intervalo de tempo da simulação ele segue executando os próximos passos. Eventualmente, quando ele concluir todas as etapas descritas em sua função loop() (as 10 chamadas de stepForward mais a chamada de <a href='function.php?f=turnleft' target='_blank'>turnLeft</a>), ele irá começar novamente a função loop(). Este processo somente encerrará quando o gladiador morrer, ou quando a simulação terminar.</p>
+			<p>Neste caso o gladiador executa o que conseguir (1 chamada da função que move para frente), e a cada novo intervalo de tempo da simulação ele segue executando os próximos passos. Eventualmente, quando ele concluir todas as etapas descritas em sua função loop() (as 10 chamadas de stepForward mais a chamada de <a href='function/turnleft' target='_blank'>turnLeft</a>), ele irá começar novamente a função loop(). Este processo somente encerrará quando o gladiador morrer, ou quando a simulação terminar.</p>
 			
-			<p>Note que existem algumas funções que levam mais tempo para serem executadas, como por exemplos as funções de ataque (ex. <a href='function.php?f=attackmelee' target='_blank'>attackMelee</a>) e habilidade (ex. <a href='function.php?f=fireball' target='_blank'>fireball</a>). Neste caso o gladiador ficará esperando até que possa agir de novo para seguir a execução de seu código. Existem também as funções que não levam tempo algum de simulação para serem executadas, como as funções que detectam o ambiente (ex. <a href='function.php?f=gettargetx' target='_blank'>getTargetX</a>).</p>
+			<p>Note que existem algumas funções que levam mais tempo para serem executadas, como por exemplos as funções de ataque (ex. <a href='function/attackmelee' target='_blank'>attackMelee</a>) e habilidade (ex. <a href='function/fireball' target='_blank'>fireball</a>). Neste caso o gladiador ficará esperando até que possa agir de novo para seguir a execução de seu código. Existem também as funções que não levam tempo algum de simulação para serem executadas, como as funções que detectam o ambiente (ex. <a href='function/gettargetx' target='_blank'>getTargetX</a>).</p>
 			
-			<p>A referência para todas as funções da gladCode pode ser acessada na <a href='docs.php'>página da documentação</a> da gladCode.</p>
+			<p>A referência para todas as funções da gladCode pode ser acessada na <a href='docs'>página da documentação</a> da gladCode.</p>
 
 		</div>
 	</div>

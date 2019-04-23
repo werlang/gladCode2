@@ -34,11 +34,21 @@ $(document).ready( function() {
 
 			editor.setTheme("ace/theme/"+ user.theme);
 			editor.setFontSize(user.font +"px");
+
+			if ($('#newglad').length){
+				$('#newglad').remove();
+				$('#fog-skin').fadeIn();
+			}
+			else if (!loadGlad)
+				$('#open').click();
+		}
+		else{
+			$('#fog-skin').fadeIn();
 		}
 	});
 	
 	$('.fog').hide();
-	$('#fog-skin').fadeIn();
+
 	if ($('#glad-code').length){
 		loadGlad = {
 			'id': $('#glad-code #idglad').html(),
@@ -52,9 +62,10 @@ $(document).ready( function() {
 		};
 		nick = $('#glad-code #user').html();
 		$('#glad-code').remove();
-		$('.fog').hide();
 	}
-	
+
+	load_glad_generator($('#fog-skin'));
+
 	$('#header-container').addClass('small');
 	
 	load_editor();
@@ -63,8 +74,6 @@ $(document).ready( function() {
 	$('#float-card .glad-preview').click( function(){
 		$('#skin').click();
 	});
-	
-	load_glad_generator($('#fog-skin'));
 	
 	$('#panel-left-opener').click( function(){
 		if ($(this).hasClass('open')){
@@ -79,18 +88,18 @@ $(document).ready( function() {
 	
 	$('#profile-icon').click( function(){
 		if (user){
-			window.location.href = "profile.php";
+			window.location.href = "profile";
 		}
 		else{
 			googleLogin().then(function(data) {
-				window.location.href = "profile.php";
+				window.location.href = "profile";
 			});
 		}
 	});
 
 	$('#new').click( function(){
 		if (saved)
-			window.location.href = "editor.php";
+			window.location.href = "newglad";
 		else{
 			
 			showDialog(
@@ -99,7 +108,7 @@ $(document).ready( function() {
 			.then( function(data){
 				if (data == "Sim"){
 					saved = true;
-					window.location.href = "editor.php";
+					window.location.href = "newglad";
 				}
 			});
 		}
@@ -115,7 +124,7 @@ $(document).ready( function() {
 							user = data.email;
 							setLoadGlad();
 							$('#login').html(data.nome).off().click( function(){
-								window.location.href = "profile.php";
+								window.location.href = "profile";
 							});
 						});
 					}
@@ -186,7 +195,7 @@ $(document).ready( function() {
 	$('#fog-glads #btn-glad-open').click( function(){
 		if (saved){
 			var id = $('#fog-glads .glad-preview.selected').data('id');
-			window.location.href = "editor.php?g="+id;
+			window.location.href = "glad-"+id;
 		}
 		else{
 			var name = $('#fog-glads .glad-preview.selected .glad span').html();
@@ -197,7 +206,7 @@ $(document).ready( function() {
 				if (data == "Sim"){
 					saved = true;
 					var id = $('#fog-glads .glad-preview.selected').data('id');
-					window.location.href = "editor.php?g="+id;
+					window.location.href = "glad-"+id;
 				}
 			});
 		}
@@ -235,7 +244,7 @@ $(document).ready( function() {
 							if (action == "INSERT"){
 								showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
 									if (data == "Sim")
-										window.open('profile.php?t=battle')
+										window.open('battle')
 								});
 							}
 							else{
@@ -262,7 +271,7 @@ $(document).ready( function() {
 							user = data.email;
 							setLoadGlad();
 							$('#login').html(data.nome).off().click( function(){
-								window.location.href = "profile.php";
+								window.location.href = "profile";
 							});
 						});
 					}
@@ -426,7 +435,7 @@ $(document).ready( function() {
 						var hash = data;
 						showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
 							if (data == "Sim")
-								window.open("playback.php?log="+ hash);
+								window.open("play/"+ hash);
 							else{
 								$.post("back_log.php", {
 									action: "DELETE",
@@ -559,7 +568,7 @@ $(document).ready( function() {
 				$('#help-window .categories').removeClass('selected');
 				$(this).addClass('selected');
 				$('#help-window #subcat').remove();
-				$('#help-window').append("<div id='subcat'><a href='manual.php' class='button' target='_blank'>Manual da gladCode</a><a href='docs.php' class='button' target='_blank'>Referência das funções</a></div>");
+				$('#help-window').append("<div id='subcat'><a href='manual' class='button' target='_blank'>Manual da gladCode</a><a href='docs' class='button' target='_blank'>Referência das funções</a></div>");
 				$('#help-window #subcat').hide().slideDown();
 			}
 		});

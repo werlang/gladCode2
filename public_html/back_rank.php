@@ -1,10 +1,15 @@
 <?php
 	include_once "connection.php";
 	
-	$sql = "SELECT cod FROM gladiators INNER JOIN usuarios ON master = email";
+	$search = mysql_escape_string($_POST['search']);
+	if ($search != ""){
+		$search = " WHERE g.name LIKE '%$search%' OR u.apelido LIKE '%$search%'";
+	}
+
+	$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.email $search";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	$total = $result->num_rows;
-
+	//echo $sql;
 	$units = 15;
 	if (isset($_POST['page']))
 		$page = $_POST['page'];
@@ -21,7 +26,7 @@
 		$page--;
 	}
 	
-	$sql = "SELECT * FROM gladiators INNER JOIN usuarios ON master = email ORDER BY mmr DESC LIMIT $units OFFSET $offset";
+	$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON master = email $search ORDER BY mmr DESC LIMIT $units OFFSET $offset";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	
 	$output = array();
@@ -39,11 +44,12 @@
 		$output['glads'][$i]['user'] = $row['apelido'];
 		
 		$id = $row['cod'];
-		$sql = "SELECT sum(r.reward) FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.cod = $id AND l.time > CURRENT_TIME() - INTERVAL 1 DAY";
+		$sql = "SELECT (SELECT sum(r.reward) FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.cod = $id AND l.time > CURRENT_TIME() - INTERVAL 1 DAY) AS sumreward, (SELECT COUNT(*)+1 FROM gladiators g INNER JOIN usuarios u ON master = email WHERE mmr > (SELECT mmr FROM gladiators WHERE cod = $id)) AS ranking";
 		if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result2->fetch_assoc();
 		
-		$output['glads'][$i]['change24'] = $row['sum(r.reward)'];
+		$output['glads'][$i]['change24'] = $row['sumreward'];//$row['sum(r.reward)'];
+		$output['glads'][$i]['rank'] = $row['ranking'];//$row['sum(r.reward)'];
 		
 		$i++;
 	}

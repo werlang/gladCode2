@@ -82,7 +82,7 @@ void upgradeINT(int gladid){
 	(g+gladid)->up = 3;
 }
 
-float getSimCounter(int gladid){
+float getSimTime(int gladid){
 	return (g+gladid)->time;
 }
 
@@ -1037,9 +1037,14 @@ int ambush(int gladid){
 	return r;
 }
 
+//mostra uma mensagem de fala
 void speak(int gladid, char *message){
 	strncpy((g+gladid)->message, message, 250);
 	(g+gladid)->message[249] = '\0';
 	(g+gladid)->msgtime = 3;
 }
 
+//retorna o nível do gladiador
+int getLvl(int gladid){
+	return (g+gladid)->lvl;
+}
