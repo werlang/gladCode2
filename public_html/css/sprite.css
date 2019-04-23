@@ -120,7 +120,8 @@ canvas {
 	width: 64px;
     cursor: pointer;
     margin: 2px;
-    border-radius: 7px;
+	border-radius: 7px;
+	z-index: 1;
 }
 
 .img-button.hidden {

@@ -4,9 +4,31 @@
 	$action = $_POST['action'];
 	if ($action == "GET"){
 		$user = $_SESSION['user'];
-		$sql = "SELECT * FROM messages m INNER JOIN usuarios u ON email = sender WHERE receiver = '$user' ORDER BY time DESC";
+		$page = mysql_escape_string($_POST['page']);
+
+		$sql = "SELECT cod FROM messages m INNER JOIN usuarios u ON email = sender WHERE receiver = '$user'";
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$total = $result->num_rows;
+
+		$units = 10;
+		
+		if ($page < 1)
+			$page = 1;
+		$offset = $units * ($page - 1);
+		if ($offset >= $total){
+			$offset = $total - 1;
+			$page--;
+		}
+
+		$sql = "SELECT * FROM messages m INNER JOIN usuarios u ON email = sender WHERE receiver = '$user' ORDER BY time DESC LIMIT $units OFFSET $offset";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		
+		$meta = array();
+		$meta['page'] = $page;
+		$meta['total'] = $total;
+		$meta['start'] = $offset + 1;
+		$meta['end'] = $offset + $result->num_rows;
+
 		$info = array();
 		$i = 0;
 		while($row = $result->fetch_assoc()){
@@ -20,8 +42,10 @@
 			$info[$i]['isread'] = $row['isread'];
 			$i++;
 		}
+
+		$output = array('meta' => $meta, 'info' => $info);
 		
-		echo json_encode($info);
+		echo json_encode($output);
 	}
 	elseif ($action == "SEND"){
 		$sender = $_SESSION['user'];

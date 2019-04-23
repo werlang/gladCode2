@@ -19,6 +19,8 @@
 	<title>gladCode - Perfil</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='jquery-ui/jquery-ui.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/profile.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/glad-card.css'/> 
@@ -130,6 +132,10 @@
 			<div class='content' data-menu='ranking'>
 				<div id='ranking-container'>
 					<h2>Ranking</h2>
+					<div id='search'>
+						<i class="material-icons md-light md-24">search</i>
+						<input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
+					</div>
 					<div class='table'></div>
 					<div id='page-title'>
 						<button id='prev'></button>
@@ -142,6 +148,11 @@
 				<div id='message-panel'>
 					<h2>Mensagens</h2>
 					<div class='table'></div>
+					<div id='page-title'>
+						<button id='prev'></button>
+						<span></span> - <span></span> de <span></span>
+						<button id='next'></button>
+					</div>
 				</div>
 			</div>
 			<div class='content' data-menu='friends'>

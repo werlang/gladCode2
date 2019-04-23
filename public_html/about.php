@@ -19,7 +19,7 @@
 	<div id='frame'>
 		<div id='mission-container'><div id='mission'>
 			<div id='line1'>Programar pode ser divertido</div>
-			<div id='line2'>É nisso que a gladCode acredita. Trazendo o ambiente de programação para uma temática interessante como dos jogos, em que o usuário veja graficamente o resultado de seus esforços através das ações de seu avatar, a gladCode buscar incitar iniciantes e experts em programação para competirem e melhorarem suas habilidades. Diversão e aprendizado é o nosso objetivo.</div>
+			<div id='line2'>É nisso que a gladCode acredita. Trazendo o ambiente de programação para uma temática interessante como dos jogos, em que o usuário veja graficamente o resultado de seus esforços através das ações de seu avatar, a gladCode busca incitar iniciantes e experts em programação para competirem e melhorarem suas habilidades. Diversão e aprendizado é o nosso objetivo.</div>
 		</div></div>
 		<div id='author'>
 			<div class='row title'>Pablo Werlang</div>

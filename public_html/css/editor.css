@@ -137,14 +137,6 @@ body {
     align-items: center;
 }
 
-#fog-glads #open-glad {
-	width: 100%;
-	max-width: 600px;
-	background-color: white;
-	border-radius: 3px;
-	box-shadow: 1px 1px 5px black;
-	max-height: 100vh;
-}
 
 #fog-glads #button-container,
 #fog-battle #button-container {
@@ -182,9 +174,10 @@ body {
     filter: brightness(85%);
 }
 
+#fog-glads #open-glad,
 #fog #settings-window,
 #fog-battle #battle-window {
-		width: 600px;
+	width: 600px;
     background-color: white;
     border-radius: 3px;
     box-shadow: 1px 1px 5px black;
@@ -200,8 +193,9 @@ body {
     font-weight: bold;
 }
 
+#fog-glads #message,
 #fog-battle #message {
-    margin: 0px 30px;
+		margin: 0px 30px;
 }
 
 #fog-battle #selection-container {

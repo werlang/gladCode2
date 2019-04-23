@@ -51,8 +51,7 @@ var game;
 function load_phaser(){
 	if (game)
 		game.destroy();
-	game = new Phaser.Game(screenW, screenH, Phaser.AUTO, 'canvas-div', { preload: preload, create: create, update: update, render: render });
-	$('#canvas-container').show();
+	game = new Phaser.Game($(document).width(), $(document).height(), Phaser.AUTO, 'canvas-div', { preload: preload, create: create, update: update, render: render });
 }
 
 function preload() {
@@ -93,6 +92,8 @@ function preload() {
 	game.load.start();
 	loadCache = true;
 	resize();
+	$('#canvas-div canvas').focus();
+	game.camera.focusOnXY(screenW * game.camera.scale.x / 2, screenH * game.camera.scale.y / 2);
 }
 
 var background, back_top, back_walls;
@@ -109,10 +110,11 @@ var poison = (Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate);
 var mask;
 var groupglad;
 
+var bar = {};
 function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
-	$('#canvas-div canvas').css('touch-action','pan-y');
+	//$('#canvas-div canvas').css('touch-action','pan-y');
 
 	background = game.add.image(0, 0, 'background');
 	back_top = game.add.image(0, 0, 'background_top');
@@ -133,8 +135,37 @@ function create() {
 	music = game.add.audio('music', 1, true);
 	ending = game.add.audio('ending');
 	victory = game.add.audio('victory');
+
+	game.input.mouse.onMouseWheel = zoomWheel;
 	
-	$('#canvas-container').hide();
+	game.input.onDown.add( function(input){
+		if (input.button === Phaser.Mouse.LEFT_BUTTON)
+			game.input.mouse.drag = true;
+	}, this);
+	game.input.mouse.drag = false;
+	game.input.onUp.add( function(mouse){
+		game.input.mouse.drag = false;
+	}, this);
+
+	var graphics = {};
+	graphics.back = game.add.graphics(0,0);
+	graphics.back.beginFill(0x000000);
+	graphics.back.drawRect(-100,0,30,9);
+
+	graphics.hp = game.add.graphics(0,0);
+	graphics.hp.beginFill(0xff0000);
+	graphics.hp.drawRect(-100,0,30,5);
+	
+	graphics.ap = game.add.graphics(0,0);
+	graphics.ap.beginFill(0x0000ff);
+	graphics.ap.drawRect(-100,0,30,4);
+
+	bar.back = game.add.sprite(-100,0, graphics.back.generateTexture());
+	bar.back.alpha = 0.15;
+	bar.hp = game.add.sprite(-100,0, graphics.hp.generateTexture());
+	bar.hp.alpha = 0.4;
+	bar.ap = game.add.sprite(-100,0, graphics.ap.generateTexture());
+	bar.ap.alpha = 0.4;
 }
 
 function update() {
@@ -180,27 +211,24 @@ function update() {
 				'xp': parseInt(json.glads[i].xp),
 				'time': false,
 			};
+
+			gladArray[i].bars = game.add.bitmapData(game.width, game.height);
+			gladArray[i].bars.addToWorld();
 		}
 		music.play();
 		music.volume = 0.1;
-		
+		//game.camera.follow(sprite[0]);
 	}
 	else if (sprite.length > 0){
 		if (!startsim){
 			startsim = true;
 			$('#fog').remove();
-			$('#canvas-container').css({'opacity':1, 'position':'relative'});
-			$('body').scrollTo('#canvas-container');
+			$('#canvas-container').css({'opacity':1});
 			resize();	
 			pausesim = false;
 		}
 
-		if (json && simtimenow != json.simtime){
-			if ($('#canvas-container').css('display') == 'none'){
-				$('#canvas-container').show();
-				resize();
-			}
-			
+		if (json && simtimenow != json.simtime){			
 			simtimenow = json.simtime;
 			for (i=0 ; i<nglad ; i++){
 				var x = parseFloat(json.glads[i].x);
@@ -218,6 +246,8 @@ function update() {
 				sprite[i].x = arenaX1 + x * arenaRate;
 				sprite[i].y = arenaY1 + y * arenaRate;
 				
+				showHpApBars(i);
+
 				if (level > gladArray[i].level){
 					gladArray[i].level = level;
 					var lvlup = game.add.sprite(sprite[i].x, sprite[i].y, 'level');
@@ -343,7 +373,7 @@ function update() {
 				}
 					
 				//stun
-				if (!gladArray[i].stun && json.glads[i].buffs.stun.timeleft > 0.1){
+				if (!gladArray[i].stun && json.glads[i].buffs.stun.timeleft > 0.1 && gladArray[i].alive){
 					gladArray[i].stun = game.add.sprite(sprite[i].x, sprite[i].y, 'stun');
 					gladArray[i].stun.anchor.setTo(0.5, 1);
 					gladArray[i].stun.scale.setTo(0.6);
@@ -352,7 +382,7 @@ function update() {
 					gladArray[i].stun.animations.play('stun', null, true, false);
 					game.add.audio('stun').play();
 				}
-				else if (gladArray[i].stun && json.glads[i].buffs.stun.timeleft <= 0.1){
+				else if (gladArray[i].stun && (json.glads[i].buffs.stun.timeleft <= 0.1 || !gladArray[i].alive)){
 					gladArray[i].stun.destroy();
 					gladArray[i].stun = false;
 				}
@@ -494,6 +524,34 @@ function update() {
 	groupglad.sendToBack(mask);
 	groupglad.sendToBack(background);
 	groupglad.bringToTop(back_top);
+
+	if (game.input.mouse.drag){
+		if (game.camera.target){
+			$('.ui-glad').removeClass('follow');
+			game.camera.unfollow();
+		}
+		game.camera.view.y -= game.input.speed.y;
+		game.camera.view.x -= game.input.speed.x;
+	}
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_ADD) || game.input.keyboard.isDown(Phaser.Keyboard.EQUALS))
+		zoomWheel({deltaY: -1});
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_SUBTRACT) || game.input.keyboard.isDown(Phaser.Keyboard.UNDERSCORE))
+		zoomWheel({deltaY: 1});
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+		game.camera.view.x -= 10;
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+		game.camera.view.x += 10;
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
+		game.camera.view.y -= 10;
+
+	if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
+		game.camera.view.y += 10;
+
 }
 
 function render() {
@@ -570,15 +628,23 @@ function update_ui(json){
 			$('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
 		}
 		
-		if ($('.lvl-value').eq(i).html() != lvl){
-			$('.lvl-value').eq(i).html(lvl);
+		if ($('.lvl-value span').eq(i).html() != lvl){
+			$('.lvl-value span').eq(i).html(lvl);
 			$('.glad-str span').eq(i).html(STR);
 			$('.glad-agi span').eq(i).html(AGI);
 			$('.glad-int span').eq(i).html(INT);
+			
+			$('.lvl-value').eq(i).addClass('up');
+			let j = i;
+			setTimeout( function(){
+				$('.lvl-value').eq(j).removeClass('up');
+			}, 500);
+
+
 		}
 		
-		if ($('.xp-bar .filled').eq(i).width() != 100 - xp)
-			$('.xp-bar .filled').eq(i).width(100 - xp +'%');
+		if ($('.xp-bar .filled').eq(i).width() != xp)
+			$('.xp-bar .filled').eq(i).height(xp +'%');
 		
 		if ($('.hp-bar .filled').eq(i).width() != hp/maxhp*100)
 			$('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
@@ -653,33 +719,65 @@ function debugTimer(){
 }
 
 $(window).keydown(function(event) {
-	if(event.ctrlKey && event.altKey && event.keyCode == 70) { //ctrl+alt+f
-		if (showFPS)
-			showFPS = false;
+	if(event.keyCode == Phaser.Keyboard.F)
+		showFPS = (showFPS + 1) % 2;
+
+	if(event.keyCode == Phaser.Keyboard.B)
+		showbars = (showbars + 1) % 2;
+
+	if(event.keyCode == Phaser.Keyboard.M){
+		if ($('#ui-container').css('display') == 'flex')
+			$('#ui-container').fadeOut();
 		else
-			showFPS = true;
+			$('#ui-container').fadeIn();
 	}
+
+	if(event.keyCode == Phaser.Keyboard.SPACEBAR)
+		$('#pause').click();
+
+	if(event.keyCode == Phaser.Keyboard.A)
+		$('#back-step').click();
+
+	if(event.keyCode == Phaser.Keyboard.D)
+		$('#fowd-step').click();
+
+	if(event.keyCode >= Phaser.Keyboard.ONE && event.keyCode <= Phaser.Keyboard.FIVE){
+		var i = event.keyCode - Phaser.Keyboard.ONE;
+		$('.ui-glad').eq(i).click();
+	}
+
 });
+
+function getGladPositionOnCanvas(gladid){
+	var ph = (screenH * game.camera.scale.y) / (25 + 6);
+	var pw = (screenW * game.camera.scale.x) / (25 + 4);
+	
+	var x = pw*2 + pw * parseFloat(json.glads[gladid].x);
+	var y = ph*5 + ph * parseFloat(json.glads[gladid].y);
+	var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
+	var cl = $('#canvas-div canvas').position().left;
+	return {x: x+cl, y: y+ct};
+}
 
 function showMessageBaloon(gladid){
 	var message = json.glads[gladid].message;
 
-	if (message != ""){
-		var ph = $('#canvas-div canvas').height() / (25 + 6);
-		var pw = $('#canvas-div canvas').width() / (25 + 4);
-		
-		$('.baloon.glad-'+ gladid).remove();
-		$('#canvas-div').append("<div class='baloon glad-"+ gladid +"'>"+ message +"</div>");
+	if (message != "" && json.glads[gladid].hp > 0){
+		var gpos = getGladPositionOnCanvas(gladid);
+
+		if (!$('.baloon.glad-'+ gladid).length)
+			$('#canvas-div').append("<div class='baloon glad-"+ gladid +"'>"+ message +"</div>");
+
 		var baloon = $('.baloon.glad-'+ gladid);
-		var x = pw*2 + pw * parseFloat(json.glads[gladid].x) + 10;
-		var y = ph*5 + ph * parseFloat(json.glads[gladid].y) - baloon.outerHeight() - 10;
-		var ct = $('#canvas-div canvas').position().top;
-		var cl = $('#canvas-div canvas').position().left;
-		baloon.css({'top': ct+y, 'left': cl+x});
+		var x = gpos.x + 15 * game.camera.scale.x;
+		var y = gpos.y - 15 * game.camera.scale.y - baloon.outerHeight();
+		baloon.css({'top': y, 'left': x});
 		if (baloon.width() < 200 && baloon.height() >= 50){
-			baloon.css({'left': cl+x-230});
+			baloon.css({'left': x-230});
 			baloon.addClass('left');
 		}
+		else if (baloon.hasClass('left'))
+			baloon.removeClass('left');
 	}
 	else{
 		$('.baloon.glad-'+ gladid).fadeOut( function(){
@@ -689,3 +787,90 @@ function showMessageBaloon(gladid){
 	
 }
 
+var showbars = true;
+function showHpApBars(gladid){
+	if (gladArray[gladid].bars)
+		gladArray[gladid].bars.clear();
+
+	if (showbars && json.glads[gladid].hp > 0){
+		var x = arenaX1 + json.glads[gladid].x * arenaRate;
+		var y = arenaY1 + json.glads[gladid].y * arenaRate
+		var hp = parseFloat(json.glads[gladid].hp);
+		var maxhp = parseFloat(json.glads[gladid].maxhp);
+		var ap = parseFloat(json.glads[gladid].ap);
+		var maxap = parseFloat(json.glads[gladid].maxap);
+		var barsize = 30;
+
+		gladArray[gladid].bars.draw(bar.back, x + -barsize/2, y + -35, barsize, 9);
+		gladArray[gladid].bars.draw(bar.hp, x + -barsize/2, y + -35, hp/maxhp * barsize, 5);
+		gladArray[gladid].bars.draw(bar.ap, x + -barsize/2, y + -30, ap/maxap * barsize, 4);
+		
+	}
+}
+
+function zoomWheel(wheel){
+	var scaleValue = 0.03;
+	var delta = wheel.deltaY / Math.abs(wheel.deltaY) * scaleValue;
+	var canvasW = screenW * (game.camera.scale.x - delta);
+	var canvasH = screenH * (game.camera.scale.y - delta);
+
+	var bind = null;
+	if ($(window).width() > $(window).height()){
+		if (canvasW >= $(window).width())
+			bind = "width";
+		else if (canvasH <= $(window).height())
+			bind = "height";
+		else
+			bind = "none";
+	}
+	else{
+		if (canvasH >= $(window).height())
+			bind = "height";
+		else if (canvasW <= $(window).width())
+			bind = "width";
+		else
+			bind = "none";
+	}
+
+	if (bind == "width"){
+		canvasW = $(window).width();
+		canvasH = $(window).width() * screenH/screenW;
+		game.camera.scale.x = $(window).width() / screenW;
+		game.camera.scale.y = $(window).width() / screenW;
+	}
+	else if (bind == "height"){
+		canvasH = $(window).height();
+		canvasW = $(window).height() * screenW/screenH;
+		game.camera.scale.x = $(window).height() / screenH;
+		game.camera.scale.y = $(window).height() / screenH;
+	}
+	else{
+		game.camera.scale.x -= delta;
+		game.camera.scale.y -= delta;
+	}
+
+	if (canvasW > $(window).width())
+		canvasW = $(window).width();
+	if (canvasH > $(window).height())
+		canvasH = $(window).height();
+
+	game.scale.setGameSize(canvasW, canvasH);
+	game.camera.bounds.width = screenW;
+	game.camera.bounds.height = screenH;
+
+	if (bind == "none"){
+		var sizeIncrease = screenH * scaleValue;
+		if (game.input.y <= game.camera.height/3){
+			game.camera.y -= sizeIncrease;
+		}
+		else if (game.input.y >= game.camera.height*2/3){
+			game.camera.y += sizeIncrease;
+		}
+		else if (delta < 0){
+			game.camera.y += sizeIncrease / 2;
+		}
+		else{
+			game.camera.y -= sizeIncrease / 2;
+		}
+	}
+}

@@ -28,7 +28,7 @@ $(document).ready( function(){
 			if (JSON.parse(data).length == 0)
 			showDialog("Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?",["Sim","Não, obrigado"]).then( function(data){
 				if (data == "Sim")
-					window.location.href = "editor.php";
+					window.location.href = "editor";
 			});
 		});
 	});
@@ -190,7 +190,7 @@ $(document).ready( function(){
 									//console.log(data);
 									$('#glads-container .glad-preview').last().after("<div class='glad-add'><div class='image'></div><div class='info'>Clique para criar um novo gladiador</div></div>");
 									$('#glads-container .glad-add').first().click( function(){
-										window.location.href = "editor.php";
+										window.location.href = "editor";
 									});
 								});
 							}
@@ -203,7 +203,7 @@ $(document).ready( function(){
 							var name = $(this).parents('.info').find('.glad span').html();
 							showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique no botão para abrir o editor",["Cancelar","OK"]).then( function(data){
 								if (data == "OK")
-									window.open("editor.php?g="+ card.data('id'));
+									window.open("glad-"+ card.data('id'));
 							});
 						}
 						else{
@@ -221,7 +221,7 @@ $(document).ready( function(){
 								$('#fog').click();
 							});
 							$('#editor').click( function(){
-								window.open("editor.php?g="+ card.data('id'));
+								window.open("glad-"+ card.data('id'));
 								$('#fog').click();
 							});
 						}
@@ -239,7 +239,7 @@ $(document).ready( function(){
 				if (i < initglads + Math.floor(user.lvl/gladsinterval)){
 					$('#glads-container .glad-add .info').last().html("Clique para criar um novo gladiador");
 					$('#glads-container .glad-add').last().click( function(){
-						window.location.href = "editor.php";
+						window.location.href = "editor";
 					});
 				}
 				else{
@@ -617,6 +617,7 @@ $(document).ready( function(){
 	});
 
 	var rankpage = 1;
+	var ranksearch = "";
 	$('#ranking-container #prev').click( function(){
 		rankpage--;
 		reload_ranking();
@@ -628,12 +629,20 @@ $(document).ready( function(){
 	$('#menu #ranking').click( function() {
 		reload_ranking();
 	});
+
+	$('#ranking-container #search .input').on('input', function(e){
+		ranksearch = $(this).val();
+		rankpage = 1;
+		reload_ranking();
+	});
 	
 	function reload_ranking(){
 		$.post("back_rank.php",{
-			page: rankpage
+			page: rankpage,
+			search: ranksearch
 		})
 		.done( function(data){
+			//console.log(data);
 			try{
 				data = JSON.parse(data);
 			}
@@ -650,7 +659,7 @@ $(document).ready( function(){
 			data = data.glads;
 			
 			for (var i in data){
-				var pos = parseInt(i) + gstart;
+				var pos = data[i].rank;
 				
 				var rowrank = '';
 				if (pos == 1)
@@ -689,16 +698,51 @@ $(document).ready( function(){
 		});
 	}
 	
+	var msgpage = 1;
+	$('#message-panel #prev').click( function(){
+		msgpage--;
+		reload_messages();
+	});
+	$('#message-panel #next').click( function(){
+		msgpage++;
+		reload_messages();
+	});
 	$('#menu #messages').click( function() {
+		reload_messages();
+	});
+	function reload_messages(){
 		//checkNotifications();
 		$('#message-panel #full-message').remove();
 		$('#message-panel .table').show();
 		$.post("back_message.php",{
-			action: "GET"
+			action: "GET",
+			page: msgpage
 		})
 		.done( function(data){
-			data = JSON.parse(data);
 			//console.log(data);
+			try{
+				data = JSON.parse(data);
+			}
+			catch(error){
+				console.log(error);
+			}
+
+			var meta = data.meta;
+			data = data.info;
+
+			$('#message-panel #page-title span').eq(0).html(meta.start);
+			$('#message-panel #page-title span').eq(1).html(meta.end);
+			$('#message-panel #page-title span').eq(2).html(meta.total);
+
+			if (meta.page == 1)
+				$('#message-panel #prev').prop("disabled", true);
+			else
+				$('#message-panel #prev').removeProp("disabled");
+			if (meta.end == meta.total)
+				$('#message-panel #next').prop("disabled", true);
+			else
+				$('#message-panel #next').removeProp("disabled");
+
 			$('#message-panel .table').html("");
 			for (var i in data){
 				$('#message-panel .table').append("<div class='row'><div class='cell user'>"+ data[i].nick +"</div><div class='cell message'>"+ data[i].message +"</div><div class='cell time'>"+ getMessageTime(data[i].time) +"</div></div>");
@@ -785,7 +829,7 @@ $(document).ready( function(){
 				});
 			});
 		});
-	});
+	}
 	
 	$('#friend-panel #request, #friend-panel #friends').addClass('hidden');
 
@@ -1042,7 +1086,7 @@ $(document).ready( function(){
 
 	$('#menu #logout').click( function() {
 		googleLogout().then( function(){
-			window.location.href = 'index.php';
+			window.location.href = 'index';
 		});
 	});
 		
@@ -1158,7 +1202,7 @@ function preBattleShow(glads){
 		if (progress >= 1)
 			clearInterval(preBattleInt);
 		
-		var tipTime = 4; 
+		var tipTime = 10; 
 		if ((timeElapsed / 100) % tipTime == 0){
 			var i = parseInt(Math.random() * tipArray.length);
 			$('#pre-battle-show #tips').html(tipArray[i]);

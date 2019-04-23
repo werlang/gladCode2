@@ -3,7 +3,7 @@
 	"ptname": "pegaX",
 	"syntax": "float getX ( void );",
 	"description": {
-		"long": "Retorna o valor da coordenada x do gladiador. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual.php#nav-sim'>arena</a>.",
+		"long": "Retorna o valor da coordenada x do gladiador. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual#nav-sim'>arena</a>.",
 		"brief": "Retorna a coordenada x do gladiador."
 	},
 	"param": [

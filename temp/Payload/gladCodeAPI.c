@@ -4,9 +4,9 @@ Estas funções somente enviam sinais do cliente para o servidor. O servidor é 
 Desta maneira somente com a sintaxe dos sinais, pode-se fazer o port facilmente para qualquer linguagem.
 */
 
-float getSimCounter(){
+float getSimTime(){
 	char r[10];
-	sendMessage("getSimCounter", r);
+	sendMessage("getSimTime", r);
 	return atof(r);
 }
 
@@ -485,5 +485,11 @@ void speak(char *message){
 	sprintf(apiMessage, "speak %s", m);
 	apiMessage[999] = '\0';
 	sendMessage(apiMessage, r);
+}
+
+int getLvl(){
+	char r[10];
+	sendMessage("getLvl", r);
+	return atoi(r);
 }
 

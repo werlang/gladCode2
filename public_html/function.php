@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8' />
+	<BASE href="/~gladcode/">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode</title>
@@ -42,14 +43,9 @@
 			
 		</div>
 	</div>
-	<div id='footer-wrapper'>
-		<div id='footer'>
-			<div>© 2018 gladcode.tk</div>
-			<div>Pablo Werlang</div>
-			<div><a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></div>
-		</div>
-	</div>
 	<?php
+		include("footer.php");
+
 		$func = "";
 		if (isset($_GET['f']))
 			$func = $_GET['f'];

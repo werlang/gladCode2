@@ -907,6 +907,35 @@ body{
 	width: 100%;
 }
 
+#ranking-container #search{
+	display: flex;
+	align-items: center;
+}
+
+#ranking-container #search i.material-icons{
+    margin-right: -44px;
+    margin-left: 20px;
+    z-index: 1;
+}
+
+#ranking-container #search .input{
+	box-sizing: border-box;
+    text-align: left;
+    border: 0px solid black;
+    padding: 15px 0px 15px 60px;
+    background-color: #6c97a9;
+    color: white;
+}
+
+#ranking-container #search .input::placeholder{
+	color:#b1c9d3;
+	transition: all 0.3s;
+}
+
+#ranking-container #search:hover .input::placeholder{
+	color:#cdd9df;
+}
+
 #ranking-container .table .mine{
 	color: #008eca;
 }
@@ -1572,3 +1601,17 @@ body{
 	flex-basis: 80px;
 	flex-grow: 0;
 }
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }

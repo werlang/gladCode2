@@ -174,6 +174,54 @@ $(document).ready( function() {
 	$('#fullscreen').click( function(){
 		setFullScreen(!isFullScreen());
 	});
+
+	$('#help').click( function(){
+		$('body').append("<div id='fog'><div id='help-window' class='blue-window'><div id='content'><h2>Controle da câmera</h2><div class='table'><div class='row'><div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div><div class='cell'>Mover a câmera</div></div><div class='row'><div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div><div class='cell'>Zoom da arena</div></div><div class='row'><div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div><div class='cell'>Acompanhar um gladiador</div></div></div><h2>Teclas de atalho</h2><div class='table'><div class='row'><div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div></div><div class='row'><div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div></div><div class='row'><div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div></div><div class='row'><div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div></div><div class='row'><div class='cell'><span class='key'>A</span></div><div class='cell'>Retroceder simulação</div></div><div class='row'><div class='cell'><span class='key'>D</span></span></div><div class='cell'>Avançar simulação</div></div></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
+
+		$('#help-window #ok').click( function(){
+			$('#fog').remove();
+		});
+	});
+
+	$('#settings').click( function(){
+		$('body').append("<div id='fog'><div id='settings-window' class='blue-window'><h2>Preferências</h2><div class='check-container'><div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap</label></div><div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores</label></div><div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS)</label></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
+
+		if (showbars)
+			$('#pref-bars input').prop('checked', true);
+		if ($('#ui-container').css('display') == 'flex')
+			$('#pref-frames input').prop('checked', true);
+		if (showFPS)
+			$('#pref-fps input').prop('checked', true);
+
+		$('.checkslider').each( function(){
+			create_checkbox($(this));
+		});
+	
+		$('#settings-window #ok').click( function(){
+			$('#fog').remove();
+		});
+
+		$('#pref-bars input').change( function(){
+			if ($(this).prop('checked'))
+				showbars = true;
+			else
+				showbars = false;
+		});
+
+		$('#pref-frames input').change( function(){
+			if ($(this).prop('checked'))
+				$('#ui-container').fadeIn();
+			else
+				$('#ui-container').fadeOut();
+		});
+
+		$('#pref-fps input').change( function(){
+			if ($(this).prop('checked'))
+				showFPS = true;
+			else
+				showFPS = false;
+		});		
+	});
 	
 	$( "#time" ).slider({
 		range: "min",
@@ -196,7 +244,13 @@ $(document).ready( function() {
 			timestep = ui.value;
 		}
 	});
-	
+
+	$([window, document]).focusin(function(){
+		//console.log("entrou");
+	}).focusout(function(){
+		pausesim = false; //coloca false na var
+		$('#pause').click(); //clica no botao e pause fica true
+	});	
 });
 
 function isFullScreen(){
@@ -248,20 +302,26 @@ $(window).resize( function() {
 });
 
 function resize() {
-	if ($(window).height() > $(window).width()){
-		$('#canvas-div canvas').css({'max-width': '100%', 'max-height': $('#canvas-div canvas').width() / screenRatio});
-		
+	var canvasH = $(window).height();
+	var canvasW = $(window).height() * screenW/screenH;
+	game.scale.setGameSize(canvasW, canvasH);
+	if ($(window).width() > $(window).height()){
+		game.camera.scale.x = $(window).height() / screenH;
+		game.camera.scale.y = $(window).height() / screenH;
 	}
-	else
-		$('#canvas-div canvas').css({'max-height': '100%', 'max-width': $('#canvas-div canvas').height() * screenRatio});
+	else{
+		game.camera.scale.x = $(window).width() / screenW;
+		game.camera.scale.y = $(window).width() / screenW;
+	}	
+	game.camera.bounds.width = screenW;
+	game.camera.bounds.height = screenH;
+
 }
 
 var show_final_score = true;
 function start_timer(steps){
 	istep = setInterval( function(){
 		if (startloop){
-			$('#canvas-container').css('opacity',1);
-			$('#canvas-container').fadeIn(1000);
 			//console.log(steps[timestep]);
 			if (timestep < 0)
 				timestep = 0;
@@ -283,7 +343,7 @@ function start_timer(steps){
 						name = "Empate";
 						team = "";
 					}
-					$('#canvas-container').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
+					$('body').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
 					$('#end-message #retornar').click( function() {
 						show_final_score = false;
 						$('#fog').remove();
@@ -343,9 +403,20 @@ function start_timer(steps){
 
 function create_ui(nglad){
 	$('#ui-container').html("");
-	for (i=0 ; i<nglad ; i++){
+	for (let i=0 ; i<nglad ; i++){
 		$('#ui-container').append("<div class='ui-glad'></div>");
 		$('.ui-glad').last().load("ui_template.html", function(){
+			$(this).click( function(){
+				if ($(this).hasClass('follow') || $(this).hasClass('dead')){
+					game.camera.unfollow();
+					$('.ui-glad').removeClass('follow');
+				}
+				else{
+					game.camera.follow(sprite[i]);
+					$('.ui-glad').removeClass('follow');
+					$(this).addClass('follow');
+				}
+			});
 		});
 	}
 }
