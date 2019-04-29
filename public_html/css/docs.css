@@ -24,6 +24,7 @@ body{
 	font-family: roboto, helvetica, arial, sans-serif;
 	margin-top: 5px;
 	margin-left: 340px;
+	min-height: 100vh;
 }
 
 #side-menu {
@@ -35,6 +36,8 @@ body{
 	height: 100vh;
 	overflow-y: auto;
 	padding-top: 50px;
+	padding: 50px 0px 25px 0px;
+	box-sizing: border-box;
 }
 
 #ads {
@@ -44,7 +47,7 @@ body{
 @media only screen and (min-width: 900px) {
 
 #content {
-    padding: 80px 30px;
+    padding: 80px 30px 200px;
 }
 }
 
@@ -118,7 +121,8 @@ p {
 
 #side-menu ul {
 	list-style: none;
-	padding-left: 35px;
+	padding-left: 0px;
+	cursor: pointer;
 }
 
 #side-menu #search {
@@ -146,11 +150,34 @@ p {
 
 #side-menu a {
 	color: #646464;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+#side-menu ul {
+	margin: 0;
 }
 
 #side-menu li {
-	margin-bottom: 15px;
+	height: 35px;
 	transition: 0.3s all;
+	display: none;
+	align-items: center;
+	padding-left: 30px;
+}
+
+#side-menu ul ul li {
+	padding-left: 60px;
+}
+
+#side-menu ul ul ul li {
+	padding-left: 90px;
+}
+
+#side-menu li.visible {
+	display: flex;
 }
 
 #side-menu li:hover {
@@ -167,4 +194,30 @@ p {
 
 #side-menu li i.open {
 	transform: rotate(90deg);
+}
+
+#side-menu .here a {
+	font-weight: bold;
+	color: black;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+	margin: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0); 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }

@@ -7,12 +7,12 @@
 	<title>gladCode - Editor</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/editor.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/sprite.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/slider.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/glad-card.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/editor.css'/> 
 	<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script src="jquery-ui/jquery-ui.js"></script>

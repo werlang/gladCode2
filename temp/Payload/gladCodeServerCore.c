@@ -146,36 +146,16 @@ void setXp(int gladid, float dmg, int enemy){
 	(g+gladid)->xp += round(xp);
 	int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
 	if ((g+gladid)->xp >= tonext && (g+gladid)->hp > 0){
-		float expected = 200 + ((g+gladid)->lvl - 1) * 10;
+		float recovered = 35 + 5 * (g+gladid)->lvl; //roughtly (200+lvl*25)*0.2 (20% avg life at given lvl)
 		
-		(g+gladid)->hp += expected * 0.5;
+		(g+gladid)->hp += recovered;
 		if ((g+gladid)->hp > (g+gladid)->maxhp)
 			(g+gladid)->hp = (g+gladid)->maxhp;
-		(g+gladid)->ap += expected * 0.2;
+		(g+gladid)->ap += recovered;
 		if ((g+gladid)->ap > (g+gladid)->maxap)
 			(g+gladid)->ap = (g+gladid)->maxap;
 		
-		if ((g+gladid)->up == 1){
-			(g+gladid)->STR++;
-			(g+gladid)->hp += 20;
-			(g+gladid)->maxhp += 20;
-			(g+gladid)->mdmg += 1.5;
-		}
-		if ((g+gladid)->up == 2){
-			float d = (g+gladid)->AGI - (5 + ((g+gladid)->lvl - 1)*0.5);
-			(g+gladid)->AGI++;
-			(g+gladid)->spd += 0.1;
-			(g+gladid)->as = 3 * d / (d + 10) + 0,5;
-			(g+gladid)->ts += 18;
-			(g+gladid)->rdmg += 1;
-		}
-		if ((g+gladid)->up == 3){
-			(g+gladid)->INT++;
-			(g+gladid)->ap += 20;
-			(g+gladid)->maxap += 20;
-			(g+gladid)->cs += 0.1;
-		}
-
+		(g+gladid)->up += POINTS_LVL_UP;
 		(g+gladid)->lvl++;
 		(g+gladid)->xp -= round(tonext);
 	}
@@ -193,10 +173,7 @@ void addBuff(int id, int code, float timeleft, float value){
     }
     else if (code == BUFF_MOVEMENT){
         //o valor do buff novo substitui o do anterior
-        if ((g+id)->buffs[code].timeleft > 0)
-            (g+id)->spd /= (g+id)->buffs[code].value;
         (g+id)->buffs[code].value = value;
-        (g+id)->spd *= value;
     }
     else if (code == BUFF_RESIST){
         (g+id)->buffs[code].value = value;
@@ -237,12 +214,6 @@ void updateBuffs(int gladid){
                 (g+gladid)->hp -= (g+gladid)->buffs[i].value * (1 - (g+gladid)->buffs[BUFF_RESIST].value/2);
 				if ((g+gladid)->hp < 0.01) //previne que hp tipo 0.000001 passe como vivo
 					(g+gladid)->hp = 0;
-            }
-            //caso o buff acabe, reduz de volta a velocidade
-            else if (i == BUFF_MOVEMENT){
-                if ((g+gladid)->buffs[i].timeleft <= 0){
-                    (g+gladid)->spd /= (g+gladid)->buffs[i].value;
-                }
             }
             //se atacar perde o buff
             else if (i == BUFF_INVISIBLE){
@@ -342,7 +313,7 @@ void updateProjectiles(){
                     float dy = (g+m)->y - a->y;
                     float dist = sqrt( pow(dx,2) + pow(dy,2) );
                     if (dist <= 2){
-                        float dmg = (1-(dist/2)) * a->dmg * 2.2857; //dano = 0.7*INT, burn= 1.6*INT = 1.6/0.7=2.2857
+                        float dmg = (1-(dist/2)) * a->dmg * 2.2857; //dano = 0.7*sdmg, burn= 1.6*INT = 1.6/0.7=2.2857
                         addBuff(m, BUFF_BURN, 3, dmg / 3 * timeInterval); //3 segundos
 						setXp(a->owner, dmg, m); //xp pelo burn
                         (g+m)->lasthitangle = getNormalAngle(getAngleFromAB((g+m)->x, (g+m)->y, a->x - a->spdx / travelunit, a->y - a->spdy / travelunit));
@@ -662,6 +633,7 @@ int updateSimulation(int gladid){
         if ((g+gladid)->hp > (g+gladid)->maxhp)
             (g+gladid)->hp = (g+gladid)->maxhp;
 		*/
+
         updateBuffs(gladid);
 
         //passa fica mais proximo de poder agir de novo
@@ -783,7 +755,11 @@ float moveForwardUnsafe(int gladid){
 
 int moveToUnsafe(int gladid, float x, float y){
     if (turnToUnsafe(gladid, x, y)){
-		if ((g+gladid)->spd * timeInterval >= getDistUnsafe(gladid, x, y)){
+		float move = (g+gladid)->spd * timeInterval;
+		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+			move *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+			
+		if (move >= getDistUnsafe(gladid, x, y)){
 			(g+gladid)->x = x;
 			(g+gladid)->y = y;
 			return 1;
@@ -818,7 +794,7 @@ void registerGlad(int gladid){
     (g+gladid)->targetlocked = 0; //nenhum alvo fixado
     (g+gladid)->targetsaved = 0; //nenhum alvo fixado
     (g+gladid)->moveLock = 0; //nao esta tentando nenhum movimento longo
-    (g+gladid)->up = 0; //qual atributo vai ser melhorado quando subir de nivel
+    (g+gladid)->up = 0; //quantos pontos faltam distribuir
     (g+gladid)->xp = 0; //experiencia
     (g+gladid)->lasthitangle = 0; //angulo de onde veio o ultimo ataque
     (g+gladid)->lasthitnotification = 0; //sem notificacao de acerto
@@ -863,13 +839,13 @@ int createGladiator(int port){
 int calcCost(int val){
 	if (val == 0)
 		return 0;
-	return ceil((float)val/3) + calcCost(val-1);
+	return ceil((float)val/6) + calcCost(val-1);
 }
 
-//verifica se distribuiu os 25 pontos corretamente
+//verifica se distribuiu os 50 pontos corretamente
 int checkSetup(int gladid){
     int sum = calcCost((g+gladid)->STR) + calcCost((g+gladid)->AGI) + calcCost((g+gladid)->INT);
-    if (sum != 25)
+    if (sum != 50)
         return 0;
     if ((g+gladid)->STR < 0)
         return 0;

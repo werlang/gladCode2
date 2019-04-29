@@ -1,8 +1,8 @@
 setup(){
     setName("Blinker");
-    setSTR(3);
+    setSTR(6);
     setAGI(0);
-    setINT(10);
+    setINT(20);
     setSpritesheet("60b785096ebc6019a0de35ed6ad44662");
 }
 

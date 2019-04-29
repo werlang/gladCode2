@@ -1,20 +1,20 @@
 {
 	"name": "upgradeINT",
 	"ptname": "melhoraINT",
-	"syntax": "void upgradeINT ( void );",
+	"syntax": "int upgradeINT ( void );",
 	"description": {
-		"long": "Altera a prioridade de melhoria de atributo do gladiador para Inteligência. Esta melhoria acontece toda vez que o gladiador <a href='manual.php#xp-table'>sobe de nível</a>. Caso as funções upgradeAGI ou upgradeSTR forem chamadas, o atributo melhorado não será mais a Inteligência, até que upgradeINT seja chamado novamente.",
-		"brief": "Indica que o gladiador deve aprimorar o atributo Inteligência."
+		"long": "Utiliza um dos pontos de aprimoramento acumulados para aumentar o valor do atributo Inteligência do gladiador. Os pontos de aprimoramento são ganhados toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Inteligência foi melhorado com sucesso.",
+		"brief": "Aprimora o atributo Inteligência."
 	},
 	"param": [
 		{"name": "void", "description": "A função não recebe parâmetros."}
 	],
-	"treturn": "A função não possui retorno (void).",
-	"sample": "loop(){\n    if (getINT() >= 15)\n        upgradeSTR();\n    else\n        upgradeINT();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
-	"explain": "Este exemplo analisa o valor do atributo Inteligência do gladiador, e caso ele seja pelo menos 15, chama a função upgradeSTR(), indicando que ele deseja aumentar sua Força. Até isso acontecer, a prioridade de melhoria de atributo é para a Inteligência. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+	"treturn": "Retorna 0 caso não haja nenhum ponto de aprimoramento disponível e a Inteligência do gladiador não tenha sido aprimorada. Caso contrário retorna 1.",
+	"sample": "loop(){\n    if (getSTR() >= 30)\n        upgradeINT();\n    else\n        upgradeSTR();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeINT(), fazendo com que ele aumente o atributo Inteligência caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
 	"seealso": [
-		"upgradeSTR",
 		"upgradeAGI",
+		"upgradeSTR",
 		"getINT",
 		"moveTo"
 	]

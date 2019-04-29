@@ -1,8 +1,8 @@
 setup(){
     setName("Magnus");
-    setSTR(4);
-    setAGI(2);
-    setINT(9);
+    setSTR(8);
+    setAGI(4);
+    setINT(18);
     setSpritesheet("d2eb1d688b45e19129d2d25959170ad9");
 }
 

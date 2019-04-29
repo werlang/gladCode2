@@ -1,8 +1,8 @@
 setup(){
     setName("Rogue");
     setSTR(0);
-    setAGI(10);
-    setINT(3);
+    setAGI(20);
+    setINT(6);
     setSpritesheet("19bfabb3fb3ff3a8c6bdb781adb9ce37");
 }
 

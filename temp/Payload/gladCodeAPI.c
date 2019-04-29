@@ -66,19 +66,22 @@ char* getName(){
 	return response;
 }
 
-void upgradeSTR(){
-	char r[10];
-	sendMessage("upgradeSTR", r);
+int upgradeSTR(){
+	char response[10];
+	sendMessage("upgradeSTR", response);
+	return atoi(response);
 }
 
-void upgradeAGI(){
-	char r[10];
-	sendMessage("upgradeAGI", r);
+int upgradeAGI(){
+	char response[10];
+	sendMessage("upgradeAGI", response);
+	return atoi(response);
 }
 
-void upgradeINT(){
-	char r[10];
-	sendMessage("upgradeINT", r);
+int upgradeINT(){
+	char response[10];
+	sendMessage("upgradeINT", response);
+	return atoi(response);
 }
 
 float stepForward(){

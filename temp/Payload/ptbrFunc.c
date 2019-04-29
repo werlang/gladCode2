@@ -36,16 +36,16 @@ char* pegaNome(){
 	return name;
 }
 
-void melhoraFOR(){
-	upgradeSTR();
+int melhoraFOR(){
+	return upgradeSTR();
 }
 
-void melhoraAGI(){
-	upgradeAGI();
+int melhoraAGI(){
+	return upgradeAGI();
 }
 
-void melhoraINT(){
-	upgradeINT();
+int melhoraINT(){
+	return upgradeINT();
 }
 
 float passoFrente(){

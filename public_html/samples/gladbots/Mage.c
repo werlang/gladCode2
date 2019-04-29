@@ -1,8 +1,8 @@
 setup(){
     setName("Mage");
-    setSTR(3);
+    setSTR(6);
     setAGI(0);
-    setINT(10);
+    setINT(20);
     setSpritesheet("cc35b0addb0210cd1392849df86ced9c");
 }
 

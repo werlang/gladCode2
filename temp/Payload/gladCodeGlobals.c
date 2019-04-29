@@ -4,12 +4,13 @@ globais do ambiente, herdado do gladCode1
 
 #define PROJECTILE_MAX_DISTANCE 15
 #define AP_REC_BASE 5 //recuperacao de ap
-#define AP_REC_INT 0.5 //AP_REC+BASE + AP_REC_INT * INT
+#define AP_REC_INT 0.25 //AP_REC+BASE + AP_REC_INT * INT
 #define GLAD_HITBOX 0.5 //raio do hitbox do gladiador
 #define XP_FACTOR 0.2 
 #define XP_FIRSTLVL 25
 #define POISON_TIME 45 //quanto tempo ele come�a a aparecer
 #define POISON_SPEED 10 //quanto tempo leva para andar 1p
+#define POINTS_LVL_UP 5
 
 #define PROJECTILE_TYPE_ATTACK 0
 #define PROJECTILE_TYPE_FIREBALL 1
@@ -72,6 +73,7 @@ struct gladiador{
     float maxhp; //hp total
     float mdmg; //dano melee
     float rdmg; //dano ranged
+    float sdmg; //dano spell
 
     int AGI; //agilidade
     float as; //velocidade de ataque, em att/s
@@ -93,7 +95,7 @@ struct gladiador{
     int targetlocked; //porta do gladiador que est� fixado
 	int targetsaved; //porta do gladiador salvo na mem�ria
     int xp; //experiencia do gladiador (em %)
-    int up; //qual atributo vai ganhar upgrade quando subir de nivel
+    int up; //quantos pontos de atributo o gladiador tem para distribuir
     struct buff buffs[N_BUFFS]; //vetor de buffs
 	int action; //actioncode
 	float time; //simtime

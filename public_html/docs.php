@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8' />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Documentação</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
@@ -12,6 +12,7 @@
 	<link type='text/css' rel='stylesheet' href='css/docs.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="script/side-menu.js"></script>
 	<script type="text/javascript" src="script/docs.js"></script>
 </head>
 <body>
@@ -20,73 +21,31 @@
 		<div id='side-menu'>
 		</div>
 		<div id='content'>			
-			<h1>Documentação da API gladCode</h1>
+			<h1 id='nav-intro'>Documentação da API gladCode</h1>
 			
 			<p>Para a programação dos gladiadores, é necessário o uso de funções específicas para interação com os diversos aspectos da gladCode, como movimento, detecção de inimigos, e uso de habilidades. Nas seções abaixo está descrito a sintaxe de cada função disponível. </p>
 			
 			<div class='video'><iframe src="https://www.youtube.com/embed/Wrc-0_Kq-_4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 			
 			<p>As funções da gladCode também pode ser usadas no idioma Português. Caso deseje consulta-las, <a href='docs-ptbr'>clique aqui</a>.</p>
-
-			<div class='nav'>
-				<a href='#nav-setup'>Setup</a>
-				<a href='#nav-up'>Melhorias</a>
-				<a href='#nav-mov'>Movimento</a>
-				<a href='#nav-att'>Ataque</a>
-				<a href='#nav-info'>Informações</a>
-				<a href='#nav-sense'>Percepção</a>
-				<a href='#nav-math'>Matemática</a>
-				<a href='#nav-hab'>Habilidades</a>
-			</div>
-
-			<h2 id='nav-setup'>Setup</h2>
-			
-			<p>As funções de setup servem para definir as características do gladiador, como nome e atributos básicos. Elas podem ser chamadas somente dentro da função setup() no <a href='manual.php#nav-prog'>código do gladiador</a>.</p>
-			
-			<p><b>OBS: A função setup, bem como todas funções que devem estar contidas dentro da mesma, só devem estar presentes caso o modo clássico de <a href='socks' target='_blank'>batalha</a> ou <a href='tournment' target='_blank'>torneio</a> esteja sendo executado. Caso contrário, o <a href='editor' target='_blank'>editor de gladiadores</a> se encarrega de adicionar as informações do gladiador para o servidor.</b></p>
-			
-			<table class='table t-funcs'>
-				<tbody>
-					<tr>
-						<td><a href='function/setname'>setName</a></td>
-						<td>Atribui um nome para o gladiador.</td>
-					</tr>
-					<tr>
-						<td><a href='function/setstr'>setSTR</a></td>
-						<td>Atribui um valor para o atributo Força (STR) do gladiador.</td>
-					</tr>
-					<tr>
-						<td><a href='function/setagi'>setAGI</a></td>
-						<td>Atribui um valor para o atributo Agilidade (AGI) do gladiador.</td>
-					</tr>
-					<tr>
-						<td><a href='function/setint'>setINT</a></td>
-						<td>Atribui um valor para o atributo Inteligência (INT) do gladiador.</td>
-					</tr>
-					<tr>
-						<td><a href='function/setspritesheet'>setSpritesheet</a></td>
-						<td>Atribui ao gladiador uma aparência.</td>
-					</tr>
-				</tbody>
-			</table>
 			
 			<h2 id='nav-up'>Melhorias</h2>
 			
-			<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual#xp-table'>sobe de nível</a>, ele ganha um ponto em um atributo básico. As funções de melhoria indicam qual atributo será aprimorado na próxima vez que ele subir de nível. Estas funções podem ser chamadas tanto no setup() quanto no loop().</p>
+			<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual#xp-table'>sobe de nível</a>, ele ganha um ponto para aprimorar um atributo básico. As funções de melhoria usam estes pontos e aumentam o atributo escolhido.</p>
 		
 			<table class='table t-funcs'>
 				<tbody>
 					<tr>
 						<td><a href='function/upgradestr'>upgradeSTR</a></td>
-						<td>Indica que o gladiador deve aprimorar o atributo Força.</td>
+						<td>Aprimora o atributo Força.</td>
 					</tr>
 					<tr>
 						<td><a href='function/upgradeagi'>upgradeAGI</a></td>
-						<td>Indica que o gladiador deve aprimorar o atributo Agilidade.</td>
+						<td>Aprimora o atributo Agilidade.</td>
 					</tr>
 					<tr>
 						<td><a href='function/upgradeint'>upgradeINT</a></td>
-						<td>Indica que o gladiador deve aprimorar o atributo Inteligência.</td>
+						<td>Aprimora Inteligência.</td>
 					</tr>
 				</tbody>
 			</table>
@@ -343,27 +302,6 @@
 					</tr>
 				</tbody>
 			</table>
-			
-			<h2 id='nav-math'>Matemática</h2>
-			
-			<p>As funções matemáticas estão presentes na gladCode para ajudar o competidor a realizar cálculos relativos à arena.</p>
-		
-			<table class='table t-funcs'>
-				<tbody>
-					<tr>
-						<td><a href='function/getdist'>getDist</a></td>
-						<td>Retorna a distância até o ponto.</td>
-					</tr>
-					<tr>
-						<td><a href='function/getdisttotarget'>getDistToTarget</a></td>
-						<td>Retorna a distância até o alvo fixado.</td>
-					</tr>
-					<tr>
-						<td><a href='function/getangle'>getAngle</a></td>
-						<td>Retorna o ângulo até o ponto.</td>
-					</tr>
-				</tbody>
-			</table>
 
 			<h2 id='nav-hab'>Habilidades</h2>
 
@@ -399,6 +337,58 @@
 					</tr>
 				</tbody>
 			</table>
+
+			<h2 id='nav-math'>Matemática</h2>
+			
+			<p>As funções matemáticas estão presentes na gladCode para ajudar o competidor a realizar cálculos relativos à arena.</p>
+		
+			<table class='table t-funcs'>
+				<tbody>
+					<tr>
+						<td><a href='function/getdist'>getDist</a></td>
+						<td>Retorna a distância até o ponto.</td>
+					</tr>
+					<tr>
+						<td><a href='function/getdisttotarget'>getDistToTarget</a></td>
+						<td>Retorna a distância até o alvo fixado.</td>
+					</tr>
+					<tr>
+						<td><a href='function/getangle'>getAngle</a></td>
+						<td>Retorna o ângulo até o ponto.</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<h2 id='nav-setup'>Setup</h2>
+			
+			<p>As funções de setup servem para definir as características do gladiador, como nome e atributos básicos. Elas podem ser chamadas somente dentro da função setup() no <a href='manual.php#nav-prog'>código do gladiador</a>.</p>
+			
+			<p><b>OBS: A função setup, bem como todas funções que devem estar contidas dentro da mesma, só devem estar presentes caso o modo clássico de <a href='socks' target='_blank'>batalha</a> ou <a href='tournment' target='_blank'>torneio</a> esteja sendo executado. Caso contrário, o <a href='editor' target='_blank'>editor de gladiadores</a> se encarrega de adicionar as informações do gladiador para o servidor.</b></p>
+			
+			<table class='table t-funcs'>
+				<tbody>
+					<tr>
+						<td><a href='function/setname'>setName</a></td>
+						<td>Atribui um nome para o gladiador.</td>
+					</tr>
+					<tr>
+						<td><a href='function/setstr'>setSTR</a></td>
+						<td>Atribui um valor para o atributo Força (STR) do gladiador.</td>
+					</tr>
+					<tr>
+						<td><a href='function/setagi'>setAGI</a></td>
+						<td>Atribui um valor para o atributo Agilidade (AGI) do gladiador.</td>
+					</tr>
+					<tr>
+						<td><a href='function/setint'>setINT</a></td>
+						<td>Atribui um valor para o atributo Inteligência (INT) do gladiador.</td>
+					</tr>
+					<tr>
+						<td><a href='function/setspritesheet'>setSpritesheet</a></td>
+						<td>Atribui ao gladiador uma aparência.</td>
+					</tr>
+				</tbody>
+			</table>			
 		</div>
 		<div id='ads'>
 		</div>

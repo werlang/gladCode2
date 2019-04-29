@@ -1,8 +1,8 @@
 setup(){
     setName("Runner");
-    setSTR(6);
-    setAGI(8);
-    setINT(1);
+    setSTR(12);
+    setAGI(16);
+    setINT(2);
     setSpritesheet("5d5a8e60d49d40c58b60f66a08dfd93e");
 }
 

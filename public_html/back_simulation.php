@@ -218,7 +218,7 @@
 	function calcAttrValue($attr){
 		if ($attr == 0)
 			return 0;
-		return calcAttrValue($attr - 1) + ceil($attr/3);
+		return calcAttrValue($attr - 1) + ceil($attr/6);
 	}
 
 	function validate_attr($code){
@@ -226,7 +226,7 @@
 		$vagi = getAGI($code);
 		$vint = getINT($code);
 		$soma = calcAttrValue($vstr) + calcAttrValue($vagi) + calcAttrValue($vint);
-		if ($soma == 25)
+		if ($soma == 50)
 			return true;
 		else {
 			return false;

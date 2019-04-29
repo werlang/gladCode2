@@ -628,19 +628,23 @@ function update_ui(json){
 			$('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
 		}
 		
+		if ($('.glad-str span').eq(i).html() !== STR)
+			$('.glad-str span').eq(i).html(STR);
+
+		if ($('.glad-agi span').eq(i).html() !== AGI)
+			$('.glad-agi span').eq(i).html(AGI);
+
+		if ($('.glad-int span').eq(i).html() !== INT)
+			$('.glad-int span').eq(i).html(INT);
+
 		if ($('.lvl-value span').eq(i).html() != lvl){
 			$('.lvl-value span').eq(i).html(lvl);
-			$('.glad-str span').eq(i).html(STR);
-			$('.glad-agi span').eq(i).html(AGI);
-			$('.glad-int span').eq(i).html(INT);
 			
 			$('.lvl-value').eq(i).addClass('up');
 			let j = i;
 			setTimeout( function(){
 				$('.lvl-value').eq(j).removeClass('up');
 			}, 500);
-
-
 		}
 		
 		if ($('.xp-bar .filled').eq(i).width() != xp)
@@ -765,7 +769,9 @@ function showMessageBaloon(gladid){
 	if (message != "" && json.glads[gladid].hp > 0){
 		var gpos = getGladPositionOnCanvas(gladid);
 
-		if (!$('.baloon.glad-'+ gladid).length)
+		if ($('.baloon.glad-'+ gladid).length)
+			$('.baloon.glad-'+ gladid).html(message);
+		else
 			$('#canvas-div').append("<div class='baloon glad-"+ gladid +"'>"+ message +"</div>");
 
 		var baloon = $('.baloon.glad-'+ gladid);
