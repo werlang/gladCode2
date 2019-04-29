@@ -1,8 +1,8 @@
 setup(){
     setName("War Maker");
-    setSTR(9);
-    setAGI(2);
-    setINT(4);
+    setSTR(18);
+    setAGI(4);
+    setINT(8);
     setSpritesheet("2870b23a1fe506e4bb852942137c6af1");
 }
 

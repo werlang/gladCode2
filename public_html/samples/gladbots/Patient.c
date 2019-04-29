@@ -1,8 +1,8 @@
 setup(){
     setName("Patient");
-    setSTR(8);
-    setAGI(6);
-    setINT(1);
+    setSTR(16);
+    setAGI(12);
+    setINT(2);
     setSpritesheet("5eddb402bf6ec2094dccd33b167b6356");
 }
 

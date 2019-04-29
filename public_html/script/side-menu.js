@@ -1,0 +1,73 @@
+$(document).ready( function(){
+    $('#side-menu').load("docs-menu.html", function(){
+		var icon = "<i class='material-icons'>arrow_forward_ios</i>";
+		$('#side-menu li').each( function(){
+			if ($(this).next('ul').length != 0)
+				$(this).prepend(icon);
+		});
+		
+        $('#side-menu li').removeClass('visible');
+        $('#side-menu li i').removeClass('open');
+        $('#side-menu > ul > li').addClass('visible');
+        
+        $('#side-menu #search input').on('input', function(){
+            $('#side-menu li').removeClass('visible');
+            $('#side-menu li i').removeClass('open');
+            var text = $(this).val();
+            if (text.length <= 1){
+                $('#side-menu > ul > li').addClass('visible');
+            }
+            else{
+                var pattern = new RegExp("[\\w]*"+ text +"[\\w]*","ig");
+                $('#side-menu li').each(function(){
+                    if ($(this).text().match(pattern)){
+                        $(this).addClass('visible');
+                        $(this).parent().prev('li').addClass('visible').parent().prev('li').addClass('visible');
+                    }
+                });
+                $('#side-menu li').each(function(){
+					if ($(this).css('display') != 'none')
+						$(this).children('i').addClass('open');
+				});
+            }
+        });
+
+        $('#side-menu li').click( function(e){
+            //console.log($(this));
+            //e.preventDefault();
+            var list = $(this).next('ul');
+            if (list.children().css('display') != 'none'){
+                list.find('li').removeClass('visible');
+                list.find('li i').removeClass('open');
+                $(this).children('i').removeClass('open');
+			}
+            else{
+                list.children('li').addClass('visible');
+				$(this).children('i').addClass('open');
+            }
+        });
+        menuLoadFlag = true;
+    });
+});
+
+function scrollTo(elem, offset){
+    if (elem){
+        if (!offset)
+            offset = 0;
+        $([document.documentElement, document.body]).animate({
+            scrollTop: elem.offset().top + offset
+        }, 1000);
+    }
+}
+
+var menuLoadFlag = false;
+function menu_loaded(){
+    var resp = $.Deferred();
+    var intLoad = setInterval( function(){
+        if (menuLoadFlag){
+            clearInterval(intLoad);
+            return resp.resolve(true);
+        }
+    }, 10);
+    return resp.promise();
+}

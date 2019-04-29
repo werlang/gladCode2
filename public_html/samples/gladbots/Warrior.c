@@ -1,8 +1,8 @@
 setup(){
     setName("Warrior");
-    setSTR(10);
-    setAGI(2);
-    setINT(1);
+    setSTR(20);
+    setAGI(4);
+    setINT(2);
     setSpritesheet("8daec5aa3f0cef2dfe15099a8ded0714");
 }
 

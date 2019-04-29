@@ -1,8 +1,8 @@
 setup(){
     setName("Rouge");
-    setSTR(4);
-    setAGI(9);
-    setINT(2);
+    setSTR(8);
+    setAGI(18);
+    setINT(4);
     setSpritesheet("f0d413c1e3612da663b6b5b82f994c0d");
 }
 

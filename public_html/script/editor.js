@@ -713,7 +713,7 @@ function load_glad_generator(element){
 					'title': 'Força - STR', 
 					'description': 'Força física e resistência do gladiador.', 
 					'list': [
-						{'path': 'sprite/images/decapitation.png',	'description': 'Dano corpo-a-corpo causado em gladiadores inimigos'},
+						{'path': 'sprite/images/decapitation.png',	'description': 'Dano físico, o dano causado com armas corpo-a-corpo'},
 						{'path': 'sprite/images/healing.png',	'description': 'Pontos de vida, responsáveis por manter o gladiador vivo'}
 					]
 				},
@@ -722,7 +722,7 @@ function load_glad_generator(element){
 					'title': 'Agilidade - AGI', 
 					'description': 'Agilidade, rapidez e destreza do gladiador.', 
 					'list': [
-						{'path': 'sprite/images/bullseye.png',	'description': 'Dano à distância causado em gladiadores inimigos'},
+						{'path': 'sprite/images/bullseye.png',	'description': 'Precisão, o dano causado com armas à distância'},
 						{'path': 'sprite/images/sprint.png',	'description': 'Velocidade de movimento dentro da arena'},
 						{'path': 'sprite/images/blades.png',	'description': 'Velocidade de execução de ataques'}
 					]
@@ -732,9 +732,9 @@ function load_glad_generator(element){
 					'title': 'Inteligência - INT', 
 					'description': 'Rapidez de raciocínio e Capacidade intelectual do gladiador.', 
 					'list': [
+						{'path': 'sprite/images/energy.png',	'description': 'Poder mágico, o dano causado com habilidades mágicas'},
 						{'path': 'sprite/images/3balls.png',	'description': 'Velocidade de execução de uma habilidade'},
-						{'path': 'sprite/images/energy.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'},
-						{'path': 'sprite/images/energise.png',	'description': 'Regeneração dos pontos de habilidade'}
+						{'path': 'sprite/images/energise.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'}
 					]
 				},
 			];
@@ -922,7 +922,7 @@ function load_glad_generator(element){
 		function calcAttrValue(slider) {
 			if (slider == 0)
 				return 0;
-			return calcAttrValue(slider - 1) + Math.ceil(slider/3);
+			return calcAttrValue(slider - 1) + Math.ceil(slider/6);
 		}
 		
 		$(document).on('input change', '#distribuicao .slider', function() {
@@ -936,14 +936,14 @@ function load_glad_generator(element){
 			});
 			
 			var numobj = $('#distribuicao #remaining span');
-			numobj.html(25 - soma);
+			numobj.html(50 - soma);
 
-			if (soma == 25){
+			if (soma == 50){
 				$('#get-code').html("GERAR CÓDIGO");
 				$('#get-code').removeProp('disabled');
 				numobj.css('color','#4caf50');
 			}
-			else if (soma > 25)
+			else if (soma > 50)
 				numobj.css('color','#f44336');
 			else
 				numobj.css('color','black');

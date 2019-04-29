@@ -1,8 +1,8 @@
 setup(){
     setName("Wanderer");
-    setSTR(7);
-    setAGI(7);
-    setINT(1);
+    setSTR(14);
+    setAGI(14);
+    setINT(2);
     setSpritesheet("5e42e6e79e35354c626e0e2008504b4a");
 }
 

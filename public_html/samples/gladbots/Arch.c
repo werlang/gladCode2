@@ -1,7 +1,7 @@
 setup(){
     setName("Arch");
-    setSTR(3);
-    setAGI(10);
+    setSTR(6);
+    setAGI(20);
     setINT(0);
     setSpritesheet("9b48a8dbc1130be4959d9985c893255f");
 }
