@@ -9,14 +9,19 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/table.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/side-menu.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/manual.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/manual.js"></script>
+	<script type="text/javascript" src="script/prism.js"></script>
+	<script type="text/javascript" src="script/side-menu.js"></script>
+	<script type="text/javascript" src="script/docs.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
+        <div id='side-menu'></div>
         <div id='content-box'>
             <h1>Conhecendo a gladCode</h1>
 
@@ -61,10 +66,7 @@
 
             <p>Não se preocupe, você não precisa memorizar estes custos, pois o <a href='editor'>editor de gladiadores</a> cuida disto para você.</p>
 
-            <div class='col-2'>
-                <img id='img-points' src='image/editor-points.png'>
-            </div>
-
+            <img id='img-points' src='image/editor-points.png'>
 
             <p>Os efeitos dos atributos básicos sobre os secundários estão descritos a seguir:</p>
 
@@ -101,9 +103,7 @@
 
             <p>A página onde você personaliza a aparência, distribui os atributos e programa o comportamento de seu gladiador chama-se <a href='editor'>editor de gladiadores</a>. Nela você começa com uma interface que lhe permite escolher entre diversas opções de itens que configuram a aparência de seu gladiador.</p>
 
-            <div class='col-2'>
-                <img id='img-editor' src='image/editor-glad.png'>
-            </div>
+            <img id='img-editor' src='image/editor-glad.png'>
 
             <p>Após isso você passa para a distribuição dos pontos de atributos do gladiador, onde você possui 25 pontos para distribuir entre os atributos força, agilidade e inteligência do gladiador. Conforme explicado anteriormente, estes atributos irão influenciar o quão bom seu gladiador é em determinadas ações.</p>
 
@@ -253,19 +253,19 @@
             <p>O funcionamento é bem simples. Na função loop() será colocado todo o comportamento do gladiador. A cada intervalo de tempo (0.1s) o gladiador irá executar todas as tarefas descritas dentro desta função:</p>
 
             <pre><code class="language-c">loop(){
-                stepForward(); //função que faz mover para frente
-            }</code></pre>
+    stepForward(); //função que faz mover para frente
+}</code></pre>
 
             <p>No código acima, a cada intervalo de tempo (0.1s) o gladiador irá mover-se o quanto conseguir (depende de sua agilidade) para frente, resultando em sucessivas chamadas da função <a href='function/stepforward' target='_blank'>stepForward</a> ao longo do tempo.</p>
 
             <p>Porém, existem situações em que o gladiador não consegue executar todos os comando da função loop() em um único intervalo da simulação, como no caso abaixo:</p>
 
             <pre><code class="language-c">loop(){
-                int i;
-                for (i=0 ; i&lt10 ; i++) //faz 10 chamadas da função stepForward
-                    stepForward();
-                turnLeft(); //função que rotaciona no sentido anti-horário
-            }</code></pre>
+    int i;
+    for (i=0 ; i&lt10 ; i++) //faz 10 chamadas da função stepForward
+        stepForward();
+    turnLeft(); //função que rotaciona no sentido anti-horário
+}</code></pre>
 
             <p>Neste caso o gladiador executa o que conseguir (1 chamada da função que move para frente), e a cada novo intervalo de tempo da simulação ele segue executando os próximos passos. Eventualmente, quando ele concluir todas as etapas descritas em sua função loop() (as 10 chamadas de stepForward mais a chamada de <a href='function/turnleft' target='_blank'>turnLeft</a>), ele irá começar novamente a função loop(). Este processo somente encerrará quando o gladiador morrer, ou quando a simulação terminar.</p>
 

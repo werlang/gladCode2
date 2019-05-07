@@ -16,7 +16,7 @@
 	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="script/update.js"></script>
+	<script type="text/javascript" src="script/update.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 </head>
 <body>

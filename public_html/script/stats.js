@@ -1,6 +1,12 @@
 $(document).ready( function() {
+	menu_loaded().then( function(data){
+		var loc = window.location.href.split("/");
+		loc = loc[loc.length - 1];
+		$('#side-menu #'+loc).addClass('here');
+	});    
+	$('#learn').addClass('here');
 
-	$('#footer-wrapper').addClass('white');
+	//$('#footer-wrapper').addClass('white');
 
 	$( "#date-str, #date-end" ).datepicker({
 		showAnim: "slideDown",

@@ -1,17 +1,17 @@
 {
 	"name": "upgradeSTR",
 	"ptname": "melhoraFOR",
-	"syntax": "int upgradeSTR ( void );",
+	"syntax": "int upgradeSTR ( int pontos );",
 	"description": {
-		"long": "Utiliza um dos pontos de aprimoramento acumulados para aumentar o valor do atributo Força do gladiador. Os pontos de aprimoramento são ganhados toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Força foi melhorado com sucesso.",
+		"long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Força do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Força foi melhorado com sucesso. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis.",
 		"brief": "Aprimora o atributo Força."
 	},
 	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
+		{"name": "pontos", "description": "Inteiro contendo quantos pontos serão aprimorados do atributo Força."}
 	],
 	"treturn": "Retorna 0 caso não haja nenhum ponto de aprimoramento disponível e a força do gladiador não tenha sido aprimorada. Caso contrário retorna 1.",
-	"sample": "loop(){\n    if (getSTR() >= 30)\n        upgradeAGI();\n    else\n        upgradeSTR();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
-	"explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeAGI(), fazendo com que ele aumente o atributo Agilidade caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+	"sample": "loop(){\n    if (getSTR() >= 30)\n        upgradeAGI(1);\n    else\n        upgradeSTR(1);\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeAGI, fazendo com que ele aumente o atributo Agilidade caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
 	"seealso": [
 		"upgradeAGI",
 		"upgradeINT",

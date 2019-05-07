@@ -71,39 +71,45 @@ char* getName(int gladid){
 	return (g+gladid)->name;
 }
 
-int upgradeSTR(int gladid){
-	if ((g+gladid)->up > 0){
-		(g+gladid)->STR++;
-		(g+gladid)->hp += 10;
-		(g+gladid)->maxhp += 10;
-		(g+gladid)->mdmg += 0.75;
-		(g+gladid)->up--;
+int upgradeSTR(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->STR += n;
+		(g+gladid)->hp += 10 * n;
+		(g+gladid)->maxhp += 10 * n;
+		(g+gladid)->mdmg += 0.75 * n;
+		(g+gladid)->up -= n;
 		return 1;
 	}
 	return 0;
 }
 
-int upgradeAGI(int gladid){
-	if ((g+gladid)->up > 0){
-		(g+gladid)->AGI++;
-		(g+gladid)->spd += 0.05;
-		(g+gladid)->as += 0.05;
-		(g+gladid)->ts += 9;
-		(g+gladid)->rdmg += 0.5;
-		(g+gladid)->up--;
+int upgradeAGI(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->AGI += n;
+		(g+gladid)->spd += 0.05 * n;
+		(g+gladid)->as += 0.05 * n;
+		(g+gladid)->ts += 9 * n;
+		(g+gladid)->rdmg += 0.5 * n;
+		(g+gladid)->up -= n;
 		return 1;
 	}
 	return 0;
 }
 
-int upgradeINT(int gladid){
-	if ((g+gladid)->up > 0){
-		(g+gladid)->INT++;
-		(g+gladid)->ap += 10;
-		(g+gladid)->maxap += 10;
-		(g+gladid)->cs += 0.05;
-		(g+gladid)->sdmg += 0.5;
-		(g+gladid)->up--;
+int upgradeINT(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->INT += n;
+		(g+gladid)->ap += 10 * n;
+		(g+gladid)->maxap += 10 * n;
+		(g+gladid)->cs += 0.05 * n;
+		(g+gladid)->sdmg += 0.5 * n;
+		(g+gladid)->up -= n;
 		return 1;
 	}
 	return 0;

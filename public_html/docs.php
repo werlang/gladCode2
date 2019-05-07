@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8' />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Documentação</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
@@ -10,6 +10,7 @@
       rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/table.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/docs.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/side-menu.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="script/side-menu.js"></script>
@@ -18,8 +19,7 @@
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
-		<div id='side-menu'>
-		</div>
+		<div id='side-menu'></div>
 		<div id='content'>			
 			<h1 id='nav-intro'>Documentação da API gladCode</h1>
 			
@@ -31,7 +31,7 @@
 			
 			<h2 id='nav-up'>Melhorias</h2>
 			
-			<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual#xp-table'>sobe de nível</a>, ele ganha um ponto para aprimorar um atributo básico. As funções de melhoria usam estes pontos e aumentam o atributo escolhido.</p>
+			<p>As funções de melhoria definem que tipo de aprimoramento o gladiador está buscando. Toda vez que o gladiador <a href='manual#xp-table'>sobe de nível</a>, ele ganha 5 pontos de aprimoramento. Estes pontos podem ser gastos para melhorar um atributo básico. As funções de melhoria usam estes pontos e aumentam o atributo escolhido.</p>
 		
 			<table class='table t-funcs'>
 				<tbody>

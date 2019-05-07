@@ -1,5 +1,4 @@
 $(document).ready( function() {
-	
 	var found = false;
 	var func = $('#vget').val();
 
@@ -13,6 +12,18 @@ $(document).ready( function() {
 				loadDict(func, $('#dict').html());
 				$('#dict').remove()
 			}
+			menu_loaded().then( function(data){
+				var loc = window.location.href.split("/");
+				loc = loc[loc.length - 1];
+				$('#side-menu li a').each( function(){
+					if ($(this).html().toLowerCase() == loc){
+						$(this).parent().addClass('here visible').siblings('li').addClass('visible');
+						$(this).parents('ul').prev('li').addClass('here visible');
+						$('li.here i').addClass('open');
+					}
+				});
+			});    
+
 		}).fail( function(){
 			load_content("");
 		});
@@ -30,6 +41,7 @@ function load_content(item){
 	$('title').html("gladCode - "+ item.name);
 	$('#temp-name').html(item.name);
 	$('#temp-syntax').html(item.syntax);
+	Prism.highlightElement($('#temp-syntax')[0]);
 	$('#temp-description').html(item.description.long);
 	
 	$.each(item.param, function(k,i) {
@@ -41,6 +53,7 @@ function load_content(item){
 	
 	$('#temp-return').html(item.treturn);
 	$('#temp-sample').html(item.sample);
+	Prism.highlightElement($('#temp-sample')[0]);
 	$('#temp-explain').html(item.explain);
 
 	$.each(item.seealso, function(k,i) {

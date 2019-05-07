@@ -25,23 +25,30 @@ p.syntax {
 }
 
 pre {
-	max-width: 100%;
+	width: 100%;
+	max-width: calc(100vw - 30px);
+	margin: 0px 10px;
 }
 
 .table.t-funcs {
-	width: 100vw;
-	margin-left: -15px;
+	width: 100%;
+	margin: auto;
 }
 
 #temp-seealso tr {
-	width: 100vw;
+	width: 100%;
     box-sizing: border-box;	
 }
 
 @media only screen and (min-width: 600px) {
-.table.t-funcs {
-	width: 100%;
-	margin-left: 0px;
+	.table.t-funcs {
+		width: 100%;
+		margin-left: 0px;
+	}
 }
 
+@media only screen and (min-width: 800px) {
+	pre {
+		max-width: calc(100vw - 400px);
+	}
 }

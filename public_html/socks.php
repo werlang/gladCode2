@@ -13,12 +13,12 @@
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="script/scrollTo.js"></script>
-	<script type="text/javascript" src="script/socks.js"></script>
+	<script type="text/javascript" src="script/socks.min.js"></script>
 	<script type="text/javascript" src="script/phaser.min.js"></script>
 	<script type="text/javascript" src="script/phaser.js"></script>
-	<script type="text/javascript" src="script/stats_func.js"></script>
-	<script type="text/javascript" src="script/assets.js"></script>
-	<script type="text/javascript" src="script/runSim.js"></script>
+	<script type="text/javascript" src="script/stats_func.min.js"></script>
+	<script type="text/javascript" src="script/assets.min.js"></script>
+	<script type="text/javascript" src="script/runSim.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	
 	<script src="script/dropzone.js"></script>

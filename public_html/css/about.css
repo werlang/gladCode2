@@ -19,7 +19,7 @@ body{
     background-color: #00638d;
     display: flex;
     justify-content: center;
-    margin-top: 80px;
+    padding-top: 80px;
     z-index: 1;
 }
 
