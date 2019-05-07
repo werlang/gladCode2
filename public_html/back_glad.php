@@ -151,7 +151,7 @@
 
 	function validate_attr($vstr,$vagi,$vint){
 		$soma = calcAttrValue($vstr) + calcAttrValue($vagi) + calcAttrValue($vint);
-		if ($soma == 25)
+		if ($soma == 50)
 			return true;
 		else {
 			return false;
