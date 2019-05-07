@@ -1,7 +1,8 @@
 var user;
 $(document).ready( function(){
 	$('#header-container').addClass('small-profile');
-	
+	$('#header-profile').addClass('here');
+
 	fill_assets();
 	
 	var preferences = ["friend","message","update","duel"];

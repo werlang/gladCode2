@@ -2,8 +2,8 @@ RewriteEngine On
 
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
 
-RewriteRule    ^function/(.*)$    docs.php?t=function&f=$1 [NC,L]
-RewriteRule    ^funcao/(.*)$    docs.php?t=function&f=$1&l=pt [NC,L]
+RewriteRule    ^function/(.*)$    function.php?&f=$1 [NC,L]
+RewriteRule    ^funcao/(.*)$    function.php?f=$1&l=pt [NC,L]
 
 RewriteRule    ^glad-([0-9]+)$    editor.php?g=$1    [NC,L]
 RewriteRule    ^newglad$    editor.php?g=0    [NC,L]

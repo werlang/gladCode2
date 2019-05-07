@@ -13,7 +13,7 @@
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
-	<script type="text/javascript" src="script/code.js"></script>
+	<script type="text/javascript" src="script/code.min.js"></script>
 	<script type="text/javascript" src="script/tabs.js"></script>
 	<script type="text/javascript" src="script/file_manager.js"></script>
 	<script type="text/javascript" src="script/keybinds.js"></script>

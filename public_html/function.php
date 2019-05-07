@@ -2,17 +2,21 @@
 <html>
 <head>
 	<meta charset='utf-8' />
-	<BASE href="/~gladcode/">
+	<BASE href="/">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/table.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/docs.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/function.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/side-menu.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="script/side-menu.js"></script>
 	<script type="text/javascript" src="script/function.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
@@ -20,7 +24,8 @@
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
-		<div id='content-box'>
+		<div id='side-menu'></div>
+		<div id='content'>
 			<h2 id='temp-name'></h2>
 			<pre><code class="language-c" id='temp-syntax'></code></pre>
 			<p id='temp-description'></p>

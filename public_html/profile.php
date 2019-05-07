@@ -32,14 +32,14 @@
 	<link type='text/css' rel='stylesheet' href='css/table2.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="sprite/assets.js"></script>
-	<script type="text/javascript" src="script/profile.js"></script>
+	<script type="text/javascript" src="script/assets.min.js"></script>
+	<script type="text/javascript" src="script/profile.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 	<script type="text/javascript" src="script/croppie.js"></script>
-	<script type="text/javascript" src="script/runSim.js"></script>
+	<script type="text/javascript" src="script/runSim.min.js"></script>
 	<script type="text/javascript" src="script/checkboxes.js"></script>
-	<script type="text/javascript" src="script/stats_func.js"></script>
+	<script type="text/javascript" src="script/stats_func.min.js"></script>
 	<script type="text/javascript" src="script/dropzone.js"></script>
 </head>
 <body>
@@ -178,6 +178,7 @@
 				</div>
 			</div>
 		</div>
+		<div id='ads'></div>
 	</div>
 	<?php include("footer.php"); ?>
 </body>

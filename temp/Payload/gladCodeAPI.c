@@ -66,21 +66,24 @@ char* getName(){
 	return response;
 }
 
-int upgradeSTR(){
-	char response[10];
-	sendMessage("upgradeSTR", response);
+int upgradeSTR(int n){
+	char message[50], response[10];
+	sprintf(message, "upgradeSTR %i", n);
+	sendMessage(message,response);
 	return atoi(response);
 }
 
-int upgradeAGI(){
-	char response[10];
-	sendMessage("upgradeAGI", response);
+int upgradeAGI(int n){
+	char message[50], response[10];
+	sprintf(message, "upgradeAGI %i", n);
+	sendMessage(message,response);
 	return atoi(response);
 }
 
-int upgradeINT(){
-	char response[10];
-	sendMessage("upgradeINT", response);
+int upgradeINT(int n){
+	char message[50], response[10];
+	sprintf(message, "upgradeINT %i", n);
+	sendMessage(message,response);
 	return atoi(response);
 }
 

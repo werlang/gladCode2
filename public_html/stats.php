@@ -6,16 +6,21 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Estatísticas</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+	<link type='text/css' rel='stylesheet' href='css/side-menu.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/table.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/stats.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="script/stats.js"></script>
-	<script type="text/javascript" src="script/stats_func.js"></script>
+	<script type="text/javascript" src="script/stats_func.min.js"></script>
+	<script type="text/javascript" src="script/side-menu.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
+		<div id='side-menu'></div>
 		<div id='content-box'>
 			<h1>Estatísticas da gladCode</h1>
 			<div id='date-container'>

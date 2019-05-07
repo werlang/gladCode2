@@ -26,10 +26,10 @@
 	<link type='text/css' rel='stylesheet' href='css/checkboxes.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/playback.js"></script>
+	<script type="text/javascript" src="script/playback.min.js"></script>
 	<script type="text/javascript" src="script/phaser.min.js"></script>
-	<script type="text/javascript" src="script/phaser.js"></script>
-	<script type="text/javascript" src="script/assets.js"></script>
+	<script type="text/javascript" src="script/render.min.js"></script>
+	<script type="text/javascript" src="script/assets.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/dropzone.js"></script>
 	<script type="text/javascript" src="script/checkboxes.js"></script>

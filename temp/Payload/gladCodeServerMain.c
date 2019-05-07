@@ -92,13 +92,16 @@ void *connection_handler(void *p){
 				sprintf(reply, "%s",getName(gladid));
 			}
 			else if (strcmp(func->call,"upgradeSTR")==0){
-				sprintf(reply, "%i",upgradeSTR(gladid));
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeSTR(gladid, n));
 			}
 			else if (strcmp(func->call,"upgradeAGI")==0){
-				sprintf(reply, "%i",upgradeAGI(gladid));
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeAGI(gladid, n));
 			}
 			else if (strcmp(func->call,"upgradeINT")==0){
-				sprintf(reply, "%i",upgradeINT(gladid));
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeINT(gladid, n));
 			}
 			else if (strcmp(func->call,"getX")==0){
 				sprintf(reply, "%f",getX(gladid));

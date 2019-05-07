@@ -11,6 +11,7 @@ var wannaSave = false;
 var tutoState = 0;
 
 $(document).ready( function() {
+    $('#header-editor').addClass('here');
 	
 	$.post("back_login.php", {
 		action: "GET"

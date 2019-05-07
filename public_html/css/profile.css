@@ -1,28 +1,28 @@
 body{
 	margin: 0;
-	background-color: #edf1f3;
 	font-family: consolas, arial, sans-serif;
 	font-size: 16px;
 }
 
 #frame {
 	width: 100%;
-    display: flex;
+	display: flex;
 	flex-direction: column;
-    padding-top: 65px;
+    padding-top: 50px;
 }
 
-#header-container.small-profile {
-	height: 175px;
+#ads {
+	width: 0;
+	flex-grow: 1;
+	background-color: #f7f7f7;
+    border-left: 1px solid #e6e6e6;
 }
 
 #panel {
 	width: 100%;
     background-color: white;
     z-index: 1;
-    margin-right: 25px;
     border-radius: 3px;
-    box-shadow: 1px 1px 3px black;
     font-family: acme;
 	color: #646464;
 	min-height: 620px;
@@ -30,25 +30,22 @@ body{
 
 #frame #menu {
     width: 100%;
-    background-color: transparent;
+    background-color: #00638d;
 	z-index: 1;
 }
 
 @media only screen and (min-width: 600px) {
-#header-container.small-profile {
-	height: 250px;
-}
-#frame {
-	flex-direction: row;
-    padding-top: 140px;
-}
-#panel {
-	width: 60%;
-	max-width: 780px;
-}
-#frame #menu {
-    width: 300px;
-}
+	#frame {
+		flex-direction: row;
+	}
+	#panel {
+		flex-grow: 100;
+		flex-basis: 0;
+		max-width: 740px;
+	}
+	#frame #menu {
+		width: auto;
+	}
 
 }
 
@@ -67,7 +64,7 @@ body{
     font-family: consolas;
     font-weight: bold;
 	font-size: 1.2em;
-    color: #646464;
+    color: white;
     cursor: pointer;
 	box-sizing: border-box;
 	width: 33%;
@@ -75,12 +72,11 @@ body{
 }
 
 #frame #menu .item:hover {
-	background-color: #ffffff;
-	color: black;
+	background-color: #00000010;
 }
 
 #frame #menu .item.here {
-	background-color: #bfd1d8;
+	background-color: #00000026;
 	display: flex;
 	width: 100%;
 	order: 1;
@@ -101,28 +97,45 @@ body{
 		transition: all 0.3s;
 		width: 100%;
 	}
-	#frame #menu .item span {
-		display: inline;
+	#frame #menu .item.here span {
+		display: none;
 	}
-
-	#frame #menu .item.disabled {
+		#frame #menu .item.disabled {
 		filter: grayscale(100%);
 		opacity: 0.5;
 	}
 }
 
+@media only screen and (min-width: 800px) {
+	#frame #menu {
+		width: 300px;
+	}
+
+	#frame #menu .item.here span {
+		display: inline;
+	}
+
+	#frame #menu .item span {
+		display: inline;
+	}
+}
+
 #frame #menu #profile-ui {
-	height: 110px;
-    display: flex;
+	display: flex;
+	align-items: center;
+	flex-direction: row;
     padding: 10px;
-    box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: #00000026;
 }
 
 #frame #menu #profile-ui #picture {
 	display: flex;
+	justify-content: center;
     border: 2px solid #03384e;
     border-radius: 10px;
 	background-color: white;
+	margin-top: 15px;
 }
 
 #frame #menu #profile-ui #picture img {
@@ -160,6 +173,7 @@ body{
 #frame #menu #profile-ui #lvl {
 	display: flex;
     align-items: center;
+    z-index: 1;
 }
 
 #frame #menu #profile-ui #lvl img {
@@ -179,7 +193,6 @@ body{
     background-color: #6c97a9;
     border-radius: 3px;
     margin-left: -17px;
-    z-index: -1;
     text-align: right;
     padding-right: 4px;
     border: 1px solid black;
@@ -246,8 +259,34 @@ body{
 }
 
 @media only screen and (min-width: 600px) {
+	#frame #menu #profile-ui #picture img {
+		max-height: 50px;
+	}
+
+	#frame #menu #profile-ui {
+		flex-direction: column;
+	}
+
 	#frame #menu #menu-buttons {
 		display: block;
+	}
+
+	#frame #menu #profile-ui #picture {
+		margin-top: 15px;
+	}
+}
+
+@media only screen and (min-width: 800px) {
+	#frame #menu #profile-ui #picture img {
+		max-height: 80px;
+	}
+
+	#frame #menu #profile-ui {
+		flex-direction: row;
+	}
+
+	#frame #menu #profile-ui #picture {
+		margin-top: 0px;
 	}
 }
 
@@ -375,7 +414,7 @@ body{
 
 #profile-panel,
 #friend-panel {
-	padding: 30px 20px;
+	padding: 30px 0px;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -564,6 +603,10 @@ body{
 	background-color: #a4e6a6;
 }
 
+#friend-panel #search {
+	margin: 0px 20px;
+}
+
 #friend-panel .input {
 	text-align: left;
 	width: 100%;
@@ -665,7 +708,7 @@ body{
 	display: flex;
     height: 100%;
 	width: 50px;
-	margin-left: -55px;
+	margin-left: -50px;
 	margin-right: -15px;
     z-index: 1;
 	transition: margin-left 0.5s;
@@ -834,7 +877,7 @@ body{
 #battle-container #tab-container {
     display: flex;
 	margin-top: 20px;
-	background-image: linear-gradient(#ffffff, #d3d3d3);
+	background-image: linear-gradient(#ffffff 90%, #d3d3d3);
 }
 
 #battle-container .tab {
@@ -904,7 +947,9 @@ body{
 
 #message-panel,
 #ranking-container {
-	width: 100%;
+	width: 0;
+	flex-basis: 0;
+	flex-grow: 1;
 }
 
 #ranking-container #search{

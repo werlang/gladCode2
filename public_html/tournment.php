@@ -20,11 +20,11 @@
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/tournment.js"></script>
-	<script type="text/javascript" src="script/tournment_tiers.js"></script>
-	<script type="text/javascript" src="script/stats_func.js"></script>
-	<script type="text/javascript" src="script/assets.js"></script>
-	<script type="text/javascript" src="script/runSim.js"></script>
+	<script type="text/javascript" src="script/tournment.min.js"></script>
+	<script type="text/javascript" src="script/tournment_tiers.min.js"></script>
+	<script type="text/javascript" src="script/stats_func.min.js"></script>
+	<script type="text/javascript" src="script/assets.min.js"></script>
+	<script type="text/javascript" src="script/runSim.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	
 	<script src="script/dropzone.js"></script>
