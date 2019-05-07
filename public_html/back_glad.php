@@ -80,7 +80,6 @@
 			$vagi = mysql_escape_string($_POST['vagi']);
 			$vint = mysql_escape_string($_POST['vint']);
 			$code = mysql_escape_string($_SESSION['code']);
-
 			if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
 				$sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
@@ -161,6 +160,6 @@
 	function calcAttrValue($attr){
 		if ($attr == 0)
 			return 0;
-		return calcAttrValue($attr - 1) + ceil($attr/3);
+		return calcAttrValue($attr - 1) + ceil($attr/6);
 	}
 ?>
