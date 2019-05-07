@@ -1,11 +1,14 @@
 <?php
 	include_once "connection.php";
 	
-	$search = mysql_escape_string($_POST['search']);
-	if ($search != ""){
-		$search = " WHERE g.name LIKE '%$search%' OR u.apelido LIKE '%$search%'";
+	$search = "";
+	if (isset($_POST['search'])){
+		$search = mysql_escape_string($_POST['search']);
+		if ($search != ""){
+			$search = " WHERE g.name LIKE '%$search%' OR u.apelido LIKE '%$search%'";
+		}
 	}
-
+	
 	$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.email $search";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	$total = $result->num_rows;
