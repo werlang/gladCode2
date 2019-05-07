@@ -9,7 +9,7 @@ setup(){
 int start = 1;
 
 loop(){
-	upgradeAGI();
+	upgradeAGI(1);
 	if (start){
 		if(moveTo(12.5,12.5))
 			start = 0;

@@ -9,7 +9,7 @@ setup(){
 #include<math.h>
 
 loop(){
-	upgradeINT();
+	upgradeINT(1);
 	if (getCloseEnemy() && getDist(getTargetX(), getTargetY()) < 5){
 		float dx,dy;
 		float safe = sqrt(pow(getSafeRadius(), 2)/2);
