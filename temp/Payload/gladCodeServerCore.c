@@ -738,6 +738,9 @@ float turnStepUnsafe(int gladid, float ang){
 
 float moveForwardUnsafe(int gladid){
     float hip = (g+gladid)->spd * timeInterval;
+	if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+		hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+
     float ang = (g+gladid)->head;
     float dx, dy;
     calcSidesFromAngleDist(&dx, &dy, hip, ang);
