@@ -9,7 +9,7 @@ setup(){
 int f = 0;
 
 loop(){
-	upgradeAGI();
+	upgradeAGI(1);
 	if (!getCloseEnemy()){
 		if (f){
 			if (getDist(12.5,12.5) > 5)

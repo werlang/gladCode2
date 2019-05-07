@@ -9,7 +9,7 @@ setup(){
 int start = 1;
 
 loop(){
-	upgradeAGI();
+	upgradeAGI(1);
 	if (getLastHitTime() < 1 && getAmbushTimeLeft() == 0){
 		ambush();
 		turnToAngle(getLastHitAngle());

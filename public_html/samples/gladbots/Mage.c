@@ -7,7 +7,7 @@ setup(){
 }
 
 loop(){
-	upgradeINT();
+	upgradeINT(1);
 	if(getLowHp()){
 		if (getAp() >= 40)
 			fireball(getTargetX(), getTargetY());

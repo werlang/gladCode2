@@ -9,7 +9,7 @@ setup(){
 int start = 1;
 
 loop(){
-	upgradeSTR();
+	upgradeSTR(1);
 	if (getCloseEnemy()){
 		float dist = getDist(getTargetX(), getTargetY());
 		if (dist < 0.8 && isTargetVisible()){

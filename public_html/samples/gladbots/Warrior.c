@@ -10,7 +10,7 @@ int start = 1;
 float hp;
 
 loop(){
-	upgradeSTR();
+	upgradeSTR(1);
 	int hit = 0;
 	if (hp != getHp()){
 		hp = getHp();
