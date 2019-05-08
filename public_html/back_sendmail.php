@@ -2,10 +2,16 @@
 	$host = 'in-v3.mailjet.com';
 	$port = '80';
 
+	//$host = 'email-smtp.us-east-1.amazonaws.com';
+	//$port = 587;
+
 	$sendername = 'gladCode';
-	$senderuser = '3d3198fe000a26c2dfb9656b71063111';
 	$senderemail = 'gladbot@gladcode.tk';
+	$senderuser = '3d3198fe000a26c2dfb9656b71063111';
 	$senderpassword = '2190e217582a90175cb145e0f97bc03a';
+
+	//$senderuser = 'AKIA6Q3EGWTCOEJHZ5GS';
+	//$senderpassword = 'BDxSzfEoN5Mc9XrJE+PcRrj3ubcy+wjv2u1tznLNPbLj';
 
 	include_once "connection.php";
 	$cancelSend = false;
@@ -159,6 +165,7 @@
 		 
 		$mail->IsSMTP();
 		$mail->SMTPAuth = true;
+		//$mail->SMTPSecure = 'tls'; //amazon asks
 		$mail->CharSet = 'UTF-8';
 		$mail->Host = $host;
 		$mail->Port = $port;
