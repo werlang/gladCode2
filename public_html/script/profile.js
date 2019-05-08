@@ -958,7 +958,7 @@ $(document).ready( function(){
 						action: "DUEL",
 						friend: userid,
 					}).done( function(data){
-						//console.log(data);
+						console.log(data);
 					});
 				}
 				else
