@@ -1,22 +1,6 @@
-RewriteEngine On
-
-RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
-
-RewriteRule    ^function/(.*)$    function.php?&f=$1 [NC,L]
-RewriteRule    ^funcao/(.*)$    function.php?f=$1&l=pt [NC,L]
-
-RewriteRule    ^glad-([0-9]+)$    editor.php?g=$1    [NC,L]
-RewriteRule    ^newglad$    editor.php?g=0    [NC,L]
-
-RewriteRule    ^glads$    profile.php?t=glads    [NC,L]
-RewriteRule    ^battle$    profile.php?t=battle    [NC,L]
-RewriteRule    ^rank$    profile.php?t=ranking    [NC,L]
-RewriteRule    ^messages$    profile.php?t=messages    [NC,L]
-RewriteRule    ^friends$    profile.php?t=friends    [NC,L]
-RewriteRule    ^logout$    profile.php?t=logout    [NC,L]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule     ^([^\.]+)$      $1.php
-
-#RewriteCond %{HTTPS} off
-#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+RewriteBase /
+RewriteCond %{REMOTE_ADDR} !^201\.21\.112\.216
+RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+RewriteCond %{REQUEST_URI} !^/script/jquery\.min\.js$
+RewriteCond %{REQUEST_URI} !^/icon/[\w]*.png$
+RewriteRule ^(.*)$ http://gladcode.tk/maintenance.html [R=307,L]
