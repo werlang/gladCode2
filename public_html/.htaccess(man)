@@ -1,0 +1,6 @@
+RewriteBase /
+RewriteCond %{REMOTE_ADDR} !^201\.21\.112\.216
+RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+RewriteCond %{REQUEST_URI} !^/script/jquery\.min\.js$
+RewriteCond %{REQUEST_URI} !^/icon/[\w]*.png$
+RewriteRule ^(.*)$ http://gladcode.tk/maintenance.html [R=307,L]
