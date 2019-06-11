@@ -302,20 +302,23 @@ $(window).resize( function() {
 });
 
 function resize() {
-	var canvasH = $(window).height();
-	var canvasW = $(window).height() * screenW/screenH;
-	game.scale.setGameSize(canvasW, canvasH);
+	var canvasH, canvasW;
 	if ($(window).width() > $(window).height()){
+		canvasH = $(window).height();
+		canvasW = $(window).height() * screenW/screenH;
 		game.camera.scale.x = $(window).height() / screenH;
 		game.camera.scale.y = $(window).height() / screenH;
 	}
 	else{
-		game.camera.scale.x = $(window).width() / screenW;
-		game.camera.scale.y = $(window).width() / screenW;
+		canvasH = $(window).height();
+		canvasW = $(window).width();
+		game.camera.scale.x = $(window).height() / screenH;
+		game.camera.scale.y = $(window).height() / screenH;
+		game.camera.x = screenW * game.camera.scale.x / 2 - game.width/2;
 	}	
+	game.scale.setGameSize(canvasW, canvasH);
 	game.camera.bounds.width = screenW;
 	game.camera.bounds.height = screenH;
-
 }
 
 var show_final_score = true;
@@ -447,3 +450,10 @@ function startBattle(simulation){
 	startloop = true;
 	start_timer(steps);
 }
+
+function copyToClipboard(text) {
+	$('body').append("<input type='text' id='icopy' value='"+ text +"'>");
+	$('#icopy').select();
+	document.execCommand("copy");
+	$('#icopy').remove();
+}	

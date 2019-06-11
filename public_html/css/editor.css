@@ -13,9 +13,17 @@ body {
 	display: flex;
 	flex-direction: column;
 	margin-top: 50px;
-	width: 0px;
+	width: 65px;
 	transition: width 0.5s;
 	z-index: 1;
+}
+
+#panel-left img {
+	display: inline;
+}
+
+#panel-left.hidden img {
+	display: none;
 }
 
 #editor {
@@ -183,8 +191,9 @@ body {
 	font-family: roboto;
 	color: #646464;
 	box-sizing: border-box;
-	overflow-y: auto;
-	max-height: 100vh;
+	max-height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 #fog-battle h3 span {

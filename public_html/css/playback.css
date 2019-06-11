@@ -1,8 +1,11 @@
+html {
+    font-size: 6px;
+}
+
 body{
 	margin: 0;
 	background-color: #edf1f3;
 	font-family: consolas, arial, sans-serif;
-    font-size: 16px;
     overflow: hidden;
 }
 
@@ -107,14 +110,12 @@ body{
 }
 
 @media only screen and (min-width: 600px) {
+    html {
+        font-size: 10px;
+    }
+
     #canvas-container {
         flex-direction: row;
-    }
-
-    #canvas-div {
-    }
-
-    #canvas-container canvas{
     }
 }
 
@@ -174,7 +175,7 @@ body{
 
 #canvas-container #button-container .speed {
 	font-family: acme;
-	font-size: 0.8em;
+	font-size: 0.8rem;
 	color: black;
 }
 
@@ -242,7 +243,7 @@ body{
     margin-left: -18px;
 	transition: opacity 0.3s;
 	font-family: acme;
-	font-size: 0.9em;
+	font-size: 0.9rem;
 }
 
 #time-container:hover .ui-slider-time {
@@ -254,21 +255,39 @@ body{
     left: 0;
     top: 0;
     display: flex;
-    flex-direction: column;
     margin-top: 10px;
-    margin-left: 10px;
+    width: 100%;
+}
+
+.ui-glad .row {
+    max-width: 10em;
+    flex-wrap: wrap;
 }
 
 @media only screen and (min-width: 600px) {
     #ui-container {
+        flex-direction: column;
+        margin-left: 10px;
+        width: auto;
     }
+
+    .ui-glad .row {
+        max-width: none;
+        flex-wrap: nowrap;
+    }
+
+    .ui-glad .glad-right-side {
+        max-width: none;
+        margin-left: -1rem;
+    }
+    
 }
 
 .ui-glad {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
     opacity: 0.9;
     transition: 0.3s all;
     cursor: pointer;
@@ -286,15 +305,15 @@ body{
 
 .glad-name {
     width: 100%;
-    height: 25px;
+    height: 2.5rem;
 	display: flex;
     justify-content: center;
     align-items: center;
 	font-family: acme, cursive;
-	font-size: 1.3em;
+	font-size: 2em;
 	text-transform: uppercase;
     color: #ffffffd0;
-    margin-left: 15px; 
+    margin-left: 1.5rem; 
     transition: all 0.3s;
 }
 
@@ -313,7 +332,7 @@ body{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: 225px;
+    max-width: 22.5rem;
 }
 
 .row {
@@ -323,9 +342,9 @@ body{
 }
 
 .glad-portrait {
-    width: 72px;
-    height: 72px;
-    border-radius: 40px;
+    width: 7.2rem;
+    height: 7.2rem;
+    border-radius: 4rem;
     box-sizing: border-box;
     overflow: hidden;
     transition: background-color 2s;
@@ -340,10 +359,10 @@ body{
 #canvas-container .glad-portrait canvas {
     transition: opacity 2s;
     background-color: #aadaaa;
-    margin: 4px;
-    border-radius: 70px;
-    width: 64px;
-    height: 64px;
+    margin: 0.4rem;
+    border-radius: 7rem;
+    width: 6.4rem;
+    height: 6.4rem;
     box-shadow: 0px 0px 5px black inset;
 }
 
@@ -352,21 +371,22 @@ body{
 }
 
 .glad-right-side {
-    width: 160px;
-    margin-left: -10px;
+    width: 16rem;
+    margin-left: 5px;
     display: flex;
     flex-direction: column;
+    max-width: 100%;
 }
 
 .glad-hp, .glad-ap {
     width: 100%;
-    height: 16px;
+    height: 1.6rem;
     display: flex;
     align-items: center;
     box-sizing: border-box;
     border: 1px solid #48484830;
     box-shadow: 0px 0px 5px #00000040;
-    border-radius: 5px;
+    border-radius: 0.5rem;
 }
 
 .ui-glad.follow .glad-hp,
@@ -378,29 +398,29 @@ body{
 }
 
 .glad-xp {
-    width: 50px;
-    height: 90px;
-    margin-right: -40px;
-    margin-top: -8px;
+    width: 5rem;
+    height: 9rem;
+    margin-right: -4rem;
+    margin-top: -0.8rem;
 }
 
 .lvl-value {
-    width: 20px;
-    height: 20px;
+    width: 2rem;
+    height: 2rem;
     box-sizing: border-box;
     background-color: #ffffff;
-    border-radius: 15px;
+    border-radius: 1.5rem;
     font-family: acme, cursive;
-    font-size: 0.9em;
     display: flex;
     justify-content: center;
     align-items: center;
     box-shadow: 0px 0px 5px black;
     position: absolute;
     z-index: 2;
-    margin-left: 36px;
-    margin-top: -2px;
+    margin-left: 3.6rem;
+    margin-top: -0.2rem;
     transition: 0.5s all ease-out;
+    font-size: 1.4em;
 }
 
 .lvl-value.up {
@@ -415,7 +435,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 20px;
+    border-radius: 2rem;
 }
 
 .hp-bar {
@@ -423,7 +443,7 @@ body{
     height: 100%;
     box-sizing: border-box;
     background-color: #6b000000;
-    border-radius: 3px;
+    border-radius: 0.3rem;
     transition: all 0.3s;
 }
 
@@ -451,7 +471,7 @@ body{
     height: 100%;
     box-sizing: border-box;
     background-color: #00007500;
-    border-radius: 3px;
+    border-radius: 0.3rem;
     transition: all 0.3s;
 }
 
@@ -498,24 +518,25 @@ body{
 .filled {
 	transition: width 0.5s;
     box-shadow: 0px 0px 3px black inset;
-    border-radius: 3px;
+    border-radius: 0.3rem;
 }
 
 .glad-buffs {
 	display: flex;
     align-items: center;
-    margin-left: 10px;
-    margin-top: 5px;
+    flex-wrap: wrap;
+    margin-left: 1rem;
+    margin-top: 0.5rem;
 }
 
 .glad-buffs div {
     display: flex;
-    padding: 2px;
+    padding: 0.2rem;
     background-image: linear-gradient(-45deg, #696969, #ebebeb);
     box-shadow: 0px 0px 5px black;
-    border-radius: 3px;
+    border-radius: 0.3rem;
     box-sizing: border-box;
-    margin: 0px 2px;
+    margin: 0px 0.2rem;
     opacity: 0;
     transition: all 0.5s;
     order: 1;
@@ -532,27 +553,35 @@ body{
 }
 
 .glad-buffs img {
-    width: 20px;
-    height: 20px;
+    width: 2rem;
+    height: 2rem;
     background-color: #a8cfa0;
     box-shadow: 0px 0px 5px black inset;
-    padding: 3px;
-    border-radius: 3px;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
 }
+
+@media only screen and (min-width: 600px) {
+    .glad-buffs {
+        flex-wrap: nowrap;
+    }
+
+}
+
 
 .glad-attr {
     display: flex;
     justify-content: center;
-    margin-top: -15px;
+    margin-top: -1.5rem;
 }
 
 .glad-attr img{
     box-sizing: border-box;
-    width: 20px;
-    height: 20px;
+    width: 2rem;
+    height: 2rem;
     z-index: 1;
-    border-radius: 20px;
-    padding: 1px;
+    border-radius: 2rem;
+    padding: 0.1rem;
     box-shadow: 0px 0px 3px black inset;
 }
 
@@ -572,32 +601,32 @@ body{
 }
 
 .glad-attr div:nth-child(odd) {
-    margin-top: -3px;
-    margin-bottom: 7px;
+    margin-top: -0.3rem;
+    margin-bottom: 0.7rem;
 }
 
 .glad-attr div{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2px 1px;
+    margin: 0.2em 0.1rem;
     background-image: linear-gradient(-45deg, #696969, #ebebeb);
-    border-radius: 20px 20px 20px 20px;
+    border-radius: 2rem;
     box-shadow: 0px 0px 5px black;
 }
 
 .glad-attr span{
-	width: 17px;
+	width: 1.7rem;
     text-align: center;
-    font-size: 0.9em;
+    font-size: 1.4em;
     font-family: acme, cursive;
     text-shadow: 1px 1px 3px black;
     color: white;
-    margin-top: -10px;
-    padding-top: 7px;
+    margin-top: -1rem;
+    padding-top: 0.7rem;
     box-shadow: 0px 0px 3px black inset;
-    border-radius: 0 0 10px 10px;
-    margin-bottom: 2px;
+    border-radius: 0 0 1em 1rem;
+    margin-bottom: 0.2rem;
 }
 
 #end-message,
@@ -611,7 +640,7 @@ body{
     border-radius: 3px;
     box-shadow: 3px 3px 15px -1px black;
     font-family: acme;
-    font-size: 1.8em;
+    font-size: 1.8rem;
     color: #cee1e8;
 	border: 2px solid #3c839e;
     text-shadow: 1px 1px 5px black;
@@ -786,7 +815,7 @@ body{
 	border: 2px solid #5a5a5a;
 	background-color: #b4ffb47d;
 	font-family: acme;
-	font-size: 0.8em;
+	font-size: 1.4em;
 	cursor: default;
 	word-break: break-all;
 	max-width: 200px;

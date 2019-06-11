@@ -192,7 +192,7 @@
                     <tr>
                         <td><a href='function/block'>Block</a></td>
                         <td>50</td>
-                        <td>Reduz todo dano levado em 10% + (STR/(STR+16))% por 7s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
+                        <td>Reduz todo dano levado em 10% * (0.1 + STR/(STR+16)) por 7s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
                     </tr>
                     <tr>
                         <td><a href='function/assassinate'>Assassinate</a></td>

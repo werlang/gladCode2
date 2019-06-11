@@ -27,3 +27,8 @@ body{
 	font-family: roboto, helvetica, arial, sans-serif;
 	color: #616161;
 }
+
+textarea {
+	width: 700px;
+	min-height: 200px;
+}

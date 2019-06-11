@@ -3,7 +3,7 @@
 	"ptname": "bloqueio",
 	"syntax": "int block ( void );",
 	"description": {
-		"long": "Causa o efeito <a href='manual.php#nav-efeito'>proteção</a> no gladiador, fazendo com que todo dano direto sofrido por ele seja reduzido. O dano será reduzido em uma porcentagem igual a (10 + STR/(STR+8)), onde STR é a <a href='manual.php#nav-glad'>força</a> do gladiador. Caso o gladiador não esteja enxergando a fonte do dano recebido, o efeito da proteção é reduzido pela metade. O efeito de proteção sobre o gladiador possui duração de 7 segundos.",
+		"long": "Causa o efeito <a href='manual.php#nav-efeito'>proteção</a> no gladiador, fazendo com que todo dano direto sofrido por ele seja reduzido. O dano será reduzido em uma porcentagem igual a (0.1 + STR/(STR+16)) * 10%, onde STR é a <a href='manual.php#nav-glad'>força</a> do gladiador. Caso o gladiador não esteja enxergando a fonte do dano recebido, o efeito da proteção é reduzido pela metade. O efeito de proteção sobre o gladiador possui duração de 7 segundos.",
 		"brief": "Aumenta a defesa do gladiador."
 	},
 	"param": [

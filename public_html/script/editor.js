@@ -78,11 +78,11 @@ $(document).ready( function() {
 	
 	$('#panel-left-opener').click( function(){
 		if ($(this).hasClass('open')){
-			$('#panel-left').width(0);
+			$('#panel-left').width(0).addClass('hidden');
 			$(this).removeClass('open');
 		}
 		else{
-			$('#panel-left').width(65);
+			$('#panel-left').width(65).removeClass('hidden');
 			$(this).addClass('open');
 		}
 	});
