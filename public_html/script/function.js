@@ -1,4 +1,6 @@
 $(document).ready( function() {
+	$('#learn').addClass('here');
+	
 	var found = false;
 	var func = $('#vget').val();
 

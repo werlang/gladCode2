@@ -761,7 +761,7 @@ function getGladPositionOnCanvas(gladid){
 	var x = pw*2 + pw * parseFloat(json.glads[gladid].x);
 	var y = ph*5 + ph * parseFloat(json.glads[gladid].y);
 	var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
-	var cl = $('#canvas-div canvas').position().left;
+	var cl = $('#canvas-div canvas').position().left - game.camera.view.x;
 	return {x: x+cl, y: y+ct};
 }
 

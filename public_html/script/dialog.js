@@ -7,7 +7,7 @@ function showDialog(message,buttons){
 		$('#dialog-box #button-container').append("<button class='button'>"+ buttons[i] +"</button>");
 	}
 	$('#dialog-box .button').click( function(){
-		$('#fog').remove();
+		$('#dialog-box').parents('#fog').remove();
 		response.resolve($(this).html());
 	});
 	return response.promise();
@@ -29,12 +29,12 @@ function showTextArea(message,placeholder,maxchar){
 			}
 			else{
 				response.resolve(text);
-				$('#fog').remove();
+				$('#dialog-box').parents('#fog').remove();
 			}
 		}
 		else{
 			response.resolve(false);
-			$('#fog').remove();
+			$('#dialog-box').parents('#fog').remove();
 		}
 	});
 	
@@ -67,7 +67,7 @@ function showInput(message,defValue){
 			response.resolve(text);
 		else
 			response.resolve(false);
-		$('#fog').remove();
+		$('#dialog-box').parents('#fog').remove();
 	});
 	$('#dialog-box .input').keyup(function(e){
 		if (e.keyCode == 13)
@@ -82,7 +82,7 @@ function showMessage(message){
 	$('#dialog-box #message').html(message);
 	$('#fog').hide().fadeIn();
 	$('#dialog-box .button').click( function(){
-		$('#fog').remove();
+		$('#dialog-box').parents('#fog').remove();
 		response.resolve(true);
 	});
 	return response.promise();
@@ -91,7 +91,7 @@ function showMessage(message){
 function showTerminal(title, message){
 	$('body').append("<div id='fog'><div id='terminal'><div id='title'><span>"+ title +"</span><div id='close'></div></div><pre></pre></div></div>");
 	$('#terminal #close').click( function() {
-		$('#fog').remove();
+		$('#dialog-box').parents('#fog').remove();
 	});
 	$('#terminal pre').html(message);
 }

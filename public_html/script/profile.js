@@ -1,4 +1,6 @@
 var user;
+var count_refresh_teams = 0, count_refresh_tour_list = 0;
+
 $(document).ready( function(){
 	$('#header-container').addClass('small-profile');
 	$('#header-profile').addClass('here');
@@ -74,15 +76,19 @@ $(document).ready( function(){
 				else
 					$('#glads .notification').removeClass('empty');
 				
-				var notbattle = parseInt(data.reports) + parseInt(data.duels)
-				if (notbattle >= 10)
-					$('#battle .notification').html("...");
-				else
-					$('#battle .notification').html(notbattle);
-				if (notbattle == 0)
+				var duels = parseInt(data.duels);
+				$('#battle .notification').html(duels);
+				if (duels == 0)
 					$('#battle .notification').addClass('empty');
 				else
 					$('#battle .notification').removeClass('empty');
+
+				var reports = parseInt(data.reports);
+				$('#report .notification').html(reports);
+				if (reports == 0)
+					$('#report .notification').addClass('empty');
+				else
+					$('#report .notification').removeClass('empty');
 			}
 			setTimeout( function(){
 				checkNotifications();
@@ -252,34 +258,6 @@ $(document).ready( function(){
 		});
 	});
 	
-	$('#battle-container .tab').click( function(){
-		$('#battle-container .tab').removeClass('selected');
-		$(this).addClass('selected');
-
-		reload_reports();
-	});
-
-	var reportpage = {
-		battles: 1,
-		duels: 1,
-		favorites: 1
-	};
-	$('#battle-container #prev').click( function(){
-		if ($('#bhist-container .tab.selected').html() == "Batalhas")
-			reportpage.battles--;
-		else if ($('#bhist-container .tab.selected').html() == "Duelos")
-			reportpage.duels--;
-
-		reload_reports();
-	});
-	$('#battle-container #next').click( function(){
-		if ($('#bhist-container .tab.selected').html() == "Batalhas")
-			reportpage.battles++;
-		else if ($('#bhist-container .tab.selected').html() == "Duelos")
-			reportpage.duels++;
-
-		reload_reports();
-	});
 	$('#menu #battle').click( function() {
 
 		$('#match-find').prop('disabled',true);
@@ -328,7 +306,6 @@ $(document).ready( function(){
 				});
 			});
 
-			reload_reports();
 		}
 
 		$.post("back_duel.php",{
@@ -433,7 +410,581 @@ $(document).ready( function(){
 			});
 		});
 	});
+
+	$('#panel #battle-mode .button').click( function(){
+		$('#panel #battle-mode .button').removeClass('selected');
+		$(this).addClass('selected');
+	});
+
+	$('#panel #battle-mode #ranked.button').click( function(){
+		$('#panel #battle-container .wrapper').hide();
+		var ranked = $('#panel #battle-container #ranked.wrapper');
+		if (ranked.css('display') == 'none')
+			ranked.fadeIn();
+	});
+
+	$('#panel #battle-mode #duel.button').click( function(){
+		$('#panel #battle-container .wrapper').hide();
+		var duel = $('#panel #battle-container #duel.wrapper');
+		if (duel.css('display') == 'none')
+			duel.fadeIn();
+	});
+
+	$('#panel #duel.wrapper .input').on('input', function(){
+		var text = $('#panel #duel.wrapper .input').val();
+		filter_friends(text);
+	});
+	filter_friends("");
+	function filter_friends(text){
+		$.post('back_friends.php', {
+			action: "FILTER",
+			text: text
+		}).done( function(data){
+			//console.log(data);
+			data = JSON.parse(data);
+			$('#panel #duel.wrapper #table-friends').html("");
+			for (let i in data){
+				var row = "<div class='row'><div class='cell image'><img src='"+ data[i].picture +"'></div><div class='cell nick'>"+ data[i].nick +"</div></div>";
+				$('#panel #duel.wrapper #table-friends').append(row);
+				$('#panel #duel.wrapper #table-friends .row').last().data('user', data[i].user);
+			}
+			$('#panel #duel.wrapper #table-friends .row').click( function(){
+				$('#panel #duel.wrapper #table-friends .row').removeClass('selected');
+				$(this).addClass('selected');
+				$('#panel #duel.wrapper #challenge').removeProp('disabled');
+			});
+		});
+	}
+	$('#panel #duel.wrapper #challenge').click( function() {
+		var userid = $('#panel #duel.wrapper #table-friends .row.selected').data('user');
+		var nick = $('#panel #duel.wrapper #table-friends .row.selected .cell.nick').text();
+		create_duel_box(nick, userid);
+	});
+
+	$('#panel #battle-mode #tourn.button').click( function(){
+		$('#panel #battle-container .wrapper').hide();
+		var duel = $('#panel #battle-container #tourn.wrapper');
+		if (duel.css('display') == 'none')
+			duel.fadeIn();
+
+		refresh_tourn_list();
+	});
+
+	function refresh_tourn_list(){
+		if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
+			$.post("back_tournament.php", {
+				action: "LIST"
+			}).done( function(data){
+				//console.log(data);
+				if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
+					data = JSON.parse(data);
+					var open = data.open;
+					var mytourn = data.mytourn;
+
+					$('#panel #battle-container #tourn.wrapper #table-open').html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div></div>");
+					for (let i in open){
+						$('#panel #battle-container #tourn.wrapper #table-open').append("<div class='row'><div class='cell'>"+ open[i].name +"</div><div class='cell'>"+ open[i].description +"</div><div class='cell'>"+ open[i].teams +"/"+ open[i].maxteams +"</div></div>");
+					}
+
+					$('#panel #battle-container #tourn.wrapper #table-mytourn').html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div></div>");
+					for (let i in mytourn){
+						$('#panel #battle-container #tourn.wrapper #table-mytourn').append("<div class='row'><div class='cell'>"+ mytourn[i].name +"</div><div class='cell'>"+ mytourn[i].description +"</div><div class='cell'>"+ mytourn[i].teams +"/"+ mytourn[i].maxteams +"</div></div>");
+					}
+				}
+
+				count_refresh_tour_list++;
+				setTimeout( function(){
+					count_refresh_tour_list--;
+					if (count_refresh_tour_list == 0)
+						refresh_tourn_list();
+				}, 10000);
+			});
+		}
+	}
+
+	$('#panel #tourn.wrapper #create').click( function() {
+		var box = "<div id='fog'><div class='tourn-box'><div id='title'><h2>Criar torneio</h2><div id='public'><label>Público<input type='checkbox' class='checkslider'></label></div></div><input id='name' class='input' placeholder='Identificador do torneio (nome)' maxlength='50'><input type='password' id='pass' class='input' placeholder='senha para ingressar' maxlength='32'><textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea><div id='options'><div id='maxteams'><span>Máximo de equipes</span><input class='input' value='50' maxlength='2'></div><div id='allowlessmasters'><label><input type='checkbox' class='checkslider'>Equipes podem ter menos de 3 mestres</label></div></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='create' class='button'>CRIAR</button></div></div></div>";
+		$('body').append(box);
+		create_checkbox($('.tourn-box .checkslider'));
+		$('#fog .tourn-box').hide().fadeIn();
+
+		$('.tourn-box #cancel').click( function(){
+			$('#fog').remove();
+		});
+		
+		$('.tourn-box #create').click( function(){
+			var name = $('.tourn-box #name').val();
+			var pass = $('.tourn-box #pass').val();
+			var desc = $('.tourn-box #desc').val();
+			var max = $('.tourn-box #maxteams input').val();
+			var allow = $('.tourn-box #allowlessmasters input').prop('checked');
+
+			$('.tourn-box .input').removeClass('error');
+			$('.tourn-box .tip').remove();
+			if (name.length < 6){
+				$('.tourn-box #name').focus();
+				$('.tourn-box #name').addClass('error');
+				$('.tourn-box #name').before("<span class='tip'>O identificador precisa ter tamanho 6 ou mais</span>");
+			}
+			else if (name.match(/[^\w\s]/g)){
+				$('.tourn-box #name').focus();
+				$('.tourn-box #name').addClass('error');
+				$('.tourn-box #name').before("<span class='tip'>O identificador precisa conter somente letras, números ou espaços</span>");
+			}
+			else if ($('.tourn-box #pass').css('display') != "none" && pass.length == 0){
+				$('.tourn-box #pass').focus();
+				$('.tourn-box #pass').addClass('error');
+				$('.tourn-box #pass').before("<span class='tip'>Digite uma senha, ou torne o torneio público</span>");
+			}
+			else if (max.match(/[^\d]/g) || max < 2 || max > 50){
+				$('.tourn-box #maxteams input').focus();
+				$('.tourn-box #maxteams input').addClass('error');
+				$('.tourn-box #maxteams input').before("<span class='tip'>Informe um número entre 2 e 50</span>");
+			}
+			else{
+				$.post("back_tournament.php",{
+					action: "CREATE",
+					name: name,
+					pass: pass,
+					desc: desc,
+					max: max,
+					allow: allow
+				}).done( function(data){
+					if (data != "EXISTS"){
+						$('#fog').remove();
+
+						var content = "<p>As equipes deverão entrar com os seguintes dados para se inscrever em seu torneio:</p><div>Identificador: <span>"+ name +"</span></div><div>Senha: <span>"+ pass +"</span></div>";
+
+						if (pass == "")
+							content = "<p>As equipes deverão procurar seu torneio na lista de torneios públicos, ou entrar com o seguinte identificador para se inscrever em seu torneio:</p><div>Identificador: <span>"+ name +"</span></div>";
+
+						var box = "<div id='fog'><div id='tourn-message' class='tourn-box'><h2>Torneio registrado</h2>"+ content +"<div id='button-container'><button class='button'>OK</button></div></div></div>";
+						$('body').append(box);
+
+						$('#tourn-message .button').click( function(){
+							$('#fog').remove();
+							refresh_tourn_list();
+						});
+					}
+					else{
+						$('.tourn-box #name').focus();
+						$('.tourn-box #name').addClass('error');
+						$('.tourn-box #name').before("<span class='tip'>Um torneio com este identificador já existe</span>");
+					}
+				});
+			}
+
+		});
+
+		$('.tourn-box #public .checkslider').click( function(){
+			$('.tourn-box .input').removeClass('error');
+			$('.tourn-box .tip').remove();
+			if ($(this).prop('checked'))
+				$('.tourn-box #pass').hide().val("");
+			else
+				$('.tourn-box #pass').show();
+		});
+	});
+
+	$('#panel #tourn.wrapper #join').click( function() {
+		var box = "<div id='fog' class='tourn'><div class='tourn-box'><h2>Ingresso em torneio</h2><p>Informe os dados do torneio que deseja participar</p><input id='name' class='input' placeholder='Identificador do torneio (nome)'><input id='pass' class='input' placeholder='Senha do torneio' type='password'><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='join' class='button'>INGRESSAR</button></div></div></div>";
+		$('body').append(box);
+		$('.tourn-box #name').focus();
 	
+		$('.tourn-box #cancel').click( function(){
+			$('#fog').remove();
+		});
+		$('.tourn-box #name, .tourn-box #pass').keyup(function(e){
+			if (e.keyCode == 13)
+				$('.tourn-box #join').click();
+			if (e.keyCode == 27)
+				$('#fog').remove();
+		});
+		$('.tourn-box #join').click( function(){
+			var tname = $('.tourn-box #name').val();
+			var tpass = $('.tourn-box #pass').val();
+
+			$.post("back_tournament.php",{
+				action: "JOIN",
+				name: tname,
+				pass: tpass
+			}).done( function(data){
+				//console.log(data);
+				if (data == "NOTFOUND"){
+					$('.tourn-box #name').focus();
+					$('.tourn-box #name, .tourn-box #pass').addClass('error');
+					$('.tourn-box .tip').remove();
+					$('.tourn-box #name').before("<span class='tip'>Torneio não encontrado</span>");
+				}
+				else{
+					data = JSON.parse(data);
+					refresh_teams({name: tname, pass: tpass});
+
+					$('.tourn-box').html("<h2>"+ data.name +"</h2><p>"+ data.description +"</p><h3>Equipes inscritas</h3><div class='table'></div><div id='new-container'><button id='new' class='button'>Nova Equipe</button></div><div id='button-container'><button id='close' class='button single'>FECHAR</button></div>");
+	
+					$('.tourn-box #close').click( function(){
+						$('#fog').remove();
+					});
+
+					$('.tourn-box #new').click( function(){
+						$('.tourn-box #new').hide().after("<div class='input-button'><input placeholder='Nome da nova equipe' id='name'><button><i class='material-icons'>group_add</i></button></div>");
+						$('.tourn-box #name').focus();
+						
+						$('.tourn-box #name').keyup( function(e){
+							if (e.keyCode == 13)
+								$('.tourn-box .input-button button').click();
+							else if (e.keyCode == 27){
+								$('.tourn-box .input-button').remove();
+								$('.tourn-box #new').fadeIn();
+								$('.tourn-box .tip').remove();
+							}
+						});
+
+						$('.tourn-box .input-button button').click( function(){
+							var name = $('.tourn-box #name').val();
+							$('.tourn-box .tip').remove();
+							if (name.length < 3){
+								$('.tourn-box #name').focus();
+								$('.tourn-box .input-button').before("<span class='tip'>Nome muito curto</span>");
+							}
+							else if ($('.tourn-box .table').html().match(">"+ name +"<")){
+								$('.tourn-box #name').focus();
+								$('.tourn-box .input-button').before("<span class='tip'>Esta equipe já está registrada</span>");
+							}
+							else{
+								choose_tourn_glad().then( function(gladid){
+									if (gladid !== false){
+										$.post("back_tournament.php", {
+											action: "TEAM_CREATE",
+											name: name,
+											tname: tname,
+											tpass: tpass,
+											glad: gladid
+										}).done( function(data){
+											//console.log(data);
+				
+											if (data == "NOTFOUND"){
+												showMessage("Torneio não encontrado");
+											}
+											else if (data == "ALREADYIN"){
+												showMessage("Já está em um time neste torneio");
+											}
+											else if (data == "EXISTS"){
+												$('.tourn-box #name').focus();
+												$('.tourn-box .input-button').before("<span class='tip'>Esta equipe já está registrada</span>");
+											}
+											else{
+												data = JSON.parse(data);
+
+												$('.tourn-box .input-button').remove();
+												$('.tourn-box #new').fadeIn();
+				
+												var box = "<div id='fog' class='message'><div id='tourn-message' class='tourn-box'><h2>Equipe <span>"+ name +"</span> registrada</h2><p>Os mestres deverão informar a seguinte senha para ingressar nesta equipe:</p><div>Senha: <span>"+ data.word +"</span></div><div id='button-container'><button class='button'>OK</button></div></div></div>";
+												$('body').append(box);
+				
+												$('#tourn-message .button').click( function(){
+													$('#fog.message').remove();
+													$('.tourn-box .table .row').last().click();
+												});
+		
+												refresh_teams({name: tname, pass: tpass});
+											}
+										});
+									}
+								});
+
+							}
+						});
+					});	
+				}
+			});
+		});
+	});
+
+	function refresh_teams(obj){
+		//console.log(obj);
+		if ($('#fog.tourn').length){
+			$.post("back_tournament.php",{
+				action: "LIST_TEAMS",
+				name: obj.name,
+				pass: obj.pass,
+				tourn: obj.tourn
+			}).done( function(data){
+				//console.log(data);
+				var data = JSON.parse(data);
+				var teams = data.teams;
+				var joined = false;
+				if (data.joined)
+					joined = data.joined;
+
+				if (teams.length == 0)
+					$('.tourn-box .table').html("<div class='row'>Nenhuma equipe inscrita</div>");
+				else{
+					$('.tourn-box .table').html("<div class='row head'><div class='cell'>Nome</div><div class='cell'>Gladiadores</div></div>");
+					for (let i in teams){
+						$('.tourn-box .table').append("<div class='row'><div class='cell'>"+ teams[i].name +"</div><div class='cell'>"+ teams[i].glads +"/3</div></div>");
+						rebind_team_rows(teams[i].id);
+						if (joined && joined === teams[i].id)
+							$('.tourn-box .table .row').last().addClass('signed');
+						else if (teams[i].glads == 3)
+							$('.tourn-box .table .row').last().addClass('full');
+					}
+				}
+				if (joined !== false)
+					$('.tourn-box #new-container').hide();
+				else
+					$('.tourn-box #new-container').show();
+
+				count_refresh_teams++;
+				setTimeout( function(){
+					count_refresh_teams--;
+					if (count_refresh_teams == 0)
+						refresh_teams({name: obj.name, pass: obj.pass, tourn: obj.tourn});
+				}, 10000);
+			});
+		}
+	}
+
+	$('#menu #report').click( function() {
+		reload_reports();
+	});
+
+	$('#report-container .tab').click( function(){
+		$('#report-container .tab').removeClass('selected');
+		$(this).addClass('selected');
+
+		reload_reports();
+	});
+	var reportpage = {
+		battles: 1,
+		duels: 1,
+		favorites: 1
+	};
+	$('#report-container #prev').click( function(){
+		if ($('#bhist-container .tab.selected').html() == "Batalhas")
+			reportpage.battles--;
+		else if ($('#bhist-container .tab.selected').html() == "Duelos")
+			reportpage.duels--;
+
+		reload_reports();
+	});
+	$('#report-container #next').click( function(){
+		if ($('#bhist-container .tab.selected').html() == "Batalhas")
+			reportpage.battles++;
+		else if ($('#bhist-container .tab.selected').html() == "Duelos")
+			reportpage.duels++;
+
+		reload_reports();
+	});
+
+	function rebind_team_rows(teamid){
+		$('.tourn-box .table .row').last().click( function(){
+			var teamname = $(this).find('.cell').eq(0).html();
+			var box = "<div id='fog' class='team'><div class='tourn-box'><div id='title'><h2>Equipe <span>"+ teamname +"</span></h2><div id='word'>Senha<span></span></div></div><h3>Gladiadores inscritos</h3><div class='glad-card-container'></div><div id='button-container'><button id='back' class='button'>VOLTAR</button><button id='join-leave' class='button'>ABANDONAR</button></div></div></div>";
+			$('#fog .tourn-box').hide();
+			$('body').append(box);
+
+			$('.tourn-box #back').click( function(){
+				$('#fog.team').remove();
+				$('#fog .tourn-box').fadeIn();
+			});
+
+			$('.tourn-box #join-leave').click( function(){
+				if ($('.tourn-box #join-leave').html() == "ABANDONAR"){
+					showDialog("Tem certeza que deseja sair da equipe <span class='highlight'>"+ teamname +"</span>?",["Não", "SIM"]).then( function(data){
+						if (data == "SIM"){
+							$.post("back_tournament.php", {
+								action: "LEAVE_TEAM",
+								id: teamid
+							}).done( function(data){
+								//console.log(data);
+								data = JSON.parse(data);
+								var tournid = data.tourn;
+
+								$('#fog.team').remove();
+
+								var message = "Você não faz mais parte da equipe <span class='highlight'>"+ teamname +"</span>";
+								if (data.status == "REMOVED")
+									message = "A equipe <span class='highlight'>"+ teamname +"</span> foi desmantelada";
+
+								showMessage(message).then( function(data){
+									$('.tourn-box').fadeIn();
+									refresh_teams({tourn: tournid});
+								});
+							});
+						}
+					});
+				}
+				else{
+					choose_tourn_glad().then( function(data){
+						if (data !== false){
+							var gladid = data;
+							showInput("Senha para ingressar na equipe").then( function(data){
+								if (data !== false){
+									var pass = data;
+									$.post("back_tournament.php", {
+										action: "JOIN_TEAM",
+										pass: pass,
+										team: teamid,
+										glad: gladid
+									}).done( function(data){
+										//console.log(data);
+										data = JSON.parse(data);
+										var tournid = data.tourn;
+
+										if (data.status == "FAIL")
+											showMessage("Senha incorreta");
+										else{
+											showMessage("Você ingressou na equipe <span class='highlight'>"+ teamname +"</span>").then( function(){
+												$('.tourn-box .row.signed').click();
+											});
+											$('.tourn-box #back').click();
+											refresh_teams({tourn: tournid});
+										}
+									});
+								}
+							});
+						}
+					});
+				}
+			});
+
+			$.post("back_tournament.php", {
+				action: "TEAM",
+				id: teamid
+			}).done( function(data){
+				//console.log(data);
+				data = JSON.parse(data);
+				var tname = data.name;
+				var word = data.word;
+				var allow = data.allow;
+				var joined = false;
+				if (data.joined)
+					joined = data.joined;
+
+				data = data.glads;
+
+				if (word)
+					$('.tourn-box #word span').html(word);
+				else
+					$('.tourn-box #word').remove();
+
+				var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
+					for (let i in data){
+						$('.tourn-box .glad-card-container').append("<div class='glad-preview'></div>");
+					}
+					$('.tourn-box .glad-card-container .glad-preview').html(template);
+		
+					for (let i in data){
+						if (data[i].name){
+							setGladImage($('.tourn-box .glad-card-container') ,i, data[i].skin);
+							$('.tourn-box .glad-preview .info .glad span').eq(i).html(data[i].name);
+							$('.tourn-box .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
+							$('.tourn-box .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
+							$('.tourn-box .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
+							$('.tourn-box .glad-preview').eq(i).data('id',data[i].id);
+							$('.tourn-box .glad-preview .info').eq(i).append("<div class='row master'>"+ data[i].apelido +"</div>");
+						}
+						else{
+							$('.tourn-box .glad-preview').eq(i).addClass('blurred');
+							setGladImage($('.tourn-box .glad-card-container') ,i, '');
+							$('.tourn-box .glad-preview .info .glad span').eq(i).html('??????');
+							$('.tourn-box .glad-preview .info .attr .str span').eq(i).html('??');
+							$('.tourn-box .glad-preview .info .attr .agi span').eq(i).html('??');
+							$('.tourn-box .glad-preview .info .attr .int span').eq(i).html('??');
+							$('.tourn-box .glad-preview .info').eq(i).append("<div class='row master'>"+ data[i] +"</div>");
+						}
+					}
+					$('.glad-preview .code').remove();
+					$('.glad-preview .delete-container').remove();
+
+					for (let i = 0 ; i < 3 - data.length ; i++){
+						$('.tourn-box .glad-card-container').append("<div class='glad-add'><div class='image'></div><div class='info'>Clique para inscrever um novo gladiador</div></div>");
+					}
+					if ($('.tourn-box .glad-preview.blurred').length > 0){
+						$('.tourn-box .glad-add').addClass('disabled');
+						$('.tourn-box #join-leave').html('INGRESSAR');
+					}
+					if (allow == "0"){
+						$('.tourn-box .glad-add').addClass('disabled');
+					}
+					if (joined && $('.tourn-box #join-leave').html() == 'INGRESSAR'){
+						$('.tourn-box #join-leave').remove();
+						$('.tourn-box #button-container .button').addClass('single');
+					}
+
+					$('.tourn-box .glad-add').not('.disabled').click( function(){
+						choose_tourn_glad().then( function(gladid){
+							if (gladid !== false){
+								$.post("back_trounament.php", {
+									action: "ADD_GLAD",
+									glad: gladid,
+									team: teamid
+								}).done( function(data){
+									console.log(data);
+								});
+							}
+						});
+					});
+				});
+		
+			});
+
+		});
+	}
+
+	function choose_tourn_glad(){
+		var response = $.Deferred();
+
+		var box = "<div id='fog' class='glads'><div id='duel-box'><div id='title'>Escolha o gladiador que irá lhe representar no torneio</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>";
+		$('body').append(box);
+
+		var template = $("<div id='template'></div>").load("glad-card-template.html", function(){});
+		$.post("back_glad.php",{
+			action: "GET",
+		}).done( function(data){
+			data = JSON.parse(data);
+			for (var i in data){
+				$('#fog.glads .glad-card-container').append("<div class='glad-preview'></div>");
+			}
+			$('#fog.glads .glad-card-container .glad-preview').html(template);
+
+			for (var i in data){
+				setGladImage($('#fog.glads .glad-card-container') ,i, data[i].skin);
+				$('#fog.glads .glad-preview .info .glad span').eq(i).html(data[i].name);
+				$('#fog.glads .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
+				$('#fog.glads .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
+				$('#fog.glads .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
+				$('#fog.glads .glad-preview').eq(i).data('id',data[i].id);
+			}
+			$('#fog.glads .glad-preview .code .button').remove();
+			$('#fog.glads .glad-preview .delete-container').remove();
+			
+			$('#fog.glads .glad-preview').click( function(){
+				$('#fog.glads #btn-glad-open').removeProp('disabled');
+				$('#fog.glads .glad-preview').removeClass('selected');
+				$(this).addClass('selected');
+				$('#duel-box #choose').removeProp('disabled');
+			});
+			
+			$('#fog.glads .glad-preview').dblclick( function(){
+				$('#fog.glads #duel-box #choose').click();
+			});
+		});
+		
+		$('#duel-box #cancel').click( function(){
+			$('#fog.glads').remove();
+			return response.resolve(false);
+		});
+		$('#duel-box #choose').click( function(){
+			var gladid = $('#fog.glads .glad-preview.selected').data('id');
+			$('#fog.glads').remove();
+			return response.resolve(gladid);
+		});
+
+		return response.promise();
+	}
+
 	function reload_reports(){
 		var pstart, pend, ptotal;
 		if ($('#bhist-container .tab.selected').html() == "Batalhas"){
@@ -541,19 +1092,19 @@ $(document).ready( function(){
 		}
 
 		function bind_report_pages(){
-			$('#battle-container #page-title span').eq(0).html(pstart);
-			$('#battle-container #page-title span').eq(1).html(pend);
-			$('#battle-container #page-title span').eq(2).html(ptotal);
+			$('#report-container #page-title span').eq(0).html(pstart);
+			$('#report-container #page-title span').eq(1).html(pend);
+			$('#report-container #page-title span').eq(2).html(ptotal);
 			
 			if (pstart == 1)
-				$('#battle-container #prev').prop('disabled',true);
+				$('#report-container #prev').prop('disabled',true);
 			else
-				$('#battle-container #prev').removeProp('disabled');
+				$('#report-container #prev').removeProp('disabled');
 				
 			if (pend == ptotal)
-				$('#battle-container #next').prop('disabled',true);
+				$('#report-container #next').prop('disabled',true);
 			else
-				$('#battle-container #next').removeProp('disabled');
+				$('#report-container #next').removeProp('disabled');
 		}
 
 	}
@@ -945,6 +1496,10 @@ $(document).ready( function(){
 		var nick = button.parents('.row').data('nick');
 		var userid = button.parents('.row').data('user');
 
+		create_duel_box(nick, userid);
+	});
+
+	function create_duel_box(nick, userid){
 		var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='invite' class='button' disabled>DESAFIAR</button></div></div></div>";
 		$('body').append(box);
 
@@ -1003,14 +1558,14 @@ $(document).ready( function(){
 						action: "DUEL",
 						friend: userid,
 					}).done( function(data){
-						console.log(data);
+						//console.log(data);
 					});
 				}
 				else
 					console.log(data);
 			});
 		});
-	});
+	}
 
 	$('#friend-panel input').on('input', function() {
 		var text = $(this).val();
