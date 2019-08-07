@@ -1,5 +1,6 @@
 //required to provide inside glads object:
 //name, user, code, skin, vstr, vagi, vint
+//or an array with ids
 
 var ajaxcall;
 
@@ -11,6 +12,7 @@ function runSimulation(params) {
 	var single = params.single;
 	var ranked = params.ranked;
 	var duel = params.duel;
+	var tournament = params.tournament;
 
 	if (!single)
 		single = false;
@@ -20,6 +22,8 @@ function runSimulation(params) {
 		ranked = false;
 	if (!duel)
 		duel = false;
+	if (!tournament)
+		tournament = false;
 
 	//console.log(glads);
 	var response = $.Deferred();
@@ -29,6 +33,7 @@ function runSimulation(params) {
 		single: single,
 		ranked: ranked,
 		duel: duel,
+		tournament: tournament
 	})
 	.done(function(data){
 		//console.log(data);

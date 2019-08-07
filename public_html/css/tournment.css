@@ -71,10 +71,6 @@ body{
 	margin: 0;
 }
 
-#intro #main-text {
-	
-}
-
 #intro #sub-text {
 	font-size: 0.75em;
     margin-top: 20px;
@@ -434,9 +430,6 @@ body{
 #pre-battle-container .glad-box.selected .name,
 #pre-battle-container #glad-showcase .glad-box .name {
 	color: #be1515;
-}
-
-#pre-battle-container #team-container {
 }
 
 #pre-battle-container #team-container #name {

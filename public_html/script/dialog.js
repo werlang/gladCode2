@@ -91,7 +91,7 @@ function showMessage(message){
 function showTerminal(title, message){
 	$('body').append("<div id='fog'><div id='terminal'><div id='title'><span>"+ title +"</span><div id='close'></div></div><pre></pre></div></div>");
 	$('#terminal #close').click( function() {
-		$('#dialog-box').parents('#fog').remove();
+		$('#terminal').parents('#fog').remove();
 	});
 	$('#terminal pre').html(message);
 }
