@@ -159,14 +159,17 @@ $(document).ready( function(){
 								$('.tourn-box .input-button').before("<span class='tip'>Esta equipe já está registrada</span>");
 							}
 							else{
-								choose_tourn_glad().then( function(gladid){
-									if (gladid !== false){
-										$.post("back_tournament.php", {
+								choose_tourn_glad().then( function(data){
+									if (data !== false){
+                                        var gladid = data.glad;
+                                        var showcode = data.showcode;
+                                        $.post("back_tournament.php", {
 											action: "TEAM_CREATE",
 											name: name,
 											tname: tname,
 											tpass: tpass,
-											glad: gladid
+                                            glad: gladid,
+                                            showcode: showcode
 										}).done( function(data){
 											//console.log(data);
 				
@@ -449,7 +452,8 @@ function rebind_team_rows(teamid){
             else{
                 choose_tourn_glad().then( function(data){
                     if (data !== false){
-                        var gladid = data;
+                        var gladid = data.glad;
+                        var showcode = data.showcode;
                         showInput("Senha para ingressar na equipe").then( function(data){
                             if (data !== false){
                                 var pass = data;
@@ -457,7 +461,8 @@ function rebind_team_rows(teamid){
                                     action: "JOIN_TEAM",
                                     pass: pass,
                                     team: teamid,
-                                    glad: gladid
+                                    glad: gladid,
+                                    showcode: showcode
                                 }).done( function(data){
                                     //console.log(data);
                                     data = JSON.parse(data);
@@ -597,11 +602,14 @@ function refresh_glads(teamid){
                 }
 
                 $('.tourn-box .glad-add').not('.disabled').click( function(){
-                    choose_tourn_glad().then( function(gladid){
-                        if (gladid !== false){
+                    choose_tourn_glad().then( function(data){
+                        if (data !== false){
+                            var gladid = data.glad;
+                            var showcode = data.showcode;
                             $.post("back_tournament.php", {
                                 action: "ADD_GLAD",
                                 glad: gladid,
+                                showcode: showcode,
                                 team: teamid,
                                 pass: word
                             }).done( function(data){
@@ -632,8 +640,9 @@ function refresh_glads(teamid){
 function choose_tourn_glad(){
     var response = $.Deferred();
 
-    var box = "<div id='fog' class='glads'><div id='duel-box'><div id='title'>Escolha o gladiador que irá lhe representar no torneio</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>";
+    var box = "<div id='fog' class='glads'><div id='duel-box'><div id='title'>Escolha o gladiador que irá lhe representar no torneio</div><div class='glad-card-container'></div><div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>";
     $('body').append(box);
+    create_checkbox($('#duel-box .checkslider'));
 
     var template = $("<div id='template'></div>").load("glad-card-template.html", function(){});
     $.post("back_glad.php",{
@@ -674,8 +683,9 @@ function choose_tourn_glad(){
     });
     $('#duel-box #choose').click( function(){
         var gladid = $('#fog.glads .glad-preview.selected').data('id');
+        var showcode = $('#duel-box input.checkslider').prop('checked');
         $('#fog.glads').remove();
-        return response.resolve(gladid);
+        return response.resolve({glad: gladid, showcode: showcode});
     });
 
     return response.promise();

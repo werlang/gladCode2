@@ -171,6 +171,7 @@
         $tname = mysql_escape_string($_POST['tname']);
         $tpass = mysql_escape_string($_POST['tpass']);
         $glad = mysql_escape_string($_POST['glad']);
+        $showcode = mysql_escape_string($_POST['showcode']);
         $tourn = "";
 
         $sql = "SELECT id FROM tournament WHERE name = '$tname' AND password = '$tpass'";
@@ -222,7 +223,10 @@
                         $nrows = $result->num_rows;
         
                         if ($nrows > 0){
-                            $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad','$teamid')";
+                            if ($showcode == 'true')
+                                $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$teamid', '1')";
+                            else
+                                $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$teamid')";
                             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                         }
                     }
@@ -326,6 +330,7 @@
         $word = mysql_escape_string($_POST['pass']);
         $team = mysql_escape_string($_POST['team']);
         $glad = mysql_escape_string($_POST['glad']);
+        $showcode = mysql_escape_string($_POST['showcode']);
         $output = array();
 
         $sql = "SELECT tournament FROM teams WHERE id = '$team'";
@@ -352,7 +357,10 @@
                 $nrows = $result->num_rows;
 
                 if ($nrows > 0 ){
-                    $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$team')";
+                    if ($showcode == 'true')
+                        $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$team', '1')";
+                    else
+                        $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$team')";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
@@ -371,6 +379,7 @@
     }
     elseif ($action == "ADD_GLAD"){
         $glad = mysql_escape_string($_POST['glad']);
+        $showcode = mysql_escape_string($_POST['showcode']);
         $team = mysql_escape_string($_POST['team']);
         $pass = mysql_escape_string($_POST['pass']);
            
@@ -385,7 +394,6 @@
             $output['status'] = "NOTJOINED";
         else{
             $row = $result->fetch_assoc();
-            $output['test'] = $row['pass'];
             if ($row['pass'] != $pass)
                 $output['status'] = "PASSWORD";
             elseif ($row['nglads'] >= 3)
@@ -405,7 +413,10 @@
                     if ($row['master'] != $user)
                         $output['status'] = "PERMISSION";
                     else{
-                        $sql = "INSERT INTO gladiator_teams(gladiator, team) VALUES ('$glad','$team')";
+                        if ($showcode == 'true')
+                            $sql = "INSERT INTO gladiator_teams(gladiator, team, visible) VALUES ('$glad','$team', '1')";
+                        else
+                            $sql = "INSERT INTO gladiator_teams(gladiator, team) VALUES ('$glad','$team')";
                         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                         $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
                         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }

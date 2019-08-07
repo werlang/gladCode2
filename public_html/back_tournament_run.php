@@ -62,7 +62,7 @@
         $version = file_get_contents("version");
 
         $myteams = "SELECT te.id FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE g.master = '$user'";
-        $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, gt.dead FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.email = g.master WHERE t.hash = '$hash' AND te.id IN ($myteams)";
+        $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, gt.dead, gt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.email = g.master WHERE t.hash = '$hash' AND te.id IN ($myteams)";
 
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
@@ -75,7 +75,10 @@
                 if ($row['version'] != $version)
                     $glad['oldversion'] = true;
                 
-                $glad['code'] = htmlspecialchars($row['code']);
+                if ($row['visible'] == '1')
+                    $glad['code'] = htmlspecialchars($row['code']);
+                else
+                    unset($glad['code']);
 
                 if ($row['dead'] == '1')
                     $glad['dead'] = true;
