@@ -1656,6 +1656,11 @@ body{
     font-weight: bold;
 }
 
+#duel-box #show-code {
+	margin-left: 15px;
+	margin-bottom: 10px;
+}
+
 #duel-challenge {
 	width: 100%;
 }

@@ -152,7 +152,7 @@ function refresh_round(){
 
             if (data.groups[i].status == "DONE"){
                 $(this).find('.foot .button').html("VISUALIZAR BATALHA");
-                $(this).find('.foot .button').removeProp('disable');
+                $(this).find('.foot .button').removeProp('disabled');
                 $(this).find('.foot .button').click( function(){
                     window.open('play/'+ data.groups[i].hash);
                 });

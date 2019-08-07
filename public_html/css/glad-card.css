@@ -257,6 +257,12 @@
     color: white;
 }
 
+.glad-preview .button:hover:disabled,
+.glad-preview .button:disabled {
+    background-color: transparent;
+    color: #0000002b;
+}
+
 .glad-preview.dead {
     filter: grayscale(100%);
     cursor: default;

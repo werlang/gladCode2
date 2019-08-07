@@ -188,14 +188,18 @@ function load_glad_cards(obj,options){
                 obj.find('.glad-preview').eq(i).data('id',data[i].id);
 
                 if (options.code){
-                    obj.find('.glad-preview .code .button').eq(i).click(function(e){
-                        e.stopPropagation();
-                        $('body').append("<div id='fog' class='code'><div class='float-box'><pre id='code' pre class='line-numbers language-c'><code class='language-c'>"+ data[i].code +"</code></pre><div id='button-container'><button class='button'>FECHAR</button></div></div></div>");
-                        Prism.highlightElement($('code')[0]);
-                        $('#fog.code .button').click( function(){
-                            $('#fog.code').remove();
-                        });
-                    });
+					if (data[i].code){
+						obj.find('.glad-preview .code .button').eq(i).click(function(e){
+							e.stopPropagation();
+							$('body').append("<div id='fog' class='code'><div class='float-box'><pre id='code' pre class='line-numbers language-c'><code class='language-c'>"+ data[i].code +"</code></pre><div id='button-container'><button class='button'>FECHAR</button></div></div></div>");
+							Prism.highlightElement($('code')[0]);
+							$('#fog.code .button').click( function(){
+								$('#fog.code').remove();
+							});
+						});
+					}
+					else
+						obj.find('.glad-preview .code .button').prop('disabled', true);
                 }
 
                 if (options.master)
