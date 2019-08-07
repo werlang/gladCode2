@@ -32,7 +32,17 @@
 		$userglad = $glads;
 		$glads = array($glads, $row['gladiator1']);
 	}
-	
+	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
+		$groupid = mysql_escape_string($_POST['tournament']);
+        $sql = "SELECT glt.gladiator FROM group_teams grt INNER JOIN gladiator_teams glt ON grt.glad = glt.id WHERE grt.groupid = '$groupid'";
+        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+
+        while($row = $result->fetch_assoc()){
+            array_push($glads, $row['gladiator']);
+        }
+        
+	}
+
 	//print_r($glads);
 	
 	foreach ($glads as $glad){
@@ -160,6 +170,11 @@
 				$id = mysql_escape_string($_POST['duel']);
 				$user = $_SESSION['user'];
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			}
+			if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
+				$id = mysql_escape_string($_POST['tournament']);
+				$sql = "UPDATE groups SET log = '$hash' WHERE id = '$id'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			}
 

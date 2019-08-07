@@ -33,6 +33,8 @@
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="script/assets.min.js"></script>
+	<script type="text/javascript" src="script/profile-tourn.js"></script>
+	<script type="text/javascript" src="script/glad-card.js"></script>
 	<script type="text/javascript" src="script/profile.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
@@ -135,7 +137,7 @@
 						<div class='container'>
 							<h2>Torneios públicos abertos</h2>
 							<div id='table-open' class='table'></div>
-							<h2>Meus torneios</h2>
+							<h2 id='mytourn-title'>Meus torneios</h2>
 							<div id='table-mytourn' class='table'></div>
 							<div id='button-container'>
 								<button id='create' class='button'>CRIAR UM TORNEIO</button>

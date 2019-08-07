@@ -1,4 +1,5 @@
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
+RewriteRule    ^tourn\/([a-f0-9]+)/?$    tournament.php?h=$1    [NC,L]
 
 RewriteRule    ^function/(.*)$    function.php?&f=$1 [NC,L]
 RewriteRule    ^funcao/(.*)$    function.php?f=$1&l=pt [NC,L]
