@@ -2,8 +2,10 @@
 	include_once "connection.php";
 	session_start();
 
-	$output = ""; 
+	$output = array();
+	$outtext = ""; 
 	$error = "";
+	$cancel_run = false;
 	
 	$foldername = md5('folder'.microtime()*rand());
 	$path = "/home/gladcode/temp";
@@ -32,19 +34,35 @@
 		$userglad = $glads;
 		$glads = array($glads, $row['gladiator1']);
 	}
-	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
-		$groupid = mysql_escape_string($_POST['tournament']);
-        $sql = "SELECT glt.gladiator FROM group_teams grt INNER JOIN gladiator_teams glt ON grt.glad = glt.id WHERE grt.groupid = '$groupid'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-        while($row = $result->fetch_assoc()){
-            array_push($glads, $row['gladiator']);
-        }
-        
+	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
+		if (isset($_SESSION['tourn-group'])){
+			$groupid = mysql_escape_string($_POST['tournament']);
+			if ($_SESSION['tourn-group'] != md5("tourn-group-$groupid-id")){
+				$groupid = null;
+				$cancel_run = true;
+			}
+			unset($_SESSION['tourn-group']);
+
+			$sql = "SELECT log FROM groups WHERE id = $groupid";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+			if ($row = $result->fetch_assoc() && $row['log'] == null){
+				$sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+	
+				while($row = $result->fetch_assoc()){
+					array_push($glads, $row['gladiator']);
+				}
+			}
+			else
+				$groupid = null;
+		}
+		else{
+			$groupid = null;
+			$cancel_run = true;
+		}
 	}
 
-	//print_r($glads);
-	
 	foreach ($glads as $glad){
 		if (ctype_digit($glad)){
 			array_push($ids, $glad);
@@ -82,7 +100,8 @@
 			array_push($codes, $code);
 		}
 	}
-	//print_r($ids);
+	//$output['test'] = $ids;
+
 	if (count($ids) > 0){
 		$ids = implode(",", $ids);
 		$sql = "SELECT code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.email WHERE g.cod IN ($ids)";
@@ -104,7 +123,6 @@
 		}
 	}
 	
-	//print_r($codes);
 	$invalid_attr = false;
 	foreach($codes as $i => $code){
 		if (!validate_attr($code)){
@@ -114,13 +132,15 @@
 		file_put_contents("$path/$foldername/code$i.c",$code);
 	}
 
-	if (!$invalid_attr){		
+	if ($cancel_run)
+		$output['simulation'] = null;
+	elseif (!$invalid_attr){		
 		system("$path/call_socket.sh $foldername &>> $path/$foldername/error.txt");
 		
 		if (file_exists("$path/$foldername/outputc.txt"))
-			$output .= file_get_contents ("$path/$foldername/outputc.txt");
+			$outtext .= file_get_contents ("$path/$foldername/outputc.txt");
 		if (file_exists("$path/$foldername/outputs.txt"))
-			$output .= file_get_contents ("$path/$foldername/outputs.txt");
+			$outtext .= file_get_contents ("$path/$foldername/outputs.txt");
 		if (file_exists("$path/$foldername/error.txt"))
 			$error .= file_get_contents ("$path/$foldername/error.txt");
 		if (file_exists("$path/$foldername/errors.txt"))
@@ -134,8 +154,8 @@
 		if ($error != ""){
 			$error = str_replace($spechar, $repchar, $error);
 		}
-		if ($output != ""){
-			$output = str_replace($spechar, $repchar, $output);
+		if ($outtext != ""){
+			$outtext = str_replace($spechar, $repchar, $outtext);
 		}
 		
 		//stream the file contents
@@ -153,10 +173,15 @@
 				$name = preg_replace('/#/', " ", $glad->{'name'});
 				foreach($skins as $key => $skin){
 					$key = explode("@", $key);
-					if ($name == $key[0] && $user == $key[1])
+					if ($name == $key[0] && $user == $key[1]){
 						$simulation[0]->{'glads'}[$gkey]->{'skin'} = $skin;
+						//cannot uncomment this because C crashes
+						//$simulation[0]->{'glads'}[$gkey]->{'user'} = $user;
+						//$simulation[0]->{'glads'}[$gkey]->{'name'} = $name;
+					}
 				}
 			}
+
 			$file = json_encode($simulation);
 			
 			$hash = save_log($conn, $file);
@@ -172,21 +197,35 @@
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			}
-			if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
-				$id = mysql_escape_string($_POST['tournament']);
-				$sql = "UPDATE groups SET log = '$hash' WHERE id = '$id'";
+			if (isset($_POST['tournament']) && $_POST['tournament'] != "false" && $groupid != null){
+				$sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$row = $result->fetch_assoc();
+				$logid = $row['id'];
+
+				$sql = "SELECT log FROM groups WHERE id = $groupid";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$row = $result->fetch_assoc();
+				if ($row['log'] == null){
+					$sql = "UPDATE groups SET log = '$logid' WHERE id = '$groupid'";
+					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				}
 			}
 
-			echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"$hash\"}";
+			$output['simulation'] = $hash;
+			//echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"$hash\"}";
 		}
-		else
-			echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"\"}";
+		$output['error'] = $error;
+		$output['output'] = $outtext;
+			//echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"\"}";
 		
 	}
 	else{
-		echo "{\"error\":\"INVALID_ATTR\",\"output\":\"\",\"simulation\":\"\"}";
+		//echo "{\"error\":\"INVALID_ATTR\",\"output\":\"\",\"simulation\":\"\"}";
+		$output['error'] = "INVALID_ATTR";
 	}
+
+	echo json_encode($output);
 
 	system("rm -rf $path/$foldername");
 	

@@ -36,7 +36,7 @@ function runSimulation(params) {
 		tournament: tournament
 	})
 	.done(function(data){
-		//console.log(data);
+		//onsole.log(data);
 		var jsonerror;
 		try{
 			JSON.parse(data);
@@ -51,7 +51,7 @@ function runSimulation(params) {
 			console.log("JSON: "+data);
 			return response.resolve("ERROR");
 		}
-		else{
+		else if (data.simulation){
 			data = JSON.parse(data);
 			var simulation = data.simulation;
 			var error = data.error;
@@ -87,6 +87,8 @@ function runSimulation(params) {
 				}
 			}
 		}
+		else
+			return response.resolve(false);
 	});
 	
 	return response.promise();

@@ -997,6 +997,10 @@ body{
 	filter: brightness(92%);
 }
 
+#duel-box .glad-preview.old:hover{
+	filter: grayscale(100%);
+}
+
 #duel-box .glad-preview.selected,
 #battle-container .glad-preview.selected {
     box-shadow: 0px 0px 5px 2px #4286f4;

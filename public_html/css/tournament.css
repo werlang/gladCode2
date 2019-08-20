@@ -52,12 +52,16 @@ body{
     background: #555; 
 }
 
-h1 #tourn-name {
+#tourn-name {
     color: #00638d;
 }
 
-h3#tourn-desc {
+h1 {
     margin-left: 15px;
+}
+
+h3#tourn-desc {
+    margin-left: 25px;
 }
 
 #group-container {
@@ -97,11 +101,6 @@ h3#tourn-desc {
 	margin-bottom: 2px;
 }
 
-/*
-#group-container .group.defeated .title {
-	background-color: #c88080;
-}
-*/
 #group-container .group .head .title{
 	text-align: center;
 	flex-grow: 1;
@@ -150,22 +149,6 @@ h3#tourn-desc {
 	background-color: #bed9e6;
 }
 
-/*
-#group-container .team.gold {
-    color: #90701a;
-    background-image: linear-gradient(to bottom,#c1922a,#f9e777,#c1922a);
-}
-
-#group-container .team.silver {
-    color: #6c6c6c;
-    background-image: linear-gradient(to bottom,#9c9c9c,#e4e4e4,#9c9c9c);
-}
-
-#group-container .team.bronze {
-    color: #6d4c39;
-    background-image: linear-gradient(to bottom,#98694d,#e1c19a,#98694d);
-}
-*/
 #group-container .group .team .icon {
     background-color: #bcbcbc;
     border-radius: 50px;
@@ -191,51 +174,16 @@ h3#tourn-desc {
     box-shadow: 0px 0px 8px 4px #77bb77;
 }
 
-/*
-#group-container .group.defeated .team:hover .icon {
-    background-color: #dc6158;
+#group-container .group .team .time .win {
+    height: 20px;
 }
 
-#group-container .team.gold .icon {
-    background-color: #fff3a8;
-    border: 2px solid #c1922a;
-}
-
-#group-container .team.silver .icon {
-    background-color: #f7f7f7;
-    border: 2px solid #9c9c9c;
-}
-
-#group-container .team.bronze .icon {
-    background-color: #f9e2c7;
-    border: 2px solid #98694d;
-}
-
-#group-container .team.none .icon {
-	height: 40px;
-    width: 40px;
-    border: 2px solid #bcbcbc;
-    background-color: #fff;
-    font-size: 1.5em;
-}
-
-#group-container .team.win img {
-    width: 40px;
-	height: 40px;
-}
-*/
 #group-container .group .team .name {
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
 }
-/*
-#group-container .team.win .name {
-    flex-grow: 1;
-    text-align: center;
-    font-size: 1.3em;
-}
-*/
+
 #group-container .group .team .info {
     display: flex;
     align-items: stretch;
@@ -288,15 +236,17 @@ h3#tourn-desc {
     width: 50px;
 	font-size: 0.9em;
 }
-/*
-#group-container .group .team .info .time img{
-	height: 25px;
-}
-*/
 
 #button-container {
 	display: flex;
     justify-content: center;
+    flex-direction: column;
+    margin-bottom: 50px;
+    align-items: center;
+}
+
+#button-container .button {
+    margin: 10px 5px;
 }
 
 .button {
@@ -326,6 +276,13 @@ h3#tourn-desc {
     max-width: 400px;
     height: 50px;
 }
+
+@media only screen and (min-width: 600px) {
+    #button-container {
+        flex-direction: row;
+    }
+}
+
 
 .float-box {
 	background-color: white;
@@ -378,10 +335,6 @@ h3#tourn-desc {
     max-height: calc(98vh - 50px);
 }
 
-#prepare.button {
-    margin-bottom: 50px;
-}
-
 #group-container .foot .button {
     height: auto;
     width: 100%;
@@ -396,4 +349,87 @@ h3#tourn-desc {
 
 #group-container .foot .button.one .plural {
     display: none;
+}
+
+#ranking-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#ranking-container .team {
+    display: flex;
+    border-radius: 50px 10px 10px 50px;
+    border: 2px solid #d7d7d7;
+    background-color: #e2e2e2;
+    color: #646464;
+    margin-bottom: 5px;
+    font-size: 1.3rem;
+    cursor: default;
+    transition: 0.3s all;
+}
+
+#ranking-container .team:hover {
+    filter: brightness(0.9);
+}
+
+#ranking-container .team .ordinal {
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 100%;
+    background-color: white;
+    border: 2px solid #d7d7d7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 3px;
+}
+
+#ranking-container .team .name {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+#ranking-container .team.gold {
+    color: #90701a;
+    background-image: linear-gradient(to bottom,#c1922a,#f9e777,#c1922a);
+    border: none;
+}
+
+#ranking-container .team.silver {
+    color: #6c6c6c;
+    background-image: linear-gradient(to bottom,#9c9c9c,#e4e4e4,#9c9c9c);
+    border: none;
+}
+
+#ranking-container .team.bronze {
+    color: #6d4c39;
+    background-image: linear-gradient(to bottom,#98694d,#e1c19a,#98694d);
+    border: none;
+}
+
+#ranking-container .team.gold .ordinal {
+    background-color: #fff3a8;
+    border: 2px solid #c1922a;
+}
+
+#ranking-container .team.silver .ordinal {
+    background-color: #f7f7f7;
+    border: 2px solid #9c9c9c;
+}
+
+#ranking-container .team.bronze .ordinal {
+    background-color: #f9e2c7;
+    border: 2px solid #98694d;
+}
+
+#ranking-container .team .icon {
+    height: 30px;
+    width: 30px;
 }
