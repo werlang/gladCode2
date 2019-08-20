@@ -189,6 +189,7 @@ function load_glad_cards(obj,options){
 
                 if (options.code){
 					if (data[i].code){
+						obj.find('.glad-preview .code .button').eq(i).removeProp('disabled');
 						obj.find('.glad-preview .code .button').eq(i).click(function(e){
 							e.stopPropagation();
 							$('body').append("<div id='fog' class='code'><div class='float-box'><pre id='code' pre class='line-numbers language-c'><code class='language-c'>"+ data[i].code +"</code></pre><div id='button-container'><button class='button'>FECHAR</button></div></div></div>");
@@ -199,14 +200,18 @@ function load_glad_cards(obj,options){
 						});
 					}
 					else
-						obj.find('.glad-preview .code .button').prop('disabled', true);
+						obj.find('.glad-preview .code .button').eq(i).prop('disabled', true);
                 }
 
                 if (options.master)
                     obj.find('.glad-preview .info .master').eq(i).html(data[i].user);
 
                 if (options.dead && data[i].dead)
-                    obj.find('.glad-preview').eq(i).addClass('dead');
+					obj.find('.glad-preview').eq(i).addClass('dead').attr('title', 'Este gladiador está morto');
+					
+				if (data[i].oldversion){
+					obj.find('.glad-preview').eq(i).addClass('old').attr('title', 'Este gladiador precisa ser atualizado');
+				}
             }
     
             if (!options.code)

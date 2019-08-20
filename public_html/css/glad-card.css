@@ -263,6 +263,7 @@
     color: #0000002b;
 }
 
+.glad-preview.old,
 .glad-preview.dead {
     filter: grayscale(100%);
     cursor: default;

@@ -2,8 +2,14 @@
 
 <?php
 	session_start();
-    if (isset($_GET['h']))
-        $hash = $_GET['h'];
+    if (isset($_GET['h'])){
+		$hash = mysql_escape_string($_GET['h']);
+
+		if (isset($_GET['r']))
+			$round = mysql_escape_string($_GET['r']);
+		else
+			header("Location: $hash/0");
+	}
     else
         header("Location: index.php");
 ?>
@@ -12,6 +18,7 @@
 <head>
 	<meta charset='utf-8' />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<BASE href="../../">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Torneio</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
@@ -35,7 +42,7 @@
 <body>
 	<?php
 		include("header.php");
-        echo "<div id='hash' hidden>". mysql_escape_string($hash) ."</div>";
+        echo "<div id='hash' hidden>$hash</div><div id='round' hidden>$round</div>";
 	?>
 	<div id='frame'>
 		<div id='menu'>

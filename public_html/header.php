@@ -3,7 +3,6 @@
 	if (session_status() == PHP_SESSION_NONE)
 		session_start();
 ?>
-
 <html>
 <head>
 	<meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
@@ -28,14 +27,7 @@
 					<div class='item'><a href='https://www.facebook.com/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'>PÁGINA FACEBOOK</a></div>
 				</div>
 			</div>
-			<div class='item drop-menu'>
-				<div class='title'>OUTROS</div>
-				<div class='item-container'>
-					<div class='item'><a href='socks' title='Simule batalhas entre gladiadores'>BATALHA CLÁSSICA</a></div>
-					<div class='item'><a href='tournment' title='Simule seu próprio torneio particular'>TORNEIO CLÁSSICO</a></div>
-					<div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'>COMPILADOR C</a></div>
-				</div>
-			</div>
+			<div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'>COMPILADOR C</a></div>
 			<div class='item drop-menu mobile'>
 				<div class='title'>LOGIN</div>
 				<div class='item-container'>

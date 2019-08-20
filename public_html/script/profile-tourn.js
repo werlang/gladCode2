@@ -175,7 +175,11 @@ $(document).ready( function(){
 				
 											if (data == "NOTFOUND"){
 												showMessage("Torneio não encontrado");
-											}
+                                            }
+											else if (data == "STARTED"){
+                                                $('#fog.tourn').remove();
+                                                showMessage("Este torneio já iniciou");
+                                            }
 											else if (data == "ALREADYIN"){
 												showMessage("Já está em um time neste torneio");
 											}
@@ -288,124 +292,137 @@ function refresh_teams(obj){
         }).done( function(data){
             //console.log(data);
             var data = JSON.parse(data);
-            var teams = data.teams;
-            var joined = false;
-            if (data.joined)
-                joined = data.joined;
 
-            if (teams.length == 0){
-                $('.tourn-box .table').html("<div class='row'>Nenhuma equipe inscrita</div>");
-                $('.tourn-box h3 #count').html("");
+            if (data.status == "STARTED"){
+                var hash = data.hash;
+                $('#fog.tourn').remove();
+                showDialog("Este torneio já iniciou. Deseja acompanhá-lo?",['Sim','Não']).then( function(data){
+                    if (data == "Sim")
+                        window.open('tourn/'+ hash);
+                });
             }
             else{
-                //$('.tourn-box #button-container .button').addClass('single');
-                $('.tourn-box .table').html("<div class='row head'><div class='cell'>Nome</div><div class='cell'>Gladiadores</div></div>");
-                for (let i in teams){
-                    $('.tourn-box .table').append("<div class='row'><div class='cell'>"+ teams[i].name +"</div><div class='cell'>"+ teams[i].glads +"/3</div><div class='kick' title='Expulsar equipe'><i class='material-icons'>cancel</i></div></div>");
-                    rebind_team_rows(teams[i].id);
-                    if (joined && joined === teams[i].id)
-                        $('.tourn-box .table .row').last().addClass('signed');
-                    else if (teams[i].glads == 3)
-                        $('.tourn-box .table .row').last().addClass('full');
+                var teams = data.teams;
+                var joined = false;
+                if (data.joined)
+                    joined = data.joined;
+
+                if (teams.length == 0){
+                    $('.tourn-box .table').html("<div class='row'>Nenhuma equipe inscrita</div>");
+                    $('.tourn-box h3 #count').html("");
+                }
+                else{
+                    //$('.tourn-box #button-container .button').addClass('single');
+                    $('.tourn-box .table').html("<div class='row head'><div class='cell'>Nome</div><div class='cell'>Gladiadores</div></div>");
+                    for (let i in teams){
+                        $('.tourn-box .table').append("<div class='row'><div class='cell'>"+ teams[i].name +"</div><div class='cell'>"+ teams[i].glads +"/3</div><div class='kick' title='Expulsar equipe'><i class='material-icons'>cancel</i></div></div>");
+                        rebind_team_rows(teams[i].id);
+                        if (joined && joined === teams[i].id)
+                            $('.tourn-box .table .row').last().addClass('signed');
+                        else if (teams[i].glads == 3)
+                            $('.tourn-box .table .row').last().addClass('full');
+                    }
+
+                    $('.tourn-box h3 #count').html("("+ teams.length +"/"+ data.maxteams +")");
                 }
 
-                $('.tourn-box h3 #count').html("("+ teams.length +"/"+ data.maxteams +")");
-            }
-
-            if (data.filled == true && data.manager == true && teams.length > 1){
-                $('.tourn-box #button-container #start').removeProp('disabled');
-                $('.tourn-box #button-container #start').off();
-                $('.tourn-box #button-container #start').click( function(){
-                    showDialog("Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas",["Sim","NÃO"]).then( function(data){
-                        if (data == "Sim"){
-                            $.post("back_tournament.php",{
-                                action: "START",
-                                name: obj.name,
-                                pass: obj.pass
-                            }).done( function(data){
-                                console.log(data);
-                                data = JSON.parse(data);
-                                if (data.status == "DONE"){
-                                    $('.tourn-box #close').click();
-                                    window.open('tourn/'+ data.hash);
-                                }
-                            });
-                        }
+                if (data.filled == true && data.manager == true && teams.length > 1){
+                    $('.tourn-box #button-container #start').removeProp('disabled');
+                    $('.tourn-box #button-container #start').off();
+                    $('.tourn-box #button-container #start').click( function(){
+                        showDialog("Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas",["Sim","NÃO"]).then( function(data){
+                            if (data == "Sim"){
+                                $.post("back_tournament.php",{
+                                    action: "START",
+                                    name: obj.name,
+                                    pass: obj.pass
+                                }).done( function(data){
+                                    console.log(data);
+                                    data = JSON.parse(data);
+                                    if (data.status == "DONE"){
+                                        $('.tourn-box #close').click();
+                                        window.open('tourn/'+ data.hash);
+                                    }
+                                });
+                            }
+                        });
                     });
-                });
-            }
-            else
-                $('.tourn-box #button-container #start').prop('disabled', true);				
+                }
+                else
+                    $('.tourn-box #button-container #start').prop('disabled', true);				
 
-            if (data.manager == true && teams.length == 0){
-                $('.tourn-box #button-container #delete').show();
-                $('.tourn-box #button-container #start').hide();
-                $('.tourn-box #button-container #delete').off();
-                $('.tourn-box #button-container #delete').click( function(){
-                    showDialog("Deseja remover o torneio?",["Sim","NÃO"]).then( function(data){
-                        if (data == "Sim"){
-                            $.post("back_tournament.php",{
-                                action: "DELETE",
-                                name: obj.name,
-                                pass: obj.pass,
-                                tourn: obj.tourn
-                            }).done( function(data){
-                                //console.log(data);
-                                if (data == "DELETED"){
-                                    showMessage("Torneio removido");
-                                    $('#fog').remove();		
-                                    refresh_tourn_list();
-                                }
-                                else{
-                                    showMessage("Um torneio só pode ser removido quando não possuir equipes");
-                                }
-                            });
-                        }
+                if (data.manager == true && teams.length == 0){
+                    $('.tourn-box #button-container #delete').show();
+                    $('.tourn-box #button-container #start').hide();
+                    $('.tourn-box #button-container #delete').off();
+                    $('.tourn-box #button-container #delete').click( function(){
+                        showDialog("Deseja remover o torneio?",["Sim","NÃO"]).then( function(data){
+                            if (data == "Sim"){
+                                $.post("back_tournament.php",{
+                                    action: "DELETE",
+                                    name: obj.name,
+                                    pass: obj.pass,
+                                    tourn: obj.tourn
+                                }).done( function(data){
+                                    //console.log(data);
+                                    if (data == "DELETED"){
+                                        showMessage("Torneio removido");
+                                        $('#fog').remove();		
+                                        refresh_tourn_list();
+                                    }
+                                    else if (data == "STARTED")
+                                        showMessage("Este torneio já iniciou");
+                                    else{
+                                        showMessage("Um torneio só pode ser removido quando não possuir equipes");
+                                    }
+                                });
+                            }
+                        });
                     });
-                });
-            }
-            else if (data.manager == false){
-                $('.tourn-box .table .row .kick').remove();
-                $('.tourn-box #button-container #delete').remove();
-                $('.tourn-box #button-container #start').remove();
-                $('.tourn-box #button-container #close').addClass('single');
-            }
-            else if (data.manager == true){
-                $('.tourn-box #button-container #delete').hide();
-                $('.tourn-box #button-container #start').show();
-                $('.tourn-box .kick').click( function(e){
-                    e.stopPropagation();
-                    var team = $(this).parents(".row").find('.cell').eq(0).html();
-                    showDialog("Deseja expulsar a equipe <span class='highlight'>"+ team +"</span> do torneio?",["Sim", "Não"]).then( function(data){
-                        if (data == "Sim"){
-                            $.post("back_tournament.php",{
-                                action: "KICK",
-                                name: obj.name,
-                                pass: obj.pass,
-                                teamname: team
-                            }).done( function(data){
-                                //console.log(data);
-                                data = JSON.parse(data);
-                                if (data.status == "DONE")
-                                    refresh_teams(obj);
-                                    showMessage("Equipe <span class='highlight'>"+ team +"</span> removida do torneio");
-                            });
-                        }
+                }
+                else if (data.manager == false){
+                    $('.tourn-box .table .row .kick').remove();
+                    $('.tourn-box #button-container #delete').remove();
+                    $('.tourn-box #button-container #start').remove();
+                    $('.tourn-box #button-container #close').addClass('single');
+                }
+                else if (data.manager == true){
+                    $('.tourn-box #button-container #delete').hide();
+                    $('.tourn-box #button-container #start').show();
+                    $('.tourn-box .kick').click( function(e){
+                        e.stopPropagation();
+                        var team = $(this).parents(".row").find('.cell').eq(0).html();
+                        showDialog("Deseja expulsar a equipe <span class='highlight'>"+ team +"</span> do torneio?",["Sim", "Não"]).then( function(data){
+                            if (data == "Sim"){
+                                $.post("back_tournament.php",{
+                                    action: "KICK",
+                                    name: obj.name,
+                                    pass: obj.pass,
+                                    teamname: team
+                                }).done( function(data){
+                                    //console.log(data);
+                                    data = JSON.parse(data);
+                                    if (data.status == "DONE")
+                                        refresh_teams(obj);
+                                        showMessage("Equipe <span class='highlight'>"+ team +"</span> removida do torneio");
+                                });
+                            }
+                        });
                     });
-                });
+                }
+
+                if (joined !== false || teams.length >= data.maxteams)
+                    $('.tourn-box #new-container').hide();
+                else
+                    $('.tourn-box #new-container').show();
+
+                count_refresh_teams++;
+                setTimeout( function(){
+                    count_refresh_teams--;
+                    if (count_refresh_teams == 0)
+                        refresh_teams({name: obj.name, pass: obj.pass, tourn: obj.tourn});
+                }, 10000);
             }
-
-            if (joined !== false || teams.length >= data.maxteams)
-                $('.tourn-box #new-container').hide();
-            else
-                $('.tourn-box #new-container').show();
-
-            count_refresh_teams++;
-            setTimeout( function(){
-                count_refresh_teams--;
-                if (count_refresh_teams == 0)
-                    refresh_teams({name: obj.name, pass: obj.pass, tourn: obj.tourn});
-            }, 10000);
         });
     }
 }
@@ -437,14 +454,18 @@ function rebind_team_rows(teamid){
 
                             $('#fog.team').remove();
 
-                            var message = "Você não faz mais parte da equipe <span class='highlight'>"+ teamname +"</span>";
-                            if (data.status == "REMOVED")
-                                message = "A equipe <span class='highlight'>"+ teamname +"</span> foi desmantelada";
+                            if (data.status == "STARTED")
+                                showMessage("Este torneio já iniciou");
+                            else{
+                                var message = "Você não faz mais parte da equipe <span class='highlight'>"+ teamname +"</span>";
+                                if (data.status == "REMOVED")
+                                    message = "A equipe <span class='highlight'>"+ teamname +"</span> foi desmantelada";
 
-                            showMessage(message).then( function(data){
-                                $('.tourn-box').fadeIn();
-                                refresh_teams({tourn: tournid});
-                            });
+                                showMessage(message).then( function(data){
+                                    $('.tourn-box').fadeIn();
+                                    refresh_teams({tourn: tournid});
+                                });
+                            }
                         });
                     }
                 });
@@ -470,6 +491,8 @@ function rebind_team_rows(teamid){
 
                                     if (data.status == "FAIL")
                                         showMessage("Senha incorreta");
+                                    else if (data.status == "STARTED")
+                                        showMessage("Este torneio já iniciou");
                                     else if (data.status == "SIGNED")
                                         showMessage("Você já participa de uma equipe deste torneio");
                                     else{
@@ -501,7 +524,7 @@ function refresh_glads(teamid){
         id: teamid,
         sync: teamsync.time
     }).done( function(data){
-        //console.log(data);
+        //onsole.log(data);
         data = JSON.parse(data);
 
         if (data.status == "DONE"){
@@ -509,6 +532,7 @@ function refresh_glads(teamid){
             var word = data.word;
             var flex = data.flex;
             var joined = false;
+
             teamsync.time = data.sync;
             if (data.joined)
                 joined = data.joined;
@@ -516,9 +540,9 @@ function refresh_glads(teamid){
             data = data.glads;
 
             if (word)
-                $('.tourn-box #word span').html(word);
+                $('#fog.team .tourn-box #word span').html(word);
             else
-                $('.tourn-box #word').remove();
+                $('#fog.team .tourn-box #word').remove();
 
             var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
                 $('.tourn-box .glad-card-container').html("");
@@ -566,7 +590,11 @@ function refresh_glads(teamid){
                             }).done( function(data){
                                 //console.log(data);
                                 data = JSON.parse(data);
-                                if (data.status == "REMOVED"){
+                                if (data.status == "STARTED"){
+                                    $('#fog.team').remove();
+                                    showMessage("Este torneio já iniciou");
+                                }
+                                else if (data.status == "REMOVED"){
                                     $('#fog.team').remove();
                                     showMessage("A equipe <span class='highlight'>"+ tname +"</span> foi desmantelada").then( function(){
                                         $('.tourn-box').fadeIn();
@@ -596,13 +624,14 @@ function refresh_glads(teamid){
                 if (flex == "0"){
                     $('.tourn-box .glad-add').addClass('disabled');
                 }
-                if (joined && $('.tourn-box #join-leave').html() == 'INGRESSAR'){
-                    $('.tourn-box #join-leave').remove();
-                    $('.tourn-box #button-container .button').addClass('single');
+                if ((joined || data.length >= 3) && $('.tourn-box #join-leave').html() == 'INGRESSAR'){
+                    $('#fog.team .tourn-box #join-leave').remove();
+                    $('#fog.team .tourn-box #button-container .button').addClass('single');
                 }
 
                 $('.tourn-box .glad-add').not('.disabled').click( function(){
                     choose_tourn_glad().then( function(data){
+                        //console.log(data);
                         if (data !== false){
                             var gladid = data.glad;
                             var showcode = data.showcode;
@@ -617,6 +646,10 @@ function refresh_glads(teamid){
                                 data = JSON.parse(data);
                                 if (data.status == "SAMEGLAD")
                                     showMessage("Este gladiador já faz parte da equipe");
+                                else if (data.status == "STARTED"){
+                                    $('#fog.team').remove();
+                                    showMessage('Este torneio já iniciou');
+                                }
                                 else if (data.status == "DONE"){
                                     $('#fog.team').remove();
                                     $('.tourn-box .row.signed').click();
@@ -648,6 +681,7 @@ function choose_tourn_glad(){
     $.post("back_glad.php",{
         action: "GET",
     }).done( function(data){
+        //console.log(data);
         data = JSON.parse(data);
         for (var i in data){
             $('#fog.glads .glad-card-container').append("<div class='glad-preview'></div>");
@@ -661,11 +695,14 @@ function choose_tourn_glad(){
             $('#fog.glads .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
             $('#fog.glads .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
             $('#fog.glads .glad-preview').eq(i).data('id',data[i].id);
+
+            if (data[i].oldversion)
+                $('#fog.glads .glad-preview').eq(i).addClass('old').attr('title', 'Este gladiador precisa ser atualizado');
         }
         $('#fog.glads .glad-preview .code .button').remove();
         $('#fog.glads .glad-preview .delete-container').remove();
         
-        $('#fog.glads .glad-preview').click( function(){
+        $('#fog.glads .glad-preview').not('.old').click( function(){
             $('#fog.glads #btn-glad-open').removeProp('disabled');
             $('#fog.glads .glad-preview').removeClass('selected');
             $(this).addClass('selected');
@@ -682,10 +719,12 @@ function choose_tourn_glad(){
         return response.resolve(false);
     });
     $('#duel-box #choose').click( function(){
-        var gladid = $('#fog.glads .glad-preview.selected').data('id');
-        var showcode = $('#duel-box input.checkslider').prop('checked');
-        $('#fog.glads').remove();
-        return response.resolve({glad: gladid, showcode: showcode});
+        if ($('#fog.glads .glad-preview.selected').length){
+            var gladid = $('#fog.glads .glad-preview.selected').data('id');
+            var showcode = $('#duel-box input.checkslider').prop('checked');
+            $('#fog.glads').remove();
+            return response.resolve({glad: gladid, showcode: showcode});
+        }
     });
 
     return response.promise();
