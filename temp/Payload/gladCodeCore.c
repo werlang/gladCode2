@@ -11,12 +11,17 @@ Todas funções que o usuario pode chamar diretamente estão em gladCodeAPI.
 
 //tutorial deste site:
 //http://www.binarytides.com/socket-programming-c-linux-tutorial/
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<time.h>
+#include<math.h>
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr
 #include<netdb.h> //hostent
+
 #include "gladCodeAPI.c"
 #include "ptbrFunc.c"
 

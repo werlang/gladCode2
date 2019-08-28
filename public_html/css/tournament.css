@@ -237,7 +237,11 @@ h3#tourn-desc {
 	font-size: 0.9em;
 }
 
-#button-container {
+.float-box #button-container {
+	display: flex;
+}
+
+#content-box #button-container {
 	display: flex;
     justify-content: center;
     flex-direction: column;
@@ -245,7 +249,7 @@ h3#tourn-desc {
     align-items: center;
 }
 
-#button-container .button {
+#content-box #button-container .button {
     margin: 10px 5px;
 }
 
@@ -273,12 +277,12 @@ h3#tourn-desc {
 }
 
 #content-box .button {
-    max-width: 400px;
+    max-width: 300px;
     height: 50px;
 }
 
 @media only screen and (min-width: 600px) {
-    #button-container {
+    #content-box #button-container {
         flex-direction: row;
     }
 }
@@ -433,3 +437,96 @@ h3#tourn-desc {
     height: 30px;
     width: 30px;
 }
+
+#timeleft {
+    font-family: orbitron;
+    font-size: 1rem;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 230px;
+    margin: auto;
+    cursor: default;
+}
+
+#timeleft #time {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    justify-content: center;
+}
+
+#timeleft .numbers {
+    display: flex;
+}
+
+#timeleft #time .numbers:hover span {
+    background-color: #000000;
+}
+
+#timeleft #time span {
+    color: white;
+    background-color: #000000b0;
+    height: 1.8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.3em;
+    margin: 0px 2px;
+    font-size: 1.5rem;
+    border-radius: 3px;
+    transition: 0.3s background-color, color 3s;
+}
+
+#timeleft.yellow #time span {
+    color: #f6d558
+}
+
+#timeleft.red #time span {
+    color: #ff6c6c;
+}
+
+#timeleft.green #time span {
+    color: #84ff8f;
+}
+
+#timeleft #text {
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.8em;
+}
+
+#button-container .arrow {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    margin-top: -65px;
+    cursor: pointer;
+}
+
+#button-container .arrow.nobutton {
+    margin: -90px 120px 0px
+}
+
+#button-container .arrow:hover i {
+    color: #00638d;
+    text-shadow: 1px 1px 6px black;
+}
+
+#button-container .arrow:disabled {
+    cursor: not-allowed;
+}
+
+#button-container .arrow i {
+    font-size: 7rem;
+    color: #bed9e6;
+    text-shadow: 1px 1px 6px #00638d;
+    transition: 0.3s all;
+}
+
+#button-container .arrow:disabled i {
+    color: #fafafa;
+    text-shadow: 1px 1px 6px #00000033;
+}
+

@@ -466,13 +466,20 @@ int main(int argc , char *argv[]){
 		char name[10];
 		sprintf(name,"usercode/code%i",i);
 		FILE *f = NULL;
-		int to = 100000;
+
+		struct timeval wait_start, wait_now;
+		gettimeofday(&wait_start,NULL);
+		long unsigned int sec_diff;
 		do{
 			f = fopen(name,"r");
-			to--;
-		}while (f == NULL && to > 0);
-		if (f == NULL)
-			nglad--;
+			gettimeofday(&wait_now,NULL);
+			sec_diff = wait_now.tv_sec - wait_start.tv_sec;
+		}while (f == NULL && sec_diff < 3);
+		if (f == NULL){
+			endsim = 1;
+			printf("CLIENT TIMEOUT",i);
+			break;
+		}
 		else
 			fclose(f);
 

@@ -38,11 +38,11 @@
 	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
 		if (isset($_SESSION['tourn-group'])){
 			$groupid = mysql_escape_string($_POST['tournament']);
-			if ($_SESSION['tourn-group'] != md5("tourn-group-$groupid-id")){
+			if (isset($_SESSION['tourn-group'][$groupid]) && $_SESSION['tourn-group'][$groupid] != md5("tourn-group-$groupid-id")){
 				$groupid = null;
 				$cancel_run = true;
 			}
-			unset($_SESSION['tourn-group']);
+			unset($_SESSION['tourn-group'][$groupid]);
 
 			$sql = "SELECT log FROM groups WHERE id = $groupid";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
@@ -122,7 +122,7 @@
 			array_push($codes, $code);
 		}
 	}
-	
+
 	$invalid_attr = false;
 	foreach($codes as $i => $code){
 		if (!validate_attr($code)){

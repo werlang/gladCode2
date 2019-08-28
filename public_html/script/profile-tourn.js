@@ -218,12 +218,35 @@ $(document).ready( function(){
 		});
 	});
 
+    $('#panel .title #offset button').click( function(){
+        var step = 10;
+        var value;
+        if ($(this).parent().hasClass('open'))
+            value = 'open';
+        if ($(this).parent().hasClass('mine'))
+            value = 'mine';
+
+        if ($(this).attr('id') == 'prev')
+            tournpage[value].offset -= step;
+        if ($(this).attr('id') == 'next')
+            tournpage[value].offset += step;
+
+        refresh_tourn_list();
+    });
+
 });
 
+var tournpage = {
+    mine: {offset: 0},
+    open: {offset: 0}
+};
 function refresh_tourn_list(){
+    var step = 10;
     if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
         $.post("back_tournament.php", {
-            action: "LIST"
+            action: "LIST",
+            moffset: tournpage.mine.offset,
+            ooffset: tournpage.open.offset
         }).done( function(data){
             //console.log(data);
             if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
@@ -231,11 +254,40 @@ function refresh_tourn_list(){
                 var open = data.open;
                 var mytourn = data.mytourn;
 
+                tournpage.mine.offset = parseInt(data.pages.mine.offset);
+                tournpage.mine.total = parseInt(data.pages.mine.total);
+                tournpage.mine.end = Math.min(tournpage.mine.total, tournpage.mine.offset + step);
+
+                tournpage.open.offset = parseInt(data.pages.open.offset);
+                tournpage.open.total = parseInt(data.pages.open.total);
+                tournpage.open.end = Math.min(tournpage.open.total, tournpage.open.offset + step);
+
+
+                $('#panel #battle-container #tourn.wrapper #offset.mine .start').html(tournpage.mine.offset + 1);
+                $('#panel #battle-container #tourn.wrapper #offset.open .start').html(tournpage.open.offset + 1);
+
+                $('#panel #battle-container #tourn.wrapper #offset.mine .end').html(tournpage.mine.end);
+                $('#panel #battle-container #tourn.wrapper #offset.open .end').html(tournpage.open.end);
+
+                $('#panel #battle-container #tourn.wrapper #offset.mine .total').html(tournpage.mine.total);
+                $('#panel #battle-container #tourn.wrapper #offset.open .total').html(tournpage.open.total);
+
+
+                $('#panel #battle-container #tourn.wrapper #offset button').removeProp('disabled');
+                if (tournpage.mine.offset == 0)
+                    $('#panel #battle-container #tourn.wrapper #offset.mine #prev').prop('disabled', true);
+                if (tournpage.open.offset == 0)
+                    $('#panel #battle-container #tourn.wrapper #offset.open #prev').prop('disabled', true);
+                if (tournpage.mine.end == tournpage.mine.total)
+                    $('#panel #battle-container #tourn.wrapper #offset.mine #next').prop('disabled', true);
+                if (tournpage.open.end == tournpage.open.total)
+                    $('#panel #battle-container #tourn.wrapper #offset.open #next').prop('disabled', true);
+
                 $('#panel #battle-container #tourn.wrapper #table-open').html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div><div class='cell'>Flex</div></div>");
                 for (let i in open){
                     $('#panel #battle-container #tourn.wrapper #table-open').append("<div class='row'><div class='cell' id='name'>"+ open[i].name +"</div><div class='cell'>"+ open[i].description +"</div><div class='cell'>"+ open[i].teams +"/"+ open[i].maxteams +"</div><div class='cell flex'>"+ open[i].flex +"</div></div>");
                 }
-
+            
                 $('#mytourn-title').hide();
                 if (mytourn.length > 0){
                     $('#panel #battle-container #tourn.wrapper #table-mytourn').html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div><div class='cell'>Flex</div></div>");
@@ -295,7 +347,7 @@ function refresh_teams(obj){
 
             if (data.status == "STARTED"){
                 var hash = data.hash;
-                $('#fog.tourn').remove();
+                $('#fog.tourn, #fog.team').remove();
                 showDialog("Este torneio já iniciou. Deseja acompanhá-lo?",['Sim','Não']).then( function(data){
                     if (data == "Sim")
                         window.open('tourn/'+ hash);
@@ -337,11 +389,19 @@ function refresh_teams(obj){
                                     name: obj.name,
                                     pass: obj.pass
                                 }).done( function(data){
-                                    console.log(data);
+                                    //console.log(data);
                                     data = JSON.parse(data);
                                     if (data.status == "DONE"){
+                                        var hash = data.hash;
                                         $('.tourn-box #close').click();
-                                        window.open('tourn/'+ data.hash);
+                                        window.open('tourn/'+ hash);
+
+                                        $.post("back_sendmail.php",{
+                                            action: "TOURNAMENT",
+                                            hash: hash
+                                        }).done( function(data){
+                                            //console.log(data);
+                                        });
                                     }
                                 });
                             }

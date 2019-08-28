@@ -21,6 +21,7 @@
 	<BASE href="../../">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Torneio</title>
+	<link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"

@@ -1013,7 +1013,6 @@ function draw() {
 		
 	}
 	
-	spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
 	var img = new Array();
 	for(i=0 ; i < selectedArray.length ; i++){
 		if (selectedArray[i].path != '' && !selectedArray[i].png){
@@ -1027,10 +1026,14 @@ function draw() {
 			imgReady++;
 	}
 	
+	var tempss = document.createElement("canvas");
+	tempss.width = spritesheet.width;
+    tempss.height = spritesheet.height;
+	var tempctx = tempss.getContext("2d");
+	
 	interval = setInterval( function() {
 		if (imgReady == selectedArray.length){
 			clearInterval(interval);
-			killLoadingBar();
 			for(i=0 ; i < selectedArray.length ; i++){
 				if (img[i]){
 					if (selectedArray[i].oversize){
@@ -1038,19 +1041,21 @@ function draw() {
 						var sprites = move[moveEnum[selectedArray[i].move]].sprites;
 						for (k=0 ; k<4 ; k++){
 							for (j=0 ; j<sprites ; j++){
-								spritectx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
+								tempctx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
 							}
 						}
 					}
 					else{
 						for (k=0 ; k<21 ; k++){
 							for (j=0 ; j<13 ; j++){
-								spritectx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
+								tempctx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
 							}
 						}
 					}
 				}
 			}
+			spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
+			spritectx.drawImage(tempss, 0, 0);
 		}
 	}, 10);
 }
@@ -1058,7 +1063,6 @@ function draw() {
 function reload_reqs(keepItems){
 	if (!keepItems)
 		$('#right-container').html("");
-	createLoadingBar();
 	var visible = {};
 	setTimeout( function(){
 		var parentList = parentTree[$('.img-button.sub.selected').attr('id')];
@@ -1407,18 +1411,6 @@ function cloneCanvas(oldCanvas) {
 
     //return the new canvas
     return newCanvas;
-}
-
-function createLoadingBar(){
-	if ($('#loadbar').length == 0)
-		$('#middle-container').append("<div id='loadbar'><img src='sprite/images/loading.gif'></div>");
-	$('#middle-container canvas').hide();
-	$('#loadbar').show();
-}
-
-function killLoadingBar(){
-	$('#loadbar').hide();
-	$('#middle-container canvas').show();
 }
 
 function download(filename, text) {

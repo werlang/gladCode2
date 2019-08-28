@@ -1,5 +1,6 @@
 <?php
-	session_start();
+    session_start();
+    date_default_timezone_set('America/Sao_Paulo');
     include_once "connection.php";
     $user = $_SESSION['user'];
     $action = $_POST['action'];
@@ -29,9 +30,29 @@
 
     }
     else if ($action == "LIST"){
-        $sql = "SELECT * FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = '' ORDER BY t.creation DESC";
+        $output = array();
+        $moffset = mysql_escape_string($_POST['moffset']);
+        $ooffset = mysql_escape_string($_POST['ooffset']);
+        $limit = 10;
+
+        if ($moffset < 0)
+            $moffset = 0;
+        if ($ooffset < 0)
+            $ooffset = 0;
+
+        //how many open 
+        $sql = "SELECT t.id FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = ''";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-		$nrows = $result->num_rows;
+        $nopen = $result->num_rows;
+
+        if ($ooffset >= $nopen)
+            $ooffset -= $limit;
+
+        //show open tournaments not started and not filled
+        $sql = "SELECT * FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = '' ORDER BY t.creation DESC LIMIT $limit OFFSET $ooffset";
+        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $nrows = $result->num_rows;
+        
         $open = array();
 		if ($nrows > 0){
             while ($row = $result->fetch_assoc()){
@@ -46,9 +67,19 @@
             }
         }
 
-        $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user' ORDER BY t.creation DESC";
+        //how many mine
+        $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-		$nrows = $result->num_rows;
+        $nmine = $result->num_rows;
+
+        if ($moffset >= $nmine)
+            $moffset -= $limit;
+
+        //show tournaments which I am the manager or I have joined
+        $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user' ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
+        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $nrows = $result->num_rows;
+        
         $mytourn = array();
 		if ($nrows > 0){
             while ($row = $result->fetch_assoc()){
@@ -63,10 +94,19 @@
             }
         }
 
-        $output = array(
-            'open' => $open,
-            'mytourn' => $mytourn
-        );
+        $output['pages'] = array();
+
+        $output['pages']['mine'] = array();
+        $output['pages']['mine']['offset'] = $moffset;
+        $output['pages']['mine']['total'] = $nmine;
+
+        $output['pages']['open'] = array();
+        $output['pages']['open']['offset'] = $ooffset;
+        $output['pages']['open']['total'] = $nopen;
+
+        $output['open'] = $open;
+        $output['mytourn'] = $mytourn;
+
         echo json_encode($output);
     }
     else if ($action == "JOIN"){
@@ -506,9 +546,10 @@
 
         $output = array();
 
-        $sql = "SELECT t.hash FROM tournament t INNER JOIN teams te ON te.tournament = te.id WHERE te.id = $team";
+        $sql = "SELECT t.hash FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE te.id = $team";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $row = $result->fetch_assoc();
+        $output['teste'] = $row;
         if ($row['hash'] != '')
             $output['status'] = "STARTED";
         else{
@@ -615,7 +656,7 @@
                     $ngroups = ceil($nteams / 5);
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
-                        $sql = "INSERT INTO groups(round) VALUES ('1')";
+                        $sql = "INSERT INTO groups(round, creation) VALUES ('1', now())";
                         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                         array_push($groups, $conn->insert_id);
                     }

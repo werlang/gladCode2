@@ -60,7 +60,8 @@ body{
     font-family: consolas, helvetica, arial, sans-serif;
 	outline: none;
 	cursor: pointer;
-	transition: background-color 0.5s;
+    transition: background-color 0.5s;
+    font-size: 1em;
 }
 
 .button:hover {
@@ -150,7 +151,6 @@ body{
 #canvas-container #button-container .button{
 	box-sizing: border-box;
     padding: 5px 10px;
-    height: 50px;
     width: 60px;
     margin: 0px 3px;
     background-color: transparent;
@@ -175,7 +175,7 @@ body{
 
 #canvas-container #button-container .speed {
 	font-family: acme;
-	font-size: 0.8rem;
+	font-size: 1.7rem;
 	color: black;
 }
 
@@ -640,7 +640,7 @@ body{
     border-radius: 3px;
     box-shadow: 3px 3px 15px -1px black;
     font-family: acme;
-    font-size: 1.8rem;
+    font-size: 2.5rem;
     color: #cee1e8;
 	border: 2px solid #3c839e;
     text-shadow: 1px 1px 5px black;
@@ -716,7 +716,7 @@ body{
 
 
 #url {
-	font-size: 1.3em;
+	font-size: 2.5rem;
     box-sizing: border-box;
     justify-content: center;
     cursor: default;
@@ -805,7 +805,8 @@ body{
     margin: 10px;
     border-radius: 5px;
     border: 2px solid #928e8e;
-	cursor: default;
+    cursor: default;
+    font-size: 1.5rem;
 }
 
 .baloon {
@@ -862,7 +863,7 @@ body{
     border-radius: 3px;
     box-shadow: 3px 3px 15px -1px black;
     font-family: acme;
-    font-size: 1.8em;
+    font-size: 2.5em;
     color: #cee1e8;
     border: 2px solid #3c839e;
     text-shadow: 1px 1px 5px black;

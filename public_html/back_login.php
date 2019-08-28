@@ -20,7 +20,6 @@
 				$info['apelido'] = $row['apelido'];
 				$info['nome'] = $row['nome'];
 				$info['sobrenome'] = $row['sobrenome'];
-				$info['foto'] = $row['foto'];
 				$info['pasta'] = $row['pasta'];
 				$info['lvl'] = $row['lvl'];
 				$info['xp'] = $row['xp'];
@@ -33,6 +32,21 @@
 				$info['preferences']['friend'] = $row['pref_friend'];
 				$info['preferences']['update'] = $row['pref_update'];
 				$info['preferences']['duel'] = $row['pref_duel'];
+				$info['preferences']['tourn'] = $row['pref_tourn'];
+
+				if (exif_imagetype($row['foto']) == IMAGETYPE_PNG){
+					$foto = $row['foto'];
+				}
+				else{
+					$gladcode = 'gladcodehashsecret36';
+					$hash = md5( $gladcode . strtolower( trim( $email ) ) );
+					$foto = mysql_escape_string("https://www.gravatar.com/avatar/$hash?d=retro");
+
+					$sql = "UPDATE usuarios SET foto = '$foto' WHERE email = '$email'";
+					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				}
+				$info['foto'] = $foto;
+
 				echo json_encode($info);
 			}
 			else
@@ -49,15 +63,18 @@
 		$nome = $_POST['nome'];
 		$apelido = $nome . rand(100,999);
 		$sobrenome = $_POST['sobrenome'];
-		$foto = $_POST['foto'];
-		
+
+		$gladcode = 'gladcodehashsecret36';
+		$hash = md5( $gladcode . strtolower( trim( $email ) ) );
+		$foto = "https://www.gravatar.com/avatar/$hash?d=retro";
+
 		$sql = "SELECT * FROM usuarios WHERE email = '$email'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$nrows = $result->num_rows;
 		
 		if ($nrows == 0){
 			$pasta = md5($email);
-			$sql = "INSERT INTO usuarios (email,nome,apelido,sobrenome,foto,pasta,ativo) VALUES ('$email','$nome','$apelido','$sobrenome','$foto','$pasta',now())";
+			$sql = "INSERT INTO usuarios (email,nome,apelido,sobrenome,pasta,ativo,foto) VALUES ('$email','$nome','$apelido','$sobrenome','$pasta',now(), '$foto')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			$path = "/home/gladcode/user";
 			system("mkdir $path/$pasta");
@@ -90,6 +107,7 @@
 			$pref_friend = $preferences['friend'];
 			$pref_update = $preferences['update'];
 			$pref_duel = $preferences['duel'];
+			$pref_tourn = $preferences['tourn'];
 			
 			$sql = "SELECT email FROM usuarios WHERE apelido = '$nickname' AND email != '$email'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
@@ -107,7 +125,7 @@
 					$picture = "profpics/$pasta.png";
 				}
 				
-				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel' WHERE email = '$email'";
+				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn' WHERE email = '$email'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 				echo "DONE";

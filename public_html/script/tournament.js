@@ -53,7 +53,7 @@ $(document).ready( function() {
 
                 if (!(data.teams[i].group in groups)){
                     groups[groupid] = groupindex;
-                    $('#content-box #group-container').append("<div class='group'><div class='head'><div class='title'>Grupo "+ parseInt(groupindex+1) +" - <span>Rodada "+ data.tournament.round +"</span></div><div class='icons'><div class='glad'><img src='icon/gladcode_icon.png'></div><div class='time'><img src='icon/clock-icon.png'></div></div></div><div class='teams-container'></div><div class='foot'><button class='button' disabled>Aguardando <span class='number'></span> mestre<span class='plural'>s</span></button></div></div>");
+                    $('#content-box #group-container').append("<div class='group'><div class='head'><div class='title'>Grupo "+ parseInt(groupindex+1) +" - <span>Rodada "+ data.tournament.round +"</span></div><div class='icons'><div class='glad' title='Quantos gladiadores da equipe ainda restam'><img src='icon/gladcode_icon.png'></div><div class='time' title='Quantos segundos o gladiador da equipe sobreviveu'><img src='icon/clock-icon.png'></div></div></div><div class='teams-container'></div><div class='foot'><button class='button' disabled>Aguardando <span class='number'></span> mestre<span class='plural'>s</span></button></div></div>");
                     $('#content-box #group-container .group').eq(groupindex).data('id', groupid);
                     groupindex++;
                 }
@@ -71,14 +71,13 @@ $(document).ready( function() {
 
             }
 
-            $('#content-box').append("<div id='button-container'><button id='back-round' class='button'>RODADA ANTERIOR</button><button id='prepare' class='button' disabled>PREPARAR-SE</button></div>");
+            $('#content-box').append("<div id='timeleft' title='Tempo máximo restante até o fim da rodada'><div id='time'><div class='numbers'><span>0</span><span>0</span></div>:<div class='numbers'><span>0</span><span>0</span></div>:<div class='numbers'><span>0</span><span>0</span></div></div><div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div></div><div id='button-container'><button class='arrow' id='back-round' title='Rodada anterior' disabled><i class='material-icons'>navigate_before</i></button><button id='prepare' class='button' disabled>PREPARAR-SE</button><button class='arrow' id='next-round' title='Próxima rodada' disabled><i class='material-icons'>navigate_next</i></button></div>");
 
             refresh_round();
 
             var round = data.tournament.round;
-            if (round == 1)
-                $('#content-box #back-round').remove();
-            else{
+            if (round > 1){
+                $('#content-box #back-round').removeProp('disabled');
                 $('#content-box #back-round').click( function(){
                     window.location.href = 'tourn/'+ hash +'/'+ parseInt(round - 1);
                 });
@@ -163,9 +162,46 @@ $(document).ready( function() {
                     });
 
                 });
+
             }
-            else
-                $('#content-box #prepare').hide();
+            else{
+                $('#content-box #prepare').remove();
+                $('#button-container .arrow').addClass('nobutton');
+            }
+
+            var timecreation = new Date(data.tournament.creation);
+            var timenow = new Date();
+            var timediff = timenow - timecreation;
+
+            countDown();
+            function countDown() {
+                setTimeout( function(){
+                    var timeleft = msToTime(86400000 - timediff);
+                    timediff += 1000;
+                    
+                    $('#timeleft .numbers').each( function(index, obj){
+                        if (parseInt(timeleft[index]) != parseInt($(obj).text())){
+                            $(obj).find('span').eq(0).html(timeleft[index].toString()[0]);
+                            $(obj).find('span').eq(1).html(timeleft[index].toString()[1]);
+                        }
+                    });
+
+                    if ($('#group-container .team.myteam .icon.green').length == 1)
+                        $('#timeleft').addClass('green');
+                    else if (parseInt(timeleft[0]) == 0){
+                        if (parseInt(timeleft[1]) < 10)
+                            $('#timeleft').addClass('red');
+                        else
+                            $('#timeleft').addClass('yellow');
+                    }
+                    
+                    if ($('#group-container .team .icon.green').length == $('#group-container .team').length)
+                        $('#timeleft .numbers span').html('0');
+                    if ($('#timeleft #time').text() != '00:00:00')
+                        countDown();
+                }, 1000);
+            }
+
         }
         
     });
@@ -195,19 +231,22 @@ function refresh_round(){
                 var alive = ['', 'one', 'two', 'three'];
                 alive = alive[data.teams[i].alive];
         
-                var iconready = {icon: 'hourglass_empty', class: ''};
+                var iconready = {icon: 'hourglass_empty', class: '', title: 'A equipe ainda não escolheu seu gladiador'};
                 if (data.teams[i].ready)
-                    iconready = {icon: "check", class: 'green'};
+                    iconready = {icon: "check", class: 'green', title: 'A equipe está pronta para a batalha'};
 
                 $(this).find('.icon i').html(iconready.icon);
                 $(this).find('.icon').attr('class', "icon "+ iconready.class);
+                $(this).find('.icon').attr('title', iconready.title);
 
                 $(this).find('.info .glad').attr('class', 'glad '+ alive);
                 $(this).find('.info .time').html(lasttime);
             }
         });
 
+        var busyrun = false;
         $('#content-box #group-container .group').each( function(){
+            var groupobj = $(this);
             var i = $(this).data('id');
 
             if (data.groups[i].status == "DONE"){
@@ -218,25 +257,54 @@ function refresh_round(){
                 });
             }
             else if (data.groups[i].status == "LOCK" || data.groups[i].status == "RUN"){
-                $(this).addClass('hide-info');
-                $(this).find('.foot .button').html("Grupo pronto. Organizando batalha...");
-                if (data.groups[i].status == "RUN"){
-                    runSimulation({
-                        tournament: i
-                    }).then( function(data){
-                        //console.log(data);
-                        if (data != "ERROR"){
-                            $.post("back_tournament_run.php",{
-                                action: "UPDATE",
-                                hash: hash
-                            }).done( function(data){
-                                console.log(data);
+                tryRun();
+                //try to run. if any other group is already running, wait for 1s and check again
+                function tryRun(){
+                    if (busyrun){
+                        setTimeout( function(){
+                            tryRun();
+                        }, 1000);
+                    }
+                    else{
+                        busyrun = true;
+                        groupobj.addClass('hide-info');
+                        groupobj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
+
+                        if ((groupobj).find('.team.myteam').length > 0)
+                            $('#content-box #prepare').prop('disabled', true).html("Aguarde a nova rodada");
+
+                        if (data.groups[i].status == "RUN"){
+                            runSimulation({
+                                tournament: i
+                            }).then( function(data){
+                                //console.log(data);
+                                if (data != "ERROR"){
+                                    $.post("back_tournament_run.php",{
+                                        action: "UPDATE",
+                                        hash: hash
+                                    }).done( function(data){
+                                        //console.log(data);
+                                        busyrun = false;
+
+                                        data = JSON.parse(data);
+                                        if (data.status == "NEXT"){
+                                            $.post("back_sendmail.php",{
+                                                action: "TOURNAMENT",
+                                                hash: hash
+                                            }).done( function(data){
+                                                console.log(data);
+                                            });
+                                        }
+                                    });
+                                }
+                                else{
+                                    //window.location.reload();
+                                }
                             });
                         }
-                        else
-                            showMessage("ERROR");
-                    });
+                    }
                 }
+                //return false; //exist the each loop to make possible for only one group to run battle
             }
             else if (data.groups[i].status == "WAIT"){
                 $(this).find('.foot .button .number').html(data.groups[i].value);
@@ -246,21 +314,20 @@ function refresh_round(){
         });
 
         if (data.status == "NEXT" || data.status == "END"){
-            $('#content-box #prepare').removeProp('disabled').show();
+            $('#content-box #next-round').removeProp('disabled');
+            $('#content-box #prepare').remove();
+            $('#button-container .arrow').addClass('nobutton');
+            //$('#content-box #prepare').prop('disabled', true).off();
 
-            if (data.status == "END"){
-                $('#content-box #prepare').html("CLASSIFICAÇÃO FINAL");
-                $('#content-box #prepare').off().click( function(){
+            $('#content-box #next-round').off().click( function(){
+                if (data.status == "END"){
                     window.location.href = 'tourn/'+ hash +'/0';
-                });
-            }
-            else{
-                $('#content-box #prepare').html("PRÓXIMA RODADA");
-                $('#content-box #prepare').off().click( function(){
+                }
+                else{
                     var newround = parseInt(round) + 1;
                     window.location.href = 'tourn/'+ hash +'/'+ newround;
-                });
-            }
+                }
+            });
         }
 
     });
@@ -268,9 +335,26 @@ function refresh_round(){
     count_refresh++;
     setTimeout( function(){
         count_refresh--;
-        if (count_refresh == 0)
+        if (count_refresh == 0){
             refresh_round();
+        }
     }, 5000);
 
 }
 
+function msToTime(ms) {
+    var s = Math.floor(ms / 1000);
+    var m = Math.floor(s / 60);
+    s = s % 60;
+    var h = Math.floor(m / 60);
+    m = m % 60;
+  
+    if (h < 10)
+        h = '0' + h;
+    if (m < 10)
+        m = '0' + m;
+    if (s < 10)
+        s = '0' + s;
+        
+    return [h,m,s];
+  }
