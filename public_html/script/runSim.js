@@ -36,7 +36,7 @@ function runSimulation(params) {
 		tournament: tournament
 	})
 	.done(function(data){
-		//onsole.log(data);
+		//console.log(data);
 		var jsonerror;
 		try{
 			JSON.parse(data);
@@ -51,7 +51,7 @@ function runSimulation(params) {
 			console.log("JSON: "+data);
 			return response.resolve("ERROR");
 		}
-		else if (data.simulation){
+		else if (JSON.parse(data)){
 			data = JSON.parse(data);
 			var simulation = data.simulation;
 			var error = data.error;
@@ -63,15 +63,28 @@ function runSimulation(params) {
 				}
 				else{
 					error = error.split("/usercode/").join("");
-					for (var i in glads)
-						error = error.split("code"+i+".c").join("<span>"+ glads[i].name +"</span>");
+					for (var i in glads){
+						if (glads[i].name)
+							error = error.split("code"+i+".c").join("<span>"+ glads[i].name +"</span>");
+						else{
+							var pattern = /setName\("([\w\W]*?)"\);/;
+							var name = glads[i].match(pattern)[1];
+							error = error.split("code"+i+".c").join("<span>"+ name +"</span>");
+						}
+					}
+					var pattern = /\\n/g;
+					error = error.replace(pattern, '\n');
 					
 					showTerminal("ERRO DE COMPILAÇÃO", error);
 				}
 				return response.resolve("ERROR");
 			}
 			else if (simulation.length > 0){
-				if (output.indexOf("timed out") != -1){
+				if (output == "CLIENT TIMEOUT"){
+					showTerminal("ERRO NA SIMULAÇÃO","A gladCode está tendo problemas entre a conexão do simulador e os gladiadores. Por favor, reporte este problema para <a href='mailto:contato@gladcode.tk'><span>contato@gladcode.tk</span></a>");
+					return response.resolve("ERROR");
+				}
+				else if (output.indexOf("timed out") != -1){
 					var glad = output.split("Gladiator ")[1].split(" timed out")[0];
 					showTerminal("GLADIADOR EM LOOP", "O código do gladiador <span>"+ glad +"</span> está em uma repetição da qual não consegue sair.\nEle foi desativado para não comprometer a simulação.\n\nRevise o código-fonte e tente novamente.");
 					return response.resolve("ERROR");

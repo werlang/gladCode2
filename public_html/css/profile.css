@@ -1800,6 +1800,51 @@ body{
 	margin: 20px 30px 15px 30px;
 }
 
+#tourn.wrapper .title {
+	display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+#tourn.wrapper #offset {
+	margin-bottom: 10px;
+	margin-right: 15px;
+	display: flex;
+	align-items: center;
+	cursor: default;
+}
+
+#tourn.wrapper #offset span {
+	margin: 0px 5px;
+}
+
+#tourn.wrapper #offset button {
+	background-color: transparent;
+    border: none;
+    outline: none;
+    transition: 0.5s all;
+    border-radius: 100%;
+    height: 30px;
+    line-height: 0;
+    font-family: acme;
+    font-size: 2em;
+    color: #1e86d8;
+    margin-left: 10px;
+    padding: 0;
+	width: 30px;
+	cursor: pointer;
+}
+
+#tourn.wrapper #offset button:hover {
+	background-color: #ededed;
+}
+
+#tourn.wrapper #offset button:disabled {
+	background-color: transparent;
+	color: #b5b5b5;
+	cursor: default;
+}
+
 #tourn.wrapper #button-container {
 	display: flex;
 	flex-direction: column;
@@ -1818,6 +1863,7 @@ body{
 
 #tourn.wrapper .table .row {
 	cursor: pointer;
+	height: 25px;
 }
 
 #tourn.wrapper .table .row.head {

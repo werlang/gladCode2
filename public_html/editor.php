@@ -21,7 +21,7 @@
 	<script type="text/javascript" src="script/editor.js"></script>
 	<script type="text/javascript" src="script/assets.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
-	<script type="text/javascript" src="script/runSim.min.js"></script>
+	<script type="text/javascript" src="script/runSim.js"></script>
 	<script type="text/javascript" src="script/tutorial.min.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 </head>

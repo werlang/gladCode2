@@ -4,6 +4,7 @@
     $user = $_SESSION['user'];
     $action = $_POST['action'];
     $output = array();
+    date_default_timezone_set('America/Sao_Paulo');
 
     if ($action == "GET"){
         $hash = mysql_escape_string($_POST['hash']);
@@ -59,7 +60,7 @@
     
             //get info from tournament, lasttime and dead
             $alive = "SELECT count(*) FROM group_teams grt INNER JOIN groups gr ON gr.id = grt.groupid INNER JOIN teams te2 ON te2.id = grt.team INNER JOIN gladiator_teams glt ON te2.id = glt.team WHERE (glt.dead = '0' OR glt.dead >= '$round') AND gr.round = '$round' AND te.id = te2.id";
-            $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, t.name AS tname, t.description, te.name, grt.groupid, ($alive) AS alive, grt.lasttime, gr.locked FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round' ORDER BY grt.lasttime DESC, grt.id";
+            $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, t.name AS tname, t.description, te.name, grt.groupid, ($alive) AS alive, grt.lasttime, gr.locked, gr.creation FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round' ORDER BY grt.groupid, grt.lasttime DESC";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
             $nrows = $result->num_rows;
@@ -71,6 +72,7 @@
                         $output['tournament']['name'] = $row['tname'];
                         $output['tournament']['description'] = $row['description'];
                         $output['tournament']['round'] = $round;
+                        $output['tournament']['creation'] = $row['creation'];
                     }
     
                     $team = array();
@@ -197,12 +199,23 @@
         $round = mysql_escape_string($_POST['round']);
 
         //check if there is any battle left to be done
-        $sql = "SELECT * FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
+        $sql = "SELECT gr.creation FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
-
+        
+        $timeup = false;
         if ($nrows == 0)
             $nextround = true;
+        else{
+            //calc time left to end 24h time limit to choose since round creation
+            $row = $result->fetch_assoc();
+            $creation = (new DateTime($row['creation']))->getTimestamp();
+            $now = (new DateTime())->getTimestamp();
+            $timeleft = 86400 - ($now - $creation);
+
+            if ($timeleft <= 0)
+                $timeup = true;
+        }
 
         //check how many alive and lasttime for each team in the tournament
         $alive = "SELECT count(*) FROM group_teams grt INNER JOIN teams te2 ON te2.id = grt.team INNER JOIN gladiator_teams glt ON glt.team = te2.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE (glt.dead = '0' OR glt.dead > '$round') AND gr.round = '$round' AND te.id = te2.id";
@@ -232,9 +245,24 @@
             $output['groups'][$groupid]['total'] = $row['total'];
             $output['groups'][$groupid]['remaining'] = $row['rem'];
 
-            if ($row['rem'] > 0)
+            if ($row['rem'] > 0 && !$timeup)
                 $output['groups'][$groupid]['status'] = "WAIT";
             else{
+                if ($timeup){
+                    //select a random glad from each participating group's team
+                    $sql = "SELECT gl.gladiator, gl.id FROM (SELECT glt.gladiator, te.id AS team, grt.id FROM gladiator_teams glt INNER JOIN teams te ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id WHERE grt.groupid = '$groupid' AND glt.dead = '0' AND grt.gladiator IS NULL ORDER BY rand()) AS gl INNER JOIN teams te ON te.id = gl.team GROUP BY te.id";
+                    if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    
+                    //time's up, so select randomly one glad for each group remaining
+                    while($row2 = $result2->fetch_assoc()){
+                        $glad = $row2['gladiator'];
+                        $id = $row2['id'];
+                        $sql = "UPDATE group_teams SET gladiator = '$glad' WHERE id = '$id'";
+                        if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+
+                    }
+                }
+
                 $sql = "SELECT l.hash, gr.locked FROM groups gr INNER JOIN logs l ON l.id = gr.log WHERE gr.id = '$groupid'";
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                 $row2 = $result2->fetch_assoc();
@@ -244,7 +272,9 @@
                         $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid'";
                         if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-                        $_SESSION['tourn-group'] = md5("tourn-group-$groupid-id");
+                        if (!isset($_SESSION['tourn-group']))
+                            $_SESSION['tourn-group'] = array();
+                        $_SESSION['tourn-group'][$groupid] = md5("tourn-group-$groupid-id");
                         $output['groups'][$groupid]['status'] = "RUN";
                     }
                     else
@@ -400,8 +430,6 @@
                         $teams[$i]['dead'] = true;
                 }
                 usort($teams, 'death_sort');
-
-                $output['teste'] = $teams;
                 
                 //create new groups
                 $ngroups = ceil($nteams / 5);
@@ -410,7 +438,7 @@
                 $remteams = $nteams;
                 $teami = 0;
                 for ($i=0 ; $i<$ngroups ; $i++){
-                    $sql = "INSERT INTO groups(round) VALUES ('$newround')";
+                    $sql = "INSERT INTO groups(round, creation) VALUES ('$newround', now())";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                     $group = $conn->insert_id;
 
@@ -485,7 +513,6 @@
         if ($t == null || $t == 'null')
             return false;
 
-        date_default_timezone_set('America/Sao_Paulo');
         $locked = new DateTime($t);
         $now = new DateTime();
         $diff = $now->getTimestamp() - $locked->getTimestamp();

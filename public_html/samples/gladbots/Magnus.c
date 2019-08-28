@@ -6,8 +6,6 @@ setup(){
     setSpritesheet("d2eb1d688b45e19129d2d25959170ad9");
 }
 
-#include<math.h>
-
 loop(){
 	upgradeINT(1);
 	if (getCloseEnemy() && getDist(getTargetX(), getTargetY()) < 5){

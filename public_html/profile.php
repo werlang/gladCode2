@@ -96,6 +96,7 @@
 						<div id='pref-message'><label><input type='checkbox' class='checkslider'>Outro usuário me enviar uma mensagem</label></div>
 						<div id='pref-update'><label><input type='checkbox' class='checkslider'>A gladCode receber uma atualização</label></div>
 						<div id='pref-duel'><label><input type='checkbox' class='checkslider'>Um amigo enviar um desafio para um duelo</label></div>
+						<div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
 					</div>
 					<div id='button-container'>
 						<button class='button'>GRAVAR</button>
@@ -135,9 +136,16 @@
 					</div>
 					<div id='tourn' class='wrapper'>
 						<div class='container'>
-							<h2>Torneios públicos abertos</h2>
+							<div class='title'>
+								<h2>Torneios públicos abertos</h2>
+								<div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+							</div>
 							<div id='table-open' class='table'></div>
-							<h2 id='mytourn-title'>Meus torneios</h2>
+							
+							<div class='title'>
+								<h2 id='mytourn-title'>Meus torneios</h2>
+								<div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+							</div>
 							<div id='table-mytourn' class='table'></div>
 							<div id='button-container'>
 								<button id='create' class='button'>CRIAR UM TORNEIO</button>

@@ -6,5 +6,9 @@ while [ -f /usercode/code$i.c ]; do
 	i=$((i + 1))
 done
 
-nice -n 15 gcc -o /usercode/gladCodeServerMain /usercode/gladCodeServerMain.c 2>> /usercode/errors.txt -lm -lpthread && nice -n 15 ./usercode/gladCodeServerMain $i >> /usercode/outputs.txt
+#nice -n 15 gcc -o /usercode/gladCodeServerMain /usercode/gladCodeServerMain.c 2>> /usercode/errors.txt -lm -lpthread && nice -n 15 ./usercode/gladCodeServerMain $i >> /usercode/outputs.txt
 
+#any update in main must be recompilled
+#gcc -o gladCodeServerMain gladCodeServerMain.c -lm -lpthread
+
+nice -n 15 ./usercode/gladCodeServerMain $i >> /usercode/outputs.txt

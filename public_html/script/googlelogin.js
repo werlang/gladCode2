@@ -53,8 +53,7 @@ function googleLogin(){
 				action: "SET",
 				email: data.email,
 				nome: data.given_name,
-				sobrenome: data.family_name,
-				foto: data.picture,
+				sobrenome: data.family_name
 			} ).done( function(data){
 				loginAjax.resolve(JSON.parse(data));
 			});

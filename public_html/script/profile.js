@@ -6,12 +6,12 @@ $(document).ready( function(){
 
 	fill_assets();
 	
-	var preferences = ["friend","message","update","duel"];
-	var picture
+	var preferences = ["friend","message","update","duel","tourn"];
 	$.post("back_login.php", {
 		action: "GET"
 	})
 	.done( function(data){
+		//console.log(data);
 		user = JSON.parse(data);
 		if ($('#tab').length){
 			var id = $('#tab').html();
