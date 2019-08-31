@@ -1,10 +1,10 @@
-var tileD = 32;
-var screenW = tileD * 29;
-var screenH = tileD * 31;
+var tileD = 32; //size of a single tile
+var screenW = tileD * 42; //how many tiles there is in the entire image
+var screenH = tileD * 49;
 var screenRatio = screenW/screenH;
-var arenaX1 = tileD * 2;
-var arenaY1 = tileD * 5;
-var arenaD = screenW - (tileD * 2 + tileD * 2);
+var arenaX1 = tileD * 8; //how many tiles until the start of the arena
+var arenaY1 = tileD * 14;
+var arenaD = screenW - (2 * arenaX1); //tiles not valid in the left and right side
 var arenaRate = arenaD / 25;
 var nglad = 0;
 var json, loadglads = false, startsim = false;
@@ -55,16 +55,18 @@ function load_phaser(){
 }
 
 function preload() {
-	//
+	game.load.onLoadStart.add(loadStart, this);
+    game.load.onFileComplete.add(fileComplete, this);
+	game.load.onLoadComplete.add(loadComplete, this);
+
 	for (i=0 ; i < hashes.length ; i++){
 		game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
 	}	
 
-	game.load.image("background", 'res/map3.png');
-    game.load.image('background_top', 'res/map3_top.png');
-    game.load.image('background_walls', 'res/map3_walls.png');
-    game.load.image('arrow', 'res/arrow.png');
-	game.load.image('mask', 'res/mask.png');
+	game.load.image("background", 'res/layer0.png');
+	game.load.image('background_top', 'res/layer1.png');
+	game.load.image('arrow', 'res/arrow.png');
+    game.load.image('gas', 'res/gas.png', 50, 50);
 	game.load.spritesheet('fireball', 'res/fireball.png', 64, 64);
 	game.load.spritesheet('explosion', 'res/explosion.png', 256, 128);
 	game.load.spritesheet('stun', 'res/stun.png', 96, 64);
@@ -88,15 +90,41 @@ function preload() {
 	game.load.audio('lvlup', 'res/audio/lvlup.mp3');
 	game.load.audio('death_male', 'res/audio/death_male.mp3');
 	game.load.audio('death_female', 'res/audio/death_female.mp3');
+	game.load.spritesheet('dummy', 'res/glad.png', 64, 64);
+	game.load.spritesheet('cheer', 'res/cheer.png', 64, 64);
 	
 	game.load.start();
 	loadCache = true;
 	resize();
 	$('#canvas-div canvas').focus();
 	game.camera.focusOnXY(screenW * game.camera.scale.x / 2, screenH * game.camera.scale.y / 2);
+
 }
 
-var background, back_top, back_walls;
+function loadStart(){
+	$('#loadbar #status').html("Preparando recursos");
+	$('#loadbar #second .bar').width(0);
+}
+
+
+/*
+progress = % loaded
+totalLoaded = how many files loaded
+totalFiles = how many files there is to load
+cacheKey = the asset object
+success = boolean saying if the assets was successfully loaded
+*/
+function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles){
+	$('#loadbar #status').html("Carregando recursos");
+	$('#loadbar #second .bar').width(progress +"%");
+	$('#loadbar #main .bar').width(50 + progress/2 +"%");
+}
+
+function loadComplete(){
+	$('#loadbar #status').html("Tudo pronto");
+}
+
+var background, back_top;
 var layer_walls, layer_ground, layer_poison;
 
 var sprite = new Array();
@@ -107,10 +135,12 @@ var music, ending, victory;
 var clones = new Array();
 
 var poison = (Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate);
-var mask;
+var gasl = [];
 var groupglad;
 
 var bar = {};
+var npc;
+
 function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -118,19 +148,12 @@ function create() {
 
 	background = game.add.image(0, 0, 'background');
 	back_top = game.add.image(0, 0, 'background_top');
-	back_walls = game.add.image(0, 0, 'background_walls');
-
-	mask = game.add.image(arenaX1 + arenaD/2 + tileD/2, arenaY1 + arenaD/2 + tileD/2, 'mask');
-	mask.anchor.setTo(0.5, 0.5);
-	mask.scale.set(arenaRate);
-	mask.alpha = 0.3;
-
+	
 	groupglad = game.add.group();
+	groupgas = game.add.group();
 	
 	groupglad.add(background);
 	groupglad.add(back_top);
-	groupglad.add(back_walls);
-	groupglad.add(mask);
 	
 	music = game.add.audio('music', 1, true);
 	ending = game.add.audio('ending');
@@ -166,15 +189,54 @@ function create() {
 	bar.hp.alpha = 0.4;
 	bar.ap = game.add.sprite(-100,0, graphics.ap.generateTexture());
 	bar.ap.alpha = 0.4;
+
+	fillPeople();
+
+	$.each(npc, function(i,v){
+		let pos = getPosArena(v.x, v.y, true);
+		v.sprite = game.add.sprite(pos.x, pos.y, 'cheer');
+		v.sprite.scale.setTo(game.camera.scale.x, game.camera.scale.y);
+		v.sprite.anchor.setTo(0.5, 0.5);
+		v.sprite.animations.add('cheer', arrayFill(v.start, parseInt(v.start+1)), v.time, true);
+		v.sprite.animations.play('cheer');
+	});
 }
 
+var gasld = 4;
+var gaspl = 25;
 function update() {
 	if (json.poison){
 		poison = parseFloat(json.poison);
 		
-		var rad = poison * arenaRate / Math.sqrt(2*Math.pow(arenaD/2,2));
-		var cs = arenaRate * rad * 0.42;
-		mask.scale.setTo(cs);
+		var gasadv = Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate / poison;
+
+		if (gasadv >= 1 && (gasl.length == 0 || (17-poison) / gasld > gasl.length - 1)){
+			var gas = [];
+			for (let j = 0 ; j< gaspl ; j++){
+				gas.push(game.add.sprite(0,0,'gas'));
+				gas[j].anchor.setTo(0.5, 0.5);
+				gas[j].scale.setTo(gas[j].width / arenaRate * 3); //size = 1p
+				gas[j].rotSpeed = Math.random() * 1 - 0.5;
+				gas[j].alpha = 0;
+				groupgas.add(gas[j]);
+			}
+			gasl.push(gas);
+		}
+		for (let i=0 ; i<gasl.length ; i++){
+			for (let j=0 ; j<gasl[i].length ; j++){
+				var radi = 360 / gasl[i].length * j;
+				radi = radi * Math.PI / 180;
+				let x = 12.5 + (poison + i*gasld + gasl[i][j].width/2 / arenaRate ) * Math.sin(radi);
+				let y = 12.5 + (poison + i*gasld + gasl[i][j].height/2 / arenaRate) * Math.cos(radi);
+				gasl[i][j].angle += gasl[i][j].rotSpeed;
+				if (gasl[i][j].alpha < 1) 
+					gasl[i][j].alpha += 0.005;
+				gasl[i][j].x = arenaX1 + x * arenaRate;
+				gasl[i][j].y = arenaY1 + y * arenaRate;
+			}
+		}
+		groupglad.add(groupgas);
+	
 	}
 	if (nglad > 0 && !loadglads) {
 		loadglads = true;
@@ -308,7 +370,18 @@ function update() {
 						}
 					}
 					else if (actionlist[action] && actionlist[action].animation != 'none' && gladArray[i].time != json.simtime){
-						sprite[i].animations.play(anim, Math.max(1/((lockedfor - 0.1)/animationlist[actionlist[action].animation].frames*2), 10));
+						var frames = animationlist[actionlist[action].animation].frames;
+						//lockedfor + 0,1 porque quando chega nesse ponto já descontou do turno atual
+						//e multiplica por 2 porque os locked dos ataques são divididos em 2 partes
+						var timelocked = lockedfor + 0.1;
+						if (actionlist[action].name == "ranged" || actionlist[action].name == "melee")
+							timelocked *= 2;
+						var actionspeed = Math.max(10, frames / timelocked);
+
+						//console.log({action: actionspeed, name: json.glads[i].name, lock: lockedfor});
+
+						sprite[i].animations.stop();
+						sprite[i].animations.play(anim, actionspeed);
 						gladArray[i].time = json.simtime;
 						
 						if (actionlist[action].name == "teleport" && gladArray[i].fade == 0){
@@ -413,6 +486,7 @@ function update() {
 							var anim = 'slash-' + getActionDirection(head);
 						else
 							var anim = 'stab-' + getActionDirection(head);
+						sprite[i].animations.stop();
 						sprite[i].animations.play(anim, 20);
 						game.add.audio('melee').play();
 					}
@@ -516,15 +590,15 @@ function update() {
 		else
 			sproj[x].active = false;
 	}
-	
+		
 	groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
 	for (var i=0 ; i<nglad ; i++){
 		if (!gladArray[i].alive)
 			groupglad.sendToBack(sprite[i]);
 	}
 	
-	groupglad.sendToBack(mask);
 	groupglad.sendToBack(background);
+	groupglad.bringToTop(groupgas);
 	groupglad.bringToTop(back_top);
 
 	if (game.input.mouse.drag){
@@ -534,6 +608,7 @@ function update() {
 		}
 		game.camera.view.y -= game.input.speed.y;
 		game.camera.view.x -= game.input.speed.x;
+		$('.baloon').remove();
 	}
 
 	if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_ADD) || game.input.keyboard.isDown(Phaser.Keyboard.EQUALS))
@@ -755,11 +830,11 @@ $(window).keydown(function(event) {
 });
 
 function getGladPositionOnCanvas(gladid){
-	var ph = (screenH * game.camera.scale.y) / (25 + 6);
-	var pw = (screenW * game.camera.scale.x) / (25 + 4);
+	var ph = game.camera.scale.y * tileD;
+	var pw = game.camera.scale.x * tileD;
 	
-	var x = pw*2 + pw * parseFloat(json.glads[gladid].x);
-	var y = ph*5 + ph * parseFloat(json.glads[gladid].y);
+	var x = pw*(arenaX1/tileD) + pw * parseFloat(json.glads[gladid].x);
+	var y = ph*(arenaY1/tileD) + ph * parseFloat(json.glads[gladid].y);
 	var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
 	var cl = $('#canvas-div canvas').position().left - game.camera.view.x;
 	return {x: x+cl, y: y+ct};
@@ -817,24 +892,25 @@ function showHpApBars(gladid){
 }
 
 function zoomWheel(wheel){
-	var scaleValue = 0.03;
-	var delta = wheel.deltaY / Math.abs(wheel.deltaY) * scaleValue;
-	var canvasW = screenW * (game.camera.scale.x - delta);
-	var canvasH = screenH * (game.camera.scale.y - delta);
+	var scaleValue = 0.05;
+	var delta = 1 - wheel.deltaY / Math.abs(wheel.deltaY) * scaleValue;
+	var canvasW = screenW * (game.camera.scale.x * delta);
+	var canvasH = screenH * (game.camera.scale.y * delta);
+
+	var point = {
+		x: (game.input.mouse.input.x + game.camera.x) / game.camera.scale.x,
+		y: (game.input.mouse.input.y + game.camera.y) / game.camera.scale.y,
+	}
 
 	var bind = null;
 	if ($(window).width() > $(window).height()){
-		if (canvasW >= $(window).width())
-			bind = "width";
-		else if (canvasH <= $(window).height())
+		if (canvasH <= $(window).height())
 			bind = "height";
 		else
 			bind = "none";
 	}
 	else{
-		if (canvasH >= $(window).height())
-			bind = "height";
-		else if (canvasW <= $(window).width())
+		if (canvasW <= $(window).width())
 			bind = "width";
 		else
 			bind = "none";
@@ -853,8 +929,8 @@ function zoomWheel(wheel){
 		game.camera.scale.y = $(window).height() / screenH;
 	}
 	else{
-		game.camera.scale.x -= delta;
-		game.camera.scale.y -= delta;
+		game.camera.scale.x *= delta;
+		game.camera.scale.y *= delta;
 	}
 
 	if (canvasW > $(window).width())
@@ -867,18 +943,116 @@ function zoomWheel(wheel){
 	game.camera.bounds.height = screenH;
 
 	if (bind == "none"){
-		var sizeIncrease = screenH * scaleValue;
-		if (game.input.y <= game.camera.height/3){
-			game.camera.y -= sizeIncrease;
-		}
-		else if (game.input.y >= game.camera.height*2/3){
-			game.camera.y += sizeIncrease;
-		}
-		else if (delta < 0){
-			game.camera.y += sizeIncrease / 2;
-		}
-		else{
-			game.camera.y -= sizeIncrease / 2;
+		var mx = game.input.mouse.input.x;
+		var my = game.input.mouse.input.y;
+		var sx = game.camera.scale.x;
+		var sy = game.camera.scale.y;
+		var cx = game.camera.x;
+		var cy = game.camera.y;
+
+		game.camera.x = point.x * sx - mx;
+		game.camera.y = point.y * sy - my;
+	}
+	$('.baloon').remove();
+}
+
+function getPosArena(x, y, absolute=false){
+	x = (x + 0.5) * tileD;
+	y = (y + 0.5) * tileD;
+	if (!absolute){
+		x += arenaX1;
+		y += arenaY1;
+	}
+
+	return {x: x, y: y};
+}
+
+function fillPeople(){
+	npc = {
+		king: 			{x: 20, y: 7},
+		queen:			{x: 21, y: 7},
+		counselor1:		{x: 19, y: 6.5},
+		counselor2:		{x: 22, y: 6.5},
+		royalguard1:	{x: 16, y: 4},
+		royalguard2:	{x: 25, y: 4},
+		archer1:		{x: 4, y: 3},
+		archer2:		{x: 39, y: 1},
+		archer3:		{x: 21, y: 39},
+		commonguard1:	{x: 2, y: 9},
+		commonguard2:	{x: 39, y: 9},
+		commonguard3:	{x: 2, y: 40},
+		commonguard4:	{x: 39, y: 40},
+	};	
+
+	arenaSpaces = [
+		//left top
+		{x: 2.4, y: 9, axis: 1, capacity: 31, fill: 0.3, heading: 'right'},
+		{x: 3.4, y: 9.3, axis: 1, capacity: 31, fill: 0.4, heading: 'right'},
+
+		//left bottom
+		{x: 5.4, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'right'},
+		{x: 6.4, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'right'},
+
+		//right bottom
+		{x: 34.6, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'left'},
+		{x: 35.6, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'left'},
+
+		//right top
+		{x: 37.6, y: 9.3, axis: 1, capacity: 31, fill: 0.4, heading: 'left'},
+		{x: 38.6, y: 9, axis: 1, capacity: 31, fill: 0.3, heading: 'left'},
+
+
+		//top top left
+		{x: 8, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down'},
+		{x: 8.1, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down'},
+
+		//top bottom left
+		{x: 8, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down'},
+		{x: 8.1, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down'},
+
+		//top top right
+		{x: 28, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down'},
+		{x: 26.9, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down'},
+
+		//top bottom right
+		{x: 26, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down'},
+		{x: 25.9, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down'},
+
+
+		//bottom botom left
+		{x: 7, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up'},
+
+		//bottom top left
+		{x: 5, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up'},
+
+		//bottom bottom right
+		{x: 25, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up'},
+
+		//bottom top right
+		{x: 25, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up'},
+	];
+
+	var headArray = {up: [0, 8, 16], left: [2, 10, 18], down: [4, 12, 20], right: [6, 14, 22]};
+
+	var n = 0;
+	for (let j in arenaSpaces){
+		for (let i=0 ; i<arenaSpaces[j].capacity ; i++){
+			if (Math.random() < arenaSpaces[j].fill){
+				var xinc = 0, yinc = 0;
+				if (arenaSpaces[j].axis == 1)
+					yinc = i;
+				else
+					xinc = i;
+
+				npc['people'+n] = {
+					x: arenaSpaces[j].x + xinc,
+					y: arenaSpaces[j].y + yinc,
+					heading: arenaSpaces[j].heading,
+					start: headArray[arenaSpaces[j].heading][parseInt(Math.random()*3)],
+					time: Math.random()*6 + 2
+				};
+				n++;
+			}
 		}
 	}
 }

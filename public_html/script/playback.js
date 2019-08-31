@@ -8,8 +8,10 @@ var pausesim = true;
 var stepIncrement = 1;
 var istep;
 var tournHash, loghash;
+var fullscreen = false;
 
 $(document).ready( function() {
+	$('#loadbar #status').html("Página carregada");
 
 	$('#footer-wrapper').addClass('white');
 
@@ -29,64 +31,93 @@ $(document).ready( function() {
 		}
 		
 		function queryLog(){
-			$.post( "back_log.php", { 
-				action: "GET",
-				loghash: loghash
-			}).done( function(data){
-				//console.log(data);
-				if (data == "NULL"){
-					if (tournHash)
-						window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
-					else
-						window.location.href = "https://gladcode.tk";
-				}
-				else{
-					var e;
-					try{
-						log = JSON.parse(data);
-					}
-					catch(error){
-						e = error;
-						console.log(error);
-					}
-					if (e){
-						queryLog();
+			$.ajax({
+				xhr: function() {
+					var xhr = new window.XMLHttpRequest();
+					xhr.upload.addEventListener("progress", function(evt) {
+						if (evt.lengthComputable) {
+							var percentComplete = evt.loaded / evt.total;
+							//Do something with upload progress here
+						}
+				   }, false);
+			
+				   xhr.addEventListener("progress", function(evt) {
+					   if (evt.lengthComputable) {
+						   var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
+						   $('#loadbar #status').html("Fazendo download do log de batalha");
+						   $('#loadbar #second .bar').width(percentComplete +"%");
+						   $('#loadbar #main .bar').width(percentComplete/4 +"%");
+					   }
+				   }, false);
+			
+				   return xhr;
+				},
+				type: 'POST',
+				url: "back_log.php",
+				data: {
+					action: "GET",
+					loghash: loghash
+				},
+				success: function(data){
+					//console.log(data);
+					if (data == "NULL"){
+						if (tournHash)
+							window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
+						else
+							window.location.href = "https://gladcode.tk";
 					}
 					else{
-						var glads = log[0].glads;
-						stab = [];
-						gender = [];
-						
-						//console.log(log);
-						for (var i in glads){
-							//console.log(glads[i].skin);
-							var skin = glads[i].skin;
-							keepOrder(i,hashes,skin);
-							skin = JSON.parse(skin);
+						var e;
+						try{
+							log = JSON.parse(data);
+						}
+						catch(error){
+							e = error;
+							console.log(error);
+						}
+						if (e){
+							queryLog();
+						}
+						else{
+							var glads = log[0].glads;
+							stab = [];
+							gender = [];
 							
-							stab[i] = "0";
-							gender[i] = "male";
-							for (var j in skin){
-								var item = getImage(skin[j]);
-								if (item.move == 'thrust')
-									stab[i] = "1";
-								if (item.id == 'female')
-									gender[i] = "female";
+							//console.log(log);
+							for (var i in glads){
+								//console.log(glads[i].skin);
+								var skin = glads[i].skin;
+								keepOrder(i,hashes,skin);
+								skin = JSON.parse(skin);
+								
+								stab[i] = "0";
+								gender[i] = "male";
+								for (var j in skin){
+									var item = getImage(skin[j]);
+									if (item.move == 'thrust')
+										stab[i] = "1";
+									if (item.id == 'female')
+										gender[i] = "female";
+								}
 							}
-						}
-						
-						function keepOrder(i, hashes, skin){
-							fetchSpritesheet(skin).then( function(data){
-								hashes[i] = data;
-							});
-						}
-						
-						var waitHash = setInterval( function(){
-							if (hashes.length == glads.length){
-								clearInterval(waitHash);
-								startBattle(log);
+							
+							function keepOrder(i, hashes, skin){
+								fetchSpritesheet(skin).then( function(data){
+									hashes[i] = data;
+									var pct = (100 * hashes.length / glads.length).toFixed(0);
+									$('#loadbar #status').html("Montando gladiadores");
+									$('#loadbar #second .bar').width(pct +"%");
+									$('#loadbar #main .bar').width(25 + pct/4 +"%");
+								});
 							}
-						}, 10);
+							
+							var waitHash = setInterval( function(){
+								if (hashes.length == glads.length){
+									clearInterval(waitHash);
+									startBattle(log);
+								}
+							}, 10);
+						}
 					}
 				}
 			});
@@ -251,6 +282,7 @@ $(document).ready( function() {
 		pausesim = false; //coloca false na var
 		$('#pause').click(); //clica no botao e pause fica true
 	});	
+
 });
 
 function isFullScreen(){
@@ -266,7 +298,7 @@ function isFullScreen(){
 
 function setFullScreen(state){
 	if (state){
-		var elem = document.getElementById("canvas-container");
+		var elem = $("body")[0];
 		if (elem.requestFullscreen) {
 			elem.requestFullscreen();
 		}
@@ -279,6 +311,7 @@ function setFullScreen(state){
 		else if (elem.msRequestFullscreen) { /* IE/Edge */
 			elem.msRequestFullscreen();
 		}
+		fullscreen = true;
 	}
 	else{
 		if (document.exitFullscreen) {
@@ -293,8 +326,11 @@ function setFullScreen(state){
 		else if (document.msExitFullscreen) {
 			document.msExitFullscreen();
 		}
+		fullscreen = false;
 	}
-	
+	setTimeout( function(){
+		resize();
+	}, 100);
 }
 
 $(window).resize( function() {
@@ -304,21 +340,37 @@ $(window).resize( function() {
 function resize() {
 	var canvasH, canvasW;
 	if ($(window).width() > $(window).height()){
+		var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
 		canvasH = $(window).height();
-		canvasW = $(window).height() * screenW/screenH;
-		game.camera.scale.x = $(window).height() / screenH;
-		game.camera.scale.y = $(window).height() / screenH;
+		canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+		game.camera.scale.x = $(window).height() * usefulRatio / screenH;
+		game.camera.scale.y = $(window).height() * usefulRatio / screenH;
+		if ($(window).height() < 600){
+			showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato").then( function(data){
+				window.location.reload();
+			});
+		}
 	}
 	else{
-		canvasH = $(window).height();
+		var usefulRatio = screenW / arenaD;
+		canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
 		canvasW = $(window).width();
-		game.camera.scale.x = $(window).height() / screenH;
-		game.camera.scale.y = $(window).height() / screenH;
-		game.camera.x = screenW * game.camera.scale.x / 2 - game.width/2;
+		game.camera.scale.x = $(window).width() * usefulRatio / screenW;
+		game.camera.scale.y = $(window).width() * usefulRatio / screenW;
+		if ($(window).height() < 600 && !isFullScreen() && !fullscreen){
+			showDialog("Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?", ['Não','SIM']).then( function(data){
+				if (data == "SIM")
+					setFullScreen(true);
+					$('#fog').remove();
+					fullscreen = true;
+			});
+		}
 	}	
-	game.scale.setGameSize(canvasW, canvasH);
-	game.camera.bounds.width = screenW;
+	game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
+	game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
 	game.camera.bounds.height = screenH;
+	game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
+	game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
 }
 
 var show_final_score = true;
@@ -429,6 +481,7 @@ function startBattle(simulation){
 			
 	startloop = false;
 	
+	$('#loadbar #status').html("Carregando render");
 	load_phaser();
 
 	//console.log(simulation[0]);
