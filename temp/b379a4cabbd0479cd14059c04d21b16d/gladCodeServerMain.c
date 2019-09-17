@@ -92,16 +92,16 @@ void *connection_handler(void *p){
 				sprintf(reply, "%s",getName(gladid));
 			}
 			else if (strcmp(func->call,"upgradeSTR")==0){
-				upgradeSTR(gladid);
-				sprintf(reply, "done");
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeSTR(gladid, n));
 			}
 			else if (strcmp(func->call,"upgradeAGI")==0){
-				upgradeAGI(gladid);
-				sprintf(reply, "done");
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeAGI(gladid, n));
 			}
 			else if (strcmp(func->call,"upgradeINT")==0){
-				upgradeINT(gladid);
-				sprintf(reply, "done");
+				int n = func->arg[0].toInt;
+				sprintf(reply, "%i",upgradeINT(gladid, n));
 			}
 			else if (strcmp(func->call,"getX")==0){
 				sprintf(reply, "%f",getX(gladid));
@@ -176,8 +176,8 @@ void *connection_handler(void *p){
 				else
 					sprintf(reply, "false");
 			}
-			else if (strcmp(func->call,"getSimCounter")==0){
-				sprintf(reply, "%.1f",getSimCounter(gladid));
+			else if (strcmp(func->call,"getSimTime")==0){
+				sprintf(reply, "%.1f",getSimTime(gladid));
 			}
 			else if (strcmp(func->call,"getSimCounters")==0){
 				sprintf(reply, "%s",getSimCounters());
@@ -378,6 +378,10 @@ void *connection_handler(void *p){
 				char *m = func->arg[0].toLongStr;
 				speak(gladid, m);
 				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"getLvl")==0){
+				int r = getLvl(gladid);
+				sprintf(reply, "%i", r);
 			}
 			else if (strcmp(func->call,"endSocketComm")==0){
 				endcomm = 1;

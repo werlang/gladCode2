@@ -13,28 +13,29 @@ int getIndex(int port){
 void setSTR(int gladid, int n){
 	if ( (g+gladid)->lvl == 0){
 		(g+gladid)->STR = n;
-        (g+gladid)->hp = 100 + n*20;
+        (g+gladid)->hp = 100 + n*10;
         (g+gladid)->maxhp = (g+gladid)->hp;
-        (g+gladid)->mdmg = 1.5*n+5;
+        (g+gladid)->mdmg = 0.75*n+5;
 	}
 }
 
 void setAGI(int gladid, int n){
 	if ( (g+gladid)->lvl == 0){
         (g+gladid)->AGI = n;
-        (g+gladid)->spd = 1 + n*0.1;
-        (g+gladid)->as = 0.5 + n*0.1;
-        (g+gladid)->ts = 90 + n*18;
-        (g+gladid)->rdmg = n+5;
+        (g+gladid)->spd = 1 + n*0.05;
+        (g+gladid)->as = 0.5 + n*0.05;
+        (g+gladid)->ts = 90 + n*9;
+        (g+gladid)->rdmg = n*0.5+5;
 	}
 }
 
 void setINT(int gladid, int n){
 	if ( (g+gladid)->lvl == 0){
         (g+gladid)->INT = n;
-        (g+gladid)->ap = 100 + n*20;
+        (g+gladid)->ap = 100 + n*10;
         (g+gladid)->maxap = (g+gladid)->ap;
-        (g+gladid)->cs = 0.5 + n*0.1;
+        (g+gladid)->cs = 0.5 + n*0.05;
+        (g+gladid)->sdmg = n*0.5;
 	}
 }
 
@@ -70,19 +71,51 @@ char* getName(int gladid){
 	return (g+gladid)->name;
 }
 
-void upgradeSTR(int gladid){
-	(g+gladid)->up = 1;
+int upgradeSTR(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->STR += n;
+		(g+gladid)->hp += 10 * n;
+		(g+gladid)->maxhp += 10 * n;
+		(g+gladid)->mdmg += 0.75 * n;
+		(g+gladid)->up -= n;
+		return 1;
+	}
+	return 0;
 }
 
-void upgradeAGI(int gladid){
-	(g+gladid)->up = 2;
+int upgradeAGI(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->AGI += n;
+		(g+gladid)->spd += 0.05 * n;
+		(g+gladid)->as += 0.05 * n;
+		(g+gladid)->ts += 9 * n;
+		(g+gladid)->rdmg += 0.5 * n;
+		(g+gladid)->up -= n;
+		return 1;
+	}
+	return 0;
 }
 
-void upgradeINT(int gladid){
-	(g+gladid)->up = 3;
+int upgradeINT(int gladid, int n){
+	if (n > (g+gladid)->up)
+		n = (g+gladid)->up;
+	if (n > 0){
+		(g+gladid)->INT += n;
+		(g+gladid)->ap += 10 * n;
+		(g+gladid)->maxap += 10 * n;
+		(g+gladid)->cs += 0.05 * n;
+		(g+gladid)->sdmg += 0.5 * n;
+		(g+gladid)->up -= n;
+		return 1;
+	}
+	return 0;
 }
 
-float getSimCounter(int gladid){
+float getSimTime(int gladid){
 	return (g+gladid)->time;
 }
 
@@ -156,6 +189,9 @@ float stepBack(int gladid){
 	if ((g+gladid)->hp > 0 && !endsim){
 		
 		float hip = -(g+gladid)->spd*timeInterval;
+		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+			hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+
 		float ang = (g+gladid)->head;
 		float dx, dy;
 		calcSidesFromAngleDist(&dx, &dy, hip, ang);
@@ -181,6 +217,9 @@ float stepLeft(int gladid){
 	if ((g+gladid)->hp > 0 && !endsim){
 		
 		float hip = (g+gladid)->spd*timeInterval;
+		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+			hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+
 		float ang = (g+gladid)->head-90;
 		float dx, dy;
 		calcSidesFromAngleDist(&dx, &dy, hip, ang);
@@ -206,6 +245,9 @@ float stepRight(int gladid){
 	if ((g+gladid)->hp > 0 && !endsim){
 		
 		float hip = (g+gladid)->spd*timeInterval;
+		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+			hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+
 		float ang = (g+gladid)->head+90;
 		float dx, dy;
 		calcSidesFromAngleDist(&dx, &dy, hip, ang);
@@ -413,7 +455,11 @@ float getAp(int gladid){
 }
 
 float getSpeed(int gladid){
-	return (g+gladid)->spd;
+	float spd = (g+gladid)->spd;
+	if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+		spd *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+
+	return spd;
 }
 
 float getHead(int gladid){
@@ -564,7 +610,11 @@ float getTargetHead(int gladid){
 float getTargetSpeed(int gladid){
 	if (isLockedTargetVisibleUnsafe(gladid)){
 		int target = getLockedTarget(gladid);
-        return (g+target)->spd;
+		float spd = (g+target)->spd;
+		if ((g+target)->buffs[BUFF_MOVEMENT].timeleft > 0)
+			spd *= (g+target)->buffs[BUFF_MOVEMENT].value;
+
+        return spd;
 	}
 	else
 		return 0;
@@ -818,7 +868,7 @@ int fireball(int gladid, float x, float y){
 				(g+gladid)->ap -= abilitycost[ABILITY_FIREBALL];
 				float spdx, spdy;
 				calcSidesFromAngleDist(&spdx, &spdy, 1, (g+gladid)->head);
-				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->INT * 0.7, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
+				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->sdmg * 0.7, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
 				r = 1;
 				
 				(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
@@ -850,7 +900,7 @@ int teleport(int gladid, float x, float y){
 			float newhead = getAngleUnsafe(gladid, x, y);
 			(g+gladid)->head = newhead;
 				
-			if (getDistUnsafe(gladid, x, y) <= (g+gladid)->INT + 5){
+			if (getDistUnsafe(gladid, x, y) <= (g+gladid)->sdmg + 5){
 				float dx = x - (g+gladid)->x;
 				float dy = y - (g+gladid)->y;
 				(g+gladid)->x = x;
@@ -860,7 +910,7 @@ int teleport(int gladid, float x, float y){
 			}
 			else{
 				float rx, ry;
-				calcSidesFromMaxDist(gladid, x, y, (g+gladid)->INT + 5, &rx, &ry);
+				calcSidesFromMaxDist(gladid, x, y, (g+gladid)->sdmg + 5, &rx, &ry);
 				(g+gladid)->x += rx;
 				(g+gladid)->y += ry;
 				preventCollision(gladid, x, y);
@@ -942,7 +992,7 @@ int block(int gladid){
 			(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
 			waitForLockedStatus(gladid);
 
-			addBuff(gladid, BUFF_RESIST, 7, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 8));
+			addBuff(gladid, BUFF_RESIST, 7, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 16));
 
 			(g+gladid)->ap -= abilitycost[ABILITY_BLOCK];
 			r = 1;
@@ -975,7 +1025,7 @@ int assassinate(int gladid, float x, float y){
 			if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft > 0)
 				projectiletype = PROJECTILE_TYPE_STUN;
 
-			float damage = (g+gladid)->rdmg;
+			float damage;
 			int bonus = 0;
 			if (!seen || (g+gladid)->buffs[BUFF_INVISIBLE].timeleft > 0)
 				bonus++;
@@ -983,7 +1033,12 @@ int assassinate(int gladid, float x, float y){
 			if ((g+target)->buffs[BUFF_STUN].timeleft > 0)
 				bonus++;
 
-			damage += bonus * (g+gladid)->AGI;
+			if (bonus == 2)
+				damage = (g+gladid)->rdmg * 2.3;
+			else if (bonus == 1)
+				damage = (g+gladid)->rdmg * 1.6;
+			else
+				damage = (g+gladid)->rdmg;
 			/*
 			if (bonus == 2)
 				(g+gladid)->ap += abilitycost[ABILITY_ASSASSINATE];
@@ -1019,7 +1074,7 @@ int ambush(int gladid){
 			(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
 			waitForLockedStatus(gladid);
 
-			addBuff(gladid, BUFF_INVISIBLE, 2 + (g+gladid)->AGI * 0.4, 0);
+			addBuff(gladid, BUFF_INVISIBLE, 2 + (g+gladid)->AGI * 0.2, 0);
 
 			(g+gladid)->ap -= abilitycost[ABILITY_AMBUSH];
 			r = 1;
@@ -1037,9 +1092,14 @@ int ambush(int gladid){
 	return r;
 }
 
+//mostra uma mensagem de fala
 void speak(int gladid, char *message){
 	strncpy((g+gladid)->message, message, 250);
 	(g+gladid)->message[249] = '\0';
 	(g+gladid)->msgtime = 3;
 }
 
+//retorna o nível do gladiador
+int getLvl(int gladid){
+	return (g+gladid)->lvl;
+}

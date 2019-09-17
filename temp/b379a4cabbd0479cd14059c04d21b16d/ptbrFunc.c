@@ -1,3 +1,7 @@
+float pegaTempo(){
+	return getSimTime();
+}
+
 void mudaFOR(int arg){
 	setSTR(arg);
 }
@@ -32,16 +36,16 @@ char* pegaNome(){
 	return name;
 }
 
-void melhoraFOR(){
-	upgradeSTR();
+int melhoraFOR(int n){
+	return upgradeSTR(n);
 }
 
-void melhoraAGI(){
-	upgradeAGI();
+int melhoraAGI(int n){
+	return upgradeAGI(n);
 }
 
-void melhoraINT(){
-	upgradeINT();
+int melhoraINT(int n){
+	return upgradeINT(n);
 }
 
 float passoFrente(){
@@ -274,4 +278,8 @@ int estaLento(){
 
 void fala(char *message){
 	speak(message);
+}
+
+int pegaNivel(){
+	return getLvl();
 }
