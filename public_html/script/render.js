@@ -11,6 +11,7 @@ var json, loadglads = false, startsim = false;
 var loadCache = false;
 var stab, gender;
 var simtimenow;
+var sfxVolume = 1;
 
 var actionlist = [
 	{'name': 'fireball', 'value': 0, 'animation': 'cast'},
@@ -63,8 +64,10 @@ function preload() {
 		game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
 	}	
 
-	game.load.image("background", 'res/layer0.png');
-	game.load.image('background_top', 'res/layer1.png');
+	game.load.image("layer0", 'res/layer0.png');
+	game.load.image('layer1', 'res/layer1.png');
+	game.load.image('layer2', 'res/layer2.png');
+	game.load.image('layer3', 'res/layer3.png');
 	game.load.image('arrow', 'res/arrow.png');
     game.load.image('gas', 'res/gas.png', 50, 50);
 	game.load.spritesheet('fireball', 'res/fireball.png', 64, 64);
@@ -91,7 +94,38 @@ function preload() {
 	game.load.audio('death_male', 'res/audio/death_male.mp3');
 	game.load.audio('death_female', 'res/audio/death_female.mp3');
 	game.load.spritesheet('dummy', 'res/glad.png', 64, 64);
-	game.load.spritesheet('cheer', 'res/cheer.png', 64, 64);
+	game.load.spritesheet('cheer_male', 'res/cheer_male.png', 64, 64);
+	game.load.spritesheet('cheer_female', 'res/cheer_female.png', 64, 64);
+	game.load.spritesheet('cheer_shirt_male', 'res/cheer_shirt_male.png', 64, 64);
+	game.load.spritesheet('cheer_shirt1_female', 'res/cheer_shirt1_female.png', 64, 64);
+	game.load.spritesheet('cheer_shirt2_female', 'res/cheer_shirt2_female.png', 64, 64);
+	game.load.spritesheet('cheer_pants_male', 'res/cheer_pants_male.png', 64, 64);
+	game.load.spritesheet('cheer_pants_female', 'res/cheer_pants_female.png', 64, 64);
+	game.load.spritesheet('cheer_male_hair_parted', 'sprite/Universal-LPC-spritesheet/hair/male/parted.png', 64, 64);
+	game.load.spritesheet('cheer_male_hair_ponytail', 'sprite/Universal-LPC-spritesheet/hair/male/ponytail.png', 64, 64);
+	game.load.spritesheet('cheer_male_hair_mohawk', 'sprite/Universal-LPC-spritesheet/hair/male/mohawk.png', 64, 64);
+	game.load.spritesheet('cheer_male_hair_jewfro', 'sprite/Universal-LPC-spritesheet/hair/male/jewfro.png', 64, 64);
+	game.load.spritesheet('cheer_male_hair_bedhead', 'sprite/Universal-LPC-spritesheet/hair/male/bedhead.png', 64, 64);
+	game.load.spritesheet('cheer_male_shoes', 'sprite/Universal-LPC-spritesheet/feet/shoes/male/black_shoes_male.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_long', 'sprite/Universal-LPC-spritesheet/hair/female/long.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_jewfro', 'sprite/Universal-LPC-spritesheet/hair/female/jewfro.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_loose', 'sprite/Universal-LPC-spritesheet/hair/female/loose.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_longknot', 'sprite/Universal-LPC-spritesheet/hair/female/longknot.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_pixie', 'sprite/Universal-LPC-spritesheet/hair/female/pixie.png', 64, 64);
+	game.load.spritesheet('cheer_female_hair_pixie', 'sprite/Universal-LPC-spritesheet/hair/female/pixie.png', 64, 64);
+	game.load.spritesheet('cheer_female_shoes', 'sprite/Universal-LPC-spritesheet/feet/shoes/female/black_shoes_female.png', 64, 64);
+	game.load.spritesheet('dummy_grey_male', 'res/dummy_grey_male.png', 192, 192);
+	game.load.spritesheet('dummy_grey_female', 'res/dummy_grey_female.png', 192, 192);
+	game.load.spritesheet('royal_male', 'res/royal_male.png', 192, 192);
+	game.load.spritesheet('royal_female', 'res/royal_female.png', 192, 192);
+	game.load.spritesheet('guard_male', 'res/guard_male.png', 192, 192);
+	game.load.spritesheet('guard_female', 'res/guard_female.png', 192, 192);
+	game.load.spritesheet('archer_male', 'res/archer_male.png', 192, 192);
+	game.load.spritesheet('archer_female', 'res/archer_female.png', 192, 192);
+	game.load.spritesheet('king_blue', 'res/king-blue.png', 64, 64);
+	game.load.spritesheet('king_red', 'res/king-red.png', 64, 64);
+	game.load.spritesheet('queen_blue', 'res/queen-blue.png', 64, 64);
+	game.load.spritesheet('queen_red', 'res/queen-red.png', 64, 64);
 	
 	game.load.start();
 	loadCache = true;
@@ -124,8 +158,7 @@ function loadComplete(){
 	$('#loadbar #status').html("Tudo pronto");
 }
 
-var background, back_top;
-var layer_walls, layer_ground, layer_poison;
+var layers = [];
 
 var sprite = new Array();
 var sproj = new Array();
@@ -136,8 +169,8 @@ var clones = new Array();
 
 var poison = (Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate);
 var gasl = [];
-var groupglad;
-
+var groupglad, groupgas;
+var groupnpc = [];
 var bar = {};
 var npc;
 
@@ -145,17 +178,18 @@ function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 	//$('#canvas-div canvas').css('touch-action','pan-y');
-
-	background = game.add.image(0, 0, 'background');
-	back_top = game.add.image(0, 0, 'background_top');
 	
 	groupglad = game.add.group();
 	groupgas = game.add.group();
+	groupnpc.push(game.add.group());
+	groupnpc.push(game.add.group());
 	
-	groupglad.add(background);
-	groupglad.add(back_top);
+	for (let i=0 ; i<=3 ; i++){
+		layers.push(game.add.image(0, 0, 'layer'+i));
+		groupglad.add(layers[i]);
+	}
 	
-	music = game.add.audio('music', 1, true);
+	music = game.add.audio('music', 0.5, true);
 	ending = game.add.audio('ending');
 	victory = game.add.audio('victory');
 
@@ -192,13 +226,126 @@ function create() {
 
 	fillPeople();
 
-	$.each(npc, function(i,v){
+	$.each(npc, function(n,v){
 		let pos = getPosArena(v.x, v.y, true);
-		v.sprite = game.add.sprite(pos.x, pos.y, 'cheer');
-		v.sprite.scale.setTo(game.camera.scale.x, game.camera.scale.y);
-		v.sprite.anchor.setTo(0.5, 0.5);
-		v.sprite.animations.add('cheer', arrayFill(v.start, parseInt(v.start+1)), v.time, true);
-		v.sprite.animations.play('cheer');
+		v.sprite = {};
+		if (n.match(/royalguard\d/g) || n.match(/commonguard\d/g) || n.match(/archer\d/g)){
+			if (v.gender == 'male'){
+				v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_male');
+				if (n.match(/royalguard\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'royal_male');
+				if (n.match(/commonguard\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'guard_male');
+				if (n.match(/archer\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'archer_male');
+			}
+			else{
+				v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_female');
+				if (n.match(/royalguard\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'royal_female');
+				if (n.match(/commonguard\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'guard_female');
+				if (n.match(/archer\d/g))
+					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'archer_female');
+			}
+
+			if (n.match(/royalguard\d/g)){
+				v.sprite.body.animations.add('guard', [v.start-13, v.start, v.start+13, v.start], v.time, false);
+				v.sprite.gear.animations.add('guard', [v.start-13, v.start, v.start+13, v.start], v.time, false);
+				game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+					v.sprite.body.animations.play('guard');
+					v.sprite.gear.animations.play('guard');
+				}, this);
+			}
+			else if (n.match(/commonguard\d/g)){
+				v.sprite.body.animations.add('guard', [v.start, v.start+13], v.time, true);
+				v.sprite.gear.animations.add('guard', [v.start, v.start+13], v.time, true);
+				v.sprite.body.animations.play('guard');
+				v.sprite.gear.animations.play('guard');
+			}
+			else if (n.match(/archer\d/g)){
+				v.sprite.body.animations.add('guard', [v.start, v.start+1, v.start+2, v.start+2, v.start+1, v.start], v.time, false);
+				v.sprite.gear.animations.add('guard', [v.start, v.start+1, v.start+2, v.start+2, v.start+1, v.start], v.time, false);
+				game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+					v.sprite.body.animations.play('guard');
+					v.sprite.gear.animations.play('guard');
+				}, this);
+			}
+
+			v.sprite.body.animations.play('guard');
+			v.sprite.gear.animations.play('guard');
+		}
+		else if (n == 'king' || n == 'queen'){
+			v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_' + v.gender);
+			v.sprite.body.animations.add('watch', [v.start, v.start+1, v.start], v.time, false);
+			v.sprite.body.animations.play('watch');
+			game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+				v.sprite.body.animations.play('watch');
+			}, this);
+
+			if (v.color)
+				v.sprite.gear = game.add.sprite(pos.x, pos.y, n + '_blue');
+			else
+				v.sprite.gear = game.add.sprite(pos.x, pos.y, n + '_red');
+
+			if (v.hair.style != 'no_hair'){
+				v.sprite.hair = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_hair_'+ v.hair.style);
+				v.sprite.hair.animations.add('watch', [v.start], v.time, true);
+				v.sprite.hair.animations.play('watch');
+			}
+		}
+		else{
+			v.sprite.body = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender);
+			
+			if (v.gender == 'female'){
+				if (Math.random() < 0.5)
+					v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt1_female');
+				else
+					v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt2_female');
+			}
+			else
+				v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt_male');
+
+			v.sprite.pants = game.add.sprite(pos.x, pos.y, 'cheer_pants_'+ v.gender);
+			if (v.hair.style != 'no_hair')
+				v.sprite.hair = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_hair_'+ v.hair.style);
+			v.sprite.shoes = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_shoes');
+		}
+		for (let i in v.sprite){
+			groupnpc[v.layer-1].add(v.sprite[i]);
+			v.sprite[i].scale.setTo(game.camera.scale.x, game.camera.scale.y);
+			v.sprite[i].anchor.setTo(0.5, 0.5);
+
+			if (i == 'hair'){
+				let hairFrame = {
+					male: [0,0,7,7,14,14,21,21, 0,0,7,7,14,14,21,21, 63,61,70,69,81,79,88,87],
+					female: [0,173,7,103,14,109,21,115, 3,3,10,10,17,17,24,24]
+				};
+				v.sprite[i].animations.add('cheer', arrayFrame([hairFrame[v.gender][v.start], hairFrame[v.gender][v.start+1]]), v.time, true);
+				v.sprite[i].tint = v.hair.color;
+			}
+			else if (i == 'shoes'){
+				let shoesFrame = {
+					male: [0,0,7,7,14,14,21,21, 0,0,7,7,14,14,21,21, 61,61,69,69,78,78,87,87],
+					female: [0,173,7,103,14,109,21,115, 3,3,10,10,17,17,24,24]
+				};
+				v.sprite[i].animations.add('cheer', arrayFrame([shoesFrame[v.gender][v.start], shoesFrame[v.gender][v.start+1]]), v.time, true);
+			}
+			else{
+				if (i == 'body'){
+					v.sprite[i].tint = v.skin.tint;
+				}
+				else if (i == 'pants' || i == 'shirt'){
+					v.sprite[i].tint = clothesColor();
+				}
+
+				if (v.cheer)
+					v.sprite[i].animations.add('cheer', arrayFill(v.start, parseInt(v.start+1)), v.time, true);
+			}
+
+			if (v.cheer)
+				v.sprite[i].animations.play('cheer');
+		}
 	});
 }
 
@@ -236,6 +383,8 @@ function update() {
 			}
 		}
 		groupglad.add(groupgas);
+		groupglad.add(groupnpc[0]);
+		groupglad.add(groupnpc[1]);
 	
 	}
 	if (nglad > 0 && !loadglads) {
@@ -280,7 +429,7 @@ function update() {
 			gladArray[i].bars.addToWorld();
 		}
 		music.play();
-		music.volume = 0.1;
+		music.volume = $('#sound').data('music');
 		//game.camera.follow(sprite[0]);
 	}
 	else if (sprite.length > 0){
@@ -320,7 +469,7 @@ function update() {
 					groupglad.add(lvlup);
 					lvlup.animations.add('levelup', null, 15, false);
 					lvlup.animations.play('levelup', null, false, true);
-					game.add.audio('lvlup').play();
+					game.add.audio('lvlup', sfxVolume).play();
 				}
 				
 				if (hp != gladArray[i].hp) {
@@ -333,7 +482,7 @@ function update() {
 						fire.height = 3 * arenaRate;
 						fire.animations.add('explode', null, 15, true);
 						fire.animations.play('explode', null, false, true);
-						game.add.audio('explosion').play();
+						game.add.audio('explosion', sfxVolume).play();
 					}
 						
 					gladArray[i].hp = hp;
@@ -343,10 +492,10 @@ function update() {
 					if (gladArray[i].alive){
 						sprite[i].animations.play('die');
 						if (gender[newindex[i]] == "male"){
-							game.add.audio('death_male').play();
+							game.add.audio('death_male', sfxVolume).play();
 						}
 						else{
-							game.add.audio('death_female').play();
+							game.add.audio('death_female', sfxVolume).play();
 						}
 					}
 					gladArray[i].alive = false;
@@ -362,10 +511,10 @@ function update() {
 							sprite[i].animations.play(anim, 50, true);
 							gladArray[i].charge = true;
 							if (gender[newindex[i]] == "male"){
-								game.add.audio('charge_male').play();
+								game.add.audio('charge_male', sfxVolume).play();
 							}
 							else{
-								game.add.audio('charge_female').play();
+								game.add.audio('charge_female', sfxVolume).play();
 							}
 						}
 					}
@@ -388,7 +537,7 @@ function update() {
 							gladArray[i].fade = 1;
 							gladArray[i].x = sprite[i].x;
 							gladArray[i].y = sprite[i].y;
-							game.add.audio('teleport').play();
+							game.add.audio('teleport', sfxVolume).play();
 						}
 						if (actionlist[action].name == "assassinate"){
 							gladArray[i].assassinate = true;
@@ -397,10 +546,10 @@ function update() {
 							gladArray[i].block = false;
 						}
 						if (actionlist[action].name == "ranged"){
-							game.add.audio('ranged').play();
+							game.add.audio('ranged', sfxVolume).play();
 						}
 						if (actionlist[action].name == "melee"){
-							game.add.audio('melee').play();
+							game.add.audio('melee', sfxVolume).play();
 						}
 							
 					}
@@ -414,7 +563,7 @@ function update() {
 				
 				if (gladArray[i].invisible){
 					if (sprite[i].alpha >= 1)
-						game.add.audio('ambush').play();
+						game.add.audio('ambush', sfxVolume).play();
 					if (sprite[i].alpha > 0.3)
 						sprite[i].alpha -= 0.05;
 				}
@@ -455,7 +604,7 @@ function update() {
 					groupglad.add(gladArray[i].stun);
 					gladArray[i].stun.animations.add('stun', null, 15, true);
 					gladArray[i].stun.animations.play('stun', null, true, false);
-					game.add.audio('stun').play();
+					game.add.audio('stun', sfxVolume).play();
 				}
 				else if (gladArray[i].stun && (json.glads[i].buffs.stun.timeleft <= 0.1 || !gladArray[i].alive)){
 					gladArray[i].stun.destroy();
@@ -472,7 +621,7 @@ function update() {
 					shield.animations.add('shield', null, 15, false);
 					shield.animations.play('shield', null, false, true);
 					shield.alpha = 0.5;
-					game.add.audio('block').play();
+					game.add.audio('block', sfxVolume).play();
 				}
 				else if (gladArray[i].block && json.glads[i].buffs.resist.timeleft <= 0.1){
 					gladArray[i].block = false;
@@ -488,7 +637,7 @@ function update() {
 							var anim = 'stab-' + getActionDirection(head);
 						sprite[i].animations.stop();
 						sprite[i].animations.play(anim, 20);
-						game.add.audio('melee').play();
+						game.add.audio('melee', sfxVolume).play();
 					}
 					else if (actionlist[action].name != "charge"){
 						sprite[i].animations.currentAnim.speed = 15;
@@ -541,7 +690,7 @@ function update() {
 					spr = game.add.sprite(0, 0, 'fireball');
 					spr.animations.add('fireball', arrayFill(0,7), 15, true);
 					spr.animations.play('fireball');
-					game.add.audio('fireball').play();
+					game.add.audio('fireball', sfxVolume).play();
 				}
 				else if (json.projectiles[i].type == 2){ //stun
 					spr = game.add.sprite(0, 0, 'arrow');
@@ -553,7 +702,7 @@ function update() {
 					gladArray[json.projectiles[i].owner].assassinate = false;
 					spr = game.add.sprite(0, 0, 'arrow');
 					spr.tint = 0xFF0000;
-					game.add.audio('assassinate').play();
+					game.add.audio('assassinate', sfxVolume).play();
 				}
 								
 				spr.anchor.setTo(0.5, 0.5);
@@ -578,10 +727,10 @@ function update() {
 				fire.height = 3 * arenaRate;
 				fire.animations.add('explode', null, 15, true);
 				fire.animations.play('explode', null, false, true);
-				game.add.audio('explosion').play();
+				game.add.audio('explosion', sfxVolume).play();
 			}
 			else{
-				game.add.audio('arrow_hit').play();
+				game.add.audio('arrow_hit', sfxVolume).play();
 			}
 			
 			sproj[x].sprite.destroy();
@@ -596,10 +745,14 @@ function update() {
 		if (!gladArray[i].alive)
 			groupglad.sendToBack(sprite[i]);
 	}
-	
-	groupglad.sendToBack(background);
+		
+	groupglad.sendToBack(layers[0]);
 	groupglad.bringToTop(groupgas);
-	groupglad.bringToTop(back_top);
+	groupglad.bringToTop(layers[1]);
+	groupglad.bringToTop(groupnpc[0]);
+	groupglad.bringToTop(layers[2]);
+	groupglad.bringToTop(groupnpc[1]);
+	groupglad.bringToTop(layers[3]);
 
 	if (game.input.mouse.drag){
 		if (game.camera.target){
@@ -800,17 +953,43 @@ function debugTimer(){
 }
 
 $(window).keydown(function(event) {
-	if(event.keyCode == Phaser.Keyboard.F)
-		showFPS = (showFPS + 1) % 2;
+	if(event.keyCode == Phaser.Keyboard.S){
+		$('#sound').click();
+	}
 
-	if(event.keyCode == Phaser.Keyboard.B)
+	if(event.keyCode == Phaser.Keyboard.F){
+		showFPS = (showFPS + 1) % 2;
+	
+		$.post("back_play.php", {
+			action: "SET_PREF",
+			show_fps: (showFPS == 1)
+		});
+	}
+
+	if(event.keyCode == Phaser.Keyboard.B){
 		showbars = (showbars + 1) % 2;
+	
+		$.post("back_play.php", {
+			action: "SET_PREF",
+			show_bars: (showbars == 1)
+		});
+	}
 
 	if(event.keyCode == Phaser.Keyboard.M){
-		if ($('#ui-container').css('display') == 'flex')
+		var showFrames;
+		if ($('#ui-container').css('display') == 'flex'){
 			$('#ui-container').fadeOut();
-		else
+			showFrames = false;
+		}
+		else{
 			$('#ui-container').fadeIn();
+			showFrames = true;
+		}
+
+		$.post("back_play.php", {
+			action: "SET_PREF",
+			show_frames: showFrames
+		});
 	}
 
 	if(event.keyCode == Phaser.Keyboard.SPACEBAR)
@@ -968,68 +1147,82 @@ function getPosArena(x, y, absolute=false){
 }
 
 function fillPeople(){
+
+	var realmColor = Math.floor(Math.random() * 2);
+
 	npc = {
-		king: 			{x: 20, y: 7},
-		queen:			{x: 21, y: 7},
-		counselor1:		{x: 19, y: 6.5},
-		counselor2:		{x: 22, y: 6.5},
-		royalguard1:	{x: 16, y: 4},
-		royalguard2:	{x: 25, y: 4},
-		archer1:		{x: 4, y: 3},
-		archer2:		{x: 39, y: 1},
-		archer3:		{x: 21, y: 39},
-		commonguard1:	{x: 2, y: 9},
-		commonguard2:	{x: 39, y: 9},
-		commonguard3:	{x: 2, y: 40},
-		commonguard4:	{x: 39, y: 40},
+		king: 			{x: 20, y: 7.3, start: 2*13, heading: 'down', gender: 'male', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
+		queen:			{x: 21, y: 7.3, start: 2*13, heading: 'down', gender: 'female', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
+		counselor1:		{x: 19, y: 6.7, start: 4, gender: 'male'},
+		counselor2:		{x: 22, y: 6.7, start: 4, gender: 'male'},
+		royalguard1:	{x: 16, y: 4, start: 6*13, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
+		royalguard2:	{x: 25, y: 4, start: 6*13, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
+		archer1:		{x: 4, y: 3, start: 18*13, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
+		archer2:		{x: 39, y: 1, start: 18*13, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
+		archer3:		{x: 21, y: 39, start: 16*13, heading: 'up', time: 8, interval: (Math.random() * 2 + 7)},
+		commonguard1:	{x: 2, y: 9, start: 6*13, heading: 'down', time: Math.random() * 0.1 + 0.1},
+		commonguard2:	{x: 39, y: 9, start: 5*13, heading: 'left', time: Math.random() * 0.1 + 0.1},
+		commonguard3:	{x: 2, y: 40, start: 7*13, heading: 'right', time: Math.random() * 0.1 + 0.1},
+		commonguard4:	{x: 39, y: 40, start: 4*13, heading: 'up', time: Math.random() * 0.1 + 0.1},
 	};	
+
+	var gender = [{name: 'male', anims: 3, prob: 0.7}, {name: 'female', anims: 2, prob: 0.3}];
+
+	for (let i in npc){
+		npc[i].layer = 1;
+		if (!npc[i].skin)
+			npc[i].skin = skinColor(i);
+		if (!npc[i].gender)
+			npc[i].gender = gender[weightedRoll([gender[0].prob, gender[1].prob])].name;
+		npc[i].hair = getHair(npc[i].skin.name, npc[i].gender);
+	}
 
 	arenaSpaces = [
 		//left top
-		{x: 2.4, y: 9, axis: 1, capacity: 31, fill: 0.3, heading: 'right'},
-		{x: 3.4, y: 9.3, axis: 1, capacity: 31, fill: 0.4, heading: 'right'},
+		{x: 2.4, y: 10.1, axis: 1, capacity: 29, fill: 0.3, heading: 'right', layer: 1},
+		{x: 3.4, y: 10.4, axis: 1, capacity: 29, fill: 0.4, heading: 'right', layer: 1},
 
 		//left bottom
-		{x: 5.4, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'right'},
-		{x: 6.4, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'right'},
+		{x: 5.4, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'right', layer: 1},
+		{x: 6.4, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'right', layer: 1},
 
 		//right bottom
-		{x: 34.6, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'left'},
-		{x: 35.6, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'left'},
+		{x: 34.6, y: 11.3, axis: 1, capacity: 28, fill: 0.6, heading: 'left', layer: 1},
+		{x: 35.6, y: 11, axis: 1, capacity: 29, fill: 0.5, heading: 'left', layer: 1},
 
 		//right top
-		{x: 37.6, y: 9.3, axis: 1, capacity: 31, fill: 0.4, heading: 'left'},
-		{x: 38.6, y: 9, axis: 1, capacity: 31, fill: 0.3, heading: 'left'},
+		{x: 37.6, y: 11.5, axis: 1, capacity: 29, fill: 0.4, heading: 'left', layer: 1},
+		{x: 38.6, y: 11.2, axis: 1, capacity: 29, fill: 0.3, heading: 'left', layer: 1},
 
 
 		//top top left
-		{x: 8, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down'},
-		{x: 8.1, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down'},
+		{x: 8, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down', layer: 1},
+		{x: 8.1, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down', layer: 2},
 
 		//top bottom left
-		{x: 8, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down'},
-		{x: 8.1, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down'},
+		{x: 8, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down', layer: 1},
+		{x: 8.1, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down', layer: 2},
 
 		//top top right
-		{x: 28, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down'},
-		{x: 26.9, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down'},
+		{x: 28, y: 5, axis: 0, capacity: 6, fill: 0.7, heading: 'down', layer: 1},
+		{x: 26.9, y: 5.5, axis: 0, capacity: 7, fill: 0.8, heading: 'down', layer: 2},
 
 		//top bottom right
-		{x: 26, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down'},
-		{x: 25.9, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down'},
+		{x: 26, y: 9, axis: 0, capacity: 8, fill: 0.5, heading: 'down', layer: 1},
+		{x: 25.9, y: 9.5, axis: 0, capacity: 8, fill: 0.6, heading: 'down', layer: 2},
 
 
 		//bottom botom left
-		{x: 7, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up'},
+		{x: 7, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up', layer: 1},
 
 		//bottom top left
-		{x: 5, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up'},
+		{x: 5, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up', layer: 2},
 
 		//bottom bottom right
-		{x: 25, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up'},
+		{x: 25, y: 39.5, axis: 0, capacity: 10, fill: 0.6, heading: 'up', layer: 1},
 
 		//bottom top right
-		{x: 25, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up'},
+		{x: 25, y: 40.5, axis: 0, capacity: 12, fill: 0.4, heading: 'up', layer: 2},
 	];
 
 	var headArray = {up: [0, 8, 16], left: [2, 10, 18], down: [4, 12, 20], right: [6, 14, 22]};
@@ -1044,15 +1237,214 @@ function fillPeople(){
 				else
 					xinc = i;
 
+				var skin = skinColor();
+				var genderroll = gender[weightedRoll([gender[0].prob, gender[1].prob])];
 				npc['people'+n] = {
 					x: arenaSpaces[j].x + xinc,
 					y: arenaSpaces[j].y + yinc,
 					heading: arenaSpaces[j].heading,
-					start: headArray[arenaSpaces[j].heading][parseInt(Math.random()*3)],
-					time: Math.random()*6 + 2
+					time: Math.random()*6 + 2,
+					layer: arenaSpaces[j].layer,
+					skin: skin,
+					gender: genderroll.name,
+					hair: getHair(skin.name, genderroll.name),
+					anims: genderroll.anims,
+					start: headArray[arenaSpaces[j].heading][parseInt(Math.random() * genderroll.anims)],
+					cheer: true
 				};
 				n++;
 			}
 		}
 	}
+}
+
+function clothesColor(){
+	var r = 0, g = 0, b = 0, v = 0;
+	//pure color
+	let s = Math.random();
+	if (s < 0.15){
+		v = Math.round(Math.random() * 200 + 50 ).toString(16);
+		r = v;
+		g = v;
+		b = v;
+	}
+	else{
+		if (s < 0.5){
+			let c = Math.random();
+			if (c < 0.4)
+				r = 230;
+			else if (c < 0.6)
+				g = 180;
+			else
+				b = 200;
+		}
+		else{
+			r = 150;
+			g = 150;
+			b = 150;
+		}
+
+		r = Math.round(Math.random() * r).toString(16);
+		g = Math.round(Math.random() * g).toString(16);
+		b = Math.round(Math.random() * b).toString(16);
+	}
+
+
+	if (r.length < 2)
+		r = "0" + r;
+	if (g.length < 2)
+		g = "0" + g;
+	if (b.length < 2)
+		b = "0" + b;
+
+	var color = '0x' + r + g + b;
+	//console.log(color);
+	return color;
+}
+
+//convert frames into new array of frames counting blank frames from spritesheet
+function arrayFrame(frames){
+	var maxcol = 13;
+	var moves = [7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 6, 6, 6, 6, 13, 13, 13, 13];
+	var movei;
+	var frame;
+	var newframes = [];
+	var sum;
+
+	for (let i in frames){
+		frame = 0;
+		movei = 0;
+		sum = 0;
+
+		while (frames[i] >= frame){
+			if (frame + moves[movei] > frames[i]){
+				newframes.push(sum + frames[i] - frame);
+				break;
+			}
+			else{
+				sum += maxcol;
+				frame += moves[movei];
+				movei++;
+			}
+		}
+	}
+	return newframes;
+}
+
+function getHair(skin, gender){
+	var r = 0, g = 0, b = 0, v = 0;
+
+	var chances = {
+		color: {
+			light: [0.1, 0.25],
+			black: [0, 0],
+			tanned: [0.05, 0.15],
+			dark: [0, 0.05],
+			darkelf: [0.2, 0.4],
+			red_orc: [0.1, 0.1]
+		},
+		style: {
+			male: {
+				light: [0.25, 0.3, 0.1, 0.05, 0.3, 0.1],
+				black: [0.05, 0.05, 0.2, 0.4, 0.1, 0.4],
+				tanned: [0.35, 0.2, 0.1, 0.05, 0.3, 0.1],
+				dark: [0.15, 0.1, 0.2, 0.3, 0.25, 0.3],
+				darkelf: [0.3, 0.1, 0, 0, 0, 0.8],
+				red_orc: [0.15, 0, 0.3, 0.05, 0.1, 0.5]
+			},
+			female: {
+				light: [0.3, 0.05, 0.3, 0.3, 0.2, 0],
+				black: [0.1, 0.6, 0.15, 0.3, 0.3, 0.02],
+				tanned: [0.3, 0.2, 0.3, 0.3, 0.2, 0.01],
+				dark: [0.2, 0.3, 0.2, 0.2, 0.3, 0.02],
+				darkelf: [0.1, 0, 0.1, 0.4, 0.3, 0.2],
+				red_orc: [0.1, 0.05, 0.1, 0.2, 0.3, 0.2]
+			}
+		}
+	}
+
+	var s = Math.random();
+	//redhead
+	if (s < chances.color[skin][0]){
+		r = Math.random() * 90 + 110;
+		g = Math.random() * 55 + 70;
+		b = Math.random() * 25 + 55;
+	}
+	//blonde
+	else if (s < chances.color[skin][1] + chances.color[skin][0]){
+		r = Math.random() * 70 + 160;
+		g = r * 0.8;
+	}
+	//brunette - black
+	else{
+		r = Math.random() * 70 + 30;
+		g = r * 0.75;
+		b = Math.random() * 30 + 20;
+	}
+	r = Math.round(r).toString(16);
+	g = Math.round(g).toString(16);
+	b = Math.round(b).toString(16);
+
+	if (r.length < 2)
+		r = "0" + r;
+	if (g.length < 2)
+		g = "0" + g;
+	if (b.length < 2)
+		b = "0" + b;
+
+	var color = '0x' + r + g + b;
+
+	var hairstyle = {
+		male: ['ponytail', 'parted', 'mohawk', 'jewfro', 'bedhead', 'no_hair'],
+		female: ['long', 'jewfro', 'loose', 'longknot', 'pixie', 'no_hair']
+	}
+
+	var h = weightedRoll(chances.style[gender][skin]);
+	var style = hairstyle[gender][h];
+
+	//console.log(color);
+	return {color: color, style: style};
+}
+
+function skinColor(name){
+	var skins = {
+		light: {chance: 0.35, tint: '0xfdd5b7'},
+		black: {chance: 0.1, tint: '0x61382d'},
+		tanned: {chance: 0.25, tint: '0xfdd082'},
+		dark: {chance: 0.2, tint: '0xba8454'},
+		darkelf: {chance: 0.05, tint: '0xaeb3ca'},
+		red_orc: {chance: 0.05, tint: '0x568b33'},
+	}
+
+	if (name == 'king' || name == 'queen'){
+		skins.darkelf.chance = 0;
+		skins.red_orc.chance = 0;
+		skins.light.chance = 0.4;
+		skins.tanned.chance = 0.3;
+	}
+
+	var s = Math.random();
+	for (let i in skins){
+		if (s < skins[i].chance)
+			return {name: i, tint: skins[i].tint};
+		else
+			s -= skins[i].chance;
+	}
+}
+
+function weightedRoll(probs){
+	var sum = 0;
+	for (let i in probs)
+		sum += probs[i];
+	for (let i in probs)
+		probs[i] = probs[i] / sum;
+
+	var roll = Math.random();
+	for (let i in probs){
+		if (roll < probs[i])
+			return i;
+		else
+			roll -= probs[i];
+	}
+	return -1;
 }

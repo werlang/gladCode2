@@ -9,6 +9,7 @@ var stepIncrement = 1;
 var istep;
 var tournHash, loghash;
 var fullscreen = false;
+var sfxVolume = 1;
 
 $(document).ready( function() {
 	$('#loadbar #status').html("Página carregada");
@@ -28,6 +29,25 @@ $(document).ready( function() {
 		else{
 			loghash = $('#log').html();
 			queryLog();
+
+			$.post("back_play.php", {
+				action: "GET_PREF"
+			}).done( function(data){
+				//console.log(data);
+				data = JSON.parse(data);
+				showbars = (data.show_bars === true || data.show_bars == 'true');
+				showFPS = (data.show_fps === true || data.show_fps == 'true');
+
+				$('#sound').data('music', parseFloat(data.music_volume));
+				sfxVolume = parseFloat(data.sfx_volume);
+				$('#sound').data('sfx', parseFloat(data.sfx_volume));
+				changeSoundIcon();
+
+				if (data.show_frames === true || data.show_frames == 'true')
+					$('#ui-container').fadeIn();
+				else
+					$('#ui-container').fadeOut();
+			});
 		}
 		
 		function queryLog(){
@@ -207,7 +227,7 @@ $(document).ready( function() {
 	});
 
 	$('#help').click( function(){
-		$('body').append("<div id='fog'><div id='help-window' class='blue-window'><div id='content'><h2>Controle da câmera</h2><div class='table'><div class='row'><div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div><div class='cell'>Mover a câmera</div></div><div class='row'><div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div><div class='cell'>Zoom da arena</div></div><div class='row'><div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div><div class='cell'>Acompanhar um gladiador</div></div></div><h2>Teclas de atalho</h2><div class='table'><div class='row'><div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div></div><div class='row'><div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div></div><div class='row'><div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div></div><div class='row'><div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div></div><div class='row'><div class='cell'><span class='key'>A</span></div><div class='cell'>Retroceder simulação</div></div><div class='row'><div class='cell'><span class='key'>D</span></span></div><div class='cell'>Avançar simulação</div></div></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
+		$('body').append("<div id='fog'><div id='help-window' class='blue-window'><div id='content'><h2>Controle da câmera</h2><div class='table'><div class='row'><div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div><div class='cell'>Mover a câmera</div></div><div class='row'><div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div><div class='cell'>Zoom da arena</div></div><div class='row'><div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div><div class='cell'>Acompanhar um gladiador</div></div></div><h2>Teclas de atalho</h2><div class='table'><div class='row'><div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div></div><div class='row'><div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div></div><div class='row'><div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div></div><div class='row'><div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div></div><div class='row'><div class='cell'><span class='key'>A</span></div><div class='cell'>Retroceder simulação</div></div><div class='row'><div class='cell'><span class='key'>D</span></div><div class='cell'>Avançar simulação</div></div><div class='row'><div class='cell'><span class='key'>S</span></div><div class='cell'>Liga/desliga Música e efeitos sonoros</div></div></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
 
 		$('#help-window #ok').click( function(){
 			$('#fog').remove();
@@ -215,7 +235,41 @@ $(document).ready( function() {
 	});
 
 	$('#settings').click( function(){
-		$('body').append("<div id='fog'><div id='settings-window' class='blue-window'><h2>Preferências</h2><div class='check-container'><div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap</label></div><div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores</label></div><div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS)</label></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
+		$('body').append("<div id='fog'><div id='settings-window' class='blue-window'><h2>Preferências</h2><div class='check-container'><div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap</label></div><div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores</label></div><div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS)</label></div><div id='volume-container'><h3>Volume do áudio</h3><p>Efeitos sonoros</p><div id='sfx-volume'></div><p>Música</p><div id='music-volume'></div></div></div><div id='button-container'><button class='button' id='ok'>OK</button></div></div></div>");
+
+		var soundtest = game.add.audio('lvlup');
+		$( "#sfx-volume" ).slider({
+			range: "min",
+			min: 0,
+			max: 1,
+			step: 0.01,
+			create: function( event, ui ) {
+				$(this).slider('value', sfxVolume);
+			},
+			slide: function( event, ui ) {
+				sfxVolume = ui.value;
+				soundtest.stop();
+				soundtest.play('', 0.5, sfxVolume);
+
+				changeSoundIcon();
+			},
+		});
+
+		$( "#music-volume" ).slider({
+			range: "min",
+			min: 0,
+			max: 0.1,
+			value: 0.1,
+			step: 0.001,
+			create: function( event, ui ) {
+				$(this).slider('value', music.volume);
+			},
+			slide: function( event, ui ) {
+				music.volume = ui.value;
+
+				changeSoundIcon();
+			},
+		});
 
 		if (showbars)
 			$('#pref-bars input').prop('checked', true);
@@ -229,6 +283,15 @@ $(document).ready( function() {
 		});
 	
 		$('#settings-window #ok').click( function(){
+			$.post("back_play.php", {
+				action: "SET_PREF",
+				show_bars: showbars,
+				show_frames: $('#pref-frames input').prop('checked'),
+				show_fps: showFPS,
+				sfx_volume: sfxVolume,
+				music_volume: music.volume,
+			});
+
 			$('#fog').remove();
 		});
 
@@ -253,6 +316,42 @@ $(document).ready( function() {
 				showFPS = false;
 		});		
 	});
+
+	$('#sound').click( function(){
+		if (music.volume > 0){
+			$(this).data('music', music.volume);
+			music.volume = 0;
+		}
+		else if (sfxVolume > 0){
+			$(this).data('sfx', sfxVolume);
+			sfxVolume = 0;
+		}
+		else{
+			music.volume = $(this).data('music');
+			if (music.volume == 0)
+				music.volume = 0.1;
+	
+			sfxVolume = $(this).data('sfx');
+			if (sfxVolume == 0)
+				sfxVolume = 1;
+		}
+		changeSoundIcon();
+
+		$.post("back_play.php",{
+			action: "SET_PREF",
+			music_volume: music.volume,
+			sfx_volume: sfxVolume
+		});
+	})
+
+	function changeSoundIcon(){
+		if ((!music && parseFloat($('#sound').data('music')) > 0) || (music && music.volume > 0))
+			$('#sound').find('img').prop('src','icon/music.png');
+		else if (sfxVolume > 0)
+			$('#sound').find('img').prop('src','icon/music-off.png');
+		else
+			$('#sound').find('img').prop('src','icon/mute.png');
+	}
 	
 	$( "#time" ).slider({
 		range: "min",
@@ -440,7 +539,7 @@ function start_timer(steps){
 					$('#end-message').hide();
 					$('#end-message').fadeIn(1000);
 					music.pause();
-					victory.play();
+					victory.play('', 0, music.volume / 0.1);
 				}
 			}
 			else if (!show_final_score){

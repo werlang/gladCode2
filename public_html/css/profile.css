@@ -1991,15 +1991,23 @@ body{
 	justify-content: space-around;
 }
 
-.tourn-box #options #maxteams {
+.tourn-box #options .col {
 	display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.tourn-box #options #maxteams input {
+.tourn-box #options .col input {
 	text-align: center;
 	width: 80px;
+}
+
+.tourn-box #options #maxtime input {
+	width: 140px;
+}
+
+.tourn-box #options .col span {
+	text-align: center;
 }
 
 .tourn-box #options label {

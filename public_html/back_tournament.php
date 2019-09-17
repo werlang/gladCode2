@@ -9,19 +9,34 @@
         $name = mysql_escape_string($_POST['name']);
         $pass = mysql_escape_string($_POST['pass']);
         $desc = mysql_escape_string($_POST['desc']);
-        $max = mysql_escape_string($_POST['max']);
+        $maxteams = mysql_escape_string($_POST['maxteams']);
+        $maxtime = mysql_escape_string($_POST['maxtime']);
         $flex = mysql_escape_string($_POST['flex']);
         if ($flex == "true")
             $flex = 1;
         else
             $flex = 0;
 
+        if ($maxteams < 2)
+            $maxteams = 2;
+        if ($maxteams > 50)
+            $maxteams = 50;
+
+        $maxtime = implode(":", explode("h", $maxtime));
+        $maxtime = implode("", explode(" ", $maxtime));
+        $maxtime = implode("", explode("m", $maxtime));
+        
+        if ($maxtime[strlen($maxtime)-1] == ':')
+            $maxtime .= "00";
+        elseif (count(explode(":", $maxtime)) == 1 )
+        	$maxtime = "00:". $maxtime;
+
         $sql = "SELECT * FROM tournament WHERE name = '$name'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
 
         if ($nrows == 0){
-            $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$max', '$flex');";
+            $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
             echo $hash;
         }
@@ -621,11 +636,12 @@
 
         $output = array();
 
-        $sql = "SELECT t.id AS id FROM tournament t WHERE t.name = '$tname' AND t.password = '$tpass' AND t.manager = '$user' AND t.hash = ''";
+        $sql = "SELECT t.id AS id, t.maxtime FROM tournament t WHERE t.name = '$tname' AND t.password = '$tpass' AND t.manager = '$user' AND t.hash = ''";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
         $row = $result->fetch_assoc();
         $tournid = $row['id'];
+        $maxtime = $row['maxtime'];
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
@@ -656,7 +672,7 @@
                     $ngroups = ceil($nteams / 5);
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
-                        $sql = "INSERT INTO groups(round, creation) VALUES ('1', now())";
+                        $sql = "INSERT INTO groups(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
                         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                         array_push($groups, $conn->insert_id);
                     }

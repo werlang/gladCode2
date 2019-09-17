@@ -4,23 +4,29 @@ var images = [
 	{'id': 'female', 'path': 'female.png', 'png': true, 'height': 256, 'width': 256, 'parent': 'gender'},
 	//male body
 	{'id': 'male-light', 'path': 'body/male/light.png', 'parent': 'shape', 'req': 'male', 'layer': 0, 'default': true},
-	{'id': 'male-dark', 'path': 'body/male/dark.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-	{'id': 'male-dark2', 'path': 'body/male/dark2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-	{'id': 'male-darkelf', 'path': 'body/male/darkelf.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-	{'id': 'male-darkelf2', 'path': 'body/male/darkelf2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	{'id': 'male-tanned', 'path': 'body/male/tanned.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	{'id': 'male-tanned2', 'path': 'body/male/tanned2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-olive', 'path': 'body/male/man_olive.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-dark', 'path': 'body/male/dark.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-brown', 'path': 'body/male/man_brown.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-dark2', 'path': 'body/male/dark2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-black', 'path': 'body/male/man_black.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-darkelf2', 'path': 'body/male/darkelf2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+	{'id': 'male-darkelf', 'path': 'body/male/darkelf.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	{'id': 'male-orc', 'path': 'body/male/orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	{'id': 'male-red_orc', 'path': 'body/male/red_orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	{'id': 'skeleton', 'path': 'body/male/skeleton.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
 	//female body
 	{'id': 'female-light', 'path': 'body/female/light.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-	{'id': 'female-dark', 'path': 'body/female/dark.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-	{'id': 'female-dark2', 'path': 'body/female/dark2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-	{'id': 'female-darkelf', 'path': 'body/female/darkelf.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-	{'id': 'female-darkelf2', 'path': 'body/female/darkelf2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
 	{'id': 'female-tanned', 'path': 'body/female/tanned.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
 	{'id': 'female-tanned2', 'path': 'body/female/tanned2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-olive', 'path': 'body/female/woman_olive.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-dark', 'path': 'body/female/dark.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-brown', 'path': 'body/female/woman_brown.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-dark2', 'path': 'body/female/dark2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-black', 'path': 'body/female/woman_black.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-darkelf2', 'path': 'body/female/darkelf2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+	{'id': 'female-darkelf', 'path': 'body/female/darkelf.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
 	{'id': 'female-orc', 'path': 'body/female/orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
 	{'id': 'female-red_orc', 'path': 'body/female/red_orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
 	//hair style
@@ -325,8 +331,8 @@ function fetchSpritesheet(json) {
 		if (getImage(json[i]))
 			selectedArray.push(getImage(json[i]));
 	}
-	if (!validate_skin(selectedArray))
-		errorload = true;
+	//if (!validate_skin(selectedArray))
+	//	errorload = true;
 	
 	if (!errorload){
 		selectedArray.sort(function(a, b){

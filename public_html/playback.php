@@ -62,6 +62,7 @@
 					<div class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></div>
 					<div class='button' id='fowd-step' title='Avançar simulação'><div class='speed'>1x</div></div>
 					<div class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png' hidden><img id='img-pause' src='icon/pause.png'></div>
+					<div class='button' id='sound' title='Áudio normal/mudo'><img src='icon/music.png'></div>
 					<div class='button' id='help' title='Ajuda'><img src='icon/question.png'></div>
 				</div>
 			</div>
