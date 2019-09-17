@@ -60,7 +60,7 @@
     
             //get info from tournament, lasttime and dead
             $alive = "SELECT count(*) FROM group_teams grt INNER JOIN groups gr ON gr.id = grt.groupid INNER JOIN teams te2 ON te2.id = grt.team INNER JOIN gladiator_teams glt ON te2.id = glt.team WHERE (glt.dead = '0' OR glt.dead >= '$round') AND gr.round = '$round' AND te.id = te2.id";
-            $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, t.name AS tname, t.description, te.name, grt.groupid, ($alive) AS alive, grt.lasttime, gr.locked, gr.creation FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round' ORDER BY grt.groupid, grt.lasttime DESC";
+            $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, t.name AS tname, t.description, te.name, grt.groupid, ($alive) AS alive, grt.lasttime, gr.locked, gr.deadline FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round' ORDER BY grt.groupid, grt.lasttime DESC";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
             $nrows = $result->num_rows;
@@ -72,7 +72,7 @@
                         $output['tournament']['name'] = $row['tname'];
                         $output['tournament']['description'] = $row['description'];
                         $output['tournament']['round'] = $round;
-                        $output['tournament']['creation'] = $row['creation'];
+                        $output['tournament']['deadline'] = $row['deadline'];
                     }
     
                     $team = array();
@@ -199,7 +199,7 @@
         $round = mysql_escape_string($_POST['round']);
 
         //check if there is any battle left to be done
-        $sql = "SELECT gr.creation FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
+        $sql = "SELECT gr.deadline FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
         
@@ -207,13 +207,12 @@
         if ($nrows == 0)
             $nextround = true;
         else{
-            //calc time left to end 24h time limit to choose since round creation
+            //check of time is up for a new round
             $row = $result->fetch_assoc();
-            $creation = (new DateTime($row['creation']))->getTimestamp();
+            $deadline = (new DateTime($row['deadline']))->getTimestamp();
             $now = (new DateTime())->getTimestamp();
-            $timeleft = 86400 - ($now - $creation);
 
-            if ($timeleft <= 0)
+            if ($now > $deadline)
                 $timeup = true;
         }
 
@@ -316,10 +315,11 @@
         $hash = mysql_escape_string($_POST['hash']);
 
         //max round number found
-        $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
+        $sql = "SELECT max(gr.round) AS maxround, t.maxtime FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $row = $result->fetch_assoc();
         $maxround = $row['maxround'];
+        $maxtime = $row['maxtime'];
 
         //get id from groups on the last round
         $sql = "SELECT DISTINCT gr.log FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND gr.round = $maxround";
@@ -438,7 +438,7 @@
                 $remteams = $nteams;
                 $teami = 0;
                 for ($i=0 ; $i<$ngroups ; $i++){
-                    $sql = "INSERT INTO groups(round, creation) VALUES ('$newround', now())";
+                    $sql = "INSERT INTO groups(round, deadline) VALUES ('$newround', ADDTIME(now(), TIME('$maxtime')))";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                     $group = $conn->insert_id;
 

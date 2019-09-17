@@ -169,15 +169,13 @@ $(document).ready( function() {
                 $('#button-container .arrow').addClass('nobutton');
             }
 
-            var timecreation = new Date(data.tournament.creation);
-            var timenow = new Date();
-            var timediff = timenow - timecreation;
-
+            var deadline = new Date(data.tournament.deadline);
             countDown();
             function countDown() {
                 setTimeout( function(){
-                    var timeleft = msToTime(86400000 - timediff);
-                    timediff += 1000;
+                    var timenow = new Date();
+                    var timediff = deadline - timenow;
+                    var timeleft = msToTime(timediff);
                     
                     $('#timeleft .numbers').each( function(index, obj){
                         if (parseInt(timeleft[index]) != parseInt($(obj).text())){

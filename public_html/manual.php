@@ -130,6 +130,8 @@
 
             <p>Os gladiadores irão batalhar dentro da arena utilizando sua própria programação, de forma autônoma até que somente um saia vivo. Caso uma batalha já esteja acontecendo por <strong>45 segundos</strong>, das bordas da arena surgirá um gás tóxico. Esta nuvem mortal lentamente se espalha pela arena em direção ao seu centro, com velocidade <strong>0.1 p/s</strong>. Todos gladiadores que estiverem dentro desta nuvem levam dano continuamente. Esta é uma maneira de garantir que a rodada não irá durar para sempre, além de incentivar que os gladiadores se direcionem para o centro da arena após certo tempo, aumentando as chances de um confronto direto.</p>
 
+            <h2 id='nav-exp'>Experiência</h2>
+
             <div class='row'>
                 <div class='col-2'>
                     <p>Cada vez que algum gladiador causar dano a outro, ele ganhará <strong>pontos de experiência (xp)</strong> relativos a porcentagem do hp total que foi removido do gladiador atacado. Quando o gladiador atacante atingir uma quantidade de xp determinada (veja tabela ao lado), ele <strong>avançará de nível</strong>, concedendo a ele poder adicional.</p>
@@ -202,7 +204,7 @@
                     <tr>
                         <td><a href='function/ambush'>Ambush</a></td>
                         <td>70</td>
-                        <td>Torna-se invisível por 2s + (0.2s x AGI). O efeito da habilidade é cancelado ao realizar um ataque ou lançar uma habilidade. Ataques realizados enquanto invisível atordoam o alvo por 1.5s</td>
+                        <td>Torna-se invisível por 1s + (0.1s x AGI). O efeito da habilidade é cancelado ao realizar um ataque ou lançar uma habilidade, e o gladiador não recupera ap enquanto estiver invisível. Ataques realizados enquanto invisível atordoam o alvo por 1.5s</td>
                     </tr>
                 </tbody>
             </table>

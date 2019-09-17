@@ -3,20 +3,68 @@ var teamsync = {id: 0, time: 0};
 
 $(document).ready( function(){
 	$('#panel #tourn.wrapper #create').click( function() {
-		var box = "<div id='fog'><div class='tourn-box'><div id='title'><h2>Criar torneio</h2><div id='public'><label>Público<input type='checkbox' class='checkslider'></label></div></div><input id='name' class='input' placeholder='Identificador do torneio (nome)' maxlength='50'><input type='password' id='pass' class='input' placeholder='senha para ingressar' maxlength='32'><textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea><div id='options'><div id='maxteams'><span>Máximo de equipes</span><input class='input' value='50' maxlength='2'></div><div id='flex-team'><label><input type='checkbox' class='checkslider'>Flex: Mestres podem inscrever mais de um gladiador</label></div></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='create' class='button'>CRIAR</button></div></div></div>";
+		var box = "<div id='fog'><div class='tourn-box'><div id='title'><h2>Criar torneio</h2><div id='public'><label>Público<input type='checkbox' class='checkslider'></label></div></div><input id='name' class='input' placeholder='Identificador do torneio (nome)' maxlength='50'><input type='password' id='pass' class='input' placeholder='senha para ingressar' maxlength='32'><textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea><div id='options'><div id='maxteams' class='col'><span>Máximo de equipes</span><input class='input' value='50' maxlength='2'></div><div id='maxtime' class='col'><span>Tempo máximo da rodada</span><input class='input' value='23h 59m'></div><div id='flex-team'><label><input type='checkbox' class='checkslider'>Flex: Mestres podem inscrever mais de um gladiador</label></div></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='create' class='button'>CRIAR</button></div></div></div>";
 		$('body').append(box);
 		create_checkbox($('.tourn-box .checkslider'));
 		$('#fog .tourn-box').hide().fadeIn();
 
 		$('.tourn-box #cancel').click( function(){
 			$('#fog').remove();
-		});
-		
+        });
+        
+        $('.tourn-box #maxtime .input').on('keydown', function(e){
+            e.preventDefault();
+            var h = '', m = '';
+            var v = $(this).val();
+
+            for (let i in v){
+                if (v[i] >= '0' && v[i] <= '9' ){
+                    if (v[i] != 0 || i > 0)
+                        m += v[i];
+                }
+            }
+
+            if (e.key >= '0' && e.key <= '9' && m.length < 4){
+                m += e.key;
+            }
+            else if (e.keyCode == 8 || e.keyCode == 46){
+                m = m.substr(0, m.length-1);
+            }
+            if (m.length == 0)
+                m = '0';
+
+            h = m.substr(-4, Math.min(2, m.length-2));
+            m = m.substr(-2,2);
+
+            if (parseInt(h) > 23)
+                h = '23';
+            if (h.length == 2 && parseInt(m) > 59)
+                m = '59';
+
+            v = m + 'm';
+            if (h != '')
+                v = h + 'h ' + v;
+            $(this).val(v);
+        });
+        
+        function validateMaxtime(){
+            var v = $('.tourn-box #maxtime .input').val();
+            if (v.split('h ').length == 1)
+                v = '00h '+ v;
+            var h = v.split('h ')[0];
+            var m = v.split('h ')[1].split('m')[0];
+            if (parseInt(m) > 59 || parseInt(h) > 23){
+                return 0;
+            }
+            return 1;
+        }
+
 		$('.tourn-box #create').click( function(){
 			var name = $('.tourn-box #name').val();
 			var pass = $('.tourn-box #pass').val();
 			var desc = $('.tourn-box #desc').val();
-			var max = $('.tourn-box #maxteams input').val();
+			var maxteams = $('.tourn-box #maxteams input').val();
+			var maxtime = $('.tourn-box #maxtime input').val();
 			var flex = $('.tourn-box #flex-team input').prop('checked');
 
 			$('.tourn-box .input').removeClass('error');
@@ -36,18 +84,24 @@ $(document).ready( function(){
 				$('.tourn-box #pass').addClass('error');
 				$('.tourn-box #pass').before("<span class='tip'>Digite uma senha, ou torne o torneio público</span>");
 			}
-			else if (max.match(/[^\d]/g) || max < 2 || max > 50){
+			else if (maxteams.match(/[^\d]/g) || maxteams < 2 || maxteams > 50){
 				$('.tourn-box #maxteams input').focus();
 				$('.tourn-box #maxteams input').addClass('error');
 				$('.tourn-box #maxteams input').before("<span class='tip'>Informe um número entre 2 e 50</span>");
-			}
+            }
+            else if (!validateMaxtime()){
+				$('.tourn-box #maxtime input').focus();
+				$('.tourn-box #maxtime input').addClass('error');
+				$('.tourn-box #maxtime input').before("<span class='tip'>Formato de hora inválida</span>");
+            }
 			else{
 				$.post("back_tournament.php",{
 					action: "CREATE",
 					name: name,
 					pass: pass,
 					desc: desc,
-					max: max,
+                    maxteams: maxteams,
+                    maxtime: maxtime,
 					flex: flex
 				}).done( function(data){
 					if (data != "EXISTS"){
