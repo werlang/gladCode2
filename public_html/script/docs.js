@@ -1,10 +1,1 @@
-$(document).ready( function(){
-    menu_loaded().then( function(data){
-        var loc = window.location.href.split("/");
-        loc = loc[loc.length - 1];
-        $('#side-menu #'+loc).addClass('here');
-        $('#side-menu #'+loc).click();
-    }); 
-    
-    $('#learn').addClass('here');
-});
+$(document).ready(function(){menu_loaded().then(function(a){a=window.location.href.split("/");a=a[a.length-1];$("#side-menu #"+a).addClass("here");$("#side-menu #"+a).click()});$("#learn").addClass("here")});
