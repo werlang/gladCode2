@@ -12,6 +12,8 @@ var loadCache = false;
 var stab, gender;
 var simtimenow;
 var sfxVolume = 1;
+var dt = 0;
+var showFrames = true;
 
 var actionlist = [
 	{'name': 'fireball', 'value': 0, 'animation': 'cast'},
@@ -52,7 +54,15 @@ var game;
 function load_phaser(){
 	if (game)
 		game.destroy();
-	game = new Phaser.Game($(document).width(), $(document).height(), Phaser.AUTO, 'canvas-div', { preload: preload, create: create, update: update, render: render });
+	game = new Phaser.Game({
+        width: $(document).width(),
+        height: $(document).height(),
+        renderer: Phaser.WEBGL_MULTI,
+        parent: 'canvas-div',
+        antialias: true,
+        multitexture: true,
+        enableDebug: false,
+        state: { preload: preload, create: create, update: update, render: render }});
 }
 
 function preload() {
@@ -64,17 +74,6 @@ function preload() {
 		game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
 	}	
 
-	game.load.image("layer0", 'res/layer0.png');
-	game.load.image('layer1', 'res/layer1.png');
-	game.load.image('layer2', 'res/layer2.png');
-	game.load.image('layer3', 'res/layer3.png');
-	game.load.image('arrow', 'res/arrow.png');
-    game.load.image('gas', 'res/gas.png', 50, 50);
-	game.load.spritesheet('fireball', 'res/fireball.png', 64, 64);
-	game.load.spritesheet('explosion', 'res/explosion.png', 256, 128);
-	game.load.spritesheet('stun', 'res/stun.png', 96, 64);
-	game.load.spritesheet('level', 'res/level.png', 192, 192);
-	game.load.spritesheet('shield', 'res/shield.png', 192, 192);
 	game.load.audio('music', 'res/audio/adventure.mp3');
 	game.load.audio('ending', 'res/audio/ending.mp3');
 	game.load.audio('victory', 'res/audio/victory.mp3');
@@ -94,44 +93,17 @@ function preload() {
 	game.load.audio('death_male', 'res/audio/death_male.mp3');
 	game.load.audio('death_female', 'res/audio/death_female.mp3');
 	game.load.spritesheet('dummy', 'res/glad.png', 64, 64);
-	game.load.spritesheet('cheer_male', 'res/cheer_male.png', 64, 64);
-	game.load.spritesheet('cheer_female', 'res/cheer_female.png', 64, 64);
-	game.load.spritesheet('cheer_shirt_male', 'res/cheer_shirt_male.png', 64, 64);
-	game.load.spritesheet('cheer_shirt1_female', 'res/cheer_shirt1_female.png', 64, 64);
-	game.load.spritesheet('cheer_shirt2_female', 'res/cheer_shirt2_female.png', 64, 64);
-	game.load.spritesheet('cheer_pants_male', 'res/cheer_pants_male.png', 64, 64);
-	game.load.spritesheet('cheer_pants_female', 'res/cheer_pants_female.png', 64, 64);
-	game.load.spritesheet('cheer_male_hair_parted', 'sprite/Universal-LPC-spritesheet/hair/male/parted.png', 64, 64);
-	game.load.spritesheet('cheer_male_hair_ponytail', 'sprite/Universal-LPC-spritesheet/hair/male/ponytail.png', 64, 64);
-	game.load.spritesheet('cheer_male_hair_mohawk', 'sprite/Universal-LPC-spritesheet/hair/male/mohawk.png', 64, 64);
-	game.load.spritesheet('cheer_male_hair_jewfro', 'sprite/Universal-LPC-spritesheet/hair/male/jewfro.png', 64, 64);
-	game.load.spritesheet('cheer_male_hair_bedhead', 'sprite/Universal-LPC-spritesheet/hair/male/bedhead.png', 64, 64);
-	game.load.spritesheet('cheer_male_shoes', 'sprite/Universal-LPC-spritesheet/feet/shoes/male/black_shoes_male.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_long', 'sprite/Universal-LPC-spritesheet/hair/female/long.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_jewfro', 'sprite/Universal-LPC-spritesheet/hair/female/jewfro.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_loose', 'sprite/Universal-LPC-spritesheet/hair/female/loose.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_longknot', 'sprite/Universal-LPC-spritesheet/hair/female/longknot.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_pixie', 'sprite/Universal-LPC-spritesheet/hair/female/pixie.png', 64, 64);
-	game.load.spritesheet('cheer_female_hair_pixie', 'sprite/Universal-LPC-spritesheet/hair/female/pixie.png', 64, 64);
-	game.load.spritesheet('cheer_female_shoes', 'sprite/Universal-LPC-spritesheet/feet/shoes/female/black_shoes_female.png', 64, 64);
-	game.load.spritesheet('dummy_grey_male', 'res/dummy_grey_male.png', 192, 192);
-	game.load.spritesheet('dummy_grey_female', 'res/dummy_grey_female.png', 192, 192);
-	game.load.spritesheet('royal_male', 'res/royal_male.png', 192, 192);
-	game.load.spritesheet('royal_female', 'res/royal_female.png', 192, 192);
-	game.load.spritesheet('guard_male', 'res/guard_male.png', 192, 192);
-	game.load.spritesheet('guard_female', 'res/guard_female.png', 192, 192);
-	game.load.spritesheet('archer_male', 'res/archer_male.png', 192, 192);
-	game.load.spritesheet('archer_female', 'res/archer_female.png', 192, 192);
-	game.load.spritesheet('king_blue', 'res/king-blue.png', 64, 64);
-	game.load.spritesheet('king_red', 'res/king-red.png', 64, 64);
-	game.load.spritesheet('queen_blue', 'res/queen-blue.png', 64, 64);
-	game.load.spritesheet('queen_red', 'res/queen-red.png', 64, 64);
-	
+    
+    game.load.atlas('atlas_crowd', 'res/atlas_crowd.png', 'res/atlas_crowd.json');
+    game.load.atlas('atlas_effects', 'res/atlas_effects.png', 'res/atlas_effects.json');
+    game.load.atlas('background', 'res/layers.png', 'res/layers.json');
+
 	game.load.start();
 	loadCache = true;
 	resize();
-	$('#canvas-div canvas').focus();
-	game.camera.focusOnXY(screenW * game.camera.scale.x / 2, screenH * game.camera.scale.y / 2);
+    $('#canvas-div canvas').focus();
+    if (game.camera)
+        game.camera.focusOnXY(screenW * game.camera.scale.x / 2, screenH * game.camera.scale.y / 2);
 
 }
 
@@ -173,19 +145,26 @@ var groupglad, groupgas;
 var groupnpc = [];
 var bar = {};
 var npc;
+var audio = {};
+var textures;
 
 function create() {
 
+    textures = game.renderer.setTexturePriority(['atlas_crowd','atlas_effects']);
+
     game.physics.startSystem(Phaser.Physics.ARCADE);
-	//$('#canvas-div canvas').css('touch-action','pan-y');
 	
 	groupglad = game.add.group();
 	groupgas = game.add.group();
 	groupnpc.push(game.add.group());
 	groupnpc.push(game.add.group());
-	
+
+    groupglad.add(groupgas);
+    groupglad.add(groupnpc[0]);
+    groupglad.add(groupnpc[1]);
+
 	for (let i=0 ; i<=3 ; i++){
-		layers.push(game.add.image(0, 0, 'layer'+i));
+		layers.push(game.add.image(0, 0, 'background', 'layer_'+ i));
 		groupglad.add(layers[i]);
 	}
 	
@@ -204,153 +183,163 @@ function create() {
 		game.input.mouse.drag = false;
 	}, this);
 
-	var graphics = {};
-	graphics.back = game.add.graphics(0,0);
-	graphics.back.beginFill(0x000000);
-	graphics.back.drawRect(-100,0,30,9);
-
-	graphics.hp = game.add.graphics(0,0);
-	graphics.hp.beginFill(0xff0000);
-	graphics.hp.drawRect(-100,0,30,5);
-	
-	graphics.ap = game.add.graphics(0,0);
-	graphics.ap.beginFill(0x0000ff);
-	graphics.ap.drawRect(-100,0,30,4);
-
-	bar.back = game.add.sprite(-100,0, graphics.back.generateTexture());
-	bar.back.alpha = 0.15;
-	bar.hp = game.add.sprite(-100,0, graphics.hp.generateTexture());
-	bar.hp.alpha = 0.4;
-	bar.ap = game.add.sprite(-100,0, graphics.ap.generateTexture());
-	bar.ap.alpha = 0.4;
+    initBars();
 
 	fillPeople();
-
+    
 	$.each(npc, function(n,v){
 		let pos = getPosArena(v.x, v.y, true);
-		v.sprite = {};
+        v.sprite = {};
+        
 		if (n.match(/royalguard\d/g) || n.match(/commonguard\d/g) || n.match(/archer\d/g)){
-			if (v.gender == 'male'){
-				v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_male');
-				if (n.match(/royalguard\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'royal_male');
-				if (n.match(/commonguard\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'guard_male');
-				if (n.match(/archer\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'archer_male');
-			}
-			else{
-				v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_female');
-				if (n.match(/royalguard\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'royal_female');
-				if (n.match(/commonguard\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'guard_female');
-				if (n.match(/archer\d/g))
-					v.sprite.gear = game.add.sprite(pos.x, pos.y, 'archer_female');
-			}
+            v.sprite.body = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+            v.sprite.gear = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
 
-			if (n.match(/royalguard\d/g)){
-				v.sprite.body.animations.add('guard', [v.start-13, v.start, v.start+13, v.start], v.time, false);
-				v.sprite.gear.animations.add('guard', [v.start-13, v.start, v.start+13, v.start], v.time, false);
+            if (n.match(/archer\d/g)){
+                var frames = [0,1,2,2,1,0];
+                var prefix = {
+                    body: 'dummy_grey_' + v.gender + '_',
+                    gear: 'archer_' + v.gender + '_'};
+                                
+				v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
+				v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
 				game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
 					v.sprite.body.animations.play('guard');
 					v.sprite.gear.animations.play('guard');
 				}, this);
-			}
-			else if (n.match(/commonguard\d/g)){
-				v.sprite.body.animations.add('guard', [v.start, v.start+13], v.time, true);
-				v.sprite.gear.animations.add('guard', [v.start, v.start+13], v.time, true);
+            }
+            else if (n.match(/royalguard\d/g)){
+                var frames = [-1,0,1,0];
+                var prefix = {
+                    body: 'dummy_grey_' + v.gender + '_',
+                    gear: 'royal_' + v.gender + '_'};
+
+                v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
+                v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
+                game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+                    v.sprite.body.animations.play('guard');
+                    v.sprite.gear.animations.play('guard');
+                }, this);
+            }
+            else if (n.match(/commonguard\d/g)){
+                var frames = [0,1];
+                var prefix = {
+                    body: 'dummy_grey_' + v.gender + '_',
+                    gear: 'guard_' + v.gender + '_'};
+
+                v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, true);
+				v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear, 0, {start: 0, end: 3}), v.time, true);
 				v.sprite.body.animations.play('guard');
 				v.sprite.gear.animations.play('guard');
-			}
-			else if (n.match(/archer\d/g)){
-				v.sprite.body.animations.add('guard', [v.start, v.start+1, v.start+2, v.start+2, v.start+1, v.start], v.time, false);
-				v.sprite.gear.animations.add('guard', [v.start, v.start+1, v.start+2, v.start+2, v.start+1, v.start], v.time, false);
-				game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
-					v.sprite.body.animations.play('guard');
-					v.sprite.gear.animations.play('guard');
-				}, this);
-			}
-
+            }
 			v.sprite.body.animations.play('guard');
 			v.sprite.gear.animations.play('guard');
 		}
 		else if (n == 'king' || n == 'queen'){
-			v.sprite.body = game.add.sprite(pos.x, pos.y, 'dummy_grey_' + v.gender);
-			v.sprite.body.animations.add('watch', [v.start, v.start+1, v.start], v.time, false);
+            v.sprite.body = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+
+            var frames = [0,1,0];
+            var prefix = {
+                body: 'dummy_grey_' + v.gender + '_',
+                gear: 'guard_' + v.gender + '_',
+                hair: 'hair_'+ v.gender +'_'+ v.hair.style + '_0'};
+
+            v.sprite.body.animations.add('watch', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
 			v.sprite.body.animations.play('watch');
 			game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
 				v.sprite.body.animations.play('watch');
 			}, this);
 
 			if (v.color)
-				v.sprite.gear = game.add.sprite(pos.x, pos.y, n + '_blue');
+				v.sprite.gear = game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-blue');
 			else
-				v.sprite.gear = game.add.sprite(pos.x, pos.y, n + '_red');
+                v.sprite.gear = game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-red');
 
 			if (v.hair.style != 'no_hair'){
-				v.sprite.hair = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_hair_'+ v.hair.style);
-				v.sprite.hair.animations.add('watch', [v.start], v.time, true);
-				v.sprite.hair.animations.play('watch');
+                v.sprite.hair = game.add.sprite(pos.x, pos.y, 'atlas_crowd', prefix.hair + v.start.hair);
 			}
 		}
 		else{
-			v.sprite.body = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender);
-			
-			if (v.gender == 'female'){
-				if (Math.random() < 0.5)
-					v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt1_female');
-				else
-					v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt2_female');
-			}
-			else
-				v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'cheer_shirt_male');
+            v.sprite.body = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
 
-			v.sprite.pants = game.add.sprite(pos.x, pos.y, 'cheer_pants_'+ v.gender);
-			if (v.hair.style != 'no_hair')
-				v.sprite.hair = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_hair_'+ v.hair.style);
-			v.sprite.shoes = game.add.sprite(pos.x, pos.y, 'cheer_'+ v.gender +'_shoes');
-		}
+            if (v.hair.style != 'no_hair')
+                v.sprite.hair = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+
+            v.sprite.shirt = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+            v.sprite.pants = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+            v.sprite.shoes = game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+        }
 		for (let i in v.sprite){
 			groupnpc[v.layer-1].add(v.sprite[i]);
 			v.sprite[i].scale.setTo(game.camera.scale.x, game.camera.scale.y);
 			v.sprite[i].anchor.setTo(0.5, 0.5);
 
-			if (i == 'hair'){
-				let hairFrame = {
-					male: [0,0,7,7,14,14,21,21, 0,0,7,7,14,14,21,21, 63,61,70,69,81,79,88,87],
-					female: [0,173,7,103,14,109,21,115, 3,3,10,10,17,17,24,24]
-				};
-				v.sprite[i].animations.add('cheer', arrayFrame([hairFrame[v.gender][v.start], hairFrame[v.gender][v.start+1]]), v.time, true);
-				v.sprite[i].tint = v.hair.color;
+			if (i == 'hair' && v.hair.style != 'no_hair'){
+                var prefix = 'hair_'+ v.gender +'_'+ v.hair.style + '_';
+                var anim = [0];
+                if (v.cheer)
+                    anim = v.anim.hair;
+
+                v.sprite[i].animations.add('cheer', buildFrames(prefix, anim, v.start.hair, 2), v.time, true);
+                v.sprite[i].tint = v.hair.color;
 			}
-			else if (i == 'shoes'){
-				let shoesFrame = {
-					male: [0,0,7,7,14,14,21,21, 0,0,7,7,14,14,21,21, 61,61,69,69,78,78,87,87],
-					female: [0,173,7,103,14,109,21,115, 3,3,10,10,17,17,24,24]
-				};
-				v.sprite[i].animations.add('cheer', arrayFrame([shoesFrame[v.gender][v.start], shoesFrame[v.gender][v.start+1]]), v.time, true);
-			}
-			else{
+            else if (i == 'shoes'){
+                if (v.gender == 'male')
+                    digits = 1;
+
+                prefix = 'shoes_'+ v.gender +'_';
+                v.sprite[i].animations.add('cheer', buildFrames(prefix, [0], v.start.shoes, digits), v.time, true);
+            }
+            else{
+                var digits = 2;
+                var prefix;
+                var frames = [0,1];
+
 				if (i == 'body'){
-					v.sprite[i].tint = v.skin.tint;
-				}
+                    v.sprite[i].tint = v.skin.tint;
+                    prefix = 'cheer_'+ v.gender +'_';
+                }
 				else if (i == 'pants' || i == 'shirt'){
-					v.sprite[i].tint = clothesColor();
-				}
-
-				if (v.cheer)
-					v.sprite[i].animations.add('cheer', arrayFill(v.start, parseInt(v.start+1)), v.time, true);
+                    v.sprite[i].tint = clothesColor();
+                    var n = '';
+                    if (i == 'shirt' && v.gender == 'female')
+                        n = parseInt(Math.random() * 2 + 1);
+                    prefix = 'cheer_'+ i + n +'_'+ v.gender +'_';
+                }
+                
+                v.sprite[i].animations.add('cheer', buildFrames(prefix, frames, v.start.body, digits), v.time, true);
 			}
 
-			if (v.cheer)
-				v.sprite[i].animations.play('cheer');
+			if (v.cheer){
+                v.sprite[i].animations.play('cheer');
+            }
 		}
-	});
+    });
 }
 
-var gasld = 4;
-var gaspl = 25;
+//function created to debug code. pass argument 's' when you want to start measure and 'e' when to end.
+//it gives the average time per second the code takes to execute
+var mt, ma = null, ta=0, tc=0;
+function measureTime(m){
+    if (!ma)
+        ma = new Date();
+
+    if (m == 's')
+        mt = new Date();
+    else if (m == 'e'){
+        ta += new Date() - mt;
+        tc++;
+        if (new Date() - ma >= 1000){
+            console.log(ta/tc);
+            ma = null;
+            tc = 0;
+            ta = 0;
+        }
+    }
+}
+
+var gasld = 4; //gas layer depth
+var gaspl = 25; //gas per layer
 function update() {
 	if (json.poison){
 		poison = parseFloat(json.poison);
@@ -360,7 +349,7 @@ function update() {
 		if (gasadv >= 1 && (gasl.length == 0 || (17-poison) / gasld > gasl.length - 1)){
 			var gas = [];
 			for (let j = 0 ; j< gaspl ; j++){
-				gas.push(game.add.sprite(0,0,'gas'));
+				gas.push(game.add.image(0,0, 'atlas_effects', 'gas'));
 				gas[j].anchor.setTo(0.5, 0.5);
 				gas[j].scale.setTo(gas[j].width / arenaRate * 3); //size = 1p
 				gas[j].rotSpeed = Math.random() * 1 - 0.5;
@@ -382,15 +371,17 @@ function update() {
 				gasl[i][j].y = arenaY1 + y * arenaRate;
 			}
 		}
-		groupglad.add(groupgas);
-		groupglad.add(groupnpc[0]);
-		groupglad.add(groupnpc[1]);
 	
-	}
+    }
+    
 	if (nglad > 0 && !loadglads) {
 		loadglads = true;
 		for (i=0 ; i<nglad ; i++){
-			//console.log(json.glads[i].x);
+            //console.log(json.glads[i].x);
+            if (textures.length < game.renderer.maxTextures){
+                game.renderer.currentBatchedTextures.push('glad'+newindex[i]);
+            }
+
 			sprite[i] = game.add.sprite(arenaX1 + parseFloat(json.glads[i].x) * arenaRate, arenaY1 + parseFloat(json.glads[i].y) * arenaRate, 'glad'+newindex[i]);
 			sprite[i].anchor.setTo(0.5, 0.5);
 			
@@ -406,31 +397,31 @@ function update() {
 			groupglad.add(sprite[i]);
 						
 			gladArray[i] = {
-				'x': 0,
-				'y': 0,
-				'hp': parseFloat(json.glads[i].hp),
-				'alive': true,
-				'fade': 0,
-				'clone': null,
-				'invisible': false,
-				'stun': false,
-				'assassinate': false,
-				'level': 1,
-				'block': false,
-				'charge': false,
-				'poison': false,
-				'xp': parseInt(json.glads[i].xp),
-				'time': false,
+				x: 0,
+				y: 0,
+				hp: parseFloat(json.glads[i].hp),
+				alive: true,
+				fade: 0,
+				clone: null,
+				invisible: false,
+				stun: false,
+				assassinate: false,
+				level: 1,
+				block: false,
+				charge: false,
+				poison: false,
+				xp: parseInt(json.glads[i].xp),
+                time: false,
+                sprites: {}
 			};
 
-			var w = arenaX1 + 25 * arenaRate;
-			var h = arenaY1 + 25 * arenaRate;
-			gladArray[i].bars = game.add.bitmapData(w,h);
-			gladArray[i].bars.addToWorld();
+			//var w = arenaX1 + 25 * arenaRate;
+			//var h = arenaY1 + 25 * arenaRate;
+			//gladArray[i].bars = game.add.bitmapData(w,h);
+			//gladArray[i].bars.addToWorld();
 		}
 		music.play();
 		music.volume = $('#sound').data('music');
-		//game.camera.follow(sprite[0]);
 	}
 	else if (sprite.length > 0){
 		if (!startsim){
@@ -438,11 +429,11 @@ function update() {
 			$('#fog').remove();
 			$('#canvas-container').css({'opacity':1});
 			resize();	
-			pausesim = false;
+            pausesim = false;
 		}
 
-		if (json && simtimenow != json.simtime){			
-			simtimenow = json.simtime;
+		if (json && simtimenow != json.simtime){
+			
 			for (i=0 ; i<nglad ; i++){
 				var x = parseFloat(json.glads[i].x);
 				var y = parseFloat(json.glads[i].y);
@@ -453,36 +444,33 @@ function update() {
 				var head = parseFloat(json.glads[i].head);
 				var hp = parseFloat(json.glads[i].hp);
 				var lockedfor = parseFloat(json.glads[i].lockedfor);
-				
-				showMessageBaloon(i);
+
 
 				sprite[i].x = arenaX1 + x * arenaRate;
 				sprite[i].y = arenaY1 + y * arenaRate;
-				
-				showHpApBars(i);
 
-				if (level > gladArray[i].level){
-					gladArray[i].level = level;
-					var lvlup = game.add.sprite(sprite[i].x, sprite[i].y, 'level');
-					lvlup.anchor.setTo(0.5);
-					lvlup.scale.setTo(0.4);
-					groupglad.add(lvlup);
-					lvlup.animations.add('levelup', null, 15, false);
-					lvlup.animations.play('levelup', null, false, true);
-					game.add.audio('lvlup', sfxVolume).play();
+                showMessageBaloon(i);
+                showHpApBars(i);
+
+				if (level != gladArray[i].level){
+                    gladArray[i].level = level;
+                    var lvlup = addSprite(gladArray[i], 'lvlup', sprite[i].x, sprite[i].y);
+                    lvlup.anchor.setTo(0.5, 0.35);
+                    lvlup.animations.play('lvlup', null, false, true);
+                    groupglad.add(lvlup);
+                    playAudio('lvlup', sfxVolume);
 				}
 				
 				if (hp != gladArray[i].hp) {
 					//explodiu na cara
 					if (actionlist[action].name == 'fireball' && json.glads[i].buffs.burn.timeleft > 0.1){
-						var fire = game.add.sprite(sprite[i].x, sprite[i].y, 'explosion');
+                        var fire = addSprite(gladArray[i], 'explode', sprite[i].x, sprite[i].y);
 						fire.anchor.setTo(0.5, 0.5);
 						fire.alpha = 0.5;
 						fire.width = 5 * arenaRate;
 						fire.height = 3 * arenaRate;
-						fire.animations.add('explode', null, 15, true);
-						fire.animations.play('explode', null, false, true);
-						game.add.audio('explosion', sfxVolume).play();
+                        fire.animations.play('explode', null, false, true);
+                        playAudio('explosion', sfxVolume);
 					}
 						
 					gladArray[i].hp = hp;
@@ -492,10 +480,10 @@ function update() {
 					if (gladArray[i].alive){
 						sprite[i].animations.play('die');
 						if (gender[newindex[i]] == "male"){
-							game.add.audio('death_male', sfxVolume).play();
+                            playAudio('death_male', sfxVolume);
 						}
 						else{
-							game.add.audio('death_female', sfxVolume).play();
+                            playAudio('death_female', sfxVolume);
 						}
 					}
 					gladArray[i].alive = false;
@@ -511,10 +499,10 @@ function update() {
 							sprite[i].animations.play(anim, 50, true);
 							gladArray[i].charge = true;
 							if (gender[newindex[i]] == "male"){
-								game.add.audio('charge_male', sfxVolume).play();
+								playAudio('charge_male', sfxVolume);
 							}
 							else{
-								game.add.audio('charge_female', sfxVolume).play();
+								playAudio('charge_female', sfxVolume);
 							}
 						}
 					}
@@ -537,7 +525,7 @@ function update() {
 							gladArray[i].fade = 1;
 							gladArray[i].x = sprite[i].x;
 							gladArray[i].y = sprite[i].y;
-							game.add.audio('teleport', sfxVolume).play();
+							playAudio('teleport', sfxVolume);
 						}
 						if (actionlist[action].name == "assassinate"){
 							gladArray[i].assassinate = true;
@@ -546,10 +534,10 @@ function update() {
 							gladArray[i].block = false;
 						}
 						if (actionlist[action].name == "ranged"){
-							game.add.audio('ranged', sfxVolume).play();
+							playAudio('ranged', sfxVolume);
 						}
 						if (actionlist[action].name == "melee"){
-							game.add.audio('melee', sfxVolume).play();
+							playAudio('melee', sfxVolume);
 						}
 							
 					}
@@ -563,7 +551,7 @@ function update() {
 				
 				if (gladArray[i].invisible){
 					if (sprite[i].alpha >= 1)
-						game.add.audio('ambush', sfxVolume).play();
+						playAudio('ambush', sfxVolume);
 					if (sprite[i].alpha > 0.3)
 						sprite[i].alpha -= 0.05;
 				}
@@ -598,30 +586,26 @@ function update() {
 					
 				//stun
 				if (!gladArray[i].stun && json.glads[i].buffs.stun.timeleft > 0.1 && gladArray[i].alive){
-					gladArray[i].stun = game.add.sprite(sprite[i].x, sprite[i].y, 'stun');
+                    gladArray[i].stun = addSprite(gladArray[i], 'stun', sprite[i].x, sprite[i].y);
 					gladArray[i].stun.anchor.setTo(0.5, 1);
 					gladArray[i].stun.scale.setTo(0.6);
-					groupglad.add(gladArray[i].stun);
-					gladArray[i].stun.animations.add('stun', null, 15, true);
 					gladArray[i].stun.animations.play('stun', null, true, false);
-					game.add.audio('stun', sfxVolume).play();
+					playAudio('stun', sfxVolume);
 				}
 				else if (gladArray[i].stun && (json.glads[i].buffs.stun.timeleft <= 0.1 || !gladArray[i].alive)){
-					gladArray[i].stun.destroy();
+					gladArray[i].stun.kill();
 					gladArray[i].stun = false;
 				}
 				
 				//block
 				if (!gladArray[i].block && json.glads[i].buffs.resist.timeleft > 0.1){
-					gladArray[i].block = true;
-					var shield = game.add.sprite(sprite[i].x, sprite[i].y, 'shield');
+                    gladArray[i].block = true;
+                    var shield = addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
 					shield.anchor.setTo(0.5);
-					shield.scale.setTo(0.4);
 					groupglad.add(shield);
-					shield.animations.add('shield', null, 15, false);
 					shield.animations.play('shield', null, false, true);
 					shield.alpha = 0.5;
-					game.add.audio('block', sfxVolume).play();
+                    playAudio('block', sfxVolume);
 				}
 				else if (gladArray[i].block && json.glads[i].buffs.resist.timeleft <= 0.1){
 					gladArray[i].block = false;
@@ -637,7 +621,7 @@ function update() {
 							var anim = 'stab-' + getActionDirection(head);
 						sprite[i].animations.stop();
 						sprite[i].animations.play(anim, 20);
-						game.add.audio('melee', sfxVolume).play();
+						playAudio('melee', sfxVolume);
 					}
 					else if (actionlist[action].name != "charge"){
 						sprite[i].animations.currentAnim.speed = 15;
@@ -662,97 +646,103 @@ function update() {
 					sprite[i].tint = 0xFFFFFF;
 				
 				gladArray[i].xp = xp;
-				
-				if ($( "#time" ).slider("value") != parseFloat(json.simtime) * 10){
+
+                if (timeSlider != Math.floor(json.simtime)){
+                    timeSlider = json.simtime;
 					$( "#time" ).slider("value", parseFloat(json.simtime) * 10);
-				}
-				
-				update_ui(json);
-			}
-		}
+                }
+
+                update_ui(json);
+
+            }
+            
+        }
+        
 		debugTimer();
 	}
-	
-	var i=0;
-	if (json.projectiles && json.projectiles.length > 0) {
+    
+    if (simtimenow != json.simtime ){
+        var i=0;
 
-		var nproj = json.projectiles.length;
-		for (i=0 ; i<nproj ; i++){
-			var id = json.projectiles[i].id;
-			var type = json.projectiles[i].type;
-			var j = findProj(id);
-			if (j == -1){
-				var spr;
-				if (json.projectiles[i].type == 0){ //ranged attack
-					spr = game.add.sprite(0, 0, 'arrow');
-				}
-				else if (json.projectiles[i].type == 1){ //fireball
-					spr = game.add.sprite(0, 0, 'fireball');
-					spr.animations.add('fireball', arrayFill(0,7), 15, true);
-					spr.animations.play('fireball');
-					game.add.audio('fireball', sfxVolume).play();
-				}
-				else if (json.projectiles[i].type == 2){ //stun
-					spr = game.add.sprite(0, 0, 'arrow');
-					spr.tint = 0x00FF00;
-				}
-				
-				//console.log(json.simtime +'-'+ json.projectiles[i].owner);
-				if (gladArray[json.projectiles[i].owner] && gladArray[json.projectiles[i].owner].assassinate){
-					gladArray[json.projectiles[i].owner].assassinate = false;
-					spr = game.add.sprite(0, 0, 'arrow');
-					spr.tint = 0xFF0000;
-					game.add.audio('assassinate', sfxVolume).play();
-				}
-								
-				spr.anchor.setTo(0.5, 0.5);
-				j = sproj.length;
-				sproj.push({'sprite': spr, 'active': true, 'id': id, 'type': type});
-			}
-			
-			sproj[j].sprite.x = arenaX1 + parseFloat(json.projectiles[i].x) * arenaRate;
-			sproj[j].sprite.y = arenaY1 + parseFloat(json.projectiles[i].y) * arenaRate;
-			sproj[j].sprite.angle = parseFloat(json.projectiles[i].head) + 90;
-			sproj[j].active = true;
-		}
-	}
-	
-	for (x in sproj){
-		if (sproj[x].active === false) {
-			if (sproj[x].type == 1){
-				var fire = game.add.sprite(sproj[x].sprite.x, sproj[x].sprite.y, 'explosion');
-				fire.anchor.setTo(0.5, 0.5);
-				fire.alpha = 0.5;
-				fire.width = 5 * arenaRate;
-				fire.height = 3 * arenaRate;
-				fire.animations.add('explode', null, 15, true);
-				fire.animations.play('explode', null, false, true);
-				game.add.audio('explosion', sfxVolume).play();
-			}
-			else{
-				game.add.audio('arrow_hit', sfxVolume).play();
-			}
-			
-			sproj[x].sprite.destroy();
-			sproj.splice(x,1);
-		}
-		else
-			sproj[x].active = false;
-	}
-		
-	groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
-	for (var i=0 ; i<nglad ; i++){
-		if (!gladArray[i].alive)
-			groupglad.sendToBack(sprite[i]);
-	}
-		
-	groupglad.sendToBack(layers[0]);
-	groupglad.bringToTop(groupgas);
-	groupglad.bringToTop(layers[1]);
-	groupglad.bringToTop(groupnpc[0]);
-	groupglad.bringToTop(layers[2]);
-	groupglad.bringToTop(groupnpc[1]);
-	groupglad.bringToTop(layers[3]);
+        if (json.projectiles && json.projectiles.length > 0) {
+
+            var nproj = json.projectiles.length;
+            for (i=0 ; i<nproj ; i++){
+                var id = json.projectiles[i].id;
+                var type = json.projectiles[i].type;
+                var j = findProj(id);
+                if (j == -1){
+                    var spr;
+                    if (json.projectiles[i].type == 0){ //ranged attack
+                        spr = newProjectile('arrow');
+                    }
+                    else if (json.projectiles[i].type == 1){ //fireball
+                        spr = newProjectile('fireball');
+                        spr.animations.play('fireball');
+                        playAudio('fireball', sfxVolume);
+                    }
+                    else if (json.projectiles[i].type == 2){ //stun
+                        spr = newProjectile('arrow');
+                        spr.tint = 0x00FF00;
+                    }
+                    
+                    //console.log(json.simtime +'-'+ json.projectiles[i].owner);
+                    if (gladArray[json.projectiles[i].owner] && gladArray[json.projectiles[i].owner].assassinate){
+                        gladArray[json.projectiles[i].owner].assassinate = false;
+                        spr = newProjectile('arrow');
+                        spr.tint = 0xFF0000;
+                        playAudio('assassinate', sfxVolume);
+                    }
+                                    
+                    spr.anchor.setTo(0.5, 0.5);
+                    j = sproj.length;
+                    sproj.push({'sprite': spr, 'active': true, 'id': id, 'type': type});
+                }
+                
+                sproj[j].sprite.x = arenaX1 + parseFloat(json.projectiles[i].x) * arenaRate;
+                sproj[j].sprite.y = arenaY1 + parseFloat(json.projectiles[i].y) * arenaRate;
+                sproj[j].sprite.angle = parseFloat(json.projectiles[i].head) + 90;
+                sproj[j].active = true;
+            }
+        }
+        
+        //calculate projectile hit
+        for (let x in sproj){
+            if (sproj[x].active === false) {
+                if (sproj[x].type == 1){
+                    var fire = newProjectile('explode', sproj[x].sprite.x, sproj[x].sprite.y);
+                    fire.anchor.setTo(0.5, 0.5);
+                    fire.alpha = 0.5;
+                    fire.width = 5 * arenaRate;
+                    fire.height = 3 * arenaRate;
+                    fire.animations.play('explode', null, false, true);
+                    playAudio('explosion', sfxVolume);
+                }
+                else{
+                    playAudio('arrow_hit', sfxVolume);
+                }
+                
+                sproj[x].sprite.kill();
+                sproj.splice(x,1);
+            }
+            else
+                sproj[x].active = false;
+        }
+
+        groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
+        for (var i=0 ; i<nglad ; i++){
+            if (!gladArray[i].alive)
+                groupglad.sendToBack(sprite[i]);
+        }
+
+        groupglad.sendToBack(layers[0]);
+        groupglad.bringToTop(groupgas);
+        groupglad.bringToTop(layers[1]);
+        groupglad.bringToTop(groupnpc[0]);
+        groupglad.bringToTop(layers[2]);
+        groupglad.bringToTop(groupnpc[1]);
+        groupglad.bringToTop(layers[3]);
+    }
 
 	if (game.input.mouse.drag){
 		if (game.camera.target){
@@ -782,6 +772,8 @@ function update() {
 	if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
 		game.camera.view.y += 10;
 
+    
+    simtimenow = json.simtime;
 }
 
 function render() {
@@ -833,101 +825,146 @@ function createAnimation(glad, action){
 }
 
 function update_ui(json){
-	var nglad = json.glads.length;
-	for (i=0 ; i<nglad ; i++){
-		var name = json.glads[i].name;
-		var STR = json.glads[i].STR;
-		var AGI = json.glads[i].AGI;
-		var INT = json.glads[i].INT;
-		var hp = parseInt(json.glads[i].hp);
-		var maxhp = parseInt(json.glads[i].maxhp);
-		var ap = parseInt(json.glads[i].ap);
-		var maxap = parseInt(json.glads[i].maxap);
-		var lvl = parseInt(json.glads[i].lvl);
-		var xp = parseInt(json.glads[i].xp);
-		var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
-		var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
-		var stun = parseFloat(json.glads[i].buffs.stun.timeleft);
-		var invisible = parseFloat(json.glads[i].buffs.invisible.timeleft);
-		var speed = parseFloat(json.glads[i].buffs.movement.timeleft);
-		if (gladArray[i])
-			var poison = gladArray[i].poison;
-		
-		if ($('.glad-name span').eq(i).html() == ""){
-			$('.glad-name span').eq(i).html(name);
-			$('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
-		}
-		
-		if ($('.glad-str span').eq(i).html() !== STR)
-			$('.glad-str span').eq(i).html(STR);
+    if (showFrames){
+        var nglad = json.glads.length;
+        for (i=0 ; i<nglad ; i++){
+            var name = json.glads[i].name;
+            var STR = json.glads[i].STR;
+            var AGI = json.glads[i].AGI;
+            var INT = json.glads[i].INT;
+            var hp = parseInt(json.glads[i].hp);
+            var maxhp = parseInt(json.glads[i].maxhp);
+            var ap = parseInt(json.glads[i].ap);
+            var maxap = parseInt(json.glads[i].maxap);
+            var lvl = parseInt(json.glads[i].lvl);
+            var xp = parseInt(json.glads[i].xp);
+            var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
+            var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
+            var stun = parseFloat(json.glads[i].buffs.stun.timeleft);
+            var invisible = parseFloat(json.glads[i].buffs.invisible.timeleft);
+            var speed = parseFloat(json.glads[i].buffs.movement.timeleft);
+            if (gladArray[i])
+                var poison = gladArray[i].poison;
+        
+            if (!uiVars[i].name){
+                uiVars[i].name = name;
+                $('.glad-name span').eq(i).html(name);
+                $('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
+            }
+            
+            if (uiVars[i].STR !== STR){
+                uiVars[i].STR = STR;
+                $('.glad-str span').eq(i).html(STR);
+            }
 
-		if ($('.glad-agi span').eq(i).html() !== AGI)
-			$('.glad-agi span').eq(i).html(AGI);
+            if (uiVars[i].AGI !== AGI){
+                uiVars[i].AGI = AGI;
+                $('.glad-agi span').eq(i).html(AGI);
+            }
 
-		if ($('.glad-int span').eq(i).html() !== INT)
-			$('.glad-int span').eq(i).html(INT);
+            if (uiVars[i].INT !== INT){
+                uiVars[i].INT = INT;
+                $('.glad-int span').eq(i).html(INT);
+            }
 
-		if ($('.lvl-value span').eq(i).html() != lvl){
-			$('.lvl-value span').eq(i).html(lvl);
-			
-			$('.lvl-value').eq(i).addClass('up');
-			let j = i;
-			setTimeout( function(){
-				$('.lvl-value').eq(j).removeClass('up');
-			}, 500);
-		}
-		
-		if ($('.xp-bar .filled').eq(i).width() != xp)
-			$('.xp-bar .filled').eq(i).height(xp +'%');
-		
-		if ($('.hp-bar .filled').eq(i).width() != hp/maxhp*100)
-			$('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
-		
-		if (hp <= 0)
-			$('.ui-glad').eq(i).addClass('dead');
-		else if ($('.ui-glad').eq(i).hasClass('dead'))
-			$('.ui-glad').eq(i).removeClass('dead')
-		
-		$('.ap-bar .filled').eq(i).width(ap/maxap*100 +'%');
-		
-		if (burn)
-			$('.buff-burn').eq(i).addClass('active');
-		else if ($('.buff-burn').eq(i).hasClass('active'))
-			$('.buff-burn').eq(i).removeClass('active');
-		
-		if (resist)
-			$('.buff-resist').eq(i).addClass('active');
-		else if ($('.buff-resist').eq(i).hasClass('active'))
-			$('.buff-resist').eq(i).removeClass('active');
-		
-		if (stun)
-			$('.buff-stun').eq(i).addClass('active');
-		else if ($('.buff-stun').eq(i).hasClass('active'))
-			$('.buff-stun').eq(i).removeClass('active');
+            if (uiVars[i].lvl != lvl){
+                uiVars[i].lvl = lvl;
+                $('.lvl-value span').eq(i).html(lvl);
+                
+                $('.lvl-value').eq(i).addClass('up');
+                let j = i;
+                setTimeout( function(){
+                    $('.lvl-value').eq(j).removeClass('up');
+                }, 500);
+            }
+            
+            if (uiVars[i].xp != xp){
+                uiVars[i].xp = xp;
+                $('.xp-bar .filled').eq(i).height(xp +'%');
+            }
+            
+            if (uiVars[i].hp != hp){
+                uiVars[i].hp = hp;
+                $('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
+            }
+            
+            if (hp <= 0){
+                uiVars[i].dead = true;
+                $('.ui-glad').eq(i).addClass('dead');
+            }
+            else if (uiVars[i].dead){
+                uiVars[i].dead = false;
+                $('.ui-glad').eq(i).removeClass('dead');
+            }
+            
+            if (uiVars[i].ap != ap){
+                uiVars[i].ap = ap;
+                $('.ap-bar .filled').eq(i).width(ap/maxap*100 +'%');
+            }
+            
+            if (burn){
+                uiVars[i].burn = true;
+                $('.buff-burn').eq(i).addClass('active');
+            }
+            else if (uiVars[i].burn){
+                uiVars[i].burn = false;
+                $('.buff-burn').eq(i).removeClass('active');
+            }
+            
+            if (resist){
+                uiVars[i].resist = true;
+                $('.buff-resist').eq(i).addClass('active');
+            }
+            else if (uiVars[i].resist){
+                uiVars[i].resist = false;
+                $('.buff-resist').eq(i).removeClass('active');
+            }
+            
+            if (stun){
+                uiVars[i].stun = true;
+                $('.buff-stun').eq(i).addClass('active');
+            }
+            else if (uiVars[i].stun){
+                uiVars[i].stun = false;
+                $('.buff-stun').eq(i).removeClass('active');
+            }
 
-		if (invisible)
-			$('.buff-invisible').eq(i).addClass('active');
-		else if ($('.buff-invisible').eq(i).hasClass('active'))
-			$('.buff-invisible').eq(i).removeClass('active');
+            if (invisible){
+                uiVars[i].invisible = true;
+                $('.buff-invisible').eq(i).addClass('active');
+            }
+            else if (uiVars[i].invisible){
+                uiVars[i].invisible = false;
+                $('.buff-invisible').eq(i).removeClass('active');
+            }
 
-		if (speed)
-			$('.buff-speed').eq(i).addClass('active');
-		else if ($('.buff-speed').eq(i).hasClass('active'))
-			$('.buff-speed').eq(i).removeClass('active');
+            if (speed){
+                uiVars[i].speed = true;
+                $('.buff-speed').eq(i).addClass('active');
+            }
+            else if (uiVars[i].speed){
+                uiVars[i].speed = false;
+                $('.buff-speed').eq(i).removeClass('active');
+            }
 
-		if (poison)
-			$('.buff-poison').eq(i).addClass('active');
-		else if ($('.buff-poison').eq(i).hasClass('active'))
-			$('.buff-poison').eq(i).removeClass('active');
-	}
-	
+            if (poison){
+                uiVars[i].poison = true;
+                $('.buff-poison').eq(i).addClass('active');
+            }
+            else if (uiVars[i].poison){
+                uiVars[i].poison = false;
+                $('.buff-poison').eq(i).removeClass('active');
+            }
+
+        }
+    }
 }
 
 var showFPS = false;
 var oldTime = null;
 var avgFPS = 0, contFPS = 0;
+var avgFPS5 = [];
 function debugTimer(){
-	var intFPS;
 	if (showFPS){
 		if (!oldTime)
 			oldTime = new Date();
@@ -938,17 +975,39 @@ function debugTimer(){
 			oldTime = newTime;
 		}
 		if (!$('#fps').length){
-			$('#canvas-container').append("<div id='fps'></fps>")
-			intFPS = setInterval( function(){
-				$('#fps').html("FPS: "+ parseFloat(1000/(avgFPS/contFPS)).toFixed(1));
-				avgFPS = 0;
-				contFPS = 0;
-			}, 1000);
-		}
+            $('#canvas-container').append("<div id='fps'></fps>");
+            intFPS();
+        }
+        function intFPS(){
+            setTimeout( function() {
+                if (contFPS > 0){
+                    avgFPS = 1000/(avgFPS/contFPS);
+                    contFPS = 0;
+
+                    //calculate average FPS in last 5 seconds
+                    avgFPS5.push(avgFPS);
+                    if (avgFPS5.length > 5)
+                        avgFPS5.splice(0,1);
+                    avgFPS = 0;
+                    for (let i in avgFPS5)
+                        avgFPS += avgFPS5[i];
+                    avgFPS /= avgFPS5.length;
+
+                    $('#fps').html("FPS: "+ parseFloat(avgFPS).toFixed(1));
+                }
+                
+                if ($('#fps').length)
+                    intFPS();
+                else{
+                    avgFPS5 = [];
+                    avgFPS = 0;
+                    contFPS = 0;
+                }
+            }, 1000);
+        }
 	}
 	else if ($('#fps').length){
-			$('#fps').remove();
-			clearInterval(intFPS);
+        $('#fps').remove();
 	}
 }
 
@@ -976,8 +1035,7 @@ $(window).keydown(function(event) {
 	}
 
 	if(event.keyCode == Phaser.Keyboard.M){
-		var showFrames;
-		if ($('#ui-container').css('display') == 'flex'){
+		if (showFrames){
 			$('#ui-container').fadeOut();
 			showFrames = false;
 		}
@@ -1039,35 +1097,100 @@ function showMessageBaloon(gladid){
 			baloon.addClass('left');
 		}
 		else if (baloon.hasClass('left'))
-			baloon.removeClass('left');
+            baloon.removeClass('left');
+            
+        gladArray[gladid].baloon = true;
 	}
-	else{
+	else if (gladArray[gladid].baloon){
 		$('.baloon.glad-'+ gladid).fadeOut( function(){
-			$(this).remove();
+            $(this).remove();
+            gladArray[gladid].baloon = null;
 		});
 	}
 	
 }
 
+function initBars(){
+    var graphics = {};
+	graphics.back = game.add.graphics(0,0);
+	graphics.back.beginFill(0x000000);
+	graphics.back.drawRect(-100,0,30,9);
+
+	graphics.hp = game.add.graphics(0,0);
+	graphics.hp.beginFill(0xff0000);
+	graphics.hp.drawRect(-100,0,30,5);
+	
+	graphics.ap = game.add.graphics(0,0);
+	graphics.ap.beginFill(0x0000ff);
+	graphics.ap.drawRect(-100,0,30,4);
+
+	bar.back = graphics.back.generateTexture();
+	bar.back.alpha = 0.15;
+	bar.hp = graphics.hp.generateTexture();
+	bar.hp.alpha = 0.4;
+	bar.ap = graphics.ap.generateTexture();
+	bar.ap.alpha = 0.4;
+}
+
 var showbars = true;
-function showHpApBars(gladid){	
-	if (gladArray[gladid].bars)
-		gladArray[gladid].bars.clear();
+function showHpApBars(gladid){
+    if (showbars){
+        if (!gladArray[gladid].bars){
+            var b = {};
+            b.back = game.add.sprite(0,0, bar.back);
+            b.back.alpha = 0.15;
+            b.hp = game.add.sprite(0,0, bar.hp);
+            b.hp.alpha = 0.4;
+            b.ap = game.add.sprite(0,0, bar.ap);
+            b.ap.alpha = 0.4;
 
-	if (showbars && json.glads[gladid].hp > 0){
-		var x = arenaX1 + json.glads[gladid].x * arenaRate;
-		var y = arenaY1 + json.glads[gladid].y * arenaRate;
-		var hp = parseFloat(json.glads[gladid].hp);
-		var maxhp = parseFloat(json.glads[gladid].maxhp);
-		var ap = parseFloat(json.glads[gladid].ap);
-		var maxap = parseFloat(json.glads[gladid].maxap);
-		var barsize = 30;
+            gladArray[gladid].bars = b;
+        }
+    
+        if (json.glads[gladid].hp > 0){
+            var x = arenaX1 + json.glads[gladid].x * arenaRate;
+            var y = arenaY1 + json.glads[gladid].y * arenaRate;
+            var hp = parseFloat(json.glads[gladid].hp);
+            var maxhp = parseFloat(json.glads[gladid].maxhp);
+            var ap = parseFloat(json.glads[gladid].ap);
+            var maxap = parseFloat(json.glads[gladid].maxap);
+            var barsize = 30;
 
-		gladArray[gladid].bars.draw(bar.back, x + -barsize/2, y + -35, barsize, 9);
-		gladArray[gladid].bars.draw(bar.hp, x + -barsize/2, y + -35, hp/maxhp * barsize, 5);
-		gladArray[gladid].bars.draw(bar.ap, x + -barsize/2, y + -30, ap/maxap * barsize, 4);
+            gladArray[gladid].bars.back.x = x + -barsize/2;
+            gladArray[gladid].bars.back.y = y + -35;
+            gladArray[gladid].bars.back.width = barsize;
+            gladArray[gladid].bars.back.height = 9;
+    
+            gladArray[gladid].bars.hp.x = x + -barsize/2;
+            gladArray[gladid].bars.hp.y = y + -35;
+            gladArray[gladid].bars.hp.width = hp/maxhp * barsize;
+            gladArray[gladid].bars.hp.height = 5;
 
-	}
+            gladArray[gladid].bars.ap.x = x + -barsize/2;
+            gladArray[gladid].bars.ap.y = y + -30;
+            gladArray[gladid].bars.ap.width = ap/maxhp * barsize;
+            gladArray[gladid].bars.ap.height = 4;
+
+            if (!gladArray[gladid].bars.back.alive){
+                gladArray[gladid].bars.back.revive();
+                gladArray[gladid].bars.hp.revive();
+                gladArray[gladid].bars.ap.revive();
+            }
+        }
+        else{
+            gladArray[gladid].bars.back.kill();
+            gladArray[gladid].bars.hp.kill();
+            gladArray[gladid].bars.ap.kill();
+        }
+    }
+    else if (gladArray[gladid].bars && gladArray[gladid].bars.back.alive){
+        gladArray[gladid].bars.back.kill();
+        gladArray[gladid].bars.hp.kill();
+        gladArray[gladid].bars.ap.kill();
+    }
+
+
+    
 }
 
 function zoomWheel(wheel){
@@ -1151,19 +1274,19 @@ function fillPeople(){
 	var realmColor = Math.floor(Math.random() * 2);
 
 	npc = {
-		king: 			{x: 20, y: 7.3, start: 2*13, heading: 'down', gender: 'male', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
-		queen:			{x: 21, y: 7.3, start: 2*13, heading: 'down', gender: 'female', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
-		counselor1:		{x: 19, y: 6.7, start: 4, gender: 'male'},
-		counselor2:		{x: 22, y: 6.7, start: 4, gender: 'male'},
-		royalguard1:	{x: 16, y: 4, start: 6*13, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
-		royalguard2:	{x: 25, y: 4, start: 6*13, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
-		archer1:		{x: 4, y: 3, start: 18*13, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
-		archer2:		{x: 39, y: 1, start: 18*13, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
-		archer3:		{x: 21, y: 39, start: 16*13, heading: 'up', time: 8, interval: (Math.random() * 2 + 7)},
-		commonguard1:	{x: 2, y: 9, start: 6*13, heading: 'down', time: Math.random() * 0.1 + 0.1},
-		commonguard2:	{x: 39, y: 9, start: 5*13, heading: 'left', time: Math.random() * 0.1 + 0.1},
-		commonguard3:	{x: 2, y: 40, start: 7*13, heading: 'right', time: Math.random() * 0.1 + 0.1},
-		commonguard4:	{x: 39, y: 40, start: 4*13, heading: 'up', time: Math.random() * 0.1 + 0.1},
+		king: 			{x: 20, y: 7.3, start: {body: 0, hair: 2}, heading: 'down', gender: 'male', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
+		queen:			{x: 21, y: 7.3, start: {body: 0, hair: 4}, heading: 'down', gender: 'female', color: realmColor, time: 5, interval: (Math.random() * 2 + 3)},
+		counselor1:		{x: 19, y: 6.7, start: {body: 4}, heading: 'down', gender: 'male'},
+		counselor2:		{x: 22, y: 6.7, start: {body: 4}, heading: 'down', gender: 'male'},
+		royalguard1:	{x: 16, y: 4, start: {gear: 2, body: 4}, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
+		royalguard2:	{x: 25, y: 4, start: {gear: 2, body: 4}, heading: 'down', time: Math.random() * 0.4 + 0.6, interval: (Math.random() * 6 + 8)},
+		archer1:		{x: 4, y: 3, start: {gear: 3, body: 9}, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
+		archer2:		{x: 39, y: 1, start: {gear: 3, body: 9}, heading: 'down', time: 8, interval: (Math.random() * 2 + 7)},
+		archer3:		{x: 21, y: 39, start: {gear: 0, body: 6}, heading: 'up', time: 8, interval: (Math.random() * 2 + 7)},
+		commonguard1:	{x: 2, y: 9, start: {gear: 2, body: 4}, heading: 'down', time: Math.random() * 0.1 + 0.1},
+		commonguard2:	{x: 39, y: 9, start: {gear: 1, body: 3}, heading: 'left', time: Math.random() * 0.1 + 0.1},
+		commonguard3:	{x: 2, y: 40, start: {gear: 3, body: 5}, heading: 'right', time: Math.random() * 0.1 + 0.1},
+		commonguard4:	{x: 39, y: 40, start: {gear: 0, body: 2}, heading: 'up', time: Math.random() * 0.1 + 0.1},
 	};	
 
 	var gender = [{name: 'male', anims: 3, prob: 0.7}, {name: 'female', anims: 2, prob: 0.3}];
@@ -1177,6 +1300,8 @@ function fillPeople(){
 		npc[i].hair = getHair(npc[i].skin.name, npc[i].gender);
 	}
 
+    var factor = 1;
+    
 	arenaSpaces = [
 		//left top
 		{x: 2.4, y: 10.1, axis: 1, capacity: 29, fill: 0.3, heading: 'right', layer: 1},
@@ -1227,10 +1352,31 @@ function fillPeople(){
 
 	var headArray = {up: [0, 8, 16], left: [2, 10, 18], down: [4, 12, 20], right: [6, 14, 22]};
 
+    var shoesanim = {
+        male: {up: 0, left: 3, down: 1, right: 4},
+        female: {up: 0, left: 2, down: 4, right: 6}
+    };
+
+    var hairinfo = {
+        start: {
+            male: [
+                {up: 0, left: 1, down: 2, right: 3},
+                {up: 0, left: 1, down: 2, right: 3},
+                {up: 4, left: 6, down: 8, right: 10}],
+            female: [
+                {up: 0, left: 2, down: 4, right: 6},
+                {up: 8, left: 9, down: 10, right: 11}]
+        },
+        anim: {
+            male: [[0,0], [0,0], [0,1]],
+            female: [[0,1], [0,0]]
+        }
+    };
+
 	var n = 0;
 	for (let j in arenaSpaces){
 		for (let i=0 ; i<arenaSpaces[j].capacity ; i++){
-			if (Math.random() < arenaSpaces[j].fill){
+			if (Math.random() < arenaSpaces[j].fill * factor){
 				var xinc = 0, yinc = 0;
 				if (arenaSpaces[j].axis == 1)
 					yinc = i;
@@ -1238,7 +1384,8 @@ function fillPeople(){
 					xinc = i;
 
 				var skin = skinColor();
-				var genderroll = gender[weightedRoll([gender[0].prob, gender[1].prob])];
+                var genderroll = gender[weightedRoll([gender[0].prob, gender[1].prob])];
+                var animroll = Math.floor(Math.random() * genderroll.anims);
 				npc['people'+n] = {
 					x: arenaSpaces[j].x + xinc,
 					y: arenaSpaces[j].y + yinc,
@@ -1249,8 +1396,13 @@ function fillPeople(){
 					gender: genderroll.name,
 					hair: getHair(skin.name, genderroll.name),
 					anims: genderroll.anims,
-					start: headArray[arenaSpaces[j].heading][parseInt(Math.random() * genderroll.anims)],
-					cheer: true
+					start: {
+                        body: headArray[arenaSpaces[j].heading][animroll],
+                        shoes: shoesanim[genderroll.name][arenaSpaces[j].heading],
+                        hair: hairinfo.start[genderroll.name][animroll][arenaSpaces[j].heading]},
+                    cheer: true,
+                    anim: {
+                        hair: hairinfo.anim[genderroll.name][animroll]}
 				};
 				n++;
 			}
@@ -1300,35 +1452,6 @@ function clothesColor(){
 	var color = '0x' + r + g + b;
 	//console.log(color);
 	return color;
-}
-
-//convert frames into new array of frames counting blank frames from spritesheet
-function arrayFrame(frames){
-	var maxcol = 13;
-	var moves = [7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 6, 6, 6, 6, 13, 13, 13, 13];
-	var movei;
-	var frame;
-	var newframes = [];
-	var sum;
-
-	for (let i in frames){
-		frame = 0;
-		movei = 0;
-		sum = 0;
-
-		while (frames[i] >= frame){
-			if (frame + moves[movei] > frames[i]){
-				newframes.push(sum + frames[i] - frame);
-				break;
-			}
-			else{
-				sum += maxcol;
-				frame += moves[movei];
-				movei++;
-			}
-		}
-	}
-	return newframes;
 }
 
 function getHair(skin, gender){
@@ -1447,4 +1570,110 @@ function weightedRoll(probs){
 			roll -= probs[i];
 	}
 	return -1;
+}
+
+function addSprite(glad, name, x, y){
+    var anim = {
+        lvlup: {key: 'level', frames: 20, frameRate: 15, loop: false},
+        explode: {key: 'explosion', frames: 12, frameRate: 15, loop: true},
+        stun: {key: 'stun', frames: 6, frameRate: 15, loop: true},
+        shield: {key: 'shield', frames: 20, frameRate: 15, loop: false}
+    };
+
+
+    if (glad.sprites[name]){
+        glad.sprites[name].x = x;
+        glad.sprites[name].y = y;
+        glad.sprites[name].revive();
+    }
+    else{
+        let nz = Math.floor(Math.log10(Math.max(1, anim[name].frames)))+1;
+        glad.sprites[name] = game.add.sprite(x, y, 'atlas_effects');
+        var frames = Phaser.Animation.generateFrameNames(anim[name].key +'_', 0, anim[name].frames-1, '', nz)
+        glad.sprites[name].animations.add(name, frames, anim[name].frameRate, anim[name].loop);
+    }
+
+    return glad.sprites[name];
+
+}
+
+projSprites = {arrow: [], fireball: [], explode: []};
+function newProjectile(type, x, y){
+    var newi = null
+    for (let i in projSprites[type]){
+        if (!projSprites[type][i].alive){
+            newi = i;
+            break;
+        }
+    }
+
+    if (type != 'explode'){
+        x = 0;
+        y = 0;
+    }
+
+    if (newi){
+        projSprites[type][newi].x = x;
+        projSprites[type][newi].y = y;
+        projSprites[type][newi].tint = 0xFFFFFF;
+        projSprites[type][newi].revive();
+    }
+    else{
+        newi = projSprites[type].length;
+        if (type == 'arrow')
+            projSprites[type].push(game.add.image(x, y, 'atlas_effects', 'arrow'));
+        else{
+            projSprites[type].push(game.add.sprite(x, y, 'atlas_effects'));
+
+            if (type == 'fireball'){
+                var frames = Phaser.Animation.generateFrameNames('fireball_', 0, 7, '', 2);
+                projSprites[type][newi].animations.add('fireball', frames, 15, true);
+            }
+            if (type == 'explode'){
+                var frames = Phaser.Animation.generateFrameNames('explosion_', 0, 11, '', 2);
+                projSprites[type][newi].animations.add('explode', frames, 15, true);
+            }
+        }
+    }
+
+    return projSprites[type][newi];
+}
+
+function playAudio(marker, volume){
+    if (!audio[marker])
+        audio[marker] = [];
+
+    var newi = null;
+    for (let i in audio[marker]){
+        if (!audio[marker][i].isPlaying){
+            newi = i;
+            break;
+        }
+    }
+
+    if (newi){
+        audio[marker][newi].volume = volume;
+        audio[marker][newi].play()
+    }
+    else
+        audio[marker].push(game.add.audio(marker, volume).play());
+}
+
+function buildFrames(prefix, frames, start, digits, loop){
+    if (!start)
+        start = 0;
+    if (!digits)
+        digits = 0;
+
+    var strings = [];
+    for (let i in frames){
+        let p = frames[i] + start;
+        if (loop && p > loop.end)
+            p = loop.start;
+        let n = '0000000'.slice(Math.log10(Math.max(1, p))+1, digits) + p;
+        strings.push(prefix + n);
+    }
+
+    return strings;
+
 }
