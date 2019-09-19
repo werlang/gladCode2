@@ -10,6 +10,7 @@ var istep;
 var tournHash, loghash;
 var fullscreen = false;
 var sfxVolume = 1;
+var timeSlider = 0;
 
 $(document).ready( function() {
 	$('#loadbar #status').html("Página carregada");
@@ -43,10 +44,14 @@ $(document).ready( function() {
 				$('#sound').data('sfx', parseFloat(data.sfx_volume));
 				changeSoundIcon();
 
-				if (data.show_frames === true || data.show_frames == 'true')
-					$('#ui-container').fadeIn();
-				else
-					$('#ui-container').fadeOut();
+				if (data.show_frames === true || data.show_frames == 'true'){
+                    $('#ui-container').fadeIn();
+                    showFrames = true;
+                }
+				else{
+                    $('#ui-container').fadeOut();
+                    showFrames = false;
+                }
 			});
 		}
 		
@@ -483,6 +488,7 @@ function start_timer(steps){
 				timestep = steps.length - 1;
 				var name, team, id, hp;
 				for (i in steps[timestep].glads){
+                    //revive gladiator when running backwards
 					if (steps[timestep].glads[i].hp > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
 						if (!id || hp < steps[timestep].glads[i].hp){
 							name = steps[timestep].glads[i].name;
@@ -492,7 +498,7 @@ function start_timer(steps){
 						}
 					}
 				}
-				if (!$('#end-message').length && show_final_score){
+				if (show_final_score && !$('#end-message').length){
 					if (!id){
 						name = "Empate";
 						team = "";
@@ -551,10 +557,12 @@ function start_timer(steps){
 			if (!pausesim){
 				timestep += stepIncrement / Math.abs(stepIncrement);
 			}
-		}
+        }
 	}, 100 / Math.abs(stepIncrement));	
 }
 
+//the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
+uiVars = [];
 function create_ui(nglad){
 	$('#ui-container').html("");
 	for (let i=0 ; i<nglad ; i++){
@@ -572,7 +580,8 @@ function create_ui(nglad){
 				}
 			});
 		});
-	}
+        uiVars.push({});
+    }
 }
 
 function startBattle(simulation){
