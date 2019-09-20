@@ -24,6 +24,8 @@
 				$offset = $total - 1;
 				$page--;
 			}
+			if ($offset < 0)
+				$offset = 0;
 			
 			$sql = "SELECT r.id, time, name, isread, hash, reward FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') ORDER BY time DESC LIMIT $units OFFSET $offset";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }

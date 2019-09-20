@@ -19,9 +19,12 @@
 			$offset = $total - 1;
 			$page--;
 		}
+		
+		if ($offset < 0)
+			$offset = 0;
 
 		$sql = "SELECT * FROM messages m INNER JOIN usuarios u ON email = sender WHERE receiver = '$user' ORDER BY time DESC LIMIT $units OFFSET $offset";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: '.$sql); }
 		
 		$meta = array();
 		$meta['page'] = $page;
