@@ -33,7 +33,9 @@
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="script/assets.min.js"></script>
-	<script type="text/javascript" src="script/profile.min.js"></script>
+	<script type="text/javascript" src="script/profile-tourn.js"></script>
+	<script type="text/javascript" src="script/glad-card.js"></script>
+	<script type="text/javascript" src="script/profile.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 	<script type="text/javascript" src="script/croppie.js"></script>
@@ -64,6 +66,7 @@
 				<div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
 				<div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
 				<div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHA</span></div>
+				<div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>HISTÓRICO</span></div>
 				<div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
 				<div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>MENSAGENS</span></div>
 				<div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
@@ -93,6 +96,7 @@
 						<div id='pref-message'><label><input type='checkbox' class='checkslider'>Outro usuário me enviar uma mensagem</label></div>
 						<div id='pref-update'><label><input type='checkbox' class='checkslider'>A gladCode receber uma atualização</label></div>
 						<div id='pref-duel'><label><input type='checkbox' class='checkslider'>Um amigo enviar um desafio para um duelo</label></div>
+						<div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
 					</div>
 					<div id='button-container'>
 						<button class='button'>GRAVAR</button>
@@ -101,6 +105,58 @@
 			</div>
 			<div class='content' data-menu='battle'>
 				<div id='battle-container'>
+					<div id='battle-mode'>
+						<h2>Para qual modo de batalha deseja se inscrever?</h2>
+						<div id='button-container'>
+							<button id='ranked' class='button'><img src='icon/winner-icon.png'>Batalha Ranqueada</button>
+							<button id='duel' class='button'><img src='sprite/images/swords.png'>Duelo de Gladiadores</button>
+							<button id='tourn' class='button'><img src='icon/tournament.png'>Torneio Personalizado</button>
+						</div>
+					</div>
+					<div id='duel-challenge' class='hidden'>
+						<h2>Desafios para duelo</h2>
+						<div class='table'></div>
+					</div>
+					<div id='ranked' class='wrapper'>
+						<div class='container'>
+							<h2>Selecione o gladiador que deseja inscrever na arena</h2>
+							<div class='glad-card-container'></div>
+							<button id='match-find' class='button' disabled>PROCURAR ADVERSÁRIOS</button>
+						</div>
+					</div>
+					<div id='duel' class='wrapper'>
+						<div class='container'>
+							<h2>Amigo a ser desafido</h2>
+							<input class='input' type='text' placeholder='apelido-do-usuario'>
+							<div class='table' id='table-friends'></div>
+							<div id='button-container'>
+								<button id='challenge' class='button' disabled>DESAFIAR</button>
+							</div>
+						</div>
+					</div>
+					<div id='tourn' class='wrapper'>
+						<div class='container'>
+							<div class='title'>
+								<h2>Torneios públicos abertos</h2>
+								<div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+							</div>
+							<div id='table-open' class='table'></div>
+							
+							<div class='title'>
+								<h2 id='mytourn-title'>Meus torneios</h2>
+								<div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+							</div>
+							<div id='table-mytourn' class='table'></div>
+							<div id='button-container'>
+								<button id='create' class='button'>CRIAR UM TORNEIO</button>
+								<button id='join' class='button'>INGRESSAR EM UM TORNEIO</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class='content' data-menu='report'>
+				<div id='report-container'>
 					<div id='bhist-container'>
 						<h2>Histórico de batalhas</h2>
 						<div id='tab-container'>
@@ -114,13 +170,6 @@
 							<button id='next'></button>
 						</div>
 					</div>
-					<div id='duel-challenge' class='hidden'>
-						<h2>Desafios para duelo</h2>
-						<div class='table'></div>
-					</div>
-					<h2>Selecione o gladiador que deseja inscrever na arena</h2>
-					<div class='glad-card-container'></div>
-					<button id='match-find' class='button' disabled>PROCURAR ADVERSÁRIOS</button>
 				</div>
 			</div>
 			<div class='content' data-menu='glads'>

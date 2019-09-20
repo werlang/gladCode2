@@ -1,17 +1,1 @@
-$(document).ready( function(){
-	menu_loaded().then( function(data){
-		var loc = window.location.href.split("/");
-		loc = loc[loc.length - 1];
-		$('#side-menu #'+loc).addClass('here');
-	});    
-    $('#learn').addClass('here');
-
-	$.post("back_rank.php",{})
-	.done( function(data){
-		data = JSON.parse(data).glads;
-		for (var i in data){
-			var pos = parseInt(i)+1;
-			$('.table tbody').append("<tr><td>"+ pos +"º</td><td>"+ data[i].glad +"</td><td>"+ data[i].user +"</td><td>"+ parseInt(data[i].mmr) +"</td></tr>");
-		}
-	});
-});
+$(document).ready(function(){menu_loaded().then(function(a){a=window.location.href.split("/");a=a[a.length-1];$("#side-menu #"+a).addClass("here")});$("#learn").addClass("here");$.post("back_rank.php",{}).done(function(a){a=JSON.parse(a).glads;for(var b in a){var c=parseInt(b)+1;$(".table tbody").append("<tr><td>"+c+"\u00ba</td><td>"+a[b].glad+"</td><td>"+a[b].user+"</td><td>"+parseInt(a[b].mmr)+"</td></tr>")}})});

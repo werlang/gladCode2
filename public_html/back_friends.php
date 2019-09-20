@@ -84,5 +84,24 @@
 			else
 				echo "EXISTS";
 		}
+		elseif ($action == "FILTER"){
+			$text = mysql_escape_string($_POST['text']);
+			$sql = "SELECT * FROM amizade INNER JOIN usuarios ON email = usuario1 WHERE usuario2 = '$email' AND pendente = 0 AND apelido LIKE '%$text%' UNION SELECT * FROM amizade INNER JOIN usuarios ON email = usuario2 WHERE usuario1 = '$email' AND pendente = 0 AND apelido LIKE '%$text%'";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+			$friends = array();
+			$c = 0;
+			while($row = $result->fetch_assoc()){
+				$friends[$c] = array();
+				$friends[$c]['id'] = $row['cod'];
+				$friends[$c]['user'] = $row['email'];
+				$friends[$c]['nick'] = $row['apelido'];
+				$friends[$c]['lvl'] = $row['lvl'];
+				$friends[$c]['picture'] = $row['foto'];
+				$c++;
+			}
+
+			echo json_encode($friends);
+		}
 	}
 ?>

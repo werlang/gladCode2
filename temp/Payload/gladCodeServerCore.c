@@ -624,7 +624,8 @@ int updateSimulation(int gladid){
 		pthread_mutex_lock(&lock);
 		
         //recupera ap
-        (g+gladid)->ap += (AP_REC_BASE + AP_REC_INT * (g+gladid)->INT) * timeInterval;
+		if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft == 0)
+        	(g+gladid)->ap += (AP_REC_BASE + AP_REC_INT * (g+gladid)->INT) * timeInterval;
         if ((g+gladid)->ap > (g+gladid)->maxap)
             (g+gladid)->ap = (g+gladid)->maxap;
 
@@ -886,7 +887,7 @@ void attackMeleeUnsafe(int gladid){
         if (i != gladid && (g+i)->hp > 0){
             float dist = getDistUnsafe(gladid, (g+i)->x, (g+i)->y);
             float ang = getNormalAngle(getAngleUnsafe(gladid, (g+i)->x, (g+i)->y) - (g+gladid)->head);
-            if ( dist <= 1 && (ang <= 90 || ang >= 270) ){ //180g de raio de ataque
+            if ( dist <= 2 && (ang <= 90 || ang >= 270) ){ //180g de raio de ataque
                 (g+i)->lasthitangle = getNormalAngle(getAngleFromAB((g+i)->x, (g+i)->y, (g+gladid)->x, (g+gladid)->y));
 				float dmg = (g+gladid)->mdmg;
 				setXp(gladid, dmg, i);

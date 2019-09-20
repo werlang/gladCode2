@@ -26,15 +26,28 @@
 	<link type='text/css' rel='stylesheet' href='css/checkboxes.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
 	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/playback.min.js"></script>
 	<script type="text/javascript" src="script/phaser.min.js"></script>
-	<script type="text/javascript" src="script/render.min.js"></script>
+	<script type="text/javascript" src="script/render.js"></script>
 	<script type="text/javascript" src="script/assets.min.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/dropzone.js"></script>
 	<script type="text/javascript" src="script/checkboxes.js"></script>
+	<script type="text/javascript" src="script/playback.js"></script>
 </head>
 <body>
+	<div id='fog' class='load'>
+		<div id='loadbar'>
+			<img src='icon/logo.png'>
+			<span class='text'>Carregando batalha</span>
+			<div id='main' class='bar-container'>
+				<div class='bar'></div>
+			</div>
+			<span id='status' class='text'></span>
+			<div id='second' class='bar-container'>
+				<div class='bar'></div>
+			</div>
+		</div>
+	</div>
 	<div id='log' hidden><?php echo $loghash; ?></div>
 	<div id='tourn' hidden><?php echo $tnm; ?></div>
 	<div id='frame'>
@@ -49,6 +62,7 @@
 					<div class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></div>
 					<div class='button' id='fowd-step' title='Avançar simulação'><div class='speed'>1x</div></div>
 					<div class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png' hidden><img id='img-pause' src='icon/pause.png'></div>
+					<div class='button' id='sound' title='Áudio normal/mudo'><img src='icon/music.png'></div>
 					<div class='button' id='help' title='Ajuda'><img src='icon/question.png'></div>
 				</div>
 			</div>
