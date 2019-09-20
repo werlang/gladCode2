@@ -12,6 +12,7 @@
 			$id = $row['id'];
 
 			$log = file_get_contents("logs/$id");
+			header('Content-Length: ' . filesize("logs/$id"));			
 
 			echo $log;
 		}

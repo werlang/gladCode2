@@ -3,7 +3,7 @@
 	"ptname": "ataqueCorpo",
 	"syntax": "void attackMelee ( void );",
 	"description": {
-		"long": "Realiza um ataque corpo-a-corpo. Todos gladiadores inimigos que estiverem à uma distância de até 1 passo e num arco de 180 graus da frente do gladiador atacante são acertados. Todos gladiadores acertados pelo ataque recebem dano igual ao valor do <a href='manual.php#nav-glad'>atributo dano corpo-a-copo</a> do gladiador atacante.",
+		"long": "Realiza um ataque corpo-a-corpo. Todos gladiadores inimigos que estiverem à uma distância de até 2 passos e num arco de 180 graus da frente do gladiador atacante são acertados. Todos gladiadores acertados pelo ataque recebem dano igual ao valor do <a href='manual.php#nav-glad'>atributo dano corpo-a-copo</a> do gladiador atacante.",
 		"brief": "Realiza um ataque corpo-a-corpo."
 	},
 	"param": [

@@ -1,4 +1,6 @@
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
+RewriteRule    ^tourn\/([a-f0-9]+)/?$    tournament.php?h=$1    [NC,L]
+RewriteRule    ^tourn\/([a-f0-9]+)\/([0-9]+)/?$    tournament.php?h=$1&r=$2    [NC,L]
 
 RewriteRule    ^function/(.*)$    function.php?&f=$1 [NC,L]
 RewriteRule    ^funcao/(.*)$    function.php?f=$1&l=pt [NC,L]
@@ -7,6 +9,7 @@ RewriteRule    ^glad-([0-9]+)$    editor.php?g=$1    [NC,L]
 RewriteRule    ^newglad$    editor.php?g=0    [NC,L]
 
 RewriteRule    ^glads$    profile.php?t=glads    [NC,L]
+RewriteRule    ^reports$    profile.php?t=report    [NC,L]
 RewriteRule    ^battle$    profile.php?t=battle    [NC,L]
 RewriteRule    ^rank$    profile.php?t=ranking    [NC,L]
 RewriteRule    ^messages$    profile.php?t=messages    [NC,L]
@@ -16,5 +19,5 @@ RewriteRule    ^logout$    profile.php?t=logout    [NC,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule     ^([^\.]+)$      $1.php
 
-RewriteCond %{HTTPS} off
-RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#RewriteCond %{HTTPS} off
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

@@ -1,17 +1,20 @@
 <?php
-	$host = 'in-v3.mailjet.com';
-	$port = '80';
-
-	//$host = 'email-smtp.us-east-1.amazonaws.com';
-	//$port = 587;
-
 	$sendername = 'gladCode';
 	$senderemail = 'gladbot@gladcode.tk';
+
+	/*
+	//mailjet
+	$host = 'in-v3.mailjet.com';
+	$port = '80';
 	$senderuser = '3d3198fe000a26c2dfb9656b71063111';
 	$senderpassword = '2190e217582a90175cb145e0f97bc03a';
+	*/
 
-	//$senderuser = 'AKIA6Q3EGWTCOEJHZ5GS';
-	//$senderpassword = 'BDxSzfEoN5Mc9XrJE+PcRrj3ubcy+wjv2u1tznLNPbLj';
+	//amazon
+	$host = 'email-smtp.us-east-1.amazonaws.com';
+	$port = 587;
+	$senderuser = 'AKIA6Q3EGWTCMHB4QO4A';
+	$senderpassword = 'BCCp540coFMW2ObhTkmNSKa6HSM6249ak3MoN49XSXby';
 
 	include_once "connection.php";
 	$cancelSend = false;
@@ -25,7 +28,7 @@
 		$message = $_POST['message'];
 
 		if(isset($_POST['replyid'])){
-			$id = $_POST['replyid'];
+			$id = mysql_escape_string($_POST['replyid']);
 			$sql = "SELECT * FROM messages WHERE cod = '$id'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
@@ -33,7 +36,7 @@
 			$receiveremail = $row['sender'];
 		}
 		else
-			$receiveremail = $_POST['receiver'];
+			$receiveremail = mysql_escape_string($_POST['receiver']);
 		
 		session_start();
 		$user = $_SESSION['user'];
@@ -57,16 +60,17 @@
 		
 		$assunto  = "Mensagem de $usernick";
 
-		$doc = new DOMDocument();
-		$doc->loadHTMLFile("mail_message.html");
-		$msgbody = $doc->saveHTML();
+		$vars = array();
+		$vars['usernick'] = $receivername;
+		$vars['sendernick'] = $usernick;
+		$vars['message'] = $message;
 
-		$msgbody = str_replace("{{usernick}}",$receivername,$msgbody);
-		$msgbody = str_replace("{{sendernick}}",$usernick,$msgbody);
-		$msgbody = str_replace("{{message}}",$message,$msgbody);
+		$doc = new DOMDocument();
+		$doc->loadHTMLFile("mail/mail_message.html");
+		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
 	elseif ($_POST['action'] == 'FRIEND'){
-		$receiveremail = $_POST['friend'];
+		$receiveremail = mysql_escape_string($_POST['friend']);
 		session_start();
 		$user = $_SESSION['user'];
 		
@@ -88,12 +92,13 @@
 
 		$assunto  = "Pedido de amizade de $usernick";
 
-		$doc = new DOMDocument();
-		$doc->loadHTMLFile("mail_friend.html");
-		$msgbody = $doc->saveHTML();
+		$vars = array();
+		$vars['usernick'] = $receivername;
+		$vars['sendernick'] = $usernick;
 
-		$msgbody = str_replace("{{usernick}}",$receivername,$msgbody);
-		$msgbody = str_replace("{{sendernick}}",$usernick,$msgbody);
+		$doc = new DOMDocument();
+		$doc->loadHTMLFile("mail/mail_friend.html");
+		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
 	elseif ($_POST['action'] == 'UPDATE'){
 		$version = $_POST['version'];
@@ -111,17 +116,17 @@
 		
 		$assunto  = "Atualização na gladCode";
 
-		$doc = new DOMDocument();
-		$doc->loadHTMLFile("mail_update.html");
-		$msgbody = $doc->saveHTML();
+		$vars = array();
+		$vars['version'] = $version;
+		$vars['changes'] = $summary;
+		$vars['postlink'] = $postlink;
 
-		$msgbody = str_replace("{{version}}",$version,$msgbody);
-		$msgbody = str_replace("{{changes}}",$summary,$msgbody);
-		$msgbody = str_replace("{{postlink}}",$postlink,$msgbody);
-		$msgbody = str_replace("%7B%7Bpostlink%7D%7D",$postlink,$msgbody);
+		$doc = new DOMDocument();
+		$doc->loadHTMLFile("mail/mail_update.html");
+		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
 	elseif ($_POST['action'] == 'DUEL'){
-		$friend = $_POST['friend'];
+		$friend = mysql_escape_string($_POST['friend']);
 		session_start();
 		$user = $_SESSION['user'];
 		
@@ -146,18 +151,61 @@
 	
 			$assunto  = "Desafio para duelo contra $usernick";
 	
+			$vars = array();
+			$vars['friendnick'] = $friendnick;
+			$vars['usernick'] = $usernick;
+
 			$doc = new DOMDocument();
-			$doc->loadHTMLFile("mail_duel.html");
-			$msgbody = $doc->saveHTML();
-	
-			$msgbody = str_replace("{{friendnick}}",$friendnick,$msgbody);
-			$msgbody = str_replace("{{usernick}}",$usernick,$msgbody);
+			$doc->loadHTMLFile("mail/mail_duel.html");
+			$msgbody = message_replace($doc->saveHTML(), $vars);
 
 			$receiveremail = $friend;
 			$receivername = $friendnick;
 		}
 	}
+	elseif ($_POST['action'] == 'TOURNAMENT'){
+		$hash = mysql_escape_string($_POST['hash']);
+
+		//get email from those participating in the tournament and not dead
+		$sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.email INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.email = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.email AND glt.dead = 0 AND t.hash = '$hash') > 0)";
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+		$receiveremail = array();
+		$receivername = array();
+		while($row = $result->fetch_assoc()){
+			array_push($receivername, $row['apelido']);
+			array_push($receiveremail, $row['email']);
+		}
+
+		$sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
+		";
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$row = $result->fetch_assoc();
+		$maxround = $row['maxround'];
+		$tourn = $row['name'];
+		$limit = date_format(date_create($row['tlimit']), "d/m/Y à\s H:i:s");
+		
+		$assunto  = "Torneio da gladCode";
+
+		$vars = array();
+		$vars['round'] = $maxround;
+		$vars['tourn'] = $tourn;
+		$vars['limit'] = $limit;
+		$vars['hash'] = $hash;
+
+		$doc = new DOMDocument();
+		$doc->loadHTMLFile("mail/mail_tournament.html");
+		$msgtmp = message_replace($doc->saveHTML(), $vars);
+
+		$msgbody = array();
+		foreach ($receiveremail as $i => $value){
+			$msgtmp2 = str_replace("{{usernick}}",$receivername[$i],$msgtmp);
+			array_push($msgbody, $msgtmp2);
+		}
+	}
+
 	/*********************************** A PARTIR DAQUI NAO ALTERAR ************************************/ 
+	$output = array();
 	if (!$cancelSend){
 		require_once('PHPMailer-master/PHPMailerAutoload.php');
 		 
@@ -175,22 +223,55 @@
 		$mail->FromName = $sendername;
 		$mail->IsHTML(true);
 		$mail->Subject = $assunto;
-		$mail->Body = $msgbody;
-		//$mail->AltBody = $altbody;
-		 
-		if (is_array($receiveremail)){
-			foreach($receiveremail as $i => $value)
-				$mail->AddBCC($receiveremail[$i],utf8_decode($receivername[$i]));
+
+		if (!is_array($receiveremail)){
+			$receiveremail = array($receiveremail);
+			$receivername = array($receivername);
+			$msgbody = array($msgbody);
 		}
-		else
-			$mail->AddAddress($receiveremail,utf8_decode($receivername));
-		 
-		if(!$mail->Send())
-			$mensagemRetorno = 'Erro ao enviar formulário: '. print($mail->ErrorInfo);
-		else
-			$mensagemRetorno = 'Formulário enviado com sucesso!';
-		echo $mensagemRetorno;
+
+		$errorcount = 0;
+		foreach($receiveremail as $i => $value){
+			if (!is_array($msgbody))
+				$mail->Body = $msgbody;
+			else
+				$mail->Body = $msgbody[$i];
+
+			//$mail->AltBody = $altbody;
+			
+			if (isset($_POST['self']))
+				$receiveremail[$i] = 'pswerlang@gmail.com';
+			$mail->ClearAllRecipients();
+			$mail->AddAddress($receiveremail[$i],utf8_decode($receivername[$i]));
+				
+			if(!$mail->Send()){
+				if (!is_array($output['error']))
+					$output['error'] = array();
+				$errorcount++;
+				array_push($output['error'], $mail->ErrorInfo);
+			}
+		}
+		if ($errorcount == 0){
+			$output['message'] = 'Enviado com sucesso!';
+			$output['status'] = "SUCCESS";
+		}
+		else{
+			$output['message'] = "Erro ao enviar $errorcount mensagens";
+			$output['status'] = "ERROR";
+		}
 	}
-	else
-		echo "Envio cancelado";
+	else{
+		$output['message'] = "Envio cancelado";
+		$output['status'] = "ABORT";
+	}
+
+	echo json_encode($output);
+
+	function message_replace($msg, $obj){
+		foreach ($obj as $key => $value){
+			$msg = str_replace("{{". $key ."}}",$value,$msg);
+			$msg = str_replace("%7B%7B$key%7D%7D",$value,$msg);
+		}
+		return $msg;
+	}
 ?>

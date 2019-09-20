@@ -4,7 +4,7 @@ now=$(date +%s)
 
 for dir in /home/gladcode/temp/*/
 do
-  if [[ "$dir" =~ ([a-f0-9]{32})\/ ]]; then
+  if [[ "$dir" =~ ([a-f0-9]{1,32})\/ ]]; then
     file=$(date +%s -r $dir)
     diff=$((now - file))
 
@@ -13,4 +13,3 @@ do
     fi
   fi
 done
-

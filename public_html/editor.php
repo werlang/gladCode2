@@ -18,10 +18,10 @@
 	<script src="jquery-ui/jquery-ui.js"></script>
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
-	<script type="text/javascript" src="script/editor.min.js"></script>
-	<script type="text/javascript" src="script/assets.min.js"></script>
+	<script type="text/javascript" src="script/editor.js"></script>
+	<script type="text/javascript" src="script/assets.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
-	<script type="text/javascript" src="script/runSim.min.js"></script>
+	<script type="text/javascript" src="script/runSim.js"></script>
 	<script type="text/javascript" src="script/tutorial.min.js"></script>
 	<script type="text/javascript" src="script/prism.js"></script>
 </head>
@@ -101,7 +101,7 @@
 				<img src='icon/question.png' title='Ajuda'>
 			</div>
 		</div>
-		<div id='panel-left-opener'></div>
+		<div id='panel-left-opener' class='open'></div>
 		<div id='editor'>
 			<pre id='code'></pre>
 		</div>

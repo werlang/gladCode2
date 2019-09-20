@@ -1074,7 +1074,7 @@ int ambush(int gladid){
 			(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
 			waitForLockedStatus(gladid);
 
-			addBuff(gladid, BUFF_INVISIBLE, 2 + (g+gladid)->AGI * 0.2, 0);
+			addBuff(gladid, BUFF_INVISIBLE, 1 + (g+gladid)->AGI * 0.1, 0);
 
 			(g+gladid)->ap -= abilitycost[ABILITY_AMBUSH];
 			r = 1;

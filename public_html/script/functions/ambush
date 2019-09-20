@@ -3,7 +3,7 @@
 	"ptname": "emboscada",
 	"syntax": "int ambush ( void );",
 	"description": {
-		"long": "Faz com que o gladiador receba o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> por 2 segundos, mais 0.4 segundos por cada ponto em <a href='manual.php#nav-glad'>agilidade</a> que o gladiador possuir. Caso o gladiador realize um ataque contra algum outro gladiador enquanto sob o efeito da invisibilidade, o gladiador acertado recebe o efeito <a href='manual.php#nav-efeito'>atordoado</a> durante 1 segundo. Todo ataque realizado contra um gladiador faz com que o gladiador que desferiu o ataque perca o efeito invisibilidade. Um gladiador atordoado não poderá agir até que o efeito termine, e ele é considerado como não estando enxergando nenhum outro gladiador presente na arena.",
+		"long": "Faz com que o gladiador receba o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> por 1 segundo, mais 0.1 segundos por cada ponto em <a href='manual.php#nav-glad'>agilidade</a> que o gladiador possuir. Caso o gladiador realize um ataque contra algum outro gladiador enquanto sob o efeito da invisibilidade, o gladiador acertado recebe o efeito <a href='manual.php#nav-efeito'>atordoado</a> durante 1 segundo. Todo ataque realizado contra um gladiador faz com que o gladiador que desferiu o ataque perca o efeito invisibilidade. Um gladiador atordoado não poderá agir até que o efeito termine, e ele é considerado como não estando enxergando nenhum outro gladiador presente na arena. O gladiador não recupera pontos de habilidade (ap) enquanto sob efeito da invisibilidade.",
 		"brief": "Torna-se invisível e pode atordoar o alvo."
 		},
 	"param": [
