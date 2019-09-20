@@ -1168,7 +1168,7 @@ function showHpApBars(gladid){
 
             gladArray[gladid].bars.ap.x = x + -barsize/2;
             gladArray[gladid].bars.ap.y = y + -30;
-            gladArray[gladid].bars.ap.width = ap/maxhp * barsize;
+            gladArray[gladid].bars.ap.width = ap/maxap * barsize;
             gladArray[gladid].bars.ap.height = 4;
 
             if (!gladArray[gladid].bars.back.alive){
