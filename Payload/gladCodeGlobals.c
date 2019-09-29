@@ -11,6 +11,8 @@ globais do ambiente, herdado do gladCode1
 #define POISON_TIME 45 //quanto tempo ele come�a a aparecer
 #define POISON_SPEED 10 //quanto tempo leva para andar 1p
 #define POINTS_LVL_UP 5
+#define VIS_RANGE 9
+#define VIS_RAD 120
 
 #define PROJECTILE_TYPE_ATTACK 0
 #define PROJECTILE_TYPE_FIREBALL 1

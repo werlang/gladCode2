@@ -189,7 +189,7 @@
                     <tr>
                         <td><a href='function/charge'>Charge</a></td>
                         <td>30</td>
-                        <td>Corre em direção ao alvo com velocidade 4x. Ao alcançá-lo, realiza um ataque corpo-a-corpo reduzindo sua velocidade de movimento por 5s. O valor da velocidade será alterado de acordo com a equação <a href='https://www.wolframalpha.com/input/?i=Plot%5BE%5E(-0.067+X),+%7BX,+0,+30%7D%5D' target='_blank'>Vel=e<sup>-0.067 STR</sup></a></td>
+                        <td>Corre em direção ao alvo com velocidade 4x. Ao alcançá-lo, realiza um ataque corpo-a-corpo que causa mais dano de acordo com a distância percorrida (entre 0% e 250% do dano físico), além de reduzir a velocidade de movimento do alvo por 5s. O valor da velocidade será alterado de acordo com a equação <a href='https://www.wolframalpha.com/input/?i=Plot%5BE%5E(-0.067+X),+%7BX,+0,+30%7D%5D' target='_blank'>Vel=e<sup>-0.067 STR</sup></a></td>
                     </tr>
                     <tr>
                         <td><a href='function/block'>Block</a></td>
@@ -199,7 +199,7 @@
                     <tr>
                         <td><a href='function/assassinate'>Assassinate</a></td>
                         <td>30</td>
-                        <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 160% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 230% da Precisão.</td>
+                        <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 170% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 250% da Precisão.</td>
                     </tr>
                     <tr>
                         <td><a href='function/ambush'>Ambush</a></td>
