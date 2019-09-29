@@ -674,7 +674,7 @@ void attackMelee(int gladid){
 		(g+gladid)->lockedfor = 1/(g+gladid)->as/2;
 		waitForLockedStatus(gladid);
 		
-		attackMeleeUnsafe(gladid);
+		attackMeleeUnsafe(gladid, 1);
 		
 		(g+gladid)->lockedfor = 1/(g+gladid)->as/2;
 		waitForLockedStatus(gladid);
@@ -950,6 +950,9 @@ int charge(int gladid){
 			//se move em direcao ao alvo
 			float destx = (g+target)->x;
 			float desty = (g+target)->y;
+
+			//bonus damage = 1...5
+			float bonusdmg = getDistUnsafe(gladid, destx, desty) / VIS_RANGE * 2.5;
 			while(getDistUnsafe(gladid, destx, desty) > 1){
 				if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft <= timeInterval){
 					addBuff(gladid, BUFF_MOVEMENT, timeInterval*2, 4);
@@ -966,7 +969,7 @@ int charge(int gladid){
 				waitForLockedStatus(gladid);
 			}
 
-			attackMeleeUnsafe(gladid);
+			attackMeleeUnsafe(gladid, bonusdmg);
 			(g+gladid)->action = ABILITY_CHARGE;
 			if ((g+target)->buffs[BUFF_MOVEMENT].timeleft <= 0 || (g+target)->buffs[BUFF_MOVEMENT].value < 1)
 				addBuff(target , BUFF_MOVEMENT, 5, exp(-0.067 * (g+gladid)->STR));
@@ -1039,9 +1042,9 @@ int assassinate(int gladid, float x, float y){
 				bonus++;
 
 			if (bonus == 2)
-				damage = (g+gladid)->rdmg * 2.3;
+				damage = (g+gladid)->rdmg * 2.5;
 			else if (bonus == 1)
-				damage = (g+gladid)->rdmg * 1.6;
+				damage = (g+gladid)->rdmg * 1.7;
 			else
 				damage = (g+gladid)->rdmg;
 			/*

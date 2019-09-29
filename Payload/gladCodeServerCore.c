@@ -793,8 +793,8 @@ void setStartingPos(int gladid){
 }
 
 void registerGlad(int gladid){
-    (g+gladid)->vrad = 120; //raio de visao 120 graus
-    (g+gladid)->vis = 9; //alcance da visao 9 passos
+    (g+gladid)->vrad = VIS_RAD; //raio de visao 120 graus
+    (g+gladid)->vis = VIS_RANGE; //alcance da visao 9 passos
     (g+gladid)->lockedfor = 0;
     setStartingPos(gladid); //inicializa a posicao inicial de cada gladiador formando um circulo
     (g+gladid)->targetlocked = 0; //nenhum alvo fixado
@@ -883,7 +883,7 @@ int isVisible(int gladid, int target){
 		return 0;
 }
 
-void attackMeleeUnsafe(int gladid){
+void attackMeleeUnsafe(int gladid, float bonusdmg){
     int i;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0){
@@ -891,7 +891,7 @@ void attackMeleeUnsafe(int gladid){
             float ang = getNormalAngle(getAngleUnsafe(gladid, (g+i)->x, (g+i)->y) - (g+gladid)->head);
             if ( dist <= 2 && (ang <= 90 || ang >= 270) ){ //180g de raio de ataque
                 (g+i)->lasthitangle = getNormalAngle(getAngleFromAB((g+i)->x, (g+i)->y, (g+gladid)->x, (g+gladid)->y));
-				float dmg = (g+gladid)->mdmg;
+				float dmg = (g+gladid)->mdmg * bonusdmg;
 				setXp(gladid, dmg, i);
                 dealDamage(gladid, i, dmg);
             }
