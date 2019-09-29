@@ -1,3 +1,0 @@
-/tmp/ccz47AIY.o: In function `loop':
-code4.c:(.text+0x3567): undefined reference to `getcloseEnemy'
-collect2: error: ld returned 1 exit status
