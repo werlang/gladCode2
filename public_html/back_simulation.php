@@ -8,9 +8,9 @@
 	$cancel_run = false;
 	
 	$foldername = md5('folder'.microtime()*rand());
-	$path = "/home/gladcode/temp";
+	$path = "/home/gladcode";
 
-	system("mkdir $path/$foldername && cp $path/Payload/* $path/$foldername");
+	system("mkdir $path/temp/$foldername && cp $path/Payload/* $path/temp/$foldername");
 
 	$ids = array();
 	$codes = array();
@@ -129,24 +129,24 @@
 			$invalid_attr = true;
 		}
 		$code = "#include \"gladCodeCore.c\"\n". $code;
-		file_put_contents("$path/$foldername/code$i.c",$code);
+		file_put_contents("$path/temp/$foldername/code$i.c",$code);
 	}
 
 	if ($cancel_run)
 		$output['simulation'] = null;
 	elseif (!$invalid_attr){		
-		system("$path/call_socket.sh $foldername &>> $path/$foldername/error.txt");
+		system("$path/script/call_socket.sh $foldername &>> $path/temp/$foldername/error.txt");
 		
-		if (file_exists("$path/$foldername/outputc.txt"))
-			$outtext .= file_get_contents ("$path/$foldername/outputc.txt");
-		if (file_exists("$path/$foldername/outputs.txt"))
-			$outtext .= file_get_contents ("$path/$foldername/outputs.txt");
-		if (file_exists("$path/$foldername/error.txt"))
-			$error .= file_get_contents ("$path/$foldername/error.txt");
-		if (file_exists("$path/$foldername/errors.txt"))
-			$error .= file_get_contents ("$path/$foldername/errors.txt");
-		if (file_exists("$path/$foldername/errorc.txt"))
-			$error .= file_get_contents ("$path/$foldername/errorc.txt");
+		if (file_exists("$path/temp/$foldername/outputc.txt"))
+			$outtext .= file_get_contents ("$path/temp/$foldername/outputc.txt");
+		if (file_exists("$path/temp/$foldername/outputs.txt"))
+			$outtext .= file_get_contents ("$path/temp/$foldername/outputs.txt");
+		if (file_exists("$path/temp/$foldername/error.txt"))
+			$error .= file_get_contents ("$path/temp/$foldername/error.txt");
+		if (file_exists("$path/temp/$foldername/errors.txt"))
+			$error .= file_get_contents ("$path/temp/$foldername/errors.txt");
+		if (file_exists("$path/temp/$foldername/errorc.txt"))
+			$error .= file_get_contents ("$path/temp/$foldername/errorc.txt");
 
 		$spechar = array("\n", "\r", "\t", "\"");
 		$repchar = array("\\n", "\\r", "\\t", '\\"');
@@ -159,13 +159,13 @@
 		}
 		
 		//stream the file contents
-		if ($error == "" && file_exists("$path/$foldername/simlog")){
+		if ($error == "" && file_exists("$path/temp/$foldername/simlog")){
 			if (isset($_POST['savecode']) && $_POST['savecode'] == "true"){
 				$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
 				//echo $_SESSION['code'];
 			}
 
-			$file = "[". file_get_contents("$path/$foldername/simlog") ."]";
+			$file = "[". file_get_contents("$path/temp/$foldername/simlog") ."]";
 
 			$simulation = json_decode($file);
 			foreach ($simulation[0]->{'glads'} as $gkey => $glad){
@@ -188,6 +188,7 @@
 
 			if (isset($_POST['ranked']) && $_POST['ranked'] == "true"){
 				$deaths = death_times($conn, $ids, $file);
+				$output['deaths'] = $deaths;
 				$rewards = battle_rewards($conn, $deaths);
 				send_reports($conn, $rewards, $hash);
 			}
@@ -227,7 +228,7 @@
 
 	echo json_encode($output);
 
-	system("rm -rf $path/$foldername");
+	system("rm -rf $path/temp/$foldername");
 	
 	function getSkin($subject) {
 		$pattern = '/setSpritesheet\("([\d\w]*?)"\);/';
@@ -331,7 +332,7 @@
 
 		$ids = implode(",", $ids);
 		$sql = "SELECT g.cod, g.mmr, g.master, u.lvl, u.xp FROM gladiators g INNER JOIN usuarios u ON email = master WHERE cod IN ($ids) ORDER BY FIELD(cod,$ids)";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: '. $sql ); }
 
 		$glads = array();
 		$i = 0;
@@ -439,7 +440,7 @@
 				$timeNorm = $diff/$timeDiff;
 
 			$win = 0;
-			if ($i == 0){
+			if ($i == 0 || $glad['time'] == $glads[0]['time']){
 				$win = 1;
 				$timeNorm = 1;
 			}
@@ -509,11 +510,14 @@
 	}
 
 	function death_sort($a,$b) {
-		if ($a['hp'] > 0)
-			return -1;
-		if ($b['hp'] > 0)
-			return 1;
-		return $b['time'] - $a['time'];
+		if ($a['time'] == $b['time']){
+			if ($a['hp'] >= $b['hp'])
+				return -1;
+			else
+				return 1;
+		}
+		else
+			return $b['time'] - $a['time'];
 	}
 
 	function send_reports($conn, $rewards, $log){

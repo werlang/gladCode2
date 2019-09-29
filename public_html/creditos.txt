@@ -1,4 +1,4 @@
---- Créditos ---
+--- Crï¿½ditos ---
 
 1. Sistema
 
@@ -12,36 +12,43 @@ Os sprites usados neste projeto foram criados por diversas pessoas, baseados nos
 Para saber mais sobre acesse:
 http://lpc.opengameart.org
 
-Os usuários do GitHub @makrohn, @gaurav0 e @jrconway3 compilaram todo trabalho criado pelos artistas, e disponibilizaram em suas respectivas páginas.
+Os usuï¿½rios do GitHub @makrohn, @gaurav0 e @jrconway3 compilaram todo trabalho criado pelos artistas, e disponibilizaram em suas respectivas pï¿½ginas.
 Para saber mais acesse:
 https://github.com/jrconway3/Universal-LPC-spritesheet
 
 Para conhecer sobre a licensa de uso dos sprites acesse:
 http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/LICENSE
 
-A lista dos autores e seus créditos pode ser acessada em:
+A lista dos autores e seus crï¿½ditos pode ser acessada em:
 http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/Universal-LPC-spritesheet/AUTHORS.txt
 
-3. Ícones
+3. ï¿½cones
 
-Os ícones utilizados foram baixados do site:
+Os ï¿½cones utilizados foram baixados do site:
 https://game-icons.net/
 
-A licensa dos ícones utilizados pode ser acessada em:
+A licensa dos ï¿½cones utilizados pode ser acessada em:
 https://creativecommons.org/licenses/by/3.0/legalcode
 
-A lista dos autores e seus créditos pode ser acessada em:
+A lista dos autores e seus crï¿½ditos pode ser acessada em:
 https://gladcode.tk/icon-authors.txt
 
 4. Audio
 
-As músicas e sons foram baixados do site:
+As mï¿½sicas e sons foram baixados do site:
 https://freesound.org/
 
 A lista dos autores pode ser acessada em:
 https://gladcode.tk/audio-authors.txt
 
-5. Outros
+5. Emojis
 
-Alguns dos itens utilizados não foi possível determinar a autoria. Caso eu esteja utilizando a sua arte, favor entrar em contato através do email:
+A os emojis fazem parte do projeto Noto Emoji, da Google, que pode ser acessado em:
+https://github.com/googlefonts/noto-emoji
+A licensa pode ser acessada em:
+https://github.com/googlefonts/noto-emoji/blob/master/LICENSE
+
+6. Outros
+
+Alguns dos itens utilizados nï¿½o foi possï¿½vel determinar a autoria. Caso eu esteja utilizando a sua arte, favor entrar em contato atravï¿½s do email:
 pswerlang@gmail.com

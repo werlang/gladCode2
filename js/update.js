@@ -39,6 +39,8 @@ $(document).ready( function(){
 				var changes = $('#changes textarea').val();
 				changes = changes.replace(/\r?\n/g, '<br/>');
 				//console.log(changes);
+				showMessage("Mensagem enviada. Aguarde.");
+				$('button').prop('disabled', true);
 				$.post("back_sendmail.php",{
 					action: "UPDATE",
 					version: $('#version #new').html(),

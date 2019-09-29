@@ -16,7 +16,7 @@
 	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
 	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="script/update.min.js"></script>
+	<script type="text/javascript" src="script/update.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 </head>
 <body>
@@ -33,7 +33,7 @@
 						<option selected>Alterações menores (x.x.N)</option>
 					</select>
 				</div>
-				<div>Nova versão: <span id='new'></span></div>
+				<div>Nova versão: <input id='new'></div>
 			</div>
 			<div id='changes'>
 				<p>Sumário de mudanças</p>

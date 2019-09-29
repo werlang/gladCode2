@@ -21,6 +21,8 @@
 		"stepLeft",
 		"turn",
 		"ambush",
-		"assassinate"
+		"assassinate",
+		"getBlockTimeLeft",
+		"getBurnTimeLeft"
 	]
 }
