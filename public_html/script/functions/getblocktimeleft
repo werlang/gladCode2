@@ -19,6 +19,8 @@
 		"turn",
 		"charge",
 		"block",
-		"doYouSeeMe"
+		"doYouSeeMe",
+		"getAmbushTimeLeft",
+		"getBurnTimeLeft"
 	]
 }

@@ -826,6 +826,8 @@ body{
     border: 2px solid #928e8e;
     cursor: default;
     font-size: 1.5rem;
+    pointer-events: none;
+
 }
 
 .baloon {
@@ -841,6 +843,7 @@ body{
 	max-width: 200px;
     max-height: 50px;
     overflow: hidden;
+    pointer-events: none;
 }
 
 .baloon.left {

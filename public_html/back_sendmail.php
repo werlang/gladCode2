@@ -15,6 +15,7 @@
 	$port = 587;
 	$senderuser = 'AKIA6Q3EGWTCMHB4QO4A';
 	$senderpassword = 'BCCp540coFMW2ObhTkmNSKa6HSM6249ak3MoN49XSXby';
+	$action = $_POST['action'];
 
 	include_once "connection.php";
 	$cancelSend = false;
@@ -24,7 +25,21 @@
 		$msgbody = "TEST MESSAGE";
 		$assunto = "Test subject";
 	}
-	elseif ($_POST['action'] == 'MESSAGE'){
+	elseif (isset($_GET['bulk'])){
+		$n = $_GET['bulk'];
+		$assunto = "Subject for $n test emails";
+
+		$receivername = array();
+		$receiveremail = array();
+		$msgbody = array();
+
+		for ($i=0 ; $i<$n ; $i++){
+			array_push($receivername, "Pablo");
+			array_push($receiveremail, 'contato@gladcode.tk');
+			array_push($msgbody, "Test message ". ($i+1));
+		}
+	}
+	elseif ($action  == 'MESSAGE'){
 		$message = $_POST['message'];
 
 		if(isset($_POST['replyid'])){
@@ -69,7 +84,7 @@
 		$doc->loadHTMLFile("mail/mail_message.html");
 		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
-	elseif ($_POST['action'] == 'FRIEND'){
+	elseif ($action  == 'FRIEND'){
 		$receiveremail = mysql_escape_string($_POST['friend']);
 		session_start();
 		$user = $_SESSION['user'];
@@ -100,12 +115,12 @@
 		$doc->loadHTMLFile("mail/mail_friend.html");
 		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
-	elseif ($_POST['action'] == 'UPDATE'){
+	elseif ($action  == 'UPDATE'){
 		$version = $_POST['version'];
 		$summary = $_POST['summary'];
 		$postlink = $_POST['postlink'];
 		
-		$sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1'"; //AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
+		$sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1' AND email_update != '$version'";// AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$receiveremail = array();
 		$receivername = array();
@@ -125,7 +140,7 @@
 		$doc->loadHTMLFile("mail/mail_update.html");
 		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
-	elseif ($_POST['action'] == 'DUEL'){
+	elseif ($action  == 'DUEL'){
 		$friend = mysql_escape_string($_POST['friend']);
 		session_start();
 		$user = $_SESSION['user'];
@@ -163,7 +178,7 @@
 			$receivername = $friendnick;
 		}
 	}
-	elseif ($_POST['action'] == 'TOURNAMENT'){
+	elseif ($action  == 'TOURNAMENT'){
 		$hash = mysql_escape_string($_POST['hash']);
 
 		//get email from those participating in the tournament and not dead
@@ -243,12 +258,23 @@
 				$receiveremail[$i] = 'pswerlang@gmail.com';
 			$mail->ClearAllRecipients();
 			$mail->AddAddress($receiveremail[$i],utf8_decode($receivername[$i]));
-				
-			if(!$mail->Send()){
+			
+			try {
+				$mail->Send();
+			}
+			catch (Exception $e) {
 				if (!is_array($output['error']))
 					$output['error'] = array();
 				$errorcount++;
 				array_push($output['error'], $mail->ErrorInfo);
+				$mail->smtp->reset();
+			}
+
+			if ($action == "UPDATE"){
+				$em = $receiveremail[$i];
+				$sql = "UPDATE usuarios SET email_update = '$version' WHERE email = '$em'";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
 			}
 		}
 		if ($errorcount == 0){
@@ -259,6 +285,7 @@
 			$output['message'] = "Erro ao enviar $errorcount mensagens";
 			$output['status'] = "ERROR";
 		}
+		$output['count'] = count($receiveremail);
 	}
 	else{
 		$output['message'] = "Envio cancelado";

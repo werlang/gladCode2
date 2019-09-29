@@ -89,6 +89,8 @@
 
         if ($moffset >= $nmine)
             $moffset -= $limit;
+        if ($moffset < 0)
+            $moffset = 0;
 
         //show tournaments which I am the manager or I have joined
         $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user' ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
