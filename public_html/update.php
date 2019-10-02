@@ -50,7 +50,7 @@
 				<p>Senha do administrador</p>
 				<input type='password'>
 			</div>
-			<button class='button'>Atualizar gladCode</button>
+			<button id='send' class='button'>Atualizar gladCode</button>
 		</div>
 		
 		<!--

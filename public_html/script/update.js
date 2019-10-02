@@ -30,7 +30,7 @@ $(document).ready( function(){
 	$('button').click( function(){
 		$.post("back_update.php",{
 			action: "SET",
-			version: $('#version #new').html(),
+			version: $('#version #new').val(),
 			keepup: $('#keep-updated input').prop('checked'),
 			pass: $('#pass-div input').val(),
 		}).done( function(data){
@@ -40,10 +40,10 @@ $(document).ready( function(){
 				changes = changes.replace(/\r?\n/g, '<br/>');
 				//console.log(changes);
 				showMessage("Mensagem enviada. Aguarde.");
-				$('button').prop('disabled', true);
+
 				$.post("back_sendmail.php",{
 					action: "UPDATE",
-					version: $('#version #new').html(),
+					version: $('#version #new').val(),
 					summary: changes,
 					postlink: $('#postlink input').val()
 				}).done( function(data){
