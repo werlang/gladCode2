@@ -510,14 +510,11 @@
 	}
 
 	function death_sort($a,$b) {
-		if ($a['time'] == $b['time']){
-			if ($a['hp'] >= $b['hp'])
-				return -1;
-			else
-				return 1;
-		}
-		else
-			return $b['time'] - $a['time'];
+		if ($a['hp'] > 0 && $b['hp'] <= 0)
+			return -1;
+		if ($b['hp'] > 0 && $a['hp'] <= 0)
+			return 1;
+		return $b['time'] - $a['time'];
 	}
 
 	function send_reports($conn, $rewards, $log){
