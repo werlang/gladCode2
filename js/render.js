@@ -832,12 +832,12 @@ function update_ui(json){
             var STR = json.glads[i].STR;
             var AGI = json.glads[i].AGI;
             var INT = json.glads[i].INT;
-            var hp = parseInt(json.glads[i].hp);
-            var maxhp = parseInt(json.glads[i].maxhp);
-            var ap = parseInt(json.glads[i].ap);
-            var maxap = parseInt(json.glads[i].maxap);
+            var hp = parseFloat(json.glads[i].hp);
+            var maxhp = parseFloat(json.glads[i].maxhp);
+            var ap = parseFloat(json.glads[i].ap);
+            var maxap = parseFloat(json.glads[i].maxap);
             var lvl = parseInt(json.glads[i].lvl);
-            var xp = parseInt(json.glads[i].xp);
+            var xp = parseFloat(json.glads[i].xp);
             var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
             var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
             var stun = parseFloat(json.glads[i].buffs.stun.timeleft);

@@ -489,10 +489,10 @@ function start_timer(steps){
 				var name, team, id, hp;
 				for (i in steps[timestep].glads){
                     //revive gladiator when running backwards
-					if (steps[timestep].glads[i].hp > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
-						if (!id || hp < steps[timestep].glads[i].hp){
+					if (parseFloat(steps[timestep].glads[i].hp) > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
+						if (!id || hp < parseFloat(steps[timestep].glads[i].hp)){
 							name = steps[timestep].glads[i].name;
-							hp = steps[timestep].glads[i].hp;
+							hp = parseFloat(steps[timestep].glads[i].hp);
 							team = steps[timestep].glads[i].user;
 							id = i;
 						}
