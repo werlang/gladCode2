@@ -449,19 +449,24 @@ function resize() {
 		canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
 		game.camera.scale.x = $(window).height() * usefulRatio / screenH;
 		game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-		if ($(window).height() < 600 && $(window).height() < $(window).width()){
+		if ($(window).height() < 600 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
 			showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato").then( function(data){
 				window.location.reload();
-			});
-		}
+            });
+        }
+
 	}
 	else{
+        if ($('#dialog-box').length){
+            $('#fog').remove();
+        }
+
 		var usefulRatio = screenW / arenaD;
 		canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
 		canvasW = $(window).width();
 		game.camera.scale.x = $(window).width() * usefulRatio / screenW;
 		game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-		if ($(window).height() < 600 && !isFullScreen() && !fullscreen){
+		if ($(window).height() < 600 && !isFullScreen() && !fullscreen && $('#dialog-box').length == 0){
 			showDialog("Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?", ['Não','SIM']).then( function(data){
 				if (data == "SIM")
 					setFullScreen(true);
