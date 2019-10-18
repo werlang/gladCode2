@@ -6,7 +6,7 @@
 	<meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCoding</title>
-	<link rel='stylesheet' href="cssdev/code.css"/>
+	<link rel='stylesheet' href="css/dev/code.css"/>
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
@@ -15,11 +15,11 @@
 	<script src="ace/ext-language_tools.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	
-	<script src="scriptdev/code.js"></script>
-	<script src="scriptdev/tabs.js"></script>
-	<script src="scriptdev/keybinds.js"></script>
-	<script src="scriptdev/file_manager.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
+	<script src="script/dev/code.js"></script>
+	<script src="script/dev/tabs.js"></script>
+	<script src="script/dev/keybinds.js"></script>
+	<script src="script/dev/file_manager.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
 	
 	</head>
 <body>

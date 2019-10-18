@@ -19,16 +19,16 @@
 	<title>gladCode</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	
-	<link rel='stylesheet' href="cssdev/index.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/index.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script src="scriptdev/index.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/index.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 <?php

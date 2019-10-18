@@ -2,11 +2,11 @@
     "path": {
         "root": "/home/gladcode/public_html",
         "js": {
-            "dev": "scriptdev",
+            "dev": "script/dev",
             "min": "script"
         },
         "css": {
-            "dev": "cssdev",
+            "dev": "css/dev",
             "min": "css"
         }
     },

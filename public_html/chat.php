@@ -10,9 +10,9 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	  rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
-	<link rel='stylesheet' href="cssdev/chat.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/chat.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
@@ -24,12 +24,12 @@
         });
     </script>
 	
-	<script src="scriptdev/chat.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/emoji.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
-	<script src="scriptdev/socket.js"></script>
+	<script src="script/dev/chat.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/emoji.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
+	<script src="script/dev/socket.js"></script>
 	
 	</head>
 <body>

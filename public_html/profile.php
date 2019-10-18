@@ -20,37 +20,37 @@
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
-	<link rel='stylesheet' href="cssdev/profile.css"/>
-	<link rel='stylesheet' href="cssdev/glad-card.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/chat.css"/>
-	<link rel='stylesheet' href="cssdev/prism.css"/>
-	<link rel='stylesheet' href="cssdev/croppie.css"/>
-	<link rel='stylesheet' href="cssdev/slider.css"/>
-	<link rel='stylesheet' href="cssdev/checkboxes.css"/>
-	<link rel='stylesheet' href="cssdev/table2.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/profile.css"/>
+	<link rel='stylesheet' href="css/dev/glad-card.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/chat.css"/>
+	<link rel='stylesheet' href="css/dev/prism.css"/>
+	<link rel='stylesheet' href="css/dev/croppie.css"/>
+	<link rel='stylesheet' href="css/dev/slider.css"/>
+	<link rel='stylesheet' href="css/dev/checkboxes.css"/>
+	<link rel='stylesheet' href="css/dev/table2.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
-	<script src="scriptdev/assets.js"></script>
-	<script src="scriptdev/dropzone.js"></script>
-	<script src="scriptdev/croppie.js"></script>
-	<script src="scriptdev/profile-tourn.js"></script>
-	<script src="scriptdev/chat.js"></script>
-	<script src="scriptdev/glad-card.js"></script>
-	<script src="scriptdev/profile.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/runSim.js"></script>
-	<script src="scriptdev/checkboxes.js"></script>
-	<script src="scriptdev/stats_func.js"></script>
-	<script src="scriptdev/emoji.js"></script>
-	<script src="scriptdev/socket.js"></script>
-	<script src="scriptdev/prism.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/assets.js"></script>
+	<script src="script/dev/dropzone.js"></script>
+	<script src="script/dev/croppie.js"></script>
+	<script src="script/dev/profile-tourn.js"></script>
+	<script src="script/dev/chat.js"></script>
+	<script src="script/dev/glad-card.js"></script>
+	<script src="script/dev/profile.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/runSim.js"></script>
+	<script src="script/dev/checkboxes.js"></script>
+	<script src="script/dev/stats_func.js"></script>
+	<script src="script/dev/emoji.js"></script>
+	<script src="script/dev/socket.js"></script>
+	<script src="script/dev/prism.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 <body>
