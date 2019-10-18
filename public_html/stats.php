@@ -9,21 +9,21 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
-	<link rel='stylesheet' href="cssdev/side-menu.css"/>
-	<link rel='stylesheet' href="cssdev/table.css"/>
-	<link rel='stylesheet' href="cssdev/stats.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/side-menu.css"/>
+	<link rel='stylesheet' href="css/dev/table.css"/>
+	<link rel='stylesheet' href="css/dev/stats.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	
-	<script src="scriptdev/stats.js"></script>
-	<script src="scriptdev/stats_func.js"></script>
-	<script src="scriptdev/side-menu.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/stats.js"></script>
+	<script src="script/dev/stats_func.js"></script>
+	<script src="script/dev/side-menu.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 <body>

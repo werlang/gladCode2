@@ -8,14 +8,14 @@
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	  rel="stylesheet">
-	<link rel='stylesheet' href="cssdev/sprite.css"/>
-	<link rel='stylesheet' href="cssdev/slider.css"/>
-	<link rel='stylesheet' href="cssdev/glad-card.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/chat.css"/>
-	<link rel='stylesheet' href="cssdev/prism.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
-	<link rel='stylesheet' href="cssdev/editor.css"/>
+	<link rel='stylesheet' href="css/dev/sprite.css"/>
+	<link rel='stylesheet' href="css/dev/slider.css"/>
+	<link rel='stylesheet' href="css/dev/glad-card.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/chat.css"/>
+	<link rel='stylesheet' href="css/dev/prism.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
+	<link rel='stylesheet' href="css/dev/editor.css"/>
 	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
@@ -24,17 +24,17 @@
 	<script src="ace/ext-language_tools.js"></script>
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
-	<script src="scriptdev/editor.js"></script>
-	<script src="scriptdev/assets.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/runSim.js"></script>
-	<script src="scriptdev/tutorial.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
-	<script src="scriptdev/socket.js"></script>
-	<script src="scriptdev/prism.js"></script>
-	<script src="scriptdev/emoji.js"></script>
-	<script src="scriptdev/chat.js"></script>
+	<script src="script/dev/editor.js"></script>
+	<script src="script/dev/assets.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/runSim.js"></script>
+	<script src="script/dev/tutorial.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
+	<script src="script/dev/socket.js"></script>
+	<script src="script/dev/prism.js"></script>
+	<script src="script/dev/emoji.js"></script>
+	<script src="script/dev/chat.js"></script>
 	
 	</head>
 <body>

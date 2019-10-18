@@ -20,23 +20,23 @@
 	<title>gladCode - Visualizar batalha</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
-	<link rel='stylesheet' href="cssdev/checkboxes.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/playback.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/checkboxes.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/playback.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	
-	<script src="scriptdev/phaser.js"></script>
-	<script src="scriptdev/render.js"></script>
-	<script src="scriptdev/assets.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/dropzone.js"></script>
-	<script src="scriptdev/checkboxes.js"></script>
-	<script src="scriptdev/playback.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/phaser.js"></script>
+	<script src="script/dev/render.js"></script>
+	<script src="script/dev/assets.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/dropzone.js"></script>
+	<script src="script/dev/checkboxes.js"></script>
+	<script src="script/dev/playback.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 <body>

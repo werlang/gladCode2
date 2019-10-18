@@ -6,9 +6,9 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Créditos</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='cssdev/header.css'/> 
-	<script type="text/javascript" src="scriptdev/header.js"></script>
-	<script type="text/javascript" src="scriptdev/googlelogin.js"></script>
+	<link type='text/css' rel='stylesheet' href='css/dev/header.css'/> 
+	<script type="text/javascript" src="script/dev/header.js"></script>
+	<script type="text/javascript" src="script/dev/googlelogin.js"></script>
 
 	<style>
 		body {

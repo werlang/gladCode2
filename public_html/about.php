@@ -6,19 +6,19 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Sobre</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<link rel='stylesheet' href="cssdev/about.css"/>
-	<link rel='stylesheet' href="cssdev/radio.css"/>
-	<link rel='stylesheet' href="cssdev/dialog.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/about.css"/>
+	<link rel='stylesheet' href="css/dev/radio.css"/>
+	<link rel='stylesheet' href="css/dev/dialog.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
-	<script src="scriptdev/about.js"></script>
-	<script src="scriptdev/radio.js"></script>
-	<script src="scriptdev/dialog.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/about.js"></script>
+	<script src="script/dev/radio.js"></script>
+	<script src="script/dev/dialog.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 <body>

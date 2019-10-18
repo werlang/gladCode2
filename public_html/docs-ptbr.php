@@ -8,17 +8,17 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"/>
-	<link rel='stylesheet' href="cssdev/table.css"/>
-	<link rel='stylesheet' href="cssdev/docs.css"/>
-	<link rel='stylesheet' href="cssdev/side-menu.css"/>
-	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="css/dev/table.css"/>
+	<link rel='stylesheet' href="css/dev/docs.css"/>
+	<link rel='stylesheet' href="css/dev/side-menu.css"/>
+	<link rel='stylesheet' href="css/dev/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script src="scriptdev/docs.js"></script>
-	<script src="scriptdev/side-menu.js"></script>
-	<script src="scriptdev/googlelogin.js"></script>
-	<script src="scriptdev/header.js"></script>
+	<script src="script/dev/docs.js"></script>
+	<script src="script/dev/side-menu.js"></script>
+	<script src="script/dev/googlelogin.js"></script>
+	<script src="script/dev/header.js"></script>
 	
 	</head>
 </head>
