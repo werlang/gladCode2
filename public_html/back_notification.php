@@ -1,12 +1,13 @@
 <?php
 	session_start();
 	include_once "connection.php";
+
 	$user = $_SESSION['user'];
 
 	$resp = array();
 
 	//user info
-	$sql = "SELECT lvl, xp FROM usuarios WHERE email = '$user'";
+	$sql = "SELECT lvl, xp FROM usuarios WHERE id = '$user'";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 	$row = $result->fetch_assoc();
@@ -17,17 +18,18 @@
 	$resp['user']['lvl'] = $lvl;
 	$resp['user']['xp'] = $xp;
 	
-	$sql = "UPDATE usuarios SET ativo = now() WHERE email = '$user'";
+	//set active time
+	$sql = "UPDATE usuarios SET ativo = now() WHERE id = '$user'";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 	//message
-	$sql = "SELECT u.email FROM messages m INNER JOIN usuarios u ON email = sender WHERE receiver = '$user' AND isread = '0'";
+	$sql = "SELECT u.id FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE receiver = '$user' AND isread = '0'";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	
 	$resp['messages'] = $result->num_rows;
 	
 	//pending friend requests
-	$sql = "SELECT email FROM amizade INNER JOIN usuarios ON email = usuario1 WHERE usuario2 = '$user' AND pendente = 1";
+	$sql = "SELECT u.id FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE usuario2 = '$user' AND pendente = 1";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	
 	$resp['friends'] = $result->num_rows;
@@ -38,6 +40,7 @@
 
 	$nglads = $result->num_rows;
 
+	//calc max glads according to master lvl
 	$initglad = 1;
 	$gladinterval = 10;
 	$maxglads = 6;
@@ -55,16 +58,21 @@
 	$resp['glads']['obsolete'] = $result->num_rows;
 	
 	//reports
+	$resp['reports'] = array();
 	$sql = "SELECT r.id FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') AND isread = '0'";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-	
-	$resp['reports'] = $result->num_rows;
+	$resp['reports']['ranked'] = $result->num_rows;
+
+	$sql = "SELECT d.id FROM duels d WHERE d.isread = 0 AND d.log IS NOT NULL AND d.user1 = '$user'";
+	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$resp['reports']['duel'] = $result->num_rows;
 
 	//duels
-	$sql = "SELECT d.id FROM duels d WHERE (d.log IS NULL AND d.user2 = '$user') OR (d.isread = '0' AND d.log IS NOT NULL)";
+	$sql = "SELECT d.id FROM duels d WHERE d.log IS NULL AND d.user2 = '$user'";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-
 	$resp['duels'] = $result->num_rows;
+	
+	$resp['status'] = "SUCCESS";
 
 	echo json_encode($resp);
 ?>

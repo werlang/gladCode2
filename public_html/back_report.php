@@ -1,6 +1,8 @@
 <?php
 	include_once "connection.php";
 	session_start();
+	include("back_node_message.php");
+
 	if (isset($_SESSION['user'])){
 		$user = $_SESSION['user'];
 		if ($_POST['action'] == "GET"){
@@ -52,6 +54,10 @@
 			if (isset($_POST['read'])){
 				$sql = "UPDATE reports SET isread = '1' WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user')";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+				send_node_message(array(
+					'profile notification' => array('user' => array($user))
+				));
 			}
 		}
 		elseif ($_POST['action'] == "DELETE"){

@@ -5,19 +5,26 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Documentação</title>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/table.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/side-menu.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/manual.css'/> 
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/prism.js"></script>
-	<script type="text/javascript" src="script/side-menu.js"></script>
-	<script type="text/javascript" src="script/docs.js"></script>
-</head>
+      rel="stylesheet"/>
+	
+	<link rel='stylesheet' href="cssdev/table.css"/>
+	<link rel='stylesheet' href="cssdev/manual.css"/>
+	<link rel='stylesheet' href="cssdev/side-menu.css"/>
+	<link rel='stylesheet' href="cssdev/prism.css"/>
+	<link rel='stylesheet' href="cssdev/header.css"/>
+	
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	
+	<script src="scriptdev/docs.js"></script>
+	<script src="scriptdev/side-menu.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	<script src="scriptdev/header.js"></script>
+	<script src="scriptdev/prism.js"></script>
+	
+	</head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>

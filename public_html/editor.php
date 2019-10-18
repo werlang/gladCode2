@@ -5,37 +5,42 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Editor</title>
-	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/sprite.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/slider.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/glad-card.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/editor.css'/> 
-	<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script src="jquery-ui/jquery-ui.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	  rel="stylesheet">
+	<link rel='stylesheet' href="cssdev/sprite.css"/>
+	<link rel='stylesheet' href="cssdev/slider.css"/>
+	<link rel='stylesheet' href="cssdev/glad-card.css"/>
+	<link rel='stylesheet' href="cssdev/dialog.css"/>
+	<link rel='stylesheet' href="cssdev/chat.css"/>
+	<link rel='stylesheet' href="cssdev/prism.css"/>
+	<link rel='stylesheet' href="cssdev/header.css"/>
+	<link rel='stylesheet' href="cssdev/editor.css"/>
+	
+	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
-	<script type="text/javascript" src="script/editor.js"></script>
-	<script type="text/javascript" src="script/assets.js"></script>
-	<script type="text/javascript" src="script/dialog.js"></script>
-	<script type="text/javascript" src="script/runSim.js"></script>
-	<script type="text/javascript" src="script/tutorial.min.js"></script>
-	<script type="text/javascript" src="script/prism.js"></script>
-</head>
+	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	
+	<script src="scriptdev/editor.js"></script>
+	<script src="scriptdev/assets.js"></script>
+	<script src="scriptdev/dialog.js"></script>
+	<script src="scriptdev/runSim.js"></script>
+	<script src="scriptdev/tutorial.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	<script src="scriptdev/header.js"></script>
+	<script src="scriptdev/socket.js"></script>
+	<script src="scriptdev/prism.js"></script>
+	<script src="scriptdev/emoji.js"></script>
+	<script src="scriptdev/chat.js"></script>
+	
+	</head>
 <body>
 	<?php
 		include_once "connection.php";
 		session_start();
-		if (isset($_GET['pass']) && md5($_GET['pass']) == '07aec7e86e12014f87918794f521183b'){
-			$id = mysql_escape_string($_GET['g']);
-			$sql = "SELECT master FROM gladiators WHERE cod = $id";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-			$row = $result->fetch_assoc();
-			$_SESSION['user'] = $row['master'];
-		}
 		
 		if(isset($_SESSION['user']) && isset($_GET['g'])) {
 			$user = $_SESSION['user'];
@@ -45,7 +50,7 @@
 				echo "<div id='newglad'></div>";
 			}
 			else{
-				$sql = "SELECT * FROM gladiators INNER JOIN usuarios ON email = master WHERE master = '$user' AND cod = $id";
+				$sql = "SELECT * FROM gladiators INNER JOIN usuarios ON id = master WHERE master = '$user' AND cod = $id";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				if ($result->num_rows > 0){
 					$row = $result->fetch_assoc();
@@ -147,5 +152,6 @@
 			</div>
 		</div>
 	</div>
+	<div id='chat-panel'></div>
 </body>
 </html>

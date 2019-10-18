@@ -12,10 +12,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Atualização</title>
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-	<script type="text/javascript" src="script/jquery.min.js"></script>
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script type="text/javascript" src="script/update.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 </head>

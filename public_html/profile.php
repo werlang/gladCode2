@@ -17,33 +17,42 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Perfil</title>
-	<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='jquery-ui/jquery-ui.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/profile.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/glad-card.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/prism.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/croppie.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/slider.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/checkboxes.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/table2.css'/> 
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/assets.min.js"></script>
-	<script type="text/javascript" src="script/profile-tourn.js"></script>
-	<script type="text/javascript" src="script/glad-card.js"></script>
-	<script type="text/javascript" src="script/profile.js"></script>
-	<script type="text/javascript" src="script/dialog.js"></script>
-	<script type="text/javascript" src="script/prism.js"></script>
-	<script type="text/javascript" src="script/croppie.js"></script>
-	<script type="text/javascript" src="script/runSim.min.js"></script>
-	<script type="text/javascript" src="script/checkboxes.js"></script>
-	<script type="text/javascript" src="script/stats_func.min.js"></script>
-	<script type="text/javascript" src="script/dropzone.js"></script>
-</head>
+	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
+	<link rel='stylesheet' href="cssdev/profile.css"/>
+	<link rel='stylesheet' href="cssdev/glad-card.css"/>
+	<link rel='stylesheet' href="cssdev/dialog.css"/>
+	<link rel='stylesheet' href="cssdev/chat.css"/>
+	<link rel='stylesheet' href="cssdev/prism.css"/>
+	<link rel='stylesheet' href="cssdev/croppie.css"/>
+	<link rel='stylesheet' href="cssdev/slider.css"/>
+	<link rel='stylesheet' href="cssdev/checkboxes.css"/>
+	<link rel='stylesheet' href="cssdev/table2.css"/>
+	<link rel='stylesheet' href="cssdev/header.css"/>
+	
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	
+	<script src="scriptdev/assets.js"></script>
+	<script src="scriptdev/dropzone.js"></script>
+	<script src="scriptdev/croppie.js"></script>
+	<script src="scriptdev/profile-tourn.js"></script>
+	<script src="scriptdev/chat.js"></script>
+	<script src="scriptdev/glad-card.js"></script>
+	<script src="scriptdev/profile.js"></script>
+	<script src="scriptdev/dialog.js"></script>
+	<script src="scriptdev/runSim.js"></script>
+	<script src="scriptdev/checkboxes.js"></script>
+	<script src="scriptdev/stats_func.js"></script>
+	<script src="scriptdev/emoji.js"></script>
+	<script src="scriptdev/socket.js"></script>
+	<script src="scriptdev/prism.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	<script src="scriptdev/header.js"></script>
+	
+	</head>
 <body>
 	<?php
 		include("header.php");
@@ -99,7 +108,7 @@
 						<div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
 					</div>
 					<div id='button-container'>
-						<button class='button'>GRAVAR</button>
+						<button class='button' id='save'>GRAVAR</button>
 					</div>
 				</div>
 			</div>
@@ -227,7 +236,8 @@
 				</div>
 			</div>
 		</div>
-		<div id='ads'></div>
+		<div id='right-panel'></div>
+		<div id='chat-panel'></div>
 	</div>
 	<?php include("footer.php"); ?>
 </body>

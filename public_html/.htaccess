@@ -19,5 +19,6 @@ RewriteRule    ^logout$    profile.php?t=logout    [NC,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule     ^([^\.]+)$      $1.php
 
-#RewriteCond %{HTTPS} off
-#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1(?::\d+)?$
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

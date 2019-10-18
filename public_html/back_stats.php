@@ -12,7 +12,20 @@
 			$melee = $_POST['melee'];
 			$ranged = $_POST['ranged'];
 			$win = $_POST['win'];
-			$sql = "INSERT INTO stats (time, fireball, teleport, charge, block, assassinate, ambush, melee, ranged, win) VALUES (now(), '$fireball', '$teleport', '$charge', '$block', '$assassinate', '$ambush', '$melee', '$ranged', '$win')";
+			$avglvl = $_POST['avglvl'];
+			$winnerlvl = $_POST['winnerlvl'];
+			$duration = $_POST['duration'];
+			$highstr = $_POST['highstr'];
+			$highagi = $_POST['highagi'];
+			$highint = $_POST['highint'];
+			$loghash = $_POST['loghash'];
+
+			$sql = "SELECT avg(g.mmr) AS mmr FROM gladiators g INNER JOIN reports r ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE l.hash = '$loghash'";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$row = $result->fetch_assoc();
+			$mmr = $row['mmr'];
+
+			$sql = "INSERT INTO stats (time, fireball, teleport, charge, block, assassinate, ambush, melee, ranged, win, avglvl, winnerlvl, duration, highstr, highagi, highint, avgmmr) VALUES (now(), '$fireball', '$teleport', '$charge', '$block', '$assassinate', '$ambush', '$melee', '$ranged', '$win', '$avglvl', '$winnerlvl', '$duration', '$highstr', '$highagi', '$highint', '$mmr')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		}
 		elseif ($_POST['action'] == 'load'){
@@ -32,60 +45,140 @@
 				$end = date('Y-m-d', strtotime(implode("-", $end)));
 			}
 
-			//echo $start.$end;
+			$smmr = $_POST['smmr'];
+			$emmr = $_POST['emmr'];
 			
-			$sql = "SELECT * FROM stats WHERE time >= '$start' AND time <= '$end'";
+			$sql = "SELECT * FROM stats WHERE time >= '$start' AND time <= '$end' AND (avgmmr IS NULL OR (avgmmr >= '$smmr' AND avgmmr <= '$emmr'))";
 			//echo $sql;
 			
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			$nrows = $result->num_rows;
 			$uses = array();
 			$abwin = array();
-			$first = true;
+			$abilities = array(
+				'fireball',
+				'teleport',
+				'charge',
+				'block',
+				'assassinate',
+				'ambush',
+				'ranged',
+				'melee'
+			);
+			$sumtime = array( 'sum' => 0, 'count' => 0 );
+			$highattr = array( 
+				'sum' => array( 
+					'str' => 0, 'agi' => 0, 'int' => 0 ),
+				'count' => array( 
+					'str' => 0, 'agi' => 0, 'int' => 0 ),
+				'total' => 0
+			);
+			$lvl = array(
+				'sum' => array(
+					'avg' => 0, 'winner' => 0),
+				'count' => array(
+					'avg' => 0, 'winner' => 0)
+			);
 			while($row = $result->fetch_assoc()){
+				//set uses of each ability
 				foreach ($row as $key => $value){
-					if ($key != 'cod' && $key != 'time'){					
-						if ($key == 'win'){
-							$win = json_decode($value);
-							foreach ($win as $ability){
-								if (!isset($abwin[$ability]))
-									$abwin[$ability] = 0;
-								$abwin[$ability]++;
-							}
+					if (in_array($key, $abilities)){
+						if (!isset($uses[$key])){
+							$uses[$key] = array(
+								'sum' => 0,
+								'count' => 0
+							);
 						}
-						else{
-							if ($first){
-								$uses[$key] = 0;
-								$count[$key] = 0;
-							}
-							$uses[$key] += $value;
-							if ($value > 0)
-								$count[$key]++;
+						if ($value > 0){
+							$uses[$key]['sum'] += $value;
+							$uses[$key]['count']++;
 						}
 					}
 				}
-				if ($first)
-					$first = false;
+
+				//set every ability the winner cast
+				$win = json_decode($row['win']);
+				foreach ($win as $ability){
+					if (!isset($abwin[$ability]))
+						$abwin[$ability] = 0;
+					$abwin[$ability]++;
+				}
+
+				//time the simulation lasted
+				if (!is_null($row['duration'])){
+					$sumtime['sum'] += $row['duration'];
+					$sumtime['count']++;
+				}
+				
+				//how many glads of each attr, how many fight, and total glads
+				foreach ($highattr['sum'] as $attr => $val){
+					if (isset($row["high$attr"]) && !is_null($row["high$attr"])){
+						$highattr['sum'][$attr] += $row["high$attr"];
+						$highattr['count'][$attr]++;
+						$highattr['total'] += $row["high$attr"];
+					}
+				}
+					
+				//total lvl of glads and how many fights
+				foreach ($lvl['sum'] as $attr => $val){
+					if (isset($row[$attr."lvl"]) && !is_null($row[$attr."lvl"])){
+						$lvl['sum'][$attr] += $row[$attr."lvl"];
+						$lvl['count'][$attr]++;
+					}
+				}
+						
 			}
 			$info = array(
 				'average' => array(),
 				'percuse' => array(),
 				'percwin' => array()
 			);
+			//average uses of each ability and % of the winner
 			foreach ($uses as $ability => $use){
-				if ($count[$ability] == 0)
-					$info['average'][$ability] = 0;
+				$upperab = ucwords($ability);
+				if ($use['count'] == 0)
+					$info['average'][$upperab] = 0;
 				else
-					$info['average'][$ability] = $uses[$ability] / $count[$ability];
+					$info['average'][$upperab] = $use['sum'] / $use['count'];
 				
-				$info['percuse'][$ability] = $count[$ability] / $nrows * 100;
+				$info['percuse'][$upperab] = $use['count'] / $nrows * 100;
 				
 				if (isset($abwin[$ability]))
-					$info['percwin'][$ability] = $abwin[$ability] / $count[$ability] * 100;
+					$info['percwin'][$upperab] = $abwin[$ability] / $use['count'] * 100;
 				else
-					$info['percwin'][$ability] = 0;
+					$info['percwin'][$upperab] = 0;
 			}
-			$info['nbattles'] = $nrows;
+
+			//number of battles found since new infos added
+			$info['nbattles'] = array(
+				'total' => $nrows,
+				'highattr' => $sumtime['count']);
+
+			//avg time battles lasted
+			if ($sumtime['count'] > 0)
+				$info['duration'] = $sumtime['sum'] / $sumtime['count'];
+
+			$info['highattr'] = array(
+				'avg' => array(),
+				'winner' => array()
+			);
+			//% glads of each attr, and % of winner of each type
+			foreach ($highattr['sum'] as $attr => $val){
+				if ($highattr['count'] > 0)
+					$info['highattr']['avg'][$attr] = $highattr['sum'][$attr] / $highattr['total'] * 100;
+
+				if (isset($abwin[strtoupper($attr)]))
+					$info['highattr']['winner'][$attr] = $abwin[strtoupper($attr)] / $highattr['count'][$attr] * 100;
+				else
+					$info['highattr']['winner'][$attr] = 0;
+			}
+			
+			//avg lvl of all glads (last 5 secs) and of the winner
+			foreach ($lvl['sum'] as $attr => $val){
+				if ($lvl['count'][$attr] > 0)
+					$info['highattr'][$attr]['lvl'] = $lvl['sum'][$attr] / $lvl['count'][$attr];
+			}
+			
 			echo json_encode($info);
 		}
 		

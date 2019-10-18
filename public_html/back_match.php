@@ -9,7 +9,7 @@
 			$id = mysql_escape_string($_POST['id']);
 			$pool = 10;
 			
-			$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.email INNER JOIN (SELECT cod FROM gladiators WHERE master != '$user' AND version = '$version' ORDER BY ABS(mmr - (SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user')) LIMIT $pool) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
+			$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN (SELECT cod FROM gladiators WHERE master != '$user' AND version = '$version' ORDER BY ABS(mmr - (SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user')) LIMIT $pool) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			$output = array();

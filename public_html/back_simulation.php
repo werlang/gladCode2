@@ -1,6 +1,9 @@
 <?php
 	include_once "connection.php";
 	session_start();
+	include("back_node_message.php");
+
+	$user = $_SESSION['user'];
 
 	$output = array();
 	$outtext = ""; 
@@ -27,7 +30,6 @@
 	$userglad = "";
 	if (isset($_POST['duel']) && $_POST['duel'] != "false"){
 		$id = mysql_escape_string($_POST['duel']);
-		$user = $_SESSION['user'];
 		$sql = "SELECT gladiator1 FROM duels WHERE id = '$id' AND user2 = '$user' AND log IS NULL";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
@@ -70,9 +72,9 @@
 		else{
 			$code = htmlspecialchars_decode($glad);
 
-			$user = getUser($code);
-			if ($user === false)
-				$user = "user". count($codes);
+			$nick = getUser($code);
+			if ($nick === false)
+				$nick = "user". count($codes);
 
 			$hash = getSkin($code);
 			$code = preg_replace('/setSpritesheet\("[\d\w]*?"\);/', "", $code);
@@ -83,19 +85,19 @@
 			$name = $name[1];
 
 			if (strlen($hash) != 32){
-				$skins[$name .'@'. $user] = $hash;
+				$skins[$name .'@'. $nick] = $hash;
 			}
 			else{
 				$sql = "SELECT skin FROM skins WHERE hash = '$hash'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				if ($result->num_rows > 0){
 					$row = $result->fetch_assoc();
-					$skins[$name .'@'. $user] = $row['skin'];
+					$skins[$name .'@'. $nick] = $row['skin'];
 				}
 			}	
 
 			$pattern = '/setName\("([\w À-ú]+?)"\);/';
-			$replacement = 'setName("$1@'. $user .'");';
+			$replacement = 'setName("$1@'. $nick .'");';
 			$code = preg_replace($pattern, $replacement, $code);
 			array_push($codes, $code);
 		}
@@ -104,19 +106,19 @@
 
 	if (count($ids) > 0){
 		$ids = implode(",", $ids);
-		$sql = "SELECT code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.email WHERE g.cod IN ($ids)";
+		$sql = "SELECT code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 		while($row = $result->fetch_assoc()){
 			$code = $row['code'];
-			$user = $row['apelido'];
+			$nick = $row['apelido'];
 			$name = $row['name'];
 			$vstr = $row['vstr'];
 			$vagi = $row['vagi'];
 			$vint = $row['vint'];
-			$skins[$name .'@'. $user] = $row['skin'];
+			$skins[$name .'@'. $nick] = $row['skin'];
 
-			$setup = "setup(){\n\tsetName(\"$name@$user\");\n\tsetSTR($vstr);\n\tsetAGI($vagi);\n\tsetINT($vint);\n}\n\n";
+			$setup = "setup(){\n\tsetName(\"$name@$nick\");\n\tsetSTR($vstr);\n\tsetAGI($vagi);\n\tsetINT($vint);\n}\n\n";
 			$code = $setup . $code;
 
 			array_push($codes, $code);
@@ -169,11 +171,11 @@
 
 			$simulation = json_decode($file);
 			foreach ($simulation[0]->{'glads'} as $gkey => $glad){
-				$user = preg_replace('/#/', " ", $glad->{'user'});
+				$nick = preg_replace('/#/', " ", $glad->{'user'});
 				$name = preg_replace('/#/', " ", $glad->{'name'});
 				foreach($skins as $key => $skin){
 					$key = explode("@", $key);
-					if ($name == $key[0] && $user == $key[1]){
+					if ($name == $key[0] && $nick == $key[1]){
 						$simulation[0]->{'glads'}[$gkey]->{'skin'} = $skin;
 						//cannot uncomment this because C crashes
 						//$simulation[0]->{'glads'}[$gkey]->{'user'} = $user;
@@ -181,6 +183,7 @@
 					}
 				}
 			}
+			$output['test'] = json_encode($simulation);
 
 			$file = json_encode($simulation);
 			
@@ -188,13 +191,11 @@
 
 			if (isset($_POST['ranked']) && $_POST['ranked'] == "true"){
 				$deaths = death_times($conn, $ids, $file);
-				$output['deaths'] = $deaths;
 				$rewards = battle_rewards($conn, $deaths);
 				send_reports($conn, $rewards, $hash);
 			}
 			if (isset($_POST['duel']) && $_POST['duel'] != "false"){
 				$id = mysql_escape_string($_POST['duel']);
-				$user = $_SESSION['user'];
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			}
@@ -331,7 +332,7 @@
 		}
 
 		$ids = implode(",", $ids);
-		$sql = "SELECT g.cod, g.mmr, g.master, u.lvl, u.xp FROM gladiators g INNER JOIN usuarios u ON email = master WHERE cod IN ($ids) ORDER BY FIELD(cod,$ids)";
+		$sql = "SELECT g.cod, g.mmr, g.master, u.lvl, u.xp FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE cod IN ($ids) ORDER BY FIELD(cod,$ids)";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: '. $sql ); }
 
 		$glads = array();
@@ -354,7 +355,6 @@
 		foreach($glads as $i => $glad)
 			$glad_rewards[$glad['id']] = $rewards[$i];
 
-		$user = $_SESSION['user'];
 		foreach($glads as $i => $glad){
 			if ($glad['master'] == $user){
 				$thisglad = $i;
@@ -402,8 +402,12 @@
 			$xp -= $tonext;
 		}
 		
-		$sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp' WHERE email = '$user'";
+		$sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp' WHERE id = '$user'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+		send_node_message(array(
+			'profile notification' => array('user' => array($user))
+		));
 
 		return $glad_rewards;
 	}
@@ -498,8 +502,8 @@
 
 		foreach($deaths as $i => $glad){
 			$name = $glad['name'];
-			$user = $glad['user'];
-			$sql = "SELECT g.cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.email WHERE g.name = '$name' AND u.apelido = '$user'";
+			$nick = $glad['user'];
+			$sql = "SELECT g.cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.name = '$name' AND u.apelido = '$nick'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			while($row = $result->fetch_assoc()){
@@ -523,9 +527,19 @@
 		$row = $result->fetch_assoc();
 		$log = $row['id'];
 		
+		$masters = array();
 		foreach($rewards as $glad => $reward){
 			$sql = "INSERT INTO reports (log, gladiator, reward) VALUES ('$log', '$glad', '$reward')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+
+			$sql = "SELECT master FROM gladiators WHERE cod = $glad";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+			$row = $result->fetch_assoc();
+			array_push($masters, $row['master']);
 		}
+
+		send_node_message(array(
+			'profile notification' => array('user' => $masters)
+		));
 	}
 ?>

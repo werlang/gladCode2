@@ -4,7 +4,7 @@
 			<div class='col'>
 				<div class='title'>Sobre a gladCode</div>
 				<div><a href='about'>O projeto</a></div>
-				<div><a href='creditos.txt'>Créditos</a></div>
+				<div><a href='creditos'>Créditos</a></div>
 			</div>
 			<div class='col'>
 				<div class='title'>Apoie o projeto</div>
@@ -29,9 +29,10 @@
 				<div class='title'>Contato</div>
 				<div title='Enviar email'><a href='mailto:contato@gladcode.tk'>contato@gladcode.tk</a></div>
 				<div id='social'>
-					<div title='Página do Facebook'><a href='https://www.facebook.com/gladcode'><img src='icon/facebook.png'></a></div>
-					<div title='Comunidade do Reddit'><a href='https://www.reddit.com/r/gladcode'><img src='icon/reddit.png'></a></div>
-					<div title='Canal do Youtube'><a href='https://www.youtube.com/user/pswerlang/videos'><img src='icon/youtube.png'></a></div>
+					<div title='Página do Facebook'><a href='https://www.facebook.com/gladcode' target='_blank'><img src='icon/facebook.png'></a></div>
+					<div title='Grupo do WhatsApp'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' target='_blank'><img src='icon/whatsapp_full.png'></a></div>
+					<div title='Comunidade do Reddit'><a href='https://www.reddit.com/r/gladcode' target='_blank'><img src='icon/reddit.png'></a></div>
+					<div title='Canal do Youtube'><a href='https://www.youtube.com/user/pswerlang/videos' target='_blank'><img src='icon/youtube.png'></a></div>
 				</div>
 			</div>
 		</div>

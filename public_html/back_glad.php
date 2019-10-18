@@ -2,6 +2,8 @@
 	$version = file_get_contents("version");
 	include_once "connection.php";
 	session_start();
+	include("back_node_message.php");
+
 	if ($_POST['action'] == "FILE"){
 		if (isset($_POST['filename']))
 			$code = file_get_contents($_POST['filename']);
@@ -32,11 +34,13 @@
 	}
 	elseif(isset($_SESSION['user'])) {
 		$user = $_SESSION['user'];
-		$sql = "SELECT * FROM usuarios WHERE email = '$user'";
+		
+		$sql = "SELECT * FROM usuarios WHERE id = '$user'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
 		$lvl = $row['lvl'];
-		$initglads = 1;
+		
+		$initglads = 1;		
 		$gladinterval = 10;
 		$maxglads = 6;
 		$limit = min($maxglads, $initglads + floor($lvl/$gladinterval));
@@ -64,12 +68,19 @@
 				$i++;
 			}
 			echo json_encode($info);
+
+			send_node_message(array(
+				'profile notification' => array('user' => array($user))
+			));
 		}
 		elseif ($_POST['action'] == "DELETE"){
 			$id = mysql_escape_string($_POST['id']);
-			$user = $_SESSION['user'];
 			$sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+			send_node_message(array(
+				'profile notification' => array('user' => array($user))
+			));
 		}
 		else{
 			$id = mysql_escape_string($_POST['id']);
@@ -93,11 +104,13 @@
 							$sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$version')";
 							if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 							echo "{\"ID\":". $conn->insert_id ."}";
+
+							send_node_message(array(
+								'profile notification' => array('user' => array($user))
+							));
 						}
 					}
 					elseif ($_POST['action'] == "UPDATE"){
-						$user = $_SESSION['user'];
-
 						$sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', version = '$version' WHERE cod = '$id' AND master = '$user'";
 						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 						echo "{\"ID\":". $id ."}";
