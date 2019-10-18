@@ -17,14 +17,21 @@
 	<meta property="og:description" content="Batalha de agentes virtuais autônomos.">
 	
 	<title>gladCode</title>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
-	<link type='text/css' rel='stylesheet' href='css/index.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/index.js"></script>
-	<script type="text/javascript" src="script/dialog.js"></script>
-	<?php
+	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+	
+	<link rel='stylesheet' href="cssdev/index.css"/>
+	<link rel='stylesheet' href="cssdev/dialog.css"/>
+	<link rel='stylesheet' href="cssdev/header.css"/>
+	
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	<script src="scriptdev/index.js"></script>
+	<script src="scriptdev/dialog.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	<script src="scriptdev/header.js"></script>
+	
+	</head>
+<?php
 	include("header.php");
 	if (isset($_GET['login'])){
 		if (isset($_SESSION['user'])){
@@ -35,7 +42,7 @@
 			echo "<div id='loginhash' hidden>".$_GET['login']."</div>";
 	}
 ?>
-</head>
+
 <body>
 	<div id='section-1'>
 		<div class='card'>

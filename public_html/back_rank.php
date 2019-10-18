@@ -9,7 +9,7 @@
 		}
 	}
 	
-	$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.email $search";
+	$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	$total = $result->num_rows;
 	//echo $sql;
@@ -28,8 +28,10 @@
 		$offset = $total - 1;
 		$page--;
 	}
+	if ($offset < 0)
+		$offset = 0;
 	
-	$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON master = email $search ORDER BY mmr DESC LIMIT $units OFFSET $offset";
+	$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search ORDER BY mmr DESC LIMIT $units OFFSET $offset";
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	
 	$output = array();
@@ -47,7 +49,7 @@
 		$output['glads'][$i]['user'] = $row['apelido'];
 		
 		$id = $row['cod'];
-		$sql = "SELECT (SELECT sum(r.reward) FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.cod = $id AND l.time > CURRENT_TIME() - INTERVAL 1 DAY) AS sumreward, (SELECT COUNT(*)+1 FROM gladiators g INNER JOIN usuarios u ON master = email WHERE mmr > (SELECT mmr FROM gladiators WHERE cod = $id)) AS ranking";
+		$sql = "SELECT (SELECT sum(r.reward) FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.cod = $id AND l.time > CURRENT_TIME() - INTERVAL 1 DAY) AS sumreward, (SELECT COUNT(*)+1 FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE mmr > (SELECT mmr FROM gladiators WHERE cod = $id)) AS ranking";
 		if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result2->fetch_assoc();
 		

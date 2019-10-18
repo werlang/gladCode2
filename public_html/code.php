@@ -6,19 +6,22 @@
 	<meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCoding</title>
-	<link type='text/css' rel='stylesheet' href='css/code.css'/> 
-	<link rel="stylesheet" href="jquery-ui/jquery-ui.css">
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script src="jquery-ui/jquery-ui.js"></script>
+	<link rel='stylesheet' href="cssdev/code.css"/>
+	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
+	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
-	<script type="text/javascript" src="script/code.min.js"></script>
-	<script type="text/javascript" src="script/tabs.js"></script>
-	<script type="text/javascript" src="script/file_manager.js"></script>
-	<script type="text/javascript" src="script/keybinds.js"></script>
-	<script type="text/javascript" src="script/googlelogin.js"></script>
-</head>
+	
+	<script src="scriptdev/code.js"></script>
+	<script src="scriptdev/tabs.js"></script>
+	<script src="scriptdev/keybinds.js"></script>
+	<script src="scriptdev/file_manager.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	
+	</head>
 <body>
 	<div id='frame'>
 		<div id='panel'>

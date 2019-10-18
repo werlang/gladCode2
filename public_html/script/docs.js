@@ -1,1 +1,0 @@
-$(document).ready(function(){menu_loaded().then(function(a){a=window.location.href.split("/");a=a[a.length-1];$("#side-menu #"+a).addClass("here");$("#side-menu #"+a).click()});$("#learn").addClass("here")});

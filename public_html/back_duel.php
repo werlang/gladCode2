@@ -1,15 +1,17 @@
 <?php
 	session_start();
     include_once "connection.php";
+    include("back_node_message.php");
 
-	if (isset($_POST['action']) && isset($_SESSION['user'])){
+    $output = array();
+
+    if (isset($_POST['action']) && isset($_SESSION['user'])){
 		$action = $_POST['action'];
         $user = $_SESSION['user'];
         
         if ($action == "GET"){
-            $output = array();
 
-            $sql = "SELECT d.id, d.time, u.apelido, u.foto, u.lvl FROM duels d INNER JOIN usuarios u ON u.email = d.user1 WHERE d.user2 = '$user' AND d.log IS NULL";
+            $sql = "SELECT d.id, d.time, u.apelido, u.foto, u.lvl FROM duels d INNER JOIN usuarios u ON u.id = d.user1 WHERE d.user2 = '$user' AND d.log IS NULL";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
             while($row = $result->fetch_assoc()){
@@ -22,7 +24,6 @@
                 array_push($output, $duel);
             }
 
-            echo json_encode($output);
         }
 		elseif ($action == "CHALLENGE"){
 			$friend = mysql_escape_string($_POST['friend']);
@@ -30,21 +31,26 @@
 			$sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			if ($result->num_rows == 0)
-				echo "NOT_FRIEND";
+				$output['status'] = "NOT_FRIEND";
 			else{
-				$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.email WHERE g.cod = '$glad' AND g.master = '$user'";
+				$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = '$glad' AND g.master = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				if ($result->num_rows == 0)
-					echo "NOT_GLAD";
+                    $output['status'] = "NOT_GLAD";
 				else{
 					$sql = "SELECT id FROM duels WHERE user2 = '$friend' AND gladiator1 = '$glad' AND log IS NULL";
 					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 					if ($result->num_rows > 0)
-						echo "EXISTS";
+                        $output['status'] = "EXISTS";
 					else{
 						$sql = "INSERT INTO duels (user1, gladiator1, user2, time) VALUES ('$user', '$glad', '$friend', now())";
 						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-						echo "OK";
+                        $output['status'] = "OK";
+                        
+                        send_node_message(array(
+                            'profile notification' => array('user' => array($friend))
+                        ));
+
 					}
 
 				}
@@ -53,10 +59,19 @@
         }
         elseif ($action == "DELETE"){
             $id = mysql_escape_string($_POST['id']);
+
+            $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
+            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $row = $result->fetch_assoc();
+            
+            send_node_message(array(
+                'profile notification' => array('user' => array($row['user1'], $row['user2']))
+            ));
+
             $sql = "DELETE FROM duels WHERE id = '$id' AND (user1 = '$user' OR user2 = '$user')";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-            echo "OK";
+            $output['status'] = "OK";
         }
         elseif ($action == "REPORT"){
             $sql = "SELECT d.id FROM duels d WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL)";
@@ -79,7 +94,7 @@
 				$page--;
 			}
 			
-            $sql = "SELECT d.id, d.time, d.log, d.isread, g1.name AS glad1, g2.name AS glad2, u1.apelido AS nick1, u2.apelido AS nick2, u1.email AS user1, u2.email AS user2 FROM duels d LEFT JOIN gladiators g1 ON g1.cod = d.gladiator1 LEFT JOIN gladiators g2 ON g2.cod = d.gladiator2 INNER JOIN usuarios u1 ON u1.email = d.user1 INNER JOIN usuarios u2 ON u2.email = d.user2 WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL) ORDER BY d.time DESC LIMIT $units OFFSET $offset";
+            $sql = "SELECT d.id, d.time, d.log, d.isread, g1.name AS glad1, g2.name AS glad2, u1.apelido AS nick1, u2.apelido AS nick2, u1.id AS user1, u2.id AS user2 FROM duels d LEFT JOIN gladiators g1 ON g1.cod = d.gladiator1 LEFT JOIN gladiators g2 ON g2.cod = d.gladiator2 INNER JOIN usuarios u1 ON u1.id = d.user1 INNER JOIN usuarios u2 ON u2.id = d.user2 WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL) ORDER BY d.time DESC LIMIT $units OFFSET $offset";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
             $info = array();
@@ -88,7 +103,6 @@
 			$info['start'] = $offset + 1;
 			$info['end'] = $offset + $result->num_rows;
 
-            $output = array();
             while($row = $result->fetch_assoc()){
                 $duel = array();
                 if ($row['user1'] == $user){
@@ -118,8 +132,12 @@
             $sql = "UPDATE duels SET isread = '1' WHERE user1 = '$user' AND log IS NOT NULL";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
             
-            echo json_encode($output);
+            send_node_message(array(
+                'profile notification' => array('user' => array($user))
+            ));
 
         }
+
+        echo json_encode($output);
     }
 ?>

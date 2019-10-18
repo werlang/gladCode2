@@ -6,10 +6,7 @@
 <html>
 <head>
 	<meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
-	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
-	<script type="text/javascript" src="script/googlelogin.js"></script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoadCallback" async defer></script>
-	<script type="text/javascript" src="script/header.js"></script>
 </head>
 <body>
 <div id='header-container'>	
@@ -25,6 +22,7 @@
 				<div class='item-container'>
 					<div class='item'><a href='https://www.reddit.com/r/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'>FORUM REDDIT</a></div>
 					<div class='item'><a href='https://www.facebook.com/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'>PÁGINA FACEBOOK</a></div>
+					<div class='item'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' title='Conecte-se com outros jogadores' target='_blank'>GRUPO WHATSAPP</a></div>
 				</div>
 			</div>
 			<div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'>COMPILADOR C</a></div>

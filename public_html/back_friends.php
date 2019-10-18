@@ -1,92 +1,101 @@
 <?php
 	session_start();
 	include_once "connection.php";
+	include("back_node_message.php");
+
 	if (isset($_POST['action']) && isset($_SESSION['user'])){
 		$action = $_POST['action'];
-		$email = $_SESSION['user'];
+		$user = $_SESSION['user'];
 		
 		if($action == "GET"){
-			$sql = "SELECT * FROM amizade INNER JOIN usuarios ON email = usuario1 WHERE usuario2 = '$email' AND pendente = 1";
+			$sql = "SELECT a.cod, u.apelido, u.foto, u.lvl FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 1";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			
 			$pending = array();
-			$p = 0;
 			while($row = $result->fetch_assoc()){
-				$pending[$p] = array();
-				$pending[$p]['id'] = $row['cod'];
-				$pending[$p]['nick'] = $row['apelido'];
-				$pending[$p]['picture'] = $row['foto'];
-				$pending[$p]['lvl'] = $row['lvl'];
-				$p++;
+				$p = array();
+				$p['id'] = $row['cod'];
+				$p['nick'] = $row['apelido'];
+				$p['picture'] = $row['foto'];
+				$p['lvl'] = $row['lvl'];
+				array_push($pending, $p);
 			}
 
-			$fields = "*, TIMESTAMPDIFF(MINUTE,ativo,now()) as ultimoativo";
-			$sql = "SELECT $fields FROM amizade INNER JOIN usuarios ON email = usuario1 WHERE usuario2 = '$email' AND pendente = 0 UNION SELECT $fields FROM amizade INNER JOIN usuarios ON email = usuario2 WHERE usuario1 = '$email' AND pendente = 0";
+			$fields = "a.cod, u.id, u.apelido, u.lvl, u.foto, TIMESTAMPDIFF(MINUTE,ativo,now()) as ultimoativo";
+			$sql = "SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 0 UNION SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = '$user' AND pendente = 0";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			$confirmed = array();
-			$c = 0;
 			while($row = $result->fetch_assoc()){
-				$confirmed[$c] = array();
-				$confirmed[$c]['id'] = $row['cod'];
-				$confirmed[$c]['user'] = $row['email'];
-				$confirmed[$c]['nick'] = $row['apelido'];
-				$confirmed[$c]['lvl'] = $row['lvl'];
-				$confirmed[$c]['active'] = $row['ultimoativo'];
-				$confirmed[$c]['picture'] = $row['foto'];
-				$c++;
+				$c = array();
+				$c['id'] = $row['cod'];
+				$c['user'] = $row['id'];
+				$c['nick'] = $row['apelido'];
+				$c['lvl'] = $row['lvl'];
+				$c['active'] = $row['ultimoativo'];
+				$c['picture'] = $row['foto'];
+				array_push($confirmed, $c);
 			}
 
-			echo "{\"pending\":". json_encode($pending) .",\"confirmed\":". json_encode($confirmed) ."}";
+			$output = array();
+			$output['pending'] = $pending;
+			$output['confirmed'] = $confirmed;
+			echo json_encode($output);
 		}
 		elseif ($action == "REQUEST"){
 			$id = $_POST['id'];
 			if ($_POST['answer'] == "YES")
-				$sql = "UPDATE amizade SET pendente = '0' WHERE cod = '$id' AND usuario2 = '$email'";
+				$sql = "UPDATE amizade SET pendente = '0' WHERE cod = '$id' AND usuario2 = '$user'";
 			else
-				$sql = "DELETE FROM amizade WHERE cod = '$id' AND usuário2 = '$email'";
+				$sql = "DELETE FROM amizade WHERE cod = '$id' AND usuario2 = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			echo "OK";
+
+			send_node_message(array(
+				'profile notification' => array('user' => array($user))
+			));
 		}
 		elseif ($action == "SEARCH"){
 			$text = mysql_escape_string($_POST['text']);
-			$sql = "SELECT apelido, email FROM usuarios WHERE apelido LIKE '%$text%' AND email != '$email' LIMIT 10";
+			$sql = "SELECT apelido, id, email FROM usuarios WHERE apelido LIKE '%$text%' AND id != '$user' LIMIT 10";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-			$first = true;
-			echo "[";
+			$output = array();
 			while($row = $result->fetch_assoc()){
-				$nick = $row['apelido'];
-				$user = $row['email'];
-				if ($first)
-					$first = false;
-				else
-					echo ",";
-				echo "{\"user\":\"$user\",\"nick\":\"$nick\"}";
+				$person = array();
+				$person['nick'] = $row['apelido'];
+				$person['user'] = $row['id'];
+				$person['email'] = $row['email'];
+				array_push($output, $person);
 			}
-			echo "]";
+			echo json_encode($output);
 		}
 		elseif ($action == "DELETE"){
 			$id = mysql_escape_string($_POST['user']);
-			$sql = "DELETE FROM amizade WHERE cod = '$id' AND (usuario1 = '$email' OR usuario2 = '$email')";
+			$sql = "DELETE FROM amizade WHERE cod = '$id' AND (usuario1 = '$user' OR usuario2 = '$user')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			echo "OK";
 		}
 		elseif ($action == "ADD"){
-			$user = mysql_escape_string($_POST['user']);
-			$sql = "SELECT * FROM amizade WHERE (usuario1 = '$email' AND usuario2 = '$user') OR (usuario2 = '$email' AND usuario1 = '$user')";
+			$friend = mysql_escape_string($_POST['user']);
+			$sql = "SELECT * FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			if ($result->num_rows == 0){
-				$sql = "INSERT INTO amizade (usuario1,usuario2) VALUES ('$email','$user')";
+				$sql = "INSERT INTO amizade (usuario1,usuario2) VALUES ('$user','$friend')";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				echo "OK";
+
+				send_node_message(array(
+					'profile notification' => array('user' => array($friend))
+				));
 			}
 			else
 				echo "EXISTS";
 		}
 		elseif ($action == "FILTER"){
 			$text = mysql_escape_string($_POST['text']);
-			$sql = "SELECT * FROM amizade INNER JOIN usuarios ON email = usuario1 WHERE usuario2 = '$email' AND pendente = 0 AND apelido LIKE '%$text%' UNION SELECT * FROM amizade INNER JOIN usuarios ON email = usuario2 WHERE usuario1 = '$email' AND pendente = 0 AND apelido LIKE '%$text%'";
+			$fields = "a.cod, u.id, u.apelido, u.lvl, u.foto";
+			$sql = "SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 0 AND apelido LIKE '%$text%' UNION SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = '$user' AND pendente = 0 AND apelido LIKE '%$text%'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			$friends = array();
@@ -94,7 +103,7 @@
 			while($row = $result->fetch_assoc()){
 				$friends[$c] = array();
 				$friends[$c]['id'] = $row['cod'];
-				$friends[$c]['user'] = $row['email'];
+				$friends[$c]['user'] = $row['id'];
 				$friends[$c]['nick'] = $row['apelido'];
 				$friends[$c]['lvl'] = $row['lvl'];
 				$friends[$c]['picture'] = $row['foto'];

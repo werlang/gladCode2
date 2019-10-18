@@ -330,7 +330,7 @@
                 $output['flex'] = $row['flex'];
             }
             
-            $sql = "SELECT cod, name, vstr, vagi, vint, skin, apelido, master FROM gladiators INNER JOIN usuarios ON email = master WHERE cod IN (SELECT gladiator FROM gladiator_teams WHERE team = '$teamid')";
+            $sql = "SELECT g.cod, g.name, g.vstr, g.vagi, g.vint, g.skin, u.apelido, master FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE g.cod IN (SELECT gladiator FROM gladiator_teams WHERE team = '$teamid')";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
             if ($nrows == 0){

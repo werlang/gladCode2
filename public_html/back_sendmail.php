@@ -44,7 +44,7 @@
 
 		if(isset($_POST['replyid'])){
 			$id = mysql_escape_string($_POST['replyid']);
-			$sql = "SELECT * FROM messages WHERE cod = '$id'";
+			$sql = "SELECT u.email AS sender FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod = '$id'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			$row = $result->fetch_assoc();
@@ -56,7 +56,7 @@
 		session_start();
 		$user = $_SESSION['user'];
 		
-		$sql = "SELECT apelido FROM usuarios WHERE email = '$user'";
+		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
 		
@@ -89,13 +89,13 @@
 		session_start();
 		$user = $_SESSION['user'];
 		
-		$sql = "SELECT apelido FROM usuarios WHERE email = '$user'";
+		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
 		
 		$usernick = $row['apelido'];
 		
-		$sql = "SELECT * FROM usuarios WHERE email = '$receiveremail'";
+		$sql = "SELECT apelido, pref_friend FROM usuarios WHERE email = '$receiveremail'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
 		
@@ -148,17 +148,18 @@
 		$sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		if ($result->num_rows != 0){
-			$sql = "SELECT apelido from usuarios WHERE email = '$user'";
+			$sql = "SELECT apelido from usuarios WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 			$row = $result->fetch_assoc();
 			$usernick = $row['apelido'];
 			
-			$sql = "SELECT apelido, pref_duel FROM usuarios WHERE email = '$friend'";
+			$sql = "SELECT apelido, pref_duel, email FROM usuarios WHERE id = '$friend'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			$row = $result->fetch_assoc();
 			
 			$friendnick = $row['apelido'];
+			$friendemail = $row['email'];
 			
 			$pref = $row['pref_duel'];
 			if ($pref == "0")
@@ -174,7 +175,7 @@
 			$doc->loadHTMLFile("mail/mail_duel.html");
 			$msgbody = message_replace($doc->saveHTML(), $vars);
 
-			$receiveremail = $friend;
+			$receiveremail = $friendemail;
 			$receivername = $friendnick;
 		}
 	}
@@ -182,7 +183,7 @@
 		$hash = mysql_escape_string($_POST['hash']);
 
 		//get email from those participating in the tournament and not dead
-		$sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.email INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.email = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.email AND glt.dead = 0 AND t.hash = '$hash') > 0)";
+		$sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.id AND glt.dead = 0 AND t.hash = '$hash') > 0)";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 		$receiveremail = array();

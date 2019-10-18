@@ -6,14 +6,21 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Sobre</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<link type='text/css' rel='stylesheet' href='css/about.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/radio.css'/> 
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-	<script type="text/javascript" src="script/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="script/about.js"></script>
-	<script type="text/javascript" src="script/radio.js"></script>
-</head>
+	<link rel='stylesheet' href="cssdev/about.css"/>
+	<link rel='stylesheet' href="cssdev/radio.css"/>
+	<link rel='stylesheet' href="cssdev/dialog.css"/>
+	<link rel='stylesheet' href="cssdev/header.css"/>
+	
+	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
+	<script src="scriptdev/about.js"></script>
+	<script src="scriptdev/radio.js"></script>
+	<script src="scriptdev/dialog.js"></script>
+	<script src="scriptdev/googlelogin.js"></script>
+	<script src="scriptdev/header.js"></script>
+	
+	</head>
 <body>
     <?php include("header.php"); ?>
 	<div id='frame'>
@@ -64,14 +71,54 @@
 				<span class='time'>Mar 2018</span>
 			</div>
 			<div class='row'>
-				<span class='text'>O sistema da gladCode 2 foi usado no evento Charcode usando a interface hoje chamada de modo <a href='tournment.php' target='_blank'>Torneio Clássico</a>.</span>
+				<span class='text'>O sistema da gladCode 2 foi usado no evento Charcode usando a interface hoje chamada de modo <span title='Modo descontinuado' class='discontinued'>Torneio clássico</span>.</span>
 				<img src='icon/swords.png'>
 				<span class='time'>Out 2018</span>
 			</div>
 			<div class='row'>
-				<span class='text'>Lançamento da <a href='https://www.reddit.com/r/gladcode/comments/auttt3/atualiza%C3%A7%C3%A3o_gladcode_251beta/' target='_blank'>versão Beta</a>, que proporciona a criação e teste de gladiadores de maneira integrada através do editor, além de perfis de usuários e batalhas contra outros usuários e ranking.</span>
+				<span class='text'>Lançamento da <a href='https://www.reddit.com/r/gladcode/comments/auttt3/atualiza%C3%A7%C3%A3o_gladcode_251beta/' target='_blank'>versão Beta</a>, que proporciona a criação e teste de gladiadores de maneira integrada através do editor, além de perfis de usuários, batalhas contra outros usuários e ranking.</span>
 				<img src='icon/swords.png'>
 				<span class='time'>Jan 2019</span>
+			</div>
+			<div class='row'>
+				<span class='text'><a href='https://www.reddit.com/r/gladcode/comments/d5h8qv/atualiza%C3%A7%C3%A3o_gladcode_26beta/' target='_blank'>Modo torneio</a> é incluso na gladCode, além de mudanças expressivas na aparência da arena.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Set 2019</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Inauguração do modo torneio na CharCode 2019.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Dez 2019</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Lançamento de novas habilidades.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2020</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Implementação de itens para uso dos gladiadores durante as batalhas.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2020</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Suporte à programação em blocos, e às linguagens Python, Javascript e PHP.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2020</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Loja de skins e mercado de gladiadores da gladCode.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2021</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Árvore de habilidades e achievements dos mestres.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2021</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Versão multi idiomas da gladCode. Tradução para o inglês e templates para outros idomas.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2022</span>
 			</div>
 		</div>
 		<div id='know'>
@@ -141,6 +188,7 @@
 			<div id='social'>
 				<a href='mailto:contato@gladcode.tk' title='Enviar Email' target='_blank'><img src='icon/at-sign.png'></a>
 				<a href='https://facebook.com/gladcode' title='Página do Facebook' target='_blank'><img src='icon/facebook.png'></a>
+				<a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' title='Grupo do WhatsApp' target='_blank'><img src='icon/whatsapp_full.png'></a>
 				<a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
 			</div>
 		</div>
@@ -164,7 +212,7 @@
 				Como a renderização da simulação agora seria feita no navegador, utilizando a <a href='https://phaser.io/'>framework Phaser</a> programei o novo render da gladCode.
 				Os passos seguintes foram a criação das páginas de documentação do projeto e o editor de aparência dos gladiadores, que permitia ao usuário de maneira intuitiva escolher cada peça de equipamento que comporia seu novo gladiador, e gravá-lo no banco da dados do servidor.
 				
-				Na Charcode 2018 a modalidade gladCode utilizou a hoje chamada interface de <a href='tournment.php'>torneio clássico</a> para realizar a competição, que permitiu a geração dos logs das batalhas para visualização posterior.
+				Na Charcode 2018 a modalidade gladCode utilizou a hoje chamada interface de <a href='#' title='Modo descontinuado'>torneio clássico</a> para realizar a competição, que permitiu a geração dos logs das batalhas para visualização posterior.
 
 				Os próximos passos da gladCode seriam torná-la um sistema multiplayer online, onde os usuários criariam seu perfil, salvariam seus códigos e seus gladiadores no servidor, e os colocariam para batalhar contra os gladiadores de outros usuários em um sistema de ranking online da plataforma. Desta forma nasceu o <a href='editor.php'>editor de gladiadores</a>, que une o editor da aparência do gladiador com o editor de texto do compilador C da gladCode. A página de perfil do usuário foi criada permitindo ao usuário comunicar-se com seus amigos, visualizar seu ranking, e inscrever seus gladiadores em batalhas.
 			</div>

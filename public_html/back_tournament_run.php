@@ -47,7 +47,7 @@
         }
         else{
             //get info about my team
-            $sql = "SELECT te.id AS teamid, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.email INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON te.id = gt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = '$user' AND t.hash = '$hash'";
+            $sql = "SELECT te.id AS teamid, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON te.id = gt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = '$user' AND t.hash = '$hash'";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
             
             $myteam = '';
@@ -120,7 +120,7 @@
         }
         if (!$locked){
             //get info from glads into my team from this tournament
-            $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, glt.dead, glt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.email = g.master INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
+            $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, glt.dead, glt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
 
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
             $nrows = $result->num_rows;
@@ -341,7 +341,7 @@
                             $name = preg_replace('/#/', " ", $glad['name']);
                             $nick = preg_replace('/#/', " ", $glad['user']);
                             
-                            $sql = "SELECT g.cod, glt.team FROM gladiators g INNER JOIN usuarios u ON u.email = g.master INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND g.name = '$name' AND u.apelido = '$nick'";                            
+                            $sql = "SELECT g.cod, glt.team FROM gladiators g INNER JOIN usuarios u ON u.id = g.master INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND g.name = '$name' AND u.apelido = '$nick'";                            
                             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                             $row = $result->fetch_assoc();
 

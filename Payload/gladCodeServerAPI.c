@@ -967,6 +967,9 @@ int charge(int gladid){
 				}
 				
 				waitForLockedStatus(gladid);
+
+				if ((g+gladid)->hp <= 0)
+					return 0;
 			}
 
 			attackMeleeUnsafe(gladid, bonusdmg);

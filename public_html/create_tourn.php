@@ -5,7 +5,7 @@
 include_once "connection.php";
 $output = array();
 
-
+//test for creating test tournaments
 if (isset($_GET['n']) && isset($_GET['t'])){
     $name = $_GET['n'];
     $nteams = $_GET['t'];
