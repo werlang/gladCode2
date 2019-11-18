@@ -129,8 +129,24 @@ app.post('/phpcallback', parser, function(req, res) {
 	else if (content['profile notification']){
 		var users = content['profile notification'].user;
 		for (let i in users){
+			//console.log(`send to: user-${users[i]}`);
 			io.to(`user-${users[i]}`).emit('profile notification', true);
 		}
+	}
+	else if (content['tournament list']){
+		io.to('tournament-list').emit('tournament list', true);
+	}
+	else if (content['tournament teams']){
+		var data = content['tournament teams'];
+		io.to(`tournament-${data.id}`).emit('tournament teams', data);
+	}
+	else if (content['tournament glads']){
+		var data = content['tournament glads'];
+		io.to(`team-${data.team}`).emit('tournament glads', data);
+	}
+	else if (content['tournament refresh']){
+		var data = content['tournament refresh'];
+		io.to(`tournament-${data.hash}`).emit('tournament refresh', true);
 	}
 	res.end();
 });
@@ -144,8 +160,9 @@ io.on('connection', function(socket){
 		connection.query(sql, function (error, results, fields){
 			if(error){ fn(error); return;}
 		});
+		//console.log(`join: user-${session.user}`);
 		socket.join(`user-${session.user}`);
-	});
+	}, () => {});
 
 
 	socket.on('disconnect', function(){
@@ -156,7 +173,7 @@ io.on('connection', function(socket){
 		if (session && session.user){
 			var user = session.user;
 			var output = {};
-			var sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
+			var sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
 			connection.query(sql, function (error, results, fields){
 				if(error){ fn(error); return;}
 				
@@ -174,6 +191,44 @@ io.on('connection', function(socket){
 
 	});
 
+	socket.on('tournament join', args => {
+		tournament_join_leave('join', args);
+	});
+	socket.on('tournament leave', args => {
+		tournament_join_leave('leave', args);
+	});
+
+	socket.on('team join', args => {
+		socket.join(`team-${args.team}`);
+	});
+	socket.on('team leave', args => {
+		socket.leave(`team-${args.team}`);
+	});
+
+	socket.on('tournament list join', args => {
+		socket.join(`tournament-list`);
+	});
+
+	socket.on('tournament run join', args => {
+		socket.join(`tournament-${args.hash}`);
+	});
+
+	
+	function tournament_join_leave(mode, args){
+		var sql = `SELECT * FROM tournament WHERE name = '${args.tname}' AND password = '${args.tpass}'`;
+		connection.query(sql, function (error, results, fields){
+			if(error){ console.log(error); return;}
+			
+			if (results.length > 0){
+				var id = results[0].id;
+				if (mode == 'join')
+					socket.join(`tournament-${id}`);
+				else if (mode == 'leave')
+					socket.leave(`tournament-${id}`);
+			}
+		});
+	}
+	
 });
 
 http.listen(3000, function(){
@@ -181,16 +236,19 @@ http.listen(3000, function(){
 });
 
 async function wait_session(){
-    async function isReady(){
-        return await new Promise(resolve => {
-            setTimeout(() => {
-                if (session && session.user)
-                    resolve(true);
-                else
-                    resolve(false);
-            }, 100);
-        });
-    }
-    while (await isReady() === false);
-    return true;
+	var ready = false;
+	var i = 0;
+	while (ready !== true && i < 100){
+		var ready = await new Promise( (resolve, reject) => {
+			setTimeout( function(){
+				if (!session)
+					reject();
+				else if (!session.user)
+					resolve(false);
+				else
+					resolve(true);
+			},100);
+		});
+		i++;
+	}
 }

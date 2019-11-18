@@ -1,34 +1,13 @@
-/* width */
-::-webkit-scrollbar {
-    width: 5px;
-	margin: 1px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0); 
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888; 
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555; 
-}
-
 body{
-	margin: 0;
 	color: #616161;
-	font-family: 'Source Code Pro', monospace;
-	font-size: 16px;
+}
+
+html {
+	scroll-behavior: smooth;
 }
 
 #frame {
 	width: 100%;
-	max-width: 1500px;
 	display: flex;
 	justify-content: center;
 	box-sizing: border-box;
@@ -42,7 +21,6 @@ body{
     background-color: white;
     padding: 20px 15px;
 	max-width: 900px;
-	width: 100%;
 	box-sizing: border-box;
 	font-family: 'Roboto', sans-serif;
 	margin-top: 5px;
@@ -53,10 +31,13 @@ pre {
 	width: 100%;
 }
 
+#frame pre code {
+	white-space: pre-wrap;
+}
+
 @media only screen and (min-width: 800px) {
 	#content-box {
 		padding: 80px 30px 200px;
-		margin-left: 340px;
 	}
 	pre {
 		max-width: calc(100vw - 400px);
@@ -273,4 +254,18 @@ ul {
 		display: table-row;
 	}
 
+}
+
+#right-side {
+	width: 100vw;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media only screen and (min-width: 600px) {
+	#right-side {
+		margin-left: 340px;
+	}
 }

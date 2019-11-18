@@ -8,33 +8,34 @@
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	  rel="stylesheet">
-	<link rel='stylesheet' href="css/dev/sprite.css"/>
-	<link rel='stylesheet' href="css/dev/slider.css"/>
-	<link rel='stylesheet' href="css/dev/glad-card.css"/>
-	<link rel='stylesheet' href="css/dev/dialog.css"/>
-	<link rel='stylesheet' href="css/dev/chat.css"/>
-	<link rel='stylesheet' href="css/dev/prism.css"/>
-	<link rel='stylesheet' href="css/dev/header.css"/>
-	<link rel='stylesheet' href="css/dev/editor.css"/>
+	<link rel='stylesheet' href="css/sprite.css"/>
+	<link rel='stylesheet' href="css/slider.css"/>
+	<link rel='stylesheet' href="css/glad-card.css"/>
+	<link rel='stylesheet' href="css/dialog.css"/>
+	<link rel='stylesheet' href="css/chat.css"/>
+	<link rel='stylesheet' href="css/prism.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
+	<link rel='stylesheet' href="css/editor.css"/>
 	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
-	<script src="script/dev/editor.js"></script>
-	<script src="script/dev/assets.js"></script>
-	<script src="script/dev/dialog.js"></script>
-	<script src="script/dev/runSim.js"></script>
-	<script src="script/dev/tutorial.js"></script>
-	<script src="script/dev/googlelogin.js"></script>
-	<script src="script/dev/header.js"></script>
-	<script src="script/dev/socket.js"></script>
-	<script src="script/dev/prism.js"></script>
-	<script src="script/dev/emoji.js"></script>
-	<script src="script/dev/chat.js"></script>
+	<script src="script/editor.js"></script>
+	<script src="script/assets.js"></script>
+	<script src="script/dialog.js"></script>
+	<script src="script/runSim.js"></script>
+	<script src="script/tutorial.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/header.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/prism.js"></script>
+	<script src="script/emoji.js"></script>
+	<script src="script/chat.js"></script>
 	
 	</head>
 <body>
@@ -96,7 +97,7 @@
 			<div id='test' class='mrow disabled'>
 				<img src='icon/gamepad.png' title='Testar gladiador em batalha'>
 			</div>
-			<div id='download' class='mrow disabled'>
+			<div id='download' class='mrow disabled' hidden>
 				<img src='icon/cloud_download.png' title='Baixar o código do gladiador'>
 			</div>
 			<div id='settings' class='mrow'>

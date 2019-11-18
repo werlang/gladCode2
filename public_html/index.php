@@ -19,16 +19,17 @@
 	<title>gladCode</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	
-	<link rel='stylesheet' href="css/dev/index.css"/>
-	<link rel='stylesheet' href="css/dev/dialog.css"/>
-	<link rel='stylesheet' href="css/dev/header.css"/>
+	<link rel='stylesheet' href="css/index.css"/>
+	<link rel='stylesheet' href="css/dialog.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script src="script/dev/index.js"></script>
-	<script src="script/dev/dialog.js"></script>
-	<script src="script/dev/googlelogin.js"></script>
-	<script src="script/dev/header.js"></script>
+	<script src="script/index.js"></script>
+	<script src="script/dialog.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/header.js"></script>
 	
 	</head>
 <?php
@@ -85,7 +86,6 @@
 						</div>
 						<div class='video'><img class='play' src='icon/youtube-play.png'><img class='thumb' src="https://img.youtube.com/vi/5QQtfruq8_8/mqdefault.jpg"></div>
 					</div>
-					<div class='a-wrapper'><a href='ranking'>Veja o ranking</a></div>
 				</div>
 			</div>
 			<div class='card-wrapper'>
@@ -109,7 +109,7 @@
 					<div class='a-wrapper'><a id='account' href='#'>Fazer login</a></div>
 				</div>
 			</div>
-			<div class='card-wrapper'>
+			<div class='card-wrapper' hidden>
 				<div class='card'>
 					<div class='title'><img src='image/warrior.png'>Engaje-se nas batalhas</div>
 					<div class='body'>Nos modos clássicos de batalha e torneio, você não precisa possuir um perfil na gladCode, basta fazer upload do código dos gladiadores e deixarem eles lutarem até a morte.</div>
@@ -121,12 +121,12 @@
 				<div class='card'>
 					<div class='title'><img src='image/dress.png'>Interaja com a comunidade</div>
 					<div class='body'>Mostre para todos seus gladiadores, compartilhe estratégias, tire suas dúvidas, peça ajuda ou simplesmente divirta-se na nossa página do facebook ou comunidade do reddit.</div>
+					<div class='a-wrapper'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' target='_blank'>gladCode no whatsapp</a></div>
 					<div class='a-wrapper'><a href='https://www.reddit.com/r/gladcode/' target='_blank'>gladCode no reddit</a></div>
 					<div class='a-wrapper'><a href='https://www.facebook.com/gladcode/' target='_blank'>gladCode no facebook</a></div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<?php include("footer.php"); ?>
 </body>
 </html>

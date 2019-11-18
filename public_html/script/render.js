@@ -1073,8 +1073,10 @@ function getGladPositionOnCanvas(gladid){
 	var ph = game.camera.scale.y * tileD;
 	var pw = game.camera.scale.x * tileD;
 	
-	var x = pw*(arenaX1/tileD) + pw * parseFloat(json.glads[gladid].x);
-	var y = ph*(arenaY1/tileD) + ph * parseFloat(json.glads[gladid].y);
+	//var x = pw*(arenaX1/tileD) + pw * parseFloat(25);
+	var x = pw * ((arenaX1/tileD) + parseFloat(json.glads[gladid].x)/25*26);
+	var y = ph * ((arenaY1/tileD) + parseFloat(json.glads[gladid].y)/25*26);
+	//console.log(json.glads[gladid].y);
 	var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
 	var cl = $('#canvas-div canvas').position().left - game.camera.view.x;
 	return {x: x+cl, y: y+ct};

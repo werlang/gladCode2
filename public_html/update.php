@@ -2,7 +2,14 @@
 
 <?php
 	session_start();
-	if(!isset($_SESSION['user']) || $_SESSION['user'] != 'pswerlang@gmail.com') 
+	include_once "connection.php";
+
+	$sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
+	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$row = $result->fetch_assoc();
+	$id = $row['id'];
+
+	if(!isset($_SESSION['user']) || $_SESSION['user'] != $id) 
 		header("Location: index.php");
 ?>
 
@@ -15,9 +22,13 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script type="text/javascript" src="script/update.js"></script>
+	<script type="text/javascript" src="script/googlelogin.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
+	<script type="text/javascript" src="script/header.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>
@@ -58,6 +69,7 @@
 <script async src="//embed.redditmedia.com/widgets/platform.js" charset="UTF-8"></script>-->
 
 	</div>
-	<?php include("footer.php"); ?>
+	<div id='footer'></div>
+
 </body>
 </html>

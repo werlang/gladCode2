@@ -2,7 +2,13 @@
 	session_start();
 	include_once "connection.php";
 	$action = $_POST['action'];
-	if (isset($_SESSION['user']) && $_SESSION['user'] == 'pswerlang@gmail.com'){
+
+	$sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
+	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$row = $result->fetch_assoc();
+	$id = $row['id'];
+
+	if (isset($_SESSION['user']) && $_SESSION['user'] == $id){
 		if($action == 'GET'){
 			$version = explode(".", file_get_contents("version"));
 			echo json_encode($version);

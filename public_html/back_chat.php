@@ -24,6 +24,7 @@
         $id = mysql_escape_string($_POST['id']);
         $first = mysql_escape_string($_POST['first']);
         $sync = mysql_escape_string($_POST['sync']);
+        $visited = mysql_escape_string($_POST['visited']);
 
         //check if user is in the room and not banned
         $sql = "SELECT cu.id FROM chat_users cu WHERE cu.user = '$user' AND cu.room = $id";
@@ -48,7 +49,7 @@
             $limit = 30;
 
             if ($sync == 'true' && $first == 0)
-                $sync = 'AND cm.time > cu.visited';
+                $sync = "AND UNIX_TIMESTAMP(cm.time) > $visited";
             else{
                 $sync = '';
             }
@@ -63,13 +64,20 @@
             //get message info
             $sql = "SET lc_time_names = 'pt_BR'";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-            $sql = "SELECT cm.time as a, cu.visited as b, cm.id, cm.message, DATE_FORMAT(cm.time, '%e %b %k:%i') AS time, um.apelido, cm.system, um.id AS userid, um.foto FROM chat_messages cm INNER JOIN chat_rooms cr ON cr.id = cm.room INNER JOIN chat_users cu ON cu.room = cr.id INNER JOIN usuarios um ON um.id = cm.sender WHERE cr.id = $id AND cu.user = '$user' $bantime $first $sync ORDER BY cm.time DESC, cm.id DESC LIMIT $limit";
+            $sql = "SELECT UNIX_TIMESTAMP(now(3)) AS visited, UNIX_TIMESTAMP(cm.time) AS realtime, cm.id, cm.message, DATE_FORMAT(cm.time, '%e %b %k:%i') AS time, um.apelido, cm.system, um.id AS userid, um.foto FROM chat_messages cm INNER JOIN chat_rooms cr ON cr.id = cm.room INNER JOIN chat_users cu ON cu.room = cr.id INNER JOIN usuarios um ON um.id = cm.sender WHERE cr.id = $id AND cu.user = '$user' $bantime $first $sync ORDER BY cm.time DESC, cm.id DESC LIMIT $limit";
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $output['sql'] = $sql;
 
             $output['messages'] = array();
             while ($row = $result->fetch_assoc()){
                 if ($row['userid'] == $user)
                     $row['me'] = true;
+                $row['message'] = htmlspecialchars($row['message']);
+
+                if (!isset($output['visited']))
+                    $output['visited'] = $row['visited'];
+
+                unset($row['visited']);
                 array_push($output['messages'], $row);
             }
 
@@ -136,6 +144,8 @@
 
     }
     else if ($action == "NOTIFICATIONS"){
+        $visited = json_decode($_POST['visited'], true);
+
         //all rooms I am in and not banned
         $sql = "SELECT cr.id FROM chat_rooms cr INNER JOIN chat_users cu ON cu.room = cr.id WHERE cu.user = '$user' AND cr.id NOT IN (SELECT room FROM chat_restrictions WHERE ban = 1 AND user = '$user')";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
@@ -149,8 +159,8 @@
 
             while ($row = $result->fetch_assoc()){
                 $id = $row['id'];
-        
-                $sql = "SELECT count(*) AS notif FROM chat_messages cm INNER JOIN chat_users cu ON cu.room = cm.room WHERE cm.time > cu.visited AND cm.room = $id AND cu.user = '$user'";
+                $vis_room = $visited[$id];
+                $sql = "SELECT count(*) AS notif FROM chat_messages cm INNER JOIN chat_users cu ON cu.room = cm.room WHERE UNIX_TIMESTAMP(cm.time) > '$vis_room' AND cm.room = $id AND cu.user = '$user'";
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                 
                 $row2 = $result2->fetch_assoc();

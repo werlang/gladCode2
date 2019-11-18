@@ -90,6 +90,11 @@ body{
 	flex-grow: 1;
 }
 
+#section-2 .card .body,
+#section-2 .card .text {
+	font-family: 'Roboto', sans-serif;
+}
+
 #section-2 .card .a-wrapper {
 	display: flex;
 	justify-content: flex-end;
@@ -192,9 +197,7 @@ body{
 #section-2 .card .a-wrapper {
 	justify-content: flex-end;
 }
-#section-2 .small .card-wrapper{
-	width: 33.33%;
-}
+
 
 }
 
@@ -219,7 +222,7 @@ body{
 	justify-content: flex-start;
 }
 #section-2 .small .card-wrapper{
-	width: 25%;
+	width: 35%;
 }
 
 }

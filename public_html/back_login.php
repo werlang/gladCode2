@@ -2,7 +2,8 @@
 	session_start();
 	include_once "connection.php";
 	$action = $_POST['action'];
-	//echo $action;
+	$output = array();
+	
 	if ($action == "GET"){
 		if(isset($_SESSION['user'])){
 			$user = $_SESSION['user'];
@@ -49,16 +50,17 @@
 				}
 				$info['foto'] = $foto;
 
-				echo json_encode($info);
+				$output = $info;
+				$output['status'] = "SUCCESS";
 			}
 			else
-				echo "NULL";
+				$output['status'] = "NOTFOUND";
 			
 			$sql = "UPDATE usuarios SET ativo = now() WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		}
 		else
-			echo "NULL";
+			$output['status'] = "NOTLOGGED";
 	}
 	elseif ($action == "SET"){
 		if (isset($_POST['admin'])){
@@ -110,6 +112,10 @@
 						$path = "/home/gladcode/user";
 						system("mkdir $path/$pasta");
 						$id = $conn->insert_id;
+
+						//join gladcode room
+						$sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES (1, '$id', now(3), now(3), 1)";
+						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 					}
 					else{
 						$pasta = $row['pasta'];
@@ -137,10 +143,13 @@
 			else
 				$output['status'] = "FILE ERROR";
 		}
-
-		echo json_encode($output);
 	}
 	elseif ($action == "UNSET"){
+		if (isset($_SESSION['user']))
+			$output['status'] = "LOGOUT";
+		else
+			$output['status'] = "NOCHANGE";
+
 		unset($_SESSION['user']);
 	}
 	elseif ($action == "UPDATE"){
@@ -174,20 +183,20 @@
 				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn' WHERE id = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-				echo "DONE";
+				$output['status'] = "SUCCESS";
 			}
 			else
-				echo "EXISTS";
+				$output['status'] = "EXISTS";;
 		}
 		else
-			echo "NULL";
+			$output['status'] = "NOTLOGGED";;
 	}
 	elseif ($action == "TUTORIAL"){
 		if(isset($_SESSION['user'])){
 			$user = $_SESSION['user'];
 			$sql = "UPDATE usuarios SET showTutorial = '0' WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-			echo "DONE";
+			$output['status'] = "SUCCESS";
 		}
 	}
 	elseif ($action == "EDITOR"){
@@ -198,4 +207,6 @@
 		$sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE id = '$user'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	}
+
+	echo json_encode($output);
 ?>

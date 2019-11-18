@@ -1,10 +1,18 @@
-var count_refresh = 0;
 var hash, round;
 
 $(document).ready( function() {
     hash = $('#hash').html();
     round = $('#round').html();
     $('#hash, #round').remove();
+
+    socket_ready().then( () => {
+        socket.emit('tournament run join', {
+            hash: hash
+        });
+        socket.on('tournament refresh', data =>{
+            refresh_round();
+        });
+    });
 
     $.post("back_tournament_run.php", {
         action: "GET",
@@ -71,7 +79,23 @@ $(document).ready( function() {
 
             }
 
-            $('#content-box').append("<div id='timeleft' title='Tempo máximo restante até o fim da rodada'><div id='time'><div class='numbers'><span>0</span><span>0</span></div>:<div class='numbers'><span>0</span><span>0</span></div>:<div class='numbers'><span>0</span><span>0</span></div></div><div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div></div><div id='button-container'><button class='arrow' id='back-round' title='Rodada anterior' disabled><i class='material-icons'>navigate_before</i></button><button id='prepare' class='button' disabled>PREPARAR-SE</button><button class='arrow' id='next-round' title='Próxima rodada' disabled><i class='material-icons'>navigate_next</i></button></div>");
+            $('#content-box').append(`<div id='timeleft' title='Tempo máximo restante até o fim da rodada'>
+                <div id='time'>
+                    <div class='numbers'><span>0</span><span>0</span></div>:
+                    <div class='numbers'><span>0</span><span>0</span></div>:
+                    <div class='numbers'><span>0</span><span>0</span></div>
+                </div>
+                <div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div>
+            </div>
+            <div id='button-container'>
+                <button class='arrow' id='back-round' title='Rodada anterior' disabled>
+                    <i class='material-icons'>navigate_before</i>
+                </button>
+                <button id='prepare' class='button' disabled>PREPARAR-SE</button>
+                <button class='arrow' id='next-round' title='Próxima rodada' disabled>
+                    <i class='material-icons'>navigate_next</i>
+                </button>
+            </div>`);
 
             refresh_round();
 
@@ -83,12 +107,12 @@ $(document).ready( function() {
                 });
             }
 
-
+            var manager = data.tournament.manager;
             if (hasteam){
                 $('#content-box #prepare').html("PREPARAR-SE").removeAttr('disabled');
 
                 if (data.locked)
-                    $('#content-box #prepare').prop('disabled', true).html("Aguarde a nova rodada");
+                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
 
                 var round = data.tournament.round;
                 var nick = data.nick;
@@ -104,7 +128,7 @@ $(document).ready( function() {
                        
                         if (data.status == "LOCK"){
                             showMessage("Tarde demais. Seu grupo já encerrou as inscrições");
-                            $('#content-box #prepare').prop('disabled', true).html("Aguarde a nova rodada");
+                            $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
                         }
                         else if (data.status == "NOTFOUND"){
                             showMessage("Lista de gladiadores não encontrada");
@@ -164,17 +188,32 @@ $(document).ready( function() {
                 });
 
             }
+            else if (manager){
+                $('#content-box #prepare').html("ENCERRAR RODADA").removeAttr('disabled');
+                $('#content-box #prepare').off().click( function(){
+                    $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
+                    $.post("back_tournament_run.php", {
+                        action: "END TURN",
+                        hash: hash
+                    }).done( function(data){
+                        data = JSON.parse(data);
+                        //console.log(data);
+                    });
+                });
+            }
             else{
                 $('#content-box #prepare').remove();
                 $('#button-container .arrow').addClass('nobutton');
             }
 
             var deadline = new Date(data.tournament.deadline);
+            var timenow = new Date(data.tournament.timenow);
+            var serverleft = deadline - timenow;
+            var timestart = new Date();
             countDown();
             function countDown() {
                 setTimeout( function(){
-                    var timenow = new Date();
-                    var timediff = deadline - timenow;
+                    var timediff = serverleft - (new Date() - timestart);
                     var timeleft = msToTime(timediff);
                     
                     $('#timeleft .numbers').each( function(index, obj){
@@ -202,6 +241,11 @@ $(document).ready( function() {
 
         }
         
+    });
+
+    init_chat($('#chat-panel'), {
+        full: false,
+        defaultOpen: 900
     });
 });
 
@@ -269,7 +313,7 @@ function refresh_round(){
                         groupobj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
 
                         if ((groupobj).find('.team.myteam').length > 0)
-                            $('#content-box #prepare').prop('disabled', true).html("Aguarde a nova rodada");
+                            $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
 
                         if (data.groups[i].status == "RUN"){
                             runSimulation({
@@ -290,7 +334,7 @@ function refresh_round(){
                                                 action: "TOURNAMENT",
                                                 hash: hash
                                             }).done( function(data){
-                                                console.log(data);
+                                                //console.log(data);
                                             });
                                         }
                                     });
@@ -315,7 +359,6 @@ function refresh_round(){
             $('#content-box #next-round').removeAttr('disabled');
             $('#content-box #prepare').remove();
             $('#button-container .arrow').addClass('nobutton');
-            //$('#content-box #prepare').prop('disabled', true).off();
 
             $('#content-box #next-round').off().click( function(){
                 if (data.status == "END"){
@@ -329,14 +372,6 @@ function refresh_round(){
         }
 
     });
-
-    count_refresh++;
-    setTimeout( function(){
-        count_refresh--;
-        if (count_refresh == 0){
-            refresh_round();
-        }
-    }, 5000);
 
 }
 

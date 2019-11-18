@@ -1,11 +1,9 @@
-body {
-	font-size: 16px;
-	font-family: 'Source Code Pro', monospace;
-	margin: 0;
-}
-
 #frame{
 	display: flex;
+}
+
+body{
+	overflow: hidden;
 }
 
 #panel-left {
@@ -197,9 +195,10 @@ body {
 	font-family: 'Roboto', sans-serif;
 	color: #646464;
 	box-sizing: border-box;
-	max-height: 100%;
+	max-height: calc(100% - 50px);
 	display: flex;
 	flex-direction: column;
+	margin-top: 50px;
 }
 
 #fog-battle h3 span {
@@ -509,11 +508,12 @@ body {
     box-shadow: 1px 1px 5px black;
     max-width: 100%;
     width: 600px;
-    overflow: hidden;
+	overflow: hidden;
+	margin-top: 50px;
 }
 
 #code-box pre {
-    max-height: 90vh;
+    max-height: calc(90vh - 50px);
     margin: 0;
     border-radius: 3px 3px 0 0;
     overflow: hidden;
@@ -542,11 +542,14 @@ body {
     background-color: #1e86d8;
 }
 
-#chat-panel,
+#chat-panel {
+	z-index: 6;
+}
+
 body #fog {
 	z-index: 7;
 }
 
 #header-container.small {
-	z-index: 7;
+	z-index: 8;
 }

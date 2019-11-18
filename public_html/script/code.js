@@ -10,7 +10,9 @@ var posting = $.post( "back_login.php", {
 	action: "GET",
 } );
 posting.done(function( data ) {
-	if (data != "NULL"){
+	//console.log(data);
+	data = JSON.parse(data);
+	if (data.status == "SUCCESS"){
 		data = JSON.parse(data);
 		user.email = data.email;
 		user.nome = data.nome;

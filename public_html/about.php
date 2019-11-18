@@ -6,19 +6,20 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Sobre</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<link rel='stylesheet' href="css/dev/about.css"/>
-	<link rel='stylesheet' href="css/dev/radio.css"/>
-	<link rel='stylesheet' href="css/dev/dialog.css"/>
-	<link rel='stylesheet' href="css/dev/header.css"/>
+	<link rel='stylesheet' href="css/about.css"/>
+	<link rel='stylesheet' href="css/radio.css"/>
+	<link rel='stylesheet' href="css/dialog.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
 	
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
-	<script src="script/dev/about.js"></script>
-	<script src="script/dev/radio.js"></script>
-	<script src="script/dev/dialog.js"></script>
-	<script src="script/dev/googlelogin.js"></script>
-	<script src="script/dev/header.js"></script>
+	<script src="script/about.js"></script>
+	<script src="script/radio.js"></script>
+	<script src="script/dialog.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/header.js"></script>
 	
 	</head>
 <body>
@@ -50,6 +51,7 @@
 			<div class='row' id='social'>
 				<a href='mailto:pswerlang@gmail.com'><img src='icon/gmail.png'><span>pswerlang@gmail.com</span></a>
 				<a href='https://facebook.com/pswerlang' target='_blank'><img src='icon/facebook_blue.png'><span>facebook.com/pswerlang</span></a>
+				<a href='https://github.com/werlang' target='_blank'><img src='icon/github.png'><span>github.com/werlang</span></a>
 			</div>
 		</div>
 		<div id='timeline'>
@@ -125,17 +127,20 @@
 			<div class='info'>
 				<div class='title'>Conheça mais</div>
 				<div class='text'>Na gladCode você cria gladiadores, configurando sua aparência e comportamento. Eles possuem atributos físicos e mentais que determinam o quão fortes eles são correndo, usando ataques ou lançando magias. Para configurar o comportamento de seus gladiadores você precisa usar seus conhecimentos de lógica de programação. Uma vez criados, seus gladiadores podem ser colocados para participar de disputas contra outros gladiadores, onde só os melhores conseguem chegar ao topo do ranking.</div>
-				<a href='manual.php' class='button'>Visite o Manual</a>
-				<a href='docs.php' class='button'>Veja as funções</a>
+				<div class='button-container'>
+					<a href='manual.php' class='button'>Visite o Manual</a>
+					<a href='docs.php' class='button'>Veja as funções</a>
+				</div>
 			</div>
 			<iframe frameborder="0" width="100%" height="100%" src="https://www.youtube.com/embed/lUR3CszStUg?autoplay=1&controls=0&showinfo=0&autohide=1&modestbranding=1&loop=1&playlist=lUR3CszStUg&mute=1"></iframe>
 		</div>
 		<div id='support'>
+			<!--
 			<div class='video'>
 				<video width='100%' height='100%' autoplay loop>
 					<source src='image/battle-movie.mp4'>
 				</video>
-			</div>
+			</div>-->
 			<div class='col'>
 				<div class='title'>Apoie o projeto</div>
 				<div class='text'>
@@ -192,6 +197,7 @@
 				<a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
 			</div>
 		</div>
+		<div>Copyright © 2018-2019 Pablo Werlang</div>
 			<div id='long' hidden>
 				Ainda durante a faculdade um professor apresentou para a turma um programa traria a inspiração para a gladCode anos mais tarde. Este programa possuía uma linguagem própria, e nele, nós alunos deveríamos programar a inteligência de um robô virtual, que deveria batalhar contra os robôs dos outros alunos em um mini torneio realizado após a entrega do trabalho da disciplina.
 				Os anos se passaram. Hoje sou professor do <a href='ifsul.edu.br'>Instituto Federal Sul-Riograndense (IFSul)</a> - Campus Charqueadas e ministro principalmente disciplinas de lógica de programação e linguagem de programação C.
@@ -218,6 +224,5 @@
 			</div>
         </div>
 	</div>
-	<?php include("footer.php"); ?>
 </body>
 </html>

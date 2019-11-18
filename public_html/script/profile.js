@@ -25,6 +25,7 @@ $(document).ready( function(){
 
 		socket_ready().then( () => {
 			socket.on('profile notification', data =>{
+				//console.log("server message");
 				checkNotifications();
 			});
 		});
@@ -135,14 +136,15 @@ $(document).ready( function(){
 		})
 		.done( function(data){
 			//console.log(data);
-			if (data == "DONE"){
+			data = JSON.parse(data);
+			if (data.status == "SUCCESS"){
 				showMessage("Informações atualizadas");
 				$('#profile-panel .button').removeAttr('disabled');
 				user.apelido = $('#nickname .input').val();
 				$('#profile-ui #nickname').html(user.apelido);
 				$('#profile-ui #picture img').attr('src',user.foto);
 			}
-			else if (data == "EXISTS"){
+			else if (data.status == "EXISTS"){
 				showMessage("Outro usuário já escolheu este nome").then( function(){
 					$('#nickname .input').focus().select();
 				});
@@ -196,7 +198,7 @@ $(document).ready( function(){
 									//console.log(data);
 									$('#glads-container .glad-preview').last().after("<div class='glad-add'><div class='image'></div><div class='info'>Clique para criar um novo gladiador</div></div>");
 									$('#glads-container .glad-add').first().click( function(){
-										window.location.href = "editor";
+										window.location.href = "newglad";
 									});
 								});
 							}
@@ -245,7 +247,7 @@ $(document).ready( function(){
 				if (i < initglads + Math.floor(user.lvl/gladsinterval)){
 					$('#glads-container .glad-add .info').last().html("Clique para criar um novo gladiador");
 					$('#glads-container .glad-add').last().click( function(){
-						window.location.href = "editor";
+						window.location.href = "newglad";
 					});
 				}
 				else{
@@ -458,6 +460,10 @@ $(document).ready( function(){
 			duel.fadeIn();
 
 		refresh_tourn_list();
+
+        if (socket){
+            socket.emit('tournament list join', {});
+        }        
 	});
 
 	$('#menu #report').click( function() {

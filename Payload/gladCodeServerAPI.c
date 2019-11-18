@@ -873,7 +873,7 @@ int fireball(int gladid, float x, float y){
 				(g+gladid)->ap -= abilitycost[ABILITY_FIREBALL];
 				float spdx, spdy;
 				calcSidesFromAngleDist(&spdx, &spdy, 1, (g+gladid)->head);
-				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->sdmg * 0.7, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
+				launchProjectile(gladid, (g+gladid)->x, (g+gladid)->y, (g+gladid)->sdmg * 0.5, spdx, -spdy, PROJECTILE_TYPE_FIREBALL);
 				r = 1;
 				
 				(g+gladid)->lockedfor = 1/(g+gladid)->cs/2;

@@ -1,7 +1,5 @@
-body{
-	margin: 0;
-	font-family: 'Source Code Pro', monospace;
-	font-size: 16px;
+body {
+	overflow: hidden;
 }
 
 #frame {
@@ -9,6 +7,8 @@ body{
 	display: flex;
 	flex-direction: column;
     padding-top: 50px;
+	height: 100vh;
+	box-sizing: border-box;
 }
 
 #right-panel {
@@ -25,7 +25,8 @@ body{
     border-radius: 3px;
     font-family: 'Acme', sans-serif;
 	color: #646464;
-	min-height: 620px;
+	height: 100%;
+	overflow: auto;
 }
 
 #frame #menu {
@@ -33,6 +34,9 @@ body{
 	background-color: #00638d;
 	border-right: 1px solid #e6e6e6;
 	z-index: 1;
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 @media only screen and (min-width: 600px) {
@@ -257,6 +261,8 @@ body{
 	flex-wrap: wrap;
 	justify-content: center;
 	margin-top: 3px;
+	flex-grow: 1;
+	overflow: auto;
 }
 
 @media only screen and (min-width: 600px) {
@@ -321,28 +327,6 @@ body{
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
-
-/* width */
-::-webkit-scrollbar {
-    width: 5px;
-	height: 5px;
-	margin: 1px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0); 
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888; 
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555; 
 }
 
 #code-box {
@@ -413,9 +397,12 @@ body{
 	background-color: #1e86d8;
 }
 
+#profile-panel {
+	padding: 20px;
+}
+
 #profile-panel,
 #friend-panel {
-	padding: 30px 0px;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -462,7 +449,7 @@ body{
 }
 
 .content h2 {
-    margin: 20px 30px 30px; 
+    margin: 20px 30px 20px; 
 	font-weight: normal;
 	font-size: 2em;
 }
@@ -987,10 +974,6 @@ body{
 	width: 100%;
 }
 
-#report-container #bhist-container .table {
-	margin: 0px;
-}
-
 #duel-box .glad-preview,
 #battle-container .glad-preview{
 	cursor: pointer;
@@ -1050,7 +1033,7 @@ body{
 	box-sizing: border-box;
     text-align: left;
     border: 0px solid black;
-    padding: 15px 0px 15px 60px;
+    padding: 10px 0px 10px 60px;
     background-color: #6c97a9;
     color: white;
 }
@@ -1153,7 +1136,6 @@ body{
     align-items: center;
     justify-content: flex-end;
     margin-right: 20px;
-    margin-bottom: 20px;
 }
 
 #page-title span {
@@ -1756,8 +1738,6 @@ body{
 
 #duel.wrapper #table-friends {
 	margin-top: 15px;
-	max-height: 500px;
-	overflow-y: auto;
 }
 
 #duel.wrapper #table-friends .row {
@@ -2109,7 +2089,7 @@ body{
 }
 
 .tourn-box #new-container {
-	margin-top: -30px;
+	margin-top: -10px;
 	margin-bottom: 30px;
 	display: flex;
 	flex-direction: column;
@@ -2219,3 +2199,23 @@ body{
 	color: white;
 }
 
+#menu #footer {
+    font-size: 0.8rem;
+    color: #4888a3;
+    border-top: 1px solid #0c486273;
+    padding-top: 10px;
+    background-color: #0000000d;
+	padding-bottom: 5px;
+	margin: 0;
+}
+
+#menu #footer #img-container {
+	margin-bottom: 5px;
+}
+
+#menu #footer img {
+	height: 20px;
+	margin: 0px 10px;
+	opacity: 0.2;
+	filter: none;
+}

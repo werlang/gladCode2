@@ -20,37 +20,39 @@
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
-	<link rel='stylesheet' href="css/dev/profile.css"/>
-	<link rel='stylesheet' href="css/dev/glad-card.css"/>
-	<link rel='stylesheet' href="css/dev/dialog.css"/>
-	<link rel='stylesheet' href="css/dev/chat.css"/>
-	<link rel='stylesheet' href="css/dev/prism.css"/>
-	<link rel='stylesheet' href="css/dev/croppie.css"/>
-	<link rel='stylesheet' href="css/dev/slider.css"/>
-	<link rel='stylesheet' href="css/dev/checkboxes.css"/>
-	<link rel='stylesheet' href="css/dev/table2.css"/>
-	<link rel='stylesheet' href="css/dev/header.css"/>
+	<link rel='stylesheet' href="css/profile.css"/>
+	<link rel='stylesheet' href="css/glad-card.css"/>
+	<link rel='stylesheet' href="css/dialog.css"/>
+	<link rel='stylesheet' href="css/chat.css"/>
+	<link rel='stylesheet' href="css/prism.css"/>
+	<link rel='stylesheet' href="css/croppie.css"/>
+	<link rel='stylesheet' href="css/slider.css"/>
+	<link rel='stylesheet' href="css/checkboxes.css"/>
+	<link rel='stylesheet' href="css/table2.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
-	<script src="script/dev/assets.js"></script>
-	<script src="script/dev/dropzone.js"></script>
-	<script src="script/dev/croppie.js"></script>
-	<script src="script/dev/profile-tourn.js"></script>
-	<script src="script/dev/chat.js"></script>
-	<script src="script/dev/glad-card.js"></script>
-	<script src="script/dev/profile.js"></script>
-	<script src="script/dev/dialog.js"></script>
-	<script src="script/dev/runSim.js"></script>
-	<script src="script/dev/checkboxes.js"></script>
-	<script src="script/dev/stats_func.js"></script>
-	<script src="script/dev/emoji.js"></script>
-	<script src="script/dev/socket.js"></script>
-	<script src="script/dev/prism.js"></script>
-	<script src="script/dev/googlelogin.js"></script>
-	<script src="script/dev/header.js"></script>
+	<script src="script/assets.js"></script>
+	<script src="script/dropzone.js"></script>
+	<script src="script/croppie.js"></script>
+	<script src="script/profile-tourn.js"></script>
+	<script src="script/chat.js"></script>
+	<script src="script/glad-card.js"></script>
+	<script src="script/profile.js"></script>
+	<script src="script/dialog.js"></script>
+	<script src="script/runSim.js"></script>
+	<script src="script/checkboxes.js"></script>
+	<script src="script/stats_func.js"></script>
+	<script src="script/emoji.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/prism.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/header.js"></script>
 	
 	</head>
 <body>
@@ -81,6 +83,7 @@
 				<div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
 				<div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
 			</div>
+			<div id='footer'></div>
 		</div>
 		<div id='panel'>
 			<div class='content' data-menu='profile'>
@@ -239,6 +242,5 @@
 		<div id='right-panel'></div>
 		<div id='chat-panel'></div>
 	</div>
-	<?php include("footer.php"); ?>
 </body>
 </html>

@@ -6,9 +6,11 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Créditos</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/dev/header.css'/> 
-	<script type="text/javascript" src="script/dev/header.js"></script>
-	<script type="text/javascript" src="script/dev/googlelogin.js"></script>
+	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
+	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+	<script type="text/javascript" src="script/header.js"></script>
+	<script type="text/javascript" src="script/googlelogin.js"></script>
+	<script type="text/javascript" src="script/socket.js"></script>
 
 	<style>
 		body {
@@ -101,7 +103,7 @@
 			<p><a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></p>
         </div>
 	</div>
-	<?php include("footer.php"); ?>
+	<div id='footer'></div>
 </body>
 </html>
 

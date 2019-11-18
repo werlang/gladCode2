@@ -2,6 +2,8 @@ sendingBuffer = [];
 clearToSend = true;
 var emoji;
 var recentEmoji = [];
+var visitedRooms = {};
+var uploadWidget = {};
 
 $(document).ready( function(){
     chat_started().then( () => {
@@ -15,6 +17,7 @@ $(document).ready( function(){
                     });
                 }
                 else{
+                    $('#chat-panel').addClass('hidden');
                     $('#chat-panel').click( () => {
                         if (!$('#dialog-box').length){
                             showDialog("Faça login na gladCode para participar do chat",["Cancelar","LOGIN"]).then( function(data){
@@ -94,7 +97,12 @@ $(document).ready( function(){
                         emojiStr[i].splice(j, 1);
                 }
                 for (let j in emojiStr[i]){
-                    $('#chat-panel #emoji-container #categ-'+ i).append(emojiStr[i][j].img);
+                    var e = emojiStr[i][j].img;
+                    if (i == 0 && j < 10){
+                        let n = (parseInt(j) + 1) % 10;
+                        e = `<div class='shortcut'><span class='number'>${n}</span>${emojiStr[i][j].img}</div>`;
+                    }
+                    $('#chat-panel #emoji-container #categ-'+ i).append(e);
                     $('#chat-panel #emoji-container #categ-'+ i +' .emoji-outer').last().data('unicode', emojiStr[i][j].unicode);
                 }
             }
@@ -125,15 +133,25 @@ $(document).ready( function(){
             $('#chat-panel #emoji-container .emoji-outer').click( function(){
                 var t = $('#chat-panel #message-box').html();
                 var e = $(this).data('unicode');
-        
+
                 let pos = -1;
                 if (recentEmoji)
                     pos = recentEmoji.indexOf(e);
 
                 if (pos != -1)
                     recentEmoji.splice(pos, 1);
-                else
+                else{
                     $('#chat-panel #emoji-container #categ-0 .title').after($(this).clone(true));
+                    $('#chat-panel #emoji-container #categ-0 .emoji-outer').eq(0).wrap("<div class='shortcut'></div>").before("<span class='number'></span>");
+
+                    $('#chat-panel #emoji-container #categ-0 .shortcut').each( function(i,obj){
+                        if (i < 10)
+                            $(obj).find('.number').html((i + 1) % 10);
+                        else if (!$(obj).hasClass('hidden'))
+                            $(obj).addClass('hidden');
+                    });
+
+                }
 
                 if (recentEmoji)
                     recentEmoji.unshift(e);
@@ -152,19 +170,41 @@ $(document).ready( function(){
 
         $('#chat-panel #send').click( function(){
             var text = '';
-            $.each( $('#chat-panel #chat-ui #message-box > span'), function(i,obj){
-                if ($(obj).hasClass('emoji-outer'))
-                    text += $(obj).data('unicode');
+            var codes = $('#chat-panel #chat-ui #message-box').data('code');
+            var imgs = $('#chat-panel #chat-ui #message-box').data('img');
+            $('#chat-panel #chat-ui #message-box > span').each( function(){
+                if ($(this).hasClass('emoji-outer')){
+                    text += $(this).data('unicode');
+                }
+                //cehck if there is code to be sent
+                else if ($(this).find('.code-icon').length){
+                    var parent = $(this);
+                    parent.find('.code-icon').each( function() {
+                        var id = $(this).attr('id');
+                        parent.html(parent.html().replace(/<img class="code-icon" [\w\W]+?>/, escape(`<code>${codes[id]}</code>`)));
+                    });
+                    text += unescape(parent.text());
+                }
+                //check if there are images to be sent
+                else if ($(this).find('.img-icon').length){
+                    var parent = $(this);
+                    parent.find('.img-icon').each( function() {
+                        var id = $(this).attr('id');
+                        parent.html(parent.html().replace(/<img class="img-icon" [\w\W]+?>/, escape(`<img src='${imgs[id]}'>`)));
+                    });
+                    text += unescape(parent.text());
+                }
                 else
-                    text += $(obj).text();
+                    text += $(this).text();
             } );
+            $('#chat-panel #chat-ui #message-box').data('code', {});
+            $('#chat-panel #chat-ui #message-box').data('img', {});
 
             if (text == '/help'){
                 $('#chat-panel #help').click();
                 $('#chat-panel #chat-ui #message-box').html("").focus();
             }   
             else{
-
                 sendingBuffer.push(text);   
                 $('#chat-panel #chat-ui #message-box').html("").focus();
 
@@ -197,7 +237,7 @@ $(document).ready( function(){
                                     console.log(e);
                                 }
 
-                                recentEmoji = [];
+                                //recentEmoji = [];
                                 clearToSend = true;
                                 var status = data.status;
                                 if (status == "UNKNOWN"){
@@ -291,6 +331,8 @@ $(document).ready( function(){
             var table = [
                 [{data: "COMANDOS DO CHAT", class: "head"}],
                 [{data: "Comando", class: "head half"}, {data: "Descrição", class: "head"}],
+                [{data: "<>", class: "half"}, {data: "Abre janela para inserção de código", class: ""}],
+                [{data: "!@", class: "half"}, {data: "Janela de upload de imagens", class: ""}],
                 [{data: "/show rooms", class: "half"}, {data: "Mostra todas salas públicas", class: ""}],
                 [{data: "/show users", class: "half"}, {data: "Mostra todos membros da sala", class: ""}],
                 [{data: "/list", class: "half"}, {data: "O mesmo que /show<br>Ex: /list rooms", class: ""}],
@@ -308,14 +350,34 @@ $(document).ready( function(){
             sendChatTable(table);
         });
 
-        $('#chat-panel #chat-ui').keyup( function(e){
-            var input = $(this).find('#message-box');
+        $('#chat-panel #message-box').keydown( function(e){
+            var input = $(this);
+            //insere o primeiro span pro texto ir dentro
+            if (input.find('span').length == 0)
+                input.append("<span></span>");
+            input.find('span').last().focus();
+        
+            if (e.ctrlKey && e.keyCode == 'E'.charCodeAt(0)){ //CTRL+E
+                $('#chat-panel #emoji').click();
+                e.preventDefault();
+            }
+
+            //CTRL+NUM insere um emoji dos favoritos
+            var pos = '1234567890'.indexOf(String.fromCharCode(e.keyCode));
+            if (e.ctrlKey && pos != -1){
+                e.preventDefault();
+                $('#chat-panel #emoji-container #categ-0 .emoji-outer').eq(pos).click();
+            }
+        });
+        $('#chat-panel #message-box').keyup( function(e){
+            var input = $(this);
             //key enter
             if(e.keyCode == 13) {
                 $('#chat-panel #send').click();
                 e.preventDefault();
             }
 
+            //hide or show help button
             if (input.text() == ''){
                 $('#chat-panel #send').addClass('hidden');
                 $('#chat-panel #help').removeClass('hidden');
@@ -324,7 +386,67 @@ $(document).ready( function(){
                 $('#chat-panel #send').removeClass('hidden');
                 $('#chat-panel #help').addClass('hidden');
             }
-            
+
+            //sesarch for <> to replace for code
+            if ((/&lt;&gt;/).test(input.html())){
+                var id = getRandomId(5);
+                input.find('span').each( function() {
+                    var newtext = $(this).html().replace(/&lt;&gt;/, "");
+                    $(this).html(newtext);
+                });
+                input.append(`<span><img class="code-icon" id="code-icon-${id}" src="icon/code.png" title="Editar código"></span><span></span>`);
+
+                //setCaretEndDiv($('#chat-panel #message-box')[0]);
+                $('#chat-panel #message-box span').last().focus();
+
+                $(`#chat-ui .code-icon`).click( function() {
+                    create_code_modal($(this));
+                });
+
+                if (!input.data('code'))
+                    input.data('code',{});
+
+                create_code_modal($(`#code-icon-${id}`));
+            }
+
+            //search for !@ to replace for image
+            if ((/\!\@/).test(input.html())){
+                var id = getRandomId(5);
+                input.find('span').each( function() {
+                    var newtext = $(this).html().replace(/\!\@/, "");
+                    $(this).html(newtext);
+                });
+                input.append(`<span><img class="img-icon" id="img-icon-${id}" title="Visualizar imagem" src="icon/img.png"></span><span></span>`);
+
+                $('#chat-panel #message-box span').last().focus();
+
+                if (!input.data('img'))
+                    input.data('img',{});
+
+                upload_image().then( data => {
+                    //console.log(data);
+                    if (data !== false){
+                        input.append("<span></span>");
+                        var dataimg = input.data('img');
+                        dataimg[`img-icon-${id}`] = data;
+                        input.data('img', dataimg);
+                        $(`.img-icon`).off().click( function(){
+                            var thisid = $(this).attr('id');
+                            window.open( input.data('img')[thisid] );
+                        });
+                    }
+                    else{
+                        $(`#img-icon-${id}`).remove();
+                    }
+                    //wait time until widget disappear
+                    setTimeout( function(){
+                        setCaretEndDiv($('#chat-panel #message-box')[0]);
+                    }, 300);
+                    
+                });
+                
+            }
+
         });
 
         $('#chat-panel #show-hide').click( () => {
@@ -359,15 +481,73 @@ $(document).ready( function(){
                 }
             }
         });
-
-        $('#chat-panel #message-box').on('keydown', function(e){
-            if ($(this).find('span').length == 0)
-                $(this).append("<span></span>");
-            $(this).find('span').last().focus();
-
-        });
     });
+
+    uploadWidget.widget = start_cloudinary();
 });
+
+function create_code_modal(obj){
+    $('body').append(`<div id='fog'>
+        <div id='code-modal'>
+            <div id='title'>
+                <span><img src='icon/code.png'>Editor de código</span>
+                <div id='button-container'>
+                    <button id='ok' class='button' title='Confirmar (CTRL+Enter)'></button>
+                    <button id='cancel' class='button' title='Cancelar (ESC)'></button>
+                </div>
+            </div>
+            <textarea id='terminal' spellcheck='false'></textarea>
+        </div>
+    </div>`);
+    $('#fog').hide().fadeIn();
+    var data = obj.parents('#message-box').data('code');
+
+    if (data[obj.attr('id')])
+        $('#fog #terminal').val(data[obj.attr('id')]);
+
+    $('#fog #terminal').focus();
+    $('#fog #terminal').outerHeight($('#fog #terminal')[0].scrollHeight);
+
+
+    $('#code-modal #cancel').click( () => {
+        if (!data[obj.attr('id')])
+            obj.remove();
+        $('#fog').remove();
+        setCaretEndDiv($('#chat-panel #message-box')[0])
+    });
+
+    $('#code-modal #ok').click( () => {
+        var code = $('#code-modal #terminal').val();
+        if (code != '')
+            data[obj.attr('id')] = code;
+        else
+            obj.remove();
+        $('#fog').remove();
+        setCaretEndDiv($('#chat-panel #message-box')[0])
+    });
+
+    //events that need to occur before default behaviour
+    $('#code-modal #terminal').on('keydown', function(e){
+        var terminal = $('#code-modal #terminal');
+
+        if (e.keyCode == 9){ //tab
+            e.preventDefault();
+            if (e.shiftKey)
+                insertTab(terminal, true);
+            else
+                insertTab(terminal);
+        }
+    });
+    $('#code-modal #terminal').on('keyup', function(e){
+        var terminal = $('#code-modal #terminal');
+        terminal.outerHeight(terminal[0].scrollHeight);
+
+        if (e.keyCode == 27) //esc
+            $('#code-modal #cancel').click();
+        else if (e.ctrlKey && e.keyCode == 13) //ctrl+enter
+            $('#code-modal #ok').click();
+    });
+}
 
 function sendChatTable(json){
     $('#chat-panel #chat-window').append("<div class='chat-table'></div>");
@@ -386,99 +566,104 @@ function sendChatTable(json){
 }
 
 async function listRooms(arg){
-    await socket.emit('chat rooms', function(data){
-        //console.log(data);
+    await new Promise( (resolve, reject) => {
+        socket.emit('chat rooms', function(data){
+            //console.log(data);
 
-        var rebuild = false;
-        if (arg && arg.rebuild)
-            rebuild = true;
+            var rebuild = false;
+            if (arg && arg.rebuild)
+                rebuild = true;
 
-        if (rebuild){
-            $('#chat-panel #room-container').html("");
+            if (rebuild){
+                $('#chat-panel #room-container').html("");
 
-            var room = data.room;
-            for (let i in room){
-                $('#chat-panel #room-container').append(`<div class='room visible'>
-                    <div id='title'>
-                        <span class='notification hide'>0</span>
-                        <i class='material-icons'>chevron_right</i>
-                        <span class='name'>${room[i].name}</span>
-                    </div>
-                </div>`);
-                $('#chat-panel #room-container .room').last().data({ id: room[i].id }).css({order: i});
-                bind_room_click($('#chat-panel #room-container .room').last());
-            }
-
-            $('#chat-panel #chat-window').remove();
-        }
-        else{
-            var currentRoms = [];
-            $('#chat-panel #room-container .room').each( (i, obj) => {
-                currentRoms.push({
-                    id: $(obj).data('id'),
-                    name: $(obj).find('.name').html()
-                });
-            });
-
-            for (let i in currentRoms){
-                for (let j in data.room){
-                    if (data.room[j].id == currentRoms[i].id){
-                        currentRoms[i].order = j;
-                        currentRoms[i].name = data.room[j].name;
-                    }
-                }
-            };
-
-            if (arg && arg.remove){
-                for (let i in currentRoms){
-                    if (currentRoms[i].name.toLowerCase() == arg.remove.toLowerCase()){
-                        var target = $('#chat-panel #room-container .room').eq(i);
-                        if (target.hasClass('open')){
-                            $('#chat-panel #chat-window').remove();
-                            $('#chat-panel .room').addClass('visible');
-                        }
-                        target.remove();
-                        currentRoms.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-            else if (arg && arg.insert){
-                for (let i in data.room){
-                    if (data.room[i].name.toLowerCase() == arg.insert.toLowerCase()){
-                        currentRoms.push({
-                            id: data.room[i].id,
-                            name: data.room[i].name,
-                            order: i,
-                        });
-                        break;
-                    }
-                }
-            }
-
-            for(let i in currentRoms){
-                var room = $('#chat-panel #room-container .room').eq(i);
-                if (currentRoms[i].id == room.data('id')){
-                    room.css({order: currentRoms[i].order})
-                    if (room.find('.name').html() != currentRoms[i].name)
-                        room.find('.name').html(currentRoms[i].name);
-                }
-                else{
+                var room = data.room;
+                for (let i in room){
                     $('#chat-panel #room-container').append(`<div class='room visible'>
                         <div id='title'>
                             <span class='notification hide'>0</span>
                             <i class='material-icons'>chevron_right</i>
-                            <span class='name'>${currentRoms[i].name}</span>
+                            <span class='name'>${room[i].name}</span>
                         </div>
                     </div>`);
-                    var newroom = $('#chat-panel #room-container .room').last();
-                    newroom.data({ id: currentRoms[i].id }).css({order: currentRoms[i].order});
-                    bind_room_click(newroom);
-                    newroom.click();
+                    $('#chat-panel #room-container .room').last().data({ id: room[i].id }).css({order: i});
+                    visitedRooms[room[i].id] = room[i].visited;
+                    bind_room_click($('#chat-panel #room-container .room').last());
                 }
+
+                $('#chat-panel #chat-window').remove();
+            }
+            else{
+                var currentRoms = [];
+                $('#chat-panel #room-container .room').each( (i, obj) => {
+                    currentRoms.push({
+                        id: $(obj).data('id'),
+                        name: $(obj).find('.name').html()
+                    });
+                });
+
+                for (let i in currentRoms){
+                    for (let j in data.room){
+                        if (data.room[j].id == currentRoms[i].id){
+                            currentRoms[i].order = j;
+                            currentRoms[i].name = data.room[j].name;
+                        }
+                    }
+                };
+
+                if (arg && arg.remove){
+                    for (let i in currentRoms){
+                        if (currentRoms[i].name.toLowerCase() == arg.remove.toLowerCase()){
+                            var target = $('#chat-panel #room-container .room').eq(i);
+                            if (target.hasClass('open')){
+                                $('#chat-panel #chat-window').remove();
+                                $('#chat-panel .room').addClass('visible');
+                            }
+                            target.remove();
+                            currentRoms.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+                else if (arg && arg.insert){
+                    for (let i in data.room){
+                        if (data.room[i].name.toLowerCase() == arg.insert.toLowerCase()){
+                            currentRoms.push({
+                                id: data.room[i].id,
+                                name: data.room[i].name,
+                                order: i,
+                            });
+                            break;
+                        }
+                    }
+                }
+
+                for(let i in currentRoms){
+                    var room = $('#chat-panel #room-container .room').eq(i);
+                    if (currentRoms[i].id == room.data('id')){
+                        room.css({order: currentRoms[i].order})
+                        if (room.find('.name').html() != currentRoms[i].name)
+                            room.find('.name').html(currentRoms[i].name);
+                    }
+                    else{
+                        $('#chat-panel #room-container').append(`<div class='room visible'>
+                            <div id='title'>
+                                <span class='notification hide'>0</span>
+                                <i class='material-icons'>chevron_right</i>
+                                <span class='name'>${currentRoms[i].name}</span>
+                            </div>
+                        </div>`);
+                        var newroom = $('#chat-panel #room-container .room').last();
+                        newroom.data({ id: currentRoms[i].id }).css({order: currentRoms[i].order});
+                        bind_room_click(newroom);
+                        newroom.click();
+                    }
+                }
+
             }
 
-        }
+            resolve();
+        });
     });
 
     return true;
@@ -529,6 +714,7 @@ function getChatNotification(){
     listRooms().then( () =>{
         $.post("back_chat.php", {
             action: "NOTIFICATIONS",
+            visited: JSON.stringify(visitedRooms)
         }).done( function(data){
             //console.log(data);
             try{
@@ -541,18 +727,18 @@ function getChatNotification(){
     
             if (data.status == "SUCCESS"){
                 var notif = data.notifications;
-                $.each( $('#chat-panel .room'), function(i,obj){
-                    var id = $(obj).data('id');
+                $('#chat-panel .room').each( function(){
+                    var id = $(this).data('id');
     
                     var notif_val = parseInt(notif[id]);
-                    if (notif_val > 0 && !$(obj).hasClass('open')){
-                        $(obj).find('#title .notification').removeClass('hide').html(notif_val);
-                        $(obj).find('#title i').addClass('hide');
+                    if (notif_val > 0 && !$(this).hasClass('open')){
+                        $(this).find('#title .notification').removeClass('hide').html(notif_val);
+                        $(this).find('#title i').addClass('hide');
     
                         if (notif_val >= 1000)
-                            $(obj).find('#title .notification').addClass('small');
-                        else if ($(obj).find('#title .notification').hasClass('small'))
-                            $(obj).find('#title .notification').removeClass('small');
+                            $(this).find('#title .notification').addClass('small');
+                        else if ($(this).find('#title .notification').hasClass('small'))
+                            $(this).find('#title .notification').removeClass('small');
                     }
                 });
             }
@@ -580,7 +766,8 @@ function getChatMessages(options){
             action: "MESSAGES",
             id: id,
             first: firstid,
-            sync: sync
+            sync: sync,
+            visited: visitedRooms[id]
         }).done( function(data){
             //console.log(data);
             try{
@@ -590,6 +777,8 @@ function getChatMessages(options){
                 console.log(data);
                 console.log(e);
             }
+            if (data.visited || (!visitedRooms[id] && data.visited) )
+                visitedRooms[id] = data.visited;
 
             scrolling = false;
             
@@ -638,15 +827,10 @@ function getChatMessages(options){
                             //if prepending and first baloon is from same person than previous
                             if (prepend && $('#chat-panel .baloon-container').eq(0).find('.name').html() == messages[i].apelido)
                                 $('#chat-panel .baloon-container').eq(0).addClass('sequence');
+                            
+                            //replace code tag
+                            messages[i].message = messages[i].message.replace(/&lt;code&gt;([\w\W]*?)&lt;\/code&gt;/g, "<pre class='language-c'><code>$1</code></pre>");
 
-                            /*
-                            var visible = '';
-                            if ($('#chat-panel .baloon-container').last().find('.name').html() == messages[i].apelido){
-                                $('#chat-panel .baloon-container').last().find('.avatar').removeClass('visible');
-                            }
-                            visible = 'visible';
-                            */
-                                
                             var str = `<div class='baloon-container ${me} ${sequence} ${hasText}'>
                                 <div class='baloon'>
                                     <div class='point'></div>
@@ -661,16 +845,85 @@ function getChatMessages(options){
                                 </div>
                             </div>`;
 
+                            var baloon;
                             if (prepend){
                                 $('#chat-panel #chat-window').prepend(str);
-                                $('#chat-panel #chat-window .baloon-container').first().data('id', messages[i].id);
+                                baloon = $('#chat-panel #chat-window .baloon-container').first();
                             }
                             else{
                                 $('#chat-panel #chat-window').append(str);
-                                $('#chat-panel #chat-window .baloon-container').last().hide().fadeIn(600);
-                                $('#chat-panel #chat-window .baloon-container').last().data('id', messages[i].id);
+                                baloon = $('#chat-panel #chat-window .baloon-container').last();
+                                baloon.hide().fadeIn(600);
+                                
                             }
 
+                            baloon.data('id', messages[i].id);
+
+                            //place code on the baloon
+                            baloon.find('code').each( function() {
+                                var lines = ($(this).text().match(/\n/g) || []).length + 1;
+                                Prism.highlightElement(this);
+
+                                if (!$(this).parents('.baloon-container').hasClass('me'))
+                                    $(this).addClass('dark');
+                                if ($(this).height() <= 150){
+                                    $(this).parent().addClass('brief');
+                                }
+                                else{
+                                    var pre = $(this).parent();
+                                    pre.addClass('collapsed').append(`<button class='expand'><i class='plus material-icons'>add</i><span>{ ... } MOSTRAR ${lines} LINHAS</span></button>`);
+
+                                    rebind();
+                                    function rebind(){
+                                        pre.find('.expand').click( function() {
+                                            pre.removeClass('collapsed').hide().slideDown();
+                                            $(this).find('.plus').html('remove');
+                                            $(this).addClass('open').off().click( function(){
+                                                pre.slideUp( function(){
+                                                    pre.addClass('collapsed').show();
+                                                });
+                                                $(this).find('.plus').html('add');
+                                                $(this).removeClass('open').off();
+                                                rebind();
+                                            });
+                                        }); 
+                                    }
+                                }
+                            });
+
+                            var expression = /((?:http(?:s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=,;]*))/gi;
+                            var regex = new RegExp(expression);
+                            var html = baloon.find('.text').html();
+
+                            //replace img tag
+                            if (html.match(/&lt;img src='([\w\W]+?)'&gt;/g)){
+                                baloon.find('.text').html(html.replace(/&lt;img src='([\w\W]+?)'&gt;/g, `<a href='$1' target='_blank'><img class='chat-img' src='$1'></a>`));
+                                baloon.find('.text').html(html.replace(/&lt;img src='([\w\W]+?)'&gt;/g, `<a href='$1' target='_blank'><img class='chat-img' src='$1'></a>`));
+                            }
+                            //replace b64 image
+                            else if (html.match(/(data:image\/(?:jpeg|png);base64[\w\W]+)/)){
+                                baloon.find('.text').html(html.replace(/(data:image\/(?:jpeg|png);base64[\w\W]+)/, `<img class='chat-img' src='$1'>`));
+                            }
+
+                            //check for url
+                            else if (html.match(regex) && !html.match(/\<span class=\"emoji/)){
+                                var url = html.match(regex)[0];
+                                testImage(baloon, url).then( resp => {
+                                    var html = resp.baloon.find('.text').html();
+                                    if (resp.status === true){
+                                        //url is image
+                                        resp.baloon.find('.text').html(html.replace(resp.url, `<a href='${resp.url}' target='_blank'><img class='chat-img' src='${resp.url}'></a>`));
+                                    }
+                                    else{
+                                        //normal url, not image. put link tag
+                                        if (html.search(/(?:http(?:s)?:\/\/.)/) != -1)
+                                            resp.baloon.find('.text').html(html.replace(regex, "<a href='$1' target='_blank'>$1</a>"));
+                                        else
+                                            resp.baloon.find('.text').html(html.replace(regex, "<a href='//$1' target='_blank'>$1</a>"));
+                                    }
+                                })
+                            }
+                            
                         }
                         
                     }
@@ -710,7 +963,7 @@ function init_chat(wrapper, options){
             <div id='emoji-ui'>
                 <div id='emoji-container'></div>
                 <div id='category-buttons'>
-                    <i id='recent' class='material-icons selected' title='Mais usados'>star</i>
+                    <i id='recent' class='material-icons selected' title='Mais usados (CTRL+🔢)'>star</i>
                     <i id='smile' class='material-icons' title='Carinhas e Pessoas'>emoji_emotions</i>
 					<i id='animals' class='material-icons' title='Animais e Natureza'>pets</i>
                     <i id='food' class='material-icons' title='Alimentos'>fastfood</i>
@@ -727,7 +980,7 @@ function init_chat(wrapper, options){
                 <div class='button-container'>
                     <i class='material-icons hidden' title='Enviar mensagem (Enter)' id='send'>send</i>
                     <i class='material-icons' title='Ajuda' id='help'>help_outline</i>
-                    <i class='material-icons' title='Emojis' id='emoji'>insert_emoticon</i>
+                    <i class='material-icons' title='Emojis (CTRL+E)' id='emoji'>insert_emoticon</i>
                 </div>
             </div>
         </div>`;
@@ -735,7 +988,11 @@ function init_chat(wrapper, options){
     wrapper.addClass(full);
     wrapper.addClass('preload');
 
-    if ($(window).width() < 1340 && !$('#chat-panel').hasClass('full'))
+    var defaultOpen = 1340;
+    if (options && options.defaultOpen)
+        defaultOpen = options.defaultOpen;
+        
+    if ($(window).width() < defaultOpen && !$('#chat-panel').hasClass('full'))
         wrapper.addClass('hidden');
 
     wrapper.html(str);
@@ -760,4 +1017,198 @@ async function chat_started(){
     }
     while (await isReady() === false);
     return true;
+}
+
+function getRandomId(size){
+    var str = '';
+    for (let i=0 ; i<size ; i++){
+        var c = '';
+        var n = Math.floor(Math.random()*36);
+        if (n <= 25)
+            c = String.fromCharCode(n + 97);
+        else
+            c = String.fromCharCode(n - 26 + 48);
+        str += c;
+    }
+    return str;
+}
+
+function setSelectionRange(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+        input.focus();
+        input.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+function setCaretToPos (input, pos) {
+    setSelectionRange(input, pos, pos);
+}
+
+function insertTab(obj, reverse){
+    var start = obj[0].selectionStart;
+    var end = obj[0].selectionEnd;
+    var text = obj.val();
+
+    if (start == end){
+        if (reverse){
+            var lastT = text.substr(0, start).lastIndexOf('\t');
+            text = text.substr(0, lastT) + text.substr(lastT + 1, start - lastT - 1) + text.substr(end);
+            obj.val(text);
+            setCaretToPos(obj[0], start - 1);
+        }
+        else{
+            text = text.substr(0, start) + '\t' + text.substr(end, text.length - end);
+            obj.val(text);
+            setCaretToPos(obj[0], start + 1);
+        }
+    }
+    else if (!reverse){
+        var selection = text.substr(start, end - start);
+        var tabs = 0;
+        selection = selection.replace(/([\w\W]*?\n)/gm, function(match){
+            tabs++;
+            return '\t' + match;
+        });
+        text = text.substr(0, start) + selection + text.substr(end, text.length - end);
+        obj.val(text);
+        setSelectionRange(obj[0], start, end + tabs);
+    }
+    //shift tab
+    else{
+        var selection = text.substr(start, end - start);
+        var tabs = 0;
+        selection = selection.replace(/^(\t|[ ]{2})/gm, function(p1){
+            tabs += p1.length;
+            return '';
+        });
+        console.log(selection);
+        text = text.substr(0, start) + selection + text.substr(end, text.length - end);
+        obj.val(text);
+        setSelectionRange(obj[0], start, end - tabs);
+    }
+}
+
+function setCaretEndDiv(input){
+    let range = document.createRange();//Create a range (a range is a like the selection but invisible)
+    range.selectNodeContents(input);//Select the entire contents of the element with the range
+    range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+    //range.setStart(input.firstChild, 2);
+    //range.setEnd(input.firstChild, 2);
+    let selection = window.getSelection();//get the selection object (allows you to change selection)
+    selection.removeAllRanges();//remove any selections already made
+    selection.addRange(range);//make the range you have just created the visible selection
+}
+
+async function testImage(baloon, url) {
+    return await new Promise( resolve => {
+        var img = new Image();
+
+        img.onerror = img.onabort = function() {
+            callback(url, "error");
+        };
+
+        img.onload = function() {
+            callback(url, "success");
+        };
+    
+        function callback(url, status){
+            if (status == "success")
+                resolve({baloon: baloon, url: url, status: true});
+            else
+                resolve({baloon: baloon, url: url, status: false});
+        }
+        
+        img.src = url;
+
+    });
+}
+
+function start_cloudinary(){
+    return cloudinary.createUploadWidget({
+        cloudName: "dd0mjuhdb",
+        uploadPreset: "fvbkdtsp",
+        sources: [
+            "local",
+            "url",
+            "camera",
+            "facebook",
+            "dropbox",
+            "instagram"
+        ],
+        showAdvancedOptions: false,
+        cropping: false,
+        multiple: false,
+        defaultSource: "local",
+        styles: {
+            palette: {
+                window: "#FFFFFF",
+                windowBorder: "#90A0B3",
+                tabIcon: "#00638D",
+                menuIcons: "#5A616A",
+                textDark: "#000000",
+                textLight: "#FFFFFF",
+                link: "#00638D",
+                action: "#FF620C",
+                inactiveTabIcon: "#0E2F5A",
+                error: "#F44235",
+                inProgress: "#0078FF",
+                complete: "#20B832",
+                sourceBg: "#E4EBF1"
+            },
+            fonts: {
+                default: null,
+                "'Roboto', sans-serif": {
+                    url: "https://fonts.googleapis.com/css?family=Roboto&display=swap",
+                    active: true
+                }
+            }
+        }
+    },
+    function(error, result) { 
+        //console.log(result);
+        if(error){
+            //console.log(error);
+            uploadWidget.status = 'error';
+        }
+        else if (!uploadWidget.status){
+            if (result.event == 'success'){
+                uploadWidget.status = 'success';
+                uploadWidget.info = result.info;
+            }
+            else if (result.event == 'close')
+                uploadWidget.status = 'close';
+        }
+
+    });
+}
+async function upload_image(){
+    uploadWidget.widget.open();
+
+    return await new Promise( resolve => {
+        time();
+        function time(){
+            setTimeout( function(){
+                //console.log(uploadWidget);
+                if (!uploadWidget.status)
+                    time();
+                else if (uploadWidget.info){
+                    var url = uploadWidget.info.secure_url;
+                    uploadWidget = {widget: uploadWidget.widget};
+                    resolve(url);
+                }
+                else{
+                    uploadWidget = {widget: uploadWidget.widget};
+                    resolve(false);
+                }
+
+            }, 300);
+        }
+    });
 }

@@ -46,7 +46,7 @@ $(document).ready( function() {
 	search();
 
 	$('.table .info').click( function() {
-		create_tooltip($(this).attr('title'), $(this));
+		//create_tooltip($(this).attr('title'), $(this));
 	});
 });
 
@@ -93,20 +93,22 @@ function load_table(data){
 		}
 
 		$('#nbattles').html(data.nbattles.total);
-		$('#avg-time').html(data.duration +"s");
+		$('#avg-time').html(data.duration.toFixed(1) +"s");
 
 		if (data.nbattles.highattr < data.nbattles.total){
-			$('#single-stats #low-battles').removeClass('hidden');
-			
-			$('#single-stats #low-battles').click( () => {
-				create_tooltip(`Somente ${data.nbattles.highattr} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`, $('#single-stats #low-battles'), {remain: 3000});
-			});
-			//$('#single-stats .low-battles span').html(data.nbattles.highattr).addClass('visible');
+			$('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.nbattles.highattr} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();
 		}
+		else if (!$('#single-stats #low-battles').hasClass('hidden'))
+			$('#single-stats #low-battles').addClass('hidden');
 	}
 	else{
 		$('#t-hab tbody').html("<tr><td colspan=4>Nenhuma batalha encontrada</td></tr>");
+		$('#t-glad tbody tr').each( function(){
+			$(this).append(`<td colspan=2></td>`)
+		})
+		$('#avg-time').html("-");
 		$('#nbattles').html("0");
+		$('#single-stats #low-battles').addClass('hidden')
 	}
 
 }

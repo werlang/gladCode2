@@ -1,7 +1,5 @@
-body{
-	margin: 0;
-	font-family: 'Source Code Pro', monospace;
-	font-size: 16px;
+body {
+    overflow: hidden;
 }
 
 #frame {
@@ -9,54 +7,72 @@ body{
 	display: flex;
 	flex-direction: column;
     padding-top: 50px;
+    background-color: #f7f7f7;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+}
+
+#content-wrapper {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    border-right: 1px solid #e6e6e6;
+    box-sizing: border-box;
+    overflow-y: auto;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 #content-box {
-	width: 100%;
-    background-color: white;
+    width: 100%;
+    max-width: 900px;
     z-index: 1;
     font-family: 'Acme', sans-serif;
 	color: #646464;
-    min-height: 620px;
-    margin: auto;
 }
 
 @media only screen and (min-width: 600px) {
 	#frame {
 		flex-direction: row;
 	}
-	#content-box {
+}
+
+@media only screen and (min-width: 900px) {
+    #content-wrapper {
+        max-width: 600px;
+    }
+    #chat-panel.tournament {
+        width: calc(100% - 600px);
+        max-width: 600px;
+        border-left: 1px solid #e6e6e6;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    #content-wrapper {
+        max-width: calc(100% - 600px);
+    }
+    #content-box {
         max-width: 900px;
-	}
+    }
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 5px;
-	height: 5px;
-	margin: 1px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0); 
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888; 
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+@media only screen and (min-width: 1600px) {
+    #content-wrapper {
+        max-width: 1000px;
+    }
+    #chat-panel.tournament {
+        max-width: calc(100% - 1000px);
+    }
 }
 
 #tourn-name {
     color: #00638d;
 }
 
-h1 {
+h1, h3 {
     margin-left: 15px;
 }
 
@@ -243,10 +259,15 @@ h3#tourn-desc {
 
 #content-box #button-container {
 	display: flex;
-    justify-content: center;
-    flex-direction: column;
+    justify-content: space-between;
     margin-bottom: 50px;
     align-items: center;
+}
+
+@media only screen and (min-width: 600px) {
+    #content-box #button-container {
+        justify-content: center;
+    }
 }
 
 #content-box #button-container .button {
@@ -280,13 +301,6 @@ h3#tourn-desc {
     max-width: 300px;
     height: 50px;
 }
-
-@media only screen and (min-width: 600px) {
-    #content-box #button-container {
-        flex-direction: row;
-    }
-}
-
 
 .float-box {
 	background-color: white;
@@ -369,6 +383,8 @@ h3#tourn-desc {
     background-color: #e2e2e2;
     color: #646464;
     margin-bottom: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
     font-size: 1.3rem;
     cursor: default;
     transition: 0.3s all;
@@ -501,12 +517,18 @@ h3#tourn-desc {
     background-color: transparent;
     border: none;
     outline: none;
-    margin-top: -65px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
-#button-container .arrow.nobutton {
-    margin: -90px 120px 0px
+@media only screen and (min-width: 600px) {
+    #button-container .arrow.nobutton {
+        margin: -90px 120px 0px
+    }    
+    #button-container .arrow {
+        margin-top: -65px;
+    }
 }
 
 #button-container .arrow:hover i {
@@ -529,4 +551,3 @@ h3#tourn-desc {
     color: #fafafa;
     text-shadow: 1px 1px 6px #00000033;
 }
-

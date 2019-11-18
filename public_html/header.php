@@ -15,6 +15,13 @@
 		<div id='logo'><a href='index'><img src='icon/logo.png'></a></div>
 		<i id='search' class='material-icons'>search</i>
 		<div id='h-items'>
+			<div class='item drop-menu mobile'>
+				<div class='title'>LOGIN</div>
+				<div class='item-container'>
+					<div class='item'><a id='login' title='Realize login com sua conta do Google'>ENTRAR</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
+				</div>
+			</div>
+			<div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google'>LOGIN</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
 			<div class='item' id='learn'><a href='manual' title='Saiba como funciona a gladCode'>APRENDER</a></div>
 			<div class='item' id='header-editor'><a href='editor' title='Crie e programe seus gladiadores'>EDITOR</a></div>
 			<div class='item drop-menu'>
@@ -25,14 +32,22 @@
 					<div class='item'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' title='Conecte-se com outros jogadores' target='_blank'>GRUPO WHATSAPP</a></div>
 				</div>
 			</div>
-			<div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'>COMPILADOR C</a></div>
-			<div class='item drop-menu mobile'>
-				<div class='title'>LOGIN</div>
+			<div class='item drop-menu'>
+				<div class='title'>SOBRE</div>
 				<div class='item-container'>
-					<div class='item'><a id='login' title='Realize login com sua conta do Google'>ENTRAR</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
+					<div class='item'><a href='about' title='Saiba sobre a trajetória da gladCode'>O PROJETO</a></div>
+					<div class='item'><a href='about#support' title='Maneiras de você apoiar o projeto'>APOIE A GLADCODE</a></div>
+					<div class='item'><a href='creditos' title='Créditos aos criadores das artes usadas na gladCode'>CRÉDITOS</a></div>
 				</div>
 			</div>
-			<div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google'>LOGIN</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
+			<div class='item drop-menu'>
+				<div class='title'>PROJETOS</div>
+				<div class='item-container'>
+					<div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'>COMPILADOR C</a></div>
+					<div class='item'><a href='https://github.com/werlang/gladcode' title='Projeto da primeira versão da gladCode' target='_blank'>GLADCODE V1</a></div>
+					<div class='item'><a href='https://github.com/werlang/automin' title='Compacta scripts e atualiza páginas do servidor' target='_blank'>AUTOMIN</a></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
