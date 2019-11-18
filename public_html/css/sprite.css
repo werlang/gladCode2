@@ -1,3 +1,7 @@
+#fog-skin ::-webkit-scrollbar {
+    width: 5px;
+}
+
 canvas {
 	display: block;
 }
@@ -15,27 +19,6 @@ canvas {
 	display: flex;
 	flex-direction: column;
 	max-height: 100vh;
-}
-
-/* width */
-::-webkit-scrollbar {
-    width: 5px;
-	margin: 1px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0); 
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888; 
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555; 
 }
 
 #bottom-container {

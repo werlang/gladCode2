@@ -450,10 +450,8 @@ function resize() {
 			canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
 			game.camera.scale.x = $(window).height() * usefulRatio / screenH;
 			game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-			if ($(window).height() < 600 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-				showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato").then( function(data){
-					window.location.reload();
-				});
+			if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
+				showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato");
 			}
 
 		}

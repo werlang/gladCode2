@@ -114,6 +114,12 @@ function create_toast(message, type) {
 
 }
 
+$(document).ready( function() {
+	$(document).tooltip();
+});
+
+/*
+it works, but jquery UI provides a better alternative
 function create_tooltip(message, obj, args){
 	$('#tooltip').remove();
 	$('body').append(`<div id='tooltip'>${message}</div>`);
@@ -141,3 +147,4 @@ function create_tooltip(message, obj, args){
 		})
 	}, remaintime);
 }
+*/

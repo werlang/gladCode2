@@ -18,8 +18,8 @@ $(document).ready( function() {
 	})
 	.done( function(data){
 		//console.log(data);
-		if (data != "NULL"){
-			user = JSON.parse(data);
+		user = JSON.parse(data);
+		if (user.status == "SUCCESS"){
 			$('#login').html(user.nome);
 			
 			if (user.tutor == "1")

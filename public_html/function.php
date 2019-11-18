@@ -9,21 +9,24 @@
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/dev/table.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dev/docs.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dev/function.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dev/prism.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dev/side-menu.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dev/header.css'/> 
+	<link rel='stylesheet' href="css/table.css"/>
+	<link rel='stylesheet' href="css/docs.css"/>
+	<link rel='stylesheet' href="css/side-menu.css"/>
+	<link rel='stylesheet' href="css/function.css"/>
+	<link rel='stylesheet' href="css/prism.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
+	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
-	<script type="text/javascript" src="script/dev/side-menu.js"></script>
-	<script type="text/javascript" src="script/dev/function.js"></script>
-	<script type="text/javascript" src="script/dev/prism.js"></script>
-	<script type="text/javascript" src="script/dev/header.js"></script>
-	<script type="text/javascript" src="script/dev/googlelogin.js"></script>
-</head>
+	<script src="script/function.js"></script>
+	<script src="script/side-menu.js"></script>
+	<script src="script/prism.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/socket.js"></script>
+	<script src="script/header.js"></script>
+	
+	</head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
@@ -52,8 +55,6 @@
 		</div>
 	</div>
 	<?php
-		include("footer.php");
-
 		$func = "";
 		if (isset($_GET['f']))
 			$func = $_GET['f'];

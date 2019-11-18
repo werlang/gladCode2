@@ -10,12 +10,15 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	  rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
-	<link rel='stylesheet' href="css/dev/chat.css"/>
-	<link rel='stylesheet' href="css/dev/dialog.css"/>
-	<link rel='stylesheet' href="css/dev/header.css"/>
+	<link rel='stylesheet' href="css/chat.css"/>
+	<link rel='stylesheet' href="css/dialog.css"/>
+	<link rel='stylesheet' href="css/prism.css"/>
+	<link rel='stylesheet' href="css/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+ 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
 	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
     <script>
@@ -24,12 +27,13 @@
         });
     </script>
 	
-	<script src="script/dev/chat.js"></script>
-	<script src="script/dev/dialog.js"></script>
-	<script src="script/dev/emoji.js"></script>
-	<script src="script/dev/googlelogin.js"></script>
-	<script src="script/dev/header.js"></script>
-	<script src="script/dev/socket.js"></script>
+	<script src="script/chat.js"></script>
+	<script src="script/dialog.js"></script>
+	<script src="script/emoji.js"></script>
+	<script src="script/prism.js"></script>
+	<script src="script/googlelogin.js"></script>
+	<script src="script/header.js"></script>
+	<script src="script/socket.js"></script>
 	
 	</head>
 <body>

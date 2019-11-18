@@ -12,7 +12,8 @@ $(document).ready( function(){
 function admin_auth(obj){
     socket_request('login', obj).then( (res, err) => {
         if (err) return console.log(err);
-        console.log(res);
+        if (res.session == true)
+            window.location.reload();
     });
 
     $.post("back_login.php", {

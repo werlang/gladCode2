@@ -7,11 +7,11 @@
 	<title>gladCode - Obrigado</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	<link type='text/css' rel='stylesheet' href='css/dev/header.css'/> 
+	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script type="text/javascript" src="script/dev/header.js"></script>
-	<script type="text/javascript" src="script/dev/googlelogin.js"></script>
+	<script type="text/javascript" src="script/header.js"></script>
+	<script type="text/javascript" src="script/googlelogin.js"></script>
 
 	<style>
 		body{
@@ -80,6 +80,5 @@
             <h3>Você será redirecionado em <span>10</span> segundos.</h2>
         </div>
 	</div>
-	<?php include("footer.php"); ?>
 </body>
 </html>
