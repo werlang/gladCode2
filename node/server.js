@@ -1,15 +1,15 @@
 const express = require('express');
 const app = express();
-var fs = require('fs');
+const fs = require('fs');
 
-var credentials = {
-    key: fs.readFileSync('/etc/pki/tls/private/gladcode-dev.tk.key'),
-	cert: fs.readFileSync('/etc/pki/tls/certs/gladcode-dev.tk.cert'),
-	ca: fs.readFileSync('/etc/pki/tls/certs/gladcode-dev.tk.bundle')
-};
-const https = require('https').createServer(credentials, app);
+var config = JSON.parse(fs.readFileSync('config.json'));
+if (config.credentials){
+	for (i in config.credentials)
+		config.credentials[i] = fs.readFileSync(config.credentials[i]);
+}
+const server = require(config.protocol).createServer(config.credentials, app);
 
-const io = require('socket.io')(https);
+const io = require('socket.io')(server);
 const mysql = require('mysql');
 const crypto = require('crypto');
 const request = require('request');
@@ -269,7 +269,7 @@ io.on('connection', function(socket){
 	
 });
 
-https.listen(3000, function(){
+server.listen(3000, function(){
 	console.log('listening on *:3000');
 });
 
