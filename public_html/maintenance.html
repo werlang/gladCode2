@@ -5,7 +5,6 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>gladCode - Manutenção</title>
-	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 
 	<style>
 		body {
@@ -49,15 +48,16 @@
 	</style>
 	<script>
 		var timeleft = 20;
-		$(document).ready( function(){
+		ready();
+		function ready(){
 			setInterval(function(){
 				timeleft--;
-				$('#reload').html(timeleft);
+				document.getElementById("reload").innerHTML = timeleft;
 				if (timeleft <= 0){
-					window.location.reload(); 
+					window.location.href = "index.php"; 
 				}
 			}, 1000);
-		});
+		}
 	</script>
 </head>
 <body>
