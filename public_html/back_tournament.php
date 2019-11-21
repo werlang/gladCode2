@@ -357,7 +357,9 @@
                 }
             }
 
-            $joined = check_joined($output['tourn'], $conn);
+            $joined  = false;
+            if (isset($output['tourn']))
+                $joined = check_joined($output['tourn'], $conn);
             if ($joined !== false)
                 $output['joined'] = $joined;
 

@@ -24,7 +24,11 @@
         $id = mysql_escape_string($_POST['id']);
         $first = mysql_escape_string($_POST['first']);
         $sync = mysql_escape_string($_POST['sync']);
-        $visited = mysql_escape_string($_POST['visited']);
+        
+        if (isset($_POST['visited']))
+            $visited = mysql_escape_string($_POST['visited']);
+        else
+            $visited = '';
 
         //check if user is in the room and not banned
         $sql = "SELECT cu.id FROM chat_users cu WHERE cu.user = '$user' AND cu.room = $id";
@@ -90,8 +94,16 @@
     }
     else if ($action == "SEND"){
         $message = trim(mysql_escape_string($_POST['message']));
-        $room = mysql_escape_string($_POST['room']);
-        $emojis = json_encode(array_slice($_POST['emoji'], 0, 30), JSON_UNESCAPED_UNICODE);
+
+        if (isset($_POST['room']))
+            $room = mysql_escape_string($_POST['room']);
+        else
+            $room = '';
+
+        if (isset($_POST['emoji']) && is_array($_POST['emoji']))
+            $emojis = json_encode(array_slice($_POST['emoji'], 0, 30), JSON_UNESCAPED_UNICODE);
+        else
+            $emojis = "";
         
         $sql = "UPDATE usuarios SET emoji = '$emojis' WHERE id = $user";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
@@ -370,10 +382,16 @@
             }
 
             preg_match('/ -d ([áàâãéêíóõôúç\w\s]+)/', $str, $m);
-            $description = trim($m[1]);
+            if (isset($m) && is_array($m) && count($m) > 1)
+                $description = trim($m[1]);
+            else
+                $description = '';
 
             preg_match('/([áàâãéêíóõôúç\w\s]+)/', $str, $m);
-            $name = trim($m[1]);
+            if (isset($m) && is_array($m) && count($m) > 1)
+                $name = trim($m[1]);
+            else
+                $name = '';
 
             if ($name == '')
                 $output['status'] = "BLANK";
@@ -435,6 +453,7 @@
 
                         if ($nrows == 0){
                             $output['status'] = "NOTARGET";
+                            $output['command'] = "promote";
                         }
                         else{
                             $row = $result->fetch_assoc();
@@ -603,10 +622,16 @@
                         }
                         
                         preg_match('/ -d ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $d);
-                        $d = trim($d[1]);
+                        if (isset($d) && is_array($d) && count($d) > 1)
+                            $d = trim($d[1]);
+                        else   
+                            $d = '';
 
                         preg_match('/ -n ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $n);
-                        $n = trim($n[1]);
+                        if (isset($n) && is_array($n) && count($n) > 1)
+                            $n = trim($n[1]);
+                        else   
+                            $n = '';
 
                         $fields = array();
                         $messages = array();

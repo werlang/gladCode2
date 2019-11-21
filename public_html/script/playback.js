@@ -1,5 +1,4 @@
 var code;
-var startloop = false;
 var json = {};
 var hashes = [], newindex = new Array();
 var steps = new Array();
@@ -133,15 +132,15 @@ $(document).ready( function() {
 									$('#loadbar #status').html("Montando gladiadores");
 									$('#loadbar #second .bar').width(pct +"%");
 									$('#loadbar #main .bar').width(25 + pct/4 +"%");
+
+									if (hashes.length == glads.length){
+										setTimeout( function(){
+											startBattle(log);
+										}, 100);
+									}
 								});
 							}
-							
-							var waitHash = setInterval( function(){
-								if (hashes.length == glads.length){
-									clearInterval(waitHash);
-									startBattle(log);
-								}
-							}, 10);
+
 						}
 					}
 				}
@@ -487,84 +486,82 @@ function resize() {
 var show_final_score = true;
 function start_timer(steps){
 	istep = setInterval( function(){
-		if (startloop){
-			//console.log(steps[timestep]);
-			if (timestep < 0)
-				timestep = 0;
-			if (timestep > steps.length - 1){
-				timestep = steps.length - 1;
-				var name, team, id, hp;
-				for (i in steps[timestep].glads){
-                    //revive gladiator when running backwards
-					if (parseFloat(steps[timestep].glads[i].hp) > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
-						if (!id || hp < parseFloat(steps[timestep].glads[i].hp)){
-							name = steps[timestep].glads[i].name;
-							hp = parseFloat(steps[timestep].glads[i].hp);
-							team = steps[timestep].glads[i].user;
-							id = i;
-						}
+		//console.log(steps[timestep]);
+		if (timestep < 0)
+			timestep = 0;
+		if (timestep > steps.length - 1){
+			timestep = steps.length - 1;
+			var name, team, id, hp;
+			for (i in steps[timestep].glads){
+				//revive gladiator when running backwards
+				if (parseFloat(steps[timestep].glads[i].hp) > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
+					if (!id || hp < parseFloat(steps[timestep].glads[i].hp)){
+						name = steps[timestep].glads[i].name;
+						hp = parseFloat(steps[timestep].glads[i].hp);
+						team = steps[timestep].glads[i].user;
+						id = i;
 					}
 				}
-				if (show_final_score && !$('#end-message').length){
-					if (!id){
-						name = "Empate";
-						team = "";
-					}
-					$('body').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
-					$('#end-message #retornar').click( function() {
-						show_final_score = false;
-						$('#fog').remove();
-						if (tournHash)
-							window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
-					});
+			}
+			if (show_final_score && !$('#end-message').length){
+				if (!id){
+					name = "Empate";
+					team = "";
+				}
+				$('body').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
+				$('#end-message #retornar').click( function() {
+					show_final_score = false;
+					$('#fog').remove();
+					if (tournHash)
+						window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
+				});
 
-					$('#end-message #share').click( function() {
-						$('#end-message').hide();
-
-						var link = "gladcode.tk/play/"+ loghash;
-
-						var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://"+ link +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
-
-						var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u="+ link +"' target='_blank'><img src='icon/facebook.png'></a>";
-
-						var whatsapp = "<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a"+ link +"%0a%23gladcode' target='_blank'><img src='icon/whatsapp.png'></a>";
-
-						$('#fog').append("<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div><button id='close' class='button'>OK</button></div>");
-						
-						$('#url #social #getlink').click( function(){
-							copyToClipboard(link);
-							$('#url #hash').html('Link copiado');
-							$('#url #hash').addClass('clicked');
-							setTimeout(function(){
-								$('#url #hash').removeClass('clicked');
-								$('#url #hash').html(loghash);
-							},500);
-						});
-						
-						$('#url #close').click( function(){
-							$('#url').remove();
-							$('#end-message').show();
-						});
-					});
-
-					if (id)
-						$('#end-message #image').html(getSpriteThumb(hashes[newindex[id]],'walk','down'));
+				$('#end-message #share').click( function() {
 					$('#end-message').hide();
-					$('#end-message').fadeIn(1000);
-					music.pause();
-					victory.play('', 0, music.volume / 0.1);
-				}
+
+					var link = "gladcode.tk/play/"+ loghash;
+
+					var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://"+ link +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
+
+					var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u="+ link +"' target='_blank'><img src='icon/facebook.png'></a>";
+
+					var whatsapp = "<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a"+ link +"%0a%23gladcode' target='_blank'><img src='icon/whatsapp.png'></a>";
+
+					$('#fog').append("<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div><button id='close' class='button'>OK</button></div>");
+					
+					$('#url #social #getlink').click( function(){
+						copyToClipboard(link);
+						$('#url #hash').html('Link copiado');
+						$('#url #hash').addClass('clicked');
+						setTimeout(function(){
+							$('#url #hash').removeClass('clicked');
+							$('#url #hash').html(loghash);
+						},500);
+					});
+					
+					$('#url #close').click( function(){
+						$('#url').remove();
+						$('#end-message').show();
+					});
+				});
+
+				if (id)
+					$('#end-message #image').html(getSpriteThumb(hashes[newindex[id]],'walk','down'));
+				$('#end-message').hide();
+				$('#end-message').fadeIn(1000);
+				music.pause();
+				victory.play('', 0, music.volume / 0.1);
 			}
-			else if (!show_final_score){
-				$('#fog').remove();
-				show_final_score = true;
-				music.resume();
-			}
-			phaser_update(steps[timestep]);
-			if (!pausesim){
-				timestep += stepIncrement / Math.abs(stepIncrement);
-			}
-        }
+		}
+		else if (!show_final_score){
+			$('#fog').remove();
+			show_final_score = true;
+			music.resume();
+		}
+		phaser_update(steps[timestep]);
+		if (!pausesim){
+			timestep += stepIncrement / Math.abs(stepIncrement);
+		}
 	}, 100 / Math.abs(stepIncrement));	
 }
 
@@ -593,30 +590,27 @@ function create_ui(nglad){
 
 function startBattle(simulation){
 	json = {};
-			
-	startloop = false;
-	
+				
 	$('#loadbar #status').html("Carregando render");
-	load_phaser();
+	if (load_phaser()){
+		//console.log(simulation[0]);
+		create_ui(simulation[0].glads.length);
+		$( "#time" ).slider("option", "max", simulation.length);
+		for (i=0 ; i<simulation[0].glads.length ; i++){
+			simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
+			simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
+			newindex[i] = i;
+		}
 
-	//console.log(simulation[0]);
-	create_ui(simulation[0].glads.length);
-	$( "#time" ).slider("option", "max", simulation.length);
-	for (i=0 ; i<simulation[0].glads.length ; i++){
-		simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-		simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
-		newindex[i] = i;
+		for (var i in simulation){
+			json.projectiles = {};
+			$.extend( true, json, simulation[i] ); //merge json objects
+			steps.push(JSON.parse(JSON.stringify(json)));
+			//console.log(simulation[i]);
+		}
+
+		start_timer(steps);
 	}
-
-	for (var i in simulation){
-		json.projectiles = {};
-		$.extend( true, json, simulation[i] ); //merge json objects
-		steps.push(JSON.parse(JSON.stringify(json)));
-		//console.log(simulation[i]);
-	}
-
-	startloop = true;
-	start_timer(steps);
 }
 
 function copyToClipboard(text) {

@@ -286,7 +286,6 @@ function refresh_round(){
             }
         });
 
-        var busyrun = false;
         $('#content-box #group-container .group').each( function(){
             var groupobj = $(this);
             var i = $(this).data('id');
@@ -299,54 +298,50 @@ function refresh_round(){
                 });
             }
             else if (data.groups[i].status == "LOCK" || data.groups[i].status == "RUN"){
-                tryRun();
-                //try to run. if any other group is already running, wait for 1s and check again
-                function tryRun(){
-                    if (busyrun){
-                        setTimeout( function(){
-                            tryRun();
-                        }, 1000);
-                    }
-                    else{
-                        busyrun = true;
-                        groupobj.addClass('hide-info');
-                        groupobj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
+                groupobj.addClass('hide-info');
+                groupobj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
 
-                        if ((groupobj).find('.team.myteam').length > 0)
-                            $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
+                if ((groupobj).find('.team.myteam').length > 0)
+                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
 
-                        if (data.groups[i].status == "RUN"){
-                            runSimulation({
-                                tournament: i
-                            }).then( function(data){
-                                //console.log(data);
-                                if (data != "ERROR"){
-                                    $.post("back_tournament_run.php",{
-                                        action: "UPDATE",
-                                        hash: hash
-                                    }).done( function(data){
-                                        //console.log(data);
-                                        busyrun = false;
+                if (data.groups[i].status == "RUN"){
+                    socket_ready().then( () => {
+                        socket.emit('tournament run request', {
+                            hash: hash,
+                            group: i
+                        }, function(data){
+                            // console.log(data);
+                            if (data.permission == 'granted'){
+                                runSimulation({
+                                    tournament: i
+                                }).then( function(data){
+                                    //console.log(data);
+                                    if (data != "ERROR"){
+                                        $.post("back_tournament_run.php",{
+                                            action: "UPDATE",
+                                            hash: hash
+                                        }).done( function(data){
+                                            //console.log(data);
+                                            data = JSON.parse(data);
+                                            if (data.status == "NEXT"){
+                                                $.post("back_sendmail.php",{
+                                                    action: "TOURNAMENT",
+                                                    hash: hash
+                                                }).done( function(data){
+                                                    //console.log(data);
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        });
+                    });            
 
-                                        data = JSON.parse(data);
-                                        if (data.status == "NEXT"){
-                                            $.post("back_sendmail.php",{
-                                                action: "TOURNAMENT",
-                                                hash: hash
-                                            }).done( function(data){
-                                                //console.log(data);
-                                            });
-                                        }
-                                    });
-                                }
-                                else{
-                                    //window.location.reload();
-                                }
-                            });
-                        }
-                    }
                 }
-                //return false; //exist the each loop to make possible for only one group to run battle
             }
             else if (data.groups[i].status == "WAIT"){
                 $(this).find('.foot .button .number').html(data.groups[i].value);

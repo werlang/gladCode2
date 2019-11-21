@@ -1,17 +1,21 @@
 var socket;
+var serverURL = `//${window.location.hostname}:3000`;
 
 $(document).ready( function(){
-    try{
-        socket = io('http://localhost:3000');
-    }
-    catch(e){
-        socket = null;
-    }
+    $.getScript(`${serverURL}/socket.io/socket.io.js`, function(){
+        try{
+            socket = io(serverURL, {secure: true});
+        }
+        catch(e){
+            socket = null;
+        }
+    });
 });
 
 function admin_auth(obj){
     socket_request('login', obj).then( (res, err) => {
         if (err) return console.log(err);
+        console.log(res);
         if (res.session == true)
             window.location.reload();
     });
@@ -27,7 +31,7 @@ function admin_auth(obj){
 async function socket_request(route, data){
     return await $.ajax({
         type: "POST",
-        url: "http://localhost:3000/"+ route,
+        url: `${serverURL}/${route}`,
         crossDomain: true,
         data: data,
         dataType: 'json',

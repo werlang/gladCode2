@@ -3,9 +3,6 @@
 
     $tables = array(
         "amizade" => array("usuario1", "usuario2"),
-        "chat_messages" => array("sender"),
-        "chat_restrictions" => array("user"),
-        "chat_users" => array("user"),
         "duels" => array("user1", "user2"),
         "gladiators" => array("master"),
         "messages" => array("sender", "receiver"),

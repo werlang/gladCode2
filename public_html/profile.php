@@ -34,7 +34,6 @@
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
 	<script src="script/assets.js"></script>
 	<script src="script/dropzone.js"></script>

@@ -19,8 +19,6 @@
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
  	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
-
     <script>
         $(document).ready( () => {
             init_chat($('#chat-panel'));

@@ -23,7 +23,6 @@
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="ace/ext-language_tools.js"></script>
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 	
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>

@@ -164,7 +164,7 @@
 			);
 			//% glads of each attr, and % of winner of each type
 			foreach ($highattr['sum'] as $attr => $val){
-				if ($highattr['count'] > 0)
+				if ($highattr['total'] > 0)
 					$info['highattr']['avg'][$attr] = $highattr['sum'][$attr] / $highattr['total'] * 100;
 
 				if (isset($abwin[strtoupper($attr)]))

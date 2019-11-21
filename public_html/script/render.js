@@ -50,19 +50,23 @@ function phaser_update(step){
 }
 
 
-var game;
+var game = null;
 function load_phaser(){
-	if (game)
-		game.destroy();
-	game = new Phaser.Game({
-        width: $(document).width(),
-        height: $(document).height(),
-        renderer: Phaser.WEBGL_MULTI,
-        parent: 'canvas-div',
-        antialias: true,
-        multitexture: true,
-        enableDebug: false,
-        state: { preload: preload, create: create, update: update, render: render }});
+	if (!game){
+		game = new Phaser.Game({
+			width: $(document).width(),
+			height: $(document).height(),
+			renderer: Phaser.WEBGL_MULTI,
+			parent: 'canvas-div',
+			antialias: true,
+			multitexture: true,
+			enableDebug: false,
+			state: { preload: preload, create: create, update: update, render: render }
+		});
+		
+		return true;
+	}
+	return false;
 }
 
 function preload() {
@@ -71,7 +75,13 @@ function preload() {
 	game.load.onLoadComplete.add(loadComplete, this);
 
 	for (i=0 ; i < hashes.length ; i++){
-		game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
+		try{
+			game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
+		}
+		catch(e){
+			console.log(e);
+			console.log(hashes);
+		}
 	}	
 
 	game.load.audio('music', 'res/audio/adventure.mp3');
