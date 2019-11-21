@@ -143,8 +143,7 @@ for h in config['files']:
         perc = float(files_done) / total_files * 20
         print("[", end='')
         for i in range(int(perc)):
-            print("=", end='')
-        print("{}".format(int(perc*5)%10), end='')
+            print("#", end='')
         for i in range(19 - int(perc)):
             print(" ", end='')
         print("] {:.1f}%".format(perc*5))
@@ -197,7 +196,7 @@ for h in config['files']:
             out = requests.post(url, data=data).text
 
             f = open(data_path,"w")
-            f.write(out)
+            f.write(out.encode('utf-8'))
             f.close()
             print("DONE")
         else:
