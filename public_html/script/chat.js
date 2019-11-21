@@ -17,7 +17,15 @@ $(document).ready( function(){
                     });
                 }
                 else{
-                    $('#chat-panel').addClass('hidden');
+                    if (!$('#chat-panel').hasClass('full'))
+                        $('#chat-panel').addClass('hidden');
+                    else if (!$('#dialog-box').length){
+                        showDialog("Faça login na gladCode para participar do chat",["LOGIN"]).then( function(data){
+                            googleLogin().then(function(data) {
+                                window.location.reload();
+                            });
+                        });
+                    }
                     $('#chat-panel').click( () => {
                         if (!$('#dialog-box').length){
                             showDialog("Faça login na gladCode para participar do chat",["Cancelar","LOGIN"]).then( function(data){
