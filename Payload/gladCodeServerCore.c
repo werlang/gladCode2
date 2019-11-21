@@ -315,7 +315,7 @@ void updateProjectiles(){
                     float dy = (g+m)->y - a->y;
                     float dist = sqrt( pow(dx,2) + pow(dy,2) );
                     if (dist <= 2){
-                        float dmg = (1-(dist/2)) * a->dmg * 4; //dano = 0.5*sdmg, burn= 2*sdmg = 2/0.5=4
+                        float dmg = (1-(dist/2)) * a->dmg * 3; //dano = 0.6*sdmg, burn= 3*sdmg = 1.8/0.6=3
                         addBuff(m, BUFF_BURN, 4, dmg / 4 * timeInterval); //4 segundos
 						setXp(a->owner, dmg, m); //xp pelo burn
                         (g+m)->lasthitangle = getNormalAngle(getAngleFromAB((g+m)->x, (g+m)->y, a->x - a->spdx / travelunit, a->y - a->spdy / travelunit));
