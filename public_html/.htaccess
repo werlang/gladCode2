@@ -25,3 +25,15 @@ RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 RewriteRule ^(.*)$ https://%1%{REQUEST_URI} [R=301,QSA,NC,L]
+
+
+# SET CONDITION TO "true" FOR MAINTENANCE MODE
+# DON'T FORGET TO CHANGE IP TO ALLOW OVERRIDE
+# https://whatismyip.com.br/
+<IF "false">
+    RewriteCond %{REMOTE_ADDR} !^181\.118\.66\.198
+    RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+    RewriteCond %{REQUEST_URI} !^/icon/[\w]*.png$
+    RewriteRule ^(.*)$ http://gladcode.tk/maintenance.html [R=307,L]
+    RewriteRule ^([^\.]+)$      $1.php
+</IF>
