@@ -188,7 +188,7 @@
                         <tr>
                             <td><a href='function/fireball'>Fireball</a></td>
                             <td>50</td>
-                            <td>Arremessa um projétil que causa 70% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 160% do poder mágico de dano de queimadura ao longo de 3s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
+                            <td>Arremessa um projétil que causa 50% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 200% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
                         </tr>
                         <tr>
                             <td><a href='function/teleport'>Teleport</a></td>
@@ -234,11 +234,11 @@
                         </tr>
                         <tr>
                             <td>Movimentação</td>
-                            <td>O gladiador recebe um modificador altera a velocidade de movimento, aumentando ou reduzindo.</td>
+                            <td>O gladiador recebe um modificador que altera a velocidade de movimento, aumentando ou reduzindo-a.</td>
                         </tr>
                         <tr>
                             <td>Proteção</td>
-                            <td>O gladiador recebe proteção extra a danos, reduzindo o efeito de todo tipo de dano direto causa a ele. Caso o gladiador não enxergue a direção do ataque recebido, a eficácia da proteção é reduzida.</td>
+                            <td>O gladiador recebe proteção extra a danos, reduzindo o efeito de todo tipo de dano direto causado a ele. Caso o gladiador não enxergue a direção do ataque recebido, a eficácia da proteção é reduzida.</td>
                         </tr>
                         <tr>
                             <td>Invisibilidade</td>

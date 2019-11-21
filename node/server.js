@@ -1,7 +1,15 @@
 const express = require('express');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+var fs = require('fs');
+
+var credentials = {
+    key: fs.readFileSync('/etc/pki/tls/private/gladcode-dev.tk.key'),
+	cert: fs.readFileSync('/etc/pki/tls/certs/gladcode-dev.tk.cert'),
+	ca: fs.readFileSync('/etc/pki/tls/certs/gladcode-dev.tk.bundle')
+};
+const https = require('https').createServer(credentials, app);
+
+const io = require('socket.io')(https);
 const mysql = require('mysql');
 const crypto = require('crypto');
 const request = require('request');
@@ -9,6 +17,9 @@ const expsession = require('express-session');
 const MySQLStore = require('express-mysql-session')(expsession);
 const cors = require('cors');
 const bodyParser = require('body-parser')
+
+//what groups are trying to run simulation
+var tournament_run = {};
 
 
 //var exec = require('child_process');
@@ -50,6 +61,10 @@ app.use(cors({
 		'https://gladcode.tk',
 		'http://www.gladcode.tk',
 		'https://www.gladcode.tk',
+		'http://gladcode-dev.tk',
+		'https://gladcode-dev.tk',
+		'http://www.gladcode-dev.tk',
+		'https://www.gladcode-dev.tk',
 	],
 	credentials: true,
 
@@ -78,8 +93,12 @@ app.post('/login', function(req,res){
 				var sql = `SELECT u.id FROM usuarios u INNER JOIN gladiators g ON g.master = u.id WHERE g.cod = ${arg.glad}`;
 				connection.query(sql, function (error, results, fields){
 					if(error) return console.log(error);
-					session.user = results[0].id;
-					res.send({session: true});
+					if (results.length){
+						session.user = results[0].id;
+						res.send({session: true});
+					}
+					else
+						res.send({session: false});
 				});
 			}
 			else
@@ -87,7 +106,8 @@ app.post('/login', function(req,res){
 		}
 		else if (arg.token){
 			var url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${arg.token}`;
-			request(url, (err, res, body) => {
+			request(url, (error, response, body) => {
+				console.log(body);
 				if (body){
 					body = JSON.parse(body);
 					if (body.sub){
@@ -191,6 +211,24 @@ io.on('connection', function(socket){
 
 	});
 
+	socket.on('tournament run request', (args, fn) => {
+		var hashgroup = `${args.hash}-${args.group}`;
+		if (!tournament_run[hashgroup]){
+			tournament_run[hashgroup] = true;
+			dismiss(hashgroup);
+			fn({permission: 'granted'});
+		}
+		else{
+			fn({permission: 'denied'});
+		}
+
+		function dismiss(key){
+			setTimeout( function(){
+				delete tournament_run[key];
+			}, 5000);
+		}
+	});
+
 	socket.on('tournament join', args => {
 		tournament_join_leave('join', args);
 	});
@@ -231,7 +269,7 @@ io.on('connection', function(socket){
 	
 });
 
-http.listen(3000, function(){
+https.listen(3000, function(){
 	console.log('listening on *:3000');
 });
 

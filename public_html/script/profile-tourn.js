@@ -309,7 +309,7 @@ $(document).ready( function(){
 				
 												$('#tourn-message .button').click( function(){
 													$('#fog.message').remove();
-													$('.tourn-box .table .row').last().click();
+													$('.tourn-box .table .row.signed').click();
 												});
 											}
 										});
@@ -626,7 +626,8 @@ function rebind_team_rows(teamid){
                             var tournid = data.tourn;
 
                             $('#fog.team').remove();
-
+                            $('#fog #dialog-box').parents('#fog').remove();
+                            
                             if (data.status == "STARTED")
                                 showMessage("Este torneio já iniciou");
                             else{
@@ -711,7 +712,7 @@ function refresh_glads(args){
             id: teamid,
             sync: teamsync.time
         }).done( function(data){
-            //onsole.log(data);
+            //console.log(data);
             data = JSON.parse(data);
 
             if (data.status == "DONE"){

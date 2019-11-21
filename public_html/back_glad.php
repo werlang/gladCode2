@@ -83,7 +83,10 @@
 			));
 		}
 		else{
-			$id = mysql_escape_string($_POST['id']);
+			if (isset($_POST['id']))
+				$id = mysql_escape_string($_POST['id']);
+			else
+				$id = '';
 			$skin = mysql_escape_string($_POST['skin']);
 			$name = mysql_escape_string($_POST['nome']);
 			preg_match ( '/^[\w À-ú]+?$/' , $name , $name_match );

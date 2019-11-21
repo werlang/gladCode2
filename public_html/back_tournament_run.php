@@ -3,7 +3,11 @@
     include_once "connection.php";
     include("back_node_message.php");
 
-    $user = $_SESSION['user'];
+    if (isset($_SESSION['user']))
+        $user = $_SESSION['user'];
+    else
+        $user = null;
+
     $action = $_POST['action'];
     $output = array();
     date_default_timezone_set('America/Sao_Paulo');
@@ -219,6 +223,7 @@
         if ($nrows == 0)
             $nextround = true;
         else{
+            $nextround = false;
             //check of time is up for a new round
             $row = $result->fetch_assoc();
             $deadline = (new DateTime($row['deadline']))->getTimestamp();
@@ -555,7 +560,7 @@
     }
     
     function is_locked ($t){
-        if ($t == null || $t == 'null')
+        if ($t == null || $t == 'null' || is_null($t))
             return false;
 
         $locked = new DateTime($t);

@@ -268,7 +268,7 @@ $(document).ready( function(){
                                 else if (status == "MAXPROMOTION")
                                     create_toast("O usuário "+ data.target +" não pode mais ser promovido", "info");
                                 else if (status == "NOTARGET"){
-                                    if (data.command == 'ban')
+                                    if (data.command == 'ban' || data.command == 'promote')
                                         create_toast("O usuário "+ data.target +" não foi encontrado na sala", "error");
                                     else
                                         create_toast("O usuário "+ data.target +" não está banido", "info");

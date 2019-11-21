@@ -84,16 +84,35 @@ function load_table(data){
 
 		for (let i=0 ; i < $('#t-glad tbody tr').length ; i++){
 			var a = $('#t-glad tbody tr').eq(i).data('info');
-			var perc = '%';
-			if (a == 'lvl')
-				perc = '';
+
+			var avg = data.highattr.avg[a];
+			if (avg)
+				avg = avg.toFixed(1);
+			else
+				avg = '-';
+
+			var winner = data.highattr.winner[a];
+			if (winner)
+				winner = winner.toFixed(1);
+			else
+				winner = '-';
+	
+			if (a != 'lvl' && avg != '-')
+				avg += '%';
+			if (a != 'lvl' && winner != '-')
+				winner += '%';
+
 			$('#t-glad tbody tr').eq(i).append(`
-				<td>${(data.highattr.avg[a]).toFixed(1)}${perc}</td>
-				<td>${(data.highattr.winner[a]).toFixed(1)}${perc}</td>`);
+				<td>${avg}</td>
+				<td>${winner}</td>`);
 		}
 
 		$('#nbattles').html(data.nbattles.total);
-		$('#avg-time').html(data.duration.toFixed(1) +"s");
+
+		if (data.duration)
+			$('#avg-time').html(data.duration.toFixed(1) +"s");
+		else
+			$('#avg-time').html('-');
 
 		if (data.nbattles.highattr < data.nbattles.total){
 			$('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.nbattles.highattr} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();

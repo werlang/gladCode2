@@ -1194,7 +1194,7 @@ $(document).ready( function(){
 						message: message,
 					})
 					.done( function(data){
-						console.log(data);
+						//console.log(data);
 					});
 				});
 			}

@@ -3,7 +3,9 @@
 	session_start();
 	include("back_node_message.php");
 
-	$user = $_SESSION['user'];
+	$user = null;
+	if (isset($_SESSION['user']))
+		$user = $_SESSION['user'];
 
 	$output = array();
 	$outtext = ""; 
@@ -48,7 +50,8 @@
 
 			$sql = "SELECT log FROM groups WHERE id = $groupid";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-			if ($row = $result->fetch_assoc() && $row['log'] == null){
+			$row = $result->fetch_assoc();
+			if ($row['log'] == null){
 				$sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 	
@@ -191,7 +194,7 @@
 
 			if (isset($_POST['ranked']) && $_POST['ranked'] == "true"){
 				$deaths = death_times($conn, $ids, $file);
-				$rewards = battle_rewards($conn, $deaths);
+				$rewards = battle_rewards($conn, $deaths, $user);
 				send_reports($conn, $rewards, $hash);
 			}
 			if (isset($_POST['duel']) && $_POST['duel'] != "false"){
@@ -323,7 +326,7 @@
 		}
 	}
 
-	function battle_rewards($conn, $deaths){
+	function battle_rewards($conn, $deaths, $user){
 		$ids = array();
 		$times = array();
 		foreach($deaths as $glad){
