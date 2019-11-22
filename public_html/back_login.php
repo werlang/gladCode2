@@ -3,6 +3,7 @@
 	include_once "connection.php";
 	$action = $_POST['action'];
 	$output = array();
+	date_default_timezone_set('America/Sao_Paulo');
 	
 	if ($action == "GET"){
 		if(isset($_SESSION['user'])){
@@ -22,6 +23,7 @@
 				$info['apelido'] = $row['apelido'];
 				$info['nome'] = $row['nome'];
 				$info['sobrenome'] = $row['sobrenome'];
+				$info['ativo'] = $row['ativo'];
 				$info['pasta'] = $row['pasta'];
 				$info['lvl'] = $row['lvl'];
 				$info['xp'] = $row['xp'];
@@ -58,6 +60,11 @@
 			
 			$sql = "UPDATE usuarios SET ativo = now() WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+			$sql = "SELECT now(), ativo FROM usuarios WHERE id = '$user'";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$row = $result->fetch_assoc();
+			$output['debug'] = $row;
 		}
 		else
 			$output['status'] = "NOTLOGGED";

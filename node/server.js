@@ -174,6 +174,8 @@ app.post('/phpcallback', parser, function(req, res) {
 io.on('connection', function(socket){
 	console.log("New client: " +socket.id);
 
+	connection.query("SET time_zone='-03:00';", error => {});
+	
 	wait_session().then( () => {
 		//set active time
 		var sql = `UPDATE usuarios SET ativo = now() WHERE id = '${session.user}'`;
