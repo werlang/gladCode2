@@ -1,0 +1,13 @@
+### crontab with nano
+export VISUAL=nano; crontab -e
+
+0 4 * * * /home/gladcode/script/backup_database.sh
+0 4 * * * /home/gladcode/script/remove_temp_dir.sh
+
+### quando tiver que recriar o server, e criar a pasta temp, tem que dar chown gladcode nela
+
+### tem que liberar a porta 3000 no cwp por causa do node
+
+### configurar o rclone
+https://www.techrepublic.com/article/how-to-sync-from-linux-to-google-drive-with-rclone/
+infos estão em API no console do google

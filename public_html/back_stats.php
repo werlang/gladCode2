@@ -68,9 +68,9 @@
 			$sumtime = array( 'sum' => 0, 'count' => 0 );
 			$highattr = array( 
 				'sum' => array( 
-					'str' => 0, 'agi' => 0, 'int' => 0 ),
+					'STR' => 0, 'AGI' => 0, 'INT' => 0 ),
 				'count' => array( 
-					'str' => 0, 'agi' => 0, 'int' => 0 ),
+					'STR' => 0, 'AGI' => 0, 'INT' => 0 ),
 				'total' => 0
 			);
 			$lvl = array(

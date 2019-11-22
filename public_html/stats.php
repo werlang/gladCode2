@@ -65,13 +65,13 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-info='str'>
+						<tr data-info='STR'>
 							<td class='fixed'>Força predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a força como seu atributo predominante'>help</i></td>
 						</tr>
-						<tr data-info='agi'>
+						<tr data-info='AGI'>
 							<td class='fixed'>Agilidade predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a agilidade como seu atributo predominante'>help</i></td>
 						</tr>
-						<tr data-info='int'>
+						<tr data-info='INT'>
 							<td class='fixed'>Inteligência predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a inteligência como seu atributo predominante'>help</i></td>
 						</tr>
 						<tr data-info='lvl'>
