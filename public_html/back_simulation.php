@@ -2,6 +2,7 @@
 	include_once "connection.php";
 	session_start();
 	include("back_node_message.php");
+    date_default_timezone_set('America/Sao_Paulo');
 
 	$user = null;
 	if (isset($_SESSION['user']))

@@ -336,7 +336,7 @@
                 else{
                     $sql = "SET lc_time_names = 'pt_BR'";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-                    $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(SECOND, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, u.apelido";
+                    $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(SECOND, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, login, u.apelido";
                     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                     
                     $output['user'] = array();
