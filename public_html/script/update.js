@@ -39,7 +39,7 @@ $(document).ready( function(){
 				var changes = $('#changes textarea').val();
 				changes = changes.replace(/\r?\n/g, '<br/>');
 				//console.log(changes);
-				showMessage("Mensagem enviada. Aguarde.");
+				showMessage("Mensagem enviada. Aguarde. Não clique mais de uma vez antes de dar status 500 no console.");
 
 				$.post("back_sendmail.php",{
 					action: "UPDATE",
