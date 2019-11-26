@@ -366,37 +366,6 @@
 					</tbody>
 				</table>
 				
-				<h2 id='nav-setup'>Setup</h2>
-				
-				<p>As funções de setup servem para definir as características do gladiador, como nome e atributos básicos. Elas podem ser chamadas somente dentro da função setup() no <a href='manual.php#nav-prog'>código do gladiador</a>.</p>
-				
-				<p><b>OBS: A função setup, bem como todas funções que devem estar contidas dentro da mesma, só devem estar presentes caso o modo clássico de <a href='socks' target='_blank'>batalha</a> ou <a href='tournment' target='_blank'>torneio</a> esteja sendo executado. Caso contrário, o <a href='editor' target='_blank'>editor de gladiadores</a> se encarrega de adicionar as informações do gladiador para o servidor.</b></p>
-				
-				<table class='table t-funcs'>
-					<tbody>
-						<tr>
-							<td><a href='function/setname'>setName</a></td>
-							<td>Atribui um nome para o gladiador.</td>
-						</tr>
-						<tr>
-							<td><a href='function/setstr'>setSTR</a></td>
-							<td>Atribui um valor para o atributo Força (STR) do gladiador.</td>
-						</tr>
-						<tr>
-							<td><a href='function/setagi'>setAGI</a></td>
-							<td>Atribui um valor para o atributo Agilidade (AGI) do gladiador.</td>
-						</tr>
-						<tr>
-							<td><a href='function/setint'>setINT</a></td>
-							<td>Atribui um valor para o atributo Inteligência (INT) do gladiador.</td>
-						</tr>
-						<tr>
-							<td><a href='function/setspritesheet'>setSpritesheet</a></td>
-							<td>Atribui ao gladiador uma aparência.</td>
-						</tr>
-					</tbody>
-				</table>
-				
 			</div>
 			<div id='ads'>
 			</div>
