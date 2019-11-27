@@ -11,9 +11,19 @@ var json, loadglads = false, startsim = false;
 var loadCache = false;
 var stab, gender;
 var simtimenow;
-var sfxVolume = 1;
 var dt = 0;
-var showFrames = true;
+var prefs = {
+	bars: true,
+	frames: true,
+	fps: false,
+	text: true,
+	speech: true,
+	sound: {
+		music: 1,
+		sfx: 1
+	},
+	crowd: 1
+}
 
 var actionlist = [
 	{'name': 'fireball', 'value': 0, 'animation': 'cast'},
@@ -327,7 +337,9 @@ function create() {
                 v.sprite[i].animations.play('cheer');
             }
 		}
-    });
+	});
+
+	changeCrowd(prefs.crowd);
 }
 
 //function created to debug code. pass argument 's' when you want to start measure and 'e' when to end.
@@ -425,7 +437,8 @@ function update() {
 				poison: false,
 				xp: parseInt(json.glads[i].xp),
                 time: false,
-                sprites: {}
+				sprites: {},
+				dmgfloat: 0
 			};
 
 			//var w = arenaX1 + 25 * arenaRate;
@@ -434,7 +447,7 @@ function update() {
 			//gladArray[i].bars.addToWorld();
 		}
 		music.play();
-		music.volume = $('#sound').data('music');
+		music.volume = prefs.sound.music;
 	}
 	else if (sprite.length > 0){
 		if (!startsim){
@@ -462,18 +475,20 @@ function update() {
 				sprite[i].x = arenaX1 + x * arenaRate;
 				sprite[i].y = arenaY1 + y * arenaRate;
 
-                showMessageBaloon(i);
+				showMessageBaloon(i);
                 showHpApBars(i);
 
+				//lvlup
 				if (level != gladArray[i].level){
                     gladArray[i].level = level;
                     var lvlup = addSprite(gladArray[i], 'lvlup', sprite[i].x, sprite[i].y);
                     lvlup.anchor.setTo(0.5, 0.35);
                     lvlup.animations.play('lvlup', null, false, true);
                     groupglad.add(lvlup);
-                    playAudio('lvlup', sfxVolume);
+                    playAudio('lvlup', prefs.sound.sfx);
 				}
 				
+				//took damage
 				if (hp != gladArray[i].hp) {
 					//explodiu na cara
 					if (actionlist[action].name == 'fireball' && json.glads[i].buffs.burn.timeleft > 0.1){
@@ -483,20 +498,61 @@ function update() {
 						fire.width = 5 * arenaRate;
 						fire.height = 3 * arenaRate;
                         fire.animations.play('explode', null, false, true);
-                        playAudio('explosion', sfxVolume);
+                        playAudio('explosion', prefs.sound.sfx);
 					}
-						
+					
+					if (prefs.text){
+						var dmg = gladArray[i].hp - hp;
+						var color = "#ffffff";
+						var floattime = 400;
+						var fill_color = "#000000";
+
+						if (dmg < 0){
+							fill_color = "#2dbc2d";
+							dmg = -dmg;
+						}
+						else if (json.glads[i].buffs.burn && json.glads[i].buffs.burn.timeleft > 0.1){
+							color = "#d36464";
+							floattime = 100;
+						}
+						else if (gladArray[i].poison)
+							color = "#7ae67a";
+						else if (gladArray[i].block)
+							color = "#9c745a";
+
+						gladArray[i].dmgfloat += dmg;
+
+						if (gladArray[i].dmgfloat > 0.01 * json.glads[i].maxhp){
+							new FloatingText(this, {
+								text: gladArray[i].dmgfloat.toFixed(0),
+								animation: 'up',
+								textOptions: {
+									fontSize: 16,
+									fill: fill_color,
+									stroke: color,
+									strokeThickness: 3
+								},
+								x: sprite[i].x,
+								y: sprite[i].y - 20,
+								timeToLive: floattime // ms
+							});
+
+							gladArray[i].dmgfloat = 0;
+						}
+					}
+
 					gladArray[i].hp = hp;
+
 				}
 				
 				if (hp <= 0){
 					if (gladArray[i].alive){
 						sprite[i].animations.play('die');
 						if (gender[newindex[i]] == "male"){
-                            playAudio('death_male', sfxVolume);
+                            playAudio('death_male', prefs.sound.sfx);
 						}
 						else{
-                            playAudio('death_female', sfxVolume);
+                            playAudio('death_female', prefs.sound.sfx);
 						}
 					}
 					gladArray[i].alive = false;
@@ -512,10 +568,10 @@ function update() {
 							sprite[i].animations.play(anim, 50, true);
 							gladArray[i].charge = true;
 							if (gender[newindex[i]] == "male"){
-								playAudio('charge_male', sfxVolume);
+								playAudio('charge_male', prefs.sound.sfx);
 							}
 							else{
-								playAudio('charge_female', sfxVolume);
+								playAudio('charge_female', prefs.sound.sfx);
 							}
 						}
 					}
@@ -538,7 +594,7 @@ function update() {
 							gladArray[i].fade = 1;
 							gladArray[i].x = sprite[i].x;
 							gladArray[i].y = sprite[i].y;
-							playAudio('teleport', sfxVolume);
+							playAudio('teleport', prefs.sound.sfx);
 						}
 						if (actionlist[action].name == "assassinate"){
 							gladArray[i].assassinate = true;
@@ -547,10 +603,10 @@ function update() {
 							gladArray[i].block = false;
 						}
 						if (actionlist[action].name == "ranged"){
-							playAudio('ranged', sfxVolume);
+							playAudio('ranged', prefs.sound.sfx);
 						}
 						if (actionlist[action].name == "melee"){
-							playAudio('melee', sfxVolume);
+							playAudio('melee', prefs.sound.sfx);
 						}
 							
 					}
@@ -564,7 +620,7 @@ function update() {
 				
 				if (gladArray[i].invisible){
 					if (sprite[i].alpha >= 1)
-						playAudio('ambush', sfxVolume);
+						playAudio('ambush', prefs.sound.sfx);
 					if (sprite[i].alpha > 0.3)
 						sprite[i].alpha -= 0.05;
 				}
@@ -603,7 +659,7 @@ function update() {
 					gladArray[i].stun.anchor.setTo(0.5, 1);
 					gladArray[i].stun.scale.setTo(0.6);
 					gladArray[i].stun.animations.play('stun', null, true, false);
-					playAudio('stun', sfxVolume);
+					playAudio('stun', prefs.sound.sfx);
 				}
 				else if (gladArray[i].stun && (json.glads[i].buffs.stun.timeleft <= 0.1 || !gladArray[i].alive)){
 					gladArray[i].stun.kill();
@@ -618,7 +674,7 @@ function update() {
 					groupglad.add(shield);
 					shield.animations.play('shield', null, false, true);
 					shield.alpha = 0.5;
-                    playAudio('block', sfxVolume);
+                    playAudio('block', prefs.sound.sfx);
 				}
 				else if (gladArray[i].block && json.glads[i].buffs.resist.timeleft <= 0.1){
 					gladArray[i].block = false;
@@ -634,7 +690,7 @@ function update() {
 							var anim = 'stab-' + getActionDirection(head);
 						sprite[i].animations.stop();
 						sprite[i].animations.play(anim, 20);
-						playAudio('melee', sfxVolume);
+						playAudio('melee', prefs.sound.sfx);
 					}
 					else if (actionlist[action].name != "charge"){
 						sprite[i].animations.currentAnim.speed = 15;
@@ -692,7 +748,7 @@ function update() {
                     else if (json.projectiles[i].type == 1){ //fireball
                         spr = newProjectile('fireball');
                         spr.animations.play('fireball');
-                        playAudio('fireball', sfxVolume);
+                        playAudio('fireball', prefs.sound.sfx);
                     }
                     else if (json.projectiles[i].type == 2){ //stun
                         spr = newProjectile('arrow');
@@ -704,7 +760,7 @@ function update() {
                         gladArray[json.projectiles[i].owner].assassinate = false;
                         spr = newProjectile('arrow');
                         spr.tint = 0xFF0000;
-                        playAudio('assassinate', sfxVolume);
+                        playAudio('assassinate', prefs.sound.sfx);
                     }
                                     
                     spr.anchor.setTo(0.5, 0.5);
@@ -729,10 +785,10 @@ function update() {
                     fire.width = 5 * arenaRate;
                     fire.height = 3 * arenaRate;
                     fire.animations.play('explode', null, false, true);
-                    playAudio('explosion', sfxVolume);
+                    playAudio('explosion', prefs.sound.sfx);
                 }
                 else{
-                    playAudio('arrow_hit', sfxVolume);
+                    playAudio('arrow_hit', prefs.sound.sfx);
                 }
                 
                 sproj[x].sprite.kill();
@@ -838,7 +894,16 @@ function createAnimation(glad, action){
 }
 
 function update_ui(json){
-    if (showFrames){
+    if (prefs.frames){
+		if (prefs.text && !uiVars.showtext){
+			uiVars.showtext = true;
+			$('.ap-bar .text, .hp-bar .text').removeClass('hidden');
+		}
+		else if (!prefs.text && uiVars.showtext){
+			uiVars.showtext = false;
+			$('.ap-bar .text, .hp-bar .text').addClass('hidden');
+		}
+	
         var nglad = json.glads.length;
         for (i=0 ; i<nglad ; i++){
             var name = json.glads[i].name;
@@ -898,7 +963,8 @@ function update_ui(json){
             
             if (uiVars[i].hp != hp){
                 uiVars[i].hp = hp;
-                $('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
+				$('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
+				$('.hp-bar .text').eq(i).html(`${hp.toFixed(0)} / ${maxhp}`);
             }
             
             if (hp <= 0){
@@ -913,6 +979,7 @@ function update_ui(json){
             if (uiVars[i].ap != ap){
                 uiVars[i].ap = ap;
                 $('.ap-bar .filled').eq(i).width(ap/maxap*100 +'%');
+				$('.ap-bar .text').eq(i).html(`${ap.toFixed(0)} / ${maxap}`);
             }
             
             if (burn){
@@ -967,18 +1034,16 @@ function update_ui(json){
             else if (uiVars[i].poison){
                 uiVars[i].poison = false;
                 $('.buff-poison').eq(i).removeClass('active');
-            }
-
+			}
         }
     }
 }
 
-var showFPS = false;
 var oldTime = null;
 var avgFPS = 0, contFPS = 0;
 var avgFPS5 = [];
 function debugTimer(){
-	if (showFPS){
+	if (prefs.fps){
 		if (!oldTime)
 			oldTime = new Date();
 		else{
@@ -1030,36 +1095,45 @@ $(window).keydown(function(event) {
 	}
 
 	if(event.keyCode == Phaser.Keyboard.F){
-		showFPS = (showFPS + 1) % 2;
+		prefs.fps = (prefs.fps + 1) % 2;
 	
 		$.post("back_play.php", {
 			action: "SET_PREF",
-			show_fps: (showFPS == 1)
+			show_fps: (prefs.fps == 1)
 		});
 	}
 
 	if(event.keyCode == Phaser.Keyboard.B){
-		showbars = (showbars + 1) % 2;
+		prefs.bars = (prefs.bars + 1) % 2;
 	
 		$.post("back_play.php", {
 			action: "SET_PREF",
-			show_bars: (showbars == 1)
+			show_bars: (prefs.bars == 1)
 		});
 	}
 
 	if(event.keyCode == Phaser.Keyboard.M){
-		if (showFrames){
+		if (prefs.frames){
 			$('#ui-container').fadeOut();
-			showFrames = false;
+			prefs.frames = false;
 		}
 		else{
 			$('#ui-container').fadeIn();
-			showFrames = true;
+			prefs.frames = true;
 		}
 
 		$.post("back_play.php", {
 			action: "SET_PREF",
-			show_frames: showFrames
+			show_frames: prefs.frames
+		});
+	}
+
+	if(event.keyCode == Phaser.Keyboard.T){
+		prefs.text = (prefs.text + 1) % 2;
+
+		$.post("back_play.php", {
+			action: "SET_PREF",
+			show_text: (prefs.text == 1)
 		});
 	}
 
@@ -1095,7 +1169,7 @@ function getGladPositionOnCanvas(gladid){
 function showMessageBaloon(gladid){
 	var message = json.glads[gladid].message;
 
-	if (message != "" && json.glads[gladid].hp > 0){
+	if (prefs.speech && message != "" && json.glads[gladid].hp > 0){
 		var gpos = getGladPositionOnCanvas(gladid);
 
 		if ($('.baloon.glad-'+ gladid).length)
@@ -1147,9 +1221,8 @@ function initBars(){
 	bar.ap.alpha = 0.4;
 }
 
-var showbars = true;
 function showHpApBars(gladid){
-    if (showbars){
+    if (prefs.bars){
         if (!gladArray[gladid].bars){
             var b = {};
             b.back = game.add.sprite(0,0, bar.back);
