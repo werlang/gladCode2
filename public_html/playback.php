@@ -20,6 +20,7 @@
 	<title>gladCode - Visualizar batalha</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
+	
 	<link rel='stylesheet' href="css/checkboxes.css"/>
 	<link rel='stylesheet' href="css/dialog.css"/>
 	<link rel='stylesheet' href="css/playback.css"/>
@@ -28,6 +29,7 @@
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	
 	<script src="script/phaser.js"></script>
+	<script src="script/floatingText.js"></script>
 	<script src="script/render.js"></script>
 	<script src="script/assets.js"></script>
 	<script src="script/dialog.js"></script>
