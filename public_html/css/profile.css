@@ -1579,7 +1579,29 @@ body {
 
 #pre-battle-show.complete #tips{
 	color: black;
+}
+
+#pre-battle-show.complete #tips i {
+    margin-left: 25px;
+    background-color: #c8c8c8;
+    color: black;
+    border-radius: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+    font-size: 40px;
+	transition: 0.3s all;
+	box-shadow: 0px 0px 5px #00000070;
 	cursor: pointer;
+}
+
+#pre-battle-show.complete #tips #view:hover {
+    color: #000000;
+    background-color: #719e71;
+}
+
+#pre-battle-show.complete #tips #close:hover {
+    color: #000000;
+    background-color: #db5f5f;
 }
 
 @media only screen and (min-width: 600px) {
@@ -2219,3 +2241,4 @@ body {
 	opacity: 0.2;
 	filter: none;
 }
+

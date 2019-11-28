@@ -10,7 +10,7 @@ $(document).ready( function(){
 	$.post("back_login.php", {
 		action: "GET"
 	}).done( function(data){
-		//console.log(data);
+		// console.log(data);
 		user = JSON.parse(data);
 		if ($('#tab').length){
 			var id = $('#tab').html();
@@ -24,6 +24,7 @@ $(document).ready( function(){
 		checkNotifications();
 
 		socket_ready().then( () => {
+			//console.log("socket ready");
 			socket.on('profile notification', data =>{
 				//console.log("server message");
 				checkNotifications();
@@ -677,20 +678,27 @@ $(document).ready( function(){
 				//console.log(data);
 				if (data == "ERROR"){
 					progbtn.kill();
+					window.location.reload();
 				}
 				else{
 					var hash = data;
 
 					save_stats(hash);
 
-					$('#pre-battle-show #tips').html("Batalha concluída. Clique para visualizar");
+					$('#pre-battle-show #tips').html(`<span>Batalha concluída. Escolha uma opção:</span>
+						<i id='view' title='Visualizar batalha' class='material-icons'>remove_red_eye</i>
+						<i id='close' title='Fechar janela' class='material-icons'>close</i>`);
 					clearInterval(preBattleInt);
 					$('#pre-battle-show').addClass('complete');
-					$('#pre-battle-show').click( function(){
-						window.open("play/"+ hash);
+
+					$('#pre-battle-show i').click( function(){
+						if ($(this).attr('id') == 'view')
+							window.open("play/"+ hash);
+						
 						$('#fog').remove();
 						$('#menu #battle').click();
 					});
+
 					progbtn.kill();
 				}
 			});
@@ -1299,14 +1307,38 @@ function preBattleShow(glads){
 		"Gladiadores de renome semelhante são automaticamente selecionados para se enfrentar",
 		"Observe o comportamento de seus inimigos, e tente adaptar a lógica do seu gladiador para derrotá-los",
 		"Quando você está offline, seus gladiadores podem ser desafiados. Eles podem subir ou descer no ranking",
-		"Você pode ver as últimas batalhas que seus gladiadores participaram no menu BATALHA",
+		"Você pode ver as últimas batalhas que seus gladiadores participaram no menu HISTÓRICO",
 		"Você pode procurar por usuários ou enviar mensagens para seus amigos no menu AMIGOS",
-		"Participar de batalhas concede experiência para o mestre, que lhe concede uma série de benefícios",
+		"Participar de batalhas concede experiência para o mestre, que lhe permite recrutar mais gladiadores",
 		"Está com dúvida em algo? pergunte na página do facebook ou comunidade do reddit da gladCode",
-		"Seja um membro ativo da comunidade comentando e dando sua opinião no facebook ou reddit",
+		"Quer conversar com outros mestres? Interaja de WhatsApp ou chat da gladCode",
 		"Assista o replay de suas batalhas, assim você entende melhor o comportamentos de seus gladiadores",
 		"A documentação é a melhor maneira de compreender como uma função funciona. Tem exemplos!",
 		"Não entendeu algo sobre o funcionamento da gladCode? O manual da simulação está ali à sua disposição",
+		"Ali no menu BATALHA, Você pode desafiar seus amigos para duelos de 1x1 para ver quem é o melhor",
+		"No menu BATALHA, você pode criar ou participar de um torneio. Junte seus amigos e convide-os",
+		"O chat da gladCode é o meio mais prático de compartilhar código e conhecer outros mestres. Experimente",
+		"Já viu que têm um botão de preferências nas batalhas, que te permite ajustar várias coisas legais?",
+
+		"A habilidade FIREBALL é efetiva no longo prazo, pois queima o inimigo aos poucos",
+		"A habilidade TELEPORT te envia para qualquer lugar. Mas cuide o gás tóxico",
+		"A habilidade CHARGE é ótima para se aproximar dos inimigos e causa um bom dano pela distância percorrida",
+		"A habilidade BLOCK é menos efetiva quando você leva dano pelas costas",
+		"A habilidade ASSASSINATE causa muito dano se você conseguir pegar o oponente desprevinido",
+		"A habilidade AMBUSH é ótima tanto para se livrar de perigos como para iniciar um combate",
+
+		"Cuide para nunca ficar na zona do gás tóxico. Mesmo o gladiador mais forte sucumbe nela rapidamente",
+		"É bom garantir o centro da arena, mas cuidado para não virar alvo de vários inimigos",
+		"Fugir das batalhas te mantém vivo, mas te deixa atrasado no poder que os níveis te concede",
+		"Cada um dos três atributos te concede características essenciais para todo tipo de gladiador",
+		"Sem FORÇA, um gladiador tem pouca vida, e morre rapidamente",
+		"Sem AGILIDADE, um gladiador é lento, tanto em seus ataques como em seus movimentos",
+		"Sem INTELIGÊNCIA, um gladiador não consegue lançar muitas habilidades",
+		"Com uma boa estratégia, você pode criar gladiadores híbridos que se beneficiam de várias habilidades",
+		"Se você tem pouca vida, jamais deixe um inimigo chegar muito perto de você",
+		"Se você é um mago, não fique parado. Ser atordoado pode te custar a vida",
+		"Se você é um guerreiro, abuse do BLOCK, ele é a ferramenta que te deixará vivo",
+		"Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura"
 	];
 
 	var timeElapsed = 0;
