@@ -31,27 +31,29 @@
 	<?php include("header.php"); ?>
 	<div id='frame'>
 		<div id='side-menu'></div>
-		<div id='content'>
-			<h2 id='temp-name'></h2>
-			<pre><code class="language-c" id='temp-syntax'></code></pre>
-			<p id='temp-description'></p>
-						
-			<h3>Parâmetros</h3>
-			<div id='temp-param'></div>
-			
-			<h3>Retorno</h3>
-			<p id='temp-return'></p>
-			
-			<h3>Exemplo</h3>
-			<pre><code class="language-c" id='temp-sample'></code></pre>
-			<p id='temp-explain'></p>
-			
-			<h3>Veja também</h3>
-			<table class='table t-funcs'>
-				<tbody id='temp-seealso'>
-				</tbody>
-			</table>
-			
+		<div id='right-side'>
+			<div id='content'>
+				<h2 id='temp-name'></h2>
+				<pre><code class="language-c" id='temp-syntax'></code></pre>
+				<p id='temp-description'></p>
+							
+				<h3>Parâmetros</h3>
+				<div id='temp-param'></div>
+				
+				<h3>Retorno</h3>
+				<p id='temp-return'></p>
+				
+				<h3>Exemplo</h3>
+				<pre><code class="language-c" id='temp-sample'></code></pre>
+				<p id='temp-explain'></p>
+				
+				<h3>Veja também</h3>
+				<table class='table t-funcs'>
+					<tbody id='temp-seealso'>
+					</tbody>
+				</table>
+			</div>
+			<div id='footer'></div>
 		</div>
 	</div>
 	<?php
