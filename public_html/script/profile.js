@@ -210,7 +210,7 @@ $(document).ready( function(){
 						var card = $(this).parents('.glad-preview');
 						if ($(this).parents('.glad-preview').hasClass('old')){
 							var name = $(this).parents('.info').find('.glad span').html();
-							showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique no botão para abrir o editor",["Cancelar","OK"]).then( function(data){
+							showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor",["Cancelar","OK"]).then( function(data){
 								if (data == "OK")
 									window.open("glad-"+ card.data('id'));
 							});
@@ -299,10 +299,17 @@ $(document).ready( function(){
 					$('.glad-preview .code').remove();
 					
 					$('#battle-container .glad-preview').click( function(){
+						var card = $(this);
 						if (!$(this).hasClass('old')){
 							$('#battle-container .glad-preview').removeClass('selected');
 							$(this).addClass('selected');
 							$('#match-find').removeAttr('disabled');
+						}
+						else{
+							showDialog("Este gladiador precisa ser atualizado. Deseja abri-lo no editor?", ['Sim', 'Não']).then( function(data){
+								if (data == 'Sim')
+								window.open(`glad-${card.data('id')}`);
+							});
 						}
 					});
 				});
@@ -369,13 +376,16 @@ $(document).ready( function(){
 		
 				load_glad_cards($('#fog .glad-card-container'), {
 					clickHandler: function(){
-						$('#fog #btn-glad-open').removeAttr('disabled');
-						$('#fog .glad-preview').removeClass('selected');
-						$(this).addClass('selected');
-						$('#duel-box #duel').removeAttr('disabled');
+						if (!$(this).hasClass('old')){
+							$('#fog #btn-glad-open').removeAttr('disabled');
+							$('#fog .glad-preview').removeClass('selected');
+							$(this).addClass('selected');
+							$('#duel-box #duel').removeAttr('disabled');
+						}
 					},
 					dblClickHandler: function(){
-						$('#fog #duel-box #duel').click();
+						if ($('#fog .glad-card-container .selected').length)
+							$('#fog #duel-box #duel').click();
 					}
 				});
 

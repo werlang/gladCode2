@@ -9,27 +9,37 @@
 			$id = mysql_escape_string($_POST['id']);
 			$pool = 10;
 			
-			$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN (SELECT cod FROM gladiators WHERE master != '$user' AND version = '$version' ORDER BY ABS(mmr - (SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user')) LIMIT $pool) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
+			$sql = "SELECT version FROM gladiators WHERE cod = $id";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$row = $result->fetch_assoc();
 
-			$output = array();
-			$i = 0;
-			$ids = array();
-			while($row = $result->fetch_assoc()){
-				$output[$i] = array();
-				$output[$i]['name'] = $row['name']; 
-				$output[$i]['user'] = $row['apelido']; 
-				$output[$i]['skin'] = $row['skin']; 
-				$output[$i]['vstr'] = $row['vstr']; 
-				$output[$i]['vagi'] = $row['vagi']; 
-				$output[$i]['vint'] = $row['vint']; 
-				$output[$i]['mmr'] = $row['mmr']; 
-				array_push($ids, $row['cod']);
-				$i++;
-			}		
-			array_push($ids, $id);
-			
-			$_SESSION['match'] = $ids;
+			if ($row['version'] == $version){
+				$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN (SELECT cod FROM gladiators WHERE master != '$user' AND version = '$version' ORDER BY ABS(mmr - (SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user')) LIMIT $pool) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+
+				$output = array();
+				$i = 0;
+				$ids = array();
+				while($row = $result->fetch_assoc()){
+					$output[$i] = array();
+					$output[$i]['name'] = $row['name']; 
+					$output[$i]['user'] = $row['apelido']; 
+					$output[$i]['skin'] = $row['skin']; 
+					$output[$i]['vstr'] = $row['vstr']; 
+					$output[$i]['vagi'] = $row['vagi']; 
+					$output[$i]['vint'] = $row['vint']; 
+					$output[$i]['mmr'] = $row['mmr']; 
+					array_push($ids, $row['cod']);
+					$i++;
+				}		
+				array_push($ids, $id);
+				
+				$_SESSION['match'] = $ids;
+			}
+			else{
+				$output['status'] = "OLD";
+			}
+
 			echo json_encode($output);
 		}
 		
