@@ -64,7 +64,7 @@
 			$sql = "SELECT now(), ativo FROM usuarios WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			$row = $result->fetch_assoc();
-			//$output['debug'] = $_SERVER;
+			//$output['debug'] = $row;
 		}
 		else
 			$output['status'] = "NOTLOGGED";
