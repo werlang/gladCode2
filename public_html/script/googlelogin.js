@@ -57,9 +57,9 @@ function initGoogleLogin(){
 
 function googleLogin(){
 	var loginAjax = $.Deferred();
-	
     auth2.signIn().then( function() {
         var id_token = auth2.currentUser.get().getAuthResponse().id_token;
+		//console.log(id_token);
         $.post( "back_login.php", {
             action: "SET",
             token: id_token

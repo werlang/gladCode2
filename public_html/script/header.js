@@ -67,8 +67,22 @@ $(document).ready( function() {
 		data = JSON.parse(data);
 		if (data.status == "NOTLOGGED")
 			$('.mobile #profile, .desktop #profile').hide();
-		else
-			$('.mobile #login, .desktop #login').hide();
+		else{
+			socket_request('login', {}).then( function(res, err){
+				if (err) return console.log(err);
+				if (res.session === false){
+					$.post("back_login.php", {
+						action: "UNSET"
+					}).done( function(data){
+						data = JSON.parse(data);
+						if (data.status == "LOGOUT")
+							window.location.reload();
+					});
+				}
+				else
+					$('.mobile #login, .desktop #login').hide();
+			});
+		}
 	});
 
 	if ($('#footer').length)
