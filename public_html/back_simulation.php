@@ -187,7 +187,7 @@
 					}
 				}
 			}
-			$output['test'] = json_encode($simulation);
+			//$output['test'] = json_encode($simulation);
 
 			$file = json_encode($simulation);
 			
