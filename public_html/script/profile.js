@@ -507,7 +507,7 @@ $(document).ready( function(){
 				read: true,
 				page: reportpage.battles,
 			}).done( function(data){
-				//console.log(data);
+				// console.log(data);
 				var e;
 				try{
 					data = JSON.parse(data);
@@ -524,14 +524,27 @@ $(document).ready( function(){
 					ptotal = data.total;
 					data = data.reports;
 
+					bind_report_pages();
+
                     if (ptotal == 0)
                         $('#bhist-container .table').html("<p>Você ainda não possui batalhas</p>");
                     else{
-                        bind_report_pages();
-
-                        $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
+						$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
                         for (var i in data){
-                            $('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].gladiator +"</div><div class='cell reward'>"+ (parseFloat(data[i].reward)).toFixed(1) +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a></div></div>")
+							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							if (data[i].favorite)
+								star = {body: "star", title: "Tirar dos favoritos"};
+
+							$('#bhist-container .table').append(`<div class='row'>
+							<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+							<div class='cell glad'>${data[i].gladiator}</div>
+							<div class='cell reward'>${parseFloat(data[i].reward).toFixed(1)}</div>
+							<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+							<div class='playback' title='Visualizar batalha'>
+								<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
+							</div></div>`);
+							$('#bhist-container .favorite').last().data('id', data[i].id);
+							
                             if (data[i].isread == "0")
                                 $('#bhist-container .table .row').last().addClass('unread');
                             else
@@ -544,7 +557,34 @@ $(document).ready( function(){
                                 obj.html("+"+ obj.html());
                             }
                                 
-                        }
+						}
+						
+						$('#bhist-container .favorite').click( function(){
+							var id = $(this).data('id');
+							if ($(this).find('i').html() == 'star'){
+								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
+								post_favorite(id, false, '');
+							}
+							else{
+								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
+								showInput("Informe um comentário sobre esta batalha").then( function(data){
+									if (data !== false){
+										post_favorite(id, true, data);
+									}
+								});
+							}
+
+							function post_favorite(id, fav, comment){
+								$.post("back_report.php", {
+									action: "FAVORITE",
+									favorite: fav,
+									id: id,
+									comment: comment
+								}).done( function(data){
+									//console.log(data);
+								});
+							}
+						});
                     }
 				}
 			});
@@ -570,11 +610,11 @@ $(document).ready( function(){
 					pend = data.end;
 					ptotal = data.total;
 
-                    if (ptotal == 0)
+					bind_report_pages();
+
+					if (ptotal == 0)
                         $('#bhist-container .table').html("<p>Você ainda não possui duelos</p>");
                     else{
-                        bind_report_pages();
-
                         data = data.output;
                         $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell'>Oponente</div><div class='cell'>Mestre</div><div class='cell time'>Data</div></div>");
                         for (var i in data){
@@ -621,6 +661,92 @@ $(document).ready( function(){
 				}
 			});
 
+		}
+		else if ($('#bhist-container .tab.selected').html() == "Favoritos"){
+			$.post("back_report.php", {
+				action: "GET",
+				favorites: true
+			}).done( function(data){
+				// console.log(data);
+				var e;
+				try{
+					data = JSON.parse(data);
+				}
+				catch(error){
+					//console.log(error);
+					e = error;
+				}
+				if (e || data.length == 0)
+					$('#bhist-container .table').hide();
+				else{
+					pstart = data.start;
+					pend = data.end;
+					ptotal = data.total;
+					data = data.reports;
+
+					bind_report_pages();
+
+                    if (ptotal == 0)
+                        $('#bhist-container .table').html("<p>Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas</p>");
+                    else{
+						$('#bhist-container .table').html(`<div class='row head'>
+							<div class='cell'>Gladiador</div>
+							<div class='cell comment'>Comentário</div>
+							<div class='cell time'>Data</div>
+						</div>`);
+                        for (var i in data){
+							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							if (data[i].favorite)
+								star = {body: "star", title: "Tirar dos favoritos"};
+
+                            $('#bhist-container .table').append(`<div class='row'>
+								<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+								<div class='cell glad'>${data[i].gladiator}</div>
+								<div class='cell comment'>${data[i].comment}</div>
+								<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+								<div class='playback' title='Visualizar batalha'>
+									<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
+								</div>
+							</div>`);
+							$('#bhist-container .favorite').last().data('id', data[i].id);
+
+                            if (data[i].isread == "0")
+                                $('#bhist-container .table .row').last().addClass('unread');
+                            else
+                                $('#bhist-container .table .row').last().removeClass('unread');
+                            if (data[i].reward < 0)
+                                $('#bhist-container .table .reward').last().addClass('red');
+                            else if (data[i].reward > 0){
+                                var obj = $('#bhist-container .table .reward').last();
+                                obj.addClass('green');
+                                obj.html("+"+ obj.html());
+                            }
+                                
+						}
+						
+						$('#bhist-container .favorite').click( function(){
+							var fav;
+							if ($(this).find('i').html() == 'star'){
+								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
+								fav = false;
+							}
+							else{
+								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
+								fav = true;
+							}
+
+							$.post("back_report.php", {
+								action: "FAVORITE",
+								favorite: fav,
+								id: $(this).data('id'),
+								comment: ''
+							}).done( function(data){
+								//console.log(data);
+							});
+						});
+                    }
+				}
+			});
 		}
 
 		function bind_report_pages(){

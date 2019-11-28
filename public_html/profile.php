@@ -173,6 +173,7 @@
 						<div id='tab-container'>
 							<div class='tab selected'>Batalhas</div>
 							<div class='tab'>Duelos</div>
+							<div class='tab'>Favoritos</div>
 						</div>
 						<div class='table'></div>
 						<div id='page-title'>
