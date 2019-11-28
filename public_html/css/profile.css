@@ -1383,6 +1383,11 @@ body {
     border-width: 0px 0px 2px 0px;
 }
 
+#bhist-container p {
+    margin-left: 15px;
+    font-size: 1.5em;
+}
+
 #bhist-container .table .row.head {
 	height: 50px;
 	font-size: 1.3em;
@@ -1443,6 +1448,11 @@ body {
 #bhist-container .table .row:hover .time {
 	margin-right: 30px;
 	margin-left: -30px;
+}
+
+#bhist-container .table .row.head:hover .time {
+	margin-right: 0px;
+	margin-left: 0px;
 }
 
 #bhist-container .table .row {
@@ -2250,3 +2260,22 @@ body {
 	filter: none;
 }
 
+
+#bhist-container .cell.favorite {
+    flex-grow: 0;
+    flex-basis: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 10px;
+}
+
+#bhist-container .cell.favorite i {
+	font-size: 25px;
+	cursor: pointer;
+    transition: 0.3s all;
+}
+
+#bhist-container .cell.favorite:hover i {
+	text-shadow: 0px 0px 3px #000000a3;
+}
