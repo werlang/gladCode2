@@ -1,0 +1,25 @@
+{
+	"name": "isSafeThere",
+	"ptname": "seguroLa",
+	"syntax": "int isSafeThere ( float x, float y );",
+	"description": {
+		"long": "A função analisa a posição determinada pelas coordenadas x e y recebidas como parâmetro. Caso na posição possua <a href='manual.php#nav-sim'>gás tóxico</a> a função retorna 0. Caso não haja retorna 1.",
+		"brief": "Descobre se o ponto está dentro da nuvem tóxica."
+	},
+	"param": [
+		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto."},
+		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto."}
+	],
+	"treturn": "Retorna 1 caso a posição do ponto esteja segura do gás tóxico, ou 0 caso contrário.",
+	"sample": "#include&lt;stdlib.h&gt;\r\nfloat x,y;\r\nloop(){\r\n\t\r\n\tif ((getX() == x && getY() == y) || !isSafeThere(x,y)){\r\n\t\tx = (rand()%250)/10;\r\n\t\ty = (rand()%250)/10;\r\n\t}\r\n\t\r\n\tif(isSafeThere(x,y)){\r\n\t\tif (getAp() > 70 && getDist(x,y) > 2)\r\n\t\t\tteleport(x,y);\r\n\t\telse\r\n\t\t\tmoveTo(x,y);\r\n\t}\r\n}",
+	"explain": "No exemplo o gladiador se teleporta e move pela arena para posições aleatórias, evitando as zonas cobertas por gás tóxico.",
+	"seealso": [
+		"getX",
+		"getY",
+		"getDist",
+		"getAp",
+		"teleport",
+		"moveTo"
+	],
+	"snippet": "int ${1:safe} = isSafeThere(${2:X}, ${3:Y});"
+}

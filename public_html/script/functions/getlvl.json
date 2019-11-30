@@ -1,0 +1,20 @@
+{
+	"name": "getLvl",
+	"ptname": "pegaNivel",
+	"syntax": "int getLvl ( void );",
+	"description": {
+		"long": "Retorna o nível do gladiador.",
+		"brief": "Retorna o nível do gladiador."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Inteiro contendo o nível do gladiador.",
+	"sample": "loop(){\n\tif (getLvl() < 5)\n\t\tupgradeSTR();\n\telse\n\t\tupgradeINT();\n\t\t\n...",
+	"explain": "Este trecho de código verifica o nível do gladiador. Caso seja menor que 5, o gladiador melhora a força, caso contrário a inteligência.",
+	"seealso": [
+		"upgradeSTR",
+		"upgradeINT"
+	],
+	"snippet": "int ${1:lvl} = getLvl();"
+}

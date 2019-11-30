@@ -1,0 +1,22 @@
+{
+	"name": "getX",
+	"ptname": "pegaX",
+	"syntax": "float getX ( void );",
+	"description": {
+		"long": "Retorna o valor da coordenada x do gladiador. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual#nav-sim'>arena</a>.",
+		"brief": "Retorna a coordenada x do gladiador."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo o valor da coordenada x do gladiador.",
+	"sample": "float dx = 20, dy = 5;\nloop(){\n    if (getX() == 20 && getY() == 20)\n        dx = 5;\n    if (getX() == 5 && getY() == 5)\n        dx = 20;\n    if (getX() == 20 && getY() == 5)\n        dy = 20;\n    if (getX() == 5 && getY() == 20)\n        dy = 5;\n    moveTo(dx, dy);\n}",
+	"explain": "No exemplo o gladiador utiliza as funções getX e getY para verificar sua posição na arena, e com isso ajustar para onde deseja se mover, resultando em um movimento em torno das bordas da arena.",
+	"seealso": [
+		"getY",
+		"moveTo",
+		"getTargetX",
+		"getTargetY"
+	],
+	"snippet": "float ${1:x} = getX();"
+}

@@ -1,0 +1,26 @@
+{
+	"name": "getLastHitAngle",
+	"ptname": "anguloFuiAcertado",
+	"syntax": "float getLastHitAngle ( void );",
+	"description": {
+		"long": "Retorna o ângulo de onde partiu o último ataque que o gladiador recebeu. O ângulo retornado é <a href='manual.php#nav-sim'>relativo à arena</a>, e não ao gladiador. Caso o gladiador tenha sido acertado por um projétil o ângulo retornado será de onde veio o projétil.",
+		"brief": "Retorna o ângulo de onde veio o último ataque."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo o ângulo de onde partiu o último ataque recebido pelo gladiador.",
+	"sample": "loop(){\n    if (getHit()){\n        turnToAngle(getLastHitAngle());\n\t\tgetCloseEnemy();\n\r\n\t\tif(isTargetVisible())\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
+	"seealso": [
+		"turnToAngle",
+		"getCloseEnemy",
+		"isTargetVisible",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"getLastHitTime",
+		"getHit"
+	],
+	"snippet": "float ${1:hit_angle} = getLastHitAngle();"
+}

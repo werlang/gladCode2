@@ -1,0 +1,26 @@
+{
+	"name": "getTargetX",
+	"ptname": "pegaXAlvo",
+	"syntax": "float getTargetX ( void );",
+	"description": {
+		"long": "Retorna o valor da coordenada x do gladiador selecionado como alvo. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual.php#nav-sim'>arena</a>. Caso o gladiador não tenha selecionado um alvo antes de chamar esta função, ou o alvo não esteja dentro do campo de visão do gladiador esta função retorna -1.",
+		"brief": "Retorna o valor da coordenada x do alvo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo o valor da coordenada x do alvo, ou -1 caso o alvo não esteja dentro do campo de visão do gladiador.",
+	"sample": "loop(){\n    if (getLowHp()){\n        if (getSpeed() > getTargetSpeed()){\n            if(getDistToTarget() <= 1)\n                attackMelee();\n            else\n                moveToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n    else\n        turnLeft(5);\n}",
+	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
+	"seealso": [
+		"getDistToTarget",
+		"attackRanged",
+		"attackMelee",
+		"getTargetY",
+		"getSpeed",
+		"getTargetSpeed",
+		"turnLeft",
+		"moveToTarget"
+	],
+	"snippet": "float ${1:tx} = getTargetX();"
+}

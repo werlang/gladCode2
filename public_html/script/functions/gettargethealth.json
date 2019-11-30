@@ -1,0 +1,28 @@
+{
+	"name": "getTargetHealth",
+	"ptname": "pegaSaudeAlvo",
+	"syntax": "float getTargetHealth ( void );",
+	"description": {
+		"long": "Retorna a vida que o alvo selecionado possui. O valor retornado não é a quantidade de pontos de vida do alvo, mas a razão entre a quantidade atual de pontos de vida e o total. Por consequência sempre será um valor entre 0 e 1. Embora não se saiba a quantidade exata de pontos de vida do alvo, pode-se ter uma noção de sua condição de saúde utilizando esta função.",
+		"brief": "Retorna a vida do alvo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Float contendo a razão entre a vida atual e a total do alvo (entre 0 e 1).",
+	"sample": "loop(){\n    if (getHit()){\n        turnToAngle(getLastHitAngle());\n        if (howManyEnemies() == 1 && getLowHp() && getTargetHealth() <= 0.3)\n            attackRanged(getTargetX(), getTargetY());\n        else{\n            while (howManyEnemies() > 1)\n                stepBack();\n        }\n    }\n    else{\n        while (!getHit() && !moveTo(20,5));\n        while (!getHit() && !moveTo(5,20));\n    }\n}",
+	"explain": "No exemplo o gladiador se move em sentido diagonal pela arena, até receber um ataque. quando isso acontecer ele se vira na direção do ataque, recuando caso hajam mais de um inimigo no campo de visão. Caso haja somente um inimigo com até 30% de vida, o gladiador ataca ele. ",
+	"seealso": [
+		"turnToAngle",
+		"getLastHitAngle",
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"howManyEnemies",
+		"stepBack",
+		"getHit",
+		"moveTo"
+	],
+	"snippet": "float ${1:target_health} = getTargetHealth();"
+}
