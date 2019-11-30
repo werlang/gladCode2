@@ -2,6 +2,14 @@
 	display: flex;
 }
 
+.ace_editor ::-webkit-scrollbar-thumb {
+	background: #aaa;
+}
+
+.ace_editor:hover ::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
 body{
 	overflow: hidden;
 }

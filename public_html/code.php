@@ -12,8 +12,8 @@
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-	<script src="ace/ext-language_tools.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ext-language_tools.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	
 	<script src="script/code.js"></script>
