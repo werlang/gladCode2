@@ -1,0 +1,25 @@
+{
+	"name": "turn",
+	"ptname": "vira",
+	"syntax": "void turn ( float angulo );",
+	"description": {
+		"long": "Rotaciona o gladiador uma quantidade de graus determinada pelo parâmetro. Caso o ângulo seja negativo o gladiador irá rotacionar no sentido anti-horário, ou no sentido horário caso seja positivo. O gladiador ficará travado na ação até que complete toda a rotação. Isto pode levar mais que um intervalo de tempo, dependendo do atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>).",
+		"brief": "Rotaciona o gladiador."
+	},
+	"param": [
+		{"name": "angulo", "description": "Float contendo o ângulo que deseja-se rotacionar."}
+	],
+	"treturn": "A função não possui retorno (void).",
+	"sample": "loop(){\n    while(stepForward());\n    turn(180);\n}",
+	"explain": "No exemplo o gladiador se move para frente até que encontre algum obstáculo, então rotaciona 180 graus no sentido horário. Este comportamento repetitivo fará com que o gladiador execute uma trajetória de vai-e-vem pela arena.",
+	"seealso": [
+		"moveForward",
+		"stepForward",
+		"turnLeft",
+		"turnRight",
+		"turnTo",
+		"turnToTarget",
+		"turnToAngle"
+	],
+	"snippet": "turn(${1:angle});"
+}

@@ -1,0 +1,26 @@
+{
+	"name": "isTargetVisible",
+	"ptname": "alvoVisivel",
+	"syntax": "int isTargetVisible ( void );",
+	"description": {
+		"long": "Determina se o alvo selecionado pelo gladiador está no campo de visão, retornando 1 em caso afirmativo, ou 0 caso contrário. Esta função é útil pois ela verifica a visibilidade do alvo atual, sem precisar recorrer às funções que procuram um novo alvo.",
+		"brief": "Descobre se alvo está no campo de visão e pode ser visto."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Retorna 1 caso o alvo esteja no campo de visão do gladiador, ou 0 caso contrário.",
+	"sample": "loop(){\n    if (!isTargetVisible())\n        getLowHp();\n    else{\n        if (abs(getHead() - getTargetHead()) >= 90){\n            stepLeft();\n            turnToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível determina a direção relativa do alvo e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
+	"seealso": [
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"getHead",
+		"getTargetHead",
+		"stepLeft",
+		"turnToTarget"
+	],
+	"snippet": "int ${1:target} = isTargetVisible();"
+}

@@ -679,11 +679,11 @@ function getGladFromFile(filename){
 }
 
 function load_editor(){
-	ace.require("ace/ext/language_tools");
+	var langTools = ace.require("ace/ext/language_tools");
     editor = ace.edit("code");
+    editor.session.setMode("ace/mode/c_cpp");
 	editor.setTheme("ace/theme/dreamweaver");
 	editor.setFontSize(18);
-    editor.session.setMode("ace/mode/c_cpp");
 	editor.getSession().setUseWrapMode(true);
 	editor.$blockScrolling = Infinity;
 	
@@ -691,8 +691,65 @@ function load_editor(){
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: true
-    });
+	});
 	
+
+	buildDataTable().then( function(dataTable){
+		var customCompleter = {
+			getCompletions: function(editor, session, pos, prefix, callback) {
+				if (prefix.length === 0) { callback(null, []); return }
+
+				callback(null, dataTable.map(function(table) {
+					return {
+						value: table.syntax,
+						caption: table.name,
+						snippet: table.snippet,
+						description: table.description,
+						syntax: table.syntax,
+						score: 1000,
+						meta: "gladCode"
+					};
+				}));	
+			},
+			getDocTooltip: function(item) {
+				if (item.meta == 'gladCode'){
+					var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
+					item.docHTML = `${func}<hr></hr>${item.description}`;
+				}
+				else if (item.snippet) {
+					item.docHTML = `<b>${item.caption}</b><hr></hr>${item.snippet}`;
+				}
+			}
+		}
+		langTools.addCompleter(customCompleter);
+
+	});
+}
+
+async function buildDataTable(){
+	var table = [];
+	return await new Promise( (resolve, reject) => {
+		$.get("docs.php", function(content) {
+			var docs = content.matchAll(/<a href=['"]function\/([\w]+?)['"]>/g);
+			var length = 0;
+			for (let m of docs){
+				$.getJSON(`script/functions/${m[1]}.json`, function(data){
+					// console.log(m[1]);
+					table.push({
+						name: data.name,
+						syntax: data.syntax,
+						description: data.description.brief,
+						snippet: data.snippet
+					});
+					if (table.length == length)
+						resolve(table);
+				}).fail( function(e){
+					console.log(e);
+				});
+				length++;
+			}
+		});
+	});
 }
 
 var menus = {

@@ -1,0 +1,28 @@
+{
+	"name": "howManyEnemies",
+	"ptname": "quantosInimigos",
+	"syntax": "int howManyEnemies ( void );",
+	"description": {
+		"long": "Retorna a quantidade de inimigos dentro do campo de visão do gladiador. Esta função não seleciona nenhum inimigo como alvo.",
+		"brief": "Retorna a quantidade de inimigos no campo de visão."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Inteiro contendo a quantidade de inimigos presentes no campo de visão do gladiador.",
+	"sample": "loop(){\n    if (getHit()){\n        turnToLastHit();\n        if (howManyEnemies() == 1 && getLowHp() && getTargetHealth() <= 0.3)\n            attackRanged(getTargetX(), getTargetY());\n        else{\n            while (howManyEnemies() > 1)\n                stepBack();\n        }\n    }\n    else{\n        while (!getHit() && !moveTo(20,5));\n        while (!getHit() && !moveTo(5,20));\n    }\n}",
+	"explain": "No exemplo o gladiador se move em sentido diagonal pela arena, até receber um ataque. quando isso acontecer ele se vira na direção do ataque, recuando caso hajam mais de um inimigo no campo de visão. Caso haja somente um inimigo com até 30% de vida, o gladiador ataca ele. ",
+	"seealso": [
+		"turnToAngle",
+		"getLastHitAngle",
+		"getLowHp",
+		"attackRanged",
+		"getTargetX",
+		"getTargetY",
+		"getTargetHealth",
+		"stepBack",
+		"getHit",
+		"moveTo"
+	],
+	"snippet": "int ${1:num_enemies} = howManyEnemies();"
+}

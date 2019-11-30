@@ -1,0 +1,26 @@
+{
+	"name": "fireball",
+	"ptname": "bolaFogo",
+	"syntax": "int fireball ( float x, float y );",
+	"description": {
+		"long": "Vira o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro e então lança a habilidade fireball em direção ao ponto. Caso o gladiador não consiga terminar sua rotação até o ponto (de acordo com sua <a href='manual.php#nav-glad'>velocidade de rotação</a>, a função retorna 0 e a habilidade não é lançada. Caso a habilidade seja lançada com sucesso a função retorna 1. Quando a habilidade é lançada, um projétil é arremessado a partir do ponto do gladiador atacante e percorre a arena com velocidade 10 passos por segundo (p/s) em direção ao ponto do alvo. Caso o projétil entre em contato com qualquer gladiador durante seu percurso, ele interrompe seu percurso e causa dano igual a 60% do valor do atributo <a href='manual.php#nav-attr'>Poder Mágico</a> do gladiador que disparou o projétil no gladiador acertado. Além disso, todos os gladiadores num raio de 2 passos do ponto de impacto do projétil pegam fogo, recebendo o efeito <a href='manual.php#nav-efeito'>queimadura</a> durante 4 segundos. O dano total causado pela queimadura será de 180% do Poder Mágico do gladiador que disparou o projétil. Gladiadores mais afastados do ponto central do impacto recebem proporcionalmente menos dano.",
+		"brief": "Arremessa um projétil flamejante."
+	},
+	"param": [
+		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+	],
+	"treturn": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
+	"sample": "loop(){\n\tif(getLowHp()){\n\t\tif (getAp() >= 40)\n\t\t\tfireball(getTargetX(), getTargetY());\n\t\telse\n\t\t\tattackRanged(getTargetX(), getTargetY());\n\t}\n\telse{\n\t\twhile(getX() != 12.5 || getY() != 12.5)\n\t\t\tteleport(12.5,12.5);\n\t\tturn(50);\n\t}\n}",
+	"explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
+	"seealso": [
+		"getLowHp",
+		"getAp",
+		"getTargetX",
+		"getTargetY",
+		"attackRanged",
+		"turn",
+		"teleport"
+	],
+	"snippet": "fireball(${1:X}, ${2:Y});"
+}

@@ -7,7 +7,7 @@ $(document).ready( function() {
 	if (func == "")
 		load_content("");
 	else{
-		$.getJSON("script/functions/"+ func, function(data){
+		$.getJSON(`script/functions/${func}.json`, function(data){
 			load_content(data);
 		
 			if ($('#dict').length){

@@ -1,0 +1,31 @@
+{
+	"name": "turnToTarget",
+	"ptname": "viraParaAlvo",
+	"syntax": "int turnToTarget ( void );",
+	"description": {
+		"long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do alvo fixado. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir e a função retornará 0. Caso esta função seja chamada em uma repetição, o gladiador irá continuar até que tenha concluido a rotação. Neste caso, a função retornará 1.",
+		"brief": "Rotaciona o gladiador para o alvo."
+	},
+	"param": [
+		{"name": "void", "description": "A função não recebe parâmetros."}
+	],
+	"treturn": "Retorna 0 caso não tenha concluído a rotação, ou 1 caso contrário.",
+	"sample": "int start = 1;\nloop(){\n\tif (start){\n\t\tif(moveTo(12.5,12.5))\n\t\t\tstart = 0;\n\t}\n\tif (getLowHp()){\n\t\tif(doYouSeeMe()){\n\t\t\tturnToTarget();\n\t\t\tstepLeft();\n\t\t}\n\t\telse{\n\t\t\tif (getAmbushTimeLeft() > 0)\n\t\t\t\tassassinate(getTargetX(), getTargetY());\n\t\t\telse\n\t\t\t\tambush();\n\t\t}\n\t}\n\telse if (!start)\n\t\tturn(50);\n}",
+	"explain": "No exemplo o gladiador se move até o centro da arena e então fica buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
+	"seealso": [
+		"getLowHp",
+		"moveTo",
+		"doYouSeeMe",
+		"stepLeft",
+		"getAmbushTimeLeft",
+		"assassinate",
+		"ambush",
+		"turnLeft",
+		"turnRight",
+		"turn",
+		"turnTo",
+		"turnToAngle",
+		"turnToLastHit"
+	],
+	"snippet": "turnToTarget();"
+}
