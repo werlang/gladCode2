@@ -61,7 +61,7 @@
 						<tr>
 							<th></th>
 							<th>Média<i class='material-icons info' title='Média de todos gladiadores das batalhas'>help</i></th>
-							<th>Vencedor<i class='material-icons info' title='Percentual de gladiadores que possuem a força como seu atributo predominante'>help</i></th>
+							<th>Vencedor<i class='material-icons info' title='O gladiador vencedor de cada batalha'>help</i></th>
 						</tr>
 					</thead>
 					<tbody>
