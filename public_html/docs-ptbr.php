@@ -209,6 +209,10 @@
 							<td>Retorna o tempo restante para expirar o efeito Invisibilidade.</td>
 						</tr>
 						<tr>
+							<td><a href='funcao/getburntimeleft'>tempoQueimadura</a></td>
+							<td>Retorna o tempo restante para expirar o efeito Queimadura.</td>
+						</tr>
+						<tr>
 							<td><a href='funcao/speak'>fala</a></td>
 							<td>Mostra um balão de fala com uma mensagem.</td>
 						</tr>
