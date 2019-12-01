@@ -3,7 +3,7 @@
 function send_node_message($data){
     $data_string = json_encode($data);
 
-    $hostname = $_SERVER['HTTP_HOST'];
+    $hostname = $_SERVER['SERVER_NAME'];
     $protocol = $_SERVER['REQUEST_SCHEME'];
     $ch = curl_init("$protocol://$hostname:3000/phpcallback"); 
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
