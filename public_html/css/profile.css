@@ -72,7 +72,6 @@ body {
     color: white;
     cursor: pointer;
 	box-sizing: border-box;
-	width: 33%;
 	justify-content: center;
 }
 
@@ -80,19 +79,8 @@ body {
 	background-color: #00000010;
 }
 
-#frame #menu .item.here {
-	background-color: #00000026;
-	display: flex;
-	width: 100%;
-	order: 1;
-}
-
 #frame #menu .item span {
 	display: none;
-}
-
-#frame #menu .item.here span {
-	display: inline;
 }
 
 @media only screen and (min-width: 600px) {
@@ -140,13 +128,27 @@ body {
     border: 2px solid #03384e;
     border-radius: 10px;
 	background-color: white;
-	margin-top: 15px;
+	margin-top: 0px;
 }
 
 #frame #menu #profile-ui #picture img {
 	border-radius: 10px;
-    max-height: 80px;
+    max-height: 45px;
     border: 3px solid #bfd1d8;
+}
+
+@media only screen and (min-width: 600px) {
+	#frame #menu #profile-ui #picture img {
+		max-height: 80px;
+	}
+
+	#frame #menu #profile-ui #picture {
+		margin-top: 15px;
+	}
+}
+
+#frame #menu .item.here {
+	background-color: #00000026;
 }
 
 #frame #menu #profile-ui #info {
@@ -258,8 +260,7 @@ body {
 
 #frame #menu #menu-buttons {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
+	justify-content: flex-start;
 	margin-top: 3px;
 	flex-grow: 1;
 	overflow: auto;
@@ -2207,6 +2208,13 @@ body {
     background-color: #0000000d;
 	padding-bottom: 5px;
 	margin: 0;
+	display: none;
+}
+
+@media only screen and (min-width: 600px) {
+	#menu #footer {
+		display: flex;
+	}
 }
 
 #menu #footer #img-container {
