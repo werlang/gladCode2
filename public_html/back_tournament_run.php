@@ -215,7 +215,7 @@
         $round = mysql_escape_string($_POST['round']);
 
         //check if there is any battle left to be done
-        $sql = "SELECT gr.deadline FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
+        $sql = "SELECT gr.deadline, now() AS now FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
         $nrows = $result->num_rows;
         
@@ -227,9 +227,9 @@
             //check of time is up for a new round
             $row = $result->fetch_assoc();
             $deadline = (new DateTime($row['deadline']))->getTimestamp();
-            $now = (new DateTime())->getTimestamp();
+            $now = (new DateTime($row['now']))->getTimestamp();
 
-            if ($now > $deadline)
+            if ($now >= $deadline)
                 $timeup = true;
         }
 
