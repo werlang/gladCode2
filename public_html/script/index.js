@@ -12,7 +12,7 @@ $(document).ready( function() {
 	
 	$('#account').click( function(){
 		googleLogin().then(function(data) {
-			window.location.href = "profile.php";
+			window.location.href = "news";
 		});
 	});
 	
@@ -39,7 +39,7 @@ $(document).ready( function() {
 		showDialog(loginMessage[tab],["Cancelar","LOGIN"]).then( function(data){
 			if (data == "LOGIN"){
 				googleLogin().then(function(data) {
-					window.location.href = "profile.php?t="+tab;
+					window.location.href = tab;
 				});
 			}
 		});

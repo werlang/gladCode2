@@ -89,11 +89,11 @@ $(document).ready( function() {
 	
 	$('#profile-icon').click( function(){
 		if (user){
-			window.location.href = "profile";
+			window.location.href = "news";
 		}
 		else{
 			googleLogin().then(function(data) {
-				window.location.href = "profile";
+				window.location.href = "news";
 			});
 		}
 	});
@@ -124,7 +124,7 @@ $(document).ready( function() {
 							user = data.email;
 							setLoadGlad();
 							$('#login').html(data.nome).off().click( function(){
-								window.location.href = "profile";
+								window.location.href = "news";
 							});
 						});
 					}
@@ -274,7 +274,7 @@ $(document).ready( function() {
 							user = data.email;
 							setLoadGlad();
 							$('#login').html(data.nome).off().click( function(){
-								window.location.href = "profile";
+								window.location.href = "news";
 							});
 						});
 					}

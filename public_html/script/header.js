@@ -13,7 +13,7 @@ $(document).ready( function() {
 		});
 		$('#fog #login').click( function(){
 			googleLogin().then( function(data){
-				window.location.href = "profile";
+				window.location.href = "news";
 			});
 		});	
 		
@@ -56,7 +56,7 @@ $(document).ready( function() {
 
 	$('.mobile #login, .desktop #login').click( function(){
 		googleLogin().then( function(data){
-			window.location.href = "profile";
+			window.location.href = "news";
 		});
 	});	
 	

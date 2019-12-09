@@ -46,7 +46,7 @@ $(document).ready( function(){
 	function checkNotifications(){
 		$.post("back_notification.php", {
 		}).done( function(data){
-            //console.log(data);
+            console.log(data);
 			try{
 				data = JSON.parse(data);
 			}
@@ -65,6 +65,13 @@ $(document).ready( function(){
 			else
 				$('#messages .notification').removeClass('empty');
 
+			var news = parseInt(data.news);
+			$('#news .notification').html(news);
+			if (news == 0)
+				$('#news .notification').addClass('empty');
+			else
+				$('#news .notification').removeClass('empty');
+				
 			var newfriends = parseInt(data.friends);
 			$('#friends .notification').html(newfriends);
 			if (newfriends == 0)
@@ -109,7 +116,26 @@ $(document).ready( function(){
 			$(this).addClass('here');
 		}
 	});
-		
+	
+	$('#menu #news').click( function() {
+		$.post("back_news.php",{
+			action: "GET",
+			page: 0
+		}).done( function(data){
+			console.log(data);
+			data = JSON.parse(data);
+
+			$('#panel #news-container').html("");
+			for (let i in data.posts){
+				$('#panel #news-container').append(`<div class='post'>
+					<div class='title'>${data.posts[i].title}</div>
+					<div class='time'>Publicado em ${getMessageTime(data.posts[i].time, { month_full: true })}</div>
+					<div class='body'>${data.posts[i].post}</div>
+				</div>`);
+			}
+		});
+	});
+
 	$('#menu #profile').click( function() {
 		$('#nickname .input').val(user.apelido);
 
@@ -339,7 +365,7 @@ $(document).ready( function(){
 					</div>
 					<div class='cell image-container'><img src='${picture}'></div>
 					<div class='cell user'>${nick}</div>
-					<div class='cell time' title='${getMessageTime(time, true)}'>${getMessageTime(time, false)}</div>
+					<div class='cell time' title='${getMessageTime(time)}'>${getMessageTime(time, { short: true })}</div>
 					<div class='button-container'>
 						<div class='accept' title='Aceitar desafio'></div>
 						<div class='refuse' title='Recusar desafio'></div>
@@ -549,7 +575,7 @@ $(document).ready( function(){
 							<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
 							<div class='cell glad'>${data[i].gladiator}</div>
 							<div class='cell reward'>${parseFloat(data[i].reward).toFixed(1)}</div>
-							<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+							<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
 							<div class='playback' title='Visualizar batalha'>
 								<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
 							</div></div>`);
@@ -632,7 +658,7 @@ $(document).ready( function(){
 								<div class='cell glad'>${data[i].glad}</div>
 								<div class='cell enemy'>${data[i].enemy}</div>
 								<div class='cell'>${data[i].user}</div>
-								<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
 								<div class='playback' title='Visualizar batalha'>
 									<a target='_blank' href='play/${data[i].log}'><img src='icon/eye.png'></a>
 								</div>
@@ -713,7 +739,7 @@ $(document).ready( function(){
 								<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
 								<div class='cell glad'>${data[i].gladiator}</div>
 								<div class='cell comment'>${data[i].comment}</div>
-								<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
 								<div class='playback' title='Visualizar batalha'>
 									<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
 								</div>
@@ -975,7 +1001,7 @@ $(document).ready( function(){
 
                 $('#message-panel .table').html("");
                 for (var i in data){
-                    $('#message-panel .table').append("<div class='row'><div class='cell user'>"+ data[i].nick +"</div><div class='cell message'>"+ data[i].message +"</div><div class='cell time'>"+ getMessageTime(data[i].time) +"</div></div>");
+                    $('#message-panel .table').append("<div class='row'><div class='cell user'>"+ data[i].nick +"</div><div class='cell message'>"+ data[i].message +"</div><div class='cell time'>"+ getMessageTime(data[i].time, { short: true }) +"</div></div>");
                     if (data[i].isread == "0")
                         $('#message-panel .table .row').last().addClass('unread');
                 }
@@ -983,7 +1009,7 @@ $(document).ready( function(){
                     var i = $('#message-panel .table .row').index($(this));
                     var id = data[i].id;
                     var message = data[i].message;
-                    var time = getMessageTime(data[i].time, true);
+                    var time = getMessageTime(data[i].time);
                     var nick = data[i].nick;
                     var picture = data[i].picture;
                     $('#message-panel').append("<div id='full-message'><div class='row head'><div class='image'><img src='"+ picture +"'></div><div class='user'>"+ nick +"</div><div class='time'>"+ time +"</div></div><div class='row body'><div class='message'>"+ message +"</div></div><div class='row buttons'><button class='button' id='back'><img src='icon/back.png'><span>Retornar</span></button><button class='button' id='reply'><img src='icon/reply.png'><span>Responder</span></button><button class='button' id='unread'><img src='icon/unread.png'><span>Marcar não lido</span></button><button class='button' id='delete'><img src='icon/delete2.png'><span>Excluir</span></button></div></div>");
@@ -1520,14 +1546,17 @@ function last_active_string(min){
 		return min +" minutos";
 }
 
-function getMessageTime(msgTime, detailed){
-	if (detailed){
-		var months = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
-		t = new Date(msgTime);
-		var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
-		return string;
-	}
-	else{
+function getMessageTime(msgTime, args){
+	var short = false;
+	var month_full = false;
+	if (args){
+		if (args.short)
+			short = true;
+		if (args.month_full)
+			month_full = true;
+	} 
+
+	if (short){
 		var now = new Date();
 		msgTime = new Date(msgTime);
 		
@@ -1536,6 +1565,30 @@ function getMessageTime(msgTime, detailed){
 		
 		var diff = (secNow - secMsg) / 60;
 		return last_active_string(diff);
+	}
+	else{
+		var months = [
+			"Janeiro",
+			"Fevereiro",
+			"Março",
+			"Abril",
+			"Maio",
+			"Junho",
+			"Julho",
+			"Agosto",
+			"Setembro",
+			"Outubro",
+			"Novembro",
+			"Dezembro"
+		];
+		if (!month_full){
+			for (let i in months)
+				months[i] = months[i].toLowerCase().slice(0,3);
+		}
+
+		t = new Date(msgTime);
+		var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
+		return string;
 	}
 }
 
