@@ -18,10 +18,10 @@
 			<div class='item drop-menu mobile'>
 				<div class='title'>LOGIN</div>
 				<div class='item-container'>
-					<div class='item'><a id='login' title='Realize login com sua conta do Google'>ENTRAR</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
+					<div class='item'><a id='login' title='Realize login com sua conta do Google'>ENTRAR</a><a id='profile' href='news' title='Gerencie seu perfil'>PERFIL</a></div>
 				</div>
 			</div>
-			<div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google'>LOGIN</a><a id='profile' href='profile' title='Gerencie seu perfil'>PERFIL</a></div>
+			<div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google'>LOGIN</a><a id='profile' href='news' title='Gerencie seu perfil'>PERFIL</a></div>
 			<div class='item' id='learn'><a href='manual' title='Saiba como funciona a gladCode'>APRENDER</a></div>
 			<div class='item' id='header-editor'><a href='editor' title='Crie e programe seus gladiadores'>EDITOR</a></div>
 			<div class='item drop-menu'>

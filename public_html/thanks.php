@@ -65,7 +65,7 @@
 				var val = parseInt($('#content-box span').html()) - 1;
 				$('#content-box span').html(val);
 				if (val == 0)
-					window.location.href = 'profile';
+					window.location.href = 'news';
 				else
 					time();
 			}, 1000);

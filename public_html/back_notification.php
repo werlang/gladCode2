@@ -72,6 +72,11 @@
 	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 	$resp['duels'] = $result->num_rows;
 	
+	//news
+	$sql = "SELECT id FROM news WHERE time > (SELECT read_news FROM usuarios WHERE id = $user)";
+	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$resp['news'] = $result->num_rows;
+
 	$resp['status'] = "SUCCESS";
 
 	echo json_encode($resp);
