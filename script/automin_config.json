@@ -318,5 +318,21 @@
                 {"name": "header.css"}
             ]
         }
+    },{
+        "name": "post.php",
+        "js": {
+            "files": [
+                {"name": "googlelogin.js"},
+                {"name": "socket.js"},
+                {"name": "header.js"},
+                {"name": "post.js"}
+            ]
+        },
+        "css": {
+            "files": [
+                {"name": "header.css"},
+                {"name": "post.css"}
+            ]
+        }
     }]
 }
