@@ -128,10 +128,35 @@ $(document).ready( function(){
 			$('#panel #news-container').html("");
 			for (let i in data.posts){
 				$('#panel #news-container').append(`<div class='post'>
+					<div class='share' title='Compartilhar'><i class='material-icons'>share</i></div>
 					<div class='title'>${data.posts[i].title}</div>
 					<div class='time'>Publicado em ${getMessageTime(data.posts[i].time, { month_full: true })}</div>
 					<div class='body'>${data.posts[i].post}</div>
 				</div>`);
+				$('#panel #news-container .share').last().click( () => {
+					$('body').append(`<div id='fog'>
+						<div id='link-box'>
+							<h3>Link da publicação</h3>
+							<input value='https://gladcode.tk/post/${data.posts[i].id}' readonly>
+							<button>COPIAR</button>
+						</div>
+					</div>`);
+
+					$('#fog').hide().fadeIn();
+					$('#fog').click( () => {
+						$('#fog').remove();
+					});
+
+					$('#link-box').click( e => {
+						e.stopPropagation();
+					});
+
+					$('#link-box button').click( () => {
+						$('#link-box input').select();
+						document.execCommand("copy");
+						create_toast("Link da publicação copiado para área de transferência", "success");
+					});
+				});
 			}
 		});
 	});

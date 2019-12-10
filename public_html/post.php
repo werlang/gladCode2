@@ -2,7 +2,7 @@
 
 <?php
     if (isset($_GET['p']))
-        echo "<div id='hash'>". $_GET['p'] ."</div>";
+        echo "<div id='hash' hidden>". $_GET['p'] ."</div>";
     else
         header("Location: index");
 ?>

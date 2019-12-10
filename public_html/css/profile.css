@@ -2322,3 +2322,75 @@ body {
 	margin: auto;
     display: block;
 }
+
+#panel .post .share{
+	color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-end;
+    cursor: pointer;
+    margin: -15px -20px -25px 0px;
+    border-radius: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+	transition: 0.3s all;
+	z-index: 1;
+}
+
+#panel .post:hover .share{
+	color: #00638d;
+}
+
+#panel .post .share:hover{
+	background-color: #0000000d;
+	box-shadow: 0px 0px 5px #0000001f;
+}
+
+#panel .post .share i{
+    font-size: 30px;
+    text-align: center;
+}
+
+#fog #link-box {
+	background-color: #fff;
+    display: grid;
+    border-radius: 3px;
+    padding: 15px 25px;
+	width: 350px;
+	box-shadow: 1px 1px 5px black;
+}
+
+#fog #link-box h3 {
+    grid-column: 1 / 3;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#fog #link-box input {
+	margin-right: 10px;
+    font-size: 1.2em;
+    background-color: black;
+    color: #d0eaf6;
+    padding: 0px 15px;
+    outline: none;
+    border: none;
+    height: 30px;
+	font-family: 'Roboto', sans-serif;	
+	border-radius: 3px;
+    border: 2px solid #464646;
+    box-sizing: border-box;
+}
+
+#fog #link-box button {
+	border: none;
+    outline: none;
+    background-color: #00638d;
+    color: white;
+    font-weight: bold;
+    font-family: 'Source Code Pro', monospace;
+    height: 30px;
+	width: 90px;
+	border-radius: 3px;
+	cursor: pointer;
+}
