@@ -3,7 +3,7 @@ $(document).ready( function() {
         action: "POST",
         hash: $('#hash').html()
     }).done( function(data){
-        console.log(data);
+        // console.log(data);
         data = JSON.parse(data);
 
         if (data.status == "EMPTY"){
