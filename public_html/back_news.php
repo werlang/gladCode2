@@ -23,6 +23,42 @@
 
         $output['status'] = "SUCCESS";
     }
+    else if ($action == "POST"){
+        $hash = mysql_escape_string($_POST['hash']);
+
+        $id = "SUBSTR( md5(CONCAT(id, 'news-post-86')) , 1, 4)";
+        $sql = "SELECT title, time, post FROM news WHERE $id = '$hash'";
+        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $output['sql'] = $sql;
+        if ($result->num_rows == 0)
+            $output['status'] = "EMPTY";
+        else{
+            $row = $result->fetch_assoc();
+            $output['post'] = array();
+
+            $output['post']['title'] = $row['title'];
+            $output['post']['time'] = $row['time'];
+            $output['post']['body'] = $row['post'];
+
+            $basetime = "SELECT time FROM news WHERE $id = '$hash'";
+
+            $sql = "SELECT $id AS id FROM news WHERE time < ($basetime) ORDER BY time DESC LIMIT 1";
+            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            if ($result->num_rows > 0){
+                $row = $result->fetch_assoc();
+                $output['prev'] = $row['id'];
+            }
+    
+            $sql = "SELECT $id AS id FROM news WHERE time > ($basetime) ORDER BY time LIMIT 1";
+            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            if ($result->num_rows > 0){
+                $row = $result->fetch_assoc();
+                $output['next'] = $row['id'];
+            }
+                
+            $output['status'] = "SUCCESS";
+        }        
+    }
 
     echo json_encode($output);
 ?>
