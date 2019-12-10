@@ -29,6 +29,7 @@
 	<script type="text/javascript" src="script/googlelogin.js"></script>
 	<script type="text/javascript" src="script/dialog.js"></script>
 	<script type="text/javascript" src="script/header.js"></script>
+	<script type="text/javascript" src="script/socket.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>
