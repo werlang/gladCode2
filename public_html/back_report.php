@@ -74,11 +74,12 @@
 		}
 		else if ($_POST['action'] == "FAVORITE"){
 			$output = array();
-			$favorite = $_POST['favorite'];
+			$favorite = mysql_escape_string($_POST['favorite']);
 
 			if ($favorite === "true" || $favorite === "false"){
 				$id = mysql_escape_string($_POST['id']);
 				$comment = mysql_escape_string($_POST['comment']);
+				
 				$sql = "UPDATE reports SET favorite = $favorite, comment = '$comment' WHERE id = $id";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				$output['status'] = "SUCCESS";
