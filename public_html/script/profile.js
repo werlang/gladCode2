@@ -742,7 +742,7 @@ $(document).ready( function(){
 								<div class='cell comment'>${data[i].comment}</div>
 								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
 								<div class='playback' title='Visualizar batalha'>
-									<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
+									<a target='_blank' href='play/${data[i].hash}'><img src='icon/eye.png'></a>
 								</div>
 							</div>`);
 							$('#bhist-container .favorite').last().data('id', data[i].id);
