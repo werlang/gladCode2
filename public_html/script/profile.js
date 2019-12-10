@@ -46,7 +46,7 @@ $(document).ready( function(){
 	function checkNotifications(){
 		$.post("back_notification.php", {
 		}).done( function(data){
-            console.log(data);
+            // console.log(data);
 			try{
 				data = JSON.parse(data);
 			}
@@ -122,7 +122,7 @@ $(document).ready( function(){
 			action: "GET",
 			page: 0
 		}).done( function(data){
-			console.log(data);
+			// console.log(data);
 			data = JSON.parse(data);
 
 			$('#panel #news-container').html("");
@@ -602,9 +602,10 @@ $(document).ready( function(){
 								post_favorite(id, false, '');
 							}
 							else{
-								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
+								var star = $(this);
 								showInput("Informe um comentário sobre esta batalha").then( function(data){
 									if (data !== false){
+										star.find('i').html('star').attr('title', "Tirar dos favoritos");
 										post_favorite(id, true, data);
 									}
 								});
@@ -617,7 +618,7 @@ $(document).ready( function(){
 									id: id,
 									comment: comment
 								}).done( function(data){
-									//console.log(data);
+									// console.log(data);
 								});
 							}
 						});
@@ -761,23 +762,19 @@ $(document).ready( function(){
 						}
 						
 						$('#bhist-container .favorite').click( function(){
-							var fav;
-							if ($(this).find('i').html() == 'star'){
-								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
-								fav = false;
-							}
-							else{
-								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
-								fav = true;
-							}
-
-							$.post("back_report.php", {
-								action: "FAVORITE",
-								favorite: fav,
-								id: $(this).data('id'),
-								comment: ''
-							}).done( function(data){
-								//console.log(data);
+							var id = $(this).data('id');
+							showDialog("Remover esta batalha dos favoritos?",["Sim","Não"]).then( data => {
+								if (data == "Sim"){
+									$(this).parent().remove();
+									$.post("back_report.php", {
+										action: "FAVORITE",
+										favorite: false,
+										id: id,
+										comment: ''
+									}).done( function(data){
+										// console.log(data);
+									});
+								}
 							});
 						});
                     }
