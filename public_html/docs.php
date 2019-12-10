@@ -211,6 +211,10 @@
 							<td>Retorna o tempo restante para expirar o efeito Invisibilidade.</td>
 						</tr>
 						<tr>
+							<td><a href='function/getburntimeleft'>getBurnTimeLeft</a></td>
+							<td>Retorna o tempo restante para expirar o efeito Queimadura.</td>
+						</tr>
+						<tr>
 							<td><a href='function/speak'>speak</a></td>
 							<td>Mostra um balão de fala com uma mensagem.</td>
 						</tr>

@@ -8,8 +8,12 @@
         'show_frames' => true,
         'show_bars' => true,
         'show_fps' => false,
+        'show_text' => true,
+        'show_speech' => true,
         'sfx_volume' => 1,
-        'music_volume' => 0.1);
+        'music_volume' => 0.1,
+        'crowd' => 1
+    );
 
     if ($action == "GET_PREF"){
 

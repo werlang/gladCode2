@@ -228,7 +228,6 @@
             $row = $result->fetch_assoc();
             $deadline = (new DateTime($row['deadline']))->getTimestamp();
             $now = (new DateTime($row['now']))->getTimestamp();
-
             if ($now >= $deadline)
                 $timeup = true;
         }

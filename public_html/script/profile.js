@@ -10,7 +10,7 @@ $(document).ready( function(){
 	$.post("back_login.php", {
 		action: "GET"
 	}).done( function(data){
-		//console.log(data);
+		// console.log(data);
 		user = JSON.parse(data);
 		if ($('#tab').length){
 			var id = $('#tab').html();
@@ -24,6 +24,7 @@ $(document).ready( function(){
 		checkNotifications();
 
 		socket_ready().then( () => {
+			//console.log("socket ready");
 			socket.on('profile notification', data =>{
 				//console.log("server message");
 				checkNotifications();
@@ -45,7 +46,7 @@ $(document).ready( function(){
 	function checkNotifications(){
 		$.post("back_notification.php", {
 		}).done( function(data){
-            //console.log(data);
+            console.log(data);
 			try{
 				data = JSON.parse(data);
 			}
@@ -64,6 +65,13 @@ $(document).ready( function(){
 			else
 				$('#messages .notification').removeClass('empty');
 
+			var news = parseInt(data.news);
+			$('#news .notification').html(news);
+			if (news == 0)
+				$('#news .notification').addClass('empty');
+			else
+				$('#news .notification').removeClass('empty');
+				
 			var newfriends = parseInt(data.friends);
 			$('#friends .notification').html(newfriends);
 			if (newfriends == 0)
@@ -108,7 +116,26 @@ $(document).ready( function(){
 			$(this).addClass('here');
 		}
 	});
-		
+	
+	$('#menu #news').click( function() {
+		$.post("back_news.php",{
+			action: "GET",
+			page: 0
+		}).done( function(data){
+			console.log(data);
+			data = JSON.parse(data);
+
+			$('#panel #news-container').html("");
+			for (let i in data.posts){
+				$('#panel #news-container').append(`<div class='post'>
+					<div class='title'>${data.posts[i].title}</div>
+					<div class='time'>Publicado em ${getMessageTime(data.posts[i].time, { month_full: true })}</div>
+					<div class='body'>${data.posts[i].post}</div>
+				</div>`);
+			}
+		});
+	});
+
 	$('#menu #profile').click( function() {
 		$('#nickname .input').val(user.apelido);
 
@@ -209,7 +236,7 @@ $(document).ready( function(){
 						var card = $(this).parents('.glad-preview');
 						if ($(this).parents('.glad-preview').hasClass('old')){
 							var name = $(this).parents('.info').find('.glad span').html();
-							showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique no botão para abrir o editor",["Cancelar","OK"]).then( function(data){
+							showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor",["Cancelar","OK"]).then( function(data){
 								if (data == "OK")
 									window.open("glad-"+ card.data('id'));
 							});
@@ -298,10 +325,17 @@ $(document).ready( function(){
 					$('.glad-preview .code').remove();
 					
 					$('#battle-container .glad-preview').click( function(){
+						var card = $(this);
 						if (!$(this).hasClass('old')){
 							$('#battle-container .glad-preview').removeClass('selected');
 							$(this).addClass('selected');
 							$('#match-find').removeAttr('disabled');
+						}
+						else{
+							showDialog("Este gladiador precisa ser atualizado. Deseja abri-lo no editor?", ['Sim', 'Não']).then( function(data){
+								if (data == 'Sim')
+								window.open(`glad-${card.data('id')}`);
+							});
 						}
 					});
 				});
@@ -331,7 +365,7 @@ $(document).ready( function(){
 					</div>
 					<div class='cell image-container'><img src='${picture}'></div>
 					<div class='cell user'>${nick}</div>
-					<div class='cell time' title='${getMessageTime(time, true)}'>${getMessageTime(time, false)}</div>
+					<div class='cell time' title='${getMessageTime(time)}'>${getMessageTime(time, { short: true })}</div>
 					<div class='button-container'>
 						<div class='accept' title='Aceitar desafio'></div>
 						<div class='refuse' title='Recusar desafio'></div>
@@ -368,13 +402,16 @@ $(document).ready( function(){
 		
 				load_glad_cards($('#fog .glad-card-container'), {
 					clickHandler: function(){
-						$('#fog #btn-glad-open').removeAttr('disabled');
-						$('#fog .glad-preview').removeClass('selected');
-						$(this).addClass('selected');
-						$('#duel-box #duel').removeAttr('disabled');
+						if (!$(this).hasClass('old')){
+							$('#fog #btn-glad-open').removeAttr('disabled');
+							$('#fog .glad-preview').removeClass('selected');
+							$(this).addClass('selected');
+							$('#duel-box #duel').removeAttr('disabled');
+						}
 					},
 					dblClickHandler: function(){
-						$('#fog #duel-box #duel').click();
+						if ($('#fog .glad-card-container .selected').length)
+							$('#fog #duel-box #duel').click();
 					}
 				});
 
@@ -506,7 +543,7 @@ $(document).ready( function(){
 				read: true,
 				page: reportpage.battles,
 			}).done( function(data){
-				//console.log(data);
+				// console.log(data);
 				var e;
 				try{
 					data = JSON.parse(data);
@@ -523,14 +560,27 @@ $(document).ready( function(){
 					ptotal = data.total;
 					data = data.reports;
 
+					bind_report_pages();
+
                     if (ptotal == 0)
                         $('#bhist-container .table').html("<p>Você ainda não possui batalhas</p>");
                     else{
-                        bind_report_pages();
-
-                        $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
+						$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
                         for (var i in data){
-                            $('#bhist-container .table').append("<div class='row'><div class='cell glad'>"+ data[i].gladiator +"</div><div class='cell reward'>"+ (parseFloat(data[i].reward)).toFixed(1) +"</div><div class='cell time' title='"+ getMessageTime(data[i].time, true) +"'>"+ getMessageTime(data[i].time) +"</div><div class='playback' title='Visualizar batalha'><a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a></div></div>")
+							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							if (data[i].favorite)
+								star = {body: "star", title: "Tirar dos favoritos"};
+
+							$('#bhist-container .table').append(`<div class='row'>
+							<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+							<div class='cell glad'>${data[i].gladiator}</div>
+							<div class='cell reward'>${parseFloat(data[i].reward).toFixed(1)}</div>
+							<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
+							<div class='playback' title='Visualizar batalha'>
+								<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
+							</div></div>`);
+							$('#bhist-container .favorite').last().data('id', data[i].id);
+							
                             if (data[i].isread == "0")
                                 $('#bhist-container .table .row').last().addClass('unread');
                             else
@@ -543,7 +593,34 @@ $(document).ready( function(){
                                 obj.html("+"+ obj.html());
                             }
                                 
-                        }
+						}
+						
+						$('#bhist-container .favorite').click( function(){
+							var id = $(this).data('id');
+							if ($(this).find('i').html() == 'star'){
+								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
+								post_favorite(id, false, '');
+							}
+							else{
+								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
+								showInput("Informe um comentário sobre esta batalha").then( function(data){
+									if (data !== false){
+										post_favorite(id, true, data);
+									}
+								});
+							}
+
+							function post_favorite(id, fav, comment){
+								$.post("back_report.php", {
+									action: "FAVORITE",
+									favorite: fav,
+									id: id,
+									comment: comment
+								}).done( function(data){
+									//console.log(data);
+								});
+							}
+						});
                     }
 				}
 			});
@@ -569,11 +646,11 @@ $(document).ready( function(){
 					pend = data.end;
 					ptotal = data.total;
 
-                    if (ptotal == 0)
+					bind_report_pages();
+
+					if (ptotal == 0)
                         $('#bhist-container .table').html("<p>Você ainda não possui duelos</p>");
                     else{
-                        bind_report_pages();
-
                         data = data.output;
                         $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell'>Oponente</div><div class='cell'>Mestre</div><div class='cell time'>Data</div></div>");
                         for (var i in data){
@@ -581,7 +658,7 @@ $(document).ready( function(){
 								<div class='cell glad'>${data[i].glad}</div>
 								<div class='cell enemy'>${data[i].enemy}</div>
 								<div class='cell'>${data[i].user}</div>
-								<div class='cell time' title='${getMessageTime(data[i].time, true)}'>${getMessageTime(data[i].time)}</div>
+								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
 								<div class='playback' title='Visualizar batalha'>
 									<a target='_blank' href='play/${data[i].log}'><img src='icon/eye.png'></a>
 								</div>
@@ -620,6 +697,92 @@ $(document).ready( function(){
 				}
 			});
 
+		}
+		else if ($('#bhist-container .tab.selected').html() == "Favoritos"){
+			$.post("back_report.php", {
+				action: "GET",
+				favorites: true
+			}).done( function(data){
+				// console.log(data);
+				var e;
+				try{
+					data = JSON.parse(data);
+				}
+				catch(error){
+					//console.log(error);
+					e = error;
+				}
+				if (e || data.length == 0)
+					$('#bhist-container .table').hide();
+				else{
+					pstart = data.start;
+					pend = data.end;
+					ptotal = data.total;
+					data = data.reports;
+
+					bind_report_pages();
+
+                    if (ptotal == 0)
+                        $('#bhist-container .table').html("<p>Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas</p>");
+                    else{
+						$('#bhist-container .table').html(`<div class='row head'>
+							<div class='cell'>Gladiador</div>
+							<div class='cell comment'>Comentário</div>
+							<div class='cell time'>Data</div>
+						</div>`);
+                        for (var i in data){
+							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							if (data[i].favorite)
+								star = {body: "star", title: "Tirar dos favoritos"};
+
+                            $('#bhist-container .table').append(`<div class='row'>
+								<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+								<div class='cell glad'>${data[i].gladiator}</div>
+								<div class='cell comment'>${data[i].comment}</div>
+								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
+								<div class='playback' title='Visualizar batalha'>
+									<a target='_blank' href='play/"+ data[i].hash +"'><img src='icon/eye.png'></a>
+								</div>
+							</div>`);
+							$('#bhist-container .favorite').last().data('id', data[i].id);
+
+                            if (data[i].isread == "0")
+                                $('#bhist-container .table .row').last().addClass('unread');
+                            else
+                                $('#bhist-container .table .row').last().removeClass('unread');
+                            if (data[i].reward < 0)
+                                $('#bhist-container .table .reward').last().addClass('red');
+                            else if (data[i].reward > 0){
+                                var obj = $('#bhist-container .table .reward').last();
+                                obj.addClass('green');
+                                obj.html("+"+ obj.html());
+                            }
+                                
+						}
+						
+						$('#bhist-container .favorite').click( function(){
+							var fav;
+							if ($(this).find('i').html() == 'star'){
+								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
+								fav = false;
+							}
+							else{
+								$(this).find('i').html('star').attr('title', "Tirar dos favoritos");					
+								fav = true;
+							}
+
+							$.post("back_report.php", {
+								action: "FAVORITE",
+								favorite: fav,
+								id: $(this).data('id'),
+								comment: ''
+							}).done( function(data){
+								//console.log(data);
+							});
+						});
+                    }
+				}
+			});
 		}
 
 		function bind_report_pages(){
@@ -677,20 +840,27 @@ $(document).ready( function(){
 				//console.log(data);
 				if (data == "ERROR"){
 					progbtn.kill();
+					window.location.reload();
 				}
 				else{
 					var hash = data;
 
 					save_stats(hash);
 
-					$('#pre-battle-show #tips').html("Batalha concluída. Clique para visualizar");
+					$('#pre-battle-show #tips').html(`<span>Batalha concluída. Escolha uma opção:</span>
+						<i id='view' title='Visualizar batalha' class='material-icons'>remove_red_eye</i>
+						<i id='close' title='Fechar janela' class='material-icons'>close</i>`);
 					clearInterval(preBattleInt);
 					$('#pre-battle-show').addClass('complete');
-					$('#pre-battle-show').click( function(){
-						window.open("play/"+ hash);
+
+					$('#pre-battle-show i').click( function(){
+						if ($(this).attr('id') == 'view')
+							window.open("play/"+ hash);
+						
 						$('#fog').remove();
 						$('#menu #battle').click();
 					});
+
 					progbtn.kill();
 				}
 			});
@@ -831,7 +1001,7 @@ $(document).ready( function(){
 
                 $('#message-panel .table').html("");
                 for (var i in data){
-                    $('#message-panel .table').append("<div class='row'><div class='cell user'>"+ data[i].nick +"</div><div class='cell message'>"+ data[i].message +"</div><div class='cell time'>"+ getMessageTime(data[i].time) +"</div></div>");
+                    $('#message-panel .table').append("<div class='row'><div class='cell user'>"+ data[i].nick +"</div><div class='cell message'>"+ data[i].message +"</div><div class='cell time'>"+ getMessageTime(data[i].time, { short: true }) +"</div></div>");
                     if (data[i].isread == "0")
                         $('#message-panel .table .row').last().addClass('unread');
                 }
@@ -839,7 +1009,7 @@ $(document).ready( function(){
                     var i = $('#message-panel .table .row').index($(this));
                     var id = data[i].id;
                     var message = data[i].message;
-                    var time = getMessageTime(data[i].time, true);
+                    var time = getMessageTime(data[i].time);
                     var nick = data[i].nick;
                     var picture = data[i].picture;
                     $('#message-panel').append("<div id='full-message'><div class='row head'><div class='image'><img src='"+ picture +"'></div><div class='user'>"+ nick +"</div><div class='time'>"+ time +"</div></div><div class='row body'><div class='message'>"+ message +"</div></div><div class='row buttons'><button class='button' id='back'><img src='icon/back.png'><span>Retornar</span></button><button class='button' id='reply'><img src='icon/reply.png'><span>Responder</span></button><button class='button' id='unread'><img src='icon/unread.png'><span>Marcar não lido</span></button><button class='button' id='delete'><img src='icon/delete2.png'><span>Excluir</span></button></div></div>");
@@ -1299,14 +1469,38 @@ function preBattleShow(glads){
 		"Gladiadores de renome semelhante são automaticamente selecionados para se enfrentar",
 		"Observe o comportamento de seus inimigos, e tente adaptar a lógica do seu gladiador para derrotá-los",
 		"Quando você está offline, seus gladiadores podem ser desafiados. Eles podem subir ou descer no ranking",
-		"Você pode ver as últimas batalhas que seus gladiadores participaram no menu BATALHA",
+		"Você pode ver as últimas batalhas que seus gladiadores participaram no menu HISTÓRICO",
 		"Você pode procurar por usuários ou enviar mensagens para seus amigos no menu AMIGOS",
-		"Participar de batalhas concede experiência para o mestre, que lhe concede uma série de benefícios",
+		"Participar de batalhas concede experiência para o mestre, que lhe permite recrutar mais gladiadores",
 		"Está com dúvida em algo? pergunte na página do facebook ou comunidade do reddit da gladCode",
-		"Seja um membro ativo da comunidade comentando e dando sua opinião no facebook ou reddit",
+		"Quer conversar com outros mestres? Interaja de WhatsApp ou chat da gladCode",
 		"Assista o replay de suas batalhas, assim você entende melhor o comportamentos de seus gladiadores",
 		"A documentação é a melhor maneira de compreender como uma função funciona. Tem exemplos!",
 		"Não entendeu algo sobre o funcionamento da gladCode? O manual da simulação está ali à sua disposição",
+		"Ali no menu BATALHA, Você pode desafiar seus amigos para duelos de 1x1 para ver quem é o melhor",
+		"No menu BATALHA, você pode criar ou participar de um torneio. Junte seus amigos e convide-os",
+		"O chat da gladCode é o meio mais prático de compartilhar código e conhecer outros mestres. Experimente",
+		"Já viu que têm um botão de preferências nas batalhas, que te permite ajustar várias coisas legais?",
+
+		"A habilidade FIREBALL é efetiva no longo prazo, pois queima o inimigo aos poucos",
+		"A habilidade TELEPORT te envia para qualquer lugar. Mas cuide o gás tóxico",
+		"A habilidade CHARGE é ótima para se aproximar dos inimigos e causa um bom dano pela distância percorrida",
+		"A habilidade BLOCK é menos efetiva quando você leva dano pelas costas",
+		"A habilidade ASSASSINATE causa muito dano se você conseguir pegar o oponente desprevinido",
+		"A habilidade AMBUSH é ótima tanto para se livrar de perigos como para iniciar um combate",
+
+		"Cuide para nunca ficar na zona do gás tóxico. Mesmo o gladiador mais forte sucumbe nela rapidamente",
+		"É bom garantir o centro da arena, mas cuidado para não virar alvo de vários inimigos",
+		"Fugir das batalhas te mantém vivo, mas te deixa atrasado no poder que os níveis te concede",
+		"Cada um dos três atributos te concede características essenciais para todo tipo de gladiador",
+		"Sem FORÇA, um gladiador tem pouca vida, e morre rapidamente",
+		"Sem AGILIDADE, um gladiador é lento, tanto em seus ataques como em seus movimentos",
+		"Sem INTELIGÊNCIA, um gladiador não consegue lançar muitas habilidades",
+		"Com uma boa estratégia, você pode criar gladiadores híbridos que se beneficiam de várias habilidades",
+		"Se você tem pouca vida, jamais deixe um inimigo chegar muito perto de você",
+		"Se você é um mago, não fique parado. Ser atordoado pode te custar a vida",
+		"Se você é um guerreiro, abuse do BLOCK, ele é a ferramenta que te deixará vivo",
+		"Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura"
 	];
 
 	var timeElapsed = 0;
@@ -1352,14 +1546,17 @@ function last_active_string(min){
 		return min +" minutos";
 }
 
-function getMessageTime(msgTime, detailed){
-	if (detailed){
-		var months = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
-		t = new Date(msgTime);
-		var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
-		return string;
-	}
-	else{
+function getMessageTime(msgTime, args){
+	var short = false;
+	var month_full = false;
+	if (args){
+		if (args.short)
+			short = true;
+		if (args.month_full)
+			month_full = true;
+	} 
+
+	if (short){
 		var now = new Date();
 		msgTime = new Date(msgTime);
 		
@@ -1368,6 +1565,30 @@ function getMessageTime(msgTime, detailed){
 		
 		var diff = (secNow - secMsg) / 60;
 		return last_active_string(diff);
+	}
+	else{
+		var months = [
+			"Janeiro",
+			"Fevereiro",
+			"Março",
+			"Abril",
+			"Maio",
+			"Junho",
+			"Julho",
+			"Agosto",
+			"Setembro",
+			"Outubro",
+			"Novembro",
+			"Dezembro"
+		];
+		if (!month_full){
+			for (let i in months)
+				months[i] = months[i].toLowerCase().slice(0,3);
+		}
+
+		t = new Date(msgTime);
+		var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
+		return string;
 	}
 }
 

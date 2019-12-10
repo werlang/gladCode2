@@ -38,6 +38,16 @@
 		$row = $result->fetch_assoc();
 		$userglad = $glads;
 		$glads = array($glads, $row['gladiator1']);
+
+		$version = file_get_contents("version");
+		$glads_string = implode(",", $glads);
+		$sql = "SELECT version FROM gladiators WHERE cod IN ($glads_string)";
+		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		while ($row = $result->fetch_assoc()){
+			if ($version != $row['version'])
+				$cancel_run = true;
+		}
+
 	}
 
 	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
@@ -198,7 +208,7 @@
 				$rewards = battle_rewards($conn, $deaths, $user);
 				send_reports($conn, $rewards, $hash);
 			}
-			if (isset($_POST['duel']) && $_POST['duel'] != "false"){
+			if (isset($_POST['duel']) && $_POST['duel'] != "false" && !$cancel_run){
 				$id = mysql_escape_string($_POST['duel']);
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
@@ -308,23 +318,6 @@
 		$id = $conn->insert_id;
 		file_put_contents("logs/$id",$log);
 		return $hash;
-
-		clear_singleview($conn,"1 WEEK");
-	}
-
-	function clear_singleview($conn,$period){
-		$sql = "SELECT id FROM logs WHERE singleView = 1 AND time < CURRENT_TIME() - INTERVAL $period";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-		
-		if ($result->num_rows > 0){
-			while($row = $result->fetch_assoc()){
-				$id = $row['id'];
-				unlink("logs/$id");
-			}		
-			
-			$sql = "DELETE FROM logs WHERE singleView = 1 AND time < CURRENT_TIME() - INTERVAL $period";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-		}
 	}
 
 	function battle_rewards($conn, $deaths, $user){

@@ -1,0 +1,21 @@
+{
+	"name": "upgradeINT",
+	"ptname": "melhoraINT",
+	"syntax": "int upgradeINT ( int pontos );",
+	"description": {
+		"long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Inteligência do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Inteligência foi melhorado com sucesso. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis."
+	},
+	"param": [
+		{"name": "pontos", "description": "Inteiro contendo quantos pontos serão aprimorados do atributo Inteligência."}
+	],
+	"treturn": "Retorna 0 caso não haja nenhum ponto de aprimoramento disponível e a Inteligência do gladiador não tenha sido aprimorada. Caso contrário retorna 1.",
+	"sample": "loop(){\n    if (getSTR() >= 30)\n        upgradeINT(1);\n    else\n        upgradeSTR(1);\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeINT, fazendo com que ele aumente o atributo Inteligência caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+	"seealso": [
+		"upgradeAGI",
+		"upgradeSTR",
+		"getINT",
+		"moveTo"
+	],
+	"snippet": "upgradeINT(${1:points});"
+}

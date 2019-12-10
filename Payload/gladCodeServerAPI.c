@@ -1106,6 +1106,11 @@ int ambush(int gladid){
 //mostra uma mensagem de fala
 void speak(int gladid, char *message){
 	strncpy((g+gladid)->message, message, 250);
+
+	char *newline = strstr((g+gladid)->message, "\n");
+	if (newline != NULL)
+		*newline = '\0';
+
 	(g+gladid)->message[249] = '\0';
 	(g+gladid)->msgtime = 3;
 }

@@ -287,6 +287,7 @@
         "js": {
             "files": [
                 {"name": "phaser.js"},
+                {"name": "floatingText.js"},
                 {"name": "render.js"},
                 {"name": "assets.js"},
                 {"name": "dialog.js"},
@@ -315,6 +316,22 @@
         "css": {
             "files": [
                 {"name": "header.css"}
+            ]
+        }
+    },{
+        "name": "post.php",
+        "js": {
+            "files": [
+                {"name": "googlelogin.js"},
+                {"name": "socket.js"},
+                {"name": "header.js"},
+                {"name": "post.js"}
+            ]
+        },
+        "css": {
+            "files": [
+                {"name": "header.css"},
+                {"name": "post.css"}
             ]
         }
     }]

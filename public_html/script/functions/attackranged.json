@@ -1,0 +1,26 @@
+{
+	"name": "attackRanged",
+	"ptname": "ataqueDistancia",
+	"syntax": "int attackRanged ( float x, float y );",
+	"description": {
+		"long": "Vira o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro e então realiza um ataque de longa distância em direção ao ponto. Caso o gladiador não consiga terminar sua rotação até o ponto (de acordo com sua <a href='manual.php#nav-glad'>velocidade de rotação</a>, a função retorna 0 e o ataque não é realizado. Caso o ataque seja executado a função retorna 1. Quando o ataque é realizado, um projétil é arremessado a partir do ponto do gladiador atacante e percorre a arena com velocidade 15 passos por segundo (p/s) em direção ao ponto do alvo. Caso o projétil entre em contato com qualquer gladiador durante seu percurso, ele interrompe seu percurso e causa dano igual ao valor do <a href='manual.php#nav-glad'>atributo dano à distância</a> do gladiador que disparou o projétil no gladiador acertado.",
+		"brief": "Realiza um ataque de longa distância."
+	},
+	"param": [
+		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+	],
+	"treturn": "Retorna 1 caso o ataque foi realizado com sucesso, caso contrário retorna 0.",
+	"sample": "loop(){\n    if (getLowHp()){\n        if (getHp() > 20)\n            while(!attackRanged(getTargetX(), getTargetY()));\n        else\n            stepBack();\n    }\n    else\n        turnRight(5);\n}",
+	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
+	"seealso": [
+		"getHp",
+		"getLowHp",
+		"getTargetX",
+		"getTargetY",
+		"stepBack",
+		"turnRight",
+		"attackMelee"
+	],
+	"snippet": "attackRanged(${1:X}, ${2:Y});"
+}

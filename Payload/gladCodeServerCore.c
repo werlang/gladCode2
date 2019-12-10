@@ -129,19 +129,12 @@ void preventCollision(int gladid, float lastdx, float lastdy){
 }
 
 void setXp(int gladid, float dmg, int enemy){
-	//200 de vida inicial + 10 por nivel (considera que upa STR a cada 2 niveis)
+	//200 de vida inicial + 20 por nivel (considera que upa 2 STR por nível)
 	//xp é o percentual de dano causado na vida esperada do inimigo,
-	//reduzido por 25% a cada diferença de nivel;
-	/*
-	int lvldif = (g+gladid)->lvl - (g+enemy)->lvl;
-	if (lvldif > 4)
-		lvldif = 4;
-	if (lvldif < -4)
-		lvldif = -4;
-	*/
-	int lifeatlvl = (200 + ((g+gladid)->lvl - 1) * 10 );
 
-	float xp = dmg / lifeatlvl * 100;// * (1 - 0.25 * lvldif );
+	int lifeatlvl = (200 + ((g+gladid)->lvl - 1) * 20 );
+
+	float xp = dmg / lifeatlvl * 100;
 	
 	(g+gladid)->xp += round(xp);
 	int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
@@ -760,6 +753,8 @@ float moveForwardUnsafe(int gladid){
 }
 
 int moveToUnsafe(int gladid, float x, float y){
+	if (getDistUnsafe(gladid, x, y) <= 0.01)
+		return 1;
     if (turnToUnsafe(gladid, x, y)){
 		float move = (g+gladid)->spd * timeInterval;
 		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)

@@ -73,6 +73,7 @@
 				</div>
 			</div>	
 			<div id='menu-buttons'>
+				<div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
 				<div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
 				<div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
 				<div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHA</span></div>
@@ -85,6 +86,10 @@
 			<div id='footer'></div>
 		</div>
 		<div id='panel'>
+			<div class='content' data-menu='news'><div>
+				<h2>Notícias da gladCode</h2>
+				<div id='news-container'></div>
+			</div></div>
 			<div class='content' data-menu='profile'>
 				<div id='profile-panel'>
 					<div id='nickname'>
@@ -173,6 +178,7 @@
 						<div id='tab-container'>
 							<div class='tab selected'>Batalhas</div>
 							<div class='tab'>Duelos</div>
+							<div class='tab'>Favoritos</div>
 						</div>
 						<div class='table'></div>
 						<div id='page-title'>

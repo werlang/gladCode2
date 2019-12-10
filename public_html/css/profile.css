@@ -212,6 +212,10 @@ body {
 	transition: all 0.8s;
 }
 
+#news.item .icon-frame {
+    background-color: #d4d4d4;
+}
+
 #profile.item .icon-frame {
     background-color: #8edc96;
 }
@@ -1383,6 +1387,11 @@ body {
     border-width: 0px 0px 2px 0px;
 }
 
+#bhist-container p {
+    margin-left: 15px;
+    font-size: 1.5em;
+}
+
 #bhist-container .table .row.head {
 	height: 50px;
 	font-size: 1.3em;
@@ -1443,6 +1452,11 @@ body {
 #bhist-container .table .row:hover .time {
 	margin-right: 30px;
 	margin-left: -30px;
+}
+
+#bhist-container .table .row.head:hover .time {
+	margin-right: 0px;
+	margin-left: 0px;
 }
 
 #bhist-container .table .row {
@@ -1580,7 +1594,29 @@ body {
 
 #pre-battle-show.complete #tips{
 	color: black;
+}
+
+#pre-battle-show.complete #tips i {
+    margin-left: 25px;
+    background-color: #c8c8c8;
+    color: black;
+    border-radius: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+    font-size: 40px;
+	transition: 0.3s all;
+	box-shadow: 0px 0px 5px #00000070;
 	cursor: pointer;
+}
+
+#pre-battle-show.complete #tips #view:hover {
+    color: #000000;
+    background-color: #719e71;
+}
+
+#pre-battle-show.complete #tips #close:hover {
+    color: #000000;
+    background-color: #db5f5f;
 }
 
 @media only screen and (min-width: 600px) {
@@ -2226,4 +2262,63 @@ body {
 	margin: 0px 10px;
 	opacity: 0.2;
 	filter: none;
+}
+
+
+#bhist-container .cell.favorite {
+    flex-grow: 0;
+    flex-basis: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 10px;
+}
+
+#bhist-container .cell.favorite i {
+	font-size: 25px;
+	cursor: pointer;
+    transition: 0.3s all;
+}
+
+#bhist-container .cell.favorite:hover i {
+	text-shadow: 0px 0px 3px #000000a3;
+}
+
+#panel .post {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 30px;
+    border-radius: 5px;
+    border: 1px solid #dedede;
+	background-color: #fafafa;
+	box-sizing: border-box;
+	font-family: 'Roboto', sans-serif;
+	margin: 20px 10px;
+	box-shadow: 1px 1px 5px 0px #00000038;
+}
+
+#panel .post .title {
+	font-size: 1.7em;
+	font-weight: bold;
+	margin-bottom: 15px;
+	color: #00638d;
+}
+
+#panel .post .time {
+	color: #aaaaaa;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+	border-bottom: 1px solid;
+	font-size: 0.9em;
+}
+
+#panel .post .body {
+	text-align: justify;
+}
+
+#panel .post .body img {
+    max-width: 100%;
+	border-radius: 2px;
+	margin: auto;
+    display: block;
 }
