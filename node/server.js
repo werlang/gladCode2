@@ -85,12 +85,18 @@ app.post('/login', function(req,res){
 		}
 	}
 	else{
+		//admin auth
 		var arg = req.body;
-		if (arg.pass && arg.glad){
+		if (arg.pass && (arg.glad || arg.user)){
 			let hash = crypto.createHash('md5').update(arg.pass).digest('hex');
 			var correct = '07aec7e86e12014f87918794f521183b';
 			if (hash == correct){
-				var sql = `SELECT u.id FROM usuarios u INNER JOIN gladiators g ON g.master = u.id WHERE g.cod = ${arg.glad}`;
+				if (arg.glad){
+					var sql = `SELECT u.id FROM usuarios u INNER JOIN gladiators g ON g.master = u.id WHERE g.cod = ${arg.glad}`;
+				}
+				else if (arg.user){
+					var sql = `SELECT id FROM usuarios WHERE id = ${arg.user}`;
+				}
 				connection.query(sql, function (error, results, fields){
 					if(error) return console.log(error);
 					if (results.length){
@@ -104,6 +110,7 @@ app.post('/login', function(req,res){
 			else
 				res.send({session: false});
 		}
+		//google login
 		else if (arg.token){
 			var url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${arg.token}`;
 			request(url, (error, response, body) => {
