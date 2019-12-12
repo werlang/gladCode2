@@ -753,8 +753,11 @@ float moveForwardUnsafe(int gladid){
 }
 
 int moveToUnsafe(int gladid, float x, float y){
-	if (getDistUnsafe(gladid, x, y) <= 0.01)
+	if (getDistUnsafe(gladid, x, y) <= 0.01){
+		(g+gladid)->x = x;
+		(g+gladid)->y = y;
 		return 1;
+	}
     if (turnToUnsafe(gladid, x, y)){
 		float move = (g+gladid)->spd * timeInterval;
 		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
