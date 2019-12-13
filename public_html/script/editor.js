@@ -139,7 +139,7 @@ $(document).ready( function() {
 					action: "GET",
 				}).done( function(data){
 					data = JSON.parse(data);
-                    //console.log(data);
+                    // console.log(data);
                     if (data.length == 0){
                         window.location.href = "newglad";
                     }
@@ -378,59 +378,90 @@ $(document).ready( function() {
 		$('#fog-battle #list .glad').last().data('filename',sampleGlads[i].filename);
 		$('#fog-battle #list .glad .name').last().html(i);
 		$('#fog-battle #list .glad .diff').last().addClass(num[sampleGlads[i].difficulty]);
+
+		bindGladList($('#fog-battle #list .glad').last());
 	}
-	
-	$('#fog-battle #list .glad').click( function(){
-		var filename = "samples/gladbots/"+ $(this).data('filename') +".c";
-		var code;
-		if ($(this).hasClass('selected')){
-			$(this).removeClass('selected');
-			$('#fog-battle .glad-card-container').html("");
-		}
-		else if ($('#fog-battle #list .glad.selected').length < 4){
-			$(this).addClass('selected');
-			var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-				$('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
-				$('#fog-battle .glad-card-container .glad-preview').html(template);
-				
-				getGladFromFile(filename).then( function(data){
-					//console.log(data);
-					fetchSpritesheet(data.skin).then( function(data){
-						$('#fog-battle .glad-preview .image').html(getSpriteThumb(data,'walk','down'));
-					});
-					$('#fog-battle .glad-preview .info .glad span').html(data.name);
-					$('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
-					$('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
-					$('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
-					code = data.code;
-				});
-				$('#fog-battle .glad-preview .delete').remove();
+	$.post("back_glad.php",{
+		action: "GET",
+	}).done( function(data){
+		data = JSON.parse(data);
+		// console.log(data);
+		for (let i in data){
+			$('#fog-battle #list').append(template);
+			$('#fog-battle #list .glad .name').last().html(data[i].name);
+			$('#fog-battle #list .glad .diff').last().addClass('none');
+			$('#fog-battle #list .glad').last().data('info',data[i]);
 
-				$('#fog-battle .glad-preview .code .button').click( function(){
-					$('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
-					Prism.highlightElement($('code')[0]);
-		
-					$('#code-box #close').click( function(e){
-						$('#fog').remove();
-					});
-		
-				});
-		
-			});
-		}
-
-		
-		if ($('#fog-battle #list .glad.selected').length > 0){
-			var length = $('#fog-battle #list .glad.selected').length;
-			$('#fog-battle #btn-battle').removeAttr('disabled');
-			$('#fog-battle #list-title span').html(length +" selecionados");
-		}
-		else{
-			$('#fog-battle #btn-battle').prop('disabled',true);
-			$('#fog-battle #list-title span').html("");
+			bindGladList($('#fog-battle #list .glad').last());
 		}
 	});
-		
+	
+	function bindGladList(obj){
+		obj.click( function(){
+			var filename = null;
+			if ($(this).data('filename'))
+				filename = "samples/gladbots/"+ $(this).data('filename') +".c";
+
+			var code;
+			if ($(this).hasClass('selected')){
+				$(this).removeClass('selected');
+				$('#fog-battle .glad-card-container').html("");
+			}
+			else if ($('#fog-battle #list .glad.selected').length < 4){
+				$(this).addClass('selected');
+				var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
+					$('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
+					$('#fog-battle .glad-card-container .glad-preview').html(template);
+					
+					if (filename){
+						getGladFromFile(filename).then( function(data){
+							loadCard(data);
+						});
+					}
+					else{
+						loadCard(obj.data('info'));
+					}
+
+					function loadCard(data){
+						//console.log(data);
+						fetchSpritesheet(data.skin).then( function(data){
+							$('#fog-battle .glad-preview .image').html(getSpriteThumb(data,'walk','down'));
+						});
+						$('#fog-battle .glad-preview .info .glad span').html(data.name);
+						$('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
+						$('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
+						$('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
+						code = data.code;
+					}
+
+					$('#fog-battle .glad-preview .delete').remove();
+
+					$('#fog-battle .glad-preview .code .button').click( function(){
+						$('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
+						Prism.highlightElement($('code')[0]);
+			
+						$('#code-box #close').click( function(e){
+							$('#fog').remove();
+						});
+			
+					});
+			
+				});
+			}
+
+			
+			if ($('#fog-battle #list .glad.selected').length > 0){
+				var length = $('#fog-battle #list .glad.selected').length;
+				$('#fog-battle #btn-battle').removeAttr('disabled');
+				$('#fog-battle #list-title span').html(length +" selecionados");
+			}
+			else{
+				$('#fog-battle #btn-battle').prop('disabled',true);
+				$('#fog-battle #list-title span').html("");
+			}
+		});
+	}
+
 	var progbtn;
 	$('#fog-battle #btn-cancel').click( function(){
 		if (progbtn && progbtn.isActive()){
@@ -446,13 +477,22 @@ $(document).ready( function() {
 		var glads = [];
 		var totalGlads = $('#fog-battle #list .glad.selected').length;
 		$('#fog-battle #list .glad.selected').each( function(){
+			var selected = $(this)
 			var name = $(this).find('.name').html();
-			var filename = `samples/gladbots/${sampleGlads[ name ].filename}.c`;
-			getGladFromFile(filename).then( function(data){
-				glads.push(data.code);
+			if (!selected.data('info')){
+				var filename = `samples/gladbots/${sampleGlads[ name ].filename}.c`;
+				getGladFromFile(filename).then( function(data){
+					glads.push(data.code);
+					if (glads.length == totalGlads)
+						loadReady(glads);
+				});
+			}
+			//my own glads
+			else{
+				glads.push(selected.data('info').id);
 				if (glads.length == totalGlads)
 					loadReady(glads);
-			});
+			}
 		});
 
 		function loadReady(glads){

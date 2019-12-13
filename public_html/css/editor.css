@@ -311,6 +311,10 @@ body{
     border-radius: 5px;
 }
 
+#fog-battle #list .diff.none .bar {
+    background-color: transparent;
+}
+
 #fog-battle #list .diff.three .bar {
     background-color: #f44336;
 }
