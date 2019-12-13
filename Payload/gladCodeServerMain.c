@@ -478,7 +478,7 @@ int main(int argc , char *argv[]){
 			f = fopen(name,"r");
 			gettimeofday(&wait_now,NULL);
 			sec_diff = wait_now.tv_sec - wait_start.tv_sec;
-		}while (f == NULL);// && sec_diff < 3);
+		}while (f == NULL && sec_diff < 5);
 		if (f == NULL){
 			endsim = 1;
 			printf("CLIENT TIMEOUT",i);

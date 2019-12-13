@@ -215,12 +215,27 @@ $(document).ready( function() {
 		}
 	});
 
+	var sampleGlads = {
+		'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
+		'Runner': {'difficulty': 1, 'filename': 'Runner'},
+		'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
+		'Arch': {'difficulty': 2, 'filename': 'Arch'},
+		'Patient': {'difficulty': 2, 'filename': 'Patient'},
+		'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
+		'Mage': {'difficulty': 2, 'filename': 'Mage'},
+		'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
+		'Archie': {'difficulty': 3, 'filename': 'Archie'},
+		'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
+		'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
+		'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
+	};
+
 	$('#save').click( function(){
 		if (!$(this).hasClass('disabled')){
 			if (user){
 				setLoadGlad();
 				//console.log(loadGlad);
-				
+
 				if (tested){
 					var action = "INSERT";
 					if (gladid)
@@ -236,6 +251,7 @@ $(document).ready( function() {
 						skin: JSON.stringify(pieces),
 					}).done( function(data){
 						//console.log(data);
+						$('#fog').remove();
 						if (data.search("LIMIT") != -1)
 							showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
 						else if (data == "EXISTS")
@@ -258,12 +274,47 @@ $(document).ready( function() {
 					});
 				}
 				else{
-					showDialog("Você precisar testar o gladiador <span class='highlight'>"+ loadGlad.name +"</span> ao menos uma vez antes de salvá-lo. Deseja fazer isso agora?",["Sim","Não"]).then( function(data){
-						if (data == "Sim"){
-							$('#test').click();
-							wannaSave = true;
-						}
-					});
+					$('body').append(`<div id='fog'>
+						<div id='save-box'>
+							<div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
+							<div id='button-container'><button class='button'>OK</button></div>
+						</div>
+					</div>`);
+
+					var sample = {
+						"Archie": sampleGlads['Archie'],
+						"War Maker": sampleGlads['War Maker'],
+						"Magnus": sampleGlads['Magnus'],
+						"Rouge": sampleGlads['Rouge']
+					};
+
+					var glads = [];
+					for (let i in sample){
+						var filename = `samples/gladbots/${sample[i].filename}.c`;
+						getGladFromFile(filename).then( function(data){
+							glads.push(data.code);
+							if (glads.length == 4)
+								loadReady(glads);
+						});
+					}
+			
+					function loadReady(glads){
+						btnbattle_click($('#save-box button'), glads).then( hash => {
+							// console.log(hash);
+							if (hash !== false){
+								$.post("back_log.php", {
+									action: "DELETE",
+									hash: hash
+								});
+
+								tested = true;
+								$('#save').click();
+							}
+							else{
+								$('#fog').remove();
+							}
+						});
+					}
 				}
 			}
 			else{
@@ -320,20 +371,6 @@ $(document).ready( function() {
 		}
 	});
 
-	var sampleGlads = {
-		'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
-		'Runner': {'difficulty': 1, 'filename': 'Runner'},
-		'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
-		'Arch': {'difficulty': 2, 'filename': 'Arch'},
-		'Patient': {'difficulty': 2, 'filename': 'Patient'},
-		'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
-		'Mage': {'difficulty': 2, 'filename': 'Mage'},
-		'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
-		'Archie': {'difficulty': 3, 'filename': 'Archie'},
-		'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
-		'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
-		'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
-	};
 	var num = ["","one","two","three"];
 	var template = "<div class='glad'><div class='name'></div><div class='diff'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div></div>";
 	for (var i in sampleGlads){
@@ -406,65 +443,70 @@ $(document).ready( function() {
 	});
 
 	$('#fog-battle #btn-battle').click( function(){
-		//$('#fog-battle #btn-cancel').prop('disabled',true);
-		progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
 		var glads = [];
-		var gladsReady = 0;
-		$.each( $('#fog-battle #list .glad.selected'), function(){
-			var filename = "samples/gladbots/"+ sampleGlads[ $(this).find('.name').html() ].filename +".c";
+		var totalGlads = $('#fog-battle #list .glad.selected').length;
+		$('#fog-battle #list .glad.selected').each( function(){
+			var name = $(this).find('.name').html();
+			var filename = `samples/gladbots/${sampleGlads[ name ].filename}.c`;
 			getGladFromFile(filename).then( function(data){
 				glads.push(data.code);
-				gladsReady++;
+				if (glads.length == totalGlads)
+					loadReady(glads);
 			});
 		});
 
-		var waitGlad = setInterval( function(){
-			if (gladsReady == $('#fog-battle #list .glad.selected').length){
-				glads.push(loadGlad.code);
-
-				clearInterval(waitGlad);
-				runSimulation({
-					glads: glads,
-					savecode: true,
-					single: true,
-				}).then( function(data){
-					//console.log(data);
-					if (data == "ERROR"){
-						progbtn.kill();
-						//$('#fog-battle #btn-cancel').removeAttr('disabled');
-						$('#fog-battle').hide();
-					}
+		function loadReady(glads){
+			btnbattle_click($('#fog-battle #btn-battle'), glads).then( hash => {
+				showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
+					if (data == "Sim")
+						window.open("play/"+ hash);
 					else{
-						var hash = data;
-						showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
-							if (data == "Sim")
-								window.open("play/"+ hash);
-							else{
-								$.post("back_log.php", {
-									action: "DELETE",
-									hash: hash
-								});
-							}
-							if (wannaSave){
-								showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
-									if (data == "Sim")
-										$('#save').click();
-								});
-								wannaSave = false;
-							}
-							if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
-								showTutorial();
+						$.post("back_log.php", {
+							action: "DELETE",
+							hash: hash
 						});
-						tested = true;
-						progbtn.kill();
-						//$('#fog-battle #btn-cancel').removeAttr('disabled');
-						$('#fog-battle').hide();
 					}
+					if (wannaSave){
+						showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
+							if (data == "Sim")
+								$('#save').click();
+						});
+						wannaSave = false;
+					}
+					if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
+						showTutorial();
 				});
-			}
-			
-		}, 10);
+				progbtn.kill();
+				//$('#fog-battle #btn-cancel').removeAttr('disabled');
+				$('#fog-battle').hide();
+			});
+		}
 	});
+
+	async function btnbattle_click(btn, glads){
+		progbtn = new progressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
+
+		glads.push(loadGlad.code);
+
+		return new Promise( (resolve, reject) => {
+			runSimulation({
+				glads: glads,
+				savecode: true,
+				single: true,
+			}).then( function(data){
+				// console.log(data);
+				if (data == "ERROR"){
+					//$('#fog-battle #btn-cancel').removeAttr('disabled');
+					$('#fog-battle').hide();
+					resolve(false);
+				}
+				else{
+					resolve(data);
+				}
+				progbtn.kill();
+			});
+		});
+	}
 
 	$('#download').click( function(){
 		if (!$(this).hasClass('disabled')){
