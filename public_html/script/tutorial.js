@@ -1,4 +1,4 @@
-tutoState = 23;
+// tutoState = 23;
 function showTutorial(){
 	if (tutoState == 0){
 		showDialog("Olá. Como você é novo aqui, eu gostaria de lhe ensinar alguns conceitos básicos sobre programação de gladiadores. Você aceita?",["Nunca","Agora não","SIM"]).then( function(data){

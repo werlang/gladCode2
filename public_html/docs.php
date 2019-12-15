@@ -369,7 +369,32 @@
 						</tr>
 					</tbody>
 				</table>
+
+				<h2 id='nav-test'>Funções de teste</h2>
 				
+				<p>As funções de teste servem para testar situações de combate específicas, e elas podem ser usadas <b>somente dentro do editor</b>, e nas batalhas de teste. O código de um gladiador não pode ser salvo enquanto possuir alguma destas funções.</p>
+			
+				<table class='table t-funcs'>
+					<tbody>
+						<tr>
+							<td><a href='function/setposition'>setPosition</a></td>
+							<td>Posiciona o gladiador em um ponto da arena.</td>
+						</tr>
+						<tr>
+							<td><a href='function/sethp'>setHp</a></td>
+							<td>Modifica os pontos de vida do gladiador.</td>
+						</tr>
+						<tr>
+							<td><a href='function/setap'>setAp</a></td>
+							<td>Modifica os pontos de habilidade do gladiador.</td>
+						</tr>
+						<tr>
+							<td><a href='function/lvlup'>lvlUp</a></td>
+							<td>Faz com que o gladiador ganhe níveis.</td>
+						</tr>
+					</tbody>
+				</table>
+
 			</div>
 			<div id='ads'>
 			</div>

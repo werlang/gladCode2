@@ -212,6 +212,17 @@
 					$codes[count($codes)-1] = $oldcode;
 				}
 
+				// remove banned functions
+				$banned = json_decode(file_get_contents("banned_functions.json"), true)['functions'];
+
+				$code = $codes[count($codes) - 1];
+				foreach($banned as $function){
+					$pattern = '/'. $function .'.*/';
+					$code = preg_replace($pattern, "", $code);
+				}
+				$codes[count($codes) - 1] = $code;
+
+				// save code on session
 				$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
 				//echo $_SESSION['code'];
 			}

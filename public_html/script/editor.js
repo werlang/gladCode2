@@ -236,86 +236,96 @@ $(document).ready( function() {
 				setLoadGlad();
 				//console.log(loadGlad);
 
-				if (tested){
-					var action = "INSERT";
-					if (gladid)
-						action = "UPDATE";
-					var nome = $('#distribuicao #nome').val();
-					$.post( "back_glad.php", {
-						action: action,
-						id: gladid,
-						nome: nome,
-						vstr: $('#float-card .glad-preview .info .attr .str span').html(),
-						vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
-						vint: $('#float-card .glad-preview .info .attr .int span').html(),
-						skin: JSON.stringify(pieces),
-					}).done( function(data){
-						//console.log(data);
-						$('#fog').remove();
-						if (data.search("LIMIT") != -1)
-							showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
-						else if (data == "EXISTS")
-							showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
-						else if (data == "INVALID")
-							showMessage("CHEATER");
-						else if (data.search("ID") != -1){
-							gladid = JSON.parse(data).ID;
-							if (action == "INSERT"){
-								showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
-									if (data == "Sim")
-										window.open('battle')
-								});
-							}
-							else{
-								showMessage("Gladiador <span class='highlight'>"+ nome +"</span> gravado");
-							}
-							saved = true;
+				getBannedFunctions(editor.getValue()).then( function(banned){
+					if (banned.length){
+						var msg = "Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:";
+						for (let i in banned){
+							msg += `<li><b>${banned[i]}</b></li>`;
 						}
-					});
-				}
-				else{
-					$('body').append(`<div id='fog'>
-						<div id='save-box'>
-							<div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
-							<div id='button-container'><button class='button'>OK</button></div>
-						</div>
-					</div>`);
-
-					var sample = {
-						"Archie": sampleGlads['Archie'],
-						"War Maker": sampleGlads['War Maker'],
-						"Magnus": sampleGlads['Magnus'],
-						"Rouge": sampleGlads['Rouge']
-					};
-
-					var glads = [];
-					for (let i in sample){
-						var filename = `samples/gladbots/${sample[i].filename}.c`;
-						getGladFromFile(filename).then( function(data){
-							glads.push(data.code);
-							if (glads.length == 4)
-								loadReady(glads);
-						});
+						msg += "</ul>"
+						showMessage(msg);
 					}
-			
-					function loadReady(glads){
-						btnbattle_click($('#save-box button'), glads).then( hash => {
-							// console.log(hash);
-							if (hash !== false){
-								$.post("back_log.php", {
-									action: "DELETE",
-									hash: hash
-								});
-
-								tested = true;
-								$('#save').click();
-							}
-							else{
-								$('#fog').remove();
+					else if (tested){
+						var action = "INSERT";
+						if (gladid)
+							action = "UPDATE";
+						var nome = $('#distribuicao #nome').val();
+						$.post( "back_glad.php", {
+							action: action,
+							id: gladid,
+							nome: nome,
+							vstr: $('#float-card .glad-preview .info .attr .str span').html(),
+							vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
+							vint: $('#float-card .glad-preview .info .attr .int span').html(),
+							skin: JSON.stringify(pieces),
+						}).done( function(data){
+							//console.log(data);
+							$('#fog').remove();
+							if (data.search("LIMIT") != -1)
+								showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
+							else if (data == "EXISTS")
+								showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
+							else if (data == "INVALID")
+								showMessage("CHEATER");
+							else if (data.search("ID") != -1){
+								gladid = JSON.parse(data).ID;
+								if (action == "INSERT"){
+									showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
+										if (data == "Sim")
+											window.open('battle')
+									});
+								}
+								else{
+									showMessage("Gladiador <span class='highlight'>"+ nome +"</span> gravado");
+								}
+								saved = true;
 							}
 						});
 					}
-				}
+					else{
+						$('body').append(`<div id='fog'>
+							<div id='save-box'>
+								<div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
+								<div id='button-container'><button class='button'>OK</button></div>
+							</div>
+						</div>`);
+	
+						var sample = {
+							"Archie": sampleGlads['Archie'],
+							"War Maker": sampleGlads['War Maker'],
+							"Magnus": sampleGlads['Magnus'],
+							"Rouge": sampleGlads['Rouge']
+						};
+	
+						var glads = [];
+						for (let i in sample){
+							var filename = `samples/gladbots/${sample[i].filename}.c`;
+							getGladFromFile(filename).then( function(data){
+								glads.push(data.code);
+								if (glads.length == 4)
+									loadReady(glads);
+							});
+						}
+				
+						function loadReady(glads){
+							btnbattle_click($('#save-box button'), glads).then( hash => {
+								// console.log(hash);
+								if (hash !== false){
+									$.post("back_log.php", {
+										action: "DELETE",
+										hash: hash
+									});
+	
+									tested = true;
+									$('#save').click();
+								}
+								else{
+									$('#fog').remove();
+								}
+							});
+						}
+					}
+				});
 			}
 			else{
 				showDialog("Você precisa fazer LOGIN no sistema para salvar seu gladiador",["Cancelar","LOGIN"]).then( function(data){
@@ -1696,3 +1706,17 @@ window.onbeforeunload = function() {
 	else
     	return true;
 };
+
+async function getBannedFunctions(code){
+	return new Promise( (resolve, reject) => {
+		$.getJSON("banned_functions.json", function(banned){
+			banned = banned.functions;
+			var found = [];
+			for (let i in banned){
+				if (code.indexOf(banned[i]) != -1)
+					found.push(banned[i]);
+			}
+			resolve(found);
+		});
+	});
+}
