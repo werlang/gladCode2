@@ -497,34 +497,43 @@ $(document).ready( function() {
 
 		function loadReady(glads){
 			btnbattle_click($('#fog-battle #btn-battle'), glads).then( hash => {
-				showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
-					if (data == "Sim")
-						window.open("play/"+ hash);
-					else{
-						$.post("back_log.php", {
-							action: "DELETE",
-							hash: hash
-						});
-					}
-					if (wannaSave){
-						showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
-							if (data == "Sim")
-								$('#save').click();
-						});
-						wannaSave = false;
-					}
-					if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
-						showTutorial();
-				});
-				progbtn.kill();
-				//$('#fog-battle #btn-cancel').removeAttr('disabled');
-				$('#fog-battle').hide();
+				if (hash !== false){
+					showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
+						if (data == "Sim")
+							window.open("play/"+ hash);
+						else{
+							$.post("back_log.php", {
+								action: "DELETE",
+								hash: hash
+							});
+						}
+						if (wannaSave){
+							showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
+								if (data == "Sim")
+									$('#save').click();
+							});
+							wannaSave = false;
+						}
+						if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
+							showTutorial();
+					});
+					progbtn.kill();
+					//$('#fog-battle #btn-cancel').removeAttr('disabled');
+					$('#fog-battle').hide();
+				}
 			});
 		}
 	});
 
 	async function btnbattle_click(btn, glads){
 		progbtn = new progressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
+
+		var breakpoints = [];
+		$('.ace_breakpoint').each( function() {
+			breakpoints.push($(this).text());
+		});
+		if (!breakpoints.length)
+			breakpoints = false;
 
 		glads.push(loadGlad.code);
 
@@ -533,6 +542,7 @@ $(document).ready( function() {
 				glads: glads,
 				savecode: true,
 				single: true,
+				breakpoints: breakpoints
 			}).then( function(data){
 				// console.log(data);
 				if (data == "ERROR"){
@@ -724,6 +734,79 @@ $(document).ready( function() {
 		
 	});
 	
+	editor.on("guttermousedown", function(e) {
+		var target = e.domEvent.target;
+
+		if (e.domEvent.button != 0) //left mouse button
+			return;
+		
+		if (target.className.indexOf("ace_gutter-cell") == -1){
+			return;
+		}
+	
+		if (!editor.isFocused()){
+			return; 
+		}
+	
+		var breakpoints = e.editor.session.getBreakpoints(row, 0);
+		var row = e.getDocumentPosition().row;
+	
+		var Range = require('ace/range').Range;
+
+		// If there's a breakpoint already defined, it should be removed, offering the toggle feature
+		if(typeof breakpoints[row] === typeof undefined){
+			var brackets = 0;
+			for (let i=0 ; i < editor.session.getLength() ; i++){				
+				var line = editor.session.getLine(i);
+				var ln = parseInt($(target).text()) - 1;
+
+				if (i == ln){
+					var rowdif = row;
+					if (editor.session.getLine(ln).indexOf("else") != -1){
+						rowdif = row + 1;
+					}
+
+					if (brackets == 0){
+						showMessage("Breakpoints só podem ser inseridos dentro de funções");
+					}
+					else{
+						e.editor.session.setBreakpoint(rowdif);
+
+						var marker = editor.session.getMarkers();
+						var marked = false;
+						for (let i in marker){
+							if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
+								marked = true;
+							}
+						}
+						if (!marked)
+							editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
+					}
+	
+				}
+
+				if (line.indexOf("{") != -1)
+					brackets++;
+				if (line.indexOf("}") != -1)
+					brackets--;
+			}
+
+		}else{
+			e.editor.session.clearBreakpoint(row);
+
+			var marker = editor.session.getMarkers();
+			for (let i in marker){
+				if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
+					editor.session.removeMarker(marker[i].id);
+				}
+			}
+		}
+
+		e.stop();
+	});
+
+	editor.on("guttermouseup", function(e) {
+	});
 });
 
 function setLoadGlad(){
