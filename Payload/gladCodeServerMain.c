@@ -392,6 +392,27 @@ void *connection_handler(void *p){
 				breakpoint(gladid, m);
 				sprintf(reply, "done");
 			}
+			else if (strcmp(func->call,"setPosition")==0){
+				float x = func->arg[0].toFloat;
+				float y = func->arg[1].toFloat;
+				setPositionSB(gladid, x, y);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"setHp")==0){
+				float hp = func->arg[0].toFloat;
+				setHpSB(gladid, hp);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"setAp")==0){
+				float ap = func->arg[0].toFloat;
+				setApSB(gladid, ap);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"lvlUp")==0){
+				int n = func->arg[0].toInt;
+				lvlUpSB(gladid, n);
+				sprintf(reply, "done");
+			}
 			else if (strcmp(func->call,"endSocketComm")==0){
 				endcomm = 1;
 				sprintf(reply, "done");

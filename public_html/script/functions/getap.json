@@ -1,6 +1,6 @@
 {
 	"name": "getAp",
-	"ptname": "pegaPa",
+	"ptname": "pegaPh",
 	"syntax": "float getAp ( void );",
 	"description": {
 		"long": "Retorna a quantidade de pontos de habilidade restantes do gladiador.",

@@ -177,7 +177,7 @@
 							<td>Retorna os pontos de vida do gladiador.</td>
 						</tr>
 						<tr>
-							<td><a href='funcao/getap'>pegaPa</a></td>
+							<td><a href='funcao/getap'>pegaPh</a></td>
 							<td>Retorna os pontos de habilidade do gladiador.</td>
 						</tr>
 						<tr>
@@ -367,7 +367,31 @@
 						</tr>
 					</tbody>
 				</table>
+
+				<h2 id='nav-test'>Funções de teste</h2>
 				
+				<p>As funções de teste servem para testar situações de combate específicas, e elas podem ser usadas <b>somente dentro do editor</b>, e nas batalhas de teste. O código de um gladiador não pode ser salvo enquanto possuir alguma destas funções.</p>
+			
+				<table class='table t-funcs'>
+					<tbody>
+						<tr>
+							<td><a href='funcao/setposition'>mudaPosicao</a></td>
+							<td>Posiciona o gladiador em um ponto da arena.</td>
+						</tr>
+						<tr>
+							<td><a href='funcao/sethp'>mudaPv</a></td>
+							<td>Modifica os pontos de vida do gladiador.</td>
+						</tr>
+						<tr>
+							<td><a href='funcao/setap'>mudaPh</a></td>
+							<td>Modifica os pontos de habilidade do gladiador.</td>
+						</tr>
+						<tr>
+							<td><a href='funcao/lvlup'>sobeNivel</a></td>
+							<td>Faz com que o gladiador ganhe níveis.</td>
+						</tr>
+					</tbody>
+				</table>				
 			</div>
 			<div id='footer'></div>
 		</div>

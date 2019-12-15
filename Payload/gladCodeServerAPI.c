@@ -1129,3 +1129,29 @@ void breakpoint(int gladid, char *message){
 	(g+gladid)->msgtime = timeInterval;
 	(g+gladid)->msgtype = MSG_BREAKPOINT;
 }
+
+// altera a posição do gladiador (sandbox)
+void setPositionSB(int gladid, float x, float y){
+	(g+gladid)->x = x;
+	(g+gladid)->y = y;
+}
+
+// muda o hp do gladiador (sandbox)
+void setHpSB(int gladid, float hp){
+	(g+gladid)->hp = hp;
+	if ((g+gladid)->hp > (g+gladid)->maxhp)
+		(g+gladid)->hp = (g+gladid)->maxhp;
+}
+
+// muda o ap do gladiador (sandbox)
+void setApSB(int gladid, float ap){
+	(g+gladid)->ap = ap;
+	if ((g+gladid)->ap > (g+gladid)->maxap)
+		(g+gladid)->ap = (g+gladid)->maxap;
+}
+
+// faz o gladiador subir de nivel (sandbox)
+void lvlUpSB(int gladid, int n){
+	(g+gladid)->up += POINTS_LVL_UP * n;
+	(g+gladid)->lvl += n;
+}

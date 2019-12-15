@@ -542,3 +542,27 @@ void breakpoint(char *message){
 	sprintf(m, "breakpoint %s", message);
 	sendMessage(m, r);
 }
+
+void setPosition(float x, float y){
+	char message[50], response[10];
+	sprintf(message, "setPosition %f %f", x, y);
+	sendMessage(message,response);
+}
+
+void setHp(float hp){
+	char message[50], response[10];
+	sprintf(message, "setHp %f", hp);
+	sendMessage(message,response);
+}
+
+void setAp(float ap){
+	char message[50], response[10];
+	sprintf(message, "setAp %f", ap);
+	sendMessage(message,response);
+}
+
+void lvlUp(int n){
+	char message[50], response[10];
+	sprintf(message, "lvlUp %i", n);
+	sendMessage(message,response);
+}
