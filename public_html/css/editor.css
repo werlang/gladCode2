@@ -636,3 +636,11 @@ body #fog {
 	position:absolute;
   	z-index:20;
 }
+
+.ace_gutter-cell.transition {
+	transition: 0.5s background;
+}
+
+.ace_gutter-cell.red {
+	background-color: red;
+}

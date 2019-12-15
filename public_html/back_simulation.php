@@ -139,15 +139,13 @@
 		//insert breakpoint line
 		foreach ($breakpoints as $ln){
 			$line = $ln - 1 + $setup;
-			$hint = preg_replace('/\s*(.*?)[{};]{0,1}\n/', "$1", $code[$line]);
+			$hint = preg_replace('/\s*(.*?)[{};]*/', "$1", $code[$line]);
 			$code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
 			$code = preg_replace($pattern, $replacement, $code);
 				
 		}
 		$code = implode(PHP_EOL, $code);
 		$codes[count($codes) - 1] = $code;
-
-		$output['code'] = $code;
 	}
 
 
