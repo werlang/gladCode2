@@ -28,9 +28,11 @@
 #dialog-box #message {
 	margin: 10px 0px;
 	cursor: default;
+	text-align: justify;
 }
 
-#dialog-box #message .highlight {
+#dialog-box #message .highlight,
+#dialog-box #message b {
 	color: #00638d;
     font-weight: bold;
 }

@@ -514,7 +514,9 @@ $(document).ready( function() {
 							});
 							wannaSave = false;
 						}
-						if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
+						
+						var states = [4, 5, 6, 8, 11, 13, 15, 17, 19, 21, 23, 24];
+						if (states.indexOf(tutoState) != -1)
 							showTutorial();
 					});
 					progbtn.kill();
