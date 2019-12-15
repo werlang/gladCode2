@@ -1113,9 +1113,19 @@ void speak(int gladid, char *message){
 
 	(g+gladid)->message[249] = '\0';
 	(g+gladid)->msgtime = 3;
+	(g+gladid)->msgtype = MSG_SPEAK;
 }
 
 //retorna o nível do gladiador
 int getLvl(int gladid){
 	return (g+gladid)->lvl;
+}
+
+//envia uma fala do tipo breakpoint, para o render interpretar como uma pausa
+void breakpoint(int gladid, char *message){
+	strncpy((g+gladid)->message, message, 250);
+
+	(g+gladid)->message[249] = '\0';
+	(g+gladid)->msgtime = timeInterval;
+	(g+gladid)->msgtype = MSG_BREAKPOINT;
 }

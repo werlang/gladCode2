@@ -612,3 +612,27 @@ body #fog {
     transition: all 0.3s;
     cursor: pointer;
 } 
+
+.ace_gutter-cell.ace_breakpoint{ 
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+	color: transparent;
+	background-color: #ff000014;
+}
+
+.ace_gutter-cell.ace_breakpoint:before{
+	content: '';
+    background-color: red;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    border-radius: 100%;
+	box-shadow: 0px 0px 3px red;
+}
+
+.line-breakpoint {
+	background-color: #ff000014;
+	position:absolute;
+  	z-index:20;
+}

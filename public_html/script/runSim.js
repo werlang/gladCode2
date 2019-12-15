@@ -4,36 +4,15 @@
 
 var ajaxcall;
 
-function runSimulation(params) {
+function runSimulation(args) {
 	if (ajaxcall)
 		ajaxcall.abort();
-	var glads = params.glads;
-	var savecode = params.savecode;
-	var single = params.single;
-	var ranked = params.ranked;
-	var duel = params.duel;
-	var tournament = params.tournament;
-
-	if (!single)
-		single = false;
-	if (!savecode)
-		savecode = false;
-	if (!ranked)
-		ranked = false;
-	if (!duel)
-		duel = false;
-	if (!tournament)
-		tournament = false;
-
+	var glads = args.glads;
+	
 	//console.log(glads);
 	var response = $.Deferred();
 	ajaxcall = $.post("back_simulation.php", {
-		glads: JSON.stringify(glads),
-		savecode: savecode,
-		single: single,
-		ranked: ranked,
-		duel: duel,
-		tournament: tournament
+		args: JSON.stringify(args),
 	})
 	.done(function(data){
 		// console.log(data);

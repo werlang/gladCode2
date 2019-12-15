@@ -847,32 +847,6 @@ body{
 	border-radius: 7px 7px 0px 7px;
 }
 
-/*
-.bar-container {
-    width: 30px;
-    height: 9px;
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    background-color: #00000020;
-}
-
-.bar-container .ap,
-.bar-container .hp {
-    width: 100%;
-    transition: 0.3s all;
-}
-
-.bar-container .hp {
-    background-color: #ff00006a;
-    height: 5px;
-}
-
-.bar-container .ap {
-    background-color: #0000ff6a;
-    height: 4px;
-}
-*/
 .blue-window {
     max-width: 600px;
     max-height: 99vh;
@@ -1051,4 +1025,31 @@ body{
 
 body .ui-tooltip {
     font-size: 1.6rem;
+}
+
+.breakpoint {
+    position: absolute;
+    border-radius: 100%;
+    background-color: red;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    box-shadow: 0px 0px 3px red;
+    font-size: 0;
+}
+
+.breakpoint.expanded {
+	padding: 1px 5px;
+	border-radius: 7px;
+	border: 2px solid #ff6464;
+	background-color: #ff8a8aab;
+	font-family: 'Source Code Pro', monospace;
+	font-size: 1.4em;
+	cursor: default;
+	word-break: break-all;
+    overflow: hidden;
+    pointer-events: none;
+    width: auto;
+    height: auto;
+    transition: 0.5s all, 0s border-radius;
 }

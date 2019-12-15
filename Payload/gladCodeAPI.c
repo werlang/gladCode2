@@ -537,3 +537,8 @@ int getLvl(){
 	return atoi(r);
 }
 
+void breakpoint(char *message){
+	char m[256], r[10];
+	sprintf(m, "breakpoint %s", message);
+	sendMessage(m, r);
+}

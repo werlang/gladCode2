@@ -476,7 +476,8 @@ function update() {
 				sprite[i].y = arenaY1 + y * arenaRate;
 
 				showMessageBaloon(i);
-                showHpApBars(i);
+				showHpApBars(i);
+				showBreakpoint(i);
 
 				//lvlup
 				if (level != gladArray[i].level){
@@ -1197,6 +1198,46 @@ function showMessageBaloon(gladid){
 		});
 	}
 	
+}
+
+function showBreakpoint(gladid){
+	if (json.glads[gladid].breakpoint && json.glads[gladid].hp > 0){
+		if (!pausesim)
+			$('#pause').click();
+
+		var gpos = getGladPositionOnCanvas(gladid);
+		var bp = json.glads[gladid].breakpoint;
+
+		if ($(`.breakpoint.glad-${gladid}`).length)
+			$('.breakpoint.glad-'+ gladid).remove();
+		$('#canvas-div').append(`<div class='breakpoint glad-${gladid}' title='Expandir breakpoint'>${bp}</div>`);
+
+		var baloon = $('.breakpoint.glad-'+ gladid);
+		baloon.hide().fadeIn();
+
+		var x = gpos.x - 7.5;
+		var y = gpos.y - 25 * game.camera.scale.y - baloon.outerHeight();
+		baloon.css({'top': y, 'left': x});
+		if (baloon.width() < 200 && baloon.height() >= 50){
+			baloon.css({'left': x-230});
+			baloon.addClass('left');
+		}
+		else if (baloon.hasClass('left'))
+            baloon.removeClass('left');
+            
+		gladArray[gladid].breakpoint = true;
+		
+		baloon.click( () => {
+			if (!baloon.hasClass('expanded'))
+				baloon.addClass('expanded').removeAttr('title');
+		});
+	}
+	else if (gladArray[gladid].breakpoint && !pausesim){
+		gladArray[gladid].breakpoint = false;
+		$('.breakpoint.glad-'+ gladid).fadeOut(function(){
+            $(this).remove();
+		});
+	}
 }
 
 function initBars(){

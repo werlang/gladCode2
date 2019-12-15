@@ -387,6 +387,11 @@ void *connection_handler(void *p){
 				int r = getLvl(gladid);
 				sprintf(reply, "%i", r);
 			}
+			else if (strcmp(func->call,"breakpoint")==0){
+				char *m = func->arg[0].toLongStr;
+				breakpoint(gladid, m);
+				sprintf(reply, "done");
+			}
 			else if (strcmp(func->call,"endSocketComm")==0){
 				endcomm = 1;
 				sprintf(reply, "done");

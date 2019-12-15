@@ -452,8 +452,12 @@ void recordSteps(){
 			if ( (g+i)->action != (go+i)->action )
 				sprintf(buffer, "%s\"action\":%i,", buffer, (g+i)->action);
 
-			if ( strcmp((g+i)->message, (go+i)->message) != 0 )
-				sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
+			if ( strcmp((g+i)->message, (go+i)->message) != 0){
+				if ((g+i)->msgtype == MSG_SPEAK)
+					sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
+				else if ((g+i)->msgtype == MSG_BREAKPOINT)
+					sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, (g+i)->message);
+			}
 
 			sprintf(buffs, "\"buffs\":{");
 			
@@ -806,6 +810,8 @@ void registerGlad(int gladid){
     (g+gladid)->action = ACTION_NONE; //action inicial do gladiador
     strcpy((g+gladid)->message, "");
 	(g+gladid)->msgtime = 0;
+	(g+gladid)->msgtype = MSG_SPEAK;
+
     int i;
     for (i=0 ; i<N_BUFFS ; i++){ //zera todos buffs
         (g+gladid)->buffs[i].timeleft = 0;
