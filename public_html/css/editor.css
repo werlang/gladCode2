@@ -31,8 +31,19 @@ body{
 	display: inline;
 }
 
-#panel-left.hidden img {
+#panel-left.hidden img,
+#panel-left.hidden i {
 	display: none;
+}
+
+#panel-left i {
+	font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    color: white;
 }
 
 #editor {

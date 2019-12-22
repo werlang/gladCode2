@@ -256,8 +256,8 @@ $(document).ready( function() {
 				<h2>Teclas de atalho</h2>
 				<div class='table'>
 					<div class='row'>
-						<div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div><
-					/div>
+						<div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
+					</div>
 					<div class='row'>
 						<div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
 					</div>
@@ -623,7 +623,7 @@ function start_timer(steps){
 					name = "Empate";
 					team = "";
 				}
-				$('body').append("<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>"+ name +"</span><span id='team'>"+ team +"</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><img src='icon/share.png'></button></div></div></div>");
+				$('body').append(`<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>${name}</span><span id='team'>${team}</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button></div></div></div>`);
 				$('#end-message #retornar').click( function() {
 					show_final_score = false;
 					$('#fog').remove();
@@ -636,13 +636,13 @@ function start_timer(steps){
 
 					var link = "gladcode.tk/play/"+ loghash;
 
-					var twitter = "<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://"+ link +"&hashtags=gladcode' target='_blank'><img src='icon/twitter.png'></a>";
+					var twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
 
-					var facebook = "<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u="+ link +"' target='_blank'><img src='icon/facebook.png'></a>";
+					var facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
 
-					var whatsapp = "<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a"+ link +"%0a%23gladcode' target='_blank'><img src='icon/whatsapp.png'></a>";
+					var whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
 
-					$('#fog').append("<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>"+ loghash +"</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><img src='icon/link.png'></div>"+ twitter + facebook + whatsapp +"</div><button id='close' class='button'>OK</button></div>");
+					$('#fog').append(`<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>${loghash}</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>${twitter + facebook + whatsapp}</div><button id='close' class='button'>OK</button></div>`);
 					
 					$('#url #social #getlink').click( function(){
 						copyToClipboard(link);

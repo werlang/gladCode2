@@ -22,8 +22,7 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Torneio</title>
 	<link href="https://fonts.googleapis.com/css?family=Orbitron|Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
 	<link rel='stylesheet' href='css/prism.css'/> 
 	<link rel='stylesheet' href='css/dialog.css'/> 
@@ -35,6 +34,8 @@
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
+
 	<script src="script/prism.js"></script>
 	<script src="script/assets.js"></script>
 	<script src="script/glad-card.js"></script>
