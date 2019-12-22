@@ -818,6 +818,7 @@ function update() {
 		if (game.camera.target){
 			$('.ui-glad').removeClass('follow');
 			game.camera.unfollow();
+			$('#details').remove();
 		}
 		game.camera.view.y -= game.input.speed.y;
 		game.camera.view.x -= game.input.speed.x;
@@ -1036,7 +1037,10 @@ function update_ui(json){
                 uiVars[i].poison = false;
                 $('.buff-poison').eq(i).removeClass('active');
 			}
-        }
+		}
+		
+		if ($('.ui-glad.follow').length)
+			updateDetailedWindow();
     }
 }
 
