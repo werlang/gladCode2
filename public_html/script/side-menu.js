@@ -14,7 +14,7 @@ $(document).ready( function(){
     });
 
     $('#side-menu').load("side-menu.html", function(){
-		var icon = "<i class='material-icons'>arrow_forward_ios</i>";
+		var icon = "<i class='fas fa-chevron-right'></i>";
 		$('#side-menu li').each( function(){
 			if ($(this).next('ul').length != 0)
 				$(this).prepend(icon);

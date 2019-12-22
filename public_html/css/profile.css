@@ -1028,10 +1028,12 @@ body {
 	align-items: center;
 }
 
-#ranking-container #search i.material-icons{
+#ranking-container #search i{
     margin-right: -44px;
     margin-left: 20px;
-    z-index: 1;
+	z-index: 1;
+	color: white;
+	font-size: 20px;
 }
 
 #ranking-container #search .input{
@@ -1603,10 +1605,15 @@ body {
     border-radius: 100%;
     padding: 2px;
     box-sizing: border-box;
-    font-size: 40px;
-	transition: 0.3s all;
-	box-shadow: 0px 0px 5px #00000070;
-	cursor: pointer;
+    font-size: 35px;
+    transition: 0.3s all;
+    box-shadow: 0px 0px 5px #00000070;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #pre-battle-show.complete #tips #view:hover {
@@ -1757,22 +1764,6 @@ body {
 	flex-grow: 0;
 }
 
-/* Rules for sizing the icon. */
-.material-icons.md-18 { font-size: 18px; }
-.material-icons.md-24 { font-size: 24px; }
-.material-icons.md-36 { font-size: 36px; }
-.material-icons.md-48 { font-size: 48px; }
-
-/* Rules for using icons as black on a light background. */
-.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
-.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
-
-/* Rules for using icons as white on a dark background. */
-.material-icons.md-light { color: rgba(255, 255, 255, 1); }
-.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
-
-.material-icons.md-green { color: rgb(0, 170, 0); }
-
 #duel.wrapper #table-friends {
 	margin-top: 15px;
 }
@@ -1852,7 +1843,7 @@ body {
     height: 30px;
     line-height: 0;
     font-family: 'Acme', sans-serif;
-    font-size: 2em;
+    font-size: 1.1em;
     color: #1e86d8;
     margin-left: 10px;
     padding: 0;
@@ -1902,6 +1893,10 @@ body {
 #tourn.wrapper .table .cell:nth-child(4) {
 	max-width: 30px;
 	text-align: center;
+}
+
+#tourn.wrapper i.flex {
+	color: rgb(0, 170, 0);
 }
 
 .tourn-box {
@@ -2194,8 +2189,11 @@ body {
 
 .input-button {
 	display: flex;
+	align-items: center;
 	transition: 0.3s all;
 	width: 100%;
+	background-color: #00638d;
+	border-radius: 3px;;
 }
 
 .input-button input {
@@ -2205,15 +2203,19 @@ body {
     box-sizing: border-box;
     border-width: 2px 0px 2px 2px;
     border-radius: 3px 0px 0px 3px;
-    padding: 0px 10px;
+    padding: 5px 10px;
     font-family: 'Roboto', sans-serif;
 	color: #616161;
 	flex-grow: 1;
 	font-size: 1em;
 }
 
+.input-button:hover {
+	background-color: #1e86d8;
+}
+
 .input-button button {
-	background-color: #00638d;
+	background-color: transparent;
     border: none;
     outline: none;
     box-sizing: border-box;
@@ -2222,14 +2224,11 @@ body {
     padding: 2px 5px;
 	cursor: pointer;
 	display: flex;
+	font-size: 25px;
 }
 
 .input-button:hover input {
 	border-color: #1e86d8;
-}
-
-.input-button:hover button {
-	background-color: #1e86d8;
 }
 
 .input-button button i {
@@ -2275,7 +2274,7 @@ body {
 }
 
 #bhist-container .cell.favorite i {
-	font-size: 25px;
+	font-size: 20px;
 	cursor: pointer;
     transition: 0.3s all;
 }
@@ -2348,7 +2347,7 @@ body {
 }
 
 #panel .post .share i{
-    font-size: 30px;
+    font-size: 25px;
     text-align: center;
 }
 

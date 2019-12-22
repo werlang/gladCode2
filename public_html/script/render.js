@@ -193,7 +193,8 @@ function create() {
 	victory = game.add.audio('victory');
 
 	window.addEventListener("wheel", event => {
-		zoomWheel({deltaY: event.deltaY});
+		if ($(event.path[0]).parents('#canvas-div').length)
+			zoomWheel({deltaY: event.deltaY});
 	});
 
 	

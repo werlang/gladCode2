@@ -7,8 +7,6 @@
 	<title>gladCode - Estatísticas</title>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
 	<link rel='stylesheet' href="css/side-menu.css"/>
 	<link rel='stylesheet' href="css/table.css"/>
 	<link rel='stylesheet' href="css/stats.css"/>
@@ -17,7 +15,8 @@
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
+
 	<script src="script/stats.js"></script>
 	<script src="script/stats_func.js"></script>
 	<script src="script/side-menu.js"></script>
@@ -47,9 +46,9 @@
 					<thead>
 						<tr>
 							<th>Habilidade</th>
-							<th><span>Utilizado</span><i class='material-icons info' title='Percentual de batalhas que a habilidade foi utilizada'>help</i></th>
-							<th><span>Média</span><i class='material-icons info' title='Média utilizações nas batalhes que a habilidade foi presente'>help</i></th>
-							<th><span>Vitórias</span><i class='material-icons info' title='Percentual de vezes que o gladiador que utilizou a habilidade venceu'>help</i></th>
+							<th><span>Utilizado</span><i class='info fas fa-question-circle' title='Percentual de batalhas que a habilidade foi utilizada'></i></th>
+							<th><span>Média</span><i class='info fas fa-question-circle' title='Média utilizações nas batalhes que a habilidade foi presente'></i></th>
+							<th><span>Vitórias</span><i class='info fas fa-question-circle' title='Percentual de vezes que o gladiador que utilizou a habilidade venceu'></i></th>
 						</tr>
 					</thead>
 					<tbody></tbody>
@@ -60,22 +59,22 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Média<i class='material-icons info' title='Média de todos gladiadores das batalhas'>help</i></th>
-							<th>Vencedor<i class='material-icons info' title='O gladiador vencedor de cada batalha'>help</i></th>
+							<th>Média<i class='info fas fa-question-circle' title='Média de todos gladiadores das batalhas'></i></th>
+							<th>Vencedor<i class='info fas fa-question-circle' title='O gladiador vencedor de cada batalha'></i></th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr data-info='STR'>
-							<td class='fixed'>Força predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a força como seu atributo predominante'>help</i></td>
+							<td class='fixed'>Força predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a força como seu atributo predominante'></i></td>
 						</tr>
 						<tr data-info='AGI'>
-							<td class='fixed'>Agilidade predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a agilidade como seu atributo predominante'>help</i></td>
+							<td class='fixed'>Agilidade predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a agilidade como seu atributo predominante'></i></td>
 						</tr>
 						<tr data-info='INT'>
-							<td class='fixed'>Inteligência predominante<i class='material-icons info' title='Percentual de gladiadores que possuem a inteligência como seu atributo predominante'>help</i></td>
+							<td class='fixed'>Inteligência predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a inteligência como seu atributo predominante'></i></td>
 						</tr>
 						<tr data-info='lvl'>
-							<td class='fixed'>Nível máximo<i class='material-icons info' title='Maior nível atingido pelo gladiadores vivos nos últimos 5 segundos da batalha'>help</i></td>
+							<td class='fixed'>Nível máximo<i class='info fas fa-question-circle' title='Maior nível atingido pelo gladiadores vivos nos últimos 5 segundos da batalha'></i></td>
 						</tr>
 					</tbody>
 				</table>
@@ -87,7 +86,7 @@
 						<div class='value' id='avg-time'></div>
 					</div>
 					<div class='card'>
-						<i id='low-battles' class='material-icons hidden'>help</i>
+						<i id='low-battles' class='hidden fas fa-question-circle'></i>
 						<div class='title'>Número de batalhas encontradas</div>
 						<div class='value' id='nbattles'></div>
 					</div>

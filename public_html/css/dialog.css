@@ -168,6 +168,10 @@
     box-shadow: 1px 1px 10px 0px #00000059;
 }
 
+.toast i {
+	font-size: 1.3em;
+}
+
 .toast.info {
 	background-color: #ffc500;
 }

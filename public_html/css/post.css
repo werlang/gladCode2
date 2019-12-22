@@ -103,7 +103,8 @@ a {
 }
 
 #button-container i {
-    font-size: 3em;
+    font-size: 2em;
+    margin: 10px 20px;
 }
 
 #button-container a:hover {
