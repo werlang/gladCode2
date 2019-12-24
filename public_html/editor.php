@@ -17,12 +17,12 @@
 	<link rel='stylesheet' href="css/editor.css"/>
 	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>

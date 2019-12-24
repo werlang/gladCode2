@@ -93,11 +93,11 @@
 				$nick = "user". count($codes);
 
 			$hash = getSkin($code);
-			$code = preg_replace('/setSpritesheet\("[\d\w]*?"\);/', "", $code);
-			$code = preg_replace('/setSkin\("[\W\w]*?"\);/', "", $code);
-			$code = preg_replace('/setUser\("[\W\w]*?"\);/', "", $code);
+			$code = preg_replace('/setSpritesheet\("[\d\w]*?"\)[;]{0,1}/', "", $code);
+			$code = preg_replace('/setSkin\("[\W\w]*?"\)[;]{0,1}/', "", $code);
+			$code = preg_replace('/setUser\("[\W\w]*?"\)[;]{0,1}/', "", $code);
 
-			preg_match('/setName\("([\W\w]*?)"\);/', $code, $name);
+			preg_match('/setName\("([\W\w]*?)"\)/', $code, $name);
 			$name = $name[1];
 
 			if (strlen($hash) != 32){
@@ -112,8 +112,8 @@
 				}
 			}	
 
-			$pattern = '/setName\("([\w À-ú]+?)"\);/';
-			$replacement = 'setName("$1@'. $nick .'");';
+			$pattern = '/setName\("([\w À-ú]+?)"\)/';
+			$replacement = 'setName("$1@'. $nick .'")';
 			$code = preg_replace($pattern, $replacement, $code);
 			array_push($codes, $code);
 		}
@@ -163,7 +163,14 @@
 			$vint = $row['vint'];
 			$skins[$name .'@'. $nick] = $row['skin'];
 
-			$setup = "setup(){\n\tsetName(\"$name@$nick\");\n\tsetSTR($vstr);\n\tsetAGI($vagi);\n\tsetINT($vint);\n}\n\n";
+			$language = getLanguage($code);
+			if ($language == "c"){
+				$setup = "setup(){\n\tsetName(\"$name@$nick\");\n\tsetSTR($vstr);\n\tsetAGI($vagi);\n\tsetINT($vint);\n}\n\n";
+			}
+			else if ($language == "python"){
+				$setup = "def setup():\n\tsetName(\"$name@$nick\")\n\tsetSTR($vstr)\n\tsetAGI($vagi)\n\tsetINT($vint)\n\n";
+			}
+
 			$code = $setup . $code;
 
 			array_push($codes, $code);
@@ -175,8 +182,16 @@
 		if (!validate_attr($code)){
 			$invalid_attr = true;
 		}
-		$code = "#include \"gladCodeCore.c\"\n". $code;
-		file_put_contents("$path/temp/$foldername/code$i.c",$code);
+
+		$language = getLanguage($code);
+		if ($language == "c"){
+			$code = "#include \"gladCodeCore.c\"\n". $code;
+			file_put_contents("$path/temp/$foldername/code$i.c",$code);
+		}
+		else if ($language == "python"){
+			$code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n\twhile running():\n\t\tloop()\n\tendSocketComm()";
+			file_put_contents("$path/temp/$foldername/code$i.py",$code);
+		}
 	}
 
 	if ($cancel_run)
@@ -223,7 +238,13 @@
 				$codes[count($codes) - 1] = $code;
 
 				// save code on session
-				$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
+				$language = getLanguage($code);
+				if ($language == "c"){
+					$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
+				}
+				else if ($language == "python"){
+					$_SESSION['code'] = preg_replace('/def setup\(\)[\w\W]*?:[\w\W]*?\n\n/', "", $codes[count($codes)-1]);
+				}
 				//echo $_SESSION['code'];
 			}
 
@@ -289,14 +310,14 @@
 
 	echo json_encode($output);
 
-	system("rm -rf $path/temp/$foldername");
+	// system("rm -rf $path/temp/$foldername");
 	
 	function getSkin($subject) {
-		$pattern = '/setSpritesheet\("([\d\w]*?)"\);/';
+		$pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
 		$hash = codeMatch($subject, $pattern);
 
 		if ($hash === false){
-			$pattern = '/setSkin\("([\W\w]*?)"\);/';
+			$pattern = '/setSkin\("([\W\w]*?)"\)[;]{0,1}/';
 			$hash = codeMatch($subject, $pattern);
 		}
 
@@ -304,28 +325,28 @@
 	}
 
 	function getUser($subject) {
-		$pattern = '/setUser\("([\W\w]*?)"\);/';
+		$pattern = '/setUser\("([\W\w]*?)"\)[;]{0,1}/';
 		return codeMatch($subject, $pattern);
 	}
 
 	function getSTR($subject) {
-		$pattern = '/setSTR\(([\d]{1,2})\);/';
+		$pattern = '/setSTR\(([\d]{1,2})\)[;]{0,1}/';
 		return codeMatch($subject, $pattern);
 	}
 	
 	function getAGI($subject) {
-		$pattern = '/setAGI\(([\d]{1,2})\);/';
+		$pattern = '/setAGI\(([\d]{1,2})\)[;]{0,1}/';
 		return codeMatch($subject, $pattern);
 	}
 
 	function getINT($subject) {
-		$pattern = '/setINT\(([\d]{1,2})\);/';
+		$pattern = '/setINT\(([\d]{1,2})\)[;]{0,1}/';
 		return codeMatch($subject, $pattern);
 	}
 
 	function codeMatch($subject, $pattern){
 		preg_match ( $pattern , $subject , $matches );
-		if (count($matches) < 2)
+		if (count($matches) < 2 || $matches[1] == 'undefined')
 			return false;
 		else
 			return $matches[1];
@@ -584,5 +605,13 @@
 		send_node_message(array(
 			'profile notification' => array('user' => $masters)
 		));
+	}
+
+	function getLanguage($code){
+		$language = "c";
+		if (strpos($code, "def loop():") !== false)
+			$language = "python";
+		
+		return $language;
 	}
 ?>
