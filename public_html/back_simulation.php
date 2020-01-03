@@ -22,17 +22,19 @@
 	$codes = array();
 	$skins = array();
 
+	$args = json_decode($_POST['args'], true);
+
 	$glads = array();
-	if (isset($_POST['glads']))
-		$glads = json_decode($_POST["glads"]);
+	if (isset($args['glads']))
+		$glads = $args["glads"];
 	if (isset($_SESSION['match'])){
 		$glads = array_merge($glads, $_SESSION["match"]);
 		unset($_SESSION['match']);
 	}
 	
 	$userglad = "";
-	if (isset($_POST['duel']) && $_POST['duel'] != "false"){
-		$id = mysql_escape_string($_POST['duel']);
+	if (isset($args['duel'])){
+		$id = mysql_escape_string($args['duel']);
 		$sql = "SELECT gladiator1 FROM duels WHERE id = '$id' AND user2 = '$user' AND log IS NULL";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		$row = $result->fetch_assoc();
@@ -50,9 +52,9 @@
 
 	}
 
-	if (isset($_POST['tournament']) && $_POST['tournament'] != "false"){
+	if (isset($args['tournament'])){
 		if (isset($_SESSION['tourn-group'])){
-			$groupid = mysql_escape_string($_POST['tournament']);
+			$groupid = mysql_escape_string($args['tournament']);
 			if (isset($_SESSION['tourn-group'][$groupid]) && $_SESSION['tourn-group'][$groupid] != md5("tourn-group-$groupid-id")){
 				$groupid = null;
 				$cancel_run = true;
@@ -116,7 +118,36 @@
 			array_push($codes, $code);
 		}
 	}
-	//$output['test'] = $ids;
+
+	if (isset($args['breakpoints']) && $args['breakpoints'] !== false && isset($args['single'])){
+		$code = $codes[count($codes) - 1];
+		$oldcode = $code;
+		$breakpoints = $args['breakpoints'];
+
+		//add {} in single line blocks to avoid messing with structure if breakpoint is inserted in between
+		$pattern = '/((?:(?:if)||(?:for)|(?:while))[ ]{0,1}\([^\n]*?\))\n(.*)|(else)\n(.*)/';
+		$replacement = '$1$3{'. PHP_EOL .'$2$4}';
+		$code = preg_replace($pattern, $replacement, $code);
+
+		$code = explode(PHP_EOL, $code);
+		foreach ($code as $i => $line){
+			if ($line == "}"){
+				$setup = $i + 2;
+				break;
+			}
+		}
+		//insert breakpoint line
+		foreach ($breakpoints as $ln){
+			$line = $ln - 1 + $setup;
+			$hint = preg_replace('/\s*(.*?)[{};]*/', "$1", $code[$line]);
+			$code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
+			$code = preg_replace($pattern, $replacement, $code);
+				
+		}
+		$code = implode(PHP_EOL, $code);
+		$codes[count($codes) - 1] = $code;
+	}
+
 
 	if (count($ids) > 0){
 		$ids = implode(",", $ids);
@@ -176,7 +207,22 @@
 		
 		//stream the file contents
 		if ($error == "" && file_exists("$path/temp/$foldername/simlog")){
-			if (isset($_POST['savecode']) && $_POST['savecode'] == "true"){
+			if (isset($args['savecode']) && $args['savecode'] === true){
+				if (isset($args['breakpoints']) && $args['breakpoints'] !== false && isset($args['single'])){
+					$codes[count($codes)-1] = $oldcode;
+				}
+
+				// remove banned functions
+				$banned = json_decode(file_get_contents("banned_functions.json"), true)['functions'];
+
+				$code = $codes[count($codes) - 1];
+				foreach($banned as $function){
+					$pattern = '/'. $function .'.*/';
+					$code = preg_replace($pattern, "", $code);
+				}
+				$codes[count($codes) - 1] = $code;
+
+				// save code on session
 				$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
 				//echo $_SESSION['code'];
 			}
@@ -203,17 +249,17 @@
 			
 			$hash = save_log($conn, $file);
 
-			if (isset($_POST['ranked']) && $_POST['ranked'] == "true"){
+			if (isset($args['ranked'])){
 				$deaths = death_times($conn, $ids, $file);
 				$rewards = battle_rewards($conn, $deaths, $user);
 				send_reports($conn, $rewards, $hash);
 			}
-			if (isset($_POST['duel']) && $_POST['duel'] != "false" && !$cancel_run){
-				$id = mysql_escape_string($_POST['duel']);
+			if (isset($args['duel']) && !$cancel_run){
+				$id = mysql_escape_string($args['duel']);
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			}
-			if (isset($_POST['tournament']) && $_POST['tournament'] != "false" && $groupid != null){
+			if (isset($args['tournament']) && $groupid != null){
 				$sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 				$row = $result->fetch_assoc();
@@ -308,7 +354,7 @@
 		$hash = substr(md5('log'.microtime()*rand()), 0,16);
 
 		$single = "0";
-		if (isset($_POST['single']) && $_POST['single'] == "true"){
+		if (isset($args['single'])){
 			$single = "1";
 		}
 

@@ -74,7 +74,18 @@ $(document).ready( function() {
                     myteam = data.teams[i].name;
                 }
 
-                $('#content-box #group-container .group .teams-container').eq(groups[groupid]).append("<div class='team "+ myteamclass+"'><div class='icon'><i class='material-icons'>hourglass_empty</i></div><div class='name'>"+ data.teams[i].name +"</div><div class='info'><div class='glad'><div class='g-bar'></div><div class='g-bar'></div><div class='g-bar'></div></div><div class='time'>-</div></div></div>");
+                $('#content-box #group-container .group .teams-container').eq(groups[groupid]).append(`<div class='team ${myteamclass}'>
+                    <div class='icon'><i class='far fa-hourglass'></i></div>
+                    <div class='name'>${data.teams[i].name}</div>
+                    <div class='info'>
+                        <div class='glad'>
+                            <div class='g-bar'></div>
+                            <div class='g-bar'></div>
+                            <div class='g-bar'></div>
+                        </div>
+                        <div class='time'>-</div>
+                    </div>
+                </div>`);
                 $('#content-box #group-container .group').eq(groups[groupid]).find('.team').last().data('id', data.teams[i].id);
 
             }
@@ -89,11 +100,11 @@ $(document).ready( function() {
             </div>
             <div id='button-container'>
                 <button class='arrow' id='back-round' title='Rodada anterior' disabled>
-                    <i class='material-icons'>navigate_before</i>
+                    <i class='fas fa-chevron-left'></i>
                 </button>
                 <button id='prepare' class='button' disabled>PREPARAR-SE</button>
                 <button class='arrow' id='next-round' title='Próxima rodada' disabled>
-                    <i class='material-icons'>navigate_next</i>
+                    <i class='fas fa-chevron-right'></i>
                 </button>
             </div>`);
 
@@ -273,13 +284,12 @@ function refresh_round(){
                 var alive = ['', 'one', 'two', 'three'];
                 alive = alive[data.teams[i].alive];
         
-                var iconready = {icon: 'hourglass_empty', class: '', title: 'A equipe ainda não escolheu seu gladiador'};
+                var iconready = {class: 'far fa-hourglass', title: 'A equipe ainda não escolheu seu gladiador'};
                 if (data.teams[i].ready)
-                    iconready = {icon: "check", class: 'green', title: 'A equipe está pronta para a batalha'};
+                    iconready = {class: "fas fa-check green", title: 'A equipe está pronta para a batalha'};
 
-                $(this).find('.icon i').html(iconready.icon);
-                $(this).find('.icon').attr('class', "icon "+ iconready.class);
-                $(this).find('.icon').attr('title', iconready.title);
+                $(this).find('.icon i').attr('class', iconready.class);
+                $(this).find('.icon i').attr('title', iconready.title);
 
                 $(this).find('.info .glad').attr('class', 'glad '+ alive);
                 $(this).find('.info .time').html(lasttime);

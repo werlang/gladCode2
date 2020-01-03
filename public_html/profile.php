@@ -18,7 +18,6 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Perfil</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
 	<link rel='stylesheet' href="css/profile.css"/>
 	<link rel='stylesheet' href="css/glad-card.css"/>
@@ -34,6 +33,7 @@
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	
 	<script src="script/assets.js"></script>
 	<script src="script/dropzone.js"></script>
@@ -154,13 +154,13 @@
 						<div class='container'>
 							<div class='title'>
 								<h2>Torneios públicos abertos</h2>
-								<div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+								<div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
 							</div>
 							<div id='table-open' class='table'></div>
 							
 							<div class='title'>
 								<h2 id='mytourn-title'>Meus torneios</h2>
-								<div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='material-icons'>chevron_left</i></button><button id='next'><i class='material-icons'>chevron_right</i></button></div>
+								<div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
 							</div>
 							<div id='table-mytourn' class='table'></div>
 							<div id='button-container'>
@@ -199,7 +199,7 @@
 				<div id='ranking-container'>
 					<h2>Ranking</h2>
 					<div id='search'>
-						<i class="material-icons md-light md-24">search</i>
+						<i class="fas fa-search"></i>
 						<input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
 					</div>
 					<div class='table'></div>

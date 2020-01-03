@@ -4,39 +4,18 @@
 
 var ajaxcall;
 
-function runSimulation(params) {
+function runSimulation(args) {
 	if (ajaxcall)
 		ajaxcall.abort();
-	var glads = params.glads;
-	var savecode = params.savecode;
-	var single = params.single;
-	var ranked = params.ranked;
-	var duel = params.duel;
-	var tournament = params.tournament;
-
-	if (!single)
-		single = false;
-	if (!savecode)
-		savecode = false;
-	if (!ranked)
-		ranked = false;
-	if (!duel)
-		duel = false;
-	if (!tournament)
-		tournament = false;
-
+	var glads = args.glads;
+	
 	//console.log(glads);
 	var response = $.Deferred();
 	ajaxcall = $.post("back_simulation.php", {
-		glads: JSON.stringify(glads),
-		savecode: savecode,
-		single: single,
-		ranked: ranked,
-		duel: duel,
-		tournament: tournament
+		args: JSON.stringify(args),
 	})
 	.done(function(data){
-		//console.log(data);
+		// console.log(data);
 		var jsonerror;
 		try{
 			JSON.parse(data);
@@ -112,11 +91,23 @@ class progressButton {
 		this.oldhtml = obj.html();
 
 		obj.html("<div id='bar'></div><div id='oldcontent'></div>");
-		obj.find('#bar').css({'background-color':'#00638d','width':'0px','height':'100%','border-radius':'3px'});
+		obj.find('#bar').css({
+			'background-color':'#00638d',
+			'width':'0px',
+			'height':'100%',
+			'border-radius':'3px'
+		});
 		obj.prop('disabled','true');
 		obj.css('padding','0');
 		obj.append("<div id='oldcontent'></div>");
-		$('#oldcontent').css({'display':'flex','align-items':'center','justify-content':'center','width':'100%','height':'100%','margin-top':obj.outerHeight()*-1});
+		$('#oldcontent').css({
+			'display':'flex',
+			'align-items':'center',
+			'justify-content':'center',
+			'width':'100%',
+			'height':'100%',
+			'margin-top':obj.outerHeight()*-1
+		});
 		
 		this.bsize = 0;
 		this.obj = obj;
@@ -124,7 +115,6 @@ class progressButton {
 		var roul = 0, rcont = 0;
 		
 		this.progint = setInterval(function(){
-			var w = obj.find('#bar').width();
 			var maxtime = 20;
 			var uni = obj.width() / (maxtime * 100);
 			self.bsize += uni;

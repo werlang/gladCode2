@@ -173,21 +173,27 @@ h3#tourn-desc {
     justify-content: center;
     align-items: center;
     margin: 3px 5px 3px 3px;
-    transition: 2s all;
 }
 
 #group-container .group .team .icon i {
-    font-size: 20px;
     color: white;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    transition: 2s all;
 }
 
 #group-container .group .team:hover .icon {
     filter: brightness(0.9);
 }
 
-#group-container .group .team .icon.green {
+#group-container .group .team .icon i.green {
     background-color: #77bb77;
     box-shadow: 0px 0px 8px 4px #77bb77;
+    border-radius: 100%;
 }
 
 #group-container .group .team .time .win {
@@ -541,10 +547,11 @@ h3#tourn-desc {
 }
 
 #button-container .arrow i {
-    font-size: 7rem;
+    font-size: 5rem;
     color: #bed9e6;
     text-shadow: 1px 1px 6px #00638d;
     transition: 0.3s all;
+    margin: 30px;
 }
 
 #button-container .arrow:disabled i {

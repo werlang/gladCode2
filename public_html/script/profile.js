@@ -128,10 +128,35 @@ $(document).ready( function(){
 			$('#panel #news-container').html("");
 			for (let i in data.posts){
 				$('#panel #news-container').append(`<div class='post'>
+					<div class='share' title='Compartilhar'><i class='fas fa-share-alt'></i></div>
 					<div class='title'>${data.posts[i].title}</div>
 					<div class='time'>Publicado em ${getMessageTime(data.posts[i].time, { month_full: true })}</div>
 					<div class='body'>${data.posts[i].post}</div>
 				</div>`);
+				$('#panel #news-container .share').last().click( () => {
+					$('body').append(`<div id='fog'>
+						<div id='link-box'>
+							<h3>Link da publicação</h3>
+							<input value='https://gladcode.tk/post/${data.posts[i].id}' readonly>
+							<button>COPIAR</button>
+						</div>
+					</div>`);
+
+					$('#fog').hide().fadeIn();
+					$('#fog').click( () => {
+						$('#fog').remove();
+					});
+
+					$('#link-box').click( e => {
+						e.stopPropagation();
+					});
+
+					$('#link-box button').click( () => {
+						$('#link-box input').select();
+						document.execCommand("copy");
+						create_toast("Link da publicação copiado para área de transferência", "success");
+					});
+				});
 			}
 		});
 	});
@@ -567,12 +592,12 @@ $(document).ready( function(){
                     else{
 						$('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
                         for (var i in data){
-							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							var star = {class: "far", title: "Guardar nos favoritos"};
 							if (data[i].favorite)
-								star = {body: "star", title: "Tirar dos favoritos"};
+								star = {class: "fas", title: "Tirar dos favoritos"};
 
 							$('#bhist-container .table').append(`<div class='row'>
-							<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+							<div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
 							<div class='cell glad'>${data[i].gladiator}</div>
 							<div class='cell reward'>${parseFloat(data[i].reward).toFixed(1)}</div>
 							<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
@@ -597,15 +622,15 @@ $(document).ready( function(){
 						
 						$('#bhist-container .favorite').click( function(){
 							var id = $(this).data('id');
-							if ($(this).find('i').html() == 'star'){
-								$(this).find('i').html('star_border').attr('title', "Guardar nos favoritos");
+							if ($(this).find('i').hasClass('fas')){
+								$(this).find('i').removeClass('fas').addClass('far').attr('title', "Guardar nos favoritos");
 								post_favorite(id, false, '');
 							}
 							else{
 								var star = $(this);
 								showInput("Informe um comentário sobre esta batalha").then( function(data){
 									if (data !== false){
-										star.find('i').html('star').attr('title', "Tirar dos favoritos");
+										star.find('i').removeClass('far').addClass('fas').attr('title', "Tirar dos favoritos");
 										post_favorite(id, true, data);
 									}
 								});
@@ -732,12 +757,12 @@ $(document).ready( function(){
 							<div class='cell time'>Data</div>
 						</div>`);
                         for (var i in data){
-							var star = {body: "star_border", title: "Guardar nos favoritos"};
+							var star = {class: "far", title: "Guardar nos favoritos"};
 							if (data[i].favorite)
-								star = {body: "star", title: "Tirar dos favoritos"};
+								star = {class: "fas", title: "Tirar dos favoritos"};
 
                             $('#bhist-container .table').append(`<div class='row'>
-								<div class='cell favorite' title='${star.title}'><i class='material-icons'>${star.body}</i></div>
+								<div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
 								<div class='cell glad'>${data[i].gladiator}</div>
 								<div class='cell comment'>${data[i].comment}</div>
 								<div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
@@ -845,8 +870,8 @@ $(document).ready( function(){
 					save_stats(hash);
 
 					$('#pre-battle-show #tips').html(`<span>Batalha concluída. Escolha uma opção:</span>
-						<i id='view' title='Visualizar batalha' class='material-icons'>remove_red_eye</i>
-						<i id='close' title='Fechar janela' class='material-icons'>close</i>`);
+						<i id='view' title='Visualizar batalha' class='fas fa-eye'></i>
+						<i id='close' title='Fechar janela' class='fas fa-times'></i>`);
 					clearInterval(preBattleInt);
 					$('#pre-battle-show').addClass('complete');
 

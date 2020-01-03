@@ -387,6 +387,32 @@ void *connection_handler(void *p){
 				int r = getLvl(gladid);
 				sprintf(reply, "%i", r);
 			}
+			else if (strcmp(func->call,"breakpoint")==0){
+				char *m = func->arg[0].toLongStr;
+				breakpoint(gladid, m);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"setPosition")==0){
+				float x = func->arg[0].toFloat;
+				float y = func->arg[1].toFloat;
+				setPositionSB(gladid, x, y);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"setHp")==0){
+				float hp = func->arg[0].toFloat;
+				setHpSB(gladid, hp);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"setAp")==0){
+				float ap = func->arg[0].toFloat;
+				setApSB(gladid, ap);
+				sprintf(reply, "done");
+			}
+			else if (strcmp(func->call,"lvlUp")==0){
+				int n = func->arg[0].toInt;
+				lvlUpSB(gladid, n);
+				sprintf(reply, "done");
+			}
 			else if (strcmp(func->call,"endSocketComm")==0){
 				endcomm = 1;
 				sprintf(reply, "done");
@@ -478,7 +504,7 @@ int main(int argc , char *argv[]){
 			f = fopen(name,"r");
 			gettimeofday(&wait_now,NULL);
 			sec_diff = wait_now.tv_sec - wait_start.tv_sec;
-		}while (f == NULL);// && sec_diff < 3);
+		}while (f == NULL && sec_diff < 5);
 		if (f == NULL){
 			endsim = 1;
 			printf("CLIENT TIMEOUT",i);

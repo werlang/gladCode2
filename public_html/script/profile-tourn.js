@@ -242,7 +242,7 @@ $(document).ready( function(){
 					});
 
 					$('.tourn-box #new').click( function(){
-						$('.tourn-box #new').hide().after("<div class='input-button'><input placeholder='Nome da nova equipe' id='name'><button><i class='material-icons'>group_add</i></button></div>");
+						$('.tourn-box #new').hide().after("<div class='input-button'><input placeholder='Nome da nova equipe' id='name'><button><i class='fas fa-users'></i></button></div>");
 						$('.tourn-box #name').focus();
 						
 						$('.tourn-box #name').keyup( function(e){
@@ -405,7 +405,7 @@ function refresh_tourn_list(){
 
                 $('#panel #battle-container #tourn.wrapper .table .cell.flex').each( function() {
                     if ($(this).html() == "1"){
-                        $(this).html("<i class='material-icons md-18 md-green'>done</i>");
+                        $(this).html("<i class='fas fa-check flex'></i>");
                     }
                     else if ($(this).html() == "0"){
                         $(this).html("");
@@ -476,7 +476,7 @@ function refresh_teams(obj){
                     //$('.tourn-box #button-container .button').addClass('single');
                     $('.tourn-box .table').html("<div class='row head'><div class='cell'>Nome</div><div class='cell'>Gladiadores</div></div>");
                     for (let i in teams){
-                        $('.tourn-box .table').append("<div class='row'><div class='cell'>"+ teams[i].name +"</div><div class='cell'>"+ teams[i].glads +"/3</div><div class='kick' title='Expulsar equipe'><i class='material-icons'>cancel</i></div></div>");
+                        $('.tourn-box .table').append("<div class='row'><div class='cell'>"+ teams[i].name +"</div><div class='cell'>"+ teams[i].glads +"/3</div><div class='kick' title='Expulsar equipe'><i class='fas fa-times-circle'></i></div></div>");
                         rebind_team_rows(teams[i].id);
                         if (joined && joined === teams[i].id)
                             $('.tourn-box .table .row').last().addClass('signed');

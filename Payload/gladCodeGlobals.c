@@ -38,6 +38,9 @@ globais do ambiente, herdado do gladCode1
 #define ACTION_WAITING 9
 #define ACTION_NONE 10
 
+#define MSG_SPEAK 0
+#define MSG_BREAKPOINT 9
+
 //custos de cada habilidade. os �ndices batem com as constantes dos buffs
 int abilitycost[6] = {50,50,30,50,30,70};
 
@@ -103,6 +106,7 @@ struct gladiador{
 	float time; //simtime
 	float moveLock; //guarda valor para controle de movimentos de longa duracao
 	char message[256];
+    int msgtype;
 	float msgtime;
 };
 
