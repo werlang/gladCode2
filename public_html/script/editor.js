@@ -139,7 +139,7 @@ $(document).ready( function() {
 					action: "GET",
 				}).done( function(data){
 					data = JSON.parse(data);
-                    //console.log(data);
+                    // console.log(data);
                     if (data.length == 0){
                         window.location.href = "newglad";
                     }
@@ -215,56 +215,117 @@ $(document).ready( function() {
 		}
 	});
 
+	var sampleGlads = {
+		'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
+		'Runner': {'difficulty': 1, 'filename': 'Runner'},
+		'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
+		'Arch': {'difficulty': 2, 'filename': 'Arch'},
+		'Patient': {'difficulty': 2, 'filename': 'Patient'},
+		'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
+		'Mage': {'difficulty': 2, 'filename': 'Mage'},
+		'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
+		'Archie': {'difficulty': 3, 'filename': 'Archie'},
+		'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
+		'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
+		'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
+	};
+
 	$('#save').click( function(){
 		if (!$(this).hasClass('disabled')){
 			if (user){
 				setLoadGlad();
 				//console.log(loadGlad);
+
+				getBannedFunctions(editor.getValue()).then( function(banned){
+					if (banned.length){
+						var msg = "Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:";
+						for (let i in banned){
+							msg += `<li><b>${banned[i]}</b></li>`;
+						}
+						msg += "</ul>"
+						showMessage(msg);
+					}
+					else if (tested){
+						var action = "INSERT";
+						if (gladid)
+							action = "UPDATE";
+						var nome = $('#distribuicao #nome').val();
+						$.post( "back_glad.php", {
+							action: action,
+							id: gladid,
+							nome: nome,
+							vstr: $('#float-card .glad-preview .info .attr .str span').html(),
+							vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
+							vint: $('#float-card .glad-preview .info .attr .int span').html(),
+							skin: JSON.stringify(pieces),
+						}).done( function(data){
+							//console.log(data);
+							$('#fog').remove();
+							if (data.search("LIMIT") != -1)
+								showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
+							else if (data == "EXISTS")
+								showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
+							else if (data == "INVALID")
+								showMessage("CHEATER");
+							else if (data.search("ID") != -1){
+								gladid = JSON.parse(data).ID;
+								if (action == "INSERT"){
+									showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
+										if (data == "Sim")
+											window.open('battle')
+									});
+								}
+								else{
+									showMessage("Gladiador <span class='highlight'>"+ nome +"</span> gravado");
+								}
+								saved = true;
+							}
+						});
+					}
+					else{
+						$('body').append(`<div id='fog'>
+							<div id='save-box'>
+								<div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
+								<div id='button-container'><button class='button'>OK</button></div>
+							</div>
+						</div>`);
+	
+						var sample = {
+							"Archie": sampleGlads['Archie'],
+							"War Maker": sampleGlads['War Maker'],
+							"Magnus": sampleGlads['Magnus'],
+							"Rouge": sampleGlads['Rouge']
+						};
+	
+						var glads = [];
+						for (let i in sample){
+							var filename = `samples/gladbots/${sample[i].filename}.c`;
+							getGladFromFile(filename).then( function(data){
+								glads.push(data.code);
+								if (glads.length == 4)
+									loadReady(glads);
+							});
+						}
 				
-				if (tested){
-					var action = "INSERT";
-					if (gladid)
-						action = "UPDATE";
-					var nome = $('#distribuicao #nome').val();
-					$.post( "back_glad.php", {
-						action: action,
-						id: gladid,
-						nome: nome,
-						vstr: $('#float-card .glad-preview .info .attr .str span').html(),
-						vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
-						vint: $('#float-card .glad-preview .info .attr .int span').html(),
-						skin: JSON.stringify(pieces),
-					}).done( function(data){
-						//console.log(data);
-						if (data.search("LIMIT") != -1)
-							showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
-						else if (data == "EXISTS")
-							showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
-						else if (data == "INVALID")
-							showMessage("CHEATER");
-						else if (data.search("ID") != -1){
-							gladid = JSON.parse(data).ID;
-							if (action == "INSERT"){
-								showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
-									if (data == "Sim")
-										window.open('battle')
-								});
-							}
-							else{
-								showMessage("Gladiador <span class='highlight'>"+ nome +"</span> gravado");
-							}
-							saved = true;
+						function loadReady(glads){
+							btnbattle_click($('#save-box button'), glads).then( hash => {
+								// console.log(hash);
+								if (hash !== false){
+									$.post("back_log.php", {
+										action: "DELETE",
+										hash: hash
+									});
+	
+									tested = true;
+									$('#save').click();
+								}
+								else{
+									$('#fog').remove();
+								}
+							});
 						}
-					});
-				}
-				else{
-					showDialog("Você precisar testar o gladiador <span class='highlight'>"+ loadGlad.name +"</span> ao menos uma vez antes de salvá-lo. Deseja fazer isso agora?",["Sim","Não"]).then( function(data){
-						if (data == "Sim"){
-							$('#test').click();
-							wannaSave = true;
-						}
-					});
-				}
+					}
+				});
 			}
 			else{
 				showDialog("Você precisa fazer LOGIN no sistema para salvar seu gladiador",["Cancelar","LOGIN"]).then( function(data){
@@ -320,20 +381,6 @@ $(document).ready( function() {
 		}
 	});
 
-	var sampleGlads = {
-		'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
-		'Runner': {'difficulty': 1, 'filename': 'Runner'},
-		'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
-		'Arch': {'difficulty': 2, 'filename': 'Arch'},
-		'Patient': {'difficulty': 2, 'filename': 'Patient'},
-		'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
-		'Mage': {'difficulty': 2, 'filename': 'Mage'},
-		'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
-		'Archie': {'difficulty': 3, 'filename': 'Archie'},
-		'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
-		'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
-		'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
-	};
 	var num = ["","one","two","three"];
 	var template = "<div class='glad'><div class='name'></div><div class='diff'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div></div>";
 	for (var i in sampleGlads){
@@ -341,59 +388,90 @@ $(document).ready( function() {
 		$('#fog-battle #list .glad').last().data('filename',sampleGlads[i].filename);
 		$('#fog-battle #list .glad .name').last().html(i);
 		$('#fog-battle #list .glad .diff').last().addClass(num[sampleGlads[i].difficulty]);
+
+		bindGladList($('#fog-battle #list .glad').last());
 	}
-	
-	$('#fog-battle #list .glad').click( function(){
-		var filename = "samples/gladbots/"+ $(this).data('filename') +".c";
-		var code;
-		if ($(this).hasClass('selected')){
-			$(this).removeClass('selected');
-			$('#fog-battle .glad-card-container').html("");
-		}
-		else if ($('#fog-battle #list .glad.selected').length < 4){
-			$(this).addClass('selected');
-			var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-				$('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
-				$('#fog-battle .glad-card-container .glad-preview').html(template);
-				
-				getGladFromFile(filename).then( function(data){
-					//console.log(data);
-					fetchSpritesheet(data.skin).then( function(data){
-						$('#fog-battle .glad-preview .image').html(getSpriteThumb(data,'walk','down'));
-					});
-					$('#fog-battle .glad-preview .info .glad span').html(data.name);
-					$('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
-					$('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
-					$('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
-					code = data.code;
-				});
-				$('#fog-battle .glad-preview .delete').remove();
+	$.post("back_glad.php",{
+		action: "GET",
+	}).done( function(data){
+		data = JSON.parse(data);
+		// console.log(data);
+		for (let i in data){
+			$('#fog-battle #list').append(template);
+			$('#fog-battle #list .glad .name').last().html(data[i].name);
+			$('#fog-battle #list .glad .diff').last().addClass('none');
+			$('#fog-battle #list .glad').last().data('info',data[i]);
 
-				$('#fog-battle .glad-preview .code .button').click( function(){
-					$('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
-					Prism.highlightElement($('code')[0]);
-		
-					$('#code-box #close').click( function(e){
-						$('#fog').remove();
-					});
-		
-				});
-		
-			});
-		}
-
-		
-		if ($('#fog-battle #list .glad.selected').length > 0){
-			var length = $('#fog-battle #list .glad.selected').length;
-			$('#fog-battle #btn-battle').removeAttr('disabled');
-			$('#fog-battle #list-title span').html(length +" selecionados");
-		}
-		else{
-			$('#fog-battle #btn-battle').prop('disabled',true);
-			$('#fog-battle #list-title span').html("");
+			bindGladList($('#fog-battle #list .glad').last());
 		}
 	});
-		
+	
+	function bindGladList(obj){
+		obj.click( function(){
+			var filename = null;
+			if ($(this).data('filename'))
+				filename = "samples/gladbots/"+ $(this).data('filename') +".c";
+
+			var code;
+			if ($(this).hasClass('selected')){
+				$(this).removeClass('selected');
+				$('#fog-battle .glad-card-container').html("");
+			}
+			else if ($('#fog-battle #list .glad.selected').length < 4){
+				$(this).addClass('selected');
+				var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
+					$('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
+					$('#fog-battle .glad-card-container .glad-preview').html(template);
+					
+					if (filename){
+						getGladFromFile(filename).then( function(data){
+							loadCard(data);
+						});
+					}
+					else{
+						loadCard(obj.data('info'));
+					}
+
+					function loadCard(data){
+						//console.log(data);
+						fetchSpritesheet(data.skin).then( function(data){
+							$('#fog-battle .glad-preview .image').html(getSpriteThumb(data,'walk','down'));
+						});
+						$('#fog-battle .glad-preview .info .glad span').html(data.name);
+						$('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
+						$('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
+						$('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
+						code = data.code;
+					}
+
+					$('#fog-battle .glad-preview .delete').remove();
+
+					$('#fog-battle .glad-preview .code .button').click( function(){
+						$('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
+						Prism.highlightElement($('code')[0]);
+			
+						$('#code-box #close').click( function(e){
+							$('#fog').remove();
+						});
+			
+					});
+			
+				});
+			}
+
+			
+			if ($('#fog-battle #list .glad.selected').length > 0){
+				var length = $('#fog-battle #list .glad.selected').length;
+				$('#fog-battle #btn-battle').removeAttr('disabled');
+				$('#fog-battle #list-title span').html(length +" selecionados");
+			}
+			else{
+				$('#fog-battle #btn-battle').prop('disabled',true);
+				$('#fog-battle #list-title span').html("");
+			}
+		});
+	}
+
 	var progbtn;
 	$('#fog-battle #btn-cancel').click( function(){
 		if (progbtn && progbtn.isActive()){
@@ -406,65 +484,91 @@ $(document).ready( function() {
 	});
 
 	$('#fog-battle #btn-battle').click( function(){
-		//$('#fog-battle #btn-cancel').prop('disabled',true);
-		progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
 		var glads = [];
-		var gladsReady = 0;
-		$.each( $('#fog-battle #list .glad.selected'), function(){
-			var filename = "samples/gladbots/"+ sampleGlads[ $(this).find('.name').html() ].filename +".c";
-			getGladFromFile(filename).then( function(data){
-				glads.push(data.code);
-				gladsReady++;
-			});
-		});
-
-		var waitGlad = setInterval( function(){
-			if (gladsReady == $('#fog-battle #list .glad.selected').length){
-				glads.push(loadGlad.code);
-
-				clearInterval(waitGlad);
-				runSimulation({
-					glads: glads,
-					savecode: true,
-					single: true,
-				}).then( function(data){
-					//console.log(data);
-					if (data == "ERROR"){
-						progbtn.kill();
-						//$('#fog-battle #btn-cancel').removeAttr('disabled');
-						$('#fog-battle').hide();
-					}
-					else{
-						var hash = data;
-						showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
-							if (data == "Sim")
-								window.open("play/"+ hash);
-							else{
-								$.post("back_log.php", {
-									action: "DELETE",
-									hash: hash
-								});
-							}
-							if (wannaSave){
-								showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
-									if (data == "Sim")
-										$('#save').click();
-								});
-								wannaSave = false;
-							}
-							if (tutoState == 4 || tutoState == 5 || tutoState == 6 || tutoState == 8 || tutoState == 11 || tutoState == 13 || tutoState == 15 || tutoState == 17 || tutoState == 19 || tutoState == 21 || tutoState == 23)
-								showTutorial();
-						});
-						tested = true;
-						progbtn.kill();
-						//$('#fog-battle #btn-cancel').removeAttr('disabled');
-						$('#fog-battle').hide();
-					}
+		var totalGlads = $('#fog-battle #list .glad.selected').length;
+		$('#fog-battle #list .glad.selected').each( function(){
+			var selected = $(this)
+			var name = $(this).find('.name').html();
+			if (!selected.data('info')){
+				var filename = `samples/gladbots/${sampleGlads[ name ].filename}.c`;
+				getGladFromFile(filename).then( function(data){
+					glads.push(data.code);
+					if (glads.length == totalGlads)
+						loadReady(glads);
 				});
 			}
-			
-		}, 10);
+			//my own glads
+			else{
+				glads.push(selected.data('info').id);
+				if (glads.length == totalGlads)
+					loadReady(glads);
+			}
+		});
+
+		function loadReady(glads){
+			btnbattle_click($('#fog-battle #btn-battle'), glads).then( hash => {
+				if (hash !== false){
+					showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
+						if (data == "Sim")
+							window.open("play/"+ hash);
+						else{
+							$.post("back_log.php", {
+								action: "DELETE",
+								hash: hash
+							});
+						}
+						if (wannaSave){
+							showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
+								if (data == "Sim")
+									$('#save').click();
+							});
+							wannaSave = false;
+						}
+						
+						var states = [4, 5, 6, 8, 11, 13, 15, 17, 19, 21, 23, 24];
+						if (states.indexOf(tutoState) != -1)
+							showTutorial();
+					});
+					progbtn.kill();
+					//$('#fog-battle #btn-cancel').removeAttr('disabled');
+					$('#fog-battle').hide();
+				}
+			});
+		}
 	});
+
+	async function btnbattle_click(btn, glads){
+		progbtn = new progressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
+
+		var breakpoints = [];
+		$('.ace_breakpoint').each( function() {
+			breakpoints.push($(this).text());
+		});
+		if (!breakpoints.length)
+			breakpoints = false;
+
+		glads.push(loadGlad.code);
+
+		return new Promise( (resolve, reject) => {
+			runSimulation({
+				glads: glads,
+				savecode: true,
+				single: true,
+				breakpoints: breakpoints
+			}).then( function(data){
+				// console.log(data);
+				if (data == "ERROR"){
+					//$('#fog-battle #btn-cancel').removeAttr('disabled');
+					$('#fog-battle').hide();
+					resolve(false);
+				}
+				else{
+					resolve(data);
+				}
+				progbtn.kill();
+			});
+		});
+	}
 
 	$('#download').click( function(){
 		if (!$(this).hasClass('disabled')){
@@ -642,6 +746,79 @@ $(document).ready( function() {
 		
 	});
 	
+	editor.on("guttermousedown", function(e) {
+		var target = e.domEvent.target;
+
+		if (e.domEvent.button != 0) //left mouse button
+			return;
+		
+		if (target.className.indexOf("ace_gutter-cell") == -1){
+			return;
+		}
+	
+		if (!editor.isFocused()){
+			return; 
+		}
+	
+		var breakpoints = e.editor.session.getBreakpoints(row, 0);
+		var row = e.getDocumentPosition().row;
+	
+		var Range = require('ace/range').Range;
+
+		// If there's a breakpoint already defined, it should be removed, offering the toggle feature
+		if(typeof breakpoints[row] === typeof undefined){
+			var brackets = 0;
+			for (let i=0 ; i < editor.session.getLength() ; i++){				
+				var line = editor.session.getLine(i);
+				var ln = parseInt($(target).text()) - 1;
+
+				if (i == ln){
+					var rowdif = row;
+					if (editor.session.getLine(ln).indexOf("else") != -1){
+						rowdif = row + 1;
+					}
+
+					if (brackets == 0){
+						showMessage("Breakpoints só podem ser inseridos dentro de funções");
+					}
+					else{
+						e.editor.session.setBreakpoint(rowdif);
+
+						var marker = editor.session.getMarkers();
+						var marked = false;
+						for (let i in marker){
+							if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
+								marked = true;
+							}
+						}
+						if (!marked)
+							editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
+					}
+	
+				}
+
+				if (line.indexOf("{") != -1)
+					brackets++;
+				if (line.indexOf("}") != -1)
+					brackets--;
+			}
+
+		}else{
+			e.editor.session.clearBreakpoint(row);
+
+			var marker = editor.session.getMarkers();
+			for (let i in marker){
+				if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
+					editor.session.removeMarker(marker[i].id);
+				}
+			}
+		}
+
+		e.stop();
+	});
+
+	editor.on("guttermouseup", function(e) {
+	});
 });
 
 function setLoadGlad(){
@@ -1529,3 +1706,17 @@ window.onbeforeunload = function() {
 	else
     	return true;
 };
+
+async function getBannedFunctions(code){
+	return new Promise( (resolve, reject) => {
+		$.getJSON("banned_functions.json", function(banned){
+			banned = banned.functions;
+			var found = [];
+			for (let i in banned){
+				if (code.indexOf(banned[i]) != -1)
+					found.push(banned[i]);
+			}
+			resolve(found);
+		});
+	});
+}

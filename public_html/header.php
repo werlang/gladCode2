@@ -13,7 +13,7 @@
 	<div id='header'>
 		<div id='menu-button'></div>
 		<div id='logo'><a href='index'><img src='icon/logo.png'></a></div>
-		<i id='search' class='material-icons'>search</i>
+		<i id='search' class='fas fa-search'></i>
 		<div id='h-items'>
 			<div class='item drop-menu mobile'>
 				<div class='title'>LOGIN</div>

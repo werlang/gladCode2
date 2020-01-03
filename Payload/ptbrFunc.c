@@ -116,7 +116,7 @@ float pegaPv(){
 	return getHp();
 }
 
-float pegaPa(){
+float pegaPh(){
 	return getAp();
 }
 
@@ -286,4 +286,20 @@ void fala(char *message){
 
 int pegaNivel(){
 	return getLvl();
+}
+
+void mudaPosicao(float x, float y){
+	setPosition(x, y);
+}
+
+void mudaPv(float hp){
+	setHp(hp);
+}
+
+void mudaPh(float ap){
+	setAp(ap);
+}
+
+void sobeNivel(int n){
+	lvlUp(n);
 }

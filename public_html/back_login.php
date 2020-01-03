@@ -72,11 +72,19 @@
 	elseif ($action == "SET"){
 		if (isset($_POST['admin'])){
 			$admin = json_decode($_POST['admin'], true);
-			$glad = mysql_escape_string($admin['glad']);
+
 			$pass = mysql_escape_string($admin['pass']);
 			if (md5($pass) == '07aec7e86e12014f87918794f521183b'){
-				$sql = "SELECT u.id FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = $glad";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				if (isset($admin['glad'])){
+					$glad = mysql_escape_string($admin['glad']);
+					$sql = "SELECT u.id FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = $glad";
+				}
+				else if (isset($admin['user'])){
+					$user = mysql_escape_string($admin['user']);
+					$sql = "SELECT id FROM usuarios WHERE id = $user";
+				}
+
+				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 				$row = $result->fetch_assoc();
 				$_SESSION['user'] = $row['id'];
 				$output['status'] = "ADMIN";

@@ -99,13 +99,13 @@ function showTerminal(title, message){
 function create_toast(message, type) {
     var icon;
     if (type == 'error')
-        icon = 'cancel';
+        icon = 'times-circle';
     else if (type == 'info')
-        icon = 'error';
+        icon = 'exclamation-circle';
     else if (type == 'success')
-        icon = 'check_circle';
+        icon = 'check-circle';
 
-    $('body').append("<div class='toast "+ type +"'><i class='material-icons'>"+ icon +"</i><span>"+ message +"</span></div>");
+    $('body').append(`<div class='toast ${type}'><i class='fas fa-${icon}'></i><span>${message}</span></div>`);
     setTimeout( function(){
         $('.toast').fadeOut(3000, function(){
             $(this).remove();

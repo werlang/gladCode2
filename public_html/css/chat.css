@@ -104,6 +104,7 @@
     justify-content: center;
     transition: all 0.3s;
     cursor: pointer;
+    font-size: 20px;
 }
 
 #chat-panel #chat-ui .button-container i.selected {
@@ -175,6 +176,8 @@
 	margin-right: 10px;
 	transition: 0.7s transform;
     width: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 #chat-panel .room.open i {
@@ -559,7 +562,7 @@
 }
 
 #chat-panel #emoji-ui #category-buttons {
-    font-size: 50px;
+    font-size: 25px;
     height: 0px;
     display: flex;
     justify-content: space-around;
@@ -853,9 +856,7 @@
 }
 
 #chat-panel .message .expand .plus {
-    font-size: 20px;
-    font-weight: bold;
-    border: 2px solid #d0d0d0;
+    font-size: 25px;
     display: flex;
     justify-content: center;
     align-items: center;

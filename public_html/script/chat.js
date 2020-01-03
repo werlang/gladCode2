@@ -590,7 +590,7 @@ async function listRooms(arg){
                     $('#chat-panel #room-container').append(`<div class='room visible'>
                         <div id='title'>
                             <span class='notification hide'>0</span>
-                            <i class='material-icons'>chevron_right</i>
+                            <i class='fas fa-chevron-right'></i>
                             <span class='name'>${room[i].name}</span>
                         </div>
                     </div>`);
@@ -657,7 +657,7 @@ async function listRooms(arg){
                         $('#chat-panel #room-container').append(`<div class='room visible'>
                             <div id='title'>
                                 <span class='notification hide'>0</span>
-                                <i class='material-icons'>chevron_right</i>
+                                <i class='fas fa-chevron-right'></i>
                                 <span class='name'>${currentRoms[i].name}</span>
                             </div>
                         </div>`);
@@ -879,18 +879,18 @@ function getChatMessages(options){
                                 }
                                 else{
                                     var pre = $(this).parent();
-                                    pre.addClass('collapsed').append(`<button class='expand'><i class='plus material-icons'>add</i><span>{ ... } MOSTRAR ${lines} LINHAS</span></button>`);
+                                    pre.addClass('collapsed').append(`<button class='expand'><i class='plus far fa-plus-square'></i><span>{ ... } MOSTRAR ${lines} LINHAS</span></button>`);
 
                                     rebind();
                                     function rebind(){
                                         pre.find('.expand').click( function() {
                                             pre.removeClass('collapsed').hide().slideDown();
-                                            $(this).find('.plus').html('remove');
+                                            $(this).find('.plus').removeClass('fa-plus-square').addClass('fa-minus-square');
                                             $(this).addClass('open').off().click( function(){
                                                 pre.slideUp( function(){
                                                     pre.addClass('collapsed').show();
                                                 });
-                                                $(this).find('.plus').html('add');
+                                                $(this).find('.plus').removeClass('fa-minus-square').addClass('fa-plus-square');
                                                 $(this).removeClass('open').off();
                                                 rebind();
                                             });
@@ -961,8 +961,8 @@ function init_chat(wrapper, options){
     if (options && options.full === false){
         full = '';
         leftButtons = `<div class='button-container'>
-            <i class='material-icons' title='Mostrar/Esconder Chat' id='show-hide'>swap_horiz</i>
-            <i class='material-icons' title='Abir chat em nova aba' id='open-new'>open_in_new</i>
+            <i class='fas fa-exchange-alt' title='Mostrar/Esconder Chat' id='show-hide'></i>
+            <i class='fas fa-external-link-alt' title='Abir chat em nova aba' id='open-new'></i>
         </div>`;
     }
 
@@ -971,24 +971,24 @@ function init_chat(wrapper, options){
             <div id='emoji-ui'>
                 <div id='emoji-container'></div>
                 <div id='category-buttons'>
-                    <i id='recent' class='material-icons selected' title='Mais usados (CTRL+🔢)'>star</i>
-                    <i id='smile' class='material-icons' title='Carinhas e Pessoas'>emoji_emotions</i>
-					<i id='animals' class='material-icons' title='Animais e Natureza'>pets</i>
-                    <i id='food' class='material-icons' title='Alimentos'>fastfood</i>
-                    <i id='activities' class='material-icons' title='Esportes e Atividades'>sports_esports</i>
-                    <i id='places' class='material-icons' title='Viagens e Lugares'>emoji_transportation</i>
-                    <i id='objects' class='material-icons' title='Objetos'>emoji_objects</i>
-                    <i id='symbols' class='material-icons' title='Símbolos'>emoji_symbols</i>
-                    <i id='flags' class='material-icons' title='Bandeiras'>flag</i>
+                    <i id='recent' class='fas fa-star selected' title='Mais usados (CTRL+🔢)'></i>
+                    <i id='smile' class='fas fa-grin-alt' title='Carinhas e Pessoas'></i>
+					<i id='animals' class='fas fa-paw' title='Animais e Natureza'></i>
+                    <i id='food' class='fas fa-hamburger' title='Alimentos'></i>
+                    <i id='activities' class='fas fa-futbol' title='Esportes e Atividades'></i>
+                    <i id='places' class='fas fa-map-marked-alt' title='Viagens e Lugares'></i>
+                    <i id='objects' class='fas fa-lightbulb' title='Objetos'></i>
+                    <i id='symbols' class='fas fa-icons' title='Símbolos'></i>
+                    <i id='flags' class='fas fa-flag' title='Bandeiras'></i>
                 </div>
             </div>
             <div id='chat-ui'>
                 ${leftButtons}
                 <div id='message-box' data-placeholder='Digite sua mensagem. /help para instruções' contentEditable></div>
                 <div class='button-container'>
-                    <i class='material-icons hidden' title='Enviar mensagem (Enter)' id='send'>send</i>
-                    <i class='material-icons' title='Ajuda' id='help'>help_outline</i>
-                    <i class='material-icons' title='Emojis (CTRL+E)' id='emoji'>insert_emoticon</i>
+                    <i class='far fa-comment-dots hidden' title='Enviar mensagem (Enter)' id='send'></i>
+                    <i class='far fa-question-circle' title='Ajuda' id='help'></i>
+                    <i class='far fa-grin-alt' title='Emojis (CTRL+E)' id='emoji'></i>
                 </div>
             </div>
         </div>`;
