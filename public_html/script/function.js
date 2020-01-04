@@ -67,7 +67,7 @@ function load_content(item){
 
 function findFunc(name){
 	var response = $.Deferred();
-	$.getJSON("script/functions/"+name, function(data){
+	$.getJSON(`script/functions/${name}.json`, function(data){
 		return response.resolve(data);
 	});
 	return response.promise();
