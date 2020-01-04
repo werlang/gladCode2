@@ -3,7 +3,8 @@
 	"ptname": "melhoraINT",
 	"syntax": "int upgradeINT ( int pontos );",
 	"description": {
-		"long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Inteligência do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Inteligência foi melhorado com sucesso. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis."
+		"long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Inteligência do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A função retorna 0 caso não haja nenhum ponto de aprimoramento disponível, caso contrário a função retorna 1 indicando que o atributo Inteligência foi melhorado com sucesso. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis.",
+		"brief": "Aprimora o atributo Inteligência."
 	},
 	"param": [
 		{"name": "pontos", "description": "Inteiro contendo quantos pontos serão aprimorados do atributo Inteligência."}

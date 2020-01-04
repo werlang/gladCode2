@@ -2,7 +2,7 @@
 
 <?php
     if (isset($_GET['p']))
-        echo "<div id='hash' hidden>". $_GET['p'] ."</div>";
+        $hash = $_GET['p'];
     else
         header("Location: index");
 ?>
@@ -10,10 +10,10 @@
 <html>
 <head>
     <meta charset='utf-8' />
+    <BASE href="../">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
-    <BASE href="../">
-	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
+
 	<title>gladCode - Publicação</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 
@@ -31,7 +31,11 @@
 
 </head>
 <body>
-    <?php include("header.php"); ?>
+    <?php 
+        include("header.php");
+        if (isset($hash))
+            echo "<div id='hash' hidden>". $hash ."</div>";
+    ?>
 	<div id='frame'>
         <div id='post'></div>
         <div id='button-container'>
