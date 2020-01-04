@@ -586,7 +586,7 @@ $(document).ready( function() {
 						skin: JSON.stringify(pieces)
 					}).done( function(data){
 						hash = data;
-						var setup = "setup(){\n    setName(\""+ name +"\");\n    setSTR("+ vstr +");\n    setAGI("+ vagi +");\n    setINT("+ vint +");\n    setSpritesheet(\""+ hash +"\");\n}\n\n";
+						var setup = "setup(){\n\tsetName(\""+ name +"\");\n\tsetSTR("+ vstr +");\n\tsetAGI("+ vagi +");\n\tsetINT("+ vint +");\n\tsetSpritesheet(\""+ hash +"\");\n}\n\n";
 						download(filename, setup + editor.getValue());
 					});
 				}
@@ -834,9 +834,15 @@ function setLoadGlad(){
 	loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
 	loadGlad.vint = $('#distribuicao .slider').eq(2).val();
 
-	var setup = "setup(){\n\tsetName(\""+ loadGlad.name +"\");\n\tsetSTR("+ loadGlad.vstr +");\n\tsetAGI("+ loadGlad.vagi +");\n\tsetINT("+ loadGlad.vint +");\n\tsetSkin(\""+ loadGlad.skin +"\");\n\tsetUser(\""+ loadGlad.user +"\");\n}\n\n";
-	loadGlad.code = setup + editor.getValue();
-	
+	var language = getLanguage(editor.getValue());
+	if (language == "c"){
+		var setup = `setup(){\n\tsetName(\"${loadGlad.name}\");\n\tsetSTR(${loadGlad.vstr});\n\tsetAGI(${loadGlad.vagi});\n\tsetINT(${loadGlad.vint});\n\tsetSkin(\"${loadGlad.skin}\");\n\tsetUser(\"${loadGlad.user}\");\n}\n\n`;
+		loadGlad.code = setup + editor.getValue();
+	}
+	else if (language == "python"){
+		var setup = `def setup():\n\tsetName(\"${loadGlad.name}\")\n\tsetSTR(${loadGlad.vstr})\n\tsetAGI(${loadGlad.vagi})\n\tsetINT(${loadGlad.vint})\n\tsetSkin(\"${loadGlad.skin}\")\n\tsetUser(\"${loadGlad.user}\")\n\n`;
+		loadGlad.code = setup + editor.getValue();
+	}
 }
 
 function getGladFromFile(filename){
@@ -1719,4 +1725,12 @@ async function getBannedFunctions(code){
 			resolve(found);
 		});
 	});
+}
+
+function getLanguage(code){
+	var language = "c";
+	if (code.indexOf("def loop():") != -1)
+		language = "python";
+
+	return language;
 }
