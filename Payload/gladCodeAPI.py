@@ -7,7 +7,7 @@ Desta maneira somente com a sintaxe dos sinais, pode-se fazer o port facilmente 
 from gladCodeCore import *
 
 def getSimTime():
-	return float(sendMessage("getSimTime", r))
+	return float(sendMessage("getSimTime"))
 
 def setSTR(arg):
 	sendMessage("setSTR {}".format(arg))
@@ -270,47 +270,8 @@ def isRunning():
 def isSlowed():
 	return int(sendMessage("isSlowed"))
 
-'''
-#TODO
-def speak(char *format, ...):
-	va_list arg
-	va_start(arg, format)
-
-	char message[1000] = ""
-	while (*format != '\0' && strlen(message) < 1000) :
-		if (*format == '%') :
-			format++
-			if (*format == '%')
-				sprintf(message, "%s%%", message)
-			else if (*format == 'c')
-				sprintf(message, "%s%c", message, va_arg(arg, int))
-			else if (*format == 's')
-				sprintf(message, "%s%s", message, va_arg(arg, char*))
-			else if (*format == 'i' || *format == 'd')
-				sprintf(message, "%s%i", message, va_arg(arg, int))
-			else if (*format == 'f')
-				sprintf(message, "%s%f", message, va_arg(arg, double))
-			else if (*format == '.'):
-				char f[10] = "%s%.0f"
-				f[4] = *(format + 1)
-				format += 2
-				sprintf(message, f, message, va_arg(arg, double))
-			
-		
-		else :
-			sprintf(message, "%s%c", message, *format)
-		
-		format++
-	
-	va_end(arg)
-	message[999] = '\0'
-
-	char m[1000], apiMessage[1000], r[10]
-	strncpy(m, message, 1000)
-	sprintf(apiMessage, "speak %s", m)
-	apiMessage[999] = '\0'
-	sendMessage(apiMessage, r)
-'''
+def speak(message):
+	sendMessage("speak {}".format(message))
 
 def getLvl():
 	return int(sendMessage("getLvl"))

@@ -492,26 +492,44 @@ int main(int argc , char *argv[]){
 	struct thread_param p[nglad];
 
     for( i=0 ; i<nglad ; i++){
-		
 		char name[10];
-		sprintf(name,"usercode/code%i",i);
-		FILE *f = NULL;
+		sprintf(name,"usercode/code%i.py",i);
 
-		struct timeval wait_start, wait_now;
-		gettimeofday(&wait_start,NULL);
-		long unsigned int sec_diff;
-		do{
-			f = fopen(name,"r");
-			gettimeofday(&wait_now,NULL);
-			sec_diff = wait_now.tv_sec - wait_start.tv_sec;
-		}while (f == NULL && sec_diff < 5);
-		if (f == NULL){
-			endsim = 1;
-			printf("CLIENT TIMEOUT",i);
-			break;
+		// is a C file
+		if (fopen(name,"r") == NULL) {
+			sprintf(name,"usercode/code%i",i);
+			FILE *f = NULL;
+
+			struct timeval wait_start, wait_now;
+			gettimeofday(&wait_start,NULL);
+			long unsigned int sec_diff;
+			do{
+				f = fopen(name,"r");
+				gettimeofday(&wait_now,NULL);
+				sec_diff = wait_now.tv_sec - wait_start.tv_sec;
+			}while (f == NULL && sec_diff < 5);
+			if (f == NULL){
+				endsim = 1;
+				printf("CLIENT TIMEOUT");
+				break;
+			}
+			else
+				fclose(f);
 		}
-		else
-			fclose(f);
+		// python file
+		else{
+			FILE *f = NULL;
+			do {
+				f = fopen("usercode/errorc.txt", "r");
+			} while(f == NULL);
+			char text[20] = "";
+			fgets(text, 10, f);
+			if (strlen(text) > 0){
+				endsim = 1;
+				printf("PYTHON ERROR");
+				break;
+			}
+		}
 
 		new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c);
 				

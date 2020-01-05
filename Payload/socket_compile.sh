@@ -9,7 +9,7 @@ while [ -f /usercode/code$i.* ]; do
 
 	# compile and run Python file
 	if [ -f /usercode/code$i.py ]; then
-		(cp /usercode/code$i.py /usercode/code$i && nice -n 15 python3 /usercode/code$i >> head -c 1M /usercode/outputc.txt) &
+		(nice -n 15 python3 /usercode/code$i.py 2>> /usercode/errorc.txt >> head -c 1M /usercode/outputc.txt) &
 	fi
 	i=$((i + 1))
 done

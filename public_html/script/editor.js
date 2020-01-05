@@ -864,7 +864,8 @@ function getGladFromFile(filename){
 function load_editor(){
 	var langTools = ace.require("ace/ext/language_tools");
     editor = ace.edit("code");
-    editor.session.setMode("ace/mode/c_cpp");
+	editor.session.setMode("ace/mode/c_cpp");
+	editor.session.setUseSoftTabs(false);
 	editor.setTheme("ace/theme/dreamweaver");
 	editor.setFontSize(18);
 	editor.getSession().setUseWrapMode(true);
