@@ -1,3 +1,5 @@
+var user;
+
 $(document).ready( function() {
 	$('#menu-button').click( function() {
 		$('body').append("<div id='fog'><div id='menu'></div></div>");
@@ -68,6 +70,7 @@ $(document).ready( function() {
 		if (data.status == "NOTLOGGED")
 			$('.mobile #profile, .desktop #login').removeClass('hidden');
 		else{
+			user = data;
 			socket_request('login', {}).then( function(res, err){
 				if (err) return console.log(err);
 				if (res.session === false){
@@ -88,4 +91,18 @@ $(document).ready( function() {
 	if ($('#footer').length)
 		$('#footer').load("footer.php");
 });
+
+async function waitLogged(){
+	return await new Promise( (resolve, reject) => {
+		loginReady();
+		function loginReady(){
+			setTimeout( function() {
+				if (user)
+					resolve(user);
+				else
+					loginReady();
+			}, 100);
+		}
+	});
+}
 
