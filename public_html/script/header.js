@@ -63,10 +63,10 @@ $(document).ready( function() {
 	$.post("back_login.php", {
 		action: "GET"
 	}).done( function(data){
-		//console.log(data);
+		// console.log(data);
 		data = JSON.parse(data);
 		if (data.status == "NOTLOGGED")
-			$('.mobile #profile, .desktop #profile').hide();
+			$('.mobile #profile, .desktop #login').removeClass('hidden');
 		else{
 			socket_request('login', {}).then( function(res, err){
 				if (err) return console.log(err);
@@ -80,7 +80,7 @@ $(document).ready( function() {
 					});
 				}
 				else
-					$('.mobile #login, .desktop #login').hide();
+					$('.mobile #login, .desktop #profile').removeClass('hidden');
 			});
 		}
 	});
