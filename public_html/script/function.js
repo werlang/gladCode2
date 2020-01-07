@@ -7,12 +7,22 @@ $(document).ready( function() {
 	if (func == "")
 		load_content("");
 	else{
+		$('#language select').selectmenu({
+			change: function( event, ui ) {
+				let ext = {
+					c: "c",
+					python: "py"
+				};
+				window.location.href = `function/${func}.${ext[ui.item.value]}`;
+			}
+		});
+			
 		$.getJSON(`script/functions/${func}.json`, function(data){
 			load_content(data);
 		
 			if ($('#dict').length){
 				loadDict(func, $('#dict').html());
-				$('#dict').remove()
+				$('#dict').remove();
 			}
 			menu_loaded().then( function(data){
 				var loc = window.location.href.split("/");
@@ -39,28 +49,64 @@ function load_content(item){
 		$('#content-box').html("<h1>Função <i>"+ func +"</i> não encontrada.</h1><p><a href='docs'>Voltar para documentação</a></p>")
 		return;
 	}	
-	
-	$('title').html("gladCode - "+ item.name);
-	$('#temp-name').html(item.name);
-	$('#temp-syntax').html(item.syntax);
-	Prism.highlightElement($('#temp-syntax')[0]);
-	$('#temp-description').html(item.description.long);
-	
-	$.each(item.param, function(k,i) {
-		if (i.name == "void")
-			$('#temp-param').append("<p>"+ i.description +"</p>");
-		else
-			$('#temp-param').append("<p class='syntax'>"+ i.name +"</p><p>"+ i.description +"</p>");
-	});
-	
-	$('#temp-return').html(item.treturn);
-	$('#temp-sample').html(item.sample);
-	Prism.highlightElement($('#temp-sample')[0]);
-	$('#temp-explain').html(item.explain);
 
-	$.each(item.seealso, function(k,i) {
-		findFunc(i.toLowerCase()).then( function(data){
-			$('#temp-seealso').append("<tr><td><a href='function/"+ i.toLowerCase() +"'>"+ i +"</a></td><td>"+ data.description.brief +"</td></tr>");
+	waitLogged().then(user => {
+		var language;
+
+		// set language to c or python only, and only if set in GET
+		if ($('#get-lang').length){
+			var ext = $('#get-lang').html();
+
+			if (ext == 'c')
+				language = "c";
+			else if (ext == 'py')
+				language = "python";
+
+			$('#get-lang').remove();
+		}
+		
+		// if language is not set in GET, or set wrong, set user language, else set c
+		if (!language){
+			if (user && user.language == 'python')
+				language = 'python';	
+			else
+				language = 'c';
+		}
+
+		$('#language select').val(language).selectmenu('refresh');
+
+		$('title').html("gladCode - "+ item.name);
+		$('#temp-name').html(item.name);
+
+		if (language == 'python')
+			$('#temp-syntax').html(item.syntax.python);
+		else
+			$('#temp-syntax').html(item.syntax.c);
+
+		Prism.highlightElement($('#temp-syntax')[0]);
+		$('#temp-description').html(item.description.long);
+
+		var param = item.param.default;
+		if (user && item.param[language])
+			param = item.param[language];
+
+		$.each(param, function(k,i) {
+			if (i.name == "void")
+				$('#temp-param').append("<p>"+ i.description +"</p>");
+			else
+				$('#temp-param').append("<p class='syntax'>"+ i.name +"</p><p>"+ i.description +"</p>");
+		
+		});
+		
+		$('#temp-return').html(item.treturn);
+		$('#temp-sample').html(item.sample);
+		Prism.highlightElement($('#temp-sample')[0]);
+		$('#temp-explain').html(item.explain);
+
+		$.each(item.seealso, function(k,i) {
+			findFunc(i.toLowerCase()).then( function(data){
+				$('#temp-seealso').append("<tr><td><a href='function/"+ i.toLowerCase() +"'>"+ i +"</a></td><td>"+ data.description.brief +"</td></tr>");
+			});
 		});
 	});
 }

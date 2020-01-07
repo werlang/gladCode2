@@ -8,7 +8,9 @@
 	<title>gladCode</title>
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+	  rel="stylesheet">
+	<link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
+
 	<link rel='stylesheet' href="css/table.css"/>
 	<link rel='stylesheet' href="css/docs.css"/>
 	<link rel='stylesheet' href="css/side-menu.css"/>
@@ -32,7 +34,15 @@
 	<div id='frame'>
 		<div id='side-menu'></div>
 		<div id='right-side'>
-			<div id='content'>
+			<div id='content'>			
+				<div id='language'>
+					<label>Linguagem: </label>
+					<select>
+						<option value='c'>C</option>
+						<option value='python'>Python</option>
+					</select>
+				</div>
+
 				<h2 id='temp-name'></h2>
 				<pre><code class="language-c" id='temp-syntax'></code></pre>
 				<p id='temp-description'></p>
@@ -63,6 +73,8 @@
 		echo "<input type='hidden' id='vget' value='$func'>";
 		if (isset($_GET['l']))
 			echo "<div id='dict' hidden>". $_GET['l'] ."</div>";
+		if (isset($_GET['p']))
+			echo "<div id='get-lang' hidden>". $_GET['p'] ."</div>";
 		
 	?>
 </body>
