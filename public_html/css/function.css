@@ -40,6 +40,22 @@ pre {
     box-sizing: border-box;	
 }
 
+#language {
+	margin-bottom: 25px;
+    display: flex;
+    width: 100%;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+#language label {
+	margin-right: 10px;
+}
+
+#language .ui-selectmenu-button {
+	max-width: 125px;
+}
+
 @media only screen and (min-width: 600px) {
 	.table.t-funcs {
 		width: 100%;

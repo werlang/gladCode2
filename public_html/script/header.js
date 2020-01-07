@@ -67,10 +67,10 @@ $(document).ready( function() {
 	}).done( function(data){
 		// console.log(data);
 		data = JSON.parse(data);
+		user = data;
 		if (data.status == "NOTLOGGED")
 			$('.mobile #profile, .desktop #login').removeClass('hidden');
 		else{
-			user = data;
 			socket_request('login', {}).then( function(res, err){
 				if (err) return console.log(err);
 				if (res.session === false){
