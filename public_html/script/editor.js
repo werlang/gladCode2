@@ -13,12 +13,8 @@ var tutoState = 0;
 $(document).ready( function() {
     $('#header-editor').addClass('here');
 	
-	$.post("back_login.php", {
-		action: "GET"
-	})
-	.done( function(data){
-		//console.log(data);
-		user = JSON.parse(data);
+	waitLogged().then(user => {
+		//console.log(user);
 		if (user.status == "SUCCESS"){
 			$('#login').html(user.nome);
 			
@@ -705,7 +701,10 @@ $(document).ready( function() {
 	editor.on("change", function() {
 		saved = false;
 		tested = false;
-		if ($('#float-card .glad-preview').html() != "" && editor.getValue() != ""){
+
+		var text = editor.getValue();
+
+		if ($('#float-card .glad-preview').html() != "" && text != ""){
 			$('#download').removeClass('disabled');
 		}
 		else{
@@ -714,6 +713,16 @@ $(document).ready( function() {
 		
 		if (tutoState == 1)
 			showTutorial();
+
+		var lang = getLanguage(text);
+		if (lang == "c" && editor.language != 'c'){
+			editor.session.setMode("ace/mode/c_cpp");
+			editor.language = 'c';
+		}
+		else if (lang == "python" && editor.language != 'python'){
+			editor.session.setMode("ace/mode/python");
+			editor.language = 'python';
+		}
 	});
 
 	init_chat($('#chat-panel'), {
@@ -864,7 +873,6 @@ function getGladFromFile(filename){
 function load_editor(){
 	var langTools = ace.require("ace/ext/language_tools");
     editor = ace.edit("code");
-	editor.session.setMode("ace/mode/c_cpp");
 	editor.session.setUseSoftTabs(false);
 	editor.setTheme("ace/theme/dreamweaver");
 	editor.setFontSize(18);
@@ -884,20 +892,27 @@ function load_editor(){
 				if (prefix.length === 0) { callback(null, []); return }
 
 				callback(null, dataTable.map(function(table) {
+					var syntax = table.syntax[editor.language];
+					var snippet = table.snippet[editor.language];
+
 					return {
-						value: table.syntax,
+						value: syntax,
 						caption: table.name,
-						snippet: table.snippet,
+						snippet: snippet,
 						description: table.description,
-						syntax: table.syntax,
+						syntax: syntax,
 						score: 1000,
-						meta: "gladCode"
+						meta: `gladCode-${editor.language}`
 					};
 				}));	
 			},
 			getDocTooltip: function(item) {
 				if (item.meta == 'gladCode'){
-					var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
+					if (editor.language == 'c')
+						var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
+					else if (editor.language == 'python')
+						var func = `<b>${item.syntax}</b>`;
+
 					item.docHTML = `${func}<hr></hr>${item.description}`;
 				}
 				else if (item.snippet) {
@@ -1056,6 +1071,8 @@ function load_glad_generator(element){
 				var vagi = $('#distribuicao .slider-input').eq(1).val();
 				var vint = $('#distribuicao .slider-input').eq(2).val();
 				var codigo = "loop(){\n    //comportamento do gladiador\n}";
+				if (user.language == 'python')
+					codigo = "def loop():\n    #comportamento do gladiador\n";
 				
 				if (tutoState == 1){
 					tutoState = 2;
