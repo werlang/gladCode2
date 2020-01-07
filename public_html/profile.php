@@ -105,6 +105,13 @@
 						<img id='img-result'>
 						
 					</div>
+					<div id='language'>
+						<h3>Linguagem de programação preferencial</h3>
+						<select>
+							<option value='c'>C</option>
+							<option value='python'>Python</option>
+						</select>
+					</div>
 					<div id='email'>
 						<h2>Preferências de email</h2>
 						<h3>Desejo receber um email quando:</h3>

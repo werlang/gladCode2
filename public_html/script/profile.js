@@ -21,6 +21,11 @@ $(document).ready( function(){
 			$('#menu #profile').click();
 		$('#profile-ui #picture img').attr('src',user.foto);
 		$('#profile-ui #nickname').html(user.apelido);
+
+		var language = $('#profile-panel #language select');
+		language.selectmenu().val(user.language).selectmenu('refresh');
+
+
 		checkNotifications();
 
 		socket_ready().then( () => {
@@ -184,7 +189,8 @@ $(document).ready( function(){
 			action: "UPDATE",
 			nickname: $('#nickname .input').val(),
 			picture: user.foto,
-			preferences: JSON.stringify(user.preferences)
+			preferences: JSON.stringify(user.preferences),
+			language: $('#language select').val()
 		})
 		.done( function(data){
 			//console.log(data);
