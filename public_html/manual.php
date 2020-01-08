@@ -6,23 +6,25 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Documentação</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
+
 	<link rel='stylesheet' href="css/table.css"/>
 	<link rel='stylesheet' href="css/manual.css"/>
 	<link rel='stylesheet' href="css/side-menu.css"/>
-	<link rel='stylesheet' href="css/prism.css"/>
 	<link rel='stylesheet' href="css/header.css"/>
 	
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
-	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
+	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
+
 	<script src="script/docs.js"></script>
 	<script src="script/side-menu.js"></script>
 	<script src="script/googlelogin.js"></script>
 	<script src="script/socket.js"></script>
 	<script src="script/header.js"></script>
-	<script src="script/prism.js"></script>
 	
 	</head>
 <body>
