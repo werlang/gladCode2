@@ -1,16 +1,26 @@
 {
 	"name": "getLastHitTime",
 	"ptname": "tempoFuiAcertado",
-	"syntax": "float getLastHitTime ( void );",
+	"syntax": {
+		"c": "float getLastHitTime ( void );",
+		"python": "getLastHitTime()"
+	},
 	"description": {
 		"long": "Retorna o tempo, em segundos, desde a última vez que o gladiador recebeu um ataque.",
 		"brief": "Retorna o tempo desde o último ataque recebido."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo o tempo desde a última vez que o gladiador recebeu um ataque.",
-	"sample": "loop(){\n    if (getLastHitTime() <= 2.0)\n        stepLeft();\n    else if (getCloseEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else\n        turnLeft(5);\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo o tempo desde a última vez que o gladiador recebeu um ataque."
+	},
+	"sample": {
+		"c": "11.c",
+		"python": "11.py"
+	},
 	"explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo próximo e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
 	"seealso": [
 		"getCloseEnemy",
@@ -22,5 +32,8 @@
 		"getLastHitAngle",
 		"getHit"
 	],
-	"snippet": "float ${1:hit_time} = getLastHitTime();"
+	"snippet": {
+		"c": "float ${1:hit_time} = getLastHitTime();",
+		"python": "${1:hit_time} = getLastHitTime()"
+	}
 }

@@ -1,16 +1,27 @@
 {
 	"name": "isStunned",
 	"ptname": "estaAtordoado",
-	"syntax": "int isStunned ( void );",
+	"syntax": {
+		"c": "int isStunned ( void );",
+		"python": "isStunned()"
+	},
 	"description": {
-		"long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>, retornando 1 em caso afirmativo ou 0 caso negativo ou o alvo não possa ser enxergado.",
+		"long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>.",
 		"brief": "Verifica se o alvo está atordoado."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0.",
-	"sample": "int start = 1;\nloop(){\n\tif (start){\n\t\tif(moveTo(12.5,12.5))\n\t\t\tstart = 0;\n\t}\n\tif (getLowHp()){\n\t\tif(doYouSeeMe()){\n\t\t\tturnToTarget();\n\t\t\tstepLeft();\n\t\t}\n\t\telse{\n\t\t\tif (getAmbushTimeLeft() > 0){\n\t\t\t\tif (isStunned() && !doYouSeeMe())\n\t\t\t\t\tassassinate(getTargetX(), getTargetY());\n\t\t\t\telse if (getAmbushTimeLeft() <= 1)\n\t\t\t\t\tattackRanged(getTargetX(), getTargetY());\n\t\t\t}\n\t\t\telse\n\t\t\t\tambush();\n\t\t}\n\t}\n\telse if (!start)\n\t\tturn(50);\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna False.",
+		"c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0."
+	},
+	"sample": {
+		"c": "32.c",
+		"python": "32.py"
+	},
 	"explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidades ambush e assassinate.",
 	"seealso": [
 		"getLowHp",
@@ -31,5 +42,8 @@
 		"isRunning",
 		"isSlowed"
 	],
-	"snippet": "int ${1:stunned} = isStunned();"
+	"snippet": {
+		"c": "int ${1:stunned} = isStunned();",
+		"python": "${1:stunned} = isStunned()"
+	}
 }

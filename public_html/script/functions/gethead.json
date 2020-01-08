@@ -1,16 +1,26 @@
 {
 	"name": "getHead",
 	"ptname": "pegaDirecao",
-	"syntax": "float getHead ( void );",
+	"syntax": {
+		"c": "float getHead ( void );",
+		"python": "getHead()"
+	},
 	"description": {
 		"long": "Retorna o ângulo da direção que o gladiador está posicionado, de acordo com a <a href='manual.php#nav-sim'>convenção da simulação</a>.",
 		"brief": "Retorna a direção do gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo o ângulo que o gladiador está direcionado.",
-	"sample": "loop(){\n    if (!isTargetVisible())\n        getLowHp();\n    else{\n        if (abs(getHead() - getTargetHead()) >= 90){\n            stepLeft();\n            turnToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo o ângulo que o gladiador está direcionado."
+	},
+	"sample": {
+		"c": "14.c",
+		"python": "14.py"
+	},
 	"explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível determina a direção relativa do alvo e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
 	"seealso": [
 		"getLowHp",
@@ -22,5 +32,8 @@
 		"stepLeft",
 		"turnToTarget"
 	],
-	"snippet": "float ${1:head} = getHead();"
+	"snippet": {
+		"c": "float ${1:head} = getHead();",
+		"python": "${1:head} = getHead()"
+	}
 }
