@@ -26,7 +26,7 @@ $(document).ready( function() {
 			}
 			menu_loaded().then( function(data){
 				var loc = window.location.href.split("/");
-				loc = loc[loc.length - 1];
+				loc = loc[loc.length - 1].split(".")[0];
 				$('#side-menu li a').each( function(){
 					if ($(this).html().toLowerCase() == loc){
 						$(this).parent().addClass('here visible').siblings('li').addClass('visible');
