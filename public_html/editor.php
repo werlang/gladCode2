@@ -6,13 +6,13 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Editor</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
 	<link rel='stylesheet' href="css/sprite.css"/>
 	<link rel='stylesheet' href="css/slider.css"/>
 	<link rel='stylesheet' href="css/glad-card.css"/>
 	<link rel='stylesheet' href="css/dialog.css"/>
 	<link rel='stylesheet' href="css/chat.css"/>
-	<link rel='stylesheet' href="css/prism.css"/>
 	<link rel='stylesheet' href="css/header.css"/>
 	<link rel='stylesheet' href="css/editor.css"/>
 	
@@ -23,6 +23,9 @@
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
+	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
 	
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>
@@ -32,7 +35,6 @@
 	<script src="script/googlelogin.js"></script>
 	<script src="script/header.js"></script>
 	<script src="script/socket.js"></script>
-	<script src="script/prism.js"></script>
 	<script src="script/emoji.js"></script>
 	<script src="script/chat.js"></script>
 	

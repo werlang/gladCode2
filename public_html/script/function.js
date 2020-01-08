@@ -83,6 +83,7 @@ function load_content(item){
 		else
 			$('#temp-syntax').html(item.syntax.c);
 
+		$('#temp-syntax').attr('class', `language-${language}`);
 		Prism.highlightElement($('#temp-syntax')[0]);
 		$('#temp-description').html(item.description.long);
 
@@ -98,9 +99,15 @@ function load_content(item){
 		
 		});
 		
-		$('#temp-return').html(item.treturn);
-		$('#temp-sample').html(item.sample);
-		Prism.highlightElement($('#temp-sample')[0]);
+		var treturn = item.treturn.default;
+		if (user && item.treturn[language])
+			treturn = item.treturn[language];
+
+		$('#temp-return').html(treturn);
+		$('#temp-sample').load(`script/functions/samples/${item.sample[language]}`, () => {
+			$('#temp-sample').attr('class', `language-${language}`);
+			Prism.highlightElement($('#temp-sample')[0]);
+		});
 		$('#temp-explain').html(item.explain);
 
 		$.each(item.seealso, function(k,i) {
