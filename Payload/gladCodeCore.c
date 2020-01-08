@@ -117,12 +117,9 @@ int sendMessage(char *message, char *response){
 }
 
 int startSim(){
-	char response[10];
-	sendMessage("startSimulation", response);
-	if (strcmp(response,"true")==0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("startSimulation", r);
+	return atoi(r);
 }
 
 void endSocketComm(){
@@ -131,12 +128,9 @@ void endSocketComm(){
 }
 
 int running(){
-	char response[10];
-	sendMessage("isSimRunning", response);
-	if (strcmp(response,"true")==0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("isSimRunning", r);
+	return atoi(r);
 }
 
 int main(){
