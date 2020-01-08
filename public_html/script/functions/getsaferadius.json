@@ -1,16 +1,26 @@
 {
 	"name": "getSafeRadius",
 	"ptname": "pegaRaioSeguro",
-	"syntax": "float getSafeRadius ( void );",
+	"syntax": {
+		"c": "float getSafeRadius ( void );",
+		"python": "getSafeRadius()"
+	},
 	"description": {
 		"long": "Retorna a distância do centro da arena até a borda da <a href='manual.php#nav-sim'>nuvem tóxica</a>. Como o gás se espalha de forma circular, comparar a distância do gladiador até o centro com o retorno desta função é uma maneira fácil de determinar o quão próximo o gladiador está de entrar na nuvem tóxica.",
 		"brief": "Retorna o raio da área livre de nuvem tóxica."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo a distância do centro da arena até a borda da nuvem tóxica.",
-	"sample": "float r = 1;\nloop(){\n\twhile(isSafeHere() && !moveTo(r,r));\n\twhile(isSafeHere() && !moveTo(25-r,r));\n\twhile(isSafeHere() && !moveTo(25-r,25-r));\n\twhile(isSafeHere() && !moveTo(r,25-r));\n\twhile (getDist(12.5,12.5) >= getSafeRadius() - 2)\n\t\tmoveTo(12.5,12.5);\n\tr = 12.5 - getSafeRadius()/2;\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo a distância do centro da arena até a borda da nuvem tóxica."
+	},
+	"sample": {
+		"c": "21.c",
+		"python": "21.py"
+	},
 	"explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
 	"seealso": [
 		"moveTo",
@@ -18,5 +28,8 @@
 		"isSafeHere",
 		"getHp"
 	],
-	"snippet": "float ${1:safe_radius} = getSafeRadius();"
+	"snippet": {
+		"c": "float ${1:safe_radius} = getSafeRadius();",
+		"python": "${1:safe_radius} = getSafeRadius()"
+	}
 }

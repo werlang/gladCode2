@@ -35,13 +35,13 @@ def getName():
 	return sendMessage("getName")
 
 def upgradeSTR(n):
-	return int(sendMessage("upgradeSTR {}".format(n)))
+	return bool(int(sendMessage("upgradeSTR {}".format(n))))
 
 def upgradeAGI(n):
-	return int(sendMessage("upgradeAGI {}".format(n)))
+	return bool(int(sendMessage("upgradeAGI {}".format(n))))
 
 def upgradeINT(n):
-	return int(sendMessage("upgradeINT {}".format(n)))
+	return bool(int(sendMessage("upgradeINT {}".format(n))))
 
 def stepForward():
 	return float(sendMessage("stepForward"))
@@ -65,16 +65,10 @@ def turn(ang):
 	sendMessage("turn {}".format(ang))
 
 def turnTo(x, y):
-	if sendMessage("turnTo {} {}".format(x,y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("turnTo {} {}".format(x,y))))
 
 def turnToTarget():
-	if sendMessage("turnToTarget") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("turnToTarget")))
 
 def turnToAngle(ang):
 	sendMessage("turnToAngle {}".format(ang))
@@ -83,16 +77,10 @@ def moveForward(p):
 	sendMessage("moveForward {}".format(p))
 
 def moveTo(x, y):
-	if sendMessage("moveTo {} {}".format(x,y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("moveTo {} {}".format(x,y))))
 
 def moveToTarget():
-	if sendMessage("moveToTarget") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("moveToTarget")))
 
 def getX():
 	return float(sendMessage("getX"))
@@ -116,7 +104,11 @@ def getDist(x, y):
 	return float(sendMessage("getDist {} {}".format(x, y)))
 
 def getDistToTarget():
-	return float(sendMessage("getDistToTarget"))
+	resp = float(sendMessage("getDistToTarget"))
+	if resp < 0:
+		return False
+	else:
+		return resp
 
 def getAngle(x, y):
 	return float(sendMessage("getAngle {} {}".format(x, y)))
@@ -126,54 +118,59 @@ def howManyEnemies():
 	return int(sendMessage("howManyEnemies"))
 
 def getCloseEnemy():
-	return int(sendMessage("getCloseEnemy"))
+	return bool(int(sendMessage("getCloseEnemy")))
 
 def getFarEnemy():
-	return int(sendMessage("getFarEnemy"))
+	return bool(int(sendMessage("getFarEnemy")))
 
 def getLowHp():
-	return int(sendMessage("getLowHp"))
+	return bool(int(sendMessage("getLowHp")))
 
 def getHighHp():
-	return int(sendMessage("getHighHp"))
+	return bool(int(sendMessage("getHighHp")))
 
 def getTargetX():
-	return float(sendMessage("getTargetX"))
+	resp = float(sendMessage("getTargetX"))
+	if resp < 0:
+		return False
+	else:
+		return resp
 
 def getTargetY():
-	return float(sendMessage("getTargetY"))
+	resp = float(sendMessage("getTargetY"))
+	if resp < 0:
+		return False
+	else:
+		return resp
 
 def getTargetHealth():
 	return float(sendMessage("getTargetHealth"))
 
 def getTargetSpeed():
-	return float(sendMessage("getTargetSpeed"))
+	resp = float(sendMessage("getTargetSpeed"))
+	if resp < 0:
+		return False
+	else:
+		return resp
 
 def getTargetHead():
-	return float(sendMessage("getTargetHead"))
+	resp = float(sendMessage("getTargetHead"))
+	if resp < 0:
+		return False
+	else:
+		return resp
 
 def doYouSeeMe():
-	if sendMessage("doYouSeeMe") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("doYouSeeMe")))
 
 def isTargetVisible():
-	if sendMessage("isTargetVisible") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("isTargetVisible")))
 
 def attackMelee():
 	sendMessage("attackMelee")
 
-
 def attackRanged(x, y):
-	if sendMessage("attackRanged {} {}".format(x, y)) == "true":
-		return 1
-	else:
-		return 0
-
+	return bool(int(sendMessage("attackRanged {} {}".format(x, y))))
 
 def getLastHitTime():
 	return float(sendMessage("getLastHitTime"))
@@ -184,63 +181,35 @@ def getLastHitAngle():
 def turnToLastHit():
 	sendMessage("turnToLastHit")
 
-
 def getHit():
-	if sendMessage("getHit") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("getHit")))
 
 def getSafeRadius():
 	return float(sendMessage("getSafeRadius"))
 
 def isSafeHere():
-	if sendMessage("isSafeHere") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("isSafeHere")))
 
 def isSafeThere(x, y):
-	if sendMessage("isSafeThere {} {}".format(x, y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("isSafeThere {} {}".format(x, y))))
 
 def fireball(x, y):
-	if sendMessage("fireball {} {}".format(x, y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("fireball {} {}".format(x, y))))
 
 def teleport(x, y):
-	if sendMessage("teleport {} {}".format(x, y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("teleport {} {}".format(x, y))))
 
 def block():
-	if sendMessage("block") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("block")))
 
 def ambush():
-	if sendMessage("ambush") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("ambush")))
 
 def assassinate(x, y):
-	if sendMessage("assassinate {} {}".format(x, y)) == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("assassinate {} {}".format(x, y))))
 
 def charge():
-	if sendMessage("charge") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("charge")))
 
 def getBlockTimeLeft():
 	return float(sendMessage("getBlockTimeLeft"))
@@ -256,19 +225,19 @@ def setSpritesheet(str):
 	str = str
 
 def isStunned():
-	return int(sendMessage("isStunned"))
+	return bool(int(sendMessage("isStunned")))
 
 def isBurning():
-	return int(sendMessage("isBurning"))
+	return bool(int(sendMessage("isBurning")))
 
 def isProtected():
-	return int(sendMessage("isProtected"))
+	return bool(int(sendMessage("isProtected")))
 
 def isRunning():
-	return int(sendMessage("isRunning"))
+	return bool(int(sendMessage("isRunning")))
 
 def isSlowed():
-	return int(sendMessage("isSlowed"))
+	return bool(int(sendMessage("isSlowed")))
 
 def speak(message):
 	sendMessage("speak {}".format(message))

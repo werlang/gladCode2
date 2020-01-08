@@ -1,16 +1,26 @@
 {
 	"name": "getSTR",
 	"ptname": "pegaFOR",
-	"syntax": "int getSTR ( void );",
+	"syntax": {
+		"c": "int getSTR ( void );",
+		"python": "getSTR()"
+	},
 	"description": {
 		"long": "Retorna o valor do atributo Força (STR) do gladiador.",
 		"brief": "Retorna o valor do atributo Força (STR) do gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Inteiro contendo o valor do atributo Força do gladiador.",
-	"sample": "loop(){\n    if (getSTR() >= 15)\n        upgradeAGI();\n    else\n        upgradeSTR();\n    while(!moveTo(5,20));\n    while(!moveTo(20,5));\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Inteiro contendo o valor do atributo Força do gladiador."
+	},
+	"sample": {
+		"c": "23.c",
+		"python": "23.py"
+	},
 	"explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 15, chama a função upgradeAGI(), indicando que ele deseja aumentar sua Agilidade. Até isso acontecer, a prioridade de melhoria de atributo é para a Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
 	"seealso": [
 		"setSTR",
@@ -20,5 +30,8 @@
 		"upgradeAGI",
 		"moveTo"
 	],
-	"snippet": "int ${1:mystr} = getSTR();"
+	"snippet": {
+		"c": "int ${1:mystr} = getSTR();",
+		"python": "${1:mystr} = getSTR()"
+	}
 }

@@ -1,16 +1,26 @@
 {
 	"name": "setAp",
 	"ptname": "mudaPh",
-	"syntax": "void setAp ( float valor );",
+	"syntax": {
+		"c": "void setAp ( float valor );",
+		"python": "setAp(valor)"
+	},
 	"description": {
 		"long": "Atribui um valor para os pontos de habilidade do gladiador. O máximo de pontos de habilidade que o gladiador pode possuir continua sendo limitado pelas restrições normais. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
 		"brief": "Modifica os pontos de habilidade do gladiador."
 	},
-	"param": [
-		{"name": "valor", "description": "Float contendo o valor que será atribuído aos pontos de habilidade do gladiador."}
-	],
-	"treturn": "A função não possui retorno (void).",
-	"sample": "int start = 1;\r\n\r\nloop(){\r\n\tif (start){\r\n\t\tstart = 0;\r\n\t\tlvlUp(10);\r\n\t\tsetPosition(12.5, 12.5);\r\n\t}\r\n\tupgradeINT(5);\r\n\tif(getLowHp()){\r\n\t\tfireball(getTargetX(), getTargetY());\r\n\t}\r\n\telse{\r\n\t\tturn(50);\r\n\t}\r\n\tsetHp(1000);\r\n\tsetAp(1000);\r\n\tspeak(\"Sou imortaaaal!!!\");\r\n}\r\n",
+	"param": {
+		"default": [
+			{"name": "valor", "description": "Float contendo o valor que será atribuído aos pontos de habilidade do gladiador."}
+		]
+	},
+	"treturn": {
+		"default": "A função não possui retorno."
+	},
+	"sample": {
+		"c": "33.c",
+		"python": "33.py"
+	},
 	"explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
 	"seealso": [
 		"setPosition",
@@ -24,5 +34,8 @@
         "turn",
         "speak"
 	],
-	"snippet": "setAp(${1:value});"
+	"snippet": {
+		"c": "setAp(${1:value});",
+		"python": "setAp(${1:value})"
+	}
 }
