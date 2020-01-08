@@ -21,7 +21,7 @@
 	<script src="script/socket.js"></script>
 	<script src="script/header.js"></script>
 	
-	</head>
+</head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
