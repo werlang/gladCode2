@@ -345,33 +345,35 @@ $(document).ready( function() {
 	});
 
 	$('#test').click( function(){
-		var code = editor.getValue();
-		if (code.search("setup()") != -1){
-			showDialog("A função <span class='highlight'>setup</span> só deve ser usada nos modos de batalha clássicos (aqueles que você faz upload manual do código). Posso remover este trecho para você?",["NÃO","Pode"]).then(function(data){
-				if (data == "Pode"){
-					editor.setValue(code.replace(/setup\(\)[\s\n]*?{[\w\W]*?}/g, ""));
-					setTimeout( function(){
-						showTestWindow();
-					}, 300);
-				}
-			});
-		}
-		else
-			showTestWindow();
-		
-		function showTestWindow(){
-			if (tutoState == 2){
-				tutoState = 3;
-				showTutorial();
+		if (!$(this).hasClass('disabled')){
+			var code = editor.getValue();
+			if (code.search("setup()") != -1){
+				showDialog("A função <span class='highlight'>setup</span> só deve ser usada nos modos de batalha clássicos (aqueles que você faz upload manual do código). Posso remover este trecho para você?",["NÃO","Pode"]).then(function(data){
+					if (data == "Pode"){
+						editor.setValue(code.replace(/setup\(\)[\s\n]*?{[\w\W]*?}/g, ""));
+						setTimeout( function(){
+							showTestWindow();
+						}, 300);
+					}
+				});
 			}
-			else if (tutoState == 9 || tutoState == 10 || tutoState == 12 || tutoState == 14 || tutoState == 16 || tutoState == 18 || tutoState == 20 || tutoState == 22)
-				showTutorial();
-			else{
-				setLoadGlad();
-				if (!$(this).hasClass('disabled')){
-					$('#fog-battle').fadeIn();
-					var name = $('#float-card .glad-preview .glad span').html();
-					$('#fog-battle h3 span').html(name);
+			else
+				showTestWindow();
+			
+			function showTestWindow(){
+				if (tutoState == 2){
+					tutoState = 3;
+					showTutorial();
+				}
+				else if (tutoState == 9 || tutoState == 10 || tutoState == 12 || tutoState == 14 || tutoState == 16 || tutoState == 18 || tutoState == 20 || tutoState == 22)
+					showTutorial();
+				else{
+					setLoadGlad();
+					if (!$(this).hasClass('disabled')){
+						$('#fog-battle').fadeIn();
+						var name = $('#float-card .glad-preview .glad span').html();
+						$('#fog-battle h3 span').html(name);
+					}
 				}
 			}
 		}
@@ -1053,7 +1055,12 @@ function load_glad_generator(element){
 			saved = false;
 			tested = false;
 		});	
+		
 		$('#get-code').click( function() {
+			createFloatCard();
+		});
+
+		function createFloatCard(arg){
 			var nome = $('#distribuicao #nome').val();
 			if (nome.length <= 2 || !nome.match(/^[\w À-ú]+?$/g) ){
 				$('#distribuicao #nome').addClass('error');
@@ -1095,12 +1102,17 @@ function load_glad_generator(element){
 			
 						$('.delete-container, .code').remove();
 						
-						var canvascard = document.createElement('canvas');
-						canvascard.setAttribute("width", 64);
-						canvascard.setAttribute("height", 64);
-						var ctx = canvascard.getContext("2d");
-						ctx.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
-						$('#float-card .glad-preview .image').html(canvascard);
+						if (arg && arg.image){
+							$('#float-card .glad-preview .image').html(arg.image);
+						}
+						else{
+							var canvascard = document.createElement('canvas');
+							canvascard.setAttribute("width", 64);
+							canvascard.setAttribute("height", 64);
+							var ctx = canvascard.getContext("2d");
+							ctx.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
+							$('#float-card .glad-preview .image').html(canvascard);
+						}
 
 						if ($('#float-card .glad-preview').html() != "" && editor.getValue() != "")
 							$('#download').removeClass('disabled');
@@ -1111,7 +1123,8 @@ function load_glad_generator(element){
 			}
 			saved = false;
 			tested = false;
-		});
+		}
+
 		$('#back').click( function() {
 			$('#distribuicao-container').hide();
 			$('#skin-container').show();
@@ -1244,40 +1257,42 @@ function load_glad_generator(element){
 			$('#fog-skin').hide();
 		});
 		
-		if (loadGlad){
-			selected = {};
-			var skin;
-			var errorSkin = false;
-			try{
-				skin = JSON.parse(loadGlad.skin);
-			}
-			catch(error){
-				errorSkin = true;
-				skin = [];
-			}
-			for (var i in skin){
-				if (getImage(skin[i]))
-					selected[skin[i]] = getImage(skin[i]);
-			}
+		waitLogged().then( () => {
+			if (loadGlad){
+				selected = {};
+				var skin;
+				var errorSkin = false;
+				try{
+					skin = JSON.parse(loadGlad.skin);
+				}
+				catch(error){
+					errorSkin = true;
+					skin = [];
+				}
+				for (var i in skin){
+					if (getImage(skin[i]))
+						selected[skin[i]] = getImage(skin[i]);
+				}
 
-			//console.log(selected);
-			gladid = loadGlad.id;
-			$('#distribuicao #nome').val(loadGlad.name);
-			$('#distribuicao .slider').eq(0).val(loadGlad.vstr);
-			$('#distribuicao .slider').eq(1).val(loadGlad.vagi);
-			$('#distribuicao .slider').eq(2).val(loadGlad.vint);
-			$('#distribuicao .slider').change();
-			editor.setValue(decodeHTML(loadGlad.code));
-			editor.gotoLine(1,0,true);
-			$('#get-code').click();
-			saved = true;
+				//console.log(selected);
+				gladid = loadGlad.id;
+				$('#distribuicao #nome').val(loadGlad.name);
+				$('#distribuicao .slider').eq(0).val(loadGlad.vstr);
+				$('#distribuicao .slider').eq(1).val(loadGlad.vagi);
+				$('#distribuicao .slider').eq(2).val(loadGlad.vint);
+				$('#distribuicao .slider').change();
+				editor.setValue(decodeHTML(loadGlad.code));
+				editor.gotoLine(1,0,true);
 				
-			if (!errorSkin){
-				fetchSpritesheet(JSON.stringify(skin)).then( function(data){
-					$('#float-card .image').html(getSpriteThumb(data,'walk','down'));
-				});
+				if (!errorSkin){
+					fetchSpritesheet(JSON.stringify(skin)).then( function(data){
+						createFloatCard({image: getSpriteThumb(data,'walk','down')});
+					});
+				}
+
+				saved = true;
 			}
-		}
+		});
 	});
 }
 
