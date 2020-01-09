@@ -21,12 +21,7 @@ def initClient():
 	# print("Connected")
 
 def startSim():
-	resp = sendMessage("startSimulation")
-	# print("Start sim: ", resp)
-	if resp == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("startSimulation")))
 
 def sendMessage(message):
 	global soc
@@ -36,16 +31,13 @@ def sendMessage(message):
 	#Receive a reply from the server
 	server_reply = soc.recv(5120).decode("utf8")
 	# print("Data received: ", server_reply)
-	if server_reply == "-":
+	if server_reply == "":
 		return 0
 	else:
 		return server_reply
 
 def running():
-	if sendMessage("isSimRunning") == "true":
-		return 1
-	else:
-		return 0
+	return bool(int(sendMessage("isSimRunning")))
 
 def endSocketComm():
 	sendMessage("endSocketComm")
