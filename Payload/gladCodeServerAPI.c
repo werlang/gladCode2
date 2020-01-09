@@ -476,7 +476,7 @@ float getDist(int gladid, float x, float y){
 }
 
 float getDistToTarget(int gladid){
-	float r = 9999;
+	float r = -1;
 	if (isLockedTargetVisibleUnsafe(gladid)){
 		int target = getLockedTarget(gladid);
         float x = (g+target)->x;
@@ -617,7 +617,7 @@ float getTargetSpeed(int gladid){
         return spd;
 	}
 	else
-		return 0;
+		return -1;
 }
 
 //retorna a porcentagem de vida do alvo trancado

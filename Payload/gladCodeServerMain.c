@@ -165,16 +165,10 @@ void *connection_handler(void *p){
 				sprintf(reply, "%f",getTargetY(gladid));
 			}
 			else if (strcmp(func->call,"doYouSeeMe")==0){
-				if (doYouSeeMe(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i",doYouSeeMe(gladid));
 			}
 			else if (strcmp(func->call,"isTargetVisible")==0){
-				if (isLockedTargetVisible(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i",doYouSeeMe(gladid));
 			}
 			else if (strcmp(func->call,"getSimTime")==0){
 				sprintf(reply, "%.1f",getSimTime(gladid));
@@ -183,16 +177,10 @@ void *connection_handler(void *p){
 				sprintf(reply, "%s",getSimCounters());
 			}
 			else if (strcmp(func->call,"startSimulation")==0){
-				if (startSimulation(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", startSimulation(gladid));
 			}
 			else if (strcmp(func->call,"isSimRunning")==0){
-				if (isSimRunning(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", isSimRunning(gladid));
 			}
 			else if (strcmp(func->call,"getLastHitTime")==0){
 				sprintf(reply, "%f", getLastHitTime(gladid));
@@ -204,27 +192,18 @@ void *connection_handler(void *p){
 				turnToLastHit(gladid);
 			}
 			else if (strcmp(func->call,"getHit")==0){
-				if (getHit(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i",getHit(gladid));
 			}
 			else if (strcmp(func->call,"getSafeRadius")==0){
 				sprintf(reply, "%f", getSafeRadius(gladid));
 			}
 			else if (strcmp(func->call,"isSafeHere")==0){
-				if (isSafeHere(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", isSafeHere(gladid));
 			}
 			else if (strcmp(func->call,"isSafeThere")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (isSafeThere(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", isSafeThere(gladid, x, y));
 			}
 			else if (strcmp(func->call,"stepForward")==0){
 				float d = stepForward(gladid);
@@ -259,16 +238,10 @@ void *connection_handler(void *p){
 			else if (strcmp(func->call,"turnTo")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if(turnTo(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", isSafeThere(gladid, x, y));
 			}
 			else if (strcmp(func->call,"turnToTarget")==0){
-				if(turnToTarget(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", turnToTarget(gladid));
 			}
 			else if (strcmp(func->call,"turnToAngle")==0){
 				float v = func->arg[0].toFloat;
@@ -281,16 +254,10 @@ void *connection_handler(void *p){
 			else if (strcmp(func->call,"moveTo")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (moveTo(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", moveTo(gladid, x, y));
 			}
 			else if (strcmp(func->call,"moveToTarget")==0){
-				if (moveToTarget(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", moveToTarget(gladid));
 			}
 			else if (strcmp(func->call,"attackMelee")==0){
 				attackMelee(gladid);
@@ -299,52 +266,31 @@ void *connection_handler(void *p){
 			else if (strcmp(func->call,"attackRanged")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (attackRanged(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", attackRanged(gladid, x, y));
 			}
 			else if (strcmp(func->call,"fireball")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (fireball(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", fireball(gladid, x, y));
 			}
 			else if (strcmp(func->call,"teleport")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (teleport(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", teleport(gladid, x, y));
 			}
 			else if (strcmp(func->call,"block")==0){
-				if (block(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", block(gladid));
 			}
 			else if (strcmp(func->call,"ambush")==0){
-				if (ambush(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", ambush(gladid));
 			}
 			else if (strcmp(func->call,"assassinate")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				if (assassinate(gladid, x, y))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", assassinate(gladid, x, y));
 			}
 			else if (strcmp(func->call,"charge")==0){
-				if (charge(gladid))
-					sprintf(reply, "true");
-				else
-					sprintf(reply, "false");
+				sprintf(reply, "%i", charge(gladid));
 			}
 			else if (strcmp(func->call,"getBlockTimeLeft")==0){
 				float t = getBlockTimeLeft(gladid);
@@ -492,26 +438,44 @@ int main(int argc , char *argv[]){
 	struct thread_param p[nglad];
 
     for( i=0 ; i<nglad ; i++){
-		
 		char name[10];
-		sprintf(name,"usercode/code%i",i);
-		FILE *f = NULL;
+		sprintf(name,"usercode/code%i.py",i);
 
-		struct timeval wait_start, wait_now;
-		gettimeofday(&wait_start,NULL);
-		long unsigned int sec_diff;
-		do{
-			f = fopen(name,"r");
-			gettimeofday(&wait_now,NULL);
-			sec_diff = wait_now.tv_sec - wait_start.tv_sec;
-		}while (f == NULL && sec_diff < 5);
-		if (f == NULL){
-			endsim = 1;
-			printf("CLIENT TIMEOUT",i);
-			break;
+		// is a C file
+		if (fopen(name,"r") == NULL) {
+			sprintf(name,"usercode/code%i",i);
+			FILE *f = NULL;
+
+			struct timeval wait_start, wait_now;
+			gettimeofday(&wait_start,NULL);
+			long unsigned int sec_diff;
+			do{
+				f = fopen(name,"r");
+				gettimeofday(&wait_now,NULL);
+				sec_diff = wait_now.tv_sec - wait_start.tv_sec;
+			}while (f == NULL && sec_diff < 5);
+			if (f == NULL){
+				endsim = 1;
+				printf("CLIENT TIMEOUT");
+				break;
+			}
+			else
+				fclose(f);
 		}
-		else
-			fclose(f);
+		// python file
+		else{
+			FILE *f = NULL;
+			do {
+				f = fopen("usercode/errorc.txt", "r");
+			} while(f == NULL);
+			char text[20] = "";
+			fgets(text, 10, f);
+			if (strlen(text) > 0){
+				endsim = 1;
+				printf("PYTHON ERROR");
+				break;
+			}
+		}
 
 		new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c);
 				

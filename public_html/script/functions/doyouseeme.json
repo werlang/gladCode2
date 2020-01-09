@@ -1,16 +1,27 @@
 {
 	"name": "doYouSeeMe",
 	"ptname": "voceMeVe",
-	"syntax": "int doYouSeeMe ( void );",
+	"syntax": {
+		"c": "int doYouSeeMe ( void );",
+		"python": "doYouSeeMe()"
+	},
 	"description": {
-		"long": "Verifica se o alvo selecionado está enxergando o gladiador. Em caso afirmativo retorna 1, ou 0 caso contrário. O alvo enxerga o gladiador caso o gladiador esteja dentro do campo de visão dele. Caso o alvo selecionado não esteja no campo de visão do gladiador a função também retorna 0.",
+		"long": "Verifica se o alvo selecionado está enxergando o gladiador. O alvo enxerga o gladiador caso o gladiador esteja dentro do campo de visão dele.",
 		"brief": "Descobre se o alvo enxerga o gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Retorna 1 caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna 0.",
-	"sample": "loop(){\n    if (!isTargetVisible())\n        getLowHp();\n    else{\n        if (doYouSeeMe()){\n            stepLeft();\n            turnToTarget();\n        }\n        else\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Retorna True caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna False.",
+		"c": "Retorna 1 caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna 0."
+	},
+	"sample": {
+		"c": "6.c",
+		"python": "6.py"
+	},
 	"explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível verifica se o alvo enxerga o gladiador e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
 	"seealso": [
 		"getLowHp",
@@ -21,5 +32,8 @@
 		"stepLeft",
 		"turnToTarget"
 	],
-	"snippet": "int ${1:seen} = doYouSeeMe();"
+	"snippet": {
+		"c": "int ${1:seen} = doYouSeeMe();",
+		"python": "${1:seen} = doYouSeeMe()"
+	}
 }

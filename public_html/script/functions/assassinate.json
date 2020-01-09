@@ -1,17 +1,28 @@
 {
 	"name": "assassinate",
 	"ptname": "assassinar",
-	"syntax": "int assassinate ( float x, float y );",
+	"syntax": {
+		"c": "int assassinate ( float x, float y );",
+		"python": "assassinate(x, y)"
+	},
 	"description": {
 		"long": "Dispara um ataque à distância no ponto definido pelas coordenadas x e y recebidas como parâmetro. O projétil arremessado viaja com velocidade 20 p/s. Caso o gladiador não possua um alvo fixado, ou o alvo não esteja visível a função retorna 0. Este ataque possui potencial de causar dano adicional. Caso o alvo não esteja enxergando o gladiador ou o alvo esteja <a href='manual.php#nav-efeito'>atordoado</a> a habilidade causa dano de 170% do <a href='manual.php#nav-attr'>atributo Precisão</a> do gladiador, e caso o alvo não esteja enxergando o gladiador e esteja atordoado a habilidade causa dano de 250% do atributo Precisão.",
 		"brief": "Dispara um ataque que pode causar dano e efeito adicional no alvo."
 	},
-	"param": [
-		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
-		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
-	],
-	"treturn": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
-	"sample": "int start = 1;\nloop(){\n\tif (start){\n\t\tif(moveTo(12.5,12.5))\n\t\t\tstart = 0;\n\t}\n\tif (getLowHp()){\n\t\tif(doYouSeeMe()){\n\t\t\tturnToTarget();\n\t\t\tstepLeft();\n\t\t}\n\t\telse{\n\t\t\tif (getAmbushTimeLeft() > 0)\n\t\t\t\tassassinate(getTargetX(), getTargetY());\n\t\t\telse\n\t\t\t\tambush();\n\t\t}\n\t}\n\telse if (!start)\n\t\tturn(50);\n}",
+	"param": {
+		"default": [
+			{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+			{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+		]
+	},
+	"treturn": {
+		"default": "Retorna True caso a habilidade tenha sido lançada com sucesso, caso contrário retorna False.",
+		"c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0."
+	},
+	"sample": {
+		"c": "1.c",
+		"python": "1.py"
+	},
 	"explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
 	"seealso": [
 		"getLowHp",
@@ -23,5 +34,8 @@
 		"turn",
 		"ambush"
 	],
-	"snippet": "assassinate(${1:X}, ${2:Y});"
+	"snippet": {
+		"c": "assassinate(${1:X}, ${2:Y});",
+		"python": "assassinate(${1:X}, ${2:Y})"
+	}
 }

@@ -1,16 +1,26 @@
 {
 	"name": "getSimTime",
 	"ptname": "pegaTempo",
-	"syntax": "float getSimTime ( void );",
+	"syntax": {
+		"c": "float getSimTime ( void );",
+		"python": "getSimTime()"
+	},
 	"description": {
 		"long": "A função retorna o tempo que se passou desde o início da simulação. Como o intervalo mínimo de <a href='manual#nav-sim'>tempo da simulação é 0.1s</a>, o retorno dessa função será sempre valores múltiplos de 0.1.",
 		"brief": "Retorna o tempo da simulação."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo o valor do tempo que se passou desde o início da simulação.",
-	"sample": "loop(){\n\tif (getHit()){\n\t\tturnToLastHit();\n\t\tif (getCloseEnemy())\n\t\t\tattackRanged(getTargetX(), getTargetY());\n\t\telse{\n\t\t\tfloat diff, st = getSimTime();\n\t\t\tdo{\n\t\t\t\tdiff = getSimTime() - st;\n\t\t\t\tstepBack();\n\t\t\t}while(diff < 4 && howManyEnemies() == 0);\n\t\t}\n\t}\n\telse if (getCloseEnemy())\n\t\tattackRanged(getTargetX(), getTargetY());\n\telse if (moveTo(12.5, 12.5))\n\t\tturn(45);\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo o valor do tempo que se passou desde o início da simulação."
+	},
+	"sample": {
+		"c": "22.c",
+		"python": "22.py"
+	},
 	"explain": "No exemplo o gladiador se move em direção ao centro da arena. Ao encontrar um gladiador inimigo ele ataca. Ao ser atingido, caso ele não enxergue o alvo, e recua para trás por 4 segundos.",
 	"seealso": [
 		"getHit",
@@ -24,5 +34,8 @@
 		"moveTo",
 		"turn"
 	],
-	"snippet": "float ${1:sim_time} = getSimTime();"
+	"snippet": {
+		"c": "float ${1:sim_time} = getSimTime();",
+		"python": "${1:sim_time} = getSimTime()"
+	}
 }

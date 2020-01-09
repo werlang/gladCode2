@@ -1,20 +1,33 @@
 {
 	"name": "getLvl",
 	"ptname": "pegaNivel",
-	"syntax": "int getLvl ( void );",
+	"syntax": {
+		"c": "int getLvl ( void );",
+		"python": "getLvl()"
+	},
 	"description": {
 		"long": "Retorna o nível do gladiador.",
 		"brief": "Retorna o nível do gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Inteiro contendo o nível do gladiador.",
-	"sample": "loop(){\n\tif (getLvl() < 5)\n\t\tupgradeSTR();\n\telse\n\t\tupgradeINT();\n\t\t\n...",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Inteiro contendo o nível do gladiador."
+	},
+	"sample": {
+		"c": "20.c",
+		"python": "20.py"
+	},
 	"explain": "Este trecho de código verifica o nível do gladiador. Caso seja menor que 5, o gladiador melhora a força, caso contrário a inteligência.",
 	"seealso": [
 		"upgradeSTR",
 		"upgradeINT"
 	],
-	"snippet": "int ${1:lvl} = getLvl();"
+	"snippet": {
+		"c": "int ${1:lvl} = getLvl();",
+		"python": "${1:lvl} = getLvl()"
+	}
 }
