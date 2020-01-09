@@ -1,16 +1,27 @@
 {
 	"name": "isSafeHere",
 	"ptname": "seguroAqui",
-	"syntax": "int isSafeHere ( void );",
+	"syntax": {
+		"c": "int isSafeHere ( void );",
+		"python": "isSafeHere()"
+	},
 	"description": {
-		"long": "A função analisa a posição ocupada pelo gladiador na arena. Caso na posição possua <a href='manual.php#nav-sim'>gás tóxico</a> a função retorna 0. Caso não haja retorna 1.",
+		"long": "A função analisa a posição ocupada pelo gladiador na arena, verificando se há <a href='manual.php#nav-sim'>gás tóxico</a> ou não.",
 		"brief": "Descobre se o gladiador está dentro da nuvem tóxica."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Retorna 1 caso a posição do gladiador esteja segura do gás tóxico, ou 0 caso contrário.",
-	"sample": "float r = 1;\nloop(){\n\twhile(isSafeHere() && !moveTo(r,r));\n\twhile(isSafeHere() && !moveTo(25-r,r));\n\twhile(isSafeHere() && !moveTo(25-r,25-r));\n\twhile(isSafeHere() && !moveTo(r,25-r));\n\twhile (getDist(12.5,12.5) >= getSafeRadius() - 2)\n\t\tmoveTo(12.5,12.5);\n\tr = 12.5 - getSafeRadius()/2;\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Retorna True caso haja gás tóxico na posição do gladiador, ou False caso contrário.",
+		"c": "Retorna 1 caso haja gás tóxico na posição do gladiador, ou 0 caso contrário."
+	},
+	"sample": {
+		"c": "21.c",
+		"python": "21.py"
+	},
 	"explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
 	"seealso": [
 		"moveTo",
@@ -18,5 +29,8 @@
 		"getSafeRadius",
 		"getHp"
 	],
-	"snippet": "int ${1:safe} = isSafeHere();"
+	"snippet": {
+		"c": "int ${1:safe} = isSafeHere();",
+		"python": "${1:safe} = isSafeHere()"
+	}
 }

@@ -135,20 +135,14 @@ int turnTo(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "turnTo %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int turnToTarget(){
 	char m[100], r[10];
 	sprintf(m, "turnToTarget");
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 void turnToAngle(float ang){
@@ -167,20 +161,13 @@ int moveTo(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "moveTo %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int moveToTarget(){
-	char m[100], r[10];
-	sprintf(m, "moveToTarget");
-	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("moveToTarget", r);
+	return atoi(r);
 }
 
 float getX(){
@@ -302,19 +289,13 @@ float getTargetHead(){
 int doYouSeeMe(){
 	char r[10];
 	sendMessage("doYouSeeMe", r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int isTargetVisible(){
 	char r[10];
 	sendMessage("isTargetVisible", r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 void attackMelee(){
@@ -326,10 +307,7 @@ int attackRanged(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "attackRanged %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 float getLastHitTime(){
@@ -350,12 +328,9 @@ void turnToLastHit(){
 }
 
 int getHit(){
-	char response[10];
-	sendMessage("getHit", response);
-	if (strcmp(response, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("getHit", r);
+	return atoi(r);
 }
 
 float getSafeRadius(){
@@ -365,79 +340,55 @@ float getSafeRadius(){
 }
 
 int isSafeHere(){
-	char response[10];
-	sendMessage("isSafeHere", response);
-	if (strcmp(response, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("isSafeHere", r);
+	return atoi(r);
 }
 
 int isSafeThere(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "isSafeThere %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int fireball(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "fireball %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int teleport(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "teleport %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int block(){
-	char response[10];
-	sendMessage("block", response);
-	if (strcmp(response, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("block", r);
+	return atoi(r);
 }
 
 int ambush(){
-	char response[10];
-	sendMessage("ambush", response);
-	if (strcmp(response, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("ambush", r);
+	return atoi(r);
 }
 
 int assassinate(float x, float y){
 	char m[100], r[10];
 	sprintf(m, "assassinate %f %f", x, y);
 	sendMessage(m, r);
-	if (strcmp(r, "true") == 0)
-		return 1;
-	else
-		return 0;
+	return atoi(r);
 }
 
 int charge(){
-	char response[10];
-	sendMessage("charge", response);
-	if (strcmp(response, "true") == 0)
-		return 1;
-	else
-		return 0;
+	char r[10];
+	sendMessage("charge", r);
+	return atoi(r);
 }
 
 float getBlockTimeLeft(){

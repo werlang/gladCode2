@@ -1,16 +1,26 @@
 {
 	"name": "getY",
 	"ptname": "pegaY",
-	"syntax": "float getY ( void );",
+	"syntax": {
+		"c": "float getY ( void );",
+		"python": "getY()"
+	},
 	"description": {
 		"long": "Retorna o valor da coordenada y do gladiador. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual.php#nav-sim'>arena</a>.",
 		"brief": "Retorna a coordenada y do gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo o valor da coordenada y do gladiador.",
-	"sample": "float dx = 20, dy = 5;\nloop(){\n    if (getX() == 20 && getY() == 20)\n        dx = 5;\n    if (getX() == 5 && getY() == 5)\n        dx = 20;\n    if (getX() == 20 && getY() == 5)\n        dy = 20;\n    if (getX() == 5 && getY() == 20)\n        dy = 5;\n    moveTo(dx, dy);\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo o valor da coordenada y do gladiador."
+	},
+	"sample": {
+		"c": "25.c",
+		"python": "25.py"
+	},
 	"explain": "No exemplo o gladiador utiliza as funções getX e getY para verificar sua posição na arena, e com isso ajustar para onde deseja se mover, resultando em um movimento em torno das bordas da arena.",
 	"seealso": [
 		"getX",
@@ -18,5 +28,8 @@
 		"getTargetX",
 		"getTargetY"
 	],
-	"snippet": "float ${1:y} = getY();"
+	"snippet": {
+		"c": "float ${1:y} = getY();",
+		"python": "${1:y} = getY()"
+	}
 }

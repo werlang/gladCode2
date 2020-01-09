@@ -1,16 +1,30 @@
 {
 	"name": "speak",
 	"ptname": "fala",
-	"syntax": "void speak ( char * formato, ... );",
+	"syntax": {
+		"c": "void speak ( char * formato, ... );",
+		"python": "speak(texto)"
+	},
 	"description": {
-		"long": "Faz com que apareça próximo ao gladiador uma caixa com uma mensagem, representando a fala do gladiador. A mensagem fica visível por 3 segundos e então desaparece. Esta função não possui propósito para efeitos da simulação, e é útil somente para fins de depuração do código ou efeito costmético durante a batalha. Os argumentos seguem o mesmo formato da função <a href='http://www.cplusplus.com/reference/cstdio/printf/'>printf</a> da linguagem C, ou seja, uma string com o texto a ser exibido, seguido de uma quantidade qualquer de valores. Esta string pode conter \"coringas\", que são palavras específicas em locais da string que os valores dos argumentos seguintes substituirão. A função speak aceita os \"coringas\" <b>%i</b> e <b>%d</b> para valores int, <b>%c</b> para char, <b>%s</b> para string e <b>%f</b> ou <b>%.Nf</b> para float, onde N é um número inteiro que indica o números de casas decimais que será mostrado.",
+		"long": "Faz com que apareça próximo ao gladiador uma caixa com uma mensagem, representando a fala do gladiador. A mensagem fica visível por 3 segundos e então desaparece. Esta função não possui propósito para efeitos da simulação, e é útil somente para fins de depuração do código ou efeito cosmético durante a batalha.",
 		"brief": "Mostra um balão de fala com uma mensagem."
 	},
-	"param": [
-		{"name": "nome", "description": "String contendo a mensagem a ser mostrada."}
-	],
-	"treturn": "A função não possui retorno (void).",
-	"sample": "loop(){\r\n\tif (getHit()){\r\n\t\tspeak(\"Aieeee\");\r\n\t\tambush();\r\n\t\tturnToLastHit();\r\n\t}\r\n\telse if (getCloseEnemy()){\r\n\t\tattackRanged(getTargetX(), getTargetY());\r\n\t\tspeak(\"Te achei em X:%.1f Y:%.1f\",getTargetX(), getTargetY());\r\n\t}\r\n\telse{\r\n\t\tif(getX() == 12.5 && getY() == 12.5){\r\n\t\t\tturn(30);\r\n\t\t\tspeak(\"Roda roda roda...\");\r\n\t\t}\r\n\t\telse\r\n\t\t\tmoveTo(12.5,12.5);\r\n\t}\r\n}",
+	"param": {
+		"default": [
+			{"name": "texto", "description": "String contendo a mensagem a ser mostrada."}
+		],
+		"c": [
+			{"name": "formato", "description": "String formatada contendo a mensagem a ser mostrada. Pode conter os coringas %d, %f, %c, etc. semelhante à função printf."},
+			{"name": "...", "description": "Lista de variáveis que terão seus valores mostrados no lugar dos caracteres coringas."}
+		]
+	},
+	"treturn": {
+		"default": "A função não possui retorno."
+	},
+	"sample": {
+		"c": "37.c",
+		"python": "37.py"
+	},
 	"explain": "No exemplo o gladiador se move até o centro da arena, e quando chega fica girando enquanto diz uma mensagem. Caso veja um inimigo, atira contra ele e diz a posição que o encontrou. Caso seja acertado, se vira em direção ao inimigo usa a habilidade ambush e fala outra mensagem.",
 	"seealso": [
 		"getHit",
@@ -25,5 +39,8 @@
 		"turn",
 		"moveTo"
 	],
-	"snippet": "speak(\"${1:text}\");"
+	"snippet": {
+		"c": "speak(\"${1:text}\");",
+		"python": "speak(\"${1:text}\")"
+	}
 }

@@ -1,5 +1,3 @@
-var user;
-
 $(document).ready( function(){
 	$('#header-container').addClass('small-profile');
 	$('#header-profile').addClass('here');
@@ -7,11 +5,10 @@ $(document).ready( function(){
 	fill_assets();
 	
 	var preferences = ["friend","message","update","duel","tourn"];
-	$.post("back_login.php", {
-		action: "GET"
-	}).done( function(data){
-		// console.log(data);
-		user = JSON.parse(data);
+
+	waitLogged().then(user => {
+		// console.log(user);
+
 		if ($('#tab').length){
 			var id = $('#tab').html();
 			$('#'+ id).click();
@@ -21,6 +18,11 @@ $(document).ready( function(){
 			$('#menu #profile').click();
 		$('#profile-ui #picture img').attr('src',user.foto);
 		$('#profile-ui #nickname').html(user.apelido);
+
+		var language = $('#profile-panel #language select');
+		language.selectmenu().val(user.language).selectmenu('refresh');
+
+
 		checkNotifications();
 
 		socket_ready().then( () => {
@@ -184,7 +186,8 @@ $(document).ready( function(){
 			action: "UPDATE",
 			nickname: $('#nickname .input').val(),
 			picture: user.foto,
-			preferences: JSON.stringify(user.preferences)
+			preferences: JSON.stringify(user.preferences),
+			language: $('#language select').val()
 		})
 		.done( function(data){
 			//console.log(data);

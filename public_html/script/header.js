@@ -1,3 +1,5 @@
+var user;
+
 $(document).ready( function() {
 	$('#menu-button').click( function() {
 		$('body').append("<div id='fog'><div id='menu'></div></div>");
@@ -63,10 +65,11 @@ $(document).ready( function() {
 	$.post("back_login.php", {
 		action: "GET"
 	}).done( function(data){
-		//console.log(data);
+		// console.log(data);
 		data = JSON.parse(data);
+		user = data;
 		if (data.status == "NOTLOGGED")
-			$('.mobile #profile, .desktop #profile').hide();
+			$('.mobile #profile, .desktop #login').removeClass('hidden');
 		else{
 			socket_request('login', {}).then( function(res, err){
 				if (err) return console.log(err);
@@ -80,7 +83,7 @@ $(document).ready( function() {
 					});
 				}
 				else
-					$('.mobile #login, .desktop #login').hide();
+					$('.mobile #login, .desktop #profile').removeClass('hidden');
 			});
 		}
 	});
@@ -88,4 +91,18 @@ $(document).ready( function() {
 	if ($('#footer').length)
 		$('#footer').load("footer.php");
 });
+
+async function waitLogged(){
+	return await new Promise( (resolve, reject) => {
+		loginReady();
+		function loginReady(){
+			setTimeout( function() {
+				if (user)
+					resolve(user);
+				else
+					loginReady();
+			}, 100);
+		}
+	});
+}
 

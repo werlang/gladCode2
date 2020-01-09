@@ -37,6 +37,7 @@
 				$info['preferences']['update'] = $row['pref_update'];
 				$info['preferences']['duel'] = $row['pref_duel'];
 				$info['preferences']['tourn'] = $row['pref_tourn'];
+				$info['language'] = $row['pref_language'];
 
 				if (exif_imagetype($row['foto']) == IMAGETYPE_PNG){
 					$foto = $row['foto'];
@@ -171,6 +172,7 @@
 		if(isset($_SESSION['user'])){
 			$user = $_SESSION['user'];
 			$nickname = mysql_escape_string($_POST['nickname']);
+			$language = mysql_escape_string($_POST['language']);
 			$picture = $_POST['picture'];
 			$preferences = (array)json_decode($_POST['preferences']);
 			$pref_message = $preferences['message'];
@@ -195,7 +197,7 @@
 					$picture = "profpics/$pasta.png";
 				}
 				
-				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn' WHERE id = '$user'";
+				$sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language' WHERE id = '$user'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
 				$output['status'] = "SUCCESS";

@@ -6,7 +6,9 @@ RewriteRule    ^tourn\/([a-f0-9]+)\/([0-9]+)/?$    tournament.php?h=$1&r=$2    [
 
 RewriteRule    ^post\/([a-f0-9]+)/?$    post.php?p=$1    [NC,L]
 
-RewriteRule    ^function/(.*)$    function.php?&f=$1 [NC,L]
+RewriteRule    ^function/(.*)\.(.*)$    function.php?f=$1&p=$2 [NC,L]
+RewriteRule    ^funcao/(.*)\.(.*)$    function.php?f=$1&p=$2&l=pt [NC,L]
+RewriteRule    ^function/(.*)$    function.php?f=$1 [NC,L]
 RewriteRule    ^funcao/(.*)$    function.php?f=$1&l=pt [NC,L]
 
 RewriteRule    ^glad-([0-9]+)$    editor.php?g=$1    [NC,L]

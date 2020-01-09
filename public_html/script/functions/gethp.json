@@ -1,16 +1,26 @@
 {
 	"name": "getHp",
 	"ptname": "pegaPv",
-	"syntax": "float getHp ( void );",
+	"syntax": {
+		"c": "float getHp ( void );",
+		"python": "getHp()"
+	},
 	"description": {
 		"long": "Retorna a quantidade de pontos de vida restantes do gladiador.",
 		"brief": "Retorna os pontos de vida do gladiador."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Float contendo a quantidade de pontos de vida restantes do gladiador.",
-	"sample": "loop(){\n    if (getLowHp()){\n        if (getHp() > 20)\n            attackRanged(getTargetX(), getTargetY());\n        else\n            stepBack();\n    }\n    else\n        turnRight(5);\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Float contendo a quantidade de pontos de vida restantes do gladiador."
+	},
+	"sample": {
+		"c": "17.c",
+		"python": "17.py"
+	},
 	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
 	"seealso": [
 		"getLowHp",
@@ -20,5 +30,8 @@
 		"stepBack",
 		"turnRight"
 	],
-	"snippet": "float ${1:hp} = getHp();"
+	"snippet": {
+		"c": "float ${1:hp} = getHp();",
+		"python": "${1:hp} = getHp()"
+	}
 }
