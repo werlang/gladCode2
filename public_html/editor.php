@@ -6,8 +6,7 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Editor</title>
 	<link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	  rel="stylesheet">
+
 	<link rel='stylesheet' href="css/sprite.css"/>
 	<link rel='stylesheet' href="css/slider.css"/>
 	<link rel='stylesheet' href="css/glad-card.css"/>
@@ -23,6 +22,7 @@
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="https://rawgithub.com/ajaxorg/ace-builds/master/src/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>
@@ -78,32 +78,32 @@
 	?>
 	<div id='frame'>
 		<div id='panel-left'>
-			<div id='profile-icon' class='mrow'>
-				<img src='icon/profile.png' title='Ir para o seu perfil'>
+			<div id='profile-icon' class='mrow' title='Ir para o seu perfil'>
+				<img src='icon/profile.png'>
 			</div>
-			<div id='new' class='mrow'>
-				<img src='icon/face-white.png' title='Criar novo gladiador'>
+			<div id='new' class='mrow' title='Criar novo gladiador'>
+				<i class="fas fa-baby"></i>
 			</div>
-			<div id='open' class='mrow'>
-				<img src='icon/contacts.png' title='Editar outro gladiador'>
+			<div id='open' class='mrow' title='Editar outro gladiador'>
+				<i class="fas fa-users"></i>
 			</div>
-			<div id='save' class='mrow disabled'>
-				<img src='icon/sdcard.png' title='Guardar alterações no gladiador'>
+			<div id='save' class='mrow disabled' title='Guardar alterações no gladiador'>
+				<i class='fas fa-sd-card'></i>
 			</div>
-			<div id='skin' class='mrow'>
-				<img src='icon/paint.png' title='Painel de aparência do gladiador'>
+			<div id='skin' class='mrow' title='Painel de aparência do gladiador'>
+				<i class='fas fa-paint-roller'></i>
 			</div>
-			<div id='test' class='mrow disabled'>
-				<img src='icon/gamepad.png' title='Testar gladiador em batalha'>
+			<div id='test' class='mrow disabled' title='Testar gladiador em batalha'>
+				<i class='fas fa-gamepad'></i>
 			</div>
-			<div id='download' class='mrow disabled' hidden>
-				<img src='icon/cloud_download.png' title='Baixar o código do gladiador'>
+			<div id='download' class='mrow disabled' hidden title='Baixar o código do gladiador'>
+				<i class='fas fa-file-download'></i>
 			</div>
-			<div id='settings' class='mrow'>
-				<img src='icon/settings.png' title='Preferências'>
+			<div id='settings' class='mrow' title='Preferências'>
+				<i class='fas fa-cog'></i>
 			</div>
-			<div id='help' class='mrow'>
-				<img src='icon/question.png' title='Ajuda'>
+			<div id='help' class='mrow' title='Ajuda'>
+				<i class='fas fa-question-circle'></i>
 			</div>
 		</div>
 		<div id='panel-left-opener' class='open'></div>

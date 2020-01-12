@@ -10,7 +10,7 @@
 		{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
 		{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
 	],
-	"treturn": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
+	"treturn": "Retorna 1 caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna 0.",
 	"sample": "loop(){\n\tif(getLowHp()){\n\t\tif (getAp() >= 40)\n\t\t\tfireball(getTargetX(), getTargetY());\n\t\telse\n\t\t\tattackRanged(getTargetX(), getTargetY());\n\t}\n\telse{\n\t\twhile(getX() != 12.5 || getY() != 12.5)\n\t\t\tteleport(12.5,12.5);\n\t\tturn(50);\n\t}\n}",
 	"explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
 	"seealso": [
