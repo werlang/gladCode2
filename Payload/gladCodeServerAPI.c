@@ -428,14 +428,22 @@ void turn(int gladid, float ang){
 }
 
 //se vira para uma direcao escolhida
-void turnToAngle(int gladid, float ang){
+int turnToAngle(int gladid, float ang){
 	if (endsim)
-		return;
-	float dif = getNormalAngle(ang - (g+gladid)->head);
-	if (dif <= 180)
-		turn(gladid, dif);
-	else
-		turn(gladid, dif-360);
+		return 1;
+	if ((g+gladid)->hp > 0){
+		float x,y;
+		calcSidesFromAngleDist(*x, *y, 10, ang){
+
+		int end = turnToUnsafe(gladid, x, y);
+		(g+gladid)->action = ACTION_MOVEMENT;
+		(g+gladid)->lockedfor = timeInterval;
+
+		waitForLockedStatus(gladid);
+		
+		return end;
+	}
+	return 0;
 }
 
 float getX(int gladid){

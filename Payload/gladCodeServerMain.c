@@ -238,14 +238,14 @@ void *connection_handler(void *p){
 			else if (strcmp(func->call,"turnTo")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				sprintf(reply, "%i", isSafeThere(gladid, x, y));
+				sprintf(reply, "%i", turnTo(gladid, x, y));
 			}
 			else if (strcmp(func->call,"turnToTarget")==0){
 				sprintf(reply, "%i", turnToTarget(gladid));
 			}
 			else if (strcmp(func->call,"turnToAngle")==0){
 				float v = func->arg[0].toFloat;
-				turnToAngle(gladid, v);
+				sprintf(reply, "%i", turnToAngle(gladid, v));
 			}
 			else if (strcmp(func->call,"moveForward")==0){
 				float p = func->arg[0].toFloat;

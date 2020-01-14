@@ -84,8 +84,8 @@ int viraParaAlvo(){
 	return turnToTarget();
 }
 
-void viraParaAngulo(float ang){
-	turnToAngle(ang);
+int viraParaAngulo(float ang){
+	return turnToAngle(ang);
 }
 
 void viraFuiAcertado(){

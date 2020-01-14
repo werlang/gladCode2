@@ -6,7 +6,7 @@
 		"python": "turnToAngle(angulo)"
 	},
 	"description": {
-		"long": "Rotaciona o gladiador de maneira que ele fique virado para o angulo informado no parâmetro. O ângulo informado deve seguir a <a href='manual.php#nav-sim'>convenção adotada pela simulação</a>. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá travar na ação até que complete a rotação.",
+		"long": "Rotaciona o gladiador de maneira que ele fique virado para o angulo informado no parâmetro. O ângulo informado deve seguir a <a href='manual.php#nav-sim'>convenção adotada pela simulação</a>. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
 		"brief": "Rotaciona o gladiador para um ângulo."
 	},
 	"param": {
@@ -15,7 +15,8 @@
 		]
 	},
 	"treturn": {
-		"default": "A função não possui retorno."
+		"default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou False caso contrário.",
+		"c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou 0 caso contrário."
 	},
 	"sample": {
 		"c": "46.c",

@@ -71,7 +71,7 @@ def turnToTarget():
 	return bool(int(sendMessage("turnToTarget")))
 
 def turnToAngle(ang):
-	sendMessage("turnToAngle {}".format(ang))
+	return bool(int(sendMessage("turnToAngle {}".format(ang))))
 
 def moveForward(p):
 	sendMessage("moveForward {}".format(p))
