@@ -323,9 +323,10 @@ float getLastHitAngle(){
 	return atof(response);
 }
 
-void turnToLastHit(){
+int turnToLastHit(){
 	char r[10];
 	sendMessage("turnToLastHit", r);
+	return atoi(r);
 }
 
 int getHit(){
