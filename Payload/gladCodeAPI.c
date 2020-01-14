@@ -145,10 +145,11 @@ int turnToTarget(){
 	return atoi(r);
 }
 
-void turnToAngle(float ang){
+int turnToAngle(float ang){
 	char m[100], r[10];
 	sprintf(m, "turnToAngle %f", ang);
 	sendMessage(m, r);
+	return atoi(r);
 }
 
 void moveForward(float p){
