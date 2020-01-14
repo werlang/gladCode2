@@ -2,7 +2,7 @@
 	"name": "turnToAngle",
 	"ptname": "viraParaAngulo",
 	"syntax": {
-		"c": "void turnToAngle ( float angulo );",
+		"c": "int turnToAngle ( float angulo );",
 		"python": "turnToAngle(angulo)"
 	},
 	"description": {

@@ -88,8 +88,8 @@ int viraParaAngulo(float ang){
 	return turnToAngle(ang);
 }
 
-void viraFuiAcertado(){
-	turnToLastHit();
+int viraFuiAcertado(){
+	return turnToLastHit();
 }
 
 void moveFrente(float p){

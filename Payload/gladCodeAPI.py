@@ -179,7 +179,7 @@ def getLastHitAngle():
 	return float(sendMessage("getLastHitAngle"))
 
 def turnToLastHit():
-	sendMessage("turnToLastHit")
+	return bool(int(sendMessage("turnToLastHit")))
 
 def getHit():
 	return bool(int(sendMessage("getHit")))
