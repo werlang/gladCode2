@@ -1,0 +1,151 @@
+<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+	<category name="Lógica" colour="%{BKY_LOGIC_HUE}">
+		<block type="controls_if"></block>
+		<block type="logic_compare">
+			<field name="OP">EQ</field>
+		</block>
+		<block type="logic_operation">
+			<field name="OP">AND</field>
+		</block>
+		<block type="logic_negate"></block>
+		<block type="logic_boolean">
+			<field name="BOOL">TRUE</field>
+		</block>
+		<block type="logic_null"></block>
+	</category>
+	<category name="Repetições" colour="%{BKY_LOOPS_HUE}">
+		<block type="controls_repeat_ext">
+			<value name="TIMES">
+				<shadow type="math_number">
+					<field name="NUM">10</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="controls_whileUntil">
+			<field name="MODE">WHILE</field>
+		</block>
+		<block type="controls_flow_statements">
+			<field name="FLOW">BREAK</field>
+		</block>
+	</category>
+	<category name="Matemática" colour="%{BKY_MATH_HUE}">
+		<block type="math_number">
+			<field name="NUM">0</field>
+		</block>
+		<block type="math_arithmetic">
+			<field name="OP">ADD</field>
+			<value name="A">
+				<shadow type="math_number">
+					<field name="NUM">1</field>
+				</shadow>
+			</value>
+			<value name="B">
+				<shadow type="math_number">
+					<field name="NUM">1</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="math_single">
+			<field name="OP">ROOT</field>
+			<value name="NUM">
+				<shadow type="math_number">
+					<field name="NUM">9</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="math_trig">
+			<field name="OP">SIN</field>
+			<value name="NUM">
+				<shadow type="math_number">
+					<field name="NUM">45</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="math_constant">
+			<field name="CONSTANT">PI</field>
+		</block>
+		<block type="math_round">
+			<field name="OP">ROUND</field>
+			<value name="NUM">
+				<shadow type="math_number">
+					<field name="NUM">3.1</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="math_modulo">
+			<value name="DIVIDEND">
+				<shadow type="math_number">
+					<field name="NUM">64</field>
+				</shadow>
+			</value>
+			<value name="DIVISOR">
+				<shadow type="math_number">
+					<field name="NUM">10</field>
+				</shadow>
+			</value>
+		</block>
+		<block type="math_random_float"></block>
+	</category>
+	<category name="Texto" colour="%{BKY_TEXTS_HUE}">
+		<block type="text">
+			<field name="TEXT"></field>
+		</block>
+		<block type="text_join">
+			<mutation items="2"></mutation>
+		</block>
+	</category>
+	<sep></sep>
+	<category name="Variáveis" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
+	<category name="Funções" colour="%{BKY_PROCEDURES_HUE}" custom="PROCEDURE">
+        
+    </category>
+	<sep></sep>
+	<category name="gladCode" colour="#00638d">
+		<category name="Melhorias" colour="#5b74a5">
+		</category>
+		<category name="Movimentação" colour="#5b74a5">
+            <block type="ignore_return">
+                <value name="function">
+                    <block type="move">
+						<mutation name='position'></mutation>
+                    </block>
+                </value>
+            </block>
+            <block type="ignore_return">
+                <value name="function">
+                    <block type="step"></block>
+                </value>
+            </block>
+			<block type="moveforward">
+                <value name="STEPS">
+                    <shadow type="math_number">
+						<field name="NUM">5</field>
+					</shadow>
+                </value>
+			</block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="turn">
+						<mutation name='where'></mutation>
+                    </block>
+                </value>
+            </block>
+			<block type="turnangle">
+				<mutation name='operation'></mutation>
+			</block>
+		</category>
+		<category name="Ataque" colour="#5b74a5">
+		</category>
+		<category name="Informações" colour="#5b74a5">
+		</category>
+		<category name="Percepção" colour="#5b74a5">
+		</category>
+		<category name="Habilidades" colour="#5b74a5">
+		</category>
+		<category name="Matemática" colour="#5b74a5">
+		</category>
+		<category name="Teste" colour="#5b74a5">
+            <block type="string_length"></block>
+		</category>
+	</category>
+</xml>
