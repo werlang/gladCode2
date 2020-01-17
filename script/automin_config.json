@@ -161,7 +161,8 @@
                 {"name": "socket.js"},
                 {"name": "prism.js"},
                 {"name": "emoji.js"},
-                {"name": "chat.js"}
+                {"name": "chat.js"},
+                {"name": "blocks.js"}
             ]
         },
         "css": {

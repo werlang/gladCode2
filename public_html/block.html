@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Demo: Fixed Blockly</title>
+  <script>
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/blockly_compressed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/blocks_compressed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/msg/js/pt-br.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/blockly@1.0.0/python_compressed.js"></script>
+  <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+  <style>
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+  </style>
+</head>
+<body>
+  <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+
+  <xml id="toolbox" style="display: none">
+    <block type="controls_if"></block>
+    <block type="logic_compare"></block>
+    <block type="controls_repeat_ext"></block>
+    <block type="math_number">
+      <field name="NUM">123</field>
+    </block>
+    <block type="math_arithmetic"></block>
+    <block type="text"></block>
+    <block type="text_print"></block>
+  </xml>
+
+  <button id='code'>CODE</button>
+  <button id='text'>TEXT</button>
+  <textarea id='input'></textarea>
+  <button id='blocks'>BLOCKS</button>
+  
+  <script>
+    var workspace = Blockly.inject('blocklyDiv', {
+         toolbox: document.getElementById('toolbox')
+    });
+
+    // generate python code
+    $('#code').click(function(){
+        var code = Blockly.Python.workspaceToCode(workspace);
+        console.log(code);
+    });
+
+    // save blocks
+    $('#text').click( function(){
+      var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);  
+      var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+      console.log(xmlText);
+    });
+    
+    // load blocks
+    $('#blocks').click( function(){
+      var text = $('#input').val();
+      Blockly.mainWorkspace.clear();
+      xmlDom = Blockly.Xml.textToDom(text);
+      Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+    });
+
+
+  </script>
+
+</body>
+</html>

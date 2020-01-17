@@ -9,6 +9,7 @@ var pieces;
 var loadGlad = false;
 var wannaSave = false;
 var tutoState = 0;
+var blocksEditor = false;
 
 $(document).ready( function() {
     $('#header-editor').addClass('here');
@@ -42,6 +43,8 @@ $(document).ready( function() {
 		else{
 			$('#fog-skin').fadeIn();
 		}
+
+		toggleBlocks();
 	});
 	
 	$('.fog').hide();
@@ -389,20 +392,23 @@ $(document).ready( function() {
 
 		bindGladList($('#fog-battle #list .glad').last());
 	}
-	$.post("back_glad.php",{
-		action: "GET",
-	}).done( function(data){
-		data = JSON.parse(data);
-		// console.log(data);
-		for (let i in data){
-			$('#fog-battle #list').append(template);
-			$('#fog-battle #list .glad .name').last().html(data[i].name);
-			$('#fog-battle #list .glad .diff').last().addClass('none');
-			$('#fog-battle #list .glad').last().data('info',data[i]);
 
-			bindGladList($('#fog-battle #list .glad').last());
-		}
-	});
+	if (user){
+		$.post("back_glad.php",{
+			action: "GET",
+		}).done( function(data){
+			data = JSON.parse(data);
+			// console.log(data);
+			for (let i in data){
+				$('#fog-battle #list').append(template);
+				$('#fog-battle #list .glad .name').last().html(data[i].name);
+				$('#fog-battle #list .glad .diff').last().addClass('none');
+				$('#fog-battle #list .glad').last().data('info',data[i]);
+
+				bindGladList($('#fog-battle #list .glad').last());
+			}
+		});
+	}
 	
 	function bindGladList(obj){
 		obj.click( function(){
@@ -1766,4 +1772,50 @@ function getLanguage(code){
 		language = "python";
 
 	return language;
+}
+
+function toggleBlocks(){
+	if (!blocksEditor){
+		blocksEditor = {};
+
+		// Blockly.Msg.LOGIC_HUE = 195;
+		// Blockly.Msg.MATH_HUE = 165;
+		// Blockly.Constants.Math.HUE = 165;
+		// Blockly.Msg.TEXTS_HUE = 45;
+		// Blockly.Constants.Text.HUE = 45;
+		// Blockly.Msg.VARIABLES_HUE = 0;
+		// Blockly.Msg.PROCEDURES_HUE = 300;
+
+		$('#blocks').load("blockly_toolbox.xml", function(){
+			blocksEditor.workspace = Blockly.inject('blocks', {
+				toolbox: $('#blocks #toolbox')[0],	
+				zoom: { controls: true },
+				grid: { spacing: 20, length: 0, snap: true },
+				scrollbars: true,
+				trashcan: true
+			});
+
+			blocksEditor.workspace.addChangeListener( function(){
+				var code = Blockly.Python.workspaceToCode(blocksEditor.workspace);
+		        console.log(code);
+			});
+
+			var loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
+			xmlDom = Blockly.Xml.textToDom(loop);
+			Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+		});
+	}
+	
+	if (blocksEditor.active){
+		$('#blocks').hide();
+		$('#code').show();
+		
+		blocksEditor.active = false;
+	}
+	else{
+		$('#code').hide();
+		$('#blocks').show();
+
+		blocksEditor.active = true;
+	}
 }

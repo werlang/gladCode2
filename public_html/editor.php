@@ -17,7 +17,7 @@
 	<link rel='stylesheet' href="css/editor.css"/>
 	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
-	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
+	<!-- <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
@@ -26,7 +26,23 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
-	
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/blockly.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/msg/pt-br.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/python.js"></script> -->
+
+	<script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
+	<script src='script/fallback/jquery-3.4.1.min.js'></script>
+	<script src='script/fallback/jquery-ui.min.js'></script>
+	<script src="script/fallback/cloudinary.js"></script>
+	<script src="script/fallback/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/fallback/ace-ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/fallback/prism.min.js"></script>
+	<script src="script/fallback/prism-autoloader.min.js"></script>
+	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
+	<script src="script/fallback/blockly.min.js"></script>
+	<script src="script/fallback/blockly-pt-br.js"></script>
+	<script src="script/fallback/blockly-python.js"></script>
+
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>
 	<script src="script/dialog.js"></script>
@@ -37,7 +53,8 @@
 	<script src="script/socket.js"></script>
 	<script src="script/emoji.js"></script>
 	<script src="script/chat.js"></script>
-	
+	<script src="script/blocks.js"></script>
+
 	</head>
 <body>
 	<?php
@@ -111,6 +128,7 @@
 		<div id='panel-left-opener' class='open'></div>
 		<div id='editor'>
 			<pre id='code'></pre>
+			<div id='blocks'></div>
 		</div>
 		<div id='panel-right'>
 		</div>
