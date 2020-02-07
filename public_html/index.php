@@ -121,7 +121,7 @@
 				<div class='card'>
 					<div class='title'><img src='image/dress.png'>Interaja com a comunidade</div>
 					<div class='body'>Mostre para todos seus gladiadores, compartilhe estratégias, tire suas dúvidas, peça ajuda ou simplesmente divirta-se na nossa página do facebook ou comunidade do reddit.</div>
-					<div class='a-wrapper'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' target='_blank'>gladCode no whatsapp</a></div>
+					<div class='a-wrapper'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'>gladCode no whatsapp</a></div>
 					<div class='a-wrapper'><a href='https://www.reddit.com/r/gladcode/' target='_blank'>gladCode no reddit</a></div>
 					<div class='a-wrapper'><a href='https://www.facebook.com/gladcode/' target='_blank'>gladCode no facebook</a></div>
 				</div>

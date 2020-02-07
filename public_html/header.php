@@ -29,7 +29,7 @@
 				<div class='item-container'>
 					<div class='item'><a href='https://www.reddit.com/r/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'>FORUM REDDIT</a></div>
 					<div class='item'><a href='https://www.facebook.com/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'>PÁGINA FACEBOOK</a></div>
-					<div class='item'><a href='https://chat.whatsapp.com/K0nxe4Jjfg62tlUIg9lCaS' title='Conecte-se com outros jogadores' target='_blank'>GRUPO WHATSAPP</a></div>
+					<div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' title='Conecte-se com outros jogadores' target='_blank'>GRUPO WHATSAPP</a></div>
 				</div>
 			</div>
 			<div class='item drop-menu'>
