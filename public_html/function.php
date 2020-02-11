@@ -46,25 +46,27 @@
 					</select>
 				</div>
 
-				<h2 id='temp-name'></h2>
-				<pre><code class="language-c" id='temp-syntax'></code></pre>
-				<p id='temp-description'></p>
-							
-				<h3>Parâmetros</h3>
-				<div id='temp-param'></div>
-				
-				<h3>Retorno</h3>
-				<p id='temp-return'></p>
-				
-				<h3>Exemplo</h3>
-				<pre><code class="language-c" id='temp-sample'></code></pre>
-				<p id='temp-explain'></p>
-				
-				<h3>Veja também</h3>
-				<table class='table t-funcs'>
-					<tbody id='temp-seealso'>
-					</tbody>
-				</table>
+				<div id='template'>
+					<h2 id='temp-name'></h2>
+					<pre><code class="language-c" id='temp-syntax'></code></pre>
+					<p id='temp-description'></p>
+								
+					<h3>Parâmetros</h3>
+					<div id='temp-param'></div>
+					
+					<h3>Retorno</h3>
+					<p id='temp-return'></p>
+					
+					<h3>Exemplo</h3>
+					<pre><code class="language-c" id='temp-sample'></code></pre>
+					<p id='temp-explain'></p>
+					
+					<h3>Veja também</h3>
+					<table class='table t-funcs'>
+						<tbody id='temp-seealso'>
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div id='footer'></div>
 		</div>
@@ -72,8 +74,7 @@
 	<?php
 		$func = "";
 		if (isset($_GET['f']))
-			$func = $_GET['f'];
-		echo "<input type='hidden' id='vget' value='$func'>";
+			echo "<input type='hidden' id='vget' value='". $_GET['f'] ."'>";
 		if (isset($_GET['l']))
 			echo "<div id='dict' hidden>". $_GET['l'] ."</div>";
 		if (isset($_GET['p']))
