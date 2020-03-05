@@ -1,3 +1,5 @@
+var funcList = {};
+
 Blockly.Blocks['loop'] = {
 	init: function() {
 		this.appendDummyInput()
@@ -45,7 +47,8 @@ Blockly.Blocks['move'] = {
 		this.setColour(210);
 		this.setTooltip("tooltip");
 		this.setHelpUrl("url");
-		this.columnType = this.getFieldValue('COMPLEMENT');
+		this.func = "moveTo";
+		this.params = "0, 0";
 		this.reshape(true);
 	},
 	mutationToDom: function() {
@@ -75,6 +78,12 @@ Blockly.Blocks['move'] = {
 				.setAlign(Blockly.ALIGN_RIGHT)
 				.appendField("Y");
 		}
+
+		// getTooltip(this.func).then( desc => {
+		// 	this.setTooltip(desc);
+		// });
+		// this.setHelpUrl(`function/${this.func.toLowerCase()}.py`);
+	
 	},
 	selection: function (option) {
 		if (option == "TO")
@@ -89,10 +98,7 @@ Blockly.Python['move'] = function(block) {
 	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-	var code = `moveToTarget()`;
-	if (dropdown_complement == "TO")
-		code = `moveTo(${value_x}, ${value_y})`;
-
+	var code = `${this.func}(${this.params})`;
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -313,3 +319,594 @@ Blockly.Python['turnangle'] = function(block) {
 	else
 		return code;
 };
+
+Blockly.Blocks['fireball'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Bola de fogo em")
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['fireball'] = function(block) {
+	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `fireball(${value_x}, ${value_y})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['teleport'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Teletransporte para")
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['teleport'] = function(block) {
+	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `teleport(${value_x}, ${value_y})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['charge'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Investida")
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['charge'] = function(block) {
+	var code = `charge()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['block'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Bloquear")
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['block'] = function(block) {
+	var code = `block()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['assassinate'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Assassinar em")
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['assassinate'] = function(block) {
+	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `assassinate(${value_x}, ${value_y})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['ambush'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Emboscada")
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['ambush'] = function(block) {
+	var code = `ambush()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['melee'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Ataque Corpo-a-corpo")
+		this.setOutput(false);
+		this.setNextStatement(true);
+		this.setPreviousStatement(true);
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['melee'] = function(block) {
+	var code = `attackMelee()`;
+	return code;
+};
+
+Blockly.Blocks['ranged'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Ataque à distância em")
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['ranged'] = function(block) {
+	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `attackRanged(${value_x}, ${value_y})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['get_info'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Pegar informação")
+			.appendField(new Blockly.FieldDropdown([["Coordenada X","X"], ["Coordenada Y","Y"], ["Atributo Força","STR"], ["Atributo Agilidade","AGI"], ["Atributo Inteligência","INT"], ["Nível","Lvl"], ["Pontos de vida","Hp"], ["Pontos de habilidade","Ap"], ["Velocidade","Speed"], ["Direção","Head"]]), "COMPLEMENT");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['get_info'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `get${info}()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['gethit'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Fui acertado?");
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['gethit'] = function(block) {
+	var code = `getHit()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['get_time'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Tempo restante")
+			.appendField(new Blockly.FieldDropdown([["Resistência","Block"], ["Invisibilidade","Ambush"], ["Queimadura","Burn"]]), "COMPLEMENT");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['get_time'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `get${info}TimeLeft()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['get_lasthit'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField(new Blockly.FieldDropdown([["Tempo","Time"], ["Ângulo","Angle"]]), "COMPLEMENT")
+			.appendField("do ataque recebido");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['get_lasthit'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `getLastHit${info}()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['upgrade'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Melhorar")
+			.appendField(new Blockly.FieldDropdown([["Força","STR"], ["Agilidade","AGI"], ["Inteligência","INT"]]), "COMPLEMENT");
+		this.appendValueInput("VALUE")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("em");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['upgrade'] = function(block) {
+	var attr = this.getFieldValue('COMPLEMENT');
+	var value = (Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `upgrade${attr}(${value})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['speak'] = {
+	init: function() {
+		this.appendValueInput("TEXT")
+			.setCheck("String")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Falar");
+		this.setOutput(false);
+		this.setNextStatement(true);
+		this.setPreviousStatement(true);
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['speak'] = function(block) {
+	var text = (Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "");
+	var code = `speak(${text})`;
+	return code;
+};
+
+Blockly.Blocks['getdist'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Distância para")
+			.appendField(new Blockly.FieldDropdown([["Posição","POSITION"], ["Alvo","TARGET"]], this.selection.bind(this)), "COMPLEMENT");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+		this.reshape(true);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		var hasposition = "false";
+		if (this.getFieldValue('COMPLEMENT') == "POSITION")
+			hasposition = "true";
+		container.setAttribute('position', hasposition);
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		var hasposition = (xmlElement.getAttribute('position') == "true");
+		this.reshape(hasposition);
+	},
+	reshape(hasposition){
+		if (this.getInput('X') && !hasposition){
+			this.removeInput('X');
+			this.removeInput('Y');
+		}
+		else if (!this.getInput('X') && hasposition){
+			this.appendValueInput("X")
+				.setCheck("Number")
+				.setAlign(Blockly.ALIGN_RIGHT)
+				.appendField("X");
+			this.appendValueInput("Y")
+				.setCheck("Number")
+				.setAlign(Blockly.ALIGN_RIGHT)
+				.appendField("Y");
+		}
+	},
+	selection: function (option) {
+		if (option == "POSITION")
+			this.reshape(true);
+		else
+			this.reshape(false);
+	},
+};
+
+Blockly.Python['getdist'] = function(block) {
+	var dropdown_complement = block.getFieldValue('COMPLEMENT');
+
+	var code;
+	if (dropdown_complement == "POSITION"){
+		var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+		var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+		code = `getDist(${value_x}, ${value_y})`;
+	}
+	else
+		code = `getDistToTarget()`;
+
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['getangle'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Ângulo para")
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['getangle'] = function(block) {
+	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+
+	var code = `getAngle(${value_x}, ${value_y})`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['is_status'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Alvo está")
+			.appendField(new Blockly.FieldDropdown([["Visível","TargetVisible"], ["Atordoado","Stunned"], ["Queimando","Burning"], ["Protegido", "Protected"], ["Correndo", "Running"], ["Lerdo", "Slowed"]]), "COMPLEMENT")
+			.appendField("?");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['is_status'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `is${info}()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['get_enemy'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Selecionar alvo")
+			.appendField(new Blockly.FieldDropdown([["Mais Próximo","CloseEnemy"], ["Mais Distante","FarEnemy"], ["Com menos Vida","LowHp"], ["Com mais vida", "HighHp"]]), "COMPLEMENT");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['get_enemy'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `get${info}()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['get_target'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Pegar")
+			.appendField(new Blockly.FieldDropdown([["Coordenada X","X"], ["Coordenada Y","Y"], ["Saúde","Health"], ["Velocidade","Speed"], ["Direção","Head"]]), "COMPLEMENT")
+			.appendField("do alvo");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['get_target'] = function(block) {
+	var info = this.getFieldValue('COMPLEMENT');
+	var code = `getTarget${info}()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['issafe'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("É seguro")
+			.appendField(new Blockly.FieldDropdown([["Aqui","Here"], ["Na posição","There"]], this.selection.bind(this)), "COMPLEMENT")
+			.appendField("?");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+		this.reshape(false);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		var hasposition = "false";
+		if (this.getFieldValue('COMPLEMENT') == "There")
+			hasposition = "true";
+		container.setAttribute('position', hasposition);
+
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		var hasposition = (xmlElement.getAttribute('position') == "true");
+		this.reshape(hasposition);
+
+	},
+	reshape(hasposition){
+		if (this.getInput('X') && !hasposition){
+			this.removeInput('X');
+			this.removeInput('Y');
+		}
+		else if (!this.getInput('X') && hasposition){
+			this.appendValueInput("X")
+				.setCheck("Number")
+				.setAlign(Blockly.ALIGN_RIGHT)
+				.appendField("X");
+			this.appendValueInput("Y")
+				.setCheck("Number")
+				.setAlign(Blockly.ALIGN_RIGHT)
+				.appendField("Y");
+		}
+	},
+	selection: function (option) {
+		if (option == "There")
+			this.reshape(true);
+		else
+			this.reshape(false);
+	},
+};
+
+Blockly.Python['issafe'] = function(block) {
+	var dropdown_complement = block.getFieldValue('COMPLEMENT');
+
+	var code;
+	if (dropdown_complement == "There"){
+		var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+		var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+		code = `isSafe${dropdown_complement}(${value_x}, ${value_y})`;
+	}
+	else
+		code = `isSafe${dropdown_complement}()`;
+
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['getsaferadius'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Raio seguro");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['getsaferadius'] = function(block) {
+	var code = `getSafeRadius()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['howmanyenemies'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Quantos inimigos vejo?");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['howmanyenemies'] = function(block) {
+	var code = `howManyEnemies()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['doyouseeme'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Alvo me enxerga?");
+		this.setInputsInline(true);
+		this.setOutput(true, "Boolean");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['doyouseeme'] = function(block) {
+	var code = `doYouSeeMe()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['getsimtime'] = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField("Tempo da simulação");
+		this.setInputsInline(true);
+		this.setOutput(true, "Number");
+		this.setColour(210);
+		this.setTooltip("tooltip");
+		this.setHelpUrl("url");
+	}
+};
+
+Blockly.Python['getsimtime'] = function(block) {
+	var code = `getSimTime()`;
+	return [code, Blockly.Python.ORDER_NONE];
+};
+
+async function getTooltip(name){
+	if (funcList[name])
+		return funcList[name];
+
+	return await $.getJSON(`script/functions/${name.toLowerCase()}.json`, async data => {
+		funcList[name] = data.description.brief;
+		return data.description.brief;
+	});
+}
