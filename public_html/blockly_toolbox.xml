@@ -102,6 +102,17 @@
 	<sep></sep>
 	<category name="gladCode" colour="#00638d">
 		<category name="Melhorias" colour="#5b74a5">
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="upgrade">
+						<value name="VALUE">
+							<shadow type="math_number">
+								<field name="NUM">5</field>
+							</shadow>
+						</value>
+					</block>
+                </value>
+            </block>
 		</category>
 		<category name="Movimentação" colour="#5b74a5">
             <block type="ignore_return">
@@ -132,20 +143,81 @@
             </block>
 			<block type="turnangle">
 				<mutation name='operation'></mutation>
+				<value name="ANGLE">
+					<shadow type="math_number">
+						<field name="NUM">360</field>
+					</shadow>
+				</value>
 			</block>
 		</category>
 		<category name="Ataque" colour="#5b74a5">
+			<block type="melee"></block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="ranged"></block>
+                </value>
+            </block>
 		</category>
 		<category name="Informações" colour="#5b74a5">
+			<block type="get_info"></block>
+			<block type="gethit"></block>
+			<block type="get_lasthit"></block>
+			<block type="get_time"></block>
+			<block type="speak">
+				<value name="TEXT">
+					<shadow type="text">
+						<field name="TEXT">Olá Mundo!</field>
+					</shadow>
+				</value>
+			</block>
 		</category>
 		<category name="Percepção" colour="#5b74a5">
+			<block type="is_status"></block>
+			<block type="get_enemy"></block>
+			<block type="get_target"></block>
+			<block type="issafe"></block>
+			<block type="getsaferadius"></block>
+			<block type="howmanyenemies"></block>
+			<block type="doyouseeme"></block>
+			<block type="getsimtime"></block>
 		</category>
 		<category name="Habilidades" colour="#5b74a5">
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="fireball"></block>
+                </value>
+            </block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="teleport"></block>
+                </value>
+            </block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="charge"></block>
+                </value>
+            </block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="block"></block>
+                </value>
+            </block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="assassinate"></block>
+                </value>
+            </block>
+			<block type="ignore_return">
+                <value name="function">
+                    <block type="ambush"></block>
+                </value>
+            </block>
 		</category>
 		<category name="Matemática" colour="#5b74a5">
-		</category>
-		<category name="Teste" colour="#5b74a5">
-            <block type="string_length"></block>
+			<block type="getdist">
+				<mutation name='position'></mutation>
+			</block>
+			<block type="getangle"></block>
 		</category>
 	</category>
 </xml>
