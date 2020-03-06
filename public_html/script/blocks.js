@@ -45,8 +45,6 @@ Blockly.Blocks['move'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 		this.func = "moveTo";
 		this.params = "0, 0";
 		this.reshape(true);
@@ -79,17 +77,18 @@ Blockly.Blocks['move'] = {
 				.appendField("Y");
 		}
 
-		// getTooltip(this.func).then( desc => {
-		// 	this.setTooltip(desc);
-		// });
-		// this.setHelpUrl(`function/${this.func.toLowerCase()}.py`);
+		setBlockInfo(this);
 	
 	},
 	selection: function (option) {
-		if (option == "TO")
+		if (option == "TO"){
+			this.func = 'moveTo';
 			this.reshape(true);
-		else
+		}
+		else{
+			this.func = 'moveToTarget';
 			this.reshape(false);
+		}
 	},
 };
 
@@ -110,8 +109,7 @@ Blockly.Blocks['step'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = "stepForward";
 	},
 };
 
@@ -125,7 +123,9 @@ Blockly.Python['step'] = function(block) {
 	};
 
 	code = `step${values[dropdown_complement]}()`;
-
+	this.func = `step${values[dropdown_complement]}`;
+	setBlockInfo(this);
+	
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -142,8 +142,8 @@ Blockly.Blocks['moveforward'] = {
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `moveForward`;
+		setBlockInfo(this);
 	},
 };
 
@@ -162,9 +162,6 @@ Blockly.Blocks['turn'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
-		// this.option = null;
 		this.reshape(true);
 	},
 	mutationToDom: function() {
@@ -241,6 +238,8 @@ Blockly.Python['turn'] = function(block) {
 	};
 
 	var code = `turn${values[dropdown_where]}`;
+	this.func = code;
+	setBlockInfo(this);
 
 	if (dropdown_where == "TO"){
 		var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
@@ -271,9 +270,6 @@ Blockly.Blocks['turnangle'] = {
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
-		// this.reshape(true);
 	},
 	mutationToDom: function() {
 		var container = document.createElement('mutation');
@@ -312,6 +308,9 @@ Blockly.Python['turnangle'] = function(block) {
 	if (dropdown_op == "ANGLE")
 		code += "ToAngle";
 
+	this.func = code;
+	setBlockInfo(this);
+
 	code += `(${value_angle})`;
 
 	if (dropdown_op == "ANGLE")
@@ -335,8 +334,8 @@ Blockly.Blocks['fireball'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'fireball';
+		setBlockInfo(this);
 	}
 };
 
@@ -363,8 +362,8 @@ Blockly.Blocks['teleport'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'teleport';
+		setBlockInfo(this);
 	}
 };
 
@@ -382,8 +381,8 @@ Blockly.Blocks['charge'] = {
 			.appendField("Investida")
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'charge';
+		setBlockInfo(this);
 	}
 };
 
@@ -398,8 +397,8 @@ Blockly.Blocks['block'] = {
 			.appendField("Bloquear")
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'block';
+		setBlockInfo(this);
 	}
 };
 
@@ -423,8 +422,8 @@ Blockly.Blocks['assassinate'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'assassinate';
+		setBlockInfo(this);
 	}
 };
 
@@ -442,8 +441,8 @@ Blockly.Blocks['ambush'] = {
 			.appendField("Emboscada")
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'ambush';
+		setBlockInfo(this);
 	}
 };
 
@@ -460,8 +459,8 @@ Blockly.Blocks['melee'] = {
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'attackMelee';
+		setBlockInfo(this);
 	}
 };
 
@@ -485,8 +484,8 @@ Blockly.Blocks['ranged'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'attackRanged';
+		setBlockInfo(this);
 	}
 };
 
@@ -506,14 +505,16 @@ Blockly.Blocks['get_info'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['get_info'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `get${info}()`;
+
+	this.func = `get${info}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -523,8 +524,8 @@ Blockly.Blocks['gethit'] = {
 			.appendField("Fui acertado?");
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'getHit';
+		setBlockInfo(this);
 	}
 };
 
@@ -541,14 +542,16 @@ Blockly.Blocks['get_time'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['get_time'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `get${info}TimeLeft()`;
+
+	this.func = `get${info}TimeLeft`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -560,14 +563,16 @@ Blockly.Blocks['get_lasthit'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['get_lasthit'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `getLastHit${info}()`;
+
+	this.func = `getLastHit${info}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -583,8 +588,6 @@ Blockly.Blocks['upgrade'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
@@ -593,6 +596,9 @@ Blockly.Python['upgrade'] = function(block) {
 	var value = (Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || 0);
 
 	var code = `upgrade${attr}(${value})`;
+	this.func = `upgrade${attr}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -606,8 +612,8 @@ Blockly.Blocks['speak'] = {
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = 'speak';
+		setBlockInfo(this);
 	}
 };
 
@@ -625,8 +631,6 @@ Blockly.Blocks['getdist'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 		this.reshape(true);
 	},
 	mutationToDom: function() {
@@ -673,9 +677,14 @@ Blockly.Python['getdist'] = function(block) {
 		var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
 		var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 		code = `getDist(${value_x}, ${value_y})`;
+		this.func = 'getDist';
 	}
-	else
+	else{
 		code = `getDistToTarget()`;
+		this.func = `getDistToTarget`;
+	}
+
+	setBlockInfo(this);
 
 	return [code, Blockly.Python.ORDER_NONE];
 };
@@ -695,8 +704,8 @@ Blockly.Blocks['getangle'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `getAngle`;
+		setBlockInfo(this);
 	}
 };
 
@@ -712,19 +721,20 @@ Blockly.Blocks['is_status'] = {
 	init: function() {
 		this.appendDummyInput()
 			.appendField("Alvo está")
-			.appendField(new Blockly.FieldDropdown([["Visível","TargetVisible"], ["Atordoado","Stunned"], ["Queimando","Burning"], ["Protegido", "Protected"], ["Correndo", "Running"], ["Lerdo", "Slowed"]]), "COMPLEMENT")
+			.appendField(new Blockly.FieldDropdown([["Visível","TargetVisible"], ["Atordoado","Stunned"], ["Queimando","Burning"], ["Protegido", "Protected"], ["Correndo", "Running"], ["Lento", "Slowed"]]), "COMPLEMENT")
 			.appendField("?");
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['is_status'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `is${info}()`;
+	this.func = `is${info}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -736,14 +746,15 @@ Blockly.Blocks['get_enemy'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['get_enemy'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `get${info}()`;
+	this.func = `get${info}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -756,14 +767,15 @@ Blockly.Blocks['get_target'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 	}
 };
 
 Blockly.Python['get_target'] = function(block) {
 	var info = this.getFieldValue('COMPLEMENT');
 	var code = `getTarget${info}()`;
+	this.func = `getTarget${info}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -776,8 +788,6 @@ Blockly.Blocks['issafe'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
 		this.reshape(false);
 	},
 	mutationToDom: function() {
@@ -830,6 +840,9 @@ Blockly.Python['issafe'] = function(block) {
 	else
 		code = `isSafe${dropdown_complement}()`;
 
+	this.func = `isSafe${dropdown_complement}`;
+	setBlockInfo(this);
+
 	return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -840,8 +853,8 @@ Blockly.Blocks['getsaferadius'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `getSafeRadius`;
+		setBlockInfo(this);
 	}
 };
 
@@ -857,8 +870,8 @@ Blockly.Blocks['howmanyenemies'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `howManyEnemies`;
+		setBlockInfo(this);
 	}
 };
 
@@ -874,8 +887,8 @@ Blockly.Blocks['doyouseeme'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `doYouSeeMe`;
+		setBlockInfo(this);
 	}
 };
 
@@ -891,8 +904,8 @@ Blockly.Blocks['getsimtime'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
 		this.setColour(210);
-		this.setTooltip("tooltip");
-		this.setHelpUrl("url");
+		this.func = `getSimTime`;
+		setBlockInfo(this);
 	}
 };
 
@@ -905,8 +918,16 @@ async function getTooltip(name){
 	if (funcList[name])
 		return funcList[name];
 
-	return await $.getJSON(`script/functions/${name.toLowerCase()}.json`, async data => {
+	let json = await $.getJSON(`script/functions/${name.toLowerCase()}.json`, async data => {
 		funcList[name] = data.description.brief;
-		return data.description.brief;
 	});
+
+	return json.description.brief;
+}
+
+function setBlockInfo(block){
+	getTooltip(block.func).then( data => {
+		block.setTooltip(data);
+	});
+	block.setHelpUrl(`function/${block.func.toLowerCase()}.py`);
 }
