@@ -1778,14 +1778,6 @@ function toggleBlocks(){
 	if (!blocksEditor){
 		blocksEditor = {};
 
-		// Blockly.Msg.LOGIC_HUE = 195;
-		// Blockly.Msg.MATH_HUE = 165;
-		// Blockly.Constants.Math.HUE = 165;
-		// Blockly.Msg.TEXTS_HUE = 45;
-		// Blockly.Constants.Text.HUE = 45;
-		// Blockly.Msg.VARIABLES_HUE = 0;
-		// Blockly.Msg.PROCEDURES_HUE = 300;
-
 		$('#blocks').load("blockly_toolbox.xml", function(){
 			blocksEditor.workspace = Blockly.inject('blocks', {
 				toolbox: $('#blocks #toolbox')[0],	
@@ -1796,7 +1788,8 @@ function toggleBlocks(){
 			});
 
 			blocksEditor.workspace.addChangeListener( function(){
-				var code = Blockly.Python.workspaceToCode(blocksEditor.workspace);
+				var code = Blockly.Python.workspaceToCode(blocksEditor.workspace)
+				editor.setValue(code);
 		        console.log(code);
 			});
 

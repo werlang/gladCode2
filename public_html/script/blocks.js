@@ -8,7 +8,7 @@ Blockly.Blocks['loop'] = {
 		this.setColour("#00638d");
         this.setTooltip("Função que o gladiador irá executar a cada 0.1s");
         this.setHelpUrl("manual");
-        this.setDeletable(false);
+		this.setDeletable(false);
 	}
 };
 
@@ -19,75 +19,81 @@ Blockly.Python['loop'] = function(block) {
 	return `def loop():\n${code}`;
 };
 
-Blockly.Blocks['ignore_return'] = {
-	init: function() {
-		this.appendValueInput("function")
-		this.setInputsInline(false);
-		this.setPreviousStatement(true, null);
-		this.setNextStatement(true, null);
-		this.setColour(230);
-        this.setTooltip("Ignora o retorno de uma função");
-        this.setHelpUrl("");
-	}
-};
-
-Blockly.Python['ignore_return'] = function(block) {
-	var value_function = Blockly.Python.valueToCode(block, 'function', Blockly.Python.ORDER_ATOMIC || '0');
-	var code = `${value_function}\n`;
-	return code;
-};
-
 Blockly.Blocks['move'] = {
 	init: function() {
 		this.appendDummyInput()
 			.appendField("Mover para")
 			.appendField(new Blockly.FieldDropdown([["Posição","TO"], ["Alvo","TARGET"]], this.selection.bind(this)), "COMPLEMENT");
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour('#bcbf33');
 		this.func = "moveTo";
-		this.params = "0, 0";
-		this.reshape(true);
+		this.useReturn = false;
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
 	},
 	mutationToDom: function() {
 		var container = document.createElement('mutation');
+
 		var hasposition = "false";
 		if (this.getFieldValue('COMPLEMENT') == "TO")
 			hasposition = "true";
 		container.setAttribute('position', hasposition);
+
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
 		return container;
 	},
 	domToMutation: function(xmlElement) {
-		var hasposition = (xmlElement.getAttribute('position') == "true");
-		this.reshape(hasposition);
+		this.reshape({
+			useReturn: xmlElement.getAttribute('use-return') == 'true',
+			hasposition: xmlElement.getAttribute('position') == "true"
+		});
 	},
-	reshape(hasposition){
-		if (this.getInput('X') && !hasposition){
-			this.removeInput('X');
-			this.removeInput('Y');
-		}
-		else if (!this.getInput('X') && hasposition){
-			this.appendValueInput("X")
-				.setCheck("Number")
-				.setAlign(Blockly.ALIGN_RIGHT)
-				.appendField("X");
-			this.appendValueInput("Y")
-				.setCheck("Number")
-				.setAlign(Blockly.ALIGN_RIGHT)
-				.appendField("Y");
-		}
+	reshape({useReturn, hasposition}){
+		if (hasposition === true || hasposition === false){
+			if (this.getInput('X') && !hasposition){
+				this.removeInput('X');
+				this.removeInput('Y');
+			}
+			else if (!this.getInput('X') && hasposition){
+				this.appendValueInput("X")
+					.setCheck("Number")
+					.setAlign(Blockly.ALIGN_RIGHT)
+					.appendField("X");
+				this.appendValueInput("Y")
+					.setCheck("Number")
+					.setAlign(Blockly.ALIGN_RIGHT)
+					.appendField("Y");
 
-		setBlockInfo(this);
-	
+				connectShadow(this, 'X');
+				connectShadow(this, 'Y');
+			}
+		}
+		if (useReturn === true || useReturn === false)
+			reshape_toggleUseReturn(this, useReturn);
 	},
 	selection: function (option) {
 		if (option == "TO"){
 			this.func = 'moveTo';
-			this.reshape(true);
+			this.reshape({hasposition: true});
 		}
 		else{
 			this.func = 'moveToTarget';
-			this.reshape(false);
+			this.reshape({hasposition: false});
 		}
 	},
 };
@@ -97,8 +103,16 @@ Blockly.Python['move'] = function(block) {
 	var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-	var code = `${this.func}(${this.params})`;
-	return [code, Blockly.Python.ORDER_NONE];
+	var code = `moveToTarget()`;
+	if (dropdown_complement == "TO")
+		code = `moveTo(${value_x}, ${value_y})`;
+
+	setBlockInfo(this);
+
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['step'] = {
@@ -107,10 +121,30 @@ Blockly.Blocks['step'] = {
 			.appendField("Passo para")
 			.appendField(new Blockly.FieldDropdown([["Frente","FORWARD"], ["Trás","BACK"], ["Esquerda","LEFT"], ["Direita","RIGHT"]]), "COMPLEMENT");
 		this.setInputsInline(true);
-		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour('#bcbf33');
 		this.func = "stepForward";
+		this.useReturn = false;
 	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn, 'Number');
+	} 
 };
 
 Blockly.Python['step'] = function(block) {
@@ -126,7 +160,10 @@ Blockly.Python['step'] = function(block) {
 	this.func = `step${values[dropdown_complement]}`;
 	setBlockInfo(this);
 	
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['moveforward'] = {
@@ -141,7 +178,7 @@ Blockly.Blocks['moveforward'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
-		this.setColour(210);
+		this.setColour('#bcbf33');
 		this.func = `moveForward`;
 		setBlockInfo(this);
 	},
@@ -159,71 +196,108 @@ Blockly.Blocks['turn'] = {
 		this.appendDummyInput()
 			.appendField("Virar para")
 			.appendField(new Blockly.FieldDropdown([["Posição","TO"], ["Alvo","TARGET"], ["Ataque recebido","HIT"], ["Esquerda","LEFT"], ["Direita","RIGHT"]], this.selection.bind(this)), "COMPLEMENT");
+		this.appendValueInput("X")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("X");
+		this.appendValueInput("Y")
+			.setCheck("Number")
+			.setAlign(Blockly.ALIGN_RIGHT)
+			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
-		this.reshape(true);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour('#bcbf33');
+		this.useReturn = false;
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
 	},
 	mutationToDom: function() {
 		var container = document.createElement('mutation');
 		var option = this.getFieldValue('COMPLEMENT');
 		container.setAttribute('where', option);
+
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
 		return container;
+
 	},
 	domToMutation: function(xmlElement) {
-		var option = xmlElement.getAttribute('where');
-		this.reshape(option);
+		this.reshape({
+			useReturn: xmlElement.getAttribute('use-return') == 'true',
+			option: xmlElement.getAttribute('where') == "true"
+		});
 	},
-	reshape(option){
-		var input_now = [];
-		for (let i in this.inputList){
-			let name = this.inputList[i].name;
-			if (name != "")
-				input_now.push(name);
-		}
+	reshape({useReturn, option}){
+		if (["TO", "TARGET", "HIT", "LEFT", "RIGHT"].indexOf(option) != -1){
+			var input_now = [];
+			for (let i in this.inputList){
+				let name = this.inputList[i].name;
+				if (name != "")
+					input_now.push(name);
+			}
 
-		var input_next = [];
-		if (option == "TO"){
-			input_next.push("X", "Y");
-		}
-		else if (["LEFT", "RIGHT"].indexOf(option) != -1){
-			input_next.push("ANGLE", "TEXT");
-		}
-		else if (option == "TARGET"){
-		}
+			var input_next = [];
+			if (option == "TO"){
+				input_next.push("X", "Y");
+			}
+			else if (["LEFT", "RIGHT"].indexOf(option) != -1){
+				input_next.push("ANGLE", "TEXT");
+			}
+			else if (option == "TARGET"){
+			}
 
-		// remove uneeded input
-		for (let i in input_now){
-			if (input_next.indexOf(input_now[i]) == -1){
-				this.removeInput(input_now[i]);
+			// remove uneeded input
+			for (let i in input_now){
+				if (input_next.indexOf(input_now[i]) == -1){
+					this.removeInput(input_now[i]);
+				}
+			}
+
+			// include needed inputs
+			for (let i in input_next){
+				if (input_next[i] == "X" && !this.getInput("X")){
+					this.appendValueInput("X")
+						.setCheck("Number")
+						.setAlign(Blockly.ALIGN_RIGHT)
+						.appendField("X");
+
+					connectShadow(this, 'X');
+				}
+				else if (input_next[i] == "Y" && !this.getInput("Y")){
+					this.appendValueInput("Y")
+						.setCheck("Number")
+						.setAlign(Blockly.ALIGN_RIGHT)
+						.appendField("Y");
+
+					connectShadow(this, 'Y');
+				}
+				else if (input_next[i] == "ANGLE" && !this.getInput("ANGLE")){
+					this.appendValueInput("ANGLE")
+						.setCheck("Number")
+					this.appendDummyInput("TEXT")
+						.appendField("Graus")
+						.setAlign(Blockly.ALIGN_RIGHT);
+
+					connectShadow(this, 'ANGLE');
+				}
 			}
 		}
-
-		// include needed inputs
-		for (let i in input_next){
-			if (input_next[i] == "X" && !this.getInput("X")){
-				this.appendValueInput("X")
-					.setCheck("Number")
-					.setAlign(Blockly.ALIGN_RIGHT)
-					.appendField("X");
-			}
-			else if (input_next[i] == "Y" && !this.getInput("Y")){
-				this.appendValueInput("Y")
-					.setCheck("Number")
-					.setAlign(Blockly.ALIGN_RIGHT)
-					.appendField("Y");
-			}
-			else if (input_next[i] == "ANGLE" && !this.getInput("ANGLE")){
-				this.appendValueInput("ANGLE")
-					.setCheck("Number")
-				this.appendDummyInput("TEXT")
-					.appendField("Graus")
-					.setAlign(Blockly.ALIGN_RIGHT);
-			}
+		if (useReturn === true || useReturn === false){
+			console.log(option)
+			if (option == "LEFT" || option == "RIGHT")
+				reshape_toggleUseReturn(this, useReturn, "Number");
+			else
+				reshape_toggleUseReturn(this, useReturn);
 		}
 	},
 	selection: function (option) {
-		this.reshape(option);
+		if (["TO", "TARGET", "HIT", "LEFT", "RIGHT"].indexOf(option) != -1)
+			this.reshape({option: option});
 	},
 };
 
@@ -254,7 +328,10 @@ Blockly.Python['turn'] = function(block) {
 		code += "()";
 	}
 
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['turnangle'] = {
@@ -269,7 +346,7 @@ Blockly.Blocks['turnangle'] = {
 		this.setOutput(false);
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
-		this.setColour(210);
+		this.setColour('#bcbf33');
 	},
 	mutationToDom: function() {
 		var container = document.createElement('mutation');
@@ -283,7 +360,7 @@ Blockly.Blocks['turnangle'] = {
 	},
 	reshape(option){
 		this.unplug();
-		if (option == "TURN"){
+		if (option === "TURN"){
 			this.setOutput(false);
 			this.setNextStatement(true);
 			this.setPreviousStatement(true);
@@ -332,11 +409,31 @@ Blockly.Blocks['fireball'] = {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#7d52a8");
 		this.func = 'fireball';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['fireball'] = function(block) {
@@ -344,7 +441,11 @@ Blockly.Python['fireball'] = function(block) {
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
 	var code = `fireball(${value_x}, ${value_y})`;
-	return [code, Blockly.Python.ORDER_NONE];
+
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['teleport'] = {
@@ -360,11 +461,31 @@ Blockly.Blocks['teleport'] = {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#7d52a8");
 		this.func = 'teleport';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['teleport'] = function(block) {
@@ -372,39 +493,88 @@ Blockly.Python['teleport'] = function(block) {
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
 	var code = `teleport(${value_x}, ${value_y})`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['charge'] = {
 	init: function() {
 		this.appendDummyInput()
-			.appendField("Investida")
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+			.appendField("Investida");
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#7d52a8");
 		this.func = 'charge';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['charge'] = function(block) {
 	var code = `charge()`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['block'] = {
 	init: function() {
 		this.appendDummyInput()
-			.appendField("Bloquear")
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+			.appendField("Bloquear");
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour('#7d52a8');
 		this.func = 'block';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['block'] = function(block) {
 	var code = `block()`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['assassinate'] = {
@@ -420,11 +590,31 @@ Blockly.Blocks['assassinate'] = {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#7d52a8");
 		this.func = 'assassinate';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['assassinate'] = function(block) {
@@ -432,23 +622,49 @@ Blockly.Python['assassinate'] = function(block) {
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
 	var code = `assassinate(${value_x}, ${value_y})`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['ambush'] = {
 	init: function() {
 		this.appendDummyInput()
-			.appendField("Emboscada")
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+			.appendField("Emboscada");
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#7d52a8");
 		this.func = 'ambush';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['ambush'] = function(block) {
 	var code = `ambush()`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['melee'] = {
@@ -458,7 +674,7 @@ Blockly.Blocks['melee'] = {
 		this.setOutput(false);
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
-		this.setColour(210);
+		this.setColour("#aa5353");
 		this.func = 'attackMelee';
 		setBlockInfo(this);
 	}
@@ -482,11 +698,31 @@ Blockly.Blocks['ranged'] = {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("Y");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour("#aa5353");
 		this.func = 'attackRanged';
+		this.useReturn = false;
 		setBlockInfo(this);
-	}
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['ranged'] = function(block) {
@@ -494,7 +730,10 @@ Blockly.Python['ranged'] = function(block) {
 	var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
 	var code = `attackRanged(${value_x}, ${value_y})`;
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['get_info'] = {
@@ -504,7 +743,7 @@ Blockly.Blocks['get_info'] = {
 			.appendField(new Blockly.FieldDropdown([["Coordenada X","X"], ["Coordenada Y","Y"], ["Atributo Força","STR"], ["Atributo Agilidade","AGI"], ["Atributo Inteligência","INT"], ["Nível","Lvl"], ["Pontos de vida","Hp"], ["Pontos de habilidade","Ap"], ["Velocidade","Speed"], ["Direção","Head"]]), "COMPLEMENT");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#b79337');
 	}
 };
 
@@ -523,7 +762,7 @@ Blockly.Blocks['gethit'] = {
 		this.appendDummyInput()
 			.appendField("Fui acertado?");
 		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setColour('#b79337');
 		this.func = 'getHit';
 		setBlockInfo(this);
 	}
@@ -541,7 +780,7 @@ Blockly.Blocks['get_time'] = {
 			.appendField(new Blockly.FieldDropdown([["Resistência","Block"], ["Invisibilidade","Ambush"], ["Queimadura","Burn"]]), "COMPLEMENT");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#b79337');
 	}
 };
 
@@ -562,7 +801,7 @@ Blockly.Blocks['get_lasthit'] = {
 			.appendField("do ataque recebido");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#b79337');
 	}
 };
 
@@ -586,9 +825,29 @@ Blockly.Blocks['upgrade'] = {
 			.setAlign(Blockly.ALIGN_RIGHT)
 			.appendField("em");
 		this.setInputsInline(true);
-		this.setOutput(true, "Boolean");
-		this.setColour(210);
-	}
+		this.setOutput(false);
+		this.setPreviousStatement(true);
+		this.setNextStatement(true);
+		this.setColour('#3c9b64');
+		this.useReturn = false;
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['upgrade'] = function(block) {
@@ -599,7 +858,10 @@ Blockly.Python['upgrade'] = function(block) {
 	this.func = `upgrade${attr}`;
 	setBlockInfo(this);
 
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['speak'] = {
@@ -611,7 +873,7 @@ Blockly.Blocks['speak'] = {
 		this.setOutput(false);
 		this.setNextStatement(true);
 		this.setPreviousStatement(true);
-		this.setColour(210);
+		this.setColour('#b79337');
 		this.func = 'speak';
 		setBlockInfo(this);
 	}
@@ -630,7 +892,7 @@ Blockly.Blocks['getdist'] = {
 			.appendField(new Blockly.FieldDropdown([["Posição","POSITION"], ["Alvo","TARGET"]], this.selection.bind(this)), "COMPLEMENT");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#5B67A5');
 		this.reshape(true);
 	},
 	mutationToDom: function() {
@@ -659,6 +921,9 @@ Blockly.Blocks['getdist'] = {
 				.setCheck("Number")
 				.setAlign(Blockly.ALIGN_RIGHT)
 				.appendField("Y");
+
+			connectShadow(this, 'X');
+			connectShadow(this, 'Y');
 		}
 	},
 	selection: function (option) {
@@ -703,7 +968,7 @@ Blockly.Blocks['getangle'] = {
 			.appendField("Y");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#5B67A5');
 		this.func = `getAngle`;
 		setBlockInfo(this);
 	}
@@ -725,7 +990,7 @@ Blockly.Blocks['is_status'] = {
 			.appendField("?");
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 	}
 };
 
@@ -745,8 +1010,26 @@ Blockly.Blocks['get_enemy'] = {
 			.appendField(new Blockly.FieldDropdown([["Mais Próximo","CloseEnemy"], ["Mais Distante","FarEnemy"], ["Com menos Vida","LowHp"], ["Com mais vida", "HighHp"]]), "COMPLEMENT");
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
-		this.setColour(210);
-	}
+		this.setColour('#52b2b2');
+		this.useReturn = true;
+	},
+	customContextMenu: function(options) {
+		toggleUseReturn(this, options);
+	},
+	mutationToDom: function() {
+		var container = document.createElement('mutation');
+		if (this.useReturn)
+			container.setAttribute('use-return', 'true');
+		else
+			container.setAttribute('use-return', 'false');
+		return container;
+	},
+	domToMutation: function(xmlElement) {
+		this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+	},
+	reshape: function(option) {
+		reshape_toggleUseReturn(this, option.useReturn);
+	} 
 };
 
 Blockly.Python['get_enemy'] = function(block) {
@@ -755,7 +1038,10 @@ Blockly.Python['get_enemy'] = function(block) {
 	this.func = `get${info}`;
 	setBlockInfo(this);
 
-	return [code, Blockly.Python.ORDER_NONE];
+	if (this.useReturn)
+		return [code, Blockly.Python.ORDER_NONE];
+	else
+		return code;
 };
 
 Blockly.Blocks['get_target'] = {
@@ -766,7 +1052,7 @@ Blockly.Blocks['get_target'] = {
 			.appendField("do alvo");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 	}
 };
 
@@ -787,7 +1073,7 @@ Blockly.Blocks['issafe'] = {
 			.appendField("?");
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 		this.reshape(false);
 	},
 	mutationToDom: function() {
@@ -818,6 +1104,9 @@ Blockly.Blocks['issafe'] = {
 				.setCheck("Number")
 				.setAlign(Blockly.ALIGN_RIGHT)
 				.appendField("Y");
+
+			connectShadow(this, 'X');
+			connectShadow(this, 'Y');
 		}
 	},
 	selection: function (option) {
@@ -852,7 +1141,7 @@ Blockly.Blocks['getsaferadius'] = {
 			.appendField("Raio seguro");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 		this.func = `getSafeRadius`;
 		setBlockInfo(this);
 	}
@@ -869,7 +1158,7 @@ Blockly.Blocks['howmanyenemies'] = {
 			.appendField("Quantos inimigos vejo?");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 		this.func = `howManyEnemies`;
 		setBlockInfo(this);
 	}
@@ -886,7 +1175,7 @@ Blockly.Blocks['doyouseeme'] = {
 			.appendField("Alvo me enxerga?");
 		this.setInputsInline(true);
 		this.setOutput(true, "Boolean");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 		this.func = `doYouSeeMe`;
 		setBlockInfo(this);
 	}
@@ -903,7 +1192,7 @@ Blockly.Blocks['getsimtime'] = {
 			.appendField("Tempo da simulação");
 		this.setInputsInline(true);
 		this.setOutput(true, "Number");
-		this.setColour(210);
+		this.setColour('#52b2b2');
 		this.func = `getSimTime`;
 		setBlockInfo(this);
 	}
@@ -930,4 +1219,49 @@ function setBlockInfo(block){
 		block.setTooltip(data);
 	});
 	block.setHelpUrl(`function/${block.func.toLowerCase()}.py`);
+}
+
+function toggleUseReturn(block, options){
+	var option = {};
+	option.enabled = true;
+	if (!block.useReturn){
+		option.text = 'Usar retorno';
+		option.callback = () => {
+			block.reshape({useReturn: true});
+		};
+	}
+	else{
+		option.text = 'Ignorar retorno';
+		option.callback = () => {
+			block.reshape({useReturn: false});
+		};
+	}
+	options.push(option);
+}
+
+function reshape_toggleUseReturn(block, useReturn, type){
+	block.unplug(true);
+	if (useReturn){
+		block.setPreviousStatement(false);
+		block.setNextStatement(false);
+		if (!type)
+			block.setOutput(true, "Boolean");
+		else
+			block.setOutput(true, type);
+		block.useReturn = true;
+	}
+	else{
+		block.setOutput(false);
+		block.setPreviousStatement(true);
+		block.setNextStatement(true);
+		block.useReturn = false;
+	}
+}
+
+function connectShadow(block, input){
+	let shadow = block.workspace.newBlock('math_number');
+	shadow.setShadow(true);
+	shadow.initSvg();
+	shadow.render();
+	block.getInput(input).connection.connect(shadow.outputConnection);
 }

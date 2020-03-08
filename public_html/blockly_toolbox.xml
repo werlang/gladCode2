@@ -101,32 +101,29 @@
     </category>
 	<sep></sep>
 	<category name="gladCode" colour="#00638d">
-		<category name="Melhorias" colour="#5b74a5">
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="upgrade">
-						<value name="VALUE">
-							<shadow type="math_number">
-								<field name="NUM">5</field>
-							</shadow>
-						</value>
-					</block>
-                </value>
-            </block>
+		<category name="Melhorias" colour="#3c9b64">
+			<block type="upgrade">
+				<value name="VALUE">
+					<shadow type="math_number">
+						<field name="NUM">5</field>
+					</shadow>
+				</value>
+			</block>
 		</category>
-		<category name="Movimentação" colour="#5b74a5">
-            <block type="ignore_return">
-                <value name="function">
-                    <block type="move">
-						<mutation name='position'></mutation>
-                    </block>
+		<category name="Movimentação" colour="#bcbf33">
+			<block type="move">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
-            <block type="ignore_return">
-                <value name="function">
-                    <block type="step"></block>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
+			</block>
+			<block type="step"></block>
 			<block type="moveforward">
                 <value name="STEPS">
                     <shadow type="math_number">
@@ -134,15 +131,19 @@
 					</shadow>
                 </value>
 			</block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="turn">
-						<mutation name='where'></mutation>
-                    </block>
+			<block type="turn">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
 			<block type="turnangle">
-				<mutation name='operation'></mutation>
 				<value name="ANGLE">
 					<shadow type="math_number">
 						<field name="NUM">360</field>
@@ -150,15 +151,22 @@
 				</value>
 			</block>
 		</category>
-		<category name="Ataque" colour="#5b74a5">
+		<category name="Ataque" colour="#aa5353">
 			<block type="melee"></block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="ranged"></block>
+			<block type="ranged">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
 		</category>
-		<category name="Informações" colour="#5b74a5">
+		<category name="Informações" colour="#b79337">
 			<block type="get_info"></block>
 			<block type="gethit"></block>
 			<block type="get_lasthit"></block>
@@ -171,7 +179,7 @@
 				</value>
 			</block>
 		</category>
-		<category name="Percepção" colour="#5b74a5">
+		<category name="Percepção" colour="#52b2b2">
 			<block type="is_status"></block>
 			<block type="get_enemy"></block>
 			<block type="get_target"></block>
@@ -181,43 +189,72 @@
 			<block type="doyouseeme"></block>
 			<block type="getsimtime"></block>
 		</category>
-		<category name="Habilidades" colour="#5b74a5">
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="fireball"></block>
+		<category name="Habilidades" colour="#7d52a8">
+			<block type="fireball">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="teleport"></block>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
                 </value>
-            </block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="charge"></block>
-                </value>
-            </block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="block"></block>
-                </value>
-            </block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="assassinate"></block>
-                </value>
-            </block>
-			<block type="ignore_return">
-                <value name="function">
-                    <block type="ambush"></block>
-                </value>
-            </block>
-		</category>
-		<category name="Matemática" colour="#5b74a5">
-			<block type="getdist">
-				<mutation name='position'></mutation>
 			</block>
-			<block type="getangle"></block>
+			<block type="teleport">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
+			<block type="charge"></block>
+			<block type="block"></block>
+			<block type="assassinate">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
+			<block type="ambush"></block>
+		</category>
+		<category name="Matemática" colour="#5B67A5">
+			<block type="getdist">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
+			<block type="getangle">
+				<value name="X">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+				<value name="Y">
+                    <shadow type="math_number">
+						<field name="NUM">0</field>
+					</shadow>
+                </value>
+			</block>
 		</category>
 	</category>
 </xml>
