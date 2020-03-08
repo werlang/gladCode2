@@ -655,3 +655,9 @@ body #fog {
 .ace_gutter-cell.red {
 	background-color: red;
 }
+
+.blocklyToolboxDiv,
+.blocklyFlyout,
+.blocklyMainWorkspaceScrollbar {
+	z-index: 1;
+}

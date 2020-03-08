@@ -26,9 +26,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
-	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/blockly.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/msg/pt-br.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20191014.4/python.js"></script> -->
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script> -->
 
 	<script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
 	<script src='script/fallback/jquery-3.4.1.min.js'></script>
