@@ -189,7 +189,7 @@
 			file_put_contents("$path/temp/$foldername/code$i.c",$code);
 		}
 		else if ($language == "python"){
-			$code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n\twhile running():\n\t\tloop()\n\tendSocketComm()";
+			$code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n\twhile running():\n\t\tloop()\n";
 			file_put_contents("$path/temp/$foldername/code$i.py",$code);
 		}
 	}
