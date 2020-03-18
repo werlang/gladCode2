@@ -44,7 +44,6 @@ $(document).ready( function() {
             $('#fog-skin').fadeIn();
         }
 
-        toggleBlocks();
     });
     
     $('.fog').hide();
@@ -596,6 +595,10 @@ $(document).ready( function() {
                 }
             });
         }
+    });
+
+    $('#switch').click( function(){
+        toggleBlocks();
     });
 
     $('#settings').click( function(){
@@ -1804,11 +1807,21 @@ function toggleBlocks(){
         $('#code').show();
         
         blocksEditor.active = false;
+
+        $('#switch i').removeClass('fa-code').addClass('fa-puzzle-piece');
+        $('#switch').tooltip({content: 'Alternar para editor de blocos'});
     }
     else{
-        $('#code').hide();
-        $('#blocks').show();
-
-        blocksEditor.active = true;
+        showDialog("Se você alternar para o editor de blocos perderá seu código. Deseja continuar?", ["SIM", "NÃO"]).then( data => {
+            if (data == "SIM"){
+                $('#code').hide();
+                $('#blocks').show();
+        
+                blocksEditor.active = true;
+        
+                $('#switch i').removeClass('fa-puzzle-piece').addClass('fa-code');
+                $('#switch').tooltip({content: 'Alternar para editor de código'});
+            }
+        });
     }
 }

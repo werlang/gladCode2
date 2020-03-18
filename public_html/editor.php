@@ -115,6 +115,9 @@
 			<div id='test' class='mrow disabled' title='Testar gladiador em batalha'>
 				<i class='fas fa-gamepad'></i>
 			</div>
+			<div id='switch' class='mrow' title='Alternar para editor de blocos'>
+				<i class='fas fa-puzzle-piece'></i>
+			</div>
 			<div id='download' class='mrow disabled' hidden title='Baixar o código do gladiador'>
 				<i class='fas fa-file-download'></i>
 			</div>
