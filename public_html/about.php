@@ -87,10 +87,20 @@
 				<img src='icon/swords.png'>
 				<span class='time'>Set 2019</span>
 			</div>
-			<div class='row future'>
+			<div class='row'>
 				<span class='text'>Inauguração do modo torneio na CharCode 2019.</span>
 				<img src='icon/swords.png'>
 				<span class='time'>Dez 2019</span>
+			</div>
+			<div class='row'>
+				<span class='text'>Suporte à linguagem de programação Python e programação em blocos.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>Mar 2020</span>
+			</div>
+			<div class='row future'>
+				<span class='text'>Modo lendário, onde gladiadores mantém seus níveis e a morte é definitiva.</span>
+				<img src='icon/swords.png'>
+				<span class='time'>2020</span>
 			</div>
 			<div class='row future'>
 				<span class='text'>Lançamento de novas habilidades.</span>
@@ -99,11 +109,6 @@
 			</div>
 			<div class='row future'>
 				<span class='text'>Implementação de itens para uso dos gladiadores durante as batalhas.</span>
-				<img src='icon/swords.png'>
-				<span class='time'>2020</span>
-			</div>
-			<div class='row future'>
-				<span class='text'>Suporte à programação em blocos, e às linguagens Python, Javascript e PHP.</span>
 				<img src='icon/swords.png'>
 				<span class='time'>2020</span>
 			</div>
@@ -197,7 +202,7 @@
 				<a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
 			</div>
 		</div>
-		<div>Copyright © 2018-2019 Pablo Werlang</div>
+		<div>Copyright © 2018-2020 Pablo Werlang</div>
 			<div id='long' hidden>
 				Ainda durante a faculdade um professor apresentou para a turma um programa traria a inspiração para a gladCode anos mais tarde. Este programa possuía uma linguagem própria, e nele, nós alunos deveríamos programar a inteligência de um robô virtual, que deveria batalhar contra os robôs dos outros alunos em um mini torneio realizado após a entrega do trabalho da disciplina.
 				Os anos se passaram. Hoje sou professor do <a href='ifsul.edu.br'>Instituto Federal Sul-Riograndense (IFSul)</a> - Campus Charqueadas e ministro principalmente disciplinas de lógica de programação e linguagem de programação C.

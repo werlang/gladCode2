@@ -189,7 +189,7 @@
                         <tr>
                             <td><a href='function/fireball'>Fireball</a></td>
                             <td>50</td>
-                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 180% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
+                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 215% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
                         </tr>
                         <tr>
                             <td><a href='function/teleport'>Teleport</a></td>
