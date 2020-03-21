@@ -208,10 +208,19 @@
 		else
 			$output['status'] = "NOTLOGGED";;
 	}
-	elseif ($action == "TUTORIAL"){
+	elseif ($action == "TUTORIAL_END"){
 		if(isset($_SESSION['user'])){
 			$user = $_SESSION['user'];
 			$sql = "UPDATE usuarios SET showTutorial = '0' WHERE id = '$user'";
+			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$output['status'] = "SUCCESS";
+		}
+	}
+	elseif ($action == "TUTORIAL_LANGUAGE"){
+		if(isset($_SESSION['user'])){
+			$user = $_SESSION['user'];
+			$language = mysql_escape_string($_POST['language']);
+			$sql = "UPDATE usuarios SET pref_language = '$language' WHERE id = '$user'";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 			$output['status'] = "SUCCESS";
 		}

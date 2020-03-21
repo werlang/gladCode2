@@ -307,7 +307,7 @@ Blockly.Blocks['turn'] = {
             }
         }
         if (useReturn === true || useReturn === false){
-            console.log(option)
+            // console.log(option)
             if (option == "LEFT" || option == "RIGHT")
                 reshape_toggleUseReturn(this, useReturn, "Number");
             else
