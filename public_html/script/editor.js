@@ -8,7 +8,6 @@ var hash;
 var pieces;
 var loadGlad = false;
 var wannaSave = false;
-var tutoState = 0;
 var blocksEditor = false;
 
 $(document).ready( function() {
@@ -19,8 +18,10 @@ $(document).ready( function() {
         if (user.status == "SUCCESS"){
             $('#login').html(user.nome);
             
-            if (user.tutor == "1")
-                showTutorial();
+            if (user.tutor == "1"){
+                tutorial.enabled = true
+                tutorial.show()
+            }
             
             var pic = new Image();
             pic.src = user.foto;
@@ -29,6 +30,9 @@ $(document).ready( function() {
             pic.onerror = function(){
                 $('#profile-icon img').attr('src', "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");
             }
+
+            if (user.language == 'blocks')
+                toggleBlocks({ask: false, active: true})
 
             editor.setTheme("ace/theme/"+ user.theme);
             editor.setFontSize(user.font +"px");
@@ -363,13 +367,20 @@ $(document).ready( function() {
                 showTestWindow();
             
             function showTestWindow(){
-                if (tutoState == 2){
-                    tutoState = 3;
-                    showTutorial();
-                }
-                else if (tutoState == 9 || tutoState == 10 || tutoState == 12 || tutoState == 14 || tutoState == 16 || tutoState == 18 || tutoState == 20 || tutoState == 22)
-                    showTutorial();
-                else{
+                let t = tutorial.show([
+                    'checkStep',
+                    'oponent',
+                    'checkAttack',
+                    'getHit',
+                    'reactHit',
+                    'safe',
+                    'fireball',
+                    'teleport',
+                    'upgrade',
+                    'breakpoint',
+                ])
+
+                if (t === false){
                     setLoadGlad();
                     if (!$(this).hasClass('disabled')){
                         $('#fog-battle').fadeIn();
@@ -528,9 +539,20 @@ $(document).ready( function() {
                             wannaSave = false;
                         }
                         
-                        var states = [4, 5, 6, 8, 11, 13, 15, 17, 19, 21, 23, 24];
-                        if (states.indexOf(tutoState) != -1)
-                            showTutorial();
+                        tutorial.show([
+                            'moveBackForth',
+                            'moveAskNext',
+                            'showBackForth',
+                            'attack',
+                            'checkGetHit',
+                            'checkReact',
+                            'checkSafe',
+                            'checkFireball',
+                            'checkTeleport',
+                            'checkUpgrade',
+                            'checkBreakpoint',
+                            'end'
+                        ])
                     });
                     progbtn.kill();
                     //$('#fog-battle #btn-cancel').removeAttr('disabled');
@@ -674,7 +696,8 @@ $(document).ready( function() {
         });
         
         $('#help-window #tutorial').click( function(){
-            showTutorial();
+            tutorial.enabled = true
+            tutorial.show();
         });
         $('#help-window #docs').click( function(e){
             e.stopPropagation();
@@ -722,9 +745,6 @@ $(document).ready( function() {
             $('#download').addClass('disabled');
         }
         
-        if (tutoState == 1)
-            showTutorial();
-
         var lang = getLanguage(text);
         if (lang == "c" && editor.language != 'c'){
             editor.session.setMode("ace/mode/c_cpp");
@@ -734,6 +754,13 @@ $(document).ready( function() {
             editor.session.setMode("ace/mode/python");
             editor.language = 'python';
         }
+
+        if (tutorial.enabled && user.language == 'blocks'){
+            tutorial.show([
+                'checkStep'
+            ])
+        }
+
     });
 
     init_chat($('#chat-panel'), {
@@ -859,7 +886,7 @@ function setLoadGlad(){
         var setup = `setup(){\n\tsetName(\"${loadGlad.name}\");\n\tsetSTR(${loadGlad.vstr});\n\tsetAGI(${loadGlad.vagi});\n\tsetINT(${loadGlad.vint});\n\tsetSkin(\"${loadGlad.skin}\");\n\tsetUser(\"${loadGlad.user}\");\n}\n\n`;
         loadGlad.code = setup + editor.getValue();
     }
-    else if (language == "python"){
+    else if (language == "python" || language == 'blocks'){
         var setup = `def setup():\n\tsetName(\"${loadGlad.name}\")\n\tsetSTR(${loadGlad.vstr})\n\tsetAGI(${loadGlad.vagi})\n\tsetINT(${loadGlad.vint})\n\tsetSkin(\"${loadGlad.skin}\")\n\tsetUser(\"${loadGlad.user}\")\n\n`;
         loadGlad.code = setup + editor.getValue();
     }
@@ -884,7 +911,8 @@ function getGladFromFile(filename){
 function load_editor(){
     var langTools = ace.require("ace/ext/language_tools");
     editor = ace.edit("code");
-    editor.session.setUseSoftTabs(false);
+    editor.session.setUseSoftTabs(true);
+    editor.session.setOption("tabSize", 4)
     editor.setTheme("ace/theme/dreamweaver");
     editor.setFontSize(18);
     editor.getSession().setUseWrapMode(true);
@@ -1090,10 +1118,9 @@ function load_glad_generator(element){
                 if (user.language == 'python')
                     codigo = "def loop():\n    #comportamento do gladiador\n";
                 
-                if (tutoState == 1){
-                    tutoState = 2;
-                    showTutorial();
-                }
+                if (tutorial.getLesson() == 'skin')
+                    tutorial.next(true)
+
                 if (editor){
                     if (editor.getValue() == ""){
                         editor.setValue(codigo);
@@ -1771,13 +1798,20 @@ async function getBannedFunctions(code){
 
 function getLanguage(code){
     var language = "c";
-    if (code.indexOf("def loop():") != -1)
+    if (blocksEditor.active)
+        language = 'blocks'
+    else if (code.indexOf("def loop():") != -1)
         language = "python";
 
     return language;
 }
 
-function toggleBlocks(){
+function toggleBlocks(args){
+    if (args){
+        var active = args.active
+        var ask = args.ask
+    }
+
     if (!blocksEditor){
         blocksEditor = {};
 
@@ -1802,6 +1836,11 @@ function toggleBlocks(){
         });
     }
     
+    if (active === true)
+        blocksEditor.active = false
+    if (active === false)
+        blocksEditor.active = true
+
     if (blocksEditor.active){
         $('#blocks').hide();
         $('#code').show();
@@ -1812,16 +1851,29 @@ function toggleBlocks(){
         $('#switch').tooltip({content: 'Alternar para editor de blocos'});
     }
     else{
-        showDialog("Se você alternar para o editor de blocos perderá seu código. Deseja continuar?", ["SIM", "NÃO"]).then( data => {
-            if (data == "SIM"){
-                $('#code').hide();
-                $('#blocks').show();
-        
-                blocksEditor.active = true;
-        
-                $('#switch i').removeClass('fa-puzzle-piece').addClass('fa-code');
-                $('#switch').tooltip({content: 'Alternar para editor de código'});
-            }
-        });
+        if (ask === false)
+            change()
+        else{
+            showDialog("Se você alternar para o editor de blocos perderá seu código. Deseja continuar?", ["SIM", "NÃO"]).then( data => {
+                if (data == "SIM")
+                    change()
+            });
+        }
+
+        function change(){
+            $('#code').hide();
+            $('#blocks').show();
+    
+            blocksEditor.active = true;
+    
+            $('#switch i').removeClass('fa-puzzle-piece').addClass('fa-code');
+            $('#switch').tooltip({content: 'Alternar para editor de código'});
+        }
     }
+}
+
+function saveBlocks(){
+    var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    var xmlText = Blockly.Xml.domToText(xmlDom);
+    return xmlText
 }
