@@ -370,14 +370,10 @@ $(document).ready( function() {
                 let t = tutorial.show([
                     'checkStep',
                     'oponent',
+                    'learnAttack',
                     'checkAttack',
-                    'getHit',
-                    'reactHit',
-                    'safe',
-                    'fireball',
-                    'teleport',
-                    'upgrade',
-                    'breakpoint',
+                    'checkGetHit',
+                    'checkReact'
                 ])
 
                 if (t === false){
@@ -540,18 +536,12 @@ $(document).ready( function() {
                         }
                         
                         tutorial.show([
+                            'watchCodeMove',
                             'moveBackForth',
-                            'moveAskNext',
-                            'showBackForth',
-                            'attack',
-                            'checkGetHit',
-                            'checkReact',
-                            'checkSafe',
-                            'checkFireball',
-                            'checkTeleport',
-                            'checkUpgrade',
-                            'checkBreakpoint',
-                            'end'
+                            'askMoveNext',
+                            'detectEnemy',
+                            'getHit',
+                            'reactHit'
                         ])
                     });
                     progbtn.kill();

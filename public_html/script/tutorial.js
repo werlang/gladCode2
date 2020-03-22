@@ -1,6 +1,6 @@
 var tutorial = {
     enabled: true,
-    state: 5,
+    state: 12,
     lesson: {},
     order: [
         'start',
@@ -8,11 +8,12 @@ var tutorial = {
         'firstStep',
         'checkStep',
         'oponent',
+        'watchCodeMove',
         'moveBackForth',
-        'moveAskNext',
+        'askMoveNext',
         'showBackForth',
         'detectEnemy',
-        'attack',
+        'learnAttack',
         'checkAttack',
         'getHit',
         'checkGetHit',
@@ -273,11 +274,11 @@ tutorial.lesson.oponent = async function(){
     $('#test').click();
 }
 
-tutorial.lesson.moveBackForth = async function(){
+tutorial.lesson.watchCodeMove = async function(){
     if (user.language == 'blocks'){
         await showDialog("Maravilha! Você viu como seu gladiador ficou andando sem parar? O bloco <b>Passo para [Frente]</b> faz ele dar somente um passo para frente, mas como <b>loop</b> estava sendo executado a todo momento, ele ficou andando.",["Sim"])
 
-        var code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="h;%$!XueSmZdU7Zb].,}">start</variable></variables><block type="variables_set" id="/M)73/RW@k|gPO#q,Kg2" x="60" y="10"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field><value name="VALUE"><block type="logic_boolean" id="{*$5I^4Q/UbB9YeKp*s)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}Gy*!?M3#94S#-Vn~7PM" deletable="false" x="60" y="50"><statement name="CONTENT"><block type="controls_if" id="Do]s:hh,2JEvn;zXYB!$"><mutation else="1"/><value name="IF0"><block type="variables_get" id="OQFLKw%U9PBsspSe9O`+"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field></block></value><statement name="DO0"><block type="move" id="k.y)_GDvLlH5s[LP^{+?"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="P(VIu%)G(?(R_dEon~r@"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="##Dd6S^nlM`VO]a]HI,2"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="~.+BH8:[Ml?}t?s3LIf9"><value name="IF0"><block type="logic_operation" id="!bO/`p+J}8kG/xO!`5!M" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="V/*h:|jZqTq[,ZYyU4E("><field name="OP">EQ</field><value name="A"><block type="get_info" id="]/1I;cnTv~v|3H0dJ8~R"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="~?z$p)GvC$hL.XU4]PlU"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="S}/[0Xs*#!I+bYe0#5GZ"><field name="OP">EQ</field><value name="A"><block type="get_info" id="$=w%7AWm,|HRi8k[onRs"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="v~-kCoB:+i=gXy{RdB@P"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="qa7;b6_nk8.~VQ]UW@4;"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field><value name="VALUE"><block type="logic_boolean" id="7LudFatMQFmd%zbyLoqL"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="pK?(6aZh`/k7vWHNU^Iu"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="]qCH`X#2A=OkR*uV9yGo"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+        var code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="h;%$!XueSmZdU7Zb].,}">start</variable></variables><block type="variables_set" id="/M)73/RW@k|gPO#q,Kg2" x="60" y="50"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field><value name="VALUE"><block type="logic_boolean" id="{*$5I^4Q/UbB9YeKp*s)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}Gy*!?M3#94S#-Vn~7PM" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="Do]s:hh,2JEvn;zXYB!$"><mutation else="1"/><value name="IF0"><block type="variables_get" id="OQFLKw%U9PBsspSe9O`+"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field></block></value><statement name="DO0"><block type="move" id="k.y)_GDvLlH5s[LP^{+?"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="P(VIu%)G(?(R_dEon~r@"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="##Dd6S^nlM`VO]a]HI,2"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="~.+BH8:[Ml?}t?s3LIf9"><value name="IF0"><block type="logic_operation" id="!bO/`p+J}8kG/xO!`5!M" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="V/*h:|jZqTq[,ZYyU4E("><field name="OP">EQ</field><value name="A"><block type="get_info" id="]/1I;cnTv~v|3H0dJ8~R"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="~?z$p)GvC$hL.XU4]PlU"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="S}/[0Xs*#!I+bYe0#5GZ"><field name="OP">EQ</field><value name="A"><block type="get_info" id="$=w%7AWm,|HRi8k[onRs"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="v~-kCoB:+i=gXy{RdB@P"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="qa7;b6_nk8.~VQ]UW@4;"><field name="VAR" id="h;%$!XueSmZdU7Zb].,}">start</field><value name="VALUE"><block type="logic_boolean" id="7LudFatMQFmd%zbyLoqL"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="pK?(6aZh`/k7vWHNU^Iu"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="]qCH`X#2A=OkR*uV9yGo"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
         xmlDom = Blockly.Xml.textToDom(code);
         Blockly.mainWorkspace.clear()
         Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
@@ -288,7 +289,7 @@ tutorial.lesson.moveBackForth = async function(){
         if (user.language == 'c')
             editor.setValue("// controla quando o gladiador chegou no meio da arena \nint start = 1;\n\nloop(){\n    if (start){ // se ele ainda não chegou no meio\n        moveTo(12, 12); // move em direção à posição 12,12\n        // getX e getY capturam o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) // se X e Y é 12, chegou no destino\n            start = 0; // coloca 0 em start para dizer que não quer mais caminhar\n    }\n    else // caso start já esteja em 0\n        turn(60); // fica rotacionando 60 graus\n}")
         else if (user.language == 'python')
-            editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\n\ndef loop():\n    if start: # se ele ainda não chegou no meio\n        moveTo(12, 12) # move em direção à posição 12,12\n        # getX e getY capturam o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        turn(60) # fica rotacionando 60 graus")
+            editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\n\ndef loop():\n    global start\n    if start: # se ele ainda não chegou no meio\n        moveTo(12, 12) # move em direção à posição 12,12\n        # getX e getY capturam o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        turn(60) # fica rotacionando 60 graus")
         
     }
 
@@ -297,37 +298,264 @@ tutorial.lesson.moveBackForth = async function(){
     tutorial.next()
 }
 
-tutorial.lesson.moveAskNext = async function(){
-    console.log('foo')
+tutorial.lesson.moveBackForth = async function(){
+    if (user.language == 'blocks'){
+        await showDialog(`Como você pôde ver, o gladiador se deslocou até o centro da arena e ficou girando.O bloco <b>Mover para [Posição]</b> especifica para onde ele quer ir e da um passo em direção ao destino. O gladiador sabe quando chegou por causa do bloco <b>Pegar Informação</b> com as opções <b>[Coordenada X/Y]</b>. O bloco <b>Virar Graus 
+        relativo [ao gladiador]</b> faz ele girar`, ["Entendi"])
+
+        await showDialog(`Como a variável <b>start começa em Verdadeiro</b>, o <b>senão</b> será ignorado nos primeiros momentos. Em todas etapas da simulação que start for Verdadeiro, o gladiador irá se mover em direção ao centro. Quando ele chegar, <b>start fica Falso</b>, garantindo que nas próximas execuções do bloco <b>loop</b>, o código entre no <b>senão</b> e o gladiador fique girando`, ["Acho que saquei"])
+    }
+    else{
+        await showDialog(`Como você pôde ver, o gladiador se deslocou até o centro da arena e ficou girando. A função <b>moveTo</b> especifica para onde ele quer ir e da um passo em direção ao destino. O gladiador sabe quando chegou por causa das funções <b>getX</b> e <b>getY</b>. E a função <b>turn</b> faz ele girar`, ["Entendi"])
+
+        let info = {
+            c: ['1', '0'],
+            python: ['True', 'False'],
+        }
+
+        await showDialog(`Como a variável <b>start começa em ${info[user.language][0]}</b>, o <b>else</b> da <b>linha 11</b> será ignorado nos primeiros momentos. Em todas etapas da simulação que start for ${info[user.language][0]}, o gladiador irá se mover em direção ao centro. Quando ele chegar, <b>start fica ${info[user.language][1]}</b>, garantindo que nas próximas execuções da função <b>loop</b>, o código entre no <b>else</b> e o gladiador fique girando`, ["Acho que saquei"])
+    }
+
+    let data = await showDialog("Vamos fazer uma pequena modificação neste código. Você seria capaz de fazer com que o gladiador após chegar ao centro, fique indo e voltando do ponto (5, 15) para o ponto (20, 10)?", ["Não quero","Vou tentar"])
+
+    tutorial.next()
+
+    if (data == "Não quero")
+        tutorial.next(true)
 }
 
+tutorial.lesson.askMoveNext = async function(){
+    let data = await showDialog("Interessante! Gostaria de ir para a próxima lição?",["Ainda não","Vamos lá"])
+
+    if (data == "Vamos lá")
+        tutorial.next(true)
+}
 
 tutorial.lesson.showBackForth = async function(){
-    console.log('foo')
+    if (user.language == 'blocks'){
+        let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable><variable id="hx+ws)=n`Fu#%8|Y{B/G">vai</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value><next><block type="variables_set" id="M,Wz3~5K`^2Dwf;}tU7`"><field name="VAR" id="hx+ws)=n`Fu#%8|Y{B/G">vai</field><value name="VALUE"><block type="logic_boolean" id="Boj*0LwqpnBHm4d.fy1["><field name="BOOL">FALSE</field></block></value></block></next></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="110"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation else="1"/><value name="IF0"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO0"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="controls_if" id="S3i11q:ne,u=*,k`RIL0"><mutation else="1"/><value name="IF0"><block type="variables_get" id="j#yV/3_Q;PslIKSGthZ@"><field name="VAR" id="hx+ws)=n`Fu#%8|Y{B/G">vai</field></block></value><statement name="DO0"><block type="controls_if" id="jsdvO)~G,E~P*w~(F+5G"><value name="IF0"><block type="move" id="{R|}XvOVWMI_ZW,Il`f^"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="true"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="Z=!ZG=|-oL:t#2Gsa/`j"><field name="NUM">5</field></shadow></value><value name="Y"><shadow type="math_number" id="^wqc|*`GQ;R-bq?~-N[+"><field name="NUM">15</field></shadow></value></block></value><statement name="DO0"><block type="variables_set" id="@x)E6pu8ztQ}r81]$~73"><field name="VAR" id="hx+ws)=n`Fu#%8|Y{B/G">vai</field><value name="VALUE"><block type="logic_boolean" id="4s+cJp+/)Q)pQ^/:;3hg"><field name="BOOL">FALSE</field></block></value></block></statement></block></statement><statement name="ELSE"><block type="controls_if" id="u=f~ZW[!LfElNoAXbV?K"><value name="IF0"><block type="move" id="*ePMurB4v9$ryzgW]u1="><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="true"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="]A(69o(V+/ZO^)=%[SY`"><field name="NUM">20</field></shadow></value><value name="Y"><shadow type="math_number" id="HF3;*HU)SUobIRIfLYPZ"><field name="NUM">10</field></shadow></value></block></value><statement name="DO0"><block type="variables_set" id="GnFSHMUUp/zA~2{Do~?2"><field name="VAR" id="hx+ws)=n`Fu#%8|Y{B/G">vai</field><value name="VALUE"><block type="logic_boolean" id="=T3oSVw^*^_m(w%-2P#F"><field name="BOOL">TRUE</field></block></value></block></statement></block></statement></block></statement></block></statement></block></xml>'
+        xmlDom = Blockly.Xml.textToDom(code);
+        Blockly.mainWorkspace.clear()
+        Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+    }
+    else if (user.language == 'c'){
+        editor.setValue("//controla quando o gladiador chegou no meio da arena \nint start=1, vai=0;\n\nloop(){\n    if (start){ //se ele ainda não chegou no meio\n        moveTo(12,12); //se move em direção à posição 12,12\n        //getX e getY server para capturar o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) //se X e Y é 12, chegou no destino\n            start = 0; //coloca 0 em start para dizer que não quer mais caminhar\n    }\n    else{ //caso start já esteja em 0\n        if (vai){ //verifica se vai ou vem\n            if(moveTo(5,15)) //move e testa se chegou no ponto\n                vai = 0; //diz que é hora do vem\n        }\n        else{ //se está na etapa do vem\n            if(moveTo(20,10)) \n                vai = 1; //diz que é hora do vai\n        }\n    }\n}");
+    }
+    else if (user.language == 'python'){
+        editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\nvai = False\n\ndef loop():\n    global start, vai\n    if start: # se ele ainda não chegou no meio\n        moveTo(12,12) # se move em direção à posição 12,12\n        # getX e getY server para capturar o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        if vai: # verifica se vai ou vem\n            if moveTo(5, 15): # move e testa se chegou no ponto\n                vai = False # diz que é hora do vem\n        else: # se está na etapa do vem\n            if moveTo(20, 10): \n                vai = True # diz que é hora do vai");
+    }
+
+    await showMessage("Ok. Modifiquei seu código. Pode conferir se sua solução era mais ou menos assim. Teste o gladiador para prosseguir")
+        
+    tutorial.next()
 }
 
 tutorial.lesson.detectEnemy = async function(){
-    console.log('foo')
+    let data
+    if (user.language == 'blocks'){
+        data = await showDialog("Agora vamos detectar seus oponentes. Todo gladiador consegue enxergar 60 graus ao seu redor e à uma distância de 9 passos. O bloco <b>Selecionar alvo</b>, que serve para este propósito está localizado no submenu <b>Percepção</b> no menu de blocos da gladCode. Além de detectar inimigos no campo de visão do gladiador, o bloco ainda fixa a atenção do gladiador no oponente detectado, permitindo o uso de outros blocos que requerem um alvo", ["Conhecer funções","Certo"])
+    }
+    else{
+        data = await showDialog("Agora vamos detectar seus oponentes. Todo gladiador consegue enxergar 60 graus ao seu redor e à uma distância de 9 passos. As funções <b>getLowHp</b>, <b>getHighHp</b>, <b>getCloseEnemy</b> e <b>getFarEnemy</b> além de detectarem inimigos no campo de visão do gladiador, ainda fixam a atenção do gladiador no oponente detectado, permitindo o uso de outras funções que requerem um alvo",["Conhecer funções","Certo"])
+    }
+    
+    if (data == "Conhecer funções")
+        window.open("docs#nav-sense");
+    
+    if (user.language == 'blocks'){
+        data = await showDialog("Gostaria que você usasse este bloco para detectar um oponente. Com ele você pode escolher selecionar um inimigo mais próximo/distante ou com mais/menos pontos de vida. Que tal colocá-lo dentro de uma condição (bloco Se-faça)? Assim você pode controlar o que fazer caso o gladiador encontre um oponente. Quando tiver concluido clique no botão para testar o gladiador",["Mostrar como","Vou tentar"])
+    }
+    else{
+        data = await showDialog("Gostaria que você usasse uma destas funções para detectar um oponente. Que tal colocar uma delas dentro de uma condição (if)? Assim você pode controlar o que fazer caso o gladiador encontre um oponente. Quando tiver concluido clique no botão para testar o gladiador",["Mostrar como","Vou tentar"])
+    }
+
+    if (data == "Mostrar como"){
+        if (user.language == 'blocks'){
+            let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><value name="IF0"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO0"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><next><block type="controls_if" id="3%8by*to|-Roz-.}OzLc"><comment pinned="false" h="80" w="160">aqui vamos colocar o que fazer quando detectar inimigo</comment><value name="IF0"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value></block></next></block></statement></block></xml>'
+            xmlDom = Blockly.Xml.textToDom(code);
+            Blockly.mainWorkspace.clear()
+            Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+        }
+        else if (user.language == 'c'){
+            editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        // aqui vamos colocar o que fazer quando detectar inimigo\n    }\n}");
+        }
+        else if (user.language == 'python'){
+            editor.setValue('start = True\n\ndef loop():\n    global start\n    if start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    # detecta se tem inimigo próximo, e fixa a atenção nele\n    if getCloseEnemy():\n        # aqui vamos colocar o que fazer quando detectar inimigo')
+        }
+    }
+
+    tutorial.next()
 }
 
-tutorial.lesson.attack = async function(){
-    console.log('foo')
+tutorial.lesson.learnAttack = async function(){
+    var text = editor.getValue();
+    let search
+
+    if (user.language == 'blocks' || user.language == 'python')
+        search = text.search(/[(\s=](getCloseEnemy|getFarEnemy|getLowHp|getHighHp)[\s]{0,1}\(\)[:=!<>)\s]{0,1}/g)
+    else if (user.language == 'c')
+        search = text.search(/[(\s=](getCloseEnemy|getFarEnemy|getLowHp|getHighHp)[\s]{0,1}\(\)[=!<>;)\s]/g)
+
+    if (search == -1){
+        let data
+        if (user.language == 'blocks')
+            data = await showDialog("Você ainda não inseriu o bloco <b>Selecionar alvo</b>. Quer uma ajuda?",["Esqueci", "Sim, ajuda","Deixa comigo"])
+        else
+            data = await showDialog("Você ainda não inseriu nenhuma das funções apresentadas. Quer uma ajuda?",["Esqueci", "Sim, ajuda","Deixa comigo"])
+        
+        if (data == "Sim, ajuda")
+            window.open("docs#nav-sense");
+        else if (data == "Esqueci")
+            tutorial.previous(true)
+    }
+    else{
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Agora vamos aprender a atacar. Com um alvo fixado, seu gladiador pode usar o bloco <b>Pegar [Coordenada X/Y] do alvo</b> para saber a posição do alvo. Este bloco é muito versátil e lhe possibilita saber várias coisas sobre seu alvo fixado com <b>Selecionar alvo</b>",["Como assim?","Fácil"])
+        }
+        else{
+            data = await showDialog("Agora vamos aprender a atacar. Com um alvo fixado, seu gladiador pode usar <b>getTargetX</b> e <b>getTargetY</b> para saber a posição do alvo",["Como assim?","Fácil"])
+        }
+
+        if (data == "Como assim?")
+            window.open("docs#nav-sense");
+
+        if (user.language == 'blocks'){
+            data = await showDialog("Sabendo a posição, usamos o bloco <b>Ataque à distância</b> para atirar com o arco. Ele se encontra no submenu <b>Ataque</b> dos blocos da gladCode. Neste bloco você precisa informar as coordenadas X e Y de onde você quer atirar. Tente atirar na posição do alvo e teste seu gladiador",["Me mostre como","OK"])
+        }
+        else{
+            data = await showDialog("Sabendo a posição, usamos <b>attackRanged</b> para atirar com o arco. Dentro dos parênteses da função precisa colocar as coordenadas X e Y de onde você quer atirar. Tente atirar na posição do alvo e teste seu gladiador",["Me mostre como","OK"])
+        }
+
+        if (data == "Me mostre como"){
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><value name="IF0"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO0"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><next><block type="controls_if" id="3%8by*to|-Roz-.}OzLc"><comment pinned="false" h="80" w="160">detecta se tem inimigo próximo, e fixa a atenção nele</comment><value name="IF0"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO0"><block type="ranged" id="4EIcJ[I[UGH2U]0C}n=(" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="}vF+j}:O8+N].M`UTyN3"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="j#Vn-{6r^FB=lXhZnI6n"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement></block></next></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\n\ndef loop():\n    global start\n    if start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    # detecta se tem inimigo próximo, e fixa a atenção nele\n    if getCloseEnemy():\n        attackRanged(getTargetX(), getTargetY())");
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY());\n    }\n}");
+            }
+        }
+
+        tutorial.next()
+    }
 }
 
 tutorial.lesson.checkAttack = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks' || user.language == 'python'){
+        search = text.search(/[\s]attackRanged[\s]{0,1}\(+[\s]*getTargetX[\s]{0,1}\(\)[\s]*\)*,[\s]*\(*[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)*[:\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*\n[\s(]*attackRanged[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\)/g) == -1
+    }
+    else if (user.language == 'c'){
+        search = text.search(/[(=<>!\s]attackRanged[\s]{0,1}\([\s]*getTargetX[\s]{0,1}\(\)[\s]*,[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)[)!=<>;\s]*/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*\n[\s]*attackRanged[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\);/g) == -1
+    }
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Antes de testar você deve adicionar o bloco que permite que o gladiador ataque. É só inserir o bloco <b>Ataque à distância</b> dentro do da condição que detectou o alvo, e nas coordenadas X e Y usar o bloco <b>Pegar [Coordenada X/Y] do alvo</b>",["Me mostre","Vou tentar"])
+        }
+        else{
+            data = await showDialog("Antes de testar você deve adicionar o código que permite que o gladiador ataque. É só colocar a função <b>attackRanged</b> dentro do da condição que detectou o alvo, e como parâmetro do attackRanged colocar as funções <b>getTargetX</b> e <b>getTargetY</b>",["Me mostre","Vou tentar"])
+        }
+    
+        if (data == "Me mostre"){
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><value name="IF0"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO0"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><next><block type="controls_if" id="3%8by*to|-Roz-.}OzLc"><comment pinned="false" h="80" w="160">detecta se tem inimigo próximo, e fixa a atenção nele</comment><value name="IF0"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO0"><block type="ranged" id="4EIcJ[I[UGH2U]0C}n=(" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="}vF+j}:O8+N].M`UTyN3"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="j#Vn-{6r^FB=lXhZnI6n"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement></block></next></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\n\ndef loop():\n    global start\n    if start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    # detecta se tem inimigo próximo, e fixa a atenção nele\n    if getCloseEnemy():\n        attackRanged(getTargetX(), getTargetY()) # Ataca o alvo no ponto informado");
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY()); // Ataca o alvo no ponto informado\n    }\n}");
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click()
+    }
 }
 
 tutorial.lesson.getHit = async function(){
-    console.log('foo')
+    let data
+    if (user.language == 'blocks')
+        data = await showDialog("Perfeito. Agora você tem um gladiador que sabe se defender. Caso queira atacar corpo-a-corpo, pode usar o bloco <b>Ataque Corpo-a-corpo</b>",["Referência","Certo"])
+    else
+        data = await showDialog("Perfeito. Agora você tem um gladiador que sabe se defender. Caso queira atacar corpo-a-corpo, pode usar <b>attackMelee</b>",["Referência","Certo"])
+
+    if (data == "Referência")
+        window.open("function/attackmelee");
+    
+    if (user.language == 'blocks')
+        data = await showDialog("Seu gladiador precisa também dar valor à vida dele. Vamos aprender alguns blocos para esse fim. O primeiro é <b>Fui acertado?</b>, que detecta se o gladiador foi ferido. Ele fica no submenu <b>Informações</b> dos blocos da gladCode. Atualize seu código de maneira que o gladiador tome uma atitude quando for ferido. Após, teste o gladiador",["Fui acertado?","Vou tentar"])
+    else
+        data = await showDialog("Seu gladiador precisa também dar valor à vida dele. Vamos aprender algumas funções para esse fim. A primeira é <b>getHit</b>, que detecta se o gladiador foi ferido. Atualize seu código de maneira que o gladiador tome uma atitude quando for ferido. Após, teste o gladiador",["getHit","Vou tentar"])
+
+    if (data == "getHit" || data == 'Fui acertado?')
+        window.open("function/gethit");
+    
+    tutorial.next()
 }
 
 tutorial.lesson.checkGetHit = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    if (text.search(/[(=]*[\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;:)]*/g) == -1){
+        let data
+        if (user.language == 'blocks')
+            data = await showDialog("Antes de testar você deve adicionar uma condição que permita que o gladiador verifique se foi ferido. Você deve usar o bloco <b>Fui acertado?</b> para este fim. Coloque-o dentro de uma condição (bloco Se) para fazer o teste. Se ele for ferido, faça algo, por exemplo, <b>virar 180 graus</b>",["Fui acertado?","Me ajuda","Beleza!"])
+        else
+            data = await showDialog("Antes de testar você deve adicionar uma condição que permita que o gladiador verifique se foi ferido. Você deve usar <b>getHit</b> para este fim. Coloque-o dentro de uma condição (if) para fazer o teste. Se ele for ferido, faça algo, por exemplo, <b>virar 180 graus</b>",["getHit","Me ajuda","Beleza!"])
+
+        if (data == "getHit" || data == 'Fui acertado?')
+            window.open("function/gethit");
+        if (data == "Me ajuda"){
+            await showDialog("Ok. Vou te ajudar nessa. Dê uma olhada no código e tente entender o que ele faz",["OK. Valeu!"])
+        
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="2" else="1"/><value name="IF0"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"><comment pinned="false" h="80" w="160">Verifica se o gladiador foi ferido</comment></block></value><statement name="DO0"><block type="turnangle" id="%#vY3Fbmo/dw.qm8O9|b"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><comment pinned="false" h="80" w="160">Vira 180g caso tenha sido ferido</comment><value name="ANGLE"><shadow type="math_number" id="for:,~MQ)4eR1`f%#,x4"><field name="NUM">180</field></shadow></value></block></statement><value name="IF1"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field><comment pinned="false" h="80" w="160">Se não foi ferido, verifica se tem inimigo próximo</comment></block></value><statement name="DO1"><block type="ranged" id="4EIcJ[I[UGH2U]0C}n=(" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><comment pinned="false" h="80" w="160">Ataca alvo se encontrou inimigo</comment><value name="X"><shadow type="math_number" id="}vF+j}:O8+N].M`UTyN3"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="j#Vn-{6r^FB=lXhZnI6n"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF2"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO2"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    global start\n    if getHit(): # Verifica se o gladiador foi ferido\n        turn(180) # vira 180g caso tenha sido ferido\n    elif getCloseEnemy(): # se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()) # ataca alvo se encontrou inimigo\n    elif start:\n        moveTo(12,12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turn(180); //vira 180g caso tenha sido ferido\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.reactHit = async function(){
-    console.log('foo')
+    let data
+    if (user.language == 'blocks'){
+        data = await showDialog("Ok, agora o gladiador sabe quando foi ferido. Vamos fazer ele reagir a isso. Quando ele se ferir, você pode fazer com que ele se vire na direção de onde veio a agressão, dessa maneira fica mais fácil revidar. O bloco <b>Virar para [Ataque recebido]</b> serve para fazer o gladiador se virar para onde recebeu o ataque. Este é o mesmo bloco <b>Virar para [Posição]</b>, basta alterar a opção. Modifique esse trecho e teste o gladiador",["Referência","OK"])
+    }
+    else{
+        data = await showDialog("Ok, agora o gladiador sabe quando foi ferido. Vamos fazer ele reagir a isso. Quando ele se ferir, você pode fazer com que ele se vire na direção de onde veio a agressão, dessa maneira fica mais fácil revidar. A função <b>turnToLastHit</b> serve para fazer o gladiador se virar para onde recebeu o ataque. Modifique esse trecho do código e teste o gladiador",["Referência","OK"])
+    }
+
+    if (data == "Referência")
+        window.open("function/turntolasthit")
+
+    tutorial.next()
 }
 
 tutorial.lesson.checkReact = async function(){
@@ -390,124 +618,22 @@ function showTutorial(){
     else if (tutoState == 4){
     }
     else if (tutoState == 5){
-        showDialog("Como pudemos ver, o gladiador se desloca até o centro da arena e fica girando. A função <b>moveTo</b> especifica para onde ele quer ir e da um passo em direção so destino. O gladiador sabe quando chegou por causa do <b>getX</b> e <b>getY</b>. E a função <b>turn</b> faz ele girar",["Entendi"]).then( function(){
-            showDialog("Como a variável <b>start começa em 1</b>, o <b>else</b> da <b>linha 11</b> será ignorado nos primeiros momentos. Em todas etapas da simulação que start for 1, o gladiador irá se mover em direção ao centro. Quando ele chegar, <b>start fica 0</b>, garantindo que nas próximas execuções da função <b>loop</b>, o código entre no <b>else</b> e o gladiador fique girando",["Acho que saquei"]).then( function(){
-                showDialog("Vamos fazer uma pequena modificação neste código. Você seria capaz de fazer com que o gladiador após chegar ao centro, fique indo e voltando do ponto 5,15 para o ponto 20,10?",["Não quero","Vou tentar"]).then( function(data){
-                    if (data == "Vou tentar")
-                        tutoState = 6;
-                    if (data == "Não quero"){
-                        tutoState = 7;
-                        showTutorial();
-                    }
-                });
-            });
-        });
     }
     else if (tutoState == 6){
-        showDialog("Interessante! Gostaria de ir para a próxima lição?",["Ainda não","Vamos lá"]).then( function(data){
-            if (data == "Vamos lá"){
-                tutoState = 7;
-                showTutorial();
-            }
-        });
     }	
     else if (tutoState == 7){
-        editor.setValue("//controla quando o gladiador chegou no meio da arena \r\nint start=1, vai=0;\r\n\r\nloop(){\r\n\tif (start){ //se ele ainda não chegou no meio\r\n\t\tmoveTo(12,12); //se move em direção à posição 12,12\r\n\t\t//getX e getY server para capturar o X e Y do gladiador\r\n\t\tif (getX() == 12 && getY() == 12) //se X e Y é 12, chegou no destino\r\n\t\t\tstart = 0; //coloca 0 em start para dizer que não quer mais caminhar\r\n\t}\r\n\telse{ //caso start já esteja em 0\r\n\t\tif (vai){ //verifica se vai ou vem\r\n\t\tif(moveTo(5,15)) //move e testa se chegou no ponto\r\n\t\t\t\tvai = 0; //diz que é hora do vem\r\n\t\t}\r\n\t\telse{ //se está na etapa do vem\r\n\t\t\tif(moveTo(20,10)) \r\n\t\t\t\tvai = 1; //diz que é hora do vai\r\n\t\t}\r\n\t}\r\n}");
-        showDialog("Ok. Modifiquei seu código. Pode conferir se sua solução era mais ou menos assim. Teste o gladiador para prosseguir",["OK"]).then( function(data){
-            tutoState = 8;
-        });
     }	
     else if (tutoState == 8){
-        showDialog("Agora vamos detectar seus oponentes. Todo gladiador consegue enxergar 60 graus ao seu redor e à uma distância de 9 passos. As funções <b>getLowHp</b>, <b>getHighHp</b>, <b>getCloseEnemy</b> e <b>getFarEnemy</b> além de detectarem inimigos no campo de visão do gladiador, ainda fixam a atenção do gladiador no oponente detectado, permitindo o uso de outras funções que requerem um alvo",["Conhecer funções","Certo"]).then( function(data){
-            if (data == "Conhecer funções")
-                window.open("https://gladcode.tk/docs.php#nav-sense");
-            
-            showDialog("Gostaria que você usasse uma destas funções para detectar um oponente. que tal colocar uma delas dentro de uma condição (if)? Assim você pode controlar o que fazer caso o gladiador encontre um oponente. Quando tiver concluido clique no botão para testar o gladiador",["Mostrar como","Vou tentar"]).then( function(data){
-                if (data == "Mostrar como"){
-                    editor.setValue("int start=1;\r\n\r\nloop(){\r\n\tif (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\t//detecta se tem inimigo próximo, e fixa a atenção nele\r\n\tif (getCloseEnemy()){\r\n\t\t//aqui vamos colocar o que fazer quando detectar inimigo\r\n\t}\r\n}");
-                }
-            });
-            tutoState = 9;
-            
-        });
     }
     else if (tutoState == 9){
-        var text = editor.getValue();
-        if (text.search(/[(\s=](getCloseEnemy|getFarEnemy|getLowHp|getHighHp)[\s]{0,1}\(\)[=!<>;)\s]/g) == -1){
-            showDialog("Você ainda não inseriu nenhuma das funções apresentadas. Quer uma ajuda?",["Esqueci", "Sim, ajuda","Deixa comigo"]).then( function(data){
-                if (data == "Sim, ajuda")
-                    window.open("https://gladcode.tk/docs.php#nav-sense");
-                else if (data == "Esqueci"){
-                    tutoState = 8;
-                    showTutorial();
-                }
-            });
-        }
-        else{
-            showDialog("Agora vamos aprender a atacar. Com um alvo fixado, seu gladiador pode usar <b>getTargetX</b> e <b>getTargetY</b> para saber a posição do alvo",["Como assim?","Fácil"]).then( function(data){
-                if (data == "Como assim?")
-                    window.open("https://gladcode.tk/docs.php#nav-sense");
-
-                showDialog("Sabendo a posição, usamos <b>attackRanged</b> para atirar com o arco. Dentro dos parênteses da função precisa colocar as coordenadas X e Y de onde você quer atirar. Tente atirar na posição do alvo e teste seu gladiador",["Me mostre como","OK"]).then( function(data){
-                    if (data == "Me mostre como"){
-                        editor.setValue("int start=1;\r\n\r\nloop(){\r\n\tif (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\t//detecta se tem inimigo próximo, e fixa a atenção nele\r\n\tif (getCloseEnemy()){\r\n\t\tattackRanged(getTargetX(), getTargetY());\r\n\t}\r\n}");
-                    }
-                    tutoState = 10;
-                });
-                
-            });
-        }
     }	
     else if (tutoState == 10){
-        var text = editor.getValue();
-        if (text.search(/[\s]attackRanged[\s]{0,1}\([\s]*getTargetX[\s]{0,1}\(\)[\s]*,[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)[;\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*\n[\s]*attackRanged[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\);/g) == -1){
-            showDialog("Antes de testar você deve adicionar o código que permite que o gladiador ataque. É só colocar a função <b>attackRanged</b> dentro do da condição que detectou o alvo, e como parâmetro do attackRanged colocar as funções <b>getTargetX</b> e <b>getTargetY</b>",["Me mostre","Vou tentar"]).then( function(data){
-                if (data == "Me mostre")
-                    editor.setValue("int start=1;\r\n\r\nloop(){\r\n\tif (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\t//detecta se tem inimigo próximo, e fixa a atenção nele\r\n\tif (getCloseEnemy()){\r\n\t\tattackRanged(getTargetX(), getTargetY()); //Ataca o alvo no ponto informado\r\n\t}\r\n}");
-            });
-        }
-        else{
-            tutoState = 11;
-            $('#test').click();
-        }
     }	
     else if (tutoState == 11){
-        showDialog("Perfeito. Agora você tem um gladiador que sabe se defender. Caso queira atacar corpo-a-corpo, pode usar <b>attackMelee</b>",["Referência","Certo"]).then( function(data){
-            if (data == "Referência")
-                window.open("https://gladcode.tk/function.php?f=attackmelee");
-            
-            showDialog("Seu gladiador precisa também dar valor à vida dele. Vamos aprender algumas funções para esse fim. A primeira é <b>getHit</b>, que detecta se o gladiador foi ferido. Atualize seu código de maneira que o gladiador tome uma atitude quando for ferido. Após, teste o gladiador",["getHit","Vou tentar"]).then( function(data){
-                if (data == "getHit")
-                    window.open("https://gladcode.tk/function.php?f=gethit");
-                tutoState = 12;
-            });
-            
-        });
     }	
     else if (tutoState == 12){
-        var text = editor.getValue();
-        if (text.search(/[(=][\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;)]/g) == -1){
-            showDialog("Antes de testar você deve adicionar uma condição que permita que o gladiador verifique se foi ferido. Você deve usar <b>getHit</b> para este fim. Coloque-o dentro de uma condição (if) para fazer o teste. Se ele for ferido, faça algo, por exemplo, <b>virar 180 graus</b>",["getHit","Me ajuda","Beleza!"]).then( function(data){
-                if (data == "getHit")
-                    window.open("https://gladcode.tk/function.php?f=gethit");
-                if (data == "Me ajuda"){
-                    showDialog("Ok. Vou te ajudar nessa. Dê uma olhada no código e tente entender o que ele faz",["OK. Valeu!"]).then( function(data){});
-                
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tif (getHit()) //Verifica se o gladiador foi ferido\r\n\t\tturn(180); //vira 180g caso tenha sido ferido\r\n\telse if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\r\n\t\tattackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 13;
-            $('#test').click();
-        }
     }	
     else if (tutoState == 13){
-        showDialog("Ok, agora o gladiador sabe quando foi ferido. Vamos fazer ele reagir a isso. Quando ele se ferir, você pode fazer com que ele se vire na direção de onde veio a agressão, dessa maneira fica mais fácil revidar. a função <b>turnToLastHit</b> serve para fazer o gladiador se virar para onde recebeu o ataque. Modifique esse trecho do código e teste o gladiador",["Referência","OK"]).then( function(data){
-            if (data == "Referência")
-                window.open("https://gladcode.tk/function.php?f=turntolasthit");
-            tutoState = 14;			
-        });
     }	
     else if (tutoState == 14){
         var text = editor.getValue();
