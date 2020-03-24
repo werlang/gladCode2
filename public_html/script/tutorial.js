@@ -1,6 +1,6 @@
 var tutorial = {
-    enabled: true,
-    state: 12,
+    enabled: false,
+    state: 0,
     lesson: {},
     order: [
         'start',
@@ -56,7 +56,7 @@ tutorial.previous = function(show){
 }
 
 tutorial.show = function(trigger){
-    if (!this.enabled)
+    if (!this.enabled || this.order.length == this.state)
         return false
 
     let f = this.order[this.state]
@@ -559,272 +559,363 @@ tutorial.lesson.reactHit = async function(){
 }
 
 tutorial.lesson.checkReact = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks' || user.language == 'python')
+        search = text.search(/[(=]*[\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;:)][\w\W]*turnToLastHit[\s]{0,1}\(\)/g) == -1
+    else if (user.language == 'c')
+        search = text.search(/[(=][\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;)][\w\W]*turnToLastHit[\s]{0,1}\(\)/g) == -1
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Para avançar você precisa alterar seu programa para usar o bloco <b>Virar para [Ataque recebido]</b> dentro de uma condição que testa o resultado do bloco <b>Fui acertado?</b>. Desta maneira, o gladiador verifica se foi ferido, e em caso afirmativo, se vira para o agressor",["Han??","Não sei como","Entendi"])
+        }
+        else{
+            data = await showDialog("Para avançar você precisa alterar seu código para usar a função <b>turnToLastHit</b> dentro de uma condição que testa o resultado da função <b>getHit</b>. Desta maneira, o gladiador verifica se foi ferido, e em caso afirmativo, se vira para o agressor",["Han??","Não sei como","Entendi"])
+        }
+
+        if (data == "Han??")
+            window.open("function/turntolasthit");
+        if (data == "Não sei como"){
+            await showDialog("Tudo bem. Estamos aqui para aprender. Analise bem o código e tente entender o que ele faz",["Obrigado"])
+        
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="2" else="1"/><value name="IF0"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"><comment pinned="false" h="80" w="160">Verifica se o gladiador foi ferido</comment></block></value><statement name="DO0"><block type="turn" id="be.xgflxz$DDthMmn?sq"><mutation xmlns="http://www.w3.org/1999/xhtml" where="HIT" use-return="false"></mutation><field name="COMPLEMENT">HIT</field><comment pinned="false" h="80" w="160">Vira em direção ao agressor</comment></block></statement><value name="IF1"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field><comment pinned="false" h="80" w="160">Se não foi ferido, verifica se tem inimigo próximo</comment></block></value><statement name="DO1"><block type="ranged" id="4EIcJ[I[UGH2U]0C}n=(" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><comment pinned="false" h="80" w="160">Ataca alvo se encontrou inimigo</comment><value name="X"><shadow type="math_number" id="}vF+j}:O8+N].M`UTyN3"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="j#Vn-{6r^FB=lXhZnI6n"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF2"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO2"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    if getHit(): # Verifica se o gladiador foi ferido\n        turnToLastHit() # vira em direção ao agressor\n    elif getCloseEnemy(): # se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()) # ataca alvo se encontrou inimigo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turnToLastHit(); //vira em direção ao agressor\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.safe = async function(){
-    console.log('foo')
+    await showDialog("Ótimo. Seu gladiador está ficando cada vez mais inteligente. Para concluir o assunto sobrevivência é importante falar sobre o <b>gás tóxico</b>. Após certo tempo, começa a emanar das bordas da arena uma nuvem mortal que causa dano em todos que estiverem em contato. O único refúgio é se dirigir para o centro na medida que a nuvem toma conta da periferia da arena.",["Hmm, perigoso"])
+
+    let data
+    if (user.language == 'blocks'){
+        data = await showDialog("Um gladiador consegue saber se sua vida está ameaçada pela nuvem utilizando o bloco <b>É seguro [Aqui]?</b>. Ele fica no submenu <b>Percepção</b> de blocos da gladCode. Gostaria que você adicionasse mais uma condição no código para fazer o gladiador evitar estas zonas perigosas. Após adicionar, teste o gladiador para prosseguir",["Referência","Vou tentar"])
+    }
+    else{
+        data = await showDialog("Um gladiador consegue saber se sua vida está ameaçada pela nuvem utilizando a função <b>isSafeHere</b>. Gostaria que você adicionasse mais uma condição no código para fazer o gladiador evitar estas zonas perigosas. Após adicionar, teste o gladiador para prosseguir",["Referência","Vou tentar"])
+    }
+
+    if (data == "Referência")
+        window.open("function/issafehere");
+    
+    tutorial.next()
 }
 
 tutorial.lesson.checkSafe = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks' || user.language == 'python')
+        search = text.search(/[!(\s=<>]isSafeHere[\s]{0,1}\(\)[\s)=<>:]/g) == -1
+    else
+        search = text.search(/[!(\s=<>]isSafeHere[\s]{0,1}\(\)[\s)=<>]/g) == -1
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Ei! Voçê está esquecendo de colocar o bloco <b>É seguro [Aqui]?</b>. Sem ele seu gladiador poderá morrer envenenado.",["Estou perdido","Verdade"])
+        }
+        else{
+            data = await showDialog("Ei! Voçê está esquecendo de colocar a função <b>isSafeHere</b>. Sem ela seu gladiador poderá morrer envenenado.",["Estou perdido","Verdade"])
+        }
+
+        if (data == "Estou perdido"){
+            data = await showDialog("Está certo. Vou lhe mostrar o código. Mas talvez você queira dar uma estudada no que já foi visto.",["É melhor","Estou bem"])
+
+            if (data == "É melhor")
+                window.open("function/issafehere");
+            
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="3" else="1"/><value name="IF0"><block type="logic_negate" id="*vHSVNu?Eg`2(fVFV3Mb"><value name="BOOL"><block type="issafe" id="=Tn`9uV+A=k|m{d?M8)p"><mutation xmlns="http://www.w3.org/1999/xhtml" position="false"></mutation><field name="COMPLEMENT">Here</field><comment pinned="false" h="80" w="160">Testa se o gladiador está em cima da nuvem</comment></block></value></block></value><statement name="DO0"><block type="move" id="5z9]#C8|W!^I`M8PN#Vy"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><comment pinned="false" h="80" w="160">Foge da nuvem, em direção ao centro</comment><value name="X"><shadow type="math_number" id=".zr3fXOH[oqd60y3ShsW"><field name="NUM">12.5</field></shadow></value><value name="Y"><shadow type="math_number" id="8:o!D]!GC;oPw=OtB)7X"><field name="NUM">12.5</field></shadow></value></block></statement><value name="IF1"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"/></value><statement name="DO1"><block type="turn" id="be.xgflxz$DDthMmn?sq"><mutation xmlns="http://www.w3.org/1999/xhtml" where="HIT" use-return="false"></mutation><field name="COMPLEMENT">HIT</field></block></statement><value name="IF2"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO2"><block type="ranged" id="4EIcJ[I[UGH2U]0C}n=(" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="}vF+j}:O8+N].M`UTyN3"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="j#Vn-{6r^FB=lXhZnI6n"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF3"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO3"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    if not isSafeHere(): # testa se o gladiador está em cima da nuvem\n        moveTo(12.5, 12.5) # foge da nuvem, em direção ao centro\n    if getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        attackRanged(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)");
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere()) //testa se o gladiador está em cima da nuvem\n        moveTo(12.5,12.5); //foge da nuvem, em direção ao centro\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.fireball = async function(){
-    console.log('foo')
+    let data
+    let addinfo = ''
+    if (user.language == 'blocks')
+        addinfo = '. Você pode encontrá-las no submenu <b>Habilidades</b> dos blocos da gladCode'
+
+    data = await showDialog(`Agora por fim iremos aprender sobre as habilidades dos gladiadores. As habilidades são ações especiais que gastam o recurso <b>pontos de habilidade</b> (ap) para serem usados. As habilidades possibilitam efeitos incríveis e poderosos aos gladiadores${addinfo}`,["Quero aprender mais","Entendi"])
+
+    if (data == "Quero aprender mais")
+        window.open("manual#nav-hab");
+    
+    if (user.language == 'blocks'){
+        data = await showDialog("Vamos usar o bloco <b>Bola de fogo</b> para fazer com que o gladiador lance uma bola de fogo no inimigo. O bloco funciona parecido com <b>Ataque à distância</b>. Você precisa somente fornecer as coordenadas <b>X</b> e <b>Y</b> do ponto onde deseja lançar a habilidade. Modifique seu programa trocando Ataque à distância por Bola de fogo, e teste o gladiador",["Referência","OK"])
+    }
+    else{
+        data = await showDialog("Vamos usar a função <b>fireball</b> para fazer com que o gladiador lance uma bola de fogo no inimigo. A função funciona parecido com <b>attackRanged</b>. Você precisa somente fornecer as coordenadas <b>X</b> e <b>Y</b> do ponto onde deseja lançar a habilidade. Modifique seu código trocando attackRanged por fireball, e teste o gladiador",["Referência","OK"])
+    }
+
+    if (data == "Referência")
+        window.open("function/fireball");
+    
+    tutorial.next()
 }
 
 tutorial.lesson.checkFireball = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks' || user.language == 'python')
+        search = text.search(/[\s]fireball[\s]{0,1}\([\s\(]*getTargetX[\s]{0,1}\(\)[\s\)]*,[\s\(]*getTargetY[\s]{0,1}\(\)[\s\)]*\)[\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*\n[\s]*fireball[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\)/g) == -1
+    else
+        search = text.search(/[\s]fireball[\s]{0,1}\([\s]*getTargetX[\s]{0,1}\(\)[\s]*,[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)[;\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*\n[\s]*fireball[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\);/g) == -1
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Você deveria inserir o block <b>Bola de fogo</b> em seu programa. Ela fará seu gladiador obliterar os oponentes. Precisa de ajuda?",["Bola de fogo?","Sim, preciso","Não, valeu"])
+            if (data == "Bola de fogo?")
+                window.open("function/fireball");
+        }
+        else{
+            data = await showDialog("Você deveria inserir a função <b>fireball</b> em seu código. Ela fará seu gladiador obliterar os oponentes. Precisa de ajuda?",["fireball?","Sim, preciso","Não, valeu"])
+            if (data == "fireball?")
+                window.open("function/fireball");
+        }
+
+        if (data == "Sim, preciso"){
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="3" else="1"/><value name="IF0"><block type="logic_negate" id="*vHSVNu?Eg`2(fVFV3Mb"><value name="BOOL"><block type="issafe" id="=Tn`9uV+A=k|m{d?M8)p"><mutation xmlns="http://www.w3.org/1999/xhtml" position="false"></mutation><field name="COMPLEMENT">Here</field></block></value></block></value><statement name="DO0"><block type="move" id="5z9]#C8|W!^I`M8PN#Vy"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id=".zr3fXOH[oqd60y3ShsW"><field name="NUM">12.5</field></shadow></value><value name="Y"><shadow type="math_number" id="8:o!D]!GC;oPw=OtB)7X"><field name="NUM">12.5</field></shadow></value></block></statement><value name="IF1"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"/></value><statement name="DO1"><block type="turn" id="be.xgflxz$DDthMmn?sq"><mutation xmlns="http://www.w3.org/1999/xhtml" where="HIT" use-return="false"></mutation><field name="COMPLEMENT">HIT</field></block></statement><value name="IF2"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO2"><block type="fireball" id=",bB7_EiZs(VXSV5i.n}~" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><comment pinned="false" h="80" w="160">Arremessa bola de fogo</comment><value name="X"><shadow type="math_number" id="N:;]`eiZ.S/+K1O`,ygr"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="XO~!LJoc_/`RA/].3G|~"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF3"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO3"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY()) # arremessa bola de fogo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY()); //arremessa bola de fogo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.teleport = async function(){
-    console.log('foo')
+    let data = await showDialog("Muito bem! O uso das habilidades é essencial para o sucesso do gladiador. Aprenda sobre todas elas para descobrir suas forças e fraquezas.",["Quero aprender","Pensarei a respeito"])
+
+    if (data == "Quero aprender")
+        window.open("manual#nav-hab");
+
+    if (user.language == 'blocks'){
+        await showDialog("Agora vamos aprender sobre a habilidade <b>Teletransporte</b>. Ela é muito útil quando seu gladiador se vê em uma posição indesejada. Usando o Teletransporte seu gladiador instantaneamente se transporta para um ponto qualquer. Vamos mudar o código para que o gladiador se transporte para a posição (5,5) quando for ferido (dentro da condição do <b>Fui acertado?</b>). Teste o gladiador após a mudança",["Referência","OK"])
+    }
+    else{
+        data = await showDialog("Agora vamos aprender sobre a habilidade <b>teleport</b>. Ela é muito útil quando seu gladiador se vê em uma posição indesejada. Usando o teleport seu gladiador instantaneamente se transporta para um ponto qualquer. Vamos mudar o código para que o gladiador se transporte para a posição (5,5) quando for ferido (dentro da condição do <b>getHit</b>). Teste o gladiador após a mudança",["Referência","OK"])
+    }
+
+    if (data == "Referência")
+        window.open("function/teleport");
+    
+    tutorial.next()
 }
 
 tutorial.lesson.checkTeleport = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks')
+        search = text.search(/[\s]teleport[\s]{0,1}\([\w\d\s]+,[\w\d\s]+\)[\s]/g) == -1
+    else
+        search = text.search(/[\s]teleport[\s]{0,1}\([\w\d\s]+,[\w\d\s]+\)[;\s]/g) == -1
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Você deveria inserir o bloco <b>Teletransporte</b> em seu programa. Ela faz com que seu gladiador instantaneamente fuja quando for ferido. Precisa de ajuda?",["Tele o q?","Sim, preciso","Não, valeu"])
+            if (data == "Tele o q?")
+                window.open("function/teleport");
+        }
+        else{
+            data = await showDialog("Você deveria inserir a função <b>teleport</b> em seu código. Ela faz com que seu gladiador instantaneamente fuja quando for ferido. Precisa de ajuda?",["teleport?","Sim, preciso","Não, valeu"])
+            if (data == "teleport?")
+                window.open("function/teleport");
+        }
+
+        if (data == "Sim, preciso"){
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="3" else="1"/><value name="IF0"><block type="logic_negate" id="*vHSVNu?Eg`2(fVFV3Mb"><value name="BOOL"><block type="issafe" id="=Tn`9uV+A=k|m{d?M8)p"><mutation xmlns="http://www.w3.org/1999/xhtml" position="false"></mutation><field name="COMPLEMENT">Here</field></block></value></block></value><statement name="DO0"><block type="move" id="5z9]#C8|W!^I`M8PN#Vy"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id=".zr3fXOH[oqd60y3ShsW"><field name="NUM">12.5</field></shadow></value><value name="Y"><shadow type="math_number" id="8:o!D]!GC;oPw=OtB)7X"><field name="NUM">12.5</field></shadow></value></block></statement><value name="IF1"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"/></value><statement name="DO1"><block type="teleport" id="G(HNk==N`x=rhg.sH$8."><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><comment pinned="false" h="80" w="160">Foge para posição 5,5 quando for ferido</comment><value name="X"><shadow type="math_number" id="K_+iqSfUHkD,l`_`:YSJ"><field name="NUM">5</field></shadow></value><value name="Y"><shadow type="math_number" id="24{2)/QLEE|1{RryuBQx"><field name="NUM">5</field></shadow></value></block></statement><value name="IF2"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO2"><block type="fireball" id=",bB7_EiZs(VXSV5i.n}~" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="N:;]`eiZ.S/+K1O`,ygr"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="XO~!LJoc_/`RA/].3G|~"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF3"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO3"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5) # foge para posição 5,5 quando for ferido\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5); //foge para posição 5,5 quando for ferido\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.upgrade = async function(){
-    console.log('foo')
+
+    let name = 'teleport'
+    if (user.language == 'blocks')
+        name = "teletransporte"
+
+    let data = await showDialog(`Ótimo! Você aprendeu como se usa o ${name}, mas se você quer ser um proficiente mestre de gladiadores precisa aprender sobre todas habilidades.`,["Me mostre","Talvez mais tarde"])
+
+    if (data == "Me mostre")
+        window.open("manual#nav-hab")
+
+    data = await showDialog("Na medida que os gladiadores participam das batalhas eles ganham <b>experiência</b> e eventualmente aumentam de <b>nível</b>. Subir de nível faz com que o gladiador ganhe <b>cinco pontos</b> para distribuir em quaisquer de seus atributos: Força, Agilidade ou Inteligência",["Onde diz isso?","Entendi"])
+
+    if (data == "Onde diz isso?")
+        window.open("manual#nav-sim")
+
+    if (user.language == 'blocks'){
+        data = await showDialog("Através do bloco <b>Melhorar [Força/Agilidade/Inteligência]</b> o gladiador pode decidir qual de seus atributos deseja melhorar ao subir de nível. O bloco pode ser usado em qualquer parte do bloco loop. Experimente usa-lo e teste o gladiador",["Referência","Deixa comigo"])
+    }
+    else{
+        data = await showDialog("Através das funções <b>upgradeSTR</b>, <b>upgradeAGI</b> e <b>upgradeINT</b> o gladiador pode decidir qual de seus atributos deseja melhorar ao subir de nível. A função pode ser chamada em qualquer trecho da função loop. Experimente uma das três e teste o gladiador",["Referência","Deixa comigo"])
+    }
+
+    if (data == "Referência")
+        window.open("docs#nav-up")
+    
+    tutorial.next()
 }
 
 tutorial.lesson.checkUpgrade = async function(){
-    console.log('foo')
+    var text = editor.getValue();
+
+    let search
+    if (user.language == 'blocks' || user.language == 'python')
+        search = text.search(/[\s\()]*upgrade(INT|STR|AGI)[\s]{0,1}\([\d]{1,3}\)[\)\s]*/g) == -1
+    else
+        search = text.search(/[\s]upgrade(INT|STR|AGI)[\s]{0,1}\([\d]{1,3}\)[;\s]/g) == -1
+
+    if (search){
+        let data
+        if (user.language == 'blocks'){
+            data = await showDialog("Você deve inserir o bloco <b>Melhorar [Força/Agilidade/Inteligência]</b> no comportamento do gladiador. Só assim ele poderá melhorar um de seus atributos quando subir de nível",["Melhorar?","Não sei como","OK"])
+            if (data == "Melhorar?")
+                window.open("docs#nav-up")
+        }
+        else{
+            data = await showDialog("Você deve inserir <b>upgradeSTR</b>, <b>upgradeAGI</b> ou <b>upgradeINT</b> no comportamento do gladiador. Só assim ele poderá melhorar um de seus atributos quando subir de nível",["upgrade?","Não sei como","OK"])
+            if (data == "upgrade?")
+                window.open("docs#nav-up")
+        }
+
+        if (data == "Não sei como"){
+            if (user.language == 'blocks'){
+                let code = '<xml xmlns="https://developers.google.com/blockly/xml"><variables><variable id="U=tSZ+ekH3hJ,haIaWqR">start</variable></variables><block type="variables_set" id="Y?PsUyJarv*xRk=b42Vl" x="60" y="50"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="sZQEw0Ni[={EdJ4Nm4{)"><field name="BOOL">TRUE</field></block></value></block><block type="loop" id="}N8OK1Qr^B.hPY!rF#NW" deletable="false" x="60" y="90"><statement name="CONTENT"><block type="upgrade" id="#Xz5$iF61`E;?ox7y(gW"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">INT</field><comment pinned="false" h="80" w="160">Melhora inteligência quando subir de nível</comment><value name="VALUE"><shadow type="math_number" id="HN_tMV.N9wt*7c;(i-Eb"><field name="NUM">5</field></shadow></value><next><block type="controls_if" id="}{rSgs!hHjd-7+y1A6xA"><mutation elseif="3" else="1"/><value name="IF0"><block type="logic_negate" id="*vHSVNu?Eg`2(fVFV3Mb"><value name="BOOL"><block type="issafe" id="=Tn`9uV+A=k|m{d?M8)p"><mutation xmlns="http://www.w3.org/1999/xhtml" position="false"></mutation><field name="COMPLEMENT">Here</field></block></value></block></value><statement name="DO0"><block type="move" id="5z9]#C8|W!^I`M8PN#Vy"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id=".zr3fXOH[oqd60y3ShsW"><field name="NUM">12.5</field></shadow></value><value name="Y"><shadow type="math_number" id="8:o!D]!GC;oPw=OtB)7X"><field name="NUM">12.5</field></shadow></value></block></statement><value name="IF1"><block type="gethit" id="XKN_@6azN_a7Mvj-F2L8"/></value><statement name="DO1"><block type="teleport" id="G(HNk==N`x=rhg.sH$8."><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="K_+iqSfUHkD,l`_`:YSJ"><field name="NUM">5</field></shadow></value><value name="Y"><shadow type="math_number" id="24{2)/QLEE|1{RryuBQx"><field name="NUM">5</field></shadow></value></block></statement><value name="IF2"><block type="get_enemy" id="Rd*7*Ac!*QozhA%w1_d^"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="true"></mutation><field name="COMPLEMENT">CloseEnemy</field></block></value><statement name="DO2"><block type="fireball" id=",bB7_EiZs(VXSV5i.n}~" inline="false"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="X"><shadow type="math_number" id="N:;]`eiZ.S/+K1O`,ygr"><field name="NUM">0</field></shadow><block type="get_target" id="_k+JH[2qQp$!0p.]$i*%"><field name="COMPLEMENT">X</field></block></value><value name="Y"><shadow type="math_number" id="XO~!LJoc_/`RA/].3G|~"><field name="NUM">0</field></shadow><block type="get_target" id="/]BGx,5X1V8@(::MpW,?"><field name="COMPLEMENT">Y</field></block></value></block></statement><value name="IF3"><block type="variables_get" id="S*C7wUaq?lqyj,$wljdn"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field></block></value><statement name="DO3"><block type="move" id="6D*FQ.M92nACF@+o[3OW"><mutation xmlns="http://www.w3.org/1999/xhtml" position="true" use-return="false"></mutation><field name="COMPLEMENT">TO</field><value name="X"><shadow type="math_number" id="{m-rfV|02dxcApmeeFLT"><field name="NUM">12</field></shadow></value><value name="Y"><shadow type="math_number" id="ADNV{zHWjK2mH)~Hpd]J"><field name="NUM">12</field></shadow></value><next><block type="controls_if" id="CAYdNskAgv0M80[o]J}g"><value name="IF0"><block type="logic_operation" id="uR9:!F}(w[j)Cb#HwVjW" inline="false"><field name="OP">AND</field><value name="A"><block type="logic_compare" id="#rDBbsK_]5l#p60/Pp|u"><field name="OP">EQ</field><value name="A"><block type="get_info" id="O7P+X)EUx$Tkdfzs2p}!"><field name="COMPLEMENT">X</field></block></value><value name="B"><block type="math_number" id="upFi.JRrRv@S#MzPRTPZ"><field name="NUM">12</field></block></value></block></value><value name="B"><block type="logic_compare" id="F22OyBP]^g|rs.sE8y*c"><field name="OP">EQ</field><value name="A"><block type="get_info" id="c%j#dC^XI|Y+9*kvO+^n"><field name="COMPLEMENT">Y</field></block></value><value name="B"><block type="math_number" id="IbS`JYOSuii$8X(dIKld"><field name="NUM">12</field></block></value></block></value></block></value><statement name="DO0"><block type="variables_set" id="H^QP_}9s2G6Y+U|c[[J/"><field name="VAR" id="U=tSZ+ekH3hJ,haIaWqR">start</field><value name="VALUE"><block type="logic_boolean" id="5S5)Ke~B!k=l2Y.#Bavn"><field name="BOOL">FALSE</field></block></value></block></statement></block></next></block></statement><statement name="ELSE"><block type="turnangle" id="{29j!^-s1vFHL.in;E]s"><mutation xmlns="http://www.w3.org/1999/xhtml" operation="TURN"></mutation><field name="COMPLEMENT">TURN</field><value name="ANGLE"><shadow type="math_number" id="bP(RPy`NX.J*FqOt!T;B"><field name="NUM">60</field></shadow></value></block></statement></block></next></block></statement></block></xml>'
+                xmlDom = Blockly.Xml.textToDom(code)
+                Blockly.mainWorkspace.clear()
+                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+            }
+            else if (user.language == 'python'){
+                editor.setValue("start = True\ndef loop():\n    upgradeINT(5) # melhora inteligência quando subir de nível\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5)\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+            }
+            else if (user.language == 'c'){
+                editor.setValue("int start=1;\nloop(){\n    upgradeINT(5); //melhora inteligência quando subir de nível\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5);\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
+            }
+        }
+    }
+    else{
+        tutorial.next()
+        $('#test').click();
+    }
 }
 
 tutorial.lesson.breakpoint = async function(){
-    console.log('foo')
+    if (user.language == 'c'){
+        let data = await showDialog("Uma última coisa. Vou te ensinar uma poderosa ferramenta para testar seu código: os <b>breakpoints</b>. Com eles você pode pausar a simulação quando seu gladiador estiver prestes a executar uma linha de comando específica.", ["Interessante"])
+
+        data = showDialog("Para adicionar um breakpoint, basta clicar lá no lado esquerdo, no número da linha desejada do seu código. Experimente!",["Onde?", "Certo"])
+
+        if (data == "Onde?"){
+            $('.ace_gutter-cell').addClass('red transition');
+            setTimeout( function(){
+                $('.ace_gutter-cell').removeClass('red');
+                setTimeout( function(){
+                    $('.ace_gutter-cell').removeClass('transiton');
+                }, 500);
+            }, 1500);
+        }
+
+        editor.focus();
+
+        $('.ace_gutter-cell').click( function(){
+            tutorial.next()
+            setTimeout( function() {
+                if ($('.ace_gutter-cell.ace_breakpoint').length){
+                    showMessage("Muito bem. Agora teste seu gladiador.");
+                    $('.ace_gutter-cell').off();
+                }
+            }, 500);
+            
+        });
+    }
+    else
+        tutorial.jumpTo('end')
 }
 
 tutorial.lesson.checkBreakpoint = async function(){
-    console.log('foo')
+    if ($('.ace_gutter-cell.ace_breakpoint').length)
+        tutorial.next(true)
+    else{
+        let data = await showDialog("Experimente testar seu gladiador com pelo menos um <b>breakpoint</b>.", ["Como?", "OK"])
+        if (data == "Como?")
+            tutorial.jumpTo('breakpoint')
+    }
 }
 
 tutorial.lesson.end = async function(){
-    console.log('foo')
-}
+    let data = await showDialog("Muito bem. Creio que você já tenha aprendido o básico sobre a programação dos gladiadores. Existem muitas outras funções disponíveis para você aprender. Sempre que quiser a página de referências da gladCode estará disponível. Obrigado por chegar até aqui e espero ter sido útil",["Outras funções","Obrigado"])
 
-function showTutorial(){
-    if (tutoState == 0){
-    }
-    else if (tutoState == 1){
-    }
-    else if (tutoState == 2){
-    }
-    else if (tutoState == 3){
-    }
-    else if (tutoState == 4){
-    }
-    else if (tutoState == 5){
-    }
-    else if (tutoState == 6){
-    }	
-    else if (tutoState == 7){
-    }	
-    else if (tutoState == 8){
-    }
-    else if (tutoState == 9){
-    }	
-    else if (tutoState == 10){
-    }	
-    else if (tutoState == 11){
-    }	
-    else if (tutoState == 12){
-    }	
-    else if (tutoState == 13){
-    }	
-    else if (tutoState == 14){
-        var text = editor.getValue();
-        if (text.search(/[(=][\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;)][\w\W]*turnToLastHit[\s]{0,1}\(\)/g) == -1){
-            showDialog("Para avançar você precisa alterar seu código para usar a função <b>turnToLastHit</b> dentro de uma condição que testa o resultado da função <b>getHit</b>. Desta maneira, o gladiador verifica se foi ferido, e em caso afirmativo, se vira para o agressor",["Han??","Não sei como","Entendi"]).then( function(data){
-                if (data == "Han??")
-                    window.open("https://gladcode.tk/function.php?f=turntolasthit");
-                if (data == "Não sei como"){
-                    showDialog("Tudo bem. Estamos aqui para aprender. Analise bem o código e tente entender o que ele faz",["Obrigado"]).then( function(data){});
-                
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tif (getHit()) //Verifica se o gladiador foi ferido\r\n\t\tturnToLastHit(); //vira em direção ao agressor\r\n\telse if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\r\n\t\tattackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 15;
-            $('#test').click();
-        }
-    }	
-    else if (tutoState == 15){
-        showDialog("Ótimo. Seu gladiador está ficando cada vez mais inteligente. Para concluir o assunto sobrevivência é importante falar sobre o <b>gás tóxico</b>. Após certo tempo, começa a emanar das bordas da arena uma nuvem mortal que causa dano em todos que estiverem em contato. O único refúgio é se dirigir para o centro na medida que a nuvem toma conta da periferia da arena.",["Hmm, perigoso"]).then( function(data){
-            showDialog("Um gladiador consegue saber se sua vida está ameaçada pela nuvem utilizando a função <b>isSafeHere</b>. Gostaria que você adicionasse mais uma condição no código para fazer o gladiador evitar estas zonas perigosas. Teste o gladiador para prosseguir",["Referência","Vou tentar"]).then( function(data){
-                if (data == "Referência")
-                    window.open("https://gladcode.tk/function.php?f=issafehere");
-                tutoState = 16;
-            });
-        });
-        
-    }	
-    else if (tutoState == 16){
-        var text = editor.getValue();
-        if (text.search(/[!(\s]isSafeHere[\s]{0,1}\(\)[\s)=<>]/g) == -1){
-            showDialog("Ei! Voçê está esquecendo de colocar a função <b>isSafeHere</b>. Sem ela seu gladiador poderá morrer envenenado.",["Estou perdido","Verdade"]).then( function(data){
-                if (data == "Estou perdido"){
-                    showDialog("Está certo. Vou lhe mostrar o código. Mas talvez você queira dar uma estudada no que já foi visto.",["É melhor","Estou bem"]).then( function(data){
-                        if (data == "É melhor")
-                            window.open("https://gladcode.tk/function.php?f=issafehere");
-                    });
-                
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tif (!isSafeHere()) //testa se o gladiador está em cima da nuvem\r\n\t\tmoveTo(12.5,12.5); //foge da nuvem, em direção ao centro\r\n\telse if (getHit())\r\n\t\tturnToLastHit();\r\n\telse if (getCloseEnemy())\r\n\t\tattackRanged(getTargetX(), getTargetY());\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 17;
-            $('#test').click();
-        }
-    }	
-    else if (tutoState == 17){
-        showDialog("Agora por fim iremos aprender sobre as habilidades dos gladiadores. As habilidades são ações especiais que gastam o recurso <b>pontos de habilidade</b> (ap) para serem usados. As habilidades possibilitam efeitos incríveis e poderosos aos gladiadores",["Quero aprender mais","Entendi"]).then( function(data){
-            if (data == "Quero aprender mais")
-                window.open("https://gladcode.tk/manual.php#nav-hab");
-            
-            showDialog("Vamos usar a função <b>fireball</b> para fazer com que o gladiador lance uma bola de fogo no inimigo. A função funciona parecido com <b>attackRanged</b>. Você precisa somente fornecer as coordenadas <b>X</b> e <b>Y</b> do ponto onde deseja lançar a habilidade. Modifique seu cõdigo trocando attackRanged por fireball, e teste o gladiador",["Referência","OK"]).then( function(data){
-                if (data == "Referência")
-                    window.open("https://gladcode.tk/function.php?f=fireball");
-                tutoState = 18;
-            });
-            
-        });
-    }	
-    else if (tutoState == 18){
-        var text = editor.getValue();
-        if (text.search(/[\s]fireball[\s]{0,1}\([\s]*getTargetX[\s]{0,1}\(\)[\s]*,[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)[;\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*\n[\s]*fireball[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\);/g) == -1){
-            showDialog("Você deveria inserir a função <b>fireball</b> em seu código. Ela fará seu gladiador obliterar os oponentes. Precisa de ajuda?",["fireball?","Sim, preciso","Não, valeu"]).then( function(data){
-                if (data == "fireball?")
-                    window.open("https://gladcode.tk/function.php?f=fireball");
-                if (data == "Sim, preciso"){
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tif (!isSafeHere())\r\n\t\tmoveTo(12.5,12.5);\r\n\telse if (getHit())\r\n\t\tturnToLastHit();\r\n\telse if (getCloseEnemy())\r\n\t\tfireball(getTargetX(), getTargetY()); //arremessa bola de fogo\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 19;
-            $('#test').click();
-        }
-    }	
-    else if (tutoState == 19){
-        showDialog("Muito bem! O uso das habilidades é essencial para o sucesso do gladiador. Aprenda sobre todas elas para descobrir suas forças e fraquezas.",["Quero aprender","Pensarei a respeito"]).then( function(data){
-            if (data == "Quero aprender")
-                window.open("https://gladcode.tk/manual.php#nav-hab");
-            showDialog("Agora vamos aprender sobre a habilidade <b>teleport</b>. Ela é muito útil quando seu gladiador se vê em uma posição indesejada. Usando o teleport seu gladiador instantaneamente se transporta para um ponto qualquer. Vamos mudar o código para que o gladiador se transporte para a posição 5,5 quando for ferido (dentro da condição do <b>getHit</b>). Teste o gladiador após a mudança",["Referência","OK"]).then( function(data){
-                if (data == "Referência")
-                    window.open("https://gladcode.tk/function.php?f=teleport");
-                tutoState = 20;
-            });
-        });
-    }	
-    else if (tutoState == 20){
-        var text = editor.getValue();
-        if (text.search(/[\s]teleport[\s]{0,1}\([\w\d\s]+,[\w\d\s]+\)[;\s]/g) == -1){
-            showDialog("Você deveria inserir a função <b>teleport</b> em seu código. Ela faz com que seu gladiador instantaneamente fuja quando for ferido. Precisa de ajuda?",["teleport?","Sim, preciso","Não, valeu"]).then( function(data){
-                if (data == "teleport?")
-                    window.open("https://gladcode.tk/function.php?f=teleport");
-                if (data == "Sim, preciso"){
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tif (!isSafeHere())\r\n\t\tmoveTo(12.5,12.5);\r\n\telse if (getHit())\r\n\t\tteleport(5,5); //foge para posição 5,5 quando for ferido\r\n\telse if (getCloseEnemy())\r\n\t\tfireball(getTargetX(), getTargetY());\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 21;
-            $('#test').click();
-        }
-    }	
-    else if (tutoState == 21){
-        showDialog("Ótimo! Você aprendeu como se usa o teleport, mas se você quer ser um proficiente mestre de gladiadores precisa aprender sobre todas habilidades.",["Me mostre","Talvez mais tarde"]).then( function(data){
-            if (data == "Me mostre")
-                window.open("https://gladcode.tk/manual.php#nav-hab");
+    if (data == "Outras funções")
+        window.open("docs");
 
-            showDialog("Na medida que os gladiadores participam das batalhas eles ganham <b>experiência</b> e eventualmente aumentam de <b>nível</b>. Subir de nível faz com que o gladiador ganhe <b>cinco pontos</b> para distribuir em quaisquer de seus atributos: Força, Agilidade ou Inteligência",["Onde diz isso?","Entendi"]).then( function(data){
-                if (data == "Onde diz isso?")
-                    window.open("https://gladcode.tk/manual.php#nav-sim");
+    $.post("back_login.php", {
+        action: "TUTORIAL_END",
+    })
+    // .done( data => console.log(data));
 
-                showDialog("Através das funções <b>upgradeSTR</b>, <b>upgradeAGI</b> e <b>upgradeINT</b> o gladiador pode decidir qual de seus atributos deseja melhorar ao subir de nível. A função pode ser chamada em qualquer trecho da função loop. Experimente uma das três e teste o gladiador",["Referência","Deixa comigo"]).then( function(data){
-                    if (data == "Referência")
-                        window.open("https://gladcode.tk/docs.php#nav-up");
-                    tutoState = 22;
-                });
-            });
-        });
-    }
-    else if (tutoState == 22){
-        var text = editor.getValue();
-        if (text.search(/[\s]upgrade(INT|STR|AGI)[\s]{0,1}\([\d]{1,3}\)[;\s]/g) == -1){
-            showDialog("Você deve inserir <b>upgradeSTR</b>, <b>upgradeAGI</b> ou <b>upgradeINT</b> no comportamento do gladiador. Só assim ele poderá melhorar um de seus atributos quando subir de nível",["upgrade?","Não sei como","OK"]).then( function(data){
-                if (data == "upgrade?")
-                    window.open("https://gladcode.tk/docs.php#nav-up");
-                if (data == "Não sei como"){
-                    editor.setValue("int start=1;\r\nloop(){\r\n\tupgradeINT(5); //melhora inteligência quando subir de nível\r\n\tif (!isSafeHere())\r\n\t\tmoveTo(12.5,12.5);\r\n\telse if (getHit())\r\n\t\tteleport(5,5);\r\n\telse if (getCloseEnemy())\r\n\t\tfireball(getTargetX(), getTargetY());\r\n\telse if (start){\r\n\t\tmoveTo(12,12);\r\n\t\tif (getX() == 12 && getY() == 12)\r\n\t\t\tstart = 0;\r\n\t}\r\n\telse\r\n\t\tturn(60);\r\n}");
-                }
-            });
-        }
-        else{
-            tutoState = 23;
-            $('#test').click();
-        }
-    }
-    else if (tutoState == 23){
-        showDialog("Uma última coisa. Vou te ensinar uma poderosa ferramenta para testar seu código: os <b>breakpoints</b>. Com eles você pode pausar a simulação quando seu gladiador estiver prestes a executar uma linha de comando específica.", ["Interessante"]).then( function(data){
-            showDialog("Para adicionar um breakpoint, basta clicar lá no lado esquerdo, no número da linha desejada do seu código. Experimente!",["Onde?", "Certo"]).then( function(data){
-                if (data == "Onde?"){
-                    $('.ace_gutter-cell').addClass('red transition');
-                    setTimeout( function(){
-                        $('.ace_gutter-cell').removeClass('red');
-                        setTimeout( function(){
-                            $('.ace_gutter-cell').removeClass('transiton');
-                        }, 500);
-                    }, 1500);
-                }
-
-                editor.focus();
-
-                $('.ace_gutter-cell').click( function(){
-                    tutoState = 24;
-                    setTimeout( function() {
-                        if ($('.ace_gutter-cell.ace_breakpoint').length){
-                            showMessage("Muito bem. Agora teste seu gladiador.");
-                            $('.ace_gutter-cell').off();
-                        }
-                    }, 500);
-                    
-                });
-            });
-        });
-    }
-    else if (tutoState == 24){
-        if ($('.ace_gutter-cell.ace_breakpoint').length){
-            tutoState = 25;
-            showTutorial();
-        }
-        else{
-            showDialog("Experimente testar seu gladiador com pelo menos um <b>breakpoint</b>.", ["Como?", "OK"]).then( function(data){
-                if (data == "Como?"){
-                    tutoState = 23;
-                    showTutorial();
-                }
-            });
-        }
-    }
-    else if (tutoState == 25){
-        showDialog("Muito bem. Creio que você já tenha aprendido o básico sobre a programação dos gladiadores. Existem muitas outras funções disponíveis para você aprender. Sempre que quiser a página de referências da gladCode estará disponível. Obrigado por chegar até aqui e espero ter sido útil",["Outras funções","Obrigado"]).then( function(data){
-            if (data == "Outras funções")
-                window.open("https://gladcode.tk/docs.php");
-
-            $.post("back_login.php", {
-                action: "TUTORIAL_END",
-            }).done( function(data){
-                //console.log(data);
-            });
-
-            tutoState = 999;
-        });
-    }
+    tutorial.enabled = false
 }
