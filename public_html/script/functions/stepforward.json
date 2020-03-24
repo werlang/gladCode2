@@ -1,37 +1,37 @@
 {
-	"name": "stepForward",
-	"ptname": "passoFrente",
-	"syntax": {
-		"c": "float stepForward ( void );",
-		"python": "stepForward()"
-	},
-	"description": {
-		"long": "Faz com que o gladiador se mova para frente. Ele irá mover-se a maior distância que conseguir dentro de um intervalo de tempo da simulação (determinado pela sua <a href='manual.php#nav-glad'>velocidade de movimento</a>). A função irá retornar a distância percorrida neste processo.",
-		"brief": "Move o gladiador para frente."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo a distância percorrida como resultado da execução da função."
-	},
-	"sample": {
-		"c": "39.c",
-		"python": "39.py"
-	},
-	"explain": "No exemplo o gladiador se move até o centro da arena, e uma vez que chegue lá começa a executar um percurso circular indefinidamente.",
-	"seealso": [
-		"moveTo",
-		"moveToTarget",
-		"turnLeft",
-		"stepBack",
-		"stepLeft",
-		"stepRight"
-	],
-	"snippet": {
-		"c": "stepForward();",
-		"python": "stepForward()"
-	}
+    "name": "stepForward",
+    "ptname": "passoFrente",
+    "syntax": {
+        "c": "float stepForward ( void );",
+        "python": "stepForward()"
+    },
+    "description": {
+        "long": "Faz com que o gladiador se mova para frente. Ele irá mover-se a maior distância que conseguir dentro de um intervalo de tempo da simulação (determinado pela sua <a href='manual.php#nav-glad'>velocidade de movimento</a>). A função irá retornar a distância percorrida neste processo.",
+        "brief": "Move o gladiador para frente."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo a distância percorrida como resultado da execução da função."
+    },
+    "sample": {
+        "c": "39.c",
+        "python": "39.py"
+    },
+    "explain": "No exemplo o gladiador se move até o centro da arena, e uma vez que chegue lá começa a executar um percurso circular indefinidamente.",
+    "seealso": [
+        "moveTo",
+        "moveToTarget",
+        "turnLeft",
+        "stepBack",
+        "stepLeft",
+        "stepRight"
+    ],
+    "snippet": {
+        "c": "stepForward();",
+        "python": "stepForward()"
+    }
 }

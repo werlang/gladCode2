@@ -1,42 +1,42 @@
 {
-	"name": "getAmbushTimeLeft",
-	"ptname": "tempoEmboscada",
-	"syntax": {
-		"c": "float getAmbushTimeLeft ( void );",
-		"python": "getAmbushTimeLeft()"
-	},
-	"description": {
-		"long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> expire.",
-		"brief": "Retorna o tempo restante para expirar o efeito Invisibilidade."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo o tempo restante até o efeito proteção expirar."
-	},
-	"sample": {
-		"c": "1.c",
-		"python": "1.py"
-	},
-	"explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
-	"seealso": [
-		"getLowHp",
-		"getAp",
-		"moveTo",
-		"doYouSeeMe",
-		"turnToTarget",
-		"stepLeft",
-		"turn",
-		"ambush",
-		"assassinate",
-		"getBlockTimeLeft",
-		"getBurnTimeLeft"
-	],
-	"snippet": {
-		"c": "float ${1:ambush_time} = getAmbushTimeLeft();",
-		"python": "${1:ambush_time} = getAmbushTimeLeft()"
-	}
+    "name": "getAmbushTimeLeft",
+    "ptname": "tempoEmboscada",
+    "syntax": {
+        "c": "float getAmbushTimeLeft ( void );",
+        "python": "getAmbushTimeLeft()"
+    },
+    "description": {
+        "long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> expire.",
+        "brief": "Retorna o tempo restante para expirar o efeito Invisibilidade."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo o tempo restante até o efeito proteção expirar."
+    },
+    "sample": {
+        "c": "1.c",
+        "python": "1.py"
+    },
+    "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
+    "seealso": [
+        "getLowHp",
+        "getAp",
+        "moveTo",
+        "doYouSeeMe",
+        "turnToTarget",
+        "stepLeft",
+        "turn",
+        "ambush",
+        "assassinate",
+        "getBlockTimeLeft",
+        "getBurnTimeLeft"
+    ],
+    "snippet": {
+        "c": "float ${1:ambush_time} = getAmbushTimeLeft();",
+        "python": "${1:ambush_time} = getAmbushTimeLeft()"
+    }
 }

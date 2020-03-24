@@ -1,30 +1,30 @@
 {
-	"name": "setAp",
-	"ptname": "mudaPh",
-	"syntax": {
-		"c": "void setAp ( float valor );",
-		"python": "setAp(valor)"
-	},
-	"description": {
-		"long": "Atribui um valor para os pontos de habilidade do gladiador. O máximo de pontos de habilidade que o gladiador pode possuir continua sendo limitado pelas restrições normais. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
-		"brief": "Modifica os pontos de habilidade do gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "valor", "description": "Float contendo o valor que será atribuído aos pontos de habilidade do gladiador."}
-		]
-	},
-	"treturn": {
-		"default": "A função não possui retorno."
-	},
-	"sample": {
-		"c": "33.c",
-		"python": "33.py"
-	},
-	"explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
-	"seealso": [
-		"setPosition",
-		"setHp",
+    "name": "setAp",
+    "ptname": "mudaPh",
+    "syntax": {
+        "c": "void setAp ( float valor );",
+        "python": "setAp(valor)"
+    },
+    "description": {
+        "long": "Atribui um valor para os pontos de habilidade do gladiador. O máximo de pontos de habilidade que o gladiador pode possuir continua sendo limitado pelas restrições normais. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
+        "brief": "Modifica os pontos de habilidade do gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "valor", "description": "Float contendo o valor que será atribuído aos pontos de habilidade do gladiador."}
+        ]
+    },
+    "treturn": {
+        "default": "A função não possui retorno."
+    },
+    "sample": {
+        "c": "33.c",
+        "python": "33.py"
+    },
+    "explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
+    "seealso": [
+        "setPosition",
+        "setHp",
         "lvlUp",
         "upgradeINT",
         "getLowHp",
@@ -33,9 +33,9 @@
         "getTargetY",
         "turn",
         "speak"
-	],
-	"snippet": {
-		"c": "setAp(${1:value});",
-		"python": "setAp(${1:value})"
-	}
+    ],
+    "snippet": {
+        "c": "setAp(${1:value});",
+        "python": "setAp(${1:value})"
+    }
 }
