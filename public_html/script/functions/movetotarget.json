@@ -1,46 +1,46 @@
 {
-	"name": "moveToTarget",
-	"ptname": "moveParaAlvo",
-	"syntax": {
-		"c": "int moveToTarget ( void );",
-		"python": "moveToTarget()"
-	},
-	"description": {
-		"long": "Faz com que o gladiador se mova para o ponto da arena onde está o alvo fixado. Primeiramente o gladiador vira-se na direção do alvo e após isso começa a se locomover em sua direção.",
-		"brief": "Move o gladiador em direção ao alvo."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Retorna True caso o gladiador já esteja no ponto de destino, ou False caso contrário.",
-		"c": "Retorna 1 caso o gladiador já esteja no ponto de destino, ou 0 caso contrário."
-	},
-	"sample": {
-		"c": "2.c",
-		"python": "2.py"
-	},
-	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
-	"seealso": [
-		"getSpeed",
-		"getDistToTarget",
-		"getLowHp",
-		"attackRanged",
-		"attackMelee",
-		"getTargetX",
-		"getTargetY",
-		"getTargetSpeed",
-		"turnLeft",
-		"moveTo",
-		"stepForward",
-		"stepBack",
-		"stepLeft",
-		"stepRight"
-	],
-	"snippet": {
-		"c": "moveToTarget();",
-		"python": "moveToTarget()"
-	}
+    "name": "moveToTarget",
+    "ptname": "moveParaAlvo",
+    "syntax": {
+        "c": "int moveToTarget ( void );",
+        "python": "moveToTarget()"
+    },
+    "description": {
+        "long": "Faz com que o gladiador se mova para o ponto da arena onde está o alvo fixado. Primeiramente o gladiador vira-se na direção do alvo e após isso começa a se locomover em sua direção.",
+        "brief": "Move o gladiador em direção ao alvo."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Retorna True caso o gladiador já esteja no ponto de destino, ou False caso contrário.",
+        "c": "Retorna 1 caso o gladiador já esteja no ponto de destino, ou 0 caso contrário."
+    },
+    "sample": {
+        "c": "2.c",
+        "python": "2.py"
+    },
+    "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
+    "seealso": [
+        "getSpeed",
+        "getDistToTarget",
+        "getLowHp",
+        "attackRanged",
+        "attackMelee",
+        "getTargetX",
+        "getTargetY",
+        "getTargetSpeed",
+        "turnLeft",
+        "moveTo",
+        "stepForward",
+        "stepBack",
+        "stepLeft",
+        "stepRight"
+    ],
+    "snippet": {
+        "c": "moveToTarget();",
+        "python": "moveToTarget()"
+    }
 }

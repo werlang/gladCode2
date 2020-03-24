@@ -1,40 +1,40 @@
 {
-	"name": "getSpeed",
-	"ptname": "pegaVelocidade",
-	"syntax": {
-		"c": "float getSpeed ( void );",
-		"python": "getSpeed()"
-	},
-	"description": {
-		"long": "Retorna o valor do <a href='manual.php#nav-glad'>atributo velocidade</a> do gladiador, em passos por segundo (p/s).",
-		"brief": "Retorna a velocidade do gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo a velocidade do gladiador em p/s."
-	},
-	"sample": {
-		"c": "2.c",
-		"python": "2.py"
-	},
-	"explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
-	"seealso": [
-		"getDistToTarget",
-		"getLowHp",
-		"attackRanged",
-		"attackMelee",
-		"getTargetX",
-		"getTargetY",
-		"getTargetSpeed",
-		"turnLeft",
-		"moveToTarget"
-	],
-	"snippet": {
-		"c": "float ${1:speed} = getSpeed();",
-		"python": "${1:speed} = getSpeed()"
-	}
+    "name": "getSpeed",
+    "ptname": "pegaVelocidade",
+    "syntax": {
+        "c": "float getSpeed ( void );",
+        "python": "getSpeed()"
+    },
+    "description": {
+        "long": "Retorna o valor do <a href='manual.php#nav-glad'>atributo velocidade</a> do gladiador, em passos por segundo (p/s).",
+        "brief": "Retorna a velocidade do gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo a velocidade do gladiador em p/s."
+    },
+    "sample": {
+        "c": "2.c",
+        "python": "2.py"
+    },
+    "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
+    "seealso": [
+        "getDistToTarget",
+        "getLowHp",
+        "attackRanged",
+        "attackMelee",
+        "getTargetX",
+        "getTargetY",
+        "getTargetSpeed",
+        "turnLeft",
+        "moveToTarget"
+    ],
+    "snippet": {
+        "c": "float ${1:speed} = getSpeed();",
+        "python": "${1:speed} = getSpeed()"
+    }
 }

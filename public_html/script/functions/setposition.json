@@ -1,31 +1,31 @@
 {
-	"name": "setPosition",
-	"ptname": "mudaPosicao",
-	"syntax": {
-		"c": "void setPosition ( float x, float y );",
-		"python": "setPosition(x, y)"
-	},
-	"description": {
-		"long": "Altera instantaneamente a posição do gladiador na arena de acordo com os valores das coordenadas X e Y recebidas como parâmetro. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
-		"brief": "Posiciona o gladiador em um ponto da arena."
-	},
-	"param": {
-		"default": [
-			{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
-			{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
-		]
-	},
-	"treturn": {
-		"default": "A função não possui retorno."
-	},
-	"sample": {
-		"c": "33.c",
-		"python": "33.py"
-	},
-	"explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
-	"seealso": [
-		"setHp",
-		"setAp",
+    "name": "setPosition",
+    "ptname": "mudaPosicao",
+    "syntax": {
+        "c": "void setPosition ( float x, float y );",
+        "python": "setPosition(x, y)"
+    },
+    "description": {
+        "long": "Altera instantaneamente a posição do gladiador na arena de acordo com os valores das coordenadas X e Y recebidas como parâmetro. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
+        "brief": "Posiciona o gladiador em um ponto da arena."
+    },
+    "param": {
+        "default": [
+            {"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+            {"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+        ]
+    },
+    "treturn": {
+        "default": "A função não possui retorno."
+    },
+    "sample": {
+        "c": "33.c",
+        "python": "33.py"
+    },
+    "explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
+    "seealso": [
+        "setHp",
+        "setAp",
         "lvlUp",
         "upgradeINT",
         "getLowHp",
@@ -34,9 +34,9 @@
         "getTargetY",
         "turn",
         "speak"
-	],
-	"snippet": {
-		"c": "setPosition(${1:X}, ${2:Y});",
-		"python": "setPosition(${1:X}, ${2:Y})"
-	}
+    ],
+    "snippet": {
+        "c": "setPosition(${1:X}, ${2:Y});",
+        "python": "setPosition(${1:X}, ${2:Y})"
+    }
 }

@@ -1,41 +1,41 @@
 {
-	"name": "getSimTime",
-	"ptname": "pegaTempo",
-	"syntax": {
-		"c": "float getSimTime ( void );",
-		"python": "getSimTime()"
-	},
-	"description": {
-		"long": "A função retorna o tempo que se passou desde o início da simulação. Como o intervalo mínimo de <a href='manual#nav-sim'>tempo da simulação é 0.1s</a>, o retorno dessa função será sempre valores múltiplos de 0.1.",
-		"brief": "Retorna o tempo da simulação."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo o valor do tempo que se passou desde o início da simulação."
-	},
-	"sample": {
-		"c": "22.c",
-		"python": "22.py"
-	},
-	"explain": "No exemplo o gladiador se move em direção ao centro da arena. Ao encontrar um gladiador inimigo ele ataca. Ao ser atingido, caso ele não enxergue o alvo, e recua para trás por 4 segundos.",
-	"seealso": [
-		"getHit",
-		"turnToLastHit",
-		"getCloseEnemy",
-		"attackRanged",
-		"getTargetX",
-		"getTargetY",
-		"stepBack",
-		"howManyEnemies",
-		"moveTo",
-		"turn"
-	],
-	"snippet": {
-		"c": "float ${1:sim_time} = getSimTime();",
-		"python": "${1:sim_time} = getSimTime()"
-	}
+    "name": "getSimTime",
+    "ptname": "pegaTempo",
+    "syntax": {
+        "c": "float getSimTime ( void );",
+        "python": "getSimTime()"
+    },
+    "description": {
+        "long": "A função retorna o tempo que se passou desde o início da simulação. Como o intervalo mínimo de <a href='manual#nav-sim'>tempo da simulação é 0.1s</a>, o retorno dessa função será sempre valores múltiplos de 0.1.",
+        "brief": "Retorna o tempo da simulação."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo o valor do tempo que se passou desde o início da simulação."
+    },
+    "sample": {
+        "c": "22.c",
+        "python": "22.py"
+    },
+    "explain": "No exemplo o gladiador se move em direção ao centro da arena. Ao encontrar um gladiador inimigo ele ataca. Ao ser atingido, caso ele não enxergue o alvo, e recua para trás por 4 segundos.",
+    "seealso": [
+        "getHit",
+        "turnToLastHit",
+        "getCloseEnemy",
+        "attackRanged",
+        "getTargetX",
+        "getTargetY",
+        "stepBack",
+        "howManyEnemies",
+        "moveTo",
+        "turn"
+    ],
+    "snippet": {
+        "c": "float ${1:sim_time} = getSimTime();",
+        "python": "${1:sim_time} = getSimTime()"
+    }
 }

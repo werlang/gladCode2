@@ -1,36 +1,36 @@
 {
-	"name": "setAGI",
-	"ptname": "mudaAGI",
-	"syntax": {
-		"c": "void setAGI ( int valor );",
-		"python": "setAGI(valor)"
-	},
-	"description": {
-		"long": "Atribui um valor para o atributo Agilidade (AGI) do gladiador. Esta função somente pode ser chamada dentro da função setup.",
-		"brief": "Atribui um valor para o atributo Agilidade (AGI) do gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "valor", "description": "Inteiro contendo o valor que será atribuído ao atributo Agilidade."}
-		]
-	},
-	"treturn": {
-		"default": "A função não possui retorno."
-	},
-	"sample": {
-		"c": "36.c",
-		"python": "36.py"
-	},
-	"explain": "Este exemplo demonstra a função setup de um gladiador, onde se atribui a ele o valor do atributo Agilidade, bem como os valores iniciais dos outros atributos básicos e o nome do gladiador.",
-	"seealso": [
-		"getAGI",
-		"setName",
-		"setSTR",
-		"setINT",
-		"setSpritesheet"
-	],
-	"snippet": {
-		"c": "setAGI(${1:value});",
-		"python": "setAGI(${1:value})"
-	}
+    "name": "setAGI",
+    "ptname": "mudaAGI",
+    "syntax": {
+        "c": "void setAGI ( int valor );",
+        "python": "setAGI(valor)"
+    },
+    "description": {
+        "long": "Atribui um valor para o atributo Agilidade (AGI) do gladiador. Esta função somente pode ser chamada dentro da função setup.",
+        "brief": "Atribui um valor para o atributo Agilidade (AGI) do gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "valor", "description": "Inteiro contendo o valor que será atribuído ao atributo Agilidade."}
+        ]
+    },
+    "treturn": {
+        "default": "A função não possui retorno."
+    },
+    "sample": {
+        "c": "36.c",
+        "python": "36.py"
+    },
+    "explain": "Este exemplo demonstra a função setup de um gladiador, onde se atribui a ele o valor do atributo Agilidade, bem como os valores iniciais dos outros atributos básicos e o nome do gladiador.",
+    "seealso": [
+        "getAGI",
+        "setName",
+        "setSTR",
+        "setINT",
+        "setSpritesheet"
+    ],
+    "snippet": {
+        "c": "setAGI(${1:value});",
+        "python": "setAGI(${1:value})"
+    }
 }

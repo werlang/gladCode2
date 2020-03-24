@@ -1,47 +1,47 @@
 {
-	"name": "isRunning",
-	"ptname": "estaCorrendo",
-	"syntax": {
-		"c": "int isRunning ( void );",
-		"python": "isRunning()"
-	},
-	"description": {
-		"long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>movimentação</a>, e este efeito é positivo, indicando que o alvo está correndo.",
-		"brief": "Verifica se o alvo está correndo."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Retorna True caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna False.",
-		"c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna 0."
-	},
-	"sample": {
-		"c": "29.c",
-		"python": "29.py"
-	},
-	"explain": "No exemplo o gladiador procura um inimigo, e caso encontre verifica se ele nao está muito próximo ou o inimigo esteja correndo (possivelmente em sua direção). Em caso afirmativo, lança a habilidade teleport para fugir, caso contrário lança fireball nele. Caso não encontre nenhum inimigo, o gladiador fica andando em círculos até enxergar um inimigo ou ser atingido.",
-	"seealso": [
-		"getCloseEnemy",
-		"getDistToTarget",
-		"getTargetX",
-		"getTargetY",
-		"teleport",
-		"fireball",
-		"getHit",
-		"turn",
-		"stepForward",
-		"turnToAngle",
-		"getLastHitAngle",
-		"isStunned",
-		"isBurning",
-		"isProtected",
-		"isSlowed"
-	],
-	"snippet": {
-		"c": "int ${1:running} = isRunning();",
-		"python": "${1:running} = isRunning()"
-	}
+    "name": "isRunning",
+    "ptname": "estaCorrendo",
+    "syntax": {
+        "c": "int isRunning ( void );",
+        "python": "isRunning()"
+    },
+    "description": {
+        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>movimentação</a>, e este efeito é positivo, indicando que o alvo está correndo.",
+        "brief": "Verifica se o alvo está correndo."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Retorna True caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna False.",
+        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna 0."
+    },
+    "sample": {
+        "c": "29.c",
+        "python": "29.py"
+    },
+    "explain": "No exemplo o gladiador procura um inimigo, e caso encontre verifica se ele nao está muito próximo ou o inimigo esteja correndo (possivelmente em sua direção). Em caso afirmativo, lança a habilidade teleport para fugir, caso contrário lança fireball nele. Caso não encontre nenhum inimigo, o gladiador fica andando em círculos até enxergar um inimigo ou ser atingido.",
+    "seealso": [
+        "getCloseEnemy",
+        "getDistToTarget",
+        "getTargetX",
+        "getTargetY",
+        "teleport",
+        "fireball",
+        "getHit",
+        "turn",
+        "stepForward",
+        "turnToAngle",
+        "getLastHitAngle",
+        "isStunned",
+        "isBurning",
+        "isProtected",
+        "isSlowed"
+    ],
+    "snippet": {
+        "c": "int ${1:running} = isRunning();",
+        "python": "${1:running} = isRunning()"
+    }
 }

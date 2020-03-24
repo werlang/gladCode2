@@ -1,39 +1,39 @@
 {
-	"name": "getLastHitAngle",
-	"ptname": "anguloFuiAcertado",
-	"syntax": {
-		"c": "float getLastHitAngle ( void );",
-		"python": "getLastHitAngle()"
-	},
-	"description": {
-		"long": "Retorna o ângulo de onde partiu o último ataque que o gladiador recebeu. O ângulo retornado é <a href='manual.php#nav-sim'>relativo à arena</a>, e não ao gladiador. Caso o gladiador tenha sido acertado por um projétil o ângulo retornado será de onde veio o projétil.",
-		"brief": "Retorna o ângulo de onde veio o último ataque."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo o ângulo de onde partiu o último ataque recebido pelo gladiador."
-	},
-	"sample": {
-		"c": "19.c",
-		"python": "19.py"
-	},
-	"explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
-	"seealso": [
-		"turnToAngle",
-		"getCloseEnemy",
-		"isTargetVisible",
-		"attackRanged",
-		"getTargetX",
-		"getTargetY",
-		"getLastHitTime",
-		"getHit"
-	],
-	"snippet": {
-		"c": "float ${1:hit_angle} = getLastHitAngle();",
-		"python": "${1:hit_angle} = getLastHitAngle()"
-	}
+    "name": "getLastHitAngle",
+    "ptname": "anguloFuiAcertado",
+    "syntax": {
+        "c": "float getLastHitAngle ( void );",
+        "python": "getLastHitAngle()"
+    },
+    "description": {
+        "long": "Retorna o ângulo de onde partiu o último ataque que o gladiador recebeu. O ângulo retornado é <a href='manual.php#nav-sim'>relativo à arena</a>, e não ao gladiador. Caso o gladiador tenha sido acertado por um projétil o ângulo retornado será de onde veio o projétil.",
+        "brief": "Retorna o ângulo de onde veio o último ataque."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo o ângulo de onde partiu o último ataque recebido pelo gladiador."
+    },
+    "sample": {
+        "c": "19.c",
+        "python": "19.py"
+    },
+    "explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
+    "seealso": [
+        "turnToAngle",
+        "getCloseEnemy",
+        "isTargetVisible",
+        "attackRanged",
+        "getTargetX",
+        "getTargetY",
+        "getLastHitTime",
+        "getHit"
+    ],
+    "snippet": {
+        "c": "float ${1:hit_angle} = getLastHitAngle();",
+        "python": "${1:hit_angle} = getLastHitAngle()"
+    }
 }

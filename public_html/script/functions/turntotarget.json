@@ -1,45 +1,45 @@
 {
-	"name": "turnToTarget",
-	"ptname": "viraParaAlvo",
-	"syntax": {
-		"c": "int turnToTarget ( void );",
-		"python": "turnToTarget()"
-	},
-	"description": {
-		"long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do alvo fixado. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
-		"brief": "Rotaciona o gladiador para o alvo."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou False caso contrário.",
-		"c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou 0 caso contrário."
-	},
-	"sample": {
-		"c": "1.c",
-		"python": "1.py"
-	},
-	"explain": "No exemplo o gladiador se move até o centro da arena e então fica buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
-	"seealso": [
-		"getLowHp",
-		"moveTo",
-		"doYouSeeMe",
-		"stepLeft",
-		"getAmbushTimeLeft",
-		"assassinate",
-		"ambush",
-		"turnLeft",
-		"turnRight",
-		"turn",
-		"turnTo",
-		"turnToAngle",
-		"turnToLastHit"
-	],
-	"snippet": {
-		"c": "turnToTarget();",
-		"python": "turnToTarget()"
-	}
+    "name": "turnToTarget",
+    "ptname": "viraParaAlvo",
+    "syntax": {
+        "c": "int turnToTarget ( void );",
+        "python": "turnToTarget()"
+    },
+    "description": {
+        "long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do alvo fixado. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
+        "brief": "Rotaciona o gladiador para o alvo."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou False caso contrário.",
+        "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou 0 caso contrário."
+    },
+    "sample": {
+        "c": "1.c",
+        "python": "1.py"
+    },
+    "explain": "No exemplo o gladiador se move até o centro da arena e então fica buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
+    "seealso": [
+        "getLowHp",
+        "moveTo",
+        "doYouSeeMe",
+        "stepLeft",
+        "getAmbushTimeLeft",
+        "assassinate",
+        "ambush",
+        "turnLeft",
+        "turnRight",
+        "turn",
+        "turnTo",
+        "turnToAngle",
+        "turnToLastHit"
+    ],
+    "snippet": {
+        "c": "turnToTarget();",
+        "python": "turnToTarget()"
+    }
 }

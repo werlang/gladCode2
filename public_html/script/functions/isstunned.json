@@ -1,49 +1,49 @@
 {
-	"name": "isStunned",
-	"ptname": "estaAtordoado",
-	"syntax": {
-		"c": "int isStunned ( void );",
-		"python": "isStunned()"
-	},
-	"description": {
-		"long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>.",
-		"brief": "Verifica se o alvo está atordoado."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna False.",
-		"c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0."
-	},
-	"sample": {
-		"c": "32.c",
-		"python": "32.py"
-	},
-	"explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidades ambush e assassinate.",
-	"seealso": [
-		"getLowHp",
-		"getAp",
-		"moveTo",
-		"turnToTarget",
-		"doYouSeeMe",
-		"getTargetX",
-		"getTargetY",
-		"stepLeft",
-		"getAmbushTimeLeft",
-		"attackRanged",
-		"turn",
-		"ambush",
-		"assassinate",
-		"isProtected",
-		"isBurning",
-		"isRunning",
-		"isSlowed"
-	],
-	"snippet": {
-		"c": "int ${1:stunned} = isStunned();",
-		"python": "${1:stunned} = isStunned()"
-	}
+    "name": "isStunned",
+    "ptname": "estaAtordoado",
+    "syntax": {
+        "c": "int isStunned ( void );",
+        "python": "isStunned()"
+    },
+    "description": {
+        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>.",
+        "brief": "Verifica se o alvo está atordoado."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna False.",
+        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0."
+    },
+    "sample": {
+        "c": "32.c",
+        "python": "32.py"
+    },
+    "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidades ambush e assassinate.",
+    "seealso": [
+        "getLowHp",
+        "getAp",
+        "moveTo",
+        "turnToTarget",
+        "doYouSeeMe",
+        "getTargetX",
+        "getTargetY",
+        "stepLeft",
+        "getAmbushTimeLeft",
+        "attackRanged",
+        "turn",
+        "ambush",
+        "assassinate",
+        "isProtected",
+        "isBurning",
+        "isRunning",
+        "isSlowed"
+    ],
+    "snippet": {
+        "c": "int ${1:stunned} = isStunned();",
+        "python": "${1:stunned} = isStunned()"
+    }
 }

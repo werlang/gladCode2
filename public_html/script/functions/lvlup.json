@@ -1,30 +1,30 @@
 {
-	"name": "lvlUp",
-	"ptname": "sobeNivel",
-	"syntax": {
-		"c": "void lvlUp ( int valor );",
-		"python": "lvlUp(valor)"
-	},
-	"description": {
+    "name": "lvlUp",
+    "ptname": "sobeNivel",
+    "syntax": {
+        "c": "void lvlUp ( int valor );",
+        "python": "lvlUp(valor)"
+    },
+    "description": {
         "long": "Faz com que o gladiador aumente uma quantidade de níveis igual ao valor recebido por parâmetro. Ao subir de nível desta maneira, o gladiador ganha pontos de atributos da mesma maneira que ganharia ao subir pela via convencional. Outros benefícios de subir de nível, como regeneração depontos de vida e habilidade não são concedidor ao subir de nível através desta função. Os pontos de experiência do gladiador permanecer inalterados. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
-		"brief": "Faz com que o gladiador ganhe níveis."
-	},
-	"param": {
-		"default": [
-			{"name": "valor", "description": "Inteiro contendo a quantidade de níveis que o gladiador irá subir."}
-		]
-	},
-	"treturn": {
-		"default": "A função não possui retorno."
-	},
-	"sample": {
-		"c": "33.c",
-		"python": "33.py"
-	},
-	"explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
-	"seealso": [
-		"setPosition",
-		"setHp",
+        "brief": "Faz com que o gladiador ganhe níveis."
+    },
+    "param": {
+        "default": [
+            {"name": "valor", "description": "Inteiro contendo a quantidade de níveis que o gladiador irá subir."}
+        ]
+    },
+    "treturn": {
+        "default": "A função não possui retorno."
+    },
+    "sample": {
+        "c": "33.c",
+        "python": "33.py"
+    },
+    "explain": "No exemplo o gladiador inicia o combate em nível 11, e na posição central, a seguir ele começa a girar procurando por oponentes para lançar fireball. Tudo isso enquanto atribuindo um valor alto à sua vida e pontos de habilidade.",
+    "seealso": [
+        "setPosition",
+        "setHp",
         "setAp",
         "upgradeINT",
         "getLowHp",
@@ -33,9 +33,9 @@
         "getTargetY",
         "turn",
         "speak"
-	],
-	"snippet": {
-		"c": "lvlUp(${1:value});",
-		"python": "lvlUp(${1:value})"
-	}
+    ],
+    "snippet": {
+        "c": "lvlUp(${1:value});",
+        "python": "lvlUp(${1:value})"
+    }
 }

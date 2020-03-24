@@ -1,40 +1,40 @@
 {
-	"name": "teleport",
-	"ptname": "teletransporte",
-	"syntax": {
-		"c": "int teleport ( float x, float y );",
-		"python": "teleport(x, y)"
-	},
-	"description": {
-		"long": "Transporta instantaneamente o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro. A direção do gladiador ao chegar ao ponto de destino dependerá do ponto onde ele estava antes de lançar a habilidade, como se ele estivesse olhando para o destino ao lançar a habilidade. A distância máxima que o gladiador poderá transpor ao lançar esta habilidade será de 5 passos + 1 passo para cada ponto de <a href='manual.php#nav-attr'>Poder Mágico</a> que o gladiador possuir. Caso o ponto de destino seja mais distante que a distância máxima alcançada pela habilidade, a habilidade deslocará o gladiador a maior distância possível, levando em consideração uma trajetória em linha reta até o ponto de destino.",
-		"brief": "Transporta instantaneamente o gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
-			{"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
-		]
-	},
-	"treturn": {
-		"default": "Retorna True caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna False.",
-		"c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna 0."
-	},
-	"sample": {
-		"c": "7.c",
-		"python": "7.py"
-	},
-	"explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
-	"seealso": [
-		"getLowHp",
-		"getAp",
-		"getTargetX",
-		"getTargetY",
-		"attackRanged",
-		"turn",
-		"fireball"
-	],
-	"snippet": {
-		"c": "teleport(${1:X}, ${2:Y});",
-		"python": "teleport(${1:X}, ${2:Y})"
-	}
+    "name": "teleport",
+    "ptname": "teletransporte",
+    "syntax": {
+        "c": "int teleport ( float x, float y );",
+        "python": "teleport(x, y)"
+    },
+    "description": {
+        "long": "Transporta instantaneamente o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro. A direção do gladiador ao chegar ao ponto de destino dependerá do ponto onde ele estava antes de lançar a habilidade, como se ele estivesse olhando para o destino ao lançar a habilidade. A distância máxima que o gladiador poderá transpor ao lançar esta habilidade será de 5 passos + 1 passo para cada ponto de <a href='manual.php#nav-attr'>Poder Mágico</a> que o gladiador possuir. Caso o ponto de destino seja mais distante que a distância máxima alcançada pela habilidade, a habilidade deslocará o gladiador a maior distância possível, levando em consideração uma trajetória em linha reta até o ponto de destino.",
+        "brief": "Transporta instantaneamente o gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
+            {"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+        ]
+    },
+    "treturn": {
+        "default": "Retorna True caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna False.",
+        "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna 0."
+    },
+    "sample": {
+        "c": "7.c",
+        "python": "7.py"
+    },
+    "explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
+    "seealso": [
+        "getLowHp",
+        "getAp",
+        "getTargetX",
+        "getTargetY",
+        "attackRanged",
+        "turn",
+        "fireball"
+    ],
+    "snippet": {
+        "c": "teleport(${1:X}, ${2:Y});",
+        "python": "teleport(${1:X}, ${2:Y})"
+    }
 }
