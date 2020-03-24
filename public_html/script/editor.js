@@ -373,7 +373,12 @@ $(document).ready( function() {
                     'learnAttack',
                     'checkAttack',
                     'checkGetHit',
-                    'checkReact'
+                    'checkReact',
+                    'checkSafe',
+                    'checkFireball',
+                    'checkTeleport',
+                    'checkUpgrade',
+                    'checkBreakpoint'
                 ])
 
                 if (t === false){
@@ -541,7 +546,12 @@ $(document).ready( function() {
                             'askMoveNext',
                             'detectEnemy',
                             'getHit',
-                            'reactHit'
+                            'reactHit',
+                            'safe',
+                            'fireball',
+                            'teleport',
+                            'upgrade',
+                            'breakpoint'
                         ])
                     });
                     progbtn.kill();
@@ -601,7 +611,7 @@ $(document).ready( function() {
                         skin: JSON.stringify(pieces)
                     }).done( function(data){
                         hash = data;
-                        var setup = "setup(){\n\tsetName(\""+ name +"\");\n\tsetSTR("+ vstr +");\n\tsetAGI("+ vagi +");\n\tsetINT("+ vint +");\n\tsetSpritesheet(\""+ hash +"\");\n}\n\n";
+                        var setup = "setup(){\n    setName(\""+ name +"\");\n    setSTR("+ vstr +");\n    setAGI("+ vagi +");\n    setINT("+ vint +");\n    setSpritesheet(\""+ hash +"\");\n}\n\n";
                         download(filename, setup + editor.getValue());
                     });
                 }
@@ -632,7 +642,7 @@ $(document).ready( function() {
         sample.getSession().setMode("ace/mode/c_cpp");
         sample.setReadOnly(true);
 
-        sample.setValue("int start = 1;\n\nloop(){\n\tupgradeSTR();\n\tif (getCloseEnemy()){\n\t\tfloat dist = getDist(getTargetX(), getTargetY());\n\t\tif (dist < 0.8 && isTargetVisible()){\n\t\t\tattackMelee();\n\t\t}\n\t\telse\n\t\t\tmoveToTarget();\n\t}\n\telse{\n\t\tif (start){\n\t\t\tif(moveTo(12.5,12.5))\n\t\t\t\tstart = 0;\n\t\t}\n\t\telse\n\t\t\tturnLeft(50);\n\t}\n}", -1);
+        sample.setValue("int start = 1;\n\nloop(){\n    upgradeSTR();\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}", -1);
 
         $('#settings-window #list .theme').click( function(){
             $('#settings-window #list .theme').removeClass('selected');
@@ -804,6 +814,7 @@ $(document).ready( function() {
 
         // If there's a breakpoint already defined, it should be removed, offering the toggle feature
         if(typeof breakpoints[row] === typeof undefined){
+            let lang = getLanguage(editor.getValue())
             var brackets = 0;
             for (let i=0 ; i < editor.session.getLength() ; i++){				
                 var line = editor.session.getLine(i);
@@ -815,7 +826,7 @@ $(document).ready( function() {
                         rowdif = row + 1;
                     }
 
-                    if (brackets == 0){
+                    if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
                         showMessage("Breakpoints só podem ser inseridos dentro de funções");
                     }
                     else{
@@ -834,10 +845,12 @@ $(document).ready( function() {
     
                 }
 
-                if (line.indexOf("{") != -1)
-                    brackets++;
-                if (line.indexOf("}") != -1)
-                    brackets--;
+                if (lang == 'c'){
+                    if (line.indexOf("{") != -1)
+                        brackets++;
+                    if (line.indexOf("}") != -1)
+                        brackets--;
+                }
             }
 
         }else{
@@ -873,11 +886,11 @@ function setLoadGlad(){
 
     var language = getLanguage(editor.getValue());
     if (language == "c"){
-        var setup = `setup(){\n\tsetName(\"${loadGlad.name}\");\n\tsetSTR(${loadGlad.vstr});\n\tsetAGI(${loadGlad.vagi});\n\tsetINT(${loadGlad.vint});\n\tsetSkin(\"${loadGlad.skin}\");\n\tsetUser(\"${loadGlad.user}\");\n}\n\n`;
+        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n}\n\n`;
         loadGlad.code = setup + editor.getValue();
     }
     else if (language == "python" || language == 'blocks'){
-        var setup = `def setup():\n\tsetName(\"${loadGlad.name}\")\n\tsetSTR(${loadGlad.vstr})\n\tsetAGI(${loadGlad.vagi})\n\tsetINT(${loadGlad.vint})\n\tsetSkin(\"${loadGlad.skin}\")\n\tsetUser(\"${loadGlad.user}\")\n\n`;
+        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n# start of user code\n`;
         loadGlad.code = setup + editor.getValue();
     }
 }
