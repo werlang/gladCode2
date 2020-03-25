@@ -1,9 +1,9 @@
 def loop():
-	if getHit():
-		turnToLastHit()
-		getCloseEnemy()
+    if getHit():
+        turnToLastHit()
+        getCloseEnemy()
 
-		if isTargetVisible():
-			attackRanged(getTargetX(), getTargetY())
-	 
+        if isTargetVisible():
+            attackRanged(getTargetX(), getTargetY())
+     
  
