@@ -3,7 +3,8 @@
     "ptname": "estaAtordoado",
     "syntax": {
         "c": "int isStunned ( void );",
-        "python": "isStunned()"
+        "python": "isStunned()",
+        "blocks": "Alvo está [Atordoado]?"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "32.c",
-        "python": "32.py"
+        "python": "32.py",
+        "blocks": "32.png"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidades ambush e assassinate.",
     "seealso": [

@@ -3,7 +3,8 @@
     "ptname": "pegaXAlvo",
     "syntax": {
         "c": "float getTargetX ( void );",
-        "python": "getTargetX()"
+        "python": "getTargetX()",
+        "blocks": "Pegar [Coordenada X] do alvo"
     },
     "description": {
         "long": "Retorna o valor da coordenada x do gladiador selecionado como alvo. O conjunto de coordenadas x e y formam o ponto de localização do gladiador na <a href='manual.php#nav-sim'>arena</a>.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "2.c",
-        "python": "2.py"
+        "python": "2.py",
+        "blocks": "2.png"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

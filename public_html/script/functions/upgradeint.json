@@ -3,7 +3,8 @@
     "ptname": "melhoraINT",
     "syntax": {
         "c": "int upgradeINT ( int pontos );",
-        "python": "upgradeINT(pontos)"
+        "python": "upgradeINT(pontos)",
+        "blocks": "Melhorar [Inteligência]"
     },
     "description": {
         "long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Inteligência do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "48.c",
-        "python": "48.py"
+        "python": "48.py",
+        "blocks": "48.png"
     },
     "explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeINT, fazendo com que ele aumente o atributo Inteligência caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [

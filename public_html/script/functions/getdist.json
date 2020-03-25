@@ -3,7 +3,8 @@
     "ptname": "pegaDistancia",
     "syntax": {
         "c": "float getDist ( float x, float y );",
-        "python": "getDist(x, y)"
+        "python": "getDist(x, y)",
+        "blocks": "Distância para [Posição]"
     },
     "description": {
         "long": "Retorna a distância entre o ponto definido pelas coordenadas x e y informadas por parãmetro e a localização do gladiador.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "12.c",
-        "python": "12.py"
+        "python": "12.py",
+        "blocks": "12.png"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

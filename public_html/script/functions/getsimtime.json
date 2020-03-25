@@ -3,7 +3,8 @@
     "ptname": "pegaTempo",
     "syntax": {
         "c": "float getSimTime ( void );",
-        "python": "getSimTime()"
+        "python": "getSimTime()",
+        "blocks": "Tempo da simulação"
     },
     "description": {
         "long": "A função retorna o tempo que se passou desde o início da simulação. Como o intervalo mínimo de <a href='manual#nav-sim'>tempo da simulação é 0.1s</a>, o retorno dessa função será sempre valores múltiplos de 0.1.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "22.c",
-        "python": "22.py"
+        "python": "22.py",
+        "blocks": "22.png"
     },
     "explain": "No exemplo o gladiador se move em direção ao centro da arena. Ao encontrar um gladiador inimigo ele ataca. Ao ser atingido, caso ele não enxergue o alvo, e recua para trás por 4 segundos.",
     "seealso": [

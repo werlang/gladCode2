@@ -3,7 +3,8 @@
     "ptname": "passoEsquerda",
     "syntax": {
         "c": "float stepLeft ( void );",
-        "python": "stepLeft()"
+        "python": "stepLeft()",
+        "blocks": "Passo para [Esquerda]"
     },
     "description": {
         "long": "Faz com que o gladiador se mova para a esquerda. Ele executa o movimento de lado, sem rotacionar. O gladiador move-se a maior distância que conseguir dentro de um intervalo de tempo da simulação (determinado pela sua <a href='manual.php#nav-glad'>velocidade de movimento</a>). A função irá retornar a distância percorrida neste processo.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "40.c",
-        "python": "40.py"
+        "python": "40.py",
+        "blocks": "40.png"
     },
     "explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo próximo e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
     "seealso": [

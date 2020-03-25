@@ -3,7 +3,8 @@
     "ptname": "teletransporte",
     "syntax": {
         "c": "int teleport ( float x, float y );",
-        "python": "teleport(x, y)"
+        "python": "teleport(x, y)",
+        "blocks": "Teletransporte"
     },
     "description": {
         "long": "Transporta instantaneamente o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro. A direção do gladiador ao chegar ao ponto de destino dependerá do ponto onde ele estava antes de lançar a habilidade, como se ele estivesse olhando para o destino ao lançar a habilidade. A distância máxima que o gladiador poderá transpor ao lançar esta habilidade será de 5 passos + 1 passo para cada ponto de <a href='manual.php#nav-attr'>Poder Mágico</a> que o gladiador possuir. Caso o ponto de destino seja mais distante que a distância máxima alcançada pela habilidade, a habilidade deslocará o gladiador a maior distância possível, levando em consideração uma trajetória em linha reta até o ponto de destino.",
@@ -21,7 +22,8 @@
     },
     "sample": {
         "c": "7.c",
-        "python": "7.py"
+        "python": "7.py",
+        "blocks": "7.png"
     },
     "explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
     "seealso": [

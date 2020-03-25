@@ -12,7 +12,8 @@ $(document).ready( function() {
 			change: function( event, ui ) {
 				let ext = {
 					c: "c",
-					python: "py"
+					python: "py",
+					blocks: "blk"
 				};
 
 				var lang_word = 'function';
@@ -61,31 +62,38 @@ async function load_content(item){
 			language = "c";
 		else if (ext == 'py')
 			language = "python";
+		else if (ext == 'blk')
+			language = 'blocks'
 
 		$('#get-lang').remove();
 	}
 	
 	// if language is not set in GET, or set wrong, set user language, else set c
 	if (!language){
-		if (user && user.language == 'python')
-			language = 'python';	
+		if (user)
+			language = user.language
 		else
 			language = 'c';
 	}
 
 	$('#language select').val(language).selectmenu('refresh');
 
-	$('title').html("gladCode - "+ item.name);
-	$('#temp-name').html(item.name);
+	if (language == 'blocks'){
+		$('title').html("gladCode - "+ item.syntax[language])
+		$('#temp-name').html(item.syntax[language])
+		$('#temp-syntax').html(`<img src='script/functions/blockimg/${item.name.toLowerCase()}.png'>`)
+	}
+	else{
+		$('title').html("gladCode - "+ item.name)
+		$('#temp-name').html(item.name)
 
-	if (language == 'python')
-		$('#temp-syntax').html(item.syntax.python);
-	else
-		$('#temp-syntax').html(item.syntax.c);
+		$('#temp-syntax').html(item.syntax[language])
 
-	$('#temp-syntax').attr('class', `language-${language}`);
-	Prism.highlightElement($('#temp-syntax')[0]);
-	$('#temp-description').html(item.description.long);
+		$('#temp-syntax').attr('class', `language-${language}`)
+		Prism.highlightElement($('#temp-syntax')[0])
+	}
+
+	$('#temp-description').html(item.description.long)
 
 	var param = item.param.default;
 	if (user && item.param[language])
@@ -106,8 +114,12 @@ async function load_content(item){
 
 	await new Promise( (resolve, reject) => {
 		$('#temp-sample').load(`script/functions/samples/${item.sample[language]}`, () => {
-			$('#temp-sample').attr('class', `language-${language}`);
-			Prism.highlightElement($('#temp-sample')[0]);
+			if (language == 'blocks')
+				loadBlockSample($('#temp-sample'))
+			else{
+				$('#temp-sample').attr('class', `language-${language}`);
+				Prism.highlightElement($('#temp-sample')[0]);
+			}
 			resolve(true);
 		});
 	});
@@ -118,9 +130,12 @@ async function load_content(item){
 	funcs[item.name] = item.ptname;
 
 	for (let i in item.seealso){
-		var data = await findFunc(item.seealso[i].toLowerCase());
-		$('#temp-seealso').append("<tr><td><a href='function/"+ data.name.toLowerCase() +"'>"+ data.name +"</a></td><td>"+ data.description.brief +"</td></tr>");
-		funcs[data.name] = data.ptname;
+		let data = await findFunc(item.seealso[i].toLowerCase())
+		if (language == 'blocks')
+			data.name = data.syntax.blocks
+
+		$('#temp-seealso').append("<tr><td><a href='function/"+ data.name.toLowerCase() +"'>"+ data.name +"</a></td><td>"+ data.description.brief +"</td></tr>")
+		funcs[data.name] = data.ptname
 	}
 
 	loadDict(funcs, $('#dict').html());
@@ -143,4 +158,9 @@ function loadDict(func, lang){
 		var replace = "href='funcao/$1'";
 		$('#content #template').html($('#content #template').html().replace(pattern, replace));
 	}
+}
+
+function loadBlockSample(obj){
+	let xml = obj.html()
+	console.log(xml)
 }

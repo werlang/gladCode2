@@ -3,7 +3,8 @@
     "ptname": "moveParaAlvo",
     "syntax": {
         "c": "int moveToTarget ( void );",
-        "python": "moveToTarget()"
+        "python": "moveToTarget()",
+        "blocks": "Mover para [Alvo]"
     },
     "description": {
         "long": "Faz com que o gladiador se mova para o ponto da arena onde está o alvo fixado. Primeiramente o gladiador vira-se na direção do alvo e após isso começa a se locomover em sua direção.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "2.c",
-        "python": "2.py"
+        "python": "2.py",
+        "blocks": "2.png"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

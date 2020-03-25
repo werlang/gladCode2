@@ -3,7 +3,8 @@
     "ptname": "pegaNivel",
     "syntax": {
         "c": "int getLvl ( void );",
-        "python": "getLvl()"
+        "python": "getLvl()",
+        "blocks": "Pegar informação [Nível]"
     },
     "description": {
         "long": "Retorna o nível do gladiador.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "20.c",
-        "python": "20.py"
+        "python": "20.py",
+        "blocks": "20.png"
     },
     "explain": "Este trecho de código verifica o nível do gladiador. Caso seja menor que 5, o gladiador melhora a força, caso contrário a inteligência.",
     "seealso": [

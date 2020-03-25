@@ -3,7 +3,8 @@
     "ptname": "vira",
     "syntax": {
         "c": "void turn ( float angulo );",
-        "python": "turn(angulo)"
+        "python": "turn(angulo)",
+        "blocks": "Virar relativo [ao gladiador]"
     },
     "description": {
         "long": "Rotaciona o gladiador uma quantidade de graus determinada pelo parâmetro. Caso o ângulo seja negativo o gladiador irá rotacionar no sentido anti-horário, ou no sentido horário caso seja positivo. O gladiador ficará travado na ação até que complete toda a rotação. Isto pode levar mais que um intervalo de tempo, dependendo do atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>).",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "42.c",
-        "python": "42.py"
+        "python": "42.py",
+        "blocks": "42.png"
     },
     "explain": "No exemplo o gladiador se move para frente até que encontre algum obstáculo, então rotaciona 180 graus no sentido horário. Este comportamento repetitivo fará com que o gladiador execute uma trajetória de vai-e-vem pela arena.",
     "seealso": [

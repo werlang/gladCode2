@@ -1191,7 +1191,7 @@ Blockly.Python['howmanyenemies'] = function(block) {
 Blockly.Blocks['doyouseeme'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("Alvo me enxerga?");
+            .appendField("Inimigo me enxerga?");
         this.setInputsInline(true);
         this.setOutput(true, "Boolean");
         this.setColour('#52b2b2');

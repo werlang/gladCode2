@@ -3,7 +3,8 @@
     "ptname": "pegaINT",
     "syntax": {
         "c": "int getINT ( void );",
-        "python": "getINT()"
+        "python": "getINT()",
+        "blocks": "Pegar informação [Atributo Inteligência]"
     },
     "description": {
         "long": "Retorna o valor do atributo Inteligência (INT) do gladiador.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "18.c",
-        "python": "18.py"
+        "python": "18.py",
+        "blocks": "18.png"
     },
     "explain": "Este exemplo analisa o valor do atributo Inteligência do gladiador, e caso ele seja pelo menos 15, chama a função upgradeSTR(), indicando que ele deseja aumentar sua Força. Até isso acontecer, a prioridade de melhoria de atributo é para a Inteligência. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [

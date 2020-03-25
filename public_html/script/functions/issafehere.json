@@ -3,7 +3,8 @@
     "ptname": "seguroAqui",
     "syntax": {
         "c": "int isSafeHere ( void );",
-        "python": "isSafeHere()"
+        "python": "isSafeHere()",
+        "blocks": "É seguro [Aqui]?"
     },
     "description": {
         "long": "A função analisa a posição ocupada pelo gladiador na arena, verificando se há <a href='manual.php#nav-sim'>gás tóxico</a> ou não.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "21.c",
-        "python": "21.py"
+        "python": "21.py",
+        "blocks": "21.png"
     },
     "explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
     "seealso": [

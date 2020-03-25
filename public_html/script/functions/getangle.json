@@ -3,7 +3,8 @@
     "ptname": "pegaAngulo",
     "syntax": {
         "c": "float getAngle ( float x, float y );",
-        "python": "getAngle(x, y)"
+        "python": "getAngle(x, y)",
+        "blocks": "Ângulo para"
     },
     "description": {
         "long": "Retorna o ângulo entre o ponto definido pelas coordenadas x e y informadas por parãmetro e a localização do gladiador.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "9.c",
-        "python": "9.py"
+        "python": "9.py",
+        "blocks": "9.png"
     },
     "explain": "No exemplo o gladiador se movimenta pela arena em diagonal.",
     "seealso": [

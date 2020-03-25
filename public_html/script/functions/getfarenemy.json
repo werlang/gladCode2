@@ -3,7 +3,8 @@
     "ptname": "pegaInimigoDistante",
     "syntax": {
         "c": "int getFarEnemy ( void );",
-        "python": "getFarEnemy()"
+        "python": "getFarEnemy()",
+        "blocks": "Selecionar alvo [Mais Distante]"
     },
     "description": {
         "long": "Analisa o campo de visão do gladiador e caso haja pelo menos um inimigo seleciona o que estiver mais distante do gladiador. Um inimigo selecionado desta maneira vira o alvo do gladiador, e todas funções que acessam informações sobre o alvo irão interagir com o gladiador selecionado.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "13.c",
-        "python": "13.py"
+        "python": "13.py",
+        "blocks": "13.png"
     },
     "explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo distante e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
     "seealso": [

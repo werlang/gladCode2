@@ -3,7 +3,8 @@
     "ptname": "estaCorrendo",
     "syntax": {
         "c": "int isRunning ( void );",
-        "python": "isRunning()"
+        "python": "isRunning()",
+        "blocks": "Alvo está [Correndo]?"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>movimentação</a>, e este efeito é positivo, indicando que o alvo está correndo.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "29.c",
-        "python": "29.py"
+        "python": "29.py",
+        "blocks": "29.png"
     },
     "explain": "No exemplo o gladiador procura um inimigo, e caso encontre verifica se ele nao está muito próximo ou o inimigo esteja correndo (possivelmente em sua direção). Em caso afirmativo, lança a habilidade teleport para fugir, caso contrário lança fireball nele. Caso não encontre nenhum inimigo, o gladiador fica andando em círculos até enxergar um inimigo ou ser atingido.",
     "seealso": [

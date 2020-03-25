@@ -3,7 +3,8 @@
     "ptname": "pegaAGI",
     "syntax": {
         "c": "int getAGI ( void );",
-        "python": "getAGI()"
+        "python": "getAGI()",
+        "blocks": "Pegar informação [Atributo Agilidade]"
     },
     "description": {
         "long": "Retorna o valor do atributo Agilidade (AGI) do gladiador.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "8.c",
-        "python": "8.py"
+        "python": "8.py",
+        "blocks": "8.png"
     },
     "explain": "Este exemplo analisa o valor do atributo Agilidade do gladiador, e caso ele seja pelo menos 15, chama a função upgradeINT(), indicando que ele deseja aumentar sua Inteligência. Até isso acontecer, a prioridade de melhoria de atributo é para a Agilidade. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [

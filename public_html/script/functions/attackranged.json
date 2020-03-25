@@ -1,9 +1,10 @@
 {
     "name": "attackRanged",
-    "ptname": "ataqueDistancia",
+	"ptname": "ataqueDistancia",
     "syntax": {
         "c": "int attackRanged ( float x, float y );",
-        "python": "attackRanged(x, y)"
+		"python": "attackRanged(x, y)",
+		"blocks": "Ataque à distância"
     },
     "description": {
         "long": "Vira o gladiador para o ponto definido pelas coordenadas x e y recebidas como parâmetro e então realiza um ataque de longa distância em direção ao ponto. Caso o gladiador não consiga terminar sua rotação até o ponto (de acordo com sua <a href='manual.php#nav-glad'>velocidade de rotação</a>, o ataque não é realizado. Quando o ataque é realizado, um projétil é arremessado a partir do ponto do gladiador atacante e percorre a arena com velocidade 15 passos por segundo (p/s) em direção ao ponto do alvo. Caso o projétil entre em contato com qualquer gladiador durante seu percurso, ele interrompe seu percurso e causa dano igual ao valor do <a href='manual.php#nav-glad'>atributo dano à distância</a> do gladiador que disparou o projétil no gladiador acertado.",
@@ -13,15 +14,21 @@
         "default": [
             {"name": "x", "description": "Float contendo o valor da coordenada x do ponto alvo."},
             {"name": "y", "description": "Float contendo o valor da coordenada y do ponto alvo."}
+		],
+		"blocks": [
+            {"name": "x", "description": "Número contendo o valor da coordenada x do ponto alvo."},
+            {"name": "y", "description": "Número contendo o valor da coordenada y do ponto alvo."}
         ]
     },
     "treturn": {
         "default": "Retorna True caso o ataque tenha sido realizado com sucesso, caso contrário retorna False.",
-        "c": "Retorna 1 caso o ataque foi realizado com sucesso, caso contrário retorna 0."
+		"c": "Retorna 1 caso o ataque foi realizado com sucesso, caso contrário retorna 0.",
+        "blocks": "Quando escolhido a opção Usar Retorno, o bloco retorna Verdadeiro caso o ataque tenha sido realizado com sucesso, caso contrário retorna Falso."
     },
     "sample": {
         "c": "3.c",
-        "python": "3.py"
+		"python": "3.py",
+		"blocks": "3.png"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
     "seealso": [

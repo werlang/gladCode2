@@ -3,7 +3,8 @@
     "ptname": "anguloFuiAcertado",
     "syntax": {
         "c": "float getLastHitAngle ( void );",
-        "python": "getLastHitAngle()"
+        "python": "getLastHitAngle()",
+        "blocks": "[Ângulo] do ataque recebido"
     },
     "description": {
         "long": "Retorna o ângulo de onde partiu o último ataque que o gladiador recebeu. O ângulo retornado é <a href='manual.php#nav-sim'>relativo à arena</a>, e não ao gladiador. Caso o gladiador tenha sido acertado por um projétil o ângulo retornado será de onde veio o projétil.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "19.c",
-        "python": "19.py"
+        "python": "19.py",
+        "blocks": "19.png"
     },
     "explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
     "seealso": [

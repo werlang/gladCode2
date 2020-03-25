@@ -3,7 +3,8 @@
     "ptname": "fuiAcertado",
     "syntax": {
         "c": "int getHit ( void );",
-        "python": "getHit()"
+        "python": "getHit()",
+        "blocks": "Fui acertado?"
     },
     "description": {
         "long": "Verifica se o gladiador recebeu um ataque desde a última vez que a função foi chamada.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "16.c",
-        "python": "16.py"
+        "python": "16.py",
+        "blocks": "16.png"
     },
     "explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
     "seealso": [

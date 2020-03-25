@@ -3,7 +3,8 @@
     "ptname": "estaLento",
     "syntax": {
         "c": "int isSlowed ( void );",
-        "python": "isSlowed()"
+        "python": "isSlowed()",
+        "blocks": "Alvo está [Lento]?"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>movimentação</a>, e este efeito é negativo, indicando que o alvo está mais lento que o normal.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "31.c",
-        "python": "31.py"
+        "python": "31.py",
+        "blocks": "31.png"
     },
     "explain": "No exemplo o gladiador procura um inimigo. Caso o inimigo esteja distante e não esteja lento, o gladiador usa a habilidade charge para alcançá-lo. Caso contrário ele se move até o inimigo e quando estiver próximo a ele desfere um ataque corpo-a-copo. Caso não encontre o inimigo, o gladiador fica olhando em volta procurando. Quando o gás encostar no gladiador e no início da batalha, o gladiador se move para o centro da arena.",
     "seealso": [

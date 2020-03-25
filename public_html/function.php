@@ -43,6 +43,7 @@
 					<select>
 						<option value='c'>C</option>
 						<option value='python'>Python</option>
+						<option value='blocks'>Blocos</option>
 					</select>
 				</div>
 

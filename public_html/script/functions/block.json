@@ -3,7 +3,8 @@
     "ptname": "bloqueio",
     "syntax": {
         "c": "int block ( void );",
-        "python": "block()"
+        "python": "block()",
+        "blocks": "Bloquear"
     },
     "description": {
         "long": "Causa o efeito <a href='manual.php#nav-efeito'>proteção</a> no gladiador, fazendo com que todo dano direto sofrido por ele seja reduzido. O dano será reduzido em uma porcentagem igual a (0.1 + STR/(STR+16)) * 10%, onde STR é a <a href='manual.php#nav-glad'>força</a> do gladiador. Caso o gladiador não esteja enxergando a fonte do dano recebido, o efeito da proteção é reduzido pela metade. O efeito de proteção sobre o gladiador possui duração de 7 segundos.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "4.c",
-        "python": "4.py"
+        "python": "4.py",
+        "blocks": "4.png"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso já esteja com block ativo ou o inimigo não o enxerga, usa a habilidade charge, caso contrário usa block.",
     "seealso": [

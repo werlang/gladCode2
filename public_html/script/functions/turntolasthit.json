@@ -3,7 +3,8 @@
     "ptname": "viraFuiAcertado",
     "syntax": {
         "c": "int turnToLastHit ( void );",
-        "python": "turnToLastHit()"
+        "python": "turnToLastHit()",
+        "blocks": "Virar para [Ataque recebido]"
     },
     "description": {
         "long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do ponto de onde originou o último ataque recebido. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "16.c",
-        "python": "16.py"
+        "python": "16.py",
+        "blocks": "16.png"
     },
     "explain": "No exemplo o gladiador espera até sofrer um ataque, e quando isso acontecer, ele se vira para a direção onde recebeu o ataque, fixa no alvo e começa a atacá-lo.",
     "seealso": [
