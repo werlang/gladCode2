@@ -1,5 +1,5 @@
 def loop():
-	while stepForward():
-		pass
-	turn(180)
+    while stepForward():
+        pass
+    turn(180)
  

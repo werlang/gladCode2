@@ -1,4 +1,4 @@
 loop(){
-	while(stepForward());
-	turn(180);
+    while(stepForward());
+    turn(180);
 }
