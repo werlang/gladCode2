@@ -3,7 +3,8 @@
     "ptname": "viraPara",
     "syntax": {
         "c": "int turnTo ( float x, float y );",
-        "python": "turnTo(x, y)"
+        "python": "turnTo(x, y)",
+        "blocks": "Virar para [Posição]"
     },
     "description": {
         "long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do ponto informado no parâmetro. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
@@ -21,7 +22,8 @@
     },
     "sample": {
         "c": "45.c",
-        "python": "45.py"
+        "python": "45.py",
+        "blocks": "45.png"
     },
     "explain": "No exemplo o gladiador se vira em direção ao canto da arena e se move na direção dele. Ao encontrar um obstáculo (ou alcançar o ponto), e se vira para o outro canto e se move até ele.",
     "seealso": [

@@ -3,7 +3,8 @@
     "ptname": "viraParaAngulo",
     "syntax": {
         "c": "int turnToAngle ( float angulo );",
-        "python": "turnToAngle(angulo)"
+        "python": "turnToAngle(angulo)",
+        "blocks": "Virar relativo [à arena]"
     },
     "description": {
         "long": "Rotaciona o gladiador de maneira que ele fique virado para o angulo informado no parâmetro. O ângulo informado deve seguir a <a href='manual.php#nav-sim'>convenção adotada pela simulação</a>. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "46.c",
-        "python": "46.py"
+        "python": "46.py",
+        "blocks": "46.png"
     },
     "explain": "No exemplo o gladiador se movimenta pela arena em um padrão do qual se move para cima e então para a diagonal baixo-direita.",
     "seealso": [

@@ -3,7 +3,8 @@
     "ptname": "pegaSaudeAlvo",
     "syntax": {
         "c": "float getTargetHealth ( void );",
-        "python": "getTargetHealth()"
+        "python": "getTargetHealth()",
+        "blocks": "Pegar [Saúde] do alvo"
     },
     "description": {
         "long": "Retorna a vida que o alvo selecionado possui. O valor retornado não é a quantidade de pontos de vida do alvo, mas a razão entre a quantidade atual de pontos de vida e o total. Por consequência sempre será um valor entre 0 e 1. Embora não se saiba a quantidade exata de pontos de vida do alvo, pode-se ter uma noção de sua condição de saúde utilizando esta função.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "24.c",
-        "python": "24.py"
+        "python": "24.py",
+        "blocks": "24.png"
     },
     "explain": "No exemplo o gladiador se move em sentido diagonal pela arena, até receber um ataque. quando isso acontecer ele se vira na direção do ataque, recuando caso hajam mais de um inimigo no campo de visão. Caso haja somente um inimigo com até 30% de vida, o gladiador ataca ele. ",
     "seealso": [

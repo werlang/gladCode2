@@ -3,7 +3,8 @@
     "ptname": "melhoraFOR",
     "syntax": {
         "c": "int upgradeSTR ( int pontos );",
-        "python": "upgradeSTR(pontos)"
+        "python": "upgradeSTR(pontos)",
+        "blocks": "Melhorar [Força]"
     },
     "description": {
         "long": "Utiliza os pontos de aprimoramento acumulados para aumentar o valor do atributo Força do gladiador. Os pontos de aprimoramento são ganhos toda vez que o gladiador <a href='manual#xp-table'>sobre de nível</a>. A quantidade de pontos aprimorados é igual ao valor passado no parâmetro da função, nunca ultrapassando a quantidade de pontos de aprimoramento disponíveis.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "47.c",
-        "python": "47.py"
+        "python": "47.py",
+        "blocks": "47.png"
     },
     "explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeAGI, fazendo com que ele aumente o atributo Agilidade caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [

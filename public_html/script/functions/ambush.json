@@ -3,7 +3,8 @@
     "ptname": "emboscada",
     "syntax": {
         "c": "int ambush ( void );",
-        "python": "ambush()"
+        "python": "ambush()",
+        "blocks": "Emboscada"
     },
     "description": {
         "long": "Faz com que o gladiador receba o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> por 1 segundo, mais 0.1 segundos por cada ponto em <a href='manual.php#nav-glad'>agilidade</a> que o gladiador possuir. Caso o gladiador realize um ataque contra algum outro gladiador enquanto sob o efeito da invisibilidade, o gladiador acertado recebe o efeito <a href='manual.php#nav-efeito'>atordoado</a> durante 1 segundo. Todo ataque realizado contra um gladiador faz com que o gladiador que desferiu o ataque perca o efeito invisibilidade. Um gladiador atordoado não poderá agir até que o efeito termine, e ele é considerado como não estando enxergando nenhum outro gladiador presente na arena. O gladiador não recupera pontos de habilidade (ap) enquanto sob efeito da invisibilidade.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "1.c",
-        "python": "1.py"
+        "python": "1.py",
+        "blocks": "1.png"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
     "seealso": [

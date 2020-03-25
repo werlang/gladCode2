@@ -3,7 +3,8 @@
     "ptname": "quantosInimigos",
     "syntax": {
         "c": "int howManyEnemies ( void );",
-        "python": "howManyEnemies()"
+        "python": "howManyEnemies()",
+        "blocks": "Quanto inimigos vejo?"
     },
     "description": {
         "long": "Retorna a quantidade de inimigos dentro do campo de visão do gladiador. Esta função não seleciona nenhum inimigo como alvo.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "26.c",
-        "python": "26.py"
+        "python": "26.py",
+        "blocks": "26.png"
     },
     "explain": "No exemplo o gladiador se move em sentido diagonal pela arena, até receber um ataque. quando isso acontecer ele se vira na direção do ataque, recuando caso hajam mais de um inimigo no campo de visão. Caso haja somente um inimigo com até 30% de vida, o gladiador ataca ele. ",
     "seealso": [

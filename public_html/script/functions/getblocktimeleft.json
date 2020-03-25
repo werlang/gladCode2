@@ -3,7 +3,8 @@
     "ptname": "tempoBloqueio",
     "syntax": {
         "c": "float getBlockTimeLeft ( void );",
-        "python": "getBlockTimeLeft()"
+        "python": "getBlockTimeLeft()",
+        "blocks": "Tempo restante [Resistência]"
     },
     "description": {
         "long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>proteção</a> expire.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "4.c",
-        "python": "4.py"
+        "python": "4.py",
+        "blocks": "4.png"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso já esteja com block ativo ou o inimigo não o enxerga, usa a habilidade charge, caso contrário usa block.",
     "seealso": [

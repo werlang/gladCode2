@@ -864,7 +864,7 @@ tutorial.lesson.checkUpgrade = async function(){
 }
 
 tutorial.lesson.breakpoint = async function(){
-    if (user.language == 'c'){
+    if (user.language != 'blocks'){
         let data = await showDialog("Uma última coisa. Vou te ensinar uma poderosa ferramenta para testar seu código: os <b>breakpoints</b>. Com eles você pode pausar a simulação quando seu gladiador estiver prestes a executar uma linha de comando específica.", ["Interessante"])
 
         data = showDialog("Para adicionar um breakpoint, basta clicar lá no lado esquerdo, no número da linha desejada do seu código. Experimente!",["Onde?", "Certo"])

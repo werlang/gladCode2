@@ -3,7 +3,8 @@
     "ptname": "pegaPh",
     "syntax": {
         "c": "float getAp ( void );",
-        "python": "getAp()"
+        "python": "getAp()",
+        "blocks": "Pegar informação [Pontos de habilidade]"
     },
     "description": {
         "long": "Retorna a quantidade de pontos de habilidade restantes do gladiador.",
@@ -19,7 +20,8 @@
     },
     "sample": {
         "c": "7.c",
-        "python": "7.py"
+        "python": "7.py",
+        "blocks": "7.png"
     },
     "explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
     "seealso": [

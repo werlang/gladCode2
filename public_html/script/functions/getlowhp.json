@@ -3,7 +3,8 @@
     "ptname": "pegaVidaBaixa",
     "syntax": {
         "c": "int getLowHp ( void );",
-        "python": "getLowHp()"
+        "python": "getLowHp()",
+        "blocks": "Selecionar alvo [Com menos vida]"
     },
     "description": {
         "long": "Analisa o campo de visão do gladiador e caso haja pelo menos um inimigo seleciona o que possuir menor quantidade de pontos de vida. Um inimigo selecionado desta maneira vira o alvo do gladiador, e todas funções que acessam informações sobre o alvo irão interagir com o gladiador selecionado.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "2.c",
-        "python": "2.py"
+        "python": "2.py",
+        "blocks": "2.png"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

@@ -3,7 +3,8 @@
     "ptname": "estaQueimando",
     "syntax": {
         "c": "int isBurning ( void );",
-        "python": "isBurning()"
+        "python": "isBurning()",
+        "blocks": "Alvo está [Queimando]?"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>queimadura</a>.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "27.c",
-        "python": "27.py"
+        "python": "27.py",
+        "blocks": "27.png"
     },
     "explain": "No exemplo o gladiador procura um inimigo e o ataca. Caso ele esteja qeimando o gladiador usa ambush para se esconder (para evitar ser alvo da fireball). Caso não encontre ele fica girando para procurar. Caso o lugar que ele esteja tenha gás tóxico, ele se dirige ao centro até estar em um lugar seguro.",
     "seealso": [

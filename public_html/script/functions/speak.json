@@ -3,7 +3,8 @@
     "ptname": "fala",
     "syntax": {
         "c": "void speak ( char * formato, ... );",
-        "python": "speak(texto)"
+        "python": "speak(texto)",
+        "blocks": "Falar"
     },
     "description": {
         "long": "Faz com que apareça próximo ao gladiador uma caixa com uma mensagem, representando a fala do gladiador. A mensagem fica visível por 3 segundos e então desaparece. Esta função não possui propósito para efeitos da simulação, e é útil somente para fins de depuração do código ou efeito cosmético durante a batalha.",
@@ -23,7 +24,8 @@
     },
     "sample": {
         "c": "37.c",
-        "python": "37.py"
+        "python": "37.py",
+        "blocks": "37.png"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena, e quando chega fica girando enquanto diz uma mensagem. Caso veja um inimigo, atira contra ele e diz a posição que o encontrou. Caso seja acertado, se vira em direção ao inimigo usa a habilidade ambush e fala outra mensagem.",
     "seealso": [

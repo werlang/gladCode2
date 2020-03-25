@@ -3,7 +3,8 @@
     "ptname": "pegaDirecaoAlvo",
     "syntax": {
         "c": "float getTargetHead ( void );",
-        "python": "getTargetHead()"
+        "python": "getTargetHead()",
+        "blocks": "Pegar [Direção] do alvo"
     },
     "description": {
         "long": "Retorna o ângulo da direção que o alvo selecionado está posicionado, de acordo com a <a href='manual.php#nav-sim'>convenção da simulação</a>. O ângulo retornado é relativo à arena, e não ao gladiador.",
@@ -20,7 +21,8 @@
     },
     "sample": {
         "c": "14.c",
-        "python": "14.py"
+        "python": "14.py",
+        "blocks": "14.png"
     },
     "explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível determina a direção relativa do alvo e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
     "seealso": [
