@@ -21,7 +21,7 @@
     "sample": {
         "c": "7.c",
         "python": "7.py",
-        "blocks": "7.png"
+            "blocks": "7.xml"
     },
     "explain": "No exemplo o gladiador se teleporta até o centro da arena, e então fica procurando por um inimigo. Quando o encontra lança fireball, ou um ataque à distância caso não tenha ap suficiente.",
     "seealso": [

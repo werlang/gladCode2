@@ -1880,3 +1880,11 @@ function saveBlocks(){
     var xmlText = Blockly.Xml.domToText(xmlDom);
     return xmlText
 }
+
+function loadBlocks(path){
+    $.get(path, xml => {
+        Blockly.mainWorkspace.clear();
+        let dom = Blockly.Xml.textToDom(xml)
+        Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
+    }, 'text')
+}

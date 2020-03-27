@@ -68,3 +68,92 @@ pre {
 		max-width: calc(100vw - 400px);
 	}
 }
+
+/* .fake-block {
+	color: white;
+    display: flex;
+    align-items: flex-start;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0.04em 0.04em 0 0.04em #0000009e;
+    margin: 0 0.4em 0 0.9em;
+    border-radius: 3px;
+    border: solid #ffffff4a;
+    border-width: 0.08em 0px 0px 0.08em;
+	box-sizing: border-box;
+	width: fit-content;
+	user-select: none;
+	padding: 0.25em 0.4em 0.25em 0;
+}
+
+.fake-block .text{
+	display: flex;
+	align-items: center;
+}
+
+.fake-block .tip svg .shadow {
+	fill: #0000009e;
+}
+
+.fake-block .tip svg .light {
+	fill-opacity: 0.5;
+}
+
+.fake-block.value > .tip svg{
+	height: 1.2em;
+    width: 1.2em;
+	margin: -0.6em 0.4em 0 -1.2em;
+}
+
+.fake-block.statement > .tip svg{
+	height: 2.3em;
+    width: 2.3em;
+    margin-top: -1.15em;
+    margin-left: -2.25em;
+}
+
+.fake-block.statement{
+	border-left: 0;
+}
+
+.fake-block.statement > .text{
+	margin-left: -1.4em;
+}
+
+.fake-block .option{
+	background-color: #ffffffa1;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+    color: #3a3a3a;
+    line-height: 1.1em;
+	display: flex;
+}
+
+.fake-block .option .arrow{
+	margin-left: 0.5em;
+    font-size: 0.6em;
+}
+
+.fake-block.statement > .tip{
+	display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+
+.fake-block.statement > .tip .mid{
+	flex-grow: 1;
+    width: 2.3em;
+    background-color: rgb(125, 82, 168);
+    margin-top: -0.9em;
+    margin-left: -2.25em;
+    margin-bottom: 0.45em;
+	border-left: 0.08em solid #ffffff4a;
+}
+
+.fake-block.statement > .tip svg.bottom{
+	margin-bottom: -1.3em;
+} */
+
+#sample-ws {
+	height: 400px;
+	width: 100%;
+}

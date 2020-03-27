@@ -22,7 +22,7 @@
     "sample": {
         "c": "47.c",
         "python": "47.py",
-        "blocks": "47.png"
+            "blocks": "47.xml"
     },
     "explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeAGI, fazendo com que ele aumente o atributo Agilidade caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [

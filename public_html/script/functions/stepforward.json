@@ -21,7 +21,7 @@
     "sample": {
         "c": "39.c",
         "python": "39.py",
-        "blocks": "39.png"
+            "blocks": "39.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena, e uma vez que chegue lá começa a executar um percurso circular indefinidamente.",
     "seealso": [

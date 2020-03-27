@@ -22,7 +22,7 @@
     "sample": {
         "c": "4.c",
         "python": "4.py",
-        "blocks": "4.png"
+            "blocks": "4.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso já esteja com block ativo ou o inimigo não o enxerga, usa a habilidade charge, caso contrário usa block.",
     "seealso": [

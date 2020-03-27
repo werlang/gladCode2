@@ -23,7 +23,7 @@
     "sample": {
         "c": "30.c",
         "python": "30.py",
-        "blocks": "30.png"
+            "blocks": "30.xml"
     },
     "explain": "No exemplo o gladiador se teleporta e move pela arena para posições aleatórias, evitando as zonas cobertas por gás tóxico.",
     "seealso": [

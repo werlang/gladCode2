@@ -22,7 +22,7 @@
     "sample": {
         "c": "9.c",
         "python": "9.py",
-        "blocks": "9.png"
+            "blocks": "9.xml"
     },
     "explain": "No exemplo o gladiador se movimenta pela arena em diagonal.",
     "seealso": [

@@ -22,7 +22,7 @@
     "sample": {
         "c": "16.c",
         "python": "16.py",
-        "blocks": "16.png"
+            "blocks": "16.xml"
     },
     "explain": "No exemplo o gladiador espera até sofrer um ataque, e quando isso acontecer, ele se vira para a direção onde recebeu o ataque, fixa no alvo e começa a atacá-lo.",
     "seealso": [

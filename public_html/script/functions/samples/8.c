@@ -1,8 +1,8 @@
 loop(){
     if (getAGI() >= 15)
-        upgradeINT();
+        upgradeINT(5);
     else
-        upgradeAGI();
+        upgradeAGI(5);
     while(!moveTo(5,20));
     while(!moveTo(20,5));
 }

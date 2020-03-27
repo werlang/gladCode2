@@ -366,29 +366,38 @@ Blockly.Blocks['turnangle'] = {
         this.setNextStatement(true);
         this.setPreviousStatement(true);
         this.setColour('#bcbf33');
+        this.func = 'ambush';
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        var option = this.getFieldValue('COMPLEMENT');
+        if (option == "ANGLE")
+            toggleUseReturn(this, options);
     },
     mutationToDom: function() {
         var container = document.createElement('mutation');
         var option = this.getFieldValue('COMPLEMENT');
         container.setAttribute('operation', option);
+
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+
         return container;
     },
     domToMutation: function(xmlElement) {
-        var option = xmlElement.getAttribute('operation');
-        this.reshape(option);
+        this.reshape({
+            useReturn: xmlElement.getAttribute('use-return') == 'true',
+            option: xmlElement.getAttribute('operation')
+        });
     },
-    reshape(option){
+    reshape({option, useReturn}){
         this.unplug();
-        if (option === "TURN"){
-            this.setOutput(false);
-            this.setNextStatement(true);
-            this.setPreviousStatement(true);
-        }
-        else{
-            this.setNextStatement(false);
-            this.setPreviousStatement(false);
-            this.setOutput(true, "Boolean");
-        }
+        if (option === "TURN")
+            reshape_toggleUseReturn(this, false);
+        else
+            reshape_toggleUseReturn(this, useReturn);
     },
     selection: function (option) {
         this.reshape(option);
@@ -409,7 +418,7 @@ Blockly.Python['turnangle'] = function(block) {
 
     code += `(${value_angle})`;
 
-    if (dropdown_op == "ANGLE")
+    if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
         return code + '\n';

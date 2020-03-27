@@ -21,7 +21,7 @@
     "sample": {
         "c": "34.c",
         "python": "34.py",
-        "blocks": "34.png"
+            "blocks": "34.xml"
     },
     "explain": "No exemplo o gladiador se desloca até um ponto da arena, e a partir dali ele fica andando de um lado para o outro.",
     "seealso": [

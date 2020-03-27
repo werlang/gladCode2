@@ -22,7 +22,7 @@
     "sample": {
         "c": "48.c",
         "python": "48.py",
-        "blocks": "48.png"
+            "blocks": "48.xml"
     },
     "explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeINT, fazendo com que ele aumente o atributo Inteligência caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [
