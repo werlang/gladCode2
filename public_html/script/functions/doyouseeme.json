@@ -22,7 +22,7 @@
     "sample": {
         "c": "6.c",
         "python": "6.py",
-        "blocks": "6.png"
+            "blocks": "6.xml"
     },
     "explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível verifica se o alvo enxerga o gladiador e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
     "seealso": [

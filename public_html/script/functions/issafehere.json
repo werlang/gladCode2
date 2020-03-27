@@ -22,7 +22,7 @@
     "sample": {
         "c": "21.c",
         "python": "21.py",
-        "blocks": "21.png"
+            "blocks": "21.xml"
     },
     "explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
     "seealso": [

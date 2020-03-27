@@ -22,7 +22,7 @@
     "sample": {
         "c": "15.c",
         "python": "15.py",
-        "blocks": "15.png"
+            "blocks": "15.xml"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

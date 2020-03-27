@@ -21,7 +21,7 @@
     "sample": {
         "c": "20.c",
         "python": "20.py",
-        "blocks": "20.png"
+            "blocks": "20.xml"
     },
     "explain": "Este trecho de código verifica o nível do gladiador. Caso seja menor que 5, o gladiador melhora a força, caso contrário a inteligência.",
     "seealso": [

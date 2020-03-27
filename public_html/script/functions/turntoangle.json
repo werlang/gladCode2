@@ -22,7 +22,7 @@
     "sample": {
         "c": "46.c",
         "python": "46.py",
-        "blocks": "46.png"
+            "blocks": "46.xml"
     },
     "explain": "No exemplo o gladiador se movimenta pela arena em um padrão do qual se move para cima e então para a diagonal baixo-direita.",
     "seealso": [

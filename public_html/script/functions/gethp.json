@@ -21,7 +21,7 @@
     "sample": {
         "c": "17.c",
         "python": "17.py",
-        "blocks": "17.png"
+            "blocks": "17.xml"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
     "seealso": [
