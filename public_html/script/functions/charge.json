@@ -20,9 +20,9 @@
         "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0."
     },
     "sample": {
-        "c": "5.c",
-        "python": "5.py",
-            "blocks": "5.xml"
+        "c": "4.c",
+        "python": "4.py",
+            "blocks": "4.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra utiliza charge contra o inimigo.",
     "seealso": [

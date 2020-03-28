@@ -248,7 +248,7 @@ Blockly.Blocks['turn'] = {
     domToMutation: function(xmlElement) {
         this.reshape({
             useReturn: xmlElement.getAttribute('use-return') == 'true',
-            option: xmlElement.getAttribute('where') == "true"
+            option: xmlElement.getAttribute('where')
         });
     },
     reshape({useReturn, option}){
@@ -305,10 +305,10 @@ Blockly.Blocks['turn'] = {
                     connectShadow(this, 'ANGLE');
                 }
             }
+            this.selectedOption = option
         }
         if (useReturn === true || useReturn === false){
-            // console.log(option)
-            if (option == "LEFT" || option == "RIGHT")
+            if (this.selectedOption == "LEFT" || this.selectedOption == "RIGHT")
                 reshape_toggleUseReturn(this, useReturn, "Number");
             else
                 reshape_toggleUseReturn(this, useReturn);
@@ -316,7 +316,7 @@ Blockly.Blocks['turn'] = {
     },
     selection: function (option) {
         if (["TO", "TARGET", "HIT", "LEFT", "RIGHT"].indexOf(option) != -1)
-            this.reshape({option: option});
+            this.reshape({useReturn: this.useReturn, option: option});
     },
 };
 
@@ -1268,14 +1268,14 @@ function toggleUseReturn(block, options){
 }
 
 function reshape_toggleUseReturn(block, useReturn, type){
-    block.unplug(true);
+    if (block.useReturn != useReturn)
+        block.unplug(true);
     if (useReturn){
         block.setPreviousStatement(false);
         block.setNextStatement(false);
         if (!type)
-            block.setOutput(true, "Boolean");
-        else
-            block.setOutput(true, type);
+            type = "Boolean"
+        block.setOutput(true, type);
         block.useReturn = true;
     }
     else{

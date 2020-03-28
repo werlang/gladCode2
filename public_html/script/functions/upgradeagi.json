@@ -20,11 +20,11 @@
         "c": "Retorna 0 caso não haja nenhum ponto de aprimoramento disponível e a Agilidade do gladiador não tenha sido aprimorada. Caso contrário retorna 1."
     },
     "sample": {
-        "c": "47.c",
-        "python": "47.py",
-            "blocks": "47.xml"
+        "c": "8.c",
+        "python": "8.py",
+            "blocks": "8.xml"
     },
-    "explain": "Este exemplo analisa o valor do atributo Força do gladiador, e caso ele seja pelo menos 30, chama a função upgradeAGI, fazendo com que ele aumente o atributo Agilidade caso tenha pontos de aprimoramento disponíveis. Até isso acontecer, ele tenta aprimorar o atributo Força. Enquanto isso, o gladiador move-se pela arena em diagonal.",
+    "explain": "Este exemplo faz com que todos atributos do gladiador aumentem num mesmo ritmo. Ele analisa se o atributo força é maior que agilidade, e em caso afirmativo aumenta agilidade. Caso contrário verifica se a inteligência é maior que a força, e em caso afirmativo aumenta a força, e caso contrário aumenta a inteligência. Estes aumentos de atributos só serão efetuados quando o gladiador subir de nível. Enquanto isso, o gladiador move-se pela arena em diagonal.",
     "seealso": [
         "upgradeSTR",
         "upgradeINT",

@@ -1,6 +1,6 @@
 def loop():
     if getHit():
-        turnToAngle(getLastHitAngle())
+        turnToLastHit()
         if howManyEnemies() == 1 and getLowHp() and getTargetHealth() <= 0.3:
             attackRanged(getTargetX(), getTargetY())
         else:

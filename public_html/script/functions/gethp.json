@@ -19,9 +19,9 @@
         "default": "Float contendo a quantidade de pontos de vida restantes do gladiador."
     },
     "sample": {
-        "c": "17.c",
-        "python": "17.py",
-            "blocks": "17.xml"
+        "c": "3.c",
+        "python": "3.py",
+            "blocks": "3.xml"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
     "seealso": [
