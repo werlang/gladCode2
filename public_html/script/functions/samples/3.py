@@ -1,8 +1,7 @@
 def loop():
     if getLowHp():
         if getHp() > 20:
-            while not attackRanged(getTargetX(), getTargetY()):
-                pass
+            attackRanged(getTargetX(), getTargetY())
         else:
             stepBack()
      

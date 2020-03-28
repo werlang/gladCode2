@@ -12,10 +12,15 @@ def loop():
          
         else:
             if getAmbushTimeLeft() > 0:
-                assassinate(getTargetX(), getTargetY())
+                if isStunned() and not doYouSeeMe():
+                    assassinate(getTargetX(), getTargetY())
+                elif getAmbushTimeLeft() <= 1:
+                    attackRanged(getTargetX(), getTargetY())
+             
             else:
                 ambush()
-
+         
+     
     elif not start:
         turn(50)
  

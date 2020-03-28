@@ -10,8 +10,12 @@ loop(){
             stepLeft();
         }
         else{
-            if (getAmbushTimeLeft() > 0)
-                assassinate(getTargetX(), getTargetY());
+            if (getAmbushTimeLeft() > 0){
+                if (isStunned() && !doYouSeeMe())
+                    assassinate(getTargetX(), getTargetY());
+                else if (getAmbushTimeLeft() <= 1)
+                    attackRanged(getTargetX(), getTargetY());
+            }
             else
                 ambush();
         }

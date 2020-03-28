@@ -5,7 +5,6 @@ def loop():
         x = randint(0,250)/10
         y = randint(0,250)/10
      
-    
     if isSafeThere(x,y):
         if getAp() > 70 and getDist(x,y) > 2:
             teleport(x,y)

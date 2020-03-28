@@ -1,6 +1,6 @@
 loop(){
     if (getHit()){
-        turnToAngle(getLastHitAngle());
+        turnToLastHit();
         if (howManyEnemies() == 1 && getLowHp() && getTargetHealth() <= 0.3)
             attackRanged(getTargetX(), getTargetY());
         else{

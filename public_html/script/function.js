@@ -154,6 +154,9 @@ async function load_content(item){
 
     $('#language select').val(language).selectmenu('refresh');
 
+    if (!item.syntax[language])
+        window.location.href = item.name.toLowerCase() + '.c'
+
     if (language == 'blocks'){
         $('title').html("gladCode - "+ item.syntax[language])
         $('#temp-name').html(item.syntax[language])
@@ -204,6 +207,8 @@ async function load_content(item){
         
                 xmlDom = Blockly.Xml.textToDom(code);
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+
+                resolve(true);
             }, 'text')
         }
         else{
@@ -226,7 +231,9 @@ async function load_content(item){
         if (language == 'blocks')
             data.name = data.syntax.blocks
 
-        $('#temp-seealso').append("<tr><td><a href='function/"+ data.name.toLowerCase() +"'>"+ data.name +"</a></td><td>"+ data.description.brief +"</td></tr>")
+        $('#temp-seealso').append(`<tr>
+            <td><a href='function/${data.name.toLowerCase()}'>${data.name}</a></td>
+            <td>${data.description.brief}</td></tr>`)
         funcs[data.name] = data.ptname
     }
 
