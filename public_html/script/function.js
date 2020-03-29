@@ -74,6 +74,8 @@ class fakeBlock {
     }
 }
 
+var langDict = false
+
 $(document).ready( function() {
     $('#learn').addClass('here');
     
@@ -93,8 +95,11 @@ $(document).ready( function() {
                 };
 
                 var lang_word = 'function';
-                if ($('#dict').html() == 'pt')
-                    lang_word = 'funcao';
+                if ($('#dict').length){
+                    langDict = $('#dict').html()
+                    if (langDict == 'pt')
+                        lang_word = 'funcao';
+                }
 
                 window.location.href = `${lang_word}/${func}.${ext[ui.item.value]}`;
             }
@@ -155,16 +160,25 @@ async function load_content(item){
     $('#language select').val(language).selectmenu('refresh');
 
     if (!item.syntax[language])
-        window.location.href = item.name.toLowerCase() + '.c'
+        window.location.href = `function/${item.name.default.toLowerCase()}.c`
 
     if (language == 'blocks'){
-        $('title').html("gladCode - "+ item.syntax[language])
-        $('#temp-name').html(item.syntax[language])
-        $('#temp-syntax').html(`<img src='script/functions/blockimg/${item.name.toLowerCase()}.png'>`)
+        $('title').html("gladCode - "+ item.name.block)
+        $('#temp-name').html(item.name.block)
+        $('#temp-syntax').parent().after(`<div id='syntax-ws'></div>`).remove()
+
+        let xml = `<xml>${item.syntax.blocks}</xml>`
+        let ws = Blockly.inject('syntax-ws', { readOnly: true });
+        xmlDom = Blockly.Xml.textToDom(xml);
+        Blockly.Xml.domToWorkspace(xmlDom, ws);
+
+        new ResizeObserver(() => {
+            Blockly.svgResize(ws);
+        }).observe($('#syntax-ws')[0])
     }
     else{
-        $('title').html("gladCode - "+ item.name)
-        $('#temp-name').html(item.name)
+        $('title').html("gladCode - "+ item.name.default)
+        $('#temp-name').html(item.name.default)
 
         $('#temp-syntax').html(item.syntax[language])
 
@@ -195,19 +209,23 @@ async function load_content(item){
         let samplePath = `script/functions/samples/${item.sample[language]}`
 
         if (language == 'blocks'){
-            $('#temp-sample').parent().after(`<div id='sample-ws'></div>`)
+            $('#temp-sample').parent().after(`<div id='sample-ws'></div>`).remove()
 
             $.get(samplePath, code => {
                 // console.log(code)
 
-                Blockly.inject('sample-ws', {
+                let ws = Blockly.inject('sample-ws', {
                     scrollbars: true,
                     readOnly: true
                 });
         
                 xmlDom = Blockly.Xml.textToDom(code);
-                Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+                Blockly.Xml.domToWorkspace(xmlDom, ws);
 
+                new ResizeObserver(() => {
+                    Blockly.svgResize(ws);
+                }).observe($('#sample-ws')[0])
+        
                 resolve(true);
             }, 'text')
         }
@@ -223,21 +241,29 @@ async function load_content(item){
 
     $('#temp-explain').html(item.explain);
 
-    var funcs = {};
-    funcs[item.name] = item.ptname;
+    if (langDict){
+        var funcsDict = {};
+        funcsDict[item.name.default] = item.name[langDict];
+    }
 
     for (let i in item.seealso){
         let data = await findFunc(item.seealso[i].toLowerCase())
+        let link = data.name.default.toLowerCase()
+        let name = data.name.default
+
         if (language == 'blocks')
-            data.name = data.syntax.blocks
+            name = data.name.block
 
         $('#temp-seealso').append(`<tr>
-            <td><a href='function/${data.name.toLowerCase()}'>${data.name}</a></td>
+            <td><a href='function/${link}'>${name}</a></td>
             <td>${data.description.brief}</td></tr>`)
-        funcs[data.name] = data.ptname
+
+        if (langDict)
+            funcsDict[data.name.default] = data.name[langDict]
     }
 
-    loadDict(funcs, $('#dict').html());
+    if (langDict)
+        loadDict(funcsDict)
 
     return true;
 }
@@ -246,8 +272,8 @@ async function findFunc(name){
     return await $.getJSON(`script/functions/${name}.json`, () => {});
 }
 
-function loadDict(func, lang){
-    if (lang == 'pt'){
+function loadDict(func){
+    if (langDict == 'pt'){
         for (let name in func){
             var pattern = new RegExp("([^f=\\w])"+ name +"([\\W])", 'g');
             var replace = '$1'+ func[name] +'$2';

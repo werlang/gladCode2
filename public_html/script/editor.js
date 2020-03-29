@@ -1835,7 +1835,11 @@ function toggleBlocks(args){
 
             var loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
             xmlDom = Blockly.Xml.textToDom(loop);
-            Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace);
+            Blockly.Xml.domToWorkspace(xmlDom, blocksEditor.workspace);
+
+            new ResizeObserver(() => {
+                Blockly.svgResize(blocksEditor.workspace);
+            }).observe($('#blocks')[0])    
         });
     }
     

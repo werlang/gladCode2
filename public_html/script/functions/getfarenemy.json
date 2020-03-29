@@ -1,10 +1,13 @@
 {
-    "name": "getFarEnemy",
-    "ptname": "pegaInimigoDistante",
+    "name": {
+        "default": "getFarEnemy",
+        "pt": "pegaInimigoDistante",
+        "block": "Selecionar alvo [Mais Distante]"
+    },
     "syntax": {
         "c": "int getFarEnemy ( void );",
         "python": "getFarEnemy()",
-        "blocks": "Selecionar alvo [Mais Distante]"
+        "blocks": "<block type='get_enemy'><field name='COMPLEMENT'>FarEnemy</field></block>"
     },
     "description": {
         "long": "Analisa o campo de visão do gladiador e caso haja pelo menos um inimigo seleciona o que estiver mais distante do gladiador. Um inimigo selecionado desta maneira vira o alvo do gladiador, e todas funções que acessam informações sobre o alvo irão interagir com o gladiador selecionado.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna False caso não haja nenhum inimigo no campo de visão, caso contrário retorna True.",
-        "c": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1."
+        "c": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1.",
+        "blocks": "Retorna Falso caso não haja nenhum inimigo no campo de visão, caso contrário retorna Verdadeiro. O retorno deste bloco pode ser ignorado."
     },
     "sample": {
         "c": "13.c",
         "python": "13.py",
-            "blocks": "13.xml"
+        "blocks": "13.xml"
     },
     "explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo distante e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
     "seealso": [

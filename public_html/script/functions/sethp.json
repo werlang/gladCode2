@@ -1,6 +1,8 @@
 {
-    "name": "setHp",
-    "ptname": "mudaPv",
+    "name": {
+        "default": "setHp",
+        "pt": "mudaPv"
+    },
     "syntax": {
         "c": "void setHp ( float valor );",
         "python": "setHp(valor)"

@@ -1,10 +1,13 @@
 {
-    "name": "getHp",
-    "ptname": "pegaPv",
+    "name": {
+        "default": "getHp",
+        "pt": "pegaPv",
+        "block": "Pegar informação [Pontos de vida]"
+    },
     "syntax": {
         "c": "float getHp ( void );",
         "python": "getHp()",
-        "blocks": "Pegar informação [Pontos de vida]"
+        "blocks": "<block type='get_info'><field name='COMPLEMENT'>Hp</field></block>"
     },
     "description": {
         "long": "Retorna a quantidade de pontos de vida restantes do gladiador.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo a quantidade de pontos de vida restantes do gladiador."
+        "default": "Float contendo a quantidade de pontos de vida restantes do gladiador.",
+        "blocks": "Número contendo a quantidade de pontos de vida restantes do gladiador."
     },
     "sample": {
         "c": "3.c",
         "python": "3.py",
-            "blocks": "3.xml"
+        "blocks": "3.xml"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
     "seealso": [

@@ -1,10 +1,13 @@
 {
-    "name": "isSafeHere",
-    "ptname": "seguroAqui",
+    "name": {
+        "default": "isSafeHere",
+        "pt": "seguroAqui",
+        "block": "É seguro [Aqui]?"
+    },
     "syntax": {
         "c": "int isSafeHere ( void );",
         "python": "isSafeHere()",
-        "blocks": "É seguro [Aqui]?"
+        "blocks": "<block type='issafe'><field name='COMPLEMENT'>Here</field></block>"
     },
     "description": {
         "long": "A função analisa a posição ocupada pelo gladiador na arena, verificando se há <a href='manual.php#nav-sim'>gás tóxico</a> ou não.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna True caso haja gás tóxico na posição do gladiador, ou False caso contrário.",
-        "c": "Retorna 1 caso haja gás tóxico na posição do gladiador, ou 0 caso contrário."
+        "c": "Retorna 1 caso haja gás tóxico na posição do gladiador, ou 0 caso contrário.",
+        "blocks": "Retorna Verdadeiro caso haja gás tóxico na posição do gladiador, ou Falso caso contrário."
     },
     "sample": {
         "c": "21.c",
         "python": "21.py",
-            "blocks": "21.xml"
+        "blocks": "21.xml"
     },
     "explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
     "seealso": [

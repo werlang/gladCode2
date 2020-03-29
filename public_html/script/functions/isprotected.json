@@ -1,10 +1,13 @@
 {
-    "name": "isProtected",
-    "ptname": "estaProtegido",
+    "name": {
+        "default": "isProtected",
+        "pt": "estaProtegido",
+        "block": "Alvo está [Protegido]?"
+    },
     "syntax": {
         "c": "int isProtected ( void );",
         "python": "isProtected()",
-        "blocks": "Alvo está [Protegido]?"
+        "blocks": "<block type='is_status'><field name='COMPLEMENT'>Protected</field></block>"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>proteção</a>.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna False.",
-        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna 0."
+        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna 0.",
+        "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna Falso."
     },
     "sample": {
         "c": "28.c",
         "python": "28.py",
-            "blocks": "28.xml"
+        "blocks": "28.xml"
     },
     "explain": "No exemplo o gladiador procura um por inimigo, e caso o encontre verifica se eles está muito próximo ou possui proteção. Em caso afirmativo o gladiador recua, caso contrário dispara um ataque. Caso não encontre inimigos o gladiador rotaciona.",
     "seealso": [

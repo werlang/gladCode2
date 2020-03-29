@@ -1,10 +1,13 @@
 {
-    "name": "moveForward",
-    "ptname": "moveFrente",
+    "name": {
+        "default": "moveForward",
+        "pt": "moveFrente",
+        "block": "Mover para frente"
+    },
     "syntax": {
         "c": "void moveForward ( float passos );",
         "python": "moveForward(passos)",
-        "blocks": "Mover para frente"
+        "blocks": "<block type='moveforward'></block>"
     },
     "description": {
         "long": "Faz com que o gladiador se mova para frente na arena uma distância específica. A distância será o número de passos determinado pelo parâmetro recebido. Esta função trava o gladiador na ação de movimento até que ele tenha completado todo o percurso.",
@@ -13,6 +16,9 @@
     "param": {
         "default": [
             {"name": "passos", "description": "Float contendo a quantidade de passos que o gladiador irá se deslocar."}
+        ],
+        "blocks": [
+            {"name": "passos", "description": "Número contendo a quantidade de passos que o gladiador irá se deslocar."}
         ]
     },
     "treturn": {
@@ -21,7 +27,7 @@
     "sample": {
         "c": "34.c",
         "python": "34.py",
-            "blocks": "34.xml"
+        "blocks": "34.xml"
     },
     "explain": "No exemplo o gladiador se desloca até um ponto da arena, e a partir dali ele fica andando de um lado para o outro.",
     "seealso": [

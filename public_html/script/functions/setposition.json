@@ -1,6 +1,8 @@
 {
-    "name": "setPosition",
-    "ptname": "mudaPosicao",
+    "name": {
+        "default": "setPosition",
+        "pt": "mudaPosicao"
+    },
     "syntax": {
         "c": "void setPosition ( float x, float y );",
         "python": "setPosition(x, y)"

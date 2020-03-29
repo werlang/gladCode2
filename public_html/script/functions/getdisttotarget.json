@@ -1,10 +1,13 @@
 {
-    "name": "getDistToTarget",
-    "ptname": "pegaDistanciaAlvo",
+    "name": {
+        "default": "getDistToTarget",
+        "pt": "pegaDistanciaAlvo",
+        "block": "Distância para [Alvo]"
+    },
     "syntax": {
         "c": "float getDistToTarget ( void );",
         "python": "getDistToTarget()",
-        "blocks": "Distância para [Alvo]"
+        "blocks": "<block type='getdist'><field name='COMPLEMENT'>TARGET</field></block>"
     },
     "description": {
         "long": "Retorna a distância entre o ponto definido pelas coordenadas x e y do alvo fixado e a localização do gladiador.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna False.",
-        "c": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna -1."
+        "c": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna -1.",
+        "blocks": "Número contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna Falso."
     },
     "sample": {
         "c": "2.c",
         "python": "2.py",
-            "blocks": "2.xml"
+        "blocks": "2.xml"
     },
     "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele compara a sua velocidade com a do inimigo. Caso a do inimigo seja menor, o gladiador o persegue e desfere um ataque corpo-a-corpo quando alcançá-lo. Caso contrário realiza um ataque à distância.",
     "seealso": [

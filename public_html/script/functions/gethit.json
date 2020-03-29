@@ -1,10 +1,13 @@
 {
-    "name": "getHit",
-    "ptname": "fuiAcertado",
+    "name": {
+        "default": "getHit",
+        "pt": "fuiAcertado",
+        "block": "Fui acertado?"
+    },
     "syntax": {
         "c": "int getHit ( void );",
         "python": "getHit()",
-        "blocks": "Fui acertado?"
+        "blocks": "<block type='gethit'></block>"
     },
     "description": {
         "long": "Verifica se o gladiador recebeu um ataque desde a última vez que a função foi chamada.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna True caso o gladiador tenha recebido ataque desde a última chamada desta função, ou False caso contrário.",
-        "c": "Retorna 1 caso o gladiador tenha recebido ataque desde a última chamada desta função, ou 0 caso contrário."
+        "c": "Retorna 1 caso o gladiador tenha recebido ataque desde a última chamada desta função, ou 0 caso contrário.",
+        "blocks": "Retorna Verdadeiro caso o gladiador tenha recebido ataque desde a última vez que este bloco foi executado, ou Falso caso contrário."
     },
     "sample": {
         "c": "16.c",
         "python": "16.py",
-            "blocks": "16.xml"
+        "blocks": "16.xml"
     },
     "explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
     "seealso": [

@@ -1,10 +1,13 @@
 {
-    "name": "getAmbushTimeLeft",
-    "ptname": "tempoEmboscada",
+    "name": {
+        "default": "getAmbushTimeLeft",
+        "pt": "tempoEmboscada",
+        "block": "Tempo restante [Invisibilidade]"
+    },
     "syntax": {
         "c": "float getAmbushTimeLeft ( void );",
         "python": "getAmbushTimeLeft()",
-        "blocks": "Tempo restante [Invisibilidade]"
+        "blocks": "<block type='get_time'><field name='COMPLEMENT'>Ambush</field></block>"
     },
     "description": {
         "long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>invisibilidade</a> expire.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo o tempo restante até o efeito proteção expirar."
+        "default": "Float contendo o tempo restante até o efeito proteção expirar.",
+        "blocks": "Número contendo o tempo restante até o efeito proteção expirar."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
-            "blocks": "1.xml"
+        "blocks": "1.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
     "seealso": [

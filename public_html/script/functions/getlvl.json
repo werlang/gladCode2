@@ -1,10 +1,13 @@
 {
-    "name": "getLvl",
-    "ptname": "pegaNivel",
+    "name": {
+        "default": "getLvl",
+        "pt": "pegaNivel",
+        "block": "Pegar informação [Nível]"
+    },
     "syntax": {
         "c": "int getLvl ( void );",
         "python": "getLvl()",
-        "blocks": "Pegar informação [Nível]"
+        "blocks": "<block type='get_info'><field name='COMPLEMENT'>Lvl</field></block>"
     },
     "description": {
         "long": "Retorna o nível do gladiador.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Inteiro contendo o nível do gladiador."
+        "default": "Inteiro contendo o nível do gladiador.",
+        "blocks": "Número contendo o nível do gladiador."
     },
     "sample": {
         "c": "20.c",
         "python": "20.py",
-            "blocks": "20.xml"
+        "blocks": "20.xml"
     },
     "explain": "Este trecho de código verifica o nível do gladiador. Caso seja menor que 5, o gladiador melhora a força, caso contrário a inteligência.",
     "seealso": [

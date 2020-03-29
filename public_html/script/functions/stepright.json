@@ -1,10 +1,13 @@
 {
-    "name": "stepRight",
-    "ptname": "passoDireita",
+    "name": {
+        "default": "stepRight",
+        "pt": "passoDireita",
+        "block": "Passo para [Direita]"
+    },
     "syntax": {
         "c": "float stepRight ( void );",
         "python": "stepRight()",
-        "blocks": "Passo para [Direita]"
+        "blocks": "<block type='step'><field name='COMPLEMENT'>RIGHT</field></block>"
     },
     "description": {
         "long": "Faz com que o gladiador se mova para a direita. Ele executa o movimento de lado, sem rotacionar. O gladiador move-se a maior distância que conseguir dentro de um intervalo de tempo da simulação (determinado pela sua <a href='manual.php#nav-glad'>velocidade de movimento</a>). A função irá retornar a distância percorrida neste processo.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo a distância percorrida como resultado da execução da função."
+        "default": "Float contendo a distância percorrida como resultado da execução da função.",
+        "blocks": "Número contendo a distância percorrida como resultado da execução da função. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "41.c",
         "python": "41.py",
-            "blocks": "41.xml"
+        "blocks": "41.xml"
     },
     "explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a direita caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo próximo e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido horário.",
     "seealso": [

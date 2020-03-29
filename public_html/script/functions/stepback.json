@@ -1,10 +1,13 @@
 {
-    "name": "stepBack",
-    "ptname": "passoTras",
+    "name": {
+        "default": "stepBack",
+        "pt": "passoTras",
+        "block": "Passo para [Trás]"
+    },
     "syntax": {
         "c": "float stepBack ( void );",
         "python": "stepBack()",
-        "blocks": "Passo para [Trás]"
+        "blocks": "<block type='step'><field name='COMPLEMENT'>BACK</field></block>"
     },
     "description": {
         "long": "Faz com que o gladiador se mova para trás. Ele executa o movimento de costas, sem rotacionar. O gladiador move-se a maior distância que conseguir dentro de um intervalo de tempo da simulação (determinado pela sua <a href='manual.php#nav-glad'>velocidade de movimento</a>). A função irá retornar a distância percorrida neste processo.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo a distância percorrida como resultado da execução da função."
+        "default": "Float contendo a distância percorrida como resultado da execução da função.",
+        "blocks": "Número contendo a distância percorrida como resultado da execução da função. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "38.c",
         "python": "38.py",
-            "blocks": "38.xml"
+        "blocks": "38.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena, e uma vez que chegue lá começa a executar indefinidamente um percurso circular de costas.",
     "seealso": [
