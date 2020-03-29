@@ -1,6 +1,8 @@
 {
-    "name": "setINT",
-    "ptname": "mudaINT",
+    "name": {
+        "default": "setINT",
+        "pt": "mudaINT"
+    },
     "syntax": {
         "c": "void setINT ( int valor );",
         "python": "setINT(valor)"
@@ -19,8 +21,7 @@
     },
     "sample": {
         "c": "36.c",
-        "python": "36.py",
-            "blocks": "36.xml"
+        "python": "36.py"
     },
     "explain": "Este exemplo demonstra a função setup de um gladiador, onde se atribui a ele o valor do atributo Inteligência, bem como os valores iniciais dos outros atributos básicos e o nome do gladiador.",
     "seealso": [

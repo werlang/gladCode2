@@ -1,10 +1,13 @@
 {
-    "name": "turnToTarget",
-    "ptname": "viraParaAlvo",
+    "name": {
+        "default": "turnToTarget",
+        "pt": "viraParaAlvo",
+        "block": "Virar para [Alvo]"
+    },
     "syntax": {
         "c": "int turnToTarget ( void );",
         "python": "turnToTarget()",
-        "blocks": "Virar para [Alvo]"
+        "blocks": "<block type='turn'><field name='COMPLEMENT'>TARGET</field></block>"
     },
     "description": {
         "long": "Rotaciona o gladiador fazendo com que ele fique virado na direção do alvo fixado. Caso a rotação necessária resulte em uma quantidade de graus maior que o gladiador consiga rotacionar em um intervalo de tempo (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>), ele irá rotacionar somente a quantidade que conseguir.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou False caso contrário.",
-        "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou 0 caso contrário."
+        "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou 0 caso contrário.",
+        "blocks": "Retorna Verdadeiro caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
-            "blocks": "1.xml"
+        "blocks": "1.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então fica buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
     "seealso": [

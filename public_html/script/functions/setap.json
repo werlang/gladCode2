@@ -1,6 +1,8 @@
 {
-    "name": "setAp",
-    "ptname": "mudaPh",
+    "name": {
+        "default": "setAp",
+        "pt": "mudaPh"
+    },
     "syntax": {
         "c": "void setAp ( float valor );",
         "python": "setAp(valor)"

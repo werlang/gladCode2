@@ -1,10 +1,13 @@
 {
-    "name": "getSafeRadius",
-    "ptname": "pegaRaioSeguro",
+    "name": {
+        "default": "getSafeRadius",
+        "pt": "pegaRaioSeguro",
+        "block": "Raio seguro"
+    },
     "syntax": {
         "c": "float getSafeRadius ( void );",
         "python": "getSafeRadius()",
-        "blocks": "Raio seguro"
+        "blocks": "<block type='getsaferadius'></block>"
     },
     "description": {
         "long": "Retorna a distância do centro da arena até a borda da <a href='manual.php#nav-sim'>nuvem tóxica</a>. Como o gás se espalha de forma circular, comparar a distância do gladiador até o centro com o retorno desta função é uma maneira fácil de determinar o quão próximo o gladiador está de entrar na nuvem tóxica.",
@@ -16,12 +19,13 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo a distância do centro da arena até a borda da nuvem tóxica."
+        "default": "Float contendo a distância do centro da arena até a borda da nuvem tóxica.",
+        "blocks": "Número contendo a distância do centro da arena até a borda da nuvem tóxica."
     },
     "sample": {
         "c": "21.c",
         "python": "21.py",
-            "blocks": "21.xml"
+        "blocks": "21.xml"
     },
     "explain": "No exemplo o gladiador se move contornando as bordas da arena. Ao detectar o gás tóxico ele começa a reduzir o tamanho de seu percuro até que eventualmente ele fica imóvel no centro da arena.",
     "seealso": [

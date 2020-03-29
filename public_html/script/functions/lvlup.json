@@ -1,6 +1,8 @@
 {
-    "name": "lvlUp",
-    "ptname": "sobeNivel",
+    "name": {
+        "default": "lvlUp",
+        "pt": "sobeNivel"
+    },
     "syntax": {
         "c": "void lvlUp ( int valor );",
         "python": "lvlUp(valor)"

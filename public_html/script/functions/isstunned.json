@@ -1,10 +1,13 @@
 {
-    "name": "isStunned",
-    "ptname": "estaAtordoado",
+    "name": {
+        "default": "isStunned",
+        "pt": "estaAtordoado",
+        "block": "Alvo está [Atordoado]?"
+    },
     "syntax": {
         "c": "int isStunned ( void );",
         "python": "isStunned()",
-        "blocks": "Alvo está [Atordoado]?"
+        "blocks": "<block type='is_status'><field name='COMPLEMENT'>Stunned</field></block>"
     },
     "description": {
         "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>atordoado</a>.",
@@ -17,12 +20,13 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna False.",
-        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0."
+        "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0.",
+        "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna Falso."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
-            "blocks": "1.xml"
+        "blocks": "1.xml"
     },
     "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidades ambush e assassinate.",
     "seealso": [

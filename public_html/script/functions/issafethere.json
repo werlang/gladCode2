@@ -1,10 +1,13 @@
 {
-    "name": "isSafeThere",
-    "ptname": "seguroLa",
+    "name": {
+        "default": "isSafeThere",
+        "pt": "seguroLa",
+        "block": "É seguro [Na posição]?"
+    },
     "syntax": {
         "c": "int isSafeThere ( float x, float y );",
         "python": "isSafeThere(x, y)",
-        "blocks": "É seguro [Na posição]?"
+        "blocks": "<block type='issafe'><field name='COMPLEMENT'>There</field></block>"
     },
     "description": {
         "long": "A função analisa a existência do <a href='manual.php#nav-sim'>gás tóxico</a> na posição determinada pelas coordenadas x e y recebidas como parâmetro.",
@@ -14,16 +17,21 @@
         "default": [
             {"name": "x", "description": "Float contendo o valor da coordenada x do ponto."},
             {"name": "y", "description": "Float contendo o valor da coordenada y do ponto."}
+        ],
+        "blocks": [
+            {"name": "x", "description": "Número contendo o valor da coordenada x do ponto."},
+            {"name": "y", "description": "Número contendo o valor da coordenada y do ponto."}
         ]
     },
     "treturn": {
         "default": "Retorna True caso a posição do ponto esteja segura do gás tóxico, ou False caso contrário.",
-        "c": "Retorna 1 caso a posição do ponto esteja segura do gás tóxico, ou 0 caso contrário."
+        "c": "Retorna 1 caso a posição do ponto esteja segura do gás tóxico, ou 0 caso contrário.",
+        "blocks": "Retorna Verdadeiro caso a posição do ponto esteja segura do gás tóxico, ou Falso caso contrário."
     },
     "sample": {
         "c": "30.c",
         "python": "30.py",
-            "blocks": "30.xml"
+        "blocks": "30.xml"
     },
     "explain": "No exemplo o gladiador se teleporta e move pela arena para posições aleatórias, evitando as zonas cobertas por gás tóxico.",
     "seealso": [

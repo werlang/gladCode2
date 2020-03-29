@@ -1,10 +1,13 @@
 {
-    "name": "turnLeft",
-    "ptname": "viraEsquerda",
+    "name": {
+        "default": "turnLeft",
+        "pt": "viraEsquerda",
+        "block": "Virar para [Esquerda]"
+    },
     "syntax": {
         "c": "float turnLeft ( float angulo );",
         "python": "turnLeft(angulo)",
-        "blocks": "Virar para [Esquerda]"
+        "blocks": "<block type='turn'><field name='COMPLEMENT'>LEFT</field></block>"
     },
     "description": {
         "long": "Rotaciona o gladiador no sentido anti-horário uma quantidade de graus determinada pelo parâmetro. Caso o gladiador não consiga rotacionar a quantidade desejada em um único intervalo de tempo, ele irá rotacionar somente a quantidade que conseguir (determinado pelo atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>). A função retorna a quantidade de graus que foi rotacionada de fato.",
@@ -13,15 +16,19 @@
     "param": {
         "default": [
             {"name": "angulo", "description": "Float contendo o ângulo que deseja-se rotacionar."}
+        ],
+        "blocks": [
+            {"name": "angulo", "description": "Número contendo o ângulo que deseja-se rotacionar."}
         ]
     },
     "treturn": {
-        "default": "Float contendo o ângulo rotacionado como resultado da execução da função."
+        "default": "Float contendo o ângulo rotacionado como resultado da execução da função.",
+        "blocks": "Número contendo o ângulo rotacionado como resultado da execução da função. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "43.c",
         "python": "43.py",
-            "blocks": "43.xml"
+        "blocks": "43.xml"
     },
     "explain": "No exemplo o gladiador se move para o centro da arena. Caso já esteja lá, ele tenta rotacionar 45 graus enquanto procura por um inimigo com menos vida para atacar. Caso ele consiga rotacionar 45 a cada intervalo de tempo (por causa da velocidade de rotação alta, consequência de uma Agilidade alta), ele troca o atributo de melhoria para Força.",
     "seealso": [
