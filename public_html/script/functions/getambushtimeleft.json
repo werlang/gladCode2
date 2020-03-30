@@ -25,9 +25,9 @@
     "sample": {
         "c": "1.c",
         "python": "1.py",
-        "blocks": "1.xml"
+        "blocks": "1.xml",
+        "explain": "1.txt"
     },
-    "explain": "No exemplo o gladiador se move até o centro da arena e então ficar buscando outros gladiadores. Quando encontra, caso o alvo esteja lhe observando ele desvia do caminho do mesmo, e após sair do campo de visão o gladiador lança as habilidade ambush e assassinate.",
     "seealso": [
         "getLowHp",
         "getAp",

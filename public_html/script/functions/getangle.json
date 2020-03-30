@@ -30,9 +30,9 @@
     "sample": {
         "c": "9.c",
         "python": "9.py",
-        "blocks": "9.xml"
+        "blocks": "9.xml",
+        "explain": "9.txt"
     },
-    "explain": "No exemplo o gladiador se movimenta pela arena em diagonal.",
     "seealso": [
         "getX",
         "getY",

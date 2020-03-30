@@ -31,9 +31,9 @@
     "sample": {
         "c": "30.c",
         "python": "30.py",
-        "blocks": "30.xml"
+        "blocks": "30.xml",
+        "explain": "30.txt"
     },
-    "explain": "No exemplo o gladiador se teleporta e move pela arena para posições aleatórias, evitando as zonas cobertas por gás tóxico.",
     "seealso": [
         "getX",
         "getY",

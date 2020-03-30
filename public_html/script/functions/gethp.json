@@ -25,9 +25,9 @@
     "sample": {
         "c": "3.c",
         "python": "3.py",
-        "blocks": "3.xml"
+        "blocks": "3.xml",
+        "explain": "3.txt"
     },
-    "explain": "No exemplo o gladiador fica girando até encontrar um inimigo, quando encontrar ele foge de costas caso esteja com pouca vida, ou atira nele caso contrário.",
     "seealso": [
         "getLowHp",
         "attackRanged",

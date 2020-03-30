@@ -25,9 +25,9 @@
     "sample": {
         "c": "22.c",
         "python": "22.py",
-        "blocks": "22.xml"
+        "blocks": "22.xml",
+        "explain": "22.txt"
     },
-    "explain": "No exemplo o gladiador se move em direção ao centro da arena. Ao encontrar um gladiador inimigo ele ataca. Ao ser atingido, caso ele não enxergue o alvo, e recua para trás por 4 segundos.",
     "seealso": [
         "getHit",
         "turnToLastHit",

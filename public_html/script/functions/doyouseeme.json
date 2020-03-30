@@ -26,9 +26,9 @@
     "sample": {
         "c": "1.c",
         "python": "1.py",
-        "blocks": "1.xml"
+        "blocks": "1.xml",
+        "explain": "1.txt"
     },
-    "explain": "No exemplo o gladiador verifica se o alvo está visível e caso não esteja procura um novo alvo com menos pontos de vida em seu campo de visão. Caso ainda esteja visível verifica se o alvo enxerga o gladiador e se move de maneira a ficar olhando para as costas do alvo. Quando isso acontecer, o gladiador ataca o alvo.",
     "seealso": [
         "getLowHp",
         "attackRanged",

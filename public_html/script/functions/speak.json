@@ -31,9 +31,9 @@
     "sample": {
         "c": "37.c",
         "python": "37.py",
-        "blocks": "37.xml"
+        "blocks": "37.xml",
+        "explain": "37.txt"
     },
-    "explain": "No exemplo o gladiador se move até o centro da arena, e quando chega fica girando enquanto diz uma mensagem. Caso veja um inimigo, atira contra ele e diz a posição que o encontrou. Caso seja acertado, se vira em direção ao inimigo usa a habilidade ambush e fala outra mensagem.",
     "seealso": [
         "getHit",
         "ambush",

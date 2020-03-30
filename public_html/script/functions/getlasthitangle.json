@@ -25,9 +25,9 @@
     "sample": {
         "c": "19.c",
         "python": "19.py",
-        "blocks": "19.xml"
+        "blocks": "19.xml",
+        "explain": "19.txt"
     },
-    "explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
     "seealso": [
         "turnToAngle",
         "getCloseEnemy",
