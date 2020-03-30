@@ -34,15 +34,8 @@
         "explain": "12.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "attackMelee",
-        "getTargetX",
-        "getTargetY",
-        "getSpeed",
-        "getTargetSpeed",
-        "turnLeft",
-        "moveToTarget"
+        "getangle",
+        "getdisttotarget"
     ],
     "snippet": {
         "c": "float ${1:dist} = getDist(${2:X}, ${3:Y});",

@@ -35,14 +35,11 @@
         "explain": "45.txt"
     },
     "seealso": [
-        "turnToTarget",
-        "stepForward",
-        "turnLeft",
-        "turnRight",
         "turn",
-        "turnToAngle",
-        "turnToLastHit",
-        "turnToTarget"
+        "turntolasthit",
+        "turnright",
+        "turnleft",
+        "turntotarget"
     ],
     "snippet": {
         "c": "turnTo(${1:X}, ${2:Y});",

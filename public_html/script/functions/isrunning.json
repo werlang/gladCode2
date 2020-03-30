@@ -30,21 +30,11 @@
         "explain": "29.txt"
     },
     "seealso": [
-        "getCloseEnemy",
-        "getDistToTarget",
-        "getTargetX",
-        "getTargetY",
-        "teleport",
-        "fireball",
-        "getHit",
-        "turn",
-        "stepForward",
-        "turnToAngle",
-        "getLastHitAngle",
-        "isStunned",
-        "isBurning",
-        "isProtected",
-        "isSlowed"
+        "isprotected",
+        "isburning",
+        "isslowed",
+        "isstunned",
+        "getspeed"
     ],
     "snippet": {
         "c": "int ${1:running} = isRunning();",

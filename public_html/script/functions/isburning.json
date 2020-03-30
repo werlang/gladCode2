@@ -30,19 +30,11 @@
         "explain": "27.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAmbushTimeLeft",
-        "ambush",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "turn",
-        "isSafeHere",
-        "moveTo",
-        "isStunned",
-        "isProtected",
-        "isRunning",
-        "isSlowed"
+        "isprotected",
+        "isrunning",
+        "isslowed",
+        "isstunned",
+        "getburntimeleft"
     ],
     "snippet": {
         "c": "int ${1:burn} = isBurning();",

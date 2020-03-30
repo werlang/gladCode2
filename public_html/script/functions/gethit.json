@@ -30,14 +30,8 @@
         "explain": "16.txt"
     },
     "seealso": [
-        "turnToAngle",
-        "getLastHitAngle",
-        "getCloseEnemy",
-        "isTargetVisible",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getLastHitTime"
+        "getlasthittime",
+        "getlasthitangle"
     ],
     "snippet": {
         "c": "int ${1:hit} = getHit();",

@@ -30,15 +30,9 @@
         "explain": "11.txt"
     },
     "seealso": [
-        "getLastHitTime",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "turnLeft",
-        "stepLeft",
-        "getFarEnemy",
-        "getLowHp",
-        "getHighHp"
+        "getfarenemy",
+        "getlowhp",
+        "gethighhp"
     ],
     "snippet": {
         "c": "int ${1:enemy} = getCloseEnemy();",

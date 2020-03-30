@@ -29,10 +29,9 @@
         "explain": "25.txt"
     },
     "seealso": [
-        "getX",
-        "moveTo",
-        "getTargetX",
-        "getTargetY"
+        "getx",
+        "gettargetx",
+        "gettargety"
     ],
     "snippet": {
         "c": "float ${1:y} = getY();",

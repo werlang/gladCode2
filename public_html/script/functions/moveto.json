@@ -35,12 +35,8 @@
         "explain": "35.txt"
     },
     "seealso": [
-        "moveToTarget",
-        "stepForward",
-        "stepBack",
-        "stepLeft",
-        "stepRight",
-        "turnTo"
+        "turnto",
+        "movetotarget"
     ],
     "snippet": {
         "c": "moveTo(${1:X}, ${2:Y});",

@@ -33,10 +33,8 @@
         "explain": "8.txt"
     },
     "seealso": [
-        "upgradeAGI",
-        "upgradeINT",
-        "getSTR",
-        "moveTo"
+        "upgradeagi",
+        "upgradeint"
     ],
     "snippet": {
         "c": "upgradeSTR(${1:points});",

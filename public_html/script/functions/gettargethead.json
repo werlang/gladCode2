@@ -30,15 +30,9 @@
         "explain": "14.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "isTargetVisible",
-        "getHead",
-        "doYouSeeMe",
-        "stepLeft",
-        "turnToTarget"
+        "gethead",
+        "gettargetspeed",
+        "gettargethealth"
     ],
     "snippet": {
         "c": "float ${1:target_head} = getTargetHead();",

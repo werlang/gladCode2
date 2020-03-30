@@ -30,23 +30,11 @@
         "explain": "1.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "moveTo",
-        "turnToTarget",
-        "doYouSeeMe",
-        "getTargetX",
-        "getTargetY",
-        "stepLeft",
-        "getAmbushTimeLeft",
-        "attackRanged",
-        "turn",
-        "ambush",
-        "assassinate",
-        "isProtected",
-        "isBurning",
-        "isRunning",
-        "isSlowed"
+        "isprotected",
+        "isburning",
+        "isslowed",
+        "isrunning",
+        "getambushtimeleft"
     ],
     "snippet": {
         "c": "int ${1:stunned} = isStunned();",

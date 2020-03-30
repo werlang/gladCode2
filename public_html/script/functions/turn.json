@@ -31,13 +31,11 @@
         "explain": "42.txt"
     },
     "seealso": [
-        "moveForward",
-        "stepForward",
-        "turnLeft",
-        "turnRight",
-        "turnTo",
-        "turnToTarget",
-        "turnToAngle"
+        "turnto",
+        "turntolasthit",
+        "turnright",
+        "turnleft",
+        "turntotarget"
     ],
     "snippet": {
         "c": "turn(${1:angle});",

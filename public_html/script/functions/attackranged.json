@@ -35,13 +35,7 @@
         "explain": "3.txt"
     },
     "seealso": [
-        "getHp",
-        "getLowHp",
-        "getTargetX",
-        "getTargetY",
-        "stepBack",
-        "turnRight",
-        "attackMelee"
+        "attackmelee"
     ],
     "snippet": {
         "c": "attackRanged(${1:X}, ${2:Y});",

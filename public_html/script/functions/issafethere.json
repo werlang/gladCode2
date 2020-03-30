@@ -35,12 +35,8 @@
         "explain": "30.txt"
     },
     "seealso": [
-        "getX",
-        "getY",
-        "getDist",
-        "getAp",
-        "teleport",
-        "moveTo"
+        "issafehere",
+        "getsaferadius"
     ],
     "snippet": {
         "c": "int ${1:safe} = isSafeThere(${2:X}, ${3:Y});",

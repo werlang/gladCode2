@@ -29,14 +29,9 @@
         "explain": "10.txt"
     },
     "seealso": [
-        "moveTo",
-        "getHit",
-        "teleport",
-        "ambush",
-        "turnToLastHit",
-        "turn",
-        "getBlockTimeLeft",
-        "getAmbushTimeLeft"
+        "getblocktimeleft",
+        "getambushtimeleft",
+        "isburning"
     ],
     "snippet": {
         "c": "float ${1:burn_time} = getBurnTimeLeft();",

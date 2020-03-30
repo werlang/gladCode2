@@ -30,13 +30,8 @@
         "explain": "1.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "isTargetVisible",
-        "stepLeft",
-        "turnToTarget"
+        "istargetvisible",
+        "howmanyenemies"
     ],
     "snippet": {
         "c": "int ${1:seen} = doYouSeeMe();",

@@ -28,15 +28,7 @@
         "explain": "2.txt"
     },
     "seealso": [
-        "getDistToTarget",
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getSpeed",
-        "getTargetSpeed",
-        "turnLeft",
-        "moveToTarget"
+        "attackranged"
     ],
     "snippet": {
         "c": "attackMelee();",

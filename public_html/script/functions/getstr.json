@@ -29,12 +29,8 @@
         "explain": "8.txt"
     },
     "seealso": [
-        "setSTR",
-        "getAGI",
-        "getINT",
-        "upgradeSTR",
-        "upgradeAGI",
-        "moveTo"
+        "getagi",
+        "getint"
     ],
     "snippet": {
         "c": "int ${1:mystr} = getSTR();",

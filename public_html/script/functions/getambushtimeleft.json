@@ -29,17 +29,9 @@
         "explain": "1.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "moveTo",
-        "doYouSeeMe",
-        "turnToTarget",
-        "stepLeft",
-        "turn",
-        "ambush",
-        "assassinate",
-        "getBlockTimeLeft",
-        "getBurnTimeLeft"
+        "getblocktimeleft",
+        "getburntimeleft",
+        "isstunned"
     ],
     "snippet": {
         "c": "float ${1:ambush_time} = getAmbushTimeLeft();",

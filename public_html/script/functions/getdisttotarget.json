@@ -30,15 +30,7 @@
         "explain": "2.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "attackMelee",
-        "getTargetX",
-        "getTargetY",
-        "getSpeed",
-        "getTargetSpeed",
-        "turnLeft",
-        "moveToTarget"
+        "getdist"
     ],
     "snippet": {
         "c": "float ${1:dist} = getDistToTarget();",

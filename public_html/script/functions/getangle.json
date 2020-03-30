@@ -34,11 +34,7 @@
         "explain": "9.txt"
     },
     "seealso": [
-        "getX",
-        "getY",
-        "turnToAngle",
-        "stepForward",
-        "getDist"
+        "getdist"
     ],
     "snippet": {
         "c": "float ${1:angle} = getAngle(${2:X}, ${3:Y});",

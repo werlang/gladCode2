@@ -30,19 +30,11 @@
         "explain": "1.txt"
     },
     "seealso": [
-        "getLowHp",
-        "moveTo",
-        "doYouSeeMe",
-        "stepLeft",
-        "getAmbushTimeLeft",
-        "assassinate",
-        "ambush",
-        "turnLeft",
-        "turnRight",
-        "turn",
-        "turnTo",
-        "turnToAngle",
-        "turnToLastHit"
+        "turnto",
+        "turntolasthit",
+        "turnright",
+        "turnleft",
+        "turn"
     ],
     "snippet": {
         "c": "turnToTarget();",

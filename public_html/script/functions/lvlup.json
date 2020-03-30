@@ -25,16 +25,9 @@
         "explain": "33.txt"
     },
     "seealso": [
-        "setPosition",
-        "setHp",
-        "setAp",
-        "upgradeINT",
-        "getLowHp",
-        "fireball",
-        "getTargetX",
-        "getTargetY",
-        "turn",
-        "speak"
+        "setposition",
+        "sethp",
+        "setap"
     ],
     "snippet": {
         "c": "lvlUp(${1:value});",

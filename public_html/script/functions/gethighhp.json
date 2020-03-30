@@ -30,18 +30,9 @@
         "explain": "15.txt"
     },
     "seealso": [
-        "getDistToTarget",
-        "attackRanged",
-        "attackMelee",
-        "getTargetX",
-        "getTargetY",
-        "getSpeed",
-        "getTargetSpeed",
-        "turnLeft",
-        "moveToTarget",
-        "getCloseEnemy",
-        "getFarEnemy",
-        "getLowHp"
+        "getlowhp",
+        "getcloseenemy",
+        "getfarenemy"
     ],
     "snippet": {
         "c": "int ${1:enemy} = getHighHp();",
