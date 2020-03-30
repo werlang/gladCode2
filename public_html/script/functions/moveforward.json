@@ -31,10 +31,7 @@
         "explain": "34.txt"
     },
     "seealso": [
-        "moveTo",
-        "turnTo",
-        "turn",
-        "stepForward"
+        "stepforward"
     ],
     "snippet": {
         "c": "moveForward(${1:steps});",

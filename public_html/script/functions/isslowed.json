@@ -30,17 +30,11 @@
         "explain": "31.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getDistToTarget",
-        "charge",
-        "attackMelee",
-        "moveTo",
-        "moveToTarget",
-        "isSafeHere",
-        "isStunned",
-        "isBurning",
-        "isProtected",
-        "isRunning"
+        "isprotected",
+        "isrunning",
+        "isburning",
+        "isstunned",
+        "getspeed"
     ],
     "snippet": {
         "c": "int ${1:slowed} = isSlowed();",

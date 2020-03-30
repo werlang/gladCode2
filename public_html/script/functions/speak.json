@@ -34,19 +34,7 @@
         "blocks": "37.xml",
         "explain": "37.txt"
     },
-    "seealso": [
-        "getHit",
-        "ambush",
-        "turnToLastHit",
-        "getCloseEnemy",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getX",
-        "getY",
-        "turn",
-        "moveTo"
-    ],
+    "seealso": [],
     "snippet": {
         "c": "speak(\"${1:text}\");",
         "python": "speak(\"${1:text}\")"

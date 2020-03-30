@@ -24,12 +24,7 @@
         "python": "36.py",
         "explain": "36.txt"
     },
-    "seealso": [
-        "setName",
-        "setINT",
-        "setAGI",
-        "setSTR"
-    ],
+    "seealso": [],
     "snippet": {
         "c": "setSpritesheet(${1:hash});",
         "python": "setSpritesheet(${1:hash})"

@@ -30,10 +30,8 @@
         "explain": "21.txt"
     },
     "seealso": [
-        "moveTo",
-        "getDist",
-        "getSafeRadius",
-        "getHp"
+        "issafethere",
+        "getsaferadius"
     ],
     "snippet": {
         "c": "int ${1:safe} = isSafeHere();",

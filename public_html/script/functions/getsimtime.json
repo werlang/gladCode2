@@ -29,16 +29,7 @@
         "explain": "22.txt"
     },
     "seealso": [
-        "getHit",
-        "turnToLastHit",
-        "getCloseEnemy",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "stepBack",
-        "howManyEnemies",
-        "moveTo",
-        "turn"
+        "getlasthittime"
     ],
     "snippet": {
         "c": "float ${1:sim_time} = getSimTime();",

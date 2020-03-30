@@ -30,14 +30,8 @@
         "explain": "14.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getHead",
-        "getTargetHead",
-        "stepLeft",
-        "turnToTarget"
+        "doyouseeme",
+        "howmanyenemies"
     ],
     "snippet": {
         "c": "int ${1:target} = isTargetVisible();",

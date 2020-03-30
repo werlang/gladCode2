@@ -25,11 +25,9 @@
         "explain": "36.txt"
     },
     "seealso": [
-        "getAGI",
-        "setName",
-        "setSTR",
-        "setINT",
-        "setSpritesheet"
+        "setstr",
+        "setint",
+        "setname"
     ],
     "snippet": {
         "c": "setAGI(${1:value});",

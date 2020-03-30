@@ -29,12 +29,9 @@
         "explain": "38.txt"
     },
     "seealso": [
-        "moveTo",
-        "moveToTarget",
-        "turnRight",
-        "stepForward",
-        "stepLeft",
-        "stepRight"
+        "stepforward",
+        "stepleft",
+        "stepright"
     ],
     "snippet": {
         "c": "stepBack();",

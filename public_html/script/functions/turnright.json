@@ -32,21 +32,11 @@
         "explain": "44.txt"
     },
     "seealso": [
-        "setSTR",
-        "setAGI",
-        "setINT",
-        "upgradeSTR",
-        "upgradeAGI",
-        "moveTo",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getLowHp",
-        "turnLeft",
+        "turnto",
+        "turntolasthit",
         "turn",
-        "turnTo",
-        "turnToTarget",
-        "turnToAngle"
+        "turnleft",
+        "turntotarget"
     ],
     "snippet": {
         "c": "turnRight(${1:angle});",

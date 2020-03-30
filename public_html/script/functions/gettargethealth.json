@@ -29,16 +29,9 @@
         "explain": "24.txt"
     },
     "seealso": [
-        "turnToAngle",
-        "getLastHitAngle",
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "howManyEnemies",
-        "stepBack",
-        "getHit",
-        "moveTo"
+        "gethp",
+        "gettargetspeed",
+        "gettargethead"
     ],
     "snippet": {
         "c": "float ${1:target_health} = getTargetHealth();",

@@ -35,13 +35,6 @@
         "explain": "1.txt"
     },
     "seealso": [
-        "getLowHp",
-        "moveTo",
-        "doYouSeeMe",
-        "turnToTarget",
-        "stepLeft",
-        "getAmbushTimeLeft",
-        "turn",
         "ambush"
     ],
     "snippet": {

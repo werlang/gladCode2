@@ -30,13 +30,7 @@
         "explain": "4.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "moveTo",
-        "turn",
-        "charge",
-        "getBlockTimeLeft",
-        "doYouSeeMe"
+        "charge"
     ],
     "snippet": {
         "c": "block();",

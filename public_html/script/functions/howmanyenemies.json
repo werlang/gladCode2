@@ -29,16 +29,8 @@
         "explain": "24.txt"
     },
     "seealso": [
-        "turnToAngle",
-        "getLastHitAngle",
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "getTargetHealth",
-        "stepBack",
-        "getHit",
-        "moveTo"
+        "doyouseeme",
+        "istargetvisible"
     ],
     "snippet": {
         "c": "int ${1:num_enemies} = howManyEnemies();",

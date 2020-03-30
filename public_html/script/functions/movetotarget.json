@@ -30,20 +30,9 @@
         "explain": "2.txt"
     },
     "seealso": [
-        "getSpeed",
-        "getDistToTarget",
-        "getLowHp",
-        "attackRanged",
-        "attackMelee",
-        "getTargetX",
-        "getTargetY",
-        "getTargetSpeed",
-        "turnLeft",
-        "moveTo",
-        "stepForward",
-        "stepBack",
-        "stepLeft",
-        "stepRight"
+        "moveto",
+        "turnto",
+        "turntotarget"
     ],
     "snippet": {
         "c": "moveToTarget();",

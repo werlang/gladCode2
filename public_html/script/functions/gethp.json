@@ -29,12 +29,7 @@
         "explain": "3.txt"
     },
     "seealso": [
-        "getLowHp",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "stepBack",
-        "turnRight"
+        "getap"
     ],
     "snippet": {
         "c": "float ${1:hp} = getHp();",

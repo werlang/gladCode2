@@ -35,12 +35,6 @@
         "explain": "7.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "getTargetX",
-        "getTargetY",
-        "attackRanged",
-        "turn",
         "teleport"
     ],
     "snippet": {

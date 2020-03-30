@@ -30,10 +30,6 @@
         "explain": "4.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "moveTo",
-        "turn",
         "block"
     ],
     "snippet": {

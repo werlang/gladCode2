@@ -30,19 +30,11 @@
         "explain": "16.txt"
     },
     "seealso": [
-        "getLowHp",
-        "moveTo",
-        "doYouSeeMe",
-        "stepLeft",
-        "getAmbushTimeLeft",
-        "assassinate",
-        "ambush",
-        "getHit",
-        "turnLeft",
-        "turnRight",
+        "turnto",
         "turn",
-        "turnTo",
-        "turnToAngle"
+        "turnright",
+        "turnleft",
+        "turntotarget"
     ],
     "snippet": {
         "c": "turnToLastHit();",

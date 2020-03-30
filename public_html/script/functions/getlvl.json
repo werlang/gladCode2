@@ -28,10 +28,7 @@
         "blocks": "20.xml",
         "explain": "20.txt"
     },
-    "seealso": [
-        "upgradeSTR",
-        "upgradeINT"
-    ],
+    "seealso": [],
     "snippet": {
         "c": "int ${1:lvl} = getLvl();",
         "python": "${1:lvl} = getLvl()"

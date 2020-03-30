@@ -29,17 +29,9 @@
         "explain": "40.txt"
     },
     "seealso": [
-        "getLastHitTime",
-        "getCloseEnemy",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "turnLeft",
-        "stepForward",
-        "stepBack",
-        "stepRight",
-        "moveTo",
-        "moveToTarget"
+        "stepforward",
+        "stepback",
+        "stepright"
     ],
     "snippet": {
         "c": "stepLeft();",

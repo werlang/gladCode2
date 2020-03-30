@@ -29,10 +29,9 @@
         "explain": "21.txt"
     },
     "seealso": [
-        "moveTo",
-        "getDist",
-        "isSafeHere",
-        "getHp"
+        "issafehere",
+        "issafethere",
+        "getdist"
     ],
     "snippet": {
         "c": "float ${1:safe_radius} = getSafeRadius();",

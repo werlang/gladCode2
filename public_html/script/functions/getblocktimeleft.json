@@ -29,15 +29,9 @@
         "explain": "4.txt"
     },
     "seealso": [
-        "getLowHp",
-        "getAp",
-        "moveTo",
-        "turn",
-        "charge",
-        "block",
-        "doYouSeeMe",
-        "getAmbushTimeLeft",
-        "getBurnTimeLeft"
+        "getburntimeleft",
+        "getambushtimeleft",
+        "isprotected"
     ],
     "snippet": {
         "c": "float ${1:block_time} = getBlockTimeLeft();",

@@ -29,14 +29,8 @@
         "explain": "11.txt"
     },
     "seealso": [
-        "getCloseEnemy",
-        "attackRanged",
-        "getTargetX",
-        "getTargetY",
-        "turnLeft",
-        "stepLeft",
-        "getLastHitAngle",
-        "getHit"
+        "getlasthitangle",
+        "gethit"
     ],
     "snippet": {
         "c": "float ${1:hit_time} = getLastHitTime();",

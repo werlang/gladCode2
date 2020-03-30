@@ -1,78 +1,6 @@
-class fakeBlock {
-    constructor({text, mode, color, input}){
-        let svgpath
-        if (mode == 'value')
-            svgpath = 'image/block-tip-value.svg'
-        else if (mode == 'statement')
-            svgpath = ['image/block-tip-statement-top.svg', 'image/block-tip-statement-bottom.svg']
-
-        if (input){
-            for (let i in input){
-                let pattern = new RegExp(`\\{${i}\\}`, "g")
-                text = text.replace(pattern, `<div id='${i}'></div>`)
-            }
-        }    
-        this.html = $($.parseHTML(`<div class='fake-block'><div class='tip'></div><div class='text'>${text}</div></div>`))
-
-        if (mode == "value"){
-            $.get(svgpath, data => {
-                let svg = $(data).find('svg')
-                this.html.addClass(mode).find('.tip').html(svg)
-        
-                this.setColor(color)
-
-                if (input){
-                    for (let i in input){
-                        this.html.find(`.text #${i}`).html(input[i].getBlock(true))
-                    }
-                }    
-            })
-        }
-        else{
-            $.get(svgpath[0], data => {
-                let svg = $(data).find('svg')
-                this.html.addClass(mode).find('.tip').append(svg)
-        
-                this.setColor(color)
-
-                this.html.find('.tip').append(`<div class='mid'></div>`)
-
-                $.get(svgpath[1], data => {
-                    let svg = $(data).find('svg')
-                    this.html.find('.tip').append(svg)
-            
-                    this.setColor(color)
-
-                    if (input){
-                        for (let i in input){
-                            this.html.find(`.text #${i}`).html(input[i].getBlock(true))
-                        }
-                    }    
-                })
-            })
-        }
-    }
-
-    setColor(color){
-        this.html.css({'background-color': color})
-        this.html.find('.tip path').not('.shadow').css({'fill': color})
-        this.html.find('.arrow').css({'color': color})
-    }    
-
-    getBlock(clone){
-        if (clone)
-            return this.html.clone()
-        return this.html
-    }
-
-    static option(text){
-        return `<span class='option'>${text}<span class='arrow'>⯆</span></span>`
-    }
-
-    static value(text){
-        return `<span class='option'>${text}</span>`
-    }
-}
+// ------------------------------------------------------------------------
+// WHEN MESSING WITH FUNCS, DONT FORGET TO RUN compress_functions.php AFTER
+// ------------------------------------------------------------------------
 
 var langDict = false
 
@@ -105,8 +33,8 @@ $(document).ready( function() {
             }
         });
             
-        $.getJSON(`script/functions/${func}.json`, async data => {
-            await load_content(data);        
+        $.getJSON(`script/functions.json`, async data => {
+            await load_content(func, data);        
             await menu_loaded();
             
             var loc = $('#temp-name').html().toLowerCase();
@@ -124,12 +52,14 @@ $(document).ready( function() {
 
 });
 
-async function load_content(item){
+async function load_content(item, fileData){
     if (!item || item == ""){
         var func = $('#vget').val();
         $('#content').html("<h1>Função <i>"+ func +"</i> não encontrada.</h1><p><a href='docs'>Voltar para documentação</a></p>")
         return false;
     }
+
+    item = fileData[item]
 
     var user = await waitLogged();
 
@@ -205,91 +135,100 @@ async function load_content(item){
 
     $('#temp-return').html(treturn);
 
-    await new Promise( (resolve, reject) => {
-        let samplePath = `script/functions/samples/${item.sample[language]}`
-
+    let filename = item.sample.explain.split(".")[0] + '.json'
+    var loadSample = $.get(`script/functions/samples/${filename}`, async code => {
         if (language == 'blocks'){
+            // load blocks into div, create workspace and observe resize
             $('#temp-sample').parent().after(`<div id='sample-ws'></div>`).remove()
 
-            $.get(samplePath, code => {
-                // console.log(code)
+            let ws = Blockly.inject('sample-ws', {
+                scrollbars: true,
+                readOnly: true
+            });
+    
+            xmlDom = Blockly.Xml.textToDom(code.blocks);
+            Blockly.Xml.domToWorkspace(xmlDom, ws);
 
-                let ws = Blockly.inject('sample-ws', {
-                    scrollbars: true,
-                    readOnly: true
-                });
-        
-                xmlDom = Blockly.Xml.textToDom(code);
-                Blockly.Xml.domToWorkspace(xmlDom, ws);
-
-                new ResizeObserver(() => {
-                    Blockly.svgResize(ws);
-                }).observe($('#sample-ws')[0])
-        
-                resolve(true);
-            }, 'text')
+            new ResizeObserver(() => {
+                Blockly.svgResize(ws);
+            }).observe($('#sample-ws')[0])  
         }
         else{
-            $('#temp-sample').load(samplePath, () => {
-                $('#temp-sample').attr('class', `language-${language}`);
-                Prism.highlightElement($('#temp-sample')[0]);
-
-                resolve(true);
-            });
+            // load code into div and use prism to highlight code
+            $('#temp-sample').html(code[language]).attr('class', `language-${language}`)
+            Prism.highlightElement($('#temp-sample')[0])
         }
-    });
 
-    // translate explain text to reflect blocks names
-    if (language == 'blocks'){
-        let explainPath = `script/functions/samples/${item.sample.explain}`
-        $.get(explainPath, async text => {
-            let matches = text.match(/\{[\w\W]+?\}/g)
-            let funcs = []
-            if (matches){
-                for (let match of matches){
-                    let word = match.match(/\w+/)[0]
-                    if (funcs.indexOf(word) == -1)
-                        funcs.push(word)
-                }
-                for (let func of funcs){
-                    await $.get(`script/functions/${func.toLowerCase()}.json`, data => {
-                        text = text.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block)
-                    })
-                }
+        // put functions into seealso
+        let codesearch = code.python
+        if (!codesearch)
+            codesearch = code.c
+
+        let funcs = codesearch.match(/\w+\(/g)
+        funcs = funcs.map(e => { return e.split("(")[0]})
+
+        let reserved = ['loops', 'if', 'elif', 'while', 'for']
+        for (let e of funcs){
+            if (e != item.name.default && item.seealso.indexOf(e) == -1 && reserved.indexOf(e) == -1)
+                item.seealso.push(e)
+        }   
+
+        // translate functions in brackets {} in explian text
+        let matches = code.explain.match(/\{[\w\W]+?\}/g)
+        funcs = []
+        if (matches){
+            for (let match of matches){
+                let word = match.match(/\w+/)[0]
+                if (funcs.indexOf(word) == -1)
+                    funcs.push(word)
             }
-            $('#temp-explain').html(text);
-        }, 'text')
-    }
+            for (let func of funcs){
+                // translate explain text to reflect blocks names
+                if (language == 'blocks'){
+                    let data = fileData[func.toLowerCase()]
+                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block)
+                }
+                else
+                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), func)
+            }
+        }
+        $('#temp-explain').html(code.explain);
+    
+        return code
+    })
 
     if (langDict){
         var funcsDict = {};
         funcsDict[item.name.default] = item.name[langDict];
     }
 
+    await loadSample
+
     for (let i in item.seealso){
-        let data = await findFunc(item.seealso[i].toLowerCase())
-        let link = data.name.default.toLowerCase()
-        let name = data.name.default
+        let data = fileData[item.seealso[i].toLowerCase()]
+        if (data){
+            let link = data.name.default.toLowerCase()
+            let name = data.name.default
 
-        if (language == 'blocks')
-            name = data.name.block
+            if (language == 'blocks')
+                name = data.name.block
 
-        $('#temp-seealso').append(`<tr>
-            <td><a href='function/${link}'>${name}</a></td>
-            <td>${data.description.brief}</td></tr>`)
+            if (name)
+                $('#temp-seealso').append(`<tr>
+                    <td><a href='function/${link}'>${name}</a></td>
+                    <td>${data.description.brief}</td></tr>`)
 
-        if (langDict)
-            funcsDict[data.name.default] = data.name[langDict]
+            if (langDict)
+                funcsDict[data.name.default] = data.name[langDict]
+        }
     }
 
-    if (langDict)
+    if (langDict){
+        await loadExplain
         loadDict(funcsDict)
+    }
 
     return true;
-}
-
-async function findFunc(name){
-    return await $.getJSON(`script/functions/${name}.json`, () => {});
 }
 
 function loadDict(func){

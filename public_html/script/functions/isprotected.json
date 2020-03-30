@@ -30,17 +30,11 @@
         "explain": "28.txt"
     },
     "seealso": [
-        "getCloseEnemy",
-        "getDistToTarget",
-        "getTargetX",
-        "getTargetY",
-        "stepBack",
-        "attackRanged",
-        "turn",
-        "isStunned",
-        "isBurning",
-        "isRunning",
-        "isSlowed"
+        "isburning",
+        "isrunning",
+        "isslowed",
+        "isstunned",
+        "getblocktimeleft"
     ],
     "snippet": {
         "c": "int ${1:protect} = isProtected();",
