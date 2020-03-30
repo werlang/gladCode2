@@ -239,7 +239,27 @@ async function load_content(item){
         }
     });
 
-    $('#temp-explain').html(item.explain);
+    // translate explain text to reflect blocks names
+    if (language == 'blocks'){
+        let explainPath = `script/functions/samples/${item.sample.explain}`
+        $.get(explainPath, async text => {
+            let matches = text.match(/\{[\w\W]+?\}/g)
+            let funcs = []
+            if (matches){
+                for (let match of matches){
+                    let word = match.match(/\w+/)[0]
+                    if (funcs.indexOf(word) == -1)
+                        funcs.push(word)
+                }
+                for (let func of funcs){
+                    await $.get(`script/functions/${func.toLowerCase()}.json`, data => {
+                        text = text.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block)
+                    })
+                }
+            }
+            $('#temp-explain').html(text);
+        }, 'text')
+    }
 
     if (langDict){
         var funcsDict = {};

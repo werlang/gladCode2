@@ -25,9 +25,9 @@
     "sample": {
         "c": "24.c",
         "python": "24.py",
-        "blocks": "24.xml"
+        "blocks": "24.xml",
+        "explain": "24.txt"
     },
-    "explain": "No exemplo o gladiador se move em sentido diagonal pela arena, até receber um ataque. quando isso acontecer ele se vira na direção do ataque, recuando caso hajam mais de um inimigo no campo de visão. Caso haja somente um inimigo com até 30% de vida, o gladiador ataca ele. ",
     "seealso": [
         "turnToAngle",
         "getLastHitAngle",

@@ -25,9 +25,9 @@
     "sample": {
         "c": "11.c",
         "python": "11.py",
-        "blocks": "11.xml"
+        "blocks": "11.xml",
+        "explain": "11.txt"
     },
-    "explain": "No exemplo o gladiador tenta se esquivar locomovendo-se para a esquerda caso tenha recebido um ataque nos últimos 2 segundos. Caso contrário ele procura por um inimigo próximo e o ataca. Caso não encontre inimigos ele fica rotacionando no sentido anti-horário.",
     "seealso": [
         "getCloseEnemy",
         "attackRanged",
