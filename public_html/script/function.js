@@ -37,9 +37,18 @@ $(document).ready( function() {
             await load_content(func, data);        
             await menu_loaded();
             
-            var loc = $('#temp-name').html().toLowerCase();
-            $('#side-menu li a').each( function(){
-                if ($(this).html().toLowerCase() == loc){
+            let loc = window.location.href.split("/")
+            let place = loc[loc.length - 2]
+            let funcName = loc[loc.length - 1]
+            let menuItem = {
+                block: "docs-blocks",
+                function: "docs",
+                funcao: "docs-ptbr"
+            }
+            let submenu = $(`#${menuItem[place]}`).next('ul')
+
+            submenu.find(`li a`).each( function(){
+                if ($(this).attr('href') == `${place}/${funcName}`){
                     $(this).parent().addClass('here visible').siblings('li').addClass('visible');
                     $(this).parents('ul').prev('li').addClass('here visible');
                     $('li.here i').addClass('open');
