@@ -1246,7 +1246,7 @@ function setBlockInfo(block){
     getTooltip(block.func).then( data => {
         block.setTooltip(data);
     });
-    block.setHelpUrl(`function/${block.func.toLowerCase()}.py`);
+    block.setHelpUrl(`function/${block.func.toLowerCase()}.blk`);
 }
 
 function toggleUseReturn(block, options){

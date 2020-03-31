@@ -67,12 +67,31 @@
             ]
         }
     },{
+        "name": "docs-blocks.php",
+        "js": {
+            "files": [
+                {"name": "docs.js"},
+                {"name": "side-menu.js"},
+                {"name": "googlelogin.js"},
+                {"name": "socket.js"},
+                {"name": "header.js"}
+            ]
+        },
+        "css": {
+            "files": [
+                {"name": "table.css"},
+                {"name": "docs.css"},
+                {"name": "side-menu.css"},
+                {"name": "header.css"}
+            ]
+        }
+    },{
         "name": "function.php",
         "js": {
             "files": [
+                {"name": "blocks.js"},
                 {"name": "function.js"},
                 {"name": "side-menu.js"},
-                {"name": "prism.js"},
                 {"name": "googlelogin.js"},
                 {"name": "socket.js"},
                 {"name": "header.js"}
@@ -84,7 +103,6 @@
                 {"name": "docs.css"},
                 {"name": "side-menu.css"},
                 {"name": "function.css"},
-                {"name": "prism.css"},
                 {"name": "header.css"}
             ]
         }
@@ -96,8 +114,7 @@
                 {"name": "side-menu.js"},
                 {"name": "googlelogin.js"},
                 {"name": "socket.js"},
-                {"name": "header.js"},
-                {"name": "prism.js"}
+                {"name": "header.js"}
             ]
         },
         "css": {
@@ -105,7 +122,6 @@
                 {"name": "table.css"},
                 {"name": "manual.css"},
                 {"name": "side-menu.css"},
-                {"name": "prism.css"},
                 {"name": "header.css"}
             ]
         }
@@ -159,7 +175,6 @@
                 {"name": "googlelogin.js"},
                 {"name": "header.js"},
                 {"name": "socket.js"},
-                {"name": "prism.js"},
                 {"name": "emoji.js"},
                 {"name": "chat.js"},
                 {"name": "blocks.js"}
@@ -172,7 +187,6 @@
                 {"name": "glad-card.css"},
                 {"name": "dialog.css"},
                 {"name": "chat.css"},
-                {"name": "prism.css"},
                 {"name": "header.css"},
                 {"name": "editor.css"}
             ]
@@ -184,7 +198,6 @@
                 {"name": "chat.js"},
                 {"name": "dialog.js"},
                 {"name": "emoji.js"},
-                {"name": "prism.js"},
                 {"name": "googlelogin.js"},
                 {"name": "header.js"},
                 {"name": "socket.js"}
@@ -194,7 +207,6 @@
             "files": [
                 {"name": "chat.css"},
                 {"name": "dialog.css"},
-                {"name": "prism.css"},
                 {"name": "header.css"}
             ]
         }
@@ -224,7 +236,6 @@
         "name": "tournament.php",
         "js": {
             "files": [
-                {"name": "prism.js"},
                 {"name": "assets.js"},
                 {"name": "glad-card.js"},
                 {"name": "runSim.js"},
@@ -239,7 +250,6 @@
         },
         "css": {
             "files": [
-                {"name": "prism.css"},
                 {"name": "dialog.css"},
                 {"name": "glad-card.css"},
                 {"name": "tournament.css"},
@@ -264,7 +274,6 @@
                 {"name": "stats_func.js"},
                 {"name": "emoji.js"},
                 {"name": "socket.js"},
-                {"name": "prism.js"},
                 {"name": "googlelogin.js"},
                 {"name": "header.js"}
             ]
@@ -275,7 +284,6 @@
                 {"name": "glad-card.css"},
                 {"name": "dialog.css"},
                 {"name": "chat.css"},
-                {"name": "prism.css"},
                 {"name": "croppie.css"},
                 {"name": "slider.css"},
                 {"name": "checkboxes.css"},

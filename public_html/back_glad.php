@@ -94,6 +94,11 @@
 			$vagi = mysql_escape_string($_POST['vagi']);
 			$vint = mysql_escape_string($_POST['vint']);
 			$code = mysql_escape_string($_SESSION['code']);
+
+			$blocks = "";
+			if (isset($_POST['blocks']))
+				$blocks = mysql_escape_string($_POST['blocks']);
+
 			if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
 				$sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
 				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
@@ -104,7 +109,7 @@
 						if ($result->num_rows >= $limit)
 							echo "{\"LIMIT\":$limit}";
 						else{
-							$sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$version')";
+							$sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
 							if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 							echo "{\"ID\":". $conn->insert_id ."}";
 
@@ -114,7 +119,7 @@
 						}
 					}
 					elseif ($_POST['action'] == "UPDATE"){
-						$sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', version = '$version' WHERE cod = '$id' AND master = '$user'";
+						$sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', blocks = '$blocks', version = '$version' WHERE cod = '$id' AND master = '$user'";
 						if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 						echo "{\"ID\":". $id ."}";
 					}
