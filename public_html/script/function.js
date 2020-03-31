@@ -39,16 +39,26 @@ $(document).ready( function() {
             
             let loc = window.location.href.split("/")
             let place = loc[loc.length - 2]
-            let funcName = loc[loc.length - 1]
-            let menuItem = {
-                block: "docs-blocks",
-                function: "docs",
-                funcao: "docs-ptbr"
+            let funcName = loc[loc.length - 1].split(".")
+            let ext = ''
+
+            let submenu
+
+            if (funcName[1] == 'blk'){
+                ext = '.'+ funcName[1]
+                submenu = $(`#docs-blocks`).next('ul')
             }
-            let submenu = $(`#${menuItem[place]}`).next('ul')
+            else if (place == 'funcao'){
+                submenu = $(`#docs-ptbr`).next('ul')
+            }
+            else{
+                submenu = $(`#docs`).next('ul')
+            }
+
+            funcName = funcName[0]
 
             submenu.find(`li a`).each( function(){
-                if ($(this).attr('href') == `${place}/${funcName}`){
+                if ($(this).attr('href') == `${place}/${funcName}${ext}`){
                     $(this).parent().addClass('here visible').siblings('li').addClass('visible');
                     $(this).parents('ul').prev('li').addClass('here visible');
                     $('li.here i').addClass('open');

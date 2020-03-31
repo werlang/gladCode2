@@ -20,16 +20,18 @@
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
 	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
-
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
 
-	<script src="script/fallback/blockly.min.js"></script>
+	<!-- <script src="script/fallback/blockly.min.js"></script>
 	<script src="script/fallback/blockly-pt-br.js"></script>
-	<script src="script/fallback/blockly-python.js"></script>
+	<script src="script/fallback/blockly-python.js"></script> -->
+	
 	<script src="script/blocks.js"></script>
-
 	<script src="script/function.js"></script>
 	<script src="script/side-menu.js"></script>
 	<script src="script/googlelogin.js"></script>

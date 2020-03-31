@@ -30,11 +30,13 @@
             <div id='content'>			
                 <h1 id='nav-intro'>Documentação da API gladCode</h1>
                 
-                <p>Para a programação dos gladiadores, é necessário o uso de funções específicas para interação com os diversos aspectos da gladCode, como movimento, detecção de inimigos, e uso de habilidades. Nas seções abaixo está descrito a sintaxe de cada função disponível. </p>
+                <p>Para a programação dos gladiadores, é necessário o uso blocos específicos (também chamados de funções) para interação com os diversos aspectos da gladCode, como movimento, detecção de inimigos, e uso de habilidades. Nas seções abaixo está descrito a sintaxe de cada bloco disponível. </p>
+
+                <p>Esta página tem o objetivo de mostrar uma visão geral de todos blocos de funções disponíveis na gladCode, e leva-se em consideração que você já possui noções básicas de lógica de programação. Caso deseje aprender o básico de lógica de programação usando os blocos da gladCode, assista o vídeo abaixo</p>
                 
-                <div class='video'><iframe src="https://www.youtube.com/embed/Wrc-0_Kq-_4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                <div class='video'><iframe src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                 
-                <p>As funções da gladCode também pode ser usadas no idioma Português. Caso deseje consulta-las, <a href='docs-ptbr'>clique aqui</a>.</p>
+                <p>Você também pode programar seu gladiador usando as linguagens de programação C ou Python. Caso tenha interesse <a href='docs'>clique aqui</a>.</p>
                 
                 <h2 id='nav-up'>Melhorias</h2>
                 
@@ -365,31 +367,6 @@
                         </tr>
                         <tr>
                             <td><a href='getangle'></a></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h2 id='nav-test'>Funções de teste</h2>
-                
-                <p>As funções de teste servem para testar situações de combate específicas, e elas podem ser usadas <b>somente dentro do editor</b>, e nas batalhas de teste. O código de um gladiador não pode ser salvo enquanto possuir alguma destas funções.</p>
-            
-                <table class='table t-funcs'>
-                    <tbody>
-                        <tr>
-                            <td><a href='setposition'></a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><a href='sethp'></a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><a href='setap'></a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><a href='lvlup'></a></td>
                             <td></td>
                         </tr>
                     </tbody>

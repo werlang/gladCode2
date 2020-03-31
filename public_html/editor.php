@@ -17,7 +17,7 @@
 	<link rel='stylesheet' href="css/editor.css"/>
 	
 	<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
-	<!-- <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
@@ -28,9 +28,9 @@
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
 	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script> -->
+	<script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
 
-	<script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
+	<!-- <script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
 	<script src='script/fallback/jquery-3.4.1.min.js'></script>
 	<script src='script/fallback/jquery-ui.min.js'></script>
 	<script src="script/fallback/cloudinary.js"></script>
@@ -41,7 +41,7 @@
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
 	<script src="script/fallback/blockly.min.js"></script>
 	<script src="script/fallback/blockly-pt-br.js"></script>
-	<script src="script/fallback/blockly-python.js"></script>
+	<script src="script/fallback/blockly-python.js"></script> -->
 
 	<script src="script/editor.js"></script>
 	<script src="script/assets.js"></script>
@@ -80,6 +80,7 @@
 					$skin = $row['skin'];
 					$nick = $row['apelido'];
 					$code = htmlspecialchars($row['code']);
+					$blocks = htmlspecialchars($row['blocks']);
 					echo "<div id='glad-code' hidden>
 						<div id='idglad'>$id</div>
 						<div id='name'>$name</div>
@@ -88,6 +89,7 @@
 						<div id='vint'>$vint</div>
 						<div id='skin'>$skin</div>
 						<div id='code'>$code</div>
+						<div id='blocks'>$blocks</div>
 						<div id='user'>$nick</div>
 					</div>";
 				}

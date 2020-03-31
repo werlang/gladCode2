@@ -54,17 +54,22 @@ $(document).ready( function() {
 
     if ($('#glad-code').length){
         loadGlad = {
-            'id': $('#glad-code #idglad').html(),
-            'name': $('#glad-code #name').html(),
-            'user': $('#glad-code #user').html(),
-            'code': $('#glad-code #code').html(),
-            'vstr': $('#glad-code #vstr').html(),
-            'vagi': $('#glad-code #vagi').html(),
-            'vint': $('#glad-code #vint').html(),
-            'skin': $('#glad-code #skin').html(),
+            id: $('#glad-code #idglad').html(),
+            name: $('#glad-code #name').html(),
+            user: $('#glad-code #user').html(),
+            code: $('#glad-code #code').html(),
+            blocks: $('#glad-code #blocks').html(),
+            vstr: $('#glad-code #vstr').html(),
+            vagi: $('#glad-code #vagi').html(),
+            vint: $('#glad-code #vint').html(),
+            skin: $('#glad-code #skin').html()
         };
         nick = $('#glad-code #user').html();
         $('#glad-code').remove();
+
+        if (loadGlad.blocks){
+            toggleBlocks({ask: false, active: true, load: true})
+        }
     }
 
     load_glad_generator($('#fog-skin'));
@@ -252,7 +257,8 @@ $(document).ready( function() {
                         if (gladid)
                             action = "UPDATE";
                         var nome = $('#distribuicao #nome').val();
-                        $.post( "back_glad.php", {
+
+                        let args = {
                             action: action,
                             id: gladid,
                             nome: nome,
@@ -260,7 +266,13 @@ $(document).ready( function() {
                             vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
                             vint: $('#float-card .glad-preview .info .attr .int span').html(),
                             skin: JSON.stringify(pieces),
-                        }).done( function(data){
+                        }
+
+                        if (loadGlad.blocks)
+                            args.blocks = loadGlad.blocks
+
+                        // console.log(args)
+                        $.post( "back_glad.php", args).done( function(data){
                             //console.log(data);
                             $('#fog').remove();
                             if (data.search("LIMIT") != -1)
@@ -883,6 +895,7 @@ function setLoadGlad(){
     loadGlad.vstr = $('#distribuicao .slider').eq(0).val();
     loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
     loadGlad.vint = $('#distribuicao .slider').eq(2).val();
+    delete loadGlad.blocks
 
     var language = getLanguage(editor.getValue());
     if (language == "c"){
@@ -892,6 +905,9 @@ function setLoadGlad(){
     else if (language == "python" || language == 'blocks'){
         var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n# start of user code\n`;
         loadGlad.code = setup + editor.getValue();
+
+        if (language == 'blocks')
+            loadGlad.blocks = saveBlocks()
     }
 }
 
@@ -1809,10 +1825,11 @@ function getLanguage(code){
     return language;
 }
 
-function toggleBlocks(args){
+async function toggleBlocks(args){
     if (args){
         var active = args.active
         var ask = args.ask
+        var load = args.load
     }
 
     if (!blocksEditor){
@@ -1829,13 +1846,19 @@ function toggleBlocks(args){
 
             blocksEditor.workspace.addChangeListener( function(){
                 var code = Blockly.Python.workspaceToCode(blocksEditor.workspace)
-                editor.setValue(code);
+
+                if (code != "def loop():\n  pass\n")
+                    editor.setValue(code);
                 // console.log(code);
             });
 
-            var loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
-            xmlDom = Blockly.Xml.textToDom(loop);
-            Blockly.Xml.domToWorkspace(xmlDom, blocksEditor.workspace);
+            if (!load){
+                var loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
+                xmlDom = Blockly.Xml.textToDom(loop);
+                Blockly.Xml.domToWorkspace(xmlDom, blocksEditor.workspace);
+            }
+            else
+                loadBlocks({xml: decodeHTML(loadGlad.blocks)})
 
             new ResizeObserver(() => {
                 Blockly.svgResize(blocksEditor.workspace);
@@ -1885,10 +1908,17 @@ function saveBlocks(){
     return xmlText
 }
 
-function loadBlocks(path){
-    $.get(path, xml => {
+function loadBlocks({path, xml}){
+    if (path){
+        $.get(path, xml => {
+            Blockly.mainWorkspace.clear();
+            let dom = Blockly.Xml.textToDom(xml)
+            Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
+        }, 'text')
+    }
+    else if (xml){
         Blockly.mainWorkspace.clear();
         let dom = Blockly.Xml.textToDom(xml)
         Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
-    }, 'text')
+    }
 }

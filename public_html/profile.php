@@ -52,7 +52,6 @@
 	<script src="script/stats_func.js"></script>
 	<script src="script/emoji.js"></script>
 	<script src="script/socket.js"></script>
-	<script src="script/socket.js"></script>
 	<script src="script/googlelogin.js"></script>
 	<script src="script/header.js"></script>
 	
