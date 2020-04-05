@@ -542,6 +542,13 @@ body{
     overflow: hidden;
 }
 
+#code-box #code-ws {
+    height: calc(90vh - 50px);
+    margin: 0;
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
 #code-box #button-container {
     display: flex;
     justify-content: center;

@@ -18,7 +18,7 @@
 	$action = $_POST['action'];
 
 	include_once "connection.php";
-	$cancelSend = false;
+	$cancelSend = true;
 	if (isset($_GET['teste'])){
 		$receivername = "Pablo";
 		$receiveremail = 'pswerlang@gmail.com';

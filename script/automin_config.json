@@ -245,7 +245,8 @@
                 {"name": "emoji.js"},
                 {"name": "socket.js"},
                 {"name": "googlelogin.js"},
-                {"name": "header.js"}
+                {"name": "header.js"},
+                {"name": "blocks.js"}
             ]
         },
         "css": {
@@ -275,7 +276,8 @@
                 {"name": "emoji.js"},
                 {"name": "socket.js"},
                 {"name": "googlelogin.js"},
-                {"name": "header.js"}
+                {"name": "header.js"},
+                {"name": "blocks.js"}
             ]
         },
         "css": {

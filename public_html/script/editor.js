@@ -416,22 +416,24 @@ $(document).ready( function() {
         bindGladList($('#fog-battle #list .glad').last());
     }
 
-    if (user){
-        $.post("back_glad.php",{
-            action: "GET",
-        }).done( function(data){
-            data = JSON.parse(data);
-            // console.log(data);
-            for (let i in data){
-                $('#fog-battle #list').append(template);
-                $('#fog-battle #list .glad .name').last().html(data[i].name);
-                $('#fog-battle #list .glad .diff').last().addClass('none');
-                $('#fog-battle #list .glad').last().data('info',data[i]);
-
-                bindGladList($('#fog-battle #list .glad').last());
-            }
-        });
-    }
+    waitLogged().then( () => {
+        if (user){
+            $.post("back_glad.php",{
+                action: "GET",
+            }).done( function(data){
+                data = JSON.parse(data);
+                // console.log(data);
+                for (let i in data){
+                    $('#fog-battle #list').append(template);
+                    $('#fog-battle #list .glad .name').last().html(data[i].name);
+                    $('#fog-battle #list .glad .diff').last().addClass('none');
+                    $('#fog-battle #list .glad').last().data('info',data[i]);
+    
+                    bindGladList($('#fog-battle #list .glad').last());
+                }
+            });
+        }
+    })
     
     function bindGladList(obj){
         obj.click( function(){
@@ -439,7 +441,7 @@ $(document).ready( function() {
             if ($(this).data('filename'))
                 filename = "samples/gladbots/"+ $(this).data('filename') +".c";
 
-            var code;
+            var code, blocks;
             if ($(this).hasClass('selected')){
                 $(this).removeClass('selected');
                 $('#fog-battle .glad-card-container').html("");
@@ -468,14 +470,32 @@ $(document).ready( function() {
                         $('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
                         $('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
                         $('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
-                        code = data.code;
+                        code = data.code
+                        blocks = data.blocks
                     }
 
                     $('#fog-battle .glad-preview .delete').remove();
 
                     $('#fog-battle .glad-preview .code .button').click( function(){
-                        $('body').append("<div id='fog'><div id='code-box'><pre class='line-numbers language-c'><code class='language-c'>"+ code +"</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>");
-                        Prism.highlightElement($('code')[0]);
+                        let language = "c";
+                        if (code.indexOf("def loop():") != -1)
+                            language = "python";
+
+                        if (blocks && blocks.length){
+                            $('body').append(`<div id='fog'><div id='code-box'><div id='code-ws'></div><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>`);
+
+                            let ws = Blockly.inject('code-ws', {
+                                scrollbars: true,
+                                readOnly: true
+                            });
+                    
+                            xmlDom = Blockly.Xml.textToDom(decodeHTML(blocks));
+                            Blockly.Xml.domToWorkspace(xmlDom, ws);
+                        }
+                        else{
+                            $('body').append(`<div id='fog'><div id='code-box'><pre class='line-numbers language-${language}'><code class='language-${language}'>${code}</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>`);
+                            Prism.highlightElement($('code')[0]);
+                        }
             
                         $('#code-box #close').click( function(e){
                             $('#fog').remove();
