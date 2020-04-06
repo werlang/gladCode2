@@ -10,10 +10,7 @@
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
-    <link rel='stylesheet' href="css/chat.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
-    
+    <link rel='stylesheet' href="css/chat.min.css"/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
@@ -28,13 +25,7 @@
         });
     </script>
     
-    <script src="script/chat.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/emoji.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
-    <script src="script/socket.js"></script>
-    
+    <script src="script/chat.min.js"></script>
     </head>
 <body>
     <?php include("header.php"); ?>

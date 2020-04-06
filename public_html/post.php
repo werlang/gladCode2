@@ -17,18 +17,12 @@
 	<title>gladCode - Publicação</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 
-    <link rel='stylesheet' href="css/header.css"/>
-    <link rel='stylesheet' href="css/post.css"/>
-    
+    <link rel='stylesheet' href="css/post.min.css"/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
 	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
-    <script src="script/post.js"></script>
-    
+    <script src="script/post.min.js"></script>
     </head>
 <body>
     <?php 

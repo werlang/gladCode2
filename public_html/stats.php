@@ -7,24 +7,12 @@
     <title>gladCode - Estatísticas</title>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <link rel='stylesheet' href="css/side-menu.css"/>
-    <link rel='stylesheet' href="css/table.css"/>
-    <link rel='stylesheet' href="css/stats.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
-    
+    <link rel='stylesheet' href="css/stats.min.css"/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
-    <script src="script/stats.js"></script>
-    <script src="script/stats_func.js"></script>
-    <script src="script/side-menu.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
-    
+    <script src="script/stats.min.js"></script>
     </head>
 <body>
     <?php include("header.php"); ?>

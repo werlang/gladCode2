@@ -21,24 +21,12 @@
     <link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     
-    <link rel='stylesheet' href="css/checkboxes.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/playback.css"/>
-    
+    <link rel='stylesheet' href="css/playback.min.css"/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
-    <script src="script/phaser.js"></script>
-    <script src="script/floatingText.js"></script>
-    <script src="script/render.js"></script>
-    <script src="script/assets.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/dropzone.js"></script>
-    <script src="script/checkboxes.js"></script>
-    <script src="script/playback.js"></script>
-    <script src="script/socket.js"></script>
-    
+    <script src="script/playback.min.js"></script>
     </head>
 <body>
     <div id='fog' class='load'>
