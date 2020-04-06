@@ -428,14 +428,22 @@ void turn(int gladid, float ang){
 }
 
 //se vira para uma direcao escolhida
-void turnToAngle(int gladid, float ang){
+int turnToAngle(int gladid, float ang){
 	if (endsim)
-		return;
-	float dif = getNormalAngle(ang - (g+gladid)->head);
-	if (dif <= 180)
-		turn(gladid, dif);
-	else
-		turn(gladid, dif-360);
+		return 1;
+	if ((g+gladid)->hp > 0){
+		float dx,dy;
+		calcSidesFromAngleDist(&dx, &dy, 10, ang);
+
+		int end = turnToUnsafe(gladid, (g+gladid)->x + dx, (g+gladid)->y - dy);
+		(g+gladid)->action = ACTION_MOVEMENT;
+		(g+gladid)->lockedfor = timeInterval;
+
+		waitForLockedStatus(gladid);
+		
+		return end;
+	}
+	return 0;
 }
 
 float getX(int gladid){
@@ -661,10 +669,8 @@ int doYouSeeMe(int gladid){
 	return 0;
 }
 
-int isLockedTargetVisible(int gladid){
-		int r = isLockedTargetVisibleUnsafe(gladid);
-	
-	return r;
+int isTargetVisible(int gladid){
+	return isLockedTargetVisibleUnsafe(gladid);
 }
 
 //ataca inimigo em frente num raio de 180g
@@ -722,9 +728,9 @@ float getLastHitAngle(int gladid){
 }
 
 //se vira na direcao do alvo fixado
-void turnToLastHit(int gladid){
+int turnToLastHit(int gladid){
 	float angle = getLastHitAngle(gladid);
-	turnToAngle(gladid, angle);
+	return turnToAngle(gladid, angle);
 }
 
 int getHit(int gladid){

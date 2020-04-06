@@ -132,7 +132,7 @@
         }
         if (!$locked){
             //get info from glads into my team from this tournament
-            $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, glt.dead, glt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
+            $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, g.blocks, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, glt.dead, glt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
 
             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
             $nrows = $result->num_rows;
@@ -145,10 +145,14 @@
                     if ($row['version'] != $version)
                         $glad['oldversion'] = true;
                     
-                    if ($row['visible'] == '1')
+                    if ($row['visible'] == '1'){
                         $glad['code'] = htmlspecialchars($row['code']);
-                    else
+                        $glad['blocks'] = htmlspecialchars($row['blocks']);
+                    }
+                    else{
                         unset($glad['code']);
+                        unset($glad['blocks']);
+                    }
 
                     if ($row['dead'] < $round && $row['dead'] != 0)
                         $glad['dead'] = true;

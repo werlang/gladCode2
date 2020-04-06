@@ -1,39 +1,40 @@
 {
-	"name": "getBurnTimeLeft",
-	"ptname": "tempoQueimadura",
-	"syntax": {
-		"c": "float getBurnTimeLeft ( void );",
-		"python": "getBurnTimeLeft()"
-	},
-	"description": {
-		"long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>queimadura</a> expire.",
-		"brief": "Retorna o tempo restante para expirar o efeito Queimadura."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Float contendo o tempo restante até o efeito proteção expirar."
-	},
-	"sample": {
-		"c": "10.c",
-		"python": "10.py"
-	},
-	"explain": "No exemplo o gladiador se move até o centro da arena e então fica rotacionando até que ele receba um ataque. Caso o ataque seja uma fireball, ele ficará queimado e fugirá com teleport. Caso contrário ele fica invisível com ambush e vira em direção ao ataque.",
-	"seealso": [
-		"moveTo",
-		"getHit",
-		"teleport",
-		"ambush",
-        "turnToLastHit",
-		"turn",
-		"getBlockTimeLeft",
-		"getAmbushTimeLeft"
-	],
-	"snippet": {
-		"c": "float ${1:burn_time} = getBurnTimeLeft();",
-		"python": "${1:burn_time} = getBurnTimeLeft()"
-	}
+    "name": {
+        "default": "getBurnTimeLeft",
+        "pt": "tempoQueimadura",
+        "block": "Tempo restante [Queimadura]"
+    },
+    "syntax": {
+        "c": "float getBurnTimeLeft ( void );",
+        "python": "getBurnTimeLeft()",
+        "blocks": "<block type='get_time'><field name='COMPLEMENT'>Burn</field></block>"
+    },
+    "description": {
+        "long": "Retorna o tempo restante até que o efeito <a href='manual.php#nav-efeito'>queimadura</a> expire.",
+        "brief": "Retorna o tempo restante para expirar o efeito Queimadura."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Float contendo o tempo restante até o efeito queimadura expirar.",
+        "blocks": "Número contendo o tempo restante até o efeito queimadura expirar."
+    },
+    "sample": {
+        "c": "10.c",
+        "python": "10.py",
+        "blocks": "10.xml",
+        "explain": "10.txt"
+    },
+    "seealso": [
+        "getblocktimeleft",
+        "getambushtimeleft",
+        "isburning"
+    ],
+    "snippet": {
+        "c": "float ${1:burn_time} = getBurnTimeLeft();",
+        "python": "${1:burn_time} = getBurnTimeLeft()"
+    }
 }

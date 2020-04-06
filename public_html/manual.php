@@ -9,11 +9,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
 	<link rel='stylesheet' href="css/table.css"/>
-	<link rel='stylesheet' href="css/manual.css"/>
-	<link rel='stylesheet' href="css/side-menu.css"/>
-	<link rel='stylesheet' href="css/header.css"/>
-	
-	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+    <link rel='stylesheet' href="css/manual.css"/>
+    <link rel='stylesheet' href="css/side-menu.css"/>
+    <link rel='stylesheet' href="css/header.css"/>
+    
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
@@ -21,12 +21,12 @@
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
 
 	<script src="script/docs.js"></script>
-	<script src="script/side-menu.js"></script>
-	<script src="script/googlelogin.js"></script>
-	<script src="script/socket.js"></script>
-	<script src="script/header.js"></script>
-	
-	</head>
+    <script src="script/side-menu.js"></script>
+    <script src="script/googlelogin.js"></script>
+    <script src="script/socket.js"></script>
+    <script src="script/header.js"></script>
+    
+    </head>
 <body>
 	<?php include("header.php"); ?>
 	<div id='frame'>
@@ -189,7 +189,7 @@
                         <tr>
                             <td><a href='function/fireball'>Fireball</a></td>
                             <td>50</td>
-                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 180% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
+                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 215% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
                         </tr>
                         <tr>
                             <td><a href='function/teleport'>Teleport</a></td>

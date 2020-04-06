@@ -359,6 +359,14 @@ h3#tourn-desc {
     max-height: calc(98vh - 50px);
 }
 
+#fog.code #code-ws {
+    margin: -30px -20px -10px;
+    overflow: hidden;
+    border-radius: 3px 3px 0px 0px;
+    max-width: 600px;
+    height: calc(98vh - 50px);
+}
+
 #group-container .foot .button {
     height: auto;
     width: 100%;

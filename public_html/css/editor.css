@@ -88,7 +88,7 @@ body{
 	}
 }
 
-#code {
+#code, #blocks {
 	height: 100%;
 	width: 100%;
 	margin: 0;
@@ -542,6 +542,13 @@ body{
     overflow: hidden;
 }
 
+#code-box #code-ws {
+    height: calc(90vh - 50px);
+    margin: 0;
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
 #code-box #button-container {
     display: flex;
     justify-content: center;
@@ -654,4 +661,10 @@ body #fog {
 
 .ace_gutter-cell.red {
 	background-color: red;
+}
+
+.blocklyToolboxDiv,
+.blocklyFlyout,
+.blocklyMainWorkspaceScrollbar {
+	z-index: 1;
 }

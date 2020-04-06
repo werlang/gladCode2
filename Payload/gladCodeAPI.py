@@ -71,7 +71,7 @@ def turnToTarget():
 	return bool(int(sendMessage("turnToTarget")))
 
 def turnToAngle(ang):
-	sendMessage("turnToAngle {}".format(ang))
+	return bool(int(sendMessage("turnToAngle {}".format(ang))))
 
 def moveForward(p):
 	sendMessage("moveForward {}".format(p))
@@ -179,7 +179,7 @@ def getLastHitAngle():
 	return float(sendMessage("getLastHitAngle"))
 
 def turnToLastHit():
-	sendMessage("turnToLastHit")
+	return bool(int(sendMessage("turnToLastHit")))
 
 def getHit():
 	return bool(int(sendMessage("getHit")))
