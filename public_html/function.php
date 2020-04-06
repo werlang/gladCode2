@@ -10,12 +10,7 @@
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
-    <link rel='stylesheet' href="css/table.css"/>
-    <link rel='stylesheet' href="css/docs.css"/>
-    <link rel='stylesheet' href="css/side-menu.css"/>
-    <link rel='stylesheet' href="css/function.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
-    
+    <link rel='stylesheet' href="css/function.min.css"/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
@@ -31,13 +26,7 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
     
-    <script src="script/blocks.js"></script>
-    <script src="script/function.js"></script>
-    <script src="script/side-menu.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
-    
+    <script src="script/function.min.js"></script>
     </head>
 <body>
     <?php include("header.php"); ?>
