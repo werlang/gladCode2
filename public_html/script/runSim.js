@@ -15,7 +15,7 @@ function runSimulation(args) {
 		args: JSON.stringify(args),
 	})
 	.done(function(data){
-		// console.log(data);
+		console.log(data);
 		var jsonerror;
 		try{
 			JSON.parse(data);
@@ -43,18 +43,23 @@ function runSimulation(args) {
 				else{
 					error = error.split("/usercode/").join("");
 					for (var i in glads){
-						if (glads[i].name)
-							error = error.split("code"+i+".c").join("<span>"+ glads[i].name +"</span>");
+						if (glads[i].name){
+							error = error.split(`code${i}.c`).join(`<span>${glads[i].name}</span>`);
+							error = error.split(`code${i}.py`).join(`<span>${glads[i].name}</span>`);
+						}
 						else{
-							var pattern = /setName\("([\w\W]*?)"\);/;
-							var name = glads[i].match(pattern)[1];
-							error = error.split("code"+i+".c").join("<span>"+ name +"</span>");
+							var pattern = /setName\("([\w\W]*?)"\)/;
+							var match = glads[i].match(pattern);
+							if (match){ 
+								error = error.split(`code${i}.c`).join(`<span>${match[1]}</span>`);
+								error = error.split(`code${i}.py`).join(`<span>${match[1]}</span>`);
+							}
 						}
 					}
 					var pattern = /\\n/g;
 					error = error.replace(pattern, '\n');
-					
-					showTerminal("ERRO DE COMPILAÇÃO", error);
+
+					showTerminal("ERRO DE SINTAXE", error);
 				}
 				return response.resolve("ERROR");
 			}

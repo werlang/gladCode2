@@ -1,16 +1,27 @@
 {
 	"name": "getHit",
 	"ptname": "fuiAcertado",
-	"syntax": "int getHit ( void );",
+	"syntax": {
+		"c": "int getHit ( void );",
+		"python": "getHit()"
+	},
 	"description": {
-		"long": "Verifica se o gladiador recebeu um ataque desde a última vez que a função foi chamada, retornando 1 em caso afirmativo ou 0 caso contrário.",
+		"long": "Verifica se o gladiador recebeu um ataque desde a última vez que a função foi chamada.",
 		"brief": "Descobre se o gladiador foi atacado."
 	},
-	"param": [
-		{"name": "void", "description": "A função não recebe parâmetros."}
-	],
-	"treturn": "Retorna 1 caso o gladiador tenha recebido ataque no último intervalo de tempo, ou 0 caso contrário.",
-	"sample": "loop(){\n    if (getHit()){\n        turnToLastHit();\n\t\tgetCloseEnemy();\n\r\n\t\tif(isTargetVisible())\n            attackRanged(getTargetX(), getTargetY());\n    }\n}",
+	"param": {
+		"default": [
+			{"name": "void", "description": "A função não recebe parâmetros."}
+		]
+	},
+	"treturn": {
+		"default": "Retorna True caso o gladiador tenha recebido ataque desde a última chamada desta função, ou False caso contrário.",
+		"c": "Retorna 1 caso o gladiador tenha recebido ataque desde a última chamada desta função, ou 0 caso contrário."
+	},
+	"sample": {
+		"c": "16.c",
+		"python": "16.py"
+	},
 	"explain": "No exemplo o gladiador fica aguardando até receber um ataque. Quando isso acontece ele se vira em direção ao atacante, e ao enxergar um alvo próximo ele desfere um ataque à distância contra ele.",
 	"seealso": [
 		"turnToAngle",
@@ -22,5 +33,8 @@
 		"getTargetY",
 		"getLastHitTime"
 	],
-	"snippet": "int ${1:hit} = getHit();"
+	"snippet": {
+		"c": "int ${1:hit} = getHit();",
+		"python": "${1:hit} = getHit()"
+	}
 }
