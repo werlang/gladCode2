@@ -8,7 +8,14 @@
     <link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
-    <link rel='stylesheet' href="css/editor.min.css"/>
+    <link rel='stylesheet' href="css/sprite.css"/>
+    <link rel='stylesheet' href="css/slider.css"/>
+    <link rel='stylesheet' href="css/glad-card.css"/>
+    <link rel='stylesheet' href="css/dialog.css"/>
+    <link rel='stylesheet' href="css/chat.css"/>
+    <link rel='stylesheet' href="css/header.css"/>
+    <link rel='stylesheet' href="css/editor.css"/>
+    
     <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
@@ -36,7 +43,18 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
 
-    <script src="script/editor.min.js"></script>
+    <script src="script/editor.js"></script>
+    <script src="script/assets.js"></script>
+    <script src="script/dialog.js"></script>
+    <script src="script/runSim.js"></script>
+    <script src="script/tutorial.js"></script>
+    <script src="script/googlelogin.js"></script>
+    <script src="script/header.js"></script>
+    <script src="script/socket.js"></script>
+    <script src="script/emoji.js"></script>
+    <script src="script/chat.js"></script>
+    <script src="script/blocks.js"></script>
+    
     </head>
 <body>
     <?php
