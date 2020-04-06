@@ -10,7 +10,12 @@ if (isset($_GET['n']) && isset($_GET['t'])){
     $name = $_GET['n'];
     $nteams = $_GET['t'];
     
-    $sql = "INSERT INTO tournament (name, creation, maxteams, flex, manager, hash, password, description) VALUES ('$name', now(), 50, 1, 'pswerlang@gmail.com', '', '', '')";
+    $sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
+    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+    $row = $result->fetch_assoc();
+    $manager = $row['id'];
+
+    $sql = "INSERT INTO tournament (name, creation, maxteams, maxtime, flex, manager, hash, password, description) VALUES ('$name', now(), 50, '00:30:00', 1, '$manager', '', '', '')";
     if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
     $tournid = $conn->insert_id;
 

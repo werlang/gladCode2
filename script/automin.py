@@ -59,10 +59,10 @@ for h in config['files']:
 
                 if k == 'js':
                     pattern = r'<script[\w\s\=\-\/\"\']*?src=[\'\"]{}\/{}[\'\"][\w\s\=\-\/\"\'>]+?<\/script>'.format(min_path[k], name)
-                    replace = "<script src=\"{}/{}.min.js\"></script>\n\t<script src=\"{}/{}\"></script>".format(min_path[k], html_name.split('.')[-2], min_path[k], name)
+                    replace = "<script src=\"{}/{}.min.js\"></script>\n    <script src=\"{}/{}\"></script>".format(min_path[k], html_name.split('.')[-2], min_path[k], name)
                 else:
                     pattern = r'<link[\w\s\=\-\/\"\']*?href=[\'\"]{}\/{}[\'\"]\/>'.format(min_path[k], name)
-                    replace = "<link rel='stylesheet' href=\"{}/{}.min.css\"/>\n\t<link rel='stylesheet' href=\"{}/{}\"/>".format(min_path[k], html_name.split('.')[-2], min_path[k], name)
+                    replace = "<link rel='stylesheet' href=\"{}/{}.min.css\"/>\n    <link rel='stylesheet' href=\"{}/{}\"/>".format(min_path[k], html_name.split('.')[-2], min_path[k], name)
 
                 file_php = re.sub(pattern, replace, file_php)
             
@@ -108,10 +108,10 @@ for h in config['files']:
                 #insert dev script/link tags
                 if k == 'js':
                     pattern = r'<script src=\"{}\/{}\.min\.js\"><\/script>'.format(min_path[k], html_name.split('.')[-2])
-                    replace = "<script src=\"{}/{}\"></script>\n\t<script src=\"{}/{}.min.js\"></script>".format(min_path[k], name, min_path[k], html_name.split('.')[-2])
+                    replace = "<script src=\"{}/{}\"></script>\n    <script src=\"{}/{}.min.js\"></script>".format(min_path[k], name, min_path[k], html_name.split('.')[-2])
                 else:
                     pattern = r'<link rel=\'stylesheet\' href=\"{}\/{}\.min\.css\"\/>'.format(min_path[k], html_name.split('.')[-2])
-                    replace = "<link rel='stylesheet' href=\"{}/{}\"/>\n\t<link rel='stylesheet' href=\"{}/{}.min.css\"/>".format(min_path[k], name, min_path[k], html_name.split('.')[-2])
+                    replace = "<link rel='stylesheet' href=\"{}/{}\"/>\n    <link rel='stylesheet' href=\"{}/{}.min.css\"/>".format(min_path[k], name, min_path[k], html_name.split('.')[-2])
 
                 file_php = re.sub(pattern, replace, file_php)
 

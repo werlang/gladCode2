@@ -1,37 +1,39 @@
 {
-	"name": "getINT",
-	"ptname": "pegaINT",
-	"syntax": {
-		"c": "int getINT ( void );",
-		"python": "getINT()"
-	},
-	"description": {
-		"long": "Retorna o valor do atributo Inteligência (INT) do gladiador.",
-		"brief": "Retorna o valor do atributo Inteligência (INT) do gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Inteiro contendo o valor do atributo Inteligência do gladiador."
-	},
-	"sample": {
-		"c": "18.c",
-		"python": "18.py"
-	},
-	"explain": "Este exemplo analisa o valor do atributo Inteligência do gladiador, e caso ele seja pelo menos 15, chama a função upgradeSTR(), indicando que ele deseja aumentar sua Força. Até isso acontecer, a prioridade de melhoria de atributo é para a Inteligência. Enquanto isso, o gladiador move-se pela arena em diagonal.",
-	"seealso": [
-		"setINT",
-		"getSTR",
-		"getAGI",
-		"upgradeSTR",
-		"upgradeINT",
-		"moveTo"
-	],
-	"snippet": {
-		"c": "int ${1:myint} = getINT();",
-		"python": "${1:myint} = getINT()"
-	}
+    "name": {
+        "default": "getINT",
+        "pt": "pegaINT",
+        "block": "Pegar informação [Atributo Inteligência]"
+    },
+    "syntax": {
+        "c": "int getINT ( void );",
+        "python": "getINT()",
+        "blocks": "<block type='get_info'><field name='COMPLEMENT'>INT</field></block>"
+    },
+    "description": {
+        "long": "Retorna o valor do atributo Inteligência (INT) do gladiador.",
+        "brief": "Retorna o valor do atributo Inteligência (INT) do gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Inteiro contendo o valor do atributo Inteligência do gladiador.",
+        "blocks": "Número contendo o valor do atributo Inteligência do gladiador."
+    },
+    "sample": {
+        "c": "8.c",
+        "python": "8.py",
+        "blocks": "8.xml",
+        "explain": "8.txt"
+    },
+    "seealso": [
+        "getstr",
+        "getagi"
+    ],
+    "snippet": {
+        "c": "int ${1:myint} = getINT();",
+        "python": "${1:myint} = getINT()"
+    }
 }

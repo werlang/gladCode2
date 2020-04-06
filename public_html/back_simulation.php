@@ -123,27 +123,52 @@
 		$code = $codes[count($codes) - 1];
 		$oldcode = $code;
 		$breakpoints = $args['breakpoints'];
+		$language = getLanguage($code);
 
-		//add {} in single line blocks to avoid messing with structure if breakpoint is inserted in between
-		$pattern = '/((?:(?:if)||(?:for)|(?:while))[ ]{0,1}\([^\n]*?\))\n(.*)|(else)\n(.*)/';
-		$replacement = '$1$3{'. PHP_EOL .'$2$4}';
-		$code = preg_replace($pattern, $replacement, $code);
+		if ($language == 'c'){
+			// add {} in single line blocks to avoid messing with structure if breakpoint is inserted in between
+			$pattern = '/((?:(?:if)||(?:for)|(?:while))[ ]{0,1}\([^\n]*?\))\n(.*)|(else)\n(.*)/';
+			$replacement = '$1$3{'. PHP_EOL .'$2$4}';
+			$code = preg_replace($pattern, $replacement, $code);
 
-		$code = explode(PHP_EOL, $code);
-		foreach ($code as $i => $line){
-			if ($line == "}"){
-				$setup = $i + 2;
-				break;
+			// find where setup ends
+			$code = explode(PHP_EOL, $code);
+			foreach ($code as $i => $line){
+				if ($line == "}"){
+					$setup = $i + 2;
+					break;
+				}
+			}
+
+			//insert breakpoint line
+			foreach ($breakpoints as $ln){
+				$line = $ln - 1 + $setup;
+				$hint = preg_replace('/\s*(.*?)[{};]*\n/', "$1", $code[$line]);
+				$code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
+				$code = preg_replace($pattern, $replacement, $code);
+					
 			}
 		}
-		//insert breakpoint line
-		foreach ($breakpoints as $ln){
-			$line = $ln - 1 + $setup;
-			$hint = preg_replace('/\s*(.*?)[{};]*/', "$1", $code[$line]);
-			$code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
-			$code = preg_replace($pattern, $replacement, $code);
-				
+		else if ($language == 'python'){
+			// find where setup ends
+			$code = explode(PHP_EOL, $code);
+			foreach ($code as $i => $line){
+				if ($line == "# start of user code"){
+					$setup = $i + 2;
+					break;
+				}
+			}
+
+			//insert breakpoint line
+			foreach ($breakpoints as $ln){
+				$line = $ln - 2 + $setup;
+				$hint = preg_replace('/(\s*)(.*)/', "$2", $code[$line]);
+				$tab = preg_replace('/(\s*)(.*)/', "$1", $code[$line]);
+				$code[$line] = $tab ."breakpoint(\"". $hint ."\")". PHP_EOL . $code[$line];
+					
+			}
 		}
+
 		$code = implode(PHP_EOL, $code);
 		$codes[count($codes) - 1] = $code;
 	}
@@ -165,10 +190,10 @@
 
 			$language = getLanguage($code);
 			if ($language == "c"){
-				$setup = "setup(){\n\tsetName(\"$name@$nick\");\n\tsetSTR($vstr);\n\tsetAGI($vagi);\n\tsetINT($vint);\n}\n\n";
+				$setup = "setup(){\n    setName(\"$name@$nick\");\n    setSTR($vstr);\n    setAGI($vagi);\n    setINT($vint);\n}\n\n";
 			}
 			else if ($language == "python"){
-				$setup = "def setup():\n\tsetName(\"$name@$nick\")\n\tsetSTR($vstr)\n\tsetAGI($vagi)\n\tsetINT($vint)\n\n";
+				$setup = "def setup():\n    setName(\"$name@$nick\")\n    setSTR($vstr)\n    setAGI($vagi)\n    setINT($vint)\n# start of user code\n";
 			}
 
 			$code = $setup . $code;
@@ -189,7 +214,7 @@
 			file_put_contents("$path/temp/$foldername/code$i.c",$code);
 		}
 		else if ($language == "python"){
-			$code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n\twhile running():\n\t\tloop()\n\tendSocketComm()";
+			$code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
 			file_put_contents("$path/temp/$foldername/code$i.py",$code);
 		}
 	}
@@ -243,7 +268,7 @@
 					$_SESSION['code'] = preg_replace('/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/', "", $codes[count($codes)-1]);
 				}
 				else if ($language == "python"){
-					$_SESSION['code'] = preg_replace('/def setup\(\)[\w\W]*?:[\w\W]*?\n\n/', "", $codes[count($codes)-1]);
+					$_SESSION['code'] = preg_replace('/def setup\(\)[\w\W]*?:[\w\W]*?\n# start of user code\n/', "", $codes[count($codes)-1]);
 				}
 				//echo $_SESSION['code'];
 			}

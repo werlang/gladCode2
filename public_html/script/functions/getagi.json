@@ -1,37 +1,39 @@
 {
-	"name": "getAGI",
-	"ptname": "pegaAGI",
-	"syntax": {
-		"c": "int getAGI ( void );",
-		"python": "getAGI()"
-	},
-	"description": {
-		"long": "Retorna o valor do atributo Agilidade (AGI) do gladiador.",
-		"brief": "Retorna o valor do atributo Agilidade (AGI) do gladiador."
-	},
-	"param": {
-		"default": [
-			{"name": "void", "description": "A função não recebe parâmetros."}
-		]
-	},
-	"treturn": {
-		"default": "Inteiro contendo o valor do atributo Agilidade do gladiador."
-	},
-	"sample": {
-		"c": "8.c",
-		"python": "8.py"
-	},
-	"explain": "Este exemplo analisa o valor do atributo Agilidade do gladiador, e caso ele seja pelo menos 15, chama a função upgradeINT(), indicando que ele deseja aumentar sua Inteligência. Até isso acontecer, a prioridade de melhoria de atributo é para a Agilidade. Enquanto isso, o gladiador move-se pela arena em diagonal.",
-	"seealso": [
-		"setAGI",
-		"getSTR",
-		"getINT",
-		"upgradeINT",
-		"upgradeAGI",
-		"moveTo"
-	],
-	"snippet": {
-		"c": "int ${1:myagi} = getAGI();",
-		"python": "${1:myagi} = getAGI()"
-	}
+    "name": {
+        "default": "getAGI",
+        "pt": "pegaAGI",
+        "block": "Pegar informação [Atributo Agilidade]"
+    },
+    "syntax": {
+        "c": "int getAGI ( void );",
+        "python": "getAGI()",
+        "blocks": "<block type='get_info'><field name='COMPLEMENT'>AGI</field></block>"
+    },
+    "description": {
+        "long": "Retorna o valor do atributo Agilidade (AGI) do gladiador.",
+        "brief": "Retorna o valor do atributo Agilidade (AGI) do gladiador."
+    },
+    "param": {
+        "default": [
+            {"name": "void", "description": "A função não recebe parâmetros."}
+        ]
+    },
+    "treturn": {
+        "default": "Inteiro contendo o valor do atributo Agilidade do gladiador.",
+        "blocks": "Número contendo o valor do atributo Agilidade do gladiador."
+    },
+    "sample": {
+        "c": "8.c",
+        "python": "8.py",
+        "blocks": "8.xml",
+        "explain": "8.txt"
+    },
+    "seealso": [
+        "getstr",
+        "getint"
+    ],
+    "snippet": {
+        "c": "int ${1:myagi} = getAGI();",
+        "python": "${1:myagi} = getAGI()"
+    }
 }

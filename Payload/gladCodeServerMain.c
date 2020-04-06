@@ -165,16 +165,16 @@ void *connection_handler(void *p){
 				sprintf(reply, "%f",getTargetY(gladid));
 			}
 			else if (strcmp(func->call,"doYouSeeMe")==0){
-				sprintf(reply, "%i",doYouSeeMe(gladid));
+				sprintf(reply, "%i", doYouSeeMe(gladid));
 			}
 			else if (strcmp(func->call,"isTargetVisible")==0){
-				sprintf(reply, "%i",doYouSeeMe(gladid));
+				sprintf(reply, "%i", isTargetVisible(gladid));
 			}
 			else if (strcmp(func->call,"getSimTime")==0){
-				sprintf(reply, "%.1f",getSimTime(gladid));
+				sprintf(reply, "%.1f", getSimTime(gladid));
 			}
 			else if (strcmp(func->call,"getSimCounters")==0){
-				sprintf(reply, "%s",getSimCounters());
+				sprintf(reply, "%s", getSimCounters());
 			}
 			else if (strcmp(func->call,"startSimulation")==0){
 				sprintf(reply, "%i", startSimulation(gladid));
@@ -189,7 +189,7 @@ void *connection_handler(void *p){
 				sprintf(reply, "%f", getLastHitAngle(gladid));
 			}
 			else if (strcmp(func->call,"turnToLastHit")==0){
-				turnToLastHit(gladid);
+				sprintf(reply, "%i", turnToLastHit(gladid));
 			}
 			else if (strcmp(func->call,"getHit")==0){
 				sprintf(reply, "%i",getHit(gladid));
@@ -238,14 +238,14 @@ void *connection_handler(void *p){
 			else if (strcmp(func->call,"turnTo")==0){
 				float x = func->arg[0].toFloat;
 				float y = func->arg[1].toFloat;
-				sprintf(reply, "%i", isSafeThere(gladid, x, y));
+				sprintf(reply, "%i", turnTo(gladid, x, y));
 			}
 			else if (strcmp(func->call,"turnToTarget")==0){
 				sprintf(reply, "%i", turnToTarget(gladid));
 			}
 			else if (strcmp(func->call,"turnToAngle")==0){
 				float v = func->arg[0].toFloat;
-				turnToAngle(gladid, v);
+				sprintf(reply, "%i", turnToAngle(gladid, v));
 			}
 			else if (strcmp(func->call,"moveForward")==0){
 				float p = func->arg[0].toFloat;

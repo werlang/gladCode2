@@ -1,7 +1,5 @@
-def loop():
-	if getLvl() < 5:
-		upgradeSTR()
-	else:
-		upgradeINT()
-		
-...
+def upgrade():
+    if getLvl() < 5:
+        upgradeSTR(5)
+    else:
+        upgradeINT(5)
