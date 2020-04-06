@@ -26,12 +26,12 @@
     <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
-    <link rel='stylesheet' href='css/dialog.css'/> 
-    <link rel='stylesheet' href='css/glad-card.css'/> 
-    <link rel='stylesheet' href='css/tournament.css'/> 
+    <link rel='stylesheet' href="css/dialog.css"/>
+    <link rel='stylesheet' href="css/glad-card.css"/>
+    <link rel='stylesheet' href="css/tournament.css"/>
     <link rel='stylesheet' href="css/chat.css"/>
     <link rel='stylesheet' href="css/header.css"/>
-
+    
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
@@ -54,7 +54,8 @@
     <script src="script/googlelogin.js"></script>
     <script src="script/header.js"></script>
     <script src="script/blocks.js"></script>
-</head>
+    
+    </head>
 <body>
     <?php
         include("header.php");

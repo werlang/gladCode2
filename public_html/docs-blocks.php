@@ -21,7 +21,7 @@
     <script src="script/socket.js"></script>
     <script src="script/header.js"></script>
     
-</head>
+    </head>
 <body>
     <?php include("header.php"); ?>
     <div id='frame'>
@@ -34,7 +34,7 @@
 
                 <p>Esta página tem o objetivo de mostrar uma visão geral de todos blocos de funções disponíveis na gladCode, e leva-se em consideração que você já possui noções básicas de lógica de programação. Caso deseje aprender o básico de lógica de programação usando os blocos da gladCode, assista o vídeo abaixo</p>
                 
-                <div class='video'><iframe src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+                <div class='video'><iframe src="https://www.youtube.com/embed/hzxe5rmyODI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
                 
                 <p>Você também pode programar seu gladiador usando as linguagens de programação C ou Python. Caso tenha interesse <a href='docs'>clique aqui</a>.</p>
                 
