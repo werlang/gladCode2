@@ -8,7 +8,7 @@ var stepIncrement = 1;
 var istep;
 var tournHash, loghash;
 var fullscreen = false;
-var timeSlider = 0;
+var timeSlider = 0; 
 
 $(document).ready( function() {
 	$('#loadbar #status').html("Página carregada");

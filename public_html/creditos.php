@@ -6,9 +6,13 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Créditos</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-    <link rel='stylesheet' href="css/creditos.min.css"/>
+    <link rel='stylesheet' href="css/header.css"/>
+    
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src="script/creditos.min.js"></script>
+    <script src="script/googlelogin.js"></script>
+    <script src="script/socket.js"></script>
+    <script src="script/header.js"></script>
+    
     <style>
         body {
             margin: 0;

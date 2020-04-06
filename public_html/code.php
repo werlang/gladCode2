@@ -6,7 +6,8 @@
     <meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCoding</title>
-    <link rel='stylesheet' href="css/code.min.css"/>
+    <link rel='stylesheet' href="css/code.css"/>
+    
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
     <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
@@ -15,7 +16,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ext-language_tools.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     
-    <script src="script/code.min.js"></script>
+    <script src="script/code.js"></script>
+    <script src="script/tabs.js"></script>
+    <script src="script/keybinds.js"></script>
+    <script src="script/socket.js"></script>
+    <script src="script/file_manager.js"></script>
+    <script src="script/googlelogin.js"></script>
+    
     </head>
 <body>
     <div id='frame'>
