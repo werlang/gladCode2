@@ -417,7 +417,7 @@ $(document).ready( function() {
     }
 
     waitLogged().then( () => {
-        if (user){
+        if (user.status == "SUCCESS" ){
             $.post("back_glad.php",{
                 action: "GET",
             }).done( function(data){

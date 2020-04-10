@@ -541,18 +541,29 @@ $(document).ready( function(){
         create_duel_box(nick, userid);
     });
 
-    $('#panel #battle-mode #tourn.button').click( function(){
+    $('#panel #battle-mode #tourn.button').click( async function(){
         $('#panel #battle-container .wrapper').hide();
         var duel = $('#panel #battle-container #tourn.wrapper');
         if (duel.css('display') == 'none')
             duel.fadeIn();
 
         refresh_tourn_list();
-
-        if (socket){
-            socket.emit('tournament list join', {});
-        }        
     });
+
+    $('#panel #battle-mode #train.button').click( function(){
+        $('#panel #battle-container .wrapper').hide();
+        var train = $('#panel #battle-container #train.wrapper');
+        if (train.css('display') == 'none')
+            train.fadeIn();
+
+        trainList.refresh();
+    })
+
+    if ($('#subtab').length){
+        let subtab = $('#subtab').html()
+        $('#subtab').remove()
+        $(`#panel #battle-mode #${subtab}.button`).click()
+    }
 
     $('#menu #report').click( function() {
         reload_reports();
