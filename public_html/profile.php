@@ -46,6 +46,7 @@
     <script src="script/dropzone.js"></script>
     <script src="script/croppie.js"></script>
     <script src="script/profile-tourn.js"></script>
+    <script src="script/profile-train.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/profile.js"></script>
@@ -65,6 +66,8 @@
         include("header.php");
         if(isset($_GET['t']))
             echo "<div id='tab' hidden>". mysql_escape_string($_GET['t']) ."</div>";
+        if(isset($_GET['s']))
+            echo "<div id='subtab' hidden>". mysql_escape_string($_GET['s']) ."</div>";
     ?>
     <div id='frame'>
         <div id='menu'>
@@ -141,6 +144,7 @@
                             <button id='ranked' class='button'><img src='icon/winner-icon.png'>Batalha Ranqueada</button>
                             <button id='duel' class='button'><img src='sprite/images/swords.png'>Duelo de Gladiadores</button>
                             <button id='tourn' class='button'><img src='icon/tournament.png'>Torneio Personalizado</button>
+                            <button id='train' class='button'><img src='icon/stars-stack.png'>Treino de equipes</button>
                         </div>
                     </div>
                     <div id='duel-challenge' class='hidden'>
@@ -180,6 +184,24 @@
                             <div id='button-container'>
                                 <button id='create' class='button'>CRIAR UM TORNEIO</button>
                                 <button id='join' class='button'>INGRESSAR EM UM TORNEIO</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id='train' class='wrapper'>
+                        <div class='container'>
+                        <div class='title manage'>
+                                <h2>Treinos que gerencio</h2>
+                                <div id='offset' class='manage'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                            </div>
+                            <div id='table-manage' class='table'></div>
+                            <div class='title part'>
+                                <h2>Treinos que participo</h2>
+                                <div id='offset' class='part'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                            </div>
+                            <div id='table-part' class='table'></div>
+                            <div id='button-container'>
+                                <button id='create' class='button'>NOVO TREINO</button>
+                                <button id='join' class='button'>PARTICIPAR DE TREINO</button>
                             </div>
                         </div>
                     </div>
