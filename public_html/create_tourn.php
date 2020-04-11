@@ -11,25 +11,25 @@ if (isset($_GET['n']) && isset($_GET['t'])){
     $nteams = $_GET['t'];
     
     $sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
-    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+    $result = runQuery($sql);
     $row = $result->fetch_assoc();
     $manager = $row['id'];
 
     $sql = "INSERT INTO tournament (name, creation, maxteams, maxtime, flex, manager, hash, password, description) VALUES ('$name', now(), 50, '00:30:00', 1, '$manager', '', '', '')";
-    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+    $result = runQuery($sql);
     $tournid = $conn->insert_id;
 
     $teams = array();
     for ($i=0 ; $i<$nteams ; $i++){
         $sql = "INSERT INTO teams (name, password, tournament, modified) VALUES ('eq$i','bababa', $tournid, now())";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+        $result = runQuery($sql);
         array_push($teams, $conn->insert_id);
     }
 
     $limit = $nteams*3;
     $glads = array();
     $sql = "SELECT g.cod FROM gladiators g GROUP BY g.master LIMIT $limit";
-    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+    $result = runQuery($sql);
     while ($row = $result->fetch_assoc()){
         array_push($glads, $row['cod']);
     }
@@ -38,7 +38,7 @@ if (isset($_GET['n']) && isset($_GET['t'])){
         for ($i=0 ; $i<3 ; $i++){
             $glad = array_pop($glads);
             $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ($glad, $team)";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
         }
     }
 

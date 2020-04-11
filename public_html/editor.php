@@ -70,7 +70,7 @@
             }
             else{
                 $sql = "SELECT * FROM gladiators INNER JOIN usuarios ON id = master WHERE master = '$user' AND cod = $id";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                $result = runQuery($sql);
                 if ($result->num_rows > 0){
                     $row = $result->fetch_assoc();
                     $name = $row['name'];
