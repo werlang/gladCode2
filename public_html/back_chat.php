@@ -479,11 +479,35 @@
                 }
             }
         }
-        else if ($command == "ban" || $command == "unban"){
-            if ($room == '')
+        else if ($command == "ban" || $command == "unban" || $command == "kick"){
+            // set room arg if trying to kick from outside 
+            if ($command == "kick" && $room == ''){
+                if ($command == "kick"){
+                    $str = implode(" ", $args);
+                    $args = explode(" ", explode(" -r", $str)[0]);
+                    preg_match('/ -r ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $d);
+                    if (isset($d) && is_array($d) && count($d) > 1){
+                        $r = trim($d[1]);
+                        $sql = "SELECT id FROM chat_rooms WHERE name = '$r'";
+                        $result = runQuery($sql);
+                        $nrows = $result->num_rows;
+                        if ($nrows > 0){
+                            $row = $result->fetch_assoc();
+                            $room = $row['id'];
+                        }
+                        else
+                            $room = '';
+                    }
+                    else   
+                        $room = '';
+                }
+            }
+
+            if ($room == ''){
                 $output['status'] = "NOROOM";
+            }
             else{
-                $sql = "SELECT cu.privilege, u.apelido FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE cu.user = '$user' AND cu.room = $room";
+                $sql = "SELECT cu.privilege, u.apelido, cr.name FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user INNER JOIN chat_rooms cr ON cr.id = cu.room WHERE cu.user = '$user' AND cu.room = $room";
                 if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                 $nrows = $result->num_rows;
 
@@ -493,14 +517,15 @@
                     $row = $result->fetch_assoc();
                     $priv = $row['privilege'];
                     $nick = $row['apelido'];
+                    $room_name = $row['name'];
                     if ($priv == 1)
                         $output['status'] = "NOPERMISSION";
                     else{
                         $target = implode(" ", $args);
 
-                        if ($command == "ban")
+                        if ($command == "ban" || $command == "kick")
                             $sql = "SELECT cu.privilege, cu.user FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE u.apelido = '$target' AND cu.room = $room";
-                        else
+                        elseif ($command == "unban")
                             $sql = "SELECT cre.user, 2 AS privilege FROM usuarios u INNER JOIN chat_restrictions cre ON cre.user = u.id WHERE u.apelido = '$target' AND cre.room = $room";
                         
                         if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
@@ -516,10 +541,9 @@
                             $tpriv = $row['privilege'];
 
                             //check if user is already banned
-                            $sql = "SELECT count(*) FROM chat_restrictions WHERE user = '$tuser' AND room = $room AND ban = 1";
+                            $sql = "SELECT id FROM chat_restrictions WHERE user = '$tuser' AND room = $room AND ban = 1";
                             if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-                            $row = $result->fetch_assoc();
-                            $banned = $row['count(*)'];
+                            $banned = $result->num_rows;
                             if ($banned > 0 && $command == 'ban'){
                                 $output['status'] = "ALREADYBANNED";
                                 $output['target'] = $target;
@@ -530,11 +554,25 @@
                                     $sql = "INSERT INTO chat_restrictions (user, room, ban, time) VALUES ('$tuser', $room, 1, now(3))";
                                     $output['status'] = "BAN";
                                 }
+                                elseif ($command == 'kick'){
+                                    $msg = "$target foi removido da sala por $nick";
+                                    $sql = "DELETE FROM chat_users WHERE user = '$tuser' AND room = $room";
+                                    $output['status'] = "KICK";
+                                }
                                 else{
                                     $msg = "$nick removeu o banimento de $target";
                                     $sql = "DELETE FROM chat_restrictions WHERE user = '$tuser' AND room = $room";
                                     $output['status'] = "UNBAN";
                                 }
+
+                                send_node_message(array(
+                                    'chat personal' => array(
+                                        'user' => $tuser,
+                                        'status' => $output['status'],
+                                        'room_name' => $room_name 
+                                    )
+                                ));
+
                                 if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
                                 $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$msg', 1)";
@@ -591,7 +629,26 @@
                 }
             }
         }
-        else if ($command == "edit"){
+        else if ($command == "edit"){            
+            if ($room == ''){
+                $str = implode(" ", $args);
+                preg_match('/ -r ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $r);
+                if (isset($r) && is_array($r) && count($r) > 1){
+                    $r = trim($r[1]);
+                    $sql = "SELECT id FROM chat_rooms WHERE name = '$r'";
+                    $result = runQuery($sql);
+                    $nrows = $result->num_rows;
+                    if ($nrows > 0){
+                        $row = $result->fetch_assoc();
+                        $room = $row['id'];
+                    }
+                    else
+                        $room = '';
+                }
+                else   
+                    $room = '';
+            }
+
             if ($room == '')
                 $output['status'] = "NOROOM";
             else{

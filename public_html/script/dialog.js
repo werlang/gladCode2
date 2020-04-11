@@ -106,6 +106,9 @@ function create_toast(message, type) {
         icon = 'check-circle';
 
     $('body').append(`<div class='toast ${type}'><i class='fas fa-${icon}'></i><span>${message}</span></div>`);
+	$('.toast').each( (i,e) => {
+		$(e).css({ 'bottom': `calc(${i*1.5}em + ${i*20}px)` })
+	})
     setTimeout( function(){
         $('.toast').fadeOut(3000, function(){
             $(this).remove();

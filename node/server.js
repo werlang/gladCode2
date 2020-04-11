@@ -153,6 +153,10 @@ app.post('/phpcallback', parser, function(req, res) {
         var msg = content['chat notification'];
         io.to(`chat-room-${msg.room}`).emit('chat notification', msg);
     }
+    else if (content['chat personal']){
+        var msg = content['chat personal'];
+        io.to(`user-${msg.user}`).emit('chat personal', msg);
+    }
     else if (content['profile notification']){
         var users = content['profile notification'].user;
         for (let i in users){
