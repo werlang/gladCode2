@@ -36,7 +36,7 @@
 	if (isset($args['duel'])){
 		$id = mysql_escape_string($args['duel']);
 		$sql = "SELECT gladiator1 FROM duels WHERE id = '$id' AND user2 = '$user' AND log IS NULL";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		$userglad = $glads;
 		$glads = array($glads, $row['gladiator1']);
@@ -44,7 +44,7 @@
 		$version = file_get_contents("version");
 		$glads_string = implode(",", $glads);
 		$sql = "SELECT version FROM gladiators WHERE cod IN ($glads_string)";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		while ($row = $result->fetch_assoc()){
 			if ($version != $row['version'])
 				$cancel_run = true;
@@ -62,11 +62,11 @@
 			unset($_SESSION['tourn-group'][$groupid]);
 
 			$sql = "SELECT log FROM groups WHERE id = $groupid";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+			$result = runQuery($sql);
 			$row = $result->fetch_assoc();
 			if ($row['log'] == null){
 				$sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+				$result = runQuery($sql);
 	
 				while($row = $result->fetch_assoc()){
 					array_push($glads, $row['gladiator']);
@@ -105,7 +105,7 @@
 			}
 			else{
 				$sql = "SELECT skin FROM skins WHERE hash = '$hash'";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 				if ($result->num_rows > 0){
 					$row = $result->fetch_assoc();
 					$skins[$name .'@'. $nick] = $row['skin'];
@@ -177,7 +177,7 @@
 	if (count($ids) > 0){
 		$ids = implode(",", $ids);
 		$sql = "SELECT code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		while($row = $result->fetch_assoc()){
 			$code = $row['code'];
@@ -303,20 +303,20 @@
 			if (isset($args['duel']) && !$cancel_run){
 				$id = mysql_escape_string($args['duel']);
 				$sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 			}
 			if (isset($args['tournament']) && $groupid != null){
 				$sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 				$row = $result->fetch_assoc();
 				$logid = $row['id'];
 
 				$sql = "SELECT log FROM groups WHERE id = $groupid";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 				$row = $result->fetch_assoc();
 				if ($row['log'] == null){
 					$sql = "UPDATE groups SET log = '$logid' WHERE id = '$groupid'";
-					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+					$result = runQuery($sql);
 				}
 			}
 
@@ -405,7 +405,7 @@
 		}
 
 		$sql = "INSERT INTO logs (time, version, hash, singleView) VALUES (now(), '$version', '$hash', '$single')";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+		$result = runQuery($sql);
 		
 		$id = $conn->insert_id;
 		file_put_contents("logs/$id",$log);
@@ -492,7 +492,7 @@
 		}
 		
 		$sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp' WHERE id = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		send_node_message(array(
 			'profile notification' => array('user' => array($user))
@@ -509,7 +509,7 @@
 			$id = $glad['id'];
 			
 			$sql = "UPDATE gladiators SET mmr = mmr + '$mmr' WHERE cod = '$id'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 		}		
 		
 		return $reward;
@@ -593,7 +593,7 @@
 			$name = $glad['name'];
 			$nick = $glad['user'];
 			$sql = "SELECT g.cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.name = '$name' AND u.apelido = '$nick'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			while($row = $result->fetch_assoc()){
 				$deaths[$i]['id'] = $row['cod'];
@@ -612,17 +612,17 @@
 
 	function send_reports($conn, $rewards, $log){
 		$sql = "SELECT id FROM logs WHERE hash = '$log'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		$log = $row['id'];
 		
 		$masters = array();
 		foreach($rewards as $glad => $reward){
 			$sql = "INSERT INTO reports (log, gladiator, reward) VALUES ('$log', '$glad', '$reward')";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+			$result = runQuery($sql);
 
 			$sql = "SELECT master FROM gladiators WHERE cod = $glad";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+			$result = runQuery($sql);
 			$row = $result->fetch_assoc();
 			array_push($masters, $row['master']);
 		}

@@ -10,7 +10,7 @@
             $user = $_SESSION['user'];
 
             $sql = "SELECT * FROM usuarios WHERE id = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
 
             $nrows = $result->num_rows;			
@@ -49,7 +49,7 @@
                     $foto = mysql_escape_string("https://www.gravatar.com/avatar/$hash?d=retro");
 
                     $sql = "UPDATE usuarios SET foto = '$foto' WHERE id = '$user'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                    $result = runQuery($sql);
                 }
                 $info['foto'] = $foto;
 
@@ -60,10 +60,10 @@
                 $output['status'] = "NOTFOUND";
             
             $sql = "UPDATE usuarios SET ativo = now() WHERE id = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
 
             $sql = "SELECT now(), ativo FROM usuarios WHERE id = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
             $row = $result->fetch_assoc();
             //$output['debug'] = $row;
         }
@@ -85,7 +85,7 @@
                     $sql = "SELECT id FROM usuarios WHERE id = $user";
                 }
 
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $row = $result->fetch_assoc();
                 $_SESSION['user'] = $row['id'];
                 $output['status'] = "ADMIN";
@@ -116,7 +116,7 @@
                     $foto = "https://www.gravatar.com/avatar/$hash?d=retro";
             
                     $sql = "SELECT * FROM usuarios WHERE email = '$email' OR googleid = '$googleid'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                    $result = runQuery($sql);
                     $nrows = $result->num_rows;
                     $row = $result->fetch_assoc();
                     
@@ -124,14 +124,14 @@
                         $apelido = $nome . rand(100,999);
                         $pasta = md5($email);
                         $sql = "INSERT INTO usuarios (googleid,email,nome,apelido,sobrenome,pasta,ativo,foto) VALUES ('$googleid','$email','$nome','$apelido','$sobrenome','$pasta',now(), '$foto')";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                        $result = runQuery($sql);
                         $path = "/home/gladcode/user";
                         system("mkdir $path/$pasta");
                         $id = $conn->insert_id;
 
                         //join gladcode room
                         $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES (1, '$id', now(3), now(3), 1)";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                     }
                     else{
                         $pasta = $row['pasta'];
@@ -139,7 +139,7 @@
             
                         if (is_null($row['googleid']) || $row['email'] != $email){
                             $sql = "UPDATE usuarios SET googleid = '$googleid', email = '$email' WHERE id = $id";
-                            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                            $result = runQuery($sql);
                         }
                     }
                     
@@ -182,11 +182,11 @@
             $pref_tourn = $preferences['tourn'];
             
             $sql = "SELECT id FROM usuarios WHERE apelido = '$nickname' AND id != '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
 
             if ($result->num_rows == 0){
                 $sql = "SELECT pasta FROM usuarios WHERE id = '$user'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                $result = runQuery($sql);
                 $row = $result->fetch_assoc();
                 $pasta = $row['pasta'];
 
@@ -198,7 +198,7 @@
                 }
                 
                 $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language' WHERE id = '$user'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                $result = runQuery($sql);
 
                 $output['status'] = "SUCCESS";
             }
@@ -212,7 +212,7 @@
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
             $sql = "UPDATE usuarios SET showTutorial = '0' WHERE id = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
             $output['status'] = "SUCCESS";
         }
     }
@@ -221,7 +221,7 @@
             $user = $_SESSION['user'];
             $language = mysql_escape_string($_POST['language']);
             $sql = "UPDATE usuarios SET pref_language = '$language' WHERE id = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
             $output['status'] = "SUCCESS";
         }
     }
@@ -231,7 +231,7 @@
         $font = mysql_escape_string($_POST['font']);
 
         $sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE id = '$user'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+        $result = runQuery($sql);
     }
 
     echo json_encode($output);

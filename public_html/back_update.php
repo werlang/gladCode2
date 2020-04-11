@@ -4,7 +4,7 @@
 	$action = $_POST['action'];
 
 	$sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
-	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$result = runQuery($sql);
 	$row = $result->fetch_assoc();
 	$id = $row['id'];
 
@@ -22,7 +22,7 @@
 				if ($keepup == "true"){
 					$oldversion = file_get_contents("version");
 					$sql = "UPDATE gladiators SET version = '$version' WHERE version = '$oldversion'";
-					if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+					$result = runQuery($sql);
 				}
 				file_put_contents("version", $version);
 				echo "OK";

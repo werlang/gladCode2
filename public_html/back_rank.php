@@ -10,7 +10,7 @@
 	}
 	
 	$sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search";
-	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$result = runQuery($sql);
 	$total = $result->num_rows;
 	//echo $sql;
 	$units = 10;
@@ -32,7 +32,7 @@
 		$offset = 0;
 	
 	$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search ORDER BY mmr DESC LIMIT $units OFFSET $offset";
-	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$result = runQuery($sql);
 	
 	$output = array();
 	$output['page'] = $page;

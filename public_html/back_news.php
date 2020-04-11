@@ -12,7 +12,7 @@
 
         $id = "SUBSTR( md5(CONCAT(id, 'news-post-86')) , 1, 4)";
         $sql = "SELECT $id AS id, title, time, post FROM news ORDER BY time DESC LIMIT 5 OFFSET $page";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
 
         $output['posts'] = array();
         while ($row = $result->fetch_assoc()){
@@ -20,7 +20,7 @@
         }
 
         $sql = "UPDATE usuarios SET read_news = now(3) WHERE id = $user";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
 
         $output['status'] = "SUCCESS";
     }
@@ -29,7 +29,7 @@
 
         $id = "SUBSTR( md5(CONCAT(id, 'news-post-86')) , 1, 4)";
         $sql = "SELECT title, time, post FROM news WHERE $id = '$hash'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $output['sql'] = $sql;
         if ($result->num_rows == 0)
             $output['status'] = "EMPTY";
@@ -44,14 +44,14 @@
             $basetime = "SELECT time FROM news WHERE $id = '$hash'";
 
             $sql = "SELECT $id AS id FROM news WHERE time < ($basetime) ORDER BY time DESC LIMIT 1";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             if ($result->num_rows > 0){
                 $row = $result->fetch_assoc();
                 $output['prev'] = $row['id'];
             }
     
             $sql = "SELECT $id AS id FROM news WHERE time > ($basetime) ORDER BY time LIMIT 1";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             if ($result->num_rows > 0){
                 $row = $result->fetch_assoc();
                 $output['next'] = $row['id'];

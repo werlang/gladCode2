@@ -11,7 +11,7 @@
 				$fav = "AND favorite = 1";
 
 			$sql = "SELECT id FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			$total = $result->num_rows;
 			
 			$units = 10;
@@ -33,7 +33,7 @@
 				$offset = 0;
 			
 			$sql = "SELECT r.id, time, name, isread, hash, reward, favorite, comment FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav ORDER BY time DESC LIMIT $units OFFSET $offset";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			
 			$info = array();
 			$info['page'] = $page;
@@ -60,7 +60,7 @@
 			
 			if (isset($_POST['read'])){
 				$sql = "UPDATE reports SET isread = '1' WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user')";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 
 				send_node_message(array(
 					'profile notification' => array('user' => array($user))
@@ -70,7 +70,7 @@
 		elseif ($_POST['action'] == "DELETE"){
 			$id = mysql_escape_string($_POST['id']);
 			$sql = "DELETE FROM reports WHERE id = '$id' AND gladiator IN (SELECT cod FROM gladiators WHERE master = '$user')";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 		}
 		else if ($_POST['action'] == "FAVORITE"){
 			$output = array();
@@ -81,7 +81,7 @@
 				$comment = mysql_escape_string($_POST['comment']);
 				
 				$sql = "UPDATE reports SET favorite = $favorite, comment = '$comment' WHERE id = $id";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 				$output['status'] = "SUCCESS";
 			}
 			else{
