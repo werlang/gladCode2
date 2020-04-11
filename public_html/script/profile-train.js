@@ -98,6 +98,9 @@ $(document).ready( function(){
                     maxtime: maxtime,
                     players: players
                 }))
+                // console.log(data)
+
+                sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
 
                 $('#fog').remove()
                 let box = `
@@ -283,7 +286,8 @@ $(document).ready( function(){
                     $('#fog').remove()
                     if (!roomList[data.id])
                         roomList.create({id: data.id})
-                    roomList[data.id].show()
+                    await roomList[data.id].show()
+                    sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
                 }
                 else
                     create_toast("Erro ao ingressar, tente novamente", "error")
@@ -390,7 +394,6 @@ var roomList = {
     create: function(info){
         this[info.id] = {
             id: info.id,
-
             show: async function(){
                 var id = this.id
                 let data = JSON.parse(await $.post("back_train.php", {
@@ -398,7 +401,10 @@ var roomList = {
                     id: id
                 }))
                 // console.log(data)
-                // TODO: fazer os fulanos ingressarem nas chat rooms
+                this.name = data.name
+                this.hash = data.hash
+                this.description = data.description
+
                 if (data.status == "STARTED"){
                     window.open(`train/${data.hash}`)
                 }
@@ -455,6 +461,8 @@ var roomList = {
                                     id: id,
                                     myself: true
                                 })
+
+                                sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                             }
 
                         })
@@ -527,6 +535,7 @@ var roomList = {
                                 this.text = this.input.val().trim()
                                 this.input.remove()
                                 this.object.html(this.text).removeClass('hidden')
+                                let oldname = roomList[id].name
             
                                 let data = JSON.parse(await $.post("back_train.php", {
                                     action: "EDIT",
@@ -541,6 +550,10 @@ var roomList = {
                                 }
                                 else if (data.status == "SUCCESS"){
                                     create_toast(`Campo alterado com sucesso`, "success")
+                                    roomList[id][this.field] = this.text
+                                    if (this.field == 'name'){
+                                        sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d Sala de discussão do treino ${this.text}`})
+                                    }
                                 }
                             },
             
@@ -553,9 +566,10 @@ var roomList = {
                         textEdit.create()
                     })
             
-                    $('.train.window #renew').click( async function(){
-                        $(this).find('i').remove()
-                        $(this).append(`<i class='fas fa-spinner fa-pulse'></i>`)
+                    $('.train.window #renew').click( async e => {
+                        let renew = $(e.currentTarget)
+                        renew.find('i').remove()
+                        renew.append(`<i class='fas fa-spinner fa-pulse'></i>`)
                         let data = JSON.parse(await $.post("back_train.php", {
                             action: "RENEW",
                             id: id
@@ -564,12 +578,15 @@ var roomList = {
                         if (data.status == "SUCCESS"){
                             let qrcode = new Image()
                             qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
-                            qrcode.onload = function(){
+                            qrcode.onload = () => {
                                 $('.train.window #qr').html(qrcode).removeClass('blur')
                                 $('.train.window #qr').attr('title', 'Ampliar QR code')
                                 $('.train.window #link span').html(data.hash).removeClass('blur')
                                 $('.train.window #renew').remove()
                                 showQR($('.train.window #qr img').clone())
+                                sendChatMessage({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
+                                console.log({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
+                                this.hash = data.hash
                             }
                         }
                     })
@@ -583,6 +600,7 @@ var roomList = {
 
             refresh: async function(){
                 var id = this.id
+
                 let data = JSON.parse(await $.post("back_train.php", {
                     action: "ROOM",
                     id: id
@@ -603,8 +621,9 @@ var roomList = {
                         create_toast("Você saiu do treino", "success")
                         this.left = false
                     }
-                    else
+                    else{
                         showMessage("Você foi removido do treino")
+                    }
                     if (socket)
                         socket.emit('training room leave', {id: id})
                 }
@@ -635,7 +654,7 @@ var roomList = {
             
                         if (manager){
                             $('.train.window #start').hide()
-                            $('.train.window #delete').show().off().click( async function(){
+                            $('.train.window #delete').show().off().click( async () => {
                                 if (await showDialog(`Deseja excluir o treino ${data.name}?`, ["Sim", "Não"]) == "Sim"){
                                     let data = JSON.parse(await $.post("back_train.php", {
                                         action: "DELETE",
@@ -646,6 +665,8 @@ var roomList = {
                                     if (data.status == "SUCCESS"){
                                         $('#fog').remove()
                                         create_toast("Treino removido", "success")
+
+                                        sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                                     }
                                 }
                             })
@@ -697,8 +718,9 @@ var roomList = {
                         }
                         
                         if (manager){
-                            $('.train.window .table .kick').click(async function(){
-                                let gladid = $(this).parents('.row').data('id')
+                            $('.train.window .table .kick').click(async e => {
+                                let kick = $(e.currentTarget)
+                                let gladid = kick.parents('.row').data('id')
                                 
                                 let data = JSON.parse(await $.post("back_train.php", {
                                     action: "KICK",
@@ -708,6 +730,8 @@ var roomList = {
                                 // console.log(data)
                                 if (data.status == "SUCCESS"){
                                     create_toast("Participante removido", "success")
+                                    let name = kick.parent().find('.cell').eq(0).html()
+                                    sendChatMessage({text: `/kick ${name} -r ${this.name}_${this.hash}`})
                                 }
                             })
                         }

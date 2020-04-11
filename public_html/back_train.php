@@ -202,10 +202,9 @@
                     $output['description'] = $row['description'];
                     if ($row['timediff'] > 0)
                         $output['expired'] = true;
-                    else{
+                    else
                         $output['expired'] = false;
-                        $output['hash'] = $row['hash'];
-                    }
+                    $output['hash'] = $row['hash'];
                     $output['players'] = $row['players'];
                     $output['maxtime'] = $row['maxtime'];
 
@@ -221,7 +220,7 @@
                     $output['status'] = "MANAGE";
                 }
                 else{
-                    $sql = "SELECT t.name, t.description, t.maxtime, t.players FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id WHERE t.id = $trainid AND gt.gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
+                    $sql = "SELECT t.name, t.description, t.maxtime, t.players, t.hash FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id WHERE t.id = $trainid AND gt.gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
                     $result = runQuery($sql);
                     $nrows = $result->num_rows;
 
@@ -231,7 +230,6 @@
                         $row = $result->fetch_assoc();
                         $output = $row;
 
-                        // TODO mandar junto a lista de players/gladiadores pra compor a janela
                         $sql = "SELECT g.name AS gladiator, u.apelido AS master, g.master AS masterid FROM usuarios u INNER JOIN gladiators g ON u.id = g.master INNER JOIN gladiator_training gt ON g.cod = gt.gladiator WHERE gt.training = $trainid";
                         $result = runQuery($sql);
 
