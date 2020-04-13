@@ -15,7 +15,14 @@
 
     function runQuery($sql){
         global $conn;
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        if(!$result = $conn->query($sql)){
+            $error = array(
+                'status' => "SQLERROR",
+                'message' => $conn->error,
+                'sql' => $sql
+            );
+            die(json_encode($error));
+        }
         return $result;
     }
 ?>

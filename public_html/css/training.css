@@ -1,3 +1,43 @@
 #fog.black {
     background-color: black;
 }
+
+#dialog-box .ui-slider {
+	height: 15px;
+    box-shadow: 0px 0px 2px #00000069 inset;
+	box-sizing: border-box;
+    background-color: #eeeeee;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+#dialog-box .ui-slider-range {
+	background-color: #6c97a9;
+	box-shadow: 0px 0px 3px #0000005e inset
+}
+
+#dialog-box .ui-slider-handle {
+	outline: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #575757;
+    width: 50px;
+    font-family: 'Source Code Pro', monospace;
+    border-radius: 3px;
+    line-height: 1em;
+    color: #ccecff;
+    margin-top: 24px;
+	margin-left: -25px;
+	z-index: 0;
+}
+
+#dialog-box .ui-slider-handle:before {
+	content: "";
+    position: absolute;
+    margin-top: -17px;
+    border: solid transparent;
+    border-bottom-color: #575757;
+	border-width: 5px 5px;
+}

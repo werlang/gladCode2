@@ -12,18 +12,10 @@
         $name = mysql_escape_string($_POST['name']);
         $desc = mysql_escape_string($_POST['desc']);
         $maxtime = mysql_escape_string($_POST['maxtime']);
-        $maxtime = implode(":", explode("h", $maxtime));
-        $maxtime = implode("", explode(" ", $maxtime));
-        $maxtime = implode("", explode("m", $maxtime));
         $players = mysql_escape_string($_POST['players']);
         $hash = newHash();
 
-        if ($maxtime[strlen($maxtime)-1] == ':')
-            $maxtime .= "00";
-        elseif (count(explode(":", $maxtime)) == 1 )
-        	$maxtime = "00:". $maxtime;
-
-        $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), GREATEST(TIME('00:03'), TIME('$maxtime')), $players, '$hash', now(3) + INTERVAL 1 HOUR);";
+        $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, '$hash', now(3) + INTERVAL 1 HOUR);";
         $result = runQuery($sql);
         
         send_node_message(array('training list' => array()));
@@ -480,7 +472,7 @@
                     foreach($gtids as $i => $id){
                         // create group if not every one needed is created
                         if (count($groups) < $ngroups){
-                            $sql = "INSERT INTO training_groups (deadline) VALUES (now(3))";
+                            $sql = "INSERT INTO training_groups () VALUES ()";
                             $result = runQuery($sql);
                             array_push($groups, $conn->insert_id);
                         }
