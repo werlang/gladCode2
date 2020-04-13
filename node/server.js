@@ -179,6 +179,10 @@ app.post('/phpcallback', parser, function(req, res) {
         var data = content['tournament refresh'];
         io.to(`tournament-${data.hash}`).emit('tournament refresh', true);
     }
+    else if (content['training refresh']){
+        var data = content['training refresh'];
+        io.to(`training-${data.hash.toLowerCase()}`).emit('training refresh', true);
+    }
     else if (content['training list']){
 		io.to('training-list').emit('training list', true);
     }
@@ -269,6 +273,10 @@ io.on('connection', function(socket){
 
     socket.on('tournament run join', args => {
         socket.join(`tournament-${args.hash}`);
+    });
+
+    socket.on('training run join', args => {
+        socket.join(`training-${args.hash.toLowerCase()}`);
     });
 
     socket.on('training list join', args => {

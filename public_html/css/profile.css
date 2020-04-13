@@ -2060,6 +2060,7 @@ body {
 .window #options {
     display: flex;
     justify-content: space-around;
+    margin-bottom: 35px;
 }
 
 .window #options .col {
@@ -2077,7 +2078,7 @@ body {
     width: 140px;
 }
 
-.train.window #options #players #slider {
+.train.window #options #slider {
     width: 140px;
 }
 
@@ -2473,6 +2474,11 @@ body {
     margin-top: 24px;
 	margin-left: -14px;
 	z-index: 0;
+}
+
+.train.window #maxtime .ui-slider-handle {
+    width: 50px;
+    margin-left: -25px;
 }
 
 .train.window .ui-slider-handle:before {

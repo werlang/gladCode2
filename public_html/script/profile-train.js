@@ -19,7 +19,7 @@ $(document).ready( function(){
                 <div id='options'>
                     <div id='maxtime' class='col'>
                         <span>Tempo máximo do treino</span>
-                        <input class='input' value='45m'>
+                        <div id='slider'></div>
                     </div>
                     <div id='players' class='col'>
                         <span>Gladiadores por batalha</span>
@@ -49,6 +49,23 @@ $(document).ready( function(){
                     $(obj).html(ui.value);
                 });
             }
+        })
+
+        $( ".train.window #maxtime #slider" ).slider({
+            range: "min",
+            min: 5,
+            max: 120,
+            step: 5,
+            value: 45,
+            create: function( event, ui ) {
+                var val = $(this).slider('option','value');
+                $(this).find('.ui-slider-handle').html(val + 'm');
+            },
+            slide: function( event, ui ) {
+                $(this).find('.ui-slider-handle').each( (index, obj) => {
+                    $(obj).html(ui.value + 'm');
+                });
+            }
         });
 
         $('#fog .train.window').hide().fadeIn();
@@ -56,10 +73,6 @@ $(document).ready( function(){
 
 		$('.train.window #cancel').click( function(){
 			$('#fog').remove();
-        });
-
-        $('.train.window #maxtime .input').on('keydown', function(e){
-            $(this).val(formatTime($(this).val(), e))
         });
 
         $('.train.window #maxtime .input').focusout( function(){
@@ -82,9 +95,9 @@ $(document).ready( function(){
         $('.train.window #create').click( async function(){
             var name = $('.train.window #name').val()
 			var desc = $('.train.window #desc').val()
-            var maxtime = $('.train.window #maxtime input').val()
+            var maxtime = $('.train.window #maxtime #slider').slider('option','value')
             var players = $('.train.window #players #slider').slider('option','value')
-
+            console.log(maxtime)
             if (name.length < 6){
                 $('.train.window #name').focus();
                 $('.train.window #name').addClass('error');
@@ -98,7 +111,7 @@ $(document).ready( function(){
                     maxtime: maxtime,
                     players: players
                 }))
-                // console.log(data)
+                console.log(data)
 
                 sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
 
@@ -322,8 +335,9 @@ var trainList = {
 
     refresh: async function(){
         if (!this.listening){
-            await socket_ready()
-            socket.emit('training list join', {})
+            socket_ready().then( () => {
+                socket.emit('training list join', {})
+            })
             this.listening = true
         }
 
@@ -427,7 +441,7 @@ var roomList = {
                                 </div>
                                 <div id='time-container'>
                                     <span>Tempo máximo do treino</span>
-                                    <span id='maxtime'>${formatTime(data.maxtime)}</span>
+                                    <span id='maxtime'>${data.maxtime}m</span>
                                 </div>
                                 <div id='player-container'>
                                     <span>Batalhas compostas por <span id='players'>${data.players}</span> e ${data.players == 5 ? 4 : parseInt(data.players) + 1} mestres</span>
@@ -819,52 +833,4 @@ var roomList = {
         
         }
     }
-}
-
-
-
-function formatTime(v, key){
-    if (key)
-        key.preventDefault();
-    else if (v.indexOf(":") != -1){
-        v = v.split(':')
-        if (v[0] == '00')
-            return `${v[1]}m`
-        else
-            return `${v[0]}h ${v[1]}m`
-    }
-
-    var h = '', m = '';
-
-    for (let i in v){
-        if (v[i] >= '0' && v[i] <= '9' ){
-            if (v[i] != 0 || i > 0)
-                m += v[i];
-        }
-    }
-
-    if (key){
-        if (key.key >= '0' && key.key <= '9' && m.length < 4){
-            m += key.key;
-        }
-        else if (key.keyCode == 8 || key.keyCode == 46){
-            m = m.substr(0, m.length-1);
-        }
-        if (m.length == 0)
-            m = '0';
-    }
-
-    h = m.substr(-4, Math.min(2, m.length-2));
-    m = m.substr(-2,2);
-
-    if (parseInt(h) > 23)
-        h = '23';
-    if (h.length == 2 && parseInt(m) > 59)
-        m = '59';
-
-    v = m + 'm';
-    if (h != '')
-        v = h + 'h ' + v;
-    
-    return v
 }
