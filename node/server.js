@@ -183,6 +183,10 @@ app.post('/phpcallback', parser, function(req, res) {
         var data = content['training refresh'];
         io.to(`training-${data.hash.toLowerCase()}`).emit('training refresh', true);
     }
+    else if (content['training end']){
+        var data = content['training end'];
+        io.to(`training-${data.hash.toLowerCase()}`).emit('training end', true);
+    }
     else if (content['training list']){
 		io.to('training-list').emit('training list', true);
     }
