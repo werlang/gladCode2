@@ -90,7 +90,7 @@ $(document).ready( function() {
 
             }
 
-            $('#content-box').append(`<div id='timeleft' title='Tempo máximo restante até o fim da rodada'>
+            $('#content-box').append(`<div class='timeleft' title='Tempo máximo restante até o fim da rodada'>
                 <div id='time'>
                     <div class='numbers'><span>0</span><span>0</span></div>:
                     <div class='numbers'><span>0</span><span>0</span></div>:
@@ -227,7 +227,7 @@ $(document).ready( function() {
                     var timediff = serverleft - (new Date() - timestart);
                     var timeleft = msToTime(timediff);
                     
-                    $('#timeleft .numbers').each( function(index, obj){
+                    $('.timeleft .numbers').each( function(index, obj){
                         if (parseInt(timeleft[index]) != parseInt($(obj).text())){
                             $(obj).find('span').eq(0).html(timeleft[index].toString()[0]);
                             $(obj).find('span').eq(1).html(timeleft[index].toString()[1]);
@@ -235,17 +235,17 @@ $(document).ready( function() {
                     });
 
                     if ($('#group-container .team.myteam .icon.green').length == 1)
-                        $('#timeleft').addClass('green');
+                        $('.timeleft').addClass('green');
                     else if (parseInt(timeleft[0]) == 0){
                         if (parseInt(timeleft[1]) < 10)
-                            $('#timeleft').addClass('red');
+                            $('.timeleft').addClass('red');
                         else
-                            $('#timeleft').addClass('yellow');
+                            $('.timeleft').addClass('yellow');
                     }
                     
                     if ($('#group-container .team .icon.green').length == $('#group-container .team').length)
-                        $('#timeleft .numbers span').html('0');
-                    if ($('#timeleft #time').text() != '00:00:00')
+                        $('.timeleft .numbers span').html('0');
+                    if ($('.timeleft #time').text() != '00:00:00')
                         countDown();
                 }, 1000);
             }

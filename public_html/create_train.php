@@ -47,8 +47,10 @@
         $sql = "DELETE FROM gladiator_training WHERE training = $trainid";
         $result = runQuery($sql);
 
-        $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
-        $result = runQuery($sql);
+        if (strlen($groups) > 0){
+            $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
+            $result = runQuery($sql);
+        }
     }
     echo "DONE";
 

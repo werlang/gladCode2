@@ -12,7 +12,7 @@
         $hash = mysql_escape_string($_POST['hash']);
         $round = mysql_escape_string($_POST['round']);
 
-        $sql = "SELECT t.id, t.name, t.description, t.maxtime, t.hash, t.hash_valid AS expire, now(3) AS 'now', t.manager FROM training t WHERE hash = '$hash'";
+        $sql = "SELECT t.id, t.name, t.description, t.maxtime, t.hash_valid AS expire, t.deadline, now(3) AS 'now', t.manager, max(tg.round) AS maxround FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE hash = '$hash'";
         $result = runQuery($sql);
         $row = $result->fetch_assoc();
         
@@ -20,46 +20,78 @@
         $output['name'] = $row['name'];
         $output['description'] = $row['description'];
         $output['maxtime'] = $row['maxtime'];
-        $output['hash'] = $row['hash'];
+        $output['hash'] = $hash;
         $output['now'] = $row['now'];
+        $maxround = $row['maxround'];
 
-        if ($row['manager'] == $user)
-            $output['manager'] = true;
+        if (!is_null($row['deadline']))
+            $output['train_deadline'] = $row['deadline'];
 
-        $sql = "SELECT gt.id, u.apelido AS master, g.name AS gladiator, g.cod AS gladid, tg.id AS 'group', tg.round, u.id AS user, tg.deadline FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid INNER JOIN gladiators g ON gt.gladiator = g.cod INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.groupid";
-        $result = runQuery($sql);
-        
-        $groups = array();
-        while($row = $result->fetch_assoc()){
-            if (!isset($output['round'])){
-                $output['round'] = $row['round'];
-                $output['deadline'] = $row['deadline'];
+        $deadline = (new DateTime($row['deadline']))->getTimestamp();
+        $now = (new DateTime($row['now']))->getTimestamp();
+        if ($now >= $deadline)
+            $output['end'] = true;
+
+        if ($now >= $deadline && $round == $maxround){
+            $sql = "SELECT g.name, u.apelido, sum(gt.score) AS score FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY gt.gladiator ORDER BY score DESC";
+            $result = runQuery($sql);
+
+            $output['ranking'] = array();
+            while($row = $result->fetch_assoc()){
+                array_push($output['ranking'], $row);
             }
 
-            $team = array();
-            $team['master'] = $row['master'];
-            $team['gladiator'] = $row['gladiator'];
-
-            if ($row['user'] == $user)
-                $team['myteam'] = true;
-
-            $gid = $row['group'];
-            $tid = $row['id'];
-            $gladid = $row['gladid'];
-
-            // get summed score
-            $sql = "SELECT sum(score) AS score FROM gladiator_training WHERE gladiator = $gladid AND training = $trainid";
-            $result2 = runQuery($sql);
-            $row = $result2->fetch_assoc();
-            $team['score'] = $row['score'];
-
-            if (!isset($groups[$gid]))
-                $groups[$gid] = array();
-            $groups[$gid][$tid] = $team;            
+            $output['maxround'] = $maxround;
+            $output['status'] = "END";
         }
+        elseif ($round > $maxround || $round < 1){
+            $output['round'] = $maxround;
+            $output['status'] = "REDIRECT";
+        }
+        else{
+            if ($row['manager'] == $user)
+                $output['manager'] = true;
 
-        $output['groups'] = $groups;
-        $output['status'] = "SUCCESS";
+            $sql = "SELECT gt.id, u.apelido AS master, g.name AS gladiator, g.cod AS gladid, tg.id AS 'group', u.id AS user, tg.deadline FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid INNER JOIN gladiators g ON gt.gladiator = g.cod INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.groupid";
+            $result = runQuery($sql);
+            
+            $groups = array();
+            while($row = $result->fetch_assoc()){
+                if (!isset($output['round'])){
+                    $output['round'] = $round;
+                    $output['deadline'] = $row['deadline'];
+                }
+
+                $team = array();
+                $team['master'] = $row['master'];
+                $team['gladiator'] = $row['gladiator'];
+
+                if ($row['user'] == $user)
+                    $team['myteam'] = true;
+
+                $gid = $row['group'];
+                $tid = $row['id'];
+                $gladid = $row['gladid'];
+
+                // get summed score
+                $sql = "SELECT sum(gt.score) AS score FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.gladiator = $gladid AND gt.training = $trainid AND tg.round < $round";
+                $result2 = runQuery($sql);
+                $row = $result2->fetch_assoc();
+
+                if (is_null($row['score']))
+                    $team['score'] = 0;
+                else{
+                    $team['score'] = $row['score'];
+                }
+
+                if (!isset($groups[$gid]))
+                    $groups[$gid] = array();
+                $groups[$gid][$tid] = $team;            
+            }
+
+            $output['groups'] = $groups;
+            $output['status'] = "SUCCESS";
+        }
     }
     elseif ($action == "DEADLINE"){
         $hash = mysql_escape_string($_POST['hash']);
@@ -76,6 +108,18 @@
             $row = $result->fetch_assoc();
             if ($row['manager'] != $user)
                 $output['status'] = "NOTALLOWED";
+            // end training
+            elseif (!isset($_POST['round']) && !isset($_POST['time'])){
+                $trainid = $row['id'];
+                $sql = "UPDATE training SET deadline = now(3) WHERE id = $trainid";
+                $result = runQuery($sql);
+
+                $output['status'] = "SUCCESS";
+
+                send_node_message(array('training end' => array(
+                    'hash' => $hash
+                )));
+            }
             else{
                 $trainid = $row['id'];
 
@@ -101,6 +145,18 @@
                     'hash' => $hash
                 )));
 
+                // set training deadline
+                if ($round == 1){
+                    $sql = "SELECT maxtime, deadline FROM training WHERE id = $trainid";
+                    $result = runQuery($sql);
+                    $row = $result->fetch_assoc();
+                    $maxtime = $row['maxtime'];
+
+                    if (is_null($row['deadline'])){
+                        $sql = "UPDATE training SET deadline = now(3) + INTERVAL $maxtime MINUTE WHERE id = $trainid";
+                        $result = runQuery($sql);
+                    }
+                }
             }
         }
     }
@@ -108,7 +164,7 @@
         $hash = mysql_escape_string($_POST['hash']);
         $round = mysql_escape_string($_POST['round']);
 
-        $sql = "SELECT id FROM training WHERE hash = '$hash'";
+        $sql = "SELECT id, deadline FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
         $nrows = $result->num_rows;
 
@@ -117,6 +173,7 @@
         else{
             $row = $result->fetch_assoc();
             $trainid = $row['id'];
+            $train_deadline = $row['deadline'];
 
             $sql = "SELECT gt.score, gt.id, tg.deadline, now(3) AS 'now', tg.id AS 'group', tg.locked, l.hash AS 'log', l.id AS 'logid' FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid LEFT JOIN logs l ON l.id = tg.log  WHERE gt.training = $trainid AND tg.round = $round";
             $result = runQuery($sql);
@@ -142,13 +199,23 @@
                 if (!is_null($row['log'])){
                     $groups[$gid]['log'] = $row['log'];
                     // put battle info into groups
-                    $groups[$gid] = getScores($groups[$gid], $row['logid'], $trainid);
+                    $groups[$gid] = getScores($groups[$gid], $row['logid'], $trainid, $round);
                 }
             }
 
             $output['groups'] = $groups;
             $output['deadline'] = $deadline;
+            $output['train_deadline'] = $train_deadline;
             $output['now'] = $now;
+
+            $train_deadline = (new DateTime($train_deadline))->getTimestamp();
+            $now = (new DateTime($now))->getTimestamp();
+            if ($now >= $train_deadline){
+                $output['end'] = true;
+                $endtrain = true;
+            }
+            else
+                $endtrain = false;
 
             if (is_null($deadline))
                 $output['status'] = "WAIT";
@@ -169,13 +236,13 @@
                     }
                 }
 
+                // is already running something
                 if (isset($_SESSION['train-run'])){
                     $output['status'] = "LOCK";
                 }
                 else{
                     // time is up
                     $deadline = (new DateTime($deadline))->getTimestamp();
-                    $now = (new DateTime($now))->getTimestamp();
                     if ($now >= $deadline){
                         foreach($groups as $gid => $group){
                             if (!isset($group['locked'])){
@@ -184,16 +251,29 @@
                                 break;
                             }
                         }
+                        // nothing to be done in this round
                         if(!isset($chosen)){
                             $output['status'] = "DONE";
+
+                            // check if new round already exists
+                            $sql = "SELECT max(tg.round) AS maxround FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE gt.training = $trainid";
+                            $result = runQuery($sql);
+                            $row = $result->fetch_assoc();
+                            $maxround = $row['maxround'];
+
+                            if ($round == $maxround && !$endtrain){
+                                createNewRound($trainid, $round);
+                            }
                         }
-                        else{
+                        else if (!$endtrain){
                             $sql = "UPDATE training_groups SET locked = now(3) WHERE id = $chosen";
                             $result = runQuery($sql);
                             
                             $output['run'] = $chosen;
                             $output['status'] = "RUN";
                         }
+                        else
+                            $output['status'] = "END";
                     }
                     else
                         $output['status'] = "SUCCESS";
@@ -204,7 +284,48 @@
 
     echo json_encode($output);
 
-    function getScores($group, $logid, $trainid){
+    function createNewRound($trainid, $round){
+        global $conn;
+        $sql = "SELECT players FROM training WHERE id = $trainid";
+        $result = runQuery($sql);
+        $row = $result->fetch_assoc();
+        $maxplayers = $row['players'];
+
+        $sql = "SELECT gt.gladiator FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.lasttime DESC";
+        $result = runQuery($sql);
+
+        $glads = array();
+        while($row = $result->fetch_assoc())
+            array_push($glads, $row['gladiator']);
+
+        if ($maxplayers == 5)
+            $ngroups = ceil(count($glads) / $maxplayers);
+        else
+            $ngroups = floor(count($glads) / $maxplayers);
+
+        // iterate over every shuffled id
+        $groups = array();
+        $fields = array();
+        $newround = $round + 1;
+
+        foreach($glads as $i => $id){
+            // create group if not every one needed is created
+            if (count($groups) < $ngroups){
+                $sql = "INSERT INTO training_groups (round) VALUES ($newround)";
+                $result = runQuery($sql);
+                array_push($groups, $conn->insert_id);
+            }
+
+            // cycle groups inserting it on every participant
+            $groupid = $groups[$i % $ngroups];
+            array_push($fields, "($id, $groupid, $trainid)");
+        }
+        $fields = implode(",", $fields);
+        $sql = "INSERT INTO gladiator_training (gladiator, groupid, training) VALUES $fields";
+        $result = runQuery($sql);
+    }
+
+    function getScores($group, $logid, $trainid, $round){
         $ids = array_keys($group);
         $retrieve = true;
         foreach ($ids as $id){
@@ -232,7 +353,7 @@
                         $nick = preg_replace('/#/', " ", $glad['user']);
                         
                         // find point in time when every glad was killed
-                        $sql = "SELECT gt.id FROM gladiators g INNER JOIN usuarios u ON u.id = g.master INNER JOIN gladiator_training gt ON gt.gladiator = g.cod WHERE gt.training = $trainid AND g.name = '$name' AND u.apelido = '$nick'";                            
+                        $sql = "SELECT gt.id FROM gladiators g INNER JOIN usuarios u ON u.id = g.master INNER JOIN gladiator_training gt ON gt.gladiator = g.cod INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND g.name = '$name' AND u.apelido = '$nick' AND tg.round = $round";                            
                         $result = runQuery($sql);
                         $row = $result->fetch_assoc();
 
@@ -267,10 +388,12 @@
 
             foreach($teams as $i => $team){
                 $id = $team['id'];
-                $group[$id]['time'] = $team['time'];
                 $group[$id]['score'] = $rewards[$i];
-                if (isset($team['winner']))
+                if (isset($team['winner'])){
                     $group[$id]['winner'] = $team['winner'];
+                    $team['time'] += 1000;
+                }
+                $group[$id]['time'] = $team['time'];
 
                 $score = $rewards[$i];
                 $time = $team['time'];

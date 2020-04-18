@@ -3,7 +3,8 @@ RewriteEngine On
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
 RewriteRule    ^tourn\/([a-f0-9]+)/?$    tournament.php?h=$1    [NC,L]
 RewriteRule    ^tourn\/([a-f0-9]+)\/([0-9]+)/?$    tournament.php?h=$1&r=$2    [NC,L]
-RewriteRule    ^train\/([a-zA-Z0-9]+)/?$    training.php?j=$1    [NC,L]
+RewriteRule    ^train\/([a-zA-Z0-9]+)/?$    training.php?h=$1    [NC,L]
+RewriteRule    ^train\/([a-zA-Z0-9]+)\/([0-9]+)/?$    training.php?h=$1&r=$2    [NC,L]
 
 RewriteRule    ^post\/([a-f0-9]+)/?$    post.php?p=$1    [NC,L]
 
