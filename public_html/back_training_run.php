@@ -145,18 +145,6 @@
                     'hash' => $hash
                 )));
 
-                // set training deadline
-                if ($round == 1){
-                    $sql = "SELECT maxtime, deadline FROM training WHERE id = $trainid";
-                    $result = runQuery($sql);
-                    $row = $result->fetch_assoc();
-                    $maxtime = $row['maxtime'];
-
-                    if (is_null($row['deadline'])){
-                        $sql = "UPDATE training SET deadline = now(3) + INTERVAL $maxtime MINUTE WHERE id = $trainid";
-                        $result = runQuery($sql);
-                    }
-                }
             }
         }
     }

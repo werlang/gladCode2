@@ -42,3 +42,9 @@
 .table .row.head {
   font-weight: bold;
 }
+
+.table .row.dummy .dummy-text {
+    background-color: #00000012;
+    color: transparent;
+    border-radius: 5px;
+}

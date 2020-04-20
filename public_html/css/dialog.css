@@ -31,8 +31,8 @@
 	text-align: justify;
 }
 
-#dialog-box #message .highlight,
-#dialog-box #message b {
+#dialog-box .highlight,
+#dialog-box b {
 	color: #00638d;
     font-weight: bold;
 }

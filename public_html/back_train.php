@@ -33,8 +33,8 @@
         if ($poffset < 0)
             $poffset = 0;
 
-        $masters = "(SELECT count(*) FROM gladiator_training WHERE training = t.id) AS masters";
-        $select = "SELECT t.id, t.name, t.description, $masters";
+        $masters = "SELECT count(DISTINCT gladiator) FROM gladiator_training WHERE training = t.id";
+        $select = "SELECT DISTINCT t.id, t.name, t.description, ($masters) AS masters";
 
         //show participating training
         $fromwhere = "FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE g.master = $user";
@@ -428,7 +428,7 @@
     elseif ($action == "START"){
         $trainid = mysql_escape_string($_POST['id']);
 
-        $sql = "SELECT manager FROM training WHERE id = $trainid";
+        $sql = "SELECT manager, maxtime, players FROM training WHERE id = $trainid";
         $result = runQuery($sql);
         $nrows = $result->num_rows;
 
@@ -439,21 +439,22 @@
         else{
             $row = $result->fetch_assoc();
             $manager = $row['manager'];
+            $maxtime = $row['maxtime'];
+            $maxplayers = $row['players'];
             if ($manager != $user)
                 $output['status'] = "NOTALLOWED";
             else{
-                $sql = "SELECT gt.id, t.players, t.hash FROM gladiator_training gt INNER JOIN training t ON t.id = gt.training WHERE t.id = $trainid";
+                $sql = "SELECT gt.id, t.hash FROM gladiator_training gt INNER JOIN training t ON t.id = gt.training WHERE t.id = $trainid";
                 $result = runQuery($sql);
                 $nplayers = $result->num_rows;
 
-                if ($nplayers < 2)
+                if ($nplayers < $maxplayers)
                     $output['status'] = "FEWPLAYERS";
                 else{
                     // calculate number of groups and place ids from participants in array
                     $gtids = array(); 
                     while ($row = $result->fetch_assoc()){
-                        if (!isset($maxplayers)){
-                            $maxplayers = $row['players'];
+                        if (!isset($ngroups)){
                             $hash = $row['hash'];
                             if ($maxplayers == 5)
                                 $ngroups = ceil($nplayers / $maxplayers);
@@ -482,6 +483,10 @@
                         $sql = "UPDATE gladiator_training SET groupid = $groupid WHERE id = $id";
                         $result = runQuery($sql);
                     }
+
+                    // set training deadline
+                    $sql = "UPDATE training SET deadline = now(3) + INTERVAL $maxtime MINUTE WHERE id = $trainid";
+                    $result = runQuery($sql);
 
                     send_node_message(array('training room' => array(
                         'id' => $trainid

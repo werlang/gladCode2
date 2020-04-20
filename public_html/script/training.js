@@ -140,7 +140,7 @@ training.show = async function(){
         hash: this.hash,
         round: this.round
     })
-    console.log(data)
+    // console.log(data)
 
     if (data.status == "REDIRECT")
         window.location.href = `train/${this.hash}/${data.round}`
@@ -394,7 +394,7 @@ training.refresh = async function(args){
         hash: this.hash,
         round: this.round
     })
-    console.log(data)
+    // console.log(data)
 
     this.now = data.now
     this.deadline = data.deadline
@@ -493,17 +493,6 @@ training.refresh = async function(args){
             window.location.href = `train/${this.hash}/${parseInt(this.round)-1}`
         })
     }
-}
-
-async function post(path, args){
-    return $.post(path, args).then( data => {
-        try{
-            data = JSON.parse(data)
-        } catch(e) {
-            return {error: e, data: data}
-        }
-        return data
-    })
 }
 
 function revealInfo(obj){
