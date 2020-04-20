@@ -106,3 +106,15 @@ async function waitLogged(){
 	});
 }
 
+async function post(path, args){
+    return $.post(path, args).then( data => {
+        try{
+            data = JSON.parse(data)
+        } catch(e) {
+            return {error: e, data: data}
+        }
+        return data
+    })
+}
+
+

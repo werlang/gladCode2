@@ -47,6 +47,7 @@
     <script src="script/croppie.js"></script>
     <script src="script/profile-tourn.js"></script>
     <script src="script/profile-train.js"></script>
+    <script src="script/profile-rank.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/profile.js"></script>
@@ -238,11 +239,12 @@
                         <i class="fas fa-search"></i>
                         <input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
                     </div>
+                    <div id='tab-container'><div id='tab-general' class='tab selected'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
                     <div class='table'></div>
-                    <div id='page-title'>
-                        <button id='prev'></button>
+                    <div class='page-nav'>
                         <span></span> - <span></span> de <span></span>
-                        <button id='next'></button>
+                        <button id='prev'><i class='fas fa-chevron-left'></i></button>
+                        <button id='next'><i class='fas fa-chevron-right'></i></button>
                     </div>
                 </div>
             </div>

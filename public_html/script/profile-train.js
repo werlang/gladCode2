@@ -75,23 +75,6 @@ $(document).ready( function(){
 			$('#fog').remove();
         });
 
-        $('.train.window #maxtime .input').focusout( function(){
-            var v = $(this).val();
-            if (v.split('h ').length == 1)
-                v = '00h '+ v;
-            var h = v.split('h ')[0];
-            var m = v.split('h ')[1].split('m')[0];
-            if (parseInt(m) > 59)
-                m = '59'
-            if (parseInt(h) > 23)
-                h = '26'
-
-            v = m + 'm';
-            if (h != '')
-                v = h + 'h ' + v;
-            $(this).val(v);
-        })
-
         $('.train.window #create').click( async function(){
             var name = $('.train.window #name').val()
 			var desc = $('.train.window #desc').val()
@@ -418,6 +401,7 @@ var roomList = {
                 this.name = data.name
                 this.hash = data.hash
                 this.description = data.description
+                this.players = data.players
 
                 if (data.status == "STARTED"){
                     window.open(`train/${data.hash}`)
@@ -702,7 +686,7 @@ var roomList = {
                             $('.train.window #start').show()
                             $('.train.window #delete').hide()
 
-                            if (data.glads.length >= 2){
+                            if (data.glads.length >= this.players){
                                 $('.train.window #start').removeAttr('disabled').off().click( async function(){
                                     if (await showDialog("Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados",["Sim","Não"]) == "Sim"){
                                         $('.train.window #close').click();
@@ -716,13 +700,6 @@ var roomList = {
                                         if (data.status == "SUCCESS"){
                                             create_toast("Treino iniciado", "success")
                                             window.open(`train/${data.hash}`);
-
-                                            // $.post("back_sendmail.php",{
-                                            //     action: "TOURNAMENT",
-                                            //     hash: hash
-                                            // }).done( function(data){
-                                            //     //console.log(data);
-                                            // });
                                         }
                                     }
                                 });

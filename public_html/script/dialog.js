@@ -150,3 +150,120 @@ function create_tooltip(message, obj, args){
     }, remaintime);
 }
 */
+
+
+// ---------------------------------------------------------------------------------------------
+// Message class
+// let m = new Message({<options>})
+// 
+// options object:
+// message: Message to be shown
+// buttons: {id: "text_shown", ...} 
+//          if null, an OK button will be placed: {ok: "OK"}
+// input:   A text input to be shown.
+//          If null, no input will be placed
+//          If true, a simple text field will be placed
+//          {default: "default_text", placeholder: "placeholder_text", enter: id}
+//          default: Pre-filled value in the field
+//          placeholder: Placeholder html attr of the field
+//          enter:  Id from the buttons object. When enter is pressed, this button will be clicked
+//                  If no enter id is given, 'ok', then 'yes' will be default values
+// preventKill: Prevent dialog box from closing when a button is pressed
+// 
+// Methods:
+// show():  async function to show the message box. Binds the buttons events
+// kill():  Manually close the box. Useful when preventKill is set to true
+// click(button, callback): Bind a custom callback when button is clicked
+//                          callback arg receive the value of the input field
+//                          Ex: m.click('ok', resp => console.log(resp))
+// ----------------------------------------------------------------------------------------------
+
+class Message {
+    constructor(options){
+        this.message = options.message
+        if (options.buttons)
+            this.buttons = options.buttons
+        else
+            this.buttons = { ok: 'OK'}
+
+        if (options.input){
+            this.input = {
+                default: '',
+                placeholder: '',
+                enter: "OK"
+            }
+            if (options.input.default)
+                this.input.default = options.input.default
+            if (options.input.placeholder)
+                this.input.placeholder = options.input.placeholder
+            
+            if (options.input.enter)
+                this.input.enter = options.input.enter
+            else if (this.buttons.ok)
+                this.input.enter = 'ok'
+            else if (this.buttons.yes)
+                this.input.enter = 'yes'
+        }
+
+        if (options.preventKill)
+            this.preventKill = true
+    }
+
+    async show(){
+        let buttonsDOM = ""
+        for (let id in this.buttons){
+            buttonsDOM += `<button class='button' id='dialog-button-${id}'>${this.buttons[id]}</button>`
+        }
+
+        let input = this.input ? `<input type='text' class='input' value='${this.input.default}' placeholder='${this.input.placeholder}'>` : ''
+
+        $('body').append(`<div id='fog'>
+            <div id='dialog-box'>
+                <div id='message'>${this.message}</div>
+                ${input}
+                <div id='button-container'>${buttonsDOM}</div>
+            </div>
+        </div>`)
+        $('#fog').hide().fadeIn()
+
+        if (this.input){
+            $('#dialog-box .input').focus()
+            $('#dialog-box .input').keyup( e => {
+                if (e.keyCode == 13 && this.input.enter)
+                    $(`#dialog-box #dialog-button-${this.input.enter}`).click();
+            })            
+        }
+
+        return this.bind()
+    }
+
+    async bind(){
+        return new Promise( (resolve, reject) => {
+            for (let id in this.buttons){
+                $(`#dialog-box #dialog-button-${id}`).click( async () => {
+                    let response = { clicked: id }
+                    if (this.input)
+                        response.value = $('#dialog-box .input').val()
+
+                    if (!this.preventKill)
+                        $('#dialog-box').parents('#fog').remove()
+
+                    resolve(response)
+                })
+            }
+        })
+    }
+
+    kill(){
+        $('#dialog-box').parents('#fog').remove()
+    }
+
+    click(button, fn){
+        $(`#dialog-box #dialog-button-${button}`).click( async () => {
+            if (this.input)
+                fn({input: $('#dialog-box .input').val()})
+            else
+                fn()
+        })
+    }
+}

@@ -24,6 +24,7 @@
                 $info['nome'] = $row['nome'];
                 $info['sobrenome'] = $row['sobrenome'];
                 $info['ativo'] = $row['ativo'];
+                $info['premium'] = $row['premium'] == 1 ? true : false;
                 $info['pasta'] = $row['pasta'];
                 $info['lvl'] = $row['lvl'];
                 $info['xp'] = $row['xp'];

@@ -979,13 +979,13 @@ body {
     margin-top: 15px;
 }
 
-#report-container #tab-container {
+#tab-container {
     display: flex;
     margin-top: 20px;
     background-image: linear-gradient(#ffffff 90%, #d3d3d3);
 }
 
-#report-container .tab {
+#tab-container .tab {
     background-color: #6c97a9;
     color: white;
     padding: 5px 10px 2px;
@@ -997,13 +997,15 @@ body {
     transition: all 0.3s;
     border: solid transparent;
     border-width: 1px 1px 0px 1px;
+    display: flex;
+    align-items: center;
 }
 
-#report-container .tab:hover {
+#tab-container .tab:hover {
     background-color: #86b2c5;
 }
 
-#report-container .tab.selected {
+#tab-container .tab.selected {
     background-color: #fafafa;
     color: #747474;
     border-color: #adadad;
@@ -1135,6 +1137,10 @@ body {
     font-size: 1.3em;
     border: 2px solid #d3d3d3;
     border-width: 2px 0px 2px 0px;
+}
+
+#ranking-container .table {
+    border-top: none;
 }
 
 #ranking-container .row {
@@ -1872,7 +1878,7 @@ body {
     margin: 0px 5px;
 }
 
-
+.page-nav button,
 #train.wrapper #offset button,
 #tourn.wrapper #offset button {
     background-color: transparent;
@@ -1891,11 +1897,13 @@ body {
     cursor: pointer;
 }
 
+.page-nav button:hover,
 #train.wrapper #offset button:hover,
 #tourn.wrapper #offset button:hover {
     background-color: #ededed;
 }
 
+.page-nav button:disabled,
 #train.wrapper #offset button:disabled,
 #tourn.wrapper #offset button:disabled {
     background-color: transparent;
@@ -2771,4 +2779,69 @@ body {
 .train.window #link .button {
     height: 25px;
     margin-top: 5px;
+}
+
+#dialog-box .wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#tab-container .tab i.close {
+    margin-left: 5px;
+    margin-right: -5px;
+    font-size: 0.7em;
+    transition: 0.3s all;
+    border-radius: 100%;
+    height: 16px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #b5b5b5;
+}
+
+#tab-container .tab i.close:hover {
+    background-color: #00000042;
+    color: #c16363;
+}
+
+#ranking-container .table .head .fa-star {
+	font-size: 25px;
+    color: #FFCA28;
+}
+
+#ranking-container .table .head .fa-clock{
+	font-size: 25px;
+    color: #34e442;
+}
+
+.page-nav {
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
+
+.page-nav span {
+    margin: 0px 5px;
+}
+
+#dialog-box.promo.school {
+    max-width: 400px;
+}
+
+#dialog-box.promo.school #message {
+    text-align: center;
+}
+
+#dialog-box.promo.school img {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    margin: auto;
+}
+
+#dialog-box.promo.school a {
+    color: #00638d;
 }
