@@ -4,10 +4,10 @@
     session_start();
     if(!isset($_SESSION['user'])){
         if (isset($_GET['t'])){
-            header("Location: index.php?login=". $_GET['t']);
+            header("Location: index?login=". $_GET['t']);
         }
         else
-            header("Location: index.php");
+            header("Location: index");
     }
 ?>
 
@@ -82,6 +82,9 @@
                     </div>
                 </div>
             </div>	
+            <div id='currencies' title='Créditos' class='hidden'>
+                <div class='curr'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+            </div>
             <div id='menu-buttons'>
                 <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
                 <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
@@ -177,11 +180,12 @@
                             </div>
                             <div id='table-open' class='table'></div>
                             
-                            <div class='title'>
-                                <h2 id='mytourn-title'>Meus torneios</h2>
+                            <div id='mytourn' class='title'>
+                                <h2>Meus torneios</h2>
                                 <div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-mytourn' class='table'></div>
+
                             <div id='button-container'>
                                 <button id='create' class='button'>CRIAR UM TORNEIO</button>
                                 <button id='join' class='button'>INGRESSAR EM UM TORNEIO</button>

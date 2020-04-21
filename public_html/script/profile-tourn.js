@@ -394,13 +394,13 @@ function refresh_tourn_list(){
                     $('#panel #battle-container #tourn.wrapper #table-open').append("<div class='row'><div class='cell' id='name'>"+ open[i].name +"</div><div class='cell'>"+ open[i].description +"</div><div class='cell'>"+ open[i].teams +"/"+ open[i].maxteams +"</div><div class='cell flex'>"+ open[i].flex +"</div></div>");
                 }
             
-                $('#mytourn-title').hide();
+                $('#mytourn.title').hide();
                 if (mytourn.length > 0){
                     $('#panel #battle-container #tourn.wrapper #table-mytourn').html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div><div class='cell'>Flex</div></div>");
                     for (let i in mytourn){
                         $('#panel #battle-container #tourn.wrapper #table-mytourn').append("<div class='row'><div class='cell' id='name'>"+ mytourn[i].name +"</div><div class='cell'>"+ mytourn[i].description +"</div><div class='cell'>"+ mytourn[i].teams +"/"+ mytourn[i].maxteams +"</div><div class='cell flex'>"+ mytourn[i].flex +"</div></div>");
                     }
-                    $('#mytourn-title').show();
+                    $('#mytourn.title').show();
                 }
 
                 $('#panel #battle-container #tourn.wrapper .table .cell.flex').each( function() {

@@ -10,7 +10,7 @@
 	$id = $row['id'];
 
 	if(!isset($_SESSION['user']) || $_SESSION['user'] != $id) 
-		header("Location: index.php");
+		header("Location: index");
 ?>
 
 <html>

@@ -18,6 +18,10 @@ $(document).ready( function(){
             this.pages[tag] = { offset: 0 }
         }
 
+        if (!user.premium){
+            $('#ranking-container #tab-container #add-tab').hide()
+        }
+
         this.bind()
     }
 
@@ -68,7 +72,24 @@ $(document).ready( function(){
 
     tabs.init = function(){
         $('#ranking-container #tab-container #add-tab').click( async function(){
-            if (user.premium){
+            if (!user.premium){
+                new Message({
+                    message: `
+                        <h3>Transforme seu perfil em uma conta de tutor</h3>
+                        <img id='school' src='image/school.png'>
+                        <p>Adicione e remova tags para monitorar o desempenho de seus alunos nos treinos.</p>
+                        <p>Gere rankings personalizados e aumente o engajamento.</p>
+                        `,
+                    buttons: { no: "NÃO", yes: "SABER MAIS" }
+                }).show().click('yes', () => {
+                    window.open('about#plans')
+                })
+                $('#dialog-box').addClass('school large')
+            }
+            else if (parseFloat(user.credits) <= 0){
+                noCredit()
+            }
+            else{
                 // create a message box with in input
                 let input = new Message({
                     message: `Nome da <b>#hashtag</b> que deseja rastrear`,
@@ -97,23 +118,6 @@ $(document).ready( function(){
                     input.kill()
                 })
             }
-            else{
-                let msg = new Message({
-                    message: `
-                        <h3>Transforme seu perfil em uma conta de tutor.</h3>
-                        <img id='school' src='image/school.png'>
-                        <p>Adicione e remova tags para monitorar o desempenho de seus alunos nos treinos.</p>
-                        <p>Gere rankings personalizados e aumente o engajamento.</p>
-                        <p><a href='#'>Saiba mais</a></p>
-                        `,
-                    buttons: { no: "NÃO", yes: "EU QUERO" }
-                })
-                msg.show()
-                $('#dialog-box').addClass('school promo')
-                msg.click('yes', () => {
-                    console.log('TODO: direcionar pra pagamento')
-                })
-            }
         })
     
     }
@@ -129,11 +133,12 @@ $(document).ready( function(){
             create_toast(`Aba #${name} criada`, "success")
         }
         else if (data.status == "NOPREMIUM"){
-            let msg = new Message({
-                message: `Esta função só pode ser usada por contas verificadas de instituições de ensino`
-            })
-            msg.show()
+            create_toast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
             user.premium = false
+        }
+        else if (data.status == "NOCREDITS"){
+            create_toast("Você não possui créditos para utilizar essa função", "error")
+            user.credits = 0
         }
 
         this.show()
@@ -343,3 +348,25 @@ $(document).ready( function(){
     tabs.init()
 
 })
+
+function noCredit(){
+    new Message({
+        message: `
+            <h3>Você não possui créditos suficientes</h3>
+            <div id='credit'><i class='fas fa-credit-card'></i></div>
+            <p>Recarregue seus créditos para poder continuar usando as funções da sua conta de tutor.</p>
+            `,
+        buttons: { no: "CANCELAR", yes: "RECARREGAR" }
+    }).show().click('yes', () => {
+        rechargeCredits()
+    })
+    $('#dialog-box').addClass('school')
+}
+
+function rechargeCredits(){
+    console.log("TODO: recarregar créditos")
+}
+
+// API: 4E4C730C2525B23004CB1FA8001D06C5
+
+// token: ae118152-d009-43e4-b20e-4f213c5a3fd4043efb8346d187e94cba6bc14211d2738272-a66d-489b-bf37-c5f8602c6f03

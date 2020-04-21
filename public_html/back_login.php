@@ -24,7 +24,8 @@
                 $info['nome'] = $row['nome'];
                 $info['sobrenome'] = $row['sobrenome'];
                 $info['ativo'] = $row['ativo'];
-                $info['premium'] = $row['premium'] == 1 ? true : false;
+                $info['premium'] = is_null($row['premium']) ? false : true;
+                $info['credits'] = $row['credits'];
                 $info['pasta'] = $row['pasta'];
                 $info['lvl'] = $row['lvl'];
                 $info['xp'] = $row['xp'];
@@ -233,6 +234,22 @@
 
         $sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE id = '$user'";
         $result = runQuery($sql);
+    }
+    elseif ($action == "PREMIUM"){
+        $user = $_SESSION['user'];
+        $sql = "SELECT premium FROM usuarios WHERE id = $user";
+        $result = runQuery($sql);
+        $row = $result->fetch_assoc();
+        
+        if (!is_null($row['premium'])){
+            $output['status'] = "PREMIUM";
+        }
+        else{
+            $sql = "UPDATE usuarios SET premium = now(), credits = 30 WHERE id = $user";
+            $result = runQuery($sql);
+
+            $output['status'] = "SUCCESS";
+        }
     }
 
     echo json_encode($output);

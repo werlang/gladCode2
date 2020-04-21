@@ -147,6 +147,28 @@ body {
     }
 }
 
+#frame #menu #currencies {
+    background-color: #00000014;
+    color: #a9a9a9;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    font-family: 'Roboto', sans-serif;
+}
+
+#frame #menu #currencies.hidden {
+    display: none;
+}
+
+#frame #menu #currencies .curr span {
+    margin-left: 10px;
+}
+
+#frame #menu #currencies .curr i {
+    font-size: 1.2em;
+}
+
 #frame #menu .item.here {
     background-color: #00000026;
 }
@@ -933,7 +955,7 @@ body {
     margin: 20px 10px 0px;
     max-width: 100%;
     height: 150px;
-    width: 180px;
+    width: 160px;
     display: flex;
     flex-direction: column;
     padding: 10px 20px;
@@ -2732,6 +2754,7 @@ body {
 .train.window #options-container #players{
     font-size: 1.5em;
     color: #00638d;
+    margin: 0 2px;
 }
 
 .train.window #qr {
@@ -2827,21 +2850,36 @@ body {
     margin: 0px 5px;
 }
 
-#dialog-box.promo.school {
-    max-width: 400px;
-}
 
-#dialog-box.promo.school #message {
+#dialog-box.school #message {
     text-align: center;
 }
 
-#dialog-box.promo.school img {
+#dialog-box.school img {
     width: 100%;
     max-width: 300px;
     display: flex;
     margin: auto;
 }
 
-#dialog-box.promo.school a {
+#dialog-box.school a {
     color: #00638d;
+}
+
+#menu .curr span.debit {
+    color: #f53c3c;
+    cursor: pointer;
+}
+
+#dialog-box.school #credit {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#dialog-box.school #credit i {
+    font-size: 50px;
+    color: #00638d;
+    border-radius: 25%;
 }

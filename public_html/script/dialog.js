@@ -171,7 +171,7 @@ function create_tooltip(message, obj, args){
 // preventKill: Prevent dialog box from closing when a button is pressed
 // 
 // Methods:
-// show():  async function to show the message box. Binds the buttons events
+// show():  async function to show the message box
 // kill():  Manually close the box. Useful when preventKill is set to true
 // click(button, callback): Bind a custom callback when button is clicked
 //                          callback arg receive the value of the input field
@@ -209,7 +209,7 @@ class Message {
             this.preventKill = true
     }
 
-    async show(){
+    show(){
         let buttonsDOM = ""
         for (let id in this.buttons){
             buttonsDOM += `<button class='button' id='dialog-button-${id}'>${this.buttons[id]}</button>`
@@ -234,24 +234,14 @@ class Message {
             })            
         }
 
-        return this.bind()
-    }
-
-    async bind(){
-        return new Promise( (resolve, reject) => {
-            for (let id in this.buttons){
-                $(`#dialog-box #dialog-button-${id}`).click( async () => {
-                    let response = { clicked: id }
-                    if (this.input)
-                        response.value = $('#dialog-box .input').val()
-
-                    if (!this.preventKill)
-                        $('#dialog-box').parents('#fog').remove()
-
-                    resolve(response)
-                })
-            }
-        })
+        for (let id in this.buttons){
+            $(`#dialog-box #dialog-button-${id}`).click( async () => {
+                if (!this.preventKill)
+                    $('#dialog-box').parents('#fog').remove()
+            })
+        }
+        
+        return this
     }
 
     kill(){
@@ -265,5 +255,7 @@ class Message {
             else
                 fn()
         })
+
+        return this
     }
 }
