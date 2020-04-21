@@ -74,17 +74,12 @@ $(document).ready( function(){
         var emoji_categ = ["Smileys & People", "Animals & Nature", "Food & Drink", "Activities", "Travel & Places", "Objects", "Symbols", "Flags"];
         var emojiStr = [];
 
-        $.post("back_chat.php", {
+        post("back_chat.php", {
             action: "EMOJI"
-        }).done( data => {
-            //console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(e){
-                data = {emoji: ''};
-            }
-            if (data.emoji != '')
+        }).then( data => {
+            // console.log(data);
+            
+            if (data.status != "NOTLOGGED" && data.emoji != '')
                 recentEmoji = JSON.parse(data.emoji);
 
             emojiStr.push([]);

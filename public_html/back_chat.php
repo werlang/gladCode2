@@ -184,12 +184,17 @@
         
     }
     else if ($action == "EMOJI"){
-        $sql = "SELECT emoji FROM usuarios WHERE id = $user";
-        $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        if (isset($user)){
+            $sql = "SELECT emoji FROM usuarios WHERE id = $user";
+            $result = runQuery($sql);
+            $row = $result->fetch_assoc();
 
-        $output['emoji'] = $row['emoji'];
-        $output['status'] = "SUCCESS";
+            $output['emoji'] = $row['emoji'];
+            $output['status'] = "SUCCESS";
+        }
+        else{
+            $output['status'] = "NOTLOGGED";
+        }
     }
 
     echo json_encode($output, JSON_UNESCAPED_UNICODE);
