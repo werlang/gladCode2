@@ -15,13 +15,26 @@
         $players = mysql_escape_string($_POST['players']);
         $hash = newHash();
 
-        $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, '$hash', now(3) + INTERVAL 1 HOUR);";
+        $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
-        
-        send_node_message(array('training list' => array()));
+        $row = $result->fetch_assoc();
 
-        $output['hash'] = $hash;
-        $output['status'] = "SUCCESS";
+        if (is_null($row['premium'])){
+            $output['status'] = "NOPREMIUM";
+        }
+        elseif ($row['credits'] <= 0){
+            $output['status'] = "NOCREDITS";
+        }
+        else{
+            $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, '$hash', now(3) + INTERVAL 1 HOUR);";
+            $result = runQuery($sql);
+            
+            send_node_message(array('training list' => array()));
+    
+            $output['hash'] = $hash;
+            $output['status'] = "SUCCESS";
+        }
+
     }
     else if ($action == "LIST"){
         $moffset = mysql_escape_string($_POST['moffset']);
@@ -456,10 +469,7 @@
                     while ($row = $result->fetch_assoc()){
                         if (!isset($ngroups)){
                             $hash = $row['hash'];
-                            if ($maxplayers == 5)
-                                $ngroups = ceil($nplayers / $maxplayers);
-                            else
-                                $ngroups = floor($nplayers / $maxplayers);
+                            $ngroups = ceil($nplayers / $maxplayers);
                         }
 
                         array_push($gtids, $row['id']);

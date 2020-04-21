@@ -286,7 +286,7 @@ $(document).ready( function() {
                                 if (action == "INSERT"){
                                     showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
                                         if (data == "Sim")
-                                            window.open('battle')
+                                            window.open('battle.ranked')
                                     });
                                 }
                                 else{

@@ -58,7 +58,7 @@ $(document).ready( function() {
 	});	
 
 	$('#gladcode').click( function() {
-		window.location.href = "index.php";
+		window.location.href = "index";
 	});	
 
 	$('#button-cload').click( function() {

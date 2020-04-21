@@ -65,13 +65,15 @@
             $output['status'] = "NOACTION";
         }
         else{
-            $sql = "SELECT premium FROM usuarios WHERE id = $user";
+            $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
             $result = runQuery($sql);
             $row = $result->fetch_assoc();
-            $premium = $row['premium'];
 
-            if ($premium == 0){
+            if (is_null($row['premium'])){
                 $output['status'] = "NOPREMIUM";
+            }
+            elseif ($row['credits'] < 0){
+                $output['status'] = "NOCREDITS";
             }
             else{
                 $sql = "SELECT id FROM user_tabs WHERE name = '$name' AND owner = $user";

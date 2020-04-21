@@ -19,6 +19,10 @@
     justify-content: space-around;
 }
 
+#dialog-box.large {
+	max-width: 400px;
+}
+
 #dialog-box #button-container {
 	width: 100%;
     display: flex;
@@ -49,6 +53,13 @@
     padding: 3px 5px;
 	transition: all 0.3s;
 	cursor: pointer;
+}
+
+#dialog-box #title {
+	display: block;
+	font-size: 1.5em;
+	font-weight: bold;
+	margin: 10px 0 20px 0;
 }
 
 #dialog-box .button:hover {

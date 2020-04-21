@@ -3,7 +3,7 @@ var user;
 $(document).ready( function() {
 	$('#menu-button').click( function() {
 		$('body').append("<div id='fog'><div id='menu'></div></div>");
-		$('#fog #menu').html("<a href='index.php'><img src='icon/logo.png'></a>"+ $('#h-items').html());
+		$('#fog #menu').html("<a href='index'><img src='icon/logo.png'></a>"+ $('#h-items').html());
 		
 		$('#fog').click( function() {
 			$('#fog #menu').toggle("slide", 300, function() {

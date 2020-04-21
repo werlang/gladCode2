@@ -11,7 +11,7 @@
             header("Location: $hash/0");
     }
     else
-        header("Location: index.php");
+        header("Location: index");
 ?>
 
 <html>

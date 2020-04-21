@@ -7,200 +7,233 @@ $(document).ready( function(){
             roomList[data.id].refresh()
         });
     });
+
+    waitLogged().then( () => {
+        if (!user.premium){
+            $('#panel #train.wrapper #create').hide()        
+        }
+    })
     
     $('#panel #train.wrapper #create').click( function() {
-        let box = `<div id='fog'>
-            <div class='train window small'>
-                <div id='title'>
-                    <h2>Criar treino</h2>
-                </div>
-                <input id='name' class='input' placeholder='Identificador do treino (nome)' maxlength='50'>
-                <textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea>
-                <div id='options'>
-                    <div id='maxtime' class='col'>
-                        <span>Tempo máximo do treino</span>
-                        <div id='slider'></div>
+        if (!user.premium){
+            new Message({
+                message: `
+                    <h3>Transforme seu perfil em uma conta de tutor.</h3>
+                    <img id='school' src='image/training.png'>
+                    <p>Crie treinos onde você decide o tempo de duração e a quantidade de alunos por batalha.</p>
+                    <p>Gere rankings personalizados e aumente o engajamento.</p>
+                    `,
+                buttons: { no: "NÃO", yes: "SABER MAIS" }
+            }).show().click('yes', () => {
+                window.open('about#plans')
+            })
+            $('#dialog-box').addClass('school large')
+        }
+        else if (parseFloat(user.credits) <= 0){
+            noCredit()
+        }
+        else{
+            let box = `<div id='fog'>
+                <div class='train window small'>
+                    <div id='title'>
+                        <h2>Criar treino</h2>
                     </div>
-                    <div id='players' class='col'>
-                        <span>Gladiadores por batalha</span>
-                        <div id='slider'></div>
-                    </div>
-                </div>
-                <div id='button-container'>
-                    <button id='cancel' class='button'>Cancelar</button>
-                    <button id='create' class='button'>CRIAR</button>
-                </div>
-            </div>
-        </div>`
-		$('body').append(box);
-        
-        $( ".train.window #players #slider" ).slider({
-            range: "min",
-            min: 2,
-            max: 5,
-            step: 1,
-            value: 3,
-            create: function( event, ui ) {
-                var val = $(this).slider('option','value');
-                $(this).find('.ui-slider-handle').html(val);
-            },
-            slide: function( event, ui ) {
-                $(this).find('.ui-slider-handle').each( (index, obj) => {
-                    $(obj).html(ui.value);
-                });
-            }
-        })
-
-        $( ".train.window #maxtime #slider" ).slider({
-            range: "min",
-            min: 5,
-            max: 120,
-            step: 5,
-            value: 45,
-            create: function( event, ui ) {
-                var val = $(this).slider('option','value');
-                $(this).find('.ui-slider-handle').html(val + 'm');
-            },
-            slide: function( event, ui ) {
-                $(this).find('.ui-slider-handle').each( (index, obj) => {
-                    $(obj).html(ui.value + 'm');
-                });
-            }
-        });
-
-        $('#fog .train.window').hide().fadeIn();
-        $('#fog .train.window #name').focus();
-
-		$('.train.window #cancel').click( function(){
-			$('#fog').remove();
-        });
-
-        $('.train.window #create').click( async function(){
-            var name = $('.train.window #name').val()
-			var desc = $('.train.window #desc').val()
-            var maxtime = $('.train.window #maxtime #slider').slider('option','value')
-            var players = $('.train.window #players #slider').slider('option','value')
-            console.log(maxtime)
-            if (name.length < 6){
-                $('.train.window #name').focus();
-                $('.train.window #name').addClass('error');
-                $('.train.window #name').before("<span class='tip'>O identificador precisa ter tamanho 6 ou mais</span>");
-            }
-            else{
-                let data = JSON.parse(await $.post("back_train.php",{
-                    action: "CREATE",
-                    name: name,
-                    desc: desc,
-                    maxtime: maxtime,
-                    players: players
-                }))
-                console.log(data)
-
-                sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
-
-                $('#fog').remove()
-                let box = `
-                    <h2>Treino criado</h2>
-                    <p>Os mestres de gladiadores podem ingressar no treino</p>
-                    <div class='column-list'>
-                        <div class='item' id='qrcode'>
-                            <span>Escaneando o QR code em seus celulares</span>
-                            <i class='fas fa-qrcode'></i>
+                    <input id='name' class='input' placeholder='Identificador do treino (nome)' maxlength='50'>
+                    <textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea>
+                    <div id='options'>
+                        <div id='maxtime' class='col'>
+                            <span>Tempo máximo do treino</span>
+                            <div id='slider'></div>
                         </div>
-                        <div class='item' id='link'>
-                            <span>Usando o link do treino</span>
-                            <i class='fas fa-link'></i>
-                        </div>
-                        <div class='item' id='manual'>
-                            <span>Digitando o código do treino</span>
-                            <i class='fas fa-font'></i>
+                        <div id='players' class='col'>
+                            <span>Gladiadores por batalha</span>
+                            <div id='slider'></div>
                         </div>
                     </div>
                     <div id='button-container'>
-                        <button class='button'>FECHAR</button>
+                        <button id='cancel' class='button'>Cancelar</button>
+                        <button id='create' class='button'>CRIAR</button>
                     </div>
-                `
-                $('body').append(`<div id='fog'><div id='train-message'>${box}</div><div id='big-info'></div></div>`)
+                </div>
+            </div>`
+            $('body').append(box);
+            
+            $( ".train.window #players #slider" ).slider({
+                range: "min",
+                min: 2,
+                max: 5,
+                step: 1,
+                value: 3,
+                create: function( event, ui ) {
+                    var val = $(this).slider('option','value');
+                    $(this).find('.ui-slider-handle').html(val);
+                },
+                slide: function( event, ui ) {
+                    $(this).find('.ui-slider-handle').each( (index, obj) => {
+                        $(obj).html(ui.value);
+                    });
+                }
+            })
 
-                $('#train-message .button').click( function(){
-                    $('#fog').remove()
-                })
+            $( ".train.window #maxtime #slider" ).slider({
+                range: "min",
+                min: 5,
+                max: 120,
+                step: 5,
+                value: 45,
+                create: function( event, ui ) {
+                    var val = $(this).slider('option','value');
+                    $(this).find('.ui-slider-handle').html(val + 'm');
+                },
+                slide: function( event, ui ) {
+                    $(this).find('.ui-slider-handle').each( (index, obj) => {
+                        $(obj).html(ui.value + 'm');
+                    });
+                }
+            });
 
-                $('#train-message #qrcode').click(async function(){
-                    $('#train-message').hide()
+            $('#fog .train.window').hide().fadeIn();
+            $('#fog .train.window #name').focus();
 
-                    var qrcode = new Image()
-                    $('#fog').addClass('black')
-                    $('#big-info').html("<div id='close'><i class='icon fas fa-times'></i></div><i class='fas fa-spinner fa-pulse'></i>").fadeIn()
+            $('.train.window #cancel').click( function(){
+                $('#fog').remove();
+            });
 
-                    qrcode.onload = () => {
-                        $('#big-info .fa-spinner').remove()
-                        $('#big-info').hide().append(qrcode).fadeIn()
+            $('.train.window #create').click( async function(){
+                var name = $('.train.window #name').val()
+                var desc = $('.train.window #desc').val()
+                var maxtime = $('.train.window #maxtime #slider').slider('option','value')
+                var players = $('.train.window #players #slider').slider('option','value')
+
+                if (name.length < 6){
+                    $('.train.window #name').focus();
+                    $('.train.window #name').addClass('error');
+                    $('.train.window #name').before("<span class='tip'>O identificador precisa ter tamanho 6 ou mais</span>");
+                }
+                else{
+                    let data = JSON.parse(await $.post("back_train.php",{
+                        action: "CREATE",
+                        name: name,
+                        desc: desc,
+                        maxtime: maxtime,
+                        players: players
+                    }))
+                    // console.log(data)
+
+                    if (data.status == "NOPREMIUM"){
+                        create_toast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
+                        user.premium = false            
                     }
-                    qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
-
-                    $('#fog #close').click( function(){
-                        $('#fog').removeClass('black')
-                        $('#big-info').hide().html("")
-                        $('#train-message').fadeIn()
-                    })
-                })
-
-                $('#train-message #link, #train-message #manual').click(async function(){
-                    let prelink = 'https://gladcode.tk/train/'
-                    let manualclass = ''
-                    let manualtext = ''
-                    if ($(this).attr('id') == 'manual'){
-                        prelink = ''
-                        manualclass = 'manual'
-                        manualtext = `<p>Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo</p>`
+                    else if (data.status == "NOCREDITS"){
+                        create_toast("Você não possui créditos para utilizar essa função", "error")
+                        user.credits = 0
                     }
+                    else if (data.status == "SUCCESS"){
+                        sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
 
-                    $('#fog').addClass('white')
-                    $('#big-info').html(`<i id='close' class='icon fas fa-times'></i>
-                        ${manualtext}
-                        <div class='row'>
-                            <span class='link ${manualclass}'>${prelink}<b>${data.hash}</b></span>
-                        </div>
-                        <div id='buttons' class='row'>
-                            <i id='reduce' class='icon fas fa-minus' title='Reduzir fonte'></i>
-                            <i id='copy' class='icon fas fa-copy' title='Copiar link'></i>
-                            <i id='increase' class='icon fas fa-plus' title='Aumentar fonte'></i>
-                        </div>
-                    `).fadeIn()
-                    $('#train-message').hide()
+                        $('#fog').remove()
+                        let box = `
+                            <h2>Treino criado</h2>
+                            <p>Os mestres de gladiadores podem ingressar no treino</p>
+                            <div class='column-list'>
+                                <div class='item' id='qrcode'>
+                                    <span>Escaneando o QR code em seus celulares</span>
+                                    <i class='fas fa-qrcode'></i>
+                                </div>
+                                <div class='item' id='link'>
+                                    <span>Usando o link do treino</span>
+                                    <i class='fas fa-link'></i>
+                                </div>
+                                <div class='item' id='manual'>
+                                    <span>Digitando o código do treino</span>
+                                    <i class='fas fa-font'></i>
+                                </div>
+                            </div>
+                            <div id='button-container'>
+                                <button class='button'>FECHAR</button>
+                            </div>
+                        `
+                        $('body').append(`<div id='fog'><div id='train-message'>${box}</div><div id='big-info'></div></div>`)
 
-                    $('#fog #close').click( function(){
-                        $('#fog').removeClass('white')
-                        $('#big-info').hide().html("")
-                        $('#train-message').fadeIn()
-                    })
+                        $('#train-message .button').click( function(){
+                            $('#fog').remove()
+                        })
 
-                    $('#big-info span, #big-info #copy').click( function(){
-                        $('body').append(`<input type='text' id='dummy' readonly value='${$('#big-info .link.manual').text()}'>`)
-                        $('#dummy').select();
-                        document.execCommand("copy");
-                        create_toast("Link do treino copiado para área de transferência", "success");
-                        $('#dummy').remove()
-                    })
+                        $('#train-message #qrcode').click(async function(){
+                            $('#train-message').hide()
 
-                    $('#big-info #increase').click( function(){
-                        let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
-                        $('#big-info .link').css({'font-size': parseInt(size * 1.1) + 'px'})
-                        
-                    })
+                            var qrcode = new Image()
+                            $('#fog').addClass('black')
+                            $('#big-info').html("<div id='close'><i class='icon fas fa-times'></i></div><i class='fas fa-spinner fa-pulse'></i>").fadeIn()
 
-                    $('#big-info #reduce').click( function(){
-                        let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
-                        $('#big-info .link').css({'font-size': parseInt(size * 0.9) + 'px'})
-                        
-                    })
-                })
+                            qrcode.onload = () => {
+                                $('#big-info .fa-spinner').remove()
+                                $('#big-info').hide().append(qrcode).fadeIn()
+                            }
+                            qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
 
-            }
+                            $('#fog #close').click( function(){
+                                $('#fog').removeClass('black')
+                                $('#big-info').hide().html("")
+                                $('#train-message').fadeIn()
+                            })
+                        })
 
-        })
-        
+                        $('#train-message #link, #train-message #manual').click(async function(){
+                            let prelink = 'https://gladcode.tk/train/'
+                            let manualclass = ''
+                            let manualtext = ''
+                            if ($(this).attr('id') == 'manual'){
+                                prelink = ''
+                                manualclass = 'manual'
+                                manualtext = `<p>Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo</p>`
+                            }
+
+                            $('#fog').addClass('white')
+                            $('#big-info').html(`<i id='close' class='icon fas fa-times'></i>
+                                ${manualtext}
+                                <div class='row'>
+                                    <span class='link ${manualclass}'>${prelink}<b>${data.hash}</b></span>
+                                </div>
+                                <div id='buttons' class='row'>
+                                    <i id='reduce' class='icon fas fa-minus' title='Reduzir fonte'></i>
+                                    <i id='copy' class='icon fas fa-copy' title='Copiar link'></i>
+                                    <i id='increase' class='icon fas fa-plus' title='Aumentar fonte'></i>
+                                </div>
+                            `).fadeIn()
+                            $('#train-message').hide()
+
+                            $('#fog #close').click( function(){
+                                $('#fog').removeClass('white')
+                                $('#big-info').hide().html("")
+                                $('#train-message').fadeIn()
+                            })
+
+                            $('#big-info span, #big-info #copy').click( function(){
+                                $('body').append(`<input type='text' id='dummy' readonly value='${$('#big-info .link.manual').text()}'>`)
+                                $('#dummy').select();
+                                document.execCommand("copy");
+                                create_toast("Link do treino copiado para área de transferência", "success");
+                                $('#dummy').remove()
+                            })
+
+                            $('#big-info #increase').click( function(){
+                                let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
+                                $('#big-info .link').css({'font-size': parseInt(size * 1.1) + 'px'})
+                                
+                            })
+
+                            $('#big-info #reduce').click( function(){
+                                let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
+                                $('#big-info .link').css({'font-size': parseInt(size * 0.9) + 'px'})
+                                
+                            })
+                        })
+                    }
+                }
+
+            })
+        }
     })
 
     $('#panel #train.wrapper #join').click( async function(){
@@ -428,7 +461,7 @@ var roomList = {
                                     <span id='maxtime'>${data.maxtime}m</span>
                                 </div>
                                 <div id='player-container'>
-                                    <span>Batalhas compostas por <span id='players'>${data.players}</span> e ${data.players == 5 ? 4 : parseInt(data.players) + 1} mestres</span>
+                                    <span>Batalhas compostas por <span id='players'>${data.players}</span><span id='pl-second'></span> mestres</span>
                                 </div>
                             </div>
                             <div id='button-container'>
@@ -583,7 +616,6 @@ var roomList = {
                                 $('.train.window #renew').remove()
                                 showQR($('.train.window #qr img').clone())
                                 sendChatMessage({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
-                                console.log({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
                                 this.hash = data.hash
                             }
                         }
@@ -604,6 +636,7 @@ var roomList = {
                     id: id
                 }))
                 // console.log(data)
+
                 if (data.status == "NOTFOUND"){
                     $('#fog').remove()
                     showMessage("O treino foi removido pelo gerenciador")
@@ -646,7 +679,8 @@ var roomList = {
                         }
                     }
             
-                    if (data.glads.length == 0){
+                    let nglads = data.glads.length
+                    if (nglads == 0){
                         $('.train.window .table').html("<div class='row'>Nenhum participante</div>");
                         $('.train.window h3 #count').html("");
             
@@ -671,6 +705,33 @@ var roomList = {
                         }
                     }
                     else {
+                        let players = parseInt(this.players)
+                        let ngroups = Math.ceil(nglads / players)
+                        let lower = Math.floor(nglads / ngroups)
+                        let higher = Math.ceil(nglads / ngroups)
+
+                        if (lower == higher && lower == players){
+                            $('.train.window #player-container #players').html(lower)
+                            $('.train.window #player-container #pl-second').html("")
+                        }
+                        else if (lower == players){
+                            $('.train.window #player-container #players').html(lower)
+                            $('.train.window #player-container #pl-second').html(`e ${higher}`)
+                        }
+                        else if (higher == players){
+                            $('.train.window #player-container #players').html(higher)
+                            $('.train.window #player-container #pl-second').html(`e ${lower}`)
+                        }
+                        else{
+                            $('.train.window #player-container #players').html("")
+                            if (lower == higher){
+                                $('.train.window #player-container #pl-second').html(lower)
+                            }
+                            else{
+                                $('.train.window #player-container #pl-second').html(`${lower} e ${higher}`)
+                            }
+                        }
+
                         $('.train.window .table').html("<div class='row head'><div class='cell'>Mestre</div><div class='cell'>Gladiador</div></div>");
                         for (let glad of data.glads){
                             $('.train.window .table').append(`<div class='row'><div class='cell'>${glad.master}</div><div class='cell'>${glad.gladiator}</div><div class='kick' title='Expulsar participante'><i class='fas fa-times-circle'></i></div></div>`);
