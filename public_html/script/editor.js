@@ -1007,21 +1007,23 @@ async function buildDataTable(){
     var table = [];
     return await new Promise( (resolve, reject) => {
         $.get("docs.php", function(content) {
-            var docs = content.matchAll(/<a href=['"]function\/([\w]+?)['"]>/g);
+            var docs = content.matchAll(/<td><a href=['"]([\w]+?)['"]><\/a><\/td>/g);
             var length = 0;
             for (let m of docs){
                 $.getJSON(`script/functions/${m[1]}.json`, function(data){
                     // console.log(m[1]);
                     table.push({
-                        name: data.name,
+                        name: data.name.default,
                         syntax: data.syntax,
                         description: data.description.brief,
                         snippet: data.snippet
                     });
-                    if (table.length == length)
+                    if (table.length == length){
                         resolve(table);
+                    }
                 }).fail( function(e){
                     console.log(e);
+                    length--;
                 });
                 length++;
             }
