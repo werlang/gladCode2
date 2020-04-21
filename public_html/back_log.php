@@ -14,7 +14,12 @@
 			$log = file_get_contents("logs/$id");
 			header('Content-Length: ' . filesize("logs/$id"));			
 
-			echo $log;
+			if (strlen($log) > 0){
+				echo $log;
+			}
+			else{
+				echo "NULL";
+			}
 		}
 		else
 			echo "NULL";

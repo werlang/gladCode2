@@ -87,7 +87,7 @@ $(document).ready( function() {
 					loghash: loghash
 				},
 				success: function(data){
-					//console.log(data);
+					// console.log(data);
 					if (data == "NULL"){
 						if (tournHash)
 							window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
