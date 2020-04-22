@@ -1064,7 +1064,6 @@ body {
     justify-content: flex-end;
     align-items: flex-end;
     margin-bottom: 3px;
-    height: 40px;
 }
 
 #battle-container #match-find {
@@ -1240,6 +1239,8 @@ body {
     transform: rotate(180deg);
 }
 
+#report-container .tab .notification,
+#battle-container .notification,
 #frame #menu .notification {
     background-color: red;
     width: 20px;
@@ -1255,8 +1256,22 @@ body {
     z-index: 1;
     font-family: 'Roboto', sans-serif;
     margin-top: -25px;
+    transition: 0.3s all;
 }
 
+#battle-container .notification {
+    margin: 5px 40px -25px 0;
+}
+
+#report-container .tab .notification{
+    margin: 0 3px 0 0;
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+}
+
+#report-container .tab .notification.empty,
+#battle-container .notification.empty,
 #frame #menu .notification.empty {
     display: none;
 }
@@ -1606,7 +1621,7 @@ body {
     color: #6c97a9;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 #pre-battle-show .glad-preview .row.mmr {
@@ -1763,6 +1778,10 @@ body {
 
 #duel-challenge {
     width: 100%;
+}
+
+#duel-challenge.hidden {
+    display: none;
 }
 
 #duel-challenge h2 {
@@ -2882,4 +2901,24 @@ body {
     font-size: 50px;
     color: #00638d;
     border-radius: 25%;
+}
+
+#post-table {
+    display: flex;
+    justify-content: space-between;
+    align-self: center;
+}
+
+#post-table #unread {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    margin-left: 20px;
+}
+
+.table .cell h3 {
+    margin: 0 35px;
+    line-height: 35px;
+    white-space: pre-wrap;
+    text-align: center;
 }

@@ -229,15 +229,17 @@ class Message {
         if (this.input){
             $('#dialog-box .input').focus()
             $('#dialog-box .input').keyup( e => {
-                if (e.keyCode == 13 && this.input.enter)
-                    $(`#dialog-box #dialog-button-${this.input.enter}`).click();
+                if (e.keyCode == 13 && this.input.enter){
+                    $(`#dialog-box #dialog-button-${this.input.enter}`).click()
+                }
             })            
         }
 
         for (let id in this.buttons){
             $(`#dialog-box #dialog-button-${id}`).click( async () => {
-                if (!this.preventKill)
+                if (!this.preventKill){
                     $('#dialog-box').parents('#fog').remove()
+                }
             })
         }
         
@@ -249,11 +251,17 @@ class Message {
     }
 
     click(button, fn){
-        $(`#dialog-box #dialog-button-${button}`).click( async () => {
-            if (this.input)
+        $(`#dialog-box #dialog-button-${button}`).off().click( async () => {
+            if (this.input){
                 fn({input: $('#dialog-box .input').val()})
-            else
+            }
+            else{
                 fn()
+            }
+
+            if (!this.preventKill){
+                $('#dialog-box').parents('#fog').remove()
+            }
         })
 
         return this

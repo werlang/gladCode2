@@ -43,7 +43,7 @@ async function runSimulation(args) {
         args: JSON.stringify(args),
     })
     .done(function(data){
-        console.log(data);
+        // console.log(data);
         var jsonerror;
         try{
             JSON.parse(data);

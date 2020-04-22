@@ -327,12 +327,20 @@
             if (isset($args['ranked'])){
                 $deaths = death_times($conn, $ids, $file);
                 $rewards = battle_rewards($conn, $deaths, $user);
-                send_reports($conn, $rewards, $hash);
+                send_reports($rewards, $hash);
             }
             if (isset($args['duel']) && !$cancel_run){
                 $id = mysql_escape_string($args['duel']);
                 $sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
                 $result = runQuery($sql);
+
+                $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
+                $result = runQuery($sql);
+                $row = $result->fetch_assoc();
+
+                send_node_message(array( 'profile notification' => array(
+                    'user' => array($row['user1'], $row['user2'])
+                )));
             }
             if (isset($args['tournament']) && $groupid != null){
                 $sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
@@ -657,7 +665,9 @@
         return $b['time'] - $a['time'];
     }
 
-    function send_reports($conn, $rewards, $log){
+    function send_reports($rewards, $log){
+        global $conn;
+
         $sql = "SELECT id FROM logs WHERE hash = '$log'";
         $result = runQuery($sql);
         $row = $result->fetch_assoc();
