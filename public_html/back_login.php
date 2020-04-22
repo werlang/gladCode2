@@ -236,20 +236,22 @@
         $result = runQuery($sql);
     }
     elseif ($action == "PREMIUM"){
-        $user = $_SESSION['user'];
-        $sql = "SELECT premium FROM usuarios WHERE id = $user";
-        $result = runQuery($sql);
-        $row = $result->fetch_assoc();
-        
-        if (!is_null($row['premium'])){
-            $output['status'] = "PREMIUM";
-        }
-        else{
-            $sql = "UPDATE usuarios SET premium = now(), credits = 30 WHERE id = $user";
-            $result = runQuery($sql);
+        $output['status'] = "NOSUPPORT";
 
-            $output['status'] = "SUCCESS";
-        }
+        // $user = $_SESSION['user'];
+        // $sql = "SELECT premium FROM usuarios WHERE id = $user";
+        // $result = runQuery($sql);
+        // $row = $result->fetch_assoc();
+        
+        // if (!is_null($row['premium'])){
+        //     $output['status'] = "PREMIUM";
+        // }
+        // else{
+        //     $sql = "UPDATE usuarios SET premium = now(), credits = 30 WHERE id = $user";
+        //     $result = runQuery($sql);
+
+        //     $output['status'] = "SUCCESS";
+        // }
     }
 
     echo json_encode($output);

@@ -63,7 +63,7 @@
 	$result = runQuery($sql);
 	$resp['reports']['ranked'] = $result->num_rows;
 
-	$sql = "SELECT d.id FROM duels d WHERE d.isread = 0 AND d.log IS NOT NULL AND d.user1 = '$user'";
+	$sql = "SELECT d.id FROM duels d WHERE d.isread = 0 AND d.log IS NOT NULL AND (d.user1 = $user OR d.user2 = $user)";
 	$result = runQuery($sql);
 	$resp['reports']['duel'] = $result->num_rows;
 

@@ -100,8 +100,11 @@
 	width: 100%;
 	display: flex;
 	justify-content: flex-start;
-	margin-bottom: 10px;
 	color: #646464;
+}
+
+.glad-preview .row.code {
+	margin-bottom: 6px;
 }
 
 .glad-preview .message,
@@ -181,7 +184,7 @@
 .glad-card-container .glad span{
 	color: #000;
     text-align: center;
-    height: 0;
+    /* height: 0; */
 }
 
 .glad-card-container .attr {
