@@ -97,7 +97,7 @@ $(document).ready( function() {
 
 });
 
-// templateTranslate('pt')
+templateTranslate('pt')
 
 async function waitLogged(){
     return await new Promise( (resolve, reject) => {
