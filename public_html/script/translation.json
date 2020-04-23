@@ -70,6 +70,10 @@
     "header_projects_compiler": {
         "pt": "COMPILADOR C",
         "en": "C COMPILER"
+    },
+    "header_projects_stats": {
+        "pt": "ESTATÍSTICAS",
+        "en": "STATISTICS"
     }
 
 }

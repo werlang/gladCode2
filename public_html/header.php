@@ -38,6 +38,7 @@
                     <div class='item'><a href='about' title='Saiba sobre a trajetória da gladCode'><span>{{header_about_project}}</span></a></div>
                     <div class='item'><a href='about#support' title='Maneiras de você apoiar o projeto'><span>{{header_about_support}}</span></a></div>
                     <div class='item'><a href='creditos' title='Créditos aos criadores das artes usadas na gladCode'><span>{{header_about_credits}}</span></a></div>
+                    <div class='item'><a href='stats' title='Informações sobre as batalhas realizadas'><span>{{header_about_stats}}</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu'>
