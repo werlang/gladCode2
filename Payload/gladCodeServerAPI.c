@@ -978,6 +978,7 @@ int charge(int gladid){
 					return 0;
 			}
 
+			turnToUnsafe(gladid, (g+target)->x, (g+target)->y);
 			attackMeleeUnsafe(gladid, bonusdmg);
 			(g+gladid)->action = ABILITY_CHARGE;
 			if ((g+target)->buffs[BUFF_MOVEMENT].timeleft <= 0 || (g+target)->buffs[BUFF_MOVEMENT].value < 1)

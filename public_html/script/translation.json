@@ -1,0 +1,75 @@
+{
+    "news": {
+        "pt": "NOTÍCIAS",
+        "en": "NEWS"
+    },
+    "profile": {
+        "pt": "PERFIL",
+        "en": "PROFILE"
+    },
+    "glads": {
+        "pt": "GLADIADORES",
+        "en": "GLADIATORS"
+    },
+    "battles": {
+        "pt": "BATALHA",
+        "en": "BATTLES"
+    },
+    "reports": {
+        "pt": "HISTÓRICO",
+        "en": "REPORTS"
+    },
+    "messages": {
+        "pt": "MENSAGENS",
+        "en": "MESSAGES"
+    },
+    "friends": {
+        "pt": "AMIGOS",
+        "en": "FRIENDS"
+    },
+    "learn": {
+        "pt": "APRENDER",
+        "en": "LEARN"
+    },
+    "community": {
+        "pt": "COMUNIDADE",
+        "en": "COMMUNITY"
+    },
+    "about": {
+        "pt": "SOBRE",
+        "en": "ABOUT"
+    },
+    "projects": {
+        "pt": "PROJETOS",
+        "en": "PROJECTS"
+    },
+    "header_community_facebook": {
+        "pt": "PÁGINA FACEBOOK",
+        "en": "FACEBOOK PAGE"
+    },
+    "header_community_reddit": {
+        "pt": "FORUM REDDIT",
+        "en": "REDDIT FORUM"
+    },
+    "header_community_whatsapp": {
+        "pt": "GRUPO WHATSAPP",
+        "en": "WHATSAPP GROUP"
+    },
+    "header_about_project": {
+        "pt": "O PROJETO",
+        "en": "THE PROJECT"
+    },
+    "header_about_support": {
+        "pt": "APOIE A GLADCODE",
+        "en": "SUPPORT GLADCODE"
+    },
+    "header_about_credits": {
+        "pt": "CRÉDITOS",
+        "en": "CREDITS"
+    },
+    "header_projects_compiler": {
+        "pt": "COMPILADOR C",
+        "en": "C COMPILER"
+    }
+
+}

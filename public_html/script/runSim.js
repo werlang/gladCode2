@@ -192,19 +192,3 @@ class progressButton {
             return false;
     }
 }
-
-function decodeHTML(str) {
-    var escapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '`': '&#x60;'
-    };
-    for (var i in escapeMap){
-        var regexp = new RegExp(escapeMap[i],"g");
-        str = str.replace(regexp, i);
-    }
-    return str;
-}

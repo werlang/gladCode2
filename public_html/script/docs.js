@@ -11,7 +11,7 @@ $(document).ready( async function(){
     $.get(`script/functions.json`, async data => {
         
         let page = window.location.href.split("/").splice(-1,1)[0].split("#")[0]
-        console.log(page)
+        // console.log(page)
         $('.t-funcs a').map( (i,e) => {
             let match = $(e).attr('href')
             // console.log(match)
