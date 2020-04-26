@@ -90,9 +90,9 @@ $(document).ready( function() {
 					//console.log(data);
 					if (data == "NULL"){
 						if (tournHash)
-							window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
+							window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
 						else
-							window.location.href = "https://gladcode.tk";
+							window.location.href = "https://gladcode.dev";
 					}
 					else{
 						var e;
@@ -628,13 +628,13 @@ function start_timer(steps){
 					show_final_score = false;
 					$('#fog').remove();
 					if (tournHash)
-						window.location.href = "https://gladcode.tk/tournment.php?t="+ tournHash;
+						window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
 				});
 
 				$('#end-message #share').click( function() {
 					$('#end-message').hide();
 
-					var link = "gladcode.tk/play/"+ loghash;
+					var link = "gladcode.dev/play/"+ loghash;
 
 					var twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
 
@@ -642,7 +642,7 @@ function start_timer(steps){
 
 					var whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
 
-					$('#fog').append(`<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.tk/play/</span><span id='hash'>${loghash}</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>${twitter + facebook + whatsapp}</div><button id='close' class='button'>OK</button></div>`);
+					$('#fog').append(`<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.dev/play/</span><span id='hash'>${loghash}</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>${twitter + facebook + whatsapp}</div><button id='close' class='button'>OK</button></div>`);
 					
 					$('#url #social #getlink').click( function(){
 						copyToClipboard(link);

@@ -65,7 +65,7 @@ function runSimulation(args) {
 			}
 			else if (simulation.length > 0){
 				if (output == "CLIENT TIMEOUT"){
-					showTerminal("ERRO NA SIMULAÇÃO","A gladCode está tendo problemas entre a conexão do simulador e os gladiadores. Por favor, reporte este problema para <a href='mailto:contato@gladcode.tk'><span>contato@gladcode.tk</span></a>");
+					showTerminal("ERRO NA SIMULAÇÃO","A gladCode está tendo problemas entre a conexão do simulador e os gladiadores. Por favor, reporte este problema para <a href='mailto:contato@gladcode.dev'><span>contato@gladcode.dev</span></a>");
 					return response.resolve("ERROR");
 				}
 				else if (output.indexOf("timed out") != -1){

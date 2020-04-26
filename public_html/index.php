@@ -9,11 +9,11 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     
     <meta property="og:title" content="gladCode">
-    <meta property="og:image" content="https://www.gladcode.tk/icon/gladcode_icon.png">
+    <meta property="og:image" content="https://www.gladcode.dev/icon/gladcode_icon.png">
     <meta property="og:image:width" content="200">
     <meta property="og:image:height" content="200">	
 
-    <meta property="og:url" content="https://gladcode.tk">
+    <meta property="og:url" content="https://gladcode.dev">
     <meta property="og:description" content="Batalha de agentes virtuais autônomos.">
     
     <title>gladCode</title>

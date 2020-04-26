@@ -1,6 +1,6 @@
 <?php
 	$sendername = 'gladCode';
-	$senderemail = 'gladbot@gladcode.tk';
+	$senderemail = 'gladbot@gladcode.dev';
 
 	/*
 	//mailjet
@@ -18,7 +18,7 @@
 	$action = $_POST['action'];
 
 	include_once "connection.php";
-	$cancelSend = true;
+	$cancelSend = false;
 	if (isset($_GET['teste'])){
 		$receivername = "Pablo";
 		$receiveremail = 'pswerlang@gmail.com';
@@ -35,7 +35,7 @@
 
 		for ($i=0 ; $i<$n ; $i++){
 			array_push($receivername, "Pablo");
-			array_push($receiveremail, 'contato@gladcode.tk');
+			array_push($receiveremail, 'contato@gladcode.dev');
 			array_push($msgbody, "Test message ". ($i+1));
 		}
 	}

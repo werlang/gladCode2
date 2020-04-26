@@ -10,7 +10,7 @@
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Running</field></block>"
     },
     "description": {
-        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>movimentação</a>, e este efeito é positivo, indicando que o alvo está correndo.",
+        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='manual#nav-efeito'>movimentação</a>, e este efeito é positivo, indicando que o alvo está correndo.",
         "brief": "Verifica se o alvo está correndo."
     },
     "param": {

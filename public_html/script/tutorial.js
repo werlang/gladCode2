@@ -119,9 +119,9 @@ tutorial.lesson.start = async function(){
             setLang('blocks')
             toggleBlocks({ask: false, active: true})
 
-            let data = await showDialog("Gostaria de assistir uns vídeos ensinando lógica de programação básica usando blocos na gladCode?", ["SIM", "NÃO"])
+            let data = await showDialog("Gostaria de assistir um vídeo ensinando lógica de programação básica usando blocos na gladCode?", ["SIM", "NÃO"])
             if (data == "SIM"){
-                window.open("link dos tutoriais")
+                window.open("https://www.youtube.com/embed/hzxe5rmyODI")
                 await showMessage("Agora que você sabe um pouco de lógica de programação, vamos prosseguir com o tutorial!")
 
                 tutorial.next(true)

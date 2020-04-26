@@ -61,10 +61,10 @@ app.use(cors({
 		'https://gladcode.tk',
 		'http://www.gladcode.tk',
 		'https://www.gladcode.tk',
-		'http://gladcode-dev.tk',
-		'https://gladcode-dev.tk',
-		'http://www.gladcode-dev.tk',
-		'https://www.gladcode-dev.tk',
+		'http://gladcode.dev',
+		'https://gladcode.dev',
+		'http://www.gladcode.dev',
+		'https://www.gladcode.dev'
 	],
 	credentials: true,
 
