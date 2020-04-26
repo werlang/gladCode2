@@ -139,7 +139,7 @@ $(document).ready( function(){
                     $('body').append(`<div id='fog'>
                         <div id='link-box'>
                             <h3>Link da publicação</h3>
-                            <input value='https://gladcode.tk/post/${data.posts[i].id}' readonly>
+                            <input value='https://gladcode.dev/post/${data.posts[i].id}' readonly>
                             <button>COPIAR</button>
                         </div>
                     </div>`);

@@ -10,7 +10,7 @@
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Protected</field></block>"
     },
     "description": {
-        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>proteção</a>.",
+        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='manual#nav-efeito'>proteção</a>.",
         "brief": "Verifica se o alvo está protegido."
     },
     "param": {

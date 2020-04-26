@@ -81,7 +81,7 @@
             <p><a href='https://creativecommons.org/licenses/by/3.0/legalcode'>https://creativecommons.org/licenses/by/3.0/legalcode</a></p>
 
             <p>A lista dos autores e seus créditos pode ser acessada em:</p>
-            <p><a href='https://gladcode.tk/icon-authors.txt'>https://gladcode.tk/icon-authors.txt</a></p>
+            <p><a href='https://gladcode.dev/icon-authors.txt'>https://gladcode.dev/icon-authors.txt</a></p>
 
             <h2>Audio</h2>
 
@@ -89,7 +89,7 @@
             <p><a href='https://freesound.org/'>https://freesound.org/</a></p>
 
             <p>A lista dos autores pode ser acessada em:</p>
-            <p><a href='https://gladcode.tk/audio-authors.txt'>https://gladcode.tk/audio-authors.txt</a></p>
+            <p><a href='https://gladcode.dev/audio-authors.txt'>https://gladcode.dev/audio-authors.txt</a></p>
 
             <h2>Emojis</h2>
 

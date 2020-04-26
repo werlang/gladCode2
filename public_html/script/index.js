@@ -12,6 +12,7 @@ $(document).ready( function() {
 	
 	$('#account').click( function(){
 		googleLogin().then(function(data) {
+			// console.log(data)
 			window.location.href = "news";
 		});
 	});

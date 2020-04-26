@@ -10,7 +10,7 @@
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Burning</field></block>"
     },
     "description": {
-        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='https://gladcode.tk/manual.php#nav-efeito'>queimadura</a>.",
+        "long": "A função verifica se o alvo selecionado pelo gladiador possui o efeito <a href='manual#nav-efeito'>queimadura</a>.",
         "brief": "Verifica se o alvo está queimando."
     },
     "param": {
