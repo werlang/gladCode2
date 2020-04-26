@@ -35,12 +35,12 @@
         	$maxtime = "00:". $maxtime;
 
         $sql = "SELECT * FROM tournament WHERE name = '$name'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows == 0){
             $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             echo $hash;
 
             send_node_message(array('tournament list' => array()));
@@ -62,7 +62,7 @@
 
         //how many open 
         $sql = "SELECT t.id FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = ''";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nopen = $result->num_rows;
 
         if ($ooffset >= $nopen)
@@ -70,7 +70,7 @@
 
         //show open tournaments not started and not filled
         $sql = "SELECT * FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = '' ORDER BY t.creation DESC LIMIT $limit OFFSET $ooffset";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
         
         $open = array();
@@ -89,7 +89,7 @@
 
         //how many mine
         $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nmine = $result->num_rows;
 
         if ($moffset >= $nmine)
@@ -99,7 +99,7 @@
 
         //show tournaments which I am the manager or I have joined
         $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user' ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
         
         $mytourn = array();
@@ -138,12 +138,12 @@
             $pass = mysql_escape_string($_POST['pass']);
         else{
             $sql = "SELECT password FROM tournament WHERE name = '$name' AND manager = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
 
             if ($nrows == 0){
                 $sql = "SELECT t.password AS password FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE g.master = '$user' AND t.name = '$name'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
             }
 
             $row = $result->fetch_assoc();
@@ -151,7 +151,7 @@
         }
 
         $sql = "SELECT * FROM tournament WHERE name = '$name' AND password = '$pass'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -183,7 +183,7 @@
             $sql = "SELECT * FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
         if ($row['hash'] == ''){
             $tournid = $row['id'];
@@ -202,7 +202,7 @@
 
             //list id and name from temns in a giver tournament
             $sql = "SELECT id, name FROM teams WHERE tournament = '$tournid'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             while ($row = $result->fetch_assoc()){
                 $team = array();
                 $team['name'] = $row['name'];
@@ -218,7 +218,7 @@
             }
 
             $sql = "SELECT te.id FROM teams te WHERE (SELECT count(*) FROM gladiator_teams WHERE team = te.id) < 3 AND te.tournament = '$tournid'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
             
             if ($nrows == 0)
@@ -244,7 +244,7 @@
         $tourn = "";
 
         $sql = "SELECT id, hash FROM tournament WHERE name = '$tname' AND password = '$tpass'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -260,14 +260,14 @@
                 echo "ALREADYIN";
             else{
                 $sql = "SELECT t.maxteams AS maxteams FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE t.id = '$tourn'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
                 $row = $result->fetch_assoc();
                 if ($nrows > 0 && $nrows >= $row['maxteams'])
                     echo "FULL";
                 else{
                     $sql = "SELECT name FROM teams WHERE name = '$name' AND tournament = $tourn";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $nrows = $result->num_rows;
                     if ($nrows == 0){
                         $vow = "aeiouy";
@@ -282,7 +282,7 @@
                         }            
             
                         $sql = "INSERT INTO teams (name, tournament, password, modified) VALUES ('$name', $tourn, '$word', now())";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         $teamid = $conn->insert_id;
             
                         $output = array();
@@ -291,7 +291,7 @@
                         echo json_encode($output);
         
                         $sql = "SELECT cod FROM gladiators WHERE master = '$user'";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         $nrows = $result->num_rows;
         
                         if ($nrows > 0){
@@ -299,7 +299,7 @@
                                 $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$teamid', '1')";
                             else
                                 $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$teamid')";
-                            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                            $result = runQuery($sql);
                         }
 
                         send_node_message(array('tournament list' => array()));
@@ -322,7 +322,7 @@
         $output = array();
 
         $sql = "SELECT modified FROM teams WHERE id = '$teamid'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
 
         if ($row['modified'] != $sync){
@@ -332,7 +332,7 @@
             $output['glads'] = array();
 
             $sql = "SELECT gt.gladiator, t.name, t.password, t.tournament, tn.flex FROM teams t INNER JOIN gladiator_teams gt ON t.id = gt.team INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN tournament tn ON tn.id = t.tournament WHERE gt.team = '$teamid' AND g.master = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
             if ($nrows > 0){
                 $row = $result->fetch_assoc();
@@ -343,7 +343,7 @@
             }
             
             $sql = "SELECT g.cod, g.name, g.vstr, g.vagi, g.vint, g.skin, u.apelido, master FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE g.cod IN (SELECT gladiator FROM gladiator_teams WHERE team = '$teamid')";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
 
             if ($nrows == 0){
                 while ($row = $result->fetch_assoc())
@@ -375,7 +375,7 @@
 
         $output = array();
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$teamid'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -387,7 +387,7 @@
             $tpass = $row['password'];
 
             $sql = "SELECT hash FROM tournament WHERE id = $tournid";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $row = $result->fetch_assoc();
             
             if ($row['hash'] != '')
@@ -396,7 +396,7 @@
                 $output['tourn'] = $tournid;
     
                 $sql = "SELECT gt.id AS id FROM gladiator_teams gt INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE gt.team = '$teamid' AND g.master = '$user'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
         
                 $ids = array();
                 while ($row = $result->fetch_assoc())
@@ -404,15 +404,15 @@
                 $ids = implode(",", $ids);
         
                 $sql = "DELETE FROM gladiator_teams WHERE id IN ($ids)";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
         
                 $sql = "SELECT id FROM gladiator_teams WHERE team = '$teamid'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
         
                 if ($nrows == 0){
                     $sql = "DELETE FROM teams WHERE id = '$teamid'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $output['status'] = "REMOVED";
 
                     send_node_message(array('tournament list' => array()));
@@ -425,7 +425,7 @@
                 }
                 else{
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$teamid'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $output['status'] = "LEFT";
 
                     send_node_message(array('tournament glads' => array( 'team' => $teamid )));
@@ -451,7 +451,7 @@
         $output = array();
 
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$team'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
 
         $tourn = $row['id'];
@@ -459,14 +459,14 @@
         $tpass = $row['password'];
 
         $sql = "SELECT t.id FROM gladiators g INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON gt.team = te.id INNER JOIN tournament t ON te.tournament = t.id WHERE t.id = '$tourn' AND g.master = '$user'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows > 0)
             $output['status'] = "SIGNED";
         else{
             $sql = "SELECT t.id FROM tournament t WHERE t.id = '$tourn' AND t.hash = ''";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
             
             if ($nrows == 0)
@@ -475,12 +475,12 @@
                 $output['tourn'] = $tourn;
 
                 $sql = "SELECT * FROM teams WHERE id = '$team' AND password = '$word'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
 
                 if ($nrows > 0){
                     $sql = "SELECT cod FROM gladiators WHERE master = '$user' AND cod = '$glad'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $nrows = $result->num_rows;
 
                     if ($nrows > 0 ){
@@ -488,9 +488,9 @@
                             $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$team', '1')";
                         else
                             $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$team')";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
             
                         $output['status'] = "SUCCESS";
 
@@ -522,7 +522,7 @@
         $nglads = "SELECT count(*) FROM gladiator_teams WHERE team = '$team'";
         $signed = "SELECT count(*) FROM gladiator_teams gt INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE gt.team = '$team' AND g.master = '$user'";
         $sql = "SELECT t.id AS tournid, t.name AS tname, t.password AS tpass, te.password AS pass, ($nglads) AS nglads, t.flex AS flex, ($signed) AS signed, t.hash FROM gladiators g INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON te.id = gt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = '$user' AND te.id = '$team'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         $output = array();
@@ -544,13 +544,13 @@
                 $tpass = $row['tpass'];
 
                 $sql = "SELECT * FROM gladiator_teams WHERE gladiator = '$glad' && team = '$team'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
                 if ($nrows > 0)
                     $output['status'] = "SAMEGLAD";
                 else{
                     $sql = "SELECT master FROM gladiators WHERE cod = '$glad'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $row = $result->fetch_assoc();
                     if ($row['master'] != $user)
                         $output['status'] = "PERMISSION";
@@ -559,9 +559,9 @@
                             $sql = "INSERT INTO gladiator_teams(gladiator, team, visible) VALUES ('$glad','$team', '1')";
                         else
                             $sql = "INSERT INTO gladiator_teams(gladiator, team) VALUES ('$glad','$team')";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         $output['status'] = "DONE";
 
                         send_node_message(array('tournament teams' => array(
@@ -590,7 +590,7 @@
             $sql = "SELECT id, manager, hash FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
         $tournid = $row['id'];
         $manager = $row['manager'];
@@ -601,12 +601,12 @@
             $output['status'] = "STARTED";
         else{
             $sql = "SELECT id FROM teams WHERE tournament = '$tournid'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
 
             if ($nrows == 0){
                 $sql = "DELETE FROM tournament WHERE id = '$tournid'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $output['status'] = "DELETED";
 
                 send_node_message(array('tournament list' => array()));
@@ -630,7 +630,7 @@
         $output = array();
 
         $sql = "SELECT t.id, t.name, t.password, t.hash FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE te.id = $team";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
 
         if ($row['hash'] != '')
@@ -641,34 +641,34 @@
             $tpass = $row['password'];
 
             $sql = "SELECT * FROM gladiators g INNER JOIN gladiator_teams gt ON g.cod = gt.gladiator WHERE g.master = '$user' AND gt.team = '$team' AND gt.gladiator = '$glad'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
                 $output['status'] = "NOTFOUND";
             else{
                 $sql = "DELETE FROM gladiator_teams WHERE gladiator = '$glad' AND team = '$team'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
 
                 $sql = "SELECT t.id AS id FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE te.id = '$team'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $row = $result->fetch_assoc();
                 $output['tournid'] = $row['id'];
 
                 $sql = "SELECT * FROM gladiator_teams WHERE team = '$team'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
                 
                 if ($nrows > 0){
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $output['status'] = "DONE";
 
                     send_node_message(array('tournament glads' => array( 'team' => $team )));
                 }
                 else{
                     $sql = "DELETE FROM teams WHERE id = '$team'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
                     $output['status'] = "REMOVED";
 
                     send_node_message(array('tournament list' => array()));
@@ -699,7 +699,7 @@
         $output = array();
 
         $sql = "SELECT te.tournament, t.name, t.password, te.id AS id FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE t.manager = '$user' AND t.name = '$tname' AND t.password = '$tpass' AND te.name = '$team'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -712,9 +712,9 @@
             $tpass = $row['password'];
 
             $sql = "DELETE FROM gladiator_teams WHERE team = '$team'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $sql = "DELETE FROM teams WHERE id = '$team'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             
             $output['status'] = "DONE";
 
@@ -742,7 +742,7 @@
         $output = array();
 
         $sql = "SELECT t.id AS id, t.maxtime FROM tournament t WHERE t.name = '$tname' AND t.password = '$tpass' AND t.manager = '$user' AND t.hash = ''";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
         $row = $result->fetch_assoc();
         $tournid = $row['id'];
@@ -752,7 +752,7 @@
             $output['status'] = "NOTFOUND";
         else{
             $sql = "SELECT id FROM teams WHERE tournament = '$tournid'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
             $nteams = $result->num_rows;
 
             if ($nteams <= 1)
@@ -764,7 +764,7 @@
                 shuffle($teams);
 
                 $sql = "SELECT te.id FROM teams te WHERE (SELECT count(*) FROM gladiator_teams WHERE team = te.id) < 3 AND te.tournament = '$tournid'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                $result = runQuery($sql);
                 $nrows = $result->num_rows;
                 
                 if ($nrows > 0)
@@ -772,7 +772,7 @@
                 else{
                     $hash = substr(md5('tourn'.microtime()*rand()), 0,16);
                     $sql = "UPDATE tournament t SET t.hash = '$hash' WHERE t.id = '$tournid'";
-                    if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    $result = runQuery($sql);
 
                     create_chat($conn, $tournid);
 
@@ -787,14 +787,14 @@
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
                         $sql = "INSERT INTO groups(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                         array_push($groups, $conn->insert_id);
                     }
 
                     foreach($teams as $i => $team){
                         $group = $groups[$i % $ngroups];
                         $sql = "INSERT INTO group_teams (team, groupid) VALUES ('$team', '$group')";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                        $result = runQuery($sql);
                     }
 
                     $output['status'] = "DONE";
@@ -810,7 +810,7 @@
 
         $sql = "SELECT t.id AS id FROM teams t INNER JOIN gladiator_teams gt ON gt.team = t.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE t.tournament = '$tournid' AND g.master = '$user'";
         
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $nrows = $result->num_rows;
         
         if ($nrows > 0){
@@ -825,7 +825,7 @@
     function create_chat($conn, $tourn){
         //check if room exists
         $sql = "SELECT cr.id, t.name, t.manager FROM chat_rooms cr RIGHT JOIN tournament t ON t.name = cr.name WHERE t.id = $tourn";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
 
         $row = $result->fetch_assoc();
         $name = $row['name'];
@@ -836,12 +836,12 @@
 
         //create chat room
         $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), 'Sala de discussão do torneio $name', 0)";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
         $room = $conn->insert_id;
 
         //get who is in the tournament
         $sql = "SELECT DISTINCT g.master FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE te.tournament = $tourn";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
 
         $masters = array();
         while ($row = $result->fetch_assoc()){
@@ -856,11 +856,11 @@
                 $privilege = 0;
             //insert every user from the tournament in the new chat room
             $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($room, '$master', now(3), now(3), $privilege)";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+            $result = runQuery($sql);
         }
 
         $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+        $result = runQuery($sql);
 
         send_node_message(array(
             'chat notification' => array(

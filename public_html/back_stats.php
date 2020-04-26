@@ -21,12 +21,12 @@
 			$loghash = $_POST['loghash'];
 
 			$sql = "SELECT avg(g.mmr) AS mmr FROM gladiators g INNER JOIN reports r ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE l.hash = '$loghash'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			$row = $result->fetch_assoc();
 			$mmr = $row['mmr'];
 
 			$sql = "INSERT INTO stats (time, fireball, teleport, charge, block, assassinate, ambush, melee, ranged, win, avglvl, winnerlvl, duration, highstr, highagi, highint, avgmmr) VALUES (now(), '$fireball', '$teleport', '$charge', '$block', '$assassinate', '$ambush', '$melee', '$ranged', '$win', '$avglvl', '$winnerlvl', '$duration', '$highstr', '$highagi', '$highint', '$mmr')";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 		}
 		elseif ($_POST['action'] == 'load'){
 			if ($_POST['start'] == ''){
@@ -51,7 +51,7 @@
 			$sql = "SELECT * FROM stats WHERE time >= '$start' AND time <= '$end' AND (avgmmr IS NULL OR (avgmmr >= '$smmr' AND avgmmr <= '$emmr'))";
 			//echo $sql;
 			
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			$nrows = $result->num_rows;
 			$uses = array();
 			$abwin = array();

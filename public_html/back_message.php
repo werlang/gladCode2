@@ -9,7 +9,7 @@
 		$page = mysql_escape_string($_POST['page']);
 
 		$sql = "SELECT cod FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$total = $result->num_rows;
 
 		$units = 10;
@@ -59,7 +59,7 @@
 		
 		$sql = "INSERT INTO messages (time, sender, receiver, message) VALUES (now(), '$sender', '$receiver', '$message')";
 		echo $sql;
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		send_node_message(array(
 			'profile notification' => array('user' => array($receiver))
@@ -70,7 +70,7 @@
 		$id = mysql_escape_string($_POST['id']);
 		$val = mysql_escape_string($_POST['value']);
 		$sql = "UPDATE messages SET isread = '$val' WHERE cod = '$id' AND receiver = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		send_node_message(array(
 			'profile notification' => array('user' => array($user))
@@ -80,7 +80,7 @@
 		$user = $_SESSION['user'];
 		$id = mysql_escape_string($_POST['id']);
 		$sql = "DELETE FROM messages WHERE cod = '$id' AND receiver = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 	}
 	elseif ($action == "REPLY"){
 		$sender = $_SESSION['user'];
@@ -88,7 +88,7 @@
 		$message = mysql_escape_string(htmlentities($_POST['message']));
 		
 		$sql = "SELECT * FROM messages WHERE cod = '$id' AND receiver = '$sender'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		$row = $result->fetch_assoc();
 		$receiver = $row['sender'];
@@ -96,7 +96,7 @@
 		$message = "<quote>$oldmessage</quote>$message";
 		
 		$sql = "INSERT INTO messages (time, sender, receiver, message) VALUES (now(), '$sender', '$receiver', '$message')";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		send_node_message(array(
 			'profile notification' => array('user' => array($receiver))

@@ -9,7 +9,7 @@
 		
 		if($action == "GET"){
 			$sql = "SELECT a.cod, u.apelido, u.foto, u.lvl FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 1";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			
 			$pending = array();
 			while($row = $result->fetch_assoc()){
@@ -23,7 +23,7 @@
 
 			$fields = "a.cod, u.id, u.apelido, u.lvl, u.foto, TIMESTAMPDIFF(MINUTE,ativo,now()) as ultimoativo";
 			$sql = "SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 0 UNION SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = '$user' AND pendente = 0";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			$confirmed = array();
 			while($row = $result->fetch_assoc()){
@@ -48,7 +48,7 @@
 				$sql = "UPDATE amizade SET pendente = '0' WHERE cod = '$id' AND usuario2 = '$user'";
 			else
 				$sql = "DELETE FROM amizade WHERE cod = '$id' AND usuario2 = '$user'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			echo "OK";
 
 			send_node_message(array(
@@ -58,7 +58,7 @@
 		elseif ($action == "SEARCH"){
 			$text = mysql_escape_string($_POST['text']);
 			$sql = "SELECT apelido, id, email FROM usuarios WHERE apelido LIKE '%$text%' AND id != '$user' LIMIT 10";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			$output = array();
 			while($row = $result->fetch_assoc()){
@@ -73,16 +73,16 @@
 		elseif ($action == "DELETE"){
 			$id = mysql_escape_string($_POST['user']);
 			$sql = "DELETE FROM amizade WHERE cod = '$id' AND (usuario1 = '$user' OR usuario2 = '$user')";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			echo "OK";
 		}
 		elseif ($action == "ADD"){
 			$friend = mysql_escape_string($_POST['user']);
 			$sql = "SELECT * FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			if ($result->num_rows == 0){
 				$sql = "INSERT INTO amizade (usuario1,usuario2) VALUES ('$user','$friend')";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 				echo "OK";
 
 				send_node_message(array(
@@ -96,7 +96,7 @@
 			$text = mysql_escape_string($_POST['text']);
 			$fields = "a.cod, u.id, u.apelido, u.lvl, u.foto";
 			$sql = "SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 0 AND apelido LIKE '%$text%' UNION SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = '$user' AND pendente = 0 AND apelido LIKE '%$text%'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			$friends = array();
 			$c = 0;

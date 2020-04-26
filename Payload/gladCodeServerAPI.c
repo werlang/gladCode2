@@ -25,7 +25,7 @@ void setAGI(int gladid, int n){
         (g+gladid)->spd = 1 + n*0.05;
         (g+gladid)->as = 0.5 + n*0.05;
         (g+gladid)->ts = 90 + n*9;
-        (g+gladid)->rdmg = n*0.5+5;
+        (g+gladid)->rdmg = n*0.4+5;
 	}
 }
 
@@ -93,7 +93,7 @@ int upgradeAGI(int gladid, int n){
 		(g+gladid)->spd += 0.05 * n;
 		(g+gladid)->as += 0.05 * n;
 		(g+gladid)->ts += 9 * n;
-		(g+gladid)->rdmg += 0.5 * n;
+		(g+gladid)->rdmg += 0.4 * n;
 		(g+gladid)->up -= n;
 		return 1;
 	}
@@ -978,6 +978,7 @@ int charge(int gladid){
 					return 0;
 			}
 
+			turnToUnsafe(gladid, (g+target)->x, (g+target)->y);
 			attackMeleeUnsafe(gladid, bonusdmg);
 			(g+gladid)->action = ABILITY_CHARGE;
 			if ((g+target)->buffs[BUFF_MOVEMENT].timeleft <= 0 || (g+target)->buffs[BUFF_MOVEMENT].value < 1)
