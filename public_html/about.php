@@ -83,12 +83,7 @@
                 <span class='time'>Jan 2019</span>
             </div>
             <div class='row'>
-                <span class='text'><a href='https://www.reddit.com/r/gladcode/comments/d5h8qv/atualiza%C3%A7%C3%A3o_gladcode_26beta/' target='_blank'>Modo torneio</a> é incluso na gladCode, além de mudanças expressivas na aparência da arena.</span>
-                <img src='icon/swords.png'>
-                <span class='time'>Set 2019</span>
-            </div>
-            <div class='row'>
-                <span class='text'>Inauguração do modo torneio na CharCode 2019.</span>
+                <span class='text'>Inauguração do novo <a href='https://www.reddit.com/r/gladcode/comments/d5h8qv/atualiza%C3%A7%C3%A3o_gladcode_26beta/' target='_blank'>Modo torneio</a> na CharCode 2019, além de mudanças expressivas na aparência da arena.</span>
                 <img src='icon/swords.png'>
                 <span class='time'>Dez 2019</span>
             </div>
@@ -133,19 +128,33 @@
                 <div class='title'>Conheça mais</div>
                 <div class='text'>Na gladCode você cria gladiadores, configurando sua aparência e comportamento. Eles possuem atributos físicos e mentais que determinam o quão fortes eles são correndo, usando ataques ou lançando magias. Para configurar o comportamento de seus gladiadores você precisa usar seus conhecimentos de lógica de programação. Uma vez criados, seus gladiadores podem ser colocados para participar de disputas contra outros gladiadores, onde só os melhores conseguem chegar ao topo do ranking.</div>
                 <div class='button-container'>
-                    <a href='manual.php' class='button'>Visite o Manual</a>
-                    <a href='docs.php' class='button'>Veja as funções</a>
+                    <a href='manual' class='button'>Visite o Manual</a>
+                    <a href='docs' class='button'>Veja as funções</a>
                 </div>
             </div>
             <iframe frameborder="0" width="100%" height="100%" src="https://www.youtube.com/embed/lUR3CszStUg?autoplay=1&controls=0&showinfo=0&autohide=1&modestbranding=1&loop=1&playlist=lUR3CszStUg&mute=1"></iframe>
         </div>
+        <div id='plans'>
+            <div id='img-rank'><img src='image/personal-ranking.png'></div>
+            <div class='col'>
+                <div class='title'>Planos para escolas</div>
+                <div class='text'>
+                    <p>Caso você seja afiliado a alguma instituição de ensino, ou até mesmo preste tutoria para alguns alunos, introduza a gladCode em suas aulas e veja o engajamento crescer.</p>
+                    <p>Experimente a funcionalidade exclusiva do plano para escolas, o <a href='battle' target='_blank'>treino de equipes</a>.</p>
+                    <p>Esta modalidade permite a criação de rodadas de combates entre seus alunos com tempo definido e número máximo de participantes por combate, além de um ranking específico da sua escola que demonstra o desempenho dos alunos ao longo de todos treino realizados.</p>
+                </div>
+                <div id='button-container'>
+                    <div id='premium-frame'>
+                        <span class='s4'>Somente</span>
+                        <div><span class='s2'>R$</span><span class='s1'>0,99</span><span class='s4'>/ mês</span></div>
+                        <span class='s3'>por aluno</span>
+                        <span class='s4'>Ganhe <b>R$ 30,00</b> de créditos para testar as funcionalidades</span>
+                    </div>
+                    <button id='premium' class='button'>TENHO INTERESSE</button>
+                </div>
+            </div>
+        </div>
         <div id='support'>
-            <!--
-            <div class='video'>
-                <video width='100%' height='100%' autoplay loop>
-                    <source src='image/battle-movie.mp4'>
-                </video>
-            </div>-->
             <div class='col'>
                 <div class='title'>Apoie o projeto</div>
                 <div class='text'>
@@ -196,13 +205,13 @@
             <div class='title'>Entre em contato</div>
             <div class='subtitle'>Adoraríamos saber o que você pensa sobre o projeto</div>
             <div id='social'>
-                <a href='mailto:contato@gladcode.dev' title='Enviar Email' target='_blank'><img src='icon/at-sign.png'></a>
+                <a href='mailto:pswerlang@gmail.com' title='Enviar Email' target='_blank'><img src='icon/at-sign.png'></a>
                 <a href='https://facebook.com/gladcode' title='Página do Facebook' target='_blank'><img src='icon/facebook.png'></a>
                 <a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' title='Grupo do WhatsApp' target='_blank'><img src='icon/whatsapp_full.png'></a>
                 <a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
             </div>
         </div>
-        <div>Copyright © 2018-2020 Pablo Werlang</div>
+        <div id='about-footer'>Copyright © 2018-2020 Pablo Werlang</div>
             <div id='long' hidden>
                 Ainda durante a faculdade um professor apresentou para a turma um programa traria a inspiração para a gladCode anos mais tarde. Este programa possuía uma linguagem própria, e nele, nós alunos deveríamos programar a inteligência de um robô virtual, que deveria batalhar contra os robôs dos outros alunos em um mini torneio realizado após a entrega do trabalho da disciplina.
                 Os anos se passaram. Hoje sou professor do <a href='ifsul.edu.br'>Instituto Federal Sul-Riograndense (IFSul)</a> - Campus Charqueadas e ministro principalmente disciplinas de lógica de programação e linguagem de programação C.
@@ -216,7 +225,7 @@
 
                 Embora um enorme desafio desafio do ponto de vista técnico, a gladCode foi um sucesso. Mas o projeto, muito promissor e elogiado por alunos e professores não podia para por aí. A gladCode era um programa que exigia um certo trabalho para rodar, e isso muitas vezes era um impecilho na hora de um aluno iniciante dar os primeiros passos. Então 2018 começou com o desafio de transportar a gladCode para um sistema web, permitindo que o usuário execute e visualize a simulação no navegador, sem precisar instalar nada.
 
-                Como eu precisava que o servidor compilasse e executasse os programas, eu precisava de acesso root ao servidor, por isso contratei um <a href='https://www.hostinger.com.br/tutoriais/o-que-e-vps-como-escolher-um-servidor-vps'>VPS</a> para hospedar o projeto. Depois da tarefa de configuração do servidor (que eu nunca tinha tido contato até então) percebi que eu precisaria executar o código do usuário em um ambiente seguro e isolado, então fui apresentado ao <a href='https://www.docker.com/'>Docker</a> e seus containers, e desta empreitada surgiu o <a href='code.php'>compilador C</a> da gladCode.
+                Como eu precisava que o servidor compilasse e executasse os programas, eu precisava de acesso root ao servidor, por isso contratei um <a href='https://www.hostinger.com.br/tutoriais/o-que-e-vps-como-escolher-um-servidor-vps'>VPS</a> para hospedar o projeto. Depois da tarefa de configuração do servidor (que eu nunca tinha tido contato até então) percebi que eu precisaria executar o código do usuário em um ambiente seguro e isolado, então fui apresentado ao <a href='https://www.docker.com/'>Docker</a> e seus containers, e desta empreitada surgiu o <a href='code'>compilador C</a> da gladCode.
 
                 Após esta etapa precisei fazer o port de todo o código da gladCode para linux para executar no servidor, então aproveitei o momento para modificar a estrutura do programa. A partir de então a comunicação entre os processos passou a ser feita por troca de mensagens em um servidor <a href='https://blog.pantuza.com/artigos/o-que-sao-e-como-funcionam-os-sockets'>socket</a> ao invés de por <a href='https://pt.wikipedia.org/wiki/Mem%C3%B3ria_compartilhada'>memória compartilhada</a>. Esta mudança permitiu criar uma <a href='https://pt.wikipedia.org/wiki/Interface_de_programa%C3%A7%C3%A3o_de_aplica%C3%A7%C3%B5es'>API</a> onde no futuro se tornaria muito mais simples adicionar suporte à outras linguagens de programação além do C. Troquei também o padrão de comunicação do log da simulação por <a href='https://www.json.org/json-pt.html'>JSON</a>, visto que a comunicação entre o servidor e o usuário seria feita pelo navegador em linguagem javascript. Assim nasceu a segunda versão da gladCode.
 
@@ -225,7 +234,7 @@
                 
                 Na Charcode 2018 a modalidade gladCode utilizou a hoje chamada interface de <a href='#' title='Modo descontinuado'>torneio clássico</a> para realizar a competição, que permitiu a geração dos logs das batalhas para visualização posterior.
 
-                Os próximos passos da gladCode seriam torná-la um sistema multiplayer online, onde os usuários criariam seu perfil, salvariam seus códigos e seus gladiadores no servidor, e os colocariam para batalhar contra os gladiadores de outros usuários em um sistema de ranking online da plataforma. Desta forma nasceu o <a href='editor.php'>editor de gladiadores</a>, que une o editor da aparência do gladiador com o editor de texto do compilador C da gladCode. A página de perfil do usuário foi criada permitindo ao usuário comunicar-se com seus amigos, visualizar seu ranking, e inscrever seus gladiadores em batalhas.
+                Os próximos passos da gladCode seriam torná-la um sistema multiplayer online, onde os usuários criariam seu perfil, salvariam seus códigos e seus gladiadores no servidor, e os colocariam para batalhar contra os gladiadores de outros usuários em um sistema de ranking online da plataforma. Desta forma nasceu o <a href='editor'>editor de gladiadores</a>, que une o editor da aparência do gladiador com o editor de texto do compilador C da gladCode. A página de perfil do usuário foi criada permitindo ao usuário comunicar-se com seus amigos, visualizar seu ranking, e inscrever seus gladiadores em batalhas.
             </div>
         </div>
     </div>

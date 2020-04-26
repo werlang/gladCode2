@@ -19,6 +19,10 @@
     justify-content: space-around;
 }
 
+#dialog-box.large {
+	max-width: 400px;
+}
+
 #dialog-box #button-container {
 	width: 100%;
     display: flex;
@@ -31,8 +35,8 @@
 	text-align: justify;
 }
 
-#dialog-box #message .highlight,
-#dialog-box #message b {
+#dialog-box .highlight,
+#dialog-box b {
 	color: #00638d;
     font-weight: bold;
 }
@@ -49,6 +53,13 @@
     padding: 3px 5px;
 	transition: all 0.3s;
 	cursor: pointer;
+}
+
+#dialog-box #title {
+	display: block;
+	font-size: 1.5em;
+	font-weight: bold;
+	margin: 10px 0 20px 0;
 }
 
 #dialog-box .button:hover {
@@ -158,7 +169,7 @@
     margin-bottom: 80px;
     border-radius: 5px;
 	box-sizing: border-box;
-	z-index: 5;
+	z-index: 6;
 	padding: 10px 20px;
 	color: white;
 	font-family: 'Roboto', sans-serif;

@@ -588,7 +588,7 @@ tutorial.lesson.checkReact = async function(){
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
             }
             else if (user.language == 'python'){
-                editor.setValue("start = True\ndef loop():\n    if getHit(): # Verifica se o gladiador foi ferido\n        turnToLastHit() # vira em direção ao agressor\n    elif getCloseEnemy(): # se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()) # ataca alvo se encontrou inimigo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+                editor.setValue("start = True\ndef loop():\n    global start\n    if getHit(): # Verifica se o gladiador foi ferido\n        turnToLastHit() # vira em direção ao agressor\n    elif getCloseEnemy(): # se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()) # ataca alvo se encontrou inimigo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turnToLastHit(); //vira em direção ao agressor\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
@@ -649,7 +649,7 @@ tutorial.lesson.checkSafe = async function(){
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
             }
             else if (user.language == 'python'){
-                editor.setValue("start = True\ndef loop():\n    if not isSafeHere(): # testa se o gladiador está em cima da nuvem\n        moveTo(12.5, 12.5) # foge da nuvem, em direção ao centro\n    if getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        attackRanged(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)");
+                editor.setValue("start = True\ndef loop():\n    global start\n    if not isSafeHere(): # testa se o gladiador está em cima da nuvem\n        moveTo(12.5, 12.5) # foge da nuvem, em direção ao centro\n    if getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        attackRanged(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)");
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere()) //testa se o gladiador está em cima da nuvem\n        moveTo(12.5,12.5); //foge da nuvem, em direção ao centro\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
@@ -716,7 +716,7 @@ tutorial.lesson.checkFireball = async function(){
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
             }
             else if (user.language == 'python'){
-                editor.setValue("start = True\ndef loop():\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY()) # arremessa bola de fogo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+                editor.setValue("start = True\ndef loop():\n    global start\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        turnToLastHit()\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY()) # arremessa bola de fogo\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY()); //arremessa bola de fogo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
@@ -778,7 +778,7 @@ tutorial.lesson.checkTeleport = async function(){
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
             }
             else if (user.language == 'python'){
-                editor.setValue("start = True\ndef loop():\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5) # foge para posição 5,5 quando for ferido\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+                editor.setValue("start = True\ndef loop():\n    global start\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5) # foge para posição 5,5 quando for ferido\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5); //foge para posição 5,5 quando for ferido\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
@@ -850,7 +850,7 @@ tutorial.lesson.checkUpgrade = async function(){
                 Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
             }
             else if (user.language == 'python'){
-                editor.setValue("start = True\ndef loop():\n    upgradeINT(5) # melhora inteligência quando subir de nível\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5)\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
+                editor.setValue("start = True\ndef loop():\n    global start\n    upgradeINT(5) # melhora inteligência quando subir de nível\n    if not isSafeHere():\n        moveTo(12.5, 12.5)\n    elif getHit():\n        teleport(5, 5)\n    elif getCloseEnemy():\n        fireball(getTargetX(), getTargetY())\n    elif start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    else:\n        turn(60)")
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    upgradeINT(5); //melhora inteligência quando subir de nível\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5);\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")

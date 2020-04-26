@@ -45,7 +45,7 @@
 		if(isset($_POST['replyid'])){
 			$id = mysql_escape_string($_POST['replyid']);
 			$sql = "SELECT u.email AS sender FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod = '$id'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			$row = $result->fetch_assoc();
 			$receiveremail = $row['sender'];
@@ -57,14 +57,14 @@
 		$user = $_SESSION['user'];
 		
 		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		
 		$usernick = $row['apelido'];
 		
 		
 		$sql = "SELECT * FROM usuarios WHERE email = '$receiveremail'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		
 		$receivername = $row['apelido'];
@@ -90,13 +90,13 @@
 		$user = $_SESSION['user'];
 		
 		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		
 		$usernick = $row['apelido'];
 		
 		$sql = "SELECT apelido, pref_friend FROM usuarios WHERE email = '$receiveremail'";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		
 		$receivername = $row['apelido'];
@@ -121,7 +121,7 @@
 		$postlink = $_POST['postlink'];
 		
 		$sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1' AND email_update != '$version'";// AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$receiveremail = array();
 		$receivername = array();
 		while($row = $result->fetch_assoc()){
@@ -146,16 +146,16 @@
 		$user = $_SESSION['user'];
 		
 		$sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		if ($result->num_rows != 0){
 			$sql = "SELECT apelido from usuarios WHERE id = '$user'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 
 			$row = $result->fetch_assoc();
 			$usernick = $row['apelido'];
 			
 			$sql = "SELECT apelido, pref_duel, email FROM usuarios WHERE id = '$friend'";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			$row = $result->fetch_assoc();
 			
 			$friendnick = $row['apelido'];
@@ -184,7 +184,7 @@
 
 		//get email from those participating in the tournament and not dead
 		$sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.id AND glt.dead = 0 AND t.hash = '$hash') > 0)";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 
 		$receiveremail = array();
 		$receivername = array();
@@ -195,7 +195,7 @@
 
 		$sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
 		";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+		$result = runQuery($sql);
 		$row = $result->fetch_assoc();
 		$maxround = $row['maxround'];
 		$tourn = $row['name'];
@@ -274,7 +274,7 @@
 			if ($action == "UPDATE"){
 				$em = $receiveremail[$i];
 				$sql = "UPDATE usuarios SET email_update = '$version' WHERE email = '$em'";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 
 			}
 		}

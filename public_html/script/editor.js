@@ -286,7 +286,7 @@ $(document).ready( function() {
                                 if (action == "INSERT"){
                                     showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
                                         if (data == "Sim")
-                                            window.open('battle')
+                                            window.open('battle.ranked')
                                     });
                                 }
                                 else{
@@ -417,7 +417,7 @@ $(document).ready( function() {
     }
 
     waitLogged().then( () => {
-        if (user){
+        if (user.status == "SUCCESS" ){
             $.post("back_glad.php",{
                 action: "GET",
             }).done( function(data){
@@ -1007,21 +1007,23 @@ async function buildDataTable(){
     var table = [];
     return await new Promise( (resolve, reject) => {
         $.get("docs.php", function(content) {
-            var docs = content.matchAll(/<a href=['"]function\/([\w]+?)['"]>/g);
+            var docs = content.matchAll(/<td><a href=['"]([\w]+?)['"]><\/a><\/td>/g);
             var length = 0;
             for (let m of docs){
                 $.getJSON(`script/functions/${m[1]}.json`, function(data){
                     // console.log(m[1]);
                     table.push({
-                        name: data.name,
+                        name: data.name.default,
                         syntax: data.syntax,
                         description: data.description.brief,
                         snippet: data.snippet
                     });
-                    if (table.length == length)
+                    if (table.length == length){
                         resolve(table);
+                    }
                 }).fail( function(e){
                     console.log(e);
+                    length--;
                 });
                 length++;
             }

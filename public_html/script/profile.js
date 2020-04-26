@@ -19,6 +19,20 @@ $(document).ready( function(){
         $('#profile-ui #picture img').attr('src',user.foto);
         $('#profile-ui #nickname').html(user.apelido);
 
+        $('#menu #currencies').remove()
+        // if (!user.premium){
+        //     $('#menu #currencies').remove()
+        // }
+        // else{
+        //     $('#menu #currencies').removeClass('hidden')
+        //     $('#menu .curr span').html(`R$ ${parseFloat(user.credits).toFixed(2)}`)
+        //     if (parseFloat(user.credits) < 0){
+        //         $('#menu .curr span').addClass('debit').attr('title', 'Recarregar créditos').click( () => {
+        //             rechargeCredits()
+        //         })
+        //     }
+        // }
+
         var language = $('#profile-panel #language select');
         language.selectmenu().val(user.language).selectmenu('refresh');
 
@@ -89,19 +103,36 @@ $(document).ready( function(){
             else
                 $('#glads .notification').removeClass('empty');
             
-            var duels = parseInt(data.duels);
-            $('#battle .notification').html(duels);
-            if (duels == 0)
-                $('#battle .notification').addClass('empty');
-            else
-                $('#battle .notification').removeClass('empty');
+            let duels = parseInt(data.duels)
+            $('#battle .notification').html(duels).addClass('empty')
+            $('#battle-container #duel .notification').html(duels).addClass('empty')
+            if ($('#battle-container #duel-challenge .table .row').length != duels){
+                check_challenges()
+            }
+            if (duels > 0){
+                $('#battle .notification').html(duels).removeClass('empty')
+                $('#battle-container #duel .notification').html(duels).removeClass('empty')
+            }
 
-            var reports = parseInt(data.reports.ranked) + parseInt(data.reports.duel);
-            $('#report .notification').html(reports);
-            if (reports == 0)
-                $('#report .notification').addClass('empty');
-            else
+            let reports = {
+                ranked: parseInt(data.reports.ranked),
+                duel: parseInt(data.reports.duel)
+            }
+            reports.total = reports.ranked + reports.duel
+            $('#report .notification').html(reports.total)
+            $('#report .notification').addClass('empty');
+            $('#report-container #ranked.tab .notification').addClass('empty')
+            $('#report-container #duel.tab .notification').addClass('empty')
+            if (reports.total > 0){
                 $('#report .notification').removeClass('empty');
+
+                if (reports.ranked > 0){
+                    $('#report-container #ranked.tab .notification').removeClass('empty')
+                }
+                if (reports.duel > 0){
+                    $('#report-container #duel.tab .notification').removeClass('empty')
+                }
+            }
         
         });
     }
@@ -368,7 +399,7 @@ $(document).ready( function(){
                         $('#battle-container .glad-preview').eq(i).data('vagi',data[i].vagi);
                         $('#battle-container .glad-preview').eq(i).data('vint',data[i].vint);
                         $('#battle-container .glad-preview').eq(i).data('mmr',data[i].mmr);
-                        $('#battle-container .glad-preview .info .glad').eq(i).after("<div class='row mmr' title='Renome'><span>"+ parseInt(data[i].mmr) +"</span><img src='icon/winner-icon.png'></div>");
+                        $('#battle-container .glad-preview .info .master').eq(i).after("<div class='row mmr' title='Renome'><span>"+ parseInt(data[i].mmr) +"</span><img src='icon/winner-icon.png'></div>");
                         if(data[i].oldversion)
                             $('#battle-container .glad-preview').eq(i).addClass('old');
                     }
@@ -394,101 +425,7 @@ $(document).ready( function(){
 
         }
 
-        $.post("back_duel.php",{
-            action: "GET"
-        })
-        .done( function(data) {
-            //console.log(data);
-            data = JSON.parse(data);
-            $('#duel-challenge').addClass('hidden');
-            if (data.length >= 1)
-                $('#duel-challenge').removeClass('hidden');
-
-            $('#duel-challenge .table').html("");
-            for (var i in data){
-                var nick = data[i].nick;
-                var time = data[i].time;
-                var lvl = data[i].lvl;
-                var picture = data[i].picture;
-                $('#duel-challenge .table').append(`<div class='row'>
-                    <div class='cell lvl-container'>
-                        <img src='res/star.png' title='Nível'><span>${lvl}</span>
-                    </div>
-                    <div class='cell image-container'><img src='${picture}'></div>
-                    <div class='cell user'>${nick}</div>
-                    <div class='cell time' title='${getMessageTime(time)}'>${getMessageTime(time, { short: true })}</div>
-                    <div class='button-container'>
-                        <div class='accept' title='Aceitar desafio'></div>
-                        <div class='refuse' title='Recusar desafio'></div>
-                    </div>
-                </div>`);
-                $('#duel-challenge .table .row').last().data('id', data[i].id);
-            }
-
-            $('#duel-challenge .table .refuse').click( function(){
-                var row = $(this).parents('.row');
-                var id = row.data('id');
-                $.post("back_duel.php",{
-                    action: "DELETE",
-                    id: id,
-                }).done( function(data){
-                    //console.log(data);
-                    data = JSON.parse(data);
-                    if (data.status == "OK"){
-                        showMessage("Desafio recusado");
-                        row.remove();
-                        if ($('#duel-challenge .table .row').length == 0)
-                            $('#duel-challenge').addClass('hidden');
-                    }
-                });
-            })
-
-            $('#duel-challenge .table .accept').click( function(){
-                var row = $(this).parents('.row');
-                var nick = row.find('.user').html();
-                var id = row.data('id');
-        
-                var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='duel' class='button' disabled>DUELAR</button></div></div></div>";
-                $('body').append(box);
-        
-                load_glad_cards($('#fog .glad-card-container'), {
-                    clickHandler: function(){
-                        if (!$(this).hasClass('old')){
-                            $('#fog #btn-glad-open').removeAttr('disabled');
-                            $('#fog .glad-preview').removeClass('selected');
-                            $(this).addClass('selected');
-                            $('#duel-box #duel').removeAttr('disabled');
-                        }
-                    },
-                    dblClickHandler: function(){
-                        if ($('#fog .glad-card-container .selected').length)
-                            $('#fog #duel-box #duel').click();
-                    }
-                });
-
-                $('#fog #duel-box #duel').click( function(){
-                    var myglad = $('#fog .glad-preview.selected').data('id');
-                    var progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
-                    runSimulation({
-                        duel: id,
-                        glads: myglad,
-                    }).then( function(data){
-                        progbtn.kill();
-                        $('#fog').remove();
-                        var log = data;
-                        showMessage("Duelo concluído. Clique para visualizar a batalha.").then( function(){
-                            window.open("play/"+ log);
-                        });
-                        $('#battle').click();
-                    });
-                });
-
-                $('#fog #duel-box #cancel').click( function(){
-                    $('#fog').remove();
-                });
-
-            });
-        });
+        check_challenges()
     });
 
     $('#panel #battle-mode .button').click( function(){
@@ -541,314 +478,28 @@ $(document).ready( function(){
         create_duel_box(nick, userid);
     });
 
-    $('#panel #battle-mode #tourn.button').click( function(){
+    $('#panel #battle-mode #tourn.button').click( async function(){
         $('#panel #battle-container .wrapper').hide();
         var duel = $('#panel #battle-container #tourn.wrapper');
         if (duel.css('display') == 'none')
             duel.fadeIn();
 
         refresh_tourn_list();
-
-        if (socket){
-            socket.emit('tournament list join', {});
-        }        
     });
 
-    $('#menu #report').click( function() {
-        reload_reports();
-    });
+    $('#panel #battle-mode #train.button').click( function(){
+        $('#panel #battle-container .wrapper').hide();
+        var train = $('#panel #battle-container #train.wrapper');
+        if (train.css('display') == 'none')
+            train.fadeIn();
 
-    $('#report-container .tab').click( function(){
-        $('#report-container .tab').removeClass('selected');
-        $(this).addClass('selected');
+        trainList.refresh();
+    })
 
-        reload_reports();
-    });
-    var reportpage = {
-        battles: 1,
-        duels: 1,
-        favorites: 1
-    };
-    $('#report-container #prev').click( function(){
-        if ($('#bhist-container .tab.selected').html() == "Batalhas")
-            reportpage.battles--;
-        else if ($('#bhist-container .tab.selected').html() == "Duelos")
-            reportpage.duels--;
-
-        reload_reports();
-    });
-    $('#report-container #next').click( function(){
-        if ($('#bhist-container .tab.selected').html() == "Batalhas")
-            reportpage.battles++;
-        else if ($('#bhist-container .tab.selected').html() == "Duelos")
-            reportpage.duels++;
-
-        reload_reports();
-    });
-
-    function reload_reports(){
-        var pstart, pend, ptotal;
-        if ($('#bhist-container .tab.selected').html() == "Batalhas"){
-            $.post("back_report.php", {
-                action: "GET",
-                read: true,
-                page: reportpage.battles,
-            }).done( function(data){
-                // console.log(data);
-                var e;
-                try{
-                    data = JSON.parse(data);
-                }
-                catch(error){
-                    //console.log(error);
-                    e = error;
-                }
-                if (e || data.length == 0)
-                    $('#bhist-container .table').hide();
-                else{
-                    pstart = data.start;
-                    pend = data.end;
-                    ptotal = data.total;
-                    data = data.reports;
-
-                    bind_report_pages();
-
-                    if (ptotal == 0)
-                        $('#bhist-container .table').html("<p>Você ainda não possui batalhas</p>");
-                    else{
-                        $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>");
-                        for (var i in data){
-                            var star = {class: "far", title: "Guardar nos favoritos"};
-                            if (data[i].favorite)
-                                star = {class: "fas", title: "Tirar dos favoritos"};
-
-                            $('#bhist-container .table').append(`<div class='row'>
-                            <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
-                            <div class='cell glad'>${data[i].gladiator}</div>
-                            <div class='cell reward'>${parseFloat(data[i].reward).toFixed(1)}</div>
-                            <div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
-                            <div class='playback' title='Visualizar batalha'>
-                                <a target='_blank' href='play/${data[i].hash}'><img src='icon/eye.png'></a>
-                            </div></div>`);
-                            $('#bhist-container .favorite').last().data('id', data[i].id);
-                            
-                            if (data[i].isread == "0")
-                                $('#bhist-container .table .row').last().addClass('unread');
-                            else
-                                $('#bhist-container .table .row').last().removeClass('unread');
-                            if (data[i].reward < 0)
-                                $('#bhist-container .table .reward').last().addClass('red');
-                            else if (data[i].reward > 0){
-                                var obj = $('#bhist-container .table .reward').last();
-                                obj.addClass('green');
-                                obj.html("+"+ obj.html());
-                            }
-                                
-                        }
-                        
-                        $('#bhist-container .favorite').click( function(){
-                            var id = $(this).data('id');
-                            if ($(this).find('i').hasClass('fas')){
-                                $(this).find('i').removeClass('fas').addClass('far').attr('title', "Guardar nos favoritos");
-                                post_favorite(id, false, '');
-                            }
-                            else{
-                                var star = $(this);
-                                showInput("Informe um comentário sobre esta batalha").then( function(data){
-                                    if (data !== false){
-                                        star.find('i').removeClass('far').addClass('fas').attr('title', "Tirar dos favoritos");
-                                        post_favorite(id, true, data);
-                                    }
-                                });
-                            }
-
-                            function post_favorite(id, fav, comment){
-                                $.post("back_report.php", {
-                                    action: "FAVORITE",
-                                    favorite: fav,
-                                    id: id,
-                                    comment: comment
-                                }).done( function(data){
-                                    // console.log(data);
-                                });
-                            }
-                        });
-                    }
-                }
-            });
-        }
-        else if ($('#bhist-container .tab.selected').html() == "Duelos"){
-            $.post("back_duel.php", {
-                action: "REPORT",
-                page: reportpage.duels,
-            }).done( function(data){
-                //console.log(data);
-                var e;
-                try{
-                    data = JSON.parse(data);
-                }
-                catch(error){
-                    console.log(error);
-                    e = error;
-                }
-                if (e || data.length == 0)
-                    $('#bhist-container').hide();
-                else{
-                    pstart = data.start;
-                    pend = data.end;
-                    ptotal = data.total;
-
-                    bind_report_pages();
-
-                    if (ptotal == 0)
-                        $('#bhist-container .table').html("<p>Você ainda não possui duelos</p>");
-                    else{
-                        data = data.output;
-                        $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell'>Oponente</div><div class='cell'>Mestre</div><div class='cell time'>Data</div></div>");
-                        for (var i in data){
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell glad'>${data[i].glad}</div>
-                                <div class='cell enemy'>${data[i].enemy}</div>
-                                <div class='cell'>${data[i].user}</div>
-                                <div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
-                                <div class='playback' title='Visualizar batalha'>
-                                    <a target='_blank' href='play/${data[i].log}'><img src='icon/eye.png'></a>
-                                </div>
-                            </div>`);							
-
-                            if (data[i].isread == "0")
-                                $('#bhist-container .table .row').last().addClass('unread');
-                            else
-                                $('#bhist-container .table .row').last().removeClass('unread');
-
-                            if (data[i].glad == null)
-                                $('#bhist-container .table .row .glad').last().html("Gladiador Esquecido").addClass('forgotten');
-                            if (data[i].enemy == null){
-                                if (data[i].log == null){
-                                    $('#bhist-container .table .row .enemy').last().html("???");
-                                    $('#bhist-container .table .row').last().find('.playback').remove();
-                                    $('#bhist-container .table .row').last().append("<div class='remove' title='Cancelar desafio'>X</div>")
-                                    $('#bhist-container .table .row').last().find('.remove').data('id',data[i].id).click(function(){
-                                        var id = $(this).data('id');
-                                        $.post("back_duel.php",{
-                                            action: "DELETE",
-                                            id: id,
-                                        }).done(function(data){
-                                            showMessage("Desafio cancelado");
-                                            reload_reports();
-                                        });
-                                    });
-                                }
-                                else
-                                    $('#bhist-container .table .row .enemy').last().html("Gladiador Esquecido").addClass('forgotten');
-                            }
-                            
-                        }
-                    }
-
-                }
-            });
-
-        }
-        else if ($('#bhist-container .tab.selected').html() == "Favoritos"){
-            $.post("back_report.php", {
-                action: "GET",
-                favorites: true
-            }).done( function(data){
-                // console.log(data);
-                var e;
-                try{
-                    data = JSON.parse(data);
-                }
-                catch(error){
-                    //console.log(error);
-                    e = error;
-                }
-                if (e || data.length == 0)
-                    $('#bhist-container .table').hide();
-                else{
-                    pstart = data.start;
-                    pend = data.end;
-                    ptotal = data.total;
-                    data = data.reports;
-
-                    bind_report_pages();
-
-                    if (ptotal == 0)
-                        $('#bhist-container .table').html("<p>Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas</p>");
-                    else{
-                        $('#bhist-container .table').html(`<div class='row head'>
-                            <div class='cell'>Gladiador</div>
-                            <div class='cell comment'>Comentário</div>
-                            <div class='cell time'>Data</div>
-                        </div>`);
-                        for (var i in data){
-                            var star = {class: "far", title: "Guardar nos favoritos"};
-                            if (data[i].favorite)
-                                star = {class: "fas", title: "Tirar dos favoritos"};
-
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
-                                <div class='cell glad'>${data[i].gladiator}</div>
-                                <div class='cell comment'>${data[i].comment}</div>
-                                <div class='cell time' title='${getMessageTime(data[i].time)}'>${getMessageTime(data[i].time, { short: true })}</div>
-                                <div class='playback' title='Visualizar batalha'>
-                                    <a target='_blank' href='play/${data[i].hash}'><img src='icon/eye.png'></a>
-                                </div>
-                            </div>`);
-                            $('#bhist-container .favorite').last().data('id', data[i].id);
-
-                            if (data[i].isread == "0")
-                                $('#bhist-container .table .row').last().addClass('unread');
-                            else
-                                $('#bhist-container .table .row').last().removeClass('unread');
-                            if (data[i].reward < 0)
-                                $('#bhist-container .table .reward').last().addClass('red');
-                            else if (data[i].reward > 0){
-                                var obj = $('#bhist-container .table .reward').last();
-                                obj.addClass('green');
-                                obj.html("+"+ obj.html());
-                            }
-                                
-                        }
-                        
-                        $('#bhist-container .favorite').click( function(){
-                            var id = $(this).data('id');
-                            showDialog("Remover esta batalha dos favoritos?",["Sim","Não"]).then( data => {
-                                if (data == "Sim"){
-                                    $(this).parent().remove();
-                                    $.post("back_report.php", {
-                                        action: "FAVORITE",
-                                        favorite: false,
-                                        id: id,
-                                        comment: ''
-                                    }).done( function(data){
-                                        // console.log(data);
-                                    });
-                                }
-                            });
-                        });
-                    }
-                }
-            });
-        }
-
-        function bind_report_pages(){
-            $('#report-container #page-title span').eq(0).html(pstart);
-            $('#report-container #page-title span').eq(1).html(pend);
-            $('#report-container #page-title span').eq(2).html(ptotal);
-            
-            if (pstart == 1)
-                $('#report-container #prev').prop('disabled',true);
-            else
-                $('#report-container #prev').removeAttr('disabled');
-                
-            if (pend == ptotal)
-                $('#report-container #next').prop('disabled',true);
-            else
-                $('#report-container #next').removeAttr('disabled');
-        }
-
+    if ($('#subtab').length){
+        let subtab = $('#subtab').html()
+        $('#subtab').remove()
+        $(`#panel #battle-mode #${subtab}.button`).click()
     }
 
     $.post("back_glad.php",{
@@ -916,88 +567,6 @@ $(document).ready( function(){
         });
         
     });
-
-    var rankpage = 1;
-    var ranksearch = "";
-    $('#ranking-container #prev').click( function(){
-        rankpage--;
-        reload_ranking();
-    });
-    $('#ranking-container #next').click( function(){
-        rankpage++;
-        reload_ranking();
-    });
-    $('#menu #ranking').click( function() {
-        reload_ranking();
-    });
-
-    $('#ranking-container #search .input').on('input', function(e){
-        ranksearch = $(this).val();
-        rankpage = 1;
-        reload_ranking();
-    });
-    
-    function reload_ranking(){
-        $.post("back_rank.php",{
-            page: rankpage,
-            search: ranksearch
-        })
-        .done( function(data){
-            //console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(error){
-                console.log(error);
-            }
-            
-            $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Gladiador</div><div class='cell'>Mestre</div><div class='cell mmr'>Renome</div></div>");
-            
-            var gstart = data.start;
-            var gend = data.end;
-            var gtotal = data.total;
-            rankpage = data.page;
-            data = data.glads;
-            
-            for (var i in data){
-                var pos = data[i].rank;
-                
-                var rowrank = '';
-                if (pos == 1)
-                    rowrank = 'gold';
-                else if (pos == 2)
-                    rowrank = 'silver';
-                else if (pos == 3)
-                    rowrank = 'bronze';
-                
-                $('#ranking-container .table').append("<div class='row "+ rowrank +"'><div class='cell position'>"+ pos +"º</div><div class='cell'>"+ data[i].glad +"</div><div class='cell'>"+ data[i].user +"</div><div class='cell mmr'><span class='change24'>"+ Math.abs(parseInt(data[i].change24)) +"</span>"+ parseInt(data[i].mmr) +"</div></div>");
-                if (user.apelido == data[i].user)
-                    $('#ranking-container .table .row').last().addClass('mine');
-                if (parseInt(data[i].change24) > 0){
-                    $('#ranking-container .table .mmr .change24').last().addClass('green');
-                    $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>");
-                }
-                else if (parseInt(data[i].change24) < 0){
-                    $('#ranking-container .table .mmr .change24').last().addClass('red');
-                    $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>");
-                }
-            }
-                            
-            $('#ranking-container #page-title span').eq(0).html(gstart);
-            $('#ranking-container #page-title span').eq(1).html(gend);
-            $('#ranking-container #page-title span').eq(2).html(gtotal);
-            
-            if (gstart == 1)
-                $('#ranking-container #prev').prop('disabled',true);
-            else
-                $('#ranking-container #prev').removeAttr('disabled');
-                
-            if (gend == gtotal)
-                $('#ranking-container #next').prop('disabled',true);
-            else
-                $('#ranking-container #next').removeAttr('disabled');
-        });
-    }
     
     var msgpage = 1;
     $('#message-panel #prev').click( function(){
@@ -1326,8 +895,9 @@ $(document).ready( function(){
                         //console.log(data);
                     });
                 }
-                else
-                    console.log(data);
+                else{
+                    // console.log(data);
+                }
             });
         });
     }
@@ -1647,4 +1217,104 @@ function validate_skin(selectedArray){
         }
     }
     return false;
+}
+
+async function check_challenges(){
+    let data = await post("back_duel.php",{
+        action: "GET"
+    })
+    // console.log(data);
+
+    if (data.status == "SUCCESS"){
+        data = data.duels;
+
+        $('#duel-challenge').addClass('hidden');
+        if (data.length >= 1)
+            $('#duel-challenge').removeClass('hidden');
+
+        $('#duel-challenge .table').html("");
+        for (var i in data){
+            var nick = data[i].nick;
+            var time = data[i].time;
+            var lvl = data[i].lvl;
+            var picture = data[i].picture;
+            $('#duel-challenge .table').append(`<div class='row'>
+                <div class='cell lvl-container'>
+                    <img src='res/star.png' title='Nível'><span>${lvl}</span>
+                </div>
+                <div class='cell image-container'><img src='${picture}'></div>
+                <div class='cell user'>${nick}</div>
+                <div class='cell time' title='${getMessageTime(time)}'>${getMessageTime(time, { short: true })}</div>
+                <div class='button-container'>
+                    <div class='accept' title='Aceitar desafio'></div>
+                    <div class='refuse' title='Recusar desafio'></div>
+                </div>
+            </div>`);
+            $('#duel-challenge .table .row').last().data('id', data[i].id);
+        }
+
+        $('#duel-challenge .table .refuse').click( function(){
+            var row = $(this).parents('.row');
+            var id = row.data('id');
+            $.post("back_duel.php",{
+                action: "DELETE",
+                id: id,
+            }).done( function(data){
+                //console.log(data);
+                data = JSON.parse(data);
+                if (data.status == "OK"){
+                    showMessage("Desafio recusado");
+                    row.remove();
+                    if ($('#duel-challenge .table .row').length == 0)
+                        $('#duel-challenge').addClass('hidden');
+                }
+            });
+        })
+
+        $('#duel-challenge .table .accept').click( function(){
+            var row = $(this).parents('.row');
+            var nick = row.find('.user').html();
+            var id = row.data('id');
+    
+            var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='duel' class='button' disabled>DUELAR</button></div></div></div>";
+            $('body').append(box);
+    
+            load_glad_cards($('#fog .glad-card-container'), {
+                clickHandler: function(){
+                    if (!$(this).hasClass('old')){
+                        $('#fog #btn-glad-open').removeAttr('disabled');
+                        $('#fog .glad-preview').removeClass('selected');
+                        $(this).addClass('selected');
+                        $('#duel-box #duel').removeAttr('disabled');
+                    }
+                },
+                dblClickHandler: function(){
+                    if ($('#fog .glad-card-container .selected').length)
+                        $('#fog #duel-box #duel').click();
+                }
+            });
+
+            $('#fog #duel-box #duel').click( function(){
+                var myglad = $('#fog .glad-preview.selected').data('id');
+                var progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
+                runSimulation({
+                    duel: id,
+                    glads: myglad,
+                }).then( function(data){
+                    progbtn.kill();
+                    $('#fog').remove();
+                    var log = data;
+                    showMessage("Duelo concluído. Clique para visualizar a batalha.").then( function(){
+                        window.open("play/"+ log);
+                    });
+                    $('#battle').click();
+                });
+            });
+
+            $('#fog #duel-box #cancel').click( function(){
+                $('#fog').remove();
+            });
+
+        });
+    }
 }

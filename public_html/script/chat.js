@@ -46,6 +46,21 @@ $(document).ready( function(){
                     getChatMessages({room: data.room, sync: true});
                 }
             });
+            socket.on('chat personal', data => {
+                let msg
+                if (data.status == "KICK"){
+                    msg = `Você foi removido da sala ${data.room_name}`;
+                    listRooms({remove: data.room_name});
+                }
+                else if (data.status == "BAN"){
+                    msg = `Você foi banido da sala ${data.room_name}`;
+                    listRooms({remove: data.name});
+                }
+                else if (data.status == "UNBAN"){
+                    msg = `Seu banimento da sala ${data.room_name} foi removido`
+                }
+                create_toast(msg, "info");
+            });
         });
 
         //prepare emojis
@@ -59,17 +74,12 @@ $(document).ready( function(){
         var emoji_categ = ["Smileys & People", "Animals & Nature", "Food & Drink", "Activities", "Travel & Places", "Objects", "Symbols", "Flags"];
         var emojiStr = [];
 
-        $.post("back_chat.php", {
+        post("back_chat.php", {
             action: "EMOJI"
-        }).done( data => {
-            //console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(e){
-                data = {emoji: ''};
-            }
-            if (data.emoji != '')
+        }).then( data => {
+            // console.log(data);
+            
+            if (data.status != "NOTLOGGED" && data.emoji != '')
                 recentEmoji = JSON.parse(data.emoji);
 
             emojiStr.push([]);
@@ -228,14 +238,14 @@ $(document).ready( function(){
                         var room = $('#chat-panel .room.open').data('id');
 
                         if (message != '' && room != ''){
-                            //console.log("send: "+message);
+                            // console.log("send: "+message);
                             $.post("back_chat.php", {
                                 action: "SEND",
                                 message: message,
                                 room: room,
                                 emoji: recentEmoji
                             }).done( function(data){
-                                //console.log(data);
+                                // console.log(data);
 
                                 try {
                                     data = JSON.parse(data);
@@ -350,9 +360,10 @@ $(document).ready( function(){
                 [{data: "/leave", class: "half"}, {data: "Sai da sala atualmente aberta", class: ""}],
                 [{data: "/claim", class: "half"}, {data: "Torna-se o líder da sala aberta, caso os líderes estejam há muito inativos", class: ""}],
                 [{data: "/promote MEMBRO", class: "half"}, {data: "Torna o MEMBRO um líder da sala aberta<br>Ex: /promote fulaninho", class: ""}],
+                [{data: "/kick MEMBRO [-r SALA]", class: "half"}, {data: "Remove MEMBRO da SALA (Precisa ser Líder). Se estiver dentro de uma sala, não é necessário o argumento SALA.<br>Ex: /kick fulaninho", class: ""}],
                 [{data: "/ban MEMBRO", class: "half"}, {data: "Remove permissão do MEMBRO de ver mensagens da sala (Precisa ser Líder)<br>Ex: /ban fulaninho", class: ""}],
                 [{data: "/unban MEMBRO", class: "half"}, {data: "Devolve a permissão do MEMBRO de participar normalmente da sala (Precisa ser Líder)<br>Ex: /unban fulaninho", class: ""}],
-                [{data: "/edit [-n NOME] [-d DESC] [-pvt | -pub]", class: "half"}, {data: "Edita informações da sala.<br>-n NOME => (Opcional) Altera o nome da sala<br>-d DESC => (Opcional) Altera a descrição da sala<br>-pvt => (Opcional) Torna a sala privada<br>-pub => (Opcional) Torna a sala pública<br>Ex: /edit -n novo nome -d descrição da sala -pub", class: ""}],
+                [{data: "/edit [-r SALA] [-n NOME] [-d DESC] [-pvt | -pub]", class: "half"}, {data: "Edita informações da sala.<br>-r SALA => (Opcional) Indica qual sala será editada. Quando está dentro de uma sala, não é necessário.<br>-n NOME => (Opcional) Altera o nome da sala<br>-d DESC => (Opcional) Altera a descrição da sala<br>-pvt => (Opcional) Torna a sala privada<br>-pub => (Opcional) Torna a sala pública<br>Ex: /edit -n novo nome -d descrição da sala -pub", class: ""}],
             ];
 
             sendChatTable(table);
@@ -620,6 +631,7 @@ async function listRooms(arg){
                 };
 
                 if (arg && arg.remove){
+                    // console.log(arg.remove)
                     for (let i in currentRoms){
                         if (currentRoms[i].name.toLowerCase() == arg.remove.toLowerCase()){
                             var target = $('#chat-panel #room-container .room').eq(i);
@@ -1219,4 +1231,9 @@ async function upload_image(){
             }, 300);
         }
     });
+}
+
+function sendChatMessage({text}){
+    $('#chat-panel #message-box').html(`<span>${text}</span>`)
+    $('#chat-panel #send').click()
 }

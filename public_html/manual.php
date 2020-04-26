@@ -88,7 +88,7 @@
                     </ul>
                     <li>Agilidade (AGI)</li>
                     <ul>
-                        <li><strong>Precisão(rdmg)</strong>: 5 rdmg + 0.5 rdmg por ponto de AGI</li>
+                        <li><strong>Precisão(rdmg)</strong>: 5 rdmg + 0.4 rdmg por ponto de AGI</li>
                         <li><strong>Velocidade de Ataque (as)</strong>: 0.5 as + 0.05 as por ponto de AGI</li>
                         <li><strong>Velocidade de Movimento (ms)</strong>: 1 ms + 0.05 ms por ponto de AGI</li>
                         <li><strong>Velocidade de Rotação (ts)</strong>: 90 ts + 9 ts por ponto de AGI</li>

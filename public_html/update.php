@@ -5,12 +5,12 @@
 	include_once "connection.php";
 
 	$sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
-	if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+	$result = runQuery($sql);
 	$row = $result->fetch_assoc();
 	$id = $row['id'];
 
 	if(!isset($_SESSION['user']) || $_SESSION['user'] != $id) 
-		header("Location: index.php");
+		header("Location: index");
 ?>
 
 <html>
@@ -65,11 +65,6 @@
 			</div>
 			<button id='send' class='button'>Atualizar gladCode</button>
 		</div>
-		
-		<!--
-		<blockquote class="reddit-card" data-card-created="1547921855"><a href="https://www.reddit.com/r/gladcode/comments/9t5qp1/questionário_sobre_melhorias_da_gladcode/">Questionário sobre melhorias da gladCode</a> from <a href="http://www.reddit.com/r/gladcode">r/gladcode</a></blockquote>
-<script async src="//embed.redditmedia.com/widgets/platform.js" charset="UTF-8"></script>-->
-
 	</div>
 	<div id='footer'></div>
 

@@ -4,10 +4,10 @@
     session_start();
     if(!isset($_SESSION['user'])){
         if (isset($_GET['t'])){
-            header("Location: index.php?login=". $_GET['t']);
+            header("Location: index?login=". $_GET['t']);
         }
         else
-            header("Location: index.php");
+            header("Location: index");
     }
 ?>
 
@@ -27,6 +27,7 @@
     <link rel='stylesheet' href="css/chat.css"/>
     <link rel='stylesheet' href="css/croppie.css"/>
     <link rel='stylesheet' href="css/slider.css"/>
+    <link rel='stylesheet' href="css/radio.css"/>
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/table2.css"/>
     <link rel='stylesheet' href="css/header.css"/>
@@ -46,10 +47,14 @@
     <script src="script/dropzone.js"></script>
     <script src="script/croppie.js"></script>
     <script src="script/profile-tourn.js"></script>
+    <script src="script/profile-train.js"></script>
+    <script src="script/profile-report.js"></script>
+    <script src="script/profile-rank.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/profile.js"></script>
     <script src="script/dialog.js"></script>
+    <script src="script/radio.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/stats_func.js"></script>
@@ -65,6 +70,8 @@
         include("header.php");
         if(isset($_GET['t']))
             echo "<div id='tab' hidden>". mysql_escape_string($_GET['t']) ."</div>";
+        if(isset($_GET['s']))
+            echo "<div id='subtab' hidden>". mysql_escape_string($_GET['s']) ."</div>";
     ?>
     <div id='frame'>
         <div id='menu'>
@@ -78,15 +85,18 @@
                     </div>
                 </div>
             </div>	
+            <div id='currencies' title='Créditos' class='hidden'>
+                <div class='curr'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+            </div>
             <div id='menu-buttons'>
-                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
-                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
-                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
-                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHA</span></div>
-                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>HISTÓRICO</span></div>
+                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>{{news}}</span></div>
+                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>{{profile}}</span></div>
+                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>{{glads}}</span></div>
+                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>{{battles}}</span></div>
+                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>{{reports}}</span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>MENSAGENS</span></div>
-                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
+                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>{{messages}}</span></div>
+                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>{{friends}}</span></div>
                 <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
             <div id='footer'></div>
@@ -139,13 +149,10 @@
                         <h2>Para qual modo de batalha deseja se inscrever?</h2>
                         <div id='button-container'>
                             <button id='ranked' class='button'><img src='icon/winner-icon.png'>Batalha Ranqueada</button>
-                            <button id='duel' class='button'><img src='sprite/images/swords.png'>Duelo de Gladiadores</button>
+                            <button id='duel' class='button'><div class='notification empty'></div><img src='sprite/images/swords.png'>Duelo de Gladiadores</button>
                             <button id='tourn' class='button'><img src='icon/tournament.png'>Torneio Personalizado</button>
+                            <button id='train' class='button'><img src='icon/stars-stack.png'>Treino de equipes</button>
                         </div>
-                    </div>
-                    <div id='duel-challenge' class='hidden'>
-                        <h2>Desafios para duelo</h2>
-                        <div class='table'></div>
                     </div>
                     <div id='ranked' class='wrapper'>
                         <div class='container'>
@@ -155,6 +162,10 @@
                         </div>
                     </div>
                     <div id='duel' class='wrapper'>
+                        <div id='duel-challenge' class='hidden'>
+                            <h2>Desafios para duelo</h2>
+                            <div class='table'></div>
+                        </div>
                         <div class='container'>
                             <h2>Amigo a ser desafido</h2>
                             <input class='input' type='text' placeholder='apelido-do-usuario'>
@@ -172,14 +183,33 @@
                             </div>
                             <div id='table-open' class='table'></div>
                             
-                            <div class='title'>
-                                <h2 id='mytourn-title'>Meus torneios</h2>
+                            <div id='mytourn' class='title'>
+                                <h2>Meus torneios</h2>
                                 <div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-mytourn' class='table'></div>
+
                             <div id='button-container'>
                                 <button id='create' class='button'>CRIAR UM TORNEIO</button>
                                 <button id='join' class='button'>INGRESSAR EM UM TORNEIO</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id='train' class='wrapper'>
+                        <div class='container'>
+                            <div class='title manage'>
+                                <h2>Treinos que gerencio</h2>
+                                <div id='offset' class='manage'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                            </div>
+                            <div id='table-manage' class='table'></div>
+                            <div class='title part'>
+                                <h2>Treinos que participo</h2>
+                                <div id='offset' class='part'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                            </div>
+                            <div id='table-part' class='table'></div>
+                            <div id='button-container'>
+                                <button id='create' class='button'>NOVO TREINO</button>
+                                <button id='join' class='button'>PARTICIPAR DE TREINO</button>
                             </div>
                         </div>
                     </div>
@@ -190,15 +220,18 @@
                     <div id='bhist-container'>
                         <h2>Histórico de batalhas</h2>
                         <div id='tab-container'>
-                            <div class='tab selected'>Batalhas</div>
-                            <div class='tab'>Duelos</div>
-                            <div class='tab'>Favoritos</div>
+                            <div id='ranked' class='tab selected'><div class='notification empty'></div><span>Batalhas</span></div>
+                            <div id='duel' class='tab'><div class='notification empty'></div><span>Duelos</span></div>
+                            <div class='tab'><span>Favoritos</span></div>
                         </div>
                         <div class='table'></div>
-                        <div id='page-title'>
-                            <button id='prev'></button>
-                            <span></span> - <span></span> de <span></span>
-                            <button id='next'></button>
+                        <div id='post-table'>
+                            <label id='unread'><input type="checkbox" class='radio'>Somente não lidos</label>
+                            <div class='page-nav'>
+                                <span></span> - <span></span> de <span></span>
+                                <button id='prev'><i class='fas fa-chevron-left'></i></button>
+                                <button id='next'><i class='fas fa-chevron-right'></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,11 +249,12 @@
                         <i class="fas fa-search"></i>
                         <input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
                     </div>
+                    <div id='tab-container'><div id='tab-general' class='tab selected'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
                     <div class='table'></div>
-                    <div id='page-title'>
-                        <button id='prev'></button>
+                    <div class='page-nav'>
                         <span></span> - <span></span> de <span></span>
-                        <button id='next'></button>
+                        <button id='prev'><i class='fas fa-chevron-left'></i></button>
+                        <button id='next'><i class='fas fa-chevron-right'></i></button>
                     </div>
                 </div>
             </div>

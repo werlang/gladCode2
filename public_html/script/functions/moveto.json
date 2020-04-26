@@ -36,7 +36,9 @@
     },
     "seealso": [
         "turnto",
-        "movetotarget"
+        "movetotarget",
+        "stepForward",
+        "moveForward"
     ],
     "snippet": {
         "c": "moveTo(${1:X}, ${2:Y});",

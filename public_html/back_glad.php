@@ -13,7 +13,7 @@
         $hash = getSpriteHash($code);
         
         $sql = "SELECT skin FROM skins WHERE hash = '$hash'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+        $result = runQuery($sql);
 
         $info = array();
 
@@ -36,7 +36,7 @@
         $user = $_SESSION['user'];
         
         $sql = "SELECT * FROM usuarios WHERE id = '$user'";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+        $result = runQuery($sql);
         $row = $result->fetch_assoc();
         $lvl = $row['lvl'];
         
@@ -48,7 +48,7 @@
         
         if ($_POST['action'] == "GET"){
             $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
 
             $i = 0;
             $info = array();
@@ -77,7 +77,7 @@
         elseif ($_POST['action'] == "DELETE"){
             $id = mysql_escape_string($_POST['id']);
             $sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
-            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+            $result = runQuery($sql);
 
             send_node_message(array(
                 'profile notification' => array('user' => array($user))
@@ -102,16 +102,16 @@
 
             if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
                 $sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
-                if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                $result = runQuery($sql);
                 if ($result->num_rows == 0){
                     if ($_POST['action'] == "INSERT"){
                         $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                        $result = runQuery($sql);
                         if ($result->num_rows >= $limit)
                             echo "{\"LIMIT\":$limit}";
                         else{
                             $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
-                            if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                            $result = runQuery($sql);
                             echo "{\"ID\":". $conn->insert_id ."}";
 
                             send_node_message(array(
@@ -121,7 +121,7 @@
                     }
                     elseif ($_POST['action'] == "UPDATE"){
                         $sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', blocks = '$blocks', version = '$version' WHERE cod = '$id' AND master = '$user'";
-                        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+                        $result = runQuery($sql);
                         echo "{\"ID\":". $id ."}";
                     }
                 }

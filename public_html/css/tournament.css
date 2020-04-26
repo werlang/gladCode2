@@ -89,7 +89,7 @@ h3#tourn-desc {
 }
 
 #group-container .group {
-	display: flex;
+	/* display: flex; */
     flex-direction: column;
     background-color: #f8f8f8;
     cursor: default;
@@ -100,7 +100,7 @@ h3#tourn-desc {
     font-size: 1.2em;
 	margin: 10px;
     width: 100%;
-    padding-bottom: 2px;
+    /* padding-bottom: 2px; */
     margin-bottom: 25px;
 }
 
@@ -136,6 +136,16 @@ h3#tourn-desc {
 
 #group-container .group .head .icons img{
 	height: 30px;
+}
+
+#group-container .group .head .icons .fa-star{
+	font-size: 25px;
+    color: #FFCA28;
+}
+
+#group-container .group .head .icons .fa-clock{
+	font-size: 25px;
+    color: #34e442;
 }
 
 #group-container .group .head .icons div {
@@ -468,7 +478,7 @@ h3#tourn-desc {
     width: 30px;
 }
 
-#timeleft {
+.timeleft {
     font-family: 'Orbitron', sans-serif;
     font-size: 1rem;
     color: black;
@@ -480,22 +490,22 @@ h3#tourn-desc {
     cursor: default;
 }
 
-#timeleft #time {
+.timeleft #time {
     display: flex;
     align-items: center;
     font-size: 2rem;
     justify-content: center;
 }
 
-#timeleft .numbers {
+.timeleft .numbers {
     display: flex;
 }
 
-#timeleft #time .numbers:hover span {
+.timeleft #time .numbers:hover span {
     background-color: #000000;
 }
 
-#timeleft #time span {
+.timeleft #time span {
     color: white;
     background-color: #000000b0;
     height: 1.8em;
@@ -509,19 +519,19 @@ h3#tourn-desc {
     transition: 0.3s background-color, color 3s;
 }
 
-#timeleft.yellow #time span {
+.timeleft.yellow #time span {
     color: #f6d558
 }
 
-#timeleft.red #time span {
+.timeleft.red #time span {
     color: #ff6c6c;
 }
 
-#timeleft.green #time span {
+.timeleft.green #time span {
     color: #84ff8f;
 }
 
-#timeleft #text {
+.timeleft #text {
     display: flex;
     justify-content: space-around;
     font-size: 0.8em;

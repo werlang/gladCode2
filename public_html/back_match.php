@@ -10,12 +10,12 @@
 			$pool = 10;
 			
 			$sql = "SELECT version FROM gladiators WHERE cod = $id";
-			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+			$result = runQuery($sql);
 			$row = $result->fetch_assoc();
 
 			if ($row['version'] == $version){
 				$sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN (SELECT cod FROM gladiators WHERE master != '$user' AND version = '$version' ORDER BY ABS(mmr - (SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user')) LIMIT $pool) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
-				if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
+				$result = runQuery($sql);
 
 				$output = array();
 				$i = 0;
