@@ -2116,6 +2116,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
 }
 
 .window #options .col input {
@@ -2516,7 +2517,7 @@ body {
     align-items: center;
     background-color: #575757;
     width: 25px;
-    font-family: 'Source Code Pro', monospace;
+    font-family: 'Roboto', monospace;
     border-radius: 3px;
     line-height: 1em;
     color: #ccecff;
@@ -2525,6 +2526,7 @@ body {
 	z-index: 0;
 }
 
+.train.window #weight .ui-slider-handle,
 .train.window #maxtime .ui-slider-handle {
     width: 50px;
     margin-left: -25px;

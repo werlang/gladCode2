@@ -13,6 +13,7 @@
         $desc = mysql_escape_string($_POST['desc']);
         $maxtime = mysql_escape_string($_POST['maxtime']);
         $players = mysql_escape_string($_POST['players']);
+        $weight = mysql_escape_string($_POST['weight']);
         $hash = newHash();
 
         $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";

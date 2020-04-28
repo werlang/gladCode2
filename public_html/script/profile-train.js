@@ -34,7 +34,7 @@ $(document).ready( function(){
         }
         else{
             let box = `<div id='fog'>
-                <div class='train window small'>
+                <div class='train window'>
                     <div id='title'>
                         <h2>Criar treino</h2>
                     </div>
@@ -47,6 +47,10 @@ $(document).ready( function(){
                         </div>
                         <div id='players' class='col'>
                             <span>Gladiadores por batalha</span>
+                            <div id='slider'></div>
+                        </div>
+                        <div id='weight' class='col'>
+                            <span>Peso do treino</span>
                             <div id='slider'></div>
                         </div>
                     </div>
@@ -92,6 +96,35 @@ $(document).ready( function(){
                 }
             });
 
+            $( ".train.window #weight #slider" ).slider({
+                range: "min",
+                min: 0,
+                max: 8,
+                step: 1,
+                value: 1,
+                eqValue: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10],
+                create: function( event, ui ) {
+                    let eqValue = $(this).slider('option','eqValue')
+                    let value = $(this).slider('option','value')
+                    let text = eqValue[value]
+                    text = text == 10 ? text : text.toFixed(1)
+                    $(this).find('.ui-slider-handle').html(text + 'x')
+                },
+                slide: function( event, ui ) {
+                    $(this).find('.ui-slider-handle').each( (index, obj) => {
+                        let eqValue = $(this).slider('option','eqValue')
+                        let text = eqValue[ui.value]
+                        text = text == 10 ? text : text.toFixed(1)
+                        $(obj).html(text + 'x')
+                    });
+                },
+                getWeight: function(){
+                    let eqValue = $( ".train.window #weight #slider" ).slider('option','eqValue')
+                    let value = $( ".train.window #weight #slider" ).slider('option','value')
+                    return eqValue[value]
+                }
+            });
+
             $('#fog .train.window').hide().fadeIn();
             $('#fog .train.window #name').focus();
 
@@ -104,6 +137,7 @@ $(document).ready( function(){
                 var desc = $('.train.window #desc').val()
                 var maxtime = $('.train.window #maxtime #slider').slider('option','value')
                 var players = $('.train.window #players #slider').slider('option','value')
+                var weight = $('.train.window #weight #slider').slider('option','getWeight')()
 
                 if (name.length < 6){
                     $('.train.window #name').focus();
@@ -116,7 +150,8 @@ $(document).ready( function(){
                         name: name,
                         desc: desc,
                         maxtime: maxtime,
-                        players: players
+                        players: players,
+                        weight: weight
                     }))
                     // console.log(data)
 
