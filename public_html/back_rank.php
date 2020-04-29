@@ -150,18 +150,23 @@
         $tab = mysql_escape_string($_POST['tab']);
         $search = strtolower(mysql_escape_string($_POST['search']));
 
-        $sql = "SELECT t.id, t.name FROM training t WHERE t.description LIKE '%#$tab%'";
+        $sql = "SELECT t.id, t.name, t.weight FROM training t WHERE t.description LIKE '%#$tab%'";
         $result = runQuery($sql);
 
         $training = array();
         while($row = $result->fetch_assoc()){
-            array_push($training, $row['id']);
+            $train = array();
+            $train['id'] = $row['id'];
+            $train['weight'] = $row['weight'];
+            array_push($training, $train);
         }
 
         $prize = array(10, 6, 4, 3, 2);
         $ranking = array();
         // get rank from a given training ordered by higher summed score, and average lasttime as tiebreaker
-        foreach ($training as $trainid){
+        foreach ($training as $train){
+            $trainid = $train['id'];
+            $weight = $train['weight'];
             // need to calc avg time manually, because we need to subtract 1000 when the user won and ignore time 0 
             $manualtime = "SELECT avg(IF(gt2.lasttime > 1000, gt2.lasttime - 1000, gt2.lasttime)) FROM gladiator_training gt2 INNER JOIN gladiators g2 ON g2.cod = gt2.gladiator WHERE gt2.training = gt.training AND g2.master = g.master AND gt2.lasttime > 0";
             $sql = "SELECT sum(gt.score) AS score, ($manualtime) AS time, g.master, u.apelido FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY g.master ORDER BY score DESC, time DESC";
@@ -178,7 +183,7 @@
                             'fights' => 0
                         );
                     }
-                    $ranking[$id]['score'] += isset($prize[$i]) ? $prize[$i] : 0;
+                    $ranking[$id]['score'] += (isset($prize[$i]) ? $prize[$i] : 0) * $weight;
                     $ranking[$id]['time'] += $row['time'] > 1000 ? $row['time'] - 1000 : $row['time'];
                     $ranking[$id]['fights']++;
                     $ranking[$id]['nick'] = $row['apelido'];

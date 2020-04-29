@@ -27,7 +27,7 @@
             $output['status'] = "NOCREDITS";
         }
         else{
-            $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, '$hash', now(3) + INTERVAL 1 HOUR);";
+            $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, weight, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, $weight, '$hash', now(3) + INTERVAL 1 HOUR);";
             $result = runQuery($sql);
             
             send_node_message(array('training list' => array()));
