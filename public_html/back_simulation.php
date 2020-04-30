@@ -84,7 +84,7 @@
     if (isset($args['training'])){
         if (isset($_SESSION['train-run'])){
             $groupid = mysql_escape_string($args['training']);
-            if (!isset($_SESSION['train-run']) || $_SESSION['train-run'] != md5("train-$groupid-id")){
+            if (!isset($_SESSION['train-run']) || $_SESSION['train-run']['id'] != md5("train-$groupid-id")){
                 $groupid = null;
                 $cancel_run = true;
             }

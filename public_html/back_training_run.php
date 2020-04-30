@@ -32,8 +32,12 @@
         if ($now >= $deadline)
             $output['end'] = true;
 
+        // train is ended
         if ($now >= $deadline && $round == $maxround){
-            $sql = "SELECT g.name, u.apelido, sum(gt.score) AS score FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY gt.gladiator ORDER BY score DESC";
+            // need to calc avg time manually, because we need to subtract 1000 when the user won and ignore time 0 
+            $manualtime = "SELECT avg(IF(gt2.lasttime > 1000, gt2.lasttime - 1000, gt2.lasttime)) FROM gladiator_training gt2 WHERE gt2.training = $trainid AND gt2.lasttime > 0 AND gt2.gladiator = gt.gladiator";
+            
+            $sql = "SELECT g.name, u.apelido, sum(gt.score) AS score, ($manualtime) AS 'time' FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY gt.gladiator ORDER BY score DESC";
             $result = runQuery($sql);
 
             $output['ranking'] = array();
@@ -219,13 +223,14 @@
                         if (is_null($row['log'])){
                             unset($groups[$gid]['locked']);
                         }
-                        if (isset($_SESSION['train-run']) && $_SESSION['train-run'] == md5("train-$gid-id"))
+                        if (isset($_SESSION['train-run']) && $_SESSION['train-run']['id'] == md5("train-$gid-id"))
                             unset($_SESSION['train-run']);
                     }
                 }
 
                 // is already running something
-                if (isset($_SESSION['train-run'])){
+                // also check if 15 seconds have passed since the session lock
+                if (isset($_SESSION['train-run']) && $_SESSION['train-run']['time'] + 15 > (new DateTime())->getTimestamp() ){
                     $output['status'] = "LOCK";
                 }
                 else{
@@ -234,7 +239,10 @@
                     if ($now >= $deadline){
                         foreach($groups as $gid => $group){
                             if (!isset($group['locked'])){
-                                $_SESSION['train-run'] = md5("train-$gid-id");
+                                $_SESSION['train-run'] = array(
+                                    'id' => md5("train-$gid-id"),
+                                    'time' => (new DateTime())->getTimestamp()
+                                );
                                 $chosen = $gid;
                                 break;
                             }
@@ -279,21 +287,18 @@
         $row = $result->fetch_assoc();
         $maxplayers = $row['players'];
 
-        $sql = "SELECT gt.gladiator FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.lasttime DESC";
+        $sql = "SELECT gt.gladiator FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.score DESC, gt.lasttime DESC";
         $result = runQuery($sql);
 
         $glads = array();
-        while($row = $result->fetch_assoc())
+        while($row = $result->fetch_assoc()){
             array_push($glads, $row['gladiator']);
+        }
 
-        if ($maxplayers == 5)
-            $ngroups = ceil(count($glads) / $maxplayers);
-        else
-            $ngroups = floor(count($glads) / $maxplayers);
+        $ngroups = ceil(count($glads) / $maxplayers);
 
         // iterate over every shuffled id
         $groups = array();
-        $fields = array();
         $newround = $round + 1;
 
         foreach($glads as $i => $id){
@@ -301,15 +306,56 @@
             if (count($groups) < $ngroups){
                 $sql = "INSERT INTO training_groups (round) VALUES ($newround)";
                 $result = runQuery($sql);
-                array_push($groups, $conn->insert_id);
-            }
 
-            // cycle groups inserting it on every participant
-            $groupid = $groups[$i % $ngroups];
-            array_push($fields, "($id, $groupid, $trainid)");
+                $group = array(
+                    'id' => $conn->insert_id,
+                    'nglads' => 1
+                );
+                array_push($groups, $group);
+            }
+            else{
+                $groups[$i % $ngroups]['nglads']++;
+            }
         }
+
+        $fields = array();
+
+        // groups has nglads, which indicates how many glads in each group
+        foreach($groups as $group){
+            for($i=0 ; $i<$group['nglads'] ; $i++){
+                if (!isset($groups[$i]['glads'])){
+                    $groups[$i]['glads'] = array();
+                }
+
+                // shift glad id from $glads and place in field array
+                array_push($fields, "(". implode(",", array(
+                    array_shift($glads), $group['id'], $trainid
+                )) .")");
+            }
+        }
+
         $fields = implode(",", $fields);
         $sql = "INSERT INTO gladiator_training (gladiator, groupid, training) VALUES $fields";
+        $result = runQuery($sql);
+
+        // remove duplicate rounds
+        $sql = "SELECT DISTINCT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid ORDER BY tg.id LIMIT $ngroups";
+        $result = runQuery($sql);
+        $ids = array();
+        while ($row = $result->fetch_assoc()){
+            array_push($ids, $row['id']);
+        }
+        $idlimit = implode(",", $ids);
+
+        $sql = "SELECT DISTINCT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid";
+        $result = runQuery($sql);
+        $ids = array();
+        while ($row = $result->fetch_assoc()){
+            array_push($ids, $row['id']);
+        }
+        $idtotal = implode(",", $ids);
+
+        $sql = "DELETE FROM training_groups WHERE id IN ($idtotal) AND id NOT IN ($idlimit)";
         $result = runQuery($sql);
     }
 
