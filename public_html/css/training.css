@@ -102,7 +102,7 @@
 #ranking-container .head {
     display: flex;
     justify-content: flex-end;
-    padding-right: 35px;
+    padding-right: 5px;
 }
 
 #ranking-container .head .score,
@@ -111,9 +111,17 @@
     color: #FFCA28;
 }
 
+#ranking-container .head .time,
 #group-container .group .head .icons .fa-clock{
 	font-size: 25px;
     color: #34e442;
+}
+
+#ranking-container .head .score,
+#ranking-container .head .time {
+    width: 50px;
+    width: 50px;
+    margin-right: 10px;
 }
 
 #group-container .foot .button {

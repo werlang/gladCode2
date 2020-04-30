@@ -136,6 +136,7 @@
         else{
             $row = $result->fetch_assoc();
             $trainid = $row['id'];
+            $trainname = $row['name'];
 
             if (isStarted($trainid))
                 $output['status'] = "STARTED";
@@ -166,7 +167,8 @@
                         // add glad into training
                         $sql = "INSERT INTO gladiator_training (gladiator, training, score) VALUES ($glad, $trainid, 0)";
                         $result = runQuery($sql);
-                        $output['id'] = $trainid;    
+                        $output['id'] = $trainid; 
+                        $output['name'] = $trainname;
                         $output['status'] = "SUCCESS";    
                         send_node_message(array('training list' => array()));
                         send_node_message(array('training room' => array(

@@ -34,6 +34,66 @@ $(document).ready( function(){
 
         this.bind()
 
+        let totalWidth = 0
+        $('#ranking-container #tab-container .tab').each( (_,e) => {
+            totalWidth += $(e).outerWidth() + 5
+        })
+
+        // when tabs overflow container, add menu to select tab
+        $('#ranking-container #tab-container #more-tabs').remove()
+        if (totalWidth > $('#ranking-container #tab-container').width()){
+            $('#ranking-container #tab-container').append(`<div id='more-tabs'><i class='fas fa-ellipsis-v'></i></div>`)
+            $('#ranking-container #tab-container #more-tabs').css('margin-left', $('#ranking-container #tab-container').outerWidth() + 5).click( function() {
+                if ( $('#ranking-container #tab-container #tab-select').length){
+                    $('#ranking-container #tab-container #tab-select').remove()
+                }
+                else{
+                    let names = []
+                    let selected
+                    $('#ranking-container #tab-container .tab').not('#add-tab').each( (_,e) => {
+                        if ($(e).hasClass('selected')){
+                            selected = $(e).text()
+                        }
+
+                        names.push($(e).text())
+                    })
+                    let items = ""
+                    for (let tab of names){
+                        let selClass = ""
+                        if (tab == selected){
+                            selClass = 'selected'
+                        }
+
+                        items += `<div class='item ${selClass}'>${tab}</div>`
+                    }
+                    $('#ranking-container #tab-container').append(`<div id='tab-select'>${items}</div>`)
+                    $('#ranking-container #tab-container #tab-select').css({
+                        'top': $(this).offset().top + $(this).outerHeight() + 10,
+                        'left': $(this).offset().left - $('#ranking-container #tab-container #tab-select').width() + $(this).outerWidth()
+                    }).hide().slideDown()
+
+                    $('#ranking-container #tab-container #tab-select .item').click( function() {
+                        var name = $(this).text()
+                        $('#ranking-container #tab-container .tab').each( (_,e) => {
+                            if ($(e).text() == name){
+                                $(e).click()
+                                $('#ranking-container #tab-container #tab-select').remove()
+
+                                $('#ranking-container #tab-container').scrollLeft(0)
+                                let posbase = $('#ranking-container #tab-container').position().left
+                                let diffpos = $(e).position().left - posbase
+                                let containerWidth = $('#ranking-container #tab-container').outerWidth()
+                                let newscroll = Math.max(0, diffpos + $(e).outerWidth() + 100 - containerWidth)
+                                // console.log(newscroll)
+                                // console.log(diffpos)
+                                $('#ranking-container #tab-container').scrollLeft(newscroll)
+                            }
+                        })
+                    })
+                }
+            })
+        }
+
         return this
     }
 
@@ -77,12 +137,14 @@ $(document).ready( function(){
 
             let tab = $(this).text().toLowerCase()
             
-            tabs.fetch({
-                id: tab,
-                offset: tabs.pages[tab].offset,
-                search: $('#ranking-container #search .input').val(),
-                dummy: dummy
-            })
+            if (tabs.pages[tab]){
+                tabs.fetch({
+                    id: tab,
+                    offset: tabs.pages[tab].offset,
+                    search: $('#ranking-container #search .input').val(),
+                    dummy: dummy
+                })
+            }
         })
 
         return this
@@ -292,10 +354,11 @@ $(document).ready( function(){
             for (let i=0 ; i<limit ; i++){
                 if (data.ranking[offset + i]){
                     let row = data.ranking[offset + i]
+                    let score = row.score%1 ? row.score.toFixed(1) : row.score
                     $('#ranking-container .table').append(`<div class='row'>
                         <div class='cell position'>${row.position}º</div>
                         <div class='cell'>${row.nick}</div>
-                        <div class='cell mmr'>${row.score}</div>
+                        <div class='cell mmr'>${score}</div>
                         <div class='cell mmr'>${row.time.toFixed(1)}s</div>
                     </div>`)
 
