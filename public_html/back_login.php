@@ -27,6 +27,7 @@
                 $info['premium'] = is_null($row['premium']) ? false : true;
                 $info['credits'] = $row['credits'];
                 $info['pasta'] = $row['pasta'];
+                $info['speak'] = $row['spoken_language'];
                 $info['lvl'] = $row['lvl'];
                 $info['xp'] = $row['xp'];
                 $info['silver'] = $row['silver'];

@@ -18,35 +18,35 @@
             <div class='item drop-menu mobile'>
                 <div class='title'>LOGIN</div>
                 <div class='item-container'>
-                    <div class='item'><a id='login' title='Realize login com sua conta do Google' class='hidden'>ENTRAR</a><a id='profile' href='news' title='Gerencie seu perfil' class='hidden'><span>{{profile}}</span></a></div>
+                    <div class='item'><a id='login' title='{{header_tooltip_login}}' class='hidden'>{{header_enter}}</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>{{profile}}</span></a></div>
                 </div>
             </div>
-            <div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google' class='hidden'>LOGIN</a><a id='profile' href='news' title='Gerencie seu perfil' class='hidden'><span>{{profile}}</span></a></div>
-            <div class='item' id='learn'><a href='manual' title='Saiba como funciona a gladCode'><span>{{learn}}</span></a></div>
-            <div class='item' id='header-editor'><a href='editor' title='Crie e programe seus gladiadores'>EDITOR</a></div>
+            <div class='item desktop' id='header-profile'><a id='login' title='{{header_tooltip_login}}' class='hidden'>LOGIN</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>{{profile}}</span></a></div>
+            <div class='item' id='learn'><a href='manual' title='{{header_tooltip_learn}}'><span>{{learn}}</span></a></div>
+            <div class='item' id='header-editor'><a href='editor' title='{{header_tooltip_editor}}'>EDITOR</a></div>
             <div class='item drop-menu'>
                 <div class='title'><span>{{community}}</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'><span>{{header_community_reddit}}</span></a></div>
-                    <div class='item'><a href='https://www.facebook.com/gladcode/' title='Acompanhe as novidades da gladCode' target='_blank'><span>{{header_community_facebook}}</span></a></div>
-                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' title='Conecte-se com outros jogadores' target='_blank'><span>{{header_community_whatsapp}}</span></a></div>
+                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span>{{header_community_reddit}}</span></a></div>
+                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span>{{header_community_facebook}}</span></a></div>
+                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>{{header_community_whatsapp}}</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu'>
                 <div class='title'><span>{{about}}</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='about' title='Saiba sobre a trajetória da gladCode'><span>{{header_about_project}}</span></a></div>
-                    <div class='item'><a href='about#support' title='Maneiras de você apoiar o projeto'><span>{{header_about_support}}</span></a></div>
-                    <div class='item'><a href='creditos' title='Créditos aos criadores das artes usadas na gladCode'><span>{{header_about_credits}}</span></a></div>
-                    <div class='item'><a href='stats' title='Informações sobre as batalhas realizadas'><span>{{header_about_stats}}</span></a></div>
+                    <div class='item'><a href='about' title='{{header_tooltip_about}}'><span>{{header_about_project}}</span></a></div>
+                    <div class='item'><a href='about#support' title='{{header_tooltip_support}}'><span>{{header_about_support}}</span></a></div>
+                    <div class='item'><a href='creditos' title='{{header_tooltip_credits}}'><span>{{header_about_credits}}</span></a></div>
+                    <div class='item'><a href='stats' title='{{header_tooltip_stats}}'><span>{{header_about_stats}}</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu'>
                 <div class='title'><span>{{projects}}</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'><span>{{header_projects_compiler}}</span></a></div>
-                    <div class='item'><a href='https://github.com/werlang/gladcode' title='Projeto da primeira versão da gladCode' target='_blank'>GLADCODE V1</a></div>
-                    <div class='item'><a href='https://github.com/werlang/automin' title='Compacta scripts e atualiza páginas do servidor' target='_blank'>AUTOMIN</a></div>
+                    <div class='item'><a href='code' title='{{header_tooltip_compiler}}'><span>{{header_projects_compiler}}</span></a></div>
+                    <div class='item'><a href='https://github.com/werlang/gladcode' title='{{header_tooltip_github_gladcode}}' target='_blank'>GLADCODE V1</a></div>
+                    <div class='item'><a href='https://github.com/werlang/automin' title='{{header_tooltip_automin}}' target='_blank'>AUTOMIN</a></div>
                 </div>
             </div>
             <!-- <div class='item drop-menu'>

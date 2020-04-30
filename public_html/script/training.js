@@ -182,6 +182,9 @@ training.show = async function(){
         for (let gid in this.groups){
             $('#content-box #group-container').append(`<div class='group'>
                 <div class='head'>
+                    <div class='icons'>
+                        <div title='Pontuação total até o momento'><i class='fas fa-trophy'></i></div>
+                    </div>
                     <div class='title'>Grupo ${i+1} - <span>Rodada ${this.round}</span></div>
                     <div class='icons'>
                         <div class='glad' title='Pontuação da última rodada'><i class='fas fa-star'></i></div>

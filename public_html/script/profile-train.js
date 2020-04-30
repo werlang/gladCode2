@@ -205,7 +205,7 @@ $(document).ready( function(){
                                 $('#big-info .fa-spinner').remove()
                                 $('#big-info').hide().append(qrcode).fadeIn()
                             }
-                            qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
+                            qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
 
                             $('#fog #close').click( function(){
                                 $('#fog').removeClass('black')
@@ -215,7 +215,7 @@ $(document).ready( function(){
                         })
 
                         $('#train-message #link, #train-message #manual').click(async function(){
-                            let prelink = 'https://gladcode.tk/train/'
+                            let prelink = 'https://gladcode.dev/train/'
                             let manualclass = ''
                             let manualtext = ''
                             if ($(this).attr('id') == 'manual'){
@@ -489,7 +489,7 @@ var roomList = {
                             <div id='options-container'>
                                 <div>
                                     <div id='qr' class='blur'></div>
-                                    <div id='link'>https://gladcode.tk/train/</div>
+                                    <div id='link'>https://gladcode.dev/train/</div>
                                 </div>
                                 <div id='time-container'>
                                     <span>Tempo máximo do treino</span>
@@ -538,7 +538,7 @@ var roomList = {
             
                     let qrcode = new Image()
                     if (!data.expired){
-                        qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
+                        qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
                         
                         $('.train.window #link').before(`<button id='renew'><i class='fas fa-spinner fa-pulse'></i></button>`)
             
@@ -643,7 +643,7 @@ var roomList = {
                         // console.log(data)
                         if (data.status == "SUCCESS"){
                             let qrcode = new Image()
-                            qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
+                            qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
                             qrcode.onload = () => {
                                 $('.train.window #qr').html(qrcode).removeClass('blur')
                                 $('.train.window #qr').attr('title', 'Ampliar QR code')
@@ -705,7 +705,7 @@ var roomList = {
 
                     if (!data.expired && $('.train.window #link span').html() != data.hash){
                         let qrcode = new Image()
-                        qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.tk/train/${data.hash}&size=500x500`
+                        qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
                         qrcode.onload = function(){
                             $('.train.window #qr').html(qrcode).attr('title', "Apliar QR code").removeClass('blur')
                             $('.train.window #link span').html(data.hash).removeClass('blur')

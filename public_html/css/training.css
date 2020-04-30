@@ -82,7 +82,7 @@
 
 #group-container .group .team .score {
     background-color: #bcbcbc;
-    color: #f4f4f4;
+    color: #ffe594;
     border-radius: 50px;
     padding: 2px;
     height: 25px;
@@ -91,6 +91,8 @@
     justify-content: center;
     align-items: center;
     margin: 3px 5px 3px 3px;
+    text-shadow: 1px 1px 2px black;
+    box-shadow: 0px 0px 3px #000000a8 inset;
 }
 
 #ranking-container .team.gold .score,
@@ -115,6 +117,12 @@
 #group-container .group .head .icons .fa-clock{
 	font-size: 25px;
     color: #34e442;
+}
+
+#group-container .group .head .icons .fa-trophy{
+	font-size: 25px;
+    color: #FFCA28;
+    margin-left: 8px;
 }
 
 #ranking-container .head .score,
