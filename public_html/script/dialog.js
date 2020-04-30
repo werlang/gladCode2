@@ -117,7 +117,8 @@ function create_toast(message, type) {
 }
 
 $(document).ready( function() {
-    $(document).tooltip();
+    $(document).tooltip()
+    $(document).tooltip("option", "show.delay", 700)
 });
 
 /*
