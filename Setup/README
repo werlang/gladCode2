@@ -15,4 +15,10 @@ export VISUAL=nano; crontab -e
 https://www.techrepublic.com/article/how-to-sync-from-linux-to-google-drive-with-rclone/
 infos estão em API no console do google
 
+### node_install tem que ser executado na pasta node
 ### tem que criar o config.json na pasta node pra conectar no socket.io usando o domínio correto e chaves ssh
+
+### se for localhost, config.json tem que ser assim:
+###{
+###    "protocol": "http"
+###}

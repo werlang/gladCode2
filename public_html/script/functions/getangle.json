@@ -10,7 +10,7 @@
         "blocks": "<block type='getangle'></block>"
     },
     "description": {
-        "long": "Retorna o ângulo entre o ponto definido pelas coordenadas x e y informadas por parãmetro e a localização do gladiador.",
+        "long": "Retorna o ângulo entre o ponto definido pelas coordenadas x e y informadas por parãmetro e a localização do gladiador. O ângulo retornado será um valor entre 0 e 360, onde 0 indica a direção que o gladiador está olhando. O ângulo cresce no sentido horário.",
         "brief": "Retorna o ângulo até o ponto."
     },
     "param": {

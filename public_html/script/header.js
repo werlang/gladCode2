@@ -1,4 +1,7 @@
 var user;
+post("back_login.php", {
+    action: "GET"
+}).then( data => user = data )
 
 $(document).ready( function() {
     $('#menu-button').click( function() {
@@ -62,12 +65,7 @@ $(document).ready( function() {
         });
     });	
     
-    $.post("back_login.php", {
-        action: "GET"
-    }).done( function(data){
-        // console.log(data);
-        data = JSON.parse(data);
-        user = data;
+    waitLogged().then( data => {
         if (data.status == "NOTLOGGED")
             $('.mobile #profile, .desktop #login').removeClass('hidden');
         else{
@@ -86,18 +84,24 @@ $(document).ready( function() {
                     $('.mobile #login, .desktop #profile').removeClass('hidden');
             });
         }
-    });
+    })
 
     if ($('#footer').length){
-        $('#footer').load("footer.php");
+        $('#footer').load("footer.php", async () => {
+            await waitLogged()
+            translator.translate($('#footer'))
+        });
     }
 
     $('#header .item #english').click( () => {
     })
 
+    waitLogged().then( async () => {
+        await translator.init()
+        await translator.translate($('body'))
+        // translator.googleTranslate($('body'))
+    })
 });
-
-templateTranslate('pt')
 
 async function waitLogged(){
     return await new Promise( (resolve, reject) => {
@@ -141,64 +145,118 @@ function decodeHTML(str) {
     return str;
 }
 
-function templateTranslate(lang){
-    $.getJSON(`script/translation.json`, data => {
-        // console.log(data)
-        $(`span`).contents().each(function(){
-            let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
-            if (v.length && data[v]){
-                this.textContent = this.textContent.replace(this.textContent, data[v][lang])
-            }
-        })
+var translator = {}
+
+translator.init = function(){
+    return $.getJSON(`script/translation.json`, data => {
+        this.info = data
     })
 }
 
-async function googleTranslate(parent){
-    let content = []
-    // search every element
-
-    parent.find('*').contents().filter(function() {
-        return this.nodeType == 3
-    }).each(function(){
-        // this.textContent = this.textContent.replace('Hi I am text','Hi I am replace');
-
-        // get only final elements: exclude empty, with new line and tabs
-        if (this.textContent.length > 0 && !this.textContent.includes("\n") && !this.textContent.includes("\t")){
-            content.push(this.textContent)
-        }
-    })
-    // get only unique
-    content = content.filter( (e, i) => content.indexOf(e) == i)
-    let translation = []
-    // console.log(content)
-
-    const apiKey = "AIzaSyDfENHlgZgw6BDTbevnSJKiZP30BRIJe2g"
-    const url = `https://www.googleapis.com/language/translate/v2`
-
-    let calls = []
-    for (let i in content){
-        calls[i] = $.post(url, {
-            q: content[i],
-            source: 'pt',
-            target: 'en',
-            key: apiKey
-        }).done( data => {
-            // console.log(data)
-            translation[i] = decodeHTML(data.data.translations[0].translatedText)
-        })
+translator.translate = async function(element){
+    if (!this.info){
+        return false
     }
+    else {
+        let info = this.info
+        let lang = user && user.speak ? user.speak : 'pt'
 
-    for (let call of calls){
-        await call
-    }
+        var fieldcheck = ['title', 'placeholder']
+
+        // console.log(data)
+        element.find(`*`).contents().each(function(){
+            // replace contents
+            if (this.nodeType == 3){
+                let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
+                if (v.length && info[v]){
+                    this.textContent = this.textContent.replace(this.textContent, info[v][lang])
+                }
+            }
+
+            let fields = []
+            for (let check of fieldcheck){
+                if (this[check] && this[check] != ""){
+                    fields.push(check)
+                }
+            }
     
-    parent.find('*').contents().filter(function() {
-        return this.nodeType == 3
-    }).each(function(){
-        let index = content.indexOf(this.textContent)
-        if (index != -1){
-            this.textContent = ` ${this.textContent.replace(content[index], translation[index])} `
-        }
-    })
+            for (let field of fields){
+                let replace = this[field].replace(/\{\{(\w+)\}\}/, "$1")
+                if (replace.length && info[replace]){
+                    this[field] = this[field].replace(this[field], info[replace][lang])
+                }
+            }
+        })
 
+        return this
+    }
+}
+
+translator.googleTranslate = async function(elements) {
+    let lang = (user && user.speak) ? user.speak : 'pt'
+    let contents = this.contents ? this.contents : []
+    let translation = this.translation ? this.translation : []
+
+    if (lang != 'pt'){
+        elements = Array.isArray(elements) ? elements : [elements]
+
+        for (element of elements){
+            element.find(`*`).contents().each(function(){
+                // replace contents
+                if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t")){
+                    let text = this.textContent.replace(/(\w+)/, "$1")
+                    if (text.length && !contents[text]){
+                        contents.push(text)
+                    }
+                }
+            })
+        }
+
+        // get only unique
+        for (let i in contents){
+            if (contents.indexOf(contents[i]) != i){
+                contents.splice(i, 1)
+                if (translation[i]){
+                    translation.splice(i, 1)
+                }
+            }
+        } 
+
+        const apiKey = "AIzaSyDfENHlgZgw6BDTbevnSJKiZP30BRIJe2g"
+        const url = `https://www.googleapis.com/language/translate/v2`
+
+        let calls = []
+        for (let i=translation.length ; i<contents.length ; i++){
+            calls[i] = $.post(url, {
+                q: contents[i],
+                source: 'pt',
+                target: lang,
+                key: apiKey
+            }).done( data => {
+                // console.log(data)
+                translation[i] = decodeHTML(data.data.translations[0].translatedText)
+            })
+        }
+
+        for (let call of calls){
+            await call
+        }
+
+        this.contents = contents
+        this.translation = translation
+        
+        for (element of elements){
+            element.find(`*`).contents().each(function(){
+                // replace contents
+                if (this.nodeType == 3){
+                    let index = contents.indexOf(this.textContent)
+                    if (index != -1){
+                        this.textContent = ` ${this.textContent.replace(contents[index], translation[index])} `
+                    }
+                }
+            })
+        }
+    }
+
+    return this
 }

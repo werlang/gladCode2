@@ -40,6 +40,10 @@ $(document).ready(async function(){
         }
         else if (data.status == "STARTED"){
             redirect = false
+
+            training.round = round
+            training.hash = hash
+            await training.show()
         }
 
         if (redirect){
@@ -78,9 +82,6 @@ $(document).ready(async function(){
         });
     })
 
-    training.round = round
-    training.hash = hash
-    await training.show()
 })
 
 var selectedGlad = {
@@ -127,6 +128,7 @@ var selectedGlad = {
                 $('.glad-box').hide()
                 await showMessage("Você ingressou no treino")
                 window.location.href = 'battle.train'
+                sendChatMessage({text: `/join ${data.name}_${hash}`})
             }
         });
     }
@@ -140,7 +142,7 @@ training.show = async function(){
         hash: this.hash,
         round: this.round
     })
-    // console.log(data)
+    console.log(data)
 
     if (data.status == "REDIRECT")
         window.location.href = `train/${this.hash}/${data.round}`
@@ -149,11 +151,13 @@ training.show = async function(){
         this[f] = data[f]
 
     if (data.status == "END"){
-        $('#content-box').html("<h1>Classificação final</h1><h3>O treino <span id='tourn-name'>"+ this.name +"</span> chegou ao fim e esta foi a classificação obtida pelos participantes</h3><div id='ranking-container'><div class='head'><div class='score' title='Pontuação obtida no treino'><i class='fas fa-star'></i></div></div></div><div id='button-container'><button id='back-round' class='button'>RODADA ANTERIOR</button></div>");
+        $('#content-box').html("<h1>Classificação final</h1><h3>O treino <span id='tourn-name'>"+ this.name +"</span> chegou ao fim e esta foi a classificação obtida pelos participantes</h3><div id='ranking-container'><div class='head'><div class='score' title='Pontuação obtida no treino'><i class='fas fa-star'></i></div><div class='time' title='Tempo médio sobrevivido'><i class='fas fa-clock'></i></div></div></div><div id='button-container'><button id='back-round' class='button'>RODADA ANTERIOR</button></div>");
 
         for (let i in data.ranking){
-            var c = parseInt(i)+1;
-            $('#content-box #ranking-container').append(`<div class='team'><div class='ordinal'>${c}º</div><div class='name'>${data.ranking[i].apelido} - ${data.ranking[i].name}</div><div class='score'>${parseInt(data.ranking[i].score)}</div></div>`);
+            let c = parseInt(i)+1
+            let score = data.ranking[i].score%1 ? parseFloat(data.ranking[i].score).toFixed(1) : parseInt(data.ranking[i].score)
+            let time = parseFloat(data.ranking[i].time).toFixed(1)
+            $('#content-box #ranking-container').append(`<div class='team'><div class='ordinal'>${c}º</div><div class='name'>${data.ranking[i].apelido} - ${data.ranking[i].name}</div><div class='score'>${score}</div><div class='score'>${time}</div></div>`);
 
             if (c == 1)
                 $('#content-box #ranking-container .team').last().addClass('gold');
@@ -178,6 +182,9 @@ training.show = async function(){
         for (let gid in this.groups){
             $('#content-box #group-container').append(`<div class='group'>
                 <div class='head'>
+                    <div class='icons'>
+                        <div title='Pontuação total até o momento'><i class='fas fa-trophy'></i></div>
+                    </div>
                     <div class='title'>Grupo ${i+1} - <span>Rodada ${this.round}</span></div>
                     <div class='icons'>
                         <div class='glad' title='Pontuação da última rodada'><i class='fas fa-star'></i></div>
@@ -425,8 +432,6 @@ training.refresh = async function(args){
             $('#content-box #prepare').off().html("AGUARDE...").attr('disabled', true)
     }
 
-
-
     this.finished = 0
     $('#content-box #group-container .group').each( async (i, obj) => {
         obj = $(obj)
@@ -449,7 +454,6 @@ training.refresh = async function(args){
             obj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
         }
     })
-
 
     if (data.status == "SUCCESS" && !data.end){
         this.countDown({})
