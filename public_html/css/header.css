@@ -65,8 +65,9 @@ body{
 	max-width: 100%;
 }
 
+#header #h-items .item .hidden,
 #header .item .hidden {
-	display: none;
+		display: none;
 }
 
 #header #search {
@@ -306,7 +307,7 @@ body{
 @media only screen and (min-width: 600px) {
 }
 
-#header #h-items .item #language{
+#header #h-items #language .title{
 	font-size: 0.9em;
     font-weight: normal;
 }

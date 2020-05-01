@@ -111,7 +111,7 @@
                     <div id='nickname'>
                         <h2>Apelido</h2>
                         <h3>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</h3>
-                        <input type='text' class='input' placeholder='apelido'>
+                        <input type='text' class='input' placeholder='{{profile_profile_nick_placeholder}}'>
                     </div>
                     <div id='picture'>
                         <h2>Foto de perfil</h2>
@@ -139,7 +139,7 @@
                         <div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
                     </div>
                     <div id='button-container'>
-                        <button class='button' id='save'>GRAVAR</button>
+                        <button class='button' id='save'>{{profile_profile_save}}</button>
                     </div>
                 </div>
             </div>

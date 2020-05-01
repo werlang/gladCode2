@@ -254,6 +254,21 @@
         //     $output['status'] = "SUCCESS";
         // }
     }
+    elseif ($action == "SPOKEN_LANGUAGE"){
+        $user = $_SESSION['user'];
+        $lang = mysql_escape_string($_POST['language']);
+
+        $available_languages = array('pt', 'en');
+        if (in_array($lang, $available_languages)){
+            $sql = "UPDATE usuarios SET spoken_language = '$lang' WHERE id = $user";
+            $result = runQuery($sql);
+
+            $output['status'] = "SUCCESS";
+        }
+        else{
+            $output['status'] = "INVALID";
+        }
+    }
 
     echo json_encode($output);
 ?>

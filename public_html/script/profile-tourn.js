@@ -738,7 +738,8 @@ function refresh_glads(args){
                         $('.tourn.window .glad-card-container').append("<div class='glad-preview'></div>");
                     }
                     $('.tourn.window .glad-card-container .glad-preview').html(template);
-        
+                    translator.translate($('.glad-card-container'))
+
                     for (let i in data){
                         if (data[i].name){
                             setGladImage($('.tourn.window .glad-card-container') ,i, data[i].skin);
@@ -869,7 +870,8 @@ function choose_tourn_glad(){
             $('#fog.glads .glad-card-container').append("<div class='glad-preview'></div>");
         }
         $('#fog.glads .glad-card-container .glad-preview').html(template);
-
+        translator.translate($('.glad-card-container'))
+        
         for (var i in data){
             setGladImage($('#fog.glads .glad-card-container') ,i, data[i].skin);
             $('#fog.glads .glad-preview .info .glad span').eq(i).html(data[i].name);

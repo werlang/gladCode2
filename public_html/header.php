@@ -49,12 +49,13 @@
                     <div class='item'><a href='https://github.com/werlang/automin' title='{{header_tooltip_automin}}' target='_blank'>AUTOMIN</a></div>
                 </div>
             </div>
-            <!-- <div class='item drop-menu'>
-                <div id='language' class='title'>PORTUGUÊS</div>
+            <div class='item drop-menu' id='language'>
+                <div class='title'></div>
                 <div class='item-container'>
-                    <div id='english' class='item'><a>ENGLISH</a></div>
+                    <div id='lang-pt' class='item'><a>PORTUGUÊS</a></div>
+                    <div id='lang-en' class='item'><a>ENGLISH</a></div>
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 </div>

@@ -176,6 +176,8 @@ function load_glad_cards(obj,options){
         }
         template = $("<div id='template'></div>").load("glad-card-template.html", function(){
             obj.find('.glad-preview').html(template);
+            translator.translate($('.glad-preview'))
+
             for (let i in data){
                 if (options.dead && data[i].dead)
                     setGladImage(obj, i, data[i].skin, true);

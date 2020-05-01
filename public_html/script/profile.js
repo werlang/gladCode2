@@ -255,6 +255,8 @@ $(document).ready( function(){
                     $('#glads-container .glad-card-container').append("<div class='glad-preview'></div>");
                 }
                 $('#glads-container .glad-card-container .glad-preview').html(template);
+                translator.translate($('.glad-card-container'))
+
                 for (var i in data){
                     setGladImage($('#glads-container'), i, data[i].skin);
                     $('#glads-container .glad-preview .info .glad span').eq(i).html(data[i].name);
@@ -270,26 +272,24 @@ $(document).ready( function(){
                     }
                     $('#glads-container .glad-preview .delete').eq(i).click( function(){
                         var card = $(this).parents('.glad-preview');
-                        showDialog(
-                            "Deseja excluir o gladiador <span class='highlight'>"+ card.find('.glad span').html() +"</span>?",
-                            ["Sim","Não"])
-                        .then( function(data){
-                            if (data == "Sim"){
-                                card.fadeOut(function(){
-                                    card.remove();
+                        new Message({
+                            message: `Deseja excluir o gladiador <b>${card.find('.glad span').html()}</b>?`,
+                            buttons: {yes: "Sim", no: "Não"}
+                        }).show().click('yes', () => {
+                            card.fadeOut(function(){
+                                card.remove();
+                            });
+                            $.post("back_glad.php",{
+                                action: "DELETE",
+                                id: card.data('id')
+                            }).done( function(data){
+                                //console.log(data);
+                                $('#glads-container .glad-preview').last().after("<div class='glad-add'><div class='image'></div><div class='info'>Clique para criar um novo gladiador</div></div>");
+                                $('#glads-container .glad-add').first().click( function(){
+                                    window.location.href = "newglad";
                                 });
-                                $.post("back_glad.php",{
-                                    action: "DELETE",
-                                    id: card.data('id')
-                                }).done( function(data){
-                                    //console.log(data);
-                                    $('#glads-container .glad-preview').last().after("<div class='glad-add'><div class='image'></div><div class='info'>Clique para criar um novo gladiador</div></div>");
-                                    $('#glads-container .glad-add').first().click( function(){
-                                        window.location.href = "newglad";
-                                    });
-                                });
-                            }
-                        });
+                            });
+                        })
                         //console.log(card.data('id'));
                     });
                     $('#glads-container .glad-preview .code .button').eq(i).click( function(){
@@ -365,6 +365,7 @@ $(document).ready( function(){
                     $('#glads-container .glad-add').last().addClass('inactive');
                 }
             }
+            translator.googleTranslate($('#glads-container .glad-card-container .glad-add'))
         });
     });
     
@@ -384,6 +385,8 @@ $(document).ready( function(){
                         $('#battle-container .glad-card-container').append("<div class='glad-preview'></div>");
                     }
                     $('#battle-container .glad-card-container .glad-preview').html(template);
+                    translator.translate($('.glad-card-container'))
+
                     for (var i in data){
                         setGladImage($('#battle-container'), i, data[i].skin);
                         $('#battle-container .glad-preview .info .glad span').eq(i).html(data[i].name);
@@ -1061,7 +1064,9 @@ function preBattleShow(glads){
         $('#pre-battle-show .glad-card-container').append("<div class='glad-preview'></div>");
     }
     var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-        $('#pre-battle-show .glad-card-container .glad-preview').html(template);		
+        $('#pre-battle-show .glad-card-container .glad-preview').html(template);	
+        translator.translate($('.glad-card-container'))
+
         for (var i in glads){
             setGladImage($('#pre-battle-show'), i, glads[i].skin);
             $('#pre-battle-show .glad-preview .info .glad span').eq(i).html(glads[i].name);

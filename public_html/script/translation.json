@@ -198,5 +198,25 @@
     "profile_profile_save": {
         "pt": "GRAVAR",
         "en": "SAVE"
+    },
+    "glad_card_delete_title": {
+        "pt": "Remover gladiador",
+        "en": "Remove this gladiator"
+    },
+    "glad_card_str": {
+        "pt": "Força",
+        "en": "Strength"
+    },
+    "glad_card_agi": {
+        "pt": "Agilidade",
+        "en": "Agility"
+    },
+    "glad_card_int": {
+        "pt": "Inteligência",
+        "en": "Intelligence"
+    },
+    "glad_card_view_code": {
+        "pt": "Ver código-fonte",
+        "en": "View source code"
     }
 }

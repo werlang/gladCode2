@@ -142,10 +142,14 @@ $(document).ready( function() {
                 $('#fog-glads').fadeIn();
                 $('#fog-glads .glad-preview').remove();
                 $('#fog-glads #btn-glad-open').prop('disabled',true);
-                var template = $("<div id='template'></div>").load("glad-card-template.html", function(){});
+                var prTemplate = new Promise( (resolve, reject) => {
+                    $("<div id='template'></div>").load("glad-card-template.html", function(){
+                        resolve($(this))
+                    });
+                })
                 $.post("back_glad.php",{
                     action: "GET",
-                }).done( function(data){
+                }).done( async function(data){
                     data = JSON.parse(data);
                     // console.log(data);
                     if (data.length == 0){
@@ -154,7 +158,10 @@ $(document).ready( function() {
                     for (var i in data){
                         $('#fog-glads .glad-card-container').append("<div class='glad-preview'></div>");
                     }
+
+                    let template = await prTemplate
                     $('#fog-glads .glad-card-container .glad-preview').html(template);
+                    translator.translate($('.glad-card-container'))
 
                     for (var i in data){
                         setGladImage(i, data[i].skin);
@@ -452,7 +459,8 @@ $(document).ready( function() {
                 var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
                     $('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
                     $('#fog-battle .glad-card-container .glad-preview').html(template);
-                    
+                    translator.translate($('.glad-card-container'))
+
                     if (filename){
                         getGladFromFile(filename).then( function(data){
                             loadCard(data);
