@@ -323,7 +323,8 @@ function refresh_round(){
                             // console.log(data);
                             if (data.permission == 'granted'){
                                 runSimulation({
-                                    tournament: i
+                                    tournament: i,
+                                    origin: "tourn"
                                 }).then( function(data){
                                     //console.log(data);
                                     if (data != "ERROR"){

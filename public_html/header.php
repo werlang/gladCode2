@@ -32,7 +32,7 @@
                     <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>{{header_community_whatsapp}}</span></a></div>
                 </div>
             </div>
-            <div class='item drop-menu'>
+            <div class='item drop-menu' id='about'>
                 <div class='title'><span>{{about}}</span></div>
                 <div class='item-container'>
                     <div class='item'><a href='about' title='{{header_tooltip_about}}'><span>{{header_about_project}}</span></a></div>

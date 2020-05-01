@@ -4,7 +4,7 @@ $(document).ready( function() {
         loc = loc[loc.length - 1];
         $('#side-menu #'+loc).addClass('here');
     });    
-    $('#learn').addClass('here');
+    $('#about').addClass('here');
 
     $( "#mmr-slider" ).slider({
         range: true,

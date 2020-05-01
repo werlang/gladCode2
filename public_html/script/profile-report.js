@@ -117,14 +117,18 @@ $(document).ready( function(){
                             reward.value = `+${reward.value}`
                         }
 
+                        let visual = ``
+                        if (!row.expired){
+                            visual = `<div class='playback' title='Visualizar batalha'>
+                                <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
+                            </div>`
+                        }
                         $('#bhist-container .table').append(`<div class='row ${unread}'>
                             <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
                             <div class='cell glad'>${row.gladiator}</div>
                             <div class='cell reward ${reward.class}'>${reward.value}</div>
                             <div class='cell time' title='${getMessageTime(row.time)}'>${getMessageTime(row.time, { short: true })}</div>
-                            <div class='playback' title='Visualizar batalha'>
-                                <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
-                            </div>
+                            ${visual}
                         </div>`);
                         $('#bhist-container .favorite').last().data('id', row.id);
                     }

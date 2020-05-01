@@ -5,20 +5,39 @@
 class Simulation{
     constructor(args){
         this.args = args
+        this.running = false
+
+        if (args.terminal){
+            this.terminal = args.terminal
+            delete this.args.terminal
+        }
     }
 
     async run(){
+        this.running = true
         let call = $.post("back_simulation.php", {
             args: JSON.stringify(this.args)
         })
         this.call = call
         return new Promise( (resolve, reject) => {
             this.call.then( data => {
+                console.log(data)
                 try {
                     data = JSON.parse(data)
                 } catch(e){
+                    if (this.terminal){
+                        this.showTerm({error: e})
+                    }
+
+                    this.running = false
                     reject({ error: e })
                 }
+
+                if (this.terminal){
+                    this.showTerm(data)
+                }
+
+                this.running = false
                 this.hash = data
                 resolve(data)
             })
@@ -26,7 +45,42 @@ class Simulation{
     }
 
     abort(){
+        this.running = false
         this.call.abort()
+    }
+
+    showTerm(data){
+        if (data.error){
+            let error = data.error.split("/usercode/").join("");
+            for (let i in this.args.glads){
+                let glad = this.args.glads[i]
+                if (glad.name){
+                    error = error.split(`code${i}.c`).join(`<span>${glad.name}</span>`);
+                    error = error.split(`code${i}.py`).join(`<span>${glad.name}</span>`);
+                }
+                else{
+                    var pattern = /setName\("([\w\W]*?)"\)/;
+                    var match = glad.match(pattern);
+                    if (match){ 
+                        error = error.split(`code${i}.c`).join(`<span>${match[1]}</span>`);
+                        error = error.split(`code${i}.py`).join(`<span>${match[1]}</span>`);
+                    }
+                }
+            }
+            var pattern = /\\n/g;
+            error = error.replace(pattern, '\n');
+            showTerminal("ERRO DE SINTAXE", error);
+            console.log(data)
+        }
+        else if (data.output == "CLIENT TIMEOUT"){
+            showTerminal("ERRO NA SIMULAÇÃO","A gladCode está tendo problemas entre a conexão do simulador e os gladiadores. Por favor, reporte este problema para <a href='mailto:contato@gladcode.dev'><span>contato@gladcode.dev</span></a>");
+            console.log(data)
+        }
+        else if (data.output.indexOf("timed out") != -1){
+            var glad = data.output.split("Gladiator ")[1].split(" timed out")[0];
+            showTerminal("GLADIADOR EM LOOP", "O código do gladiador <span>"+ glad +"</span> está em uma repetição da qual não consegue sair.\nEle foi desativado para não comprometer a simulação.\n\nRevise o código-fonte e tente novamente.");
+            console.log(data)
+        }
     }
 }
 
