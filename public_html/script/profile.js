@@ -535,6 +535,7 @@ $(document).ready( function(){
             
             runSimulation({
                 ranked: true,
+                origin: "ranked"
             }).then( function(data){
                 //console.log(data);
                 if (data == "ERROR"){
@@ -1300,6 +1301,7 @@ async function check_challenges(){
                 runSimulation({
                     duel: id,
                     glads: myglad,
+                    origin: "duel"
                 }).then( function(data){
                     progbtn.kill();
                     $('#fog').remove();

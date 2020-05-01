@@ -1,19 +1,26 @@
 <?php
-	include_once "/home/gladcode/public_html/connection.php";
+    include_once "/home/gladcode/public_html/connection.php";
 
-    clear_singleview($conn,"1 WEEK");
+    $modes = array(
+        "editor" => "1 WEEK",
+        "ranked" => "1 YEAR"
+    );
 
-    function clear_singleview($conn,$period){
-		$sql = "SELECT id FROM logs WHERE singleView = 1 AND time < CURRENT_TIME() - INTERVAL $period";
-		$result = runQuery($sql);
-		
-		if ($result->num_rows > 0){
-			while($row = $result->fetch_assoc()){
-				$id = $row['id'];
-				unlink("logs/$id");
-			}		
-			$sql = "DELETE FROM logs WHERE singleView = 1 AND time < CURRENT_TIME() - INTERVAL $period";
-			$result = runQuery($sql);
-		}
+    foreach($modes as $mode => $period){
+        $fav = $mode == "ranked" ? " AND id NOT IN (SELECT DISTINCT log FROM reports WHERE favorite = 1)" : "";
+        $sql = "SELECT id FROM logs WHERE origin = '$mode' AND time < now() - INTERVAL $period AND expired = 0 $fav";
+        $result = runQuery($sql);
+        
+        if ($result->num_rows > 0){
+            $ids = array();
+            while($row = $result->fetch_assoc()){
+                $id = $row['id'];
+                unlink("/home/gladcode/public_html/logs/$id");
+                array_push($ids, $id);
+            }		
+            $ids = implode(",", $ids);
+            $sql = "UPDATE logs SET expired = 1 WHERE id IN ($ids)";
+            $result = runQuery($sql);
+        }
     }
 ?>

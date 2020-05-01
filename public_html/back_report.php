@@ -38,7 +38,7 @@
             $offset = 0;
         }
         
-        $sql = "SELECT r.id, time, name, isread, hash, reward, favorite, comment FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav $unread ORDER BY time DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT r.id, time, name, isread, hash, reward, favorite, comment, expired FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav $unread ORDER BY time DESC LIMIT $limit OFFSET $offset";
         $result = runQuery($sql);
         
         $infos = array();
@@ -49,10 +49,17 @@
             $info['time'] = $row['time'];
             $info['gladiator'] = $row['name'];
             $info['isread'] = $row['isread'];
-            $info['hash'] = $row['hash'];
             $info['reward'] = $row['reward'];
             $info['favorite'] = boolval($row['favorite']);
             $info['comment'] = $row['comment'];
+
+            if ($row['expired'] == 1){
+                $info['expired'] = true;
+            }
+            else{
+                $info['hash'] = $row['hash'];
+            }
+
             array_push($infos, $info);
             array_push($ids, $row['id']);
         }

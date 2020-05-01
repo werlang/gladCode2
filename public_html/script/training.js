@@ -461,7 +461,10 @@ training.refresh = async function(args){
     else{
         if (data.status == "RUN" && !data.end){
             const gid = data.run
-            let sim = new Simulation({ training: gid })
+            let sim = new Simulation({
+                training: gid,
+                origin: "train"
+            })
             let simdata
             await socket_ready()
             socket.emit('tournament run request', {

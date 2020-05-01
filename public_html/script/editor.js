@@ -9,6 +9,7 @@ var pieces;
 var loadGlad = false;
 var wannaSave = false;
 var blocksEditor = false;
+var sim
 
 $(document).ready( function() {
     $('#header-editor').addClass('here');
@@ -523,8 +524,8 @@ $(document).ready( function() {
     $('#fog-battle #btn-cancel').click( function(){
         if (progbtn && progbtn.isActive()){
             progbtn.kill();
-            if (ajaxcall)
-                ajaxcall.abort();
+            if (sim && sim.running)
+                sim.abort();
         }
         else
             $('#fog-battle').hide();
@@ -607,23 +608,27 @@ $(document).ready( function() {
         glads.push(loadGlad.code);
 
         return new Promise( (resolve, reject) => {
-            runSimulation({
+            // console.log(glads)
+            sim = new Simulation({
                 glads: glads,
                 savecode: true,
+                origin: "editor",
                 single: true,
-                breakpoints: breakpoints
-            }).then( function(data){
+                breakpoints: breakpoints,
+                terminal: true,
+            })
+            sim.run().then( data => {
                 // console.log(data);
-                if (data == "ERROR"){
+                if (data.error){
                     //$('#fog-battle #btn-cancel').removeAttr('disabled');
                     $('#fog-battle').hide();
                     resolve(false);
                 }
                 else{
-                    resolve(data);
+                    resolve(data.simulation);
                 }
                 progbtn.kill();
-            });
+            })
         });
     }
 
