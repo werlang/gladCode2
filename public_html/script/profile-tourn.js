@@ -45,6 +45,17 @@ $(document).ready( function(){
             </div>
         </div>`;
         $('body').append(box);
+
+        let msg = [
+            "O identificador precisa ter tamanho 6 ou mais",
+            "O identificador precisa conter somente letras, números ou espaços",
+            "Digite uma senha, ou torne o torneio público",
+            "Informe um número entre 2 e 50",
+            "Formato de hora inválida",
+            "Um torneio com este identificador já existe"
+        ]
+        translator.translate([$('#fog')].concat(msg)).then( data => { msg = data })
+
         create_checkbox($('.tourn.window .checkslider'));
         $('#fog .tourn.window').hide().fadeIn();
         $('#fog .tourn.window #name').focus();
@@ -113,27 +124,27 @@ $(document).ready( function(){
             if (name.length < 6){
                 $('.tourn.window #name').focus();
                 $('.tourn.window #name').addClass('error');
-                $('.tourn.window #name').before("<span class='tip'>O identificador precisa ter tamanho 6 ou mais</span>");
+                $('.tourn.window #name').before(`<span class='tip'>${msg[0]}</span>`);
             }
             else if (name.match(/[^\w\s]/g)){
                 $('.tourn.window #name').focus();
                 $('.tourn.window #name').addClass('error');
-                $('.tourn.window #name').before("<span class='tip'>O identificador precisa conter somente letras, números ou espaços</span>");
+                $('.tourn.window #name').before(`<span class='tip'>${msg[1]}</span>`);
             }
             else if ($('.tourn.window #pass').css('opacity') != "0" && pass.length == 0){
                 $('.tourn.window #pass').focus();
                 $('.tourn.window #pass').addClass('error');
-                $('.tourn.window #pass').before("<span class='tip'>Digite uma senha, ou torne o torneio público</span>");
+                $('.tourn.window #pass').before(`<span class='tip'>${msg[2]}</span>`);
             }
             else if (maxteams.match(/[^\d]/g) || maxteams < 2 || maxteams > 50){
                 $('.tourn.window #maxteams input').focus();
                 $('.tourn.window #maxteams input').addClass('error');
-                $('.tourn.window #maxteams input').before("<span class='tip'>Informe um número entre 2 e 50</span>");
+                $('.tourn.window #maxteams input').before(`<span class='tip'>${msg[3]}</span>`);
             }
             else if (!validateMaxtime()){
                 $('.tourn.window #maxtime input').focus();
                 $('.tourn.window #maxtime input').addClass('error');
-                $('.tourn.window #maxtime input').before("<span class='tip'>Formato de hora inválida</span>");
+                $('.tourn.window #maxtime input').before(`<span class='tip'>${msg[4]}</span>`);
             }
             else{
                 $.post("back_tournament.php",{
@@ -156,6 +167,8 @@ $(document).ready( function(){
                         var box = "<div id='fog'><div id='tourn-message' class='tourn window'><h2>Torneio registrado</h2>"+ content +"<div id='button-container'><button class='button'>OK</button></div></div></div>";
                         $('body').append(box);
 
+                        translator.translate($('#fog'))
+
                         $('#tourn-message .button').click( function(){
                             $('#fog').remove();
                         });
@@ -163,7 +176,7 @@ $(document).ready( function(){
                     else{
                         $('.tourn.window #name').focus();
                         $('.tourn.window #name').addClass('error');
-                        $('.tourn.window #name').before("<span class='tip'>Um torneio com este identificador já existe</span>");
+                        $('.tourn.window #name').before(`<span class='tip'>${msg[5]}</span>`);
                     }
                 });
             }
@@ -427,6 +440,8 @@ function refresh_tourn_list(){
                         $('.tourn.window #join').click();
                     });
                 });
+
+                translator.translate($('#panel #battle-container #tourn.wrapper .row.head'))
             }
 
         });

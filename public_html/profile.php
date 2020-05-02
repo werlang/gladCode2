@@ -89,15 +89,15 @@
                 <div class='curr'><i class='fas fa-money-bill'></i><span>0,00</span></div>
             </div>
             <div id='menu-buttons'>
-                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>{{news}}</span></div>
-                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>{{profile}}</span></div>
-                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>{{glads}}</span></div>
-                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>{{battles}}</span></div>
-                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>{{reports}}</span></div>
-                <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>{{messages}}</span></div>
-                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>{{friends}}</span></div>
-                <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
+                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span data-translation-template='{{menu_news}}'></span></div>
+                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span data-translation-template='{{menu_profile}}'></span></div>
+                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span data-translation-template='{{menu_glads}}'></span></div>
+                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span data-translation-template='{{menu_battles}}'></span></div>
+                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span data-translation-template='{{menu_reports}}'></span></div>
+                <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span  data-translation-template='{{menu_ranking}}'></span></div>
+                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span data-translation-template='{{menu_messages}}'></span></div>
+                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span data-translation-template='{{menu_friends}}'></span></div>
+                <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span  data-translation-template='{{menu_logout}}'></span></div>
             </div>
             <div id='footer'></div>
         </div>
@@ -111,7 +111,7 @@
                     <div id='nickname'>
                         <h2>Apelido</h2>
                         <h3>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</h3>
-                        <input type='text' class='input' placeholder='{{profile_profile_nick_placeholder}}'>
+                        <input type='text' class='input' placeholder='apelido'>
                     </div>
                     <div id='picture'>
                         <h2>Foto de perfil</h2>
@@ -139,7 +139,7 @@
                         <div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
                     </div>
                     <div id='button-container'>
-                        <button class='button' id='save'>{{profile_profile_save}}</button>
+                        <button class='button' id='save'>GRAVAR</button>
                     </div>
                 </div>
             </div>

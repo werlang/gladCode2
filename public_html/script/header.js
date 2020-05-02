@@ -1,7 +1,5 @@
 var user;
-post("back_login.php", {
-    action: "GET"
-}).then( data => user = data )
+waitLogged()
 
 $(document).ready( function() {
     $('#menu-button').click( function() {
@@ -83,6 +81,12 @@ $(document).ready( function() {
                 else
                     $('.mobile #login, .desktop #profile').removeClass('hidden');
             });
+
+            translator.translate($('body')).then( () => {
+                let langObj = $(`#header #language #lang-${user.speak}.item`)
+                $('#header #language .title').html(langObj.text())
+                langObj.addClass('hidden')
+            })
         }
     })
 
@@ -100,42 +104,27 @@ $(document).ready( function() {
             action: "SPOKEN_LANGUAGE",
             language: lang
         })
-        console.log(data)
+        // console.log(data)
         if (data.status == "SUCCESS"){
             window.location.reload()
-        }
-    })
-
-    waitLogged().then( async () => {
-        let langObj = $(`#header #language #lang-${user.speak}.item`)
-        $('#header #language .title').html(langObj.text())
-        langObj.addClass('hidden')
-
-        await translator.init({
-            ignore: ['C'],
-            force: {
-                "Não": "No"
-            }
-        })
-        await translator.translate($('body'))
-        if (user.speak != 'pt'){
-            translator.googleTranslate($('body'))
         }
     })
 });
 
 async function waitLogged(){
-    return await new Promise( (resolve, reject) => {
-        loginReady();
-        function loginReady(){
-            setTimeout( function() {
-                if (user)
-                    resolve(user);
-                else
-                    loginReady();
-            }, 100);
-        }
-    });
+    if (user){
+        return user
+    }
+    else{
+        return new Promise( (resolve, reject) => {
+            post("back_login.php", {
+                action: "GET"
+            }).then( data => {
+                user = data
+                resolve(user)
+            })
+        })
+    }
 }
 
 async function post(path, args){
@@ -168,136 +157,109 @@ function decodeHTML(str) {
 
 var translator = {}
 
-translator.init = function({force, ignore}){
-    this.ignore = []
-    if (ignore){
-        this.ignore = ignore
-    }
-
-    if (force){
-        this.translations = []
-        for (let k in force){
-            this.translations.push({
-                pt: k,
-                en: force[k]
-            })
-        }
-    }
-
-    return $.getJSON(`script/translation.json`, data => {
-        this.template = data
-    })
-}
-
-translator.translate = async function(element){
-    if (!this.template){
-        return false
-    }
-    else {
-        let info = this.template
-        let lang = user && user.speak ? user.speak : 'pt'
-
-        var fieldcheck = ['title', 'placeholder']
-
-        // console.log(data)
-        element.find(`*`).contents().each(function(){
-            // replace contents
-            if (this.nodeType == 3){
-                let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
-                if (v.length && info[v]){
-                    this.textContent = this.textContent.replace(this.textContent, info[v][lang])
-                }
-            }
-
-            let fields = []
-            for (let check of fieldcheck){
-                if (this[check] && this[check] != ""){
-                    fields.push(check)
-                }
-            }
-    
-            for (let field of fields){
-                let replace = this[field].replace(/\{\{(\w+)\}\}/, "$1")
-                if (replace.length && info[replace]){
-                    this[field] = this[field].replace(this[field], info[replace][lang])
-                }
-            }
-        })
-
-        return this
-    }
-}
-
-translator.googleTranslate = async function(elements) {
+translator.translate = async function(elements){
     let lang = (user && user.speak) ? user.speak : 'pt'
-    let contents = this.translations ? this.translations : []
+    let contents = this.translations ? this.translations : {}
+    elements = Array.isArray(elements) ? elements : [elements]
 
-    let ignoreList = this.ignore
-
-    if (lang != 'pt'){
-        elements = Array.isArray(elements) ? elements : [elements]
-
-        for (element of elements){
-            element.find(`*`).contents().each(function(){
-                // replace contents
-                if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t") && !ignoreList.includes(this.textContent)){
-                    let text = this.textContent.replace(/(\w+)/, "$1")
-                    if (text.length && !contents.filter(e => e.pt == text).length){
-                        contents.push({pt: text})
-                    }
-                }
-                // replace titles
-                if (this.title && this.title.length){
-                    if (!contents.filter(e => e.pt == this.title).length){
-                        contents.push({pt: this.title})
-                    }
-                }
-            })
-        }
-
-        const apiKey = "AIzaSyDfENHlgZgw6BDTbevnSJKiZP30BRIJe2g"
-        const url = `https://www.googleapis.com/language/translate/v2`
-
-        let calls = []
-        for (let i in contents){
-            if (!contents[i].en){
-                calls[i] = $.post(url, {
-                    q: contents[i].pt,
-                    source: 'pt',
-                    target: lang,
-                    key: apiKey
-                }).done( data => {
-                    // console.log(data)
-                    contents[i].en = decodeHTML(data.data.translations[0].translatedText)
-                })
+    for (let element of elements){
+        if (typeof element === 'string'){
+            if (!contents[element]){
+                contents[element] = {}
             }
         }
-
-        for (let call of calls){
-            await call
-        }
-
-        this.translations = contents
-        
-        for (element of elements){
+        else{
             element.find(`*`).contents().each(function(){
-                // replace contents
-                if (this.nodeType == 3){
-                    let item = contents.filter(e => e.pt == this.textContent)
-                    if (item.length){
-                        this.textContent = ` ${this.textContent.replace(item[0].pt, item[0].en)} `
-                    }
+                // check for template
+                if ($(this).data('translationTemplate')){
+                    let temp = $(this).data('translationTemplate')
+                    contents[temp] = {template: temp}
                 }
 
-                if (this.title){
-                    let item = contents.filter(e => e.pt == this.title)
-                    if (item.length){
-                        this.title = item[0].en
+                if (lang != 'pt'){
+                    // replace contents
+                    if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t") && !$(this).hasClass('translated') && !this.textContent.match(/^[\d\s]+$/) && !this.textContent.match(/^\W+$/)){
+                        let text = this.textContent.replace(/(\w+)/, "$1")
+                        if (text.length && !contents[text]){
+                            contents[text] = {}
+                        }
+                    }
+                    // replace other fields
+                    let fieldList = ['title', 'placeholder']
+
+                    for (let field of fieldList){
+                        if (this[field] && this[field].length && !$(this).hasClass('translated')){
+                            if (!contents[this[field]]){
+                                contents[this[field]] = {}
+                            }
+                        }
                     }
                 }
             })
         }
     }
 
-    return this
+    let toTranslate = []
+    for (let i in contents){
+        if (!contents[i][lang]){
+            toTranslate.push(i)
+        }
+    }
+
+    let data = await post("back_login.php", {
+        action: "TRANSLATE",
+        language: lang,
+        data: JSON.stringify(toTranslate),
+    })
+    // console.log(data)
+
+    for (let i in data.response){
+        contents[i][lang] = data.response[i]
+    }
+    
+    this.translations = contents
+    
+    let stringResponse = []
+    for (element of elements){
+        if (typeof element === 'string'){
+            if (contents[element]){
+                stringResponse.push(contents[element][lang])
+            }
+        }
+        else{
+            element.find(`*`).contents().each(function(){
+                // replace template
+                if ($(this).data('translationTemplate')){
+                    let temp = $(this).data('translationTemplate')
+                    this.textContent = contents[temp][lang]
+                    $(this).addClass('translated')
+                }
+                else if (lang != 'pt'){
+                    // replace contents
+                    if (this.nodeType == 3){
+                        if (contents[this.textContent] && !$(this).hasClass('translated')){                
+                            this.textContent = ` ${contents[this.textContent][lang]} `
+                            $(this).addClass('translated')
+                        }
+                    }
+
+                    // replace other fields
+                    let fieldList = ['title', 'placeholder']
+
+                    for (let field of fieldList){
+                        if (this[field]){
+                            if (contents[this[field]]){
+                                this[field] = `${contents[this[field]][lang]}`
+                                $(this).addClass('translated')
+                            }
+                        }
+                    }
+                    
+                }
+            })
+        }
+    }
+
+    return stringResponse
+    
 }
