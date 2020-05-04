@@ -149,12 +149,14 @@ body {
 
 #frame #menu #currencies {
     background-color: #00000014;
-    color: #a9a9a9;
+    color: #e2e2e2;
     padding: 5px 15px;
     display: flex;
     align-items: center;
     cursor: default;
     font-family: 'Roboto', sans-serif;
+    text-shadow: 1px 1px 2px black;
+    font-size: 1.2em;
 }
 
 #frame #menu #currencies.hidden {
@@ -167,6 +169,10 @@ body {
 
 #frame #menu #currencies .curr i {
     font-size: 1.2em;
+}
+
+#frame #menu #currencies #silver i {
+    color: silver;
 }
 
 #frame #menu .item.here {
@@ -1667,42 +1673,6 @@ body {
     max-width: 100%;
 }
 
-#pre-battle-show.complete #progress{
-    background-color: #e0e0e0;
-}
-
-#pre-battle-show.complete #tips{
-    color: black;
-}
-
-#pre-battle-show.complete #tips i {
-    margin-left: 25px;
-    background-color: #c8c8c8;
-    color: black;
-    border-radius: 100%;
-    padding: 2px;
-    box-sizing: border-box;
-    font-size: 35px;
-    transition: 0.3s all;
-    box-shadow: 0px 0px 5px #00000070;
-    cursor: pointer;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#pre-battle-show.complete #tips #view:hover {
-    color: #000000;
-    background-color: #719e71;
-}
-
-#pre-battle-show.complete #tips #close:hover {
-    color: #000000;
-    background-color: #db5f5f;
-}
-
 @media only screen and (min-width: 600px) {
     #pre-battle-show #tips {
         height: 60px;
@@ -2980,4 +2950,213 @@ body {
     background-color: #6c97a9;
     color: white;
 
+}
+
+#after-battle {
+    display: flex;
+    background-color: white;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px black;
+    font-family: 'Acme', sans-serif;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    color: #616161;
+    cursor: default;
+}
+
+#after-battle .glad-card-container {
+    align-items: center;
+}
+
+#after-battle h2{
+    text-align: center;
+    margin: 10px 0;
+}
+
+#after-battle .row {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 15px 0;
+}
+
+#after-battle .glad-card-container .row {
+    margin: 0;
+    justify-content: space-around;
+}
+
+#after-battle .row.group {
+    border: 4px solid #90a0b3;
+    border-radius: 5px;
+    padding: 10px 0px;
+    margin: 0 0 10px;
+}
+
+#after-battle .col {
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px;
+    text-align: center;
+}
+
+#after-battle #lvl span {
+    font-size: 3em;
+    margin: 0 5px;
+}
+
+#after-battle #lvl #plusone {
+    font-size: 1.3em;
+    color: green;
+    width: 35px;
+    margin: 0 -35px 0 0;
+    transition: 1s opacity;
+}
+
+#after-battle #lvl #plusone.hidden {
+    opacity: 0;
+}
+
+#after-battle #xp-text {
+    font-size: 1.2em;
+    margin: 10px 0 5px;
+    display: flex;
+    align-items: center;
+    height: 2em;
+    justify-content: center;
+}
+
+#after-battle #xp-increase {
+    color: green;
+    margin: 0 5px;
+    align-self: flex-start;
+}
+
+#after-battle #xp-now {
+    align-self: flex-start;
+}
+
+#after-battle #xp-total {
+    margin: 0 5px;
+    align-self: flex-end;
+}
+
+#after-battle #xp-bar-container {
+    display: flex;
+    justify-content: center;
+}
+
+#after-battle #xp-bar {
+    width: 160px;
+    background-color: #6c97a969;
+    border: 1px solid #6c97a9;
+    border-radius: 3px;
+}
+
+#after-battle #xp-bar #filled{
+    width: 0%;
+    background-color: #e7dd24;
+    transition: all 0.8s;
+    height: 15px;
+    border-radius: 3px 0 0 3px;
+}
+
+#after-battle #silver-now,
+#after-battle #renown-now {
+    text-align: center;
+    font-size: 3em;
+    color: silver;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -5px;
+    margin-bottom: -10px;
+}
+
+#after-battle #renown-now .value,
+#after-battle #silver-now .value{
+    margin-left: -75px;
+    width: 75px;
+    text-shadow: 1px 1px 3px black;
+}
+
+#after-battle #renown-now .value.green {
+    color: green;
+}
+
+#after-battle #renown-now .value.red {
+    color: red;
+}
+
+#after-battle #renown-total {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+#after-battle #silver-now {
+    color: silver;
+}
+
+#after-battle #silver-total {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+#after-battle .svg {
+    height: 75px;
+}
+
+#after-battle .svg.hidden {
+    display: none;
+}
+
+#after-battle svg {
+    width: 75px;
+    height: 75px;
+}
+
+#after-battle #renown-now svg .body {
+    fill: #FFCA28;
+}
+
+#after-battle #silver-now svg .center {
+    fill: #E5E8E9;
+}
+
+#after-battle #silver-now svg .border {
+    fill: #D0D9D6;
+}
+
+#after-battle #button-container {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+}
+
+#after-battle #button-container button{
+    outline: none;  
+    border: 0;
+    background-color: transparent;
+    font-size: 3em;
+    font-weight: bold;
+    color: white;
+    background-color: #00638D;
+    padding: 5px 15px;
+    transition: 0.3s;
+    border-radius: 3px;
+    width: 150px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#after-battle #button-container button span{
+    font-size: 0.3em;
+    color: #98d3ec;
+    margin-top: 5px;
+}
+
+#after-battle #button-container button:hover{
+    background-color: #1e86d8;
 }

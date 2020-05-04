@@ -472,7 +472,7 @@
 
         $ids = implode(",", $ids);
         $sql = "SELECT g.cod, g.mmr, g.master, u.lvl, u.xp FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE cod IN ($ids) ORDER BY FIELD(cod,$ids)";
-        if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: '. $sql ); }
+        $result = runQuery($sql);
 
         $glads = array();
         $i = 0;
@@ -513,16 +513,31 @@
                 /10 -> /2 porque metade é apostas e metade é ingressos, /5 porque os ingressos vao pra cada gladiador
                 -20 -> custo de manutencao do gladiador
             na vitória -> ganha a parte das apostas
+
+            400g é o income básico
+            200 por apostas e 200 por ingressos
+            20g numa derrota (ingressos divididos por 5 - manutenção)
+            em 5 lutas com 1 vitória, média de 60g
+            agenciadores te colocam em 20 lutas (1200g média) por dia
+            depois, tu luta em arenas não oficiais por 1/10 disso ilimitado
         */
+
         $income = 1000 + ($glad['mmr'] - 1000) * 0.3;
-        //$silver = (0.7 * $income - 300)/10 - 20;
+        $silver = (0.7 * $income - 300)/10 - 20;
         $xplose = 100;
         $xpwin = 150;
         $xp += $xplose;
+        // winner
         if ($thisglad == 0){
             $xp += $xpwin;
-            //$silver += (0.7 * $income - 300)/2;
+            $silver += (0.7 * $income - 300)/2;
         }
+
+        // get how many battles today
+        $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY";
+        $result = runQuery($sql);
+        // cut silver if not managed battle        
+        $silver = $result->num_rows < 20 ? $silver : $silver / 10;
         
         /*
         y = ax+b;
@@ -541,7 +556,7 @@
             $xp -= $tonext;
         }
         
-        $sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp' WHERE id = '$user'";
+        $sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp', silver = silver + $silver WHERE id = '$user'";
         $result = runQuery($sql);
 
         send_node_message(array(

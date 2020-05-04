@@ -85,8 +85,9 @@
                     </div>
                 </div>
             </div>	
-            <div id='currencies' title='Créditos' class='hidden'>
-                <div class='curr'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+            <div id='currencies' class='hidden'>
+                <div class='curr' id='money' title='Créditos'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+                <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
             </div>
             <div id='menu-buttons'>
                 <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>{{news}}</span></div>
