@@ -19,18 +19,15 @@ $(document).ready( function(){
         $('#profile-ui #picture img').attr('src',user.foto);
         $('#profile-ui #nickname').html(user.apelido);
 
-        $('#menu #currencies').remove()
-        // if (!user.premium){
-        //     $('#menu #currencies').remove()
-        // }
-        // else{
-        //     $('#menu #currencies').removeClass('hidden')
-        //     $('#menu .curr span').html(`R$ ${parseFloat(user.credits).toFixed(2)}`)
-        //     if (parseFloat(user.credits) < 0){
-        //         $('#menu .curr span').addClass('debit').attr('title', 'Recarregar créditos').click( () => {
-        //             rechargeCredits()
-        //         })
-        //     }
+        // remove money until premium account is enabled
+        $('#menu #currencies #money').remove()
+        $('#menu #currencies').removeClass('hidden')
+        // $('#menu .curr span').html(`R$ ${parseFloat(user.credits).toFixed(2)}`)
+        $('#menu #currencies #silver span').html(parseInt(user.silver))
+        // if (parseFloat(user.credits) < 0){
+        //     $('#menu .curr span').addClass('debit').attr('title', 'Recarregar créditos').click( () => {
+        //         rechargeCredits()
+        //     })
         // }
 
         var language = $('#profile-panel #language select');
@@ -58,84 +55,6 @@ $(document).ready( function(){
         });
 
     });
-        
-    function checkNotifications(){
-        $.post("back_notification.php", {
-        }).done( function(data){
-            // console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(e){
-                console.log(e);
-            }
-
-            $('#profile-ui #lvl span').html(data.user.lvl);
-            var xpneeded = (parseInt(data.user.lvl) * 4.5 - 2.0) * 130;
-            var xp = parseInt(data.user.xp);
-            $('#profile-ui #xp #filled').width(xp/xpneeded*100 + "%");
-            
-            $('#messages .notification').html(data.messages);
-            if (parseInt(data.messages) == 0)
-                $('#messages .notification').addClass('empty');
-            else
-                $('#messages .notification').removeClass('empty');
-
-            var news = parseInt(data.news);
-            $('#news .notification').html(news);
-            if (news == 0)
-                $('#news .notification').addClass('empty');
-            else
-                $('#news .notification').removeClass('empty');
-                
-            var newfriends = parseInt(data.friends);
-            $('#friends .notification').html(newfriends);
-            if (newfriends == 0)
-                $('#friends .notification').addClass('empty');
-            else
-                $('#friends .notification').removeClass('empty');
-                
-            var grem = parseInt(data.glads.remaining);
-            var gobs = parseInt(data.glads.obsolete);
-            $('#glads .notification').html(grem + gobs);
-            if (grem + gobs == 0)
-                $('#glads .notification').addClass('empty');
-            else
-                $('#glads .notification').removeClass('empty');
-            
-            let duels = parseInt(data.duels)
-            $('#battle .notification').html(duels).addClass('empty')
-            $('#battle-container #duel .notification').html(duels).addClass('empty')
-            if ($('#battle-container #duel-challenge .table .row').length != duels){
-                check_challenges()
-            }
-            if (duels > 0){
-                $('#battle .notification').html(duels).removeClass('empty')
-                $('#battle-container #duel .notification').html(duels).removeClass('empty')
-            }
-
-            let reports = {
-                ranked: parseInt(data.reports.ranked),
-                duel: parseInt(data.reports.duel)
-            }
-            reports.total = reports.ranked + reports.duel
-            $('#report .notification').html(reports.total)
-            $('#report .notification').addClass('empty');
-            $('#report-container #ranked.tab .notification').addClass('empty')
-            $('#report-container #duel.tab .notification').addClass('empty')
-            if (reports.total > 0){
-                $('#report .notification').removeClass('empty');
-
-                if (reports.ranked > 0){
-                    $('#report-container #ranked.tab .notification').removeClass('empty')
-                }
-                if (reports.duel > 0){
-                    $('#report-container #duel.tab .notification').removeClass('empty')
-                }
-            }
-        
-        });
-    }
 
     $('#menu .item').click( function(){
         if (!$(this).hasClass('disabled')){
@@ -523,7 +442,19 @@ $(document).ready( function(){
             'vagi': selGlad.data('vagi'),
             'vint': selGlad.data('vint'),
             'mmr': selGlad.data('mmr'),
-        };
+        }
+
+        let oldStatus = {
+            lvl: user.lvl,
+            xp: {
+                value: parseFloat(user.xp),
+                total: getXpToNextLvl()
+            },
+            silver: user.silver,
+            mmr: thisglad.mmr,
+            glad: thisglad.id
+        }
+
         $.post("back_match.php", {
             action: "MATCH",
             id: thisglad.id
@@ -533,35 +464,28 @@ $(document).ready( function(){
             //console.log(glads);
             var preBattleInt = preBattleShow(glads);
             
-            runSimulation({
+            new Simulation({
                 ranked: true,
-                origin: "ranked"
-            }).then( function(data){
-                //console.log(data);
-                if (data == "ERROR"){
-                    progbtn.kill();
-                    window.location.reload();
+                origin: "ranked",
+                terminal: true
+            }).run().then( function(data){
+                // console.log(data);
+                if (data.error){
+                    progbtn.kill()
+                    window.location.reload()
                 }
                 else{
-                    var hash = data;
+                    let hash = data.simulation
 
                     save_stats(hash);
 
-                    $('#pre-battle-show #tips').html(`<span>Batalha concluída. Escolha uma opção:</span>
-                        <i id='view' title='Visualizar batalha' class='fas fa-eye'></i>
-                        <i id='close' title='Fechar janela' class='fas fa-times'></i>`);
                     clearInterval(preBattleInt);
-                    $('#pre-battle-show').addClass('complete');
-
-                    $('#pre-battle-show i').click( function(){
-                        if ($(this).attr('id') == 'view')
-                            window.open("play/"+ hash);
-                        
-                        $('#fog').remove();
-                        $('#menu #battle').click();
-                    });
-
                     progbtn.kill();
+
+                    $('#fog').remove();
+                    $('#menu #battle').click();
+
+                    afterBattleShow(hash, oldStatus)
                 }
             });
             
@@ -1052,6 +976,292 @@ $(document).ready( function(){
     });
 });
 
+async function checkNotifications(){
+    return $.post("back_notification.php", {
+        action: "GET"
+    }).done( function(data){
+        // console.log(data);
+        try{
+            data = JSON.parse(data);
+        }
+        catch(e){
+            console.log(e);
+        }
+
+        $('#profile-ui #lvl span').html(data.user.lvl);
+        user.lvl = data.user.lvl
+        var xpneeded = getXpToNextLvl()
+        var xp = parseInt(data.user.xp);
+        user.xp = data.user.xp
+        $('#profile-ui #xp #filled').width(xp/xpneeded*100 + "%");
+
+        $('#currencies #silver span').html(data.user.silver)
+        user.silver = data.user.silver
+
+        $('#messages .notification').html(data.messages);
+        if (parseInt(data.messages) == 0)
+            $('#messages .notification').addClass('empty');
+        else
+            $('#messages .notification').removeClass('empty');
+
+        var news = parseInt(data.news);
+        $('#news .notification').html(news);
+        if (news == 0)
+            $('#news .notification').addClass('empty');
+        else
+            $('#news .notification').removeClass('empty');
+            
+        var newfriends = parseInt(data.friends);
+        $('#friends .notification').html(newfriends);
+        if (newfriends == 0)
+            $('#friends .notification').addClass('empty');
+        else
+            $('#friends .notification').removeClass('empty');
+            
+        var grem = parseInt(data.glads.remaining);
+        var gobs = parseInt(data.glads.obsolete);
+        $('#glads .notification').html(grem + gobs);
+        if (grem + gobs == 0)
+            $('#glads .notification').addClass('empty');
+        else
+            $('#glads .notification').removeClass('empty');
+        
+        let duels = parseInt(data.duels)
+        $('#battle .notification').html(duels).addClass('empty')
+        $('#battle-container #duel .notification').html(duels).addClass('empty')
+        if ($('#battle-container #duel-challenge .table .row').length != duels){
+            check_challenges()
+        }
+        if (duels > 0){
+            $('#battle .notification').html(duels).removeClass('empty')
+            $('#battle-container #duel .notification').html(duels).removeClass('empty')
+        }
+
+        let reports = {
+            ranked: parseInt(data.reports.ranked),
+            duel: parseInt(data.reports.duel)
+        }
+        reports.total = reports.ranked + reports.duel
+        $('#report .notification').html(reports.total)
+        $('#report .notification').addClass('empty');
+        $('#report-container #ranked.tab .notification').addClass('empty')
+        $('#report-container #duel.tab .notification').addClass('empty')
+        if (reports.total > 0){
+            $('#report .notification').removeClass('empty');
+
+            if (reports.ranked > 0){
+                $('#report-container #ranked.tab .notification').removeClass('empty')
+            }
+            if (reports.duel > 0){
+                $('#report-container #duel.tab .notification').removeClass('empty')
+            }
+        }
+    
+    });
+}
+
+function afterBattleShow(hash, oldStatus){
+    // console.log(oldStatus)
+    $('body').append(`<div id='fog'>
+        <div id='after-battle'>
+            <div class='row'>
+                <div class='glad-card-container'></div>
+                <div class='col'>
+                    <h2>Batalha concluída</h2>
+                    <div class='row group'>
+                        <div class='col'>
+                            <span>Seu nível</span>
+                            <div id='lvl'><span class='value'></span><span id='plusone' class='hidden'>(+1)</span></div>
+                        </div>
+                        <div class='col'>
+                            <span>Experiência</span>
+                            <div id='xp-text'><span id='xp-now'></span><span id='xp-increase'></span>/<span id='xp-total'></span></div>
+                            <div id='xp-bar-container'>
+                                <div id='xp-bar'><div id='filled'></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='row group'>
+                        <div class='col'>
+                            <span>Renome</span>
+                            <div id='renown-now'><span class='svg hidden'>icon/crown.svg</span><span class='value'></span></div>
+                            <span id='renown-total'></span>
+                        </div>
+                        <div class='col'>
+                            <span>Prata</span>
+                            <div id='silver-now'><span class='svg hidden'>icon/coin.svg</span><span class='value'></span></div>
+                            <span id='silver-total'></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id='button-container'>
+                <button id='code'><i class='fas fa-code'></i><span>EDITAR GLADIADOR</span></button>
+                <button id='close'><i class='fas fa-times'></i><span>NÃO VISUALIZAR</span></button>
+                <button id='watch'><i class='fas fa-eye'></i><span>VISUALIZAR BATALHA</span></button>
+            </div>
+        </div>
+    </div>`)
+
+    $('#fog #after-battle span.svg').each( function() {
+        $.get($(this).html(), null, null, 'text').then( data => $(this).removeClass('hidden').html(data))
+    })
+
+    post("back_notification.php", {
+        action: "SUMMARY",
+        hash: hash
+    }).then( data => {
+        // console.log(data)
+
+        $('#fog #after-battle #lvl .value').html(data.lvl)
+
+        let xpincrease = data.xp - oldStatus.xp.value
+        if (oldStatus.lvl != data.lvl){
+            $('#fog #after-battle #lvl #plusone').removeClass('hidden')
+            xpincrease = (parseFloat(data.xp) + parseFloat(oldStatus.xp.total) - parseFloat(oldStatus.xp.value)).toFixed(0)
+        }
+
+        let time = 1500
+        let steps = 100
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: 0,
+            end: xpincrease,
+            onStep: data => {
+                if (data != 0){
+                    $('#fog #after-battle #xp-increase').html(`(+${parseInt(data)})`)
+                }
+            }
+        }).run()
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: oldStatus.xp.value,
+            end: data.xp,
+            onStep: data => {
+                $('#fog #after-battle #xp-now').html(parseInt(data))
+            }
+        }).run()
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: oldStatus.xp.value / oldStatus.xp.total * 100,
+            end: data.xp / getXpToNextLvl() * 100,
+            onStep: data => {
+                $('#fog #after-battle #xp-bar #filled').css('width', `${data}%`)
+            }
+        }).run()
+        $('#fog #after-battle #xp-total').html(parseInt(getXpToNextLvl()))
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: 0,
+            end: data.silver - oldStatus.silver,
+            onStep: data => {
+                $('#fog #after-battle #silver-now .value').html(`+${parseInt(data)}`)
+            }
+        }).run()
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: oldStatus.silver,
+            end: data.silver,
+            onStep: data => {
+                $('#fog #after-battle #silver-total').html(data.toFixed(0))
+            }
+        }).run()
+
+        let mmrdiff = parseInt(data.glad.mmr) - parseInt(oldStatus.mmr)
+        if (mmrdiff > 0){
+            $('#fog #after-battle #renown-now .value').addClass('green')
+        }
+        else if (mmrdiff < 0){
+            $('#fog #after-battle #renown-now .value').addClass('red')
+        }
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: 0,
+            end: mmrdiff,
+            onStep: data => {
+                data = mmrdiff > 0 ? `+${parseInt(data)}` : parseInt(data)
+                $('#fog #after-battle #renown-now .value').html(data)
+            }
+        }).run()
+
+        new valueAnimator({
+            time: time,
+            steps: steps,
+            start: oldStatus.mmr,
+            end: data.glad.mmr,
+            onStep: data => {
+                $('#fog #after-battle #renown-total').html(parseInt(data))
+            }
+        }).run()
+
+        load_glad_cards($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
+
+        $('#fog #after-battle #code').click( () => {
+            window.open(`glad-${data.glad.id}`)
+        })
+    })
+
+    $('#fog #after-battle #close').click( () => {
+        $('#fog').remove()
+    })
+
+    $('#fog #after-battle #watch').click( () => {
+        window.open(`play/${hash}`)
+    })
+}
+
+class valueAnimator{
+    constructor(args){
+        this.time = args.time ? args.time : 1000
+        this.steps = args.steps ? args.steps : 100
+        this.start = args.start ? parseFloat(args.start) : 0
+        this.end = args.end ? parseFloat(args.end) : 0
+        this.value = this.start
+        
+        this.onStep = args.onStep ? args.onStep : null
+    }
+
+    run(){
+        return new Promise( (resolve,reject) => {
+            let interval = this.time / this.steps
+            let valueStep = (this.end - this.start) / this.steps
+
+            tick(this, interval, valueStep)
+            function tick(animator, interval, valueStep){
+                let now = new Date()
+                setTimeout( () => {
+                    animator.value += valueStep
+        
+                    if (animator.onStep){
+                        animator.onStep(animator.value)
+                    }
+
+                    if ((animator.value < animator.end && animator.start < animator.end) || (animator.value > animator.end && animator.start > animator.end)){
+                        tick(animator, interval, valueStep)
+                    }
+                    else{
+                        resolve(true)
+                    }
+                }, interval - (new Date() - now))
+            }
+        })
+    }
+}
+
+
+
 function preBattleShow(glads){
     //console.log(glads);
     $('#fog').remove();
@@ -1319,4 +1529,8 @@ async function check_challenges(){
 
         });
     }
+}
+
+function getXpToNextLvl(){
+    return (parseInt(user.lvl) * 1.9 + 1) * 130;
 }
