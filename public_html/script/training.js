@@ -142,7 +142,7 @@ training.show = async function(){
         hash: this.hash,
         round: this.round
     })
-    console.log(data)
+    // console.log(data)
 
     if (data.status == "REDIRECT")
         window.location.href = `train/${this.hash}/${data.round}`
@@ -492,6 +492,25 @@ training.refresh = async function(args){
                     // console.log(data)
                 })
             })
+
+            if (data.newround){
+                await socket_ready()
+                socket.emit('tournament run request', {
+                    hash: this.hash,
+                    group: 'newround'
+                }, async data => {
+                    // console.log(data);
+                    if (data.permission == 'granted'){
+                        post("back_training_run.php", {
+                            action: "NEW ROUND",
+                            hash: this.hash,
+                            round: this.round
+                        }).then( data => {
+                            // console.log(data)
+                        })
+                    }
+                })
+            }
         }
     }
 
