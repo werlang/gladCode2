@@ -426,12 +426,13 @@ var trainList = {
                         if (this.page[set].end == this.page[set].total)
                             $(`#train.wrapper #offset.${set} #next`).prop('disabled', true);
     
-                        $(`#train.wrapper #table-${set}`).html("<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Mestres</div</div>");
+                        $(`#train.wrapper #table-${set}`).html(`<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Mestres</div>${set == 'manage' ? `<div class='cell'></div>` : ''}</div>`);
                         for (let row of data[set]){
                             $(`#train.wrapper #table-${set}`).append(`<div class='row'>
                                 <div class='cell' id='name'>${row.name}</div>
                                 <div class='cell'>${row.description}</div>
                                 <div class='cell'>${row.masters}</div>
+                                ${set == 'manage' ? `<div class='cell actions'><i title='Remover torneio' class='remove fas fa-times'></i></div>` : ''}
                             </div>`)
                             $(`#train.wrapper #table-${set} .row`).last().data('id', row.id)
                             if (!roomList[row.id])
@@ -445,6 +446,38 @@ var trainList = {
                     let id = $(this).data('id')
                     roomList[id].show()
                 })
+
+                $('#train.wrapper .table .row .actions .remove').click( async function(e){
+                    e.stopPropagation()
+                    let id = $(this).parents('.row').data('id')
+                    let name = $(this).parents('.row').find('#name').text()
+                    new Message({
+                        message: `Deseja realmente excluir o treino <b>${name}</b>? Esta operação é irreversível`,
+                        buttons: {yes: "SIM", no: "NÃO"}
+                    }).show().click('yes', async () => {
+                        input.show().click('ok', async data => {
+                            if (data.input == name){
+                                data = await post("back_train.php", {
+                                    action: "REMOVE",
+                                    id: id
+                                })
+                                // console.log(data)
+                                if (data.status == "SUCCESS"){
+                                    new Message({message: `O treino foi removido com sucesso`}).show()
+                                }
+                            }
+                            else{
+                                new Message({message: `O nome informado não confere`}).show()
+                            }
+                        })
+                    })
+
+                    let input = new Message({
+                        message: `Para confirmar a remoção, informe o nome do treino`,
+                        buttons: {ok: "OK", cancel: "CANCELAR"},
+                        input: true
+                    })
+                })  
             }
     
             if (data.redirect){

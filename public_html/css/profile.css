@@ -1981,13 +1981,35 @@ body {
     cursor: default;
 }
 
+#train.wrapper .table .cell:nth-child(3) {
+    max-width: 70px;
+    text-align: center;
+}
+
 #tourn.wrapper .table .cell:nth-child(3) {
     max-width: 70px;
     text-align: right;
 }
+
+#train.wrapper .table .cell:nth-child(4),
 #tourn.wrapper .table .cell:nth-child(4) {
     max-width: 30px;
     text-align: center;
+}
+
+#train.wrapper .table .cell.actions i {
+    display: none;
+    color: #ec4242;
+    transition: 0.3s all;
+    border-radius: 3px;
+}
+
+#train.wrapper .table .row:hover .cell.actions i {
+    display: block;
+}
+
+#train.wrapper .table .cell.actions:hover i {
+    background-color: #00000020;
 }
 
 #tourn.wrapper i.flex {
