@@ -13,6 +13,7 @@
         $desc = mysql_escape_string($_POST['desc']);
         $maxtime = mysql_escape_string($_POST['maxtime']);
         $players = mysql_escape_string($_POST['players']);
+        $weight = mysql_escape_string($_POST['weight']);
         $hash = newHash();
 
         $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
@@ -26,7 +27,7 @@
             $output['status'] = "NOCREDITS";
         }
         else{
-            $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, '$hash', now(3) + INTERVAL 1 HOUR);";
+            $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, weight, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, $weight, '$hash', now(3) + INTERVAL 1 HOUR);";
             $result = runQuery($sql);
             
             send_node_message(array('training list' => array()));
@@ -135,6 +136,7 @@
         else{
             $row = $result->fetch_assoc();
             $trainid = $row['id'];
+            $trainname = $row['name'];
 
             if (isStarted($trainid))
                 $output['status'] = "STARTED";
@@ -165,7 +167,8 @@
                         // add glad into training
                         $sql = "INSERT INTO gladiator_training (gladiator, training, score) VALUES ($glad, $trainid, 0)";
                         $result = runQuery($sql);
-                        $output['id'] = $trainid;    
+                        $output['id'] = $trainid; 
+                        $output['name'] = $trainname;
                         $output['status'] = "SUCCESS";    
                         send_node_message(array('training list' => array()));
                         send_node_message(array('training room' => array(
@@ -507,6 +510,44 @@
                 }
             }
         }
+    }
+    elseif ($action == "REMOVE"){
+        $trainid = mysql_escape_string($_POST['id']);
+
+        $sql = "SELECT manager FROM training WHERE id = $trainid";
+        $result = runQuery($sql);
+        $row = $result->fetch_assoc();
+
+        if ($row['manager'] != $user){
+            $output['status'] = "NOPERMISSION";
+        }
+        else{
+            $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
+            $result = runQuery($sql);
+            $groups = array();
+            while ($row = $result->fetch_assoc())
+                array_push($groups, $row['groupid']);
+            $groups = implode(",", $groups);
+
+            $sql = "DELETE FROM gladiator_training WHERE training = $trainid";
+            $result = runQuery($sql);
+
+            if (strlen($groups) > 0){
+                $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
+                $result = runQuery($sql);
+            }
+
+            $sql = "DELETE FROM training WHERE id = $trainid";
+            $result = runQuery($sql);
+
+            send_node_message(array('training list' => array()));
+            send_node_message(array('training room' => array(
+                'id' => $trainid
+            )));
+            
+            $output['status'] = "SUCCESS";
+        }
+
     }
 
     echo json_encode($output);
