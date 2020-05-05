@@ -432,7 +432,7 @@ var trainList = {
                                 <div class='cell' id='name'>${row.name}</div>
                                 <div class='cell'>${row.description}</div>
                                 <div class='cell'>${row.masters}</div>
-                                ${set == 'manage' ? `<div class='cell actions'><i title='Remover torneio' class='remove fas fa-times'></i></div>` : ''}
+                                ${set == 'manage' ? `<div class='cell actions'><i title='Remover treino' class='remove fas fa-times'></i></div>` : ''}
                             </div>`)
                             $(`#train.wrapper #table-${set} .row`).last().data('id', row.id)
                             if (!roomList[row.id])
