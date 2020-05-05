@@ -54,19 +54,19 @@ app.use(expsession({
 
 //cors
 app.use(cors({
-	origin: [
-		'http://127.0.0.1:85',
-		'http://127.0.0.1',
-		'http://gladcode.tk',
-		'https://gladcode.tk',
-		'http://www.gladcode.tk',
-		'https://www.gladcode.tk',
-		'http://gladcode.dev',
-		'https://gladcode.dev',
-		'http://www.gladcode.dev',
-		'https://www.gladcode.dev'
-	],
-	credentials: true,
+    origin: [
+        'http://127.0.0.1:85',
+        'http://127.0.0.1',
+        'http://gladcode.tk',
+        'https://gladcode.tk',
+        'http://www.gladcode.tk',
+        'https://www.gladcode.tk',
+        'http://gladcode.dev',
+        'https://gladcode.dev',
+        'http://www.gladcode.dev',
+        'https://www.gladcode.dev'
+    ],
+    credentials: true,
 
 }));
 
@@ -188,7 +188,7 @@ app.post('/phpcallback', parser, function(req, res) {
         io.to(`training-${data.hash.toLowerCase()}`).emit('training end', true);
     }
     else if (content['training list']){
-		io.to('training-list').emit('training list', true);
+        io.to('training-list').emit('training list', true);
     }
     else if (content['training room']){
         var data = content['training room'];
