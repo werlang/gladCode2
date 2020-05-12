@@ -31,7 +31,7 @@
         $glads = array_merge($glads, $_SESSION["match"]);
         unset($_SESSION['match']);
     }
-    
+
     $userglad = "";
     if (isset($args['duel'])){
         $id = mysql_escape_string($args['duel']);
@@ -322,7 +322,7 @@
 
             $file = json_encode($simulation);
             
-            $hash = save_log($conn, $file);
+            $hash = save_log($conn, $file, $args['origin']);
 
             if (isset($args['ranked'])){
                 $deaths = death_times($conn, $ids, $file);
@@ -450,16 +450,11 @@
         }
     }
 
-    function save_log($conn, $log){
+    function save_log($conn, $log, $origin){
         $version = file_get_contents("version");
         $hash = substr(md5('log'.microtime()*rand()), 0,16);
 
-        $single = "0";
-        if (isset($args['single'])){
-            $single = "1";
-        }
-
-        $sql = "INSERT INTO logs (time, version, hash, singleView) VALUES (now(), '$version', '$hash', '$single')";
+        $sql = "INSERT INTO logs (time, version, hash, origin) VALUES (now(), '$version', '$hash', '$origin')";
         $result = runQuery($sql);
         
         $id = $conn->insert_id;
