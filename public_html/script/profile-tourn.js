@@ -197,7 +197,13 @@ $(document).ready( function(){
         var box = "<div id='fog' class='tourn'><div class='tourn window'><h2>Ingresso em torneio</h2><p>Informe os dados do torneio que deseja participar</p><input id='name' class='input' placeholder='Identificador do torneio (nome)'><input id='pass' class='input' placeholder='Senha do torneio' type='password'><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='join' class='button'>INGRESSAR</button></div></div></div>";
         $('body').append(box);
         $('.tourn.window #name').focus();
-    
+        translator.translate($('#fog'))
+
+        let msg = [
+            "Torneio não encontrado"
+        ]
+        translator.translate(msg).then( data => msg = data)
+
         $('.tourn.window #cancel').click( function(){
             $('#fog').remove();
         });
@@ -222,7 +228,7 @@ $(document).ready( function(){
                     $('.tourn.window #name').focus();
                     $('.tourn.window #name, .tourn.window #pass').addClass('error');
                     $('.tourn.window .tip').remove();
-                    $('.tourn.window #name').before("<span class='tip'>Torneio não encontrado</span>");
+                    $('.tourn.window #name').before(`<span class='tip'>${msg[0]}</span>`);
                 }
                 else if (data.hash != ''){
                     $('.tourn.window #cancel').click();
@@ -239,7 +245,8 @@ $(document).ready( function(){
                     }
 
                     $('.tourn.window').html("<div id='title'><h2>Torneio<span>"+ data.name +"</span></h2><div id='word'>Senha<span>"+ data.pass +"</span></div></div><p>"+ data.description +"</p><h3>Equipes inscritas <span id='count'></span></h3><div class='table'></div><div id='new-container'><button id='new' class='button'>Nova Equipe</button></div><div id='button-container'><button id='delete' class='button' hidden>REMOVER</button><button id='start' class='button' disabled>INICIAR TORNEIO</button><button id='close' class='button'>FECHAR</button></div>");
-
+                    translator.translate($('#fog'))
+                    
                     if (data.pass == '')
                         $('.tourn.window #word').hide();
 
@@ -450,13 +457,18 @@ function refresh_tourn_list(){
 
 function refresh_teams(obj){
     //console.log(obj);
+    let msg = [
+        "O torneio foi removido",
+        "Este torneio já iniciou"
+    ]
+
     if (obj.remove){
         $('#fog.tourn, #fog.team, #fog.glads').remove();
-        showMessage("O torneio foi removido");
+        showMessage(msg[0]);
     }
     else if (obj.start){
         if ($('#fog.tourn, #fog.team, #fog.glads').length)
-            showMessage("Este torneio já iniciou");
+            showMessage(msg[1]);
         $('#fog.tourn, #fog.team, #fog.glads').remove();
     }
     else if ($('#fog.tourn').length){
@@ -472,10 +484,10 @@ function refresh_teams(obj){
             if (data.status == "STARTED"){
                 var hash = data.hash;
                 $('#fog.tourn, #fog.team').remove();
-                showDialog("Este torneio já iniciou. Deseja acompanhá-lo?",['Sim','Não']).then( function(data){
-                    if (data == "Sim")
-                        window.open('tourn/'+ hash);
-                });
+                new Message({
+                    message: "Este torneio já iniciou. Deseja acompanhá-lo?",
+                    buttons: {yes: 'Sim', no: 'Não'}
+                }).show().click('yes', () => window.open('tourn/'+ hash))
             }
             else{
                 var teams = data.teams;
@@ -502,33 +514,34 @@ function refresh_teams(obj){
                     $('.tourn.window h3 #count').html("("+ teams.length +"/"+ data.maxteams +")");
                 }
 
+                translator.translate($('.tourn.window'))
+
                 if (data.filled == true && data.manager == true && teams.length > 1){
                     $('.tourn.window #button-container #start').removeAttr('disabled');
                     $('.tourn.window #button-container #start').off();
                     $('.tourn.window #button-container #start').click( function(){
-                        showDialog("Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas",["Sim","NÃO"]).then( function(data){
-                            if (data == "Sim"){
-                                $('.tourn.window #close').click();
-                                $.post("back_tournament.php",{
-                                    action: "START",
-                                    name: obj.name,
-                                    pass: obj.pass
-                                }).done( function(data){
-                                    //console.log(data);
-                                    data = JSON.parse(data);
-                                    if (data.status == "DONE"){
-                                        var hash = data.hash;
-                                        window.open('tourn/'+ hash);
+                        new Message({
+                            message: "Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas",
+                            buttons: {yes: "Sim", no: "NÃO"}
+                        }).show().click('yes', () => {
+                            $('.tourn.window #close').click();
+                            post("back_tournament.php",{
+                                action: "START",
+                                name: obj.name,
+                                pass: obj.pass
+                            }).then( data => {
+                                //console.log(data);
+                                if (data.status == "DONE"){
+                                    var hash = data.hash;
+                                    window.open('tourn/'+ hash);
 
-                                        $.post("back_sendmail.php",{
-                                            action: "TOURNAMENT",
-                                            hash: hash
-                                        }).done( function(data){
-                                            //console.log(data);
-                                        });
-                                    }
-                                });
-                            }
+                                    post("back_sendmail.php",{
+                                        action: "TOURNAMENT",
+                                        hash: hash
+                                    })
+                                    // .then( data => console.log(data))
+                                }
+                            });
                         });
                     });
                 }
@@ -540,27 +553,28 @@ function refresh_teams(obj){
                     $('.tourn.window #button-container #start').hide();
                     $('.tourn.window #button-container #delete').off();
                     $('.tourn.window #button-container #delete').click( function(){
-                        showDialog("Deseja remover o torneio?",["Sim","NÃO"]).then( function(data){
-                            if (data == "Sim"){
-                                $.post("back_tournament.php",{
-                                    action: "DELETE",
-                                    name: obj.name,
-                                    pass: obj.pass,
-                                    tourn: obj.tourn
-                                }).done( function(data){
-                                    //console.log(data);
-                                    data = JSON.parse(data);
-                                    if (data.status == "DELETED"){
-                                        showMessage("Torneio removido");
-                                        $('#fog').remove();		
-                                    }
-                                    else if (data.status == "STARTED")
-                                        showMessage("Este torneio já iniciou");
-                                    else{
-                                        showMessage("Um torneio só pode ser removido quando não possuir equipes");
-                                    }
-                                });
-                            }
+                        new Message({
+                            message: "Deseja remover o torneio?",
+                            buttons: {yes: "Sim", no: "NÃO"}
+                        }).show().click('yes', () => {
+                            $.post("back_tournament.php",{
+                                action: "DELETE",
+                                name: obj.name,
+                                pass: obj.pass,
+                                tourn: obj.tourn
+                            }).done( function(data){
+                                //console.log(data);
+                                data = JSON.parse(data);
+                                if (data.status == "DELETED"){
+                                    new Message({message: "Torneio removido"})
+                                    $('#fog').remove();		
+                                }
+                                else if (data.status == "STARTED")
+                                    new Message({message: "Este torneio já iniciou"})
+                                else{
+                                    new Message({message: "Um torneio só pode ser removido quando não possuir equipes"})
+                                }
+                            });
                         });
                     });
                 }
@@ -576,20 +590,20 @@ function refresh_teams(obj){
                     $('.tourn.window .kick').click( function(e){
                         e.stopPropagation();
                         var team = $(this).parents(".row").find('.cell').eq(0).html();
-                        showDialog("Deseja expulsar a equipe <span class='highlight'>"+ team +"</span> do torneio?",["Sim", "Não"]).then( function(data){
-                            if (data == "Sim"){
-                                $.post("back_tournament.php",{
-                                    action: "KICK",
-                                    name: obj.name,
-                                    pass: obj.pass,
-                                    teamname: team
-                                }).done( function(data){
-                                    //console.log(data);
-                                    data = JSON.parse(data);
-                                    if (data.status == "DONE")
-                                        showMessage("Equipe <span class='highlight'>"+ team +"</span> removida do torneio");
-                                });
-                            }
+                        new Message({
+                            message: `Deseja expulsar a equipe <b>${team}</b> do torneio?`,
+                            buttons: {yes: "Sim", no: "Não"}
+                        }).show().click('yes', () => {
+                            post("back_tournament.php",{
+                                action: "KICK",
+                                name: obj.name,
+                                pass: obj.pass,
+                                teamname: team
+                            }).then( data => {
+                                //console.log(data);
+                                if (data.status == "DONE")
+                                    new Message({message: `Equipe <b>${team}</b> removida do torneio`})
+                            })
                         });
                     });
                 }

@@ -82,11 +82,11 @@ $(document).ready( function() {
                     $('.mobile #login, .desktop #profile').removeClass('hidden');
             });
 
-            translator.translate($('body')).then( () => {
+            // translator.translate($('body *').not('.table')).then( () => {
                 let langObj = $(`#header #language #lang-${user.speak}.item`)
                 $('#header #language .title').html(langObj.text())
                 langObj.addClass('hidden')
-            })
+            // })
         }
     })
 
@@ -155,7 +155,9 @@ function decodeHTML(str) {
     return str;
 }
 
-var translator = {}
+var translator = {
+    ready: true
+}
 
 translator.translate = async function(elements){
     let lang = (user && user.speak) ? user.speak : 'pt'
@@ -206,19 +208,21 @@ translator.translate = async function(elements){
         }
     }
 
-    let data = await post("back_login.php", {
-        action: "TRANSLATE",
-        language: lang,
-        data: JSON.stringify(toTranslate),
-    })
-    // console.log(data)
+    if (toTranslate.length){
+        let data = await post("back_login.php", {
+            action: "TRANSLATE",
+            language: lang,
+            data: JSON.stringify(toTranslate),
+        })
+        // console.log(data)
 
-    for (let i in data.response){
-        contents[i][lang] = data.response[i]
+        for (let i in data.response){
+            contents[i][lang] = data.response[i]
+        }
     }
-    
+
     this.translations = contents
-    
+
     let stringResponse = []
     for (element of elements){
         if (typeof element === 'string'){
