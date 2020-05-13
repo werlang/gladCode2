@@ -346,7 +346,7 @@
                 $result = runQuery($sql);
                 if ($result->num_rows > 0){
                     $row = $result->fetch_assoc();
-                    $sql = "UPDATE translations SET $target = '{$response[$i]}' WHERE id = {$row['id']}";
+                    $sql = "UPDATE translations SET $target = '{$response[$i]}' WHERE id = {$row['id']} AND $target IS NULL";
                     $result = runQuery($sql);
                 }
                 else{

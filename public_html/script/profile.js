@@ -59,8 +59,16 @@ $(document).ready( function(){
 
         translator.translate(tipArray).then( data => {
             tipArray = data
-        })    
+        })
+        
+        $('#panel').hide()
+        translator.translate([$('#menu'), $('#panel')]).then( () => {
+            $('#panel').show()
+        })
 
+        let translateStrings = [
+            
+        ]
     });
         
     function checkNotifications(){
@@ -556,7 +564,7 @@ $(document).ready( function(){
             ]
 
             translator.translate(msg).then( data => {
-                msg = msg.map( (_,i) => { return data[i] })
+                msg = data
             })
 
             runSimulation({

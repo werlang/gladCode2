@@ -82,11 +82,11 @@ $(document).ready( function() {
                     $('.mobile #login, .desktop #profile').removeClass('hidden');
             });
 
-            // translator.translate($('body *').not('.table')).then( () => {
+            translator.translate($('#header')).then( () => {
                 let langObj = $(`#header #language #lang-${user.speak}.item`)
                 $('#header #language .title').html(langObj.text())
                 langObj.addClass('hidden')
-            // })
+            })
         }
     })
 

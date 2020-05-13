@@ -226,7 +226,10 @@ class Message {
             </div>
         </div>`)
         $('#fog').hide().fadeIn()
-        translator.translate($('#dialog-box'))
+        $('#fog #dialog-box *').hide()
+        translator.translate($('#dialog-box')).then( () => {
+            $('#fog #dialog-box *').show()
+        })
 
         if (this.input){
             $('#dialog-box .input').focus()
