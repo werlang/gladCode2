@@ -511,6 +511,44 @@
             }
         }
     }
+    elseif ($action == "REMOVE"){
+        $trainid = mysql_escape_string($_POST['id']);
+
+        $sql = "SELECT manager FROM training WHERE id = $trainid";
+        $result = runQuery($sql);
+        $row = $result->fetch_assoc();
+
+        if ($row['manager'] != $user){
+            $output['status'] = "NOPERMISSION";
+        }
+        else{
+            $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
+            $result = runQuery($sql);
+            $groups = array();
+            while ($row = $result->fetch_assoc())
+                array_push($groups, $row['groupid']);
+            $groups = implode(",", $groups);
+
+            $sql = "DELETE FROM gladiator_training WHERE training = $trainid";
+            $result = runQuery($sql);
+
+            if (strlen($groups) > 0){
+                $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
+                $result = runQuery($sql);
+            }
+
+            $sql = "DELETE FROM training WHERE id = $trainid";
+            $result = runQuery($sql);
+
+            send_node_message(array('training list' => array()));
+            send_node_message(array('training room' => array(
+                'id' => $trainid
+            )));
+            
+            $output['status'] = "SUCCESS";
+        }
+
+    }
 
     echo json_encode($output);
 
