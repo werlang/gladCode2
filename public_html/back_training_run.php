@@ -229,8 +229,8 @@
                 }
 
                 // is already running something
-                // also check if 15 seconds have passed since the session lock
-                if (isset($_SESSION['train-run']) && $_SESSION['train-run']['time'] + 15 > (new DateTime())->getTimestamp() ){
+                // also check if 10 seconds have passed since the session lock
+                if (isset($_SESSION['train-run']) && $_SESSION['train-run']['time'] + 10 > (new DateTime())->getTimestamp() ){
                     $output['status'] = "LOCK";
                 }
                 else{
@@ -258,7 +258,7 @@
                             $maxround = $row['maxround'];
 
                             if ($round == $maxround && !$endtrain){
-                                createNewRound($trainid, $round);
+                                $output['newround'] = true;
                             }
                         }
                         else if (!$endtrain){
@@ -277,87 +277,91 @@
             }
         }
     }
+    elseif ($action == "NEW ROUND"){
+        $round = mysql_escape_string($_POST['round']);
+        $hash = mysql_escape_string($_POST['hash']);
 
-    echo json_encode($output);
-
-    function createNewRound($trainid, $round){
-        global $conn;
-        $sql = "SELECT players FROM training WHERE id = $trainid";
+        $sql = "SELECT players, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
         $row = $result->fetch_assoc();
         $maxplayers = $row['players'];
+        $trainid = $row['id'];
 
-        $sql = "SELECT gt.gladiator FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.score DESC, gt.lasttime DESC";
+        $sql = "SELECT gt.gladiator, tg.deadline, now(3) AS 'now' FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND tg.round = $round ORDER BY gt.score DESC, gt.lasttime DESC";
         $result = runQuery($sql);
 
         $glads = array();
         while($row = $result->fetch_assoc()){
             array_push($glads, $row['gladiator']);
+            if (!isset($deadline)){
+                $deadline = $row['deadline'];
+                $now = $row['now'];
+            }
         }
 
-        $ngroups = ceil(count($glads) / $maxplayers);
+        $now = (new DateTime($now))->getTimestamp();
+        $deadline = (new DateTime($deadline))->getTimestamp();
+        if ($now < $deadline){
+            $output['TIME'];
+        }
+        else{
+            $ngroups = ceil(count($glads) / $maxplayers);
 
-        // iterate over every shuffled id
-        $groups = array();
-        $newround = $round + 1;
+            // iterate over every shuffled id
+            $groups = array();
+            $newround = $round + 1;
 
-        foreach($glads as $i => $id){
-            // create group if not every one needed is created
-            if (count($groups) < $ngroups){
-                $sql = "INSERT INTO training_groups (round) VALUES ($newround)";
-                $result = runQuery($sql);
+            $sql = "SELECT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid";
+            $result = runQuery($sql);
+            $nrows = $result->num_rows;
 
-                $group = array(
-                    'id' => $conn->insert_id,
-                    'nglads' => 1
-                );
-                array_push($groups, $group);
+            if ($nrows > 0){
+                $output['status'] = "EXISTS";
             }
             else{
-                $groups[$i % $ngroups]['nglads']++;
-            }
-        }
+                foreach($glads as $i => $id){
+                    // create group if not every one needed is created
+                    if (count($groups) < $ngroups){
+                        $sql = "INSERT INTO training_groups (round) VALUES ($newround)";
+                        $result = runQuery($sql);
 
-        $fields = array();
-
-        // groups has nglads, which indicates how many glads in each group
-        foreach($groups as $group){
-            for($i=0 ; $i<$group['nglads'] ; $i++){
-                if (!isset($groups[$i]['glads'])){
-                    $groups[$i]['glads'] = array();
+                        $group = array(
+                            'id' => $conn->insert_id,
+                            'nglads' => 1
+                        );
+                        array_push($groups, $group);
+                    }
+                    else{
+                        $groups[$i % $ngroups]['nglads']++;
+                    }
                 }
 
-                // shift glad id from $glads and place in field array
-                array_push($fields, "(". implode(",", array(
-                    array_shift($glads), $group['id'], $trainid
-                )) .")");
+                $fields = array();
+
+                // groups has nglads, which indicates how many glads in each group
+                foreach($groups as $group){
+                    for($i=0 ; $i<$group['nglads'] ; $i++){
+                        if (!isset($groups[$i]['glads'])){
+                            $groups[$i]['glads'] = array();
+                        }
+
+                        // shift glad id from $glads and place in field array
+                        array_push($fields, "(". implode(",", array(
+                            array_shift($glads), $group['id'], $trainid
+                        )) .")");
+                    }
+                }
+
+                $fields = implode(",", $fields);
+                $sql = "INSERT INTO gladiator_training (gladiator, groupid, training) VALUES $fields";
+                $result = runQuery($sql);
+
+                $output['status'] = "SUCCESS";
             }
         }
-
-        $fields = implode(",", $fields);
-        $sql = "INSERT INTO gladiator_training (gladiator, groupid, training) VALUES $fields";
-        $result = runQuery($sql);
-
-        // remove duplicate rounds
-        $sql = "SELECT DISTINCT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid ORDER BY tg.id LIMIT $ngroups";
-        $result = runQuery($sql);
-        $ids = array();
-        while ($row = $result->fetch_assoc()){
-            array_push($ids, $row['id']);
-        }
-        $idlimit = implode(",", $ids);
-
-        $sql = "SELECT DISTINCT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid";
-        $result = runQuery($sql);
-        $ids = array();
-        while ($row = $result->fetch_assoc()){
-            array_push($ids, $row['id']);
-        }
-        $idtotal = implode(",", $ids);
-
-        $sql = "DELETE FROM training_groups WHERE id IN ($idtotal) AND id NOT IN ($idlimit)";
-        $result = runQuery($sql);
     }
+
+    echo json_encode($output);
 
     function getScores($group, $logid, $trainid, $round){
         $ids = array_keys($group);
