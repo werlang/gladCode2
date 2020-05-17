@@ -50,6 +50,7 @@
     <script src="script/profile-train.js"></script>
     <script src="script/profile-report.js"></script>
     <script src="script/profile-rank.js"></script>
+    <script src="script/profile-potions.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/profile.js"></script>
@@ -93,6 +94,7 @@
                 <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>{{news}}</span></div>
                 <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>{{profile}}</span></div>
                 <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>{{glads}}</span></div>
+                <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
                 <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>{{battles}}</span></div>
                 <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>{{reports}}</span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
@@ -242,6 +244,14 @@
                     <h2>Estes são seus gladiadores:</h2>
                     <div class='glad-card-container'></div>
                 </div>
+            </div>
+            <div class='content' data-menu='potions'>
+                <div id='apot-container'>
+                    <h2>Apotecário</h2>
+                    <h3>Estes são os produtos que você pode encomendar: <span class='help' title='Mais informações'><i class='fas fa-question-circle'></i></span></h3>
+                    <div id='shop-container'></div>
+                    <div id='my-pots'></div>
+                </div
             </div>
             <div class='content' data-menu='ranking'>
                 <div id='ranking-container'>

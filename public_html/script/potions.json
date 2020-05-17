@@ -1,0 +1,16 @@
+{
+    "potions": [
+        {
+            "name": "Poção da vitalidade",
+            "price": 1000,
+            "description": "Foo bar",
+            "icon": "icon/bitcoin.png"
+        },{
+            "name": "Poção energética",
+            "price": 1000,
+            "description": "lorem ipsum",
+            "icon": "icon/ethereum.png"
+        }
+
+    ]
+}
