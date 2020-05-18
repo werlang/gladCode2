@@ -251,7 +251,7 @@
                     <h3>Estes são os produtos que você pode encomendar: <span class='help' title='Mais informações'><i class='fas fa-question-circle'></i></span></h3>
                     <div id='shop-container'></div>
                     <div id='my-pots'></div>
-                </div
+                </div>
             </div>
             <div class='content' data-menu='ranking'>
                 <div id='ranking-container'>
