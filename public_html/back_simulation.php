@@ -523,7 +523,7 @@
         */
 
         $income = 1000 + ($glad['mmr'] - 1000) * 0.3;
-        $silver = (0.7 * $income - 300)/10 - 20;
+        $silver = max(0, (0.7 * $income - 300)/10 - 20);
         $xplose = 100;
         $xpwin = 150;
         $xp += $xplose;
