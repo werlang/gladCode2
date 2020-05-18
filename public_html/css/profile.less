@@ -3192,6 +3192,10 @@ body {
     .content {
         #apot-container {
             width: 100%;
+            overflow: hidden;
+            height: calc(100vh - 50px);
+            display: flex;
+            flex-direction: column;
 
             .help {
                 font-size: 1rem;
@@ -3204,14 +3208,16 @@ body {
                 display: flex;
                 justify-content: space-around;
                 flex-wrap: wrap;
+                overflow-y: auto;
 
                 .slot {
                     display: flex;
-                    width: 130px;
-                    height: 200px;
+                    width: 150px;
+                    height: 220px;
                     flex-direction: column;
                     box-shadow: 0 0 3px black;
                     border-radius: 3px;
+                    margin: 10px;
 
                     &:hover .bot .button-container {
                         opacity: 1;
@@ -3221,9 +3227,12 @@ body {
                         background-color: #6c97a9;
                         height: 100px;
                         border-radius: 3px 3px 0 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
 
                         img {
-                            max-width: 100%;
+                            height: 80px;
                         }
                     }
 
@@ -3252,7 +3261,13 @@ body {
 
                         .name {
                             margin-top: 10px;
-                            font-size: 1.3em;
+                            font-size: 1.1em;
+                            display: flex;
+                            flex-grow: 1;
+                            justify-content: center;
+                            align-items: center;
+                            text-align: center;
+                            padding: 0 10px;
                         }
 
                         .button-container {
@@ -3270,7 +3285,7 @@ body {
                                 display: flex;
                                 transition: 0.3s all;
                                 border-radius: 3px;
-                                padding: 3px 8px;
+                                padding: 3px 15px;
                                 cursor: pointer;
                             }
 
@@ -3278,8 +3293,145 @@ body {
                                 background-color: #6c97a9;
                                 color: white;
                             }
+
+                            .buy.disabled i {
+                                background-color: transparent;
+                                opacity: 0.2;
+                                cursor: not-allowed;
+                            }
                         }
                     }
+                }
+
+                .slot.disabled {
+                    .top {
+                        background-color: #949494;
+
+                        img {
+                            filter: grayscale(1);
+                        }    
+                    }
+
+
+                    .mid {
+                        background-color: #d8d8d8;
+
+                        span {
+                            color: red;
+                        }
+                    }
+
+                    .bot {
+                        .info {
+                            color: #646464;
+                        }
+
+                        .buy {
+                            opacity: 0;
+                        }
+                    }
+                }
+            }
+
+            #my-pots {
+                width: 100%;
+                height: 180px;
+                background-color: #00638d2b;
+                border-top: 1px solid #00638d4a;
+                flex-shrink: 0;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+
+                .slot {
+                    width: 150px;
+                    height: 150px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    border-radius: 3px;
+                    background-color: white;
+                    border: 2px solid #6c97a9;
+                    transition: 0.3s all;
+
+                    .top {
+                        height: 75px;
+                        width: 100%;
+                        background-color: #6c97a9;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        .empty {
+                            width: 65px;
+                            height: 55px;
+                            background-color: #00000010;
+                            border-radius: 5px;
+                        }
+
+                        img {
+                            height: 100%;
+                        }
+                    }
+
+                    .mid {
+                        display: flex;
+                        align-items: center;
+                        flex-grow: 1;
+                        padding: 0 10px;
+                    }
+
+                    .bot {
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                        align-items: center;
+                        margin-bottom: 5px;
+                        font-family: 'Roboto', sans-serif;
+                        font-size: 0.9em;
+
+                        i {
+                            opacity: 0.7;
+                            margin: 0 10px 0 5px;
+                        }
+
+                        .time {
+                            color: red;
+                            font-size: 0.9em;
+                        }
+                    }
+                }
+
+                .slot.disabled {
+                    border-color: #a96c6c99;
+
+                    .top {
+                        background-color: #c38686b3;
+
+                        .empty {
+                            background-image: url("../icon/lock.png");
+                            background-repeat: no-repeat;
+                            background-position: center;
+                            background-color: transparent;
+                        }
+                    }
+                }
+
+                .slot.empty {
+                    .top{
+                        background-color: #6c97a929;
+                    }
+
+                    .bot {
+                        display: none;
+                    }
+                }
+
+                .slot.filled:hover {
+                    box-shadow: 0px 0px 3px #00000050;
+                    cursor: pointer;
+                    filter: brightness(1.1);
                 }
             }
         }
