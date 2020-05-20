@@ -13,6 +13,7 @@ globais do ambiente, herdado do gladCode1
 #define POINTS_LVL_UP 5
 #define VIS_RANGE 9
 #define VIS_RAD 120
+#define N_SLOTS 4
 
 #define PROJECTILE_TYPE_ATTACK 0
 #define PROJECTILE_TYPE_FIREBALL 1
@@ -37,11 +38,12 @@ globais do ambiente, herdado do gladCode1
 #define ACTION_MOVEMENT 8
 #define ACTION_WAITING 9
 #define ACTION_NONE 10
+#define ACTION_ITEM 11
 
 #define MSG_SPEAK 0
 #define MSG_BREAKPOINT 9
 
-//custos de cada habilidade. os �ndices batem com as constantes dos buffs
+//custos de cada habilidade. os indices batem com as constantes dos buffs
 int abilitycost[6] = {50,50,30,50,30,70};
 
 struct buff {
@@ -108,6 +110,21 @@ struct gladiador{
 	char message[256];
     int msgtype;
 	float msgtime;
+    int items[N_SLOTS];
+};
+
+// indices dos items indicarão o que o gladiador pode usar
+char itemList[10][100] = {
+    "pot-hp-1",
+    "pot-hp-2",
+    "pot-hp-3",
+    "pot-hp-4",
+    "pot-hp-5",
+    "pot-ap-1",
+    "pot-ap-2",
+    "pot-ap-3",
+    "pot-ap-4",
+    "pot-ap-5"
 };
 
 struct gladiador *g, *go;

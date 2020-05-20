@@ -44,10 +44,10 @@ void calcSidesFromAngleDist(float *dx, float *dy, float d, float a){
 
 //verifica se coordenada está dentro da arena
 int checkBounds(float x, float y){
-	if (x >= 0 && x <= 25 && y >= 0 && y <= 25)
-		return 1;
-	else
-		return 0;
+    if (x >= 0 && x <= 25 && y >= 0 && y <= 25)
+        return 1;
+    else
+        return 0;
 }
 
 //impede que o glad saia da tela
@@ -74,18 +74,18 @@ void calcSidesFromMaxDist(int gladid, float destx, float desty, float maxdist, f
     dh1 = getDistUnsafe(gladid, destx, desty);
     dx1 = destx - (g+gladid)->x;
     dy1 = desty - (g+gladid)->y;
-	if (dh1 > 0){
-		*maxx = maxdist/dh1 * dx1;
-		*maxy = maxdist/dh1 * dy1;
-	}
-	else{
-		*maxx = dx1;
-		*maxy = dy1;
-	}
+    if (dh1 > 0){
+        *maxx = maxdist/dh1 * dx1;
+        *maxy = maxdist/dh1 * dy1;
+    }
+    else{
+        *maxx = dx1;
+        *maxy = dy1;
+    }
 }
 
 float getAngleUnsafe(int gladid, float x, float y) {
-	return getAngleFromAB((g+gladid)->x, (g+gladid)->y, x, y);
+    return getAngleFromAB((g+gladid)->x, (g+gladid)->y, x, y);
 }
 
 float getDistAB(float x1, float y1, float x2, float y2){
@@ -98,60 +98,60 @@ float getDistAB(float x1, float y1, float x2, float y2){
 void preventCollision(int gladid, float lastdx, float lastdy){
     int i;
     float h;
-	for (i=0 ; i<nglad ; i++){
-		if (i != gladid && (g+i)->hp > 0){
-			h = getDistUnsafe(gladid, (g+i)->x, (g+i)->y );
-			if (h < GLAD_HITBOX){
-				if (h == 0){
-					if (lastdx == 0 && lastdy == 0){
-						(g+gladid)->x += (rand()%3)*GLAD_HITBOX-GLAD_HITBOX;
-						(g+gladid)->y += (rand()%3)*GLAD_HITBOX-GLAD_HITBOX;
-					}
-					else{
-						(g+gladid)->x -= lastdx;
-						(g+gladid)->y -= lastdy;
-					}
-					h = getDistUnsafe(gladid, (g+i)->x, (g+i)->y );
-				}
-				
-				float dx, dy, dfx=0, dfy=0;
-				dx = (g+i)->x - (g+gladid)->x;
-				dy = (g+i)->y - (g+gladid)->y;
-								
-				dfx = GLAD_HITBOX * dx / h;
-				dfy = GLAD_HITBOX * dy / h;
-				
-				(g+gladid)->x = (g+i)->x - dfx;
-				(g+gladid)->y = (g+i)->y - dfy;
-			}
-		}
-	}
+    for (i=0 ; i<nglad ; i++){
+        if (i != gladid && (g+i)->hp > 0){
+            h = getDistUnsafe(gladid, (g+i)->x, (g+i)->y );
+            if (h < GLAD_HITBOX){
+                if (h == 0){
+                    if (lastdx == 0 && lastdy == 0){
+                        (g+gladid)->x += (rand()%3)*GLAD_HITBOX-GLAD_HITBOX;
+                        (g+gladid)->y += (rand()%3)*GLAD_HITBOX-GLAD_HITBOX;
+                    }
+                    else{
+                        (g+gladid)->x -= lastdx;
+                        (g+gladid)->y -= lastdy;
+                    }
+                    h = getDistUnsafe(gladid, (g+i)->x, (g+i)->y );
+                }
+                
+                float dx, dy, dfx=0, dfy=0;
+                dx = (g+i)->x - (g+gladid)->x;
+                dy = (g+i)->y - (g+gladid)->y;
+                                
+                dfx = GLAD_HITBOX * dx / h;
+                dfy = GLAD_HITBOX * dy / h;
+                
+                (g+gladid)->x = (g+i)->x - dfx;
+                (g+gladid)->y = (g+i)->y - dfy;
+            }
+        }
+    }
 }
 
 void setXp(int gladid, float dmg, int enemy){
-	//200 de vida inicial + 20 por nivel (considera que upa 2 STR por nível)
-	//xp é o percentual de dano causado na vida esperada do inimigo,
+    //200 de vida inicial + 20 por nivel (considera que upa 2 STR por nível)
+    //xp é o percentual de dano causado na vida esperada do inimigo,
 
-	int lifeatlvl = (200 + ((g+gladid)->lvl - 1) * 20 );
+    int lifeatlvl = (200 + ((g+gladid)->lvl - 1) * 20 );
 
-	float xp = dmg / lifeatlvl * 100;
-	
-	(g+gladid)->xp += round(xp);
-	int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
-	if ((g+gladid)->xp >= tonext && (g+gladid)->hp > 0){
-		float recovered = 35 + 5 * (g+gladid)->lvl; //roughtly (200+lvl*25)*0.2 (20% avg life at given lvl)
-		
-		(g+gladid)->hp += recovered;
-		if ((g+gladid)->hp > (g+gladid)->maxhp)
-			(g+gladid)->hp = (g+gladid)->maxhp;
-		(g+gladid)->ap += recovered;
-		if ((g+gladid)->ap > (g+gladid)->maxap)
-			(g+gladid)->ap = (g+gladid)->maxap;
-		
-		(g+gladid)->up += POINTS_LVL_UP;
-		(g+gladid)->lvl++;
-		(g+gladid)->xp -= round(tonext);
-	}
+    float xp = dmg / lifeatlvl * 100;
+    
+    (g+gladid)->xp += round(xp);
+    int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
+    if ((g+gladid)->xp >= tonext && (g+gladid)->hp > 0){
+        float recovered = 35 + 5 * (g+gladid)->lvl; //roughtly (200+lvl*25)*0.2 (20% avg life at given lvl)
+        
+        (g+gladid)->hp += recovered;
+        if ((g+gladid)->hp > (g+gladid)->maxhp)
+            (g+gladid)->hp = (g+gladid)->maxhp;
+        (g+gladid)->ap += recovered;
+        if ((g+gladid)->ap > (g+gladid)->maxap)
+            (g+gladid)->ap = (g+gladid)->maxap;
+        
+        (g+gladid)->up += POINTS_LVL_UP;
+        (g+gladid)->lvl++;
+        (g+gladid)->xp -= round(tonext);
+    }
 }
 
 void addBuff(int id, int code, float timeleft, float value){
@@ -179,7 +179,7 @@ void dealDamage(int gladid, int id, float value){
     if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft > 0){
         addBuff(id, BUFF_STUN, 1.5 , 0);
     }
-	
+    
     //caso a vitima tenha o buff de resistencia e esteja virado para o atacante, leva menos dano
     if ((g+id)->buffs[BUFF_RESIST].timeleft > 0){
         if ((g+id)->head >= (g+id)->lasthitangle - (g+id)->vrad/2 && (g+id)->head <= (g+id)->lasthitangle + (g+id)->vrad/2){
@@ -189,12 +189,12 @@ void dealDamage(int gladid, int id, float value){
             value *= (1 - (g+id)->buffs[BUFF_RESIST].value / 2);
         }
     }
-	
-	(g+id)->lasthittime = (g+id)->time;
-	(g+id)->lasthitnotification = 1;
+    
+    (g+id)->lasthittime = (g+id)->time;
+    (g+id)->lasthitnotification = 1;
     (g+id)->hp -= value;
-	if ((g+id)->hp < 0.01) //previne que hp tipo 0.000001 passe como vivo
-		(g+id)->hp = 0;
+    if ((g+id)->hp < 0.01) //previne que hp tipo 0.000001 passe como vivo
+        (g+id)->hp = 0;
 }
 
 void updateBuffs(int gladid){
@@ -205,15 +205,15 @@ void updateBuffs(int gladid){
 
             if (i == BUFF_BURN){
                 (g+gladid)->hp -= (g+gladid)->buffs[i].value * (1 - (g+gladid)->buffs[BUFF_RESIST].value/2);
-				if ((g+gladid)->hp < 0.01) //previne que hp tipo 0.000001 passe como vivo
-					(g+gladid)->hp = 0;
+                if ((g+gladid)->hp < 0.01) //previne que hp tipo 0.000001 passe como vivo
+                    (g+gladid)->hp = 0;
             }
             //se atacar perde o buff
             else if (i == BUFF_INVISIBLE){
                 if ((g+gladid)->action != ACTION_WAITING && (g+gladid)->action != ACTION_MOVEMENT && (g+gladid)->action != ABILITY_AMBUSH && (g+gladid)->action != ACTION_NONE && (g+gladid)->buffs[i].timeleft > 1/(g+gladid)->as/2){
-					//esse tempo é para que o gladiador perca a inbisibilidade somente depois de dar o ataque
+                    //esse tempo é para que o gladiador perca a inbisibilidade somente depois de dar o ataque
                     (g+gladid)->buffs[i].timeleft = 1/(g+gladid)->as/2;
-				}
+                }
             }
         }
         else {
@@ -226,17 +226,17 @@ void updateBuffs(int gladid){
 void launchProjectile(int gladid, float x, float y, float dmg, float spdx, float spdy, int type){
     struct projectile *t = (struct projectile*)malloc(sizeof(struct projectile));
 
-	t->id = rand()%9999999;
+    t->id = rand()%9999999;
     t->type = type;
     t->x = x;
     t->y = y;
-	t->head = getAngleFromAB(x, y, x + spdx, y + spdy);
+    t->head = getAngleFromAB(x, y, x + spdx, y + spdy);
     t->spdx = spdx;
     t->spdy = spdy;
     t->dmg = dmg;
     t->dist = 0;
     t->next = NULL;
-	t->owner = gladid;
+    t->owner = gladid;
 
     if (p == NULL)
         p = t;
@@ -288,7 +288,7 @@ void updateProjectiles(){
                     //acertou
                     if ( xg >= xl && xg <= xr && yg >= yl && yg <= yr ){
                         (g+j)->lasthitangle = getNormalAngle(getAngleFromAB((g+j)->x, (g+j)->y, a->x - a->spdx / travelunit, a->y - a->spdy / travelunit));
-						setXp(a->owner, a->dmg, j);
+                        setXp(a->owner, a->dmg, j);
                         dealDamage(a->owner, j, a->dmg);
                         hitglad = 1;
                         break;
@@ -298,7 +298,7 @@ void updateProjectiles(){
             if (hitglad)
                 break;
         }
-		
+        
         if (a->dist >= PROJECTILE_MAX_DISTANCE || hitglad){
             //causa burn da fireball
             if (a->type == PROJECTILE_TYPE_FIREBALL){
@@ -310,7 +310,7 @@ void updateProjectiles(){
                     if (dist <= 2){
                         float dmg = (1-(dist/2)) * a->dmg * 3.5833; //dano = 0.6*sdmg, burn= 3.5833*sdmg = 2.15/0.6=3.5833
                         addBuff(m, BUFF_BURN, 4, dmg / 4 * timeInterval); //4 segundos
-						setXp(a->owner, dmg, m); //xp pelo burn
+                        setXp(a->owner, dmg, m); //xp pelo burn
                         (g+m)->lasthitangle = getNormalAngle(getAngleFromAB((g+m)->x, (g+m)->y, a->x - a->spdx / travelunit, a->y - a->spdy / travelunit));
                     }
                 }
@@ -318,11 +318,11 @@ void updateProjectiles(){
             else if (hitglad && a->type == PROJECTILE_TYPE_STUN){
                 addBuff(j, BUFF_STUN, 1.5 , 0);
             }
-			
+            
             struct projectile *t = a->next;
             removeProjectile(a);
             a = t;
-			
+            
         }
         else
             a = a->next;
@@ -331,308 +331,318 @@ void updateProjectiles(){
 
 //grava no arquivo de saida o json da diff da etapa anterior pra atual
 void recordSteps(){
-	char resp[6000*nglad];
+    char resp[6000*nglad];
 
-	int i,j;
-	char buffer[1000], buffs[300];
-	float simtime;
-	for (i=0 ; i<nglad ; i++){
-		if ((g+i)->hp > 0){
-			simtime = (g+i)->time;
-			break;
-		}
-	}
-	if (simtime == timeInterval){
-		sprintf(resp, "{\"simtime\":%.1f,\"glads\":[",simtime);
-		for (i=0 ; i<nglad ; i++){
-			sprintf(buffs,"\"buffs\":{\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}}",
-				(g+i)->buffs[BUFF_BURN].value,(g+i)->buffs[BUFF_BURN].timeleft,
-				(g+i)->buffs[BUFF_MOVEMENT].value,(g+i)->buffs[BUFF_MOVEMENT].timeleft,
-				(g+i)->buffs[BUFF_RESIST].value,(g+i)->buffs[BUFF_RESIST].timeleft,
-				(g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
-				(g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
-			);
-			sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"action\":%i,\"message\":\"%s\",%s}",
-				(g+i)->name,
-				(g+i)->user,
-				i, //thread num
-				(g+i)->lvl, //lvl
-				(g+i)->xp, //xp
-				(g+i)->STR, //STR
-				(g+i)->AGI, //AGI
-				(g+i)->INT, //INT
-				(g+i)->spd, //movement speed
-				(g+i)->as, //attack speed
-				(g+i)->cs, //cast speed
-				(g+i)->x, //X
-				(g+i)->y, //Y
-				(g+i)->head, //heading (0-359.9)
-				(g+i)->lockedfor, //time until can act again
-				(g+i)->hp, //life
-				(g+i)->maxhp, //maximum life
-				(g+i)->ap, //ability points
-				(g+i)->maxap, //maximum ap
-				(g+i)->action,
-				(g+i)->message,
-				buffs
-			);
-			if (i!=0)
-				strcat(resp,",");
-			strcat(resp, buffer);	
-		}
-		sprintf(resp, "%s],\"projectiles\":[", resp);
-		struct projectile *a = p;
-		
-		for (i=0 ; a != NULL ; i++){
-			sprintf(buffer,"{\"x\":%.2f,\"y\":%.2f}", a->x, a->y);
-			if (i!=0)
-				strcat(resp,",");
-			strcat(resp, buffer);	
-			a = a->next;
-		}
-		
-		sprintf(resp, "%s],\"poison\":%.2f}", resp, getDistAB(0,0,screenW/2,screenH/2));
-		
-	}
-	else{
-		sprintf(resp, ",{\"simtime\":%.1f,\"glads\":[",simtime);
-		for (i=0 ; i<nglad ; i++){
-			strcpy(buffer, "{");
-			
-			if ( (g+i)->lvl != (go+i)->lvl )
-				sprintf(buffer, "%s\"lvl\":%i,", buffer, (g+i)->lvl);
-			
-			if ( (g+i)->xp != (go+i)->xp ){
-				float tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+i)->lvl - 1);
-				sprintf(buffer, "%s\"xp\":%i,", buffer, (int)((float)(g+i)->xp / tonext * 100));
-			}
-			
-			if ( (g+i)->STR != (go+i)->STR )
-				sprintf(buffer, "%s\"STR\":%i,", buffer, (g+i)->STR);
-			
-			if ( (g+i)->AGI != (go+i)->AGI )
-				sprintf(buffer, "%s\"AGI\":%i,", buffer, (g+i)->AGI);
+    int i,j;
+    char buffer[1000], buffs[300];
+    float simtime;
+    for (i=0 ; i<nglad ; i++){
+        if ((g+i)->hp > 0){
+            simtime = (g+i)->time;
+            break;
+        }
+    }
+    if (simtime == timeInterval){
+        sprintf(resp, "{\"simtime\":%.1f,\"glads\":[",simtime);
+        for (i=0 ; i<nglad ; i++){
+            sprintf(buffs,"\"buffs\":{\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}}",
+                (g+i)->buffs[BUFF_BURN].value,(g+i)->buffs[BUFF_BURN].timeleft,
+                (g+i)->buffs[BUFF_MOVEMENT].value,(g+i)->buffs[BUFF_MOVEMENT].timeleft,
+                (g+i)->buffs[BUFF_RESIST].value,(g+i)->buffs[BUFF_RESIST].timeleft,
+                (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
+                (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
+            );
+            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"item0\":%i,\"item1\":%i,\"item2\":%i,\"item3\":%i,\"action\":%i,\"message\":\"%s\",%s}",
+                (g+i)->name,
+                (g+i)->user,
+                i, //thread num
+                (g+i)->lvl, //lvl
+                (g+i)->xp, //xp
+                (g+i)->STR, //STR
+                (g+i)->AGI, //AGI
+                (g+i)->INT, //INT
+                (g+i)->spd, //movement speed
+                (g+i)->as, //attack speed
+                (g+i)->cs, //cast speed
+                (g+i)->x, //X
+                (g+i)->y, //Y
+                (g+i)->head, //heading (0-359.9)
+                (g+i)->lockedfor, //time until can act again
+                (g+i)->hp, //life
+                (g+i)->maxhp, //maximum life
+                (g+i)->ap, //ability points
+                (g+i)->maxap, //maximum ap
+                (g+i)->items[0],
+                (g+i)->items[1],
+                (g+i)->items[2],
+                (g+i)->items[3],
+                (g+i)->action,
+                (g+i)->message,
+                buffs
+            );
+            if (i!=0)
+                strcat(resp,",");
+            strcat(resp, buffer);	
+        }
+        sprintf(resp, "%s],\"projectiles\":[", resp);
+        struct projectile *a = p;
+        
+        for (i=0 ; a != NULL ; i++){
+            sprintf(buffer,"{\"x\":%.2f,\"y\":%.2f}", a->x, a->y);
+            if (i!=0)
+                strcat(resp,",");
+            strcat(resp, buffer);	
+            a = a->next;
+        }
+        
+        sprintf(resp, "%s],\"poison\":%.2f}", resp, getDistAB(0,0,screenW/2,screenH/2));
+        
+    }
+    else{
+        sprintf(resp, ",{\"simtime\":%.1f,\"glads\":[",simtime);
+        for (i=0 ; i<nglad ; i++){
+            strcpy(buffer, "{");
+            
+            if ( (g+i)->lvl != (go+i)->lvl )
+                sprintf(buffer, "%s\"lvl\":%i,", buffer, (g+i)->lvl);
+            
+            if ( (g+i)->xp != (go+i)->xp ){
+                float tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+i)->lvl - 1);
+                sprintf(buffer, "%s\"xp\":%i,", buffer, (int)((float)(g+i)->xp / tonext * 100));
+            }
+            
+            if ( (g+i)->STR != (go+i)->STR )
+                sprintf(buffer, "%s\"STR\":%i,", buffer, (g+i)->STR);
+            
+            if ( (g+i)->AGI != (go+i)->AGI )
+                sprintf(buffer, "%s\"AGI\":%i,", buffer, (g+i)->AGI);
 
-			if ( (g+i)->INT != (go+i)->INT )
-				sprintf(buffer, "%s\"INT\":%i,", buffer, (g+i)->INT);
+            if ( (g+i)->INT != (go+i)->INT )
+                sprintf(buffer, "%s\"INT\":%i,", buffer, (g+i)->INT);
 
-			if ( (g+i)->spd != (go+i)->spd )
-				sprintf(buffer, "%s\"spd\":%.2f,", buffer, (g+i)->spd);
+            if ( (g+i)->spd != (go+i)->spd )
+                sprintf(buffer, "%s\"spd\":%.2f,", buffer, (g+i)->spd);
 
-			if ( (g+i)->as != (go+i)->as )
-				sprintf(buffer, "%s\"as\":%.2f,", buffer, (g+i)->as);
+            if ( (g+i)->as != (go+i)->as )
+                sprintf(buffer, "%s\"as\":%.2f,", buffer, (g+i)->as);
 
-			if ( (g+i)->cs != (go+i)->cs )
-				sprintf(buffer, "%s\"cs\":%.2f,", buffer, (g+i)->cs);
+            if ( (g+i)->cs != (go+i)->cs )
+                sprintf(buffer, "%s\"cs\":%.2f,", buffer, (g+i)->cs);
 
-			if ( (g+i)->x != (go+i)->x )
-				sprintf(buffer, "%s\"x\":%.2f,", buffer, (g+i)->x);
+            if ( (g+i)->x != (go+i)->x )
+                sprintf(buffer, "%s\"x\":%.2f,", buffer, (g+i)->x);
 
-			if ( (g+i)->y != (go+i)->y )
-				sprintf(buffer, "%s\"y\":%.2f,", buffer, (g+i)->y);
+            if ( (g+i)->y != (go+i)->y )
+                sprintf(buffer, "%s\"y\":%.2f,", buffer, (g+i)->y);
 
-			if ( (g+i)->head != (go+i)->head )
-				sprintf(buffer, "%s\"head\":%.1f,", buffer, (g+i)->head);
+            if ( (g+i)->head != (go+i)->head )
+                sprintf(buffer, "%s\"head\":%.1f,", buffer, (g+i)->head);
 
-			if ( (g+i)->lockedfor != (go+i)->lockedfor )
-				sprintf(buffer, "%s\"lockedfor\":%.2f,", buffer, (g+i)->lockedfor);
+            if ( (g+i)->lockedfor != (go+i)->lockedfor )
+                sprintf(buffer, "%s\"lockedfor\":%.2f,", buffer, (g+i)->lockedfor);
 
-			if ( (g+i)->hp != (go+i)->hp )
-				sprintf(buffer, "%s\"hp\":%.2f,", buffer, (g+i)->hp);
+            if ( (g+i)->hp != (go+i)->hp )
+                sprintf(buffer, "%s\"hp\":%.2f,", buffer, (g+i)->hp);
 
-			if ( (g+i)->maxhp != (go+i)->maxhp )
-				sprintf(buffer, "%s\"maxhp\":%.2f,", buffer, (g+i)->maxhp);
+            if ( (g+i)->maxhp != (go+i)->maxhp )
+                sprintf(buffer, "%s\"maxhp\":%.2f,", buffer, (g+i)->maxhp);
 
-			if ( (g+i)->ap != (go+i)->ap )
-				sprintf(buffer, "%s\"ap\":%.2f,", buffer, (g+i)->ap);
+            if ( (g+i)->ap != (go+i)->ap )
+                sprintf(buffer, "%s\"ap\":%.2f,", buffer, (g+i)->ap);
 
-			if ( (g+i)->maxap != (go+i)->maxap )
-				sprintf(buffer, "%s\"maxap\":%.2f,", buffer, (g+i)->maxap);
+            int s;
+            for (s=0 ; s<N_SLOTS ; s++){
+                if ( (g+i)->items[s] != (go+i)->items[s] )
+                    sprintf(buffer, "%s\"item%i\":%i,", buffer, s, (g+i)->items[s]);
+            }
 
-			if ( (g+i)->action != (go+i)->action )
-				sprintf(buffer, "%s\"action\":%i,", buffer, (g+i)->action);
+            if ( (g+i)->maxap != (go+i)->maxap )
+                sprintf(buffer, "%s\"maxap\":%.2f,", buffer, (g+i)->maxap);
 
-			if ( strcmp((g+i)->message, (go+i)->message) != 0){
-				if ((g+i)->msgtype == MSG_SPEAK)
-					sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
-				else if ((g+i)->msgtype == MSG_BREAKPOINT)
-					sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, (g+i)->message);
-			}
+            if ( (g+i)->action != (go+i)->action )
+                sprintf(buffer, "%s\"action\":%i,", buffer, (g+i)->action);
 
-			sprintf(buffs, "\"buffs\":{");
-			
-			if ( (g+i)->buffs[BUFF_BURN].timeleft != (go+i)->buffs[BUFF_BURN].timeleft )			
-				sprintf(buffs, "%s\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_BURN].value, (g+i)->buffs[BUFF_BURN].timeleft);
-				
-			if ( (g+i)->buffs[BUFF_MOVEMENT].timeleft != (go+i)->buffs[BUFF_MOVEMENT].timeleft )			
-				sprintf(buffs, "%s\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_MOVEMENT].value, (g+i)->buffs[BUFF_MOVEMENT].timeleft);
+            if ( strcmp((g+i)->message, (go+i)->message) != 0){
+                if ((g+i)->msgtype == MSG_SPEAK)
+                    sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
+                else if ((g+i)->msgtype == MSG_BREAKPOINT)
+                    sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, (g+i)->message);
+            }
 
-			if ( (g+i)->buffs[BUFF_RESIST].timeleft != (go+i)->buffs[BUFF_RESIST].timeleft )			
-				sprintf(buffs, "%s\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_RESIST].value, (g+i)->buffs[BUFF_RESIST].timeleft);
+            sprintf(buffs, "\"buffs\":{");
+            
+            if ( (g+i)->buffs[BUFF_BURN].timeleft != (go+i)->buffs[BUFF_BURN].timeleft )			
+                sprintf(buffs, "%s\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_BURN].value, (g+i)->buffs[BUFF_BURN].timeleft);
+                
+            if ( (g+i)->buffs[BUFF_MOVEMENT].timeleft != (go+i)->buffs[BUFF_MOVEMENT].timeleft )			
+                sprintf(buffs, "%s\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_MOVEMENT].value, (g+i)->buffs[BUFF_MOVEMENT].timeleft);
 
-			if ( (g+i)->buffs[BUFF_INVISIBLE].timeleft != (go+i)->buffs[BUFF_INVISIBLE].timeleft )			
-				sprintf(buffs, "%s\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_INVISIBLE].value, (g+i)->buffs[BUFF_INVISIBLE].timeleft);
+            if ( (g+i)->buffs[BUFF_RESIST].timeleft != (go+i)->buffs[BUFF_RESIST].timeleft )			
+                sprintf(buffs, "%s\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_RESIST].value, (g+i)->buffs[BUFF_RESIST].timeleft);
 
-			if ( (g+i)->buffs[BUFF_STUN].timeleft != (go+i)->buffs[BUFF_STUN].timeleft )			
-				sprintf(buffs, "%s\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}", buffs, (g+i)->buffs[BUFF_STUN].value, (g+i)->buffs[BUFF_STUN].timeleft);
-			
-			if ( buffs[strlen(buffs)-1] == ',' )
-				buffs[strlen(buffs)-1] = '}';
-			else
-				strcat(buffs, "}");
+            if ( (g+i)->buffs[BUFF_INVISIBLE].timeleft != (go+i)->buffs[BUFF_INVISIBLE].timeleft )			
+                sprintf(buffs, "%s\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},", buffs, (g+i)->buffs[BUFF_INVISIBLE].value, (g+i)->buffs[BUFF_INVISIBLE].timeleft);
 
-			if (strcmp(buffs, "\"buffs\":{}") != 0)
-				strcat(buffer, buffs);
-			
-			if ( buffer[strlen(buffer)-1] == ',' )
-				buffer[strlen(buffer)-1] = '}';
-			else
-				strcat(buffer, "}");
-			
-			if (i!=0)
-				strcat(resp,",");
-			strcat(resp, buffer);	
-		}
-	
-		sprintf(resp, "%s],\"projectiles\":[", resp);
-		struct projectile *a = p;
-		
-		for (i=0 ; a != NULL ; i++){
-			sprintf(buffer,"{\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"id\":%i,\"type\":%i,\"owner\":%i}", a->x, a->y, a->head, a->id, a->type, a->owner);
-			if (i!=0)
-				strcat(resp,",");
-			strcat(resp, buffer);	
-			a = a->next;
-		}
-		
-		if (simtime >= POISON_TIME){
-			float startdist = getDistAB(0,0,screenW/2,screenH/2);
-			float spread = (simtime - POISON_TIME) / POISON_SPEED;
-			float safezone = startdist - spread;
-			if (safezone < 0)
-				safezone = 0;
-			sprintf(resp, "%s],\"poison\":%.2f}", resp, safezone);
-		}
-		else
-			sprintf(resp, "%s]}", resp);
-	}
-	
-	for (i=0 ; i<nglad ; i++){
-		*(go+i) = *(g+i);
-	}
-	
-	//printf("%s\n",resp);
-	fprintf(outArq, "%s",resp);
+            if ( (g+i)->buffs[BUFF_STUN].timeleft != (go+i)->buffs[BUFF_STUN].timeleft )			
+                sprintf(buffs, "%s\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}", buffs, (g+i)->buffs[BUFF_STUN].value, (g+i)->buffs[BUFF_STUN].timeleft);
+            
+            if ( buffs[strlen(buffs)-1] == ',' )
+                buffs[strlen(buffs)-1] = '}';
+            else
+                strcat(buffs, "}");
+
+            if (strcmp(buffs, "\"buffs\":{}") != 0)
+                strcat(buffer, buffs);
+            
+            if ( buffer[strlen(buffer)-1] == ',' )
+                buffer[strlen(buffer)-1] = '}';
+            else
+                strcat(buffer, "}");
+            
+            if (i!=0)
+                strcat(resp,",");
+            strcat(resp, buffer);	
+        }
+    
+        sprintf(resp, "%s],\"projectiles\":[", resp);
+        struct projectile *a = p;
+        
+        for (i=0 ; a != NULL ; i++){
+            sprintf(buffer,"{\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"id\":%i,\"type\":%i,\"owner\":%i}", a->x, a->y, a->head, a->id, a->type, a->owner);
+            if (i!=0)
+                strcat(resp,",");
+            strcat(resp, buffer);	
+            a = a->next;
+        }
+        
+        if (simtime >= POISON_TIME){
+            float startdist = getDistAB(0,0,screenW/2,screenH/2);
+            float spread = (simtime - POISON_TIME) / POISON_SPEED;
+            float safezone = startdist - spread;
+            if (safezone < 0)
+                safezone = 0;
+            sprintf(resp, "%s],\"poison\":%.2f}", resp, safezone);
+        }
+        else
+            sprintf(resp, "%s]}", resp);
+    }
+    
+    for (i=0 ; i<nglad ; i++){
+        *(go+i) = *(g+i);
+    }
+    
+    //printf("%s\n",resp);
+    fprintf(outArq, "%s",resp);
 }
 
 int checkAlive(){
-	int i, nalive=0;
-	for (i=0 ; i<nglad ; i++){
-		if ( (g+i)->hp > 0 )
-			nalive++;
-		else if ((g+i)->hp < 0)
-			(g+i)->hp = 0;
-	}
-	if (nalive <= 1){
-		endsim = 1;
-		recordSteps();
-	}
-	return nalive;
+    int i, nalive=0;
+    for (i=0 ; i<nglad ; i++){
+        if ( (g+i)->hp > 0 )
+            nalive++;
+        else if ((g+i)->hp < 0)
+            (g+i)->hp = 0;
+    }
+    if (nalive <= 1){
+        endsim = 1;
+        recordSteps();
+    }
+    return nalive;
 }
 
 //verifica se todos gladiadores estao no mesmo tempo
 int checkSync(){
-	int i, first=1, sync=0, alive=0;
-	float sample;
-	for (i=0 ; i<nglad ; i++){
-		if ((g+i)->hp > 0){
-			if (first){
-				first = 0;
-				sample = (g+i)->time;
-				sync++;
-			}
-			else if(sample == (g+i)->time){
-				sync++;
-			}
-			alive++;
-		}
-	}
-	
-	if (sync == alive)
-		return 1;
-	else
-		return 0;
+    int i, first=1, sync=0, alive=0;
+    float sample;
+    for (i=0 ; i<nglad ; i++){
+        if ((g+i)->hp > 0){
+            if (first){
+                first = 0;
+                sample = (g+i)->time;
+                sync++;
+            }
+            else if(sample == (g+i)->time){
+                sync++;
+            }
+            alive++;
+        }
+    }
+    
+    if (sync == alive)
+        return 1;
+    else
+        return 0;
 }
 
 //cria veneno das bordas da arena
 void spread_poison(int gladid){
-	float startdist = getDistAB(0,0,screenW/2,screenH/2);
-	float spread = ((g+gladid)->time - POISON_TIME) / POISON_SPEED;
-	
-	//poison causa 5%hp/s na vida
-	if ( getDistUnsafe(gladid, screenW/2, screenH/2) >= startdist - spread)
-		(g+gladid)->hp -= 0.05 * (g+gladid)->maxhp * timeInterval;
+    float startdist = getDistAB(0,0,screenW/2,screenH/2);
+    float spread = ((g+gladid)->time - POISON_TIME) / POISON_SPEED;
+    
+    //poison causa 5%hp/s na vida
+    if ( getDistUnsafe(gladid, screenW/2, screenH/2) >= startdist - spread)
+        (g+gladid)->hp -= 0.05 * (g+gladid)->maxhp * timeInterval;
 }
 
 //atualiza o counter da simulacao
 int updateSimulation(int gladid){	
-	int i;	
-	int timeout[nglad];
-	
-	if (endsim)
-		return 0;
-	
-	for (i=0 ; i<nglad ; i++)
-		timeout[i] = 10000;
-	
-	int loweri;
-	do{
-		usleep(1);
-		loweri = -1;
-		for (i=0 ; i<nglad ; i++){
-			if ((g+i)->hp > 0){
-				if (loweri == -1 || (g+i)->time < (g+loweri)->time){
-					loweri = i;
-				}
-			}
-		}
-		timeout[loweri]--;
-	}while(!endsim && loweri != gladid && timeout[loweri] > 0);
-	
-	if (timeout[loweri] == 0){
-		(g+loweri)->hp = 0;
-		printf("Gladiator %s timed out\n",(g+loweri)->name);
-		//endsim = 1;
-	}
+    int i;	
+    int timeout[nglad];
+    
+    if (endsim)
+        return 0;
+    
+    for (i=0 ; i<nglad ; i++)
+        timeout[i] = 10000;
+    
+    int loweri;
+    do{
+        usleep(1);
+        loweri = -1;
+        for (i=0 ; i<nglad ; i++){
+            if ((g+i)->hp > 0){
+                if (loweri == -1 || (g+i)->time < (g+loweri)->time){
+                    loweri = i;
+                }
+            }
+        }
+        timeout[loweri]--;
+    }while(!endsim && loweri != gladid && timeout[loweri] > 0);
+    
+    if (timeout[loweri] == 0){
+        (g+loweri)->hp = 0;
+        printf("Gladiator %s timed out\n",(g+loweri)->name);
+        //endsim = 1;
+    }
 
-	if ((g+gladid)->hp > 0){
-		(g+gladid)->time += timeInterval;
-		//printf("%i %f\n",gladid, (g+gladid)->time);
-	}
-		
-	if (checkSync()){
-		updateProjectiles();
-		recordSteps();
-	}
-	
-	if ((g+gladid)->hp <= 0){
-		(g+gladid)->hp = 0;
-		return 0;
-	}
+    if ((g+gladid)->hp > 0){
+        (g+gladid)->time += timeInterval;
+        //printf("%i %f\n",gladid, (g+gladid)->time);
+    }
+        
+    if (checkSync()){
+        updateProjectiles();
+        recordSteps();
+    }
+    
+    if ((g+gladid)->hp <= 0){
+        (g+gladid)->hp = 0;
+        return 0;
+    }
     else{
-		pthread_mutex_lock(&lock);
-		
+        pthread_mutex_lock(&lock);
+        
         //recupera ap
-		if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft == 0)
-        	(g+gladid)->ap += (AP_REC_BASE + AP_REC_INT * (g+gladid)->INT) * timeInterval;
+        if ((g+gladid)->buffs[BUFF_INVISIBLE].timeleft == 0)
+            (g+gladid)->ap += (AP_REC_BASE + AP_REC_INT * (g+gladid)->INT) * timeInterval;
         if ((g+gladid)->ap > (g+gladid)->maxap)
             (g+gladid)->ap = (g+gladid)->maxap;
 
-		/*
+        /*
         (g+gladid)->hp += (1 + 0.1 * (g+gladid)->STR) * timeInterval;
         if ((g+gladid)->hp > (g+gladid)->maxhp)
             (g+gladid)->hp = (g+gladid)->maxhp;
-		*/
+        */
 
         updateBuffs(gladid);
 
@@ -640,45 +650,45 @@ int updateSimulation(int gladid){
         if ((g+gladid)->lockedfor > 0)
             (g+gladid)->lockedfor -= timeInterval;
 
-		if ((g+gladid)->msgtime > 0)
-			(g+gladid)->msgtime -= timeInterval;
-		else if (strcmp((g+gladid)->message, "") != 0)
-			strcpy((g+gladid)->message, "");
-		
-		if ( (g+gladid)->time > POISON_TIME){
-			spread_poison(gladid);
-		}
-				
-		pthread_mutex_unlock(&lock);		
+        if ((g+gladid)->msgtime > 0)
+            (g+gladid)->msgtime -= timeInterval;
+        else if (strcmp((g+gladid)->message, "") != 0)
+            strcpy((g+gladid)->message, "");
+        
+        if ( (g+gladid)->time > POISON_TIME){
+            spread_poison(gladid);
+        }
+                
+        pthread_mutex_unlock(&lock);		
     }
 
-	do{
-		usleep(1);
-		for (i=0 ; i<nglad ; i++){
-			if ((g+gladid)->time > (g+i)->time && (g+i)->hp > 0){
-				break;
-			}
-		}
-		checkAlive();
-	}while(!endsim && i < nglad);
-	
-	return 1;	
+    do{
+        usleep(1);
+        for (i=0 ; i<nglad ; i++){
+            if ((g+gladid)->time > (g+i)->time && (g+i)->hp > 0){
+                break;
+            }
+        }
+        checkAlive();
+    }while(!endsim && i < nglad);
+    
+    return 1;	
 }
 
 //aguarda o tempo ate o gladiador estar pronto para agir novamente
 void waitForLockedStatus(int gladid){
     //updates nos projeteis, tempo e grava na arquivo, mesmo quando o gladiador nao pode agir
     
-	while ( !endsim && ((g+gladid)->lockedfor > 0 || (g+gladid)->buffs[BUFF_STUN].timeleft > 0) ){
-		//updateProjectiles();
-		if (!updateSimulation(gladid)){
-			return;
-		}
-		checkAlive();
+    while ( !endsim && ((g+gladid)->lockedfor > 0 || (g+gladid)->buffs[BUFF_STUN].timeleft > 0) ){
+        //updateProjectiles();
+        if (!updateSimulation(gladid)){
+            return;
+        }
+        checkAlive();
         (g+gladid)->action = ACTION_WAITING;
-	}
-	
-	//(g+gladid)->action = ACTION_NONE;
+    }
+    
+    //(g+gladid)->action = ACTION_NONE;
 }
 
 //as funcoes unsafe cumprem o papel das mesmas funções da API, porém sem alterar o actioncode ou trancar o gladiador.
@@ -686,98 +696,98 @@ void waitForLockedStatus(int gladid){
 
 int turnToUnsafe(int gladid, float x, float y){
     float newhead = getNormalAngle(getAngleUnsafe(gladid, x, y));
-	float dif = getNormalAngle(newhead - (g+gladid)->head);
-	if (dif < 180){
-		if (dif <= (g+gladid)->ts * timeInterval){
-			(g+gladid)->head = newhead;
-			return 1;
-		}
-		else
-			(g+gladid)->head += (g+gladid)->ts * timeInterval;
-	}
-	else{
-		if (360-dif <= (g+gladid)->ts * timeInterval){
-			(g+gladid)->head = newhead;
-			return 1;
-		}
-		else
-			(g+gladid)->head -= (g+gladid)->ts * timeInterval;
-	}
-	(g+gladid)->head = getNormalAngle((g+gladid)->head);
-	return 0;
+    float dif = getNormalAngle(newhead - (g+gladid)->head);
+    if (dif < 180){
+        if (dif <= (g+gladid)->ts * timeInterval){
+            (g+gladid)->head = newhead;
+            return 1;
+        }
+        else
+            (g+gladid)->head += (g+gladid)->ts * timeInterval;
+    }
+    else{
+        if (360-dif <= (g+gladid)->ts * timeInterval){
+            (g+gladid)->head = newhead;
+            return 1;
+        }
+        else
+            (g+gladid)->head -= (g+gladid)->ts * timeInterval;
+    }
+    (g+gladid)->head = getNormalAngle((g+gladid)->head);
+    return 0;
 }
 
 //vira a visao em até um passo
 float turnStepUnsafe(int gladid, float ang){
-	ang = getNormalAngle(ang);
-	float r;
-	if (ang < 180){
-		if (ang <= (g+gladid)->ts * timeInterval){
-			(g+gladid)->head += ang;
-			r = ang;
-		}
-		else{
-			(g+gladid)->head += (g+gladid)->ts * timeInterval;
-			r = (g+gladid)->ts * timeInterval;
-		}
-	}
-	else{
-		if (360 - ang <= (g+gladid)->ts * timeInterval){
-			(g+gladid)->head += ang;
-			r = ang - 360;
-		}
-		else{
-			(g+gladid)->head -= (g+gladid)->ts * timeInterval;
-			r = -((g+gladid)->ts * timeInterval);
-		}
-	}
-	(g+gladid)->head = getNormalAngle((g+gladid)->head);
-	
-	return r;
+    ang = getNormalAngle(ang);
+    float r;
+    if (ang < 180){
+        if (ang <= (g+gladid)->ts * timeInterval){
+            (g+gladid)->head += ang;
+            r = ang;
+        }
+        else{
+            (g+gladid)->head += (g+gladid)->ts * timeInterval;
+            r = (g+gladid)->ts * timeInterval;
+        }
+    }
+    else{
+        if (360 - ang <= (g+gladid)->ts * timeInterval){
+            (g+gladid)->head += ang;
+            r = ang - 360;
+        }
+        else{
+            (g+gladid)->head -= (g+gladid)->ts * timeInterval;
+            r = -((g+gladid)->ts * timeInterval);
+        }
+    }
+    (g+gladid)->head = getNormalAngle((g+gladid)->head);
+    
+    return r;
 }
 
 float moveForwardUnsafe(int gladid){
     float hip = (g+gladid)->spd * timeInterval;
-	if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
-		hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+    if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+        hip *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
 
     float ang = (g+gladid)->head;
     float dx, dy;
     calcSidesFromAngleDist(&dx, &dy, hip, ang);
 
-	float oldx = (g+gladid)->x;
-	float oldy = (g+gladid)->y;
+    float oldx = (g+gladid)->x;
+    float oldy = (g+gladid)->y;
     (g+gladid)->x += dx;
     (g+gladid)->y -= dy;
 
     preventLeaving(gladid);
     preventCollision(gladid, dx, -dy);
-	
-	return getDistUnsafe(gladid, oldx, oldy);
+    
+    return getDistUnsafe(gladid, oldx, oldy);
 }
 
 int moveToUnsafe(int gladid, float x, float y){
-	if (getDistUnsafe(gladid, x, y) <= 0.01){
-		(g+gladid)->x = x;
-		(g+gladid)->y = y;
-		return 1;
-	}
+    if (getDistUnsafe(gladid, x, y) <= 0.01){
+        (g+gladid)->x = x;
+        (g+gladid)->y = y;
+        return 1;
+    }
     if (turnToUnsafe(gladid, x, y)){
-		float move = (g+gladid)->spd * timeInterval;
-		if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
-			move *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
-			
-		if (move >= getDistUnsafe(gladid, x, y)){
-			(g+gladid)->x = x;
-			(g+gladid)->y = y;
-			return 1;
-		}
-		else{
-			moveForwardUnsafe(gladid);
-			return 0;
-		}
-	}
-	return 0;
+        float move = (g+gladid)->spd * timeInterval;
+        if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
+            move *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
+            
+        if (move >= getDistUnsafe(gladid, x, y)){
+            (g+gladid)->x = x;
+            (g+gladid)->y = y;
+            return 1;
+        }
+        else{
+            moveForwardUnsafe(gladid);
+            return 0;
+        }
+    }
+    return 0;
 }
 
 //define a posicao e direcao inicial do gladiador
@@ -791,7 +801,7 @@ void setStartingPos(int gladid){
     (g+gladid)->x = centerX + x;
     (g+gladid)->y = centerY + y;
     float newhead = getNormalAngle(getAngleUnsafe(gladid, centerX, centerY));
-	(g+gladid)->head = newhead;
+    (g+gladid)->head = newhead;
 }
 
 void registerGlad(int gladid){
@@ -806,50 +816,54 @@ void registerGlad(int gladid){
     (g+gladid)->xp = 0; //experiencia
     (g+gladid)->lasthitangle = 0; //angulo de onde veio o ultimo ataque
     (g+gladid)->lasthitnotification = 0; //sem notificacao de acerto
-	(g+gladid)->lasthittime = -999;
+    (g+gladid)->lasthittime = -999;
     (g+gladid)->action = ACTION_NONE; //action inicial do gladiador
     strcpy((g+gladid)->message, "");
-	(g+gladid)->msgtime = 0;
-	(g+gladid)->msgtype = MSG_SPEAK;
+    (g+gladid)->msgtime = 0;
+    (g+gladid)->msgtype = MSG_SPEAK;
 
     int i;
     for (i=0 ; i<N_BUFFS ; i++){ //zera todos buffs
         (g+gladid)->buffs[i].timeleft = 0;
         (g+gladid)->buffs[i].value = 0;
     }
+
+    for (i=0 ; i<N_SLOTS ; i++){ //zera todos slots de item
+        (g+gladid)->items[i] = -1;
+    }
 }
 
 int createGladiator(int port){
     int i, gladid;
 
-	//pthread_mutex_lock(&lock);
-	if (g == NULL){
-		g = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
-		go = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
-		for (i=0 ; i<nglad ; i++)
-			(g+i)->port = 0;
-	}
-	//pthread_mutex_unlock(&lock);	
-	
-	for (i=0 ; i<nglad ; i++){
-		if ( (g+i)->port == 0 ){
-			(g+i)->port = port;
-			(g+i)->lvl = 0; //indica que o gladiador ainda está em preparo (setup)
-			gladid = i;
-			break;
-		}
-	}
-	
-	registerGlad(gladid);
-	
-	return gladid;
+    //pthread_mutex_lock(&lock);
+    if (g == NULL){
+        g = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
+        go = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
+        for (i=0 ; i<nglad ; i++)
+            (g+i)->port = 0;
+    }
+    //pthread_mutex_unlock(&lock);	
+    
+    for (i=0 ; i<nglad ; i++){
+        if ( (g+i)->port == 0 ){
+            (g+i)->port = port;
+            (g+i)->lvl = 0; //indica que o gladiador ainda está em preparo (setup)
+            gladid = i;
+            break;
+        }
+    }
+    
+    registerGlad(gladid);
+    
+    return gladid;
 }
 
 //calcula o custo do ponto de atributo
 int calcCost(int val){
-	if (val == 0)
-		return 0;
-	return ceil((float)val/6) + calcCost(val-1);
+    if (val == 0)
+        return 0;
+    return ceil((float)val/6) + calcCost(val-1);
 }
 
 //verifica se distribuiu os 50 pontos corretamente
@@ -870,21 +884,21 @@ int checkSetup(int gladid){
 }
 
 int getLockedTarget(int gladid){
-	int i;
-	for (i=0 ; i<nglad ; i++){
-		if ((g+i)->port == (g+gladid)->targetlocked)
-			return i;
-	}
-	return -1;
+    int i;
+    for (i=0 ; i<nglad ; i++){
+        if ((g+i)->port == (g+gladid)->targetlocked)
+            return i;
+    }
+    return -1;
 }
 
 int isVisible(int gladid, int target){
-	float dist = getDistUnsafe(gladid, (g+target)->x, (g+target)->y);
-	float ang = getNormalAngle(getAngleUnsafe(gladid, (g+target)->x, (g+target)->y) - (g+gladid)->head);
-	if ( dist <= (g+gladid)->vis && (ang <= (g+gladid)->vrad/2 || ang >= 360-(g+gladid)->vrad/2) && (g+target)->buffs[BUFF_INVISIBLE].timeleft <= 0 )
-		return 1;
-	else
-		return 0;
+    float dist = getDistUnsafe(gladid, (g+target)->x, (g+target)->y);
+    float ang = getNormalAngle(getAngleUnsafe(gladid, (g+target)->x, (g+target)->y) - (g+gladid)->head);
+    if ( dist <= (g+gladid)->vis && (ang <= (g+gladid)->vrad/2 || ang >= 360-(g+gladid)->vrad/2) && (g+target)->buffs[BUFF_INVISIBLE].timeleft <= 0 )
+        return 1;
+    else
+        return 0;
 }
 
 void attackMeleeUnsafe(int gladid, float bonusdmg){
@@ -895,8 +909,8 @@ void attackMeleeUnsafe(int gladid, float bonusdmg){
             float ang = getNormalAngle(getAngleUnsafe(gladid, (g+i)->x, (g+i)->y) - (g+gladid)->head);
             if ( dist <= 2 && (ang <= 90 || ang >= 270) ){ //180g de raio de ataque
                 (g+i)->lasthitangle = getNormalAngle(getAngleFromAB((g+i)->x, (g+i)->y, (g+gladid)->x, (g+gladid)->y));
-				float dmg = (g+gladid)->mdmg * bonusdmg;
-				setXp(gladid, dmg, i);
+                float dmg = (g+gladid)->mdmg * bonusdmg;
+                setXp(gladid, dmg, i);
                 dealDamage(gladid, i, dmg);
             }
         }
@@ -904,11 +918,54 @@ void attackMeleeUnsafe(int gladid, float bonusdmg){
 }
 
 int isLockedTargetVisibleUnsafe(int gladid){
-	int target = getLockedTarget(gladid);
-	if (target != -1 && isVisible(gladid, target))
-		return 1;
-	else{
-		(g+gladid)->targetlocked = 0;
-		return 0;
-	}
+    int target = getLockedTarget(gladid);
+    if (target != -1 && isVisible(gladid, target))
+        return 1;
+    else{
+        (g+gladid)->targetlocked = 0;
+        return 0;
+    }
+}
+
+void itemEffect(int gladid, int id){
+    // pot-hp-1
+    if (id == 0){
+        (g+gladid)->hp += 20 + 2 * (g+gladid)->lvl;
+    }
+    // pot-hp-2
+    else if (id == 1){
+        (g+gladid)->hp += 40 + 4 * (g+gladid)->lvl;
+    }
+    // pot-hp-3
+    else if (id == 2){
+        (g+gladid)->hp += 60 + 6 * (g+gladid)->lvl;
+    }
+    // pot-hp-4
+    else if (id == 3){
+        (g+gladid)->hp += 80 + 8 * (g+gladid)->lvl;
+    }
+    // pot-hp-5
+    else if (id == 4){
+        (g+gladid)->hp += 100 + 10 * (g+gladid)->lvl;
+    }
+    // pot-ap-1
+    else if (id == 5){
+        (g+gladid)->ap += 20 + 2 * (g+gladid)->lvl;
+    }
+    // pot-ap-2
+    else if (id == 6){
+        (g+gladid)->ap += 40 + 4 * (g+gladid)->lvl;
+    }
+    // pot-ap-3
+    else if (id == 7){
+        (g+gladid)->ap += 60 + 6 * (g+gladid)->lvl;
+    }
+    // pot-ap-4
+    else if (id == 8){
+        (g+gladid)->ap += 80 + 8 * (g+gladid)->lvl;
+    }
+    // pot-ap-5
+    else if (id == 9){
+        (g+gladid)->ap += 100 + 10 * (g+gladid)->lvl;
+    }
 }

@@ -110,6 +110,7 @@ $(document).ready( function() {
                     }
                     else{
                         let log = JSON.parse(data.log)
+                        // console.log(log)
                         var glads = log[0].glads;
                         stab = [];
                         gender = [];
