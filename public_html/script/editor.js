@@ -632,30 +632,6 @@ $(document).ready( function() {
         });
     }
 
-    $('#download').click( function(){
-        if (!$(this).hasClass('disabled')){
-            var name = $('#distribuicao #nome').val();
-            var vstr = $('#float-card .glad-preview .attr .str span').html();
-            var vagi = $('#float-card .glad-preview .attr .agi span').html();
-            var vint = $('#float-card .glad-preview .attr .int span').html();
-            
-            showInput("Nome do arquivo:", name +".c")
-            .then( function(data){
-                if (data){
-                    var filename = data;
-                    $.post("back_skin.php", {
-                        action: "SAVE",
-                        skin: JSON.stringify(pieces)
-                    }).done( function(data){
-                        hash = data;
-                        var setup = "setup(){\n    setName(\""+ name +"\");\n    setSTR("+ vstr +");\n    setAGI("+ vagi +");\n    setINT("+ vint +");\n    setSpritesheet(\""+ hash +"\");\n}\n\n";
-                        download(filename, setup + editor.getValue());
-                    });
-                }
-            });
-        }
-    });
-
     $('#switch').click( function(){
         toggleBlocks();
     });
