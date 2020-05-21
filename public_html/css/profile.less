@@ -3342,6 +3342,12 @@ body {
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
+                overflow: auto hidden;
+                justify-content: flex-start;
+
+                @media only screen and (min-width: 980px) {
+                    justify-content: space-around;
+                }
 
                 .slot {
                     width: 150px;
@@ -3354,6 +3360,8 @@ body {
                     background-color: white;
                     border: 2px solid #6c97a9;
                     transition: 0.3s all;
+                    flex-shrink: 0;
+                    margin: 0 5px;
 
                     .top {
                         height: 75px;
