@@ -205,7 +205,7 @@
 
     if (count($ids) > 0){
         $ids = implode(",", $ids);
-        $sql = "SELECT code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
+        $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
 
         while($row = $result->fetch_assoc()){
@@ -216,13 +216,28 @@
             $vagi = $row['vagi'];
             $vint = $row['vint'];
             $skins[$name .'@'. $nick] = $row['skin'];
+            $uid = $row['userid'];
+
+            $potions = "";
+            $sql = "SELECT item FROM slots WHERE user = $uid AND expire > now() ORDER BY expire LIMIT 4";
+            $result2 = runQuery($sql);
+            $potions = array();
+            for ($i=0 ; $i<4 ; $i++){
+                if ($row = $result2->fetch_assoc()){
+                    array_push($potions, $row['item']);
+                }
+                else {
+                    array_push($potions, "0");
+                }
+            }
+            $potions = implode(",", $potions);
 
             $language = getLanguage($code);
             if ($language == "c"){
-                $setup = "setup(){\n    setName(\"$name@$nick\");\n    setSTR($vstr);\n    setAGI($vagi);\n    setINT($vint);\n}\n\n";
+                $setup = "setup(){\n    setName(\"$name@$nick\");\n    setSTR($vstr);\n    setAGI($vagi);\n    setINT($vint);\n    setSlots(\"$potions\");\n}\n\n";
             }
             else if ($language == "python"){
-                $setup = "def setup():\n    setName(\"$name@$nick\")\n    setSTR($vstr)\n    setAGI($vagi)\n    setINT($vint)\n# start of user code\n";
+                $setup = "def setup():\n    setName(\"$name@$nick\")\n    setSTR($vstr)\n    setAGI($vagi)\n    setINT($vint)\n    setSlots(\"$potions\")\n# start of user code\n";
             }
 
             $code = $setup . $code;
@@ -390,7 +405,7 @@
 
     echo json_encode($output);
 
-    system("rm -rf $path/temp/$foldername");
+    // system("rm -rf $path/temp/$foldername");
     
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';

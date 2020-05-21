@@ -526,3 +526,9 @@ int useItem(char *str){
     sendMessage(m, r);
     return atoi(r);
 }
+
+void setSlots(char *str){
+    char message[50], response[10];
+    sprintf(message, "setSlots %s", str);
+    sendMessage(message,response);
+}

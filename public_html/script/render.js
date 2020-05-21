@@ -36,7 +36,8 @@ var actionlist = [
 	{'name': 'ranged', 'value': 7, 'animation': 'shoot'},
 	{'name': 'movement', 'value': 8, 'animation': 'walk'},
 	{'name': 'waiting', 'value': 9, 'animation': 'none'},
-	{'name': 'none', 'value': 10, 'animation': 'none'}
+	{'name': 'none', 'value': 10, 'animation': 'none'},
+	{'name': 'potion', 'value': 11, 'animation': 'cast'}
 ];
 var animationlist = {
 	'walk': {
