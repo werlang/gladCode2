@@ -365,19 +365,7 @@ $(document).ready( function() {
 
     $('#test').click( function(){
         if (!$(this).hasClass('disabled')){
-            var code = editor.getValue();
-            if (code.search("setup()") != -1){
-                showDialog("A função <span class='highlight'>setup</span> só deve ser usada nos modos de batalha clássicos (aqueles que você faz upload manual do código). Posso remover este trecho para você?",["NÃO","Pode"]).then(function(data){
-                    if (data == "Pode"){
-                        editor.setValue(code.replace(/setup\(\)[\s\n]*?{[\w\W]*?}/g, ""));
-                        setTimeout( function(){
-                            showTestWindow();
-                        }, 300);
-                    }
-                });
-            }
-            else
-                showTestWindow();
+            showTestWindow()
             
             function showTestWindow(){
                 let t = tutorial.show([
@@ -900,11 +888,11 @@ function setLoadGlad(){
 
     var language = getLanguage(editor.getValue());
     if (language == "c"){
-        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n}\n\n`;
+        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n    setSlots(\"-1,-1,-1,-1\");\n}\n\n`;
         loadGlad.code = setup + editor.getValue();
     }
     else if (language == "python" || language == 'blocks'){
-        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n# start of user code\n`;
+        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`;
         loadGlad.code = setup + editor.getValue();
 
         if (language == 'blocks')

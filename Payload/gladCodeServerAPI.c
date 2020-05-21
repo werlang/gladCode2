@@ -1185,14 +1185,14 @@ int useItem(int gladid, char *item){
         return 0;
     }
     else{
-        (g+gladid)->lockedfor = timeInterval;
         (g+gladid)->action = ACTION_NONE;
 
-        int i, j, r = 0;
+        int i, r = 0;
         for (i=0 ; i<N_SLOTS ; i++){
-            if ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0){
+            if ((g+gladid)->items[i] == -1 || ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0)){
                 (g+gladid)->items[i] = 0;
                 (g+gladid)->action = ACTION_ITEM;
+                (g+gladid)->lockedfor = timeInterval;
                 itemEffect(gladid, item);
                 r = 1;
                 break;
