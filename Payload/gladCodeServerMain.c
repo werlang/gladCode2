@@ -363,6 +363,11 @@ void *connection_handler(void *p){
                 char *str = func->arg[0].toStr;
                 sprintf(reply, "%i", useItem(gladid, str));
             }
+            else if (strcmp(func->call,"setSlots")==0){
+                char *str = func->arg[0].toStr;
+                setSlots(gladid, str);
+                sprintf(reply, "done");
+            }
             else if (strcmp(func->call,"endSocketComm")==0){
                 endcomm = 1;
                 sprintf(reply, "done");
@@ -391,6 +396,9 @@ int main(int argc , char *argv[]){
     long unsigned int seci = tv.tv_sec;
     long unsigned int useci = tv.tv_usec;
     
+    // set names with index in from globals
+    setItemNames();
+
     int i;
     nglad = atoi(argv[1]);
     g = NULL;

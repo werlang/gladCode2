@@ -829,7 +829,7 @@ void registerGlad(int gladid){
     }
 
     for (i=0 ; i<N_SLOTS ; i++){ //zera todos slots de item
-        (g+gladid)->items[i] = -1;
+        (g+gladid)->items[i] = 0;
     }
 }
 
@@ -927,45 +927,35 @@ int isLockedTargetVisibleUnsafe(int gladid){
     }
 }
 
-void itemEffect(int gladid, int id){
-    // pot-hp-1
-    if (id == 0){
+void itemEffect(int gladid, char *item){
+    if (strcmp(item, "pot-hp-1") == 0){
         (g+gladid)->hp += 20 + 2 * (g+gladid)->lvl;
     }
-    // pot-hp-2
-    else if (id == 1){
-        (g+gladid)->hp += 40 + 4 * (g+gladid)->lvl;
-    }
-    // pot-hp-3
-    else if (id == 2){
-        (g+gladid)->hp += 60 + 6 * (g+gladid)->lvl;
-    }
-    // pot-hp-4
-    else if (id == 3){
-        (g+gladid)->hp += 80 + 8 * (g+gladid)->lvl;
-    }
-    // pot-hp-5
-    else if (id == 4){
-        (g+gladid)->hp += 100 + 10 * (g+gladid)->lvl;
-    }
-    // pot-ap-1
-    else if (id == 5){
+    else if (strcmp(item, "pot-ap-1") == 0){
         (g+gladid)->ap += 20 + 2 * (g+gladid)->lvl;
     }
-    // pot-ap-2
-    else if (id == 6){
+    else if (strcmp(item, "pot-hp-2") == 0){
+        (g+gladid)->hp += 40 + 4 * (g+gladid)->lvl;
+    }
+    else if (strcmp(item, "pot-ap-2") == 0){
         (g+gladid)->ap += 40 + 4 * (g+gladid)->lvl;
     }
-    // pot-ap-3
-    else if (id == 7){
+    else if (strcmp(item, "pot-hp-3") == 0){
+        (g+gladid)->hp += 60 + 6 * (g+gladid)->lvl;
+    }
+    else if (strcmp(item, "pot-ap-3") == 0){
         (g+gladid)->ap += 60 + 6 * (g+gladid)->lvl;
     }
-    // pot-ap-4
-    else if (id == 8){
+    else if (strcmp(item, "pot-hp-4") == 0){
+        (g+gladid)->hp += 80 + 8 * (g+gladid)->lvl;
+    }
+    else if (strcmp(item, "pot-ap-4") == 0){
         (g+gladid)->ap += 80 + 8 * (g+gladid)->lvl;
     }
-    // pot-ap-5
-    else if (id == 9){
+    else if (strcmp(item, "pot-hp-5") == 0){
+        (g+gladid)->hp += 100 + 10 * (g+gladid)->lvl;
+    }
+    else if (strcmp(item, "pot-ap-5") == 0){
         (g+gladid)->ap += 100 + 10 * (g+gladid)->lvl;
     }
 }

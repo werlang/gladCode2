@@ -71,6 +71,22 @@ char* getName(int gladid){
     return (g+gladid)->name;
 }
 
+void setSlots(int gladid, char *str){
+    int i;
+    char *e = str, *s = str;
+    for (i=0 ; i<N_SLOTS ; i++){
+        while (*e != ',' && *e != '\0'){
+            e++;
+        }
+        char n[10];
+        strncpy(n, s, e-s);
+        n[e-s] = '\0';
+        (g+gladid)->items[i] = atoi(n);
+        e++;
+        s = e;
+    }
+}
+
 int upgradeSTR(int gladid, int n){
     if (n > (g+gladid)->up)
         n = (g+gladid)->up;
@@ -1174,10 +1190,10 @@ int useItem(int gladid, char *item){
 
         int i, j, r = 0;
         for (i=0 ; i<N_SLOTS ; i++){
-            if ((g+gladid)->items[i] != -1 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0){
-                (g+gladid)->items[i] = -1;
+            if ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0){
+                (g+gladid)->items[i] = 0;
                 (g+gladid)->action = ACTION_ITEM;
-                itemEffect(gladid, i);
+                itemEffect(gladid, item);
                 r = 1;
                 break;
             }

@@ -262,3 +262,6 @@ def lvlUp(n):
 
 def useItem(item):
     return int(sendMessage("useItem {}".format(item)))
+
+def setSlots(slots):
+    sendMessage("setSlots {}".format(slots))

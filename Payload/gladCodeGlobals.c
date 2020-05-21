@@ -113,20 +113,6 @@ struct gladiador{
     int items[N_SLOTS];
 };
 
-// indices dos items indicarão o que o gladiador pode usar
-char itemList[10][100] = {
-    "pot-hp-1",
-    "pot-hp-2",
-    "pot-hp-3",
-    "pot-hp-4",
-    "pot-hp-5",
-    "pot-ap-1",
-    "pot-ap-2",
-    "pot-ap-3",
-    "pot-ap-4",
-    "pot-ap-5"
-};
-
 struct gladiador *g, *go;
 struct projectile *p;
 int nglad = 0; //numero de gladiadores
@@ -142,3 +128,18 @@ float timeLimit = 200; //tempo limite da para o evento de fim da simula��o
 int readytostart = 0;
 pthread_mutex_t lock;
 pthread_cond_t cond;
+
+// associa os indices aos nomes dos itens
+char itemList[100][100];
+void setItemNames(){
+    strcpy(itemList[1], "pot-hp-1");
+    strcpy(itemList[2], "pot-ap-1");
+    strcpy(itemList[3], "pot-hp-2");
+    strcpy(itemList[4], "pot-ap-2");
+    strcpy(itemList[5], "pot-hp-3");
+    strcpy(itemList[6], "pot-ap-3");
+    strcpy(itemList[7], "pot-hp-4");
+    strcpy(itemList[8], "pot-ap-4");
+    strcpy(itemList[9], "pot-hp-5");
+    strcpy(itemList[10], "pot-ap-5");
+}
