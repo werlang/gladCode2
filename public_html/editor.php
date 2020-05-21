@@ -120,9 +120,6 @@
             <div id='switch' class='mrow' title='Alternar para editor de blocos'>
                 <i class='fas fa-puzzle-piece'></i>
             </div>
-            <div id='download' class='mrow disabled' hidden title='Baixar o código do gladiador'>
-                <i class='fas fa-file-download'></i>
-            </div>
             <div id='settings' class='mrow' title='Preferências'>
                 <i class='fas fa-cog'></i>
             </div>
