@@ -159,10 +159,7 @@ $(document).ready( function() {
     var stepprogi = 4, stepprog = [-10,-5,-2,-1,1,2,5,10];
     $('#back-step').click( function(){
         if (pausesim){
-            if (stepIncrement > 0)
-                stepIncrement = -1;
-            else if (timestep > 0)
-                stepIncrement *= 1.10;
+            stepIncrement = -1;
             timestep += Math.round(stepIncrement);
             $('#fowd-step .speed').html("");
             $('#back-step .speed').html(Math.round(stepIncrement));
@@ -186,10 +183,7 @@ $(document).ready( function() {
     });
     $('#fowd-step').click( function(){
         if (pausesim){
-            if (stepIncrement < 0)
-                stepIncrement = 1;
-            else if (timestep < $('#time').slider("option","max") - 1)
-                stepIncrement *= 1.10;
+            stepIncrement = 1;
             timestep += Math.round(stepIncrement);
             $('#back-step .speed').html("");
             $('#fowd-step .speed').html("+"+ Math.round(stepIncrement));
