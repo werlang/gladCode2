@@ -3188,6 +3188,27 @@ body {
     background-color: #1e86d8;
 }
 
+button {
+    border: none;
+    color: white;
+    background-color: #00638D;
+    cursor: pointer;
+    font-family: 'Source Code Pro', monospace;
+    height: 35px;
+    transition: 0.3s all;
+    font-weight: bold;
+    outline: none;
+
+    &:hover {
+        background-color: #1e86d8;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: #bcbcbc;
+    }
+}
+
 #panel {
     .content {
         #apot-container {
@@ -3196,141 +3217,63 @@ body {
             height: calc(100vh - 50px);
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+
+            .highlight {
+                color: #00638d;
+            }
+
+            #apot-panel {
+                padding: 0 20px;
+
+                p {
+                    max-width: 600px;
+                    margin: 10px auto;
+                }
+
+                #apot-info {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 30px;
+
+                    .row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 10px;
+                        width: 220px;
+                        border-bottom: 1px solid #c1c1c1;
+                        padding: 0 10px;
+
+                        div:nth-child(2) {
+                            text-align: right;
+                        }
+
+                    }
+
+                    .fa-coins {
+                        color: silver;
+                        margin-left: 5px;
+                        text-shadow: 1px 1px 2px black;
+                    }
+
+                    #button-container {
+                        margin-left: 30px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-around;
+                    }
+
+                    button {
+                        width: 220px;
+                    }
+
+                }
+            }
 
             .help {
                 font-size: 1rem;
                 margin-left: 5px;
                 cursor: pointer;
-            }
-
-            #shop-container {
-                width: 100%;
-                display: flex;
-                justify-content: space-around;
-                flex-wrap: wrap;
-                overflow-y: auto;
-
-                .slot {
-                    display: flex;
-                    width: 150px;
-                    height: 220px;
-                    flex-direction: column;
-                    box-shadow: 0 0 3px black;
-                    border-radius: 3px;
-                    margin: 10px;
-
-                    &:hover .bot .button-container {
-                        opacity: 1;
-                    }
-
-                    .top {
-                        background-color: #6c97a9;
-                        height: 100px;
-                        border-radius: 3px 3px 0 0;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        img {
-                            height: 80px;
-                        }
-                    }
-
-                    .mid {
-                        background-color: #c7d6dc;
-                        height: 25px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        i {
-                            margin-right: 10px;
-                            color: silver;
-                            text-shadow: 1px 1px 2px black;
-                        }
-                    }
-
-                    .bot {
-                        background-color: white;
-                        border-radius: 0 0 3px 3px;
-                        flex-grow: 1;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: space-between;
-
-                        .name {
-                            margin-top: 10px;
-                            font-size: 1.1em;
-                            display: flex;
-                            flex-grow: 1;
-                            justify-content: center;
-                            align-items: center;
-                            text-align: center;
-                            padding: 0 10px;
-                        }
-
-                        .button-container {
-                            margin-bottom: 5px;
-                            display: flex;
-                            justify-content: space-evenly;
-                            align-items: center;
-                            width: 100%;
-                            color: #00638d;
-                            font-size: 1.3em;
-                            opacity: 0.3;
-                            transition: 0.3s all;
-
-                            i {
-                                display: flex;
-                                transition: 0.3s all;
-                                border-radius: 3px;
-                                padding: 3px 15px;
-                                cursor: pointer;
-                            }
-
-                            i:hover {
-                                background-color: #6c97a9;
-                                color: white;
-                            }
-
-                            .buy.disabled i {
-                                background-color: transparent;
-                                opacity: 0.2;
-                                cursor: not-allowed;
-                            }
-                        }
-                    }
-                }
-
-                .slot.disabled {
-                    .top {
-                        background-color: #949494;
-
-                        img {
-                            filter: grayscale(1);
-                        }    
-                    }
-
-
-                    .mid {
-                        background-color: #d8d8d8;
-
-                        span {
-                            color: red;
-                        }
-                    }
-
-                    .bot {
-                        .info {
-                            color: #646464;
-                        }
-
-                        .buy {
-                            opacity: 0;
-                        }
-                    }
-                }
             }
 
             #my-pots {
@@ -3340,7 +3283,6 @@ body {
                 border-top: 1px solid #00638d4a;
                 flex-shrink: 0;
                 display: flex;
-                justify-content: space-around;
                 align-items: center;
                 overflow: auto hidden;
                 justify-content: flex-start;
@@ -3440,6 +3382,160 @@ body {
                     box-shadow: 0px 0px 3px #00000050;
                     cursor: pointer;
                     filter: brightness(1.1);
+                }
+            }
+        }
+    }
+}
+
+#fog {
+    #browse-potions {
+        width: 100%;
+        max-width: 900px;
+        background-color: white;
+        border-radius: 3px;
+        box-shadow: 1px 1px 5px black;
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Acme', sans-serif;
+        color: #616161;
+
+        h2 {
+            margin-left: 15px;
+        }
+
+        button {
+            flex-shrink: 0;
+        }
+    }
+
+    #shop-container {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        flex-grow: 1;
+
+        .slot {
+            display: flex;
+            width: 150px;
+            height: 220px;
+            flex-direction: column;
+            box-shadow: 0 0 3px black;
+            border-radius: 3px;
+            margin: 10px;
+
+            &:hover .bot .button-container {
+                opacity: 1;
+            }
+
+            .top {
+                background-color: #6c97a9;
+                height: 100px;
+                border-radius: 3px 3px 0 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                img {
+                    height: 80px;
+                }
+            }
+
+            .mid {
+                background-color: #c7d6dc;
+                height: 25px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                i {
+                    margin-right: 10px;
+                    color: silver;
+                    text-shadow: 1px 1px 2px black;
+                }
+            }
+
+            .bot {
+                background-color: white;
+                border-radius: 0 0 3px 3px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+
+                .name {
+                    margin-top: 10px;
+                    font-size: 1.1em;
+                    display: flex;
+                    flex-grow: 1;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    padding: 0 10px;
+                }
+
+                .button-container {
+                    margin-bottom: 5px;
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    width: 100%;
+                    color: #00638d;
+                    font-size: 1.3em;
+                    opacity: 0.3;
+                    transition: 0.3s all;
+
+                    i {
+                        display: flex;
+                        transition: 0.3s all;
+                        border-radius: 3px;
+                        padding: 3px 15px;
+                        cursor: pointer;
+                    }
+
+                    i:hover {
+                        background-color: #6c97a9;
+                        color: white;
+                    }
+
+                    .buy.disabled i {
+                        background-color: transparent;
+                        opacity: 0.2;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
+        .slot.disabled {
+            .top {
+                background-color: #949494;
+
+                img {
+                    filter: grayscale(1);
+                }    
+            }
+
+
+            .mid {
+                background-color: #d8d8d8;
+
+                span {
+                    color: red;
+                }
+            }
+
+            .bot {
+                .info {
+                    color: #646464;
+                }
+
+                .buy {
+                    opacity: 0;
                 }
             }
         }
