@@ -1,58 +1,78 @@
 $(document).ready( () => {
-    $('#apot-container .help').click( () => {
-        new Message({
-            message: "Os itens encomendados no apotecário podem ser usados por todos seus gladiadores durante 24h em batalhas ranqueadas."
-        }).show()
-    })
-
     var slotlvl
     var potions
     post("back_slots.php", {
         action: "ITEMS"
     }).then (data => {
         // console.log(data)
-        let slotsDOM = ""
         potions = data.potions
         
-        for (let i in potions){
-            let item = potions[i]
-            slotsDOM += `<div class='slot' data-id='${i}'>
-                <div class='top'><img src='${item.icon}'></div>
-                <div class='mid'><i class='fas fa-coins'></i><span>${item.price}</span></div>
-                <div class='bot'>
-                    <span class='name'>${item.name}</span>
-                    <div class='button-container'>
-                        <span class='info' title='Informações'><i class='fas fa-question-circle'></i></span>
-                        <span class='buy' title='Encomendar produto'><i class='fas fa-thumbs-up'></i></span>
+        $('#apot-container #browse').click( function(){
+            if (!$(this).attr('disabled')){
+                let slotsDOM = ""
+                for (let i in potions){
+                    let item = potions[i]
+                    slotsDOM += `<div class='slot' data-id='${i}'>
+                        <div class='top'><img src='${item.icon}'></div>
+                        <div class='mid'><i class='fas fa-coins'></i><span>${item.price}</span></div>
+                        <div class='bot'>
+                            <span class='name'>${item.name}</span>
+                            <div class='button-container'>
+                                <span class='info' title='Informações'><i class='fas fa-question-circle'></i></span>
+                                <span class='buy' title='Encomendar produto'><i class='fas fa-thumbs-up'></i></span>
+                            </div>
+                        </div>
+                    </div>`
+                }
+
+                $('body').append(`<div id='fog'>
+                    <div id='browse-potions'>
+                        <h2>Estes são os produtos que você pode encomendar:</h2>
+                        <div id='shop-container'>
+                            ${slotsDOM}
+                        </div>
+                        <button id='close'>CANCELAR</button>
                     </div>
-                </div>
-            </div>`
-        }
-        $('#apot-container #shop-container').html(slotsDOM)
-        $('#apot-container #shop-container .info').click( function() {
-            let id = $(this).parents('.slot').data('id')
-            new Message({message: potions[id].description}).show()
-        })
+                </div>`)
+                $('#fog').hide().fadeIn()
+                slots.refresh()
 
-        $('#apot-container #shop-container .buy').click( function() {
-            if (!$(this).parents('.slot').hasClass('disabled')){
-                let firstslot = $('#apot-container #my-pots .slot.empty').first()
+                $('#browse-potions #close').click( function() {
+                    $('#fog').remove()
+                })
 
-                if (firstslot.length){
+                $('#browse-potions .info').click( function() {
                     let id = $(this).parents('.slot').data('id')
-                    
-                    new Message({
-                        message: `Emcomendar <b>${potions[id].name}</b>?`,
-                        buttons: {yes: "Sim", no: "Não"}
-                    }).show().click('yes', () => {                
+                    new Message({message: potions[id].description}).show()
+                })
+        
+                $('#browse-potions .buy').click( function() {
+                    if (!$(this).parents('.slot').hasClass('disabled')){
+                        let firstslot = $('#apot-container #my-pots .slot.empty').first()
+        
                         if (firstslot.length){
-                            slots.fill(id)
+                            let id = $(this).parents('.slot').data('id')
+                            
+                            new Message({
+                                message: `Emcomendar <b>${potions[id].name}</b>?`,
+                                buttons: {yes: "Sim", no: "Não"}
+                            }).show().click('yes', () => {                
+                                if (firstslot.length){
+                                    $('#fog').remove()
+                                    if (slots.fill(id)){
+                                        create_toast(`Item ${potions[id].name} encomandado`, "success")
+                                    }
+                                    else{
+                                        create_toast(`O item não pôde ser adquirido`, "error")
+                                    }
+                                }
+                            })
                         }
-                    })
-                }
-                else {
-                    $('#apot-container #shop-container .slot').addClass('disabled')
-                }
+                        else {
+                            $('#apot-container #browse').attr('disabled', true)
+                        }
+                    }
+                })
             }
         })
 
@@ -96,7 +116,7 @@ $(document).ready( () => {
                     action: "BUY",
                     id: id
                 }).then( data => {
-                    console.log(data)
+                    // console.log(data)
                     this.refresh()
                 })
 
@@ -182,14 +202,14 @@ $(document).ready( () => {
             }
         }
 
-        $('#apot-container #shop-container .slot').removeClass('disabled')
+        $('#apot-container #browse').removeAttr('disabled')
         if (!this.items.filter(e => e.empty).length){
-            $('#apot-container #shop-container .slot').addClass('disabled')
+            $('#apot-container #browse').attr('disabled', true)
         }
 
         $('#currencies #silver span').text(user.silver)
 
-        $('#apot-container #shop-container .slot').each( (_,obj) => {
+        $('#browse-potions .slot').each( (_,obj) => {
             let id = $(obj).data('id')
             if (parseInt(user.silver) < parseInt(potions[id].price)){
                 $(obj).addClass('disabled')

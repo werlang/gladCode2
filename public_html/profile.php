@@ -247,9 +247,29 @@
             </div>
             <div class='content' data-menu='potions'>
                 <div id='apot-container'>
-                    <h2>Apotecário</h2>
-                    <h3>Estes são os produtos que você pode encomendar: <span class='help' title='Mais informações'><i class='fas fa-question-circle'></i></span></h3>
-                    <div id='shop-container'></div>
+                    <div id='apot-panel'>
+                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'>1</span></span></h2>
+                        <p>Aqui você pode encomendar poções para lhe auxiliar durante as batalhas ranqueadas.</p>
+                        <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'>1</span> hora</span>, uma vez por batalha.</p>
+                        <p>Cada um de seus compartimentos dá direito a levar um item encomendado para a batalha. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
+                        <div id='apot-info'>
+                            <div class='col'>
+                                <div class='row'>
+                                    <div>Nível do apotecário:</div><div class='lvl highlight'>1</div>
+                                </div>
+                                <div class='row'>
+                                    <div>Duração da encomenda:</div><div class='duration highlight'>1 hora</div>
+                                </div>
+                                <div class='row'>
+                                    <div>Custo para aprimorar:</div><div class='cost'><span class='highlight'>1500</span><i class='fas fa-coins'></i></div>
+                                </div>
+                            </div>
+                            <div id='button-container' class='col'>
+                                <button id='upgrade'>APRIMORAR</button>
+                                <button id='browse'>VER POÇÕES</button>
+                            </div>
+                        </div>
+                    </div>
                     <div id='my-pots'></div>
                 </div>
             </div>
