@@ -14,7 +14,10 @@ $(document).ready( () => {
                     let item = potions[i]
                     slotsDOM += `<div class='slot' data-id='${i}'>
                         <div class='top'><img src='${item.icon}'></div>
-                        <div class='mid'><i class='fas fa-coins'></i><span>${item.price}</span></div>
+                        <div class='mid'>
+                            <div><i class='fas fa-arrow-alt-circle-up'></i><span class='lvl'>${item.lvl}</span></div>
+                            <div><i class='fas fa-coins silver'></i><span class='price'>${item.price}</span></div>
+                        </div>
                         <div class='bot'>
                             <span class='name'>${item.name}</span>
                             <div class='button-container'>
@@ -43,16 +46,36 @@ $(document).ready( () => {
 
                 $('#browse-potions .info').click( function() {
                     let id = $(this).parents('.slot').data('id')
-                    new Message({message: potions[id].description}).show()
+                    new Message({ message:
+                        `<h3><b>${potions[id].name}</b></h3>
+                        <div>${potions[id].description}</div>
+                        <div id='description-info'>
+                            <div class='col'>
+                                <span class='small'>Nível necessário:</span>
+                                <span><i class='fas fa-arrow-alt-circle-up'></i><b>${potions[id].lvl}</b></span>
+                            </div>
+                            <div class='col'>
+                                <span>Custo:</span>
+                                <span><b>${potions[id].price}</b><i class='fas fa-coins silver'></i></span>
+                            </div>
+                        </div>`,
+                        class: "description"
+                    }).show()
                 })
         
                 $('#browse-potions .buy').click( function() {
-                    if (!$(this).parents('.slot').hasClass('disabled')){
-                        let firstslot = $('#apot-container #my-pots .slot.empty').first()
-        
-                        if (firstslot.length){
-                            let id = $(this).parents('.slot').data('id')
-                            
+                    let firstslot = $('#apot-container #my-pots .slot.empty').first()
+    
+                    if (firstslot.length){
+                        let id = $(this).parents('.slot').data('id')
+                        
+                        if (apothecary.lvl < potions[id].lvl){
+                            new Message({ message: `Aprimore o apotecário para o nível <b>${potions[id].lvl}</b> para poder encomendar este item` }).show()
+                        }
+                        else if (parseInt(user.silver) < potions[id].price){
+                            new Message({ message: `Você não possui prata <i class='fas fa-coins silver'></i> suficiente para adquirir este item` }).show()
+                        }
+                        else{
                             new Message({
                                 message: `Emcomendar <b>${potions[id].name}</b>?`,
                                 buttons: {yes: "Sim", no: "Não"}
@@ -68,11 +91,73 @@ $(document).ready( () => {
                                 }
                             })
                         }
-                        else {
-                            $('#apot-container #browse').attr('disabled', true)
+                    }
+                    else {
+                        $('#apot-container #browse').attr('disabled', true)
+                        $('#fog').remove()
+                        new Message({ message: `Você não possui espaços disponíveis para adquirir este item` }).show()
+                    }
+                })
+            }
+        })
+
+        $('#apot-container #upgrade').click( function(){
+            let msg = new Message({
+                message: `
+                    <h2>Melhorar o apotecário?</h2>
+                    <div id='up-table'>
+                        <div class='row'>
+                            <div>Nível</div>
+                            <div>${apothecary.lvl}</div>
+                            <div class='icon'><i class='fas fa-angle-double-right'></i></div>
+                            <div class='new'>${apothecary.lvl + 1}</div>
+                        </div>
+                        <div class='row'>
+                            <div>Duração</div>
+                            <div>${apothecary.time()} horas</div>
+                            <div class='icon'><i class='fas fa-angle-double-right'></i></div>
+                            <div class='new'>${apothecary.time(apothecary.lvl + 1)} horas</div>
+                        </div>
+                        <div class='row cost'>
+                            <div><b>Custo</b></div>
+                            <div><b><span>${apothecary.price()}</span></b><i class='fas fa-coins silver'></i></div>
+                        </div>
+                    </div>`,
+                buttons: {yes: "Aprimorar", no: "Cancelar"},
+                class: 'upgrade'
+            }).show().click('yes', () => {
+                post("back_slots.php", {
+                    action: "UPGRADE",
+                    command: "APOT"
+                }).then( data => {
+                    console.log(data)
+
+                    if (data.status == "NO MONEY"){
+                        new Message({message: "Você não possui prata suficiente"}).show()
+                    }
+                    else if (data.status == "MAX LVL"){
+                        new Message({message: "O apotecário já está no nível máximo"}).show()
+                    }
+                    else{
+                        user.silver = data.silver
+                        $('#menu #silver span').text(user.silver)
+                        user.apothecary = data.apot
+                        apothecary.lvl = parseInt(user.apothecary)
+                        $('#apot-panel .lvl').text(apothecary.lvl)
+                        $('#apot-panel .cost').text(apothecary.price())
+                        $('#apot-panel .duration').text(apothecary.time())
+
+                        if (apothecary.lvl == 5){
+                            $('#apot-panel #apot-info .cost').parents('.row').remove()
+                            $('#apot-panel #apot-info #upgrade').remove()
                         }
                     }
                 })
+            })
+
+            if (apothecary.price() > user.silver){
+                $('#up-table .cost').addClass('nomoney')
+                msg.getButton('yes').remove()
             }
         })
 
@@ -94,6 +179,18 @@ $(document).ready( () => {
             }
         }
         $('#apot-container #my-pots').html(mypots)
+
+        apothecary.init().then( () => {
+            apothecary.lvl = parseInt(user.apothecary)
+            $('#apot-panel .lvl').text(apothecary.lvl)
+            $('#apot-panel .cost').text(apothecary.price())
+            $('#apot-panel .duration').text(apothecary.time())
+
+            if (apothecary.lvl == 5){
+                $('#apot-panel #apot-info .cost').parents('.row').remove()
+                $('#apot-panel #apot-info #upgrade').remove()
+            }
+        })
     })
 
     $('#menu #potions').click( () => {
@@ -164,6 +261,7 @@ $(document).ready( () => {
         }
         for (let i in data.slots){
             this.items[i].id = data.slots[i].id
+            this.items[i].sid = data.slots[i].sid
             this.items[i].name = data.slots[i].name
             this.items[i].icon = data.slots[i].icon
             this.items[i].description = data.slots[i].description
@@ -176,7 +274,7 @@ $(document).ready( () => {
             let item = this.items[i]
             if (!item.disabled && !item.empty && !item.counting){
                 $('#apot-container #my-pots .slot').eq(i).removeClass('empty').addClass('filled').html(`
-                    <div class='top'><img src='${item.icon}'></div>
+                    <div class='top'><img src='${item.icon}'><div class='remove'><i class='fas fa-trash-alt'></i></div></div>
                     <div class='mid'><span class='name'>${item.name}</span></div>
                     <div class='bot'><span class='time'></span><i class='fas fa-clock'></i></div>
                 `)
@@ -190,6 +288,24 @@ $(document).ready( () => {
                         buttons: {yes: "Ajuda", no: "OK"}
                     }).show().click('yes', function(){
                         window.open(`manual#items`)
+                    })
+                })
+
+                $('#apot-container #my-pots .slot .remove').eq(i).click( e => {
+                    e.stopPropagation()
+
+                    new Message({
+                        message: `Deseja cancelar esta encomenda?`,
+                        buttons: {yes: "SIM", no: "NÃO"}
+                    }).show().click('yes', async () => {
+                        let data = await post("back_slots.php", {
+                            action: "EXPIRE",
+                            id: item.sid
+                        })
+                        // console.log(data)
+                        if (data.status == "SUCCESS"){
+                            this.refresh()
+                        }
                     })
                 })
             }
@@ -212,7 +328,10 @@ $(document).ready( () => {
         $('#browse-potions .slot').each( (_,obj) => {
             let id = $(obj).data('id')
             if (parseInt(user.silver) < parseInt(potions[id].price)){
-                $(obj).addClass('disabled')
+                $(obj).addClass('dis-price disabled')
+            }
+            if (apothecary.lvl < parseInt(potions[id].lvl)){
+                $(obj).addClass('dis-lvl disabled')
             }
         })
     }
@@ -244,4 +363,28 @@ $(document).ready( () => {
             }
         }, 1000)
     }
+
+    var apothecary = {
+        init: async function() {
+            let data = await post("back_slots.php", {
+                action: "UPGRADE",
+                command: "COSTS"
+            })
+            this.prices = data.prices
+            this.times = data.times
+        },
+        price: function(lvl) {
+            if (!lvl){
+                lvl = this.lvl
+            }
+            return this.prices[lvl-1]
+        },
+        time: function(lvl) {
+            if (!lvl){
+                lvl = this.lvl
+            }
+            return this.times[lvl-1]
+        }
+    }
+
 })

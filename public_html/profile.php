@@ -248,20 +248,20 @@
             <div class='content' data-menu='potions'>
                 <div id='apot-container'>
                     <div id='apot-panel'>
-                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'>1</span></span></h2>
+                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'></span></span></h2>
                         <p>Aqui você pode encomendar poções para lhe auxiliar durante as batalhas ranqueadas.</p>
-                        <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'>1</span> hora</span>, uma vez por batalha.</p>
-                        <p>Cada um de seus compartimentos dá direito a levar um item encomendado para a batalha. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
+                        <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'></span> horas</span>, uma vez por batalha.</p>
+                        <p>Cada um de seus compartimentos dá direito a levar para batalha um item encomendado. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
                         <div id='apot-info'>
                             <div class='col'>
                                 <div class='row'>
-                                    <div>Nível do apotecário:</div><div class='lvl highlight'>1</div>
+                                    <div>Nível do apotecário:</div><div class='lvl highlight'></div>
                                 </div>
                                 <div class='row'>
-                                    <div>Duração da encomenda:</div><div class='duration highlight'>1 hora</div>
+                                    <div>Duração da encomenda:</div><div class='highlight'><span class='duration'></span>horas</div>
                                 </div>
                                 <div class='row'>
-                                    <div>Custo para aprimorar:</div><div class='cost'><span class='highlight'>1500</span><i class='fas fa-coins'></i></div>
+                                    <div>Custo para aprimorar:</div><div><span class='highlight cost'></span><i class='fas fa-coins silver'></i></div>
                                 </div>
                             </div>
                             <div id='button-container' class='col'>
