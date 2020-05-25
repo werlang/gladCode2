@@ -41,6 +41,7 @@
                 $info['preferences']['duel'] = $row['pref_duel'];
                 $info['preferences']['tourn'] = $row['pref_tourn'];
                 $info['language'] = $row['pref_language'];
+                $info['apothecary'] = $row['apothecary'];
 
                 if (exif_imagetype($row['foto']) == IMAGETYPE_PNG){
                     $foto = $row['foto'];
