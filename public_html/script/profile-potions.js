@@ -287,7 +287,7 @@ $(document).ready( () => {
                         message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.id}")</b></code>`,
                         buttons: {yes: "Ajuda", no: "OK"}
                     }).show().click('yes', function(){
-                        window.open(`manual#items`)
+                        window.open(`manual#nav-item`)
                     })
                 })
 
