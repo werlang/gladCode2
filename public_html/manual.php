@@ -447,6 +447,7 @@ def loop():
                 </table>
             
                 <!-- TODO: menu itens nos blocos, onde tem um bloco pra cada item "Poção da Vitalidade [III]". useItem no function e docs  -->
+                <!-- TODO: inserir novos itens -->
             </div>
             <div id='footer'></div>
         </div>
