@@ -1747,38 +1747,6 @@ function buildIndex(){
     }
 }
 
-function cloneCanvas(oldCanvas) {
-
-    //create a new canvas
-    var newCanvas = document.createElement('canvas');
-    var context = newCanvas.getContext('2d');
-
-    //set dimensions
-    newCanvas.width = oldCanvas.width;
-    newCanvas.height = oldCanvas.height;
-
-    //apply the old canvas to the new one
-    context.drawImage(oldCanvas, 0, 0);
-
-    //return the new canvas
-    return newCanvas;
-}
-
-function download(filename, text) {
-    var pom = document.createElement('a');
-    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    pom.setAttribute('download', filename);
-
-    if (document.createEvent) {
-        var event = document.createEvent('MouseEvents');
-        event.initEvent('click', true, true);
-        pom.dispatchEvent(event);
-    }
-    else {
-        pom.click();
-    }
-}
-
 function setGladImage(index, skin){
     fetchSpritesheet(skin).then( function(data){
         $('#fog-glads .glad-preview .image').eq(index).html(getSpriteThumb(data,'walk','down'));

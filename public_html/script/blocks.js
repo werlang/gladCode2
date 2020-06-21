@@ -1231,6 +1231,221 @@ Blockly.Python['getsimtime'] = function(block) {
     return [code, Blockly.Python.ORDER_NONE];
 };
 
+Blockly.Blocks['useitem_hp'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Usar Poção de vitalidade")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT");
+        this.setInputsInline(true);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem_hp'] = function(block) {
+    var info = this.getFieldValue('COMPLEMENT');
+    var code = `useItem("pot-hp-${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
+Blockly.Blocks['useitem_ap'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Usar Poção da concentração")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT");
+        this.setInputsInline(true);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem_ap'] = function(block) {
+    var info = this.getFieldValue('COMPLEMENT');
+    var code = `useItem("pot-ap-${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
+Blockly.Blocks['useitem_high'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Usar Tônico do gigante")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT");
+        this.setInputsInline(true);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem_high'] = function(block) {
+    var info = this.getFieldValue('COMPLEMENT');
+    var code = `useItem("pot-high-${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
+Blockly.Blocks['useitem_low'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Usar Tônico fortificante")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT");
+        this.setInputsInline(true);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem_low'] = function(block) {
+    var info = this.getFieldValue('COMPLEMENT');
+    var code = `useItem("pot-low-${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
+Blockly.Blocks['useitem_xp'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Usar Elixir da sabedoria")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"]]), "COMPLEMENT");
+        this.setInputsInline(true);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem_xp'] = function(block) {
+    var info = this.getFieldValue('COMPLEMENT');
+    var code = `useItem("pot-xp-${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
 async function getTooltip(name){
     if (funcList[name])
         return funcList[name];

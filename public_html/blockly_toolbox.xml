@@ -267,5 +267,12 @@
                 </value>
             </block>
         </category>
+        <category name="Itens" colour="#9eb553">
+            <block type="useitem_hp"></block>
+            <block type="useitem_ap"></block>
+            <block type="useitem_high"></block>
+            <block type="useitem_low"></block>
+            <block type="useitem_xp"></block>
+        </category>
     </category>
 </xml>
