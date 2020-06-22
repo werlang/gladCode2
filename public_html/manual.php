@@ -376,6 +376,8 @@ reward = ( rewardBase / mmr * avgmmr ) * ( 1 + ((0.001 * mmr - 1) * lowmmr) )</e
                         <pre><code><em>silver</em> = recompensa de moedas de prata obtida.
 <em>mmr</em> = renome que o gladiador possuia antes da batalha.
 <em>win</em> = 1 caso o gladiador foi o vencedor, 0 caso contrário.</code></pre>
+
+                        <p>Caso o mestre já tenha realizado mais de <b>20 batalhas</b> nas últimas <b>24 horas</b>, a recompensa de moedas de prata da batalha será de <b>1/10 da recompensa</b> que normalmente seria recebida.</p>
                     </div>
                     <div class='col-2'>
                         <table class='table' id='tsilver'>
