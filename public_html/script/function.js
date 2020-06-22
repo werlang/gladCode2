@@ -106,6 +106,22 @@ async function load_content(item, fileData){
             language = 'c';
     }
 
+    // check if there is no version for this funcion, then remove the select option
+    if (item.noversion){
+        for (let l of item.noversion){
+            if (l == language){
+                let func = $('#vget').val();
+                $('#content').html(`<h1>A função <i>${func}</i> não existe para esta linguagem.</h1><p><a href='docs'>Voltar para documentação</a></p>`)
+                return false;
+            }
+            $('#language select option').each( function() {
+                if ($(this).val() == l){
+                    $(this).remove()
+                }
+            })
+        }
+    }
+
     $('#language select').val(language).selectmenu('refresh');
 
     if (!item.syntax[language])
