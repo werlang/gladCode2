@@ -532,3 +532,10 @@ void setSlots(char *str){
     sprintf(message, "setSlots %s", str);
     sendMessage(message,response);
 }
+
+int isItemReady(char *str){
+    char m[100], r[10];
+    sprintf(m, "isItemReady %s", str);
+    sendMessage(m, r);
+    return atoi(r);
+}

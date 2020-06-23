@@ -368,6 +368,10 @@ void *connection_handler(void *p){
                 setSlots(gladid, str);
                 sprintf(reply, "done");
             }
+            else if (strcmp(func->call,"isItemReady")==0){
+                char *str = func->arg[0].toStr;
+                sprintf(reply, "%i", isItemReady(gladid, str));
+            }
             else if (strcmp(func->call,"endSocketComm")==0){
                 endcomm = 1;
                 sprintf(reply, "done");
