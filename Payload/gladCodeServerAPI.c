@@ -1204,3 +1204,19 @@ int useItem(int gladid, char *item){
         return r;
     }
 }
+
+// verifica se o item está disponível para uso
+int isItemReady(int gladid, char *item){
+    if (endsim || (g+gladid)->hp <= 0){
+        return 0;
+    }
+    else{
+        int i;
+        for (i=0 ; i<N_SLOTS ; i++){
+            if ((g+gladid)->items[i] == -1 || ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0)){
+                return 1;
+            }
+        }
+        return 0;
+    }
+}
