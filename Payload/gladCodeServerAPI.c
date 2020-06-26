@@ -40,17 +40,14 @@ void setINT(int gladid, int n){
 }
 
 int getSTR(int gladid){
-    appendCode(gladid, "getSTR()");
     return (g+gladid)->STR;
 }
 
 int getAGI(int gladid){
-    appendCode(gladid, "getAGI()");
     return (g+gladid)->AGI;
 }
 
 int getINT(int gladid){
-    appendCode(gladid, "getINT()");
     return (g+gladid)->INT;
 }
 
@@ -75,23 +72,24 @@ char* getName(int gladid){
 }
 
 void setSlots(int gladid, char *str){
-    int i;
-    char *e = str, *s = str;
-    for (i=0 ; i<N_SLOTS ; i++){
-        while (*e != ',' && *e != '\0'){
+    if ( (g+gladid)->lvl == 0){
+        int i;
+        char *e = str, *s = str;
+        for (i=0 ; i<N_SLOTS ; i++){
+            while (*e != ',' && *e != '\0'){
+                e++;
+            }
+            char n[100];
+            strncpy(n, s, e-s);
+            n[e-s] = '\0';
+            (g+gladid)->items[i] = atoi(n);
             e++;
+            s = e;
         }
-        char n[10];
-        strncpy(n, s, e-s);
-        n[e-s] = '\0';
-        (g+gladid)->items[i] = atoi(n);
-        e++;
-        s = e;
     }
 }
 
 int upgradeSTR(int gladid, int n){
-    appendCode(gladid, "upgradeSTR(%i)", n);
     if (n > (g+gladid)->up)
         n = (g+gladid)->up;
     if (n > 0){
@@ -106,7 +104,6 @@ int upgradeSTR(int gladid, int n){
 }
 
 int upgradeAGI(int gladid, int n){
-    appendCode(gladid, "upgradeAGI(%i)", n);
     if (n > (g+gladid)->up)
         n = (g+gladid)->up;
     if (n > 0){
@@ -122,7 +119,6 @@ int upgradeAGI(int gladid, int n){
 }
 
 int upgradeINT(int gladid, int n){
-    appendCode(gladid, "upgradeINT(%i)", n);
     if (n > (g+gladid)->up)
         n = (g+gladid)->up;
     if (n > 0){
@@ -138,7 +134,6 @@ int upgradeINT(int gladid, int n){
 }
 
 float getSimTime(int gladid){
-    appendCode(gladid, "getSimTime()");
     return (g+gladid)->time;
 }
 
@@ -392,7 +387,7 @@ float turnLeft(int gladid, float ang){
 
 //se vira na direcao de um ponto
 int turnTo(int gladid, float x, float y){
-    appendCode(gladid, "turnTo(%.1f, %.1f)");
+    appendCode(gladid, "turnTo(%.1f, %.1f)", x, y);
     if (endsim)
         return 1;
     if ((g+gladid)->hp > 0){
@@ -483,27 +478,22 @@ int turnToAngle(int gladid, float ang){
 }
 
 float getX(int gladid){
-    appendCode(gladid, "getX()");
     return (g+gladid)->x;
 }
 
 float getY(int gladid){
-    appendCode(gladid, "getY()");
     return (g+gladid)->y;
 }
 
 float getHp(int gladid){
-    appendCode(gladid, "getHp()");
     return (g+gladid)->hp;
 }
 
 float getAp(int gladid){
-    appendCode(gladid, "getAp()");
     return (g+gladid)->ap;
 }
 
 float getSpeed(int gladid){
-    appendCode(gladid, "getSpeed()");
     float spd = (g+gladid)->spd;
     if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft > 0)
         spd *= (g+gladid)->buffs[BUFF_MOVEMENT].value;
@@ -512,12 +502,10 @@ float getSpeed(int gladid){
 }
 
 float getHead(int gladid){
-    appendCode(gladid, "getHead()");
     return (g+gladid)->head;
 }
 
 float getDist(int gladid, float x, float y){
-    appendCode(gladid, "getDist(%.1f, %.1f)", x, y);
     float r;
     if (x == -1 || y == -1)
         r = 9999;
@@ -527,7 +515,6 @@ float getDist(int gladid, float x, float y){
 }
 
 float getDistToTarget(int gladid){
-    appendCode(gladid, "getDistToTarget()");
     float r = -1;
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
@@ -540,13 +527,11 @@ float getDistToTarget(int gladid){
 
 //recebe um ponto, retorna o angulo o ponto do glad e o ponto recebido
 float getAngle(int gladid, float x, float y){
-    appendCode(gladid, "getAngle(%.1f, %.1f)", x, y);
     return getAngleUnsafe(gladid, x, y);
 }
 
 //retorna quantos inimigos o glad enxerga no campo de visao
 int howManyEnemies(int gladid){
-    appendCode(gladid, "howManyEnemies()");
     int i, cont=0;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
@@ -562,7 +547,6 @@ int howManyEnemies(int gladid){
 
 //tranca no inimigo mais próximo dentro do campo de visão
 int getCloseEnemy(int gladid){
-    appendCode(gladid, "getCloseEnemy()");
     float ang2, dist2;
     int i, closeri=-1, lowerdist;
     for (i=0 ; i<nglad ; i++){
@@ -590,7 +574,6 @@ int getCloseEnemy(int gladid){
 
 //tranca no inimigo mais longe dentro do campo de visão
 int getFarEnemy(int gladid){
-    appendCode(gladid, "getFarEnemy()");
     int i, fari=-1, higherdist;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
@@ -614,7 +597,6 @@ int getFarEnemy(int gladid){
 
 //tranca no inimigo de menor hp dentro do campo de visão
 int getLowHp(int gladid){
-    appendCode(gladid, "getLowHp()");
     int i, loweri=-1;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
@@ -636,7 +618,6 @@ int getLowHp(int gladid){
 
 //tranca no inimigo de maior hp dentro do campo de visão
 int getHighHp(int gladid){
-    appendCode(gladid, "getHighHp()");
     int i, higheri=-1;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
@@ -657,7 +638,6 @@ int getHighHp(int gladid){
 }
 
 float getTargetHead(int gladid){
-    appendCode(gladid, "getTargetHead()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         return (g+target)->head;
@@ -667,7 +647,6 @@ float getTargetHead(int gladid){
 }
 
 float getTargetSpeed(int gladid){
-    appendCode(gladid, "getTargetSpeed()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         float spd = (g+target)->spd;
@@ -682,7 +661,6 @@ float getTargetSpeed(int gladid){
 
 //retorna a porcentagem de vida do alvo trancado
 float getTargetHealth(int gladid){
-    appendCode(gladid, "getTargetHealth()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         return (float)((g+target)->hp) / (g+target)->maxhp;
@@ -692,7 +670,6 @@ float getTargetHealth(int gladid){
 }
 
 float getTargetX(int gladid){
-    appendCode(gladid, "getTargetX()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         return (g+target)->x;
@@ -702,7 +679,6 @@ float getTargetX(int gladid){
 }
 
 float getTargetY(int gladid){
-    appendCode(gladid, "getTargetY()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         return (g+target)->y;
@@ -713,7 +689,6 @@ float getTargetY(int gladid){
 
 //se o gladiador está no campo de visao do alvo, retorna 1
 int doYouSeeMe(int gladid){
-    appendCode(gladid, "doYouSeeMe()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);	
         float dist = getDistUnsafe(gladid, (g+target)->x, (g+target)->y);
@@ -726,7 +701,6 @@ int doYouSeeMe(int gladid){
 }
 
 int isTargetVisible(int gladid){
-    appendCode(gladid, "isTargetVisible()");
     return isLockedTargetVisibleUnsafe(gladid);
 }
 
@@ -779,12 +753,10 @@ int attackRanged(int gladid, float x, float y){
 }
 
 float getLastHitTime(int gladid){
-    appendCode(gladid, "getLastHitTime()");
     return (g+gladid)->time - (g+gladid)->lasthittime;
 }
 
 float getLastHitAngle(int gladid){
-    appendCode(gladid, "getLastHitAngle()");
     return (g+gladid)->lasthitangle;
 }
 
@@ -796,7 +768,6 @@ int turnToLastHit(int gladid){
 }
 
 int getHit(int gladid){
-    appendCode(gladid, "getHit()");
     int notif = (g+gladid)->lasthitnotification;
     (g+gladid)->lasthitnotification = 0;
     return notif;
@@ -804,7 +775,6 @@ int getHit(int gladid){
 
 
 float getSafeRadius(int gladid){
-    appendCode(gladid, "getSafeRadius()");
     float startdist = getDistAB(0,0,screenW/2,screenH/2);
     float spread = ((g+gladid)->time - POISON_TIME) / POISON_SPEED;
     float safe = startdist - spread;
@@ -820,7 +790,6 @@ float getSafeRadius(int gladid){
 
 //verifica se onde o gladiador está tem poison
 int isSafeHere(int gladid){
-    appendCode(gladid, "isSafeHere()");
     if ((g+gladid)->hp <= 0 || endsim)
         return 1;
     float mydist = getDistUnsafe(gladid,screenW/2,screenH/2);
@@ -832,7 +801,6 @@ int isSafeHere(int gladid){
 
 //verifica se tem poison no ponto
 int isSafeThere(int gladid, float x, float y){
-    appendCode(gladid, "isSafeThere(%.1f, %.1f)", x, y);
     if ((g+gladid)->hp <= 0 || endsim)
         return 1;
     
@@ -849,25 +817,21 @@ int isSafeThere(int gladid, float x, float y){
 
 //quanto tempo para acabar o buff de protecao
 float getBlockTimeLeft(int gladid){
-    appendCode(gladid, "getBlockTimeLeft()");
     return (g+gladid)->buffs[BUFF_RESIST].timeleft;
 }
 
 //quanto tempo para acabar o buff de invisibilidade
 float getAmbushTimeLeft(int gladid){
-    appendCode(gladid, "getAmbushTimeLeft()");
     return (g+gladid)->buffs[BUFF_INVISIBLE].timeleft;
 }
 
 //quanto tempo para acabar a queimadura
 float getBurnTimeLeft(int gladid){
-    appendCode(gladid, "getBurnTimeLeft()");
     return (g+gladid)->buffs[BUFF_BURN].timeleft;
 }
 
 //verifica se o alvo está atordoado
 int isStunned(int gladid){
-    appendCode(gladid, "isStunned()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         if ( (g+target)->buffs[BUFF_STUN].timeleft > 0 )
@@ -882,7 +846,6 @@ int isStunned(int gladid){
 
 //verifica se o alvo está queimando
 int isBurning(int gladid){
-    appendCode(gladid, "isBurning()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         if ( (g+target)->buffs[BUFF_BURN].timeleft > 0 )
@@ -897,7 +860,6 @@ int isBurning(int gladid){
 
 //verifica se o alvo está com resistencia
 int isProtected(int gladid){
-    appendCode(gladid, "isProtected()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         if ( (g+target)->buffs[BUFF_RESIST].timeleft > 0 )
@@ -912,7 +874,6 @@ int isProtected(int gladid){
 
 //verifica se o alvo está correndo
 int isRunning(int gladid){
-    appendCode(gladid, "isRunning()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         if ( (g+target)->buffs[BUFF_MOVEMENT].timeleft > 0 && (g+target)->buffs[BUFF_MOVEMENT].value > 1)
@@ -927,7 +888,6 @@ int isRunning(int gladid){
 
 //verifica se o alvo está lento
 int isSlowed(int gladid){
-    appendCode(gladid, "isSlowed()");
     if (isLockedTargetVisibleUnsafe(gladid)){
         int target = getLockedTarget(gladid);
         if ( (g+target)->buffs[BUFF_MOVEMENT].timeleft > 0 && (g+target)->buffs[BUFF_MOVEMENT].value < 1)
@@ -1192,7 +1152,6 @@ int ambush(int gladid){
 
 //mostra uma mensagem de fala
 void speak(int gladid, char *message){
-    appendCode(gladid, "speak(%s)", message);
     strncpy((g+gladid)->message, message, 250);
 
     char *newline = strstr((g+gladid)->message, "\n");
@@ -1206,7 +1165,6 @@ void speak(int gladid, char *message){
 
 //retorna o nível do gladiador
 int getLvl(int gladid){
-    appendCode(gladid, "getLvl()");
     return (g+gladid)->lvl;
 }
 
@@ -1247,7 +1205,7 @@ void lvlUpSB(int gladid, int n){
 
 // faz o gladiador usar um item
 int useItem(int gladid, char *item){
-    appendCode(gladid, "useItem(%s)", item);
+    appendCode(gladid, "useItem(\"%s\")", item);
     if (endsim || (g+gladid)->hp <= 0){
         return 0;
     }
@@ -1274,7 +1232,6 @@ int useItem(int gladid, char *item){
 
 // verifica se o item está disponível para uso
 int isItemReady(int gladid, char *item){
-    appendCode(gladid, "isItemReady(%s)", item);
     if (endsim || (g+gladid)->hp <= 0){
         return 0;
     }
