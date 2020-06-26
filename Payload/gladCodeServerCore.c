@@ -352,7 +352,7 @@ void recordSteps(){
                 (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
                 (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
             );
-            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"item0\":%i,\"item1\":%i,\"item2\":%i,\"item3\":%i,\"action\":%i,\"message\":\"%s\",\"code\":[%s],%s}",
+            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",%s}",
                 (g+i)->name,
                 (g+i)->user,
                 i, //thread num
@@ -453,8 +453,12 @@ void recordSteps(){
 
             int s;
             for (s=0 ; s<N_SLOTS ; s++){
-                if ( (g+i)->items[s] != (go+i)->items[s] )
-                    sprintf(buffer, "%s\"item%i\":%i,", buffer, s, (g+i)->items[s]);
+                if ( (g+i)->items[s] != (go+i)->items[s] ){
+                    break;
+                }
+            }
+            if (s < N_SLOTS){
+                sprintf(buffer, "%s\"items\":[%i,%i,%i,%i],", buffer, (g+i)->items[0], (g+i)->items[1], (g+i)->items[2], (g+i)->items[3]);
             }
 
             if ( (g+i)->maxap != (go+i)->maxap )
@@ -471,7 +475,7 @@ void recordSteps(){
             }
 
             if ( strcmp((g+i)->code_exec, (go+i)->code_exec) != 0){
-                sprintf(buffer, "%s\"code\":[%s],", buffer, (g+i)->code_exec);
+                sprintf(buffer, "%s\"code\":\"%s\",", buffer, (g+i)->code_exec);
             }
 
             sprintf(buffs, "\"buffs\":{");
@@ -1001,11 +1005,6 @@ void appendCode(int gladid, char *format, ...){
     va_end(arg);
     message[999] = '\0';
 
-    if (strcmp((g+gladid)->code_exec, "") == 0){
-        sprintf((g+gladid)->code_exec, "\"%s\"", message);
-    }
-    else{
-        sprintf((g+gladid)->code_exec, "%s, \"%s\"", (g+gladid)->code_exec, message);
-    }
+    sprintf((g+gladid)->code_exec, "%s", message);
     
 }
