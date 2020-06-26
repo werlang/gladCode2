@@ -8,6 +8,7 @@ codigo inicial do servidor.
 #include<stdio.h>
 #include<string.h>    //strlen
 #include<stdlib.h>    //strlen
+#include<stdarg.h>
 #include<math.h>
 #include<sys/socket.h>
 #include<arpa/inet.h> //inet_addr
