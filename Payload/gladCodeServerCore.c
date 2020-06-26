@@ -352,7 +352,7 @@ void recordSteps(){
                 (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
                 (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
             );
-            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"item0\":%i,\"item1\":%i,\"item2\":%i,\"item3\":%i,\"action\":%i,\"message\":\"%s\",%s}",
+            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"item0\":%i,\"item1\":%i,\"item2\":%i,\"item3\":%i,\"action\":%i,\"message\":\"%s\",\"code\":[%s],%s}",
                 (g+i)->name,
                 (g+i)->user,
                 i, //thread num
@@ -378,6 +378,7 @@ void recordSteps(){
                 (g+i)->items[3],
                 (g+i)->action,
                 (g+i)->message,
+                (g+i)->code_exec,
                 buffs
             );
             if (i!=0)
@@ -467,6 +468,10 @@ void recordSteps(){
                     sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
                 else if ((g+i)->msgtype == MSG_BREAKPOINT)
                     sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, (g+i)->message);
+            }
+
+            if ( strcmp((g+i)->code_exec, (go+i)->code_exec) != 0){
+                sprintf(buffer, "%s\"code\":[%s],", buffer, (g+i)->code_exec);
             }
 
             sprintf(buffs, "\"buffs\":{");
@@ -658,6 +663,8 @@ int updateSimulation(int gladid){
         if ( (g+gladid)->time > POISON_TIME){
             spread_poison(gladid);
         }
+
+        strcpy((g+gladid)->code_exec, "");
                 
         pthread_mutex_unlock(&lock);		
     }
@@ -819,6 +826,7 @@ void registerGlad(int gladid){
     (g+gladid)->lasthittime = -999;
     (g+gladid)->action = ACTION_NONE; //action inicial do gladiador
     strcpy((g+gladid)->message, "");
+    strcpy((g+gladid)->code_exec, "");
     (g+gladid)->msgtime = 0;
     (g+gladid)->msgtype = MSG_SPEAK;
 
@@ -958,4 +966,46 @@ void itemEffect(int gladid, char *item){
     else if (strcmp(item, "pot-ap-5") == 0){
         (g+gladid)->ap += 100 + 10 * (g+gladid)->lvl;
     }
+}
+
+void appendCode(int gladid, char *format, ...){
+    va_list arg;
+    va_start(arg, format);
+
+    char message[1000] = "";
+    while (*format != '\0' && strlen(message) < 1000) {
+        if (*format == '%') {
+            format++;
+            if (*format == '%')
+                sprintf(message, "%s%%", message);
+            else if (*format == 'c')
+                sprintf(message, "%s%c", message, va_arg(arg, int));
+            else if (*format == 's')
+                sprintf(message, "%s%s", message, va_arg(arg, char*));
+            else if (*format == 'i' || *format == 'd')
+                sprintf(message, "%s%i", message, va_arg(arg, int));
+            else if (*format == 'f')
+                sprintf(message, "%s%f", message, va_arg(arg, double));
+            else if (*format == '.'){
+                char f[10] = "%s%.0f";
+                f[4] = *(format + 1);
+                format += 2;
+                sprintf(message, f, message, va_arg(arg, double));
+            }
+        }
+        else {
+            sprintf(message, "%s%c", message, *format);
+        }
+        format++;
+    }
+    va_end(arg);
+    message[999] = '\0';
+
+    if (strcmp((g+gladid)->code_exec, "") == 0){
+        sprintf((g+gladid)->code_exec, "\"%s\"", message);
+    }
+    else{
+        sprintf((g+gladid)->code_exec, "%s, \"%s\"", (g+gladid)->code_exec, message);
+    }
+    
 }

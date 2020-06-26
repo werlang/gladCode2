@@ -108,6 +108,7 @@ struct gladiador{
 	float time; //simtime
 	float moveLock; //guarda valor para controle de movimentos de longa duracao
 	char message[256];
+	char code_exec[256];
     int msgtype;
 	float msgtime;
     int items[N_SLOTS];
