@@ -128,6 +128,10 @@ void preventCollision(int gladid, float lastdx, float lastdy){
     }
 }
 
+int getXpToNextLvl(int gladid){
+    return XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
+}
+
 void setXp(int gladid, float dmg, int enemy){
     //200 de vida inicial + 20 por nivel (considera que upa 2 STR por nível)
     //xp é o percentual de dano causado na vida esperada do inimigo,
@@ -137,7 +141,7 @@ void setXp(int gladid, float dmg, int enemy){
     float xp = dmg / lifeatlvl * 100;
     
     (g+gladid)->xp += round(xp);
-    int tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+gladid)->lvl - 1);
+    int tonext = getXpToNextLvl(gladid);
     if ((g+gladid)->xp >= tonext && (g+gladid)->hp > 0){
         float recovered = 35 + 5 * (g+gladid)->lvl; //roughtly (200+lvl*25)*0.2 (20% avg life at given lvl)
         
@@ -939,36 +943,122 @@ int isLockedTargetVisibleUnsafe(int gladid){
     }
 }
 
+void increaseHighAttr(int *m[3], int v){
+    int *a = NULL, *b = NULL, *n = NULL;
+    
+    if (*m[0] > *m[1] && *m[0] > *m[2]){
+        n = m[0];
+    }
+    else if (*m[1] > *m[0] && *m[1] > *m[2]){
+        n = m[1];
+    }
+    else if (*m[2] > *m[0] && *m[2] > *m[1]){
+        n = m[2];
+    }
+    else if (*m[0] < *m[1] && *m[0] < *m[2]){
+        a = m[1];
+        b = m[2];
+    }
+    else if (*m[1] < *m[0] && *m[1] < *m[2]){
+        a = m[0];
+        b = m[2];
+    }
+    else if (*m[2] < *m[0] && *m[2] < *m[1]){
+        a = m[0];
+        b = m[1];
+    }
+    
+    if (!n && !a && !b){
+        *m[rand()%3] += v;
+    }
+    else if (!n){
+        if (rand()%2){
+            *a += v;
+        }
+        else {
+            *b += v;
+        }
+    }
+    else{
+        *n += v;
+    }
+}
+
+void increaseLowAttr(int *m[3], int v){
+    int *a = NULL, *b = NULL, *n = NULL;
+
+    if (*m[0] < *m[1] && *m[0] < *m[2]){
+        n = m[0];
+    }
+    else if (*m[1] < *m[0] && *m[1] < *m[2]){
+        n = m[1];
+    }
+    else if (*m[2] < *m[0] && *m[2] < *m[1]){
+        n = m[2];
+    }
+    else if (*m[0] > *m[1] && *m[0] > *m[2]){
+        a = m[1];
+        b = m[2];
+    }
+    else if (*m[1] > *m[0] && *m[1] > *m[2]){
+        a = m[0];
+        b = m[2];
+    }
+    else if (*m[2] > *m[0] && *m[2] > *m[1]){
+        a = m[0];
+        b = m[1];
+    }
+    
+    if (!n && !a && !b){
+        *m[rand()%3] += v;
+    }
+    else if (!n){
+        if (rand()%2){
+            *a += v;
+        }
+        else {
+            *b += v;
+        }
+    }
+    else{
+        *n += v;
+    }
+}
+
+void explodeItemName(char *item, char *name, int *lvl){
+    char *dash = strstr(item, "-");
+    strcpy(name, dash+1);
+    dash = strstr(name, "-");
+    *lvl = atoi(dash+1);
+    *dash = '\0';
+}
+
 void itemEffect(int gladid, char *item){
-    if (strcmp(item, "pot-hp-1") == 0){
-        (g+gladid)->hp += 20 + 2 * (g+gladid)->lvl;
+    char name[20];
+    int lvl;
+
+    explodeItemName(item, name, &lvl);
+
+    if (strcmp(name, "hp") == 0){
+        (g+gladid)->hp += lvl*20 + lvl*2 * (g+gladid)->lvl;
     }
-    else if (strcmp(item, "pot-ap-1") == 0){
-        (g+gladid)->ap += 20 + 2 * (g+gladid)->lvl;
+    else if (strcmp(name, "ap") == 0){
+        (g+gladid)->ap += lvl*20 + lvl*2 * (g+gladid)->lvl;
     }
-    else if (strcmp(item, "pot-hp-2") == 0){
-        (g+gladid)->hp += 40 + 4 * (g+gladid)->lvl;
+    else if (strcmp(name, "high") == 0){
+        int highArray[4] = {10, 5, 3, 2};
+        int points = lvl + ceil((g+gladid)->lvl / highArray[lvl-1]);
+        int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+        increaseHighAttr(m, points);
     }
-    else if (strcmp(item, "pot-ap-2") == 0){
-        (g+gladid)->ap += 40 + 4 * (g+gladid)->lvl;
+    else if (strcmp(name, "low") == 0){
+        int lowArray[4] = {10, 5, 3, 2};
+        int points = 1+lvl + ceil((g+gladid)->lvl / lowArray[lvl-1]);
+        int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+        increaseLowAttr(m, points);
     }
-    else if (strcmp(item, "pot-hp-3") == 0){
-        (g+gladid)->hp += 60 + 6 * (g+gladid)->lvl;
-    }
-    else if (strcmp(item, "pot-ap-3") == 0){
-        (g+gladid)->ap += 60 + 6 * (g+gladid)->lvl;
-    }
-    else if (strcmp(item, "pot-hp-4") == 0){
-        (g+gladid)->hp += 80 + 8 * (g+gladid)->lvl;
-    }
-    else if (strcmp(item, "pot-ap-4") == 0){
-        (g+gladid)->ap += 80 + 8 * (g+gladid)->lvl;
-    }
-    else if (strcmp(item, "pot-hp-5") == 0){
-        (g+gladid)->hp += 100 + 10 * (g+gladid)->lvl;
-    }
-    else if (strcmp(item, "pot-ap-5") == 0){
-        (g+gladid)->ap += 100 + 10 * (g+gladid)->lvl;
+    else if (strcmp(name, "xp") == 0){
+        (g+gladid)->xp += (getXpToNextLvl(gladid) - (g+gladid)->xp) * 0.25 * lvl;
     }
 }
 
