@@ -113,6 +113,8 @@ function preload() {
     game.load.audio('lvlup', 'res/audio/lvlup.mp3');
     game.load.audio('heal', 'res/audio/heal.mp3');
     game.load.audio('mana', 'res/audio/mana.mp3');
+    game.load.audio('tonic', 'res/audio/tonic.mp3');
+    game.load.audio('elixir', 'res/audio/elixir.mp3');
     game.load.audio('death_male', 'res/audio/death_male.mp3');
     game.load.audio('death_female', 'res/audio/death_female.mp3');
     game.load.spritesheet('dummy', 'res/glad.png', 64, 64);
@@ -378,7 +380,7 @@ function update() {
         if (gasadv >= 1 && (gasl.length == 0 || (17-poison) / gasld > gasl.length - 1)){
             var gas = [];
             for (let j = 0 ; j< gaspl ; j++){
-                gas.push(game.add.image(0,0, 'atlas_effects', 'gas'));
+                gas.push(game.add.image(0,0, 'atlas_effects', 'gas/gas'));
                 gas[j].anchor.setTo(0.5, 0.5);
                 gas[j].scale.setTo(gas[j].width / arenaRate * 3); //size = 1p
                 gas[j].rotSpeed = Math.random() * 1 - 0.5;
@@ -475,7 +477,6 @@ function update() {
                 var hp = parseFloat(json.glads[i].hp);
                 var lockedfor = parseFloat(json.glads[i].lockedfor);
 
-
                 sprite[i].x = arenaX1 + x * arenaRate;
                 sprite[i].y = arenaY1 + y * arenaRate;
 
@@ -495,12 +496,7 @@ function update() {
 
                 // used potion
                 if (actionlist[action].name == 'potion') {
-                    if (hp > gladArray[i].hp){
-                        gladArray[i].potion = 'hp';
-                    }
-                    else{
-                        gladArray[i].potion = 'ap';
-                    }
+                    gladArray[i].potion = json.glads[i].code.split("-")[1]
                 }
                 else{
                     gladArray[i].potion = false;
@@ -702,14 +698,23 @@ function update() {
 
                 // potion
                 if (actionlist[action].name == "potion" && gladArray[i].potion){
-                    console.log(gladArray[i].potion)
-                    let name = 'mana'
-                    let alpha = 0.5
+                    // console.log(gladArray[i].potion)
+                    let name, alpha = 1
                     if (gladArray[i].potion == 'hp'){
                         name = 'heal'
-                        alpha = 1
                     }
-
+                    else if (gladArray[i].potion == 'hp'){
+                        name = 'mana'
+                        alpha = 0.5
+                    }
+                    else if (gladArray[i].potion == 'high' || gladArray[i].potion == 'low'){
+                        name = 'tonic'
+                    }
+                    else if (gladArray[i].potion == 'xp'){
+                        name = 'elixir'
+                    }
+                    
+                    console.log(name)
                     var potion = addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
                     potion.anchor.setTo(0.5);
                     groupglad.add(potion);
@@ -758,11 +763,9 @@ function update() {
                     timeSlider = json.simtime;
                     $( "#time" ).slider("value", parseFloat(json.simtime) * 10);
                 }
-
-                update_ui(json);
-
             }
             
+            update_ui(json);
         }
         
         debugTimer();
@@ -1074,10 +1077,12 @@ function update_ui(json){
                 uiVars[i].poison = false;
                 $('.buff-poison').eq(i).removeClass('active');
             }
-        }
-        
-        if ($('.ui-glad.follow').length)
-            updateDetailedWindow();
+
+            if ($('.ui-glad.follow').length && i == $('.ui-glad').index($('.follow'))){
+                updateDetailedWindow()
+            }
+    
+        }        
     }
 }
 
@@ -1749,7 +1754,9 @@ function addSprite(glad, name, x, y){
         stun: {key: 'stun', frames: 6, frameRate: 15, loop: true},
         shield: {key: 'shield', frames: 20, frameRate: 15, loop: false},
         mana: {key: 'mana', frames: 25, frameRate: 15, loop: false},
-        heal: {key: 'heal', frames: 25, frameRate: 15, loop: false}
+        heal: {key: 'heal', frames: 25, frameRate: 15, loop: false},
+        tonic: {key: 'tonic', frames: 35, frameRate: 15, loop: false},
+        elixir: {key: 'elixir', frames: 25, frameRate: 15, loop: false}
     };
 
 
@@ -1761,7 +1768,7 @@ function addSprite(glad, name, x, y){
     else{
         let nz = anim[name].frames >= 10 ? 2 : 1
         glad.sprites[name] = game.add.sprite(x, y, 'atlas_effects');
-        var frames = Phaser.Animation.generateFrameNames(anim[name].key +'_', 0, anim[name].frames-1, '', nz)
+        var frames = Phaser.Animation.generateFrameNames(anim[name].key +'/', 0, anim[name].frames-1, '', nz)
         glad.sprites[name].animations.add(name, frames, anim[name].frameRate, anim[name].loop);
     }
 
@@ -1793,16 +1800,16 @@ function newProjectile(type, x, y){
     else{
         newi = projSprites[type].length;
         if (type == 'arrow')
-            projSprites[type].push(game.add.image(x, y, 'atlas_effects', 'arrow'));
+            projSprites[type].push(game.add.image(x, y, 'atlas_effects', 'arrow/arrow'));
         else{
             projSprites[type].push(game.add.sprite(x, y, 'atlas_effects'));
 
             if (type == 'fireball'){
-                var frames = Phaser.Animation.generateFrameNames('fireball_', 0, 7, '', 2);
+                var frames = Phaser.Animation.generateFrameNames('fireball/', 0, 7, '', 2);
                 projSprites[type][newi].animations.add('fireball', frames, 15, true);
             }
             if (type == 'explode'){
-                var frames = Phaser.Animation.generateFrameNames('explosion_', 0, 11, '', 2);
+                var frames = Phaser.Animation.generateFrameNames('explosion/', 0, 11, '', 2);
                 projSprites[type][newi].animations.add('explode', frames, 15, true);
             }
         }

@@ -9,6 +9,7 @@ var istep;
 var tournHash, loghash;
 var fullscreen = false;
 var timeSlider = 0; 
+var potionList = {}
 
 $(document).ready( function() {
     $('#loadbar #status').html("Página carregada");
@@ -721,7 +722,7 @@ function startBattle(simulation){
             json.projectiles = {};
             $.extend( true, json, simulation[i] ); //merge json objects
             steps.push(JSON.parse(JSON.stringify(json)));
-            //console.log(simulation[i]);
+            // console.log(simulation[i]);
         }
 
         start_timer(steps);
@@ -784,7 +785,16 @@ function createDetailedWindow(){
             <span>AS:</span><input readonly>
             <span>CS:</span><input readonly>
             <span>Speed:</span><input readonly>
-
+            <div id='items'>
+                <span>Items:</span>
+                <div id='box'></div>
+            </div>
+            <div id='code'>
+                <span>Comandos:</span>
+                <span>Durac.</span>
+                <span>Tempo</span>
+                <div id='box'></div>
+            </div>
         </div>
     </div>`);
 
@@ -801,10 +811,22 @@ function createDetailedWindow(){
     $('#details #minimize').click( function(){
         $('#details').animate({
             "top": $(window).height() - 33,
-            "left": $(window).width() - 350,
+            "left": $(window).width() - 350
         });
 
     });
+
+    $.post("back_slots.php", {
+        action: "ITEMS"
+    }).then( data => {
+        let potions = JSON.parse(data).potions
+        // console.log(potions)
+        for (i in potions){
+            let p = potions[i]
+            potionList[p.id] = i
+        }
+        console.log(potionList)
+    })
 
 }
 
@@ -852,6 +874,49 @@ function updateDetailedWindow(){
         $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
 
         c++;
+    }
+
+    if (glad.code){
+        if (glad.code != $('#details #code #box .name').last().text()){
+            $('#details #code #box').append(`<div class='row'>
+                <div class='name'>${glad.code}</div>
+                <div class='duration'>0.1</div>
+                <div class='time'>${json.simtime.toFixed(1)}</div>
+            </div>`)
+
+            if ($('#details #code #box .row').length > 5){
+                $('#details #code #box .row').first().remove()
+            }
+        }
+        else{
+            let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
+            $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
+        }
+    }
+
+    let allPotions = '😎'
+    for (let i in glad.items){
+        let item = $('#details #items #box .row').eq(i).find('span')
+        
+        if (item.length){
+            let text = item.text()
+            if (!item.hasClass('used') && text != allPotions && text != glad.items[i]){
+                item.addClass('used')
+            }
+        }
+        else{
+            let potion
+            if (glad.items[i] > 0){
+                potion = potionList[glad.items[i]]
+            }
+            else if (glad.items[i] == 0){
+                potion = '-'
+            }
+            else if (glad.items[i] == -1){
+                potion = allPotions
+            }
+            $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
+        }
     }
 }
 
