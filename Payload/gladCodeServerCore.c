@@ -356,11 +356,12 @@ void recordSteps(){
                 (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
                 (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
             );
-            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",%s}",
+            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"tonext\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",%s}",
                 (g+i)->name,
                 (g+i)->user,
                 i, //thread num
                 (g+i)->lvl, //lvl
+                getXpToNextLvl(i),
                 (g+i)->xp, //xp
                 (g+i)->STR, //STR
                 (g+i)->AGI, //AGI
@@ -408,12 +409,13 @@ void recordSteps(){
         for (i=0 ; i<nglad ; i++){
             strcpy(buffer, "{");
             
-            if ( (g+i)->lvl != (go+i)->lvl )
+            if ( (g+i)->lvl != (go+i)->lvl ){
                 sprintf(buffer, "%s\"lvl\":%i,", buffer, (g+i)->lvl);
+                sprintf(buffer, "%s\"tonext\":%i,", buffer, getXpToNextLvl(i));
+            }
             
             if ( (g+i)->xp != (go+i)->xp ){
-                float tonext = getXpToNextLvl(i);
-                sprintf(buffer, "%s\"xp\":%i,", buffer, (int)((float)(g+i)->xp / tonext * 100));
+                sprintf(buffer, "%s\"xp\":%i,", buffer, (int)((g+i)->xp));
             }
             
             if ( (g+i)->STR != (go+i)->STR )

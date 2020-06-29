@@ -957,7 +957,7 @@ function update_ui(json){
             var ap = parseFloat(json.glads[i].ap);
             var maxap = parseFloat(json.glads[i].maxap);
             var lvl = parseInt(json.glads[i].lvl);
-            var xp = parseFloat(json.glads[i].xp);
+            var xp = parseInt(json.glads[i].xp);
             var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
             var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
             var stun = parseFloat(json.glads[i].buffs.stun.timeleft);
@@ -1000,7 +1000,7 @@ function update_ui(json){
             
             if (uiVars[i].xp != xp){
                 uiVars[i].xp = xp;
-                $('.xp-bar .filled').eq(i).height(xp +'%');
+                $('.xp-bar .filled').eq(i).height((xp / json.glads[i].tonext * 100) +'%');
             }
             
             if (uiVars[i].hp != hp){
