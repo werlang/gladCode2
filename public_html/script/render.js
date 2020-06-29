@@ -699,16 +699,17 @@ function update() {
                 // potion
                 if (actionlist[action].name == "potion" && gladArray[i].potion){
                     // console.log(gladArray[i].potion)
-                    let name, alpha = 1
+                    let name, alpha = 1, scale = 1
                     if (gladArray[i].potion == 'hp'){
                         name = 'heal'
                     }
-                    else if (gladArray[i].potion == 'hp'){
+                    else if (gladArray[i].potion == 'ap'){
                         name = 'mana'
                         alpha = 0.5
                     }
                     else if (gladArray[i].potion == 'high' || gladArray[i].potion == 'low'){
                         name = 'tonic'
+                        scale = 0.7
                     }
                     else if (gladArray[i].potion == 'xp'){
                         name = 'elixir'
@@ -717,6 +718,7 @@ function update() {
                     console.log(name)
                     var potion = addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
                     potion.anchor.setTo(0.5);
+                    potion.scale.setTo(scale);
                     groupglad.add(potion);
                     potion.animations.play(name, null, false, true);
                     potion.alpha = alpha;

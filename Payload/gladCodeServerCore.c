@@ -1033,33 +1033,45 @@ void explodeItemName(char *item, char *name, int *lvl){
     *dash = '\0';
 }
 
-void itemEffect(int gladid, char *item){
+int itemEffect(int gladid, char *item){
     char name[20];
     int lvl;
 
     explodeItemName(item, name, &lvl);
 
-    if (strcmp(name, "hp") == 0){
-        (g+gladid)->hp += lvl*20 + lvl*2 * (g+gladid)->lvl;
+    if (lvl > 0){
+        if (strcmp(name, "hp") == 0 && lvl <= 5){
+            (g+gladid)->hp += lvl*20 + lvl*2 * (g+gladid)->lvl;
+            (g+gladid)->hp = (g+gladid)->hp > (g+gladid)->maxhp ? (g+gladid)->maxhp : (g+gladid)->hp;
+        }
+        else if (strcmp(name, "ap") == 0 && lvl <= 5){
+            (g+gladid)->ap += lvl*20 + lvl*2 * (g+gladid)->lvl;
+            (g+gladid)->ap = (g+gladid)->ap > (g+gladid)->maxap ? (g+gladid)->maxap : (g+gladid)->ap;
+        }
+        else if (strcmp(name, "high") == 0 && lvl <= 4){
+            int highArray[4] = {10, 5, 3, 2};
+            int points = lvl + ceil((g+gladid)->lvl / highArray[lvl-1]);
+            int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+            increaseHighAttr(m, points);
+        }
+        else if (strcmp(name, "low") == 0 && lvl <= 4){
+            int lowArray[4] = {10, 5, 3, 2};
+            int points = 1+lvl + ceil((g+gladid)->lvl / lowArray[lvl-1]);
+            int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+            increaseLowAttr(m, points);
+        }
+        else if (strcmp(name, "xp") == 0 && lvl <= 3){
+            (g+gladid)->xp += (getXpToNextLvl(gladid) - (g+gladid)->xp) * 0.25 * lvl;
+        }
+        else{
+            return 0;
+        }
     }
-    else if (strcmp(name, "ap") == 0){
-        (g+gladid)->ap += lvl*20 + lvl*2 * (g+gladid)->lvl;
+    else{
+        return 0;
     }
-    else if (strcmp(name, "high") == 0){
-        int highArray[4] = {10, 5, 3, 2};
-        int points = lvl + ceil((g+gladid)->lvl / highArray[lvl-1]);
-        int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
-        increaseHighAttr(m, points);
-    }
-    else if (strcmp(name, "low") == 0){
-        int lowArray[4] = {10, 5, 3, 2};
-        int points = 1+lvl + ceil((g+gladid)->lvl / lowArray[lvl-1]);
-        int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
-        increaseLowAttr(m, points);
-    }
-    else if (strcmp(name, "xp") == 0){
-        (g+gladid)->xp += (getXpToNextLvl(gladid) - (g+gladid)->xp) * 0.25 * lvl;
-    }
+
+    return 1;
 }
 
 void appendCode(int gladid, char *format, ...){

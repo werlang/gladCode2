@@ -1205,7 +1205,6 @@ void lvlUpSB(int gladid, int n){
 
 // faz o gladiador usar um item
 int useItem(int gladid, char *item){
-    appendCode(gladid, "useItem(\\\"%s\\\")", item);
     if (endsim || (g+gladid)->hp <= 0){
         return 0;
     }
@@ -1218,10 +1217,13 @@ int useItem(int gladid, char *item){
                 (g+gladid)->items[i] = 0;
                 (g+gladid)->action = ACTION_ITEM;
                 (g+gladid)->lockedfor = timeInterval;
-                itemEffect(gladid, item);
-                r = 1;
+                r = itemEffect(gladid, item);
                 break;
             }
+        }
+
+        if (r){
+            appendCode(gladid, "useItem(\\\"%s\\\")", item);
         }
 
         waitForLockedStatus(gladid);
