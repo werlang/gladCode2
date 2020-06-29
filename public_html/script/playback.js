@@ -765,26 +765,26 @@ function createDetailedWindow(){
         <div id='content'>
             <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
             <span>LVL:</span><input readonly>
-            <span>HP:</span><input readonly>
             <span>XP:</span><input readonly>
-            <span>AP:</span><input readonly>
             <span>X:</span><input readonly>
-            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
+            <span>HP:</span><input readonly>
             <span>Y:</span><input readonly>
-            <span>Action:</span><input readonly>
+            <span>AP:</span><input readonly>
             <span>STR:</span><input readonly>
-            <span>Locked:</span><input readonly>
+            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
             <span>AGI:</span><input readonly>
+            <span>Action:</span><input readonly>
+            <span>INT:</span><input readonly>
             <div id='buffs'>
                 <span>Buffs:</span>
                 <span>Valor</span>
                 <span>Tempo</span>
                 <div id='box'><div></div><div></div><div></div></div>
             </div>
-            <span>INT:</span><input readonly>
             <span>AS:</span><input readonly>
             <span>CS:</span><input readonly>
             <span>Speed:</span><input readonly>
+            <span>Locked:</span><input readonly>
             <div id='items'>
                 <span>Items:</span>
                 <div id='box'></div>
@@ -816,17 +816,19 @@ function createDetailedWindow(){
 
     });
 
-    $.post("back_slots.php", {
-        action: "ITEMS"
-    }).then( data => {
-        let potions = JSON.parse(data).potions
-        // console.log(potions)
-        for (i in potions){
-            let p = potions[i]
-            potionList[p.id] = i
-        }
-        console.log(potionList)
-    })
+    if (Object.keys(potionList).length == 0){
+        $.post("back_slots.php", {
+            action: "ITEMS"
+        }).then( data => {
+            let potions = JSON.parse(data).potions
+            // console.log(potions)
+            for (i in potions){
+                let p = potions[i]
+                potionList[p.id] = i
+            }
+            // console.log(potionList)
+        })
+    }
 
 }
 
@@ -837,20 +839,20 @@ function updateDetailedWindow(){
     var info = [
         glad.name,
         glad.lvl,
-        `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
-        glad.xp,
-        `${glad.ap.toFixed(1)} / ${glad.maxap}`,
+        `${glad.xp} / ${glad.tonext}`,
         glad.x.toFixed(1),
-        glad.head.toFixed(1),
+        `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
         glad.y.toFixed(1),
-        getActionName(glad.action),
+        `${glad.ap.toFixed(1)} / ${glad.maxap}`,
         glad.STR,
-        glad.lockedfor.toFixed(1),
+        glad.head.toFixed(1),
         glad.AGI,
+        getActionName(glad.action),
         glad.INT,
         glad.as.toFixed(1),
         glad.cs.toFixed(1),
-        glad.spd.toFixed(1)
+        glad.spd.toFixed(1),
+        glad.lockedfor.toFixed(1)
     ];
 
     $('#details input').each( function(i){
