@@ -18,6 +18,7 @@
         while($row = $result->fetch_assoc()){
             $id = $row['identifier'];
             $potion = array();
+            $potion['id'] = $row['id'];
             $potion['price'] = $row['price'];
             $potion['icon'] = $row['icon'];
             $potion['name'] = $row['name'];
