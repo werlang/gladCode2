@@ -412,7 +412,7 @@ void recordSteps(){
                 sprintf(buffer, "%s\"lvl\":%i,", buffer, (g+i)->lvl);
             
             if ( (g+i)->xp != (go+i)->xp ){
-                float tonext = XP_FIRSTLVL * pow( (1 + XP_FACTOR), (g+i)->lvl - 1);
+                float tonext = getXpToNextLvl(i);
                 sprintf(buffer, "%s\"xp\":%i,", buffer, (int)((float)(g+i)->xp / tonext * 100));
             }
             
@@ -671,8 +671,6 @@ int updateSimulation(int gladid){
         if ( (g+gladid)->time > POISON_TIME){
             spread_poison(gladid);
         }
-
-        strcpy((g+gladid)->code_exec, "");
                 
         pthread_mutex_unlock(&lock);		
     }

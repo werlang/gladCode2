@@ -1205,7 +1205,7 @@ void lvlUpSB(int gladid, int n){
 
 // faz o gladiador usar um item
 int useItem(int gladid, char *item){
-    appendCode(gladid, "useItem(\"%s\")", item);
+    appendCode(gladid, "useItem(\\\"%s\\\")", item);
     if (endsim || (g+gladid)->hp <= 0){
         return 0;
     }
