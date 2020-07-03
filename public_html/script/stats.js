@@ -50,9 +50,10 @@ $(document).ready( function() {
     });
 });
 
-function search(){
+async function search(){
     var mmr = $( "#mmr-slider" ).slider('option','values');
-    load_stats({
+    
+    let stats = load_stats({
         date: {
             start: $("#date-str").val(),
             end: $("#date-end").val()
@@ -61,14 +62,17 @@ function search(){
             start: mmr[0],
             end: mmr[1]
         }
-    }).then( function(data) {
-        load_table(data);
-    });
+    })
+    
+    let potions = post("back_slots.php", { action: "ITEMS" })
+
+    load_table(await stats, (await potions).potions)
+
 }
 
-function load_table(data){
+function load_table(data, potions){
     data = JSON.parse(data);
-    //console.log(data);
+    // console.log(data);
     
     $('#t-hab tbody').html("");
     $('#t-glad tbody td').not('.fixed').remove();
@@ -114,8 +118,8 @@ function load_table(data){
         else
             $('#avg-time').html('-');
 
-        if (data.nbattles.highattr < data.nbattles.total){
-            $('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.nbattles.highattr} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();
+        if (data.potions.battles < data.nbattles.total){
+            $('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.potions.battles} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();
         }
         else if (!$('#single-stats #low-battles').hasClass('hidden'))
             $('#single-stats #low-battles').addClass('hidden');
@@ -129,5 +133,44 @@ function load_table(data){
         $('#nbattles').html("0");
         $('#single-stats #low-battles').addClass('hidden')
     }
+    
+    let table = {}
+    for (let p in potions){
+        let potkind = p.split("-").splice(0,2).join("-")
+        if (!table[potkind]){
+            let name = potions[p].name.split(" ")
+            name = name.splice(0, name.length-1).join(" ") 
+            table[potkind] = {name: name, lvl: []}
+        }
 
+        let uses = data.potions.use[p]
+        let wins = data.potions.win[p]
+        let lvl = parseInt(p.split("-")[2])
+        if (!uses){
+            uses = 0
+            wins = 0
+        }
+        table[potkind].lvl[lvl-1] = {use: uses, win: wins}
+    }
+
+    let str = []
+    for (let p in table){
+        row = []
+        for (let i=0 ; i<5 ; i++){
+            if (!table[p].lvl[i] || table[p].lvl[i].use == 0){
+                row.push(`<td>-</td>`)    
+            }
+            else{
+                let uses = table[p].lvl[i].use / data.potions.battles * 100
+                let wins = table[p].lvl[i].win / table[p].lvl[i].use * 100
+                row.push(`<td><div>
+                    <span class='up' title='Percentual de batalhas que a poção foi utilizada'>${uses == 100 ? uses.toFixed(0) : uses.toFixed(1)}%</span>/
+                    <span class='down' title='Percentual de batalhas que o gladiador que usou a poção venceu'>${wins == 100 ? wins.toFixed(0) : wins.toFixed(1)}%</span>
+                </div></td>`)
+            }
+        }
+        str.push(`<tr><td>${table[p].name}</td>${row.join("")}</tr>`)
+    }
+
+    $('#t-pot tbody').html(str.join(""))
 }

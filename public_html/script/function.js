@@ -11,6 +11,13 @@ $(document).ready( function() {
     if ($('#vget').length)
         func = $('#vget').val();
 
+    var lang_word = 'function';
+    if ($('#dict').length){
+        langDict = $('#dict').html()
+        if (langDict == 'pt')
+            lang_word = 'funcao';
+    }
+
     if (func == "")
         load_content("");
     else{
@@ -21,13 +28,6 @@ $(document).ready( function() {
                     python: "py",
                     blocks: "blk"
                 };
-
-                var lang_word = 'function';
-                if ($('#dict').length){
-                    langDict = $('#dict').html()
-                    if (langDict == 'pt')
-                        lang_word = 'funcao';
-                }
 
                 window.location.href = `${lang_word}/${func}.${ext[ui.item.value]}`;
             }
@@ -259,7 +259,7 @@ async function load_content(item, fileData){
     }
 
     if (langDict){
-        await loadExplain
+        // await loadExplain
         loadDict(funcsDict)
     }
 
