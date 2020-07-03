@@ -37,6 +37,8 @@ function save_stats(hash){
     
         var wonhab = [];
         var gladwon = [];
+        var potionuse = []
+        var potionwin = []
         let i = 1
         while (!gladwon.length){
             var step = steps[steps.length - i];
@@ -73,6 +75,21 @@ function save_stats(hash){
                             if (!ex)
                                 wonhab.push(a);
                         }
+                    }
+                }
+            }
+
+            for (let g in steps[s].glads){
+                let glad = steps[s].glads[g]
+                if (parseInt(glad.action) == 11){
+                    let potion = glad.code.split("useItem(\"")[1].split("\"")[0]
+                    
+                    if (!potionuse.includes(potion)){
+                        potionuse.push(potion)
+                    }
+
+                    if (gladwon.includes(g) && !potionwin.includes(potion)){
+                        potionwin.push(potion)
                     }
                 }
             }
@@ -137,7 +154,9 @@ function save_stats(hash){
             highstr: high.STR,
             highagi: high.AGI,
             highint: high.INT,
-            loghash: hash
+            loghash: hash,
+            potionuse: JSON.stringify(potionuse),
+            potionwin: JSON.stringify(potionwin)
         }
         // console.log(args)
         post("back_stats.php", args)
@@ -161,9 +180,7 @@ function load_stats(args){
         emmr: mmr.end
     })
     .done(function( data ) {
-        //console.log(data);
-        //this function returns ajax deferred
-        //get data in $.when(load_stats()).then( function(data) { //cod });
+        // console.log(data);
     });	
     return ajax;
 }

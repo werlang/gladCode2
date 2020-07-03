@@ -79,6 +79,22 @@
                     </tbody>
                 </table>
 
+                <h2>Poções</h2>
+                <table class='table' id='t-pot'>
+                    <thead>
+                        <tr>
+                            <th><i class='info fas fa-question-circle' title='Passe o mouse em uma célula para obter informações'></i></th>
+                            <th title='Poção nível 1'>I</th>
+                            <th title='Poção nível 2'>II</th>
+                            <th title='Poção nível 3'>III</th>
+                            <th title='Poção nível 4'>IV</th>
+                            <th title='Poção nível 5'>V</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
                 <h2>Batalhas</h2>
                 <div id='single-stats'>
                     <div class='card'>
