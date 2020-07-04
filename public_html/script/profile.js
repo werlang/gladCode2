@@ -1329,7 +1329,20 @@ function preBattleShow(glads){
         "Se você tem pouca vida, jamais deixe um inimigo chegar muito perto de você",
         "Se você é um mago, não fique parado. Ser atordoado pode te custar a vida",
         "Se você é um guerreiro, abuse do BLOCK, ele é a ferramenta que te deixará vivo",
-        "Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura"
+        "Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura",
+
+        "Ganhe moedas de prata por iniciar batalhas ranqueadas",
+        "As primeiras 20 batalhas no intervalo de 24 horas rendem mais moedas de prata",
+        "No menu POÇÕES você pode acessar todos itens disponíveis no apotecário",
+        "Aumente o nível do seu apotecário para ganhar acesso a mais e melhores itens",
+        "Os itens encomendados no apotecário ficam disponíveis para uso em todas suas batalhas",
+        "Aumente seu nível de mestre para desbloquear mais espeços para encomandar poções",
+        "Use a poção de vitalidade para impedir que seu gladiador morra",
+        "Use a poção de concentração quando seu gladiador necessitar com urgência de pontos de habilidade",
+        "O tônico do gigante é usado quando você quer especializar seu gladiador",
+        "O tônico fortificate é útil quando você não quer que seu gladiador possua pontos fracos",
+        "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível",
+        "Quando usando um tônico, caso haja empate o atributo aprimorado é decidido aleatoriamente"
     ];
 
     var timeElapsed = 0;
