@@ -405,7 +405,7 @@
 
     echo json_encode($output);
 
-    // system("rm -rf $path/temp/$foldername");
+    system("rm -rf $path/temp/$foldername");
     
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
