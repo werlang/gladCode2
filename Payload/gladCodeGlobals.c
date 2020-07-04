@@ -133,6 +133,7 @@ pthread_cond_t cond;
 // associa os indices aos nomes dos itens
 char itemList[100][100];
 void setItemNames(){
+    strcpy(itemList[0], "");
     strcpy(itemList[1], "pot-hp-1");
     strcpy(itemList[2], "pot-ap-1");
     strcpy(itemList[3], "pot-hp-2");

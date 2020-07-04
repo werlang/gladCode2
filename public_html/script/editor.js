@@ -643,7 +643,7 @@ $(document).ready( function() {
         sample.getSession().setMode("ace/mode/c_cpp");
         sample.setReadOnly(true);
 
-        sample.setValue("int start = 1;\n\nloop(){\n    upgradeSTR();\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}", -1);
+        sample.setValue("int start = 1;\n\nloop(){\n    upgradeSTR(5);\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}", -1);
 
         $('#settings-window #list .theme').click( function(){
             $('#settings-window #list .theme').removeClass('selected');

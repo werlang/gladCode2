@@ -1213,7 +1213,8 @@ int useItem(int gladid, char *item){
 
         int i, r = 0;
         for (i=0 ; i<N_SLOTS ; i++){
-            if ((g+gladid)->items[i] == -1 || ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0)){
+            int id = (g+gladid)->items[i];
+            if (id == -1 || (id != 0 && strcmp(item, itemList[id]) == 0)){
                 (g+gladid)->items[i] = 0;
                 (g+gladid)->action = ACTION_ITEM;
                 (g+gladid)->lockedfor = timeInterval;
@@ -1224,9 +1225,8 @@ int useItem(int gladid, char *item){
 
         if (r){
             appendCode(gladid, "useItem(\\\"%s\\\")", item);
+            waitForLockedStatus(gladid);
         }
-
-        waitForLockedStatus(gladid);
 
         return r;
     }
@@ -1240,7 +1240,8 @@ int isItemReady(int gladid, char *item){
     else{
         int i;
         for (i=0 ; i<N_SLOTS ; i++){
-            if ((g+gladid)->items[i] == -1 || ((g+gladid)->items[i] != 0 && strcmp(item, itemList[(g+gladid)->items[i]]) == 0)){
+            int id = (g+gladid)->items[i];
+            if (id == -1 || (id != 0 && strcmp(item, itemList[id]) == 0)){
                 return 1;
             }
         }
