@@ -192,7 +192,7 @@ training.show = async function(){
                     </div>
                 </div>
                 <div class='teams-container'></div>
-                <div class='foot'><button class='button' disabled></button></div>
+                <div class='foot'><button class='button' disabled></button><div class='rerun hidden' title='Executar simulação'><i class='fas fa-redo'></i></div></div>
             </div>`);
             $('#content-box #group-container .group').eq(i).data('id', gid);
 
@@ -267,6 +267,30 @@ training.show = async function(){
                 }
             })
 
+            $('#group-container .foot .rerun').off().click( e => {
+                let group = $(e.currentTarget).parents('.group')
+                let id = group.data('id')
+                post("back_training_run.php", {
+                    action: "RERUN",
+                    hash: this.hash,
+                    group: id
+                }).then( data => {
+                    // console.log(data)
+                    if (data.status == "SUCCESS"){
+                        let button = group.find('.foot .button')
+                        if (!button.data('try')){
+                            button.data('try', '1')
+                        }
+                        else{
+                            let btry = parseInt(button.data('try'))
+                            button.data('try', btry + 1)
+                        }
+                        button.attr('disabled', true).html(`Grupo pronto. Organizando batalha... ${button.data('try')}`);
+                        this.groups[id].log = false
+                    }
+                })
+            })
+
             if (this.deadline === null){
                 let click = showDialog(`
                     <span>Quanto tempo até o início das batalhas da rodada ${this.round}?</span>
@@ -308,6 +332,7 @@ training.show = async function(){
         else if (!this.manager || this.end){
             $('#content-box #prepare').remove();
             $('#button-container .arrow').addClass('nobutton');
+            $('#group-container .foot .rerun').remove();
         }
 
         this.counting = { train: 0, round: 0 }
@@ -418,8 +443,10 @@ training.refresh = async function(args){
     
     for (let gid in this.groups){
         let group = this.groups[gid]
-        if (data.groups[gid].locked)
+        if (data.groups[gid].locked){
             group.locked = true
+            $('.group .rerun').removeClass('hidden')
+        }
         if (data.groups[gid].log){
             group.log = data.groups[gid].log
             for (let ti in group){
@@ -465,15 +492,27 @@ training.refresh = async function(args){
                 training: gid,
                 origin: "train"
             })
-            let simdata
             await socket_ready()
             socket.emit('tournament run request', {
                 hash: this.hash,
                 group: gid
             }, async data => {
                 // console.log(data);
-                if (data.permission == 'granted')
-                    simdata = await sim.run()
+                if (data.permission == 'granted'){
+                    let d = new Date().getTime()
+                    sim.run().then( data => {
+                        // console.log(data)
+                        $('#content-box #group-container .group').each( (_,obj) => {
+                            let id = $(obj).data('id')
+                            if (data.error.length && parseInt(id) == parseInt(gid)){
+                                // this 5s time is to avoid permission denied from node
+                                setTimeout( () => {
+                                    $(obj).find('.foot .rerun').click()
+                                }, 5000 - (new Date().getTime() - d))
+                            }
+                        })    
+                    })
+                }
             })
         }
         else if (data.status == "LOCK"){
