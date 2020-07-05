@@ -817,7 +817,7 @@ function createDetailedWindow(){
     });
 
     if (Object.keys(potionList).length == 0){
-        $.post("back_slots.php", {
+        potionList.ready = $.post("back_slots.php", {
             action: "ITEMS"
         }).then( data => {
             let potions = JSON.parse(data).potions
@@ -832,7 +832,7 @@ function createDetailedWindow(){
 
 }
 
-function updateDetailedWindow(){
+async function updateDetailedWindow(){
     var index = $('.ui-glad').index($('.follow'));
     var glad = json.glads[index];
 
@@ -897,13 +897,17 @@ function updateDetailedWindow(){
     }
 
     let allPotions = '😎'
+    await potionList.ready
     for (let i in glad.items){
         let item = $('#details #items #box .row').eq(i).find('span')
         
         if (item.length){
             let text = item.text()
-            if (!item.hasClass('used') && text != allPotions && text != glad.items[i]){
+            if (text == '-' || glad.items[i] == 0){
                 item.addClass('used')
+            }
+            else {
+                item.removeClass('used')
             }
         }
         else{

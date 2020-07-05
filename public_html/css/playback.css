@@ -1266,10 +1266,11 @@ body .ui-tooltip {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    transition: 0.3s all;
     font-family: 'Source Code Pro', monospace;
 }
 
 #details #items #box .row span.used{
+    transition: 0.5s all;
     color: #99a3a7;
+    filter: grayscale(1)
 }

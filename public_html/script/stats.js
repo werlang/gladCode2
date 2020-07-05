@@ -148,6 +148,8 @@ function load_table(data, potions){
         let lvl = parseInt(p.split("-")[2])
         if (!uses){
             uses = 0
+        }
+        if (!wins){
             wins = 0
         }
         table[potkind].lvl[lvl-1] = {use: uses, win: wins}
