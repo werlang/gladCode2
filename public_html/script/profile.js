@@ -1097,7 +1097,7 @@ function afterBattleShow(hash, oldStatus){
             </div>
             <div id='button-container'>
                 <button id='code'><i class='fas fa-code'></i><span>EDITAR GLADIADOR</span></button>
-                <button id='close'><i class='fas fa-times'></i><span>NÃO VISUALIZAR</span></button>
+                <button id='close'><i class='fas fa-times'></i><span>FECHAR JANELA</span></button>
                 <button id='watch'><i class='fas fa-eye'></i><span>VISUALIZAR BATALHA</span></button>
             </div>
         </div>
