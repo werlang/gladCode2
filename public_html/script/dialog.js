@@ -169,6 +169,7 @@ function create_tooltip(message, obj, args){
 //          placeholder: Placeholder html attr of the field
 //          enter:  Id from the buttons object. When enter is pressed, this button will be clicked
 //                  If no enter id is given, 'ok', then 'yes' will be default values
+// class:   class to be appended in the dialog box
 // preventKill: Prevent dialog box from closing when a button is pressed
 // 
 // Methods:
@@ -177,6 +178,7 @@ function create_tooltip(message, obj, args){
 // click(button, callback): Bind a custom callback when button is clicked
 //                          callback arg receive the value of the input field
 //                          Ex: m.click('ok', resp => console.log(resp))
+// getButton(str):  Return the jquery object of the button of the given name
 // ----------------------------------------------------------------------------------------------
 
 class Message {
@@ -206,8 +208,13 @@ class Message {
                 this.input.enter = 'yes'
         }
 
-        if (options.preventKill)
+        if (options.preventKill){
             this.preventKill = true
+        }
+
+        if (options.class){
+            this.class = options.class
+        }
     }
 
     show(){
@@ -219,7 +226,7 @@ class Message {
         let input = this.input ? `<input type='text' class='input' value='${this.input.default}' placeholder='${this.input.placeholder}'>` : ''
 
         $('body').append(`<div id='fog'>
-            <div id='dialog-box'>
+            <div id='dialog-box' ${this.class ? `class='${this.class}'` : ''}>
                 <div id='message'>${this.message}</div>
                 ${input}
                 <div id='button-container'>${buttonsDOM}</div>
@@ -270,5 +277,9 @@ class Message {
         })
 
         return this
+    }
+
+    getButton(name) {
+        return $(`#dialog-box #dialog-button-${name}`)
     }
 }

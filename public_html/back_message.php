@@ -26,7 +26,7 @@
 			$offset = 0;
 
 		$sql = "SELECT * FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user' ORDER BY time DESC LIMIT $units OFFSET $offset";
-		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: '.$sql); }
+		$result = runQuery($sql);
 		
 		$meta = array();
 		$meta['page'] = $page;

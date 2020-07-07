@@ -37,7 +37,7 @@
             // need to calc avg time manually, because we need to subtract 1000 when the user won and ignore time 0 
             $manualtime = "SELECT avg(IF(gt2.lasttime > 1000, gt2.lasttime - 1000, gt2.lasttime)) FROM gladiator_training gt2 WHERE gt2.training = $trainid AND gt2.lasttime > 0 AND gt2.gladiator = gt.gladiator";
             
-            $sql = "SELECT g.name, u.apelido, sum(gt.score) AS score, ($manualtime) AS 'time' FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY gt.gladiator ORDER BY score DESC";
+            $sql = "SELECT g.name, u.apelido, sum(gt.score) AS score, ($manualtime) AS 'time' FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY gt.gladiator ORDER BY score DESC, time DESC";
             $result = runQuery($sql);
 
             $output['ranking'] = array();
@@ -357,6 +357,35 @@
                 $result = runQuery($sql);
 
                 $output['status'] = "SUCCESS";
+            }
+        }
+    }
+    elseif ($action == "RERUN"){
+        $hash = mysql_escape_string($_POST['hash']);
+        $group = mysql_escape_string($_POST['group']);
+
+        $sql = "SELECT manager, id FROM training WHERE hash = '$hash'";
+        $result = runQuery($sql);
+        $nrows = $result->num_rows;
+
+        if ($nrows == 0)
+            $output['status'] = "NOTFOUND";
+        else{
+            $row = $result->fetch_assoc();
+            if ($row['manager'] != $user)
+                $output['status'] = "NOTALLOWED";
+            else{
+                $trainid = $row['id'];
+                
+                $sql = "UPDATE training_groups SET deadline = now(3), locked = NULL, log = NULL WHERE id = $group";
+                $result = runQuery($sql);
+
+                $output['status'] = "SUCCESS";
+
+                send_node_message(array('training refresh' => array(
+                    'hash' => $hash
+                )));
+
             }
         }
     }

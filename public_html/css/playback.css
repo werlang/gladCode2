@@ -1084,7 +1084,7 @@ body .ui-tooltip {
 #details {
     position: fixed;
     left: calc(100% - 350px);
-    top: calc(100% - 33px);
+    top: calc(100% - 500px);
     background-color: white;
     font-size: 1rem;
     font-family: 'Roboto', sans-serif;
@@ -1208,4 +1208,69 @@ body .ui-tooltip {
 
 #details #buffs #box span.active {
     color: black;
+}
+
+#details #code {
+    grid-row: span 5;
+    grid-column: span 2;
+    align-self: stretch;
+    display: grid;
+    grid-template: auto 1fr / 4fr 1fr 1fr;
+    grid-row-gap: 5px;
+    margin-top: 5px;
+}
+
+#details #code #box {
+    display: grid;
+    grid-row: span 4;
+    grid-column: span 3;
+    background-color: #eefaff;
+    padding: 5px;
+    border: 1px solid #8e9da4;
+    border-radius: 3px;
+    grid-template-rows: repeat(5, 20px);
+}
+
+#details #code #box .row {
+    display: grid;
+    grid-template-columns: 4fr 1fr 1fr;
+    text-align: center;
+    align-items: center;
+}
+
+#details #code #box .row .name {
+    text-align: left;
+    font-family: 'Source Code Pro', monospace;
+}
+
+#details #items {
+    grid-row: span 5;
+    grid-column: span 2;
+    align-self: stretch;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-row-gap: 5px;
+    margin-top: 5px;
+}
+
+#details #items #box {
+    display: grid;
+    grid-row: span 4;
+    background-color: #eefaff;
+    padding: 5px;
+    border: 1px solid #8e9da4;
+    border-radius: 3px;
+}
+
+#details #items #box .row{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: 'Source Code Pro', monospace;
+}
+
+#details #items #box .row span.used{
+    transition: 0.5s all;
+    color: #99a3a7;
+    filter: grayscale(1)
 }

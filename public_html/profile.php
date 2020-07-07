@@ -50,6 +50,7 @@
     <script src="script/profile-train.js"></script>
     <script src="script/profile-report.js"></script>
     <script src="script/profile-rank.js"></script>
+    <script src="script/profile-potions.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/profile.js"></script>
@@ -85,13 +86,15 @@
                     </div>
                 </div>
             </div>	
-            <div id='currencies' title='Créditos' class='hidden'>
-                <div class='curr'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+            <div id='currencies' class='hidden'>
+                <div class='curr' id='money' title='Créditos'><i class='fas fa-money-bill'></i><span>0,00</span></div>
+                <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
             </div>
             <div id='menu-buttons'>
                 <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span data-translation-template='{{menu_news}}'></span></div>
                 <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span data-translation-template='{{menu_profile}}'></span></div>
                 <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span data-translation-template='{{menu_glads}}'></span></div>
+                <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span data-translation-template='{{menu_potions}}'></span></div>
                 <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span data-translation-template='{{menu_battles}}'></span></div>
                 <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span data-translation-template='{{menu_reports}}'></span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span  data-translation-template='{{menu_ranking}}'></span></div>
@@ -240,6 +243,34 @@
                 <div id='glads-container'>
                     <h2>Estes são seus gladiadores:</h2>
                     <div class='glad-card-container'></div>
+                </div>
+            </div>
+            <div class='content' data-menu='potions'>
+                <div id='apot-container'>
+                    <div id='apot-panel'>
+                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'></span></span></h2>
+                        <p>Aqui você pode encomendar poções para lhe auxiliar durante as batalhas ranqueadas.</p>
+                        <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'></span> horas</span>, uma vez por batalha.</p>
+                        <p>Cada um de seus compartimentos dá direito a levar para batalha um item encomendado. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
+                        <div id='apot-info'>
+                            <div class='col'>
+                                <div class='row'>
+                                    <div>Nível do apotecário:</div><div class='lvl highlight'></div>
+                                </div>
+                                <div class='row'>
+                                    <div>Duração da encomenda:</div><div class='highlight'><span class='duration'></span>horas</div>
+                                </div>
+                                <div class='row'>
+                                    <div>Custo para aprimorar:</div><div><span class='highlight cost'></span><i class='fas fa-coins silver'></i></div>
+                                </div>
+                            </div>
+                            <div id='button-container' class='col'>
+                                <button id='upgrade'>APRIMORAR</button>
+                                <button id='browse'>VER POÇÕES</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id='my-pots'></div>
                 </div>
             </div>
             <div class='content' data-menu='ranking'>

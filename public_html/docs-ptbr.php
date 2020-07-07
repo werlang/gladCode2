@@ -346,6 +346,23 @@
                     </tbody>
                 </table>
                 
+                <h2 id='nav-item'>Uso de itens</h2>
+                
+                <p>As funções de uso de itens levam em consideração itens adquiridos no seu perfil de mestre. Eles podem ser usados para conceder vantagens dentro da arena</p>
+            
+                <table class='table t-funcs'>
+                    <tbody>
+                        <tr>
+                            <td><a href='useitem'></a></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><a href='isitemready'></a></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
                 <h2 id='nav-math'>Matemática</h2>
                 
                 <p>As funções matemáticas estão presentes na gladCode para ajudar o competidor a realizar cálculos relativos à arena.</p>

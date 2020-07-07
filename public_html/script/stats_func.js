@@ -9,7 +9,8 @@ function save_stats(hash){
 
         var steps = [];
         $.extend(steps, JSON.parse(json.log)); //hard copy json to steps
-
+        // console.log(steps)
+        
         var abilities = {
             'fireball': {'id': 0, 'uses': 0},
             'teleport': {'id': 1, 'uses': 0},
@@ -28,20 +29,26 @@ function save_stats(hash){
     
         //build a complete log from marging previous steps
         var tempjson = {};
-        for (var i in steps){
+        for (let i in steps){
             tempjson.projectiles = {};
             $.extend( true, tempjson, steps[i] ); //merge json objects
             steps[i] = JSON.parse(JSON.stringify(tempjson));
         }
     
         var wonhab = [];
-        var gladwon;
-        var step = steps[steps.length - 1];
-        for (var g in step.glads){
-            if (step.glads[g].hp > 0)
-                gladwon = g;
+        var gladwon = [];
+        var potionuse = []
+        var potionwin = []
+        let i = 1
+        while (!gladwon.length){
+            var step = steps[steps.length - i];
+            i++
+            for (var g in step.glads){
+                if (step.glads[g].hp > 0)
+                    gladwon.push(g);
+            }
         }
-        //console.log(gladwon);
+        // console.log(gladwon);
     
         for (var s in steps){
             for (var a in abilities){
@@ -57,14 +64,33 @@ function save_stats(hash){
                             abilities[a].uses++;
                     }
                 }
-                if (gladwon && steps[s].glads[gladwon].action == abilities[a].id){
-                    var ex = false;
-                    for (var k in wonhab){
-                        if (wonhab[k] == a)
-                            ex = true;
+                if (gladwon.length){
+                    for (let i in gladwon){                    
+                        if (steps[s].glads[gladwon[i]].action == abilities[a].id){
+                            var ex = false;
+                            for (var k in wonhab){
+                                if (wonhab[k] == a)
+                                    ex = true;
+                            }
+                            if (!ex)
+                                wonhab.push(a);
+                        }
                     }
-                    if (!ex)
-                        wonhab.push(a);
+                }
+            }
+
+            for (let g in steps[s].glads){
+                let glad = steps[s].glads[g]
+                if (parseInt(glad.action) == 11){
+                    let potion = glad.code.split("useItem(\"")[1].split("\"")[0]
+                    
+                    if (!potionuse.includes(potion)){
+                        potionuse.push(potion)
+                    }
+
+                    if (gladwon.includes(g) && !potionwin.includes(potion)){
+                        potionwin.push(potion)
+                    }
                 }
             }
         }
@@ -81,7 +107,7 @@ function save_stats(hash){
 
         //average lvl from those alive
         var avglvl = 0;
-        var winnerlvl = laststep.glads[gladwon].lvl;
+        var winnerlvl = gladwon.map( e => { return laststep.glads[e].lvl }).reduce( (acc,curr) => { return acc + curr}) / gladwon.length
         for (let i in alive){
             avglvl += laststep.glads[alive[i]].lvl;
         }
@@ -104,15 +130,14 @@ function save_stats(hash){
 
             high[attr]++;
             //put highest attr in the winners abilities
-            if (i == gladwon)
+            if (gladwon.includes(i))
                 wonhab.push(attr);
         }
 
         //console.log(steps);
         //console.log(wonhab);
         //console.log(abilities);
-        
-        $.post( "back_stats.php", {
+        let args = {
             action: 'SAVE',
             fireball: abilities.fireball.uses,
             teleport: abilities.teleport.uses,
@@ -129,10 +154,12 @@ function save_stats(hash){
             highstr: high.STR,
             highagi: high.AGI,
             highint: high.INT,
-            loghash: hash
-        })
-        .done(function( data ) {
-        });
+            loghash: hash,
+            potionuse: JSON.stringify(potionuse),
+            potionwin: JSON.stringify(potionwin)
+        }
+        // console.log(args)
+        post("back_stats.php", args)
     
     });
     
@@ -153,9 +180,7 @@ function load_stats(args){
         emmr: mmr.end
     })
     .done(function( data ) {
-        //console.log(data);
-        //this function returns ajax deferred
-        //get data in $.when(load_stats()).then( function(data) { //cod });
+        // console.log(data);
     });	
     return ajax;
 }

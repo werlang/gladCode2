@@ -13,6 +13,7 @@ globais do ambiente, herdado do gladCode1
 #define POINTS_LVL_UP 5
 #define VIS_RANGE 9
 #define VIS_RAD 120
+#define N_SLOTS 4
 
 #define PROJECTILE_TYPE_ATTACK 0
 #define PROJECTILE_TYPE_FIREBALL 1
@@ -37,11 +38,12 @@ globais do ambiente, herdado do gladCode1
 #define ACTION_MOVEMENT 8
 #define ACTION_WAITING 9
 #define ACTION_NONE 10
+#define ACTION_ITEM 11
 
 #define MSG_SPEAK 0
 #define MSG_BREAKPOINT 9
 
-//custos de cada habilidade. os �ndices batem com as constantes dos buffs
+//custos de cada habilidade. os indices batem com as constantes dos buffs
 int abilitycost[6] = {50,50,30,50,30,70};
 
 struct buff {
@@ -106,8 +108,10 @@ struct gladiador{
 	float time; //simtime
 	float moveLock; //guarda valor para controle de movimentos de longa duracao
 	char message[256];
+	char code_exec[256];
     int msgtype;
 	float msgtime;
+    int items[N_SLOTS];
 };
 
 struct gladiador *g, *go;
@@ -125,3 +129,30 @@ float timeLimit = 200; //tempo limite da para o evento de fim da simula��o
 int readytostart = 0;
 pthread_mutex_t lock;
 pthread_cond_t cond;
+
+// associa os indices aos nomes dos itens
+char itemList[100][100];
+void setItemNames(){
+    strcpy(itemList[0], "");
+    strcpy(itemList[1], "pot-hp-1");
+    strcpy(itemList[2], "pot-ap-1");
+    strcpy(itemList[3], "pot-hp-2");
+    strcpy(itemList[4], "pot-ap-2");
+    strcpy(itemList[5], "pot-hp-3");
+    strcpy(itemList[6], "pot-ap-3");
+    strcpy(itemList[7], "pot-hp-4");
+    strcpy(itemList[8], "pot-ap-4");
+    strcpy(itemList[9], "pot-hp-5");
+    strcpy(itemList[10], "pot-ap-5");
+    strcpy(itemList[11], "pot-high-1");
+    strcpy(itemList[12], "pot-high-2");
+    strcpy(itemList[13], "pot-high-3");
+    strcpy(itemList[14], "pot-high-4");
+    strcpy(itemList[15], "pot-low-1");
+    strcpy(itemList[16], "pot-low-2");
+    strcpy(itemList[17], "pot-low-3");
+    strcpy(itemList[18], "pot-low-4");
+    strcpy(itemList[19], "pot-xp-1");
+    strcpy(itemList[20], "pot-xp-2");
+    strcpy(itemList[21], "pot-xp-3");
+}

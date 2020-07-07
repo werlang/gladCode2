@@ -29,6 +29,8 @@ html {
 
 pre {
 	width: 100%;
+	margin-bottom: 15px;
+    margin-top: 0;
 }
 
 #frame pre code {
@@ -65,10 +67,12 @@ h2 {
 p,ul {
 	margin: 0px 0px 20px 0px;
 	text-align: justify;
+	width: 100%;
 }
 
 ul {
 	padding-left: 15px;
+	box-sizing: border-box;
 }
 
 li {
@@ -78,7 +82,8 @@ li {
 .video {
 	width: 100%;
     height: 300px;
-    text-align: center;
+	text-align: center;
+	margin-bottom: 20px;
 }
 
 .video iframe {
@@ -183,6 +188,10 @@ ul {
 }
 }
 
+.col-2 .img-container {
+	margin: 0 20px;
+}
+
 #habilidades {
 	width: 100vw;
     margin-left: -15px;
@@ -268,4 +277,52 @@ ul {
 	#right-side {
 		margin-left: 340px;
 	}
+}
+
+#sample-1.block-container {
+	height: 100px;
+}
+
+#sample-2.block-container {
+	height: 200px;
+}
+
+.block-container {
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.block-container .block {
+	width: 100%;
+	height: 100%;
+}
+
+.silver {
+	margin: 0 5px;
+	color: silver;
+	text-shadow: 1px 1px 2px black;
+}
+
+#tsilver, #tapot {
+	margin: 0 20px;
+	text-align: center;
+}
+
+#tsilver tr,
+#tapot tr {
+	display: table-row;
+}
+
+#tsilver th,
+#tapot th {
+	padding: 0 10px;
+}
+
+#tpotions{
+	width: 100%;
+}
+
+#tpotions td:nth-child(4) {
+	max-width: 300px;
+	line-height: 1.5em;
 }

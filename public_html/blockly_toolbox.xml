@@ -267,5 +267,14 @@
                 </value>
             </block>
         </category>
+        <category name="Itens" colour="#9eb553">
+            <block type="useitem"></block>
+            <block type="itemready"></block>
+            <block type="pot_hp"></block>
+            <block type="pot_ap"></block>
+            <block type="pot_high"></block>
+            <block type="pot_low"></block>
+            <block type="pot_xp"></block>
+        </category>
     </category>
 </xml>

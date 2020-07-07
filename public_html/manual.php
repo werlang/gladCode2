@@ -19,8 +19,12 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
 	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
+    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
 
-	<script src="script/docs.js"></script>
+    <script src="script/blocks.js"></script>
+    <script src="script/manual.js"></script>
     <script src="script/side-menu.js"></script>
     <script src="script/googlelogin.js"></script>
     <script src="script/socket.js"></script>
@@ -256,34 +260,196 @@
 
                 <p>Para dar vida aos gladiadores, os competidores devem programar seu comportamento utilizando a sintaxe de uma linguagem de programação, por isso é recomendável que você tenha pelo menos um conhecimento básico de lógica de programação.</p>
 
-                <p>Atualmente a gladCode possui suporte para programação utilizando a <strong>linguagem de programação C</strong>, mas se você conhece as estruturas básicas de qualquer <a href='https://pt.wikipedia.org/wiki/Programa%C3%A7%C3%A3o_imperativa' target='_blank'>linguagem imperativa</a>, não vai achar difícil se adaptar.</p>
+                <p>Atualmente a gladCode possui suporte para programação utilizando as linguagens <strong><a href='https://www.python.org/' target='_blank'>Python</a>, <a href='https://en.wikipedia.org/wiki/C_(programming_language)' target='_blank'>C</a>, e <a href='https://developers.google.com/blockly' target='_blank'>Blocos</a></strong>. Mas se você conhece as estruturas básicas de qualquer <a href='https://pt.wikipedia.org/wiki/Programa%C3%A7%C3%A3o_imperativa' target='_blank'>linguagem imperativa</a>, não vai achar difícil se adaptar.</p>
 
                 <p>O ambiente da simulação foi criado especialmente para a gladCode portanto existem funções específicas de entrada, que fazem com que o gladiador perceba o que está acontecendo na arena, e funções de saída que fazem com que o gladiador interaja com os elementos presentes na arena.</p>
 
-                <p>Para programar um gladiador, o código-fonte do programa deverá conter a função <strong>loop()</strong>. Muito importante também é que seu código não possua a função main(). Utilize o <a href='editor' target='_blank'>editor de gladiadores</a> para criar o código de seu gladiador</p>
+                <p>Para programar um gladiador, o código-fonte do programa deverá conter a função <strong>loop</strong>. Utilize o <a href='editor' target='_blank'>editor de gladiadores</a> para criar o código de seu gladiador</p>
 
-                <p>O funcionamento é bem simples. Na função loop() será colocado todo o comportamento do gladiador. A cada intervalo de tempo (0.1s) o gladiador irá executar todas as tarefas descritas dentro desta função:</p>
+                <p>O funcionamento é bem simples. Na função loop será colocado todo o comportamento do gladiador. A cada intervalo de tempo (0.1s) o gladiador irá tentar executar todas as tarefas descritas dentro desta função:</p>
 
-                <pre><code class="language-c">loop(){
-    stepForward(); //função que faz mover para frente
+                <pre><code class="language-c">// Exemplo linguagem C
+loop(){
+    stepForward(); // função que faz mover para frente
 }</code></pre>
+
+                <pre><code class="language-python"># Exemplo linguagem Python
+def loop():
+    stepForward() # função que faz mover para frente
+</code></pre>
+
+                <div id='sample-1' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement></block></xml></div>
 
                 <p>No código acima, a cada intervalo de tempo (0.1s) o gladiador irá mover-se o quanto conseguir (depende de sua agilidade) para frente, resultando em sucessivas chamadas da função <a href='function/stepforward' target='_blank'>stepForward</a> ao longo do tempo.</p>
 
                 <p>Porém, existem situações em que o gladiador não consegue executar todos os comando da função loop() em um único intervalo da simulação, como no caso abaixo:</p>
 
-                <pre><code class="language-c">loop(){
+                <pre><code class="language-c">// Exemplo linguagem C
+loop(){
     int i;
-    for (i=0 ; i&lt10 ; i++) //faz 10 chamadas da função stepForward
+    for (i=0 ; i&lt10 ; i++) // faz 10 chamadas da função stepForward
         stepForward();
-    turnLeft(); //função que rotaciona no sentido anti-horário
+    turnLeft(5); // função que rotaciona no sentido anti-horário
 }</code></pre>
 
-                <p>Neste caso o gladiador executa o que conseguir (1 chamada da função que move para frente), e a cada novo intervalo de tempo da simulação ele segue executando os próximos passos. Eventualmente, quando ele concluir todas as etapas descritas em sua função loop() (as 10 chamadas de stepForward mais a chamada de <a href='function/turnleft' target='_blank'>turnLeft</a>), ele irá começar novamente a função loop(). Este processo somente encerrará quando o gladiador morrer, ou quando a simulação terminar.</p>
 
-                <p>Note que existem algumas funções que levam mais tempo para serem executadas, como por exemplos as funções de ataque (ex. <a href='function/attackmelee' target='_blank'>attackMelee</a>) e habilidade (ex. <a href='function/fireball' target='_blank'>fireball</a>). Neste caso o gladiador ficará esperando até que possa agir de novo para seguir a execução de seu código. Existem também as funções que não levam tempo algum de simulação para serem executadas, como as funções que detectam o ambiente (ex. <a href='function/gettargetx' target='_blank'>getTargetX</a>).</p>
+                <pre><code class="language-python"># Exemplo linguagem Python
+def loop():
+    for i in range(10): # faz 10 chamadas da função stepForward
+        stepForward()
+    turnLeft(5) # função que rotaciona no sentido anti-horário
+</code></pre>
+
+                <div id='sample-2' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_repeat_ext" id="QRs$h]i%}G}r{b;mAEgZ"><value name="TIMES"><shadow type="math_number" id="o3IiHfo:VmiR4Ts%m_Uc"><field name="NUM">10</field></shadow></value><statement name="DO"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement><next><block type="turn" id="+-]rflEcarW4v.O7=s:|"><mutation xmlns="http://www.w3.org/1999/xhtml" where="LEFT" use-return="false"></mutation><field name="COMPLEMENT">LEFT</field><value name="ANGLE"><shadow type="math_number" id="VdX3=M8c$3$qnk`U4U2C"><field name="NUM">5</field></shadow></value></block></next></block></statement></block></xml></div>
+
+                <p>Neste caso o gladiador executa o que conseguir (1 chamada da função que move para frente), e a cada novo intervalo de tempo da simulação ele segue executando os próximos passos. Eventualmente, quando ele concluir todas as etapas descritas em sua função loop (as 10 chamadas de stepForward mais a chamada de <a href='function/turnleft' target='_blank'>turnLeft</a>), ele irá começar novamente a função loop. Este processo somente encerrará quando o gladiador morrer, ou quando a simulação terminar.</p>
+
+                <p>Note que existem algumas funções que levam mais tempo para serem executadas, como por exemplo as funções de ataque (ex. <a href='function/attackmelee' target='_blank'>attackMelee</a>) e habilidade (ex. <a href='function/fireball' target='_blank'>fireball</a>). Neste caso o gladiador ficará esperando até que possa agir de novo para seguir a execução de seu código. Existem também as funções que não levam tempo algum de simulação para serem executadas, como as funções que detectam o ambiente (ex. <a href='function/gettargetx' target='_blank'>getTargetX</a>).</p>
+
+                <p>Para uma lista completa das funções existentes, suas finalidades e exemplos de utilização acesse a <a href='docs'>documentação</a>.</p>
 
                 <div class='video'><iframe src="https://www.youtube.com/embed/Wrc-0_Kq-_4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+
+                <h2 id='nav-ranked'>Batalhas ranqueadas</h2>
+
+                <div class='row'>
+                    <div class='col-2'>
+                        <p>Após criar seu primeiro gladiador você estará apto a participar das <a href='battle.ranked'>batalhas ranqueadas</a> da gladCode. Através das batalhas ranqueadas seus gladiadores ganharão <b>renome</b>, que é a pontuação utilizada para classificação dos gladiadores.</p>
+
+                        <p>A decisão de quais serão seus oponentes em uma batalha é feita através da posição no ranking que o gladiador ocupa. Para cada batalha, são selecionados os 10 gladiadores cujas posições no ranking geral são mais próximas do gladiador selecionado, e destes 10, 4 são sorteados aleatoriamente para a composição de seus oponentes na batalha.</p>
+
+                    </div>
+                    <div class='col-2'>
+                        <div class='img-container'><img src='image/ranked.png'></div>
+                    </div>
+                </div>
+
+                <h2 id='nav-mmr'>Renome</h2>
+
+                <div class='row'>
+                    <div class='col-2'>
+
+                        <p>Após cada batalha ranqueada, de acordo com o desemprenho que seu gladiator ovteve na mesma, ele ganhará uma determinada quantidade de renome. A quantidade de renome que um gladiador ganhará se baseia nos seguintes critérios:</p>
+
+                        <ul>
+                            <li>Se o gladiador foi o vencedor da batalha</li>
+                            <li>Quanto tempo o gladiador sobreviveu dentro da arena</li>
+                            <li>O renome que o gladiador possui, comparado à média de renome de todos participantes da batalha</li>
+                            <li>O quão próximo de 1000 de renome o gladiador está</li>
+                        </ul>
+
+                        <p>A recompensa em renome obtida segue a seguinte fórmula:</p>
+                    </div>
+                    <div class='col-2'>
+                        <div class='img-container'><img src='image/rewards.png'></div>
+                    </div>
+                </div>
+                
+
+                <pre><code><em>rewardBase = ( (Ntime + 1.5 * win) - avgReward ) / bestReward * 10
+reward = ( rewardBase / mmr * avgmmr ) * ( 1 + ((0.001 * mmr - 1) * lowmmr) )</em></code></pre>
+
+                <p>Onde:</p>
+
+                <pre><code><em>rewardBase</em> = recompensa obtida, considerando somente o desempenho na batalha.
+<em>Ntime</em> = tempo que o gladiador sobreviveu, normalizado (entre 0 e 1).
+<em>win</em> = 1 caso o gladiador foi o vencedor, 0 caso contrário.
+<em>avgReward</em> = rewardBase médio calculado entre todos gladiadores participantes.
+<em>bestReward</em> = rewardBase obtido pelo gladiador vencedor da batalha.
+<em>reward</em> = recompensa final obtida pelo gladiador.
+<em>mmr</em> = renome que o gladiador possuia antes da batalha.
+<em>avgmmr</em> = média de renome de todos gladiadores participantes, antes da batalha.
+<em>lowmmr</em> = 0 caso o gladiador possua renome pelo menos 1000, 1 caso contrário.</code></pre>
+
+                <h2 id='nav-silver'>Moedas de prata</h2>
+
+                <div class='row'>
+                    <div class='col-2'>
+                        <p>Além da recompensa de renome, o mestre de um gladiador participante de uma batalha ranqueada ganha também uma quantidade de <b>moedas de prata</b>. Estas moedas servem para comprar itens no <a href='potion'>apotecário</a> (loja de poções) que podem ser usados durante as batalhas.</p>
+
+                        <p>A quantidade de prata ganha em uma batalha varia de acordo com o desempenho do gladiador durante a batalha, bem como o renome que aquele gladiador possui. A fórmula do ganho de prata é a seguinte:</p>
+
+                        <pre><code><em>silver = ( (190 + 0.21 * mmr) * (5 * win + 1) ) / 10 - 20</em></code></pre>
+
+                        <p>Onde:</p>
+
+                        <pre><code><em>silver</em> = recompensa de moedas de prata obtida.
+<em>mmr</em> = renome que o gladiador possuia antes da batalha.
+<em>win</em> = 1 caso o gladiador foi o vencedor, 0 caso contrário.</code></pre>
+
+                        <p>Caso o mestre já tenha realizado mais de <b>20 batalhas</b> nas últimas <b>24 horas</b>, a recompensa de moedas de prata da batalha será de <b>1/10 da recompensa</b> que normalmente seria recebida.</p>
+                    </div>
+                    <div class='col-2'>
+                        <table class='table' id='tsilver'>
+                            <tbody>
+                                <tr><th>Renome</th><th><i class='fas fa-coins silver'></i>Vitória</th><th><i class='fas fa-coins silver'></i>Derrota</th></tr>
+                                <tr><td>0</td><td>94</td><td>0</td></tr>
+                                <tr><td>250</td><td>125</td><td>4</td></tr>
+                                <tr><td>500</td><td>157</td><td>9</td></tr>
+                                <tr><td>750</td><td>188</td><td>14</td></tr>
+                                <tr><td>1000</td><td>220</td><td>20</td></tr>
+                                <tr><td>1500</td><td>283</td><td>30</td></tr>
+                                <tr><td>2000</td><td>346</td><td>41</td></tr>
+                                <tr><td>2500</td><td>409</td><td>51</td></tr>
+                                <tr><td>3000</td><td>472</td><td>62</td></tr>
+                                <tr><td>3500</td><td>535</td><td>72</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h2 id='nav-item'>Itens consumíveis</h2>
+                
+                <div class='row'>
+                    <div class='col-2'>
+                        <p>As moedas de prata adquiridas em batalhas ranqueadas podem ser usadas para permitir que os gladiadores utilizem itens consumíveis durante as batalhas.</p>
+
+                        <p>No menu <a href='potion'>POÇÕES</a> do perfil fica o apotecário, que é a loja de poções. Sua loja de poções começa com equipamentos básicos, e poderá <b>subir de nível</b> para preparar poções mais poderosas.</p>
+
+                        <p>Você pode adquirir poções pagando moedas de prata. Uma vez adquiridas, você aluga o serviço do apotecário durante determinado tempo, de acordo com o nível da loja. Durante este tempo você poderá usar cada item adquirido <b>uma vez em cada combate</b> que algum de seus gladiadores participar.</p>
+                    </div>
+                    <div class='col-2'>
+                        <table class='table' id='tapot'>
+                            <tbody>
+                                <tr><th colspan='3'>Apotecário</th></tr>
+                                <tr><th>Nível</th><th>Duração</th><th>Custo</th></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <p>Ao encomendar os itens do apotecário, você precisa possuir espaços (ou compartimentos) de itens livres no seu perfil. Você possui <b>quatro espaços</b> de itens bloqueados a princípio, e estes compartimentos são automaticamente desbloqueadas conforme seu nível de mestre aumenta, nos níveis <b>5</b>, <b>15</b>, <b>25</b> e <b>35</b>. Para cada espaço desbloqueado, você pode possuir um item encomendado. Tais itens ficam visíveis em seus compartimentos durante o tempo em que estão ativos.</p>
+
+                <img src='image/slots.png'>
+
+                <p>Para usar um item durante o combate, seu gladiador precisa usar a função <a href='function/useitem'>useItem</a>. Como argumento você deve informar uma String com o <b>identificador</b> do item desejado. Cada item encomendado e ativo só poderá ser usado uma vez durante cada batalha.</p>
+
+                <pre><code class="language-c">// Linguagem C
+loop(){
+    if (getHp() < 100){
+        useItem("pot-hp-1");
+    }
+}
+                </code></pre>
+
+                <pre><code class="language-python"># Linguagem Python
+def loop():
+    if getHp() < 100:
+        useItem("pot-hp-1")
+                </code></pre>
+
+                <div class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_repeat_ext" id="QRs$h]i%}G}r{b;mAEgZ"><value name="TIMES"><shadow type="math_number" id="o3IiHfo:VmiR4Ts%m_Uc"><field name="NUM">10</field></shadow></value><statement name="DO"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement><next><block type="turn" id="+-]rflEcarW4v.O7=s:|"><mutation xmlns="http://www.w3.org/1999/xhtml" where="LEFT" use-return="false"></mutation><field name="COMPLEMENT">LEFT</field><value name="ANGLE"><shadow type="math_number" id="VdX3=M8c$3$qnk`U4U2C"><field name="NUM">5</field></shadow></value></block></next></block></statement></block></xml></div>
+
+                <h3>Lista de itens disponíveis</h3>
+
+                <table class='table' id='tpotions'>
+                    <tbody>
+                        <tr><th>Item</th><th>Nível</th><th>Identif.</th><th>Efeito</th><th>Custo</th></tr>
+                    </tbody>
+                </table>
+            
+                <!-- TODO: menu itens nos blocos, onde tem um bloco pra cada item "Poção da Vitalidade [III]". useItem no function e docs  -->
+                <!-- TODO: inserir novos itens -->
             </div>
             <div id='footer'></div>
         </div>

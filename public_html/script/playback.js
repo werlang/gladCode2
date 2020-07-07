@@ -9,6 +9,7 @@ var istep;
 var tournHash, loghash;
 var fullscreen = false;
 var timeSlider = 0; 
+var potionList = {}
 
 $(document).ready( function() {
     $('#loadbar #status').html("Página carregada");
@@ -110,6 +111,7 @@ $(document).ready( function() {
                     }
                     else{
                         let log = JSON.parse(data.log)
+                        // console.log(log)
                         var glads = log[0].glads;
                         stab = [];
                         gender = [];
@@ -158,10 +160,7 @@ $(document).ready( function() {
     var stepprogi = 4, stepprog = [-10,-5,-2,-1,1,2,5,10];
     $('#back-step').click( function(){
         if (pausesim){
-            if (stepIncrement > 0)
-                stepIncrement = -1;
-            else if (timestep > 0)
-                stepIncrement *= 1.10;
+            stepIncrement = -1;
             timestep += Math.round(stepIncrement);
             $('#fowd-step .speed').html("");
             $('#back-step .speed').html(Math.round(stepIncrement));
@@ -185,10 +184,7 @@ $(document).ready( function() {
     });
     $('#fowd-step').click( function(){
         if (pausesim){
-            if (stepIncrement < 0)
-                stepIncrement = 1;
-            else if (timestep < $('#time').slider("option","max") - 1)
-                stepIncrement *= 1.10;
+            stepIncrement = 1;
             timestep += Math.round(stepIncrement);
             $('#back-step .speed').html("");
             $('#fowd-step .speed').html("+"+ Math.round(stepIncrement));
@@ -726,7 +722,7 @@ function startBattle(simulation){
             json.projectiles = {};
             $.extend( true, json, simulation[i] ); //merge json objects
             steps.push(JSON.parse(JSON.stringify(json)));
-            //console.log(simulation[i]);
+            // console.log(simulation[i]);
         }
 
         start_timer(steps);
@@ -769,27 +765,36 @@ function createDetailedWindow(){
         <div id='content'>
             <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
             <span>LVL:</span><input readonly>
-            <span>HP:</span><input readonly>
             <span>XP:</span><input readonly>
-            <span>AP:</span><input readonly>
             <span>X:</span><input readonly>
-            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
+            <span>HP:</span><input readonly>
             <span>Y:</span><input readonly>
-            <span>Action:</span><input readonly>
+            <span>AP:</span><input readonly>
             <span>STR:</span><input readonly>
-            <span>Locked:</span><input readonly>
+            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
             <span>AGI:</span><input readonly>
+            <span>Action:</span><input readonly>
+            <span>INT:</span><input readonly>
             <div id='buffs'>
                 <span>Buffs:</span>
                 <span>Valor</span>
                 <span>Tempo</span>
                 <div id='box'><div></div><div></div><div></div></div>
             </div>
-            <span>INT:</span><input readonly>
             <span>AS:</span><input readonly>
             <span>CS:</span><input readonly>
             <span>Speed:</span><input readonly>
-
+            <span>Locked:</span><input readonly>
+            <div id='items'>
+                <span>Items:</span>
+                <div id='box'></div>
+            </div>
+            <div id='code'>
+                <span>Comandos:</span>
+                <span>Durac.</span>
+                <span>Tempo</span>
+                <div id='box'></div>
+            </div>
         </div>
     </div>`);
 
@@ -806,34 +811,48 @@ function createDetailedWindow(){
     $('#details #minimize').click( function(){
         $('#details').animate({
             "top": $(window).height() - 33,
-            "left": $(window).width() - 350,
+            "left": $(window).width() - 350
         });
 
     });
 
+    if (Object.keys(potionList).length == 0){
+        potionList.ready = $.post("back_slots.php", {
+            action: "ITEMS"
+        }).then( data => {
+            let potions = JSON.parse(data).potions
+            // console.log(potions)
+            for (i in potions){
+                let p = potions[i]
+                potionList[p.id] = i
+            }
+            // console.log(potionList)
+        })
+    }
+
 }
 
-function updateDetailedWindow(){
+async function updateDetailedWindow(){
     var index = $('.ui-glad').index($('.follow'));
     var glad = json.glads[index];
 
     var info = [
         glad.name,
         glad.lvl,
-        `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
-        glad.xp,
-        `${glad.ap.toFixed(1)} / ${glad.maxap}`,
+        `${glad.xp} / ${glad.tonext}`,
         glad.x.toFixed(1),
-        glad.head.toFixed(1),
+        `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
         glad.y.toFixed(1),
-        getActionName(glad.action),
+        `${glad.ap.toFixed(1)} / ${glad.maxap}`,
         glad.STR,
-        glad.lockedfor.toFixed(1),
+        glad.head.toFixed(1),
         glad.AGI,
+        getActionName(glad.action),
         glad.INT,
         glad.as.toFixed(1),
         glad.cs.toFixed(1),
-        glad.spd.toFixed(1)
+        glad.spd.toFixed(1),
+        glad.lockedfor.toFixed(1)
     ];
 
     $('#details input').each( function(i){
@@ -857,6 +876,53 @@ function updateDetailedWindow(){
         $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
 
         c++;
+    }
+
+    if (glad.code){
+        if (glad.code != $('#details #code #box .name').last().text()){
+            $('#details #code #box').append(`<div class='row'>
+                <div class='name'>${glad.code}</div>
+                <div class='duration'>0.1</div>
+                <div class='time'>${json.simtime.toFixed(1)}</div>
+            </div>`)
+
+            if ($('#details #code #box .row').length > 5){
+                $('#details #code #box .row').first().remove()
+            }
+        }
+        else{
+            let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
+            $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
+        }
+    }
+
+    let allPotions = '😎'
+    await potionList.ready
+    for (let i in glad.items){
+        let item = $('#details #items #box .row').eq(i).find('span')
+        
+        if (item.length){
+            let text = item.text()
+            if (text == '-' || glad.items[i] == 0){
+                item.addClass('used')
+            }
+            else {
+                item.removeClass('used')
+            }
+        }
+        else{
+            let potion
+            if (glad.items[i] > 0){
+                potion = potionList[glad.items[i]]
+            }
+            else if (glad.items[i] == 0){
+                potion = '-'
+            }
+            else if (glad.items[i] == -1){
+                potion = allPotions
+            }
+            $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
+        }
     }
 }
 

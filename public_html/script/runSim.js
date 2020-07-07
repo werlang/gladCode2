@@ -21,7 +21,7 @@ class Simulation{
         this.call = call
         return new Promise( (resolve, reject) => {
             this.call.then( data => {
-                console.log(data)
+                // console.log(data)
                 try {
                     data = JSON.parse(data)
                 } catch(e){

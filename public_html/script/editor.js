@@ -372,19 +372,7 @@ $(document).ready( function() {
 
     $('#test').click( function(){
         if (!$(this).hasClass('disabled')){
-            var code = editor.getValue();
-            if (code.search("setup()") != -1){
-                showDialog("A função <span class='highlight'>setup</span> só deve ser usada nos modos de batalha clássicos (aqueles que você faz upload manual do código). Posso remover este trecho para você?",["NÃO","Pode"]).then(function(data){
-                    if (data == "Pode"){
-                        editor.setValue(code.replace(/setup\(\)[\s\n]*?{[\w\W]*?}/g, ""));
-                        setTimeout( function(){
-                            showTestWindow();
-                        }, 300);
-                    }
-                });
-            }
-            else
-                showTestWindow();
+            showTestWindow()
             
             function showTestWindow(){
                 let t = tutorial.show([
@@ -640,30 +628,6 @@ $(document).ready( function() {
         });
     }
 
-    $('#download').click( function(){
-        if (!$(this).hasClass('disabled')){
-            var name = $('#distribuicao #nome').val();
-            var vstr = $('#float-card .glad-preview .attr .str span').html();
-            var vagi = $('#float-card .glad-preview .attr .agi span').html();
-            var vint = $('#float-card .glad-preview .attr .int span').html();
-            
-            showInput("Nome do arquivo:", name +".c")
-            .then( function(data){
-                if (data){
-                    var filename = data;
-                    $.post("back_skin.php", {
-                        action: "SAVE",
-                        skin: JSON.stringify(pieces)
-                    }).done( function(data){
-                        hash = data;
-                        var setup = "setup(){\n    setName(\""+ name +"\");\n    setSTR("+ vstr +");\n    setAGI("+ vagi +");\n    setINT("+ vint +");\n    setSpritesheet(\""+ hash +"\");\n}\n\n";
-                        download(filename, setup + editor.getValue());
-                    });
-                }
-            });
-        }
-    });
-
     $('#switch').click( function(){
         toggleBlocks();
     });
@@ -687,7 +651,7 @@ $(document).ready( function() {
         sample.getSession().setMode("ace/mode/c_cpp");
         sample.setReadOnly(true);
 
-        sample.setValue("int start = 1;\n\nloop(){\n    upgradeSTR();\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}", -1);
+        sample.setValue("int start = 1;\n\nloop(){\n    upgradeSTR(5);\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}", -1);
 
         $('#settings-window #list .theme').click( function(){
             $('#settings-window #list .theme').removeClass('selected');
@@ -932,11 +896,11 @@ function setLoadGlad(){
 
     var language = getLanguage(editor.getValue());
     if (language == "c"){
-        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n}\n\n`;
+        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n    setSlots(\"-1,-1,-1,-1\");\n}\n\n`;
         loadGlad.code = setup + editor.getValue();
     }
     else if (language == "python" || language == 'blocks'){
-        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n# start of user code\n`;
+        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`;
         loadGlad.code = setup + editor.getValue();
 
         if (language == 'blocks')
@@ -1788,38 +1752,6 @@ function buildIndex(){
         }		
         if (images[i].default)
             selected[images[i].id] = images[i];
-    }
-}
-
-function cloneCanvas(oldCanvas) {
-
-    //create a new canvas
-    var newCanvas = document.createElement('canvas');
-    var context = newCanvas.getContext('2d');
-
-    //set dimensions
-    newCanvas.width = oldCanvas.width;
-    newCanvas.height = oldCanvas.height;
-
-    //apply the old canvas to the new one
-    context.drawImage(oldCanvas, 0, 0);
-
-    //return the new canvas
-    return newCanvas;
-}
-
-function download(filename, text) {
-    var pom = document.createElement('a');
-    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    pom.setAttribute('download', filename);
-
-    if (document.createEvent) {
-        var event = document.createEvent('MouseEvents');
-        event.initEvent('click', true, true);
-        pom.dispatchEvent(event);
-    }
-    else {
-        pom.click();
     }
 }
 

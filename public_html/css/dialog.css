@@ -32,7 +32,6 @@
 #dialog-box #message {
 	margin: 10px 0px;
 	cursor: default;
-	text-align: justify;
 }
 
 #dialog-box .highlight,

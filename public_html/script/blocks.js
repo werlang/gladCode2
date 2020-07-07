@@ -1231,6 +1231,161 @@ Blockly.Python['getsimtime'] = function(block) {
     return [code, Blockly.Python.ORDER_NONE];
 };
 
+Blockly.Blocks['pot_hp'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Poção de vitalidade")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT")
+        this.setInputsInline(true);
+        this.setOutput(true, "String");
+        this.setColour('#9eb553');
+        this.setTooltip("Recupera pontos de vida do gladiador");
+    },
+};
+
+Blockly.Python['pot_hp'] = function(block) {
+    let lvl = this.getFieldValue('COMPLEMENT');
+    let code = `pot-hp-${lvl}`;
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['pot_ap'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Poção da concentração")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT")
+        this.setInputsInline(true);
+        this.setOutput(true, "String");
+        this.setColour('#9eb553');
+        this.setTooltip("Recupera pontos de habilidade do gladiador");
+    },
+};
+
+Blockly.Python['pot_ap'] = function(block) {
+    let lvl = this.getFieldValue('COMPLEMENT');
+    let code = `pot-ap-${lvl}`;
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['pot_high'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Tônico do gigante")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
+        this.setInputsInline(true);
+        this.setOutput(true, "String");
+        this.setColour('#9eb553');
+        this.setTooltip("Aprimora o atributo mais forte do gladiador");
+    },
+};
+
+Blockly.Python['pot_high'] = function(block) {
+    let lvl = this.getFieldValue('COMPLEMENT');
+    let code = `pot-high-${lvl}`;
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['pot_low'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Tônico fortificante")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
+        this.setInputsInline(true);
+        this.setOutput(true, "String");
+        this.setColour('#9eb553');
+        this.setTooltip("Aprimora o atributo mais fraco do gladiador");
+    },
+};
+
+Blockly.Python['pot_low'] = function(block) {
+    let lvl = this.getFieldValue('COMPLEMENT');
+    let code = `pot-low-${lvl}`;
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['pot_xp'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("Elixir da sabedoria")
+            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"]]), "COMPLEMENT")
+        this.setInputsInline(true);
+        this.setOutput(true, "String");
+        this.setColour('#9eb553');
+        this.setTooltip("Aumenta a experiência do gladiador");
+    },
+};
+
+Blockly.Python['pot_xp'] = function(block) {
+    let lvl = this.getFieldValue('COMPLEMENT');
+    let code = `pot-xp-${lvl}`;
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['useitem'] = {
+    init: function() {
+        this.appendValueInput("POTION")
+            .setCheck("String")
+            .appendField("Usar item")
+            .setAlign(Blockly.ALIGN_RIGHT);
+        this.setInputsInline(false);
+        this.setOutput(false);
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour('#9eb553');
+        this.useReturn = false;
+    },
+    customContextMenu: function(options) {
+        toggleUseReturn(this, options);
+    },
+    mutationToDom: function() {
+        var container = document.createElement('mutation');
+        if (this.useReturn)
+            container.setAttribute('use-return', 'true');
+        else
+            container.setAttribute('use-return', 'false');
+        return container;
+    },
+    domToMutation: function(xmlElement) {
+        this.reshape({useReturn: xmlElement.getAttribute('use-return') == 'true'});
+    },
+    reshape: function(option) {
+        reshape_toggleUseReturn(this, option.useReturn);
+    } 
+};
+
+Blockly.Python['useitem'] = function(block) {
+    let info = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
+    let code = `useItem("${info}")`;
+    this.func = `useItem`;
+    setBlockInfo(this);
+
+    if (this.useReturn)
+        return [code, Blockly.Python.ORDER_NONE];
+    else
+        return code + '\n';
+};
+
+Blockly.Blocks['itemready'] = {
+    init: function() {
+        this.appendValueInput("POTION")
+            .setCheck("String")
+            .appendField("Item disponível")
+            .setAlign(Blockly.ALIGN_RIGHT);
+        this.setInputsInline(false);
+        this.setOutput(true, "Boolean");
+        this.setColour('#9eb553');
+    },
+};
+
+Blockly.Python['itemready'] = function(block) {
+    let pot = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
+    var code = `isItemReady("${pot}")`;
+    this.func = `isItemReady`;
+    setBlockInfo(this);
+
+    return [code, Blockly.Python.ORDER_NONE];
+};
+
 async function getTooltip(name){
     if (funcList[name])
         return funcList[name];

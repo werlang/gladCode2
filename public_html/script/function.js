@@ -11,6 +11,13 @@ $(document).ready( function() {
     if ($('#vget').length)
         func = $('#vget').val();
 
+    var lang_word = 'function';
+    if ($('#dict').length){
+        langDict = $('#dict').html()
+        if (langDict == 'pt')
+            lang_word = 'funcao';
+    }
+
     if (func == "")
         load_content("");
     else{
@@ -21,13 +28,6 @@ $(document).ready( function() {
                     python: "py",
                     blocks: "blk"
                 };
-
-                var lang_word = 'function';
-                if ($('#dict').length){
-                    langDict = $('#dict').html()
-                    if (langDict == 'pt')
-                        lang_word = 'funcao';
-                }
 
                 window.location.href = `${lang_word}/${func}.${ext[ui.item.value]}`;
             }
@@ -104,6 +104,22 @@ async function load_content(item, fileData){
             language = user.language
         else
             language = 'c';
+    }
+
+    // check if there is no version for this funcion, then remove the select option
+    if (item.noversion){
+        for (let l of item.noversion){
+            if (l == language){
+                let func = $('#vget').val();
+                $('#content').html(`<h1>A função <i>${func}</i> não existe para esta linguagem.</h1><p><a href='docs'>Voltar para documentação</a></p>`)
+                return false;
+            }
+            $('#language select option').each( function() {
+                if ($(this).val() == l){
+                    $(this).remove()
+                }
+            })
+        }
     }
 
     $('#language select').val(language).selectmenu('refresh');
@@ -243,7 +259,7 @@ async function load_content(item, fileData){
     }
 
     if (langDict){
-        await loadExplain
+        // await loadExplain
         loadDict(funcsDict)
     }
 

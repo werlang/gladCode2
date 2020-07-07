@@ -132,6 +132,26 @@
     margin-right: 10px;
 }
 
+#group-container .foot {
+    display: flex;
+    align-items: center;
+}
+
 #group-container .foot .button {
     height: 1.8em;
+}
+
+#group-container .foot .rerun {
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -50px;
+    height: 1.8em;
+    color: white;
+    cursor: pointer;
+}
+
+#group-container .foot .rerun.hidden {
+    display: none;
 }
