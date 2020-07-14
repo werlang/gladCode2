@@ -505,14 +505,20 @@ function update() {
                 //took damage
                 if (hp != gladArray[i].hp) {
                     //explodiu na cara
-                    if (actionlist[action].name == 'fireball' && json.glads[i].buffs.burn.timeleft > 0.1){
-                        var fire = addSprite(gladArray[i], 'explode', sprite[i].x, sprite[i].y);
-                        fire.anchor.setTo(0.5, 0.5);
-                        fire.alpha = 0.5;
-                        fire.width = 5 * arenaRate;
-                        fire.height = 3 * arenaRate;
-                        fire.animations.play('explode', null, false, true);
-                        playAudio('explosion', prefs.sound.sfx);
+                    if (actionlist[action].name == 'fireball'){
+                        let pos = json.glads[i].code.split('fireball(')[1].split(')')[0].split(',')
+                        let x = parseFloat(pos[0])
+                        let y = parseFloat(pos[1])
+                        if (Math.sqrt(Math.pow(x - json.glads[i].x, 2) + Math.pow(y - json.glads[i].y, 2)) <= 2){
+                            // console.log(Math.sqrt(Math.pow(x - json.glads[i].x) + Math.pow(y - json.glads[i].y)))
+                            var fire = addSprite(gladArray[i], 'explode', sprite[i].x, sprite[i].y);
+                            fire.anchor.setTo(0.5, 0.5);
+                            fire.alpha = 0.5;
+                            fire.width = 5 * arenaRate;
+                            fire.height = 3 * arenaRate;
+                            fire.animations.play('explode', null, false, true);
+                            playAudio('explosion', prefs.sound.sfx);
+                        }
                     }
                     
                     if (prefs.text){
