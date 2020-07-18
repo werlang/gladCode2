@@ -54,6 +54,7 @@
                 <div class='item-container'>
                     <div id='lang-pt' class='item'><a><span data-translation-template='{{header_language_portuguese}}'></span></a></div>
                     <div id='lang-en' class='item'><a><span data-translation-template='{{header_language_english}}'></span></a></div>
+                    <div id='improve' class='item'><a><span data-translation-template='{{header_language_improve}}'></span></a></div>
                 </div>
             </div>
         </div>

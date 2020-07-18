@@ -104,10 +104,15 @@ $(document).ready( function() {
             action: "SPOKEN_LANGUAGE",
             language: lang
         })
-        // console.log(data)
+        console.log(data)
         if (data.status == "SUCCESS"){
             window.location.reload()
         }
+    })
+
+    $('#header #language #improve').click( function(){
+        create_toast("Clique no item que deseja melhorar a tradução", "info")
+        $('.translated').addClass("highlight")
     })
 });
 
@@ -164,6 +169,7 @@ translator.translate = async function(elements){
     let contents = this.translations ? this.translations : {}
     elements = Array.isArray(elements) ? elements : [elements]
 
+    // search for contents to put in local obj
     for (let element of elements){
         if (typeof element === 'string'){
             if (!contents[element]){
@@ -173,26 +179,28 @@ translator.translate = async function(elements){
         else{
             element.find(`*`).contents().each(function(){
                 // check for template
-                if ($(this).data('translationTemplate')){
-                    let temp = $(this).data('translationTemplate')
-                    contents[temp] = {template: temp}
-                }
-
-                if (lang != 'pt'){
-                    // replace contents
-                    if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t") && !$(this).hasClass('translated') && !this.textContent.match(/^[\d\s]+$/) && !this.textContent.match(/^\W+$/)){
-                        let text = this.textContent.replace(/(\w+)/, "$1")
-                        if (text.length && !contents[text]){
-                            contents[text] = {}
-                        }
+                if (!$(this).data('skipTranslation')){
+                    if ($(this).data('translationTemplate')){
+                        let temp = $(this).data('translationTemplate')
+                        contents[temp] = {template: temp}
                     }
-                    // replace other fields
-                    let fieldList = ['title', 'placeholder']
 
-                    for (let field of fieldList){
-                        if (this[field] && this[field].length && !$(this).hasClass('translated')){
-                            if (!contents[this[field]]){
-                                contents[this[field]] = {}
+                    if (lang != 'pt'){
+                        // replace contents
+                        if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t") && !$(this).hasClass('translated') && !this.textContent.match(/^[\d\s]+$/) && !this.textContent.match(/^\W+$/)){
+                            let text = this.textContent.replace(/(\w+)/, "$1")
+                            if (text.length && !contents[text]){
+                                contents[text] = {}
+                            }
+                        }
+                        // replace other fields
+                        let fieldList = ['title', 'placeholder']
+
+                        for (let field of fieldList){
+                            if (this[field] && this[field].length && !$(this).hasClass('translated')){
+                                if (!contents[this[field]]){
+                                    contents[this[field]] = {}
+                                }
                             }
                         }
                     }
@@ -201,6 +209,7 @@ translator.translate = async function(elements){
         }
     }
 
+    // check what is meant to be translated and send to back
     let toTranslate = []
     for (let i in contents){
         if (!contents[i][lang]){
@@ -233,32 +242,35 @@ translator.translate = async function(elements){
         else{
             element.find(`*`).contents().each(function(){
                 // replace template
-                if ($(this).data('translationTemplate')){
-                    let temp = $(this).data('translationTemplate')
-                    this.textContent = contents[temp][lang]
-                    $(this).addClass('translated')
-                }
-                else if (lang != 'pt'){
-                    // replace contents
-                    if (this.nodeType == 3){
-                        if (contents[this.textContent] && !$(this).hasClass('translated')){                
-                            this.textContent = ` ${contents[this.textContent][lang]} `
-                            $(this).addClass('translated')
-                        }
+                if (!$(this).data('skipTranslation')){
+                    if ($(this).data('translationTemplate')){
+                        let temp = $(this).data('translationTemplate')
+                        this.textContent = contents[temp][lang]
+                        $(this).addClass('translated')
                     }
-
-                    // replace other fields
-                    let fieldList = ['title', 'placeholder']
-
-                    for (let field of fieldList){
-                        if (this[field]){
-                            if (contents[this[field]]){
-                                this[field] = `${contents[this[field]][lang]}`
-                                $(this).addClass('translated')
+                    else if (lang != 'pt'){
+                        // replace contents
+                        if (this.nodeType == 3){
+                            if (contents[this.textContent] && !$(this).hasClass('translated')){                
+                                this.textContent = ` ${contents[this.textContent][lang]} `
+                                $(this).parent().addClass('translated')
+                                // console.log($(this).parent())
                             }
                         }
+
+                        // replace other fields
+                        let fieldList = ['title', 'placeholder']
+
+                        for (let field of fieldList){
+                            if (this[field]){
+                                if (contents[this[field]]){
+                                    this[field] = `${contents[this[field]][lang]}`
+                                    $(this).addClass('translated')
+                                }
+                            }
+                        }
+                        
                     }
-                    
                 }
             })
         }

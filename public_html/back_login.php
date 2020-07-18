@@ -282,7 +282,7 @@
         // search for existing data
         $sql = "SELECT * FROM translations WHERE pt IN ('$strdata') OR template IN ('$strdata')";
         $result = runQuery($sql);
-        $output['abc'] = array();
+        // $output['abc'] = array();
         if ($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 $source = (!is_null($row['template']) && in_array($row['template'], $data)) ? "template" : "pt"; 
@@ -292,12 +292,12 @@
                     $output['response'][$row[$source]] = $row[$target];
                 }
                 else{
-                    $output['abc'][$row[$source]] = $row[$target];
+                    // $output['abc'][$row[$source]] = $row[$target];
                 }
             }
         }
 
-        $output['def'] = $data; 
+        // $output['def'] = $data; 
 
         if (count($data) > 0){
             // use curl_multi pra fazer vários requests

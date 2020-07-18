@@ -311,3 +311,12 @@ body{
 	font-size: 0.9em;
     font-weight: normal;
 }
+
+#header #h-items #language #improve {
+	border: 1px solid #00000036;
+}
+
+.translated.highlight {
+	background-color: #00000033;
+	cursor: crosshair;
+}
