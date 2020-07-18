@@ -26,7 +26,10 @@ def startSim():
 def sendMessage(message):
 	global soc
 	#send data
-	soc.sendall(message.encode("utf8"))
+	try:
+		soc.sendall(message.encode("utf8"))
+	except:
+		pass
 	# print("Data sent")
 	#Receive a reply from the server
 	server_reply = soc.recv(5120).decode("utf8")
