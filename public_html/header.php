@@ -50,11 +50,10 @@
                 </div>
             </div>
             <div class='item drop-menu' id='language'>
-                <div class='title'></div>
+                <div class='title' title='{{header_tooltip_language}}'><i class='fas fa-language'></i></div>
                 <div class='item-container'>
-                    <div id='lang-pt' class='item'><a><span data-translation-template='{{header_language_portuguese}}'></span></a></div>
-                    <div id='lang-en' class='item'><a><span data-translation-template='{{header_language_english}}'></span></a></div>
-                    <div id='improve' class='item'><a><span data-translation-template='{{header_language_improve}}'></span></a></div>
+                    <div id='lang-pt' class='item'><a><span data-skip-translation="true">PORTUGUÊS</span></a></div>
+                    <div id='lang-en' class='item'><a><span data-skip-translation="true">ENGLISH</span></a></div>
                 </div>
             </div>
         </div>

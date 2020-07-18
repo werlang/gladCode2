@@ -83,9 +83,9 @@ $(document).ready( function() {
             });
 
             translator.translate($('#header')).then( () => {
-                let langObj = $(`#header #language #lang-${user.speak}.item`)
-                $('#header #language .title').html(langObj.text())
-                langObj.addClass('hidden')
+                // let langObj = $(`#header #language #lang-${user.speak}.item`)
+                // $('#header #language .title').html(langObj.text())
+                // langObj.addClass('hidden')
             })
         }
     })
@@ -108,11 +108,6 @@ $(document).ready( function() {
         if (data.status == "SUCCESS"){
             window.location.reload()
         }
-    })
-
-    $('#header #language #improve').click( function(){
-        create_toast("Clique no item que deseja melhorar a tradução", "info")
-        $('.translated').addClass("highlight")
     })
 });
 
@@ -246,14 +241,14 @@ translator.translate = async function(elements){
                     if ($(this).data('translationTemplate')){
                         let temp = $(this).data('translationTemplate')
                         this.textContent = contents[temp][lang]
-                        $(this).addClass('translated')
+                        bind_translated($(this))
                     }
                     else if (lang != 'pt'){
                         // replace contents
                         if (this.nodeType == 3){
                             if (contents[this.textContent] && !$(this).hasClass('translated')){                
                                 this.textContent = ` ${contents[this.textContent][lang]} `
-                                $(this).parent().addClass('translated')
+                                bind_translated($(this).parent())
                                 // console.log($(this).parent())
                             }
                         }
@@ -265,7 +260,7 @@ translator.translate = async function(elements){
                             if (this[field]){
                                 if (contents[this[field]]){
                                     this[field] = `${contents[this[field]][lang]}`
-                                    $(this).addClass('translated')
+                                    bind_translated($(this))
                                 }
                             }
                         }
@@ -273,6 +268,53 @@ translator.translate = async function(elements){
                     }
                 }
             })
+
+            function bind_translated(obj){
+                obj.addClass('translated')
+
+                obj.hover( function(m) {
+                    // create element
+
+                    $('.improve-box').remove()
+                    obj.append(`<div class='improve-box'><i class='fas fa-language'></i></div>`)
+
+                    setTimeout( () => {
+                        // show element
+                        if (!obj.find('.improve-box').hasClass('visible')){
+                            obj.find('.improve-box').css({
+                                'top': obj.position().top,
+                                'left': obj.position().left
+                            })
+                            obj.find('.improve-box').addClass('visible')
+                            obj.find('.improve-box').off().click( function(e) {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                $(this).remove()
+                                let text = obj.text().trim()
+                                new Message({
+                                    message: "Sugira uma tradução melhor para o texto:",
+                                    input: {
+                                        default: text
+                                    },
+                                    buttons: {ok: "OK", cancel: "Cancelar"}
+                                }).show().click('ok', data => {
+                                    let advice = {
+                                        old: text,
+                                        new: data.input
+                                    }
+                                    console.log(advice)
+                                })
+                            })
+                        }
+                    }, 2000)
+                })
+
+                obj.mouseleave( function() {
+                    // remove element
+                    obj.find('.improve-box').remove()
+                })
+            }
+
         }
     }
 
