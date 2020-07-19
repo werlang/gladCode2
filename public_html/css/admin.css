@@ -1,0 +1,111 @@
+body{
+    margin: 0;
+    background-color: #edf1f3;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 16px;
+}
+
+#frame {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 50px;
+}
+
+#content-area {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100vh;
+    margin-top: -50px;
+    box-sizing: border-box;
+    padding-top: 65px;
+    background-color: white;
+}
+
+.content-box {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 15px;
+    z-index: 1;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    color: #616161;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.content-box.visible {
+    display: flex;
+}
+
+textarea {
+    width: 700px;
+    min-height: 200px;
+}
+
+#side-menu {
+    width: 300px;
+    height: 100vh;
+    margin-top: -50px;
+    padding-top: 50px;
+    background-color: #00638d;
+    color: white;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.3rem;
+    box-sizing: border-box;
+}
+
+#side-menu #title {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #00000025;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+#side-menu .item {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    transition: 0.3s;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+#side-menu .item:hover {
+    background-color: #00000015;
+}
+
+#side-menu .item.selected {
+    background-color: #00000020;
+    border-left: 3px solid white;
+}
+
+#content-area #footer {
+    padding: 15px 0;
+    margin-top: 15px;
+}
+
+#translate .table th {
+    background-color: #6c97a9;
+    padding-left: 15px;
+    text-align: left;
+    color: #f2f8f8;
+}
+
+#translate .table td span{
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 300px;
+    cursor: pointer;
+}

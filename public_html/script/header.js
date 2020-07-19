@@ -306,7 +306,8 @@ translator.translate = async function(elements){
                                     let data = await post("back_translation.php", {
                                         action: "SUGGEST",
                                         original: advice.old,
-                                        suggestion: advice.new
+                                        suggestion: advice.new,
+                                        language: user.speak
                                     })
                                     // console.log(data)
 

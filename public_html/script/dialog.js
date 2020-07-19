@@ -235,9 +235,15 @@ class Message {
         </div>`)
         $('#fog').hide().fadeIn()
         $('#fog #dialog-box *').hide()
-        translator.translate($('#dialog-box')).then( () => {
+
+        if (!$('#dialog-box').hasClass('skip-translation')){
+            translator.translate($('#dialog-box')).then( () => {
+                $('#fog #dialog-box *').show()
+            })
+        }
+        else{
             $('#fog #dialog-box *').show()
-        })
+        }
 
         if (this.input){
             $('#dialog-box .input').focus()

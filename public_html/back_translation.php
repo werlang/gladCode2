@@ -116,11 +116,65 @@
     elseif ($action == "SUGGEST"){
         $sug = mysql_escape_string($_POST['suggestion']);
         $ori = mysql_escape_string($_POST['original']);
+        $lang = mysql_escape_string($_POST['language']);
 
-        $sql = "INSERT INTO trans_suggestion (original, suggestion, user) VALUES ('$ori', '$sug', $user)";
+        $sql = "INSERT INTO trans_suggestion (original, suggestion, user, language) VALUES ('$ori', '$sug', $user, '$lang')";
         $result = runQuery($sql);
 
         $output['status'] = "SUCCESS";
+    }
+    elseif ($action == "GET SUGGESTIONS"){
+        $sql = "SELECT email FROM usuarios WHERE id = $user";
+        $result = runQuery($sql);
+
+        $row = $result->fetch_assoc();
+        if ($row['email'] != 'pswerlang@gmail.com'){
+            $output['status'] = "NOTALLOWED";
+        }
+        else{
+            $sql = "SELECT t.id, t.language, t.original, t.suggestion, t.time, u.apelido AS 'user' FROM trans_suggestion t INNER JOIN usuarios u ON u.id = t.user WHERE t.resolved = 0 ORDER BY t.time";
+            $result = runQuery($sql);
+
+            $output['suggestions'] = array();
+            while($row = $result->fetch_assoc()){
+                array_push($output['suggestions'], $row);
+            }
+
+            $output['status'] = "SUCCESS";
+        }
+
+    }
+    elseif ($action == "SET SUGGESTIONS"){
+        $sql = "SELECT email FROM usuarios WHERE id = $user";
+        $result = runQuery($sql);
+
+        $row = $result->fetch_assoc();
+        if ($row['email'] != 'pswerlang@gmail.com'){
+            $output['status'] = "NOTALLOWED";
+        }
+        else{
+            $answer = mysql_escape_string($_POST['answer']);
+            $id = mysql_escape_string($_POST['id']);
+
+            $sql = "UPDATE trans_suggestion SET resolved = 1 WHERE id = $id";
+            $result = runQuery($sql);
+
+            if ($answer == 'yes'){
+
+                $sql = "SELECT original, suggestion, language FROM trans_suggestion WHERE id = $id";
+                $result = runQuery($sql);
+
+                $row = $result->fetch_assoc();
+                $suggestion = $row['suggestion'];
+                $original = $row['original'];
+                $language = $row['language'];
+        
+                $sql = "UPDATE translations SET $language = '$suggestion' WHERE $language = '$original'";
+                $result = runQuery($sql);
+            }
+
+            $output['status'] = "SUCCESS";
+        }
     }
 
     echo json_encode($output);
