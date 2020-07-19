@@ -470,9 +470,27 @@ body {
 
 #profile-panel #language {
     display: grid;
-    margin-bottom: 30px;
     grid-auto-flow: row;
     align-items: center;
+}
+
+#profile-panel #site-pref {
+    margin-bottom: 30px;
+
+    #pref-translation {
+        margin-left: 20px;
+
+        label {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    #translation-tip {
+        display: none;
+        padding-left: 90px;
+        color: #ababab;
+    }
 }
 
 @media only screen and (min-width: 900px) {

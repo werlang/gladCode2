@@ -124,13 +124,19 @@
                         <img id='img-result'>
                         
                     </div>
-                    <div id='language'>
-                        <h3>Linguagem de programação preferencial</h3>
-                        <select>
-                            <option value='c'>C</option>
-                            <option value='python'>Python</option>
-                            <option value='blocks'>Blocos</option>
-                        </select>
+                    <div id='site-pref'>
+                        <h2>Preferências do site</h2>
+                        <div id='language'>
+                            <h3>Linguagem de programação preferencial</h3>
+                            <select>
+                                <option value='c'>C</option>
+                                <option value='python'>Python</option>
+                                <option value='blocks'>Blocos</option>
+                            </select>
+                        </div>
+                        
+                        <div id='pref-translation'><label><input type='checkbox' class='checkslider'>Habilitar sugestões de tradução</label></div>
+                        <p id='translation-tip'>Para sugerir uma melhoria na tradução, passe o mouse por um elemento traduzido da página e espere aparecer o ícone <i class='fas fa-language'></i>, então clique nele.</p>
                     </div>
                     <div id='email'>
                         <h2>Preferências de email</h2>
@@ -139,7 +145,7 @@
                         <div id='pref-message'><label><input type='checkbox' class='checkslider'>Outro usuário me enviar uma mensagem</label></div>
                         <div id='pref-update'><label><input type='checkbox' class='checkslider'>A gladCode receber uma atualização</label></div>
                         <div id='pref-duel'><label><input type='checkbox' class='checkslider'>Um amigo enviar um desafio para um duelo</label></div>
-                        <div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
+                        <div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar uma nova rodada de um torneio que participo</label></div>
                     </div>
                     <div id='button-container'>
                         <button class='button' id='save'>GRAVAR</button>

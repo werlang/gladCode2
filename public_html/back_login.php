@@ -40,6 +40,7 @@
                 $info['preferences']['update'] = $row['pref_update'];
                 $info['preferences']['duel'] = $row['pref_duel'];
                 $info['preferences']['tourn'] = $row['pref_tourn'];
+                $info['preferences']['translation'] = $row['pref_translation'];
                 $info['language'] = $row['pref_language'];
                 $info['apothecary'] = $row['apothecary'];
 
@@ -184,6 +185,7 @@
             $pref_update = $preferences['update'];
             $pref_duel = $preferences['duel'];
             $pref_tourn = $preferences['tourn'];
+            $pref_translation = $preferences['translation'];
             
             $sql = "SELECT id FROM usuarios WHERE apelido = '$nickname' AND id != '$user'";
             $result = runQuery($sql);
@@ -201,7 +203,7 @@
                     $picture = "profpics/$pasta.png";
                 }
                 
-                $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language' WHERE id = '$user'";
+                $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language', pref_translation = '$pref_translation' WHERE id = '$user'";
                 $result = runQuery($sql);
 
                 $output['status'] = "SUCCESS";

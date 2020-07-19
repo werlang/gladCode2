@@ -55,7 +55,12 @@ var tipArray = [
     "Quando usando um tônico, caso haja empate o atributo aprimorado é decidido aleatoriamente"
 ];
 
-var dates = ['meses', 'dias', 'horas', 'minutos']
+var translateArray = ['meses', 'dias', 'horas', 'minutos', "RECORTAR IMAGEM"]
+var translateObj = {}
+for (let i in translateArray){
+    translateObj[ translateArray[i] ] = translateArray[i]
+}
+
 
 $(document).ready( function(){
     $('#header-container').addClass('small-profile');
@@ -63,7 +68,7 @@ $(document).ready( function(){
 
     fill_assets();
     
-    var preferences = ["friend","message","update","duel","tourn"];
+    var preferences = ["friend","message","update","duel","tourn","translation"];
 
     waitLogged().then(user => {
         // console.log(user);
@@ -116,8 +121,8 @@ $(document).ready( function(){
         translator.translate(tipArray).then( data => {
             tipArray = data
         })
-        translator.translate(dates).then( data => {
-            dates = data
+        translator.translate({translate: translateObj}).then( data => {
+            translateObj = data
         })
         
         $('#panel').hide()
@@ -194,15 +199,24 @@ $(document).ready( function(){
 
         for (var i in preferences){
             if (user.preferences[preferences[i]] == "1")
-                $('#email #pref-'+ preferences[i] +' input.checkslider').prop('checked', true);
+                $('#profile-panel #pref-'+ preferences[i] +' input.checkslider').prop('checked', true);
         }
     });
+
+    $('#profile-panel #pref-translation input.checkslider').click( function() {
+        if ($('#profile-panel #pref-translation input.checkslider').prop('checked')){
+            $('#profile-panel #translation-tip').slideDown()
+        }
+        else{
+            $('#profile-panel #translation-tip').fadeOut()
+        }
+    })
 
     $('#profile-panel .button').click( function(){
         $('#profile-panel .button').prop('disabled',true);
 
         for (var i in preferences){
-            if ($('#email #pref-'+ preferences[i] +' input.checkslider').prop('checked'))
+            if ($('#profile-panel #pref-'+ preferences[i] +' input.checkslider').prop('checked'))
                 user.preferences[preferences[i]] = "1";
             else
                 user.preferences[preferences[i]] = "0";
@@ -1029,7 +1043,8 @@ $(document).ready( function(){
             var img = new Image();
             img.src = file.dataURL;
             img.onload = function(){
-                $('.dz-preview').html("<button id='crop-image' class='button'>RECORTAR IMAGEM</button><img src='"+ img.src +"'>");
+                $('.dz-preview').html(`<button id='crop-image' class='button'>RECORTAR IMAGEM</button><img src='${img.src}'>`)
+                translator.translate($('.dz-preview'))
                 var crop = new Croppie($('.dz-preview img')[0], {
                     viewport: { width: 150, height: 150 },
                     boundary: { width: 300, height: 300 },
@@ -1415,13 +1430,13 @@ function last_active_string(min){
     day = day%30;
     
     if (month > 0)
-        return month +" "+ dates[0];
+        return month +" "+ translateObj.meses;
     else if (day > 0)
-        return day +" "+ dates[1];
+        return day +" "+ translateObj.dias;
     else if (hour > 0)
-        return hour +" "+ dates[2];
+        return hour +" "+ translateObj.horas;
     else
-        return min +" "+ dates[3];
+        return min +" "+ translateObj.minutos;
 }
 
 function getMessageTime(msgTime, args){

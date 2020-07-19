@@ -162,8 +162,20 @@ var translator = {
 translator.translate = async function(elements){
     let lang = (user && user.speak) ? user.speak : 'pt'
     let contents = this.translations ? this.translations : {}
+    
+    if (elements.translate){
+        let values = []
+        var keys = []
+        for (let i in elements.translate){
+            values.push(elements.translate[i])
+            keys.push(i)
+        }
+        elements = values
+    }
+    
     elements = Array.isArray(elements) ? elements : [elements]
 
+    // console.log(elements)
     // search for contents to put in local obj
     for (let element of elements){
         if (typeof element === 'string'){
@@ -272,59 +284,69 @@ translator.translate = async function(elements){
             function bind_translated(obj){
                 obj.addClass('translated')
 
-                obj.hover( function(m) {
-                    // create element
+                if (user.preferences.translation == "1"){
+                    obj.hover( function(m) {
+                        // create element
 
-                    $('.improve-box').remove()
-                    obj.append(`<div class='improve-box'><i class='fas fa-language'></i></div>`)
+                        $('.improve-box').remove()
+                        obj.append(`<div class='improve-box'><i class='fas fa-language'></i></div>`)
 
-                    setTimeout( () => {
-                        // show element
-                        if (!obj.find('.improve-box').hasClass('visible')){
-                            obj.find('.improve-box').css({
-                                'top': obj.position().top,
-                                'left': obj.position().left
-                            })
-                            obj.find('.improve-box').addClass('visible')
-                            obj.find('.improve-box').off().click( function(e) {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                $(this).remove()
-                                let text = obj.text().trim()
-                                new Message({
-                                    message: "Sugira uma tradução melhor para o texto:",
-                                    input: {
-                                        default: text
-                                    },
-                                    buttons: {ok: "OK", cancel: "Cancelar"}
-                                }).show().click('ok', async input => {
-                                    let advice = {
-                                        old: text,
-                                        new: input.input
-                                    }
-                                    
-                                    let data = await post("back_translation.php", {
-                                        action: "SUGGEST",
-                                        original: advice.old,
-                                        suggestion: advice.new,
-                                        language: user.speak
-                                    })
-                                    // console.log(data)
-
-                                    new Message({message: "Sugestão enviada"}).show()
+                        setTimeout( () => {
+                            // show element
+                            if (!obj.find('.improve-box').hasClass('visible')){
+                                obj.find('.improve-box').css({
+                                    'top': obj.position().top,
+                                    'left': obj.position().left
                                 })
-                            })
-                        }
-                    }, 2000)
-                })
+                                obj.find('.improve-box').addClass('visible')
+                                obj.find('.improve-box').off().click( function(e) {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    $(this).remove()
+                                    let text = obj.text().trim()
+                                    new Message({
+                                        message: "Sugira uma tradução melhor para o texto:",
+                                        input: {
+                                            default: text
+                                        },
+                                        buttons: {ok: "OK", cancel: "Cancelar"}
+                                    }).show().click('ok', async input => {
+                                        let advice = {
+                                            old: text,
+                                            new: input.input
+                                        }
+                                        
+                                        let data = await post("back_translation.php", {
+                                            action: "SUGGEST",
+                                            original: advice.old,
+                                            suggestion: advice.new,
+                                            language: user.speak
+                                        })
+                                        // console.log(data)
 
-                obj.mouseleave( function() {
-                    // remove element
-                    obj.find('.improve-box').remove()
-                })
+                                        new Message({message: "Sugestão enviada"}).show()
+                                    })
+                                })
+                            }
+                        }, 2000)
+                    })
+
+                    obj.mouseleave( function() {
+                        // remove element
+                        obj.find('.improve-box').remove()
+                    })
+                }
             }
 
         }
+    }
+
+    if (keys && keys.length){
+        let obj = {}
+        for (let i in keys){
+            obj[keys[i]] = stringResponse[i]
+        }
+        stringResponse = obj
     }
 
     return stringResponse
