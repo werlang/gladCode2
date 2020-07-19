@@ -136,7 +136,10 @@ $(document).ready( function(){
             }
 
             let tab = $(this).text().toLowerCase()
-            
+            if ($('#ranking-container #tab-general').hasClass('selected')){
+                tab = 'geral'
+            }
+
             if (tabs.pages[tab]){
                 tabs.fetch({
                     id: tab,
@@ -237,7 +240,7 @@ $(document).ready( function(){
         }){
 
         this.pages[id].offset = offset
-
+        
         if (id == 'geral'){
             if (dummy){
                 $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Gladiador</div><div class='cell'>Mestre</div><div class='cell mmr'>Renome</div></div>")

@@ -1,4 +1,6 @@
-$(document).ready( function(){
+$(document).ready( async function(){
+    let tabNames = ["Batalhas", "Duelos", "Favoritos"]
+    console.log(tabNames)
     var tabs = {
         pages: {
             limit: 10,
@@ -19,7 +21,7 @@ $(document).ready( function(){
             $('#report-container #tab-container .tab').removeClass('selected');
             tabDOM.addClass('selected');
             
-            let id = this.getId(tabDOM.find('span').text())
+            let id = this.getId(tabNames[tabDOM.index('.tab')])
             let check = $('#report-container #unread input:checked').length == 1
             tabs.fetch({
                 id: id,
