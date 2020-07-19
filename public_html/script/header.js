@@ -213,7 +213,7 @@ translator.translate = async function(elements){
     }
 
     if (toTranslate.length){
-        let data = await post("back_login.php", {
+        let data = await post("back_translation.php", {
             action: "TRANSLATE",
             language: lang,
             data: JSON.stringify(toTranslate),
@@ -297,12 +297,20 @@ translator.translate = async function(elements){
                                         default: text
                                     },
                                     buttons: {ok: "OK", cancel: "Cancelar"}
-                                }).show().click('ok', data => {
+                                }).show().click('ok', async input => {
                                     let advice = {
                                         old: text,
-                                        new: data.input
+                                        new: input.input
                                     }
-                                    console.log(advice)
+                                    
+                                    let data = await post("back_translation.php", {
+                                        action: "SUGGEST",
+                                        original: advice.old,
+                                        suggestion: advice.new
+                                    })
+                                    // console.log(data)
+
+                                    new Message({message: "Sugestão enviada"}).show()
                                 })
                             })
                         }
