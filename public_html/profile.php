@@ -280,7 +280,7 @@
                         <i class="fas fa-search"></i>
                         <input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
                     </div>
-                    <div id='tab-container'><div id='tab-general' class='tab selected'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
+                    <div id='tab-container'><div id='tab-general' class='tab selected' data-name='geral'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
                     <div class='table'></div>
                     <div class='page-nav'>
                         <span></span> - <span></span> de <span></span>

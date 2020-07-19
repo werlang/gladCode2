@@ -198,8 +198,9 @@ class Message {
             }
             if (options.input.default)
                 this.input.default = options.input.default
-            if (options.input.placeholder)
+            if (options.input.placeholder){
                 this.input.placeholder = options.input.placeholder
+            }
             
             if (options.input.enter)
                 this.input.enter = options.input.enter
@@ -240,6 +241,12 @@ class Message {
             translator.translate($('#dialog-box')).then( () => {
                 $('#fog #dialog-box *').show()
             })
+
+            if (this.input && this.input.placeholder){
+                translator.translate(this.input.placeholder).then( data => {
+                    $('#dialog-box input').attr('placeholder', data)
+                })
+            }
         }
         else{
             $('#fog #dialog-box *').show()

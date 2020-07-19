@@ -55,6 +55,7 @@ var tipArray = [
     "Quando usando um tônico, caso haja empate o atributo aprimorado é decidido aleatoriamente"
 ];
 
+var dates = ['meses', 'dias', 'horas', 'minutos']
 
 $(document).ready( function(){
     $('#header-container').addClass('small-profile');
@@ -114,6 +115,9 @@ $(document).ready( function(){
 
         translator.translate(tipArray).then( data => {
             tipArray = data
+        })
+        translator.translate(dates).then( data => {
+            dates = data
         })
         
         $('#panel').hide()
@@ -718,7 +722,7 @@ $(document).ready( function(){
         $.post("back_friends.php",{
             action: "GET"
         })
-        .done( function(data) {
+        .done( async function(data) {
             data = JSON.parse(data);
             //console.log(data);
             if (data.pending.length > 0)
@@ -1400,6 +1404,7 @@ async function preBattleShow(glads){
     return preBattleInt;
 }
 
+
 function last_active_string(min){
     min = parseInt(min);
     var hour = parseInt(min/60);
@@ -1410,13 +1415,13 @@ function last_active_string(min){
     day = day%30;
     
     if (month > 0)
-        return month +" meses";
+        return month +" "+ dates[0];
     else if (day > 0)
-        return day +" dias";
+        return day +" "+ dates[1];
     else if (hour > 0)
-        return hour +" horas";
+        return hour +" "+ dates[2];
     else
-        return min +" minutos";
+        return min +" "+ dates[3];
 }
 
 function getMessageTime(msgTime, args){

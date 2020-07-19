@@ -1,6 +1,6 @@
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]
-    console.log(tabNames)
+
     var tabs = {
         pages: {
             limit: 10,
@@ -407,7 +407,7 @@ $(document).ready( async function(){
     }
 
     tabs.pages.next = function({ unread = false }){
-        let id = tabs.getId($('#report-container .tab.selected span').text())
+        let id = tabs.getId(tabNames[$('#report-container .tab.selected').index('.tab')])
         if (id){
             let move = tabs.pages[id].offset + tabs.pages.limit
 
@@ -423,7 +423,7 @@ $(document).ready( async function(){
     }
 
     tabs.pages.prev = function({ unread = false }){
-        let id = tabs.getId($('#report-container .tab.selected span').text())
+        let id = tabs.getId(tabNames[$('#report-container .tab.selected').index('.tab')])
         if (id){
             let move = tabs.pages[id].offset - tabs.pages.limit
 

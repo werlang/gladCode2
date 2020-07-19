@@ -12,7 +12,7 @@ $(document).ready( function(){
         })
         // console.log(data)
 
-        let sel_name = $('#ranking-container #tab-container .tab.selected').text()
+        let sel_name = $('#ranking-container #tab-container .tab.selected').data('name')
 
         $('#ranking-container #tab-container .tab.user').remove()
         for (let i in data.tags){
@@ -22,7 +22,7 @@ $(document).ready( function(){
             if (tag == sel_name)
                 selected = 'selected'
 
-            $('#ranking-container #tab-container #add-tab').before(`<div class='tab user ${selected}'>${tag}</div>`)
+            $('#ranking-container #tab-container #add-tab').before(`<div class='tab user ${selected}' data-name='${tag}'>${tag}</div>`)
             if (!this.pages[tag]){
                 this.pages[tag] = { offset: 0 }
             }
@@ -396,7 +396,7 @@ $(document).ready( function(){
     }
 
     tabs.pages.next = function(){
-        let id = ($('#ranking-container .tab.selected').text()).toLowerCase()
+        let id = $('#ranking-container .tab.selected').data('name')
         let search = $('#ranking-container #search .input').val()
         if (id){
             let move = tabs.pages[id].offset + tabs.pages.limit
@@ -409,7 +409,7 @@ $(document).ready( function(){
     }
 
     tabs.pages.prev = function(){
-        let id = ($('#ranking-container .tab.selected').text()).toLowerCase()
+        let id = $('#ranking-container .tab.selected').data('name')
         let search = $('#ranking-container #search .input').val()
         if (id){
             let move = tabs.pages[id].offset - tabs.pages.limit
