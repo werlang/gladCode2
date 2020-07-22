@@ -1267,10 +1267,10 @@ Blockly.Python['pot_ap'] = function(block) {
     return [code, Blockly.Python.ORDER_NONE];
 };
 
-Blockly.Blocks['pot_high'] = {
+Blockly.Blocks['pot_atr'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("Tônico do gigante")
+            .appendField("Tônico do fortificante")
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");
@@ -1279,27 +1279,9 @@ Blockly.Blocks['pot_high'] = {
     },
 };
 
-Blockly.Python['pot_high'] = function(block) {
+Blockly.Python['pot_atr'] = function(block) {
     let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-high-${lvl}`;
-    return [code, Blockly.Python.ORDER_NONE];
-};
-
-Blockly.Blocks['pot_low'] = {
-    init: function() {
-        this.appendDummyInput()
-            .appendField("Tônico fortificante")
-            .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
-        this.setInputsInline(true);
-        this.setOutput(true, "String");
-        this.setColour('#9eb553');
-        this.setTooltip("Aprimora o atributo mais fraco do gladiador");
-    },
-};
-
-Blockly.Python['pot_low'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-low-${lvl}`;
+    let code = `pot-atr-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 

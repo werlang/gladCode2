@@ -943,88 +943,6 @@ int isLockedTargetVisibleUnsafe(int gladid){
     }
 }
 
-void increaseHighAttr(int *m[3], int v){
-    int *a = NULL, *b = NULL, *n = NULL;
-    
-    if (*m[0] > *m[1] && *m[0] > *m[2]){
-        n = m[0];
-    }
-    else if (*m[1] > *m[0] && *m[1] > *m[2]){
-        n = m[1];
-    }
-    else if (*m[2] > *m[0] && *m[2] > *m[1]){
-        n = m[2];
-    }
-    else if (*m[0] < *m[1] && *m[0] < *m[2]){
-        a = m[1];
-        b = m[2];
-    }
-    else if (*m[1] < *m[0] && *m[1] < *m[2]){
-        a = m[0];
-        b = m[2];
-    }
-    else if (*m[2] < *m[0] && *m[2] < *m[1]){
-        a = m[0];
-        b = m[1];
-    }
-    
-    if (!n && !a && !b){
-        *m[rand()%3] += v;
-    }
-    else if (!n){
-        if (rand()%2){
-            *a += v;
-        }
-        else {
-            *b += v;
-        }
-    }
-    else{
-        *n += v;
-    }
-}
-
-void increaseLowAttr(int *m[3], int v){
-    int *a = NULL, *b = NULL, *n = NULL;
-
-    if (*m[0] < *m[1] && *m[0] < *m[2]){
-        n = m[0];
-    }
-    else if (*m[1] < *m[0] && *m[1] < *m[2]){
-        n = m[1];
-    }
-    else if (*m[2] < *m[0] && *m[2] < *m[1]){
-        n = m[2];
-    }
-    else if (*m[0] > *m[1] && *m[0] > *m[2]){
-        a = m[1];
-        b = m[2];
-    }
-    else if (*m[1] > *m[0] && *m[1] > *m[2]){
-        a = m[0];
-        b = m[2];
-    }
-    else if (*m[2] > *m[0] && *m[2] > *m[1]){
-        a = m[0];
-        b = m[1];
-    }
-    
-    if (!n && !a && !b){
-        *m[rand()%3] += v;
-    }
-    else if (!n){
-        if (rand()%2){
-            *a += v;
-        }
-        else {
-            *b += v;
-        }
-    }
-    else{
-        *n += v;
-    }
-}
-
 void explodeItemName(char *item, char *name, int *lvl){
     char *dash = strstr(item, "-");
     strcpy(name, dash+1);
@@ -1048,17 +966,9 @@ int itemEffect(int gladid, char *item){
             (g+gladid)->ap += lvl*20 + lvl*2 * (g+gladid)->lvl;
             (g+gladid)->ap = (g+gladid)->ap > (g+gladid)->maxap ? (g+gladid)->maxap : (g+gladid)->ap;
         }
-        else if (strcmp(name, "high") == 0 && lvl <= 4){
-            int highArray[4] = {10, 5, 3, 2};
-            int points = lvl + ceil((g+gladid)->lvl / highArray[lvl-1]);
-            int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
-            increaseHighAttr(m, points);
-        }
-        else if (strcmp(name, "low") == 0 && lvl <= 4){
-            int lowArray[4] = {10, 5, 3, 2};
-            int points = 1+lvl + ceil((g+gladid)->lvl / lowArray[lvl-1]);
-            int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
-            increaseLowAttr(m, points);
+        else if (strcmp(name, "atr") == 0 && lvl <= 4){
+            int upArray[4] = {10, 5, 3, 2};
+            (g+gladid)->up += lvl + ceil((g+gladid)->lvl / upArray[lvl-1]);
         }
         else if (strcmp(name, "xp") == 0 && lvl <= 3){
             (g+gladid)->xp += (getXpToNextLvl(gladid) - (g+gladid)->xp) * 0.25 * lvl;

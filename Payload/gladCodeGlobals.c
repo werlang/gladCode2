@@ -144,14 +144,10 @@ void setItemNames(){
     strcpy(itemList[8], "pot-ap-4");
     strcpy(itemList[9], "pot-hp-5");
     strcpy(itemList[10], "pot-ap-5");
-    strcpy(itemList[11], "pot-high-1");
-    strcpy(itemList[12], "pot-high-2");
-    strcpy(itemList[13], "pot-high-3");
-    strcpy(itemList[14], "pot-high-4");
-    strcpy(itemList[15], "pot-low-1");
-    strcpy(itemList[16], "pot-low-2");
-    strcpy(itemList[17], "pot-low-3");
-    strcpy(itemList[18], "pot-low-4");
+    strcpy(itemList[15], "pot-atr-1");
+    strcpy(itemList[16], "pot-atr-2");
+    strcpy(itemList[17], "pot-atr-3");
+    strcpy(itemList[18], "pot-atr-4");
     strcpy(itemList[19], "pot-xp-1");
     strcpy(itemList[20], "pot-xp-2");
     strcpy(itemList[21], "pot-xp-3");

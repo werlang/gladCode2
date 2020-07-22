@@ -11,7 +11,5 @@ def loop():
         fireball(getTargetX(), getTargetY())
     elif getLvl() > 8 and isItemReady("pot-xp-2"):
         useItem("pot-xp-2")
-    elif getINT() > getSTR() and getINT() > getAGI() and isItemReady("pot-high-1"):
-        useItem("pot-high-1")
-    elif isItemReady("pot-low-1"):
-        useItem("pot-low-1")
+    elif isItemReady("pot-atr-1"):
+        useItem("pot-atr-1")

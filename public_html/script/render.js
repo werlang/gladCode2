@@ -713,7 +713,7 @@ function update() {
                         name = 'mana'
                         alpha = 0.5
                     }
-                    else if (gladArray[i].potion == 'high' || gladArray[i].potion == 'low'){
+                    else if (gladArray[i].potion == 'atr'){
                         name = 'tonic'
                         scale = 0.7
                     }
@@ -721,7 +721,7 @@ function update() {
                         name = 'elixir'
                     }
                     
-                    console.log(name)
+                    // console.log(name)
                     var potion = addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
                     potion.anchor.setTo(0.5);
                     potion.scale.setTo(scale);
