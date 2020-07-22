@@ -193,11 +193,11 @@
                         <tr>
                             <td><a href='function/fireball'>Fireball</a></td>
                             <td>50</td>
-                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 215% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
+                            <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 200% do poder mágico de dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
                         </tr>
                         <tr>
                             <td><a href='function/teleport'>Teleport</a></td>
-                            <td>50</td>
+                            <td>60</td>
                             <td>O gladiador imediatamente se transporta para outra localização. A distância máxima percorrida é limitada em 5p + 1p por ponto de poder mágico.</td>
                         </tr>
                         <tr>
@@ -213,7 +213,7 @@
                         <tr>
                             <td><a href='function/assassinate'>Assassinate</a></td>
                             <td>30</td>
-                            <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 170% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 250% da Precisão.</td>
+                            <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 200% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 400% da Precisão.</td>
                         </tr>
                         <tr>
                             <td><a href='function/ambush'>Ambush</a></td>
