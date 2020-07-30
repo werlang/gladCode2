@@ -64,6 +64,7 @@
     <script src="script/googlelogin.js"></script>
     <script src="script/header.js"></script>
     <script src="script/blocks.js"></script>
+    <script src="script/translate.js"></script>
     
     </head>
 <body>
@@ -79,7 +80,7 @@
             <div id="profile-ui">
                 <div id='picture'><img></div>
                 <div id='info'>
-                    <div id='nickname'></div>
+                    <div id='nickname' class='skip-translation'></div>
                     <div id='stats'>
                         <div id='lvl'><img src='res/star.png'><span></span></div>
                         <div id='xp'><div id='filled'></div></div>
@@ -90,17 +91,17 @@
                 <div class='curr' id='money' title='Créditos'><i class='fas fa-money-bill'></i><span>0,00</span></div>
                 <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
             </div>
-            <div id='menu-buttons'>
-                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span data-translation-template='{{menu_news}}'></span></div>
-                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span data-translation-template='{{menu_profile}}'></span></div>
-                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span data-translation-template='{{menu_glads}}'></span></div>
-                <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span data-translation-template='{{menu_potions}}'></span></div>
-                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span data-translation-template='{{menu_battles}}'></span></div>
-                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span data-translation-template='{{menu_reports}}'></span></div>
-                <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span  data-translation-template='{{menu_ranking}}'></span></div>
-                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span data-translation-template='{{menu_messages}}'></span></div>
-                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span data-translation-template='{{menu_friends}}'></span></div>
-                <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span  data-translation-template='{{menu_logout}}'></span></div>
+            <div id='menu-buttons' class='translating'>
+                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
+                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
+                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
+                <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
+                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
+                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
+                <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
+                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>MENSAGENS</span></div>
+                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
+                <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
             <div id='footer'></div>
         </div>
@@ -178,7 +179,7 @@
                         <div class='container'>
                             <h2>Amigo a ser desafido</h2>
                             <input class='input' type='text' placeholder='apelido-do-usuario'>
-                            <div class='table' id='table-friends'></div>
+                            <div class='table skip-translation' id='table-friends'></div>
                             <div id='button-container'>
                                 <button id='challenge' class='button' disabled>DESAFIAR</button>
                             </div>
@@ -188,13 +189,13 @@
                         <div class='container'>
                             <div class='title'>
                                 <h2>Torneios públicos abertos</h2>
-                                <div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                                <div id='offset' class='open skip-translation'><span class='start'>0</span> - <span class='end'>0</span><span class='of'>de</span><span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-open' class='table'></div>
                             
                             <div id='mytourn' class='title'>
                                 <h2>Meus torneios</h2>
-                                <div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                                <div id='offset' class='mine skip-translation'><span class='start'>0</span> - <span class='end'>0</span><span class='of'>de</span><span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-mytourn' class='table'></div>
 
@@ -227,7 +228,7 @@
             <div class='content' data-menu='report'>
                 <div id='report-container'>
                     <div id='bhist-container'>
-                        <h2>Histórico de batalhas</h2>
+                        <h2>Relatório de batalhas</h2>
                         <div id='tab-container'>
                             <div id='ranked' class='tab selected'><div class='notification empty'></div><span>Batalhas</span></div>
                             <div id='duel' class='tab'><div class='notification empty'></div><span>Duelos</span></div>

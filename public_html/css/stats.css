@@ -285,6 +285,7 @@ h2 {
 
 #t-pot td span:hover {
     color: black;
+    font-weight: bold;
 }
 
 #t-pot .up {

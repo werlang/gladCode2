@@ -27,7 +27,7 @@
                 $info['premium'] = is_null($row['premium']) ? false : true;
                 $info['credits'] = $row['credits'];
                 $info['pasta'] = $row['pasta'];
-                $info['speak'] = $row['spoken_language'];
+                $_SESSION['language'] = $row['spoken_language'];
                 $info['lvl'] = $row['lvl'];
                 $info['xp'] = $row['xp'];
                 $info['silver'] = $row['silver'];
@@ -60,6 +60,7 @@
 
                 $output = $info;
                 $output['status'] = "SUCCESS";
+                $output['logged'] = true;
             }
             else
                 $output['status'] = "NOTFOUND";
@@ -72,8 +73,14 @@
             $row = $result->fetch_assoc();
             //$output['debug'] = $row;
         }
-        else
+        else{
             $output['status'] = "NOTLOGGED";
+            $output['logged'] = false;
+        }
+
+        if (isset($_SESSION['language'])){
+            $output['speak'] = $_SESSION['language'];
+        }
     }
     elseif ($action == "SET"){
         if (isset($_POST['admin'])){
@@ -258,19 +265,31 @@
         // }
     }
     elseif ($action == "SPOKEN_LANGUAGE"){
-        $user = $_SESSION['user'];
         $lang = mysql_escape_string($_POST['language']);
-
         $available_languages = array('pt', 'en');
-        if (in_array($lang, $available_languages)){
-            $sql = "UPDATE usuarios SET spoken_language = '$lang' WHERE id = $user";
-            $result = runQuery($sql);
+        $default = "en";
 
-            $output['status'] = "SUCCESS";
+        if (in_array($lang, $available_languages)){
+            $newlang = $lang;
+            if (isset($_SESSION['user'])){
+                $user = $_SESSION['user'];
+
+                $sql = "UPDATE usuarios SET spoken_language = '$lang' WHERE id = $user";
+                $result = runQuery($sql);
+
+                $output['status'] = "SUCCESS";
+            }
+            else{
+                $output['status'] = "NOTLOGGED";
+            }
         }
         else{
+            $newlang = $default;
             $output['status'] = "INVALID";
         }
+        
+        $output['reload'] = $_SESSION['language'] != $newlang;
+        $_SESSION['language'] = $newlang;
     }
 
     echo json_encode($output);

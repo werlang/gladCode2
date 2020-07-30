@@ -106,6 +106,8 @@ function create_toast(message, type) {
         icon = 'check-circle';
 
     $('body').append(`<div class='toast ${type}'><i class='fas fa-${icon}'></i><span>${message}</span></div>`);
+    translator.translate($('.toast'))
+
     $('.toast').each( (i,e) => {
         $(e).css({ 'bottom': `calc(${i*1.5}em + ${i*20}px)` })
     })
@@ -171,7 +173,8 @@ function create_tooltip(message, obj, args){
 //          enter:  Id from the buttons object. When enter is pressed, this button will be clicked
 //                  If no enter id is given, 'ok', then 'yes' will be default values
 // class:   class to be appended in the dialog box
-// preventKill: Prevent dialog box from closing when a button is pressed
+// preventKill: Prevent dialog box from closing when a button is pressed,
+// translate: Default true. If false, prevent message box to be translated
 // 
 // Methods:
 // show():  async function to show the message box
@@ -217,6 +220,12 @@ class Message {
         if (options.class){
             this.class = options.class
         }
+
+        this.translate = true
+        if (options.translate === false){
+            this.translate = false
+        }
+
     }
 
     show(){
@@ -238,14 +247,24 @@ class Message {
         $('#fog #dialog-box *').hide()
 
         if (!$('#dialog-box').hasClass('skip-translation')){
-            translator.translate($('#dialog-box')).then( () => {
+            if (this.translate){
+                translator.translate($('#dialog-box')).then( () => {
+                    $('#fog #dialog-box *').show()
+                })
+            }
+            else{
                 $('#fog #dialog-box *').show()
-            })
+            }
 
             if (this.input && this.input.placeholder){
-                translator.translate(this.input.placeholder).then( data => {
-                    $('#dialog-box input').attr('placeholder', data)
-                })
+                if (this.translate){
+                    translator.translate(this.input.placeholder).then( data => {
+                        $('#dialog-box input').attr('placeholder', data)
+                    })
+                }
+                else{
+                    $('#dialog-box input').attr('placeholder', this.input.placeholder)
+                }
             }
         }
         else{

@@ -68,7 +68,7 @@
             foreach($curl as $i => $val){
                 $response[$i] = curl_multi_getcontent($val);
                 curl_multi_remove_handle($multiCurl, $val);
-                $response[$i] = json_decode($response[$i], true)['data']['translations'][0]['translatedText'];
+                $response[$i] = mysql_escape_string(htmlspecialchars_decode(json_decode($response[$i], true)['data']['translations'][0]['translatedText'], ENT_QUOTES));
                 $output['response'][$data[$i]] = $response[$i];
 
                 // check if template
@@ -118,10 +118,15 @@
         $ori = mysql_escape_string($_POST['original']);
         $lang = mysql_escape_string($_POST['language']);
 
-        $sql = "INSERT INTO trans_suggestion (original, suggestion, user, language) VALUES ('$ori', '$sug', $user, '$lang')";
-        $result = runQuery($sql);
-
-        $output['status'] = "SUCCESS";
+        if (!isset($user)){
+            $output['status'] = "NOTLOGGED";
+        }
+        else{
+            $sql = "INSERT INTO trans_suggestion (original, suggestion, user, language) VALUES ('$ori', '$sug', $user, '$lang')";
+            $result = runQuery($sql);
+    
+            $output['status'] = "SUCCESS";
+        }
     }
     elseif ($action == "GET SUGGESTIONS"){
         $sql = "SELECT email FROM usuarios WHERE id = $user";
@@ -144,7 +149,7 @@
         }
 
     }
-    elseif ($action == "SET SUGGESTIONS"){
+    elseif ($action == "RESOLVE"){
         $sql = "SELECT email FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
 
@@ -165,11 +170,12 @@
                 $result = runQuery($sql);
 
                 $row = $result->fetch_assoc();
-                $suggestion = $row['suggestion'];
-                $original = $row['original'];
+                $suggestion = mysql_escape_string($row['suggestion']);
+                $original = mysql_escape_string($row['original']);
                 $language = $row['language'];
         
                 $sql = "UPDATE translations SET $language = '$suggestion' WHERE $language = '$original'";
+                $output['sql'] = $sql;
                 $result = runQuery($sql);
             }
 

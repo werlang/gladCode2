@@ -438,7 +438,7 @@ def loop():
         useItem("pot-hp-1")
                 </code></pre>
 
-                <div class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_repeat_ext" id="QRs$h]i%}G}r{b;mAEgZ"><value name="TIMES"><shadow type="math_number" id="o3IiHfo:VmiR4Ts%m_Uc"><field name="NUM">10</field></shadow></value><statement name="DO"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement><next><block type="turn" id="+-]rflEcarW4v.O7=s:|"><mutation xmlns="http://www.w3.org/1999/xhtml" where="LEFT" use-return="false"></mutation><field name="COMPLEMENT">LEFT</field><value name="ANGLE"><shadow type="math_number" id="VdX3=M8c$3$qnk`U4U2C"><field name="NUM">5</field></shadow></value></block></next></block></statement></block></xml></div>
+                <div id='sample-3' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="YE7%z0YaVxJr`5WsA=Gq" deletable="false" x="0" y="0"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_if" id="?S[$exC;_2n]]J=^dNL!"><value name="IF0"><block type="logic_compare" id=",IWL8qN1c6Ijr^+[)ZKq"><field name="OP">LT</field><value name="A"><block type="get_info" id="NE9L%W_n|TSwbD$W)U7,"><field name="COMPLEMENT">Hp</field></block></value><value name="B"><block type="math_number" id="JM:^L2Od;kf}U,1ET0B!"><field name="NUM">100</field></block></value></block></value><statement name="DO0"><block type="useitem" id="xFkSVwt;a`_Q[VDM#]dQ"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="POTION"><block type="pot_hp" id="S7BZ)M1ZLl)w3/g1U(Z#"><field name="COMPLEMENT">1</field></block></value></block></statement></block></statement></block></xml></div>
 
                 <h3>Lista de itens disponíveis</h3>
 
@@ -447,9 +447,7 @@ def loop():
                         <tr><th>Item</th><th>Nível</th><th>Identif.</th><th>Efeito</th><th>Custo</th></tr>
                     </tbody>
                 </table>
-            
-                <!-- TODO: menu itens nos blocos, onde tem um bloco pra cada item "Poção da Vitalidade [III]". useItem no function e docs  -->
-                <!-- TODO: inserir novos itens -->
+        
             </div>
             <div id='footer'></div>
         </div>

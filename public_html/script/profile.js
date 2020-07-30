@@ -49,18 +49,9 @@ var tipArray = [
     "Aumente seu nível de mestre para desbloquear mais espeços para encomandar poções",
     "Use a poção de vitalidade para impedir que seu gladiador morra",
     "Use a poção de concentração quando seu gladiador necessitar com urgência de pontos de habilidade",
-    "O tônico do gigante é usado quando você quer especializar seu gladiador",
-    "O tônico fortificate é útil quando você não quer que seu gladiador possua pontos fracos",
-    "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível",
-    "Quando usando um tônico, caso haja empate o atributo aprimorado é decidido aleatoriamente"
+    "Quer dar uma melhorada em algum de seus atributos? O tônico fortificate é o que você precisa",
+    "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
 ];
-
-var translateArray = ['meses', 'dias', 'horas', 'minutos', "RECORTAR IMAGEM"]
-var translateObj = {}
-for (let i in translateArray){
-    translateObj[ translateArray[i] ] = translateArray[i]
-}
-
 
 $(document).ready( function(){
     $('#header-container').addClass('small-profile');
@@ -121,8 +112,29 @@ $(document).ready( function(){
         translator.translate(tipArray).then( data => {
             tipArray = data
         })
-        translator.translate({translate: translateObj}).then( data => {
-            translateObj = data
+
+        translator.translate([
+            'meses',
+            'dias',
+            'horas',
+            'minutos',
+            "RECORTAR IMAGEM",
+            "Nenhuma batalha para mostrar",
+            "Gladiador",
+            "Renome",
+            "Data",
+            "Nenhum item neste espaço",
+            "de",
+            "Deseja excluir o gladiador",
+            "Sim",
+            "Não",
+            "SIM",
+            "NÃO"
+        ]).then( data => {
+            // console.log($('#tourn .title #offset .of').length)
+            $('#tourn .title #offset .of').html(translator.getTranslated("de"))
+
+            // translator.bind()
         })
         
         $('#panel').hide()
@@ -130,9 +142,6 @@ $(document).ready( function(){
             $('#panel').show()
         })
 
-        let translateStrings = [
-            
-        ]
     });
 
     $('#menu .item').click( function(){
@@ -150,7 +159,7 @@ $(document).ready( function(){
     
     $('#menu #news').click( function() {
         $.post("back_news.php",{
-            action: "GET",
+            action: "READ",
             page: 0
         }).done( function(data){
             // console.log(data);
@@ -282,8 +291,9 @@ $(document).ready( function(){
                     $('#glads-container .glad-preview .delete').eq(i).click( function(){
                         var card = $(this).parents('.glad-preview');
                         new Message({
-                            message: `Deseja excluir o gladiador <b>${card.find('.glad span').html()}</b>?`,
-                            buttons: {yes: "Sim", no: "Não"}
+                            message: `${translator.getTranslated("Deseja excluir o gladiador")} <b>${card.find('.glad span').html()}</b>?`,
+                            buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
+                            translate: false
                         }).show().click('yes', () => {
                             card.fadeOut(function(){
                                 card.remove();
@@ -1170,7 +1180,13 @@ function afterBattleShow(hash, oldStatus){
     $('body').append(`<div id='fog'>
         <div id='after-battle'>
             <div class='row'>
-                <div class='glad-card-container'></div>
+                <div class='col'>
+                    <div class='glad-card-container'></div>
+                    <div id='bonus'>
+                        <div>Bônus <i class='fas fa-coins silver'></i> (<span id='nbattles'>0</span>/20)</div>
+                        <div>Próximo em: <span id='nextbonus'>00:00:00</span></div>
+                    </div>
+                </div>
                 <div class='col'>
                     <h2>Batalha concluída</h2>
                     <div class='row group'>
@@ -1189,12 +1205,12 @@ function afterBattleShow(hash, oldStatus){
                     <div class='row group'>
                         <div class='col'>
                             <span>Renome</span>
-                            <div id='renown-now'><span class='svg hidden'>icon/crown.svg</span><span class='value'></span></div>
+                            <div id='renown-now' class='skip-translation'><span class='svg hidden'>icon/crown.svg</span><span class='value'></span></div>
                             <span id='renown-total'></span>
                         </div>
                         <div class='col'>
                             <span>Prata</span>
-                            <div id='silver-now'><span class='svg hidden'>icon/coin.svg</span><span class='value'></span></div>
+                            <div id='silver-now' class='skip-translation'><span class='svg hidden'>icon/coin.svg</span><span class='value'></span></div>
                             <span id='silver-total'></span>
                         </div>
                     </div>
@@ -1208,8 +1224,10 @@ function afterBattleShow(hash, oldStatus){
         </div>
     </div>`)
 
+    translator.translate($('#after-battle'))
+
     $('#fog #after-battle span.svg').each( function() {
-        $.get($(this).html(), null, null, 'text').then( data => $(this).removeClass('hidden').html(data))
+        load_svg($(this))
     })
 
     post("back_notification.php", {
@@ -1313,6 +1331,13 @@ function afterBattleShow(hash, oldStatus){
 
         load_glad_cards($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
 
+        $('#fog #after-battle #nbattles').text(20 - data.battles.total)
+        if (data.battles.total == 20){
+            $('#fog #after-battle #nbattles').addClass('red')
+        }
+
+        timeCounter($('#fog #after-battle #nextbonus'), data.battles.next)
+
         $('#fog #after-battle #code').click( () => {
             window.open(`glad-${data.glad.id}`)
         })
@@ -1325,6 +1350,35 @@ function afterBattleShow(hash, oldStatus){
     $('#fog #after-battle #watch').click( () => {
         window.open(`play/${hash}`)
     })
+}
+
+function timeCounter(obj, time){
+    tick()
+    function tick(){
+        setTimeout( function() {
+            let m = parseInt(parseInt(time) / 60)
+            let s = parseInt(time) % 60
+            let h = parseInt(m / 60)
+            m = m % 60
+        
+            if (h < 10){
+                h = `0${h}`
+            }
+            if (m < 10){
+                m = `0${m}`
+            }
+            if (s < 10){
+                s = `0${s}`
+            }
+
+            time--
+
+            if (time > 0 && obj.length){
+                obj.text(`${h}:${m}:${s}`)
+                tick()
+            }
+        }, 1000)
+    }
 }
 
 class valueAnimator{
@@ -1430,13 +1484,13 @@ function last_active_string(min){
     day = day%30;
     
     if (month > 0)
-        return month +" "+ translateObj.meses;
+        return month +" "+ translator.getTranslated("meses", dom=false);
     else if (day > 0)
-        return day +" "+ translateObj.dias;
+        return day +" "+ translator.getTranslated("dias", dom=false);
     else if (hour > 0)
-        return hour +" "+ translateObj.horas;
+        return hour +" "+ translator.getTranslated("horas", dom=false);
     else
-        return min +" "+ translateObj.minutos;
+        return min +" "+ translator.getTranslated("minutos", dom=false);
 }
 
 function getMessageTime(msgTime, args){
@@ -1597,4 +1651,8 @@ async function check_challenges(){
 
 function getXpToNextLvl(){
     return (parseInt(user.lvl) * 1.9 + 1) * 130;
+}
+
+function load_svg(e){
+    $.get(e.html(), null, null, 'text').then( data => e.removeClass('hidden').html(data))
 }

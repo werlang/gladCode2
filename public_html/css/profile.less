@@ -622,6 +622,7 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #000000a3;
+    z-index: 1;
 }
 
 .dz-preview {
@@ -2031,7 +2032,7 @@ body {
     font-size: 2em;
 }
 
-.window #title span {
+.window #title span.highlight {
     font-size: 2rem;
     color: #00638d;
     margin-left: 5px;
@@ -2182,7 +2183,7 @@ body {
     color: black;
 }
 
-#tourn-message span {
+#tourn-message span.highlight {
     color: #00638d;
 }
 
@@ -3012,6 +3013,7 @@ body {
 
 #after-battle .glad-card-container {
     align-items: center;
+    margin: 35px 0 0 0;
 }
 
 #after-battle h2{
@@ -3176,6 +3178,16 @@ body {
     display: flex;
     justify-content: space-evenly;
     margin-bottom: 20px;
+}
+
+#after-battle #nbattles.red {
+    color: red;
+}
+
+#after-battle #nextbonus {
+    font-family: 'Source Code Pro', monospace;
+    color: #00638d;
+    font-weight: bold;
 }
 
 #after-battle #button-container button{

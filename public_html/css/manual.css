@@ -287,6 +287,10 @@ ul {
 	height: 200px;
 }
 
+#sample-3.block-container {
+	height: 130px;
+}
+
 .block-container {
 	width: 100%;
 	margin-bottom: 15px;

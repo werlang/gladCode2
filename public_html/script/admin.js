@@ -27,7 +27,7 @@ $(document).ready( async function(){
         $('#version #new').val(newversion.join('.'));
     });
     
-    $('#send.button').click( function(){
+    $('#update #send.button').click( function(){
         $.post("back_update.php",{
             action: "SET",
             version: $('#version #new').val(),
@@ -69,6 +69,10 @@ $(document).ready( async function(){
         update_translation_table()
     })
 
+    $('#side-menu #posts').click( function() {
+        update_news_table(quill)
+    })
+
     $('#side-menu .item').click( function() {
         let id = $(this).attr('id')
 
@@ -77,6 +81,82 @@ $(document).ready( async function(){
 
         $(`.content-box`).removeClass('visible')
         $(`#${id}.content-box`).addClass('visible')
+    })
+
+    let quill = new Quill('#posts #editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: {
+                container: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                    [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['blockquote', 'code-block'],
+                    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                    ['link', 'image'],
+                    ['clean']                                         // remove formatting button
+                ],
+                handlers: {
+                    image: function(){
+                        let range = this.quill.getSelection();
+                        let value = prompt('What is the image URL');
+                        if(value){
+                            this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+                        }
+                    }
+                }
+            }
+        },
+    })
+
+    quill.on('text-change', function(delta, oldDelta, source) {
+        // console.log(delta, oldDelta)
+        $('#posts #html').val($('#posts #editor .ql-editor').html())
+    })
+
+    $('#posts #preview').click( function(){
+        if ($('#posts #html').hasClass('visible')){
+            $('#posts #html').removeClass('visible')
+            $(this).text("Ver HTML")
+        }
+        else{
+            $('#posts #html').addClass('visible')
+            $(this).text("Ocultar HTML")
+        }
+    })
+
+    $('#posts #send').click( async function(){
+        let html = $('#posts #html').val()
+        let title = $('#posts #title').val()
+
+        if (!title.length){
+            $('#posts #title').focus()
+            create_toast("Insira um título", "error")
+        }
+        else if (!html.length){
+            create_toast("Informe o conteúdo", "error")
+        }
+        else{
+            let hash = false
+            if ($('#posts #send').text() == 'EDITAR'){
+                hash = $('#posts .table tr.selected td').eq(0).text()
+            }
+
+            let data = await post("back_news.php", {
+                action: "POST",
+                title: title,
+                html: html,
+                hash: hash
+            })
+            console.log(data)
+            quill.setText('')
+
+            create_toast("Notícia publicada", "success")
+        }
+
+        
+
     })
 
 })
@@ -89,7 +169,7 @@ function update_translation_table(){
 
         if (data.status == "SUCCESS"){
             let str = ""
-            for (i in data.suggestions){
+            for (let i in data.suggestions){
                 let row = data.suggestions[i]
                 str += `<tr>
                     <td><span>${row.user}</span></td>
@@ -111,16 +191,16 @@ function update_translation_table(){
                 }).show()
 
                 msg.click('yes', () => {
-                    set_suggestion(s.id, 'yes')
+                    resolve_suggestion(s.id, 'yes')
                 })
                 
                 msg.click('no', () => {
-                    set_suggestion(s.id, 'no')
+                    resolve_suggestion(s.id, 'no')
                 })
 
-                function set_suggestion(id, answer){
+                function resolve_suggestion(id, answer){
                     post("back_translation.php", {
-                        action: "SET SUGGESTIONS",
+                        action: "RESOLVE",
                         answer: answer,
                         id: id
                     }).then( data => {
@@ -128,6 +208,49 @@ function update_translation_table(){
                         update_translation_table()
                     })
                 }
+            })
+        }
+    })
+}
+
+function update_news_table(quill){
+    post("back_news.php", {
+        action: "LIST"
+    }).then( data => {
+        // console.log(data)
+
+        if (data.status == "SUCCESS"){
+            let str = ""
+            for (let i in data.posts){
+                let row = data.posts[i]
+                str += `<tr>
+                    <td><span>${row.hash}</span></td>
+                    <td><span>${row.title}</span></td>
+                    <td><span>${row.time}</span></td>
+                </tr>`
+            }
+            $('#posts .table tbody').html(str)
+
+            $('#posts .table tr').click( function() {
+                if ($(this).hasClass('selected')){
+                    $('#posts .table tr').removeClass('selected')
+
+                    $('#posts #title').val('')
+                    quill.setText('')
+                    $('#posts #send').text('POSTAR')
+                }
+                else{
+                    $('#posts .table tr').removeClass('selected')
+                    $(this).addClass('selected')
+
+                    let index = $('#posts .table tr').index($(this)) - 1
+                    let post = data.posts[index].body
+                    let title = data.posts[index].title
+                    $('#posts #title').val(title)
+                    quill.setContents(quill.clipboard.convert(post), 'silent')
+                    $('#posts #send').text('EDITAR')
+                }
+                
             })
         }
     })

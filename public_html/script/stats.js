@@ -163,10 +163,10 @@ function load_table(data, potions){
                 row.push(`<td>-</td>`)    
             }
             else{
-                let uses = table[p].lvl[i].use / data.potions.battles * 100
+                let uses = table[p].lvl[i].use
                 let wins = table[p].lvl[i].win / table[p].lvl[i].use * 100
                 row.push(`<td><div>
-                    <span class='up' title='Percentual de batalhas que a poção foi utilizada'>${uses == 100 ? uses.toFixed(0) : uses.toFixed(1)}%</span>/
+                    <span class='up' title='Quantidade de batalhas que a poção foi utilizada'>${uses}</span>/
                     <span class='down' title='Percentual de batalhas que o gladiador que usou a poção venceu'>${wins == 100 ? wins.toFixed(0) : wins.toFixed(1)}%</span>
                 </div></td>`)
             }

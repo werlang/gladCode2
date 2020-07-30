@@ -55,8 +55,9 @@ $(document).ready( async function(){
             $('#report-container #unread').show()
 
             if (dummy){
-                $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>")
+                $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell reward'>${translator.getTranslated("Renome")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
 
+                // translator.bind()
                 for (let i=0 ; i<limit ; i++){
                     $('#bhist-container .table').append(`<div class='row dummy'>
                         <div class='cell favorite'><span class='dummy-text'><i class='far fa-star'></i></span></div>
@@ -79,7 +80,9 @@ $(document).ready( async function(){
 
             if (data.status == "SUCCESS"){
                 if (!dummy){
-                    $('#bhist-container .table').html("<div class='row head'><div class='cell'>Gladiador</div><div class='cell reward'>Renome</div><div class='cell time'>Data</div></div>")
+                    $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell reward'>${translator.getTranslated("Renome")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
+
+                    // translator.bind()
                 }
 
                 $('#report-container .table .row').not('.head').remove()
@@ -97,8 +100,10 @@ $(document).ready( async function(){
                 for (let i=0 ; i<limit ; i++){
                     if (data.total == 0 && i == 0){
                         $('#bhist-container .table').append(`<div class='row'>
-                            <div class='cell'><h3>Nenhuma batalha para mostrar</h3></div>
+                            <div class='cell'><h3>${translator.getTranslated('Nenhuma batalha para mostrar', dom=true)}</h3></div>
                         </div>`);
+
+                        // translator.bind()
                     }
                     else if (offset + i < data.total){
                         let row = data.reports[i]
@@ -454,8 +459,7 @@ $(document).ready( async function(){
 
     $('#report-container #unread input').click( function(){
         let check = $(this).filter(':checked').length == 1
-        let id = tabs.getId($('#report-container .tab.selected span').text())
-
+        let id = tabs.getId(tabNames[$('#report-container .tab.selected').index('.tab')])
         if (id == 'battles'){
             let offset = tabs.pages[id].offset
             if (check)

@@ -1270,7 +1270,7 @@ Blockly.Python['pot_ap'] = function(block) {
 Blockly.Blocks['pot_atr'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("Tônico do fortificante")
+            .appendField("Tônico fortificante")
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");

@@ -20,19 +20,20 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Atualização</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='css/admin.css'/> 
-    <link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-    <link type='text/css' rel='stylesheet' href='css/header.css'/> 
-    <link rel='stylesheet' href="css/table.css"/>
 
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="script/admin.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <script type="module" src="script/admin.min.js"></script>
     <script type="text/javascript" src="script/googlelogin.js"></script>
     <script type="text/javascript" src="script/dialog.js"></script>
     <script type="text/javascript" src="script/socket.js"></script>
     <script type="text/javascript" src="script/header.js"></script>
+    <script type="text/javascript" src="script/translate.js"></script>
     <script type="text/javascript" src="script/socket.js"></script>
 </head>
 <body>
@@ -42,6 +43,7 @@
             <div id='title'><span>ADMIN AREA</span></div>
             <div class='item selected' id='update'><span>ATUALIZAÇÕES</span></div>
             <div class='item' id='translate'><span>TRADUÇÕES</span></div>
+            <div class='item' id='posts'><span>NOTÍCIAS</span></div>
         </div>
         <div id='content-area'>
             <div id='update' class='content-box visible'>
@@ -80,6 +82,31 @@
                     <thead><tr><th>Usuário</th><th>Original</th><th>Sugestão</th><th>Idioma</th><th>Data</th></tr></thead>
                     <tbody></tbody>
                 </table>
+            </div>
+            <div id='posts' class='content-box'>
+                <h2>Notícias</h2>
+
+                <table class='table'>
+                    <thead><tr><th>Hash</th><th>Título</th><th>Data</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+
+                <h2>Nova notícia</h2>
+
+                <input id='title' type='text' class='input' placeholder='Título da postagem...'>
+
+                <div id='editor-container'>
+                    <div id='editor'></div>
+                </div>
+
+                <div id='button-container'>
+                    <button id='preview' class='button'>Ver HTML</button>
+                    <button id='send' class='button'>POSTAR</button>
+                </div>
+                
+                <div id='html-container'>
+                    <textarea id='html'></textarea>
+                </div>
             </div>
             <div id='footer'></div>
         </div>

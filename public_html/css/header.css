@@ -336,3 +336,16 @@ body{
 .improve-box:hover {
     color: #00638d;
 }
+
+.translating {
+    visibility: hidden;
+}
+
+#header #h-items #language #improve {
+    border: 1px solid #0000004a;
+    background-color: #ffffff0f;
+}
+
+#header #h-items #language #improve:hover {
+    background-color: #1e86d8;
+}

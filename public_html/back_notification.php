@@ -83,6 +83,14 @@
     elseif ($action == "SUMMARY"){
         $hash = mysql_escape_string($_POST['hash']);
 
+        $sql = "SELECT count(*) AS nbattles, TIME_TO_SEC(TIMEDIFF(min(l.time), now(3) - INTERVAL 1 DAY)) AS nextbattle FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.bonus = '1'";
+        $result = runQuery($sql);
+        $row = $result->fetch_assoc();
+        $output['battles'] = array(
+            'total' => $row['nbattles'],
+            'next' => $row['nextbattle']
+        );
+
         $sql = "SELECT u.lvl, u.xp, u.silver, g.mmr, g.name, g.skin, g.vstr, g.vint, g.vagi, g.cod AS 'id' FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN reports r ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE u.id = $user AND l.hash = '$hash'";
         $result = runQuery($sql);
         $row = $result->fetch_assoc();

@@ -14,46 +14,47 @@
         <div id='menu-button'></div>
         <div id='logo'><a href='index'><img src='icon/logo.png'></a></div>
         <i id='search' class='fas fa-search'></i>
-        <div id='h-items'>
+        <div id='h-items' class='translating'>
             <div class='item drop-menu mobile'>
                 <div class='title'>LOGIN</div>
                 <div class='item-container'>
-                    <div class='item'><a id='login' title='{{header_tooltip_login}}' class='hidden'>{{header_enter}}</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span data-translation-template='{{menu_profile}}'></span></a></div>
+                    <div class='item'><a id='login' title='Realize login com sua conta do Google' class='hidden'>ENTRAR</a><a id='profile' href='news' title='Gerencie seu perfil' class='hidden'><span>PERFIL</span></a></div>
                 </div>
             </div>
-            <div class='item desktop' id='header-profile'><a id='login' title='{{header_tooltip_login}}' class='hidden'>LOGIN</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span data-translation-template='{{menu_profile}}'></span></a></div>
-            <div class='item' id='learn'><a href='manual' title='{{header_tooltip_learn}}'><span data-translation-template='{{header_learn}}'></span></a></div>
-            <div class='item' id='header-editor'><a href='editor' title='{{header_tooltip_editor}}'><span data-translation-template='{{header_editor}}'></span></a></div>
+            <div class='item desktop' id='header-profile'><a id='login' title='Realize login com sua conta do Google' class='hidden'>LOGIN</a><a id='profile' href='news' title='Gerencie seu perfil' class='hidden'><span>PERFIL</span></a></div>
+            <div class='item' id='learn'><a href='manual' title='Saiba como funciona a gladCode'><span>APRENDER</span></a></div>
+            <div class='item' id='header-editor'><a href='editor' title='Crie e programe seus gladiadores'><span>EDITOR</span></a></div>
             <div class='item drop-menu'>
-                <div class='title'><span data-translation-template='{{header_community}}'></span></div>
+                <div class='title'><span>COMUNIDADE</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span data-translation-template='{{header_community_reddit}}'></span></a></div>
-                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span data-translation-template='{{header_community_facebook}}'></span></a></div>
-                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span data-translation-template='{{header_community_whatsapp}}'></span></a></div>
+                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span>FORUM REDDIT</span></a></div>
+                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span>PÁGINA FACEBOOK</span></a></div>
+                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>GRUPO WHATSAPP</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu' id='about'>
-                <div class='title'><span data-translation-template='{{header_about}}'></span></div>
+                <div class='title'><span>SOBRE</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='about' title='{{header_tooltip_about}}'><span data-translation-template='{{header_about_project}}'></span></a></div>
-                    <div class='item'><a href='about#support' title='{{header_tooltip_support}}'><span data-translation-template='{{header_about_support}}'></span></a></div>
-                    <div class='item'><a href='creditos' title='{{header_tooltip_credits}}'><span data-translation-template='{{header_about_credits}}'></span></a></div>
-                    <div class='item'><a href='stats' title='{{header_tooltip_stats}}'><span data-translation-template='{{header_about_stats}}'></span></a></div>
+                    <div class='item'><a href='about' title='Saiba sobre a trajetória da gladCode'><span>O PROJETO</span></a></div>
+                    <div class='item'><a href='about#support' title='Maneiras de você apoiar o projeto'><span>APOIE A GLADCODE</span></a></div>
+                    <div class='item'><a href='creditos' title='Créditos aos criadores das artes usadas na gladCode'><span>CRÉDITOS</span></a></div>
+                    <div class='item'><a href='stats' title='Informações sobre as batalhas realizadas'><span>ESTATÌSTICAS</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu'>
-                <div class='title'><span data-translation-template='{{header_projects}}'></span></div>
+                <div class='title'><span>PROJETOS</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='code' title='{{header_tooltip_compiler}}'><span data-translation-template='{{header_projects_compiler}}'></span></a></div>
-                    <div class='item'><a href='https://github.com/werlang/gladcode' title='{{header_tooltip_github_gladcode}}' target='_blank'>GLADCODE V1</a></div>
-                    <div class='item'><a href='https://github.com/werlang/automin' title='{{header_tooltip_automin}}' target='_blank'>AUTOMIN</a></div>
+                    <div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'><span>COMPILADOR C</span></a></div>
+                    <div class='item'><a href='https://github.com/werlang/gladcode' title='Projeto da primeira versão da gladCode' target='_blank'>GLADCODE V1</a></div>
+                    <div class='item'><a href='https://github.com/werlang/automin' title='Compacta scripts e atualiza páginas do servidor' target='_blank'>AUTOMIN</a></div>
                 </div>
             </div>
             <div class='item drop-menu' id='language'>
-                <div class='title' title='{{header_tooltip_language}}'><i class='fas fa-language'></i></div>
+                <div class='title'><i class='fas fa-language'></i></div>
                 <div class='item-container'>
-                    <div id='lang-pt' class='item'><a><span data-skip-translation="true">PORTUGUÊS</span></a></div>
-                    <div id='lang-en' class='item'><a><span data-skip-translation="true">ENGLISH</span></a></div>
+                    <div id='lang-pt' class='item'><a><span class='skip-translation'>PORTUGUÊS</span></a></div>
+                    <div id='lang-en' class='item'><a><span class='skip-translation'>ENGLISH</span></a></div>
+                    <div id='improve' class='item'><a><span>MELHORAR TRADUÇÃO</span></a></div>
                 </div>
             </div>
         </div>

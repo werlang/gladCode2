@@ -40,6 +40,8 @@ $(document).ready( () => {
                 $('#fog').hide().fadeIn()
                 slots.refresh()
 
+                translator.translate($('#browse-potions'))
+
                 $('#browse-potions #close').click( function() {
                     $('#fog').remove()
                 })
@@ -83,7 +85,7 @@ $(document).ready( () => {
                                 if (firstslot.length){
                                     $('#fog').remove()
                                     if (slots.fill(id)){
-                                        create_toast(`Item ${potions[id].name} encomandado`, "success")
+                                        create_toast(`Item ${potions[id].name} encomendado`, "success")
                                     }
                                     else{
                                         create_toast(`O item não pôde ser adquirido`, "error")
@@ -179,6 +181,7 @@ $(document).ready( () => {
             }
         }
         $('#apot-container #my-pots').html(mypots)
+        translator.translate($('#apot-container #my-pots'))
 
         apothecary.init().then( () => {
             apothecary.lvl = parseInt(user.apothecary)
@@ -317,6 +320,8 @@ $(document).ready( () => {
                 `)
             }
         }
+
+        translator.translate($('#apot-container #my-pots .mid'))
 
         $('#apot-container #browse').removeAttr('disabled')
         if (!this.items.filter(e => e.empty).length){

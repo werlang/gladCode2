@@ -548,8 +548,8 @@
             $silver += (0.7 * $income - 300)/2;
         }
 
-        // get how many battles today
-        $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.started = '1'";
+        // get how many battles with bonus today
+        $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.bonus = '1'";
         $result = runQuery($sql);
         // cut silver if not managed battle        
         $silver = $result->num_rows < 20 ? $silver : $silver / 10;
@@ -707,8 +707,12 @@
             array_push($masters, $row['master']);
 
             if ($row['master'] == $user){
-                $fields = "(log, gladiator, reward, started)";
-                $values = "('$log', '$glad', '$reward', '1')";
+                $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.bonus = '1'";
+                $result = runQuery($sql);
+                $bonus = $result->num_rows < 20 ? 1 : 0;
+                
+                $fields = "(log, gladiator, reward, started, bonus)";
+                $values = "('$log', '$glad', '$reward', '1', '$bonus')";
             }
             else {
                 $fields = "(log, gladiator, reward)";

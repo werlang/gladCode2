@@ -1,6 +1,6 @@
 $(document).ready( function() {
     $.post("back_news.php",{
-        action: "POST",
+        action: "GET",
         hash: $('#hash').html()
     }).done( function(data){
         // console.log(data);
