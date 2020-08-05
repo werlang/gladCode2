@@ -129,7 +129,15 @@ $(document).ready( function(){
             "Sim",
             "Não",
             "SIM",
-            "NÃO"
+            "NÃO",
+            "Última atividade",
+            "Aceitar solicitação",
+            "Recusar solicitação",
+            "Enviar mensagem",
+            "Enviar convite de amizade",
+            "Mensagem para",
+            "Olá...",
+            "CANCELAR"
         ]).then( data => {
             // console.log($('#tourn .title #offset .of').length)
             $('#tourn .title #offset .of').html(translator.getTranslated("de"))
@@ -769,8 +777,8 @@ $(document).ready( function(){
                     </div>
                     <div class='cell user'>${nick}</div>
                     <div class='button-container'>
-                        <div class='check' title='Aceitar solicitação'></div>
-                        <div class='close' title='Recusar solicitação'></div>
+                        <div class='check' title='${translator.getTranslated("Aceitar solicitação", dom=false)}'></div>
+                        <div class='close' title='${translator.getTranslated("Recusar solicitação", dom=false)}'></div>
                     </div>
                 </div>`);
                 $('#friend-panel #request .table .row').last().data('id', id);
@@ -793,7 +801,7 @@ $(document).ready( function(){
                     </div>
                     <div class='cell'>${nick}</div>
                     <div class='cell last-active'>
-                        <span class='label'>Última atividade</span>
+                        <span class='label'>${translator.getTranslated("Última atividade")}</span>
                         <span>${active}</span>
                     </div>
                     <div class='button-open'></div>
@@ -850,23 +858,23 @@ $(document).ready( function(){
     }
 
     $('#friend-panel #friends .unfriend').click( function() {
-        var button = $('#friend-panel #friends .button-open.open');
-        var row = button.parents('.row');
-        var id = button.parents('.row').data('id');
-        var nick = button.parents('.row').data('nick');
-        showDialog("Deseja remover <span class='highlight'>"+ nick +"</span> da sua lista de amigos?",["Sim","Não"]).then( function(data){
-            if (data == "Sim"){
-                $.post("back_friends.php", {
-                    action: "DELETE",
-                    user: id
-                })
-                .done( function(data){
-                    //console.log(data);
-                    row.remove();
-                });
-            }
-        });
-    });
+        var button = $('#friend-panel #friends .button-open.open')
+        var row = button.parents('.row')
+        var id = button.parents('.row').data('id')
+        var nick = button.parents('.row').data('nick')
+        new Message({
+            message: `Deseja remover <b>${nick}</b> da sua lista de amigos?`,
+            buttons: {yes: "Sim", no: "Não"}
+        }).show().click('yes', () => {
+            post("back_friends.php", {
+                action: "DELETE",
+                user: id
+            }).then( data => {
+                //console.log(data);
+                row.remove()
+            })
+        })
+    })
     $('#friend-panel #friends .message').click( function() {
         var button = $('#friend-panel #friends .button-open.open');
         bind_send_message(button);
@@ -956,8 +964,8 @@ $(document).ready( function(){
                 $('#friend-panel #search .table').append(`<div class='row'>
                     <div class='cell'>${nick}</div>
                     <div class='cell button-container'>
-                        <div class='send-message' title='Enviar mensagem'></div>
-                        <div class='add-friend' title='Enviar convite de amizade'></div>
+                        <div class='send-message' title='${translator.getTranslated("Enviar mensagem", dom=false)}'></div>
+                        <div class='add-friend' title='${translator.getTranslated("Enviar convite de amizade", dom=false)}'></div>
                     </div>
                 </div>`);
                 $('#friend-panel #search .table .row').last().data({
@@ -1001,7 +1009,18 @@ $(document).ready( function(){
     function bind_send_message(elem){
         var userid = elem.parents('.row').data('user');
         var nick = elem.parents('.row').data('nick');
-        showTextArea("Mensagem para <span class='highlight'>"+ nick +"</span>:","Olá...",2048).then( function(data){
+        new Message({
+            message: `${translator.getTranslated("Mensagem para")} <b>${nick}</b>:`,
+            buttons: {
+                cancel: translator.getTranslated("CANCELAR"),
+                ok: translator.getTranslated("OK")
+            },
+            translate: false,
+            textarea: {
+                placeholder: translator.getTranslated("Olá...", dom=false),
+                // maxlength: 2048
+            }
+        }).show().click('ok', data => {
             if (data){
                 var message = data;
                 $.post("back_message.php", {

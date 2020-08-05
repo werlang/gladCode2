@@ -48,12 +48,12 @@
     <script src="script/croppie.js"></script>
     <script src="script/profile-tourn.js"></script>
     <script src="script/profile-train.js"></script>
-    <script src="script/profile-report.js"></script>
-    <script src="script/profile-rank.js"></script>
+    <script src="script/profile-report.min.js"></script>
+    <script src="script/profile-rank.min.js"></script>
     <script src="script/profile-potions.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
-    <script src="script/profile.js"></script>
+    <script src="script/profile.min.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/radio.js"></script>
     <script src="script/runSim.js"></script>
@@ -64,7 +64,7 @@
     <script src="script/googlelogin.js"></script>
     <script src="script/header.js"></script>
     <script src="script/blocks.js"></script>
-    <script src="script/translate.js"></script>
+    <script src="script/translate.min.js"></script>
     
     </head>
 <body>

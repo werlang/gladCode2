@@ -41,7 +41,8 @@ $(document).ready( function(){
 
         // when tabs overflow container, add menu to select tab
         $('#ranking-container #tab-container #more-tabs').remove()
-        if (totalWidth > $('#ranking-container #tab-container').width()){
+        let containerWidth = $('#ranking-container #tab-container').width()
+        if (totalWidth > containerWidth && containerWidth > 0){
             $('#ranking-container #tab-container').append(`<div id='more-tabs'><i class='fas fa-ellipsis-v'></i></div>`)
             $('#ranking-container #tab-container #more-tabs').css('margin-left', $('#ranking-container #tab-container').outerWidth() + 5).click( function() {
                 if ( $('#ranking-container #tab-container #tab-select').length){
@@ -239,160 +240,167 @@ $(document).ready( function(){
         dummy = true
         }){
 
-        this.pages[id].offset = offset
-        
-        if (id == 'geral'){
-            if (dummy){
-                $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Gladiador</div><div class='cell'>Mestre</div><div class='cell mmr'>Renome</div></div>")
+        translator.translate([
+            "Gladiador",
+            "Mestre",
+            "Renome",
+            "Pontuação total",
+            "Tempo médio dos treinos"
+        ]).then( async () => {
+            this.pages[id].offset = offset
+            
+            if (id == 'geral'){
+                if (dummy){
+                    $('#ranking-container .table').html(`<div class='row head'><div class='cell position'></div><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell mmr'>${translator.getTranslated("Renome")}</div></div>`)
 
-                for (let i=0 ; i<limit ; i++){
-                    $('#ranking-container .table').append(`<div class='row dummy'>
-                        <div class='cell position'><span class='dummy-text'>00°</span></div>
-                        <div class='cell'><span class='dummy-text'>GLADNAME</span></div>
-                        <div class='cell'><span class='dummy-text'>USERNAME</span></div>
-                        <div class='cell mmr'><span class='dummy-text'>0000</span></div>
-                    </div>`)
+                    for (let i=0 ; i<limit ; i++){
+                        $('#ranking-container .table').append(`<div class='row dummy'>
+                            <div class='cell position'><span class='dummy-text'>00°</span></div>
+                            <div class='cell'><span class='dummy-text'>GLADNAME</span></div>
+                            <div class='cell'><span class='dummy-text'>USERNAME</span></div>
+                            <div class='cell mmr'><span class='dummy-text'>0000</span></div>
+                        </div>`)
+                    }
                 }
-            }
 
-            $('#ranking-container .page-nav button').prop('disabled',true)
+                $('#ranking-container .page-nav button').prop('disabled',true)
 
-            let data = await post("back_rank.php",{
-                action: "GET",
-                offset: offset,
-                search: search
-            })
-            // console.log(data);
-        
-            if (!dummy){
-                $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Gladiador</div><div class='cell'>Mestre</div><div class='cell mmr'>Renome</div></div>")
-            }
-
-            $('#ranking-container .table .row').not('.head').remove()
-
-            this.pages[id].total = data.total
-
-            if (data.total < offset){
-                this.fetch({
-                    id: id,
-                    offset: 0,
+                let data = await post("back_rank.php",{
+                    action: "GET",
+                    offset: offset,
                     search: search
                 })
-                return
-            }
-
-            for (let i=0 ; i<limit ; i++){
-                if (offset + i < data.total){
-                    let row = data.ranking[i]
-                    $('#ranking-container .table').append(`<div class='row'>
-                        <div class='cell position'>${row.position}º</div>
-                        <div class='cell'>${row.glad}</div>
-                        <div class='cell'>${row.master}</div>
-                        <div class='cell mmr'><span class='change24'>${Math.abs(parseInt(row.change24))}</span>${parseInt(row.mmr)}</div>
-                    </div>`)
-
-                    if (user.apelido == row.master){
-                        $('#ranking-container .table .row').last().addClass('mine')
-                    }
-                    if (parseInt(row.change24) > 0){
-                        $('#ranking-container .table .mmr .change24').last().addClass('green')
-                        $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>")
-                    }
-                    else if (parseInt(row.change24) < 0){
-                        $('#ranking-container .table .mmr .change24').last().addClass('red')
-                        $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>")
-                    }
+                // console.log(data);
+            
+                if (!dummy){
+                    $('#ranking-container .table').html(`<div class='row head'><div class='cell position'></div><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell mmr'>${translator.getTranslated("Renome")}</div></div>`)
                 }
-                else{
-                    $('#ranking-container .table').append(`<div class='row dummy'>
-                        <div class='cell position'></div>
-                        <div class='cell'></div>
-                        <div class='cell'></div>
-                        <div class='cell mmr'></div>
-                    </div>`)
+
+                $('#ranking-container .table .row').not('.head').remove()
+
+                this.pages[id].total = data.total
+
+                if (data.total < offset){
+                    this.fetch({
+                        id: id,
+                        offset: 0,
+                        search: search
+                    })
+                    return
                 }
-            }
-        }
-        else{
-            if (dummy){
-                $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Mestre</div><div class='cell mmr'><i class='fas fa-star' title='Pontuação total'></i></div><div class='cell mmr'><i class='fas fa-clock' title='Tempo médio dos treinos'></i></div></div>")
 
                 for (let i=0 ; i<limit ; i++){
-                    $('#ranking-container .table').append(`<div class='row dummy'>
-                        <div class='cell position'><span class='dummy-text'>00°</span></div>
-                        <div class='cell'><span class='dummy-text'>USERNAME</span></div>
-                        <div class='cell mmr'><span class='dummy-text'>00</span></div>
-                        <div class='cell mmr'><span class='dummy-text'>000.0s</span></div>
-                    </div>`)
-                }
-            }
+                    if (offset + i < data.total){
+                        let row = data.ranking[i]
+                        $('#ranking-container .table').append(`<div class='row'>
+                            <div class='cell position'>${row.position}º</div>
+                            <div class='cell'>${row.glad}</div>
+                            <div class='cell'>${row.master}</div>
+                            <div class='cell mmr'><span class='change24'>${Math.abs(parseInt(row.change24))}</span>${parseInt(row.mmr)}</div>
+                        </div>`)
 
-            $('#ranking-container .page-nav button').prop('disabled',true)
-
-            let data = await post("back_rank.php", {
-                action: "FETCH",
-                tab: id,
-                search: search
-            })
-            // console.log(data)
-                  
-            if (!dummy){
-                $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Mestre</div><div class='cell mmr'><i class='fas fa-star' title='Pontuação total'></i></div><div class='cell mmr'><i class='fas fa-clock' title='Tempo médio dos treinos'></i></div></div>")
-            }
-
-            $('#ranking-container .table .row').not('.head').remove()
-
-            this.pages[id].total = data.ranking.length
-
-            // if you switch tabs and the result total is lesser than the actual tab index
-            if (data.ranking.length < offset){
-                this.fetch({
-                    id: id,
-                    offset: 0,
-                    search: search
-                })
-                return
-            }
-
-            for (let i=0 ; i<limit ; i++){
-                if (data.ranking[offset + i]){
-                    let row = data.ranking[offset + i]
-                    let score = row.score%1 ? row.score.toFixed(1) : row.score
-                    $('#ranking-container .table').append(`<div class='row'>
-                        <div class='cell position'>${row.position}º</div>
-                        <div class='cell'>${row.nick}</div>
-                        <div class='cell mmr'>${score}</div>
-                        <div class='cell mmr'>${row.time.toFixed(1)}s</div>
-                    </div>`)
-
-                    if (user.id == row.id){
-                        $('#ranking-container .table .row').last().addClass('mine')
+                        if (user.apelido == row.master){
+                            $('#ranking-container .table .row').last().addClass('mine')
+                        }
+                        if (parseInt(row.change24) > 0){
+                            $('#ranking-container .table .mmr .change24').last().addClass('green')
+                            $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>")
+                        }
+                        else if (parseInt(row.change24) < 0){
+                            $('#ranking-container .table .mmr .change24').last().addClass('red')
+                            $('#ranking-container .table .mmr .change24').last().prepend("<img src='icon/arrow-up-green.png'>")
+                        }
+                    }
+                    else{
+                        $('#ranking-container .table').append(`<div class='row dummy'>
+                            <div class='cell position'></div>
+                            <div class='cell'></div>
+                            <div class='cell'></div>
+                            <div class='cell mmr'></div>
+                        </div>`)
                     }
                 }
-                else{
-                    $('#ranking-container .table').append(`<div class='row dummy'>
-                        <div class='cell position'></div>
-                        <div class='cell'></div>
-                        <div class='cell mmr'></div>
-                        <div class='cell mmr'></div>
-                    </div>`)
-                }
             }
-            
-        }
+            else{
+                if (dummy){
+                    $('#ranking-container .table').html(`<div class='row head'><div class='cell position'></div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell mmr'><i class='fas fa-star' title='${translator.getTranslated("Pontuação total", dom=false)}'></i></div><div class='cell mmr'><i class='fas fa-clock' title='${translator.getTranslated("Tempo médio dos treinos", dom=false)}'></i></div></div>`)
 
-        $('#ranking-container .page-nav span').eq(0).html(this.pages[id].total == 0 ? 0 : offset + 1)
-        $('#ranking-container .page-nav span').eq(1).html(Math.min(offset + limit, this.pages[id].total))
-        $('#ranking-container .page-nav span').eq(2).html(this.pages[id].total)
-        
-        if (offset > 0){
-            $('#ranking-container #prev').removeAttr('disabled')
-        }
-            
-        if (offset + limit < this.pages[id].total){
-            $('#ranking-container #next').removeAttr('disabled')
-        }
+                    for (let i=0 ; i<limit ; i++){
+                        $('#ranking-container .table').append(`<div class='row dummy'>
+                            <div class='cell position'><span class='dummy-text'>00°</span></div>
+                            <div class='cell'><span class='dummy-text'>USERNAME</span></div>
+                            <div class='cell mmr'><span class='dummy-text'>00</span></div>
+                            <div class='cell mmr'><span class='dummy-text'>000.0s</span></div>
+                        </div>`)
+                    }
+                }
 
+                $('#ranking-container .page-nav button').prop('disabled',true)
+
+                let data = await post("back_rank.php", {
+                    action: "FETCH",
+                    tab: id,
+                    search: search
+                })
+                // console.log(data)
+                    
+                if (!dummy){
+                    $('#ranking-container .table').html("<div class='row head'><div class='cell position'></div><div class='cell'>Mestre</div><div class='cell mmr'><i class='fas fa-star' title='Pontuação total'></i></div><div class='cell mmr'><i class='fas fa-clock' title='Tempo médio dos treinos'></i></div></div>")
+                }
+
+                $('#ranking-container .table .row').not('.head').remove()
+
+                this.pages[id].total = data.ranking.length
+
+                // if you switch tabs and the result total is lesser than the actual tab index
+                if (data.ranking.length < offset){
+                    this.fetch({
+                        id: id,
+                        offset: 0,
+                        search: search
+                    })
+                    return
+                }
+
+                for (let i=0 ; i<limit ; i++){
+                    if (data.ranking[offset + i]){
+                        let row = data.ranking[offset + i]
+                        let score = row.score%1 ? row.score.toFixed(1) : row.score
+                        $('#ranking-container .table').append(`<div class='row'>
+                            <div class='cell position'>${row.position}º</div>
+                            <div class='cell'>${row.nick}</div>
+                            <div class='cell mmr'>${score}</div>
+                            <div class='cell mmr'>${row.time.toFixed(1)}s</div>
+                        </div>`)
+
+                        if (user.id == row.id){
+                            $('#ranking-container .table .row').last().addClass('mine')
+                        }
+                    }
+                    else{
+                        $('#ranking-container .table').append(`<div class='row dummy'>
+                            <div class='cell position'></div>
+                            <div class='cell'></div>
+                            <div class='cell mmr'></div>
+                            <div class='cell mmr'></div>
+                        </div>`)
+                    }
+                }
+                
+            }
+
+            $('#ranking-container .page-nav span').eq(0).html(this.pages[id].total == 0 ? 0 : offset + 1)
+            $('#ranking-container .page-nav span').eq(1).html(Math.min(offset + limit, this.pages[id].total))
+            $('#ranking-container .page-nav span').eq(2).html(this.pages[id].total)
+            
+            if (offset > 0){
+                $('#ranking-container #prev').removeAttr('disabled')
+            }
+                
+            if (offset + limit < this.pages[id].total){
+                $('#ranking-container #next').removeAttr('disabled')
+            }
+        })
     }
 
     tabs.pages.next = function(){

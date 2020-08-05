@@ -172,6 +172,12 @@ function create_tooltip(message, obj, args){
 //          placeholder: Placeholder html attr of the field
 //          enter:  Id from the buttons object. When enter is pressed, this button will be clicked
 //                  If no enter id is given, 'ok', then 'yes' will be default values
+// textarea:    A textarea element to be placed. Mutually exclusive with input
+//              If true, a simple textarea is placed
+//              {value: "pre_filled_text", placeholder: "placeholder_text", maxlength: 0}
+//              value: A default value to be placed inside the textarea
+//              placeholder: Placeholder html attr of the field
+//              maxlength: Maximum length of the text inserted
 // class:   class to be appended in the dialog box
 // preventKill: Prevent dialog box from closing when a button is pressed,
 // translate: Default true. If false, prevent message box to be translated
@@ -212,6 +218,20 @@ class Message {
             else if (this.buttons.yes)
                 this.input.enter = 'yes'
         }
+        else if (options.textarea){
+            this.textarea = {
+                value: '',
+                placeholder: '',
+                maxlength: 0
+            }
+            if (options.textarea.value)
+                this.textarea.value = options.textarea.value
+            if (options.textarea.placeholder){
+                this.textarea.placeholder = options.textarea.placeholder
+            }
+            if (options.textarea.maxlength)
+                this.textarea.maxlength = options.textarea.maxlength
+        }
 
         if (options.preventKill){
             this.preventKill = true
@@ -236,10 +256,13 @@ class Message {
 
         let input = this.input ? `<input type='text' class='input' value='${this.input.default}' placeholder='${this.input.placeholder}'>` : ''
 
+        let maxlength = this.textarea.maxlength ? `<span id='charcount'>${this.textarea.maxlength} caracteres</span>` : ""
+        let textarea = this.textarea ? `<textarea class='input' placeholder='${this.textarea.placeholder}' maxlength=${this.textarea.maxlength}>${this.textarea.value}</textarea>${maxlength}` : ''
+
         $('body').append(`<div id='fog'>
             <div id='dialog-box' ${this.class ? `class='${this.class}'` : ''}>
                 <div id='message'>${this.message}</div>
-                ${input}
+                ${input}${textarea}
                 <div id='button-container'>${buttonsDOM}</div>
             </div>
         </div>`)
@@ -278,6 +301,19 @@ class Message {
                     $(`#dialog-box #dialog-button-${this.input.enter}`).click()
                 }
             })            
+        }
+        else if (this.textarea && this.textarea.maxlength){
+            $('#dialog-box .input').focus()
+            $('#dialog-box .input').on('input', () => {
+                var left = this.textarea.maxlength - $('#dialog-box .input').val().length;
+                $('#dialog-box #charcount').html(left +" caracteres");
+                if (left < 0)
+                    $('#dialog-box #charcount').addClass('alert');
+                else{
+                    $('#dialog-box #charcount').removeClass('alert');
+                    $('#dialog-box .input').removeClass('alert');
+                }
+            });
         }
 
         for (let id in this.buttons){
