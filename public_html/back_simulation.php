@@ -549,7 +549,7 @@
         }
 
         // get how many battles today
-        $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY";
+        $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.started = '1'";
         $result = runQuery($sql);
         // cut silver if not managed battle        
         $silver = $result->num_rows < 20 ? $silver : $silver / 10;
@@ -692,6 +692,7 @@
 
     function send_reports($rewards, $log){
         global $conn;
+        global $user;
 
         $sql = "SELECT id FROM logs WHERE hash = '$log'";
         $result = runQuery($sql);
@@ -700,13 +701,23 @@
         
         $masters = array();
         foreach($rewards as $glad => $reward){
-            $sql = "INSERT INTO reports (log, gladiator, reward) VALUES ('$log', '$glad', '$reward')";
-            $result = runQuery($sql);
-
             $sql = "SELECT master FROM gladiators WHERE cod = $glad";
             $result = runQuery($sql);
             $row = $result->fetch_assoc();
             array_push($masters, $row['master']);
+
+            if ($row['master'] == $user){
+                $fields = "(log, gladiator, reward, started)";
+                $values = "('$log', '$glad', '$reward', '1')";
+            }
+            else {
+                $fields = "(log, gladiator, reward)";
+                $values = "('$log', '$glad', '$reward')";
+            }
+
+            $sql = "INSERT INTO reports $fields VALUES $values";
+            $result = runQuery($sql);
+
         }
 
         send_node_message(array(
