@@ -11,7 +11,7 @@
     $apot_times = array(2, 6, 12, 24, 48);
 
     if ($action == "ITEMS"){
-        $sql = "SELECT * FROM items ORDER BY price";
+        $sql = "SELECT * FROM items WHERE id NOT IN (11,12,13,14,15,16,17,18) ORDER BY price";
         $result = runQuery($sql);
 
         $output['potions'] = array();
