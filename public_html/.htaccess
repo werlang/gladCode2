@@ -27,6 +27,10 @@ RewriteRule    ^messages$    profile.php?t=messages    [NC,L]
 RewriteRule    ^friends$    profile.php?t=friends    [NC,L]
 RewriteRule    ^logout$    profile.php?t=logout    [NC,L]
 
+#redirect images to cloudinary CDN auto uploader
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule     ^(.+)\.(png|jpg|jpeg|gif|svg)$      https://res.cloudinary.com/dd0mjuhdb/image/upload/gladcode/$1.$2
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule     ^([^\.]+)$      $1.php
 

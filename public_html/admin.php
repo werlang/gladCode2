@@ -28,7 +28,7 @@
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-    <script type="module" src="script/admin.min.js"></script>
+    <script type="module" src="script/admin.js"></script>
     <script type="text/javascript" src="script/googlelogin.js"></script>
     <script type="text/javascript" src="script/dialog.js"></script>
     <script type="text/javascript" src="script/socket.js"></script>
