@@ -41,7 +41,7 @@
                     <div class='item'><a href='stats' title='Informações sobre as batalhas realizadas'><span>ESTATÌSTICAS</span></a></div>
                 </div>
             </div>
-            <div class='item drop-menu'>
+            <div id='projects' class='item drop-menu'>
                 <div class='title'><span>PROJETOS</span></div>
                 <div class='item-container'>
                     <div class='item'><a href='code' title='Compile e execute seus códigos pelo navegador'><span>COMPILADOR C</span></a></div>

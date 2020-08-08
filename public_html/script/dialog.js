@@ -256,7 +256,7 @@ class Message {
 
         let input = this.input ? `<input type='text' class='input' value='${this.input.default}' placeholder='${this.input.placeholder}'>` : ''
 
-        let maxlength = this.textarea.maxlength ? `<span id='charcount'>${this.textarea.maxlength} caracteres</span>` : ""
+        let maxlength = this.textarea && this.textarea.maxlength ? `<span id='charcount'>${this.textarea.maxlength} caracteres</span>` : ""
         let textarea = this.textarea ? `<textarea class='input' placeholder='${this.textarea.placeholder}' maxlength=${this.textarea.maxlength}>${this.textarea.value}</textarea>${maxlength}` : ''
 
         $('body').append(`<div id='fog'>
