@@ -1,7 +1,7 @@
 var teamsync = {id: 0, time: 0};
 
 $(document).ready( function(){
-    socket_ready().then( () => {
+    socket.isReady().then( () => {
         socket.on('tournament list', data =>{
             refresh_tourn_list();
         });
@@ -13,7 +13,9 @@ $(document).ready( function(){
         });
     });
 
-    waitLogged().then( () => {
+    login.wait().then( data => {
+        user = data
+        
         let msg = [
             "O identificador precisa ter tamanho 6 ou mais",
             "O identificador precisa conter somente letras, números ou espaços",

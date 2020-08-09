@@ -1,3 +1,5 @@
+import {translator} from "./translate.js"
+
 function showDialog(message,buttons){
     var response = $.Deferred();
     $('body').append("<div id='fog'><div id='dialog-box'><div id='message'></div><div id='button-container'></div></div></div>");
@@ -51,42 +53,6 @@ function showTextArea(message,placeholder,maxchar){
     return response.promise();
 }
 
-function showInput(message,defValue){
-    var response = $.Deferred();
-
-    $('body').append("<div id='fog'><div id='dialog-box'><div id='message'></div><input type='text' class='input'><div id='button-container'><button class='button'>CANCELAR</button><button class='button' id='btnok'>OK</button></div></div></div>");
-    $('#dialog-box #message').html(message);
-    if (!defValue)
-        defValue = "";
-    $('#dialog-box .input').val(defValue);
-    $('#fog').hide().fadeIn();
-    $('#dialog-box .input').focus();
-    $('#dialog-box .button').click( function(){
-        var text = $('#dialog-box .input').val();
-        if ($(this).html() == "OK")
-            response.resolve(text);
-        else
-            response.resolve(false);
-        $('#dialog-box').parents('#fog').remove();
-    });
-    $('#dialog-box .input').keyup(function(e){
-        if (e.keyCode == 13)
-            $('#dialog-box #btnok').click();
-    });
-    return response.promise();
-}
-
-async function showMessage(message){
-    $('body').append(`<div id='fog'><div id='dialog-box'><div id='message'>${message}</div><div id='button-container'><button class='button'>OK</button></div></div></div>`)
-    $('#fog').hide().fadeIn()
-    return new Promise( (resolve, reject) => {
-        $('#dialog-box .button').click( async () => {
-            $('#dialog-box').parents('#fog').remove()
-            resolve(true)
-        })
-    })
-}
-
 function showTerminal(title, message){
     $('#fog').remove()
     $('body').append("<div id='fog'><div id='terminal'><div id='title'><span>"+ title +"</span><div id='close'></div></div><pre></pre></div></div>");
@@ -96,7 +62,7 @@ function showTerminal(title, message){
     $('#terminal pre').html(message);
 }
 
-function create_toast(message, type) {
+function createToast(message, type) {
     var icon;
     if (type == 'error')
         icon = 'times-circle';
@@ -332,23 +298,67 @@ class Message {
     }
 
     click(button, fn){
-        $(`#dialog-box #dialog-button-${button}`).off().click( async () => {
-            if (this.input){
-                fn({input: $('#dialog-box .input').val()})
+        return new Promise( resolve => {
+            if (!button){
+                $(`#dialog-box .button`).off().click( async function() {
+                    if (fn){
+                        if (this.input){
+                            fn({
+                                button: $(this).attr('id').split('-')[2],
+                                input: $('#dialog-box .input').val()
+                            })
+                        }
+                        else{
+                            fn({ button: $(this).attr('id').split('-')[2] })
+                        }
+                    }
+    
+                    if (!this.preventKill){
+                        $('#dialog-box').parents('#fog').remove()
+                    }
+    
+                    if (this.input){
+                        resolve({
+                            input: $('#dialog-box .input').val(),
+                            button: $(this).attr('id').split('-')[2]
+                        })
+                    }
+                    else{
+                        resolve({ button: $(this).attr('id').split('-')[2] })
+                    }    
+                })
             }
             else{
-                fn()
+                $(`#dialog-box #dialog-button-${button}`).off().click( async () => {
+                    if (fn){
+                        if (this.input){
+                            fn({input: $('#dialog-box .input').val()})
+                        }
+                        else{
+                            fn()
+                        }
+                    }
+    
+                    if (!this.preventKill){
+                        $('#dialog-box').parents('#fog').remove()
+                    }
+    
+                    if (this.input){
+                        resolve({input: $('#dialog-box .input').val()})
+                    }
+                    else{
+                        resolve(true)
+                    }    
+                })
+
             }
 
-            if (!this.preventKill){
-                $('#dialog-box').parents('#fog').remove()
-            }
         })
-
-        return this
     }
 
     getButton(name) {
         return $(`#dialog-box #dialog-button-${name}`)
     }
 }
+
+export {Message, showDialog, createToast}

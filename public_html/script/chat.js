@@ -1,14 +1,96 @@
-sendingBuffer = [];
-clearToSend = true;
+import {socket} from "./socket.js"
+import * as _ from "./emoji.js"
+import {post} from "./header.js"
+
+var sendingBuffer = [];
+var clearToSend = true;
 var emoji;
 var recentEmoji = [];
 var visitedRooms = {};
 var uploadWidget = {};
+var scrolling = false;
+
+export const chat = {
+    started: false
+}
+
+chat.init = function(wrapper, options){
+    var leftButtons = '';
+    var full = 'full';
+
+    if (options && options.full === false){
+        full = '';
+        leftButtons = `<div class='button-container'>
+            <i class='fas fa-exchange-alt' title='Mostrar/Esconder Chat' id='show-hide'></i>
+            <i class='fas fa-external-link-alt' title='Abir chat em nova aba' id='open-new'></i>
+        </div>`;
+    }
+
+    var str = `<div id='room-container'></div>
+        <div id='view-area'>
+            <div id='emoji-ui'>
+                <div id='emoji-container'></div>
+                <div id='category-buttons'>
+                    <i id='recent' class='fas fa-star selected' title='Mais usados (CTRL+🔢)'></i>
+                    <i id='smile' class='fas fa-grin-alt' title='Carinhas e Pessoas'></i>
+					<i id='animals' class='fas fa-paw' title='Animais e Natureza'></i>
+                    <i id='food' class='fas fa-hamburger' title='Alimentos'></i>
+                    <i id='activities' class='fas fa-futbol' title='Esportes e Atividades'></i>
+                    <i id='places' class='fas fa-map-marked-alt' title='Viagens e Lugares'></i>
+                    <i id='objects' class='fas fa-lightbulb' title='Objetos'></i>
+                    <i id='symbols' class='fas fa-icons' title='Símbolos'></i>
+                    <i id='flags' class='fas fa-flag' title='Bandeiras'></i>
+                </div>
+            </div>
+            <div id='chat-ui'>
+                ${leftButtons}
+                <div id='message-box' data-placeholder='Digite sua mensagem. /help para instruções' contentEditable></div>
+                <div class='button-container'>
+                    <i class='far fa-comment-dots hidden' title='Enviar mensagem (Enter)' id='send'></i>
+                    <i class='far fa-question-circle' title='Ajuda' id='help'></i>
+                    <i class='far fa-grin-alt' title='Emojis (CTRL+E)' id='emoji'></i>
+                </div>
+            </div>
+        </div>`;
+
+    wrapper.addClass(full);
+    wrapper.addClass('preload');
+
+    var defaultOpen = 1340;
+    if (options && options.defaultOpen)
+        defaultOpen = options.defaultOpen;
+        
+    if ($(window).width() < defaultOpen && !$('#chat-panel').hasClass('full'))
+        wrapper.addClass('hidden');
+
+    wrapper.html(str);
+    setTimeout( () => {
+        wrapper.removeClass('preload');
+    }, 1000);
+    
+
+    chat.started = true;
+}
+
+chat.isStarted = async function(){
+    async function isReady(){
+        return await new Promise(resolve => {
+            setTimeout(() => {
+                if (chat.started)
+                    resolve(true);
+                else
+                    resolve(false);
+            }, 100);
+        });
+    }
+    while (await isReady() === false);
+    return true;
+}
 
 $(document).ready( function(){
-    chat_started().then( () => {
-        socket_ready().then( function() {
-            socket_request('login', {}).then( function(res, err){
+    chat.isStarted().then( () => {
+        socket.isReady().then( function() {
+            socket.request('login', {}).then( function(res, err){
                 if (err) return console.log(err);
                 //console.log(res);
                 if (res.session === true){
@@ -20,7 +102,10 @@ $(document).ready( function(){
                     if (!$('#chat-panel').hasClass('full'))
                         $('#chat-panel').addClass('hidden');
                     else if (!$('#dialog-box').length){
-                        showDialog("Faça login na gladCode para participar do chat",["LOGIN"]).then( function(data){
+                        new Message({
+                            message: `Faça login na gladCode para participar do chat`,
+                            buttons: {ok: "LOGIN"}
+                        }).show().click('ok', () => {
                             googleLogin().then(function(data) {
                                 window.location.reload();
                             });
@@ -28,12 +113,13 @@ $(document).ready( function(){
                     }
                     $('#chat-panel').click( () => {
                         if (!$('#dialog-box').length){
-                            showDialog("Faça login na gladCode para participar do chat",["Cancelar","LOGIN"]).then( function(data){
-                                if (data == "LOGIN"){
-                                    googleLogin().then(function(data) {
-                                        window.location.reload();
-                                    });
-                                }
+                            new Message({
+                                message: "Faça login na gladCode para participar do chat",
+                                buttons: {cancel: "Cancelar", ok: "LOGIN"}
+                            }).show().click('ok', () => {
+                                googleLogin().then(function(data) {
+                                    window.location.reload();
+                                });
                             });
                         }
                     });
@@ -59,7 +145,7 @@ $(document).ready( function(){
                 else if (data.status == "UNBAN"){
                     msg = `Seu banimento da sala ${data.room_name} foi removido`
                 }
-                create_toast(msg, "info");
+                createToast(msg, "info");
             });
         });
 
@@ -259,52 +345,52 @@ $(document).ready( function(){
                                 clearToSend = true;
                                 var status = data.status;
                                 if (status == "UNKNOWN"){
-                                    create_toast("Comando desconhecido", "error");
+                                    createToast("Comando desconhecido", "error");
                                 }
                                 else if (status == "LEFT"){
                                     listRooms({remove: data.name});
-                                    create_toast("Você saiu da sala "+ data.name, "success");
+                                    createToast("Você saiu da sala "+ data.name, "success");
                                 }
                                 else if (status == "JOINED"){
                                     listRooms({insert: data.name});
-                                    create_toast("Bem-vindo à sala "+ data.name, "success");
+                                    createToast("Bem-vindo à sala "+ data.name, "success");
                                 }
                                 else if (status == "CREATED"){
                                     listRooms({insert: data.name});
-                                    create_toast("Sala "+ data.name +" criada", "success");
+                                    createToast("Sala "+ data.name +" criada", "success");
                                 }
                                 else if (status == "EDITED"){
                                     listRooms({});
-                                    create_toast("Sala atualizada", "success");
+                                    createToast("Sala atualizada", "success");
                                 }
                                 else if (status == "NOTFOUND")
-                                    create_toast("Sala não encontrada", "error");
+                                    createToast("Sala não encontrada", "error");
                                 else if (status == "NOPERMISSION")
-                                    create_toast("Você não possui permissão para realizar esta ação", "error");
+                                    createToast("Você não possui permissão para realizar esta ação", "error");
                                 else if (status == "PROMOTED")
-                                    create_toast("O usuário "+ data.target +" foi promovido", "success");
+                                    createToast("O usuário "+ data.target +" foi promovido", "success");
                                 else if (status == "MAXPROMOTION")
-                                    create_toast("O usuário "+ data.target +" não pode mais ser promovido", "info");
+                                    createToast("O usuário "+ data.target +" não pode mais ser promovido", "info");
                                 else if (status == "NOTARGET"){
                                     if (data.command == 'ban' || data.command == 'promote')
-                                        create_toast("O usuário "+ data.target +" não foi encontrado na sala", "error");
+                                        createToast("O usuário "+ data.target +" não foi encontrado na sala", "error");
                                     else
-                                        create_toast("O usuário "+ data.target +" não está banido", "info");
+                                        createToast("O usuário "+ data.target +" não está banido", "info");
                                 }
                                 else if (status == "ALREADYBANNED")
-                                    create_toast(data.target +" já está banido da sala", "error");
+                                    createToast(data.target +" já está banido da sala", "error");
                                 else if (status == "BANNED")
-                                    create_toast("Você foi banido desta sala e não pode enviar mensagens", "info");
+                                    createToast("Você foi banido desta sala e não pode enviar mensagens", "info");
                                 else if (status == "SILENCED")
-                                    create_toast("Você foi silenciado até " + data.time, "info");
+                                    createToast("Você foi silenciado até " + data.time, "info");
                                 else if (status == "NOROOM")
-                                    create_toast("Entre em uma sala antes", "info");
+                                    createToast("Entre em uma sala antes", "info");
                                 else if (status == "EXISTS")
-                                    create_toast("A sala "+ data.name +" já existe", "info");
+                                    createToast("A sala "+ data.name +" já existe", "info");
                                 else if (status == "ACTIVE")
-                                    create_toast("Os líderes desta sala estão ativos", "info");
+                                    createToast("Os líderes desta sala estão ativos", "info");
                                 else if (status == "RESTRICTED")
-                                    create_toast("Você possui restrições a esta sala e não poderá assumir seu comando", "error");
+                                    createToast("Você possui restrições a esta sala e não poderá assumir seu comando", "error");
                                 else if (status == "LIST"){
                                     if (data.room){
                                         var table = [
@@ -767,7 +853,6 @@ function getChatNotification(){
 
 }
 
-var scrolling = false;
 function getChatMessages(options){
     var id = options.room;
     if (id && !scrolling){ //tem janela aberta
@@ -963,80 +1048,6 @@ function getChatMessages(options){
 
         });
     }       
-}
-
-var chatStarted = false;
-function init_chat(wrapper, options){
-    var leftButtons = '';
-    var full = 'full';
-
-    if (options && options.full === false){
-        full = '';
-        leftButtons = `<div class='button-container'>
-            <i class='fas fa-exchange-alt' title='Mostrar/Esconder Chat' id='show-hide'></i>
-            <i class='fas fa-external-link-alt' title='Abir chat em nova aba' id='open-new'></i>
-        </div>`;
-    }
-
-    var str = `<div id='room-container'></div>
-        <div id='view-area'>
-            <div id='emoji-ui'>
-                <div id='emoji-container'></div>
-                <div id='category-buttons'>
-                    <i id='recent' class='fas fa-star selected' title='Mais usados (CTRL+🔢)'></i>
-                    <i id='smile' class='fas fa-grin-alt' title='Carinhas e Pessoas'></i>
-					<i id='animals' class='fas fa-paw' title='Animais e Natureza'></i>
-                    <i id='food' class='fas fa-hamburger' title='Alimentos'></i>
-                    <i id='activities' class='fas fa-futbol' title='Esportes e Atividades'></i>
-                    <i id='places' class='fas fa-map-marked-alt' title='Viagens e Lugares'></i>
-                    <i id='objects' class='fas fa-lightbulb' title='Objetos'></i>
-                    <i id='symbols' class='fas fa-icons' title='Símbolos'></i>
-                    <i id='flags' class='fas fa-flag' title='Bandeiras'></i>
-                </div>
-            </div>
-            <div id='chat-ui'>
-                ${leftButtons}
-                <div id='message-box' data-placeholder='Digite sua mensagem. /help para instruções' contentEditable></div>
-                <div class='button-container'>
-                    <i class='far fa-comment-dots hidden' title='Enviar mensagem (Enter)' id='send'></i>
-                    <i class='far fa-question-circle' title='Ajuda' id='help'></i>
-                    <i class='far fa-grin-alt' title='Emojis (CTRL+E)' id='emoji'></i>
-                </div>
-            </div>
-        </div>`;
-
-    wrapper.addClass(full);
-    wrapper.addClass('preload');
-
-    var defaultOpen = 1340;
-    if (options && options.defaultOpen)
-        defaultOpen = options.defaultOpen;
-        
-    if ($(window).width() < defaultOpen && !$('#chat-panel').hasClass('full'))
-        wrapper.addClass('hidden');
-
-    wrapper.html(str);
-    setTimeout( () => {
-        wrapper.removeClass('preload');
-    }, 1000);
-    
-
-    chatStarted = true;
-}
-
-async function chat_started(){
-    async function isReady(){
-        return await new Promise(resolve => {
-            setTimeout(() => {
-                if (chatStarted)
-                    resolve(true);
-                else
-                    resolve(false);
-            }, 100);
-        });
-    }
-    while (await isReady() === false);
-    return true;
 }
 
 function getRandomId(size){

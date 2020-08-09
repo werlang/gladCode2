@@ -129,7 +129,7 @@ $(document).ready( function(){
                         // console.log(data)
                         if (data.status == "SUCCESS"){
                             tabs.show()
-                            create_toast(`Aba #${name} removida`, "success")
+                            createToast(`Aba #${name} removida`, "success")
                             $('#ranking-container #tab-container #tab-general').click()
                         }
                     })
@@ -195,7 +195,7 @@ $(document).ready( function(){
                         tabs.add(match[1])
                     }
                     else{
-                        create_toast("A #hashtag deve conter somente letras, números e underline", "error")
+                        createToast("A #hashtag deve conter somente letras, números e underline", "error")
                     }
                 })
                 input.click('cancel', () => {
@@ -218,14 +218,14 @@ $(document).ready( function(){
         })
         // console.log(data)
         if (data.status == "SUCCESS"){
-            create_toast(`Aba #${name} criada`, "success")
+            createToast(`Aba #${name} criada`, "success")
         }
         else if (data.status == "NOPREMIUM"){
-            create_toast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
+            createToast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
             user.premium = false
         }
         else if (data.status == "NOCREDITS"){
-            create_toast("Você não possui créditos para utilizar essa função", "error")
+            createToast("Você não possui créditos para utilizar essa função", "error")
             user.credits = 0
         }
 

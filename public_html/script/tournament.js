@@ -5,7 +5,7 @@ $(document).ready( function() {
     round = $('#round').html();
     $('#hash, #round').remove();
 
-    socket_ready().then( () => {
+    socket.isReady().then( () => {
         socket.emit('tournament run join', {
             hash: hash
         });
@@ -138,11 +138,11 @@ $(document).ready( function() {
                         data = JSON.parse(data);
                        
                         if (data.status == "LOCK"){
-                            showMessage("Tarde demais. Seu grupo já encerrou as inscrições");
+                            new Message({message: `Tarde demais. Seu grupo já encerrou as inscrições`}).show();
                             $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
                         }
                         else if (data.status == "NOTFOUND"){
-                            showMessage("Lista de gladiadores não encontrada");
+                            new Message({message: `Lista de gladiadores não encontrada`}).show();
                         }
                         else{
                             $('body').append("<div id='fog'><div class='float-box'><div id='text'>Olá <span class='highlight'>"+ nick +"</span>, você precisa escolher um gladiador para representar a equipe <span class='highlight'>"+ myteam +"</span> na rodada <span class='highlight'>"+ round +"</span> do torneio</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>AINDA NÃO</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>");
@@ -163,12 +163,12 @@ $(document).ready( function() {
                                     data = JSON.parse(data);
             
                                     if (data.status == "DEAD")
-                                        showMessage("Este gladiador está gravemente ferido e não poderá mais participar deste torneio");
+                                        new Message({message: `Este gladiador está gravemente ferido e não poderá mais participar deste torneio`}).show();
                                     else if (data.status == "OLD")
-                                        showMessage("Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o");
+                                        new Message({message: `Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o`}).show();
                                     else if (data.status == "SUCCESS"){
                                         $('#fog').remove();
-                                        showMessage("Sua equipe escolheu o gladiador <span class='highlight'>"+ gladname +"</span> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.");
+                                        new Message({message: `Sua equipe escolheu o gladiador <b>${gladname}</b> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`}).show();
                                     }
                                 });
             
@@ -315,7 +315,7 @@ function refresh_round(){
                     $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
 
                 if (data.groups[i].status == "RUN"){
-                    socket_ready().then( () => {
+                    socket.isReady().then( () => {
                         socket.emit('tournament run request', {
                             hash: hash,
                             group: i

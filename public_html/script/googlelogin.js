@@ -5,7 +5,7 @@ how to include google login in your page:
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script type="text/javascript" src="script/googlelogin.js"></script>
     
-2 - call initGoogleLogin function on the page load:
+2 - call google.init function on the page load:
 
 3 - call googleLogin to authenticate
     google_login().then( function(data){
@@ -20,16 +20,20 @@ how to include google login in your page:
     pasta: folder name on the server
 */
 
-function initGoogleLogin(){
-    var googleUser = {};
-    
+import {socket} from "./socket.js"
+
+const google = {
+    auth2: null
+}
+
+google.init = function(){ 
     var gapiInt = setInterval(gapiReady, 10);
     
     function gapiReady() {
         if (typeof gapi !== 'undefined'){
             gapi.load('auth2', function(){
                 // Retrieve the singleton for the GoogleAuth library and set up the client.
-                auth2 = gapi.auth2.init({
+                google.auth2 = gapi.auth2.init({
                     client_id: '108043684563-uhl9ui9p47r5fadmu31mr3mmg7g4936n.apps.googleusercontent.com',
                     cookiepolicy: 'single_host_origin',
                     // Request scopes in addition to 'profile' and 'email'
@@ -41,7 +45,7 @@ function initGoogleLogin(){
     }
 
     //if node is not logged, logout from php
-    socket_request('login', {}).then( function(res, err){
+    socket.request('login', {}).then( function(res, err){
         if (err) return console.log(err);
         if (res.session === false){
             $.post("back_login.php", {
@@ -55,51 +59,48 @@ function initGoogleLogin(){
     });
 }
 
-function googleLogin(){
-    var loginAjax = $.Deferred();
-    auth2.signIn().then( function() {
-        var id_token = auth2.currentUser.get().getAuthResponse().id_token;
-        // console.log(id_token);
-        $.post( "back_login.php", {
-            action: "SET",
-            token: id_token
-        } ).done( function(data){
-            // console.log(data);
-            loginAjax.resolve(JSON.parse(data));
-        });
-        
-        if (socket){
-            socket_request('login', {
+google.login = function(){
+    return new Promise( resolve => {
+        google.auth2.signIn().then( function() {
+            var id_token = google.auth2.currentUser.get().getAuthResponse().id_token;
+            // console.log(id_token);
+            post( "back_login.php", {
+                action: "SET",
                 token: id_token
-            }).then( function(res, err){
-                if (err) return console.log(err);
-            })
-        }
-
-    }).catch( function(error){
-        // console.log(error);
-    });
-
-    return loginAjax.promise();
+            }).then( data => {
+                // console.log(data);
+                resolve(data)
+            });
+            
+            if (socket){
+                socket.request('login', {
+                    token: id_token
+                }).then( function(res, err){
+                    if (err) return console.log(err);
+                })
+            }
+    
+        }).catch( function(error){
+            // console.log(error);
+        });
+    })
 }
 
-async function googleLogout() {
-
+google.logout = async function() {
     //logout on google api
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.disconnect();
-    auth2.signOut().then(function () {
-    });
+    auth2.signOut()
 
     //unset php session
-    await $.post( "back_login.php", {
+    await post( "back_login.php", {
         action: "UNSET",
-    } ).done(function(data){
-    });
+    }).then( data => {
+    })
 
     //destroy node session
     if (socket){
-        await socket_request('login', {
+        await socket.request('login', {
             logout: true
         }).then( function(res, err){
             if (err) return console.log(err);
@@ -108,3 +109,5 @@ async function googleLogout() {
 
     return true;
 }
+
+export {google}

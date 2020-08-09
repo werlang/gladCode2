@@ -114,7 +114,7 @@ tutorial.lesson.start = async function(){
         let data = await showDialog("Certo. Você já conhece um pouco de alguma linguagem de programação?",["Não","Sim"])
         
         if (data == "Não"){
-            await showMessage("Então vamos começar usando a programação em blocos.")
+            await new Message({message: `Então vamos começar usando a programação em blocos.`}).show()
 
             setLang('blocks')
             toggleBlocks({ask: false, active: true})
@@ -122,12 +122,12 @@ tutorial.lesson.start = async function(){
             let data = await showDialog("Gostaria de assistir um vídeo ensinando lógica de programação básica usando blocos na gladCode?", ["SIM", "NÃO"])
             if (data == "SIM"){
                 window.open("https://www.youtube.com/embed/hzxe5rmyODI")
-                await showMessage("Agora que você sabe um pouco de lógica de programação, vamos prosseguir com o tutorial!")
+                await new Message({message: `Agora que você sabe um pouco de lógica de programação, vamos prosseguir com o tutorial!`}).show()
 
                 tutorial.next(true)
             }
             else{
-                await showMessage("OK. Se mudar de ideia pode procurar nosso canal do Youtube. Vamos prosseguir com o tutorial!")
+                await new Message({message: `OK. Se mudar de ideia pode procurar nosso canal do Youtube. Vamos prosseguir com o tutorial!`}).show()
 
                 tutorial.next(true)
             }
@@ -161,13 +161,13 @@ tutorial.lesson.start = async function(){
 }
 
 tutorial.lesson.skin = async function(){
-    await showMessage("Configure a aparência do seu gladiador")
+    await new Message({message: `Configure a aparência do seu gladiador`}).show()
     editor.setValue("");
     $('#skin').click();
 }
 
 tutorial.lesson.firstStep = async function(){
-    await showMessage("Cada gladiador pode executar uma ação a cada 0.1s, que é o intervalo da simulação. Na <b>função loop</b> é onde você diz o que seu gladiador deve fazer em cada intervalo de tempo da simulação")
+    await new Message({message: `Cada gladiador pode executar uma ação a cada 0.1s, que é o intervalo da simulação. Na <b>função loop</b> é onde você diz o que seu gladiador deve fazer em cada intervalo de tempo da simulação`}).show()
 
     let text = {
         c: `Experimente colocar a função <b>stepForward()</b> dentro das chaves da função loop. Quando terminar, clique no botão para testar seu gladiador. É o sexto botão no menu à esquerda, com o ícone de um controle de videogame`,
@@ -259,7 +259,7 @@ tutorial.lesson.checkStep = async function(){
 
         }
         else{
-            await showMessage("Agora escolha um oponente para seu gladiador, e clique no botão para começar a batalha")
+            await new Message({message: `Agora escolha um oponente para seu gladiador, e clique no botão para começar a batalha`}).show()
             tutorial.next()
             $('#test').click();
         }
@@ -268,7 +268,7 @@ tutorial.lesson.checkStep = async function(){
 
 tutorial.lesson.oponent = async function(){
     if (user.language == 'blocks')
-        await showMessage("Perfeito. Escolha um oponente para seu gladiador, e clique no botão para começar a batalha")
+        await new Message({message: `Perfeito. Escolha um oponente para seu gladiador, e clique no botão para começar a batalha`}).show()
 
     tutorial.next()
     $('#test').click();
@@ -293,7 +293,7 @@ tutorial.lesson.watchCodeMove = async function(){
         
     }
 
-    await showMessage("Agora analise esse código, tente entendê-lo e quando quiser teste o gladiador")
+    await new Message({message: `Agora analise esse código, tente entendê-lo e quando quiser teste o gladiador`}).show()
 
     tutorial.next()
 }
@@ -345,7 +345,7 @@ tutorial.lesson.showBackForth = async function(){
         editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\nvai = False\n\ndef loop():\n    global start, vai\n    if start: # se ele ainda não chegou no meio\n        moveTo(12,12) # se move em direção à posição 12,12\n        # getX e getY server para capturar o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        if vai: # verifica se vai ou vem\n            if moveTo(5, 15): # move e testa se chegou no ponto\n                vai = False # diz que é hora do vem\n        else: # se está na etapa do vem\n            if moveTo(20, 10): \n                vai = True # diz que é hora do vai");
     }
 
-    await showMessage("Ok. Modifiquei seu código. Pode conferir se sua solução era mais ou menos assim. Teste o gladiador para prosseguir")
+    await new Message({message: `Ok. Modifiquei seu código. Pode conferir se sua solução era mais ou menos assim. Teste o gladiador para prosseguir`}).show()
         
     tutorial.next()
 }
@@ -885,7 +885,7 @@ tutorial.lesson.breakpoint = async function(){
             tutorial.next()
             setTimeout( function() {
                 if ($('.ace_gutter-cell.ace_breakpoint').length){
-                    showMessage("Muito bem. Agora teste seu gladiador.");
+                    new Message({message: `Muito bem. Agora teste seu gladiador.`}).show();
                     $('.ace_gutter-cell').off();
                 }
             }, 500);

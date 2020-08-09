@@ -1,5 +1,56 @@
-var user;
-waitLogged()
+import {google} from "./googlelogin.js"
+import {socket} from "./socket.js"
+import {translator} from "./translate.js"
+import {Message} from "./dialog.js"
+
+const login = {
+    logged: false
+}
+
+var user
+
+login.wait = async function(){
+    if (login.logged){
+        translator.language = login.user.speak
+        translator.suggest = login.user.preferences.translation == "1" ? true : false
+        user = login.user
+        return login.user
+    }
+    else{
+        return new Promise( (resolve, reject) => {
+            post("back_login.php", {
+                action: "GET"
+            }).then( data => {
+                login.user = data
+                login.logged = true
+                translator.language = login.user.speak
+                translator.suggest = login.user.preferences.translation == "1" ? true : false
+                user = login.user
+                
+                if (!login.user.speak){
+                    change_spoken_language(navigator.language.split("-")[0])
+                }
+
+                resolve(login.user)
+            })
+        })
+    }
+}
+
+const post = function(path, args){
+    return $.post(path, args).then( data => {
+        try{
+            data = JSON.parse(data)
+        } catch(e) {
+            return {error: e, data: data}
+        }
+        return data
+    })
+}
+
+login.wait()
+
+export {login, post}
 
 $(document).ready( function() {
     $('#menu-button').click( function() {
@@ -57,7 +108,7 @@ $(document).ready( function() {
         $('.item-container').removeClass('open');
     }
     
-    initGoogleLogin();
+    google.init();
 
     $('.mobile #login, .desktop #login').click( function(){
         googleLogin().then( function(data){
@@ -65,11 +116,11 @@ $(document).ready( function() {
         });
     });	
     
-    waitLogged().then( data => {
+    login.wait().then( data => {
         if (data.status == "NOTLOGGED")
             $('.mobile #profile, .desktop #login').removeClass('hidden');
         else{
-            socket_request('login', {}).then( function(res, err){
+            socket.request('login', {}).then( function(res, err){
                 if (err) return console.log(err);
                 if (res.session === false){
                     post("back_login.php", {
@@ -120,7 +171,7 @@ $(document).ready( function() {
 
     if ($('#footer').length){
         $('#footer').load("footer.php", async () => {
-            await waitLogged()
+            await login.wait()
             translator.translate($('#footer'))
         });
     }
@@ -139,38 +190,6 @@ async function change_spoken_language(lang){
     if (data.reload){
         window.location.reload()
     }
-}
-
-async function waitLogged(){
-    if (user){
-        return user
-    }
-    else{
-        return new Promise( (resolve, reject) => {
-            post("back_login.php", {
-                action: "GET"
-            }).then( data => {
-                user = data
-
-                if (!user.speak){
-                    change_spoken_language(navigator.language.split("-")[0])
-                }
-
-                resolve(user)
-            })
-        })
-    }
-}
-
-async function post(path, args){
-    return $.post(path, args).then( data => {
-        try{
-            data = JSON.parse(data)
-        } catch(e) {
-            return {error: e, data: data}
-        }
-        return data
-    })
 }
 
 function decodeHTML(str) {

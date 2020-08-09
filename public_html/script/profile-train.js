@@ -1,5 +1,5 @@
 $(document).ready( function(){
-    socket_ready().then( () => {
+    socket.isReady().then( () => {
         socket.on('training list', data =>{
             trainList.refresh()
         })
@@ -8,7 +8,8 @@ $(document).ready( function(){
         });
     });
 
-    waitLogged().then( () => {
+    login.wait().then( data => {
+        user = data
         if (!user.premium){
             $('#panel #train.wrapper #create').hide()        
         }
@@ -156,11 +157,11 @@ $(document).ready( function(){
                     // console.log(data)
 
                     if (data.status == "NOPREMIUM"){
-                        create_toast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
+                        createToast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
                         user.premium = false            
                     }
                     else if (data.status == "NOCREDITS"){
-                        create_toast("Você não possui créditos para utilizar essa função", "error")
+                        createToast("Você não possui créditos para utilizar essa função", "error")
                         user.credits = 0
                     }
                     else if (data.status == "SUCCESS"){
@@ -248,7 +249,7 @@ $(document).ready( function(){
                                 $('body').append(`<input type='text' id='dummy' readonly value='${$('#big-info .link.manual').text()}'>`)
                                 $('#dummy').select();
                                 document.execCommand("copy");
-                                create_toast("Link do treino copiado para área de transferência", "success");
+                                createToast("Link do treino copiado para área de transferência", "success");
                                 $('#dummy').remove()
                             })
 
@@ -272,92 +273,98 @@ $(document).ready( function(){
     })
 
     $('#panel #train.wrapper #join').click( async function(){
-        var hash = await showInput("Informe o código fornecido para participar do treino", '')
-        if (hash === false)
-            return
-
-        let data = await $.post("back_train.php", {
-            action: "JOIN",
-            hash: hash
-        })
-        // console.log(data)
-
-        data = JSON.parse(data)
-
-        if (data.status == "NOTFOUND")
-            showMessage("Treino não encontrado")
-        else if (data.status == "STARTED")
-            showMessage("Este treino já iniciou");
-        else if (data.status == "EXPIRED")
-            showMessage("O código para ingresso deste treino expirou")
-        else if (data.status == "COLLISION"){
-            if (await showDialog(`Colisão de hash. Informar o administrador?`, ["OK", "Cancelar"]) == "OK"){
-                $.post("back_message.php", {
-                    action: "SEND",
-                    id: 277,
-                    message: `Sistema - Colisão de hash: training#${hash}`
+        new Message({
+            message: "Informe o código fornecido para participar do treino",
+            input: true,
+            buttons: {ok: "OK", cancel: "Cancelar"}
+        }).show().click('ok', hash => {    
+            let data = await $.post("back_train.php", {
+                action: "JOIN",
+                hash: hash
+            })
+            // console.log(data)
+    
+            data = JSON.parse(data)
+    
+            if (data.status == "NOTFOUND")
+                new Message({message: `Treino não encontrado`}).show()
+            else if (data.status == "STARTED")
+                new Message({message: `Este treino já iniciou`}).show();
+            else if (data.status == "EXPIRED")
+                new Message({message: `O código para ingresso deste treino expirou`}).show()
+            else if (data.status == "COLLISION"){
+                new Message({
+                    message: `Colisão de hash. Informar o administrador?`, 
+                    buttons: {ok: "OK", cancel: "Cancelar"} 
+                }).show().click('ok', () => {
+                    $.post("back_message.php", {
+                        action: "SEND",
+                        id: 277,
+                        message: `Sistema - Colisão de hash: training#${hash}`
+                    })
                 })
             }
-        }
-        else if (data.status == "JOINED"){
-            create_toast("Você já está participando deste treino", "info")
-            roomList[data.id].show()
-        }
-        else if (data.status == "ALLOWED"){
-            var box = `<div id='fog'>
-                <div id='duel-box'>
-                    <div id='title'>Escolha o gladiador que participará do treino</div>
-                    <div class='glad-card-container'></div>
-                    <div id='button-container'>
-                        <button id='cancel' class='button'>Cancelar</button>
-                        <button id='select' class='button' disabled>SELECIONAR</button>
+            else if (data.status == "JOINED"){
+                createToast("Você já está participando deste treino", "info")
+                roomList[data.id].show()
+            }
+            else if (data.status == "ALLOWED"){
+                var box = `<div id='fog'>
+                    <div id='duel-box'>
+                        <div id='title'>Escolha o gladiador que participará do treino</div>
+                        <div class='glad-card-container'></div>
+                        <div id='button-container'>
+                            <button id='cancel' class='button'>Cancelar</button>
+                            <button id='select' class='button' disabled>SELECIONAR</button>
+                        </div>
                     </div>
-                </div>
-            </div>`;
-            $('body').append(box);
-
-            load_glad_cards($('#fog .glad-card-container'), {
-                clickHandler: function(){
-                    if (!$(this).hasClass('old')){
-                        $('#fog #btn-glad-open').removeAttr('disabled');
-                        $('#fog .glad-preview').removeClass('selected');
-                        $(this).addClass('selected');
-                        $('#duel-box #select').removeAttr('disabled');
+                </div>`;
+                $('body').append(box);
+    
+                load_glad_cards($('#fog .glad-card-container'), {
+                    clickHandler: function(){
+                        if (!$(this).hasClass('old')){
+                            $('#fog #btn-glad-open').removeAttr('disabled');
+                            $('#fog .glad-preview').removeClass('selected');
+                            $(this).addClass('selected');
+                            $('#duel-box #select').removeAttr('disabled');
+                        }
+                    },
+                    dblClickHandler: function(){
+                        if ($('#fog .glad-card-container .selected').length)
+                            $('#fog #duel-box #select').click();
                     }
-                },
-                dblClickHandler: function(){
-                    if ($('#fog .glad-card-container .selected').length)
-                        $('#fog #duel-box #select').click();
-                }
-            })
-
-            $('#fog #duel-box #cancel').click( function(){
-                $('#fog').remove();
-            })
-
-            // after selecting glad, finally join
-            $('#fog #duel-box #select').click( async function(){
-                var myglad = $('#fog .glad-preview.selected').data('id');
-                let data = await $.post("back_train.php", {
-                    action: "JOIN",
-                    hash: hash,
-                    glad: myglad
                 })
-                // console.log(data)
-                data = JSON.parse(data)
-                if (data.status == "SUCCESS"){
-                    create_toast("Você ingressou no treino", "success")
-                    $('#fog').remove()
-                    if (!roomList[data.id])
-                        roomList.create({id: data.id})
-                    await roomList[data.id].show()
-                    sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
-                }
-                else
-                    create_toast("Erro ao ingressar, tente novamente", "error")
-                
-            });
-        }
+    
+                $('#fog #duel-box #cancel').click( function(){
+                    $('#fog').remove();
+                })
+    
+                // after selecting glad, finally join
+                $('#fog #duel-box #select').click( async function(){
+                    var myglad = $('#fog .glad-preview.selected').data('id');
+                    let data = await $.post("back_train.php", {
+                        action: "JOIN",
+                        hash: hash,
+                        glad: myglad
+                    })
+                    // console.log(data)
+                    data = JSON.parse(data)
+                    if (data.status == "SUCCESS"){
+                        createToast("Você ingressou no treino", "success")
+                        $('#fog').remove()
+                        if (!roomList[data.id])
+                            roomList.create({id: data.id})
+                        await roomList[data.id].show()
+                        sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
+                    }
+                    else
+                        createToast("Erro ao ingressar, tente novamente", "error")
+                    
+                });
+            }
+
+        })
     })
 
     $('#train.wrapper .title #offset button').click( function(){
@@ -386,7 +393,7 @@ var trainList = {
 
     refresh: async function(){
         if (!this.listening){
-            socket_ready().then( () => {
+            socket.isReady().then( () => {
                 socket.emit('training list join', {})
             })
             this.listening = true
@@ -552,17 +559,20 @@ var roomList = {
                         $('.train.window #delete').html("ABANDONAR TREINO").show()
 
                         $('.train.window #delete').click( async () => {
-                            if (await showDialog(`Abandonar o treino <b>${data.name}</b>?`, ["Sim", "Não"]) == "Sim"){
+                            new Message({
+                                message: `Abandonar o treino <b>${data.name}</b>?`, 
+                                buttons: {yes: "Sim", no: "Não"} 
+                            }).show().click('yes', () => {
                                 this.left = true
 
-                                $.post("back_train.php", {
+                                post("back_train.php", {
                                     action: "KICK",
                                     id: id,
                                     myself: true
                                 })
 
                                 sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
-                            }
+                            })
 
                         })
                     }
@@ -644,11 +654,11 @@ var roomList = {
                                 }))
                                 // console.log(data)
                                 if (data.status == "ERROR"){
-                                    create_toast(data.message, "error")
+                                    createToast(data.message, "error")
                                     this.object.html(oldtext)
                                 }
                                 else if (data.status == "SUCCESS"){
-                                    create_toast(`Campo alterado com sucesso`, "success")
+                                    createToast(`Campo alterado com sucesso`, "success")
                                     roomList[id][this.field] = this.text
                                     if (this.field == 'name'){
                                         sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d Sala de discussão do treino ${this.text}`})
@@ -707,21 +717,22 @@ var roomList = {
 
                 if (data.status == "NOTFOUND"){
                     $('#fog').remove()
-                    showMessage("O treino foi removido pelo gerenciador")
+                    new Message({message: `O treino foi removido pelo gerenciador`}).show()
                 }
                 if (data.status == "STARTED"){
                     $('#fog').remove()
-                    await showMessage("O treino foi iniciado. Clique para ir até ele")
-                    window.open(`train/${data.hash}`)
+                    new Message({message: `O treino foi iniciado. Clique para ir até ele`}).show().click('ok', () => {
+                        window.open(`train/${data.hash}`)
+                    })
                 }
                 else if (data.status == "NOTALLOWED"){
                     $('#fog').remove()
                     if (this.left){
-                        create_toast("Você saiu do treino", "success")
+                        createToast("Você saiu do treino", "success")
                         this.left = false
                     }
                     else{
-                        showMessage("Você foi removido do treino")
+                        new Message({message: `Você foi removido do treino`}).show()
                     }
                     if (socket)
                         socket.emit('training room leave', {id: id})
@@ -755,7 +766,10 @@ var roomList = {
                         if (manager){
                             $('.train.window #start').hide()
                             $('.train.window #delete').show().off().click( async () => {
-                                if (await showDialog(`Deseja excluir o treino ${data.name}?`, ["Sim", "Não"]) == "Sim"){
+                                new Message({
+                                    message: `Deseja excluir o treino ${data.name}?`, 
+                                    buttons: {yes: "Sim", no: "Não"} 
+                                }).show().click('yes', () => {
                                     let data = JSON.parse(await $.post("back_train.php", {
                                         action: "DELETE",
                                         id: id
@@ -764,11 +778,11 @@ var roomList = {
             
                                     if (data.status == "SUCCESS"){
                                         $('#fog').remove()
-                                        create_toast("Treino removido", "success")
+                                        createToast("Treino removido", "success")
 
                                         sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                                     }
-                                }
+                                })
                             })
                         }
                     }
@@ -817,21 +831,24 @@ var roomList = {
 
                             if (data.glads.length >= this.players){
                                 $('.train.window #start').removeAttr('disabled').off().click( async function(){
-                                    if (await showDialog("Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados",["Sim","Não"]) == "Sim"){
+                                    new Message({
+                                        message: `Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados`, 
+                                        buttons: {yes: "Sim", no: "Não"} 
+                                    }).show().click('yes', () => {
                                         $('.train.window #close').click();
 
-                                        let data = JSON.parse(await $.post("back_train.php",{
+                                        let data = await post("back_train.php",{
                                             action: "START",
                                             id: id
-                                        }))
+                                        })
                                         //console.log(data);
 
                                         if (data.status == "SUCCESS"){
-                                            create_toast("Treino iniciado", "success")
+                                            createToast("Treino iniciado", "success")
                                             window.open(`train/${data.hash}`);
                                         }
-                                    }
-                                });
+                                    })
+                                })
                             }
                             else
                                 $('.train.window #start').attr('disabled', true).off()
@@ -849,7 +866,7 @@ var roomList = {
                                 }))
                                 // console.log(data)
                                 if (data.status == "SUCCESS"){
-                                    create_toast("Participante removido", "success")
+                                    createToast("Participante removido", "success")
                                     let name = kick.parent().find('.cell').eq(0).html()
                                     sendChatMessage({text: `/kick ${name} -r ${this.name}_${this.hash}`})
                                 }
@@ -902,11 +919,11 @@ var roomList = {
                                     data = JSON.parse(data)
                                     if (data.status == "SUCCESS"){
                                         $(this).parents('#fog').remove()
-                                        create_toast("Gladiador alterado", "success")
+                                        createToast("Gladiador alterado", "success")
                                         roomList[id].refresh()
                                     }
                                     else
-                                        create_toast("ERRO", "error")
+                                        createToast("ERRO", "error")
                                     
                                 });
                             })

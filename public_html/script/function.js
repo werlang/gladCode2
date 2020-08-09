@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------
 
 var langDict = false
+var user;
 
 $(document).ready( function() {
     $('#learn').addClass('here');
@@ -80,7 +81,7 @@ async function load_content(item, fileData){
 
     item = fileData[item]
 
-    var user = await waitLogged();
+    user = await login.wait();
 
     var language;
 

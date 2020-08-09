@@ -85,10 +85,10 @@ $(document).ready( () => {
                                 if (firstslot.length){
                                     $('#fog').remove()
                                     if (slots.fill(id)){
-                                        create_toast(`Item ${potions[id].name} encomendado`, "success")
+                                        createToast(`Item ${potions[id].name} encomendado`, "success")
                                     }
                                     else{
-                                        create_toast(`O item não pôde ser adquirido`, "error")
+                                        createToast(`O item não pôde ser adquirido`, "error")
                                     }
                                 }
                             })
@@ -163,12 +163,14 @@ $(document).ready( () => {
             }
         })
 
-        waitLogged().then( () => {
+        login.wait().then( data => {
+            user = data
             slots.refresh()
         })
     })
 
-    waitLogged().then( () => {
+    login.wait().then( data => {
+        user = data
         let mypots = ""
         for (let i=0 ; i<4 ; i++){
             mypots += `<div class='slot empty'>

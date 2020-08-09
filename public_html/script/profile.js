@@ -1,3 +1,14 @@
+import {login, post} from "./header.js"
+import {socket} from "./socket.js"
+import {translator} from "./translate.js"
+import {assets} from "./assets.js"
+import * as dropzone from "./dropzone.js"
+import * as croppie from "./croppie.js"
+import {chat} from "./chat.js"
+import {Message, createToast} from "./dialog.js"
+
+var user
+
 var tipArray = [
     "Obrigado por fazer parte da versão beta da gladCode",
     "Enquanto seu gladiador tiver menos de 1000 de renome, ele perderá menos renome",
@@ -57,11 +68,12 @@ $(document).ready( function(){
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
 
-    fill_assets();
+    assets.fill();
     
     var preferences = ["friend","message","update","duel","tourn","translation"];
 
-    waitLogged().then(user => {
+    login.wait().then( data => {
+        user = data
         // console.log(user);
 
         if ($('#tab').length){
@@ -91,7 +103,7 @@ $(document).ready( function(){
 
         checkNotifications();
 
-        socket_ready().then( () => {
+        socket.isReady().then( () => {
             //console.log("socket ready");
             socket.on('profile notification', data =>{
                 //console.log("server message");
@@ -99,14 +111,17 @@ $(document).ready( function(){
             });
         });
         
-        $.post("back_glad.php", {
+        post("back_glad.php", {
             action: "GET"
-        }).done( function(data){
-            if (JSON.parse(data).length == 0)
-            showDialog("Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?",["Sim","Não, obrigado"]).then( function(data){
-                if (data == "Sim")
+        }).then( data => {
+            if (data.length == 0){
+                new Message({
+                    message: `Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?`, 
+                    buttons: {yes: "Sim", no: "Não, obrigado"}
+                }).show().click('yes', () => {
                     window.location.href = "editor";
-            });
+                });
+            }
         });
 
         translator.translate(tipArray).then( data => {
@@ -203,7 +218,7 @@ $(document).ready( function(){
                     $('#link-box button').click( () => {
                         $('#link-box input').select();
                         document.execCommand("copy");
-                        create_toast("Link da publicação copiado para área de transferência", "success");
+                        createToast("Link da publicação copiado para área de transferência", "success");
                     });
                 });
             }
@@ -323,9 +338,11 @@ $(document).ready( function(){
                         var card = $(this).parents('.glad-preview');
                         if ($(this).parents('.glad-preview').hasClass('old')){
                             var name = $(this).parents('.info').find('.glad span').html();
-                            showDialog("A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>"+ name +"</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor",["Cancelar","OK"]).then( function(data){
-                                if (data == "OK")
-                                    window.open("glad-"+ card.data('id'));
+                            new Message({
+                                message: `A simulação da gladCode foi atualizada, e o código do gladiador <b>${name}</b> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <b>OK</b> para abrir o editor`,
+                                buttons: {cancel: "Cancelar", ok: "OK"}
+                            }).show().click('ok', () => {
+                                window.open("glad-"+ card.data('id'));
                             });
                         }
                         else{
@@ -450,8 +467,10 @@ $(document).ready( function(){
                             $('#match-find').removeAttr('disabled');
                         }
                         else{
-                            showDialog("Este gladiador precisa ser atualizado. Deseja abri-lo no editor?", ['Sim', 'Não']).then( function(data){
-                                if (data == 'Sim')
+                            new Message({
+                                message: `Este gladiador precisa ser atualizado. Deseja abri-lo no editor?`, 
+                                buttons: {yes: 'Sim', no: 'Não'} 
+                            }).show().click('yes', () => {
                                 window.open(`glad-${card.data('id')}`);
                             });
                         }
@@ -1103,9 +1122,18 @@ $(document).ready( function(){
         },
     });
 
-    init_chat($('#chat-panel'), {
+    chat.init($('#chat-panel'), {
         full: false
     });
+
+    // radio
+    $('.radio').parents('label').wrap("<div class='radio'></div>");
+    $('.radio label').addClass('option').append("<div class='border'><div class='inner'></div></div>");
+
+    // checkbox
+    $('.checkslider').each( function(){
+        $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+    })
 
 });
 
@@ -1552,19 +1580,10 @@ function getMessageTime(msgTime, args){
                 months[i] = months[i].toLowerCase().slice(0,3);
         }
 
-        t = new Date(msgTime);
+        let t = new Date(msgTime);
         var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
         return string;
     }
-}
-
-function validate_skin(selectedArray){
-    for (var i in selectedArray){
-        if (selectedArray[i].parent == "shape"){
-            return true;
-        }
-    }
-    return false;
 }
 
 async function check_challenges(){

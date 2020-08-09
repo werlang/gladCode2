@@ -26,7 +26,7 @@ posting.done(function( data ) {
 $(document).ready( function() {
 	load_editor();
 
-	initGoogleLogin();
+	google.init();
 	
 	if ($(window).width() > window_size_threshold){
 		editor.focus();

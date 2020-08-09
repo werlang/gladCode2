@@ -39,7 +39,7 @@ $(document).ready( async function(){
                 var changes = $('#changes textarea').val();
                 changes = changes.replace(/\r?\n/g, '<br/>');
                 //console.log(changes);
-                showMessage("Mensagem enviada. Aguarde. Não clique mais de uma vez antes de dar status 500 no console.");
+                new Message({message: `Mensagem enviada. Aguarde. Não clique mais de uma vez antes de dar status 500 no console.`}).show();
 
                 $.post("back_sendmail.php",{
                     action: "UPDATE",
@@ -50,11 +50,11 @@ $(document).ready( async function(){
                     console.log(data);
                     try{
                         data = JSON.parse(data);
-                        showMessage("Versão do sistema atualizada");
+                        new Message({message: `Versão do sistema atualizada`}).show();
                     }
                     catch(e){
                         console.log(e);
-                        showMessage("Erro");
+                        new Message({message: `Erro`}).show();
                     }
                     $('button').removeAttr('disabled');
                 });
@@ -132,10 +132,10 @@ $(document).ready( async function(){
 
         if (!title.length){
             $('#posts #title').focus()
-            create_toast("Insira um título", "error")
+            createToast("Insira um título", "error")
         }
         else if (!html.length){
-            create_toast("Informe o conteúdo", "error")
+            createToast("Informe o conteúdo", "error")
         }
         else{
             let hash = false
@@ -152,7 +152,7 @@ $(document).ready( async function(){
             console.log(data)
             quill.setText('')
 
-            create_toast("Notícia publicada", "success")
+            createToast("Notícia publicada", "success")
         }
 
         

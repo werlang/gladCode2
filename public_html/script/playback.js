@@ -25,7 +25,7 @@ $(document).ready( function() {
         var log;
         
         if ($('#log').html().length > 32)
-            showMessage('Erro na URL');
+            new Message({message: `Erro na URL`}).show();
         else{
             loghash = $('#log').html();
             queryLog();
@@ -499,6 +499,11 @@ $(document).ready( function() {
         $('#pause').click(); //clica no botao e pause fica true
     });	
 
+    // checkbox
+    $('.checkslider').each( function(){
+        $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+    })
+    
 });
 
 function isFullScreen(){
@@ -563,7 +568,7 @@ function resize() {
             game.camera.scale.x = $(window).height() * usefulRatio / screenH;
             game.camera.scale.y = $(window).height() * usefulRatio / screenH;
             if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-                showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato");
+                new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
             }
 
         }
@@ -578,11 +583,13 @@ function resize() {
             game.camera.scale.x = $(window).width() * usefulRatio / screenW;
             game.camera.scale.y = $(window).width() * usefulRatio / screenW;
             if ($(window).height() < 600 && !isFullScreen() && !fullscreen && $('#dialog-box').length == 0){
-                showDialog("Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?", ['Não','SIM']).then( function(data){
-                    if (data == "SIM")
-                        setFullScreen(true);
-                        $('#fog').remove();
-                        fullscreen = true;
+                new Message({
+                    message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
+                    buttons: {no: 'Não', yes: 'SIM'} 
+                }).show().click('yes', () => {
+                    setFullScreen(true);
+                    $('#fog').remove();
+                    fullscreen = true;
                 });
             }
         }	
@@ -712,7 +719,7 @@ function startBattle(simulation){
         //console.log(simulation[0]);
         create_ui(simulation[0].glads.length);
         $( "#time" ).slider("option", "max", simulation.length);
-        for (i=0 ; i<simulation[0].glads.length ; i++){
+        for (let i=0 ; i<simulation[0].glads.length ; i++){
             simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
             simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
             newindex[i] = i;

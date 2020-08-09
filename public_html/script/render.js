@@ -85,7 +85,7 @@ function preload() {
     game.load.onFileComplete.add(fileComplete, this);
     game.load.onLoadComplete.add(loadComplete, this);
 
-    for (i=0 ; i < hashes.length ; i++){
+    for (let i=0 ; i < hashes.length ; i++){
         try{
             game.cache.addSpriteSheet('glad'+i, null, hashes[i], 192, 192);
         }
@@ -407,7 +407,7 @@ function update() {
     
     if (nglad > 0 && !loadglads) {
         loadglads = true;
-        for (i=0 ; i<nglad ; i++){
+        for (let i=0 ; i<nglad ; i++){
             //console.log(json.glads[i].x);
             //if (textures.length < game.renderer.maxTextures){
                 //game.renderer.currentBatchedTextures.push('glad'+newindex[i]);
@@ -466,7 +466,7 @@ function update() {
 
         if (json && simtimenow != json.simtime){
             
-            for (i=0 ; i<nglad ; i++){
+            for (let i=0 ; i<nglad ; i++){
                 var x = parseFloat(json.glads[i].x);
                 var y = parseFloat(json.glads[i].y);
 
@@ -785,7 +785,7 @@ function update() {
         if (json.projectiles && json.projectiles.length > 0) {
 
             var nproj = json.projectiles.length;
-            for (i=0 ; i<nproj ; i++){
+            for (let i=0 ; i<nproj ; i++){
                 var id = json.projectiles[i].id;
                 var type = json.projectiles[i].type;
                 var j = findProj(id);
@@ -955,7 +955,7 @@ function update_ui(json){
         }
     
         var nglad = json.glads.length;
-        for (i=0 ; i<nglad ; i++){
+        for (let i=0 ; i<nglad ; i++){
             var name = json.glads[i].name;
             var STR = json.glads[i].STR;
             var AGI = json.glads[i].AGI;

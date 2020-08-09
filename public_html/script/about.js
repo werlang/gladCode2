@@ -62,6 +62,10 @@ $(document).ready( function(){
         // })
         // $('#dialog-box').addClass('large')
     })
+
+    // radio
+    $('.radio').parents('label').wrap("<div class='radio'></div>");
+    $('.radio label').addClass('option').append("<div class='border'><div class='inner'></div></div>");
 });
 
 function showWallet(curr){

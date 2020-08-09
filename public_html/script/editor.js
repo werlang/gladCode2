@@ -14,8 +14,9 @@ var sim
 $(document).ready( function() {
     $('#header-editor').addClass('here');
     
-    waitLogged().then(user => {
-        //console.log(user);
+    login.wait().then(data => {
+        //console.log(data);
+        user = data
         if (user.status == "SUCCESS"){
             $('#login').html(user.nome);
             
@@ -125,17 +126,18 @@ $(document).ready( function() {
     $('#open').click( function(){
         if (!$(this).hasClass('disabled')){
             if (!user){
-                showDialog("Você precisa fazer LOGIN no sistema para visualizar seus gladiadores",["Cancelar","LOGIN"]).then( function(data){
-                    if (data == "LOGIN"){
-                        googleLogin().then(function(data) {
-                            //console.log(data);
-                            user = data.email;
-                            setLoadGlad();
-                            $('#login').html(data.nome).off().click( function(){
-                                window.location.href = "news";
-                            });
+                new Message({
+                    message: "Você precisa fazer LOGIN no sistema para visualizar seus gladiadores",
+                    buttons: {cancel: "Cancelar", ok: "LOGIN"}
+                }).show().click('ok', () => {
+                    googleLogin().then(function(data) {
+                        //console.log(data);
+                        user = data.email;
+                        setLoadGlad();
+                        $('#login').html(data.nome).off().click( function(){
+                            window.location.href = "news";
                         });
-                    }
+                    });
                 });
             }
             else{
@@ -284,21 +286,23 @@ $(document).ready( function() {
                             //console.log(data);
                             $('#fog').remove();
                             if (data.search("LIMIT") != -1)
-                                showMessage("Você não pode possuir mais de <span class='highlight'>"+ JSON.parse(data).LIMIT +"</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.");
+                                new Message({message: `Você não pode possuir mais de <b>${JSON.parse(data).LIMIT}</b> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`}).show();
                             else if (data == "EXISTS")
-                                showMessage("O nome <span class='highlight'>"+ nome +"</span> já está sendo usado por outro gladiador");
+                                new Message({message: `O nome <b>${nome}</b> já está sendo usado por outro gladiador`}).show();
                             else if (data == "INVALID")
-                                showMessage("CHEATER");
+                                new Message({message: `CHEATER`}).show();
                             else if (data.search("ID") != -1){
                                 gladid = JSON.parse(data).ID;
                                 if (action == "INSERT"){
-                                    showDialog("O gladiador <span class='highlight'>"+ nome +"</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?",["Sim","Agora não"]).then( function(data){
-                                        if (data == "Sim")
-                                            window.open('battle.ranked')
-                                    });
+                                    new Message({
+                                        message: `O gladiador <b>${nome}</b> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`,
+                                        buttons: {yes: "Sim", no: "Agora não"}
+                                    }).show().click('yes', () => {
+                                        window.open('battle.ranked')
+                                    })
                                 }
                                 else{
-                                    showMessage("Gladiador <span class='highlight'>"+ nome +"</span> gravado");
+                                    new Message({message: `Gladiador <b>${nome}</b> gravado`}).show();
                                 }
                                 saved = true;
                             }
@@ -350,18 +354,19 @@ $(document).ready( function() {
                 });
             }
             else{
-                showDialog("Você precisa fazer LOGIN no sistema para salvar seu gladiador",["Cancelar","LOGIN"]).then( function(data){
-                    if (data == "LOGIN"){
-                        googleLogin().then(function(data) {
-                            //console.log(data);
-                            user = data.email;
-                            setLoadGlad();
-                            $('#login').html(data.nome).off().click( function(){
-                                window.location.href = "news";
-                            });
+                new Message({
+                    message: `Você precisa fazer LOGIN no sistema para salvar seu gladiador`, 
+                    buttons: {cancel: "Cancelar", ok: "LOGIN"}
+                }).show().click('ok', () => {
+                    googleLogin().then(function(data) {
+                        //console.log(data);
+                        user = data.email;
+                        setLoadGlad();
+                        $('#login').html(data.nome).off().click( function(){
+                            window.location.href = "news";
                         });
-                    }
-                });
+                    });
+s                });
             }
         }
     });
@@ -412,7 +417,8 @@ $(document).ready( function() {
         bindGladList($('#fog-battle #list .glad').last());
     }
 
-    waitLogged().then( () => {
+    login.wait().then( data => {
+        user = data
         if (user.status == "SUCCESS" ){
             $.post("back_glad.php",{
                 action: "GET",
@@ -552,8 +558,11 @@ $(document).ready( function() {
         function loadReady(glads){
             btnbattle_click($('#fog-battle #btn-battle'), glads).then( hash => {
                 if (hash !== false){
-                    showDialog("Deseja visualizar a batalha?",["Sim","Não"]).then( function(data){
-                        if (data == "Sim")
+                    new Message({
+                        message: `Deseja visualizar a batalha?`, 
+                        buttons: {yes: "Sim", no: "Não"} 
+                    }).show().click(null, data => {
+                        if (data.button == "yes")
                             window.open("play/"+ hash);
                         else{
                             $.post("back_log.php", {
@@ -562,9 +571,11 @@ $(document).ready( function() {
                             });
                         }
                         if (wannaSave){
-                            showDialog("Gladiador testado com sucesso. Deseja gravá-lo?",["Sim","Não"]).then( function(data){
-                                if (data == "Sim")
-                                    $('#save').click();
+                            new Message({
+                                message: `Gladiador testado com sucesso. Deseja gravá-lo?`, 
+                                buttons: {yes: "Sim", no: "Não"} 
+                            }).show().click('yes', () => {
+                                $('#save').click();
                             });
                             wannaSave = false;
                         }
@@ -776,7 +787,7 @@ $(document).ready( function() {
         full: false,
         expandWidth: "-65px"
     });
-    chat_started().then( () => {
+    chat.isStarted().then( () => {
         $('#chat-panel #show-hide').click( () => {
             resizeInt = setInterval( () => {
                 change_size();
@@ -836,7 +847,7 @@ $(document).ready( function() {
                     }
 
                     if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
-                        showMessage("Breakpoints só podem ser inseridos dentro de funções");
+                        new Message({message: `Breakpoints só podem ser inseridos dentro de funções`}).show();
                     }
                     else{
                         e.editor.session.setBreakpoint(rowdif);
@@ -1311,7 +1322,8 @@ function load_glad_generator(element){
             $('#fog-skin').hide();
         });
         
-        waitLogged().then( () => {
+        login.wait().then( data => {
+            user = data
             if (loadGlad){
                 selected = {};
                 var skin;
@@ -1398,15 +1410,15 @@ function draw() {
                     if (selectedArray[i].oversize){
                         var line = move[moveEnum[selectedArray[i].move]].line;
                         var sprites = move[moveEnum[selectedArray[i].move]].sprites;
-                        for (k=0 ; k<4 ; k++){
-                            for (j=0 ; j<sprites ; j++){
+                        for (let k=0 ; k<4 ; k++){
+                            for (let j=0 ; j<sprites ; j++){
                                 tempctx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
                             }
                         }
                     }
                     else{
-                        for (k=0 ; k<21 ; k++){
-                            for (j=0 ; j<13 ; j++){
+                        for (let k=0 ; k<21 ; k++){
+                            for (let j=0 ; j<13 ; j++){
                                 tempctx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
                             }
                         }
@@ -1432,7 +1444,7 @@ function reload_reqs(keepItems){
 
             //define quais vao ser visiveis baseado no parent 
             if (Array.isArray(image.parent)){
-                for (i=0 ; i < image.parent.length ; i++){
+                for (let i=0 ; i < image.parent.length ; i++){
                     if ( $('.img-button#'+image.parent[i]).hasClass('selected') )
                         break;
                 }
@@ -1453,7 +1465,7 @@ function reload_reqs(keepItems){
         $.each(images, function(index,image) {
             if (image.req){
                 if (image.req.or){
-                    for (i=0 ; i<image.req.or.length ; i++){
+                    for (let i=0 ; i<image.req.or.length ; i++){
                         if( selected[image.req.or[i]] )
                             break;
                     }
@@ -1463,7 +1475,7 @@ function reload_reqs(keepItems){
                     }
                 }
                 else if (image.req.and){
-                    for (i=0 ; i<image.req.and.length ; i++){
+                    for (let i=0 ; i<image.req.and.length ; i++){
                         if( !selected[image.req.and[i]] ){
                             delete visible[image.id];
                             delete selected[image.id];
@@ -1472,7 +1484,7 @@ function reload_reqs(keepItems){
                     }
                 }
                 else if (image.req.not){ 
-                    for (i=0 ; i<image.req.not.length ; i++){
+                    for (let i=0 ; i<image.req.not.length ; i++){
                         if( selected[image.req.not[i]] ){
                             delete visible[image.id];
                             delete selected[image.id];
@@ -1591,7 +1603,7 @@ function reload_reqs(keepItems){
         $.each( selected , function(index,image) {
             //torna invisivel pelo block
             if (Array.isArray(image.block)){
-                for (i=0 ; i<image.block.length ; i++)
+                for (let i=0 ; i<image.block.length ; i++)
                     $('#'+ image.block[i]).addClass('n-av');
             }
             else
@@ -1729,7 +1741,7 @@ function getImage(id) {
 }
 
 function buildIndex(){
-    for (i=0 ; i<images.length ; i++) {
+    for (let i=0 ; i<images.length ; i++) {
         imageIndex[ images[i].id ] = i;
         
         if (images[i].parent){
@@ -1851,9 +1863,11 @@ async function toggleBlocks(args){
         if (ask === false)
             change()
         else{
-            showDialog("Se você alternar para o editor de blocos perderá seu código. Deseja continuar?", ["SIM", "NÃO"]).then( data => {
-                if (data == "SIM")
-                    change()
+            new Message({
+                message: `Se você alternar para o editor de blocos perderá seu código. Deseja continuar?`, 
+                buttons: {yes: "SIM", no: "NÃO"} 
+            }).show().click('yes', () => {
+                change()
             });
         }
 

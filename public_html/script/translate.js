@@ -1,9 +1,12 @@
-var translator = {
+import {post} from "./header.js"
+import {Message} from "./dialog.js"
+
+const translator = {
     ready: true
 }
 
 translator.translate = async function(elements){
-    let lang = (user && user.speak) ? user.speak : 'pt'
+    let lang = this.language ? this.language : 'pt'
     let contents = this.translations ? this.translations : {}
     
     if (elements.translate){
@@ -152,7 +155,7 @@ translator.getTranslated = function(str, dom=true, bind=true){
         return str
     }
 
-    let translated = this.translations[str][user.speak]
+    let translated = this.translations[str][this.language]
 
     if (dom){
         translated = `<span class='translating'>${translated}</span>`
@@ -182,7 +185,7 @@ translator.bind = function (obj){
         obj.removeClass('translating')
         obj.parents().removeClass('translating')
     
-        if (user.preferences && user.preferences.translation == "1"){
+        if (translator.suggest){
             obj.hover( function(m) {
                 // create element
     
@@ -241,3 +244,5 @@ translator.bind = function (obj){
  
     }
 }
+
+export {translator}

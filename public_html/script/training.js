@@ -5,15 +5,19 @@ $(document).ready(async function(){
     $('#hash, #round').remove()
 
     if (hash){
-        await waitLogged()
+        await login.wait()
         if (user.status == "NOTLOGGED"){
-            let data = await showDialog("Você precisa realizar o login para ingressar em um treino", ["Login", "Não"])
-            if (data == "Não")
-                window.location.href = ''
-            else if (data == "Login"){
-                await googleLogin()
-                window.location.reload()
-            }
+            new Message({
+                message: `Você precisa realizar o login para ingressar em um treino`, 
+                buttons: {yes: "Login", no: "Não"} 
+            }).show().click(null, data => {
+                if (data.button == "no")
+                    window.location.href = ''
+                else if (data.button == "yes"){
+                    await googleLogin()
+                    window.location.reload()
+                }
+            })
         }
 
         let data = await post("back_train.php", {
@@ -56,7 +60,7 @@ $(document).ready(async function(){
     else
         window.location.href = ''
 
-    socket_ready().then( () => {
+    socket.isReady().then( () => {
         socket.emit('training run join', {
             hash: hash
         });
@@ -126,8 +130,9 @@ var selectedGlad = {
 
             if (data.status == "SUCCESS"){
                 $('.glad-box').hide()
-                await showMessage("Você ingressou no treino")
-                window.location.href = 'battle.train'
+                new Message({message: `Você ingressou no treino`}).show().click('ok', () => {
+                    window.location.href = 'battle.train'
+                })
                 sendChatMessage({text: `/join ${data.name}_${hash}`})
             }
         });
@@ -492,7 +497,7 @@ training.refresh = async function(args){
                 training: gid,
                 origin: "train"
             })
-            await socket_ready()
+            await socket.isReady()
             socket.emit('tournament run request', {
                 hash: this.hash,
                 group: gid
@@ -533,7 +538,7 @@ training.refresh = async function(args){
             })
 
             if (data.newround){
-                await socket_ready()
+                await socket.isReady()
                 socket.emit('tournament run request', {
                     hash: this.hash,
                     group: 'newround'
