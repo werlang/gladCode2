@@ -1,3 +1,5 @@
+const { gladCard } = require("./glad-card");
+
 var teamsync = {id: 0, time: 0};
 
 $(document).ready( function(){
@@ -319,7 +321,7 @@ $(document).ready( function(){
                     });
 
                     $('.tourn.window #new').click( function(){
-                        $('.tourn.window #new').hide().after(`<div class='input-button'><input placeholder='${translator.getTranslated("Nome da nova equipe", dom=false)}' id='name'><button><i class='fas fa-users'></i></button></div>`);
+                        $('.tourn.window #new').hide().after(`<div class='input-button'><input placeholder='${translator.getTranslated("Nome da nova equipe", false)}' id='name'><button><i class='fas fa-users'></i></button></div>`);
                         // translator.bind()
                         $('.tourn.window #name').focus();
                         
@@ -564,7 +566,7 @@ function refresh_teams(obj){
                     //$('.tourn.window #button-container .button').addClass('single');
                     $('.tourn.window .table').html(`<div class='row head'><div class='cell'>Nome</div><div class='cell'>${translator.getTranslated("Gladiadores")}</div></div>`);
                     for (let i in teams){
-                        $('.tourn.window .table').append(`<div class='row'><div class='cell'>${teams[i].name}</div><div class='cell'>${teams[i].glads}/3</div><div class='kick' title='${translator.getTranslated("Expulsar equipe", dom=false)}'><i class='fas fa-times-circle'></i></div></div>`);
+                        $('.tourn.window .table').append(`<div class='row'><div class='cell'>${teams[i].name}</div><div class='cell'>${teams[i].glads}/3</div><div class='kick' title='${translator.getTranslated("Expulsar equipe", false)}'><i class='fas fa-times-circle'></i></div></div>`);
                         rebind_team_rows(teams[i].id);
                         if (joined && joined === teams[i].id)
                             $('.tourn.window .table .row').last().addClass('signed');
@@ -717,7 +719,7 @@ function rebind_team_rows(teamid){
         });
 
         $('.tourn.window #join-leave').click( function(){
-            if ($('.tourn.window #join-leave').text() == translator.getTranslated("ABANDONAR", dom=false)){
+            if ($('.tourn.window #join-leave').text() == translator.getTranslated("ABANDONAR", false)){
                 new Message({
                     message: `${translator.getTranslated("Tem certeza que deseja sair da equipe")} <span class='highlight'>${teamname}</span>?`,
                     buttons: {no: translator.getTranslated("Não"), yes: translator.getTranslated("SIM")},
@@ -817,7 +819,7 @@ function refresh_glads(args){
             action: "TEAM",
             id: teamid,
             sync: teamsync.time
-        }).done( function(data){
+        }).done( async function(data){
             //console.log(data);
             data = JSON.parse(data);
 
@@ -833,127 +835,139 @@ function refresh_glads(args){
 
                 data = data.glads;
 
-                if (word)
-                    $('#fog.team .tourn.window #word span.highlight').html(word);
-                else
-                    $('#fog.team .tourn.window #word').remove();
-
-                var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-                    $('.tourn.window .glad-card-container').html("");
-                    for (let i in data){
-                        $('.tourn.window .glad-card-container').append("<div class='glad-preview'></div>");
-                    }
-                    $('.tourn.window .glad-card-container .glad-preview').html(template);
-                    translator.translate($('.glad-card-container'))
-
+                if (word){
+                    $('#fog.team .tourn.window #word span.highlight').html(word)
+                }
+                else{
+                    $('#fog.team .tourn.window #word').remove()
+                }
+                
+                await new Promise(resolve => {
                     for (let i in data){
                         if (data[i].name){
-                            setGladImage($('.tourn.window .glad-card-container') ,i, data[i].skin);
-                            $('.tourn.window .glad-preview .info .glad span').eq(i).html(data[i].name);
-                            $('.tourn.window .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-                            $('.tourn.window .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-                            $('.tourn.window .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-                            $('.tourn.window .glad-preview').eq(i).data('id',data[i].cod);
-                            $('.tourn.window .glad-preview .info .master').eq(i).html(data[i].apelido);
+                            gladCard.load($('.tourn.window .glad-card-container'), {
+                                master: true,
+                                remove: true,
+                                customLoad: [{
+                                    name: data[i].name,
+                                    vstr: data[i].vstr,
+                                    vagi: data[i].vagi,
+                                    vint: data[i].vint,
+                                    id: data[i].cod,
+                                    user: data[i].apelido,
+                                    skin: JSON.stringify(pieces)
+                                }],
+                                append: true
+                            }).then( () => {
+                                if (data[i].owner && data[i].owner === true){
+                                    $('.tourn.window .glad-preview').eq(i).addClass('mine');
+                                }
+    
+                                $('.glad-preview.mine .delete').click( function(){
+                                    var id = $(this).parents('.mine').data('id');
+                                    var name = $(this).parents('.mine').find('.row.glad span').html();
+                                    new Message({
+                                        message: `${translator.getTranslated("Deseja remover o gladiador")} <b>${name}</b> ${translator.getTranslated("da equipe")}?`,
+                                        buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
+                                        translate: false
+                                    }).show().click('yes', async () => {
+                                        let data = await post("back_tournament.php", {
+                                            action: "REMOVE_GLAD",
+                                            glad: id,
+                                            team: teamid
+                                        })
+                                        console.log(data);
+            
+                                        if (data.status == "STARTED"){
+                                            $('#fog.team').remove();
+                                            new Message({message: "Este torneio já iniciou"}).show();
+                                        }
+                                        else if (data.status == "REMOVED"){
+                                            $('#fog.team').remove();
+                                            new Message({message: `${translator.getTranslated("A equipe")} ${translator.getTranslated("foi desmantelada")}`}).show().click('ok', () => {
+                                                $('.tourn.window').fadeIn();
+                                            })
+                                        }
+                                        else if (data.status == "DONE"){
+                                            $('.tourn.window #back').click();
+                                            new Message({message: `${translator.getTranslated("O gladiador")} <b>${name}</b> ${translator.getTranslated("foi removido da equipe")}`}).show().click('ok', () => {
+                                                $('.tourn.window .row.signed').click()
+                                            })
+                                            
+                                        }
+                                        else{
+                                            new Message({message: data.status}).show()
+                                        }
+                                    })
+                                })
 
-                            if (data[i].owner && data[i].owner === true){
-                                $('.tourn.window .glad-preview').eq(i).addClass('mine');
-                            }
+                                resolve(true)
+                            })
                         }
                         else{
-                            $('.tourn.window .glad-preview').eq(i).addClass('blurred');
-                            setGladImage($('.tourn.window .glad-card-container') ,i, '');
-                            $('.tourn.window .glad-preview .info .glad span').eq(i).html('??????????');
-                            $('.tourn.window .glad-preview .info .attr .str span').eq(i).html('??');
-                            $('.tourn.window .glad-preview .info .attr .agi span').eq(i).html('??');
-                            $('.tourn.window .glad-preview .info .attr .int span').eq(i).html('??');
-                            $('.tourn.window .glad-preview .info .master').eq(i).html(data[i]);
+                            gladCard.load($('.tourn.window .glad-card-container'), {
+                                master: true,
+                                customLoad: [{
+                                    name: '??????????',
+                                    vstr: '??',
+                                    vagi: '??',
+                                    vint: '??',
+                                    user: data[i],
+                                    skin: ''
+                                }],
+                                append: true
+                            }).then( () => {
+                                $('.tourn.window .glad-preview').eq(i).addClass('blurred')
+
+                                resolve(true)
+                            })
                         }
                     }
-                    $('.glad-preview .code').remove();
-                    $('.glad-preview').not('.mine').find('.delete-container').remove();
 
-                    $('.glad-preview.mine .delete').click( function(){
-                        var id = $(this).parents('.mine').data('id');
-                        var name = $(this).parents('.mine').find('.row.glad span').html();
-                        new Message({
-                            message: `${translator.getTranslated("Deseja remover o gladiador")} <b>${name}</b> ${translator.getTranslated("da equipe")}?`,
-                            buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
-                            translate: false
-                        }).show().click('yes', async () => {
-                            let data = await post("back_tournament.php", {
-                                action: "REMOVE_GLAD",
-                                glad: id,
-                                team: teamid
-                            })
-                            console.log(data);
+                })
 
-                            if (data.status == "STARTED"){
-                                $('#fog.team').remove();
-                                new Message({message: "Este torneio já iniciou"}).show();
-                            }
-                            else if (data.status == "REMOVED"){
-                                $('#fog.team').remove();
-                                new Message({message: `${translator.getTranslated("A equipe")} ${translator.getTranslated("foi desmantelada")}`}).show().click('ok', () => {
-                                    $('.tourn.window').fadeIn();
-                                })
-                            }
-                            else if (data.status == "DONE"){
-                                $('.tourn.window #back').click();
-                                new Message({message: `${translator.getTranslated("O gladiador")} <b>${name}</b> ${translator.getTranslated("foi removido da equipe")}`}).show().click('ok', () => {
-                                    $('.tourn.window .row.signed').click()
-                                })
-                                
-                            }
-                            else{
-                                new Message({message: data.status}).show()
-                            }
-                        })
-                    });
+                for (let i = 0 ; i < 3 - data.length ; i++){
+                    $('.tourn.window .glad-card-container').append(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para inscrever um novo gladiador")}</div></div>`);
+                }
+                if ($('.tourn.window .glad-preview.blurred').length > 0){
+                    $('.tourn.window .glad-add').addClass('disabled');
+                    $('.tourn.window #join-leave').html(translator.getTranslated("INGRESSAR"));
+                }
+                if (flex == "0"){
+                    $('.tourn.window .glad-add').addClass('disabled');
+                }
+                if ((joined || data.length >= 3) && $('.tourn.window #join-leave').html() == translator.getTranslated("INGRESSAR", false)){
+                    $('#fog.team .tourn.window #join-leave').remove();
+                    $('#fog.team .tourn.window #button-container .button').addClass('single');
+                }
 
-                    for (let i = 0 ; i < 3 - data.length ; i++){
-                        $('.tourn.window .glad-card-container').append(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para inscrever um novo gladiador")}</div></div>`);
-                    }
-                    if ($('.tourn.window .glad-preview.blurred').length > 0){
-                        $('.tourn.window .glad-add').addClass('disabled');
-                        $('.tourn.window #join-leave').html(translator.getTranslated("INGRESSAR"));
-                    }
-                    if (flex == "0"){
-                        $('.tourn.window .glad-add').addClass('disabled');
-                    }
-                    if ((joined || data.length >= 3) && $('.tourn.window #join-leave').html() == translator.getTranslated("INGRESSAR", dom=false)){
-                        $('#fog.team .tourn.window #join-leave').remove();
-                        $('#fog.team .tourn.window #button-container .button').addClass('single');
-                    }
-
-                    $('.tourn.window .glad-add').not('.disabled').click( function(){
-                        choose_tourn_glad().then( function(data){
-                            //console.log(data);
-                            if (data !== false){
-                                var gladid = data.glad;
-                                var showcode = data.showcode;
-                                $.post("back_tournament.php", {
-                                    action: "ADD_GLAD",
-                                    glad: gladid,
-                                    showcode: showcode,
-                                    team: teamid,
-                                    pass: word
-                                }).done( function(data){
-                                    //console.log(data);
-                                    data = JSON.parse(data);
-                                    if (data.status == "SAMEGLAD")
-                                        new Message({message: "Este gladiador já faz parte da equipe"}).show();
-                                    else if (data.status == "STARTED"){
-                                        $('#fog.team').remove();
-                                        new Message({message: 'Este torneio já iniciou'}).show();
-                                    }
-                                    else if (data.status == "DONE"){
-                                        $('#fog.team').remove();
-                                        $('.tourn.window .row.signed').click();
-                                    }
-                                });
-                            }
-                        });
+                $('.tourn.window .glad-add').not('.disabled').click( function(){
+                    choose_tourn_glad().then( function(data){
+                        //console.log(data);
+                        if (data !== false){
+                            var gladid = data.glad;
+                            var showcode = data.showcode;
+                            $.post("back_tournament.php", {
+                                action: "ADD_GLAD",
+                                glad: gladid,
+                                showcode: showcode,
+                                team: teamid,
+                                pass: word
+                            }).done( function(data){
+                                //console.log(data);
+                                data = JSON.parse(data);
+                                if (data.status == "SAMEGLAD")
+                                    new Message({message: "Este gladiador já faz parte da equipe"}).show();
+                                else if (data.status == "STARTED"){
+                                    $('#fog.team').remove();
+                                    new Message({message: 'Este torneio já iniciou'}).show();
+                                }
+                                else if (data.status == "DONE"){
+                                    $('#fog.team').remove();
+                                    $('.tourn.window .row.signed').click();
+                                }
+                            });
+                        }
                     });
                 });
             }
@@ -971,32 +985,7 @@ function choose_tourn_glad(){
 
     translator.translate($('#fog.glads #duel-box'))
 
-    var template = $("<div id='template'></div>").load("glad-card-template.html", function(){});
-    $.post("back_glad.php",{
-        action: "GET",
-    }).done( function(data){
-        //console.log(data);
-        data = JSON.parse(data);
-        for (var i in data){
-            $('#fog.glads .glad-card-container').append("<div class='glad-preview'></div>");
-        }
-        $('#fog.glads .glad-card-container .glad-preview').html(template);
-        translator.translate($('.glad-card-container'))
-        
-        for (var i in data){
-            setGladImage($('#fog.glads .glad-card-container') ,i, data[i].skin);
-            $('#fog.glads .glad-preview .info .glad span').eq(i).html(data[i].name);
-            $('#fog.glads .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-            $('#fog.glads .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-            $('#fog.glads .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-            $('#fog.glads .glad-preview').eq(i).data('id',data[i].id);
-
-            if (data[i].oldversion)
-                $('#fog.glads .glad-preview').eq(i).addClass('old').attr('title', 'Este gladiador precisa ser atualizado');
-        }
-        $('#fog.glads .glad-preview .code .button').remove();
-        $('#fog.glads .glad-preview .delete-container').remove();
-        
+    gladCard.load($('#fog.glads .glad-card-container'), {}).then( () => {
         $('#fog.glads .glad-preview').not('.old').click( function(){
             $('#fog.glads #btn-glad-open').removeAttr('disabled');
             $('#fog.glads .glad-preview').removeClass('selected');
@@ -1007,7 +996,7 @@ function choose_tourn_glad(){
         $('#fog.glads .glad-preview').dblclick( function(){
             $('#fog.glads #duel-box #choose').click();
         });
-    });
+    })        
     
     $('#duel-box #cancel').click( function(){
         $('#fog.glads').remove();

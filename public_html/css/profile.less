@@ -1,4 +1,5 @@
 @import (less) "header.less";
+@import (less) "glad-card.less";
 
 body {
     overflow: hidden;
@@ -366,81 +367,6 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-}
-
-#code-box {
-    background-color: #eee;
-    border-radius: 3px;
-    box-shadow: 1px 1px 5px black;
-    max-width: 100%;
-    width: 600px;
-    overflow: hidden;
-}
-
-#code-box pre{
-    max-height: 90vh;
-    margin: 0;
-    border-radius: 3px 3px 0 0;
-    overflow: hidden;
-}
-
-#code-box pre code{
-    border-radius: 3px;
-    overflow: auto;
-}
-
-#code-box #code-ws{
-    height: 90vh;
-    margin: 0;
-    border-radius: 3px 3px 0 0;
-    overflow: hidden;
-}
-
-#code-box .close{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 25px;
-    height: 25px;
-    border-radius: 25px;
-    background-color: #ff6363;
-    color: white;
-    font-size: 1.3em;
-    font-family: 'Acme', sans-serif;
-    box-shadow: 0px 0px 3px black;
-    position: absolute;
-    right: 0;
-    margin-top: -5px;
-    z-index: 1;
-}
-
-@media only screen and (min-width: 600px) {
-    #code-box .close{
-        display: none;
-    }
-}
-
-#code-box #button-container {
-    display: flex;
-    justify-content: center;
-}
-
-#code-box .button {
-    font-size: 1.2em;
-    font-family: 'Roboto', sans-serif;
-    border: none;
-    padding: 5px 0px;
-    outline: none;
-    color: white;
-    background-color: #00638d;
-    width: 100%;
-    border-radius: 0px 0px 3px 3px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-#code-box .button:hover {
-    background-color: #1e86d8;
 }
 
 #profile-panel {
@@ -1089,14 +1015,6 @@ body {
     filter: brightness(85%);
 }
 
-#battle-container .glad-preview .row.mmr{
-    color: #7d7d7d;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    margin-bottom: 3px;
-}
-
 #battle-container #match-find {
     width: 300px;
     height: 50px;
@@ -1653,22 +1571,6 @@ body {
     display: flex;
     justify-content: center;
     /* margin-bottom: 20px; */
-}
-
-#pre-battle-show .glad-preview .row.mmr {
-    color: #7d7d7d;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 3px;
-    align-items: flex-end;
-    flex-grow: 1;
-}
-
-#battle-container .glad-preview .row.mmr img,
-#pre-battle-show .glad-preview .row.mmr img {
-    height: 20px;
-    filter: contrast(0%) grayscale(1000%);
-    margin: 0px 3px;
 }
 
 #pre-battle-show #progress {

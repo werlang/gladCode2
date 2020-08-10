@@ -1,3 +1,5 @@
+import {showTerminal} from "./dialog.js"
+
 //required to provide inside glads object:
 //name, user, code, skin, vstr, vagi, vint
 //or an array with ids
@@ -173,7 +175,7 @@ async function runSimulation(args) {
     return response.promise();
 }
 
-class progressButton {
+class ProgressButton {
     constructor(obj, text){
         this.oldhtml = obj.html();
 
@@ -246,3 +248,5 @@ class progressButton {
             return false;
     }
 }
+
+export {Simulation, ProgressButton}

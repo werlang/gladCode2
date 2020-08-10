@@ -55,11 +55,15 @@ function showTextArea(message,placeholder,maxchar){
 
 function showTerminal(title, message){
     $('#fog').remove()
-    $('body').append("<div id='fog'><div id='terminal'><div id='title'><span>"+ title +"</span><div id='close'></div></div><pre></pre></div></div>");
+    $('body').append(`<div id='fog'>
+        <div id='terminal'>
+            <div id='title'><span>${title}</span><div id='close'></div></div>
+            <pre>${message}</pre>
+        </div>
+    </div>`);
     $('#terminal #close').click( function() {
         $('#terminal').parents('#fog').remove();
-    });
-    $('#terminal pre').html(message);
+    })
 }
 
 function createToast(message, type) {
@@ -361,4 +365,4 @@ class Message {
     }
 }
 
-export {Message, showDialog, createToast}
+export {Message, showDialog, createToast, showTerminal}

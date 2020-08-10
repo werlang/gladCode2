@@ -108,16 +108,16 @@ $(document).ready( async function(){
                     for (let i=0 ; i<limit ; i++){
                         if (data.total == 0 && i == 0){
                             $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>${translator.getTranslated('Nenhuma batalha para mostrar', dom=true)}</h3></div>
+                                <div class='cell'><h3>${translator.getTranslated('Nenhuma batalha para mostrar')}</h3></div>
                             </div>`);
 
                             // translator.bind()
                         }
                         else if (offset + i < data.total){
                             let row = data.reports[i]
-                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", dom=false)};
+                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)};
                             if (row.favorite)
-                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", dom=false)};
+                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)};
 
                             let unread = ''
                             if (row.isread == "0")
@@ -134,7 +134,7 @@ $(document).ready( async function(){
 
                             let visual = ``
                             if (!row.expired){
-                                visual = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", dom=false)}'>
+                                visual = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
                                     <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
                                 </div>`
                             }
@@ -160,7 +160,7 @@ $(document).ready( async function(){
                     $('#bhist-container .favorite').click( function(){
                         var id = $(this).data('id');
                         if ($(this).find('i').hasClass('fas')){
-                            $(this).find('i').removeClass('fas').addClass('far').attr('title', translator.getTranslated("Guardar nos favoritos", dom=false));
+                            $(this).find('i').removeClass('fas').addClass('far').attr('title', translator.getTranslated("Guardar nos favoritos", false));
                             post_favorite(id, false, '');
                         }
                         else{
@@ -170,7 +170,7 @@ $(document).ready( async function(){
                                 buttons: {ok: "OK", cancel: "CANCEL"},
                                 input: { placeholder: "Comentário..." }
                             }).show().click('ok', data => {
-                                star.find('i').removeClass('far').addClass('fas').attr('title', translator.getTranslated("Tirar dos favoritos", dom=false));
+                                star.find('i').removeClass('far').addClass('fas').attr('title', translator.getTranslated("Tirar dos favoritos", false));
                                 post_favorite(id, true, data.input);
                             })
                         }
@@ -246,9 +246,9 @@ $(document).ready( async function(){
                         }
                         else if (offset + i < data.total){
                             let row = data.reports[i]
-                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", dom=false)}
+                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)}
                             if (row.favorite){
-                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", dom=false)}
+                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)}
                             }
         
                             $('#bhist-container .table').append(`<div class='row'>
@@ -256,7 +256,7 @@ $(document).ready( async function(){
                                 <div class='cell glad'>${row.gladiator}</div>
                                 <div class='cell comment'>${row.comment}</div>
                                 <div class='cell time' title='${getMessageTime(row.time)}'>${getMessageTime(row.time, { short: true })}</div>
-                                <div class='playback' title='${translator.getTranslated("Visualizar batalha", dom=false)}'>
+                                <div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
                                     <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
                                 </div>
                             </div>`)
@@ -356,7 +356,7 @@ $(document).ready( async function(){
                                 glad.me = {class: "forgotten", value: `Gladiador Esquecido`}
                             }
 
-                            let tail = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", dom=false)}'>
+                            let tail = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
                                 <a target='_blank' href='play/${row.log}'><img src='icon/eye.png'></a>
                             </div>`
                             if (!row.enemy){

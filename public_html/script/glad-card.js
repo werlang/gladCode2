@@ -1,4 +1,21 @@
-function setGladImage(parent, index, skin, dead){
+import {assets} from "./assets.js"
+import {translator} from "./translate.js"
+
+translator.translate([
+    "Este gladiador está morto",
+    "Este gladiador precisa ser atualizado",
+    "Clique para remover o gladiador",
+    "Ver código-fonte",
+    "Força",
+    "Agilidade",
+    "Inteligência",
+    "Abrir no editor",
+    "Fechar"
+])
+
+const gladCard = {}
+
+gladCard.create = function(parent, index, skin, dead){
     fetchSpritesheet(skin).then( function(data){
         var frame = 'walk';
         if (dead)
@@ -7,10 +24,12 @@ function setGladImage(parent, index, skin, dead){
     });
 }
 
+export {gladCard}
+
 function getImage(id){
-    for (var i in images){ //images is in assets.js
-        if (images[i].id == id)
-            return images[i];
+    for (var i in assets.images){ //assets.images is in assets.js
+        if (assets.images[i].id == id)
+            return assets.images[i];
     }
     return false;
 }
@@ -75,7 +94,7 @@ function fetchSpritesheet(json) {
         if (getImage(json[i]))
             selectedArray.push(getImage(json[i]));
     }
-    if (!validate_skin(selectedArray))
+    if (!assets.validateSkin(selectedArray))
         errorload = true;
     
     if (!errorload){
@@ -154,52 +173,97 @@ function fetchSpritesheet(json) {
     return response.promise();
 }
 
-function load_glad_cards(obj,options){
-    var response = $.Deferred();
-
-    if (!options.customLoad){
-        $.post("back_glad.php",{
-            action: "GET",
-        }).done( function(data){
-            //console.log(JSON.parse(data));
-            load_data(JSON.parse(data));
-        });
-    }
-    else{
-        load_data(options.customLoad);
-    }
-
-    function load_data(data){
-        //console.log(data);
-        for (let i in data){
-            obj.append("<div class='glad-preview'></div>");
+// If using customLoad, you must provide following info:
+// options.customLoad is an array for every gladiator card to be loaded
+//      id, name, vstr, vagi, vint, skin are attributes from the gladiator, loaded from db
+// options.dead: boolean. true if is to allow dead glad cards
+//      customLoad[i].dead if glad is dead
+// options.code: boolean. true if you want to show code button on the card
+//      customLoad[i].code, customLoad[i].blocks
+//      customLoad[i].oldversion: boolean. Show if the gladiator needs to be udated
+// options.master: if you want to show master's name
+//      customLoad[i].user is the master name
+gladCard.load = async function(obj, options){
+    return new Promise( resolve => {
+        if (!options.customLoad){
+            $.post("back_glad.php",{
+                action: "GET",
+            }).done( function(data){
+                //console.log(JSON.parse(data));
+                load_data(JSON.parse(data));
+            });
         }
-        template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-            obj.find('.glad-preview').html(template);
-
+        else{
+            load_data(options.customLoad);
+        }
+    
+        function load_data(data){
+            //console.log(data);
+    
             for (let i in data){
-                if (options.dead && data[i].dead)
-                    setGladImage(obj, i, data[i].skin, true);
-                else
-                    setGladImage(obj, i, data[i].skin);
-                obj.find('.glad-preview .info .glad span').eq(i).html(data[i].name);
-                obj.find('.glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-                obj.find('.glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-                obj.find('.glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-                obj.find('.glad-preview').eq(i).data('id',data[i].id);
+                let status = ''
+                let title = ''
+                if (options.dead && data[i].dead){
+                    status = 'dead'
+                    title = `title='${translator.getTranslated("Este gladiador está morto", false)}'`
+                }
+                else if (data[i].oldversion){
+                    status = 'old'
+                    title = `title='${translator.getTranslated("Este gladiador precisa ser atualizado", false)}'`
+                }
+
+                let template = `<div class="delete-container">
+                    <div class="delete" title="${translator.getTranslated("Clique para remover o gladiador", false)}"><img src="icon/delete.png"></div>
+                </div>
+                <div class='image'></div>
+                <div class='info'>
+                    <div class='row attr'>
+                        <div class='str' title='${translator.getTranslated("Força", false)}'><img src='res/str_icon.png'><span>${data[i].vstr}</span></div>
+                        <div class='agi' title='${translator.getTranslated("Agilidade", false)}'><img src='sprite/images/sprint.png'><span>${data[i].vagi}</span></div>
+                        <div class='int' title='${translator.getTranslated("Inteligência", false)}'><img src='res/int_icon.png'><span>${data[i].vint}</span></div>
+                    </div>
+                    <div class='row glad'><span>${data[i].name}</span></div>
+                    ${options.master ? `<div class='row master'>${data[i].user}</div>` : ''}
+                    ${options.mmr ? `<div class='row mmr' title='${translator.getTranslated("Renome", false)}'><span>${parseInt(data[i].mmr)}</span><img src='icon/winner-icon.png'></div>` : ''}
+                    ${options.code ? `<div class='row code'><button class='button' title='${translator.getTranslated("Ver código-fonte", false)}'>&lt;/&gt;</button></div>` : ''}
+                </div>`
+
+                let card = `<div class='glad-preview ${status}' ${title}>${template}</div>`
+
+                obj.append(card)
+
+                if (options.dead && data[i].dead){
+                    gladCard.create(obj, i, data[i].skin, true)
+                }
+                else{
+                    gladCard.create(obj, i, data[i].skin)
+                }
+
+                card = obj.find(".glad-preview").last()
+                card.data('id',data[i].id);
 
                 if (options.code){
                     let code = data[i].code
                     let blocks = data[i].blocks
 
                     if (code){
-                        obj.find('.glad-preview .code .button').eq(i).removeAttr('disabled')
-                        obj.find('.glad-preview .code .button').eq(i).click(function(e){
+                        card.find('.code .button').removeAttr('disabled')
+                        card.find('.code .button').click(function(e){
                             e.stopPropagation();
+
+                            let editor = options.editor ? `<button class='button' id='editor'>${translator.getTranslated("Abrir no editor")}</button>` : ''
 
                             if (blocks && blocks.length){
                                 let xml = decodeHTML(blocks)
-                                $('body').append(`<div id='fog' class='code'><div class='float-box'><div id='code-ws'></div><div id='button-container'><button class='button'>FECHAR</button></div></div></div>`)
+                                $('body').append(`<div id='fog' class='code'>
+                                    <div class='float-box'>
+                                        <div id='code-ws'></div>
+                                        <div id='button-container'>
+                                            ${editor}
+                                            <button class='button' id='close'>${translator.getTranslated("Fechar")}</button>
+                                        </div>
+                                    </div>
+                                </div>`)
     
                                 let ws = Blockly.inject('code-ws', {
                                     scrollbars: true,
@@ -214,32 +278,33 @@ function load_glad_cards(obj,options){
                                 if (code.indexOf("def loop():") != -1)
                                     language = "python"
 
-                                $('body').append(`<div id='fog' class='code'><div class='float-box'><pre id='code' pre class='line-numbers language-${language}'><code class='language-${language}'>${code}</code></pre><div id='button-container'><button class='button'>FECHAR</button></div></div></div>`);
+                                $('body').append(`<div id='fog' class='code'>
+                                    <div class='float-box'>
+                                        <pre id='code' pre class='line-numbers language-${language}'><code class='language-${language}'>${code}</code></pre>
+                                        <div id='button-container'>
+                                            ${editor}
+                                            <button class='button' id='close'>${translator.getTranslated("Fechar")}</button>
+                                        </div>
+                                    </div>
+                                </div>`)
                                 Prism.highlightElement($('code')[0]);
                             }
         
-                            $('#fog.code .button').click( function(){
-                                $('#fog.code').remove();
-                            });
+                            $('#fog.code #close.button').click( function(){
+                                $('#fog.code').remove()
+                            })
+                            $('#fog.code #editor.button').click( function(){
+                                window.open(`glad-${data[i].id}`)            
+                                $('#fog.code').remove()
+                            })
                         });
                     }
-                    else
-                        obj.find('.glad-preview .code .button').eq(i).prop('disabled', true);
-                }
-
-                if (options.master)
-                    obj.find('.glad-preview .info .master').eq(i).html(data[i].user);
-
-                if (options.dead && data[i].dead)
-                    obj.find('.glad-preview').eq(i).addClass('dead').attr('title', 'Este gladiador está morto');
-                    
-                if (data[i].oldversion){
-                    obj.find('.glad-preview').eq(i).addClass('old').attr('title', 'Este gladiador precisa ser atualizado');
+                    else{
+                        card.find('.code .button').prop('disabled', true)
+                    }
                 }
             }
 
-            translator.translate(obj)
-    
             if (!options.code)
                 obj.find('.glad-preview .code .button').remove();
             
@@ -251,8 +316,7 @@ function load_glad_cards(obj,options){
             if (options.dblClickHandler)
                 obj.find('.glad-preview').dblclick(options.dblClickHandler);
 
-            return response.resolve(true);
-        });
-    }
-    return response.promise();
+            resolve(data)
+        }
+    })
 }

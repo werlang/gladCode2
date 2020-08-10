@@ -102,7 +102,7 @@ var selectedGlad = {
         </div>`;
         $('body').append(box);
 
-        load_glad_cards($('#fog .glad-card-container'), {
+        gladCard.load($('#fog .glad-card-container'), {
             clickHandler: function(){
                 if (!$(this).hasClass('old')){
                     $('#fog #btn-glad-open').removeAttr('disabled');

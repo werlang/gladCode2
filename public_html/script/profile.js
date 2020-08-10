@@ -6,6 +6,10 @@ import * as dropzone from "./dropzone.js"
 import * as croppie from "./croppie.js"
 import {chat} from "./chat.js"
 import {Message, createToast} from "./dialog.js"
+import {gladCard} from "./glad-card.js"
+import * as potions from "./profile-potions.js"
+import {Simulation, ProgressButton} from "./runSim.js"
+import {stats} from "./stats_func.js"
 
 var user
 
@@ -152,7 +156,9 @@ $(document).ready( function(){
             "Enviar convite de amizade",
             "Mensagem para",
             "Olá...",
-            "CANCELAR"
+            "CANCELAR",
+            "Clique para criar um novo gladiador",
+            "atualizar",
         ]).then( data => {
             // console.log($('#tourn .title #offset .of').length)
             $('#tourn .title #offset .of').html(translator.getTranslated("de"))
@@ -282,140 +288,69 @@ $(document).ready( function(){
     });
 
     $('#menu #glads').click( function() {
-        $.post("back_glad.php",{
-            action: "GET",
-        }).done( function(data){
-            //console.log(data);
-            data = JSON.parse(data);
-            
-            var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-                $('#glads-container .glad-preview').remove();
-                if (data.length > 0)
-                    $('#menu #battle').removeClass('disabled');
-                for (var i in data){
-                    $('#glads-container .glad-card-container').append("<div class='glad-preview'></div>");
-                }
-                $('#glads-container .glad-card-container .glad-preview').html(template);
-                translator.translate($('.glad-card-container'))
+        $('#glads-container .glad-preview, #glads-container .glad-add').addClass('to-remove')
 
-                for (var i in data){
-                    setGladImage($('#glads-container'), i, data[i].skin);
-                    $('#glads-container .glad-preview .info .glad span').eq(i).html(data[i].name);
-                    $('#glads-container .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-                    $('#glads-container .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-                    $('#glads-container .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-                    $('#glads-container .glad-preview').eq(i).data('id',data[i].id);
-                    $('#glads-container .glad-preview').eq(i).data('code',data[i].code);
-                    $('#glads-container .glad-preview').eq(i).data('blocks',data[i].blocks);
-                    if(data[i].oldversion){
-                        $('#glads-container .glad-preview').eq(i).addClass('old');
-                        $('#glads-container .glad-preview .code .button').eq(i).html("{'atualizar'}");
-                    }
-                    $('#glads-container .glad-preview .delete').eq(i).click( function(){
-                        var card = $(this).parents('.glad-preview');
-                        new Message({
-                            message: `${translator.getTranslated("Deseja excluir o gladiador")} <b>${card.find('.glad span').html()}</b>?`,
-                            buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
-                            translate: false
-                        }).show().click('yes', () => {
-                            card.fadeOut(function(){
-                                card.remove();
-                            });
-                            $.post("back_glad.php",{
-                                action: "DELETE",
-                                id: card.data('id')
-                            }).done( function(data){
-                                //console.log(data);
-                                $('#glads-container .glad-preview').last().after("<div class='glad-add'><div class='image'></div><div class='info'>Clique para criar um novo gladiador</div></div>");
-                                $('#glads-container .glad-add').first().click( function(){
-                                    window.location.href = "newglad";
-                                });
-                            });
-                        })
-                        //console.log(card.data('id'));
-                    });
-                    $('#glads-container .glad-preview .code .button').eq(i).click( async function(){
-                        var card = $(this).parents('.glad-preview');
-                        if ($(this).parents('.glad-preview').hasClass('old')){
-                            var name = $(this).parents('.info').find('.glad span').html();
-                            new Message({
-                                message: `A simulação da gladCode foi atualizada, e o código do gladiador <b>${name}</b> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <b>OK</b> para abrir o editor`,
-                                buttons: {cancel: "Cancelar", ok: "OK"}
-                            }).show().click('ok', () => {
-                                window.open("glad-"+ card.data('id'));
-                            });
-                        }
-                        else{
-                            if (card.data('blocks')){
-                                let xml = decodeHTML(card.data('blocks'))
-                                $('body').append(`<div id='fog'><div id='code-box'><div class='close'>X</div><div id='code-ws'></div><div id='button-container'><button id='editor' class='button'>Abrir no editor</button></div></div></div>`);
-    
-                                // console.log(xml)
-                                let ws = Blockly.inject('code-ws', {
-                                    scrollbars: true,
-                                    readOnly: true
-                                });
-                        
-                                xmlDom = Blockly.Xml.textToDom(xml);
-                                Blockly.Xml.domToWorkspace(xmlDom, ws);
-                            }
-                            else{
-                                var code = card.data('code');
-                                //console.log(code);
+        gladCard.load($('#glads-container .glad-card-container'), {
+            remove: true,
+            code: true,
+            editor: true
+        }).then( async () => {
+            $('#glads-container .to-remove').remove()
 
-                                let language = "c";
-                                if (code.indexOf("def loop():") != -1)
-                                    language = "python";
-                            
-
-                                $('body').append(`<div id='fog'><div id='code-box'><div class='close'>X</div><pre class='line-numbers language-${language}'><code class='language-${language}'>${code}</code></pre><div id='button-container'><button id='editor' class='button'>Abrir no editor
-                                </button></div></div></div>`);
-                                Prism.highlightElement($('code')[0]);
-                            }
-                            translator.translate(['Abrir no editor']).then( data => {
-                                $('#fog #code-box button').html(data)
-                            })
-
-                            $('#fog').click( function(){
-                                $(this).remove();
-                            });
-                            $('#code-box').click( function(e){
-                                e.stopPropagation();
-                            });
-                            $('#code-box .close').click( function(e){
-                                $('#fog').click();
-                            });
-                            $('#editor').click( function(){
-                                window.open("glad-"+ card.data('id'));
-                                $('#fog').click();
-                            });
-                        }
-                    });
-                    
-                }
-            });
-            //console.log(user.lvl);
-            var initglads = 1;
-            var gladsinterval = 10;
-            var maxglads = 6;
-            $('#glads-container .glad-add').remove();
-            for (var i = data.length ; i < maxglads ; i++){
-                $('#glads-container .glad-card-container').append("<div class='glad-add'><div class='image'></div><div class='info'></div></div>");
-                if (i < initglads + Math.floor(user.lvl/gladsinterval)){
-                    $('#glads-container .glad-add .info').last().html("Clique para criar um novo gladiador");
-                    $('#glads-container .glad-add').last().click( function(){
-                        window.location.href = "newglad";
-                    });
-                }
-                else{
-                    var lvl = (i - initglads + 1)*gladsinterval;
-                    $('#glads-container .glad-add .info').last().html("Atinja o nível "+ lvl +" de mestre para desbloquear este gladiador");
-                    $('#glads-container .glad-add').last().addClass('inactive');
-                }
+            if ($('#glads-container .glad-preview').length > 0){
+                $('#menu #battle').removeClass('disabled')
             }
-            translator.translate($('#glads-container .glad-card-container .glad-add'))
-        });
-    });
+
+            $('#glads-container .glad-preview.old .code .button').html(`{'${translator.getTranslated("atualizar")}'}`)
+            $('#glads-container .glad-preview.old .code .button').click( () => {
+                new Message({ message: `A simulação da gladCode foi atualizada, e o código do gladiador precisa ser testado e salvo novamente para que ele volte a participar das batalhas` }).show()
+            })
+            
+
+            $('#glads-container .glad-preview .delete').click( function(){
+                var card = $(this).parents('.glad-preview')
+                new Message({
+                    message: `${translator.getTranslated("Deseja excluir o gladiador")} <b>${card.find('.glad span').html()}</b>?`,
+                    buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
+                    translate: false
+                }).show().click('yes', () => {
+                    card.fadeOut(function(){
+                        card.remove()
+                    })
+                    post("back_glad.php",{
+                        action: "DELETE",
+                        id: card.data('id')
+                    }).done( () => {
+                        //console.log(data);
+                        $('#glads-container .glad-preview').last().after(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para criar um novo gladiador")}</div></div>`)
+                        $('#glads-container .glad-add').first().click( function(){
+                            window.location.href = "newglad"
+                        })
+                    });
+                })
+            })
+
+            let gladlots = [1, 10, 20, 30, 40, 50]
+            let nglads = $('#glads-container .glad-preview').length
+            let maxglads = 6
+            for (let i=nglads ; i < maxglads ; i++){
+                let info = "Clique para criar um novo gladiador"
+                let inactive = ''
+                if (user.lvl < gladlots[i]){
+                    info = `Atinja o nível ${gladlots[i]} de mestre para desbloquear este gladiador`
+                    inactive = 'inactive'
+                }
+                let card = `<div class='glad-add ${inactive}'><div class='image'></div><div class='info'>${info}</div></div>`
+                $('#glads-container .glad-card-container').append(card)
+            }
+
+            translator.translate($('.glad-add'))
+            
+            $('#glads-container .glad-add').not('.inactive').click( () => {
+                window.location.href = "newglad"
+            })
+        })
+    })
     
     $('#menu #battle').click( function() {
 
@@ -427,38 +362,12 @@ $(document).ready( function(){
                 //console.log(data);
                 data = JSON.parse(data);
 
-                var template = $("<div id='template'></div>").load("glad-card-template.html", async function(){
-                    $('#battle-container .glad-preview').remove();
-                    for (var i in data){
-                        $('#battle-container .glad-card-container').append("<div class='glad-preview'></div>");
-                    }
-                    $('#battle-container .glad-card-container .glad-preview').html(template);
-                    let renown_translate = await translator.translate([$('.glad-card-container'), "Renome"])
+                $('#battle-container .glad-preview').addClass('to-remove')
+                gladCard.load($('#battle-container .glad-card-container'), {
+                    mmr: true
+                }).then( () => {
+                    $('#battle-container .glad-preview.to-remove').remove()
 
-                    for (var i in data){
-                        setGladImage($('#battle-container'), i, data[i].skin);
-                        $('#battle-container .glad-preview .info .glad span').eq(i).html(data[i].name);
-                        $('#battle-container .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-                        $('#battle-container .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-                        $('#battle-container .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-                        $('#battle-container .glad-preview').eq(i).data('id',data[i].id);
-                        $('#battle-container .glad-preview').eq(i).data('code',data[i].code);
-                        $('#battle-container .glad-preview').eq(i).data('name',data[i].name);
-                        $('#battle-container .glad-preview').eq(i).data('skin',data[i].skin);
-                        $('#battle-container .glad-preview').eq(i).data('user',data[i].user);
-                        $('#battle-container .glad-preview').eq(i).data('vstr',data[i].vstr);
-                        $('#battle-container .glad-preview').eq(i).data('vagi',data[i].vagi);
-                        $('#battle-container .glad-preview').eq(i).data('vint',data[i].vint);
-                        $('#battle-container .glad-preview').eq(i).data('mmr',data[i].mmr);
-                        $('#battle-container .glad-preview .info .master').eq(i).after(`<div class='row mmr' title='${renown_translate}'><span>${parseInt(data[i].mmr)}</span><img src='icon/winner-icon.png'></div>`);
-                        
-                        if(data[i].oldversion){
-                            $('#battle-container .glad-preview').eq(i).addClass('old');
-                        }
-                    }
-                    $('.glad-preview .delete').remove();
-                    $('.glad-preview .code').remove();
-                    
                     $('#battle-container .glad-preview').click( function(){
                         var card = $(this);
                         if (!$(this).hasClass('old')){
@@ -475,8 +384,9 @@ $(document).ready( function(){
                             });
                         }
                     });
-                });
-            });
+
+                })
+            })
 
         }
 
@@ -565,7 +475,7 @@ $(document).ready( function(){
     });
 
     $('#battle-container #match-find').click( async function() {
-        var progbtn = new progressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
+        var progbtn = new ProgressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
         
         var selGlad = $('#battle-container .glad-preview.selected');
         var thisglad = {
@@ -614,7 +524,7 @@ $(document).ready( function(){
                 else{
                     let hash = data.simulation
 
-                    save_stats(hash);
+                    stats.save(hash)
 
                     clearInterval(preBattleInt);
                     progbtn.kill();
@@ -796,8 +706,8 @@ $(document).ready( function(){
                     </div>
                     <div class='cell user'>${nick}</div>
                     <div class='button-container'>
-                        <div class='check' title='${translator.getTranslated("Aceitar solicitação", dom=false)}'></div>
-                        <div class='close' title='${translator.getTranslated("Recusar solicitação", dom=false)}'></div>
+                        <div class='check' title='${translator.getTranslated("Aceitar solicitação", false)}'></div>
+                        <div class='close' title='${translator.getTranslated("Recusar solicitação", false)}'></div>
                     </div>
                 </div>`);
                 $('#friend-panel #request .table .row').last().data('id', id);
@@ -920,7 +830,7 @@ $(document).ready( function(){
         $('body').append(box);
         translator.translate($('#fog'))
 
-        load_glad_cards($('#fog .glad-card-container'), {
+        gladCard.load($('#fog .glad-card-container'), {
             clickHandler: function(){
                 $('#fog #btn-glad-open').removeAttr('disabled');
                 $('#fog .glad-preview').removeClass('selected');
@@ -983,8 +893,8 @@ $(document).ready( function(){
                 $('#friend-panel #search .table').append(`<div class='row'>
                     <div class='cell'>${nick}</div>
                     <div class='cell button-container'>
-                        <div class='send-message' title='${translator.getTranslated("Enviar mensagem", dom=false)}'></div>
-                        <div class='add-friend' title='${translator.getTranslated("Enviar convite de amizade", dom=false)}'></div>
+                        <div class='send-message' title='${translator.getTranslated("Enviar mensagem", false)}'></div>
+                        <div class='add-friend' title='${translator.getTranslated("Enviar convite de amizade", false)}'></div>
                     </div>
                 </div>`);
                 $('#friend-panel #search .table .row').last().data({
@@ -1036,7 +946,7 @@ $(document).ready( function(){
             },
             translate: false,
             textarea: {
-                placeholder: translator.getTranslated("Olá...", dom=false),
+                placeholder: translator.getTranslated("Olá...", false),
                 // maxlength: 2048
             }
         }).show().click('ok', data => {
@@ -1376,7 +1286,7 @@ function afterBattleShow(hash, oldStatus){
             }
         }).run()
 
-        load_glad_cards($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
+        gladCard.load($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
 
         $('#fog #after-battle #nbattles').text(20 - data.battles.total)
         if (data.battles.total == 20){
@@ -1473,28 +1383,22 @@ async function preBattleShow(glads){
     $('#fog').remove();
     $('body').append("<div id='fog'><div id='pre-battle-show'><div class='glad-card-container'></div></div></div>");
     $('#fog').hide();
-    for (var i in glads){
-        $('#pre-battle-show .glad-card-container').append("<div class='glad-preview'></div>");
-    }
-    var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-        $('#pre-battle-show .glad-card-container .glad-preview').html(template);	
-        translator.translate($('.glad-card-container'))
 
-        for (var i in glads){
-            setGladImage($('#pre-battle-show'), i, glads[i].skin);
-            $('#pre-battle-show .glad-preview .info .glad span').eq(i).html(glads[i].name);
-            $('#pre-battle-show .glad-preview .info .glad').eq(i).after("<div class='row user'><span>"+ glads[i].user +"</span></div>");
-            $('#pre-battle-show .glad-preview .info .user').eq(i).after("<div class='row mmr'><span>"+ parseInt(glads[i].mmr) +"</span><img src='icon/winner-icon.png'></div>");
-            $('#pre-battle-show .glad-preview .info .attr .str span').eq(i).html(glads[i].vstr);
-            $('#pre-battle-show .glad-preview .info .attr .agi span').eq(i).html(glads[i].vagi);
-            $('#pre-battle-show .glad-preview .info .attr .int span').eq(i).html(glads[i].vint);
-        }
-        $('#pre-battle-show .glad-preview .delete-container').remove();
-        $('#pre-battle-show .glad-preview .row.code').remove();
+    gladCard.load($('#pre-battle-show .glad-card-container'), {
+        master: true,
+        customLoad: [{
+            skin: glads[i].skin,
+            name: glads[i].name,
+            vstr: glads[i].vstr,
+            vagi: glads[i].vagi,
+            vint: glads[i].vint,
+            user: glads[i].user
+        }]
+    }).then( () => {
         $('#pre-battle-show').append("<div id='tips'><span></span></div><div id='progress'></div>");
         $('#pre-battle-show #tips').html(tipArray[parseInt(Math.random() * tipArray.length)]);
         $('#fog').fadeIn();
-    });
+    })
     
     var timeElapsed = 0;
     var preBattleInt = setInterval( function(){
@@ -1531,13 +1435,13 @@ function last_active_string(min){
     day = day%30;
     
     if (month > 0)
-        return month +" "+ translator.getTranslated("meses", dom=false);
+        return month +" "+ translator.getTranslated("meses", false);
     else if (day > 0)
-        return day +" "+ translator.getTranslated("dias", dom=false);
+        return day +" "+ translator.getTranslated("dias", false);
     else if (hour > 0)
-        return hour +" "+ translator.getTranslated("horas", dom=false);
+        return hour +" "+ translator.getTranslated("horas", false);
     else
-        return min +" "+ translator.getTranslated("minutos", dom=false);
+        return min +" "+ translator.getTranslated("minutos", false);
 }
 
 function getMessageTime(msgTime, args){
@@ -1646,7 +1550,7 @@ async function check_challenges(){
             var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='duel' class='button' disabled>DUELAR</button></div></div></div>";
             $('body').append(box);
     
-            load_glad_cards($('#fog .glad-card-container'), {
+            gladCard.load($('#fog .glad-card-container'), {
                 clickHandler: function(){
                     if (!$(this).hasClass('old')){
                         $('#fog #btn-glad-open').removeAttr('disabled');
@@ -1663,7 +1567,7 @@ async function check_challenges(){
 
             $('#fog #duel-box #duel').click( function(){
                 var myglad = $('#fog .glad-preview.selected').data('id');
-                var progbtn = new progressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
+                var progbtn = new ProgressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
                 runSimulation({
                     duel: id,
                     glads: myglad,

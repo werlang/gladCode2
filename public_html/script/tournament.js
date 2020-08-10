@@ -174,7 +174,7 @@ $(document).ready( function() {
             
                             });
 
-                            load_glad_cards($('.float-box .glad-card-container'), {
+                            gladCard.load($('.float-box .glad-card-container'), {
                                 customLoad: data.glads,
                                 code: true,
                                 master: true,

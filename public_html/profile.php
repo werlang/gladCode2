@@ -22,7 +22,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
     <link rel='stylesheet' href="css/profile.css"/>
-    <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/chat.css"/>
     <link rel='stylesheet' href="css/croppie.css"/>

@@ -417,30 +417,30 @@ assets.validateSkin = function(selectedArray){
     return false;
 }
 
-assets.getSpriteThumb = function(spritesheet, move, direction){
-    var dirEnum = {
-        'walk': {'row': 8, 'col': 0},
-        'cast': {'row': 0, 'col': 0},
-        'thrust': {'row': 4, 'col': 0},
-        'slash': {'row': 12, 'col': 0},
-        'shoot': {'row': 16, 'col': 0},
-        'die': {'row': 20, 'col': 5},
-        'up': 0,
-        'left': 1,
-        'down': 2,
-        'right': 3,
-    };
-    var row = dirEnum[move].row + dirEnum[direction];
-    var col = dirEnum[move].col;
-    var thumb = document.createElement("canvas");
-    thumb.setAttribute("width", 64);
-    thumb.setAttribute("height", 64);
-    var ctx = thumb.getContext("2d");
-    ctx.drawImage(spritesheet, col*192 + 64, row*192 + 64, 64, 64, 0, 0, 64, 64); //10: linha do walk down
-    return thumb;
-}
+// assets.getSpriteThumb = function(spritesheet, move, direction){
+//     var dirEnum = {
+//         'walk': {'row': 8, 'col': 0},
+//         'cast': {'row': 0, 'col': 0},
+//         'thrust': {'row': 4, 'col': 0},
+//         'slash': {'row': 12, 'col': 0},
+//         'shoot': {'row': 16, 'col': 0},
+//         'die': {'row': 20, 'col': 5},
+//         'up': 0,
+//         'left': 1,
+//         'down': 2,
+//         'right': 3,
+//     };
+//     var row = dirEnum[move].row + dirEnum[direction];
+//     var col = dirEnum[move].col;
+//     var thumb = document.createElement("canvas");
+//     thumb.setAttribute("width", 64);
+//     thumb.setAttribute("height", 64);
+//     var ctx = thumb.getContext("2d");
+//     ctx.drawImage(spritesheet, col*192 + 64, row*192 + 64, 64, 64, 0, 0, 64, 64); //10: linha do walk down
+//     return thumb;
+// }
 
-assets.getImage = function(key){
+function getImage(key){
     for (var i in images){
         if (images[i].id == key)
             return images[i];

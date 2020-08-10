@@ -26,7 +26,14 @@ translator.translate = async function(elements){
     for (let element of elements){
         if (typeof element === 'string'){
             if (!contents[element]){
-                contents[element] = {}
+                if (element.indexOf("<prop-number>") != -1){
+                    let prop = element.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
+                    contents[prop] = {}
+                }
+                else{
+                    contents[element] = {}
+                }
+
             }
         }
         else{
@@ -92,10 +99,18 @@ translator.translate = async function(elements){
 
     this.translations = {...this.translations, ...contents}
 
+    // console.log(contents)
+    // console.log(elements)
     let stringResponse = []
     for (let element of elements){
         if (typeof element === 'string'){
-            if (contents[element]){
+            if (element.indexOf("<prop-number>") != -1){
+                let prop = element.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
+                let orig = element.match(/<prop-number>(\d+)<\/prop-number>/)[1]
+                let resp = contents[prop][lang].replace("995471", orig)
+                stringResponse.push(resp)
+            }
+            else if (contents[element]){
                 stringResponse.push(contents[element][lang])
             }
         }
@@ -111,7 +126,8 @@ translator.translate = async function(elements){
                     else if (lang != 'pt'){
                         // replace contents
                         if (this.nodeType == 3){
-                            if (contents[this.textContent] && !$(this).hasClass('translated')){                
+                            // console.log(this.textContent)
+                            if (contents[this.textContent] && !$(this).hasClass('translated')){
                                 this.textContent = ` ${contents[this.textContent][lang]} `
                                 translator.bind($(this).parent())
                             }
@@ -156,6 +172,12 @@ translator.getTranslated = function(str, dom=true, bind=true){
     }
 
     let translated = this.translations[str][this.language]
+
+    if (str.indexOf("<prop-number>") != -1){
+        let prop = str.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
+        let orig = str.match(/<prop-number>(\d+)<\/prop-number>/)[1]
+        translated = this.translations[prop][this.language].replace("995471", orig)
+    }
 
     if (dom){
         translated = `<span class='translating'>${translated}</span>`

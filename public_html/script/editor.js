@@ -1,3 +1,5 @@
+import {gladCard} from "./glad-card.js"
+
 var editor;
 var saved = true;
 var tested = true;
@@ -144,57 +146,12 @@ $(document).ready( function() {
                 $('#fog-glads').fadeIn();
                 $('#fog-glads .glad-preview').remove();
                 $('#fog-glads #btn-glad-open').prop('disabled',true);
-                var prTemplate = new Promise( (resolve, reject) => {
-                    $("<div id='template'></div>").load("glad-card-template.html", function(){
-                        resolve($(this))
-                    });
-                })
-                $.post("back_glad.php",{
-                    action: "GET",
-                }).done( async function(data){
-                    data = JSON.parse(data);
-                    // console.log(data);
-                    if (data.length == 0){
+
+                gladCard.load($('#fog-glads .glad-card-container')).then( () => {
+                    if ($('#fog-glads .glad-preview').length == 0){
                         window.location.href = "newglad";
                     }
-                    for (var i in data){
-                        $('#fog-glads .glad-card-container').append("<div class='glad-preview'></div>");
-                    }
-
-                    let template = await prTemplate
-                    $('#fog-glads .glad-card-container .glad-preview').html(template);
-                    translator.translate($('.glad-card-container'))
-
-                    for (var i in data){
-                        setGladImage(i, data[i].skin);
-                        $('#fog-glads .glad-preview .info .glad span').eq(i).html(data[i].name);
-                        $('#fog-glads .glad-preview .info .attr .str span').eq(i).html(data[i].vstr);
-                        $('#fog-glads .glad-preview .info .attr .agi span').eq(i).html(data[i].vagi);
-                        $('#fog-glads .glad-preview .info .attr .int span').eq(i).html(data[i].vint);
-                        $('#fog-glads .glad-preview').eq(i).data('id',data[i].id);
-                        //$('#fog-glads .glad-preview').eq(i).data('code',data[i].code);
-                        $('#fog-glads .glad-preview .delete').eq(i).click( function(){
-                            var card = $(this).parents('.glad-preview');
-                            showDialog(
-                                "Deseja excluir o gladiador <span class='highlight'>"+ card.find('.glad span').html() +"</span>?",
-                                ["Sim","Não"])
-                            .then( function(data){
-                                if (data == "Sim"){
-                                    card.fadeOut(function(){
-                                        card.remove();
-                                    });
-                                    $.post("back_glad.php",{
-                                        action: "DELETE",
-                                        id: card.data('id')
-                                    }).done( function(data){
-                                    });
-                                }
-                            });
-                            //console.log(card.data('id'));
-                        });
-                    }
-                    $('#fog-glads .glad-preview .code .button').remove();
-                    
+                            
                     $('#fog-glads .glad-preview').click( function(){
                         $('#fog-glads #btn-glad-open').removeAttr('disabled');
                         $('#fog-glads .glad-preview').removeClass('selected');
@@ -204,8 +161,8 @@ $(document).ready( function() {
                     $('#fog-glads .glad-preview').dblclick( function(){
                         $('#fog-glads #btn-glad-open').click();
                     });
-                    //console.log(user.lvl);
-                });
+
+                })
             }
         }
     });
@@ -450,63 +407,24 @@ s                });
             }
             else if ($('#fog-battle #list .glad.selected').length < 4){
                 $(this).addClass('selected');
-                var template = $("<div id='template'></div>").load("glad-card-template.html", function(){
-                    $('#fog-battle .glad-card-container').html("<div class='glad-preview'></div>");
-                    $('#fog-battle .glad-card-container .glad-preview').html(template);
-                    translator.translate($('.glad-card-container'))
 
-                    if (filename){
-                        getGladFromFile(filename).then( function(data){
-                            loadCard(data);
-                        });
-                    }
-                    else{
-                        loadCard(obj.data('info'));
-                    }
-
-                    function loadCard(data){
-                        //console.log(data);
-                        fetchSpritesheet(data.skin).then( function(data){
-                            $('#fog-battle .glad-preview .image').html(getSpriteThumb(data,'walk','down'));
-                        });
-                        $('#fog-battle .glad-preview .info .glad span').html(data.name);
-                        $('#fog-battle .glad-preview .info .attr .str span').html(data.vstr);
-                        $('#fog-battle .glad-preview .info .attr .agi span').html(data.vagi);
-                        $('#fog-battle .glad-preview .info .attr .int span').html(data.vint);
-                        code = data.code
-                        blocks = data.blocks
-                    }
-
-                    $('#fog-battle .glad-preview .delete').remove();
-
-                    $('#fog-battle .glad-preview .code .button').click( function(){
-                        let language = "c";
-                        if (code.indexOf("def loop():") != -1)
-                            language = "python";
-
-                        if (blocks && blocks.length){
-                            $('body').append(`<div id='fog'><div id='code-box'><div id='code-ws'></div><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>`);
-
-                            let ws = Blockly.inject('code-ws', {
-                                scrollbars: true,
-                                readOnly: true
-                            });
-                    
-                            xmlDom = Blockly.Xml.textToDom(decodeHTML(blocks));
-                            Blockly.Xml.domToWorkspace(xmlDom, ws);
-                        }
-                        else{
-                            $('body').append(`<div id='fog'><div id='code-box'><pre class='line-numbers language-${language}'><code class='language-${language}'>${code}</code></pre><div id='button-container'><button id='close' class='button'>Fechar</button></div></div></div>`);
-                            Prism.highlightElement($('code')[0]);
-                        }
-            
-                        $('#code-box #close').click( function(e){
-                            $('#fog').remove();
-                        });
-            
+                if (filename){
+                    getGladFromFile(filename).then( function(data){
+                        loadCard(data);
                     });
-            
-                });
+                }
+                else{
+                    loadCard(obj.data('info'));
+                }
+
+                function loadCard(data){
+                    //console.log(data);
+
+                    gladCard.load($('#fog-battle .glad-card-container'), {
+                        code: true,
+                        customLoad: [data]
+                    })
+                }
             }
 
             
@@ -603,7 +521,7 @@ s                });
     });
 
     async function btnbattle_click(btn, glads){
-        progbtn = new progressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
+        progbtn = new ProgressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
 
         var breakpoints = [];
         $('.ace_breakpoint').each( function() {
@@ -1135,7 +1053,7 @@ function load_glad_generator(element){
             else{
                 $('#distribuicao #nome').removeClass('error');
 
-                pieces = new Array();
+                pieces = []
                 $.each( selected, function(index, image) {
                     pieces.push(image.id);
                 });
@@ -1159,31 +1077,17 @@ function load_glad_generator(element){
                     $('#save, #test').removeClass('disabled');
                     $('#fog-skin').hide();
                     $('#back').click();
-                    $('#float-card .glad-preview').load("glad-card-template.html", function(){
-                        $('#float-card .glad-preview .info .glad span').html(nome);
-                        $('#float-card .glad-preview .info .attr .str span').html(vstr);
-                        $('#float-card .glad-preview .info .attr .agi span').html(vagi);
-                        $('#float-card .glad-preview .info .attr .int span').html(vint);
-            
-                        $('.delete-container, .code').remove();
-                        
-                        if (arg && arg.image){
-                            $('#float-card .glad-preview .image').html(arg.image);
-                        }
-                        else{
-                            var canvascard = document.createElement('canvas');
-                            canvascard.setAttribute("width", 64);
-                            canvascard.setAttribute("height", 64);
-                            var ctx = canvascard.getContext("2d");
-                            ctx.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
-                            $('#float-card .glad-preview .image').html(canvascard);
-                        }
 
-                        if ($('#float-card .glad-preview').html() != "" && editor.getValue() != "")
-                            $('#download').removeClass('disabled');
-                        else
-                            $('#download').addClass('disabled');
-                    });
+                    gladCard.load($('#fog-battle .glad-card-container'), {
+                        customLoad: [{
+                            name: nome,
+                            vstr: vstr,
+                            vagi: vagi,
+                            vint: vint,
+                            skin: JSON.stringify(pieces)
+                        }]
+                    })
+                    
                 }
             }
             saved = false;

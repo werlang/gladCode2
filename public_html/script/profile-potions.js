@@ -1,6 +1,11 @@
+import {login, post} from "./header.js"
+import {translator} from "./translate.js"
+import {Message, createToast} from "./dialog.js"
+
+var user
+var potions
+
 $(document).ready( () => {
-    var slotlvl
-    var potions
     post("back_slots.php", {
         action: "ITEMS"
     }).then (data => {
@@ -127,12 +132,14 @@ $(document).ready( () => {
                     </div>`,
                 buttons: {yes: "Aprimorar", no: "Cancelar"},
                 class: 'upgrade'
-            }).show().click('yes', () => {
+            })
+            
+            msg.show().click('yes', () => {
                 post("back_slots.php", {
                     action: "UPGRADE",
                     command: "APOT"
                 }).then( data => {
-                    console.log(data)
+                    // console.log(data)
 
                     if (data.status == "NO MONEY"){
                         new Message({message: "Você não possui prata suficiente"}).show()
@@ -200,198 +207,197 @@ $(document).ready( () => {
 
     $('#menu #potions').click( () => {
         slots.refresh()
-    })
-
-    var slots = {
-        items: [{},{},{},{}]
-    }
-
-    slots.fill = function(id){
-        for (let i in this.items){
-            if (this.items[i].empty && parseInt(user.silver) >= parseInt(potions[id].price)){
-                this.items[i].id = id
-                this.items[i].empty = false
-                this.items[i].counting = false
-                user.silver -= potions[id].price
-
-                post("back_slots.php", {
-                    action: "BUY",
-                    id: id
-                }).then( data => {
-                    // console.log(data)
-                    this.refresh()
-                })
-
-                return true
-            }
-        }
-        return false
-    }
-
-    slots.refresh = async function() {
-        let data = await post("back_slots.php", {
-            action: "SLOTS"
-        })
-        // console.log(data)
-
-        slotlvl = data.slotlvl
-        for (let i=0 ; i<4 ; i++){
-            // enable new slot
-            if (data.lvl >= slotlvl[i] && this.items[i].disabled){
-                $('#apot-container #my-pots .slot').eq(i).removeClass('disabled').addClass('empty').html(`
-                    <div class='top'><div class='empty'></div></div>
-                    <div class='mid'><span class='name'>Nenhum item neste espaço</span></div>
-                    <div class='bot' title='Tempo restante'><i class='fas fa-clock'></i><span class='time'></span></div>
-                `)
-                delete this.items[i].disabled
-                this.items[i].empty = true
-            }
-            // disable slot
-            else if (data.lvl < slotlvl[i] && !this.items[i].disabled){
-                $('#apot-container #my-pots .slot').eq(i).removeClass('empty').addClass('disabled').html(`
-                    <div class='top'><div class='empty'></div></div>
-                    <div class='mid'><span>Atinja o nível ${slotlvl[i]} para desbloquear este item</span></div>
-                `)
-                this.items[i].disabled = true
-                delete this.items[i].empty
-            }
-        }
-
-        this.time = new Date().getTime() / 1000
-
-        for (let i=0 ; i<4 ; i++){
-            if (!this.items[i].disabled){
-                this.items[i].empty = true
-            }
-        }
-        for (let i in data.slots){
-            this.items[i].id = data.slots[i].id
-            this.items[i].sid = data.slots[i].sid
-            this.items[i].name = data.slots[i].name
-            this.items[i].icon = data.slots[i].icon
-            this.items[i].description = data.slots[i].description
-            this.items[i].time = data.slots[i].time
-            this.items[i].empty = false
-        }
-
-
-        for (let i in this.items){
-            let item = this.items[i]
-            if (!item.disabled && !item.empty && !item.counting){
-                $('#apot-container #my-pots .slot').eq(i).removeClass('empty').addClass('filled').html(`
-                    <div class='top'><img src='${item.icon}'><div class='remove'><i class='fas fa-trash-alt'></i></div></div>
-                    <div class='mid'><span class='name'>${item.name}</span></div>
-                    <div class='bot'><span class='time'></span><i class='fas fa-clock'></i></div>
-                `)
-
-                item.counting = true
-                this.countTime(i)
-
-                $('#apot-container #my-pots .slot').eq(i).click( () => {
-                    new Message({
-                        message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.id}")</b></code>`,
-                        buttons: {yes: "Ajuda", no: "OK"}
-                    }).show().click('yes', function(){
-                        window.open(`manual#nav-item`)
-                    })
-                })
-
-                $('#apot-container #my-pots .slot .remove').eq(i).click( e => {
-                    e.stopPropagation()
-
-                    new Message({
-                        message: `Deseja cancelar esta encomenda?`,
-                        buttons: {yes: "SIM", no: "NÃO"}
-                    }).show().click('yes', async () => {
-                        let data = await post("back_slots.php", {
-                            action: "EXPIRE",
-                            id: item.sid
-                        })
-                        // console.log(data)
-                        if (data.status == "SUCCESS"){
-                            this.refresh()
-                        }
-                    })
-                })
-            }
-            else if (item.empty){
-                $('#apot-container #my-pots .slot').eq(i).addClass('empty').html(`
-                    <div class='top'><div class='empty'></div></div>
-                    <div class='mid'><span class='name'>Nenhum item neste espaço</span></div>
-                    <div class='bot' title='Tempo restante'><i class='fas fa-clock'></i><span class='time'></span></div>
-                `)
-            }
-        }
-
-        translator.translate($('#apot-container #my-pots .mid'))
-
-        $('#apot-container #browse').removeAttr('disabled')
-        if (!this.items.filter(e => e.empty).length){
-            $('#apot-container #browse').attr('disabled', true)
-        }
-
-        $('#currencies #silver span').text(user.silver)
-
-        $('#browse-potions .slot').each( (_,obj) => {
-            let id = $(obj).data('id')
-            if (parseInt(user.silver) < parseInt(potions[id].price)){
-                $(obj).addClass('dis-price disabled')
-            }
-            if (apothecary.lvl < parseInt(potions[id].lvl)){
-                $(obj).addClass('dis-lvl disabled')
-            }
-        })
-    }
-
-    slots.countTime = function(i){
-        let item = this.items[i]
-        setTimeout( () => {
-            let elapsed = new Date().getTime() / 1000 - this.time
-            let time = {s: parseInt(item.time) - elapsed}
-
-            if (time.s < 0){
-                item.counting = false
-                slots.refresh()
-            }
-            else {
-                time.m = Math.floor(time.s / 60)
-                time.s = Math.floor(time.s % 60)
-                time.h = Math.floor(time.m / 60)
-                time.m = Math.floor(time.m % 60)
-
-                time.s = `${time.s}s`
-                time.m = time.m == 0 && time.h == 0 ? '' : `${time.m}m`
-                time.h = time.h == 0 ? '' : `${time.h}h`
-
-                time.str = `${time.h} ${time.m} ${time.s}`
-
-                $('#apot-container #my-pots .slot').eq(i).find('.time').html(time.str)
-                this.countTime(i)
-            }
-        }, 1000)
-    }
-
-    var apothecary = {
-        init: async function() {
-            let data = await post("back_slots.php", {
-                action: "UPGRADE",
-                command: "COSTS"
-            })
-            this.prices = data.prices
-            this.times = data.times
-        },
-        price: function(lvl) {
-            if (!lvl){
-                lvl = this.lvl
-            }
-            return this.prices[lvl-1]
-        },
-        time: function(lvl) {
-            if (!lvl){
-                lvl = this.lvl
-            }
-            return this.times[lvl-1]
-        }
-    }
-
+    }) 
 })
+
+const slots = {
+    items: [{},{},{},{}]
+}
+
+slots.fill = function(id){
+    for (let i in this.items){
+        if (this.items[i].empty && parseInt(user.silver) >= parseInt(potions[id].price)){
+            this.items[i].id = id
+            this.items[i].empty = false
+            this.items[i].counting = false
+            user.silver -= potions[id].price
+
+            post("back_slots.php", {
+                action: "BUY",
+                id: id
+            }).then( data => {
+                // console.log(data)
+                this.refresh()
+            })
+
+            return true
+        }
+    }
+    return false
+}
+
+slots.refresh = async function() {
+    let data = await post("back_slots.php", {
+        action: "SLOTS"
+    })
+    // console.log(data)
+
+    this.slotlvl = data.slotlvl
+    for (let i=0 ; i<4 ; i++){
+        // enable new slot
+        if (data.lvl >= this.slotlvl[i] && this.items[i].disabled){
+            $('#apot-container #my-pots .slot').eq(i).removeClass('disabled').addClass('empty').html(`
+                <div class='top'><div class='empty'></div></div>
+                <div class='mid'><span class='name'>Nenhum item neste espaço</span></div>
+                <div class='bot' title='Tempo restante'><i class='fas fa-clock'></i><span class='time'></span></div>
+            `)
+            delete this.items[i].disabled
+            this.items[i].empty = true
+        }
+        // disable slot
+        else if (data.lvl < this.slotlvl[i] && !this.items[i].disabled){
+            $('#apot-container #my-pots .slot').eq(i).removeClass('empty').addClass('disabled').html(`
+                <div class='top'><div class='empty'></div></div>
+                <div class='mid'><span>Atinja o nível ${this.slotlvl[i]} para desbloquear este item</span></div>
+            `)
+            this.items[i].disabled = true
+            delete this.items[i].empty
+        }
+    }
+
+    this.time = new Date().getTime() / 1000
+
+    for (let i=0 ; i<4 ; i++){
+        if (!this.items[i].disabled){
+            this.items[i].empty = true
+        }
+    }
+    for (let i in data.slots){
+        this.items[i].id = data.slots[i].id
+        this.items[i].sid = data.slots[i].sid
+        this.items[i].name = data.slots[i].name
+        this.items[i].icon = data.slots[i].icon
+        this.items[i].description = data.slots[i].description
+        this.items[i].time = data.slots[i].time
+        this.items[i].empty = false
+    }
+
+
+    for (let i in this.items){
+        let item = this.items[i]
+        if (!item.disabled && !item.empty && !item.counting){
+            $('#apot-container #my-pots .slot').eq(i).removeClass('empty').addClass('filled').html(`
+                <div class='top'><img src='${item.icon}'><div class='remove'><i class='fas fa-trash-alt'></i></div></div>
+                <div class='mid'><span class='name'>${item.name}</span></div>
+                <div class='bot'><span class='time'></span><i class='fas fa-clock'></i></div>
+            `)
+
+            item.counting = true
+            this.countTime(i)
+
+            $('#apot-container #my-pots .slot').eq(i).click( () => {
+                new Message({
+                    message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.id}")</b></code>`,
+                    buttons: {yes: "Ajuda", no: "OK"}
+                }).show().click('yes', function(){
+                    window.open(`manual#nav-item`)
+                })
+            })
+
+            $('#apot-container #my-pots .slot .remove').eq(i).click( e => {
+                e.stopPropagation()
+
+                new Message({
+                    message: `Deseja cancelar esta encomenda?`,
+                    buttons: {yes: "SIM", no: "NÃO"}
+                }).show().click('yes', async () => {
+                    let data = await post("back_slots.php", {
+                        action: "EXPIRE",
+                        id: item.sid
+                    })
+                    // console.log(data)
+                    if (data.status == "SUCCESS"){
+                        this.refresh()
+                    }
+                })
+            })
+        }
+        else if (item.empty){
+            $('#apot-container #my-pots .slot').eq(i).addClass('empty').html(`
+                <div class='top'><div class='empty'></div></div>
+                <div class='mid'><span class='name'>Nenhum item neste espaço</span></div>
+                <div class='bot' title='Tempo restante'><i class='fas fa-clock'></i><span class='time'></span></div>
+            `)
+        }
+    }
+
+    translator.translate($('#apot-container #my-pots .mid'))
+
+    $('#apot-container #browse').removeAttr('disabled')
+    if (!this.items.filter(e => e.empty).length){
+        $('#apot-container #browse').attr('disabled', true)
+    }
+
+    $('#currencies #silver span').text(user.silver)
+
+    $('#browse-potions .slot').each( (_,obj) => {
+        let id = $(obj).data('id')
+        if (parseInt(user.silver) < parseInt(potions[id].price)){
+            $(obj).addClass('dis-price disabled')
+        }
+        if (apothecary.lvl < parseInt(potions[id].lvl)){
+            $(obj).addClass('dis-lvl disabled')
+        }
+    })
+}
+
+slots.countTime = function(i){
+    let item = this.items[i]
+    setTimeout( () => {
+        let elapsed = new Date().getTime() / 1000 - this.time
+        let time = {s: parseInt(item.time) - elapsed}
+
+        if (time.s < 0){
+            item.counting = false
+            slots.refresh()
+        }
+        else {
+            time.m = Math.floor(time.s / 60)
+            time.s = Math.floor(time.s % 60)
+            time.h = Math.floor(time.m / 60)
+            time.m = Math.floor(time.m % 60)
+
+            time.s = `${time.s}s`
+            time.m = time.m == 0 && time.h == 0 ? '' : `${time.m}m`
+            time.h = time.h == 0 ? '' : `${time.h}h`
+
+            time.str = `${time.h} ${time.m} ${time.s}`
+
+            $('#apot-container #my-pots .slot').eq(i).find('.time').html(time.str)
+            this.countTime(i)
+        }
+    }, 1000)
+}
+
+const apothecary = {
+    init: async function() {
+        let data = await post("back_slots.php", {
+            action: "UPGRADE",
+            command: "COSTS"
+        })
+        this.prices = data.prices
+        this.times = data.times
+    },
+    price: function(lvl) {
+        if (!lvl){
+            lvl = this.lvl
+        }
+        return this.prices[lvl-1]
+    },
+    time: function(lvl) {
+        if (!lvl){
+            lvl = this.lvl
+        }
+        return this.times[lvl-1]
+    }
+}

@@ -1,4 +1,8 @@
-function save_stats(hash){
+import {post} from "./header.js"
+
+const stats = {}
+
+stats.save = function(hash){
     var json;
     $.post("back_log.php",{
         action: "GET",
@@ -165,7 +169,7 @@ function save_stats(hash){
     
 }
 
-function load_stats(args){
+stats.load = function(args){
     var date = '';
     var mmr = '';
     if (args && args.date)
@@ -184,3 +188,5 @@ function load_stats(args){
     });	
     return ajax;
 }
+
+export {stats}

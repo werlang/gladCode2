@@ -1,3 +1,5 @@
+import {stats} from "./stats_func.js"
+
 $(document).ready( function() {
     menu_loaded().then( function(data){
         var loc = window.location.href.split("/");
@@ -53,7 +55,7 @@ $(document).ready( function() {
 async function search(){
     var mmr = $( "#mmr-slider" ).slider('option','values');
     
-    let stats = load_stats({
+    let st = stats.load({
         date: {
             start: $("#date-str").val(),
             end: $("#date-end").val()
@@ -66,7 +68,7 @@ async function search(){
     
     let potions = post("back_slots.php", { action: "ITEMS" })
 
-    load_table(await stats, (await potions).potions)
+    load_table(await st, (await potions).potions)
 
 }
 

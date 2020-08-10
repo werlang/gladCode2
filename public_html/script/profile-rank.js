@@ -323,7 +323,7 @@ $(document).ready( function(){
             }
             else{
                 if (dummy){
-                    $('#ranking-container .table').html(`<div class='row head'><div class='cell position'></div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell mmr'><i class='fas fa-star' title='${translator.getTranslated("Pontuação total", dom=false)}'></i></div><div class='cell mmr'><i class='fas fa-clock' title='${translator.getTranslated("Tempo médio dos treinos", dom=false)}'></i></div></div>`)
+                    $('#ranking-container .table').html(`<div class='row head'><div class='cell position'></div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell mmr'><i class='fas fa-star' title='${translator.getTranslated("Pontuação total", false)}'></i></div><div class='cell mmr'><i class='fas fa-clock' title='${translator.getTranslated("Tempo médio dos treinos", false)}'></i></div></div>`)
 
                     for (let i=0 ; i<limit ; i++){
                         $('#ranking-container .table').append(`<div class='row dummy'>
