@@ -1,3 +1,7 @@
+import {socket} from "./socket.js"
+
+window.admin_auth = socket.admin
+
 $(document).ready( function() {
     $('#header').addClass('big');
     $('#header-container').addClass('small');

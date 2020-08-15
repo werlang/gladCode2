@@ -1,16 +1,20 @@
+import {post} from "./header.js"
+
 export const socket = {
     serverURL: `//${window.location.hostname}:3000`
 }
 
-socket.init = function(){
-    $.getScript(`${this.serverURL}/socket.io/socket.io.js`, function(){
-        try{
-            socket.io = io(serverURL, {secure: true})
-        }
-        catch(e){
-            socket.io = null
-        }
-    })
+socket.init = async function(){
+    await $.getScript(`${this.serverURL}/socket.io/socket.io.js`)
+
+    try{
+        this.io = io(this.serverURL, {secure: true})
+    }
+    catch(e){
+        this.io = null
+    }
+
+    return this
 }
 
 socket.admin = function(obj){
@@ -42,16 +46,20 @@ socket.request = async function(route, data){
 }
 
 socket.isReady = async function(){
-    async function isReady(){
-        return await new Promise(resolve => {
-            setTimeout(() => {
-                if (socket.io && socket.io.connected)
-                    resolve(true);
-                else
-                    resolve(false);
-            }, 10);
-        });
+    if (!this.io){
+        await this.init()
     }
-    while (await isReady() === false);
-    return socket;
+    return await new Promise(resolve => {
+        checkAgain()
+        function checkAgain(){
+            if (socket.io && socket.io.connected){
+                resolve(socket)
+            }
+            else{
+                setTimeout(() => {
+                    checkAgain()
+                }, 10);
+            }
+        }
+    });
 }

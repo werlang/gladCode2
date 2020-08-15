@@ -4,13 +4,13 @@ var teamsync = {id: 0, time: 0};
 
 $(document).ready( function(){
     socket.isReady().then( () => {
-        socket.on('tournament list', data =>{
+        socket.io.on('tournament list', data =>{
             refresh_tourn_list();
         });
-        socket.on('tournament teams', data =>{
+        socket.io.on('tournament teams', data =>{
             refresh_teams(data);
         });
-        socket.on('tournament glads', data =>{
+        socket.io.on('tournament glads', data =>{
             refresh_glads(data);
         });
     });
@@ -286,7 +286,7 @@ $(document).ready( function(){
                     refresh_teams({name: tname, pass: tpass});
 
                     if (socket){
-                        socket.emit('tournament join', {
+                        socket.io.emit('tournament join', {
                             tname: tname,
                             tpass: tpass
                         });
@@ -313,7 +313,7 @@ $(document).ready( function(){
                         $('#fog').remove();
                         
                         if (socket){
-                            socket.emit('tournament leave', {
+                            socket.io.emit('tournament leave', {
                                 tname: tname,
                                 tpass: tpass
                             });
@@ -702,7 +702,7 @@ function rebind_team_rows(teamid){
         // translator.bind()
 
         if (socket){
-            socket.emit('team join', {
+            socket.io.emit('team join', {
                 team: teamid
             });
         }
@@ -712,7 +712,7 @@ function rebind_team_rows(teamid){
             $('#fog .tourn.window').fadeIn();
 
             if (socket){
-                socket.emit('team leave', {
+                socket.io.emit('team leave', {
                     team: teamid
                 });
             }
@@ -798,7 +798,7 @@ function rebind_team_rows(teamid){
 function refresh_glads(args){
     if (args.remove){
         if (socket){
-            socket.emit('team leave', {
+            socket.io.emit('team leave', {
                 team: args.team
             });
         }

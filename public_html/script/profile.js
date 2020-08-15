@@ -108,9 +108,9 @@ $(document).ready( function(){
         checkNotifications();
 
         socket.isReady().then( () => {
-            //console.log("socket ready");
-            socket.on('profile notification', data =>{
-                //console.log("server message");
+            // console.log("socket ready");
+            socket.io.on('profile notification', data =>{
+                // console.log("server message");
                 checkNotifications();
             });
         });
@@ -356,17 +356,21 @@ $(document).ready( function(){
 
         $('#match-find').prop('disabled',true);
         if (!$(this).hasClass('disabled')){
-            $.post("back_glad.php",{
+            post("back_glad.php",{
                 action: "GET",
-            }).done( function(data){
+            }).then( data => {
                 //console.log(data);
-                data = JSON.parse(data);
 
                 $('#battle-container .glad-preview').addClass('to-remove')
                 gladCard.load($('#battle-container .glad-card-container'), {
                     mmr: true
-                }).then( () => {
+                }).then( data => {
+                    // console.log(data)
                     $('#battle-container .glad-preview.to-remove').remove()
+
+                    for (let i in data){
+                        $('#battle-container .glad-preview').eq(i).data('data', data[i])    
+                    }
 
                     $('#battle-container .glad-preview').click( function(){
                         var card = $(this);
@@ -477,17 +481,17 @@ $(document).ready( function(){
     $('#battle-container #match-find').click( async function() {
         var progbtn = new ProgressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
         
-        var selGlad = $('#battle-container .glad-preview.selected');
+        var selGlad = $('#battle-container .glad-preview.selected').data('data')
         var thisglad = {
-            'id': selGlad.data('id'),
-            'name': selGlad.data('name'),
-            'skin': selGlad.data('skin'),
-            'code': selGlad.data('code'),
-            'user': selGlad.data('user'),
-            'vstr': selGlad.data('vstr'),
-            'vagi': selGlad.data('vagi'),
-            'vint': selGlad.data('vint'),
-            'mmr': selGlad.data('mmr'),
+            'id': selGlad.id,
+            'name': selGlad.name,
+            'skin': selGlad.skin,
+            'code': selGlad.code,
+            'user': selGlad.user,
+            'vstr': selGlad.vstr,
+            'vagi': selGlad.vagi,
+            'vint': selGlad.vint,
+            'mmr': selGlad.mmr,
         }
 
         let oldStatus = {
@@ -1066,7 +1070,10 @@ async function checkNotifications(){
         user.xp = data.user.xp
         $('#profile-ui #xp #filled').width(xp/xpneeded*100 + "%");
 
-        $('#currencies #silver span').html(data.user.silver)
+        // wait a little until afterBattleWindow show the siver gain to update on the hud
+        setTimeout( () => {
+            $('#currencies #silver span').html(data.user.silver)
+        }, 2500)
         user.silver = data.user.silver
 
         $('#messages .notification').html(data.messages);
@@ -1379,21 +1386,15 @@ class valueAnimator{
 
 
 async function preBattleShow(glads){
-    //console.log(glads);
+    // console.log(glads);
     $('#fog').remove();
     $('body').append("<div id='fog'><div id='pre-battle-show'><div class='glad-card-container'></div></div></div>");
     $('#fog').hide();
 
     gladCard.load($('#pre-battle-show .glad-card-container'), {
         master: true,
-        customLoad: [{
-            skin: glads[i].skin,
-            name: glads[i].name,
-            vstr: glads[i].vstr,
-            vagi: glads[i].vagi,
-            vint: glads[i].vint,
-            user: glads[i].user
-        }]
+        customLoad: glads,
+        mmr: true
     }).then( () => {
         $('#pre-battle-show').append("<div id='tips'><span></span></div><div id='progress'></div>");
         $('#pre-battle-show #tips').html(tipArray[parseInt(Math.random() * tipArray.length)]);

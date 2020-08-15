@@ -126,13 +126,13 @@ $(document).ready( function(){
                 }
             });
 
-            socket.on('chat notification', (data) => {
+            socket.io.on('chat notification', (data) => {
                 getChatNotification();
                 if ($('#chat-panel .room.open').data('id') == data.room){
                     getChatMessages({room: data.room, sync: true});
                 }
             });
-            socket.on('chat personal', data => {
+            socket.io.on('chat personal', data => {
                 let msg
                 if (data.status == "KICK"){
                     msg = `Você foi removido da sala ${data.room_name}`;
@@ -672,7 +672,7 @@ function sendChatTable(json){
 
 async function listRooms(arg){
     await new Promise( (resolve, reject) => {
-        socket.emit('chat rooms', function(data){
+        socket.io.emit('chat rooms', function(data){
             //console.log(data);
 
             var rebuild = false;
