@@ -1,30 +1,30 @@
 .glad-card-container {
     margin: 10px 0px 20px;
-	padding: 10px;
+    padding: 10px;
     font-family: acme;
     display: flex;
     justify-content: space-around;
     align-items: stretch;
     box-sizing: border-box;
-	border-radius: 10px;
+    border-radius: 10px;
     border: 3px dashed transparent;
     overflow-y: auto;
     flex-wrap: wrap;
 }
 
 .glad-card-container.dz-drag-hover {
-	border-color: #00638d;
+    border-color: #00638d;
     background-color: #bddeed;
 }
 
 .glad-card-container.dz-drag-hover .glad-preview,
 .glad-card-container.dz-drag-hover .glad-add {
-	opacity: 0.5;
+    opacity: 0.5;
 }
 
 .glad-preview,
 .glad-add {
-	display: flex;
+    display: flex;
     flex-direction: column;
     background-color: #f8f8f8;
     cursor: pointer;
@@ -61,55 +61,55 @@
 }
 
 .glad-add {
-	box-sizing: border-box;
-	cursor: pointer;
-	order: 1;
+    box-sizing: border-box;
+    cursor: pointer;
+    order: 1;
 }
 
 .glad-add .image {
-	background-size: 50px;
+    background-size: 50px;
     background-repeat: no-repeat;
     background-position: center;
-	background-image: url('../icon/round_add.png');
-	height: 100px;
+    background-image: url('../icon/round_add.png');
+    height: 100px;
 }
 
 .glad-add.inactive{
-	cursor: default;
+    cursor: default;
 }
 
 .glad-add.inactive .image {
-	background-image: url('../icon/lock.png');
-	background-color: #c38686
+    background-image: url('../icon/lock.png');
+    background-color: #c38686
 }
 
 .glad-preview.error {
     background-color: #e2baba;
-	text-shadow: 1px 1px 2px #f8dddd;
-	flex-direction: column;
-	cursor: pointer;
-	padding: 10px 5px;
+    text-shadow: 1px 1px 2px #f8dddd;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px 5px;
 }
 
 
 .glad-preview.error a {
-	color: #00638d;
+    color: #00638d;
 }
 
 .glad-preview .row{
-	width: 100%;
-	display: flex;
-	justify-content: flex-start;
-	color: #646464;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    color: #646464;
 }
 
 .glad-preview .row.code {
-	margin-bottom: 6px;
+    margin-bottom: 6px;
 }
 
 .glad-preview .message,
 .glad-preview .link {
-	flex-direction: column;
+    flex-direction: column;
 }
 
 .glad-preview .row.mmr{
@@ -129,7 +129,7 @@
 }
 
 .glad-card-container .image{
-	display: flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     background-color: #6c97a9;
@@ -139,12 +139,12 @@
 }
 
 .glad-card-container .image canvas{
-	display: block;
+    display: block;
     height: 100%;
 }
 
 .glad-card-container .info{
-	color: #646464;
+    color: #646464;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -154,12 +154,12 @@
 }
 
 .glad-add .info {
-	padding: 10px;
-	justify-content: center;
+    padding: 10px;
+    justify-content: center;
 }
 
 .glad-card-container .file {
-	color: #7d7d7d;
+    color: #7d7d7d;
     display: flex;
     flex-direction: column;
     margin-bottom: 0px;
@@ -169,12 +169,12 @@
 .glad-card-container .file div {
     display: flex;
     align-items: center;
-	margin-bottom: 3px;
+    margin-bottom: 3px;
 }
 
 .glad-card-container .file img {
-	margin: 0px 5px;
-	filter: contrast(0%) grayscale(100%);
+    margin: 0px 5px;
+    filter: contrast(0%) grayscale(100%);
 }
 
 .glad-card-container .name {
@@ -184,7 +184,7 @@
 }
 
 .glad-card-container .glad {
-	font-size: 1.5em;
+    font-size: 1.5em;
     display: flex;
     /* margin: 15px 0px 5px; */
     justify-content: center;
@@ -198,53 +198,61 @@
 }
 
 .glad-card-container .glad span{
-	color: #000;
+    color: #000;
     text-align: center;
     /* height: 0; */
-}
-
-.glad-card-container .attr {
-	justify-content: space-around;
-	font-size: 1.2em;
-	margin-bottom: 0px;
-	background-color: #c7d6dc;
-	flex-direction: row;
-}
-
-.glad-card-container .attr img {
-    box-shadow: 1px 1px 3px black;
-	border: 1px solid #556c77;
-    border-radius: 25px;
-    padding: 2px;
-	margin-top: -15px;
-	z-index: 1;
-}
-
-.glad-card-container .attr .str img{
-    background-color: #ff5050;
-}
-
-.glad-card-container .attr .agi img{
-    background-color: #e3e300;
-}
-
-.glad-card-container .attr .int img{
-    background-color: #7c90ff;
 }
 
 .glad-card-container .row img {
     width: 20px;
 }
 
-.glad-card-container .attr div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.glad-card-container .attr {
+    justify-content: space-around;
+    font-size: 1.2em;
+    margin-bottom: 0px;
+    background-color: #c7d6dc;
+    flex-direction: row;
+
+    img {
+        box-shadow: 1px 1px 3px black;
+        border: 1px solid #556c77;
+        border-radius: 25px;
+        padding: 2px;
+        margin-top: -15px;
+        z-index: 1;
+    }
+
+    .str img{
+        background-color: #ff5050;
+    }
+
+    .agi img{
+        background-color: #e3e300;
+    }
+
+    .int img{
+        background-color: #7c90ff;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        span{
+            color: #646464;
+        }    
+    }
 }
 
-.glad-card-container .attr span{
-	color: #646464;
+.glad-card-container .text {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .glad-preview  .delete-container {
@@ -273,7 +281,7 @@
 }
 
 .glad-preview .button {
-	border: none;
+    border: none;
     background-color: transparent;
     font-size: 1.3em;
     font-family: consolas;
@@ -290,7 +298,7 @@
 }
 
 .glad-preview .button:hover {
-	background-color: #6c97a9;
+    background-color: #6c97a9;
     color: white;
 }
 

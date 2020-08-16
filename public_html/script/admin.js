@@ -1,3 +1,6 @@
+import {post} from "./header.js"
+import {Message} from "./dialog.js"
+
 $(document).ready( async function(){
     var version = [];
     

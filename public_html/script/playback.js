@@ -373,9 +373,9 @@ $(document).ready( function() {
             $('#pref-speech input').prop('checked', true);
 
         $('.checkslider').each( function(){
-            create_checkbox($(this));
-        });
-    
+            $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+        })
+
         $('#settings-window #ok').click( function(){
             $.post("back_play.php", {
                 action: "SET_PREF",

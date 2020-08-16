@@ -1,6 +1,12 @@
-const { gladCard } = require("./glad-card");
+import {gladCard} from "./glad-card.js"
+import {socket} from "./socket.js"
+import {login, post} from "./header.js"
+import {translator} from "./translate.js"
+import {Message} from "./dialog.js"
+
 
 var teamsync = {id: 0, time: 0};
+var user
 
 $(document).ready( function(){
     socket.isReady().then( () => {
@@ -13,6 +19,8 @@ $(document).ready( function(){
         socket.io.on('tournament glads', data =>{
             refresh_glads(data);
         });
+
+        socket.io.emit('tournament list join', {})
     });
 
     login.wait().then( data => {
@@ -101,7 +109,10 @@ $(document).ready( function(){
 
         translator.translate([$('#fog')])
 
-        create_checkbox($('.tourn.window .checkslider'));
+        $('.tourn.window .checkslider').each( function(){
+            $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+        })
+    
         $('#fog .tourn.window').hide().fadeIn();
         $('#fog .tourn.window #name').focus();
 
@@ -219,8 +230,6 @@ $(document).ready( function(){
                         $('#tourn-message .button').click( function(){
                             $('#fog').remove();
                         });
-
-                        // translator.bind()
                     }
                     else{
                         $('.tourn.window #name').focus();
@@ -264,13 +273,13 @@ $(document).ready( function(){
             var tname = $('.tourn.window #name').val();
             var tpass = $('.tourn.window #pass').val();
 
-            $.post("back_tournament.php",{
+            post("back_tournament.php",{
                 action: "JOIN",
                 name: tname,
                 pass: tpass
-            }).done( function(data){
-                //console.log(data);
-                data = JSON.parse(data);
+            }).then( data => {
+                // console.log(data)
+
                 if (data.status == "NOTFOUND"){
                     $('.tourn.window #name').focus();
                     $('.tourn.window #name, .tourn.window #pass').addClass('error');
@@ -359,7 +368,7 @@ $(document).ready( function(){
                                             glad: gladid,
                                             showcode: showcode
                                         }).done( function(data){
-                                            //console.log(data);
+                                            // console.log(data);
                 
                                             if (data == "NOTFOUND"){
                                                 new Message({message: "Torneio não encontrado"}).show();
@@ -441,7 +450,7 @@ function refresh_tourn_list(){
             moffset: tournpage.mine.offset,
             ooffset: tournpage.open.offset
         }).done( function(data){
-            //console.log(data);
+            // console.log(data);
             if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
                 data = JSON.parse(data);
                 var open = data.open;
@@ -815,13 +824,12 @@ function refresh_glads(args){
         if (teamsync.id != teamid)
             teamsync = {id: teamid, time: 0};
         
-        $.post("back_tournament.php", {
+        post("back_tournament.php", {
             action: "TEAM",
             id: teamid,
             sync: teamsync.time
-        }).done( async function(data){
-            //console.log(data);
-            data = JSON.parse(data);
+        }).then( async data => {
+            // console.log(data);
 
             if (data.status == "DONE"){
                 var tname = data.name;
@@ -855,7 +863,7 @@ function refresh_glads(args){
                                     vint: data[i].vint,
                                     id: data[i].cod,
                                     user: data[i].apelido,
-                                    skin: JSON.stringify(pieces)
+                                    skin: data[i].skin
                                 }],
                                 append: true
                             }).then( () => {
@@ -876,7 +884,7 @@ function refresh_glads(args){
                                             glad: id,
                                             team: teamid
                                         })
-                                        console.log(data);
+                                        // console.log(data);
             
                                         if (data.status == "STARTED"){
                                             $('#fog.team').remove();
@@ -981,7 +989,10 @@ function choose_tourn_glad(){
 
     var box = "<div id='fog' class='glads'><div id='duel-box'><div id='title'>Escolha o gladiador que irá lhe representar no torneio</div><div class='glad-card-container'></div><div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>";
     $('body').append(box);
-    create_checkbox($('#duel-box .checkslider'));
+
+    $('#duel-box .checkslider').each( function(){
+        $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+    })
 
     translator.translate($('#fog.glads #duel-box'))
 
@@ -1013,3 +1024,5 @@ function choose_tourn_glad(){
 
     return response.promise();
 }
+
+export {refresh_tourn_list}

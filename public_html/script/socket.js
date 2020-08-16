@@ -1,10 +1,14 @@
 import {post} from "./header.js"
 
 export const socket = {
-    serverURL: `//${window.location.hostname}:3000`
+    serverURL: `//${window.location.hostname}:3000`,
+    io: null
 }
 
 socket.init = async function(){
+    // true to avoid entering this more than once
+    this.io = true
+    
     await $.getScript(`${this.serverURL}/socket.io/socket.io.js`)
 
     try{

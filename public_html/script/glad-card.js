@@ -222,8 +222,10 @@ gladCard.load = async function(obj, options){
                         <div class='agi' title='${translator.getTranslated("Agilidade", false)}'><img src='sprite/images/sprint.png'><span>${data[i].vagi}</span></div>
                         <div class='int' title='${translator.getTranslated("Inteligência", false)}'><img src='res/int_icon.png'><span>${data[i].vint}</span></div>
                     </div>
-                    <div class='row glad'><span>${data[i].name}</span></div>
-                    ${options.master ? `<div class='row master'>${data[i].user}</div>` : ''}
+                    <div class='row text'>
+                        <div class='row glad'><span>${data[i].name}</span></div>
+                        ${options.master ? `<div class='row master'>${data[i].user}</div>` : ''}
+                    </div>
                     ${options.mmr ? `<div class='row mmr' title='${translator.getTranslated("Renome", false)}'><span>${parseInt(data[i].mmr)}</span><img src='icon/winner-icon.png'></div>` : ''}
                     ${options.code ? `<div class='row code'><button class='button' title='${translator.getTranslated("Ver código-fonte", false)}'>&lt;/&gt;</button></div>` : ''}
                 </div>`

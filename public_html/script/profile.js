@@ -10,6 +10,7 @@ import {gladCard} from "./glad-card.js"
 import * as potions from "./profile-potions.js"
 import {Simulation, ProgressButton} from "./runSim.js"
 import {stats} from "./stats_func.js"
+import {refresh_tourn_list} from "./profile-tourn.js"
 
 var user
 
