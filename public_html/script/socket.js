@@ -1,4 +1,4 @@
-import {post} from "./header.js"
+import {post} from "./utils.js"
 
 export const socket = {
     serverURL: `//${window.location.hostname}:3000`,

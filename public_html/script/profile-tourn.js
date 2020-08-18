@@ -1,6 +1,7 @@
 import {gladCard} from "./glad-card.js"
 import {socket} from "./socket.js"
-import {login, post} from "./header.js"
+import {login} from "./header.js"
+import {post} from "./utils.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
 

@@ -1,6 +1,6 @@
 import {assets} from "./assets.js"
 import {translator} from "./translate.js"
-import {post} from "./header.js"
+import {post} from "./utils.js"
 
 translator.translate([
     "Este gladiador está morto",

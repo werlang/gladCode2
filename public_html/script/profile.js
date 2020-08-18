@@ -1,4 +1,5 @@
-import {login, post} from "./header.js"
+import {login} from "./header.js"
+import {post} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {assets} from "./assets.js"

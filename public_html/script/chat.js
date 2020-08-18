@@ -1,6 +1,6 @@
 import {socket} from "./socket.js"
 import * as _ from "./emoji.js"
-import {post} from "./header.js"
+import {post} from "./utils.js"
 
 var sendingBuffer = [];
 var clearToSend = true;

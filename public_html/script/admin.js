@@ -1,4 +1,4 @@
-import {post} from "./header.js"
+import {post} from "./utils.js"
 import {Message} from "./dialog.js"
 
 const $ = document.querySelector.bind(document)

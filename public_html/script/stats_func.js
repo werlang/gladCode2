@@ -1,4 +1,4 @@
-import {post} from "./header.js"
+import {post} from "./utils.js"
 
 const stats = {}
 

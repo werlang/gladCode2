@@ -1,4 +1,11 @@
-import {post} from "./header.js"
+import {post} from "./utils.js"
+import {translator} from "./translate.js"
+
+translator.translate([
+    "Mensagem",
+    "Usuário",
+    "Data"
+])
 
 export const messages = {
     offset: 0,
@@ -27,8 +34,9 @@ messages.reload = async function(){
         </div>`
     }
 
-    let table = `<div class='row head'><div class='cell'>Usuário</div><div class='cell'>Mensagem</div><div class='cell'>Data</div></div>${rows}`
-    document.querySelector("#message-panel .table").innerHTML = table
+    const head = `<div class='row head'><div class='cell'>${translator.getTranslated("Usuário")}</div><div class='cell'>${translator.getTranslated("Mensagem")}</div><div class='cell'>${translator.getTranslated("Data")}</div></div>`
+
+    document.querySelector("#message-panel .table").innerHTML = `${head}${rows}`
 
     const data = await post("back_message.php",{
         action: "USERS",
@@ -48,18 +56,25 @@ messages.reload = async function(){
     const prevButton = document.querySelector("#message-panel .page-nav #prev")
     const nextButton = document.querySelector("#message-panel .page-nav #next")
     
-    if (this.offset == 0){
-        prevButton.setAttribute("disabled", "disabled")
+    if (this.total <= this.step){
+        document.querySelector("#message-panel .page-nav").style.display = "none"
     }
-    else {
-        prevButton.removeAttribute("disabled")
-    }
+    else{
+        document.querySelector("#message-panel .page-nav").style.display = ""
 
-    if (this.offset + this.nrows == this.total){
-        nextButton.setAttribute("disabled", "disabled")
-    }
-    else {
-        nextButton.removeAttribute("disabled")
+        if (this.offset == 0){
+            prevButton.setAttribute("disabled", "disabled")
+        }
+        else {
+            prevButton.removeAttribute("disabled")
+        }
+
+        if (this.offset + this.nrows == this.total){
+            nextButton.setAttribute("disabled", "disabled")
+        }
+        else {
+            nextButton.removeAttribute("disabled")
+        }
     }
 
     rows = ""
@@ -75,14 +90,20 @@ messages.reload = async function(){
         </div>`
     }
 
-    table = `<div class='row head'><div class='cell'>Usuário</div><div class='cell'>Mensagem</div><div class='cell'>Data</div></div>${rows}`
-    document.querySelector("#message-panel .table").innerHTML = table
+    document.querySelector("#message-panel .table").innerHTML = `${head}${rows}`
 }
 
 document.querySelector("#menu #messages").addEventListener('click', () => {
     messages.reload()
 })
 
+document.querySelector("#message-panel .page-nav #prev").addEventListener('click', () => {
+    messages.prev()
+})
+
+document.querySelector("#message-panel .page-nav #next").addEventListener('click', () => {
+    messages.next()
+})
 
 
 function reload_messages(){
