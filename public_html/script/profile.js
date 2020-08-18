@@ -1,5 +1,5 @@
 import {login} from "./header.js"
-import {post} from "./utils.js"
+import {post, getDate, getTimeSince} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {assets} from "./assets.js"
@@ -202,7 +202,7 @@ $(document).ready( function(){
                 $('#panel #news-container').append(`<div class='post'>
                     <div class='share' title='Compartilhar'><i class='fas fa-share-alt'></i></div>
                     <div class='title'>${data.posts[i].title}</div>
-                    <div class='time'>Publicado em ${getMessageTime(data.posts[i].time, { month_full: true })}</div>
+                    <div class='time'>Publicado em ${getDate(data.posts[i].time, { month_full: true })}</div>
                     <div class='body'>${data.posts[i].post}</div>
                 </div>`);
                 $('#panel #news-container .share').last().click( () => {
@@ -571,8 +571,8 @@ $(document).ready( function(){
                     <div class='cell lvl-container'>
                         <img title='Nível' src='res/star.png'><span>${lvl}</span>
                     </div>
-                    <div class='cell image-container'>
-                        <img src='${picture}'>
+                    <div class='cell picture-frame'>
+                        <img class='picture' src='${picture}'>
                     </div>
                     <div class='cell user'>${nick}</div>
                     <div class='button-container'>
@@ -590,13 +590,13 @@ $(document).ready( function(){
                 var lvl = data.confirmed[i].lvl;
                 var id = data.confirmed[i].id;
                 var picture = data.confirmed[i].picture;
-                var active = last_active_string(data.confirmed[i].active);
+                var active = getTimeSince(data.confirmed[i].active);
                 $('#friend-panel #friends .table').append(`<div class='row'>
                     <div class='cell lvl-container'>
                         <img title='Nível' src='res/star.png'><span>${lvl}</span>
                     </div>
-                    <div class='cell image-container'>
-                        <img src='${picture}'>
+                    <div class='cell picture-frame'>
+                        <img class='picture' src='${picture}'>
                     </div>
                     <div class='cell'>${nick}</div>
                     <div class='cell last-active'>
@@ -1291,72 +1291,6 @@ async function preBattleShow(glads){
     return preBattleInt;
 }
 
-
-function last_active_string(min){
-    min = parseInt(min);
-    var hour = parseInt(min/60);
-    min = min%60;
-    var day = parseInt(hour/24);
-    hour = hour%24;
-    var month = parseInt(day/30);
-    day = day%30;
-    
-    if (month > 0)
-        return month +" "+ translator.getTranslated("meses", false);
-    else if (day > 0)
-        return day +" "+ translator.getTranslated("dias", false);
-    else if (hour > 0)
-        return hour +" "+ translator.getTranslated("horas", false);
-    else
-        return min +" "+ translator.getTranslated("minutos", false);
-}
-
-function getMessageTime(msgTime, args){
-    var short = false;
-    var month_full = false;
-    if (args){
-        if (args.short)
-            short = true;
-        if (args.month_full)
-            month_full = true;
-    } 
-
-    if (short){
-        var now = new Date();
-        msgTime = new Date(msgTime);
-        
-        var secNow = Math.round(now.getTime() / 1000);
-        var secMsg = Math.round(msgTime.getTime() / 1000);
-        
-        var diff = (secNow - secMsg) / 60;
-        return last_active_string(diff);
-    }
-    else{
-        var months = [
-            "Janeiro",
-            "Fevereiro",
-            "Março",
-            "Abril",
-            "Maio",
-            "Junho",
-            "Julho",
-            "Agosto",
-            "Setembro",
-            "Outubro",
-            "Novembro",
-            "Dezembro"
-        ];
-        if (!month_full){
-            for (let i in months)
-                months[i] = months[i].toLowerCase().slice(0,3);
-        }
-
-        let t = new Date(msgTime);
-        var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
-        return string;
-    }
-}
-
 async function check_challenges(){
     let data = await post("back_duel.php",{
         action: "GET"
@@ -1380,9 +1314,9 @@ async function check_challenges(){
                 <div class='cell lvl-container'>
                     <img src='res/star.png' title='Nível'><span>${lvl}</span>
                 </div>
-                <div class='cell image-container'><img src='${picture}'></div>
+                <div class='cell picture-frame'><img class='picture' src='${picture}'></div>
                 <div class='cell user'>${nick}</div>
-                <div class='cell time' title='${getMessageTime(time)}'>${getMessageTime(time, { short: true })}</div>
+                <div class='cell time' title='${getDate(time)}'>${getDate(time, { short: true })}</div>
                 <div class='button-container'>
                     <div class='accept' title='Aceitar desafio'></div>
                     <div class='refuse' title='Recusar desafio'></div>

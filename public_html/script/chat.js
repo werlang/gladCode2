@@ -1,6 +1,7 @@
 import {socket} from "./socket.js"
 import * as _ from "./emoji.js"
 import {post} from "./utils.js"
+import {createToast} from "./dialog.js"
 
 var sendingBuffer = [];
 var clearToSend = true;

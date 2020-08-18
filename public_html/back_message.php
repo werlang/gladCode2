@@ -47,13 +47,14 @@
         $offset = min(max(mysql_escape_string($_POST['offset']), 0), max($nrows - $limit, 0));
         $output['offset'] = $offset;
 
-        $sql = "SELECT u.apelido, u.foto, m.time, m.message, m.isread FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod IN (SELECT max(m.cod) FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user' GROUP BY u.id) ORDER BY m.time DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT u.id, u.apelido, u.foto, TIMESTAMPDIFF(MINUTE, m.time, now()) AS time, m.message, m.isread FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod IN (SELECT max(m.cod) FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user' GROUP BY u.id) ORDER BY time LIMIT $limit OFFSET $offset";
         $result = runQuery($sql);
         $output['nrows'] = $result->num_rows;;
 
         $output['messages'] = array();
         while($row = $result->fetch_assoc()){
             $message = array();
+            $message['id'] = $row['id'];
             $message['nick'] = $row['apelido'];
             $message['picture'] = $row['foto'];
             $message['time'] = $row['time'];
@@ -63,6 +64,27 @@
         }
 
         echo json_encode($output);
+    }
+    elseif ($action == "MESSAGES"){
+        $friend = mysql_escape_string($_POST['user']);
+        
+        $sql = "SELECT DATE_FORMAT(time, '%e %b %Y, %k:%i') AS time, message, sender FROM messages WHERE (sender = $user AND receiver = $friend) OR (sender = $friend AND receiver = $user) ORDER BY time";
+        $result = runQuery($sql);
+
+        $output['messages'] = array();
+        while ($row = $result->fetch_assoc()){
+            $message = array();
+            $message['message'] = $row['message'];
+            $message['time'] = $row['time'];
+            $message['sender'] = $row['sender'];
+            $message['me'] = $row['sender'] == $user;
+            array_push($output['messages'], $message);
+        }
+
+        $output['status'] = "SUCCESS";
+
+        echo json_encode($output);
+
     }
     elseif ($action == "SEND"){
         $sender = $_SESSION['user'];

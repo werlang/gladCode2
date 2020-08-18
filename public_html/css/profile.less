@@ -303,6 +303,7 @@ body {
     margin-top: 3px;
     flex-grow: 1;
     overflow: auto;
+    text-transform: uppercase;
 }
 
 @media only screen and (min-width: 600px) {
@@ -624,24 +625,27 @@ body {
     margin-bottom: 15px;
 }
 
-#duel-challenge .table .image-container,
-#friend-panel .table .image-container {
+#duel-challenge .table .picture-frame,
+#friend-panel .table .picture-frame {
+    flex-grow: 0;
+    flex-basis: 60px;
+}
+
+.picture-frame {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 0;
-    flex-basis: 60px;
     height: 100%;
-}
 
-#duel-challenge .table .image-container img,
-#friend-panel .table .image-container img {
-    height: 50px;
-    width: 50px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 3px 2px #6b777b;
-    border: 2px solid #bfd1d8;
-    box-sizing: border-box;
+    .picture {
+        height: 50px;
+        width: 50px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 3px 2px #6b777b;
+        border: 2px solid #bfd1d8;
+        box-sizing: border-box;
+    }
+    
 }
 
 #duel-challenge #request .table .image-container,
@@ -3355,4 +3359,83 @@ i.silver {
     color: silver;
     margin: 0 5px;
     text-shadow: 1px 1px 2px black;
+}
+
+#message-panel {
+    .table {
+        .row {
+            height: 60px;
+            transition: 0.3s;
+
+            .cell {
+                box-sizing: border-box;
+                cursor: pointer;
+            }
+
+            .user {
+                flex-shrink: 0;
+                flex-grow: 1.5;
+                flex-basis: 0;
+
+                display: flex;
+                align-items: center;
+    
+                .picture-frame {
+                    margin-right: 20px;
+                    width: 60px;
+                    height: 60px;
+                    flex-shrink: 0;
+                }
+
+                .nick {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+            }
+
+            .message {
+                flex-shrink: 1;
+                flex-grow: 1;
+                flex-basis: 0;
+                display: none;
+
+                @media @size900 {
+                    display: block;
+                }
+            }
+
+            .time {
+                flex-shrink: 0;
+                flex-grow: 0;
+                flex-basis: 130px;
+                display: none;
+
+                @media @size450 {
+                    display: block;
+                }
+            }
+
+            &.unread {
+                color: black;
+                background-color: rgb(240, 240, 252);
+
+                &:hover {
+                    background-color: rgb(228, 228, 247);
+                }
+            }
+        }
+
+        .row.head {
+            height: 35px;
+
+            .cell {
+                cursor: default;
+            }
+
+            .user {
+                padding-left: 50px;
+            }
+        }
+    }
 }

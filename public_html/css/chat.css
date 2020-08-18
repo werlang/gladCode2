@@ -268,6 +268,10 @@
     max-width: 100%;
 }
 
+#chat-panel .baloon quote{
+    display: none;
+}
+
 #chat-panel .baloon-container .avatar {
     display: flex;
     align-items: center;

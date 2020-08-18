@@ -1,16 +1,8 @@
-import {post} from "./utils.js"
+import {post, $index} from "./utils.js"
 import {Message} from "./dialog.js"
 
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
-
-function $hasClass(elem, className) {
-    return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
-}
-
-function $index(elem){
-    return Array.from(elem.parentNode.children).indexOf(elem)
-}
 
 window.onload = async function(){
     let version = (await post("back_update.php",{
@@ -127,7 +119,7 @@ window.onload = async function(){
     })
 
     $('#posts #preview').addEventListener('click', function(){
-        if ($hasClass($('#posts #html'), 'visible')){
+        if ($('#posts #html').classList.contains('visible')){
             $('#posts #html').classList.remove('visible') 
             this.textContent = "Ver HTML"
         }
@@ -243,7 +235,7 @@ function update_news_table(quill){
             $('#posts .table tbody').innerHTML = str
 
             $$('#posts .table tr').forEach(e => e.addEventListener('click', function() {
-                if ($hasClass(this, 'selected')){
+                if (this.classList.contains('selected')){
                     $$('#posts .table tr').forEach(e => e.classList.remove('selected'))
                     $('#posts #title').value = ''
                     quill.setText('')

@@ -1,16 +1,21 @@
-import {post} from "./utils.js"
+import {post, getTimeSince, $index} from "./utils.js"
 import {translator} from "./translate.js"
+import {login} from "./header.js"
 
-translator.translate([
-    "Mensagem",
-    "Usuário",
-    "Data"
-])
+let translationReady
+login.wait().then( () => {
+    translationReady = translator.translate([
+        "Mensagem",
+        "Usuário",
+        "Última mensagem"
+    ])
+})
+
 
 export const messages = {
     offset: 0,
     total: 0,
-    step: 15
+    step: 10
 }
 
 messages.prev = function(){
@@ -24,6 +29,12 @@ messages.next = function(){
 }
 
 messages.reload = async function(){
+    let data = post("back_message.php",{
+        action: "USERS",
+        offset: this.offset,
+        limit: this.step
+    })
+
     // fill the dummy text
     let rows = ""
     for (let i=0 ; i<this.step ; i++){
@@ -34,15 +45,13 @@ messages.reload = async function(){
         </div>`
     }
 
-    const head = `<div class='row head'><div class='cell'>${translator.getTranslated("Usuário")}</div><div class='cell'>${translator.getTranslated("Mensagem")}</div><div class='cell'>${translator.getTranslated("Data")}</div></div>`
+    await translationReady
+
+    const head = `<div class='row head'><div class='cell user'>${translator.getTranslated("Usuário")}</div><div class='cell message'>${translator.getTranslated("Mensagem")}</div><div class='cell time'>${translator.getTranslated("Última mensagem")}</div></div>`
 
     document.querySelector("#message-panel .table").innerHTML = `${head}${rows}`
 
-    const data = await post("back_message.php",{
-        action: "USERS",
-        offset: this.offset,
-        limit: this.step
-    })
+    data = await data
     // console.log(data)
 
     this.nrows = parseInt(data.nrows)
@@ -81,16 +90,94 @@ messages.reload = async function(){
     for (let i=0 ; i<this.step ; i++){
         let row = data.messages[i]
         if (i >= data.messages.length){
-            row = {nick: "", message: "", time: ""}
+            rows += `<div class='row empty'></div>`
         }
-        rows += `<div class='row'>
-            <div class='cell'>${row.nick}</div>
-            <div class='cell'>${row.message}</div>
-            <div class='cell'>${row.time}</div>
-        </div>`
+        else{
+            rows += `<div class='row ${row.isread ? '' : 'unread'}'>
+                <div class='cell user'>
+                    <span class='picture-frame'><img class='picture' src='${row.picture}'></span>
+                    <span class='nick'>${row.nick}</span>
+                </div>
+                <div class='cell message'>${row.message}</div>
+                <div class='cell time'>${getTimeSince(row.time)}</div>
+            </div>`
+        }
     }
 
     document.querySelector("#message-panel .table").innerHTML = `${head}${rows}`
+
+    document.querySelectorAll("#message-panel .table .row").forEach( e => {
+        if (!e.classList.contains('head') && !e.classList.contains('empty')){
+            e.addEventListener('click', async function() {
+                const user = data.messages[$index(this) - 1].id
+                const nick = e.querySelector(".nick").textContent
+                const picture = e.querySelector(".picture").src
+
+                const messages = await post("back_message.php", {
+                    action: "MESSAGES",
+                    user: user
+                })
+                // console.log(messages)
+
+                // prepend window to view-area
+                let chatWindow = document.querySelector('#chat-panel #chat-window')
+                if (!chatWindow){
+                    chatWindow = document.createElement("div")
+                    chatWindow.id = 'chat-window'
+                    const parent = document.querySelector('#chat-panel #view-area')
+                    parent.insertBefore(chatWindow, parent.firstChild)
+                }
+
+                document.querySelectorAll('#chat-panel .room').forEach(e => {
+                    e.classList.remove('open')
+                    e.classList.remove('visible')
+                })
+
+                document.querySelector('#chat-ui #show-hide').click()
+
+                
+                
+                const newRoom = document.createElement("div")
+                newRoom.classList.add('room', 'visible', 'open')
+                newRoom.innerHTML = `<div id="title"><i class="fas fa-chevron-right"></i><span class="name">${nick}</span></div>`
+                document.querySelector('#chat-panel #room-container').appendChild(newRoom)
+
+                let baloons = ""
+                for (let i in messages.messages){
+                    const msg = messages.messages[i]
+                    const prevMsg = messages.messages[i-1]
+
+                    baloons += `<div class='baloon-container ${msg.me ? 'me' : ''} ${i>0 && msg.sender == prevMsg.sender ? 'sequence' : ''}'>
+                        <div class='baloon'>
+                            <div class='point'></div>
+                            <div class='avatar'><img src='${picture}'></div>
+                            <div class='right'>
+                                <span class='name'></span>
+                                <div class='message'>
+                                    <span class='text'>${msg.message}</span>
+                                    <span class='time'>${msg.time}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+                }
+
+                chatWindow.innerHTML = baloons
+                chatWindow.scrollTop = chatWindow.scrollHeight
+
+                document.querySelector('#chat-panel #chat-ui #message-box').focus()
+
+                newRoom.addEventListener('click', () => {
+                    chatWindow.parentNode.removeChild(chatWindow)
+                    newRoom.parentNode.removeChild(newRoom)
+
+                    document.querySelectorAll('#chat-panel .room').forEach(e => {
+                        e.classList.add('visible')
+                    })
+                })
+            })
+        }
+    })
 }
 
 document.querySelector("#menu #messages").addEventListener('click', () => {

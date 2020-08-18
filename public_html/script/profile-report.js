@@ -1,3 +1,5 @@
+import {post, getDate} from "./utils.js"
+
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]
 
@@ -142,7 +144,7 @@ $(document).ready( async function(){
                                 <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
                                 <div class='cell glad'>${row.gladiator}</div>
                                 <div class='cell reward ${reward.class}'>${reward.value}</div>
-                                <div class='cell time' title='${getMessageTime(row.time)}'>${getMessageTime(row.time, { short: true })}</div>
+                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
                                 ${visual}
                             </div>`);
                             $('#bhist-container .favorite').last().data('id', row.id);
@@ -255,7 +257,7 @@ $(document).ready( async function(){
                                 <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
                                 <div class='cell glad'>${row.gladiator}</div>
                                 <div class='cell comment'>${row.comment}</div>
-                                <div class='cell time' title='${getMessageTime(row.time)}'>${getMessageTime(row.time, { short: true })}</div>
+                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
                                 <div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
                                     <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
                                 </div>
@@ -373,7 +375,7 @@ $(document).ready( async function(){
                                 <div class='cell glad ${glad.me.class}'>${glad.me.value}</div>
                                 <div class='cell enemy ${glad.enemy.class}'>${glad.enemy.value}</div>
                                 <div class='cell'>${row.user}</div>
-                                <div class='cell time' title='${getMessageTime(row.time)}'>${getMessageTime(row.time, { short: true })}</div>
+                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
                                 ${tail}
                             </div>`)
                             $('#bhist-container .row').last().data('id', row.id)
