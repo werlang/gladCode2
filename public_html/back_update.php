@@ -2,6 +2,7 @@
     session_start();
     include_once "connection.php";
     $action = $_POST['action'];
+    $output = array();
 
     $sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
     $result = runQuery($sql);
@@ -11,11 +12,12 @@
     if (isset($_SESSION['user']) && $_SESSION['user'] == $id){
         if($action == 'GET'){
             $version = explode(".", file_get_contents("version"));
-            echo json_encode($version);
+            $output['version'] = $version;
+            $output['status'] = "SUCCESS";
         }
         elseif($action == 'SET'){
             if (md5($_POST['pass']) != '07aec7e86e12014f87918794f521183b')
-                echo "WRONGPASS";
+                $output['status'] = "WRONGPASS";
             else{
                 $link = mysql_escape_string($_POST['link']);
                 $version = mysql_escape_string($_POST['version']);
@@ -37,4 +39,6 @@
             }
         }
     }
+
+    echo json_encode($output);
 ?>

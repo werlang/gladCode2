@@ -1,23 +1,32 @@
 import {post} from "./header.js"
 import {Message} from "./dialog.js"
 
-$(document).ready( async function(){
-    var version = [];
-    
-    $.post("back_update.php",{
+const $ = document.querySelector.bind(document)
+const $$ = document.querySelectorAll.bind(document)
+
+function $hasClass(elem, className) {
+    return new RegExp(' ' + className + ' ').test(' ' + elem.className + ' ');
+}
+
+function $index(elem){
+    return Array.from(elem.parentNode.children).indexOf(elem)
+}
+
+window.onload = async function(){
+    let version = (await post("back_update.php",{
         action: "GET"
-    }).done( function(data){
-        version = JSON.parse(data);
-        $('#version #current').html(version.join('.'));
-        if (!version[2])
-            version[2] = 0;
-        $('#version #new').val([version[0], version[1], parseInt(version[2])+1].join('.'));
-    });
-    
-    $('#version #type select').change( function(){
-        var options = $(this).find('option');
-        var selected = options.index($(this).find('option:selected'));
-        var newversion;
+    })).version.map(e => parseInt(e))
+    // console.log(version)
+
+    $('#version #current').innerHTML = version.join('.')
+    if (!version[2]){
+        version[2] = 0
+    }
+    $('#version #new').value = [version[0], version[1], parseInt(version[2])+1].join('.')
+
+    $('#version #type select').addEventListener('change', function(){
+        let selected = $index(this.querySelector('option:checked'))
+        let newversion;
         if (selected == 0)
             newversion = [parseInt(version[0])+1, 0];
         else if (selected == 1)
@@ -27,29 +36,29 @@ $(document).ready( async function(){
                 version[2] = 0;
             newversion = [version[0], version[1], parseInt(version[2])+1];
         }
-        $('#version #new').val(newversion.join('.'));
+        $('#version #new').value = newversion.join('.');
     });
     
-    $('#update #send.button').click( function(){
-        $.post("back_update.php",{
+    $('#update #send.button').addEventListener('click', function(){
+        post("back_update.php", {
             action: "SET",
-            version: $('#version #new').val(),
-            keepup: $('#keep-updated input').prop('checked'),
-            pass: $('#pass-div input').val(),
-        }).done( function(data){
-            //console.log(data);
-            if (data != "WRONGPASS"){
-                var changes = $('#changes textarea').val();
+            version: $('#version #new').value,
+            keepup: $('#keep-updated input').checked,
+            pass: $('#pass-div input').value
+        }).then( function(data){
+            // console.log(data);
+            if (data.status != "WRONGPASS"){
+                var changes = $('#changes textarea').value;
                 changes = changes.replace(/\r?\n/g, '<br/>');
                 //console.log(changes);
                 new Message({message: `Mensagem enviada. Aguarde. Não clique mais de uma vez antes de dar status 500 no console.`}).show();
 
-                $.post("back_sendmail.php",{
+                post("back_sendmail.php",{
                     action: "UPDATE",
-                    version: $('#version #new').val(),
+                    version: $('#version #new').value,
                     summary: changes,
-                    postlink: $('#postlink input').val()
-                }).done( function(data){
+                    postlink: $('#postlink input').value
+                }).then( function(data){
                     console.log(data);
                     try{
                         data = JSON.parse(data);
@@ -59,7 +68,7 @@ $(document).ready( async function(){
                         console.log(e);
                         new Message({message: `Erro`}).show();
                     }
-                    $('button').removeAttr('disabled');
+                    $('button').removeAttribute('disabled');
                 });
             }
             else{
@@ -68,23 +77,23 @@ $(document).ready( async function(){
         });
     });
 
-    $('#side-menu #translate').click( function() {
+    $('#side-menu #translate').addEventListener('click', function() {
         update_translation_table()
     })
 
-    $('#side-menu #posts').click( function() {
+    $('#side-menu #posts').addEventListener('click', function() {
         update_news_table(quill)
     })
 
-    $('#side-menu .item').click( function() {
-        let id = $(this).attr('id')
+    $$('#side-menu .item').forEach(e => e.addEventListener('click', function() {
+        let id = this.getAttribute('id')
 
-        $('#side-menu .item').removeClass('selected')
-        $(this).addClass('selected')
+        $$('#side-menu .item').forEach(e => e.classList.remove('selected'))
+        this.classList.add('selected')
 
-        $(`.content-box`).removeClass('visible')
-        $(`#${id}.content-box`).addClass('visible')
-    })
+        $$(`.content-box`).forEach(e => e.classList.remove('visible'))
+        $(`#${id}.content-box`).classList.add('visible')
+    }))
 
     let quill = new Quill('#posts #editor', {
         theme: 'snow',
@@ -114,24 +123,23 @@ $(document).ready( async function(){
     })
 
     quill.on('text-change', function(delta, oldDelta, source) {
-        // console.log(delta, oldDelta)
-        $('#posts #html').val($('#posts #editor .ql-editor').html())
+        $('#posts #html').value = $('#posts #editor .ql-editor').innerHTML
     })
 
-    $('#posts #preview').click( function(){
-        if ($('#posts #html').hasClass('visible')){
-            $('#posts #html').removeClass('visible')
-            $(this).text("Ver HTML")
+    $('#posts #preview').addEventListener('click', function(){
+        if ($hasClass($('#posts #html'), 'visible')){
+            $('#posts #html').classList.remove('visible') 
+            this.textContent = "Ver HTML"
         }
         else{
-            $('#posts #html').addClass('visible')
-            $(this).text("Ocultar HTML")
+            $('#posts #html').classList.add('visible')
+            this.textContent = "Ocultar HTML"
         }
     })
 
-    $('#posts #send').click( async function(){
-        let html = $('#posts #html').val()
-        let title = $('#posts #title').val()
+    $('#posts #send').addEventListener('click', async function(){
+        let html = $('#posts #html').value
+        let title = $('#posts #title').value
 
         if (!title.length){
             $('#posts #title').focus()
@@ -142,8 +150,8 @@ $(document).ready( async function(){
         }
         else{
             let hash = false
-            if ($('#posts #send').text() == 'EDITAR'){
-                hash = $('#posts .table tr.selected td').eq(0).text()
+            if ($('#posts #send').textContent == 'EDITAR'){
+                hash = $('#posts .table tr.selected td')[0].textContent
             }
 
             let data = await post("back_news.php", {
@@ -162,7 +170,7 @@ $(document).ready( async function(){
 
     })
 
-})
+}
 
 function update_translation_table(){
     post("back_translation.php", {
@@ -182,10 +190,10 @@ function update_translation_table(){
                     <td><span>${row.time}</span></td>
                 </tr>`
             }
-            $('#translate .table tbody').html(str)
+            $('#translate .table tbody').innerHTML = str
 
-            $('#translate .table tr').click( function() {
-                let index = $('#translate .table tr').index($(this)) - 1
+            $$('#translate .table tr').forEach(e => e.addEventListener('click', function() {
+                let index = $index(this)
                 let s = data.suggestions[index]
                 let msg = new Message({
                     message: `<h3>Original:</h3><p>${s.original}</p><h3>Sugestão:</h3><p>${s.suggestion}</p>Aceitar sugestão?`,
@@ -211,7 +219,7 @@ function update_translation_table(){
                         update_translation_table()
                     })
                 }
-            })
+            }))
         }
     })
 }
@@ -232,29 +240,29 @@ function update_news_table(quill){
                     <td><span>${row.time}</span></td>
                 </tr>`
             }
-            $('#posts .table tbody').html(str)
+            $('#posts .table tbody').innerHTML = str
 
-            $('#posts .table tr').click( function() {
-                if ($(this).hasClass('selected')){
-                    $('#posts .table tr').removeClass('selected')
-
-                    $('#posts #title').val('')
+            $$('#posts .table tr').forEach(e => e.addEventListener('click', function() {
+                if ($hasClass(this, 'selected')){
+                    $$('#posts .table tr').forEach(e => e.classList.remove('selected'))
+                    $('#posts #title').value = ''
                     quill.setText('')
-                    $('#posts #send').text('POSTAR')
+                    $('#posts #send').textContent = 'POSTAR'
                 }
                 else{
-                    $('#posts .table tr').removeClass('selected')
-                    $(this).addClass('selected')
+                    $$('#posts .table tr').forEach(e => e.classList.remove('selected'))
+                    this.classList.add('selected')
 
-                    let index = $('#posts .table tr').index($(this)) - 1
+                    let index = $index(this)
                     let post = data.posts[index].body
                     let title = data.posts[index].title
-                    $('#posts #title').val(title)
+                    $('#posts #title').value = title
                     quill.setContents(quill.clipboard.convert(post), 'silent')
-                    $('#posts #send').text('EDITAR')
+                    $('#posts #send').textContent = 'EDITAR'
+                    $('#posts #html').value = $('#posts #editor .ql-editor').innerHTML
                 }
                 
-            })
+            }))
         }
     })
 }

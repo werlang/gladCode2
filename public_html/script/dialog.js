@@ -89,10 +89,10 @@ function createToast(message, type) {
 
 }
 
-$(document).ready( function() {
+window.onload = function() {
     $(document).tooltip()
     $(document).tooltip("option", "show.delay", 700)
-});
+}
 
 /*
 it works, but jquery UI provides a better alternative

@@ -21,6 +21,7 @@ login.wait = async function(){
             post("back_login.php", {
                 action: "GET"
             }).then( data => {
+                // console.log(data)
                 login.user = data
                 login.logged = true
                 translator.language = login.user.speak
@@ -37,22 +38,44 @@ login.wait = async function(){
     }
 }
 
-const post = function(path, args){
-    return $.post(path, args).then( data => {
-        try{
-            data = JSON.parse(data)
-        } catch(e) {
-            return {error: e, data: data}
-        }
-        return data
+const post = async function(path, args){
+    // console.log(new URLSearchParams(args).toString())
+    const response = await fetch(path, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(args).toString()        
     })
+    if (!response.ok) { throw response }
+    let data = await response.text()
+    
+    try {
+        data = JSON.parse(data)
+    }
+    catch(e){
+        return {error: e, http: response, data: data}
+    }
+
+    return data
+
+    // $.post(path, {
+    //     args
+    // }).then( data => {
+    //     try{
+    //         data = JSON.parse(data)
+    //     } catch(e) {
+    //         return {error: e, data: data}
+    //     }
+    //     return data
+    // })
 }
 
 login.wait()
 
 export {login, post}
 
-$(document).ready( function() {
+window.onload = function() {
     $('#menu-button').click( function() {
         $('body').append("<div id='fog'><div id='menu'></div></div>");
         $('#fog #menu').html("<a href='index'><img src='icon/logo.png'></a>"+ $('#h-items').html());
@@ -179,7 +202,7 @@ $(document).ready( function() {
     $('#header #language .item').not('#improve').click( async function() {
         change_spoken_language($(this).attr('id').split('-')[1])
     })
-})
+}
 
 async function change_spoken_language(lang){
     let data = await post("back_login.php", {
