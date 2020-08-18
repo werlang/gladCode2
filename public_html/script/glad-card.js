@@ -1,5 +1,6 @@
 import {assets} from "./assets.js"
 import {translator} from "./translate.js"
+import {post} from "./header.js"
 
 translator.translate([
     "Este gladiador está morto",
@@ -22,6 +23,12 @@ gladCard.create = function(parent, index, skin, dead){
             frame = 'die';
         parent.find('.glad-preview .image').eq(index).html(getSpriteThumb(data,frame,'down'));
     });
+}
+
+gladCard.appendImage = async function({container, data, dead}){
+    const spriteSheet = await fetchSpritesheet(data)
+    const frame = dead ? 'die' : 'walk'
+    container.html(getSpriteThumb(spriteSheet, frame, 'down'))
 }
 
 export {gladCard}
@@ -186,11 +193,11 @@ function fetchSpritesheet(json) {
 gladCard.load = async function(obj, options){
     return new Promise( resolve => {
         if (!options.customLoad){
-            $.post("back_glad.php",{
+            post("back_glad.php",{
                 action: "GET",
-            }).done( function(data){
-                //console.log(JSON.parse(data));
-                load_data(JSON.parse(data));
+            }).then( function(data){
+                //console.log(data)
+                load_data(data)
             });
         }
         else{
@@ -234,12 +241,12 @@ gladCard.load = async function(obj, options){
 
                 obj.append(card)
 
-                if (options.dead && data[i].dead){
-                    gladCard.create(obj, i, data[i].skin, true)
-                }
-                else{
-                    gladCard.create(obj, i, data[i].skin)
-                }
+                const realIndex = options.append ? obj.find('.glad-preview').length + parseInt(i) - 1 : i
+                gladCard.appendImage({
+                    container: obj.find('.glad-preview .image').eq(realIndex),
+                    data: data[i].skin,
+                    dead: options.dead && data[i].dead
+                })
 
                 card = obj.find(".glad-preview").last()
                 card.data('id',data[i].id);

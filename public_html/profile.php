@@ -299,10 +299,10 @@
                 <div id='message-panel'>
                     <h2>Mensagens</h2>
                     <div class='table'></div>
-                    <div id='page-title'>
-                        <button id='prev'></button>
+                    <div class='page-nav'>
                         <span></span> - <span></span> de <span></span>
-                        <button id='next'></button>
+                        <button id='prev'><i class='fas fa-chevron-left'></i></button>
+                        <button id='next'><i class='fas fa-chevron-right'></i></button>
                     </div>
                 </div>
             </div>

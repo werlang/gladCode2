@@ -550,7 +550,7 @@ function refresh_teams(obj){
             pass: obj.pass,
             tourn: obj.tourn
         }).done( function(data){
-            //console.log(data);
+            // console.log(data);
             var data = JSON.parse(data);
 
             if (data.status == "STARTED"){
