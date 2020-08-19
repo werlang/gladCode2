@@ -93,7 +93,7 @@ $(document).ready( function(){
         socket.isReady().then( function() {
             socket.request('login', {}).then( function(res, err){
                 if (err) return console.log(err);
-                //console.log(res);
+                // console.log(res);
                 if (res.session === true){
                     listRooms({rebuild: true}).then( () => {
                         getChatNotification();
@@ -326,22 +326,13 @@ $(document).ready( function(){
 
                         if (message != '' && room != ''){
                             // console.log("send: "+message);
-                            $.post("back_chat.php", {
+                            post("back_chat.php", {
                                 action: "SEND",
                                 message: message,
                                 room: room,
                                 emoji: recentEmoji
-                            }).done( function(data){
+                            }).then( function(data){
                                 // console.log(data);
-
-                                try {
-                                    data = JSON.parse(data);
-                                }
-                                catch(e){
-                                    console.log(data);
-                                    console.log(e);
-                                }
-
                                 //recentEmoji = [];
                                 clearToSend = true;
                                 var status = data.status;
@@ -673,9 +664,15 @@ function sendChatTable(json){
 
 async function listRooms(arg){
     await new Promise( (resolve, reject) => {
-        socket.io.emit('chat rooms', function(data){
-            //console.log(data);
+        let directnames = post("back_message.php", {
+            action: "NAMES"
+        })
 
+        socket.io.emit('chat rooms', async function(data){
+            console.log(data);
+
+            directnames = (await directnames).rooms
+            console.log(directnames)
             var rebuild = false;
             if (arg && arg.rebuild)
                 rebuild = true;
@@ -685,13 +682,16 @@ async function listRooms(arg){
 
                 var room = data.room;
                 for (let i in room){
-                    $('#chat-panel #room-container').append(`<div class='room visible'>
+                    const name = room[i].direct ? directnames[room[i].name] : room[i].name
+
+                    $('#chat-panel #room-container').append(`<div class='room visible ${room[i].direct ? 'direct' : ''}'>
                         <div id='title'>
                             <span class='notification hide'>0</span>
                             <i class='fas fa-chevron-right'></i>
-                            <span class='name'>${room[i].name}</span>
+                            <span class='name'>${name}</span>
                         </div>
                     </div>`);
+                    document.querySelector('#chat-panel #room-container').lastElementChild.dataset.id = room[i].id
                     $('#chat-panel #room-container .room').last().data({ id: room[i].id }).css({order: i});
                     visitedRooms[room[i].id] = room[i].visited;
                     bind_room_click($('#chat-panel #room-container .room').last());
@@ -711,8 +711,9 @@ async function listRooms(arg){
                 for (let i in currentRoms){
                     for (let j in data.room){
                         if (data.room[j].id == currentRoms[i].id){
-                            currentRoms[i].order = j;
-                            currentRoms[i].name = data.room[j].name;
+                            const name = data.room[j].direct ? directnames[data.room[j].name] : data.room[j].name
+                            currentRoms[i].order = j
+                            currentRoms[i].name = name
                         }
                     }
                 };
@@ -823,7 +824,7 @@ function getChatNotification(){
             action: "NOTIFICATIONS",
             visited: JSON.stringify(visitedRooms)
         }).done( function(data){
-            //console.log(data);
+            // console.log(data);
             try{
                 data = JSON.parse(data);
             }
@@ -1249,3 +1250,5 @@ function sendChatMessage({text}){
     $('#chat-panel #message-box').html(`<span>${text}</span>`)
     $('#chat-panel #send').click()
 }
+
+export {listRooms, getChatNotification}

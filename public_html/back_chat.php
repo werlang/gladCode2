@@ -90,6 +90,10 @@
 
             $output['status'] = "SUCCESS";
 
+            // clear message menu notification for me
+            send_node_message(array(
+                'profile notification' => array('user' => array($user))
+            )); 
         }
     }
     else if ($action == "SEND"){
@@ -118,14 +122,18 @@
             else if ($room == '')
                 $output['status'] = "NOROOM";
             else{
-                //if user can post
-                $sql = "SELECT id FROM chat_users cu WHERE cu.user = '$user' AND cu.room = $room";
+                // if user is in the room
+                $sql = "SELECT cr.direct FROM chat_users cu INNER JOIN chat_rooms cr ON cr.id = cu.room WHERE cu.user = '$user' AND cu.room = $room";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->num_rows;                
 
                 if ($nrows == 0)
                     $output['status'] = "NOTJOINED";
                 else{
+                    // check if the room is a direct message room
+                    $row = $result->fetch_assoc();
+                    $direct = $row['direct'] == "1";
+
                     //check if user have any restrictions
                     $sql = "SELECT ban, time FROM chat_restrictions WHERE user = '$user' AND room = $room";
                     $result = runQuery($sql);
@@ -143,6 +151,21 @@
                         $result = runQuery($sql);
 
                         $output['status'] = "SENT";
+
+                        if ($direct){
+                            $sql = "SELECT cu.user FROM chat_users cu WHERE cu.room = $room";
+                            $result = runQuery($sql);
+                
+                            $userlist = array();
+                            while ($row = $result->fetch_assoc()){
+                                array_push($userlist, $row['user']);
+                            }
+                
+                            // send notification to my direct message target
+                            send_node_message(array(
+                                'profile notification' => array('user' => $userlist)
+                            ));                
+                        }
                     }
                 }
             }

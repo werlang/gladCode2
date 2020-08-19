@@ -220,14 +220,15 @@ io.on('connection', function(socket){
     //list rooms
     socket.on('chat rooms', (fn) => {
         if (session && session.user){
-            var user = session.user;
-            var output = {};
-            var sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
+            let user = session.user
+            let output = {}
+
+            let sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited, cr.direct FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
             connection.query(sql, function (error, results, fields){
                 if(error){ fn(error); return;}
-                
-                output.room = results;
-                output.status = "OK";
+
+                output.room = results
+                output.status = "OK"
                 fn(output);
 
                 for (let i in results){

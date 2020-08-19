@@ -167,7 +167,7 @@ translator.translate = async function(elements){
 }
 
 translator.getTranslated = function(str, dom=true, bind=true){
-    if (!this.translations || !this.translations[str]){
+    if (!this.translations || !this.translations[str] || !this.translations[str][this.language]){
         return str
     }
 

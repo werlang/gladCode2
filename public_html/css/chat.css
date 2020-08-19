@@ -138,6 +138,10 @@
     transition: 0.5s all;
 }
 
+#chat-panel .room.direct {
+    background-color: #d0f6ed;
+}
+
 #chat-panel.preload .room {
     transition: none;
 }

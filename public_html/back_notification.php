@@ -24,7 +24,9 @@
         $result = runQuery($sql);
 
         //message
-        $sql = "SELECT u.id FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE receiver = '$user' AND isread = '0'";
+        // $sql = "SELECT u.id FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE receiver = '$user' AND isread = '0'";
+        $lasttime = "SELECT max(cm.time) FROM chat_messages cm WHERE cm.room = cr.id AND cm.sender != $user";
+        $sql = "SELECT cr.id FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cr.direct = 1 AND cu.user = $user AND cu.visited < ($lasttime)";
         $result = runQuery($sql);
         
         $output['messages'] = $result->num_rows;

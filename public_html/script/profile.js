@@ -817,28 +817,28 @@ $(document).ready( function(){
             translate: false,
             textarea: {
                 placeholder: translator.getTranslated("Olá...", false),
-                // maxlength: 2048
+                maxlength: 2048
             }
         }).show().click('ok', data => {
+            // console.log(data)
             if (data){
-                var message = data;
-                $.post("back_message.php", {
+                var message = data.input;
+                post("back_message.php", {
                     action: "SEND",
                     id: userid,
                     message: message
-                })
-                .done( function(data){
-                    //console.log(data);
+                }).then( function(data){
+                    console.log(data);
                     new Message({ message: "Mensagem enviada" }).show()
                     
-                    $.post("back_sendmail.php", {
-                        action: "MESSAGE",
-                        receiver: userid,
-                        message: message,
-                    })
-                    .done( function(data){
-                        //console.log(data);
-                    });
+                    // $.post("back_sendmail.php", {
+                    //     action: "MESSAGE",
+                    //     receiver: userid,
+                    //     message: message,
+                    // })
+                    // .done( function(data){
+                    //     //console.log(data);
+                    // });
                 });
             }
         });
@@ -918,16 +918,10 @@ $(document).ready( function(){
 });
 
 async function checkNotifications(){
-    return $.post("back_notification.php", {
+    return post("back_notification.php", {
         action: "GET"
-    }).done( function(data){
+    }).then( function(data){
         // console.log(data);
-        try{
-            data = JSON.parse(data);
-        }
-        catch(e){
-            console.log(e);
-        }
 
         $('#profile-ui #lvl span').html(data.user.lvl);
         user.lvl = data.user.lvl

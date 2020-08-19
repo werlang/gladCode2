@@ -91,7 +91,7 @@ function createToast(message, type) {
 
 window.onload = function() {
     $(document).tooltip()
-    $(document).tooltip("option", "show.delay", 700)
+    $(document).tooltip("option", "show.delay", 700)    
 }
 
 /*
@@ -227,7 +227,7 @@ class Message {
         let input = this.input ? `<input type='text' class='input' value='${this.input.default}' placeholder='${this.input.placeholder}'>` : ''
 
         let maxlength = this.textarea && this.textarea.maxlength ? `<span id='charcount'>${this.textarea.maxlength} caracteres</span>` : ""
-        let textarea = this.textarea ? `<textarea class='input' placeholder='${this.textarea.placeholder}' maxlength=${this.textarea.maxlength}>${this.textarea.value}</textarea>${maxlength}` : ''
+        let textarea = this.textarea ? `<textarea class='input' placeholder='${this.textarea.placeholder}' ${this.textarea.maxlength ? `maxlength=${this.textarea.maxlength}`: ""}>${this.textarea.value}</textarea>${maxlength}` : ''
 
         $('body').append(`<div id='fog'>
             <div id='dialog-box' ${this.class ? `class='${this.class}'` : ''}>
@@ -274,16 +274,24 @@ class Message {
         }
         else if (this.textarea && this.textarea.maxlength){
             $('#dialog-box .input').focus()
+            let carac_str = "caracteres"
+            translator.translate([
+                "caracteres"
+            ]).then( data => {
+                carac_str = data
+                $('#dialog-box #charcount').html(`${this.textarea.maxlength} ${data}`)
+            })
+
             $('#dialog-box .input').on('input', () => {
-                var left = this.textarea.maxlength - $('#dialog-box .input').val().length;
-                $('#dialog-box #charcount').html(left +" caracteres");
+                var left = this.textarea.maxlength - $('#dialog-box .input').val().length
+                $('#dialog-box #charcount').html(`${left} ${carac_str}`)
                 if (left < 0)
-                    $('#dialog-box #charcount').addClass('alert');
+                    $('#dialog-box #charcount').addClass('alert')
                 else{
-                    $('#dialog-box #charcount').removeClass('alert');
-                    $('#dialog-box .input').removeClass('alert');
+                    $('#dialog-box #charcount').removeClass('alert')
+                    $('#dialog-box .input').removeClass('alert')
                 }
-            });
+            })
         }
 
         for (let id in this.buttons){
@@ -335,11 +343,11 @@ class Message {
             else{
                 $(`#dialog-box #dialog-button-${button}`).off().click( async () => {
                     if (fn){
-                        if (this.input){
+                        if (this.input || this.textarea){
                             fn({input: $('#dialog-box .input').val()})
                         }
                         else{
-                            fn()
+                            fn(true)
                         }
                     }
     
