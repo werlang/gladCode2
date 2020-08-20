@@ -322,9 +322,9 @@ $(document).ready( function(){
                     if (clearToSend){
                         clearToSend = false;
                         var message = sendingBuffer.shift();
-                        var room = $('#chat-panel .room.open').data('id');
+                        var room = $('#chat-panel .room.open').data('id') || false;
 
-                        if (message != '' && room != ''){
+                        if (message != ''){
                             // console.log("send: "+message);
                             post("back_chat.php", {
                                 action: "SEND",
@@ -335,9 +335,12 @@ $(document).ready( function(){
                                 // console.log(data);
                                 //recentEmoji = [];
                                 clearToSend = true;
-                                var status = data.status;
+                                let status = data.status;
                                 if (status == "UNKNOWN"){
                                     createToast("Comando desconhecido", "error");
+                                }
+                                else if (status == "DIRECT"){
+                                    createToast("Comandos desabilitados em mensagens diretas", "info");
                                 }
                                 else if (status == "LEFT"){
                                     listRooms({remove: data.name});
@@ -404,6 +407,15 @@ $(document).ready( function(){
                                         table.push([{data: "Total de "+ data.user.length +" participantes"}]);
                                     }
                                     sendChatTable(table);
+                                }
+                                else if (status == "SENT" && data.mail){
+                                    post("back_sendmail.php", {
+                                        action: "MESSAGE",
+                                        receiver: data.user,
+                                        message: message,
+                                    }).then( function(data){
+                                        // console.log(data);
+                                    })
                                 }
 
                                 if (sendingBuffer.length > 0){
@@ -669,10 +681,10 @@ async function listRooms(arg){
         })
 
         socket.io.emit('chat rooms', async function(data){
-            console.log(data);
+            // console.log(data);
 
             directnames = (await directnames).rooms
-            console.log(directnames)
+
             var rebuild = false;
             if (arg && arg.rebuild)
                 rebuild = true;

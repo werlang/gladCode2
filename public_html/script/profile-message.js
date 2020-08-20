@@ -101,15 +101,6 @@ messages.reload = async function(){
     })
 }
 
-// $.post("back_sendmail.php", {
-//     action: "MESSAGE",
-//     replyid: id,
-//     message: message
-// })
-// .done( function(data){
-//     //console.log(data);
-// });
-
 messages.show = async function(room){
     document.querySelectorAll('#chat-panel #room-container .room').forEach(e => {
         if (e.dataset.id == room){

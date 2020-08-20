@@ -99,7 +99,7 @@
     else if ($action == "SEND"){
         $message = trim(mysql_escape_string($_POST['message']));
 
-        if (isset($_POST['room']))
+        if (isset($_POST['room']) && $_POST['room'] != "false")
             $room = mysql_escape_string($_POST['room']);
         else
             $room = '';
@@ -157,14 +157,32 @@
                             $result = runQuery($sql);
                 
                             $userlist = array();
+                            $receiver = "";
                             while ($row = $result->fetch_assoc()){
                                 array_push($userlist, $row['user']);
+                                if ($row['user'] != $user){
+                                    $receiver = $row['user'];
+                                }
                             }
                 
                             // send notification to my direct message target
                             send_node_message(array(
                                 'profile notification' => array('user' => $userlist)
-                            ));                
+                            ));
+
+                            // get when was the last message I sent
+                            $sql = "SELECT TIMESTAMPDIFF(MINUTE, time, now()) AS timesince FROM chat_messages WHERE sender = $user AND room = $room ORDER BY time DESC LIMIT 1 OFFSET 1 ";
+                            $result = runQuery($sql);
+
+                            if ($result->num_rows > 0){
+                                $row = $result->fetch_assoc();
+
+                                if ($row['timesince'] > 120){
+                                    $output['mail'] = true;
+                                    $output['user'] = $receiver;
+                                }
+                            }
+
                         }
                     }
                 }
@@ -248,7 +266,19 @@
         $command = $command['command'];
         $output = array();
 
-        if ($command == 'join'){
+        $direct = false;
+        if ($room != ''){
+            $sql = "SELECT direct FROM chat_rooms WHERE id = $room";
+            $result = runQuery($sql);
+            $nrows = $result->num_rows;
+            $row = $result->fetch_assoc();
+            $direct = $row['direct'] == "1";
+        }
+
+        if ($direct){
+            $output['status'] = "DIRECT";
+        }
+        elseif ($command == 'join'){
             $room = implode(" ", $args);
             //search for the room
             $sql = "SELECT id FROM chat_rooms WHERE name = '$room'";

@@ -828,17 +828,18 @@ $(document).ready( function(){
                     id: userid,
                     message: message
                 }).then( function(data){
-                    console.log(data);
+                    // console.log(data);
                     new Message({ message: "Mensagem enviada" }).show()
                     
-                    // $.post("back_sendmail.php", {
-                    //     action: "MESSAGE",
-                    //     receiver: userid,
-                    //     message: message,
-                    // })
-                    // .done( function(data){
-                    //     //console.log(data);
-                    // });
+                    if (data.mail){
+                        post("back_sendmail.php", {
+                            action: "MESSAGE",
+                            receiver: userid,
+                            message: message,
+                        }).then( function(data){
+                            //console.log(data);
+                        })
+                    }
                 });
             }
         });
