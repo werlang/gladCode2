@@ -13,6 +13,7 @@ import {Simulation, ProgressButton} from "./runSim.js"
 import {stats} from "./stats_func.js"
 import {refresh_tourn_list} from "./profile-tourn.js"
 import {messages} from "./profile-message.js"
+import {google} from "./googlelogin.js"
 
 var user
 
@@ -846,7 +847,7 @@ $(document).ready( function(){
     }
 
     $('#menu #logout').click( function() {
-        googleLogout().then( function(){
+        google.logout().then( function(){
             window.location.href = 'index';
         });
     });

@@ -1,3 +1,5 @@
+import {google} from "./googlelogin.js"
+
 $(document).ready(async function(){
     // got here from train link
     let hash = $('#hash').html()
@@ -14,7 +16,7 @@ $(document).ready(async function(){
                 if (data.button == "no")
                     window.location.href = ''
                 else if (data.button == "yes"){
-                    await googleLogin()
+                    await google.login()
                     window.location.reload()
                 }
             })

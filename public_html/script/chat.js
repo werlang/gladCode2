@@ -2,6 +2,7 @@ import {socket} from "./socket.js"
 import * as _ from "./emoji.js"
 import {post} from "./utils.js"
 import {createToast} from "./dialog.js"
+import {google} from "./googlelogin.js"
 
 var sendingBuffer = [];
 var clearToSend = true;
@@ -107,7 +108,7 @@ $(document).ready( function(){
                             message: `Faça login na gladCode para participar do chat`,
                             buttons: {ok: "LOGIN"}
                         }).show().click('ok', () => {
-                            googleLogin().then(function(data) {
+                            google.login().then(function(data) {
                                 window.location.reload();
                             });
                         });
@@ -118,7 +119,7 @@ $(document).ready( function(){
                                 message: "Faça login na gladCode para participar do chat",
                                 buttons: {cancel: "Cancelar", ok: "LOGIN"}
                             }).show().click('ok', () => {
-                                googleLogin().then(function(data) {
+                                google.login().then(function(data) {
                                     window.location.reload();
                                 });
                             });

@@ -9,7 +9,8 @@ translator.translate = async function(elements){
     let lang = this.language ? this.language : 'pt'
     let contents = this.translations ? this.translations : {}
     
-    if (elements.translate){
+    // console.log(elements)
+    if (!(elements instanceof HTMLElement) && elements.translate){
         let values = []
         var keys = []
         for (let i in elements.translate){
@@ -21,7 +22,6 @@ translator.translate = async function(elements){
     
     elements = Array.isArray(elements) ? elements : [elements]
 
-    // console.log(elements)
     // search for contents to put in local obj
     for (let element of elements){
         if (typeof element === 'string'){
@@ -37,45 +37,51 @@ translator.translate = async function(elements){
             }
         }
         else{
-            element.find(`*`).contents().each(function(){
+            if (element instanceof jQuery){
+                element = $(element)[0]
+            }
+
+            element.querySelectorAll(`*`).forEach( e => {
                 // check for template
-                if (!$(this).hasClass('skip-translation') && !$(this).parents('.skip-translation').length){
-                    if ($(this).data('translationTemplate')){
-                        let temp = $(this).data('translationTemplate')
+                if (!e.classList.contains('skip-translation') && !e.closest('.skip-translation')){
+                    if (e.dataset['translationTemplate']){
+                        let temp = e.dataset['translationTemplate']
                         contents[temp] = {template: temp}
                     }
-
+                    
                     if (lang != 'pt'){
                         // replace contents
-                        if (this.nodeType == 3 && !this.textContent.includes("\n") && !this.textContent.includes("\t") && !$(this).hasClass('translated') && !this.textContent.match(/^[\d\s]+$/) && !this.textContent.match(/^\W+$/)){
-                            let text = this.textContent.replace(/(\w+)/, "$1")
+                        // console.log(e.textContent)
+                        if (!e.textContent.includes("\n") && !e.textContent.includes("\t") && !e.classList.contains('translated') && !e.textContent.match(/^[\d\s]+$/) && !e.textContent.match(/^\W+$/)){
+                            let text = e.textContent.replace(/(\w+)/, "$1")
                             if (text.length && !contents[text]){
                                 contents[text] = {}
+                                // console.log(text)
                             }
-                            $(this).parent().addClass('translating')
-                            // console.log($(this).text())
+                            e.parentNode.classList.add('translating')
                         }
                         // replace other fields
                         let fieldList = ['title', 'placeholder']
 
                         for (let field of fieldList){
-                            if (this[field] && this[field].length && !$(this).hasClass('translated')){
-                                if (!contents[this[field]]){
-                                    contents[this[field]] = {}
+                            if (e[field] && e[field].length && !e.classList.contains('translated')){
+                                if (!contents[e[field]]){
+                                    contents[e[field]] = {}
                                 }
-                                $(this).addClass('translating')
+                                e.classList.add('translating')
                             }
                         }
                     }
                     else{
-                        $(this).removeClass('translating')
-                        $(this).parents().removeClass('translating')
+                        e.classList.remove('translating')
+                        const p = e.closest('.translating') && p.classList.remove('translating')
                     }
                 }
             })
         }
     }
 
+    // console.log(contents)
     // check what is meant to be translated and send to back
     let toTranslate = []
     for (let i in contents){
@@ -115,32 +121,38 @@ translator.translate = async function(elements){
             }
         }
         else{
-            element.find(`*`).contents().each(function(){
+            if (element instanceof jQuery){
+                element = $(element)[0]
+            }
+
+            element.querySelectorAll(`*`).forEach( e => {
                 // replace template
-                if (!$(this).hasClass('skip-translation') && !$(this).parents('.skip-translation').length){
-                    if ($(this).data('translationTemplate')){
-                        let temp = $(this).data('translationTemplate')
-                        this.textContent = contents[temp][lang]
-                        translator.bind($(this))
+                if (!e.classList.contains('skip-translation') && !e.closest('.skip-translation')){
+                    if (e.dataset['translationTemplate']){
+                        let temp = e.dataset['translationTemplate']
+                        e.textContent = contents[temp][lang]
+                        translator.bind(e)
                     }
                     else if (lang != 'pt'){
                         // replace contents
-                        if (this.nodeType == 3){
-                            // console.log(this.textContent)
-                            if (contents[this.textContent] && !$(this).hasClass('translated')){
-                                this.textContent = ` ${contents[this.textContent][lang]} `
-                                translator.bind($(this).parent())
+                        e.childNodes.forEach(e => {
+                            if (e.nodeType == 3){
+                                // console.log(e.textContent)
+                                if (contents[e.textContent] && !e.parentNode.classList.contains('translated')){
+                                    e.textContent = ` ${contents[e.textContent][lang]} `
+                                    translator.bind(e.parentNode)
+                                }
                             }
-                        }
+                        })
 
                         // replace other fields
                         let fieldList = ['title', 'placeholder']
 
                         for (let field of fieldList){
-                            if (this[field]){
-                                if (contents[this[field]]){
-                                    this[field] = `${contents[this[field]][lang]}`
-                                    translator.bind($(this))
+                            if (e[field]){
+                                if (contents[e[field]]){
+                                    e[field] = `${contents[e[field]][lang]}`
+                                    translator.bind(e)
                                 }
                             }
                         }
@@ -148,7 +160,7 @@ translator.translate = async function(elements){
                     }
                 }
                 
-                $(this).removeClass('translating')
+                e.classList.remove('translating')
             })
 
         }
@@ -197,70 +209,74 @@ translator.bind = function (obj){
         bind(obj)
     }
     else{
-        $('.translating').each( function(){
-            bind($(this))
-        })
+        document.querySelectorAll('.translating').forEach(e => bind(e))
     }
 
     function bind(obj){
-        obj.addClass('translated')
-        obj.removeClass('translating')
-        obj.parents().removeClass('translating')
+        // console.log(obj)
+        obj.classList.add('translated')
+        obj.classList.remove('translating')
+        const p = obj.closest('.translating') 
+        p && p.classList.remove('translating')
     
         if (translator.suggest){
-            obj.hover( function(m) {
-                // create element
+            obj.addEventListener('mouseenter', () => hoverHandler(obj))
+            obj.addEventListener('mouseleave', () => hoverHandler(obj))
+            
+            function hoverHandler(obj) {
+                document.querySelectorAll('.improve-box').forEach(e => e.remove())
+                obj.insertAdjacentHTML('beforeend', `<div class='improve-box' data-time='${(new Date()).getTime()}'><i class='fas fa-language'></i></div>`)
     
-                $('.improve-box').remove()
-                obj.append(`<div class='improve-box' data-time='${(new Date()).getTime()}'><i class='fas fa-language'></i></div>`)
-    
-                let waitTime = 2000
+                const waitTime = 2000
                 setTimeout( () => {
                     // show element
-                    let box = obj.find('.improve-box')
-                    let timePassed = parseFloat(box.data('time')) + waitTime <= (new Date()).getTime()
-                    if (!box.hasClass('visible') && timePassed){
-                        box.css({
-                            'top': obj.position().top,
-                            'left': obj.position().left
-                        })
-                        box.addClass('visible')
-                        box.off().click( function(e) {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            $(this).remove()
-                            let text = obj.text().trim()
-                            $('#dialog-box').parents('#fog').remove()
-                            new Message({
-                                message: "Sugira uma tradução melhor para o texto:",
-                                input: {
-                                    default: text
-                                },
-                                buttons: {ok: "OK", cancel: "Cancelar"}
-                            }).show().click('ok', async input => {
-                                let advice = {
-                                    old: text,
-                                    new: input.input
-                                }
-                                
-                                let data = await post("back_translation.php", {
-                                    action: "SUGGEST",
-                                    original: advice.old,
-                                    suggestion: advice.new,
-                                    language: user.speak
+                    const box = obj.querySelector('.improve-box')
+                    if (box){
+                        const timePassed = parseFloat(box.dataset.time) + waitTime <= (new Date()).getTime()
+                        if (!box.classList.contains('visible') && timePassed){
+                            box.style.top = obj.offsetTop
+                            box.style.left = obj.offsetLeft
+                            box.classList.add('visible')
+                            // box.removeEventListener('click')
+                            box.addEventListener('click', function(e) {
+                                console.log('a')
+                                e.preventDefault()
+                                e.stopPropagation()
+                                this.remove()
+                                let text = obj.textContent.trim()
+                                const dialog = document.querySelector('#dialog-box') && dialog.closest('#fog').remove()
+                                new Message({
+                                    message: "Sugira uma tradução melhor para o texto:",
+                                    input: {
+                                        default: text
+                                    },
+                                    buttons: {ok: "OK", cancel: "Cancelar"}
+                                }).show().click('ok', async input => {
+                                    let advice = {
+                                        old: text,
+                                        new: input.input
+                                    }
+                                    
+                                    let data = await post("back_translation.php", {
+                                        action: "SUGGEST",
+                                        original: advice.old,
+                                        suggestion: advice.new,
+                                        language: user.speak
+                                    })
+                                    // console.log(data)
+        
+                                    new Message({message: "Sugestão enviada"}).show()
                                 })
-                                // console.log(data)
-    
-                                new Message({message: "Sugestão enviada"}).show()
                             })
-                        })
+                        }
                     }
                 }, waitTime)
-            })
+            }
     
-            obj.mouseleave( function() {
+            obj.addEventListener('mouseleave', function() {
                 // remove element
-                obj.find('.improve-box').remove()
+                const box = obj.querySelector('.improve-box')
+                box && box.remove()
             })
         }
  

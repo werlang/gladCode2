@@ -1,3 +1,5 @@
+import {google} from "./googlelogin.js"
+
 var input = "";
 var editor;
 var editor2;
@@ -507,7 +509,7 @@ function pre_google_login(action){
 	});		
 
 	$('#google-login').click( function(){
-		googleLogin().then( function(data){
+		google.login().then( function(data){
 			$('#fog').click();
 			//console.log(data);
 			user.email = data.email;

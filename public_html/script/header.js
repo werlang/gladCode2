@@ -24,11 +24,14 @@ login.wait = async function(){
             }).then( data => {
                 // console.log(data)
                 login.user = data
-                login.logged = true
                 translator.language = login.user.speak
-                translator.suggest = login.user.preferences.translation == "1" ? true : false
-                user = login.user
                 
+                if (data.status == "SUCCESS"){
+                    login.logged = true
+                    translator.suggest = login.user.preferences.translation == "1" ? true : false
+                    user = login.user
+                }
+
                 if (!login.user.speak){
                     change_spoken_language(navigator.language.split("-")[0])
                 }
@@ -57,7 +60,7 @@ window.onload = function() {
             e.stopPropagation();
         });
         $('#fog #login').click( function(){
-            googleLogin().then( function(data){
+            google.login().then( function(data){
                 window.location.href = "news";
             });
         });	
@@ -102,12 +105,13 @@ window.onload = function() {
     google.init();
 
     $('.mobile #login, .desktop #login').click( function(){
-        googleLogin().then( function(data){
+        google.login().then( function(data){
             window.location.href = "news";
         });
     });	
     
     login.wait().then( data => {
+        // console.log(data)
         if (data.status == "NOTLOGGED")
             $('.mobile #profile, .desktop #login').removeClass('hidden');
         else{

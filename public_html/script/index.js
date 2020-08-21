@@ -1,6 +1,10 @@
 import {socket} from "./socket.js"
+import {login} from "./header.js"
+import {google} from "./googlelogin.js"
+import {translator} from "./translate.js"
 
 window.admin_auth = socket.admin
+login.wait().then( data => console.log(data))
 
 $(document).ready( function() {
     $('#header').addClass('big');
@@ -15,7 +19,7 @@ $(document).ready( function() {
     });	
     
     $('#account').click( function(){
-        googleLogin().then(function(data) {
+        google.login().then(function(data) {
             window.location.href = "news";
         });
     });
@@ -46,10 +50,16 @@ $(document).ready( function() {
 
         showDialog(msg, ["Cancelar","LOGIN"]).then( function(data){
             if (data == "LOGIN"){
-                googleLogin().then(function(data) {
+                google.login().then(function(data) {
                     window.location.href = tab;
                 });
             }
         });
     }
 });
+
+window.onload = function() {
+    document.querySelectorAll(".card").forEach(e => {
+        // translator.translate(e)
+    })
+}

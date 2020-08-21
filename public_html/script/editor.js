@@ -1,4 +1,5 @@
 import {gladCard} from "./glad-card.js"
+import {google} from "./googlelogin.js"
 
 var editor;
 var saved = true;
@@ -103,7 +104,7 @@ $(document).ready( function() {
             window.location.href = "news";
         }
         else{
-            googleLogin().then(function(data) {
+            google.login().then(function(data) {
                 window.location.href = "news";
             });
         }
@@ -132,7 +133,7 @@ $(document).ready( function() {
                     message: "Você precisa fazer LOGIN no sistema para visualizar seus gladiadores",
                     buttons: {cancel: "Cancelar", ok: "LOGIN"}
                 }).show().click('ok', () => {
-                    googleLogin().then(function(data) {
+                    google.login().then(function(data) {
                         //console.log(data);
                         user = data.email;
                         setLoadGlad();
@@ -315,7 +316,7 @@ $(document).ready( function() {
                     message: `Você precisa fazer LOGIN no sistema para salvar seu gladiador`, 
                     buttons: {cancel: "Cancelar", ok: "LOGIN"}
                 }).show().click('ok', () => {
-                    googleLogin().then(function(data) {
+                    google.login().then(function(data) {
                         //console.log(data);
                         user = data.email;
                         setLoadGlad();
