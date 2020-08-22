@@ -1,15 +1,11 @@
 import {socket} from "./socket.js"
-import {login} from "./header.js"
+import {login, header} from "./header.js"
 import {google} from "./googlelogin.js"
 import {translator} from "./translate.js"
 
 window.admin_auth = socket.admin
-login.wait().then( data => console.log(data))
 
 $(document).ready( function() {
-    $('#header').addClass('big');
-    $('#header-container').addClass('small');
-    
     $('#section-2 .card').mouseenter( function() {
         var name = $(this).find('.title img').attr('src').split('/')[1].split('.')[0];
         $(this).find('.title img').attr('src','image/'+ name +'.gif');
@@ -58,8 +54,15 @@ $(document).ready( function() {
     }
 });
 
-window.onload = function() {
+window.onload = async function() {
+    await login.wait()
     document.querySelectorAll(".card").forEach(e => {
-        // translator.translate(e)
+        // console.log(e)
+        translator.translate(e)
+    })
+
+    header.load().then( () => {
+        $('#header').addClass('big');
+        $('#header-container').addClass('small');
     })
 }

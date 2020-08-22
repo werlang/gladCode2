@@ -1,10 +1,13 @@
 import {post, $index} from "./utils.js"
 import {Message} from "./dialog.js"
+import {header} from "./header.js"
 
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
 window.onload = async function(){
+    header.load()
+
     let version = (await post("back_update.php",{
         action: "GET"
     })).version.map(e => parseInt(e))

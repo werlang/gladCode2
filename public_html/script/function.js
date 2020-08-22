@@ -2,6 +2,12 @@
 // WHEN MESSING WITH FUNCS, DONT FORGET TO RUN compress_functions.php AFTER
 // ------------------------------------------------------------------------
 
+import {header} from "./header.js";
+
+window.onload = function(){
+    header.load()
+}
+
 var langDict = false
 var user;
 

@@ -1,4 +1,9 @@
 import {stats} from "./stats_func.js"
+import {header} from "./header.js";
+
+window.onload = function(){
+    header.load()
+}
 
 $(document).ready( function() {
     menu_loaded().then( function(data){

@@ -22,6 +22,7 @@ how to include google login in your page:
 
 import {socket} from "./socket.js"
 import {post} from "./utils.js"
+import * as _ from "https://apis.google.com/js/platform.js?onload=onLoadCallback"
 
 const google = {
     auth2: null

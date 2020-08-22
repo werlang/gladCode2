@@ -1,3 +1,9 @@
+import {header} from "./header"
+
+window.onload = function(){
+    header.load()
+}
+
 var hash, round;
 
 $(document).ready( function() {

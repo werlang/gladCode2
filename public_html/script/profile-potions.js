@@ -332,8 +332,6 @@ slots.refresh = async function() {
         }
     }
 
-    translator.translate($('#apot-container #my-pots .mid'))
-
     $('#apot-container #browse').removeAttr('disabled')
     if (!this.items.filter(e => e.empty).length){
         $('#apot-container #browse').attr('disabled', true)
@@ -350,6 +348,8 @@ slots.refresh = async function() {
             $(obj).addClass('dis-lvl disabled')
         }
     })
+
+    document.querySelectorAll('#apot-container #my-pots .mid').forEach(e => translator.translate(e))
 }
 
 slots.countTime = function(i){

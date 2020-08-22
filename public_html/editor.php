@@ -95,7 +95,6 @@
                 }
             }
         }
-        include("header.php");
     ?>
     <div id='frame'>
         <div id='panel-left'>

@@ -1,3 +1,9 @@
+import {header} from "./header.js";
+
+window.onload = function(){
+    header.load()
+}
+
 $(document).ready( async function(){
     await menu_loaded()
 

@@ -1,3 +1,9 @@
+import {header} from "./header"
+
+window.onload = function(){
+    header.load()
+}
+
 $(document).ready( function(){
     $('#support input').click( function(){
         if ($('#support #one-time:checked').length)

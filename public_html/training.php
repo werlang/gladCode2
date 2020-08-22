@@ -48,7 +48,6 @@
     </head>
 <body>
     <?php
-        include("header.php");
         echo "<div id='hash' hidden>$hash</div><div id='round' hidden>$round</div>";
     ?>
     <div id='frame'>

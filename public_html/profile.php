@@ -15,6 +15,7 @@
 <head>
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com"> -->
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Perfil</title>
     <link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
@@ -68,7 +69,6 @@
     </head>
 <body>
     <?php
-        include("header.php");
         if(isset($_GET['t']))
             echo "<div id='tab' hidden>". mysql_escape_string($_GET['t']) ."</div>";
         if(isset($_GET['s']))
@@ -254,7 +254,7 @@
             <div class='content' data-menu='potions'>
                 <div id='apot-container'>
                     <div id='apot-panel'>
-                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'></span></span></h2>
+                        <h2><span>Apotecário</span> <span class='highlight'>nível</span> <span class='lvl highlight'></span></h2>
                         <p>Aqui você pode encomendar poções para lhe auxiliar durante as batalhas ranqueadas.</p>
                         <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'></span> horas</span>, uma vez por batalha.</p>
                         <p>Cada um de seus compartimentos dá direito a levar para batalha um item encomendado. Aumente seus níveis de mestre para desbloquear mais espaços.</p>

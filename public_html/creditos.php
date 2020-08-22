@@ -13,6 +13,11 @@
     <script src="script/socket.js"></script>
     <script src="script/header.js"></script>
     
+    <script>
+        import {header} from "./header.js"
+
+        header.load()
+    </script>
     <style>
         body {
             margin: 0;
@@ -43,7 +48,6 @@
     </style>
 </head>
 <body>
-    <?php include("header.php"); ?>
     <div id='frame'>
         <div id='content-box'>
             <h1>Créditos</h1>

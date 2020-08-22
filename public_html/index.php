@@ -36,7 +36,6 @@
     
     </head>
 <?php
-    include("header.php");
     if (isset($_GET['login'])){
         if (isset($_SESSION['user'])){
             $link = "profile.php?t=".$_GET['login'];

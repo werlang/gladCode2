@@ -1,4 +1,9 @@
 import {getDate, post} from "./utils.js"
+import {header} from "./header.js";
+
+window.onload = function(){
+    header.load()
+}
 
 $(document).ready( async function() {
     let data = await post("back_news.php",{

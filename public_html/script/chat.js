@@ -3,6 +3,7 @@ import * as _ from "./emoji.js"
 import {post} from "./utils.js"
 import {createToast} from "./dialog.js"
 import {google} from "./googlelogin.js"
+import {header} from "./header.js"
 
 var sendingBuffer = [];
 var clearToSend = true;

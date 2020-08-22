@@ -35,7 +35,6 @@
     <script type="text/javascript" src="script/socket.js"></script> -->
 </head>
 <body>
-    <?php include("header.php"); ?>
     <div id='frame'>
         <div id='side-menu'>
             <div id='title'><span>ADMIN AREA</span></div>

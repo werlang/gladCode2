@@ -1,4 +1,9 @@
 import {google} from "./googlelogin.js"
+import {header} from "./header"
+
+window.onload = function(){
+    header.load()
+}
 
 $(document).ready(async function(){
     // got here from train link

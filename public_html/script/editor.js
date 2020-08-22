@@ -1,5 +1,10 @@
 import {gladCard} from "./glad-card.js"
 import {google} from "./googlelogin.js"
+import {header} from "./header.js";
+
+window.onload = function(){
+    header.load()
+}
 
 var editor;
 var saved = true;

@@ -32,7 +32,6 @@
     </head>
 <body>
     <?php 
-        include("header.php");
         if (isset($hash))
             echo "<div id='hash' hidden>". $hash ."</div>";
     ?>

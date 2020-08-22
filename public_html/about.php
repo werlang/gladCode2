@@ -23,7 +23,6 @@
     
     </head>
 <body>
-    <?php include("header.php"); ?>
     <div id='frame'>
         <div id='mission-container'><div id='mission'>
             <div id='line1'>Programar pode ser divertido</div>

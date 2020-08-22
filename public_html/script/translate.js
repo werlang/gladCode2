@@ -1,5 +1,6 @@
 import {post} from "./utils.js"
 import {Message} from "./dialog.js"
+import {login} from "./header.js"
 
 const translator = {
     ready: true
@@ -239,7 +240,6 @@ translator.bind = function (obj){
                             box.classList.add('visible')
                             // box.removeEventListener('click')
                             box.addEventListener('click', function(e) {
-                                console.log('a')
                                 e.preventDefault()
                                 e.stopPropagation()
                                 this.remove()
@@ -261,7 +261,7 @@ translator.bind = function (obj){
                                         action: "SUGGEST",
                                         original: advice.old,
                                         suggestion: advice.new,
-                                        language: user.speak
+                                        language: login.user.speak
                                     })
                                     // console.log(data)
         

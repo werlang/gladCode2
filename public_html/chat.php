@@ -37,8 +37,6 @@
     
     </head>
 <body>
-    <?php include("header.php"); ?>
-
     <div id='chat-panel'></div>
 </body>
 </html>

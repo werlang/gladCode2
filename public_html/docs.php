@@ -23,7 +23,6 @@
     
     </head>
 <body>
-    <?php include("header.php"); ?>
     <div id='frame'>
         <div id='side-menu'></div>
         <div id='right-side'>

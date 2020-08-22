@@ -1,4 +1,4 @@
-import {login} from "./header.js"
+import {header, login} from "./header.js"
 import {post, getDate, getTimeSince} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
@@ -72,7 +72,9 @@ var tipArray = [
     "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
 ];
 
-$(document).ready( function(){
+window.onload = function(){
+    header.load()
+
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
 
@@ -107,7 +109,6 @@ $(document).ready( function(){
 
         var language = $('#profile-panel #language select');
         language.selectmenu().val(user.language).selectmenu('refresh');
-
 
         checkNotifications();
 
@@ -264,16 +265,14 @@ $(document).ready( function(){
                 user.preferences[preferences[i]] = "0";
         }
         
-        $.post("back_login.php", {
+        post("back_login.php", {
             action: "UPDATE",
             nickname: $('#nickname .input').val(),
             picture: user.foto,
             preferences: JSON.stringify(user.preferences),
             language: $('#language select').val()
-        })
-        .done( function(data){
+        }).then( function(data){
             //console.log(data);
-            data = JSON.parse(data);
             if (data.status == "SUCCESS"){
                 new Message({ message: "Informações atualizadas" }).show();
                 $('#profile-panel .button').removeAttr('disabled');
@@ -917,7 +916,7 @@ $(document).ready( function(){
         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
     })
 
-});
+}
 
 async function checkNotifications(){
     return post("back_notification.php", {
