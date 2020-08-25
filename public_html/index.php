@@ -21,7 +21,6 @@
     
     <link rel='stylesheet' href="css/index.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
@@ -130,5 +129,6 @@
             </div>
         </div>
     </div>
+    <div id='footer'></div>
 </body>
 </html>

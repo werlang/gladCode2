@@ -141,6 +141,7 @@ translator.translate = async function(elements){
                                 // console.log(e.textContent)
                                 if (contents[e.textContent] && !e.parentNode.classList.contains('translated')){
                                     e.textContent = ` ${contents[e.textContent][lang]} `
+                                    stringResponse.push(e.textContent)
                                     translator.bind(e.parentNode)
                                 }
                             }
@@ -153,6 +154,7 @@ translator.translate = async function(elements){
                             if (e[field]){
                                 if (contents[e[field]]){
                                     e[field] = `${contents[e[field]][lang]}`
+                                    stringResponse.push(e[field])
                                     translator.bind(e)
                                 }
                             }

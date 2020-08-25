@@ -47,23 +47,30 @@ header.load = async function() {
             document.querySelector('body').insertAdjacentHTML('afterbegin', header)
             resolve(true)
             
-            $('#menu-button').click( function() {
-                $('body').append("<div id='fog'><div id='menu'></div></div>");
-                $('#fog #menu').html("<a href='index'><img src='icon/logo.png'></a>"+ $('#h-items').html());
+            document.querySelector('#menu-button').addEventListener('click', () => {
+                const items = document.querySelector('#h-items').innerHTML
+                document.querySelector('body').insertAdjacentHTML('afterbegin', `<div id='fog'>
+                    <div id='menu'>
+                        <a href='index'><img src='icon/logo.png'></a>
+                        ${items}
+                    </div>
+                </div>`)
                 
-                $('#fog').click( function() {
+                document.querySelector('#fog').addEventListener('click', () => {
                     $('#fog #menu').toggle("slide", 300, function() {
                         $('#fog').remove();
                     });
-                });
-                $('#fog #menu').click( function(e) {
-                    e.stopPropagation();
-                });
-                $('#fog #login').click( function(){
+                })
+
+                document.querySelector('#fog #menu').addEventListener('click', e => {
+                    e.stopPropagation()
+                })
+
+                document.querySelector('#fog #login').addEventListener('click', () => {
                     google.login().then( function(data){
-                        window.location.href = "news";
-                    });
-                });	
+                        window.location.href = "news"
+                    })
+                })
                 
                 $('#fog #menu').toggle("slide", 300); //precisa jquery ui
             });

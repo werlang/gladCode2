@@ -164,6 +164,8 @@ window.onload = function(){
             "CANCELAR",
             "Clique para criar um novo gladiador",
             "atualizar",
+            "Link da publicação",
+            "COPIAR"
         ]).then( data => {
             // console.log($('#tourn .title #offset .of').length)
             $('#tourn .title #offset .of').html(translator.getTranslated("de"))
@@ -192,12 +194,11 @@ window.onload = function(){
     });
     
     $('#menu #news').click( function() {
-        $.post("back_news.php",{
+        post("back_news.php",{
             action: "READ",
             page: 0
-        }).done( function(data){
+        }).then( function(data){
             // console.log(data);
-            data = JSON.parse(data);
 
             $('#panel #news-container').html("");
             for (let i in data.posts){
@@ -210,12 +211,11 @@ window.onload = function(){
                 $('#panel #news-container .share').last().click( () => {
                     $('body').append(`<div id='fog'>
                         <div id='link-box'>
-                            <h3>Link da publicação</h3>
+                            <h3>${translator.getTranslated("Link da publicação")}</h3>
                             <input value='https://gladcode.dev/post/${data.posts[i].id}' readonly>
-                            <button>COPIAR</button>
+                            <button>${translator.getTranslated("COPIAR")}</button>
                         </div>
                     </div>`);
-                    translator.translate($('#fog'))
 
                     $('#fog').hide().fadeIn();
                     $('#fog').click( () => {
@@ -233,7 +233,16 @@ window.onload = function(){
                     });
                 });
             }
-            translator.translate($('#panel #news-container'))
+
+            login.wait().then( data => {
+                document.querySelectorAll('#panel #news-container .post').forEach(e => {
+                    setTimeout( () => { //gambiarra
+                        translator.translate(e)
+                    }, 1000)
+                })
+
+            })
+
         });
     });
 
