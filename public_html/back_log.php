@@ -18,7 +18,13 @@
             else {
                 $id = $row['id'];
 
-                $log = file_get_contents("logs/$id");
+                $rawlog = file_get_contents("logs/$id");
+                $log = gzdecode($rawlog);
+
+                // if not gzipped, get file directly
+                if ($log === false){
+                    $log = $rawlog;
+                }
 
                 if (strlen($log) > 0){
                     $output['log'] = $log;

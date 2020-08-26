@@ -409,7 +409,7 @@
         }
 
         if ($retrieve){
-            $log = get_battle(file_get_contents("logs/$logid"));
+            $log = get_battle("logs/$logid");
 
             //get glad id and death times in each log
             $teams = array();
@@ -472,7 +472,13 @@
         return $group;
     }
 
-    function get_battle($log){
+    function get_battle($path){
+        $rawlog = file_get_contents($path);
+        $log = gzdecode($rawlog);
+        if ($log === false){
+            $log = $rawlog;
+        }
+
         $log = json_decode($log, true);
         $merged = array();
         $battle = array();

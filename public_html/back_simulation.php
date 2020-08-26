@@ -473,7 +473,7 @@
         $result = runQuery($sql);
         
         $id = $conn->insert_id;
-        file_put_contents("logs/$id",$log);
+        file_put_contents("logs/$id", gzencode($log));
         return $hash;
     }
 
