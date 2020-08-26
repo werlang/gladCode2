@@ -282,7 +282,7 @@ window.onload = function(){
             preferences: JSON.stringify(user.preferences),
             language: $('#language select').val()
         }).then( function(data){
-            //console.log(data);
+            // console.log(data);
             if (data.status == "SUCCESS"){
                 new Message({ message: "Informações atualizadas" }).show();
                 $('#profile-panel .button').removeAttr('disabled');
@@ -890,7 +890,10 @@ window.onload = function(){
                 });
                 $('.cr-slider').addClass('slider');
                 $('#crop-image').on('click', function() {
-                    crop.result('base64').then(function(dataImg) {
+                    crop.result({
+                        type: 'base64',
+                        format: 'jpeg'
+                    }).then(function(dataImg) {
                         var data = [{ image: dataImg }, { name: 'myimgage.jpg' }];
                         // use ajax to send data to php
                         //console.log(dataImg);

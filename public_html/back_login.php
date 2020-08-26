@@ -198,21 +198,24 @@
             $result = runQuery($sql);
 
             if ($result->num_rows == 0){
-                $sql = "SELECT pasta FROM usuarios WHERE id = '$user'";
-                $result = runQuery($sql);
-                $row = $result->fetch_assoc();
-                $pasta = $row['pasta'];
+                if (explode("/", $picture)[0] != "profpics"){
+                    $sql = "SELECT foto, pasta, UNIX_TIMESTAMP(now(3)) AS time FROM usuarios WHERE id = '$user'";
+                    $result = runQuery($sql);
+                    $row = $result->fetch_assoc();
+                    $dir = md5($row['time']. $row['pasta']);
 
-                $pattern = '#^data:image/\w+;base64,#i';
-                if ($picture != "profpics/$pasta.png"){
+                    if (explode("/", $row['foto'])[0] == "profpics"){
+                        unlink($row['foto']);
+                    }
+
+                    $pattern = '#^data:image/\w+;base64,#i';
                     $picture = base64_decode(preg_replace($pattern, '', $picture));
-                    file_put_contents("profpics/$pasta.png",$picture);
-                    $picture = "profpics/$pasta.png";
+                    file_put_contents("profpics/$dir.jpg", $picture);
+                    $picture = "profpics/$dir.jpg";
                 }
                 
                 $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language', pref_translation = '$pref_translation' WHERE id = '$user'";
                 $result = runQuery($sql);
-
                 $output['status'] = "SUCCESS";
             }
             else
