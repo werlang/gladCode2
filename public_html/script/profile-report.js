@@ -1,4 +1,6 @@
 import {post, getDate} from "./utils.js"
+import {translator} from "./translate.js"
+import {Message} from "./dialog.js"
 
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]

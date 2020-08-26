@@ -104,6 +104,12 @@ body{
     flex-wrap: wrap;
     padding: 5px;
 
+    .small, .big {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }    
+
     .small .card-wrapper{
         @media @size600 {
             width: 50%;
@@ -111,117 +117,6 @@ body{
 
         @media @size1400 {
             width: 35%;
-        }
-    }
-
-    .card {
-        border-radius: 5px;
-        background-color: #455A64;
-        color: white;
-        padding: 15px;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;	
-        box-shadow: 1px 1px 5px rgba(0,0,0,0.7);
-        box-sizing: border-box;
-        text-align: justify;
-
-
-        .container {
-            @media @size600 {
-                display: flex;
-            }
-
-            @media @size900 {
-                display: block;
-            }
-
-            @media @size1400 {
-                display: flex;
-            }
-        }        
-
-        .content {
-            flex-basis: 350px;
-            flex-grow: 1;
-        }
-
-        .video {
-            margin-top: 15px;
-            flex-basis: 50%;
-            flex-grow: 2;
-            display: flex;
-            align-items: center;
-            background-color: black;
-            cursor: pointer;
-
-            @media @size600 {
-                margin-top: 0px;
-                margin-left: 15px;
-            }
-
-            @media @size900 {
-                margin-top: 15px;
-                margin-left: 0px;
-            }
-            
-            &:hover .thumb {
-                opacity: 0.7;
-            }
-        }
-
-        .a-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-    
-            @media @size600 {
-                justify-content: flex-start;
-            }        
-
-            @media @size900 {
-                justify-content: flex-end;
-            }
-            
-            @media @size1400 {
-                justify-content: flex-start;
-            }
-            
-        }
-    
-    }
-
-    .title {
-        font-size: 1.5em;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        text-shadow: 0px 0px 3px black;
-    }
-
-    .body {
-        flex-grow: 1;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    .text {
-        font-family: 'Roboto', sans-serif;
-    }
-
-    a {
-        color: #92c2e8;
-        font-size: 1em;
-        font-family: 'Source Code Pro', monospace;
-        text-decoration: none;
-        font-weight: bold;
-        padding: 5px 10px;
-
-        &:hover {
-            background-color: #92c2e8;
-            color: #063a50;
-            border-radius: 3px;
         }
     }
 
@@ -241,34 +136,136 @@ body{
         @media @size1400{
             width: 50%;
         }
-        
-    }
 
-    .video {
-
-        @media @size1400{
-            margin-top: 0px;
-            margin-left: 15px;
-        }
-        
-        .thumb {
+        .card {
+            border-radius: 5px;
+            background-color: #455A64;
+            color: white;
+            padding: 15px;
             width: 100%;
-            transition: all 0.3s;
-        }
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;	
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.7);
+            box-sizing: border-box;
+            text-align: justify;
+    
+            .container {
+                @media @size600 {
+                    display: flex;
+                }
+    
+                @media @size900 {
+                    display: block;
+                }
+    
+                @media @size1400 {
+                    display: flex;
+                }
 
-        .play {
-            filter: grayscale(100%);
-            width: 25%;
-            margin-left: 37.5%;
-            margin-right: -62.5%;
-            z-index: 1;
-            transition: all 0.3s;
+                .content {
+                    flex-basis: 350px;
+                    flex-grow: 1;
+
+                }  
+
+                .video {
+                    margin-top: 15px;
+                    flex-basis: 50%;
+                    flex-grow: 2;
+                    display: flex;
+                    align-items: center;
+                    background-color: black;
+                    cursor: pointer;
+        
+                    @media @size600 {
+                        margin-top: 0px;
+                        margin-left: 15px;
+                    }
+        
+                    @media @size900 {
+                        margin-top: 15px;
+                        margin-left: 0px;
+                    }
+        
+                    @media @size1400{
+                        margin-top: 0px;
+                        margin-left: 15px;
+                    }
+        
+                    &:hover .thumb {
+                        opacity: 0.7;
+                    }
+        
+                    .thumb {
+                        width: 100%;
+                        transition: all 0.3s;
+                    }
+            
+                    .play {
+                        filter: grayscale(100%);
+                        width: 25%;
+                        margin-left: 37.5%;
+                        margin-right: -62.5%;
+                        z-index: 1;
+                        transition: all 0.3s;
+                    }
+                }
+
+            }  
+            
+            .title {
+                font-size: 1.5em;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                text-shadow: 0px 0px 3px black;
+            }
+    
+            .text {
+                font-family: 'Roboto', sans-serif;
+            }   
+            
+            .body {
+                flex-grow: 1;
+                font-family: 'Roboto', sans-serif;
+            }
+        
+            .a-wrapper {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 10px;
+        
+                @media @size600 {
+                    justify-content: flex-start;
+                }        
+    
+                @media @size900 {
+                    justify-content: flex-end;
+                }
+                
+                @media @size1400 {
+                    justify-content: flex-start;
+                }
+                
+                a {
+                    color: #92c2e8;
+                    font-size: 1em;
+                    font-family: 'Source Code Pro', monospace;
+                    text-decoration: none;
+                    font-weight: bold;
+                    padding: 5px 10px;
+            
+                    &:hover {
+                        background-color: #92c2e8;
+                        color: #063a50;
+                        border-radius: 3px;
+                    }
+                }        
+        
+            }
+        
         }
     }
-
-    .small, .big {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-    }    
 }

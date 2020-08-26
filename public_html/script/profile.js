@@ -14,6 +14,7 @@ import {stats} from "./stats_func.js"
 import {refresh_tourn_list} from "./profile-tourn.js"
 import {messages} from "./profile-message.js"
 import {google} from "./googlelogin.js"
+import * as reports from "./profile-report.js"
 
 var user
 

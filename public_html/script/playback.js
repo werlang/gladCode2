@@ -88,7 +88,7 @@ $(document).ready( function() {
                     loghash: loghash
                 },
                 success: function(data){
-                    // console.log(data);
+                    console.log(data);
                     try{
                         data = JSON.parse(data);
                     }
