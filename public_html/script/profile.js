@@ -15,6 +15,7 @@ import {refresh_tourn_list} from "./profile-tourn.js"
 import {messages} from "./profile-message.js"
 import {google} from "./googlelogin.js"
 import * as reports from "./profile-report.js"
+import * as ranking from "./profile-rank.js"
 
 var user
 

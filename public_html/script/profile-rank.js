@@ -1,4 +1,11 @@
+import {post} from "./utils.js"
+import {login} from "./header.js"
+import {translator} from "./translate.js"
+import {Message, createToast} from "./dialog.js"
+
 $(document).ready( function(){
+    login.wait()
+
     var tabs = {
         pages: {
             limit: 10,
@@ -28,7 +35,7 @@ $(document).ready( function(){
             }
         }
 
-        if (!user.premium){
+        if (!login.user.premium){
             $('#ranking-container #tab-container #add-tab').hide()
         }
 
@@ -108,7 +115,7 @@ $(document).ready( function(){
             $('#ranking-container #tab-container .tab').removeClass('selected');
             $(this).addClass('selected');
 
-            if (user.premium){
+            if (login.user.premium){
                 $('#ranking-container #tab-container .tab.user i.close').remove()
                 $('#ranking-container #tab-container .tab.user.selected').append(`<i class='fas fa-times close'></i>`)
 
@@ -156,7 +163,7 @@ $(document).ready( function(){
 
     tabs.init = function(){
         $('#ranking-container #tab-container #add-tab').click( async function(){
-            if (!user.premium){
+            if (!login.user.premium){
                 new Message({
                     message: `
                         <h3>Transforme seu perfil em uma conta de tutor</h3>
@@ -170,7 +177,7 @@ $(document).ready( function(){
                 })
                 $('#dialog-box').addClass('school large')
             }
-            else if (parseFloat(user.credits) <= 0){
+            else if (parseFloat(login.user.credits) <= 0){
                 noCredit()
             }
             else{
@@ -186,6 +193,7 @@ $(document).ready( function(){
                 // when button ok is clicked
                 input.click('ok', async data => {
                     let text = data.input.toLowerCase()
+                    let match
                     if (text == ''){
                         input.kill()
                     }
@@ -222,11 +230,11 @@ $(document).ready( function(){
         }
         else if (data.status == "NOPREMIUM"){
             createToast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
-            user.premium = false
+            login.user.premium = false
         }
         else if (data.status == "NOCREDITS"){
             createToast("Você não possui créditos para utilizar essa função", "error")
-            user.credits = 0
+            login.user.credits = 0
         }
 
         this.show()
@@ -241,12 +249,14 @@ $(document).ready( function(){
         }){
 
         translator.translate([
+            "Geral",
             "Gladiador",
             "Mestre",
             "Renome",
             "Pontuação total",
             "Tempo médio dos treinos"
         ]).then( async () => {
+            id = id.trim() == 'general' ? 'geral' : id
             this.pages[id].offset = offset
             
             if (id == 'geral'){
@@ -299,7 +309,7 @@ $(document).ready( function(){
                             <div class='cell mmr'><span class='change24'>${Math.abs(parseInt(row.change24))}</span>${parseInt(row.mmr)}</div>
                         </div>`)
 
-                        if (user.apelido == row.master){
+                        if (login.user.apelido == row.master){
                             $('#ranking-container .table .row').last().addClass('mine')
                         }
                         if (parseInt(row.change24) > 0){
@@ -373,7 +383,7 @@ $(document).ready( function(){
                             <div class='cell mmr'>${row.time.toFixed(1)}s</div>
                         </div>`)
 
-                        if (user.id == row.id){
+                        if (login.user.id == row.id){
                             $('#ranking-container .table .row').last().addClass('mine')
                         }
                     }
