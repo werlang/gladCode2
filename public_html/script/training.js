@@ -304,11 +304,13 @@ training.show = async function(){
             })
 
             if (this.deadline === null){
-                let click = showDialog(`
-                    <span>Quanto tempo até o início das batalhas da rodada ${this.round}?</span>
-                    <div id='slider'></div>
-                `, ["OK", "Cancelar"])
-
+                const msg = new Message({
+                    message: `<span>Quanto tempo até o início das batalhas da rodada ${this.round}?</span>
+                    <div id='slider'></div>`,
+                    buttons: {ok: "OK", cancel: "Cancelar"}
+                })
+                msg.show()
+                    
                 var roundTime
                 $('#dialog-box #slider').slider({
                     range: "min",
@@ -329,7 +331,7 @@ training.show = async function(){
                     }
                 })
 
-                if (await click == 'OK'){
+                msg.click('ok', () => {
                     post("back_training_run.php", {
                         action: "DEADLINE",
                         hash: this.hash,
@@ -338,7 +340,7 @@ training.show = async function(){
                     }).then( data => {
                         // console.log(data)
                     })
-                }
+                })
             }
         }
         else if (!this.manager || this.end){

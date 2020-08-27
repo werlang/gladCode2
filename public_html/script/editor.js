@@ -119,15 +119,13 @@ $(document).ready( function() {
         if (saved)
             window.location.href = "newglad";
         else{
-            showDialog(
-                "Deseja criar um novo gladiador e perder as alterações feitas no gladiador atual?",
-                ["Sim","Não"])
-            .then( function(data){
-                if (data == "Sim"){
-                    saved = true;
-                    window.location.href = "newglad";
-                }
-            });
+            new Message({
+                message: "Deseja criar um novo gladiador e perder as alterações feitas no gladiador atual?",
+                buttons: {yes: "Sim", no: "Não"}
+            }).show().click('yes', () => {
+                saved = true
+                window.location.href = "newglad"
+            })
         }
     });
     
@@ -181,17 +179,15 @@ $(document).ready( function() {
             window.location.href = "glad-"+id;
         }
         else{
-            var name = $('#fog-glads .glad-preview.selected .glad span').html();
-            showDialog(
-                "Deseja abrir o gladiador <span class='highlight'>"+ name +"</span> para edição? Todas alterações no gladiador atual serão perdidas",
-                ["Sim","Não"])
-            .then( function(data){
-                if (data == "Sim"){
-                    saved = true;
-                    var id = $('#fog-glads .glad-preview.selected').data('id');
-                    window.location.href = "glad-"+id;
-                }
-            });
+            var name = $('#fog-glads .glad-preview.selected .glad span').html()
+            new Message({
+                message: `Deseja abrir o gladiador <b>${name}</b> para edição? Todas alterações no gladiador atual serão perdidas`,
+                buttons: {yes: "Sim", no: "Não"}
+            }).show().click('yes', () => {
+                saved = true;
+                var id = $('#fog-glads .glad-preview.selected').data('id');
+                window.location.href = "glad-"+id;
+            })
         }
     });
 

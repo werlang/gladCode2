@@ -1,58 +1,5 @@
 import {translator} from "./translate.js"
 
-function showDialog(message,buttons){
-    var response = $.Deferred();
-    $('body').append("<div id='fog'><div id='dialog-box'><div id='message'></div><div id='button-container'></div></div></div>");
-    $('#dialog-box #message').html(message);
-    $('#fog').hide().fadeIn();
-    for (var i in buttons){
-        $('#dialog-box #button-container').append("<button class='button'>"+ buttons[i] +"</button>");
-    }
-    $('#dialog-box .button').click( function(){
-        $('#dialog-box').parents('#fog').remove();
-        response.resolve($(this).html());
-    });
-    return response.promise();
-}
-
-function showTextArea(message,placeholder,maxchar){
-    var response = $.Deferred();
-    
-    $('body').append("<div id='fog'><div id='dialog-box'><div id='message'>"+ message +"</div><textarea class='input' placeholder='"+ placeholder +"'></textarea><span id='charcount'>"+ maxchar +" caracteres</span><div id='button-container'><button class='button'>CANCELAR</button><button class='button' id='btnok'>OK</button></div></div></div>");
-    $('#fog').hide().fadeIn();
-    $('#dialog-box .input').focus();
-    
-    $('#dialog-box .button').click( function(){
-        var text = $('#dialog-box .input').val();
-        if ($(this).html() == "OK"){
-            if ( text.length > maxchar ){
-                $('#dialog-box .input').addClass('alert');
-                $('#dialog-box .input').focus();
-            }
-            else{
-                response.resolve(text);
-                $('#dialog-box').parents('#fog').remove();
-            }
-        }
-        else{
-            response.resolve(false);
-            $('#dialog-box').parents('#fog').remove();
-        }
-    });
-    
-    $('#dialog-box .input').on('input', function(){
-        var left = maxchar - $(this).val().length;
-        $('#dialog-box #charcount').html(left +" caracteres");
-        if (left < 0)
-            $('#dialog-box #charcount').addClass('alert');
-        else{
-            $('#dialog-box #charcount').removeClass('alert');
-            $('#dialog-box .input').removeClass('alert');
-        }
-    });
-    return response.promise();
-}
-
 function showTerminal(title, message){
     $('#fog').remove()
     $('body').append(`<div id='fog'>
@@ -89,10 +36,10 @@ function createToast(message, type) {
 
 }
 
-window.onload = function() {
+$(document).ready( () => {
     $(document).tooltip()
-    $(document).tooltip("option", "show.delay", 700)    
-}
+    $(document).tooltip("option", "show.delay", 700)
+})
 
 /*
 it works, but jquery UI provides a better alternative

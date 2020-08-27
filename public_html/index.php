@@ -34,18 +34,20 @@
     <script src="script/translate.js"></script> -->
     
     </head>
-<?php
-    if (isset($_GET['login'])){
-        if (isset($_SESSION['user'])){
-            $link = "profile.php?t=".$_GET['login'];
-            header("Location: $link");
-        }
-        else
-            echo "<div id='loginhash' hidden>".$_GET['login']."</div>";
-    }
-?>
 
 <body>
+    <?php
+        if (isset($_GET['login'])){
+            session_start();
+            if (isset($_SESSION['user'])){
+                $link = "profile.php?t=".$_GET['login'];
+                header("Location: $link");
+            }
+            else{
+                echo "<div id='loginhash' hidden>".$_GET['login']."</div>";
+            }
+        }
+    ?>
     <div id='section-1'>
         <div class='card'>
             <div class='title'>Onde a programação e os jogos se encontram</div>

@@ -1,3 +1,5 @@
+const { Message } = require("./dialog")
+
 var tutorial = {
     enabled: false,
     state: 0,
@@ -918,4 +920,20 @@ tutorial.lesson.end = async function(){
     // .done( data => console.log(data));
 
     tutorial.enabled = false
+}
+
+function showDialog(message, buttons){
+    return new Promise( resolve => {
+        const b = {}
+        for (let i in buttons){
+            b[`but-${i}`] = buttons[i]
+        }
+
+        new Message({
+            message: message,
+            buttons: b
+        }).show().click(null, data => {
+            resolve(b[data.button])
+        })
+    })
 }

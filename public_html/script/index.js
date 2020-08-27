@@ -2,6 +2,7 @@ import {socket} from "./socket.js"
 import {login, header} from "./header.js"
 import {google} from "./googlelogin.js"
 import {translator} from "./translate.js"
+import {Message} from "./dialog.js"
 
 window.admin_auth = socket.admin
 
@@ -31,26 +32,36 @@ $(document).ready( function() {
     });
     
     if ($('#loginhash').length){
-        var tab = $('#loginhash').html();
-        $('#loginhash').remove();
-        
-        var loginMessage = {
-            'messages': "Faça login para visualizar sua mensagem",
-            'friends': "Faça login para ver seus pedidos de amizade",
-            'battle': "Faça login para visualizar suas batalhas e desafios"
-        };
-
-        let msg = loginMessage[tab]
-        if (!loginMessage[tab])
-            msg = "Faça login para ir para o seu perfil"
-
-        showDialog(msg, ["Cancelar","LOGIN"]).then( function(data){
-            if (data == "LOGIN"){
-                google.login().then(function(data) {
-                    window.location.href = tab;
-                });
+        const loginMessage = {
+            messages: {
+                message: "Faça login para visualizar sua mensagem",
+                link: "messages"
+            },
+            friends: {
+                message: "Faça login para ver seus pedidos de amizade",
+                link: "friends"
+            },
+            battle: {
+                message: "Faça login para visualizar suas batalhas e desafios",
+                link: "battle"
+            },
+            default: {
+                message: "Faça login para ir para o seu perfil",
+                link: "news"
             }
-        });
+        }
+
+        const tab = loginMessage[$('#loginhash').html()] ? loginMessage[$('#loginhash').html()] : loginMessage.default
+        $('#loginhash').remove()
+
+        new Message({
+            message: tab.message,
+            buttons: {cancel: "Cancelar", ok: "LOGIN"}
+        }).show().click('ok', () => {
+            google.login().then( () => {
+                window.location.href = tab.link
+            });
+        })
     }
 });
 
