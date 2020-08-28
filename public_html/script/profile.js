@@ -16,6 +16,7 @@ import {messages} from "./profile-message.js"
 import {google} from "./googlelogin.js"
 import * as reports from "./profile-report.js"
 import * as ranking from "./profile-rank.js"
+import {trainList} from "./profile-train.js"
 
 var user
 
@@ -72,7 +73,45 @@ var tipArray = [
     "Use a poção de concentração quando seu gladiador necessitar com urgência de pontos de habilidade",
     "Quer dar uma melhorada em algum de seus atributos? O tônico fortificate é o que você precisa",
     "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
-];
+]
+translator.translate(tipArray).then( data => {
+    tipArray = data
+})
+
+translator.translate([
+    'meses',
+    'dias',
+    'horas',
+    'minutos',
+    "RECORTAR IMAGEM",
+    "Nenhuma batalha para mostrar",
+    "Gladiador",
+    "Renome",
+    "Data",
+    "Nenhum item neste espaço",
+    "de",
+    "Deseja excluir o gladiador",
+    "Sim",
+    "Não",
+    "SIM",
+    "NÃO",
+    "Última atividade",
+    "Aceitar solicitação",
+    "Recusar solicitação",
+    "Enviar mensagem",
+    "Enviar convite de amizade",
+    "Mensagem para",
+    "Olá...",
+    "CANCELAR",
+    "Clique para criar um novo gladiador",
+    "atualizar",
+    "Link da publicação",
+    "COPIAR"
+]).then( () => {
+    $('#tourn .title #offset .of').html(translator.getTranslated("de"))
+    $('#train .title #offset .of').html(translator.getTranslated("de"))
+})
+
 
 header.load()
 
@@ -134,51 +173,8 @@ window.onload = function(){
                 });
             }
         });
-
-        translator.translate(tipArray).then( data => {
-            tipArray = data
-        })
-
-        translator.translate([
-            'meses',
-            'dias',
-            'horas',
-            'minutos',
-            "RECORTAR IMAGEM",
-            "Nenhuma batalha para mostrar",
-            "Gladiador",
-            "Renome",
-            "Data",
-            "Nenhum item neste espaço",
-            "de",
-            "Deseja excluir o gladiador",
-            "Sim",
-            "Não",
-            "SIM",
-            "NÃO",
-            "Última atividade",
-            "Aceitar solicitação",
-            "Recusar solicitação",
-            "Enviar mensagem",
-            "Enviar convite de amizade",
-            "Mensagem para",
-            "Olá...",
-            "CANCELAR",
-            "Clique para criar um novo gladiador",
-            "atualizar",
-            "Link da publicação",
-            "COPIAR"
-        ]).then( data => {
-            // console.log($('#tourn .title #offset .of').length)
-            $('#tourn .title #offset .of').html(translator.getTranslated("de"))
-
-            // translator.bind()
-        })
         
-        $('#panel').hide()
-        translator.translate([$('#menu'), $('#panel')]).then( () => {
-            $('#panel').show()
-        })
+        translator.translate([$('#menu'), $('#panel')])
 
     });
 

@@ -22,18 +22,17 @@ function createToast(message, type) {
     else if (type == 'success')
         icon = 'check-circle';
 
-    $('body').append(`<div class='toast ${type}'><i class='fas fa-${icon}'></i><span>${message}</span></div>`);
-    translator.translate($('.toast'))
-
-    $('.toast').each( (i,e) => {
-        $(e).css({ 'bottom': `calc(${i*1.5}em + ${i*20}px)` })
+    document.querySelector('body').insertAdjacentHTML('beforeend', `<div class='toast ${type}'><i class='fas fa-${icon}'></i><span>${message}</span></div>`)
+    document.querySelectorAll(".toast").forEach((e,i) => {
+        translator.translate(e)
+        e.style.bottom = `calc(${i*1.5}em + ${i*20}px)`
+        setTimeout( function(){
+            e.classList.add('fading')
+            setTimeout( function(){
+                e.remove()
+            }, 3000)
+        }, 2000)
     })
-    setTimeout( function(){
-        $('.toast').fadeOut(3000, function(){
-            $(this).remove();
-        })
-    }, 2000);
-
 }
 
 $(document).ready( () => {
@@ -87,6 +86,7 @@ function create_tooltip(message, obj, args){
 //          {default: "default_text", placeholder: "placeholder_text", enter: id}
 //          default: Pre-filled value in the field
 //          placeholder: Placeholder html attr of the field
+//          focus: Boolean. If true, the input start with focus when the message appears
 //          enter:  Id from the buttons object. When enter is pressed, this button will be clicked
 //                  If no enter id is given, 'ok', then 'yes' will be default values
 // textarea:    A textarea element to be placed. Mutually exclusive with input
@@ -126,6 +126,9 @@ class Message {
                 this.input.default = options.input.default
             if (options.input.placeholder){
                 this.input.placeholder = options.input.placeholder
+            }
+            if (options.input.focus){
+                this.input.focus = true
             }
             
             if (options.input.enter)
@@ -176,24 +179,35 @@ class Message {
         let maxlength = this.textarea && this.textarea.maxlength ? `<span id='charcount'>${this.textarea.maxlength} caracteres</span>` : ""
         let textarea = this.textarea ? `<textarea class='input' placeholder='${this.textarea.placeholder}' ${this.textarea.maxlength ? `maxlength=${this.textarea.maxlength}`: ""}>${this.textarea.value}</textarea>${maxlength}` : ''
 
-        $('body').append(`<div id='fog'>
+        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog' class='hidden'>
             <div id='dialog-box' ${this.class ? `class='${this.class}'` : ''}>
                 <div id='message'>${this.message}</div>
                 ${input}${textarea}
                 <div id='button-container'>${buttonsDOM}</div>
             </div>
         </div>`)
-        $('#fog').hide().fadeIn()
-        $('#fog #dialog-box *').hide()
 
-        if (!$('#dialog-box').hasClass('skip-translation')){
+        const fog = document.querySelector('#fog.hidden')
+
+        setTimeout( () => {
+            fog.classList.remove('hidden')
+            if (this.input && this.input.focus){
+                fog.querySelector('.input').focus()    
+            }
+        }, 10)
+
+        const box = fog.querySelector('#dialog-box')
+        box.querySelector('*').display = 'none'
+
+        if (!box.classList.contains('skip-translation')){
             if (this.translate){
-                translator.translate($('#dialog-box')).then( () => {
-                    $('#fog #dialog-box *').show()
+                // console.log($('#dialog-box').html())
+                translator.translate(box).then( () => {
+                    box.querySelector('*').display = 'flex'
                 })
             }
             else{
-                $('#fog #dialog-box *').show()
+                box.querySelector('*').display = 'flex'
             }
 
             if (this.input && this.input.placeholder){

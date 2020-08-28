@@ -23,7 +23,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
     <link rel='stylesheet' href="css/profile.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/chat.css"/>
     <link rel='stylesheet' href="css/croppie.css"/>
     <link rel='stylesheet' href="css/slider.css"/>
@@ -208,12 +207,12 @@
                         <div class='container'>
                             <div class='title manage'>
                                 <h2>Treinos que gerencio</h2>
-                                <div id='offset' class='manage'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                                <div id='offset' class='manage'><span class='start'>0</span> - <span class='end'>0</span><span class='of'>de</span><span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-manage' class='table'></div>
                             <div class='title part'>
                                 <h2>Treinos que participo</h2>
-                                <div id='offset' class='part'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
+                                <div id='offset' class='part'><span class='start'>0</span> - <span class='end'>0</span><span class='of'>de</span><span class='total'>0</span><button id='prev'><i class='fas fa-chevron-left'></i></button><button id='next'><i class='fas fa-chevron-right'></i></button></div>
                             </div>
                             <div id='table-part' class='table'></div>
                             <div id='button-container'>

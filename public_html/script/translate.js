@@ -3,7 +3,9 @@ import {Message} from "./dialog.js"
 import {login} from "./header.js"
 
 const translator = {
-    ready: true
+    ready: true,
+    prop_number : "995471",
+    prop_text: "foobarproptextfoobar"
 }
 
 translator.translate = async function(elements){
@@ -27,14 +29,18 @@ translator.translate = async function(elements){
     for (let element of elements){
         if (typeof element === 'string'){
             if (!contents[element]){
-                if (element.indexOf("<prop-number>") != -1){
-                    let prop = element.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
-                    contents[prop] = {}
-                }
-                else{
-                    contents[element] = {}
+                let el = element
+
+                if (el.indexOf("<prop-number>") != -1){
+                    el = el.replace(/<prop-number>\d+<\/prop-number>/g, this.prop_number)
                 }
 
+                if (el.indexOf("<prop-text>") != -1){
+                    el = el.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
+                    console.log(el)
+                }
+
+                contents[el] = {}
             }
         }
         else{
@@ -111,14 +117,25 @@ translator.translate = async function(elements){
     let stringResponse = []
     for (let element of elements){
         if (typeof element === 'string'){
+            let prop = element
+            let orig_num = element
+            let orig_text = element
+            
             if (element.indexOf("<prop-number>") != -1){
-                let prop = element.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
-                let orig = element.match(/<prop-number>(\d+)<\/prop-number>/)[1]
-                let resp = contents[prop][lang].replace("995471", orig)
-                stringResponse.push(resp)
+                prop = prop.replace(/<prop-number>\d+<\/prop-number>/g, this.prop_number)
+                orig_num = orig_num.match(/<prop-number>(\d+)<\/prop-number>/)[1]
             }
-            else if (contents[element]){
-                stringResponse.push(contents[element][lang])
+            
+            if (element.indexOf("<prop-text>") != -1){
+                prop = prop.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
+                orig_text = orig_text.match(/<prop-text>(.+)<\/prop-text>/)[1]
+            }
+
+            if (contents[prop]){
+                let resp = contents[prop][lang]
+                resp = resp.replace(this.prop_number, orig_num)
+                resp = resp.replace(this.prop_text, orig_text)
+                stringResponse.push(resp)
             }
         }
         else{
@@ -188,11 +205,23 @@ translator.getTranslated = function(str, dom=true, bind=true){
 
     let translated = this.translations[str][this.language]
 
+    let prop = str
+    let orig_num = str
+    let orig_text = str
+
     if (str.indexOf("<prop-number>") != -1){
-        let prop = str.replace(/<prop-number>\d+<\/prop-number>/g, "995471")
-        let orig = str.match(/<prop-number>(\d+)<\/prop-number>/)[1]
-        translated = this.translations[prop][this.language].replace("995471", orig)
+        prop = prop.replace(/<prop-number>\d+<\/prop-number>/g, this.prop_number)
+        orig_num = orig_num.match(/<prop-number>(\d+)<\/prop-number>/)[1]
     }
+
+    if (str.indexOf("<prop-text>") != -1){
+        prop = prop.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
+        orig_text = orig_text.match(/<prop-text>(.+)<\/prop-text>/)[1]
+    }
+    
+    translated = this.translations[prop][this.language]
+    translated = translated.replace(this.prop_number, orig_num)
+    translated = translated.replace(this.prop_text, orig_text)
 
     if (dom){
         translated = `<span class='translating'>${translated}</span>`
@@ -246,7 +275,11 @@ translator.bind = function (obj){
                                 e.stopPropagation()
                                 this.remove()
                                 let text = obj.textContent.trim()
-                                const dialog = document.querySelector('#dialog-box') && dialog.closest('#fog').remove()
+
+                                if (document.querySelector('#dialog-box')){
+                                    document.querySelector('#dialog-box').closest('#fog').remove()
+                                }
+                                
                                 new Message({
                                     message: "Sugira uma tradução melhor para o texto:",
                                     input: {

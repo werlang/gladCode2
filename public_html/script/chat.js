@@ -1265,4 +1265,4 @@ function sendChatMessage({text}){
     $('#chat-panel #send').click()
 }
 
-export {listRooms, getChatNotification}
+export {listRooms, getChatNotification, sendChatMessage}
