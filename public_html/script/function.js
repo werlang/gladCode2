@@ -4,8 +4,9 @@
 
 import {header} from "./header.js";
 
+header.load()
+
 window.onload = function(){
-    header.load()
 }
 
 var langDict = false

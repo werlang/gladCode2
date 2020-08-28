@@ -320,4 +320,4 @@ class Message {
     }
 }
 
-export {Message, showDialog, createToast, showTerminal}
+export {Message, createToast, showTerminal}

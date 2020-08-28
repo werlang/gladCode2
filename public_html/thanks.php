@@ -61,9 +61,9 @@
     <script>
         import {header} from "./header.js";
 
-        window.onload = function(){
-            header.load()
+        header.load()
 
+        window.onload = function(){
             time()
         }
         

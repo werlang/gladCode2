@@ -1,8 +1,9 @@
 import {stats} from "./stats_func.js"
 import {header} from "./header.js";
 
+header.load()
+
 window.onload = function(){
-    header.load()
 }
 
 $(document).ready( function() {

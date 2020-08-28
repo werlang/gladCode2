@@ -1,8 +1,9 @@
 import {google} from "./googlelogin.js"
 import {header} from "./header"
 
+header.load()
+
 window.onload = function(){
-    header.load()
 }
 
 $(document).ready(async function(){

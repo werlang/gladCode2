@@ -5,8 +5,9 @@ import {header} from "./header.js"
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
+header.load()
+
 window.onload = async function(){
-    header.load()
 
     let version = (await post("back_update.php",{
         action: "GET"

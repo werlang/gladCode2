@@ -27,13 +27,7 @@
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
     <script src="script/index.js" type="module"></script>
-    <!-- <script src="script/dialog.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
-    <script src="script/translate.js"></script> -->
-    
-    </head>
+</head>
 
 <body>
     <?php

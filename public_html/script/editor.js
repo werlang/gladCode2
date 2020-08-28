@@ -2,8 +2,9 @@ import {gladCard} from "./glad-card.js"
 import {google} from "./googlelogin.js"
 import {header} from "./header.js";
 
+header.load()
+
 window.onload = function(){
-    header.load()
 }
 
 var editor;

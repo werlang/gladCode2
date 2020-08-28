@@ -74,9 +74,9 @@ var tipArray = [
     "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
 ];
 
-window.onload = function(){
-    header.load()
+header.load()
 
+window.onload = function(){
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
 

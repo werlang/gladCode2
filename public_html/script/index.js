@@ -65,6 +65,11 @@ $(document).ready( function() {
     }
 });
 
+header.load().then( () => {
+    $('#header').addClass('big');
+    $('#header-container').addClass('small');
+})
+
 window.onload = async function() {
     await login.wait()
     document.querySelectorAll(".card").forEach(e => {
@@ -72,8 +77,4 @@ window.onload = async function() {
         translator.translate(e)
     })
 
-    header.load().then( () => {
-        $('#header').addClass('big');
-        $('#header-container').addClass('small');
-    })
 }
