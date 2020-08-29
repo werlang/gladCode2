@@ -6,7 +6,7 @@ import {assets} from "./assets.js"
 import * as dropzone from "./dropzone.js"
 import * as croppie from "./croppie.js"
 import {chat} from "./chat.js"
-import {Message, createToast} from "./dialog.js"
+import {Message, createToast, tooltip} from "./dialog.js"
 import {gladCard} from "./glad-card.js"
 import * as potions from "./profile-potions.js"
 import {Simulation, ProgressButton} from "./runSim.js"
@@ -19,6 +19,9 @@ import * as ranking from "./profile-rank.js"
 import {trainList} from "./profile-train.js"
 
 var user
+
+header.load()
+tooltip()
 
 var tipArray = [
     "Obrigado por fazer parte da versão beta da gladCode",
@@ -111,9 +114,6 @@ translator.translate([
     $('#tourn .title #offset .of').html(translator.getTranslated("de"))
     $('#train .title #offset .of').html(translator.getTranslated("de"))
 })
-
-
-header.load()
 
 window.onload = function(){
     $('#header-container').addClass('small-profile');

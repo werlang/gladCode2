@@ -204,7 +204,7 @@
     }
 }
 
-body .ui-tooltip {
+.tooltip {
     position: absolute;
     background-color: #000000bd;
     border-radius: 3px;
@@ -219,4 +219,10 @@ body .ui-tooltip {
     text-align: justify;
     box-shadow: none;
     z-index: 9999;
+    transition: 0.3s opacity;
+
+    &.hidden {
+        opacity: 0;
+        display: flex;
+    }
 }

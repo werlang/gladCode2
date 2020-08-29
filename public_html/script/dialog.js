@@ -35,41 +35,70 @@ function createToast(message, type) {
     })
 }
 
-$(document).ready( () => {
-    $(document).tooltip()
-    $(document).tooltip("option", "show.delay", 700)
-})
+const tooltip = function(delay = 700){
+    const body = document.querySelector('body')
+    body.addEventListener("mouseenter", createTooltip, true)
+    body.addEventListener("mouseleave", removeTooltip, true)
 
-/*
-it works, but jquery UI provides a better alternative
-function create_tooltip(message, obj, args){
-    $('#tooltip').remove();
-    $('body').append(`<div id='tooltip'>${message}</div>`);
+    function createTooltip(e){
+        const mouse = {x: e.x, y: e.y}
+        e = e.target
+        if (e.title){
+            e.setAttribute('tooltip', e.title)
+            
+            body.querySelectorAll('.tooltip').forEach(e => {
+                e.classList.add('hidden')
+            })
+            
+            body.insertAdjacentHTML('beforeend', `<div class='tooltip hidden'>${e.title}</div>`) 
+            e.title = ''
 
-    var thistooltip = $('#tooltip'); //to avoid a running timeout to remove a tooltip just created
-    thistooltip.hide().fadeIn(150);
-    var docpos = document.body.getBoundingClientRect();
-    var elempos = obj[0].getBoundingClientRect();
-    thistooltip.css({
-        left: elempos.left - docpos.left,
-        top: elempos.top - docpos.top
-    });
+            setTimeout( () => {
+                const tooltipList = body.querySelectorAll('.tooltip')
+                const last = tooltipList[tooltipList.length - 1]
+                if (tooltipList && last){
+                    last.classList.remove('hidden')
+                    adjustPosition(last, mouse)
+                }
+            }, Math.max(delay, 10))
+        }
+    }
 
-    var fadetime = 2000;
-    if (args && args.fadeOut)
-        fadetime = args.fadeOut;
-    
-    var remaintime = 2000;
-    if (args && args.remain)
-        remaintime = args.remain;
+    function removeTooltip(e){
+        const mouse = {x: e.x, y: e.y}
+        e = e.target
+        if (e.hasAttribute('tooltip')){
+            e.title = e.getAttribute('tooltip')
+            e.removeAttribute('tooltip')
 
-    setTimeout( () => {
-        thistooltip.fadeOut(fadetime, () => {
-            thistooltip.remove();
-        })
-    }, remaintime);
+            const tooltip = body.querySelectorAll('.tooltip')
+            if (tooltip.length > 1){
+                const tpReveal = tooltip[tooltip.length - 2]
+                tpReveal.classList.remove('hidden')
+                adjustPosition(tpReveal, mouse)
+
+            }
+            if (tooltip.length > 0){
+                tooltip[tooltip.length - 1].remove()
+            }
+        }
+
+    }
+
+    function adjustPosition(e, mouse){
+        const offset = {x: 15, y: 15}
+
+        const width = e.clientWidth
+
+        e.style.left = mouse.x + offset.x + "px"
+        e.style.top = mouse.y + offset.y + "px"
+
+        if (e.clientHeight > 30){
+            e.style.left = mouse.x - width + "px"
+        }
+
+    }
 }
-*/
 
 
 // ---------------------------------------------------------------------------------------------
@@ -334,4 +363,4 @@ class Message {
     }
 }
 
-export {Message, createToast, showTerminal}
+export {Message, createToast, showTerminal, tooltip}

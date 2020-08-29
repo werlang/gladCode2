@@ -20,17 +20,6 @@ const post = async function(path, args){
     }
 
     return data
-
-    // $.post(path, {
-    //     args
-    // }).then( data => {
-    //     try{
-    //         data = JSON.parse(data)
-    //     } catch(e) {
-    //         return {error: e, data: data}
-    //     }
-    //     return data
-    // })
 }
 
 translator.translate([
