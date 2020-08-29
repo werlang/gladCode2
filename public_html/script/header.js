@@ -48,108 +48,164 @@ header.load = async function() {
             resolve(true)
             
             document.querySelector('#menu-button').addEventListener('click', () => {
-                const items = document.querySelector('#h-items').innerHTML
+                const items = document.querySelector('#h-items')
+                items.querySelectorAll('.drop-menu .item-container').forEach(e => e.removeAttribute('style'))
+    
                 document.querySelector('body').insertAdjacentHTML('afterbegin', `<div id='fog'>
                     <div id='menu'>
                         <a href='index'><img src='icon/logo.png'></a>
-                        ${items}
+                        ${items.innerHTML}
                     </div>
                 </div>`)
-                
-                document.querySelector('#fog').addEventListener('click', () => {
-                    $('#fog #menu').toggle("slide", 300, function() {
-                        $('#fog').remove();
-                    });
+
+                document.querySelectorAll('#menu #language .item:not(#improve)').forEach(e => {
+                    e.addEventListener('click', () => {
+                        change_spoken_language(e.id.split('-')[1])
+                    })
+                })    
+
+                login.wait().then( data => {
+                    if (data.logged){
+                        document.querySelector('#menu #improve.item').addEventListener('click', bind_suggestion)
+                    }
+                    else{
+                        document.querySelector('#menu #improve.item').style.display = 'none'
+                    }
                 })
 
-                document.querySelector('#fog #menu').addEventListener('click', e => {
+                const fog = document.querySelector('#fog')
+                const menu = fog.querySelector('#menu')
+                menu.style.display = 'block'
+
+                fog.addEventListener('click', () => {
+                    menu.classList.remove('open')
+
+                    setTimeout(() => {
+                        fog.remove()
+                    }, 300);
+                })
+
+                menu.addEventListener('click', e => {
                     e.stopPropagation()
                 })
 
-                document.querySelector('#fog #login').addEventListener('click', () => {
-                    google.login().then( function(data){
+                fog.querySelector('#login').addEventListener('click', () => {
+                    google.login().then( () => {
                         window.location.href = "news"
                     })
                 })
                 
-                $('#fog #menu').toggle("slide", 300); //precisa jquery ui
-            });
+                setTimeout(() => {
+                    menu.classList.add('open')
+                }, 10);
+            })
             
-            $('.drop-menu').hover( function() {
-                menu_open($(this));
-            });
-            $('.drop-menu').mouseleave( function() {
-                menu_close();
-            });
-    
-            $('.drop-menu').click( function() {
-                menu_close();
-                menu_open($(this));
-            });
-    
-            $('.mobile #login, .desktop #login').click( function(){
-                google.login().then( function(data){
-                    window.location.href = "news";
-                });
-            });	
+            // menu open and close
+            document.querySelectorAll('.drop-menu').forEach(e => {
+                e.addEventListener('mouseenter', () => {
+                    const itemHeight = 50
+                    const itemCont = e.querySelector('.item-container')
+
+                    itemCont.style.display = 'block'
+                    itemCont.classList.add('open')
+                    itemCont.style.top = e.offsetTop + itemHeight + 'px'
+
+                    if (itemCont.offsetLeft + itemCont.offsetWidth > window.innerWidth){
+                        itemCont.style.left = e.offsetLeft + e.offsetWidth - itemCont.offsetWidth + 'px'
+                    }
                     
-            $('#header #language .item').not('#improve').click( async function() {
-                change_spoken_language($(this).attr('id').split('-')[1])
+                    setTimeout( () => {
+                        itemCont.style.height = itemCont.querySelectorAll('.item').length * itemHeight + 'px'
+                    }, 10)
+                })
+
+                e.addEventListener('mouseleave', () => {
+                    // const itemHeight = 50
+                    const itemCont = e.querySelector('.item-container')
+
+                    itemCont.style.display = 'none'
+                    itemCont.classList.remove('open')
+                    itemCont.style.height = 0
+                })
+
+            })
+    
+            document.querySelectorAll('.mobile #login, .desktop #login').forEach(e => {
+                e.addEventListener('click', () => {
+                    google.login().then( () => {
+                        window.location.href = "news"
+                    })
+                })
+            })
+                    
+            document.querySelectorAll('#header #language .item:not(#improve)').forEach(e => {
+                e.addEventListener('click', () => {
+                    change_spoken_language(e.id.split('-')[1])
+                })
             })
             
             login.wait().then( data => {
                 // console.log(data)
-                if (data.status == "NOTLOGGED")
-                    $('.mobile #profile, .desktop #login').removeClass('hidden');
+                if (data.status == "NOTLOGGED"){
+                    document.querySelector('.mobile #profile').classList.remove('hidden')
+                    document.querySelector('.desktop #login').classList.remove('hidden')
+                }
                 else{
                     socket.request('login', {}).then( function(res, err){
-                        if (err) return console.log(err);
+                        if (err) return console.log(err)
+                        // console.log(res)
                         if (res.session === false){
                             post("back_login.php", {
                                 action: "UNSET"
                             }).then( function(data){
-                                if (data.status == "LOGOUT")
-                                    window.location.reload();
+                                if (data.status == "LOGOUT"){
+                                    window.location.reload()
+                                }
                             });
                         }
-                        else
-                            $('.mobile #login, .desktop #profile').removeClass('hidden');
-                    });
+                        else{
+                            document.querySelector('.mobile #login').classList.remove('hidden')
+                            document.querySelector('.desktop #profile').classList.remove('hidden')
+                        }
+                    })
                 }
             
                 if (data.logged){
-                    $('#header #improve.item').click( function() {
-                        new Message({
-                            message: `
-                                <p>Qual texto precisa ser melhor traduzido?</p>
-                                <input id='original' type='text' class='input'>
-                                <p>Qual a tradução adequada para o texto?</p>
-                                <input id='suggestion' type='text' class='input'>
-                            `,
-                            buttons: {ok: "OK", cancel: "Cancelar"},
-                            class: "improve-translation-box"
-                        }).show().click('ok', async function() {
-                            let original = $('.improve-translation-box #original').val()
-                            let suggestion = $('.improve-translation-box #suggestion').val()
-                            
-                            let data = await post("back_translation.php", {
-                                action: "SUGGEST",
-                                original: original,
-                                suggestion: suggestion,
-                                language: login.user.speak
-                            })
-                            // console.log(data)
-                
-                            new Message({message: "Sugestão enviada"}).show()
-                        })
-                    })
+                    document.querySelector('#header #improve.item').addEventListener('click', bind_suggestion)
                 }
                 else{
-                    $('#header #improve.item').hide()
+                    document.querySelector('#header #improve.item').style.display = 'none'
                 }
     
                 translator.translate(document.querySelector('#header'))
             })
+
+            function bind_suggestion() {
+                new Message({
+                    message: `
+                        <p>Qual texto precisa ser melhor traduzido?</p>
+                        <input id='original' type='text' class='input'>
+                        <p>Qual a tradução adequada para o texto?</p>
+                        <input id='suggestion' type='text' class='input'>
+                    `,
+                    buttons: {ok: "OK", cancel: "Cancelar"},
+                    class: "improve-translation-box"
+                }).show().click('ok', async function() {
+                    let original = document.querySelector('.improve-translation-box #original').value
+                    let suggestion = document.querySelector('.improve-translation-box #suggestion').value
+                    
+                    let data = await post("back_translation.php", {
+                        action: "SUGGEST",
+                        original: original,
+                        suggestion: suggestion,
+                        language: login.user.speak
+                    })
+                    // console.log(data)
+        
+                    new Message({message: "Sugestão enviada"}).show()
+                })
+            }
+
             
         })
     
@@ -166,29 +222,6 @@ header.load = async function() {
         }
 
     })
-}
-
-function menu_open(element){
-    $('.item-container').hide();
-    if ($('.item-container.open').length == 0){
-        var container = element.find('.item-container');
-        container.slideDown().addClass('open');
-        
-        var left = element.position().left;
-        if (element.position().left + container.find('.item').width() > $(window).width())
-            left = element.position().left + element.width() - container.width();
-
-        container.css({
-            'left': left, 
-            'top': element.position().top + element.height()
-        });
-
-    }
-}
-
-function menu_close(){
-    $('.item-container').hide();
-    $('.item-container').removeClass('open');
 }
 
 async function change_spoken_language(lang){

@@ -7,7 +7,7 @@ const post = async function(path, args){
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams(args).toString()        
+        body: new URLSearchParams(args).toString()
     })
     if (!response.ok) { throw response }
     let data = await response.text()

@@ -43,7 +43,7 @@ translator.translate = async function(elements){
             }
         }
         else{
-            if (element instanceof jQuery){
+            if (window.jQuery && element instanceof jQuery){
                 element = $(element)[0]
             }
 
@@ -150,7 +150,7 @@ translator.translate = async function(elements){
             }
         }
         else{
-            if (element instanceof jQuery){
+            if (window.jQuery && element instanceof jQuery){
                 element = $(element)[0]
             }
 

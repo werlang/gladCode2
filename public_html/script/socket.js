@@ -21,7 +21,7 @@ socket.init = async function(){
     return this
 }
 
-socket.admin = function(obj){
+socket.admin = async function(obj){
     socket.request('login', obj).then( (res, err) => {
         if (err) return console.log(err)
         console.log(res);
@@ -30,23 +30,33 @@ socket.admin = function(obj){
         }
     })
     
-    post("back_login.php", {
+    const resp = post("back_login.php", {
         action: "SET",
         admin: JSON.stringify(obj)
     })
+    // console.log(await resp)
 }
 
 socket.request = async function(route, data){
-    return await $.ajax({
-        type: "POST",
-        url: `${this.serverURL}/${route}`,
-        crossDomain: true,
-        data: data,
-        dataType: 'json',
-        xhrFields: { withCredentials: true },
-        success: (response) => response,
-        error: (xhr, status) => status
-    });
+    // return await $.ajax({
+    //     type: "POST",
+    //     url: `${this.serverURL}/${route}`,
+    //     crossDomain: true,
+    //     data: data,
+    //     dataType: 'json',
+    //     xhrFields: { withCredentials: true },
+    //     success: (response) => response,
+    //     error: (xhr, status) => status
+    // });
+    const request = await fetch(`${this.serverURL}/${route}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(data).toString(),
+        credentials: "include"
+    })
+    return await request.json()
 }
 
 socket.isReady = async function(){

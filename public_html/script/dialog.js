@@ -242,52 +242,53 @@ class Message {
             if (this.input && this.input.placeholder){
                 if (this.translate){
                     translator.translate(this.input.placeholder).then( data => {
-                        $('#dialog-box input').attr('placeholder', data)
+                        box.querySelector('input').placeholder = data
                     })
                 }
                 else{
-                    $('#dialog-box input').attr('placeholder', this.input.placeholder)
+                    box.querySelector('input').placeholder = this.input.placeholder
                 }
             }
         }
         else{
-            $('#fog #dialog-box *').show()
+            box.querySelectorAll('*').forEach(e => e.style.display = '')
         }
 
         if (this.input){
-            $('#dialog-box .input').focus()
-            $('#dialog-box .input').keyup( e => {
+            box.querySelector('.input').focus()
+            box.querySelector('.input').addEventListener('keyup', e => {
                 if (e.keyCode == 13 && this.input.enter){
-                    $(`#dialog-box #dialog-button-${this.input.enter}`).click()
+                    box.querySelector(`#dialog-button-${this.input.enter}`).click()
                 }
             })            
         }
         else if (this.textarea && this.textarea.maxlength){
-            $('#dialog-box .input').focus()
+            box.querySelector('.input').focus()
             let carac_str = "caracteres"
             translator.translate([
                 "caracteres"
             ]).then( data => {
                 carac_str = data
-                $('#dialog-box #charcount').html(`${this.textarea.maxlength} ${data}`)
+                box.querySelector('#charcount').textContent = `${this.textarea.maxlength} ${data}`
             })
 
-            $('#dialog-box .input').on('input', () => {
-                var left = this.textarea.maxlength - $('#dialog-box .input').val().length
-                $('#dialog-box #charcount').html(`${left} ${carac_str}`)
+            box.querySelector('.input').addEventListener('input', () => {
+                const left = this.textarea.maxlength - box.querySelector('.input').value.length
+                const charcount = box.querySelector('#charcount')
+                charcount.textContent = `${left} ${carac_str}`
                 if (left < 0)
-                    $('#dialog-box #charcount').addClass('alert')
+                    charcount.classList.add('alert')
                 else{
-                    $('#dialog-box #charcount').removeClass('alert')
-                    $('#dialog-box .input').removeClass('alert')
+                    charcount.classList.remove('alert')
+                    box.querySelector('.input').classList.remove('alert')
                 }
             })
         }
 
         for (let id in this.buttons){
-            $(`#dialog-box #dialog-button-${id}`).click( async () => {
+            box.querySelector(`#dialog-button-${id}`).addEventListener('click', async () => {
                 if (!this.preventKill){
-                    $('#dialog-box').parents('#fog').remove()
+                    box.closest('#fog').remove()
                 }
             })
         }
@@ -296,45 +297,48 @@ class Message {
     }
 
     kill(){
-        $('#dialog-box').parents('#fog').remove()
+        document.querySelector('#dialog-box').closest('#fog').remove()
     }
 
     click(button, fn){
+        const box = document.querySelector('#dialog-box')
         return new Promise( resolve => {
             if (!button){
-                $(`#dialog-box .button`).off().click( async function() {
-                    if (fn){
+                box.querySelectorAll(`.button`).forEach(e => {
+                    e.addEventListener('click', async () => {
+                        if (fn){
+                            if (this.input){
+                                fn({
+                                    button: e.id.split('-')[2],
+                                    input: box.querySelector('.input').value
+                                })
+                            }
+                            else{
+                                fn({ button: e.id.split('-')[2] })
+                            }
+                        }
+        
+                        if (!this.preventKill){
+                            box.closest('#fog').remove()
+                        }
+        
                         if (this.input){
-                            fn({
-                                button: $(this).attr('id').split('-')[2],
-                                input: $('#dialog-box .input').val()
+                            resolve({
+                                input: box.querySelector('.input').value,
+                                button: e.id.split('-')[2]
                             })
                         }
                         else{
-                            fn({ button: $(this).attr('id').split('-')[2] })
-                        }
-                    }
-    
-                    if (!this.preventKill){
-                        $('#dialog-box').parents('#fog').remove()
-                    }
-    
-                    if (this.input){
-                        resolve({
-                            input: $('#dialog-box .input').val(),
-                            button: $(this).attr('id').split('-')[2]
-                        })
-                    }
-                    else{
-                        resolve({ button: $(this).attr('id').split('-')[2] })
-                    }    
+                            resolve({ button: e.id.split('-')[2] })
+                        }    
+                    })
                 })
             }
             else{
-                $(`#dialog-box #dialog-button-${button}`).off().click( async () => {
+                box.querySelector(`#dialog-button-${button}`).addEventListener('click', async () => {
                     if (fn){
                         if (this.input || this.textarea){
-                            fn({input: $('#dialog-box .input').val()})
+                            fn({input: box.querySelector('.input').value})
                         }
                         else{
                             fn(true)
@@ -342,11 +346,11 @@ class Message {
                     }
     
                     if (!this.preventKill){
-                        $('#dialog-box').parents('#fog').remove()
+                        box.closest('#fog').remove()
                     }
     
                     if (this.input){
-                        resolve({input: $('#dialog-box .input').val()})
+                        resolve({input: box.querySelector('.input').value})
                     }
                     else{
                         resolve(true)
@@ -359,7 +363,7 @@ class Message {
     }
 
     getButton(name) {
-        return $(`#dialog-box #dialog-button-${name}`)
+        return document.querySelector(`#dialog-box #dialog-button-${name}`)
     }
 }
 
