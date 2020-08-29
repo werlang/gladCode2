@@ -10,7 +10,15 @@ translator.translate([
     "Identificador",
     "Mestres",
     "Descrição",
-    "de"
+    "de",
+    "Criar treino",
+    "Identificador do treino (nome)",
+    "Breve descrição...",
+    "Tempo máximo do treino",
+    "Gladiadores por batalha",
+    "Peso do treino",
+    "Cancelar",
+    "CRIAR"
 ])
 
 $(document).ready( function(){
@@ -51,27 +59,27 @@ $(document).ready( function(){
             let box = `<div id='fog'>
                 <div class='train window'>
                     <div id='title'>
-                        <h2>Criar treino</h2>
+                        <h2>${translator.getTranslated("Criar treino")}</h2>
                     </div>
-                    <input id='name' class='input' placeholder='Identificador do treino (nome)' maxlength='50'>
-                    <textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea>
+                    <input id='name' class='input' placeholder='${translator.getTranslated("Identificador do treino (nome)", false)}' maxlength='50'>
+                    <textarea id='desc' class='input' placeholder='${translator.getTranslated("Breve descrição...", false)}' maxlength='512'></textarea>
                     <div id='options'>
                         <div id='maxtime' class='col'>
-                            <span>Tempo máximo do treino</span>
+                            <span>${translator.getTranslated("Tempo máximo do treino")}</span>
                             <div id='slider'></div>
                         </div>
                         <div id='players' class='col'>
-                            <span>Gladiadores por batalha</span>
+                            <span>${translator.getTranslated("Gladiadores por batalha")}</span>
                             <div id='slider'></div>
                         </div>
                         <div id='weight' class='col'>
-                            <span>Peso do treino</span>
+                            <span>${translator.getTranslated("Peso do treino")}</span>
                             <div id='slider'></div>
                         </div>
                     </div>
                     <div id='button-container'>
-                        <button id='cancel' class='button'>Cancelar</button>
-                        <button id='create' class='button'>CRIAR</button>
+                        <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                        <button id='create' class='button'>${translator.getTranslated("CRIAR")}</button>
                     </div>
                 </div>
             </div>`
@@ -776,7 +784,7 @@ var roomList = {
                             $('.train.window #start').hide()
                             $('.train.window #delete').show().off().click( async () => {
                                 new Message({
-                                    message: `Deseja excluir o treino ${data.name}?`, 
+                                    message: `Deseja excluir o treino?`, 
                                     buttons: {yes: "Sim", no: "Não"} 
                                 }).show().click('yes', async () => {
                                     let data = await post("back_train.php", {

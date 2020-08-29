@@ -37,7 +37,6 @@ translator.translate = async function(elements){
 
                 if (el.indexOf("<prop-text>") != -1){
                     el = el.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
-                    console.log(el)
                 }
 
                 contents[el] = {}
@@ -51,15 +50,27 @@ translator.translate = async function(elements){
             element.querySelectorAll(`*`).forEach( e => {
                 // check for template
                 if (!e.classList.contains('skip-translation') && !e.closest('.skip-translation')){
-                    if (e.dataset['translationTemplate']){
-                        let temp = e.dataset['translationTemplate']
-                        contents[temp] = {template: temp}
-                    }
+                    // if (e.dataset['translationTemplate']){
+                    //     let temp = e.dataset['translationTemplate']
+                    //     contents[temp] = {template: temp}
+                    // }
                     
                     if (lang != 'pt'){
                         // replace contents
                         // console.log(e.textContent)
-                        if (!e.textContent.includes("\n") && !e.textContent.includes("\t") && !e.classList.contains('translated') && !e.textContent.match(/^[\d\s]+$/) && !e.textContent.match(/^\W+$/)){
+
+                        // const el_prop_text = e.querySelector("prop-text")
+                        // const el_prop_number = e.querySelector("prop-number")
+                        // if (el_prop_number){
+                        //     e.dataset['propnumber'] = el_prop_number.innerHTML
+                        //     el_prop_number.innerHTML = this.prop_number
+                        // }
+                        // if (el_prop_text){
+                        //     e.dataset['proptext'] = el_prop_text.innerHTML
+                        //     el_prop_text.innerHTML = this.prop_text
+                        // }
+        
+                        if (e.parentNode && !e.textContent.includes("\n") && !e.textContent.includes("\t") && !e.classList.contains('translated') && !e.textContent.match(/^[\d\s]+$/) && !e.textContent.match(/^\W+$/)){
                             let text = e.textContent.replace(/(\w+)/, "$1")
                             if (text.length && !contents[text]){
                                 contents[text] = {}
@@ -131,7 +142,7 @@ translator.translate = async function(elements){
                 orig_text = orig_text.match(/<prop-text>(.+)<\/prop-text>/)[1]
             }
 
-            if (contents[prop]){
+            if (contents[prop] && contents[prop][lang]){
                 let resp = contents[prop][lang]
                 resp = resp.replace(this.prop_number, orig_num)
                 resp = resp.replace(this.prop_text, orig_text)
@@ -153,7 +164,19 @@ translator.translate = async function(elements){
                     }
                     else if (lang != 'pt'){
                         // replace contents
-                        e.childNodes.forEach(e => {
+
+                        // if (e.dataset && e.dataset['propnumber']){
+                        //     contents[e.textContent][lang] = contents[e.textContent][lang].replace(this.prop_number, e.dataset['propnumber'])
+                        //     delete e.dataset['propnumber']
+                        // }
+
+                        // if (e.dataset && e.dataset['proptext']){
+                        //     contents[e.textContent][lang] = contents[e.textContent][lang].replace(this.prop_text, e.dataset['proptext'])
+                        //     console.log(contents[e.textContent][lang])
+                        //     delete e.dataset['proptext']
+                        // }
+
+                        e.childNodes.forEach(e => {        
                             if (e.nodeType == 3){
                                 // console.log(e.textContent)
                                 if (contents[e.textContent] && !e.parentNode.classList.contains('translated')){

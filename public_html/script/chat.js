@@ -668,7 +668,7 @@ function sendChatTable(json){
         table.append("<div class='row'></div>");
         var row = table.find('.row').last();
         for (let j in json[i]){
-            cclass = '';
+            let cclass = '';
             if (json[i][j].class)
                 cclass = json[i][j].class;
             row.append("<div class='cell "+ cclass +"'>"+ json[i][j].data +"</div>");

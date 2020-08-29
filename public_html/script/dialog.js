@@ -223,7 +223,7 @@ class Message {
             if (this.input && this.input.focus){
                 fog.querySelector('.input').focus()    
             }
-        }, 10)
+        }, 100)
 
         const box = fog.querySelector('#dialog-box')
         box.querySelector('*').display = 'none'
