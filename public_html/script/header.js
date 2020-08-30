@@ -181,7 +181,7 @@ header.load = async function() {
             })
 
             function bind_suggestion() {
-                new Message({
+                const msg = new Message({
                     message: `
                         <p>Qual texto precisa ser melhor traduzido?</p>
                         <input id='original' type='text' class='input'>
@@ -189,12 +189,14 @@ header.load = async function() {
                         <input id='suggestion' type='text' class='input'>
                     `,
                     buttons: {ok: "OK", cancel: "Cancelar"},
-                    class: "improve-translation-box"
-                }).show().click('ok', async function() {
-                    let original = document.querySelector('.improve-translation-box #original').value
-                    let suggestion = document.querySelector('.improve-translation-box #suggestion').value
+                    class: "improve-translation-box",
+                    preventKill: true
+                }).show()
+                msg.click('ok', async () => {
+                    const original = document.querySelector('.improve-translation-box #original').value
+                    const suggestion = document.querySelector('.improve-translation-box #suggestion').value
                     
-                    let data = await post("back_translation.php", {
+                    const data = await post("back_translation.php", {
                         action: "SUGGEST",
                         original: original,
                         suggestion: suggestion,
@@ -204,6 +206,7 @@ header.load = async function() {
         
                     new Message({message: "Sugestão enviada"}).show()
                 })
+                msg.click(null, () => msg.kill())
             }
 
             

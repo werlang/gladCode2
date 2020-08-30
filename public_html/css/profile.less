@@ -2936,10 +2936,13 @@ button {
         #apot-container {
             width: 100%;
             overflow: hidden;
-            height: calc(100vh - 50px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            
+            @media @size600 {
+                height: calc(100vh - 50px);
+            }
 
             .highlight {
                 color: #00638d;
@@ -2951,12 +2954,19 @@ button {
                 p {
                     max-width: 600px;
                     margin: 10px auto;
+                    text-align: justify;
                 }
 
                 #apot-info {
                     display: flex;
                     justify-content: center;
                     margin-top: 30px;
+                    margin-bottom: 20px;
+                    flex-direction: column;
+
+                    @media @size600 {
+                        flex-direction: row;
+                    }
 
                     .row {
                         display: flex;
@@ -2972,16 +2982,33 @@ button {
 
                     }
 
+                    #info{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+
                     #button-container {
-                        margin-left: 30px;
                         display: flex;
                         flex-direction: column;
                         justify-content: space-around;
+                        align-items: center;
+                        margin-top: 10px;
+                        
+                        @media @size600 {
+                            margin-left: 30px;
+                            margin-top: 0;
+                        }
                     }
-
+                    
                     button {
                         width: 220px;
                         height: 35px;
+                        margin-bottom: 5px;
+
+                        @media @size600 {
+                            margin-bottom: 0;
+                        }
                     }
 
                     .duration {

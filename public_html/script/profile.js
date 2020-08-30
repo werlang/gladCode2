@@ -23,96 +23,64 @@ var user
 header.load()
 tooltip()
 
-var tipArray = [
-    "Obrigado por fazer parte da versão beta da gladCode",
-    "Enquanto seu gladiador tiver menos de 1000 de renome, ele perderá menos renome",
-    "Se você for o vencedor de uma batalha, seu gladiador ganhará muito renome",
-    "Mesmo quando perder uma batalha, o gladiador pode ganhar renome, dependendo do tempo que ficou vivo",
-    "Ser um dos primeiros a morrer é a receita para perder grandes quantidades de renome",
-    "Se estiver enfrentando gladiadores mais fortes, o seu tende a ganhar mais renome",
-    "Gladiadores de renome semelhante são automaticamente selecionados para se enfrentar",
-    "Observe o comportamento de seus inimigos, e tente adaptar a lógica do seu gladiador para derrotá-los",
-    "Quando você está offline, seus gladiadores podem ser desafiados. Eles podem subir ou descer no ranking",
-    "Você pode ver as últimas batalhas que seus gladiadores participaram no menu HISTÓRICO",
-    "Você pode procurar por usuários ou enviar mensagens para seus amigos no menu AMIGOS",
-    "Participar de batalhas concede experiência para o mestre, que lhe permite recrutar mais gladiadores",
-    "Está com dúvida em algo? pergunte na página do facebook ou comunidade do reddit da gladCode",
-    "Quer conversar com outros mestres? Interaja de WhatsApp ou chat da gladCode",
-    "Assista o replay de suas batalhas, assim você entende melhor o comportamentos de seus gladiadores",
-    "A documentação é a melhor maneira de compreender como uma função funciona. Tem exemplos!",
-    "Não entendeu algo sobre o funcionamento da gladCode? O manual da simulação está ali à sua disposição",
-    "Ali no menu BATALHA, Você pode desafiar seus amigos para duelos de 1x1 para ver quem é o melhor",
-    "No menu BATALHA, você pode criar ou participar de um torneio. Junte seus amigos e convide-os",
-    "O chat da gladCode é o meio mais prático de compartilhar código e conhecer outros mestres. Experimente",
-    "Já viu que têm um botão de preferências nas batalhas, que te permite ajustar várias coisas legais?",
-
-    "A habilidade FIREBALL é efetiva no longo prazo, pois queima o inimigo aos poucos",
-    "A habilidade TELEPORT te envia para qualquer lugar. Mas cuide o gás tóxico",
-    "A habilidade CHARGE é ótima para se aproximar dos inimigos e causa um bom dano pela distância percorrida",
-    "A habilidade BLOCK é menos efetiva quando você leva dano pelas costas",
-    "A habilidade ASSASSINATE causa muito dano se você conseguir pegar o oponente desprevinido",
-    "A habilidade AMBUSH é ótima tanto para se livrar de perigos como para iniciar um combate",
-
-    "Cuide para nunca ficar na zona do gás tóxico. Mesmo o gladiador mais forte sucumbe nela rapidamente",
-    "É bom garantir o centro da arena, mas cuidado para não virar alvo de vários inimigos",
-    "Fugir das batalhas te mantém vivo, mas te deixa atrasado no poder que os níveis te concede",
-    "Cada um dos três atributos te concede características essenciais para todo tipo de gladiador",
-    "Sem FORÇA, um gladiador tem pouca vida, e morre rapidamente",
-    "Sem AGILIDADE, um gladiador é lento, tanto em seus ataques como em seus movimentos",
-    "Sem INTELIGÊNCIA, um gladiador não consegue lançar muitas habilidades",
-    "Com uma boa estratégia, você pode criar gladiadores híbridos que se beneficiam de várias habilidades",
-    "Se você tem pouca vida, jamais deixe um inimigo chegar muito perto de você",
-    "Se você é um mago, não fique parado. Ser atordoado pode te custar a vida",
-    "Se você é um guerreiro, abuse do BLOCK, ele é a ferramenta que te deixará vivo",
-    "Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura",
-
-    "Ganhe moedas de prata por iniciar batalhas ranqueadas",
-    "As primeiras 20 batalhas no intervalo de 24 horas rendem mais moedas de prata",
-    "No menu POÇÕES você pode acessar todos itens disponíveis no apotecário",
-    "Aumente o nível do seu apotecário para ganhar acesso a mais e melhores itens",
-    "Os itens encomendados no apotecário ficam disponíveis para uso em todas suas batalhas",
-    "Aumente seu nível de mestre para desbloquear mais espeços para encomandar poções",
-    "Use a poção de vitalidade para impedir que seu gladiador morra",
-    "Use a poção de concentração quando seu gladiador necessitar com urgência de pontos de habilidade",
-    "Quer dar uma melhorada em algum de seus atributos? O tônico fortificate é o que você precisa",
-    "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
-]
-translator.translate(tipArray).then( data => {
-    tipArray = data
-})
-
-translator.translate([
-    'meses',
-    'dias',
-    'horas',
-    'minutos',
-    "RECORTAR IMAGEM",
-    "Nenhuma batalha para mostrar",
-    "Gladiador",
-    "Renome",
-    "Data",
-    "Nenhum item neste espaço",
-    "de",
-    "Deseja excluir o gladiador",
-    "Sim",
-    "Não",
-    "SIM",
-    "NÃO",
-    "Última atividade",
-    "Aceitar solicitação",
-    "Recusar solicitação",
-    "Enviar mensagem",
-    "Enviar convite de amizade",
-    "Mensagem para",
-    "Olá...",
-    "CANCELAR",
-    "Clique para criar um novo gladiador",
-    "atualizar",
-    "Link da publicação",
-    "COPIAR"
-]).then( () => {
-    $('#tourn .title #offset .of').html(translator.getTranslated("de"))
-    $('#train .title #offset .of').html(translator.getTranslated("de"))
+login.wait().then( () => {
+    var tipArray = [
+        "Obrigado por fazer parte da versão beta da gladCode",
+        "Enquanto seu gladiador tiver menos de 1000 de renome, ele perderá menos renome",
+        "Se você for o vencedor de uma batalha, seu gladiador ganhará muito renome",
+        "Mesmo quando perder uma batalha, o gladiador pode ganhar renome, dependendo do tempo que ficou vivo",
+        "Ser um dos primeiros a morrer é a receita para perder grandes quantidades de renome",
+        "Se estiver enfrentando gladiadores mais fortes, o seu tende a ganhar mais renome",
+        "Gladiadores de renome semelhante são automaticamente selecionados para se enfrentar",
+        "Observe o comportamento de seus inimigos, e tente adaptar a lógica do seu gladiador para derrotá-los",
+        "Quando você está offline, seus gladiadores podem ser desafiados. Eles podem subir ou descer no ranking",
+        "Você pode ver as últimas batalhas que seus gladiadores participaram no menu HISTÓRICO",
+        "Você pode procurar por usuários ou enviar mensagens para seus amigos no menu AMIGOS",
+        "Participar de batalhas concede experiência para o mestre, que lhe permite recrutar mais gladiadores",
+        "Está com dúvida em algo? pergunte na página do facebook ou comunidade do reddit da gladCode",
+        "Quer conversar com outros mestres? Interaja de WhatsApp ou chat da gladCode",
+        "Assista o replay de suas batalhas, assim você entende melhor o comportamentos de seus gladiadores",
+        "A documentação é a melhor maneira de compreender como uma função funciona. Tem exemplos!",
+        "Não entendeu algo sobre o funcionamento da gladCode? O manual da simulação está ali à sua disposição",
+        "Ali no menu BATALHA, Você pode desafiar seus amigos para duelos de 1x1 para ver quem é o melhor",
+        "No menu BATALHA, você pode criar ou participar de um torneio. Junte seus amigos e convide-os",
+        "O chat da gladCode é o meio mais prático de compartilhar código e conhecer outros mestres. Experimente",
+        "Já viu que têm um botão de preferências nas batalhas, que te permite ajustar várias coisas legais?",
+    
+        "A habilidade FIREBALL é efetiva no longo prazo, pois queima o inimigo aos poucos",
+        "A habilidade TELEPORT te envia para qualquer lugar. Mas cuide o gás tóxico",
+        "A habilidade CHARGE é ótima para se aproximar dos inimigos e causa um bom dano pela distância percorrida",
+        "A habilidade BLOCK é menos efetiva quando você leva dano pelas costas",
+        "A habilidade ASSASSINATE causa muito dano se você conseguir pegar o oponente desprevinido",
+        "A habilidade AMBUSH é ótima tanto para se livrar de perigos como para iniciar um combate",
+    
+        "Cuide para nunca ficar na zona do gás tóxico. Mesmo o gladiador mais forte sucumbe nela rapidamente",
+        "É bom garantir o centro da arena, mas cuidado para não virar alvo de vários inimigos",
+        "Fugir das batalhas te mantém vivo, mas te deixa atrasado no poder que os níveis te concede",
+        "Cada um dos três atributos te concede características essenciais para todo tipo de gladiador",
+        "Sem FORÇA, um gladiador tem pouca vida, e morre rapidamente",
+        "Sem AGILIDADE, um gladiador é lento, tanto em seus ataques como em seus movimentos",
+        "Sem INTELIGÊNCIA, um gladiador não consegue lançar muitas habilidades",
+        "Com uma boa estratégia, você pode criar gladiadores híbridos que se beneficiam de várias habilidades",
+        "Se você tem pouca vida, jamais deixe um inimigo chegar muito perto de você",
+        "Se você é um mago, não fique parado. Ser atordoado pode te custar a vida",
+        "Se você é um guerreiro, abuse do BLOCK, ele é a ferramenta que te deixará vivo",
+        "Uma FIREBALL arremessada em uma área com mais de um inimigo fará todos levarem dano de queimadura",
+    
+        "Ganhe moedas de prata por iniciar batalhas ranqueadas",
+        "As primeiras 20 batalhas no intervalo de 24 horas rendem mais moedas de prata",
+        "No menu POÇÕES você pode acessar todos itens disponíveis no apotecário",
+        "Aumente o nível do seu apotecário para ganhar acesso a mais e melhores itens",
+        "Os itens encomendados no apotecário ficam disponíveis para uso em todas suas batalhas",
+        "Aumente seu nível de mestre para desbloquear mais espeços para encomandar poções",
+        "Use a poção de vitalidade para impedir que seu gladiador morra",
+        "Use a poção de concentração quando seu gladiador necessitar com urgência de pontos de habilidade",
+        "Quer dar uma melhorada em algum de seus atributos? O tônico fortificate é o que você precisa",
+        "Você tira melhor proveito do elixir da sabedoria quando usa ele assim que seu gladiador ganha um nível"
+    ]
+    translator.translate(tipArray).then( data => {
+        tipArray = data
+    })
 })
 
 window.onload = function(){
@@ -174,9 +142,45 @@ window.onload = function(){
             }
         });
         
-        translator.translate([$('#menu'), $('#panel')])
+        translator.translate([
+            document.querySelector('#menu'),
+            document.querySelector('#panel')
+        ])
 
-    });
+        translator.translate([
+            'meses',
+            'dias',
+            'horas',
+            'minutos',
+            "RECORTAR IMAGEM",
+            "Nenhuma batalha para mostrar",
+            "Gladiador",
+            "Renome",
+            "Data",
+            "Nenhum item neste espaço",
+            "de",
+            "Deseja excluir o gladiador",
+            "Sim",
+            "Não",
+            "SIM",
+            "NÃO",
+            "Última atividade",
+            "Aceitar solicitação",
+            "Recusar solicitação",
+            "Enviar mensagem",
+            "Enviar convite de amizade",
+            "Mensagem para",
+            "Olá...",
+            "CANCELAR",
+            "Clique para criar um novo gladiador",
+            "atualizar",
+            "Link da publicação",
+            "COPIAR"
+        ]).then( () => {
+            document.querySelector('#tourn .title #offset .of').innerHTML = translator.getTranslated("de")
+            document.querySelector('#train .title #offset .of').innerHTML = translator.getTranslated("de")
+        })
+    })
 
     $('#menu .item').click( function(){
         if (!$(this).hasClass('disabled')){

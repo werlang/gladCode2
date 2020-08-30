@@ -2,7 +2,7 @@ import {socket} from "./socket.js"
 import {login, header} from "./header.js"
 import {google} from "./googlelogin.js"
 import {translator} from "./translate.js"
-import {Message} from "./dialog.js"
+import {Message, tooltip} from "./dialog.js"
 
 window.admin_auth = socket.admin
 
@@ -69,6 +69,7 @@ header.load().then( () => {
     $('#header').addClass('big');
     $('#header-container').addClass('small');
 })
+tooltip()
 
 window.onload = async function() {
     await login.wait()

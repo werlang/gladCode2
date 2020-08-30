@@ -156,10 +156,10 @@
                     <div id='battle-mode'>
                         <h2>Para qual modo de batalha deseja se inscrever?</h2>
                         <div id='button-container'>
-                            <button id='ranked' class='button'><img src='icon/winner-icon.png'>Batalha Ranqueada</button>
-                            <button id='duel' class='button'><div class='notification empty'></div><img src='sprite/images/swords.png'>Duelo de Gladiadores</button>
-                            <button id='tourn' class='button'><img src='icon/tournament.png'>Torneio Personalizado</button>
-                            <button id='train' class='button'><img src='icon/stars-stack.png'>Treino de equipes</button>
+                            <button id='ranked' class='button'><img src='icon/winner-icon.png'><span>Batalha Ranqueada</span></button>
+                            <button id='duel' class='button'><div class='notification empty'></div><img src='sprite/images/swords.png'><span>Duelo de Gladiadores</span></button>
+                            <button id='tourn' class='button'><img src='icon/tournament.png'><span>Torneio Personalizado</span></button>
+                            <button id='train' class='button'><img src='icon/stars-stack.png'><span>Treino de Equipes</span></button>
                         </div>
                     </div>
                     <div id='ranked' class='wrapper'>
@@ -258,7 +258,7 @@
                         <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'></span> horas</span>, uma vez por batalha.</p>
                         <p>Cada um de seus compartimentos dá direito a levar para batalha um item encomendado. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
                         <div id='apot-info'>
-                            <div class='col'>
+                            <div id='info' class='col'>
                                 <div class='row'>
                                     <div>Nível do apotecário:</div><div class='lvl highlight'></div>
                                 </div>

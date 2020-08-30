@@ -1,11 +1,12 @@
 import {post, $index} from "./utils.js"
-import {Message} from "./dialog.js"
+import {Message, tooltip} from "./dialog.js"
 import {header} from "./header.js"
 
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
 header.load()
+tooltip()
 
 window.onload = async function(){
 
