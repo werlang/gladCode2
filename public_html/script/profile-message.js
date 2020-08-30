@@ -8,8 +8,13 @@ login.wait().then( () => {
     translationReady = translator.translate([
         "Mensagem",
         "Usuário",
-        "Última mensagem"
-    ])
+        "Última mensagem",
+        "de"
+    ]).then( () => {
+        document.querySelectorAll('.page-nav .of').forEach(e => {
+            e.innerHTML = translator.getTranslated("de")
+        })
+    })
 })
 
 
@@ -66,9 +71,9 @@ messages.reload = async function(){
     this.offset = parseInt(data.offset)
     this.total = parseInt(data.total)
 
-    document.querySelectorAll("#message-panel .page-nav span")[0].textContent = this.offset + 1
-    document.querySelectorAll("#message-panel .page-nav span")[1].textContent = this.offset + this.nrows
-    document.querySelectorAll("#message-panel .page-nav span")[2].textContent = this.total
+    document.querySelector("#message-panel .page-nav .start").textContent = this.offset + 1
+    document.querySelector("#message-panel .page-nav .end").textContent = this.offset + this.nrows
+    document.querySelector("#message-panel .page-nav .total").textContent = this.total
 
     document.querySelector("#message-panel .page-nav").style.display = this.total <= this.step ? "none" : ""
     document.querySelector("#message-panel .page-nav #prev").disabled = this.offset == 0

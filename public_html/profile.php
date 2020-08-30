@@ -236,7 +236,7 @@
                         <div id='post-table'>
                             <label id='unread'><input type="checkbox" class='radio'>Somente não lidos</label>
                             <div class='page-nav'>
-                                <span></span> - <span></span> de <span></span>
+                                <span class='start'></span> - <span class='end'></span><span class='of'>de</span><span class='total'></span>
                                 <button id='prev'><i class='fas fa-chevron-left'></i></button>
                                 <button id='next'><i class='fas fa-chevron-right'></i></button>
                             </div>
@@ -288,7 +288,7 @@
                     <div id='tab-container'><div id='tab-general' class='tab selected' data-name='geral'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
                     <div class='table'></div>
                     <div class='page-nav'>
-                        <span></span> - <span></span> de <span></span>
+                        <span class='start'></span> - <span class='end'></span><span class='of'>de</span><span class='total'></span>
                         <button id='prev'><i class='fas fa-chevron-left'></i></button>
                         <button id='next'><i class='fas fa-chevron-right'></i></button>
                     </div>
@@ -299,7 +299,7 @@
                     <h2>Mensagens</h2>
                     <div class='table'></div>
                     <div class='page-nav'>
-                        <span></span> - <span></span> de <span></span>
+                        <span class='start'></span> - <span class='end'></span><span class='of'>de</span><span class='total'></span>
                         <button id='prev'><i class='fas fa-chevron-left'></i></button>
                         <button id='next'><i class='fas fa-chevron-right'></i></button>
                     </div>

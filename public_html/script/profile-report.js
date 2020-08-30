@@ -58,8 +58,13 @@ $(document).ready( async function(){
             "Visualizar batalha",
             "Guardar nos favoritos",
             "Tirar dos favoritos",
-            "Comentário"
-        ]).then( async () => {        
+            "Comentário",
+            "de"
+        ]).then( async () => {  
+            document.querySelectorAll('.page-nav .of').forEach(e => {
+                e.innerHTML = translator.getTranslated("de")
+            })
+          
             this.pages[id].offset = offset
             $('#report-container #unread').hide()
 
@@ -409,9 +414,9 @@ $(document).ready( async function(){
                 }
             }
 
-            $('#report-container .page-nav span').eq(0).html(this.pages[id].total == 0 ? 0 : offset + 1)
-            $('#report-container .page-nav span').eq(1).html(Math.min(offset + limit, this.pages[id].total))
-            $('#report-container .page-nav span').eq(2).html(this.pages[id].total)
+            $('#report-container .page-nav .start').html(this.pages[id].total == 0 ? 0 : offset + 1)
+            $('#report-container .page-nav .end').html(Math.min(offset + limit, this.pages[id].total))
+            $('#report-container .page-nav .total').html(this.pages[id].total)
             
             if (offset > 0){
                 $('#report-container #prev').removeAttr('disabled')

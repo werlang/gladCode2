@@ -4,7 +4,15 @@ import {translator} from "./translate.js"
 import {Message, createToast} from "./dialog.js"
 
 $(document).ready( function(){
-    login.wait()
+    login.wait().then( () => {
+        translator.translate([
+            "de"
+        ]).then( () => {
+            document.querySelectorAll('.page-nav .of').forEach(e => {
+                e.innerHTML = translator.getTranslated("de")
+            })    
+        })
+    })
 
     var tabs = {
         pages: {
@@ -185,7 +193,9 @@ $(document).ready( function(){
                 let input = new Message({
                     message: `Nome da <b>#hashtag</b> que deseja rastrear`,
                     buttons: {ok: "OK", cancel: "CANCELAR"},
-                    input: {placeholder: "suahashtag"},
+                    input: {
+                        placeholder: "suahashtag",
+                    },
                     preventKill: true
                 })
                 input.show()
@@ -399,9 +409,9 @@ $(document).ready( function(){
                 
             }
 
-            $('#ranking-container .page-nav span').eq(0).html(this.pages[id].total == 0 ? 0 : offset + 1)
-            $('#ranking-container .page-nav span').eq(1).html(Math.min(offset + limit, this.pages[id].total))
-            $('#ranking-container .page-nav span').eq(2).html(this.pages[id].total)
+            $('#ranking-container .page-nav .start').html(this.pages[id].total == 0 ? 0 : offset + 1)
+            $('#ranking-container .page-nav .end').html(Math.min(offset + limit, this.pages[id].total))
+            $('#ranking-container .page-nav .total').html(this.pages[id].total)
             
             if (offset > 0){
                 $('#ranking-container #prev').removeAttr('disabled')

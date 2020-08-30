@@ -5,6 +5,59 @@ import {post} from "./utils.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
 
+login.wait().then( () => {
+    translator.translate([
+        "O identificador precisa ter tamanho 6 ou mais",
+        "O identificador precisa conter somente letras, números ou espaços",
+        "Digite uma senha, ou torne o torneio público",
+        "Informe um número entre 2 e 50",
+        "Formato de hora inválida",
+        "Um torneio com este identificador já existe",
+        "As equipes deverão entrar com os seguintes dados para se inscrever em seu torneio",
+        "Identificador",
+        "Senha",
+        "As equipes deverão procurar seu torneio na lista de torneios públicos, ou entrar com o seguinte identificador para se inscrever em seu torneio",
+        "Torneio registrado",
+        "Torneio não encontrado",
+        "Torneio",
+        "Equipes inscritas",
+        "Nova Equipe",
+        "REMOVER",
+        "INICIAR TORNEIO",
+        "FECHAR",
+        "Nome da nova equipe",
+        "Nome muito curto",
+        "Esta equipe já está registrada",
+        "Equipe",
+        "registrada",
+        "Os mestres deverão informar a seguinte senha para ingressar nesta equipe",
+        "Gladiadores inscritos",
+        "Gladiadores",
+        "VOLTAR",
+        "ABANDONAR",
+        "Clique para inscrever um novo gladiador",
+        "Expulsar equipe",
+        "Nenhuma equipe inscrita",
+        "Descrição",
+        "Equipes",
+        "Tem certeza que deseja sair da equipe",
+        "Você não faz mais parte da equipe",
+        "A equipe",
+        "foi desmantelada",
+        "Você ingressou na equipe",
+        "O gladiador",
+        "foi removido da equipe",
+        "INGRESSAR",
+        "Deseja remover o gladiador",
+        "da equipe",
+        "de"
+    ]).then( data => {
+        document.querySelectorAll('.title .of').forEach(e => {
+            e.innerHTML = translator.getTranslated("de")
+        })
+    })
+    
+})
 
 var teamsync = {id: 0, time: 0};
 var user
@@ -25,54 +78,7 @@ $(document).ready( function(){
     });
 
     login.wait().then( data => {
-        user = data
-        
-        let msg = [
-            "O identificador precisa ter tamanho 6 ou mais",
-            "O identificador precisa conter somente letras, números ou espaços",
-            "Digite uma senha, ou torne o torneio público",
-            "Informe um número entre 2 e 50",
-            "Formato de hora inválida",
-            "Um torneio com este identificador já existe",
-            "As equipes deverão entrar com os seguintes dados para se inscrever em seu torneio",
-            "Identificador",
-            "Senha",
-            "As equipes deverão procurar seu torneio na lista de torneios públicos, ou entrar com o seguinte identificador para se inscrever em seu torneio",
-            "Torneio registrado",
-            "Torneio não encontrado",
-            "Torneio",
-            "Equipes inscritas",
-            "Nova Equipe",
-            "REMOVER",
-            "INICIAR TORNEIO",
-            "FECHAR",
-            "Nome da nova equipe",
-            "Nome muito curto",
-            "Esta equipe já está registrada",
-            "Equipe",
-            "registrada",
-            "Os mestres deverão informar a seguinte senha para ingressar nesta equipe",
-            "Gladiadores inscritos",
-            "Gladiadores",
-            "VOLTAR",
-            "ABANDONAR",
-            "Clique para inscrever um novo gladiador",
-            "Expulsar equipe",
-            "Nenhuma equipe inscrita",
-            "Descrição",
-            "Equipes",
-            "Tem certeza que deseja sair da equipe",
-            "Você não faz mais parte da equipe",
-            "A equipe",
-            "foi desmantelada",
-            "Você ingressou na equipe",
-            "O gladiador",
-            "foi removido da equipe",
-            "INGRESSAR",
-            "Deseja remover o gladiador",
-            "da equipe"
-        ]
-        translator.translate(msg)
+        user = data        
     })
 
     $('#panel #tourn.wrapper #create').click( function() {
