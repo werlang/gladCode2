@@ -116,6 +116,18 @@ window.onload = function(){
         //     })
         // }
 
+        document.querySelector('#menu #retract').addEventListener('click', function() {
+            const menu = document.querySelector('#menu')
+            if (this.classList.contains('collapsed')){
+                this.classList.remove('collapsed')
+                menu.classList.remove('collapsed')
+            }
+            else{
+                this.classList.add('collapsed')
+                menu.classList.add('collapsed')
+            }
+        })
+
         var language = $('#profile-panel #language select');
         language.selectmenu().val(user.language).selectmenu('refresh');
 

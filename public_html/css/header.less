@@ -1,3 +1,5 @@
+@mobile:   ~"only screen and (max-width: 600px)";
+
 @size450:   ~"only screen and (min-width: 450px)";
 @size600:   ~"only screen and (min-width: 600px)";
 @size800:   ~"only screen and (min-width: 800px)";
@@ -14,7 +16,9 @@ body{
 
 /* width */
 ::-webkit-scrollbar {
-    width: 10px;
+    @media @size600 {
+        width: 10px;
+    }
 }
 
 /* Track */

@@ -101,6 +101,7 @@
                 <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
                 <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
+            <div id='retract'><i class='fas fa-caret-down'></i></div>
             <div id='footer'></div>
         </div>
         <div id='panel'>
