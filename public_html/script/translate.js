@@ -275,22 +275,24 @@ translator.bind = function (obj){
         p && p.classList.remove('translating')
     
         if (translator.suggest){
-            obj.addEventListener('mouseenter', () => hoverHandler(obj))
-            obj.addEventListener('mouseleave', () => hoverHandler(obj))
+            obj.addEventListener('mouseenter', e => hoverHandler(obj, e))
             
-            function hoverHandler(obj) {
+            function hoverHandler(obj, mouse) {
                 document.querySelectorAll('.improve-box').forEach(e => e.remove())
                 obj.insertAdjacentHTML('beforeend', `<div class='improve-box' data-time='${(new Date()).getTime()}'><i class='fas fa-language'></i></div>`)
     
                 const waitTime = 2000
+                const offset = {x: 5, y: -5}
+
                 setTimeout( () => {
                     // show element
                     const box = obj.querySelector('.improve-box')
                     if (box){
                         const timePassed = parseFloat(box.dataset.time) + waitTime <= (new Date()).getTime()
                         if (!box.classList.contains('visible') && timePassed){
-                            box.style.top = obj.offsetTop
-                            box.style.left = obj.offsetLeft
+                            box.style.top = mouse.y + offset.y + "px"
+                            box.style.left = mouse.x + offset.x + "px"
+
                             box.classList.add('visible')
                             // box.removeEventListener('click')
                             box.addEventListener('click', function(e) {
