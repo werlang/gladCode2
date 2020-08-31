@@ -4,6 +4,7 @@ import {post} from "./utils.js"
 import {Message, createToast} from "./dialog.js"
 import {translator} from "./translate.js"
 import {sendChatMessage} from "./chat.js"
+import {gladCard} from "./glad-card.js"
 
 translator.translate([
     "Remover treino",
@@ -18,7 +19,36 @@ translator.translate([
     "Gladiadores por batalha",
     "Peso do treino",
     "Cancelar",
-    "CRIAR"
+    "CRIAR",
+    "Treino criado",
+    "Os mestres de gladiadores podem ingressar no treino",
+    "Escaneando o QR code em seus celulares",
+    "Usando o link do treino",
+    "Digitando o código do treino",
+    "FECHAR",
+    "O identificador precisa ter tamanho 6 ou mais",
+    "Sala de discussão do treino",
+    "Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo",
+    "Reduzir fonte",
+    "Copiar link",
+    "Aumentar fonte",
+    "Escolha o gladiador que participará do treino",
+    "SELECIONAR",
+    "Treino",
+    "Participantes",
+    "Batalhas compostas por",
+    "REMOVER",
+    "INICIAR TREINO",
+    "mestres",
+    "Adicione uma descrição",
+    "Clique para alterar",
+    "Ampliar QR code",
+    "Renovar link",
+    "Nenhum participante",
+    "e",
+    "Mestre",
+    "Gladiador",
+    "Expulsar participante"
 ])
 
 $(document).ready( function(){
@@ -165,7 +195,7 @@ $(document).ready( function(){
                 if (name.length < 6){
                     $('.train.window #name').focus();
                     $('.train.window #name').addClass('error');
-                    $('.train.window #name').before("<span class='tip'>O identificador precisa ter tamanho 6 ou mais</span>");
+                    $('.train.window #name').before(`<span class='tip'>${translator.getTranslated("O identificador precisa ter tamanho 6 ou mais")}</span>`);
                 }
                 else{
                     let data = await post("back_train.php",{
@@ -187,28 +217,28 @@ $(document).ready( function(){
                         login.user.credits = 0
                     }
                     else if (data.status == "SUCCESS"){
-                        sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
+                        sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d ${translator.getTranslated("Sala de discussão do treino")} ${name}`})
 
                         $('#fog').remove()
                         let box = `
-                            <h2>Treino criado</h2>
-                            <p>Os mestres de gladiadores podem ingressar no treino</p>
+                            <h2>${translator.getTranslated("Treino criado")}</h2>
+                            <p>${translator.getTranslated("Os mestres de gladiadores podem ingressar no treino")}</p>
                             <div class='column-list'>
                                 <div class='item' id='qrcode'>
-                                    <span>Escaneando o QR code em seus celulares</span>
+                                    <span>${translator.getTranslated("Escaneando o QR code em seus celulares")}</span>
                                     <i class='fas fa-qrcode'></i>
                                 </div>
                                 <div class='item' id='link'>
-                                    <span>Usando o link do treino</span>
+                                    <span>${translator.getTranslated("Usando o link do treino")}</span>
                                     <i class='fas fa-link'></i>
                                 </div>
                                 <div class='item' id='manual'>
-                                    <span>Digitando o código do treino</span>
+                                    <span>${translator.getTranslated("Digitando o código do treino")}</span>
                                     <i class='fas fa-font'></i>
                                 </div>
                             </div>
                             <div id='button-container'>
-                                <button class='button'>FECHAR</button>
+                                <button class='button'>${translator.getTranslated("FECHAR")}</button>
                             </div>
                         `
                         $('body').append(`<div id='fog'><div id='train-message'>${box}</div><div id='big-info'></div></div>`)
@@ -244,7 +274,7 @@ $(document).ready( function(){
                             if ($(this).attr('id') == 'manual'){
                                 prelink = ''
                                 manualclass = 'manual'
-                                manualtext = `<p>Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo</p>`
+                                manualtext = `<p>${translator.getTranslated("Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo")}</p>`
                             }
 
                             $('#fog').addClass('white')
@@ -254,9 +284,9 @@ $(document).ready( function(){
                                     <span class='link ${manualclass}'>${prelink}<b>${data.hash}</b></span>
                                 </div>
                                 <div id='buttons' class='row'>
-                                    <i id='reduce' class='icon fas fa-minus' title='Reduzir fonte'></i>
-                                    <i id='copy' class='icon fas fa-copy' title='Copiar link'></i>
-                                    <i id='increase' class='icon fas fa-plus' title='Aumentar fonte'></i>
+                                    <i id='reduce' class='icon fas fa-minus' title='${translator.getTranslated("Reduzir fonte", false)}'></i>
+                                    <i id='copy' class='icon fas fa-copy' title='${translator.getTranslated("Copiar link", false)}'></i>
+                                    <i id='increase' class='icon fas fa-plus' title='${translator.getTranslated("Aumentar fonte", false)}'></i>
                                 </div>
                             `).fadeIn()
                             $('#train-message').hide()
@@ -299,7 +329,8 @@ $(document).ready( function(){
             message: "Informe o código fornecido para participar do treino",
             input: {focus: true},
             buttons: {ok: "OK", cancel: "Cancelar"},
-        }).show().click('ok', async hash => {    
+        }).show().click('ok', async hash => {
+            hash = hash.input
             let data = await post("back_train.php", {
                 action: "JOIN",
                 hash: hash
@@ -331,11 +362,11 @@ $(document).ready( function(){
             else if (data.status == "ALLOWED"){
                 var box = `<div id='fog'>
                     <div id='duel-box'>
-                        <div id='title'>Escolha o gladiador que participará do treino</div>
+                        <div id='title'>${translator.getTranslated("Escolha o gladiador que participará do treino")}</div>
                         <div class='glad-card-container'></div>
                         <div id='button-container'>
-                            <button id='cancel' class='button'>Cancelar</button>
-                            <button id='select' class='button' disabled>SELECIONAR</button>
+                            <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                            <button id='select' class='button' disabled>${translator.getTranslated("SELECIONAR")}</button>
                         </div>
                     </div>
                 </div>`;
@@ -539,9 +570,9 @@ var roomList = {
                     this.manager = manager
                     $('body').append(`<div id='fog'>
                         <div class='train window'>
-                            <div id='title'><h2>Treino<span id='train-name' class='edit' data-field='name'>${data.name}</span></h2></div>
+                            <div id='title'><h2>${translator.getTranslated("Treino")}<span id='train-name' class='edit' data-field='name'>${data.name}</span></h2></div>
                             <div id='train-desc' class='edit' data-field='description'>${data.description}</div>
-                            <h3>Participantes: <span id='count'></span></h3>
+                            <h3>${translator.getTranslated("Participantes")}: <span id='count'></span></h3>
                             <div class='table'></div>
                             <div id='options-container'>
                                 <div>
@@ -549,35 +580,35 @@ var roomList = {
                                     <div id='link'>https://gladcode.dev/train/</div>
                                 </div>
                                 <div id='time-container'>
-                                    <span>Tempo máximo do treino</span>
+                                    <span>${translator.getTranslated("Tempo máximo do treino")}</span>
                                     <span id='maxtime'>${data.maxtime}m</span>
                                 </div>
                                 <div id='player-container'>
-                                    <span>Batalhas compostas por <span id='players'>${data.players}</span><span id='pl-second'></span> mestres</span>
+                                    <span>${translator.getTranslated("Batalhas compostas por")} <span id='players'>${data.players}</span><span id='pl-second'></span> ${translator.getTranslated("mestres")}</span>
                                 </div>
                             </div>
                             <div id='button-container'>
-                                <button id='delete' class='button' hidden>REMOVER</button>
-                                <button id='start' class='button' disabled>INICIAR TREINO</button>
-                                <button id='close' class='button'>FECHAR</button>
+                                <button id='delete' class='button' hidden>${translator.getTranslated("REMOVER")}</button>
+                                <button id='start' class='button' disabled>${translator.getTranslated("INICIAR TREINO")}</button>
+                                <button id='close' class='button'>${translator.getTranslated("FECHAR")}</button>
                             </div>
                         </div>
                     </div>`);
             
                     if (manager){
                         if ($('.train.window #train-desc').text().length == 0){
-                            $('.train.window #train-desc').html("Adicione uma descrição")
+                            $('.train.window #train-desc').html(translator.getTranslated("Adicione uma descrição", false))
                         }
                     }
                     else{
                         $('.train.window .edit').removeClass('edit')
                         $('.train.window #qr').parent().remove()
                         $('.train.window #start').hide()
-                        $('.train.window #delete').html("ABANDONAR TREINO").show()
+                        $('.train.window #delete').html(translator.getTranslated("ABANDONAR TREINO")).show()
 
                         $('.train.window #delete').click( async () => {
                             new Message({
-                                message: `Abandonar o treino <b>${data.name}</b>?`, 
+                                message: `Abandonar o treino?`, 
                                 buttons: {yes: "Sim", no: "Não"} 
                             }).show().click('yes', () => {
                                 this.left = true
@@ -594,7 +625,7 @@ var roomList = {
                         })
                     }
             
-                    $('.train.window .edit').attr('title', "Clique para alterar")
+                    $('.train.window .edit').attr('title', translator.getTranslated("Clique para alterar", false))
             
                     let qrcode = new Image()
                     if (!data.expired){
@@ -603,7 +634,7 @@ var roomList = {
                         $('.train.window #link').before(`<button id='renew'><i class='fas fa-spinner fa-pulse'></i></button>`)
             
                         qrcode.onload = function(){
-                            $('.train.window #qr').html(qrcode).attr('title', "Apliar QR code").removeClass('blur')
+                            $('.train.window #qr').html(qrcode).attr('title', translator.getTranslated("Ampliar QR code", false)).removeClass('blur')
                             $('.train.window #link').append(`<span>${data.hash}</span>`)
                             $('.train.window #renew').remove()
                             showQR($('.train.window #qr img').clone())
@@ -611,7 +642,7 @@ var roomList = {
                     }
                     else{
                         $('.train.window #qr').html(`<i id='fake-qr' class='fas fa-qrcode'></i>`)
-                        $('.train.window #link').append(`<span class='blur'>XXXX</span>`).before(`<button id='renew' title='Renovar link'><i class='fas fa-redo'></i></button>`)
+                        $('.train.window #link').append(`<span class='blur'>XXXX</span>`).before(`<button id='renew' title='${translator.getTranslated("Renovar link", false)}'><i class='fas fa-redo'></i></button>`)
                     }
             
                     $('.train.window #close').click( function(){
@@ -678,7 +709,7 @@ var roomList = {
                                     createToast(`Campo alterado com sucesso`, "success")
                                     roomList[id][this.field] = this.text
                                     if (this.field == 'name'){
-                                        sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d Sala de discussão do treino ${this.text}`})
+                                        sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d ${translator.getTranslated("Sala de discussão do treino")} ${this.text}`})
                                     }
                                 }
                             },
@@ -706,7 +737,7 @@ var roomList = {
                             qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
                             qrcode.onload = () => {
                                 $('.train.window #qr').html(qrcode).removeClass('blur')
-                                $('.train.window #qr').attr('title', 'Ampliar QR code')
+                                $('.train.window #qr').attr('title', translator.getTranslated('Ampliar QR code', false))
                                 $('.train.window #link span').html(data.hash).removeClass('blur')
                                 $('.train.window #renew').remove()
                                 showQR($('.train.window #qr img').clone())
@@ -768,7 +799,7 @@ var roomList = {
                         let qrcode = new Image()
                         qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
                         qrcode.onload = function(){
-                            $('.train.window #qr').html(qrcode).attr('title', "Apliar QR code").removeClass('blur')
+                            $('.train.window #qr').html(qrcode).attr('title', translator.getTranslated("Ampliar QR code", false)).removeClass('blur')
                             $('.train.window #link span').html(data.hash).removeClass('blur')
                             $('.train.window #renew').remove()
                             showQR($('.train.window #qr img').clone())
@@ -777,7 +808,7 @@ var roomList = {
             
                     let nglads = data.glads.length
                     if (nglads == 0){
-                        $('.train.window .table').html("<div class='row'>Nenhum participante</div>");
+                        $('.train.window .table').html(`<div class='row'>${translator.getTranslated("Nenhum participante")}</div>`);
                         $('.train.window h3 #count').html("");
             
                         if (manager){
@@ -815,11 +846,11 @@ var roomList = {
                         }
                         else if (lower == players){
                             $('.train.window #player-container #players').html(lower)
-                            $('.train.window #player-container #pl-second').html(`e ${higher}`)
+                            $('.train.window #player-container #pl-second').html(`${translator.getTranslated("e")} ${higher}`)
                         }
                         else if (higher == players){
                             $('.train.window #player-container #players').html(higher)
-                            $('.train.window #player-container #pl-second').html(`e ${lower}`)
+                            $('.train.window #player-container #pl-second').html(`${translator.getTranslated("e")} ${lower}`)
                         }
                         else{
                             $('.train.window #player-container #players').html("")
@@ -831,9 +862,9 @@ var roomList = {
                             }
                         }
 
-                        $('.train.window .table').html("<div class='row head'><div class='cell'>Mestre</div><div class='cell'>Gladiador</div></div>");
+                        $('.train.window .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell'>${translator.getTranslated("Gladiador")}</div></div>`);
                         for (let glad of data.glads){
-                            $('.train.window .table').append(`<div class='row'><div class='cell'>${glad.master}</div><div class='cell'>${glad.gladiator}</div><div class='kick' title='Expulsar participante'><i class='fas fa-times-circle'></i></div></div>`);
+                            $('.train.window .table').append(`<div class='row'><div class='cell'>${glad.master}</div><div class='cell'>${glad.gladiator}</div><div class='kick' title='${translator.getTranslated("Expulsar participante", false)}'><i class='fas fa-times-circle'></i></div></div>`);
                             $('.train.window .table .row').last().data('id', glad.id)
             
                             if (glad.mine)
@@ -895,11 +926,11 @@ var roomList = {
                             $('.train.window .table .row.signed').click( function(){
                                 var box = `<div id='fog'>
                                     <div id='duel-box'>
-                                        <div id='title'>Escolha o gladiador que participará do treino</div>
+                                        <div id='title'>${translator.getTranslated("Escolha o gladiador que participará do treino")}</div>
                                         <div class='glad-card-container'></div>
                                         <div id='button-container'>
-                                            <button id='cancel' class='button'>Cancelar</button>
-                                            <button id='select' class='button' disabled>SELECIONAR</button>
+                                            <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                                            <button id='select' class='button' disabled>${translator.getTranslated("SELECIONAR")}</button>
                                         </div>
                                     </div>
                                 </div>`;
