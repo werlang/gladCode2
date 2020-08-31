@@ -51,7 +51,7 @@ login.wait().then( () => {
         "Deseja remover o gladiador",
         "da equipe",
         "de"
-    ]).then( data => {
+    ]).then( () => {
         document.querySelectorAll('.title .of').forEach(e => {
             e.innerHTML = translator.getTranslated("de")
         })

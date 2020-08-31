@@ -1,6 +1,24 @@
 import {post, getDate} from "./utils.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
+import { login } from "./header.js"
+
+let translatorReady
+login.wait().then( () => {
+    translatorReady = translator.translate([
+        "Oponente",
+        "Mestre",
+        "Visualizar batalha",
+        "Guardar nos favoritos",
+        "Tirar dos favoritos",
+        "Comentário",
+        "de",
+        "Você ainda não possui duelos",
+        "Cancelar desafio",
+        "Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas",
+        "Gladiador Esquecido"
+    ])
+})
 
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]
@@ -52,15 +70,7 @@ $(document).ready( async function(){
         dummy = true
         }){
 
-        translator.translate([
-            "Oponente",
-            "Mestre",
-            "Visualizar batalha",
-            "Guardar nos favoritos",
-            "Tirar dos favoritos",
-            "Comentário",
-            "de"
-        ]).then( async () => {  
+        translatorReady.then( async () => {  
             document.querySelectorAll('.page-nav .of').forEach(e => {
                 e.innerHTML = translator.getTranslated("de")
             })
@@ -250,7 +260,7 @@ $(document).ready( async function(){
                     for (let i=0 ; i<limit ; i++){
                         if (data.total == 0 && i == 0){
                             $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas</h3></div>
+                                <div class='cell'><h3>${translator.getTranslated("Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas")}</h3></div>
                             </div>`);
                         }
                         else if (offset + i < data.total){
@@ -346,7 +356,7 @@ $(document).ready( async function(){
                     for (let i=0 ; i<limit ; i++){
                         if (data.total == 0 && i == 0){
                             $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>Você ainda não possui duelos</h3></div>
+                                <div class='cell'><h3>${translator.getTranslated("Você ainda não possui duelos")}</h3></div>
                             </div>`);
                         }
                         else if (offset + i < data.total){
@@ -362,7 +372,7 @@ $(document).ready( async function(){
                                 enemy: {class: "", value: row.enemy},
                             }
                             if (!row.glad){
-                                glad.me = {class: "forgotten", value: `Gladiador Esquecido`}
+                                glad.me = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
                             }
 
                             let tail = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
@@ -370,11 +380,11 @@ $(document).ready( async function(){
                             </div>`
                             if (!row.enemy){
                                 if (row.log){
-                                    glad.enemy = {class: "forgotten", value: `Gladiador Esquecido`}
+                                    glad.enemy = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
                                 }
                                 else{
                                     glad.enemy.value = "???"
-                                    tail = "<div class='remove' title='Cancelar desafio'>X</div>"
+                                    tail = `<div class='remove' title='${translator.getTranslated("Cancelar desafio", false)}'>X</div>`
                                 }
                             }
 

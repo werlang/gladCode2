@@ -23,6 +23,7 @@ var user
 header.load()
 tooltip()
 
+let translatorReady
 login.wait().then( () => {
     var tipArray = [
         "Obrigado por fazer parte da versão beta da gladCode",
@@ -81,6 +82,38 @@ login.wait().then( () => {
     translator.translate(tipArray).then( data => {
         tipArray = data
     })
+
+    translatorReady = translator.translate([
+        'meses',
+        'dias',
+        'horas',
+        'minutos',
+        "RECORTAR IMAGEM",
+        "Nenhuma batalha para mostrar",
+        "Gladiador",
+        "Renome",
+        "Data",
+        "Nenhum item neste espaço",
+        "de",
+        "Deseja excluir o gladiador",
+        "Sim",
+        "Não",
+        "SIM",
+        "NÃO",
+        "Última atividade",
+        "Aceitar solicitação",
+        "Recusar solicitação",
+        "Enviar mensagem",
+        "Enviar convite de amizade",
+        "Mensagem para",
+        "Olá...",
+        "CANCELAR",
+        "Clique para criar um novo gladiador",
+        "atualizar",
+        "Link da publicação",
+        "COPIAR",
+        "Somente não lidos"
+    ])
 })
 
 window.onload = function(){
@@ -159,38 +192,10 @@ window.onload = function(){
             document.querySelector('#panel')
         ])
 
-        translator.translate([
-            'meses',
-            'dias',
-            'horas',
-            'minutos',
-            "RECORTAR IMAGEM",
-            "Nenhuma batalha para mostrar",
-            "Gladiador",
-            "Renome",
-            "Data",
-            "Nenhum item neste espaço",
-            "de",
-            "Deseja excluir o gladiador",
-            "Sim",
-            "Não",
-            "SIM",
-            "NÃO",
-            "Última atividade",
-            "Aceitar solicitação",
-            "Recusar solicitação",
-            "Enviar mensagem",
-            "Enviar convite de amizade",
-            "Mensagem para",
-            "Olá...",
-            "CANCELAR",
-            "Clique para criar um novo gladiador",
-            "atualizar",
-            "Link da publicação",
-            "COPIAR"
-        ]).then( () => {
+        translatorReady.then( () => {
             document.querySelector('#tourn .title #offset .of').innerHTML = translator.getTranslated("de")
             document.querySelector('#train .title #offset .of').innerHTML = translator.getTranslated("de")
+            document.querySelector('#bhist-container #unread span').innerHTML = translator.getTranslated("Somente não lidos")
         })
     })
 

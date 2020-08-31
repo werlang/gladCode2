@@ -77,6 +77,9 @@ const tooltip = function(delay = 700){
                 tpReveal.classList.remove('hidden')
                 adjustPosition(tpReveal, mouse)
 
+                setTimeout( () => {
+                    tpReveal.remove()
+                }, 10000)
             }
             if (tooltip.length > 0){
                 tooltip[tooltip.length - 1].remove()

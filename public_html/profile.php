@@ -235,7 +235,7 @@
                         </div>
                         <div class='table'></div>
                         <div id='post-table'>
-                            <label id='unread'><input type="checkbox" class='radio'>Somente não lidos</label>
+                            <label id='unread'><input type="checkbox" class='radio'><span>Somente não lidos</span></label>
                             <div class='page-nav'>
                                 <span class='start'></span> - <span class='end'></span><span class='of'>de</span><span class='total'></span>
                                 <button id='prev'><i class='fas fa-chevron-left'></i></button>
