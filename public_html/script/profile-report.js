@@ -3,9 +3,9 @@ import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
 import { login } from "./header.js"
 
-let translatorReady
-login.wait().then( () => {
-    translatorReady = translator.translate([
+const translatorReady = (async () => {
+    await login.wait()
+    await translator.translate([
         "Oponente",
         "Mestre",
         "Visualizar batalha",
@@ -16,9 +16,12 @@ login.wait().then( () => {
         "Você ainda não possui duelos",
         "Cancelar desafio",
         "Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas",
-        "Gladiador Esquecido"
+        "Gladiador Esquecido",
+        "Renome",
+        "Data"
     ])
-})
+    return true
+})()
 
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]
@@ -70,372 +73,372 @@ $(document).ready( async function(){
         dummy = true
         }){
 
-        translatorReady.then( async () => {  
-            document.querySelectorAll('.page-nav .of').forEach(e => {
-                e.innerHTML = translator.getTranslated("de")
+        await translatorReady 
+
+        document.querySelectorAll('.page-nav .of').forEach(e => {
+            e.innerHTML = translator.getTranslated("de")
+        })
+        
+        this.pages[id].offset = offset
+        $('#report-container #unread').hide()
+
+        if (id == 'battles'){
+            $('#report-container #unread').show()
+
+            if (dummy){
+                $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell reward'>${translator.getTranslated("Renome")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
+
+                // translator.bind()
+                for (let i=0 ; i<limit ; i++){
+                    $('#bhist-container .table').append(`<div class='row dummy'>
+                        <div class='cell favorite'><span class='dummy-text'><i class='far fa-star'></i></span></div>
+                        <div class='cell glad'><span class='dummy-text'>GLADIATOR</span></div>
+                        <div class='cell reward'><span class='dummy-text'>+00.0</span></div>
+                        <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                    </div>`)
+                }
+            }
+
+            $('#report-container .page-nav button').prop('disabled',true)
+
+            let data = await post("back_report.php",{
+                action: "GET",
+                offset: offset,
+                read: true,
+                unread_only: unread
             })
-          
-            this.pages[id].offset = offset
-            $('#report-container #unread').hide()
+            // console.log(data);
 
-            if (id == 'battles'){
-                $('#report-container #unread').show()
-
-                if (dummy){
+            if (data.status == "SUCCESS"){
+                if (!dummy){
                     $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell reward'>${translator.getTranslated("Renome")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
 
                     // translator.bind()
-                    for (let i=0 ; i<limit ; i++){
-                        $('#bhist-container .table').append(`<div class='row dummy'>
-                            <div class='cell favorite'><span class='dummy-text'><i class='far fa-star'></i></span></div>
-                            <div class='cell glad'><span class='dummy-text'>GLADIATOR</span></div>
-                            <div class='cell reward'><span class='dummy-text'>+00.0</span></div>
-                            <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                }
+
+                $('#report-container .table .row').not('.head').remove()
+
+                this.pages[id].total = data.total
+
+                if (data.total <= offset && data.total > 0){
+                    this.fetch({
+                        id: id,
+                        offset: 0
+                    })
+                    return
+                }
+
+                for (let i=0 ; i<limit ; i++){
+                    if (data.total == 0 && i == 0){
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell'><h3>${translator.getTranslated('Nenhuma batalha para mostrar')}</h3></div>
+                        </div>`);
+
+                        // translator.bind()
+                    }
+                    else if (offset + i < data.total){
+                        let row = data.reports[i]
+                        let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)};
+                        if (row.favorite)
+                            star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)};
+
+                        let unread = ''
+                        if (row.isread == "0")
+                            unread = 'unread'
+
+                        let reward = {class: "", value: `${parseFloat(row.reward).toFixed(1)}`}
+                        if (parseFloat(row.reward) < 0){
+                            reward.class = "red"
+                        }
+                        else if (parseFloat(row.reward) > 0){
+                            reward.class = "green"
+                            reward.value = `+${reward.value}`
+                        }
+
+                        let visual = ``
+                        if (!row.expired){
+                            visual = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
+                                <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
+                            </div>`
+                        }
+                        $('#bhist-container .table').append(`<div class='row ${unread}'>
+                            <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
+                            <div class='cell glad'>${row.gladiator}</div>
+                            <div class='cell reward ${reward.class}'>${reward.value}</div>
+                            <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
+                            ${visual}
+                        </div>`);
+                        $('#bhist-container .favorite').last().data('id', row.id);
+                    }
+                    else{
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell favorite'></div>
+                            <div class='cell glad'></div>
+                            <div class='cell reward'></div>
+                            <div class='cell time'></div>
                         </div>`)
                     }
                 }
 
-                $('#report-container .page-nav button').prop('disabled',true)
-
-                let data = await post("back_report.php",{
-                    action: "GET",
-                    offset: offset,
-                    read: true,
-                    unread_only: unread
-                })
-                // console.log(data);
-
-                if (data.status == "SUCCESS"){
-                    if (!dummy){
-                        $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell reward'>${translator.getTranslated("Renome")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
-
-                        // translator.bind()
+                $('#bhist-container .favorite').click( function(){
+                    var id = $(this).data('id');
+                    if ($(this).find('i').hasClass('fas')){
+                        $(this).find('i').removeClass('fas').addClass('far').attr('title', translator.getTranslated("Guardar nos favoritos", false));
+                        post_favorite(id, false, '');
                     }
-
-                    $('#report-container .table .row').not('.head').remove()
-
-                    this.pages[id].total = data.total
-
-                    if (data.total <= offset && data.total > 0){
-                        this.fetch({
-                            id: id,
-                            offset: 0
+                    else{
+                        var star = $(this);
+                        new Message({
+                            message: "Informe um comentário sobre esta batalha",
+                            buttons: {ok: "OK", cancel: "CANCEL"},
+                            input: { placeholder: "Comentário..." }
+                        }).show().click('ok', data => {
+                            star.find('i').removeClass('far').addClass('fas').attr('title', translator.getTranslated("Tirar dos favoritos", false));
+                            post_favorite(id, true, data.input);
                         })
-                        return
                     }
 
-                    for (let i=0 ; i<limit ; i++){
-                        if (data.total == 0 && i == 0){
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>${translator.getTranslated('Nenhuma batalha para mostrar')}</h3></div>
-                            </div>`);
-
-                            // translator.bind()
-                        }
-                        else if (offset + i < data.total){
-                            let row = data.reports[i]
-                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)};
-                            if (row.favorite)
-                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)};
-
-                            let unread = ''
-                            if (row.isread == "0")
-                                unread = 'unread'
-
-                            let reward = {class: "", value: `${parseFloat(row.reward).toFixed(1)}`}
-                            if (parseFloat(row.reward) < 0){
-                                reward.class = "red"
-                            }
-                            else if (parseFloat(row.reward) > 0){
-                                reward.class = "green"
-                                reward.value = `+${reward.value}`
-                            }
-
-                            let visual = ``
-                            if (!row.expired){
-                                visual = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
-                                    <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
-                                </div>`
-                            }
-                            $('#bhist-container .table').append(`<div class='row ${unread}'>
-                                <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
-                                <div class='cell glad'>${row.gladiator}</div>
-                                <div class='cell reward ${reward.class}'>${reward.value}</div>
-                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
-                                ${visual}
-                            </div>`);
-                            $('#bhist-container .favorite').last().data('id', row.id);
-                        }
-                        else{
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell favorite'></div>
-                                <div class='cell glad'></div>
-                                <div class='cell reward'></div>
-                                <div class='cell time'></div>
-                            </div>`)
-                        }
+                    function post_favorite(id, fav, comment){
+                        $.post("back_report.php", {
+                            action: "FAVORITE",
+                            favorite: fav,
+                            id: id,
+                            comment: comment
+                        }).done( function(data){
+                            // console.log(data);
+                        });
                     }
+                });
+            }
+        }
+        if (id == 'favorites'){
 
-                    $('#bhist-container .favorite').click( function(){
-                        var id = $(this).data('id');
-                        if ($(this).find('i').hasClass('fas')){
-                            $(this).find('i').removeClass('fas').addClass('far').attr('title', translator.getTranslated("Guardar nos favoritos", false));
-                            post_favorite(id, false, '');
-                        }
-                        else{
-                            var star = $(this);
-                            new Message({
-                                message: "Informe um comentário sobre esta batalha",
-                                buttons: {ok: "OK", cancel: "CANCEL"},
-                                input: { placeholder: "Comentário..." }
-                            }).show().click('ok', data => {
-                                star.find('i').removeClass('far').addClass('fas').attr('title', translator.getTranslated("Tirar dos favoritos", false));
-                                post_favorite(id, true, data.input);
-                            })
-                        }
+            if (dummy){
+                $('#bhist-container .table').html(`<div class='row head'>
+                    <div class='cell'>${translator.getTranslated("Gladiador")}</div>
+                    <div class='cell comment'>${translator.getTranslated("Comentário")}</div>
+                    <div class='cell time'>${translator.getTranslated("Data")}</div>
+                </div>`)
 
-                        function post_favorite(id, fav, comment){
-                            $.post("back_report.php", {
-                                action: "FAVORITE",
-                                favorite: fav,
-                                id: id,
-                                comment: comment
-                            }).done( function(data){
-                                // console.log(data);
-                            });
-                        }
-                    });
+                for (let i=0 ; i<limit ; i++){
+                    $('#bhist-container .table').append(`<div class='row dummy'>
+                        <div class='cell favorite'><span class='dummy-text'><i class='fas fa-star'></i></span></div>
+                        <div class='cell glad'><span class='dummy-text'>GLADIADOR</span></div>
+                        <div class='cell comment'><span class='dummy-text'>COMENTÁRIO DE EXEMPLO</span></div>
+                        <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                    </div>`)
                 }
             }
-            if (id == 'favorites'){
 
-                if (dummy){
+            $('#report-container .page-nav button').prop('disabled',true)
+
+            let data = await post("back_report.php",{
+                action: "GET",
+                offset: offset,
+                favorites: true
+            })
+            // console.log(data);
+
+            if (data.status == "SUCCESS"){
+
+                if (!dummy){
                     $('#bhist-container .table').html(`<div class='row head'>
                         <div class='cell'>${translator.getTranslated("Gladiador")}</div>
                         <div class='cell comment'>${translator.getTranslated("Comentário")}</div>
                         <div class='cell time'>${translator.getTranslated("Data")}</div>
                     </div>`)
+                }
 
-                    for (let i=0 ; i<limit ; i++){
-                        $('#bhist-container .table').append(`<div class='row dummy'>
-                            <div class='cell favorite'><span class='dummy-text'><i class='fas fa-star'></i></span></div>
-                            <div class='cell glad'><span class='dummy-text'>GLADIADOR</span></div>
-                            <div class='cell comment'><span class='dummy-text'>COMENTÁRIO DE EXEMPLO</span></div>
-                            <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                $('#report-container .table .row').not('.head').remove()
+
+                this.pages[id].total = data.total
+
+                if (data.total <= offset && data.total > 0){
+                    this.fetch({
+                        id: id,
+                        offset: 0
+                    })
+                    return
+                }
+
+                for (let i=0 ; i<limit ; i++){
+                    if (data.total == 0 && i == 0){
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell'><h3>${translator.getTranslated("Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas")}</h3></div>
+                        </div>`);
+                    }
+                    else if (offset + i < data.total){
+                        let row = data.reports[i]
+                        let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)}
+                        if (row.favorite){
+                            star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)}
+                        }
+    
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
+                            <div class='cell glad'>${row.gladiator}</div>
+                            <div class='cell comment'>${row.comment}</div>
+                            <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
+                            <div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
+                                <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
+                            </div>
+                        </div>`)
+                        $('#bhist-container .favorite').last().data('id', row.id);
+                    }
+                    else{
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell favorite'></div>
+                            <div class='cell glad'></div>
+                            <div class='cell comment'></div>
+                            <div class='cell time'></div>
                         </div>`)
                     }
                 }
 
-                $('#report-container .page-nav button').prop('disabled',true)
-
-                let data = await post("back_report.php",{
-                    action: "GET",
-                    offset: offset,
-                    favorites: true
-                })
-                // console.log(data);
-
-                if (data.status == "SUCCESS"){
-
-                    if (!dummy){
-                        $('#bhist-container .table').html(`<div class='row head'>
-                            <div class='cell'>${translator.getTranslated("Gladiador")}</div>
-                            <div class='cell comment'>${translator.getTranslated("Comentário")}</div>
-                            <div class='cell time'>${translator.getTranslated("Data")}</div>
-                        </div>`)
-                    }
-
-                    $('#report-container .table .row').not('.head').remove()
-
-                    this.pages[id].total = data.total
-
-                    if (data.total <= offset && data.total > 0){
-                        this.fetch({
+                $('#bhist-container .favorite').click( e => {
+                    var row = $(e.currentTarget)
+                    var id = row.data('id');
+                    new Message({
+                        message: "Remover esta batalha dos favoritos?",
+                        buttons: {yes: "Sim", no: "Não"}
+                    }).show().click('yes', async () => {
+                        row.parent().remove();
+                        await post("back_report.php", {
+                            action: "FAVORITE",
+                            favorite: false,
                             id: id,
-                            offset: 0
+                            comment: ''
                         })
-                        return
-                    }
 
-                    for (let i=0 ; i<limit ; i++){
-                        if (data.total == 0 && i == 0){
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>${translator.getTranslated("Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas")}</h3></div>
-                            </div>`);
-                        }
-                        else if (offset + i < data.total){
-                            let row = data.reports[i]
-                            let star = {class: "far", title: translator.getTranslated("Guardar nos favoritos", false)}
-                            if (row.favorite){
-                                star = {class: "fas", title: translator.getTranslated("Tirar dos favoritos", false)}
-                            }
-        
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell favorite' title='${star.title}'><i class='${star.class} fa-star'></i></div>
-                                <div class='cell glad'>${row.gladiator}</div>
-                                <div class='cell comment'>${row.comment}</div>
-                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
-                                <div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
-                                    <a target='_blank' href='play/${row.hash}'><img src='icon/eye.png'></a>
-                                </div>
-                            </div>`)
-                            $('#bhist-container .favorite').last().data('id', row.id);
-                        }
-                        else{
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell favorite'></div>
-                                <div class='cell glad'></div>
-                                <div class='cell comment'></div>
-                                <div class='cell time'></div>
-                            </div>`)
-                        }
-                    }
+                        this.fetch({
+                            id: 'favorites',
+                            offset: this.pages.favorites.offset
+                        })
+                    })       
+                });
+            }
+        }
+        if (id == 'duels'){
+            if (dummy){
+                $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell'>${translator.getTranslated("Oponente")}</div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
 
-                    $('#bhist-container .favorite').click( e => {
-                        var row = $(e.currentTarget)
-                        var id = row.data('id');
-                        new Message({
-                            message: "Remover esta batalha dos favoritos?",
-                            buttons: {yes: "Sim", no: "Não"}
-                        }).show().click('yes', async () => {
-                            row.parent().remove();
-                            await post("back_report.php", {
-                                action: "FAVORITE",
-                                favorite: false,
-                                id: id,
-                                comment: ''
-                            })
-
-                            this.fetch({
-                                id: 'favorites',
-                                offset: this.pages.favorites.offset
-                            })
-                        })       
-                    });
+                for (let i=0 ; i<limit ; i++){
+                    $('#bhist-container .table').append(`<div class='row dummy'>
+                        <div class='cell glad'><span class='dummy-text'>GLADIADOR</span></div>
+                        <div class='cell enemy'><span class='dummy-text'>GLADIADOR</span></div>
+                        <div class='cell'><span class='dummy-text'>USUÁRIO</span></div>
+                        <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                    </div>`)
                 }
             }
-            if (id == 'duels'){
-                if (dummy){
+
+            $('#report-container .page-nav button').prop('disabled',true)
+
+            let data = await post("back_duel.php", {
+                action: "REPORT",
+                offset: offset
+            })
+            // console.log(data);
+
+            if (data.status == "SUCCESS"){
+                if (!dummy){
                     $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell'>${translator.getTranslated("Oponente")}</div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
+                }    
 
-                    for (let i=0 ; i<limit ; i++){
-                        $('#bhist-container .table').append(`<div class='row dummy'>
-                            <div class='cell glad'><span class='dummy-text'>GLADIADOR</span></div>
-                            <div class='cell enemy'><span class='dummy-text'>GLADIADOR</span></div>
-                            <div class='cell'><span class='dummy-text'>USUÁRIO</span></div>
-                            <div class='cell time'><span class='dummy-text'>0 TEMPO</span></div>
+                $('#report-container .table .row').not('.head').remove()
+
+                this.pages[id].total = data.total
+
+                if (data.total <= offset && data.total > 0){
+                    this.fetch({
+                        id: id,
+                        offset: 0
+                    })
+                    return
+                }
+
+                for (let i=0 ; i<limit ; i++){
+                    if (data.total == 0 && i == 0){
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell'><h3>${translator.getTranslated("Você ainda não possui duelos")}</h3></div>
+                        </div>`);
+                    }
+                    else if (offset + i < data.total){
+                        let row = data.duels[i]
+
+                        let unread = ''
+                        if (row.isread == "0" || (!row.enemy && !row.log)){
+                            unread = 'unread'
+                        }
+
+                        let glad = {
+                            me: {class: "", value: row.glad},
+                            enemy: {class: "", value: row.enemy},
+                        }
+                        if (!row.glad){
+                            glad.me = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
+                        }
+
+                        let tail = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
+                            <a target='_blank' href='play/${row.log}'><img src='icon/eye.png'></a>
+                        </div>`
+                        if (!row.enemy){
+                            if (row.log){
+                                glad.enemy = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
+                            }
+                            else{
+                                glad.enemy.value = "???"
+                                tail = `<div class='remove' title='${translator.getTranslated("Cancelar desafio", false)}'>X</div>`
+                            }
+                        }
+
+                        $('#bhist-container .table').append(`<div class='row ${unread}'>
+                            <div class='cell glad ${glad.me.class}'>${glad.me.value}</div>
+                            <div class='cell enemy ${glad.enemy.class}'>${glad.enemy.value}</div>
+                            <div class='cell'>${row.user}</div>
+                            <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
+                            ${tail}
+                        </div>`)
+                        $('#bhist-container .row').last().data('id', row.id)
+
+                        $('#bhist-container .table .row').last().find('.remove').click( async e => {
+                            let button = $(e.currentTarget)
+                            var id = button.parents('.row').data('id')
+                            await post("back_duel.php",{
+                                action: "DELETE",
+                                id: id,
+                            })
+                            
+                            new Message({ message: "Desafio cancelado" }).show()
+                            this.fetch({
+                                id: 'duels',
+                                offset: this.pages.duels.offset
+                            })
+                        })
+                    }
+                    else{
+                        $('#bhist-container .table').append(`<div class='row'>
+                            <div class='cell glad'></div>
+                            <div class='cell enemy'></div>
+                            <div class='cell'></div>
+                            <div class='cell time'></div>
                         </div>`)
                     }
                 }
-
-                $('#report-container .page-nav button').prop('disabled',true)
-
-                let data = await post("back_duel.php", {
-                    action: "REPORT",
-                    offset: offset
-                })
-                // console.log(data);
-
-                if (data.status == "SUCCESS"){
-                    if (!dummy){
-                        $('#bhist-container .table').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Gladiador")}</div><div class='cell'>${translator.getTranslated("Oponente")}</div><div class='cell'>${translator.getTranslated("Mestre")}</div><div class='cell time'>${translator.getTranslated("Data")}</div></div>`)
-                    }    
-
-                    $('#report-container .table .row').not('.head').remove()
-
-                    this.pages[id].total = data.total
-
-                    if (data.total <= offset && data.total > 0){
-                        this.fetch({
-                            id: id,
-                            offset: 0
-                        })
-                        return
-                    }
-
-                    for (let i=0 ; i<limit ; i++){
-                        if (data.total == 0 && i == 0){
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell'><h3>${translator.getTranslated("Você ainda não possui duelos")}</h3></div>
-                            </div>`);
-                        }
-                        else if (offset + i < data.total){
-                            let row = data.duels[i]
-
-                            let unread = ''
-                            if (row.isread == "0" || (!row.enemy && !row.log)){
-                                unread = 'unread'
-                            }
-
-                            let glad = {
-                                me: {class: "", value: row.glad},
-                                enemy: {class: "", value: row.enemy},
-                            }
-                            if (!row.glad){
-                                glad.me = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
-                            }
-
-                            let tail = `<div class='playback' title='${translator.getTranslated("Visualizar batalha", false)}'>
-                                <a target='_blank' href='play/${row.log}'><img src='icon/eye.png'></a>
-                            </div>`
-                            if (!row.enemy){
-                                if (row.log){
-                                    glad.enemy = {class: "forgotten", value: translator.getTranslated("Gladiador Esquecido", false)}
-                                }
-                                else{
-                                    glad.enemy.value = "???"
-                                    tail = `<div class='remove' title='${translator.getTranslated("Cancelar desafio", false)}'>X</div>`
-                                }
-                            }
-
-                            $('#bhist-container .table').append(`<div class='row ${unread}'>
-                                <div class='cell glad ${glad.me.class}'>${glad.me.value}</div>
-                                <div class='cell enemy ${glad.enemy.class}'>${glad.enemy.value}</div>
-                                <div class='cell'>${row.user}</div>
-                                <div class='cell time' title='${getDate(row.time)}'>${getDate(row.time, { short: true })}</div>
-                                ${tail}
-                            </div>`)
-                            $('#bhist-container .row').last().data('id', row.id)
-
-                            $('#bhist-container .table .row').last().find('.remove').click( async e => {
-                                let button = $(e.currentTarget)
-                                var id = button.parents('.row').data('id')
-                                await post("back_duel.php",{
-                                    action: "DELETE",
-                                    id: id,
-                                })
-                                
-                                new Message({ message: "Desafio cancelado" }).show()
-                                this.fetch({
-                                    id: 'duels',
-                                    offset: this.pages.duels.offset
-                                })
-                            })
-                        }
-                        else{
-                            $('#bhist-container .table').append(`<div class='row'>
-                                <div class='cell glad'></div>
-                                <div class='cell enemy'></div>
-                                <div class='cell'></div>
-                                <div class='cell time'></div>
-                            </div>`)
-                        }
-                    }
-                }
             }
+        }
 
-            $('#report-container .page-nav .start').html(this.pages[id].total == 0 ? 0 : offset + 1)
-            $('#report-container .page-nav .end').html(Math.min(offset + limit, this.pages[id].total))
-            $('#report-container .page-nav .total').html(this.pages[id].total)
+        $('#report-container .page-nav .start').html(this.pages[id].total == 0 ? 0 : offset + 1)
+        $('#report-container .page-nav .end').html(Math.min(offset + limit, this.pages[id].total))
+        $('#report-container .page-nav .total').html(this.pages[id].total)
+        
+        if (offset > 0){
+            $('#report-container #prev').removeAttr('disabled')
+        }
             
-            if (offset > 0){
-                $('#report-container #prev').removeAttr('disabled')
-            }
-                
-            if (offset + limit < this.pages[id].total){
-                $('#report-container #next').removeAttr('disabled')
-            }
-        })
+        if (offset + limit < this.pages[id].total){
+            $('#report-container #next').removeAttr('disabled')
+        }
     }
 
     tabs.pages.next = function({ unread = false }){

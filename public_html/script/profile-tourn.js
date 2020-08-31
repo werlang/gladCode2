@@ -5,8 +5,9 @@ import {post} from "./utils.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
 
-login.wait().then( () => {
-    translator.translate([
+(async () => {
+    await login.wait()
+    await translator.translate([
         "O identificador precisa ter tamanho 6 ou mais",
         "O identificador precisa conter somente letras, números ou espaços",
         "Digite uma senha, ou torne o torneio público",
@@ -56,8 +57,8 @@ login.wait().then( () => {
             e.innerHTML = translator.getTranslated("de")
         })
     })
-    
-})
+    return true
+})()    
 
 var teamsync = {id: 0, time: 0};
 var user

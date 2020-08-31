@@ -3,7 +3,76 @@ import * as _ from "./emoji.js"
 import {post} from "./utils.js"
 import {createToast} from "./dialog.js"
 import {google} from "./googlelogin.js"
-import {header} from "./header.js"
+import {header, login} from "./header.js"
+import { translator } from "./translate.js"
+
+const translatorReady = (async () => {
+    await login.wait()
+    await translator.translate([
+        "Mostrar/Esconder Chat",
+        "Abir chat em nova aba",
+        "Mais usados",
+        "Carinhas e Pessoas",
+        "Animais e Natureza",
+        "Alimentos",
+        "Esportes e Atividades",
+        "Viagens e Lugares",
+        "Objetos",
+        "Símbolos",
+        "Bandeiras",
+        "Digite sua mensagem. /help para instruções",
+        "Enviar mensagem",
+        "Ajuda",
+        "LISTAGEM DE SALAS PÚBLICAS",
+        "Nome",
+        "NOME",
+        "Descrição",
+        "LISTAGEM DE PARTICIPANTES DA SALA",
+        "Autoridade",
+        "Na sala desde",
+        "Último login",
+        "Total de",
+        "participantes",
+        "COMANDOS DO CHAT",
+        "Comando",
+        "Abre janela para inserção de código",
+        "Janela de upload de imagens",
+        "Mostra todas salas públicas",
+        "Mostra todos membros da sala",
+        "O mesmo que",
+        "Entra na SALA (caso exista)",
+        "Cria a SALA (caso não exista)",
+        "Opcional",
+        "Torna a sala privada",
+        "Insere uma descrição para a sala",
+        "sala",
+        "teste",
+        "descrição da sala",
+        "SALA",
+        "Sai da SALA",
+        "Sai da sala atualmente aberta",
+        "Torna-se o líder da sala aberta, caso os líderes estejam há muito inativos",
+        "MEMBRO",
+        "Torna o MEMBRO um líder da sala aberta",
+        "fulaninho",
+        "Remove MEMBRO da SALA (Precisa ser Líder). Se estiver dentro de uma sala, não é necessário o argumento SALA",
+        "Remove permissão do MEMBRO de ver mensagens da sala (Precisa ser Líder)",
+        "Devolve a permissão do MEMBRO de participar normalmente da sala (Precisa ser Líder)",
+        "Edita informações da sala",
+        "Indica qual sala será editada. Quando está dentro de uma sala, não é necessário",
+        "Altera o nome da sala",
+        "Altera a descrição da sala",
+        "Torna a sala pública",
+        "novo nome",
+        "Editar código",
+        "Visualizar imagem",
+        "Editor de código",
+        "Confirmar",
+        "MOSTRAR",
+        "LINHAS"
+    ])
+    return true
+})()
 
 var sendingBuffer = [];
 var clearToSend = true;
@@ -17,15 +86,17 @@ export const chat = {
     started: false
 }
 
-chat.init = function(wrapper, options){
+chat.init = async function(wrapper, options){
+    await translatorReady
+
     var leftButtons = '';
     var full = 'full';
 
     if (options && options.full === false){
         full = '';
         leftButtons = `<div class='button-container'>
-            <i class='fas fa-exchange-alt' title='Mostrar/Esconder Chat' id='show-hide'></i>
-            <i class='fas fa-external-link-alt' title='Abir chat em nova aba' id='open-new'></i>
+            <i class='fas fa-exchange-alt' title='${translator.getTranslated("Mostrar/Esconder Chat", false)}' id='show-hide'></i>
+            <i class='fas fa-external-link-alt' title='${translator.getTranslated("Abir chat em nova aba", false)}' id='open-new'></i>
         </div>`;
     }
 
@@ -34,23 +105,23 @@ chat.init = function(wrapper, options){
             <div id='emoji-ui'>
                 <div id='emoji-container'></div>
                 <div id='category-buttons'>
-                    <i id='recent' class='fas fa-star selected' title='Mais usados (CTRL+🔢)'></i>
-                    <i id='smile' class='fas fa-grin-alt' title='Carinhas e Pessoas'></i>
-					<i id='animals' class='fas fa-paw' title='Animais e Natureza'></i>
-                    <i id='food' class='fas fa-hamburger' title='Alimentos'></i>
-                    <i id='activities' class='fas fa-futbol' title='Esportes e Atividades'></i>
-                    <i id='places' class='fas fa-map-marked-alt' title='Viagens e Lugares'></i>
-                    <i id='objects' class='fas fa-lightbulb' title='Objetos'></i>
-                    <i id='symbols' class='fas fa-icons' title='Símbolos'></i>
-                    <i id='flags' class='fas fa-flag' title='Bandeiras'></i>
+                    <i id='recent' class='fas fa-star selected' title='${translator.getTranslated("Mais usados", false)} (CTRL+🔢)'></i>
+                    <i id='smile' class='fas fa-grin-alt' title='${translator.getTranslated("Carinhas e Pessoas", false)}'></i>
+					<i id='animals' class='fas fa-paw' title='${translator.getTranslated("Animais e Natureza", false)}'></i>
+                    <i id='food' class='fas fa-hamburger' title='${translator.getTranslated("Alimentos", false)}'></i>
+                    <i id='activities' class='fas fa-futbol' title='${translator.getTranslated("Esportes e Atividades", false)}'></i>
+                    <i id='places' class='fas fa-map-marked-alt' title='${translator.getTranslated("Viagens e Lugares", false)}'></i>
+                    <i id='objects' class='fas fa-lightbulb' title='${translator.getTranslated("Objetos", false)}'></i>
+                    <i id='symbols' class='fas fa-icons' title='${translator.getTranslated("Símbolos", false)}'></i>
+                    <i id='flags' class='fas fa-flag' title='${translator.getTranslated("Bandeiras", false)}'></i>
                 </div>
             </div>
             <div id='chat-ui'>
                 ${leftButtons}
-                <div id='message-box' data-placeholder='Digite sua mensagem. /help para instruções' contentEditable></div>
+                <div id='message-box' data-placeholder='${translator.getTranslated("Digite sua mensagem. /help para instruções", false)}' contentEditable></div>
                 <div class='button-container'>
-                    <i class='far fa-comment-dots hidden' title='Enviar mensagem (Enter)' id='send'></i>
-                    <i class='far fa-question-circle' title='Ajuda' id='help'></i>
+                    <i class='far fa-comment-dots hidden' title='${translator.getTranslated("Enviar mensagem", false)} (Enter)' id='send'></i>
+                    <i class='far fa-question-circle' title='${translator.getTranslated("Ajuda", false)}' id='help'></i>
                     <i class='far fa-grin-alt' title='Emojis (CTRL+E)' id='emoji'></i>
                 </div>
             </div>
@@ -391,8 +462,8 @@ $(document).ready( function(){
                                 else if (status == "LIST"){
                                     if (data.room){
                                         var table = [
-                                            [{data: "LISTAGEM DE SALAS PÚBLICAS", class: "head"}],
-                                            [{data: "Nome", class: "head half"}, {data: "#", class: "head small"}, {data: "Descrição", class: "head"}],
+                                            [{data: translator.getTranslated("LISTAGEM DE SALAS PÚBLICAS"), class: "head"}],
+                                            [{data: translator.getTranslated("Nome"), class: "head half"}, {data: "#", class: "head small"}, {data: translator.getTranslated("Descrição"), class: "head"}],
                                         ];
                                         for (let i in data.room){
                                             table.push([{data: data.room[i].name, class: "half"}, {data: data.room[i].members, class: "small"}, {data: data.room[i].description}]);
@@ -400,15 +471,15 @@ $(document).ready( function(){
                                     }
                                     else if (data.user){
                                         var table = [
-                                            [{data: "LISTAGEM DE PARTICIPANTES DA SALA", class: "head"}],
-                                            [{data: "Autoridade", class: "head half"}, {data: "Nome", class: "head"}, {data: "Na sala desde", class: "head half"}, {data: "Último login", class: "head half"}],
+                                            [{data: translator.getTranslated("LISTAGEM DE PARTICIPANTES DA SALA"), class: "head"}],
+                                            [{data: translator.getTranslated("Autoridade"), class: "head half"}, {data: translator.getTranslated("Nome"), class: "head"}, {data: translator.getTranslated("Na sala desde"), class: "head half"}, {data: translator.getTranslated("Último login"), class: "head half"}],
                                         ];
                                         for (let i in data.user){
                                             table.push([{data: data.user[i].privilege, class: "half"}, {data: data.user[i].apelido}, {data: data.user[i].since, class: "half"}, {data: data.user[i].login, class: "half"}]);
                                         }
-                                        table.push([{data: "Total de "+ data.user.length +" participantes"}]);
+                                        table.push([{data: `${translator.getTranslated("Total de")} ${data.user.length} ${translator.getTranslated("participantes")}`}]);
                                     }
-                                    sendChatTable(table);
+                                    sendChatTable(table)
                                 }
                                 else if (status == "SENT" && data.mail){
                                     post("back_sendmail.php", {
@@ -439,26 +510,26 @@ $(document).ready( function(){
             }
 
             var table = [
-                [{data: "COMANDOS DO CHAT", class: "head"}],
-                [{data: "Comando", class: "head half"}, {data: "Descrição", class: "head"}],
-                [{data: "<>", class: "half"}, {data: "Abre janela para inserção de código", class: ""}],
-                [{data: "!@", class: "half"}, {data: "Janela de upload de imagens", class: ""}],
-                [{data: "/show rooms", class: "half"}, {data: "Mostra todas salas públicas", class: ""}],
-                [{data: "/show users", class: "half"}, {data: "Mostra todos membros da sala", class: ""}],
-                [{data: "/list", class: "half"}, {data: "O mesmo que /show<br>Ex: /list rooms", class: ""}],
-                [{data: "/join SALA", class: "half"}, {data: "Entra na SALA (caso exista)<br>Ex: /join gladcode", class: ""}],
-                [{data: "/create SALA [-pvt] [-d DESC]", class: "half"}, {data: "Cria a SALA (caso não exista)<br>-pvt => (Opcional) Torna a sala privada<br>-d DESC => (Opcional) Insere uma descrição para a sala<br>Ex: /create sala teste -d descrição da sala -pvt", class: ""}],
-                [{data: "/leave SALA", class: "half"}, {data: "Sai da SALA<br>Ex: /leave gladcode", class: ""}],
-                [{data: "/leave", class: "half"}, {data: "Sai da sala atualmente aberta", class: ""}],
-                [{data: "/claim", class: "half"}, {data: "Torna-se o líder da sala aberta, caso os líderes estejam há muito inativos", class: ""}],
-                [{data: "/promote MEMBRO", class: "half"}, {data: "Torna o MEMBRO um líder da sala aberta<br>Ex: /promote fulaninho", class: ""}],
-                [{data: "/kick MEMBRO [-r SALA]", class: "half"}, {data: "Remove MEMBRO da SALA (Precisa ser Líder). Se estiver dentro de uma sala, não é necessário o argumento SALA.<br>Ex: /kick fulaninho", class: ""}],
-                [{data: "/ban MEMBRO", class: "half"}, {data: "Remove permissão do MEMBRO de ver mensagens da sala (Precisa ser Líder)<br>Ex: /ban fulaninho", class: ""}],
-                [{data: "/unban MEMBRO", class: "half"}, {data: "Devolve a permissão do MEMBRO de participar normalmente da sala (Precisa ser Líder)<br>Ex: /unban fulaninho", class: ""}],
-                [{data: "/edit [-r SALA] [-n NOME] [-d DESC] [-pvt | -pub]", class: "half"}, {data: "Edita informações da sala.<br>-r SALA => (Opcional) Indica qual sala será editada. Quando está dentro de uma sala, não é necessário.<br>-n NOME => (Opcional) Altera o nome da sala<br>-d DESC => (Opcional) Altera a descrição da sala<br>-pvt => (Opcional) Torna a sala privada<br>-pub => (Opcional) Torna a sala pública<br>Ex: /edit -n novo nome -d descrição da sala -pub", class: ""}],
+                [{data: translator.getTranslated("COMANDOS DO CHAT"), class: "head"}],
+                [{data: translator.getTranslated("Comando"), class: "head half"}, {data: translator.getTranslated("Descrição"), class: "head"}],
+                [{data: "<>", class: "half"}, {data: translator.getTranslated("Abre janela para inserção de código"), class: ""}],
+                [{data: "!@", class: "half"}, {data: translator.getTranslated("Janela de upload de imagens"), class: ""}],
+                [{data: "/show rooms", class: "half"}, {data: translator.getTranslated("Mostra todas salas públicas"), class: ""}],
+                [{data: "/show users", class: "half"}, {data: translator.getTranslated("Mostra todos membros da sala"), class: ""}],
+                [{data: "/list", class: "half"}, {data: `${translator.getTranslated("O mesmo que")} /show<br>Ex: /list rooms`, class: ""}],
+                [{data: `/join ${translator.getTranslated("SALA")}`, class: "half"}, {data: `${translator.getTranslated("Entra na SALA (caso exista)")}<br>Ex: /join gladcode`, class: ""}],
+                [{data: `/create ${translator.getTranslated("SALA")} [-pvt] [-d DESC]`, class: "half"}, {data: `${translator.getTranslated("Cria a SALA (caso não exista)")}<br>-pvt => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Torna a sala privada")}<br>-d DESC => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Insere uma descrição para a sala")}<br>Ex: /create ${translator.getTranslated("sala teste")} -d ${translator.getTranslated("descrição da sala")} -pvt`, class: ""}],
+                [{data: `/leave ${translator.getTranslated("SALA")}`, class: "half"}, {data: `${translator.getTranslated("Sai da SALA")}<br>Ex: /leave gladcode`, class: ""}],
+                [{data: "/leave", class: "half"}, {data: translator.getTranslated("Sai da sala atualmente aberta"), class: ""}],
+                [{data: "/claim", class: "half"}, {data: translator.getTranslated("Torna-se o líder da sala aberta, caso os líderes estejam há muito inativos"), class: ""}],
+                [{data: `/promote ${translator.getTranslated("MEMBRO")}`, class: "half"}, {data: `${translator.getTranslated("Torna o MEMBRO um líder da sala aberta")}<br>Ex: /promote ${translator.getTranslated("fulaninho")}`, class: ""}],
+                [{data: `/kick ${translator.getTranslated("MEMBRO")} [-r ${translator.getTranslated("SALA")}]`, class: "half"}, {data: `${translator.getTranslated("Remove MEMBRO da SALA (Precisa ser Líder). Se estiver dentro de uma sala, não é necessário o argumento SALA")}.<br>Ex: /kick ${translator.getTranslated("fulaninho")}`, class: ""}],
+                [{data: `/ban ${translator.getTranslated("MEMBRO")}`, class: "half"}, {data: `${translator.getTranslated("Remove permissão do MEMBRO de ver mensagens da sala (Precisa ser Líder)")}<br>Ex: /ban ${translator.getTranslated("fulaninho")}`, class: ""}],
+                [{data: `/unban ${translator.getTranslated("MEMBRO")}`, class: "half"}, {data: `${translator.getTranslated("Devolve a permissão do MEMBRO de participar normalmente da sala (Precisa ser Líder)")}<br>Ex: /unban ${translator.getTranslated("fulaninho")}`, class: ""}],
+                [{data: `/edit [-r ${translator.getTranslated("SALA")}] [-n ${translator.getTranslated("NOME")}] [-d DESC] [-pvt | -pub]`, class: "half"}, {data: `${translator.getTranslated("Edita informações da sala")}.<br>-r ${translator.getTranslated("SALA")} => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Indica qual sala será editada. Quando está dentro de uma sala, não é necessário")}.<br>-n ${translator.getTranslated("NOME")} => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Altera o nome da sala")}<br>-d DESC => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Altera a descrição da sala")}<br>-pvt => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Torna a sala privada")}<br>-pub => (${translator.getTranslated("Opcional")}) ${translator.getTranslated("Torna a sala pública")}<br>Ex: /edit -n ${translator.getTranslated("novo nome")} -d ${translator.getTranslated("descrição da sala")} -pub`, class: ""}],
             ];
 
-            sendChatTable(table);
+            sendChatTable(table)
         });
 
         $('#chat-panel #message-box').keydown( function(e){
@@ -505,7 +576,7 @@ $(document).ready( function(){
                     var newtext = $(this).html().replace(/&lt;&gt;/, "");
                     $(this).html(newtext);
                 });
-                input.append(`<span><img class="code-icon" id="code-icon-${id}" src="icon/code.png" title="Editar código"></span><span></span>`);
+                input.append(`<span><img class="code-icon" id="code-icon-${id}" src="icon/code.png" title="${translator.getTranslated("Editar código", false)}"></span><span></span>`);
 
                 //setCaretEndDiv($('#chat-panel #message-box')[0]);
                 $('#chat-panel #message-box span').last().focus();
@@ -527,7 +598,7 @@ $(document).ready( function(){
                     var newtext = $(this).html().replace(/\!\@/, "");
                     $(this).html(newtext);
                 });
-                input.append(`<span><img class="img-icon" id="img-icon-${id}" title="Visualizar imagem" src="icon/img.png"></span><span></span>`);
+                input.append(`<span><img class="img-icon" id="img-icon-${id}" title="${translator.getTranslated("Visualizar imagem", false)}" src="icon/img.png"></span><span></span>`);
 
                 $('#chat-panel #message-box span').last().focus();
 
@@ -601,10 +672,10 @@ function create_code_modal(obj){
     $('body').append(`<div id='fog'>
         <div id='code-modal'>
             <div id='title'>
-                <span><img src='icon/code.png'>Editor de código</span>
+                <span><img src='icon/code.png'>${translator.getTranslated("Editor de código")}</span>
                 <div id='button-container'>
-                    <button id='ok' class='button' title='Confirmar (CTRL+Enter)'></button>
-                    <button id='cancel' class='button' title='Cancelar (ESC)'></button>
+                    <button id='ok' class='button' title='${translator.getTranslated("Confirmar", false)} (CTRL+Enter)'></button>
+                    <button id='cancel' class='button' title='${translator.getTranslated("Cancelar", false)} (ESC)'></button>
                 </div>
             </div>
             <textarea id='terminal' spellcheck='false'></textarea>
@@ -661,19 +732,18 @@ function create_code_modal(obj){
 }
 
 function sendChatTable(json){
-    $('#chat-panel #chat-window').append("<div class='chat-table'></div>");
-    var table = $('#chat-panel #chat-window .chat-table').last().hide().fadeIn(600);
     //console.log(json);
+    let table = ""
     for (let i in json){
-        table.append("<div class='row'></div>");
-        var row = table.find('.row').last();
+        let row = ""
         for (let j in json[i]){
-            let cclass = '';
-            if (json[i][j].class)
-                cclass = json[i][j].class;
-            row.append("<div class='cell "+ cclass +"'>"+ json[i][j].data +"</div>");
+            let data = json[i][j].data.replaceAll("<br>", "</div><div class='subrow'>")
+            row += `<div class='cell ${json[i][j].class || ''}'><div class='subrow'>${data}</div></div>`
         }
+        table += `<div class='row'>${row}</div>`
     }
+    $('#chat-panel #chat-window').append(`<div class='chat-table'>${table}</div>`)
+    $('#chat-panel #chat-window .chat-table').last().hide().fadeIn(600, () => translator.bind())
 }
 
 async function listRooms(arg){
@@ -992,7 +1062,7 @@ function getChatMessages(options){
                                 }
                                 else{
                                     var pre = $(this).parent();
-                                    pre.addClass('collapsed').append(`<button class='expand'><i class='plus far fa-plus-square'></i><span>{ ... } MOSTRAR ${lines} LINHAS</span></button>`);
+                                    pre.addClass('collapsed').append(`<button class='expand'><i class='plus far fa-plus-square'></i><span>{ ... } ${translator.getTranslated("MOSTRAR")} ${lines} ${translator.getTranslated("LINHAS")}</span></button>`);
 
                                     rebind();
                                     function rebind(){

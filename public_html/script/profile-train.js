@@ -6,8 +6,9 @@ import {translator} from "./translate.js"
 import {sendChatMessage} from "./chat.js"
 import {gladCard} from "./glad-card.js"
 
-login.wait().then( () => {
-    translator.translate([
+(async () => {
+    await login.wait()
+    await translator.translate([
         "Remover treino",
         "Identificador",
         "Mestres",
@@ -51,7 +52,8 @@ login.wait().then( () => {
         "Gladiador",
         "Expulsar participante"
     ])
-})
+    return true
+})()
 
 $(document).ready( function(){
     socket.isReady().then( () => {
