@@ -1,10 +1,10 @@
 import {socket} from "./socket.js"
-import * as _ from "./emoji.js"
+// import * as _ from "./emoji.js"
 import {post, getTimeSince} from "./utils.js"
 import {createToast} from "./dialog.js"
-import {google} from "./googlelogin.js"
 import {header, login} from "./header.js"
 import { translator } from "./translate.js"
+import { loader } from "./loader.js"
 
 const translatorReady = (async () => {
     await login.wait()
@@ -181,22 +181,22 @@ $(document).ready( function(){
                         new Message({
                             message: `Faça login na gladCode para participar do chat`,
                             buttons: {ok: "LOGIN"}
-                        }).show().click('ok', () => {
-                            google.login().then(function(data) {
-                                window.location.reload();
-                            });
-                        });
+                        }).show().click('ok', async () => {
+                            const google = await loader.load('google')
+                            await google.login()
+                            window.location.reload()
+                        })
                     }
                     $('#chat-panel').click( () => {
                         if (!$('#dialog-box').length){
                             new Message({
                                 message: "Faça login na gladCode para participar do chat",
                                 buttons: {cancel: "Cancelar", ok: "LOGIN"}
-                            }).show().click('ok', () => {
-                                google.login().then(function(data) {
-                                    window.location.reload();
-                                });
-                            });
+                            }).show().click('ok', async () => {
+                                const google = await loader.load('google')
+                                await google.login()
+                                window.location.reload()
+                            })
                         }
                     });
                 }
@@ -666,8 +666,6 @@ $(document).ready( function(){
             }
         });
     });
-
-    uploadWidget.widget = start_cloudinary();
 });
 
 function create_code_modal(obj){
@@ -1249,7 +1247,8 @@ async function testImage(baloon, url) {
     });
 }
 
-function start_cloudinary(){
+async function start_cloudinary(){
+    await loader.load('cloudinary')
     return cloudinary.createUploadWidget({
         cloudName: "dd0mjuhdb",
         uploadPreset: "fvbkdtsp",
@@ -1308,6 +1307,10 @@ function start_cloudinary(){
     });
 }
 async function upload_image(){
+    if (!uploadWidget.widget){
+        uploadWidget.widget = await start_cloudinary()
+    }
+    
     uploadWidget.widget.open();
 
     return await new Promise( resolve => {

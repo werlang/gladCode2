@@ -1,4 +1,3 @@
-import {gladCard} from "./glad-card.js"
 import {socket} from "./socket.js"
 import {login} from "./header.js"
 import {post} from "./utils.js"
@@ -81,6 +80,15 @@ $(document).ready( function(){
     login.wait().then( data => {
         user = data        
     })
+
+    $('#panel #battle-mode #tourn.button').click( async function(){
+        $('#panel #battle-container .wrapper').hide();
+        var duel = $('#panel #battle-container #tourn.wrapper');
+        if (duel.css('display') == 'none')
+            duel.fadeIn();
+
+        refresh_tourn_list();
+    });
 
     $('#panel #tourn.wrapper #create').click( function() {
         var box = `<div id='fog'>
@@ -832,6 +840,8 @@ function refresh_glads(args){
         if (teamsync.id != teamid)
             teamsync = {id: teamid, time: 0};
         
+        const gladCardModule = import("./glad-card.js")
+
         post("back_tournament.php", {
             action: "TEAM",
             id: teamid,

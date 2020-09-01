@@ -4,7 +4,7 @@ import {post} from "./utils.js"
 import {Message, createToast} from "./dialog.js"
 import {translator} from "./translate.js"
 import {sendChatMessage} from "./chat.js"
-import {gladCard} from "./glad-card.js"
+// import {gladCard} from "./glad-card.js"
 
 (async () => {
     await login.wait()
@@ -69,6 +69,15 @@ $(document).ready( function(){
         if (!login.user.premium){
             $('#panel #train.wrapper #create').hide()        
         }
+    })
+
+    $('#panel #battle-mode #train.button').click( function(){
+        $('#panel #battle-container .wrapper').hide();
+        var train = $('#panel #battle-container #train.wrapper');
+        if (train.css('display') == 'none')
+            train.fadeIn();
+
+        trainList.refresh();
     })
     
     $('#panel #train.wrapper #create').click( function() {

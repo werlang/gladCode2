@@ -1,18 +1,28 @@
 import {assets} from "./assets.js"
 import {translator} from "./translate.js"
 import {post} from "./utils.js"
+import { login } from "./header.js"
+import { loader } from "./loader.js";
 
-translator.translate([
-    "Este gladiador está morto",
-    "Este gladiador precisa ser atualizado",
-    "Clique para remover o gladiador",
-    "Ver código-fonte",
-    "Força",
-    "Agilidade",
-    "Inteligência",
-    "Abrir no editor",
-    "Fechar"
-])
+const translatorReady = (async () => {
+    await login.wait()
+    await translator.translate([
+        "Este gladiador está morto",
+        "Este gladiador precisa ser atualizado",
+        "Clique para remover o gladiador",
+        "Ver código-fonte",
+        "Força",
+        "Agilidade",
+        "Inteligência",
+        "Abrir no editor",
+        "Fechar"
+    ])
+    return true
+})();
+
+( () => {
+    assets.fill()
+})()
 
 const gladCard = {}
 
@@ -204,9 +214,13 @@ gladCard.load = async function(obj, options){
             load_data(options.customLoad);
         }
     
-        function load_data(data){
-            //console.log(data);
-    
+        async function load_data(data){
+            await translatorReady
+
+            if (!options.append){
+                obj.find('.glad-preview').remove()
+            }
+
             for (let i in data){
                 let status = ''
                 let title = ''
@@ -257,13 +271,13 @@ gladCard.load = async function(obj, options){
 
                     if (code){
                         card.find('.code .button').removeAttr('disabled')
-                        card.find('.code .button').click(function(e){
+                        card.find('.code .button').click(async function(e){
                             e.stopPropagation();
 
                             let editor = options.editor ? `<button class='button' id='editor'>${translator.getTranslated("Abrir no editor")}</button>` : ''
 
                             if (blocks && blocks.length){
-                                let xml = decodeHTML(blocks)
+                                let xml = blocks
                                 $('body').append(`<div id='fog' class='code'>
                                     <div class='float-box'>
                                         <div id='code-ws'></div>
@@ -274,6 +288,7 @@ gladCard.load = async function(obj, options){
                                     </div>
                                 </div>`)
     
+                                await loader.load('Blockly')
                                 let ws = Blockly.inject('code-ws', {
                                     scrollbars: true,
                                     readOnly: true
@@ -296,6 +311,8 @@ gladCard.load = async function(obj, options){
                                         </div>
                                     </div>
                                 </div>`)
+
+                                await loader.load('Prism')
                                 Prism.highlightElement($('code')[0]);
                             }
         

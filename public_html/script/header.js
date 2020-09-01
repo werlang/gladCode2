@@ -1,5 +1,4 @@
 import {post} from "./utils.js"
-import {google} from "./googlelogin.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
@@ -89,10 +88,10 @@ header.load = async function() {
                     e.stopPropagation()
                 })
 
-                fog.querySelector('#login').addEventListener('click', () => {
-                    google.login().then( () => {
-                        window.location.href = "news"
-                    })
+                fog.querySelector('#login').addEventListener('click', async () => {
+                    const {google} = await import("./googlelogin.js")
+                    await google.login()
+                    window.location.href = "news"
                 })
                 
                 setTimeout(() => {
@@ -131,10 +130,10 @@ header.load = async function() {
             })
     
             document.querySelectorAll('.mobile #login, .desktop #login').forEach(e => {
-                e.addEventListener('click', () => {
-                    google.login().then( () => {
-                        window.location.href = "news"
-                    })
+                e.addEventListener('click', async () => {
+                    const {google} = await import("./googlelogin.js")
+                    await google.login()
+                    window.location.href = "news"
                 })
             })
                     
@@ -211,9 +210,7 @@ header.load = async function() {
 
             
         })
-    
-        google.init()
-    
+        
         const footer = document.querySelector('#footer')
         if (footer){
             fetch("footer.html").then(async response => {
@@ -238,21 +235,21 @@ async function change_spoken_language(lang){
     }
 }
 
-function decodeHTML(str) {
-    var escapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '`': '&#x60;',
-        '\'': '&#39;'
-    };
-    for (var i in escapeMap){
-        var regexp = new RegExp(escapeMap[i],"g");
-        str = str.replace(regexp, i);
-    }
-    return str;
-}
+// function decodeHTML(str) {
+//     var escapeMap = {
+//         '&': '&amp;',
+//         '<': '&lt;',
+//         '>': '&gt;',
+//         '"': '&quot;',
+//         "'": '&#x27;',
+//         '`': '&#x60;',
+//         '\'': '&#39;'
+//     };
+//     for (var i in escapeMap){
+//         var regexp = new RegExp(escapeMap[i],"g");
+//         str = str.replace(regexp, i);
+//     }
+//     return str;
+// }
 
 export {login, header}

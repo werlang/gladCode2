@@ -29,40 +29,16 @@
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/table2.css"/>
     
+    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
     <script type="module" src="script/profile.js"></script>
 
-    <!-- <script src="script/assets.js"></script>
-    <script src="script/dropzone.js"></script>
-    <script src="script/croppie.js"></script>
-    <script src="script/profile-tourn.js"></script>
-    <script src="script/profile-train.js"></script>
-    <script src="script/profile-report.js"></script>
-    <script src="script/profile-rank.js"></script>
-    <script src="script/profile-potions.js"></script>
-    <script src="script/chat.js"></script>
-    <script src="script/glad-card.js"></script>
-    <script src="script/dialog.js"></script>
+    <!-- 
     <script src="script/radio.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/checkboxes.js"></script>
-    <script src="script/stats_func.js"></script>
-    <script src="script/emoji.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
     <script src="script/blocks.js"></script> -->
-    <!-- <script src="script/translate.js"></script> -->
     
     </head>
 <body>
@@ -119,9 +95,6 @@
                         <h2>Foto de perfil</h2>
                         <h3>Escolha uma foto apropriada para um grande mestre de gladiadores</h3>
                         <div id='img-upload'></div>
-                        <div id='img-preview-container'></div>
-                        <img id='img-result'>
-                        
                     </div>
                     <div id='site-pref'>
                         <h2>Preferências do site</h2>

@@ -34,7 +34,6 @@
     <script src="script/render.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
-    <script src="script/dropzone.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/playback.js"></script>
     <script src="script/socket.js"></script>

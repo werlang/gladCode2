@@ -2,21 +2,16 @@ import {header, login} from "./header.js"
 import {post, getDate, getTimeSince} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
-import {assets} from "./assets.js"
-import * as dropzone from "./dropzone.js"
-import * as croppie from "./croppie.js"
-import {chat} from "./chat.js"
 import {Message, createToast, tooltip} from "./dialog.js"
-import {gladCard} from "./glad-card.js"
-import * as potions from "./profile-potions.js"
-import {Simulation, ProgressButton} from "./runSim.js"
-import {stats} from "./stats_func.js"
-import {refresh_tourn_list} from "./profile-tourn.js"
-import {messages} from "./profile-message.js"
-import {google} from "./googlelogin.js"
-import * as reports from "./profile-report.js"
-import * as ranking from "./profile-rank.js"
-import {trainList} from "./profile-train.js"
+import { loader } from "./loader.js"
+// import * as potions from "./profile-potions.js"
+// import {Simulation, ProgressButton} from "./runSim.js"
+// import {stats} from "./stats_func.js"
+// import {refresh_tourn_list} from "./profile-tourn.js"
+// import {messages} from "./profile-message.js"
+// import * as reports from "./profile-report.js"
+// import * as ranking from "./profile-rank.js"
+// import {trainList} from "./profile-train.js"
 
 var user
 
@@ -117,15 +112,83 @@ const translatorReady = (async () => {
     ])
 
     return true
+})();
+
+(async () => {
+    // const chat = await loader.load("chat")
+    // chat.init($('#chat-panel'), {
+    //     full: false
+    // })
 })()
+
+document.querySelector("#menu #profile").addEventListener('click', async () => {
+    if (!document.querySelector("#img-upload").dropzone){
+        await loader.load(["Dropzone", "Croppie"])
+        new Dropzone("#img-upload", {
+            url: "#",
+            acceptedFiles: "image/*",
+            previewTemplate: "<div class='dz-preview'></div>",
+            accept: function(file, done) {
+                done();
+            },
+            init: function () {
+                this.on('addedfile', function (file) {  
+                    $('body').append("<div id='img-preview-container'></div>")
+                    $('#img-preview-container').append($(file.previewElement)).fadeIn()
+                });
+            },
+            success: function(file, response) {
+                //console.log(file);
+                var img = new Image();
+                img.src = file.dataURL;
+                img.onload = function(){
+                    $('.dz-preview').html(`<button id='crop-image' class='button'>RECORTAR IMAGEM</button><img src='${img.src}'>`)
+                    translator.translate($('.dz-preview'))
+                    var crop = new Croppie($('.dz-preview img')[0], {
+                        viewport: { width: 150, height: 150 },
+                        boundary: { width: 300, height: 300 },
+                    });
+                    $('.cr-slider').addClass('slider');
+                    $('#crop-image').on('click', function() {
+                        crop.result({
+                            type: 'base64',
+                            format: 'jpeg'
+                        }).then(function(dataImg) {
+                            var data = [{ image: dataImg }, { name: 'myimgage.jpg' }];
+                            // use ajax to send data to php
+                            //console.log(dataImg);
+                            $('#img-upload').css({
+                                'background-image': "url("+ dataImg +")",
+                                'background-size': 'cover'
+                            });
+                            login.user.foto = dataImg;
+                            //console.log(dataImg);
+                            $('#img-preview-container').hide();
+                        });
+                    });
+                }
+            },
+            // error: function(file, errorMessage) {
+            // },
+            // removedfile: function(file) {
+            // },
+            // complete: function(file) {
+            // },
+        })
+    }
+
+    loader.load("jqueryui").then( () => {
+        let language = $('#profile-panel #language select');
+        language.selectmenu().val(user.language).selectmenu('refresh');
+    })
+
+})
 
 
 window.onload = function(){
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
 
-    assets.fill();
-    
     var preferences = ["friend","message","update","duel","tourn","translation"];
 
     login.wait().then( data => {
@@ -164,9 +227,6 @@ window.onload = function(){
                 menu.classList.add('collapsed')
             }
         })
-
-        var language = $('#profile-panel #language select');
-        language.selectmenu().val(user.language).selectmenu('refresh');
 
         checkNotifications();
 
@@ -322,111 +382,106 @@ window.onload = function(){
         });
     });
 
-    $('#menu #glads').click( function() {
-        $('#glads-container .glad-preview, #glads-container .glad-add').addClass('to-remove')
-
-        gladCard.load($('#glads-container .glad-card-container'), {
+    $('#menu #glads').click( async function() {
+        const {gladCard} = await loader.load('gladcard')
+        await gladCard.load($('#glads-container .glad-card-container'), {
             remove: true,
             code: true,
             editor: true
-        }).then( async () => {
-            $('#glads-container .to-remove').remove()
+        })
 
-            if ($('#glads-container .glad-preview').length > 0){
-                $('#menu #battle').removeClass('disabled')
-            }
+        $('#glads-container .glad-add').remove()
 
-            $('#glads-container .glad-preview.old .code .button').html(`{'${translator.getTranslated("atualizar")}'}`)
-            $('#glads-container .glad-preview.old .code .button').click( () => {
-                new Message({ message: `A simulação da gladCode foi atualizada, e o código do gladiador precisa ser testado e salvo novamente para que ele volte a participar das batalhas` }).show()
-            })
-            
+        if ($('#glads-container .glad-preview').length > 0){
+            $('#menu #battle').removeClass('disabled')
+        }
 
-            $('#glads-container .glad-preview .delete').click( function(){
-                var card = $(this).parents('.glad-preview')
-                new Message({
-                    message: `${translator.getTranslated("Deseja excluir o gladiador")} <b>${card.find('.glad span').html()}</b>?`,
-                    buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
-                    translate: false
-                }).show().click('yes', () => {
-                    card.fadeOut(function(){
-                        card.remove()
-                    })
-                    post("back_glad.php",{
-                        action: "DELETE",
-                        id: card.data('id')
-                    }).done( () => {
-                        //console.log(data);
-                        $('#glads-container .glad-preview').last().after(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para criar um novo gladiador")}</div></div>`)
-                        $('#glads-container .glad-add').first().click( function(){
-                            window.location.href = "newglad"
-                        })
-                    });
+        $('#glads-container .glad-preview.old .code .button').html(`{'${translator.getTranslated("atualizar")}'}`)
+        $('#glads-container .glad-preview.old .code .button').click( () => {
+            new Message({ message: `A simulação da gladCode foi atualizada, e o código do gladiador precisa ser testado e salvo novamente para que ele volte a participar das batalhas` }).show()
+        })
+        
+
+        $('#glads-container .glad-preview .delete').click( function(){
+            var card = $(this).parents('.glad-preview')
+            new Message({
+                message: `${translator.getTranslated("Deseja excluir o gladiador")} <b>${card.find('.glad span').html()}</b>?`,
+                buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
+                translate: false
+            }).show().click('yes', () => {
+                card.fadeOut(function(){
+                    card.remove()
                 })
+                post("back_glad.php",{
+                    action: "DELETE",
+                    id: card.data('id')
+                }).done( () => {
+                    //console.log(data);
+                    $('#glads-container .glad-preview').last().after(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para criar um novo gladiador")}</div></div>`)
+                    $('#glads-container .glad-add').first().click( function(){
+                        window.location.href = "newglad"
+                    })
+                });
             })
+        })
 
-            let gladlots = [1, 10, 20, 30, 40, 50]
-            let nglads = $('#glads-container .glad-preview').length
-            let maxglads = 6
-            for (let i=nglads ; i < maxglads ; i++){
-                let info = "Clique para criar um novo gladiador"
-                let inactive = ''
-                if (user.lvl < gladlots[i]){
-                    info = `Atinja o nível ${gladlots[i]} de mestre para desbloquear este gladiador`
-                    inactive = 'inactive'
-                }
-                let card = `<div class='glad-add ${inactive}'><div class='image'></div><div class='info'>${info}</div></div>`
-                $('#glads-container .glad-card-container').append(card)
+        let gladlots = [1, 10, 20, 30, 40, 50]
+        let nglads = $('#glads-container .glad-preview').length
+        let maxglads = 6
+        for (let i=nglads ; i < maxglads ; i++){
+            let info = "Clique para criar um novo gladiador"
+            let inactive = ''
+            if (user.lvl < gladlots[i]){
+                info = `Atinja o nível ${gladlots[i]} de mestre para desbloquear este gladiador`
+                inactive = 'inactive'
             }
+            let card = `<div class='glad-add ${inactive}'><div class='image'></div><div class='info'>${info}</div></div>`
+            $('#glads-container .glad-card-container').append(card)
+        }
 
-            translator.translate($('.glad-add'))
-            
-            $('#glads-container .glad-add').not('.inactive').click( () => {
-                window.location.href = "newglad"
-            })
+        translator.translate($('.glad-add'))
+        
+        $('#glads-container .glad-add').not('.inactive').click( () => {
+            window.location.href = "newglad"
         })
     })
     
-    $('#menu #battle').click( function() {
-
+    $('#menu #battle').click( async function() {
         $('#match-find').prop('disabled',true);
         if (!$(this).hasClass('disabled')){
-            post("back_glad.php",{
+            await post("back_glad.php",{
                 action: "GET",
-            }).then( data => {
-                //console.log(data);
-
-                $('#battle-container .glad-preview').addClass('to-remove')
-                gladCard.load($('#battle-container .glad-card-container'), {
-                    mmr: true
-                }).then( data => {
-                    // console.log(data)
-                    $('#battle-container .glad-preview.to-remove').remove()
-
-                    for (let i in data){
-                        $('#battle-container .glad-preview').eq(i).data('data', data[i])    
-                    }
-
-                    $('#battle-container .glad-preview').click( function(){
-                        var card = $(this);
-                        if (!$(this).hasClass('old')){
-                            $('#battle-container .glad-preview').removeClass('selected');
-                            $(this).addClass('selected');
-                            $('#match-find').removeAttr('disabled');
-                        }
-                        else{
-                            new Message({
-                                message: `Este gladiador precisa ser atualizado. Deseja abri-lo no editor?`, 
-                                buttons: {yes: 'Sim', no: 'Não'} 
-                            }).show().click('yes', () => {
-                                window.open(`glad-${card.data('id')}`);
-                            });
-                        }
-                    });
-
-                })
             })
 
+            $('#battle-container .glad-preview').addClass('to-remove')
+
+            const {gladCard} = await loader.load("gladcard")
+            const data = await gladCard.load($('#battle-container .glad-card-container'), {
+                mmr: true
+            })
+            // console.log(data)
+            $('#battle-container .glad-preview.to-remove').remove()
+
+            for (let i in data){
+                $('#battle-container .glad-preview').eq(i).data('data', data[i])    
+            }
+
+            $('#battle-container .glad-preview').click( function(){
+                var card = $(this);
+                if (!$(this).hasClass('old')){
+                    $('#battle-container .glad-preview').removeClass('selected');
+                    $(this).addClass('selected');
+                    $('#match-find').removeAttr('disabled');
+                }
+                else{
+                    new Message({
+                        message: `Este gladiador precisa ser atualizado. Deseja abri-lo no editor?`, 
+                        buttons: {yes: 'Sim', no: 'Não'} 
+                    }).show().click('yes', () => {
+                        window.open(`glad-${card.data('id')}`);
+                    });
+                }
+            });
         }
 
         check_challenges()
@@ -481,24 +536,6 @@ window.onload = function(){
         var nick = $('#panel #duel.wrapper #table-friends .row.selected .cell.nick').text();
         create_duel_box(nick, userid);
     });
-
-    $('#panel #battle-mode #tourn.button').click( async function(){
-        $('#panel #battle-container .wrapper').hide();
-        var duel = $('#panel #battle-container #tourn.wrapper');
-        if (duel.css('display') == 'none')
-            duel.fadeIn();
-
-        refresh_tourn_list();
-    });
-
-    $('#panel #battle-mode #train.button').click( function(){
-        $('#panel #battle-container .wrapper').hide();
-        var train = $('#panel #battle-container #train.wrapper');
-        if (train.css('display') == 'none')
-            train.fadeIn();
-
-        trainList.refresh();
-    })
 
     if ($('#subtab').length){
         let subtab = $('#subtab').html()
@@ -719,7 +756,7 @@ window.onload = function(){
         create_duel_box(nick, userid);
     });
 
-    function create_duel_box(nick, userid){
+    async function create_duel_box(nick, userid){
         var box = `<div id='fog'>
             <div id='duel-box'>
                 <div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>${nick}</span> em nome da sua honra</div>
@@ -732,6 +769,7 @@ window.onload = function(){
         $('body').append(box);
         translator.translate($('#fog'))
 
+        const {gladCard} = await loader.load("gladcard")
         gladCard.load($('#fog .glad-card-container'), {
             clickHandler: function(){
                 $('#fog #btn-glad-open').removeAttr('disabled');
@@ -742,7 +780,7 @@ window.onload = function(){
             dblClickHandler: function(){
                 $('#fog #duel-box #invite').click();
             }
-        });
+        })
 
         $('#duel-box #cancel').click( function(){
             $('#fog').remove();
@@ -877,70 +915,14 @@ window.onload = function(){
         });
     }
 
-    $('#menu #logout').click( function() {
+    $('#menu #logout').click( async function() {
+        const {google} = await loader.load("google")
         google.logout().then( function(){
             window.location.href = 'index';
         });
     });
         
     $('#img-preview-container').hide();
-    
-    $("#img-upload").dropzone({
-        url: "#",
-        acceptedFiles: "image/*",
-        previewTemplate: "<div class='dz-preview'></div>",
-        accept: function(file, done) {
-            done();
-        },
-        init: function () {
-            this.on('addedfile', function (file) {  
-                $('.dz-preview').remove();
-                $('#img-preview-container').append($(file.previewElement));
-                $('#img-preview-container').fadeIn();
-            });
-        },
-        success: function(file, response) {
-            //console.log(file);
-            var img = new Image();
-            img.src = file.dataURL;
-            img.onload = function(){
-                $('.dz-preview').html(`<button id='crop-image' class='button'>RECORTAR IMAGEM</button><img src='${img.src}'>`)
-                translator.translate($('.dz-preview'))
-                var crop = new Croppie($('.dz-preview img')[0], {
-                    viewport: { width: 150, height: 150 },
-                    boundary: { width: 300, height: 300 },
-                });
-                $('.cr-slider').addClass('slider');
-                $('#crop-image').on('click', function() {
-                    crop.result({
-                        type: 'base64',
-                        format: 'jpeg'
-                    }).then(function(dataImg) {
-                        var data = [{ image: dataImg }, { name: 'myimgage.jpg' }];
-                        // use ajax to send data to php
-                        //console.log(dataImg);
-                        $('#img-upload').css({
-                            'background-image': "url("+ dataImg +")",
-                            'background-size': 'cover'
-                        });
-                        user.foto = dataImg;
-                        //console.log(dataImg);
-                        $('#img-preview-container').hide();
-                    });
-                });
-            }
-        },
-        error: function(file, errorMessage) {
-        },
-        removedfile: function(file) {
-        },
-        complete: function(file) {
-        },
-    });
-
-    chat.init($('#chat-panel'), {
-        full: false
-    });
 
     // radio
     $('.radio').parents('label').wrap("<div class='radio'></div>");
@@ -1086,6 +1068,8 @@ function afterBattleShow(hash, oldStatus){
 
     translator.translate($('#after-battle'))
 
+    const gladCardModule = loader.load("gladcard")
+
     $('#fog #after-battle span.svg').each( function() {
         load_svg($(this))
     })
@@ -1189,7 +1173,9 @@ function afterBattleShow(hash, oldStatus){
             }
         }).run()
 
-        gladCard.load($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
+        gladCardModule.then( e => {
+            e.gladCard.load($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
+        })
 
         $('#fog #after-battle #nbattles').text(20 - data.battles.total)
         if (data.battles.total == 20){
@@ -1287,6 +1273,7 @@ async function preBattleShow(glads){
     $('body').append("<div id='fog'><div id='pre-battle-show'><div class='glad-card-container'></div></div></div>");
     $('#fog').hide();
 
+    const {gladCard} = await loader.load("gladcard")
     gladCard.load($('#pre-battle-show .glad-card-container'), {
         master: true,
         customLoad: glads,
@@ -1373,7 +1360,7 @@ async function check_challenges(){
             });
         })
 
-        $('#duel-challenge .table .accept').click( function(){
+        $('#duel-challenge .table .accept').click( async function(){
             var row = $(this).parents('.row');
             var nick = row.find('.user').html();
             var id = row.data('id');
@@ -1381,6 +1368,7 @@ async function check_challenges(){
             var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='duel' class='button' disabled>DUELAR</button></div></div></div>";
             $('body').append(box);
     
+            const {gladCard} = await loader.load("gladcard")
             gladCard.load($('#fog .glad-card-container'), {
                 clickHandler: function(){
                     if (!$(this).hasClass('old')){

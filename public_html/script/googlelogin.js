@@ -25,45 +25,44 @@ import {post} from "./utils.js"
 import * as _ from "https://apis.google.com/js/platform.js?onload=onLoadCallback"
 
 const google = {
-    auth2: null
+    auth2: null,
+    started: false
 }
 
 google.init = function(){ 
-    var gapiInt = setInterval(gapiReady, 10);
-    
-    function gapiReady() {
-        if (typeof gapi !== 'undefined'){
-            gapi.load('auth2', function(){
-                // Retrieve the singleton for the GoogleAuth library and set up the client.
-                google.auth2 = gapi.auth2.init({
-                    client_id: '108043684563-uhl9ui9p47r5fadmu31mr3mmg7g4936n.apps.googleusercontent.com',
-                    cookiepolicy: 'single_host_origin',
-                    // Request scopes in addition to 'profile' and 'email'
-                    //scope: 'additional_scope'
-                });
-            });
-            clearInterval(gapiInt);
-        }
-    }
-
     //if node is not logged, logout from php
-    socket.request('login', {}).then( function(res, err){
-        if (err) return console.log(err);
+    socket.request('login', {}).then( async (res, err) => {
+        if (err) return console.log(err)
         // console.log(res)
         if (res.session === false){
-            $.post("back_login.php", {
+            const data = await post("back_login.php", {
                 action: "UNSET"
-            }).done( function(data){
-                data = JSON.parse(data);
-                if (data.status == "LOGOUT"){
-                    window.location.reload();
-                }
-            });
+            })
+            if (data.status == "LOGOUT"){
+                window.location.reload()
+            }
         }
-    });
+    })
+
+    return new Promise( resolve => {
+        gapi.load('auth2', () => {
+            // Retrieve the singleton for the GoogleAuth library and set up the client.
+            this.auth2 = gapi.auth2.init({
+                client_id: '108043684563-uhl9ui9p47r5fadmu31mr3mmg7g4936n.apps.googleusercontent.com',
+                cookiepolicy: 'single_host_origin',
+                // Request scopes in addition to 'profile' and 'email'
+                //scope: 'additional_scope'
+            })
+            this.started = true
+            resolve(true)
+        })
+    })    
 }
 
-google.login = function(){
+google.login = async function(){
+    if (!this.started){
+        await this.init()
+    }
     return new Promise( resolve => {
         google.auth2.signIn().then( function() {
             var id_token = google.auth2.currentUser.get().getAuthResponse().id_token;
@@ -91,6 +90,10 @@ google.login = function(){
 }
 
 google.logout = async function() {
+    if (!this.started){
+        await this.init()
+    }
+
     //logout on google api
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.disconnect();
