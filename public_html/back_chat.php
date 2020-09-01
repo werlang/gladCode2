@@ -394,35 +394,11 @@
                 else{
                     $sql = "SET lc_time_names = 'pt_BR'";
                     $result = runQuery($sql);
-                    $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(SECOND, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, login, u.apelido";
+                    $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(MINUTE, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, login, u.apelido";
                     $result = runQuery($sql);
                     
                     $output['user'] = array();
                     while($row = $result->fetch_assoc()){
-                        if ($row['privilege'] == 0)
-                            $row['privilege'] = "Líder";
-                        else
-                            $row['privilege'] = "Membro";
-
-                        if ($row['login'] < 3600){
-                            $n = floor($row['login'] / 60) ." minuto";
-                        }
-                        else if ($row['login'] < 86400){
-                            $n = floor($row['login'] / 3600) ." hora";
-                        }
-                        else if ($row['login'] < 2592000){
-                            $n = floor($row['login'] / 86400) ." dia";
-                        }
-                        else{
-                            $n = floor($row['login'] / 2592000) ." mes";
-                            if ($n > 1)
-                                $n .= 'e';
-                        }
-
-                        if ($n > 1)
-                            $n .= "s";
-                        $row['login'] = $n;
-
                         array_push($output['user'], $row);  
                     }
                     $output['status'] = "LIST";

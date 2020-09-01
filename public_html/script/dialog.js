@@ -91,13 +91,15 @@ const tooltip = function(delay = 700){
     function adjustPosition(e, mouse){
         const offset = {x: 15, y: 15}
 
-        const width = e.clientWidth
-
         e.style.left = mouse.x + offset.x + "px"
         e.style.top = mouse.y + offset.y + "px"
 
-        if (e.clientHeight > 30){
-            e.style.left = mouse.x - width + "px"
+        if (e.offsetLeft + e.offsetWidth > window.innerWidth){
+            e.style.left = mouse.x - e.clientWidth + "px"
+        }
+
+        if (e.offsetTop + e.offsetHeight > window.innerHeight){
+            e.style.top = mouse.y - e.clientHeight + "px"
         }
 
     }

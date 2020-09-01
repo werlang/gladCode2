@@ -1,6 +1,6 @@
 import {socket} from "./socket.js"
 import * as _ from "./emoji.js"
-import {post} from "./utils.js"
+import {post, getTimeSince} from "./utils.js"
 import {createToast} from "./dialog.js"
 import {google} from "./googlelogin.js"
 import {header, login} from "./header.js"
@@ -53,6 +53,7 @@ const translatorReady = (async () => {
         "Sai da sala atualmente aberta",
         "Torna-se o líder da sala aberta, caso os líderes estejam há muito inativos",
         "MEMBRO",
+        "Membro",
         "Torna o MEMBRO um líder da sala aberta",
         "fulaninho",
         "Remove MEMBRO da SALA (Precisa ser Líder). Se estiver dentro de uma sala, não é necessário o argumento SALA",
@@ -69,7 +70,8 @@ const translatorReady = (async () => {
         "Editor de código",
         "Confirmar",
         "MOSTRAR",
-        "LINHAS"
+        "LINHAS",
+        "Líder"
     ])
     return true
 })()
@@ -475,7 +477,7 @@ $(document).ready( function(){
                                             [{data: translator.getTranslated("Autoridade"), class: "head half"}, {data: translator.getTranslated("Nome"), class: "head"}, {data: translator.getTranslated("Na sala desde"), class: "head half"}, {data: translator.getTranslated("Último login"), class: "head half"}],
                                         ];
                                         for (let i in data.user){
-                                            table.push([{data: data.user[i].privilege, class: "half"}, {data: data.user[i].apelido}, {data: data.user[i].since, class: "half"}, {data: data.user[i].login, class: "half"}]);
+                                            table.push([{data: translator.getTranslated(data.user[i].privilege == "0" ? "Líder" : "Membro"), class: "half"}, {data: data.user[i].apelido}, {data: data.user[i].since, class: "half"}, {data: getTimeSince(data.user[i].login), class: "half"}]);
                                         }
                                         table.push([{data: `${translator.getTranslated("Total de")} ${data.user.length} ${translator.getTranslated("participantes")}`}]);
                                     }
