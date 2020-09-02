@@ -21,7 +21,16 @@ const translatorReady = (async () => {
         "Data"
     ])
     return true
+})();
+
+(async () => {
+    tabs.init()
+    document.querySelector('#report-container .tab.selected').click()
 })()
+
+document.querySelector('#menu #report').addEventListener('click', async () => {
+    document.querySelector('#report-container .tab.selected').click()
+})
 
 $(document).ready( async function(){
     let tabNames = ["Batalhas", "Duelos", "Favoritos"]
@@ -473,10 +482,6 @@ $(document).ready( async function(){
         }
     }
 
-    $('#menu #report').click(  async function() {
-        $('#report-container .tab.selected').click()
-    });
-
     $('#report-container #prev').click( function(){
         let check = $('#report-container #unread input:checked').length == 1
         tabs.pages.prev({ unread: check })
@@ -502,6 +507,4 @@ $(document).ready( async function(){
             })
         }
     })
-
-    tabs.init()
 })

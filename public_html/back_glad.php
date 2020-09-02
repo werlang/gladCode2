@@ -60,7 +60,7 @@
                 $info[$i]['vagi'] = $row['vagi'];
                 $info[$i]['vint'] = $row['vint'];
                 $info[$i]['code'] = htmlspecialchars($row['code']);
-                $info[$i]['blocks'] = htmlspecialchars($row['blocks']);
+                $info[$i]['blocks'] = $row['blocks'];
                 $info[$i]['skin'] = $row['skin'];
                 $info[$i]['mmr'] = $row['mmr'];
                 $info[$i]['user'] = $nick;

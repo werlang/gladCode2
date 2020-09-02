@@ -1,3 +1,6 @@
+import {Blockly} from "./blockly-python.js"
+export {Blockly}
+
 var funcList = {};
 
 Blockly.Blocks['loop'] = {

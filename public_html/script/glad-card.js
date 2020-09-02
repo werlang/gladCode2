@@ -288,13 +288,13 @@ gladCard.load = async function(obj, options){
                                     </div>
                                 </div>`)
     
-                                await loader.load('Blockly')
-                                let ws = Blockly.inject('code-ws', {
+                                const {Blockly} = (await loader.load('Blockly'))
+                                const ws = Blockly.inject('code-ws', {
                                     scrollbars: true,
                                     readOnly: true
                                 });
                         
-                                xmlDom = Blockly.Xml.textToDom(xml);
+                                const xmlDom = Blockly.Xml.textToDom(xml);
                                 Blockly.Xml.domToWorkspace(xmlDom, ws);
                             }
                             else{

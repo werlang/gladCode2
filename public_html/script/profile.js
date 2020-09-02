@@ -4,12 +4,10 @@ import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {Message, createToast, tooltip} from "./dialog.js"
 import { loader } from "./loader.js"
-// import * as potions from "./profile-potions.js"
 // import {Simulation, ProgressButton} from "./runSim.js"
 // import {stats} from "./stats_func.js"
 // import {refresh_tourn_list} from "./profile-tourn.js"
 // import {messages} from "./profile-message.js"
-// import * as reports from "./profile-report.js"
 // import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
@@ -184,6 +182,13 @@ document.querySelector("#menu #profile").addEventListener('click', async () => {
 
 })
 
+document.querySelector("#menu #potions").addEventListener('click', async () => {
+    loader.load("potions")
+})
+
+document.querySelector("#menu #report").addEventListener('click', async () => {
+    loader.load("reports")
+})
 
 window.onload = function(){
     $('#header-container').addClass('small-profile');

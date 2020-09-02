@@ -12,17 +12,9 @@ const paths = {
     google: "./googlelogin.js",
     chat: "./chat.js",
     cloudinary: "https://widget.cloudinary.com/v2.0/global/all.js",
-    Blockly: [
-        "./blockly.js",
-        "./pt-br.js",
-        "./python.js"
-        // "https://cdn.jsdelivr.net/gh/google/blockly@3.20200625.2/msg/js/pt-br.min.js",
-        // "https://cdn.jsdelivr.net/gh/google/blockly@3.20200625.2/python_compressed.js",
-
-        // "https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js",
-        // "https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js",
-        // "https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"
-    ]
+    Blockly: "./blocks.js",
+    potions: "./profile-potions.js",
+    reports: "./profile-report.js"
 }
 
 const callbacks = {
