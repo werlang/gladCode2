@@ -414,7 +414,7 @@ $(document).ready( function(){
                     })
                     // console.log(data)
                     if (data.status == "SUCCESS"){
-                        createToast("Você ingressou no treino", "success")
+                        createToast("Bem-vindo ao treino", "success")
                         $('#fog').remove()
                         if (!roomList[data.id])
                             roomList.create({id: data.id})
@@ -520,7 +520,7 @@ export const trainList = {
                     let id = $(this).parents('.row').data('id')
                     let name = $(this).parents('.row').find('#name').text()
                     new Message({
-                        message: `Deseja realmente excluir este treino ? Esta operação é irreversível`,
+                        message: `Deseja realmente excluir este treino? Esta operação é irreversível`,
                         buttons: {yes: "SIM", no: "NÃO"}
                     }).show().click('yes', async () => {
                         input.show().click('ok', async data => {

@@ -740,7 +740,7 @@ window.onload = function(){
         var id = button.parents('.row').data('id')
         var nick = button.parents('.row').data('nick')
         new Message({
-            message: `Deseja remover <b>${nick}</b> da sua lista de amigos?`,
+            message: `Deseja remover <ignore><b>${nick}</b></ignore> da sua lista de amigos?`,
             buttons: {yes: "Sim", no: "Não"}
         }).show().click('yes', () => {
             post("back_friends.php", {
@@ -804,10 +804,10 @@ window.onload = function(){
                 data = JSON.parse(data);
                 $('#fog').remove();
                 if (data.status == "EXISTS"){
-                    new Message({ message: `Já existe um desafio de duelo contra <b>${nick}</b> usando o gladiador <b>${gladname}</b>.` }).show();					
+                    new Message({ message: `Já existe um desafio de duelo contra <ignore><b>${nick}</b></ignore> usando o gladiador <ignore><b>${gladname}</b>.</ignore>` }).show();					
                 }
                 else if (data.status == "OK"){
-                    new Message({ message: `Desafio enviado para <b>${nick}</b>. Assim que uma resposta for dada você será notificado.` }).show();
+                    new Message({ message: `Desafio enviado para <ignore><b>${nick}</b>.</ignore> Assim que uma resposta for dada você será notificado.` }).show();
                     
                     $.post("back_sendmail.php",{
                         action: "DUEL",
@@ -862,10 +862,10 @@ window.onload = function(){
                 })
                 .done( function(data){
                     if (data == "EXISTS"){
-                        new Message({ message: `O usuário <b>${nick}</b> já está em sua lista de amigos` }).show()
+                        new Message({ message: `O usuário <ignore><b>${nick}</b></ignore> já está em sua lista de amigos` }).show()
                     }
                     else{
-                        new Message({ message: `Convite enviado para <b>${nick}</b>` }).show()
+                        new Message({ message: `Convite enviado para <ignore><b>${nick}</b></ignore>` }).show()
 
                         $.post("back_sendmail.php", {
                             action: "FRIEND",

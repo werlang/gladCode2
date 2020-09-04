@@ -306,7 +306,7 @@ training.show = async function(){
 
             if (this.deadline === null){
                 const msg = new Message({
-                    message: `<span>Quanto tempo até o início das batalhas da rodada ${this.round}?</span>
+                    message: `<span>Quanto tempo até o início das batalhas da rodada <ignore>${this.round}?</ignore></span>
                     <div id='slider'></div>`,
                     buttons: {ok: "OK", cancel: "Cancelar"}
                 })

@@ -175,7 +175,7 @@ $(document).ready( function() {
                                         new Message({message: `Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o`}).show();
                                     else if (data.status == "SUCCESS"){
                                         $('#fog').remove();
-                                        new Message({message: `Sua equipe escolheu o gladiador <b>${gladname}</b> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`}).show();
+                                        new Message({message: `Sua equipe escolheu o gladiador <ignore><b>${gladname}</b></ignore> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`}).show();
                                     }
                                 });
             

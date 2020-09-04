@@ -746,9 +746,8 @@ function rebind_team_rows(teamid){
         $('.tourn.window #join-leave').click( function(){
             if ($('.tourn.window #join-leave').text() == translator.getTranslated("ABANDONAR", false)){
                 new Message({
-                    message: `${translator.getTranslated("Tem certeza que deseja sair da equipe")} <span class='highlight'>${teamname}</span>?`,
-                    buttons: {no: translator.getTranslated("Não"), yes: translator.getTranslated("SIM")},
-                    translate: false
+                    message: `Tem certeza que deseja sair da equipe <ignore><b>${teamname}</b>?</ignore>`,
+                    buttons: {no: translator.getTranslated("Não"), yes: translator.getTranslated("SIM")}
                 }).show().click('yes', async () => {
                     let data = await post("back_tournament.php", {
                         action: "LEAVE_TEAM",
@@ -910,7 +909,7 @@ function refresh_glads(args){
                                         }
                                         else if (data.status == "REMOVED"){
                                             $('#fog.team').remove();
-                                            new Message({message: `${translator.getTranslated("A equipe")} ${translator.getTranslated("foi desmantelada")}`}).show().click('ok', () => {
+                                            new Message({message: `A equipe foi desmantelada`}).show().click('ok', () => {
                                                 $('.tourn.window').fadeIn();
                                             })
                                         }

@@ -182,7 +182,7 @@ $(document).ready( function() {
         else{
             var name = $('#fog-glads .glad-preview.selected .glad span').html()
             new Message({
-                message: `Deseja abrir o gladiador <b>${name}</b> para edição? Todas alterações no gladiador atual serão perdidas`,
+                message: `Deseja abrir o gladiador <ignore><b>${name}</b></ignore> para edição? Todas alterações no gladiador atual serão perdidas`,
                 buttons: {yes: "Sim", no: "Não"}
             }).show().click('yes', () => {
                 saved = true;
@@ -242,27 +242,27 @@ $(document).ready( function() {
                             args.blocks = loadGlad.blocks
 
                         // console.log(args)
-                        $.post( "back_glad.php", args).done( function(data){
+                        post("back_glad.php", args).then( function(data){
                             //console.log(data);
                             $('#fog').remove();
                             if (data.search("LIMIT") != -1)
-                                new Message({message: `Você não pode possuir mais de <b>${JSON.parse(data).LIMIT}</b> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`}).show();
+                                new Message({message: `Você não pode possuir mais de <ignore><b>${data.LIMIT}</b></ignore> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`}).show();
                             else if (data == "EXISTS")
-                                new Message({message: `O nome <b>${nome}</b> já está sendo usado por outro gladiador`}).show();
+                                new Message({message: `O nome <ignore><b>${nome}</b></ignore> já está sendo usado por outro gladiador`}).show();
                             else if (data == "INVALID")
                                 new Message({message: `CHEATER`}).show();
                             else if (data.search("ID") != -1){
                                 gladid = JSON.parse(data).ID;
                                 if (action == "INSERT"){
                                     new Message({
-                                        message: `O gladiador <b>${nome}</b> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`,
+                                        message: `O gladiador <ignore><b>${nome}</b></ignore> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`,
                                         buttons: {yes: "Sim", no: "Agora não"}
                                     }).show().click('yes', () => {
                                         window.open('battle.ranked')
                                     })
                                 }
                                 else{
-                                    new Message({message: `Gladiador <b>${nome}</b> gravado`}).show();
+                                    new Message({message: `Gladiador <ignore><b>${nome}</b></ignore> gravado`}).show();
                                 }
                                 saved = true;
                             }

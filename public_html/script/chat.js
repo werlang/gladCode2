@@ -419,15 +419,15 @@ $(document).ready( function(){
                                 }
                                 else if (status == "LEFT"){
                                     listRooms({remove: data.name});
-                                    createToast("Você saiu da sala "+ data.name, "success");
+                                    createToast(`Você saiu da sala <ignore>${data.name}</ignore>`, "success");
                                 }
                                 else if (status == "JOINED"){
                                     listRooms({insert: data.name});
-                                    createToast("Bem-vindo à sala "+ data.name, "success");
+                                    createToast(`Bem-vindo à sala <ignore>${data.name}</ignore>`, "success");
                                 }
                                 else if (status == "CREATED"){
                                     listRooms({insert: data.name});
-                                    createToast("Sala "+ data.name +" criada", "success");
+                                    createToast(`Sala <ignore>${data.name}</ignore> criada`, "success");
                                 }
                                 else if (status == "EDITED"){
                                     listRooms({});
@@ -438,25 +438,25 @@ $(document).ready( function(){
                                 else if (status == "NOPERMISSION")
                                     createToast("Você não possui permissão para realizar esta ação", "error");
                                 else if (status == "PROMOTED")
-                                    createToast("O usuário "+ data.target +" foi promovido", "success");
+                                    createToast(`O usuário <ignore>${data.target}</ignore> foi promovido`, "success");
                                 else if (status == "MAXPROMOTION")
-                                    createToast("O usuário "+ data.target +" não pode mais ser promovido", "info");
+                                    createToast(`O usuário <ignore>${data.target}</ignore> não pode mais ser promovido`, "info");
                                 else if (status == "NOTARGET"){
                                     if (data.command == 'ban' || data.command == 'promote')
-                                        createToast("O usuário "+ data.target +" não foi encontrado na sala", "error");
+                                        createToast(`O usuário <ignore>${data.target}</ignore> não foi encontrado na sala`, "error");
                                     else
-                                        createToast("O usuário "+ data.target +" não está banido", "info");
+                                        createToast(`O usuário <ignore>${data.target}</ignore> não está banido`, "info");
                                 }
                                 else if (status == "ALREADYBANNED")
-                                    createToast(data.target +" já está banido da sala", "error");
+                                    createToast(`<ignore>${data.target}</ignore> já está banido da sala`, "error");
                                 else if (status == "BANNED")
                                     createToast("Você foi banido desta sala e não pode enviar mensagens", "info");
                                 else if (status == "SILENCED")
-                                    createToast("Você foi silenciado até " + data.time, "info");
+                                    createToast(`Você foi silenciado até <ignore>${data.time}</ignore>`, "info");
                                 else if (status == "NOROOM")
                                     createToast("Entre em uma sala antes", "info");
                                 else if (status == "EXISTS")
-                                    createToast("A sala "+ data.name +" já existe", "info");
+                                    createToast(`A sala <ignore>${data.name}</ignore> já existe`, "info");
                                 else if (status == "ACTIVE")
                                     createToast("Os líderes desta sala estão ativos", "info");
                                 else if (status == "RESTRICTED")

@@ -139,7 +139,7 @@ $(document).ready( function(){
                     let tab = $('#ranking-container #tab-container .tab.selected')
                     let name = tab.text()
                     let message = new Message({
-                        message: `Deseja remover a aba <b>#${name}</b>`,
+                        message: `Deseja remover a aba <ignore><b>#${name}</b></ignore>`,
                         buttons: {yes: "SIM", no: "NÃO"}
                     })
                     message.show()
@@ -152,7 +152,7 @@ $(document).ready( function(){
                         // console.log(data)
                         if (data.status == "SUCCESS"){
                             tabs.show()
-                            createToast(`Aba #${name} removida`, "success")
+                            createToast(`Aba <ignore>#${name}</ignore> removida`, "success")
                             $('#ranking-container #tab-container #tab-general').click()
                         }
                     })
@@ -199,7 +199,7 @@ $(document).ready( function(){
             else{
                 // create a message box with in input
                 let input = new Message({
-                    message: `Nome da #hashtag que deseja rastrear`,
+                    message: `Nome da <ignore><b>#hashtag</b></ignore> que deseja rastrear`,
                     buttons: {ok: "OK", cancel: "CANCELAR"},
                     input: {
                         placeholder: "suahashtag",
@@ -244,7 +244,7 @@ $(document).ready( function(){
         })
         // console.log(data)
         if (data.status == "SUCCESS"){
-            createToast(`Aba #${name} criada`, "success")
+            createToast(`Aba <ignore>#${name}</ignore> criada`, "success")
         }
         else if (data.status == "NOPREMIUM"){
             createToast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")

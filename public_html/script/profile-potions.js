@@ -107,13 +107,13 @@ $(document).ready( () => {
                         }
                         else{
                             new Message({
-                                message: `Emcomendar <b>${potions[id].name}</b>?`,
+                                message: `Emcomendar <ignore><b>${potions[id].name}</b></ignore>?`,
                                 buttons: {yes: "Sim", no: "Não"}
                             }).show().click('yes', () => {                
                                 if (firstslot.length){
                                     $('#fog').remove()
                                     if (slots.fill(id)){
-                                        createToast(`Item ${potions[id].name} encomendado`, "success")
+                                        createToast(`Item <ignore>${potions[id].name}</ignore> encomendado`, "success")
                                     }
                                     else{
                                         createToast(`O item não pôde ser adquirido`, "error")
@@ -320,7 +320,7 @@ slots.refresh = async function() {
 
             $('#apot-container #my-pots .slot').eq(i).click( () => {
                 new Message({
-                    message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.id}")</b></code>`,
+                    message: `Para usar este item nas batalhas, use no seu código: <ignore><code><b>useItem("${item.id}")</b></code></ignore>`,
                     buttons: {yes: "Ajuda", no: "OK"}
                 }).show().click('yes', function(){
                     window.open(`manual#nav-item`)
