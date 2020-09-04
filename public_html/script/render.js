@@ -1152,7 +1152,7 @@ $(window).keydown(function(event) {
     if(event.keyCode == Phaser.Keyboard.F){
         prefs.fps = (prefs.fps + 1) % 2;
     
-        $.post("back_play.php", {
+        post("back_play.php", {
             action: "SET_PREF",
             show_fps: (prefs.fps == 1)
         });
@@ -1161,7 +1161,7 @@ $(window).keydown(function(event) {
     if(event.keyCode == Phaser.Keyboard.B){
         prefs.bars = (prefs.bars + 1) % 2;
     
-        $.post("back_play.php", {
+        post("back_play.php", {
             action: "SET_PREF",
             show_bars: (prefs.bars == 1)
         });
@@ -1177,7 +1177,7 @@ $(window).keydown(function(event) {
             prefs.frames = true;
         }
 
-        $.post("back_play.php", {
+        post("back_play.php", {
             action: "SET_PREF",
             show_frames: prefs.frames
         });
@@ -1186,7 +1186,7 @@ $(window).keydown(function(event) {
     if(event.keyCode == Phaser.Keyboard.T){
         prefs.text = (prefs.text + 1) % 2;
 
-        $.post("back_play.php", {
+        post("back_play.php", {
             action: "SET_PREF",
             show_text: (prefs.text == 1)
         });

@@ -208,12 +208,12 @@ $(document).ready( async function(){
                     }
 
                     function post_favorite(id, fav, comment){
-                        $.post("back_report.php", {
+                        post("back_report.php", {
                             action: "FAVORITE",
                             favorite: fav,
                             id: id,
                             comment: comment
-                        }).done( function(data){
+                        }).then( function(data){
                             // console.log(data);
                         });
                     }

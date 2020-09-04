@@ -904,18 +904,11 @@ async function listRooms(arg){
 
 function getChatNotification(){
     listRooms().then( () =>{
-        $.post("back_chat.php", {
+        post("back_chat.php", {
             action: "NOTIFICATIONS",
             visited: JSON.stringify(visitedRooms)
-        }).done( function(data){
+        }).then( function(data){
             // console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(e){
-                console.log(data);
-                console.log(e);
-            }
     
             if (data.status == "SUCCESS"){
                 var notif = data.notifications;
@@ -953,21 +946,14 @@ function getChatMessages(options){
         if (options && options.sync)
             sync = true;
 
-        $.post("back_chat.php", {
+        post("back_chat.php", {
             action: "MESSAGES",
             id: id,
             first: firstid,
             sync: sync,
             visited: visitedRooms[id]
-        }).done( function(data){
+        }).then( function(data){
             //console.log(data);
-            try{
-                data = JSON.parse(data);
-            }
-            catch(e){
-                console.log(data);
-                console.log(e);
-            }
             if (data.visited || (!visitedRooms[id] && data.visited) )
                 visitedRooms[id] = data.visited;
 

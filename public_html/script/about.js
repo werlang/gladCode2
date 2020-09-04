@@ -41,10 +41,10 @@ $(document).ready( function(){
     });
 
     $('#paypal, #pagseguro').click( function(){
-        $.post("back_thanks.php",{
+        post("back_thanks.php",{
             action: "SET",
             url: window.location.pathname
-        }).done( function(data){
+        }).then( function(data){
             //console.log(data);
         });
     });

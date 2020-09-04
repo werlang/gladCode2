@@ -107,10 +107,9 @@ tutorial.lesson.start = async function(){
     let data = await showDialog("Olá. Como você é novo aqui, eu gostaria de lhe ensinar alguns conceitos básicos sobre programação de gladiadores. Você aceita?",["Nunca","Agora não","SIM"])
 
     if (data == "Nunca"){
-        $.post("back_login.php", {
+        post("back_login.php", {
             action: "TUTORIAL_END",
         })
-        // .done( data => console.log(data))
     }
     else if (data == "SIM"){
         let data = await showDialog("Certo. Você já conhece um pouco de alguma linguagem de programação?",["Não","Sim"])
@@ -154,11 +153,10 @@ tutorial.lesson.start = async function(){
 
     function setLang(lang){
         user.language = lang
-        $.post("back_login.php", {
+        post("back_login.php", {
             action: "TUTORIAL_LANGUAGE",
             language: lang
         })
-        // .done( data => console.log(data))
     }
 }
 
@@ -914,10 +912,9 @@ tutorial.lesson.end = async function(){
     if (data == "Outras funções")
         window.open("docs");
 
-    $.post("back_login.php", {
+    post("back_login.php", {
         action: "TUTORIAL_END",
     })
-    // .done( data => console.log(data));
 
     tutorial.enabled = false
 }

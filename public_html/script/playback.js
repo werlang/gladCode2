@@ -30,11 +30,10 @@ $(document).ready( function() {
             loghash = $('#log').html();
             queryLog();
 
-            $.post("back_play.php", {
+            post("back_play.php", {
                 action: "GET_PREF"
-            }).done( function(data){
+            }).then( function(data){
                 // console.log(data);
-                data = JSON.parse(data);
                 prefs.bars = (data.show_bars === true || data.show_bars == 'true');
                 prefs.fps = (data.show_fps === true || data.show_fps == 'true');
                 prefs.text = (data.show_text === true || data.show_text == 'true');
@@ -377,7 +376,7 @@ $(document).ready( function() {
         })
 
         $('#settings-window #ok').click( function(){
-            $.post("back_play.php", {
+            post("back_play.php", {
                 action: "SET_PREF",
                 show_bars: prefs.bars,
                 show_frames: $('#pref-frames input').prop('checked'),
@@ -387,7 +386,7 @@ $(document).ready( function() {
                 sfx_volume: prefs.sound.sfx,
                 music_volume: music.volume,
                 crowd: prefs.crowd
-            }).done( function(data){
+            }).then( function(data){
                 //console.log(data);
             });
 
@@ -454,7 +453,7 @@ $(document).ready( function() {
         }
         changeSoundIcon();
 
-        $.post("back_play.php",{
+        post("back_play.php",{
             action: "SET_PREF",
             music_volume: music.volume,
             sfx_volume: prefs.sound.sfx
@@ -824,10 +823,10 @@ function createDetailedWindow(){
     });
 
     if (Object.keys(potionList).length == 0){
-        potionList.ready = $.post("back_slots.php", {
+        potionList.ready = post("back_slots.php", {
             action: "ITEMS"
         }).then( data => {
-            let potions = JSON.parse(data).potions
+            let potions = data.potions
             // console.log(potions)
             for (i in potions){
                 let p = potions[i]

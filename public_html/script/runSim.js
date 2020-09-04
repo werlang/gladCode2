@@ -17,31 +17,31 @@ class Simulation{
 
     async run(){
         this.running = true
-        let call = $.post("back_simulation.php", {
+        let call = post("back_simulation.php", {
             args: JSON.stringify(this.args)
         })
         this.call = call
         return new Promise( (resolve, reject) => {
             this.call.then( data => {
                 // console.log(data)
-                try {
-                    data = JSON.parse(data)
-                } catch(e){
+                if (data.error){
                     if (this.terminal){
-                        this.showTerm({error: e})
+                        this.showTerm({error: data.error})
                     }
-
+    
                     this.running = false
-                    reject({ error: e })
+                    reject({ error: data.error })
+                }
+                else{
+                    if (this.terminal){
+                        this.showTerm(data)
+                    }
+    
+                    this.running = false
+                    this.hash = data
+                    resolve(data)
                 }
 
-                if (this.terminal){
-                    this.showTerm(data)
-                }
-
-                this.running = false
-                this.hash = data
-                resolve(data)
             })
         })
     }
@@ -86,95 +86,6 @@ class Simulation{
     }
 }
 
-var ajaxcall;
-
-async function runSimulation(args) {
-    if (ajaxcall)
-        ajaxcall.abort();
-    var glads = args.glads;
-    
-    //console.log(glads);
-    var response = $.Deferred();
-    ajaxcall = $.post("back_simulation.php", {
-        args: JSON.stringify(args),
-    })
-    .done(function(data){
-        // console.log(data);
-        var jsonerror;
-        try{
-            JSON.parse(data);
-        }
-        catch(e){
-            jsonerror = e;
-        }
-            
-        if (jsonerror){
-            showTerminal("ERRO EM TEMPO DE EXECUÇÃO", "Algum de seus gladiadores ocasionou um erro na simulação enquanto ela estava sendo executada.\nVerifique seus códigos-fonte e tente novamente.");
-            console.log("ERROR: "+jsonerror);
-            console.log("JSON: "+data);
-            return response.resolve("ERROR");
-        }
-        else if (JSON.parse(data)){
-            data = JSON.parse(data);
-            var simulation = data.simulation;
-            var error = data.error;
-            var output = data.output;
-            
-            if (error != ""){
-                if (error == "INVALID_ATTR"){
-                    showTerminal("ERRO DE VALIDAÇÃO", "Os atributos de um dos gladiadores não são válidos ou sua pontuação não corresponde às regras da gladCode");
-                }
-                else{
-                    error = error.split("/usercode/").join("");
-                    for (var i in glads){
-                        if (glads[i].name){
-                            error = error.split(`code${i}.c`).join(`<span>${glads[i].name}</span>`);
-                            error = error.split(`code${i}.py`).join(`<span>${glads[i].name}</span>`);
-                        }
-                        else{
-                            var pattern = /setName\("([\w\W]*?)"\)/;
-                            var match = glads[i].match(pattern);
-                            if (match){ 
-                                error = error.split(`code${i}.c`).join(`<span>${match[1]}</span>`);
-                                error = error.split(`code${i}.py`).join(`<span>${match[1]}</span>`);
-                            }
-                        }
-                    }
-                    var pattern = /\\n/g;
-                    error = error.replace(pattern, '\n');
-
-                    showTerminal("ERRO DE SINTAXE", error);
-                }
-                return response.resolve("ERROR");
-            }
-            else if (simulation.length > 0){
-                if (output == "CLIENT TIMEOUT"){
-                    showTerminal("ERRO NA SIMULAÇÃO","A gladCode está tendo problemas entre a conexão do simulador e os gladiadores. Por favor, reporte este problema para <a href='mailto:contato@gladcode.dev'><span>contato@gladcode.dev</span></a>");
-                    return response.resolve("ERROR");
-                }
-                else if (output.indexOf("timed out") != -1){
-                    var glad = output.split("Gladiator ")[1].split(" timed out")[0];
-                    showTerminal("GLADIADOR EM LOOP", "O código do gladiador <span>"+ glad +"</span> está em uma repetição da qual não consegue sair.\nEle foi desativado para não comprometer a simulação.\n\nRevise o código-fonte e tente novamente.");
-                    return response.resolve("ERROR");
-                }
-                else{
-                    if (output != "")
-                        console.log("MENSAGEM: "+ output);
-                    
-                    //console.log(simulation[0]);
-                    
-                    return response.resolve(simulation);
-                    //data returned is string json, with skins of each gladiator in simulation[0].glads[i].skin
-                }
-            }
-        }
-        else
-            return response.resolve(false);
-    });
-    
-    return response.promise();
-}
-
 class ProgressButton {
     constructor(obj, text){
         this.oldhtml = obj.html();
@@ -215,10 +126,6 @@ class ProgressButton {
             if (obj.find('#bar').width() >= obj.width()){
                 self.kill();
                 showTerminal("ERRO DE CONEXÃO","Falha ao obter resposta do servidor dentro do tempo limite.");	
-                if (ajaxcall)
-                    ajaxcall.abort();
-                //obj.click();
-                
             }
         }, 10);
     }

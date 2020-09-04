@@ -4,12 +4,11 @@ const stats = {}
 
 stats.save = function(hash){
     var json;
-    $.post("back_log.php",{
+    post("back_log.php",{
         action: "GET",
         loghash: hash,
-    }).done( function(data){
+    }).then( function(data){
         // console.log(data);
-        json = JSON.parse(data);
 
         var steps = [];
         $.extend(steps, JSON.parse(json.log)); //hard copy json to steps
@@ -176,14 +175,13 @@ stats.load = function(args){
         date = args.date;
     if (args && args.mmr)
         mmr = args.mmr;
-    var ajax = $.post( "back_stats.php", {
+    var ajax = post( "back_stats.php", {
         action: 'load',
         start: date.start,
         end: date.end,
         smmr: mmr.start,
         emmr: mmr.end
-    })
-    .done(function( data ) {
+    }).then(function( data ) {
         // console.log(data);
     });	
     return ajax;

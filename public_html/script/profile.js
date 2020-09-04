@@ -76,7 +76,7 @@ const translatorReady = (async () => {
     await translator.translate(tipArray).then( data => {
         tipArray = data
     })
-    
+
     await translator.translate([
         'dias',
         'horas',
@@ -134,7 +134,7 @@ document.querySelector("#menu #profile").addEventListener('click', async () => {
                 done();
             },
             init: function () {
-                this.on('addedfile', function (file) {  
+                this.on('addedfile', function (file) {
                     $('body').append("<div id='img-preview-container'></div>")
                     $('#img-preview-container').append($(file.previewElement)).fadeIn()
                 });
@@ -246,20 +246,20 @@ window.onload = function(){
                 checkNotifications();
             });
         });
-        
+
         post("back_glad.php", {
             action: "GET"
         }).then( data => {
             if (data.length == 0){
                 new Message({
-                    message: `Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?`, 
+                    message: `Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?`,
                     buttons: {yes: "Sim", no: "Não, obrigado"}
                 }).show().click('yes', () => {
                     window.location.href = "editor";
                 });
             }
         });
-        
+
         translator.translate([
             document.querySelector('#menu'),
             document.querySelector('#panel')
@@ -284,7 +284,7 @@ window.onload = function(){
             $(this).addClass('here');
         }
     });
-    
+
     $('#menu #news').click( function() {
         post("back_news.php",{
             action: "READ",
@@ -365,7 +365,7 @@ window.onload = function(){
             else
                 user.preferences[preferences[i]] = "0";
         }
-        
+
         post("back_login.php", {
             action: "UPDATE",
             nickname: $('#nickname .input').val(),
@@ -386,7 +386,7 @@ window.onload = function(){
                     $('#nickname .input').focus().select();
                 });
                 $('#profile-panel .button').removeAttr('disabled');
-                
+
             }
         });
     });
@@ -409,7 +409,7 @@ window.onload = function(){
         $('#glads-container .glad-preview.old .code .button').click( () => {
             new Message({ message: `A simulação da gladCode foi atualizada, e o código do gladiador precisa ser testado e salvo novamente para que ele volte a participar das batalhas` }).show()
         })
-        
+
 
         $('#glads-container .glad-preview .delete').click( function(){
             var card = $(this).parents('.glad-preview')
@@ -449,12 +449,12 @@ window.onload = function(){
         }
 
         translator.translate($('.glad-add'))
-        
+
         $('#glads-container .glad-add').not('.inactive').click( () => {
             window.location.href = "newglad"
         })
     })
-    
+
     $('#menu #battle').click( async function() {
         $('#match-find').prop('disabled',true);
         if (!$(this).hasClass('disabled')){
@@ -472,7 +472,7 @@ window.onload = function(){
             $('#battle-container .glad-preview.to-remove').remove()
 
             for (let i in data){
-                $('#battle-container .glad-preview').eq(i).data('data', data[i])    
+                $('#battle-container .glad-preview').eq(i).data('data', data[i])
             }
 
             $('#battle-container .glad-preview').click( function(){
@@ -484,8 +484,8 @@ window.onload = function(){
                 }
                 else{
                     new Message({
-                        message: `Este gladiador precisa ser atualizado. Deseja abri-lo no editor?`, 
-                        buttons: {yes: 'Sim', no: 'Não'} 
+                        message: `Este gladiador precisa ser atualizado. Deseja abri-lo no editor?`,
+                        buttons: {yes: 'Sim', no: 'Não'}
                     }).show().click('yes', () => {
                         window.open(`glad-${card.data('id')}`);
                     });
@@ -521,12 +521,11 @@ window.onload = function(){
     });
     filter_friends("");
     function filter_friends(text){
-        $.post('back_friends.php', {
+        post('back_friends.php', {
             action: "FILTER",
             text: text
-        }).done( function(data){
+        }).then( function(data){
             //console.log(data);
-            data = JSON.parse(data);
             $('#panel #duel.wrapper #table-friends').html("");
             for (let i in data){
                 var row = "<div class='row'><div class='cell image'><img src='"+ data[i].picture +"'></div><div class='cell nick'>"+ data[i].nick +"</div></div>";
@@ -552,16 +551,16 @@ window.onload = function(){
         $(`#panel #battle-mode #${subtab}.button`).click()
     }
 
-    $.post("back_glad.php",{
+    post("back_glad.php",{
         action: "GET",
-    }).done( function(data){
-        if (JSON.parse(data).length == 0)
+    }).then( function(data){
+        if (data.length == 0)
             $('#menu #battle').addClass('disabled');
     });
 
     $('#battle-container #match-find').click( async function() {
         var progbtn = new ProgressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
-        
+
         var selGlad = $('#battle-container .glad-preview.selected').data('data')
         var thisglad = {
             'id': selGlad.id,
@@ -586,16 +585,15 @@ window.onload = function(){
             glad: thisglad.id
         }
 
-        $.post("back_match.php", {
+        post("back_match.php", {
             action: "MATCH",
             id: thisglad.id
-        }).done( function(data){
-            var glads = JSON.parse(data);
+        }).then( function(glads){
             glads.push(thisglad);
             //console.log(glads);
             var preBattleInt
             preBattleShow(glads).then( data => preBattleInt = data)
-            
+
             new Simulation({
                 ranked: true,
                 origin: "ranked",
@@ -620,19 +618,17 @@ window.onload = function(){
                     afterBattleShow(hash, oldStatus)
                 }
             });
-            
+
         });
-        
+
     });
-    
+
     $('#friend-panel #request, #friend-panel #friends').addClass('hidden');
 
     $('#menu #friends').click( function() {
-        $.post("back_friends.php",{
+        post("back_friends.php",{
             action: "GET"
-        })
-        .done( async function(data) {
-            data = JSON.parse(data);
+        }).then( async function(data) {
             //console.log(data);
             if (data.pending.length > 0)
                 $('#friend-panel #request').removeClass('hidden');
@@ -685,20 +681,20 @@ window.onload = function(){
                 </div>`);
                 $('#friend-panel #friends .table .row').last().data({'id': id, 'user': user, 'nick': nick});
             }
-            
+
             $('#friend-panel .check, #friend-panel .close').click( function() {
                 var answer = "NO";
                 if ($(this).hasClass('check'))
                     answer = "YES";
-                $.post("back_friends.php", {
+                post("back_friends.php", {
                     action: "REQUEST",
                     answer: answer,
                     id: $(this).parents('.row').data('id')
-                }).done( function(data){
+                }).then( function(data){
                     $('#menu #friends').click();
                 });
             });
-            
+
             $('#friend-panel #friends .button-open').click( function() {
                 close_friend_menu();
                 var button = $(this)
@@ -756,7 +752,7 @@ window.onload = function(){
         var button = $('#friend-panel #friends .button-open.open');
         bind_send_message(button);
     });
-    
+
     $('#friend-panel #friends .duel').click( function() {
         var button = $('#friend-panel #friends .button-open.open');
         var nick = button.parents('.row').data('nick');
@@ -796,23 +792,22 @@ window.onload = function(){
         $('#duel-box #invite').click( function(){
             var gladid = $('#fog .glad-preview.selected').data('id');
             var gladname = $('#fog .glad-preview.selected .info .glad span').html();
-            $.post("back_duel.php",{
+            post("back_duel.php",{
                 action: "CHALLENGE",
                 glad: gladid,
                 friend: userid
-            }).done( function(data){
-                data = JSON.parse(data);
+            }).then( function(data){
                 $('#fog').remove();
                 if (data.status == "EXISTS"){
-                    new Message({ message: `Já existe um desafio de duelo contra <ignore><b>${nick}</b></ignore> usando o gladiador <ignore><b>${gladname}</b>.</ignore>` }).show();					
+                    new Message({ message: `Já existe um desafio de duelo contra <ignore><b>${nick}</b></ignore> usando o gladiador <ignore><b>${gladname}</b>.</ignore>` }).show();
                 }
                 else if (data.status == "OK"){
                     new Message({ message: `Desafio enviado para <ignore><b>${nick}</b>.</ignore> Assim que uma resposta for dada você será notificado.` }).show();
-                    
-                    $.post("back_sendmail.php",{
+
+                    post("back_sendmail.php",{
                         action: "DUEL",
                         friend: userid,
-                    }).done( function(data){
+                    }).then( function(data){
                         //console.log(data);
                     });
                 }
@@ -825,13 +820,12 @@ window.onload = function(){
 
     $('#friend-panel input').on('input', function() {
         var text = $(this).val();
-        $.post("back_friends.php", {
+        post("back_friends.php", {
             action: "SEARCH",
             text: text,
         })
         .done( function(data){
             //console.log(data);
-            data = JSON.parse(data);
             $('#friend-panel #search .table').html("");
             for (var i in data){
                 var nick = data[i].nick;
@@ -856,22 +850,20 @@ window.onload = function(){
                 var email = $(this).parents('.row').data('email');
                 var userid = $(this).parents('.row').data('user');
 
-                $.post("back_friends.php", {
+                post("back_friends.php", {
                     action: "ADD",
                     user: userid
-                })
-                .done( function(data){
-                    if (data == "EXISTS"){
+                }).then( function(data){
+                    if (data.status == "EXISTS"){
                         new Message({ message: `O usuário <ignore><b>${nick}</b></ignore> já está em sua lista de amigos` }).show()
                     }
                     else{
                         new Message({ message: `Convite enviado para <ignore><b>${nick}</b></ignore>` }).show()
 
-                        $.post("back_sendmail.php", {
+                        post("back_sendmail.php", {
                             action: "FRIEND",
                             friend: email,
-                        })
-                        .done( function(data){
+                        }).then( function(data){
                             //console.log(data);
                         });
                     }
@@ -882,7 +874,7 @@ window.onload = function(){
             });
         });
     });
-    
+
     function bind_send_message(elem){
         var userid = elem.parents('.row').data('user');
         var nick = elem.parents('.row').data('nick');
@@ -908,7 +900,7 @@ window.onload = function(){
                 }).then( function(data){
                     // console.log(data);
                     new Message({ message: "Mensagem enviada" }).show()
-                    
+
                     if (data.mail){
                         post("back_sendmail.php", {
                             action: "MESSAGE",
@@ -929,7 +921,7 @@ window.onload = function(){
             window.location.href = 'index';
         });
     });
-        
+
     $('#img-preview-container').hide();
 
     // radio
@@ -974,14 +966,14 @@ async function checkNotifications(){
             $('#news .notification').addClass('empty');
         else
             $('#news .notification').removeClass('empty');
-            
+
         var newfriends = parseInt(data.friends);
         $('#friends .notification').html(newfriends);
         if (newfriends == 0)
             $('#friends .notification').addClass('empty');
         else
             $('#friends .notification').removeClass('empty');
-            
+
         var grem = parseInt(data.glads.remaining);
         var gobs = parseInt(data.glads.obsolete);
         $('#glads .notification').html(grem + gobs);
@@ -989,7 +981,7 @@ async function checkNotifications(){
             $('#glads .notification').addClass('empty');
         else
             $('#glads .notification').removeClass('empty');
-        
+
         let duels = parseInt(data.duels)
         $('#battle .notification').html(duels).addClass('empty')
         $('#battle-container #duel .notification').html(duels).addClass('empty')
@@ -1020,7 +1012,7 @@ async function checkNotifications(){
                 $('#report-container #duel.tab .notification').removeClass('empty')
             }
         }
-    
+
     });
 }
 
@@ -1214,7 +1206,7 @@ function timeCounter(obj, time){
             let s = parseInt(time) % 60
             let h = parseInt(m / 60)
             m = m % 60
-        
+
             if (h < 10){
                 h = `0${h}`
             }
@@ -1242,7 +1234,7 @@ class valueAnimator{
         this.start = args.start ? parseFloat(args.start) : 0
         this.end = args.end ? parseFloat(args.end) : 0
         this.value = this.start
-        
+
         this.onStep = args.onStep ? args.onStep : null
     }
 
@@ -1256,7 +1248,7 @@ class valueAnimator{
                 let now = new Date()
                 setTimeout( () => {
                     animator.value += valueStep
-        
+
                     if (animator.onStep){
                         animator.onStep(animator.value)
                     }
@@ -1291,7 +1283,7 @@ async function preBattleShow(glads){
         $('#pre-battle-show #tips').html(tipArray[parseInt(Math.random() * tipArray.length)]);
         $('#fog').fadeIn();
     })
-    
+
     var timeElapsed = 0;
     var preBattleInt = setInterval( function(){
         var buttonWidth = $('#battle-container #match-find').width();
@@ -1304,14 +1296,14 @@ async function preBattleShow(glads){
         });
         if (progress >= 1)
             clearInterval(preBattleInt);
-        
-        var tipTime = 10; 
+
+        var tipTime = 10;
         if ((timeElapsed / 100) % tipTime == 0){
             var i = parseInt(Math.random() * tipArray.length);
             $('#pre-battle-show #tips').html(tipArray[i]);
         }
         timeElapsed++;
-        
+
     }, 10);
     return preBattleInt;
 }
@@ -1353,12 +1345,11 @@ async function check_challenges(){
         $('#duel-challenge .table .refuse').click( function(){
             var row = $(this).parents('.row');
             var id = row.data('id');
-            $.post("back_duel.php",{
+            post("back_duel.php",{
                 action: "DELETE",
                 id: id,
-            }).done( function(data){
+            }).then( function(data){
                 //console.log(data);
-                data = JSON.parse(data);
                 if (data.status == "OK"){
                     new Message({ message: "Desafio recusado" }).show();
                     row.remove();
@@ -1372,7 +1363,7 @@ async function check_challenges(){
             var row = $(this).parents('.row');
             var nick = row.find('.user').html();
             var id = row.data('id');
-    
+
             var box = `<div id='fog'>
                 <div id='duel-box'>
                     <div id='title'>${translator.getTranslated("Escolha o gladiador que duelará contra")} <span class='highlight'>${nick}</span> ${translator.getTranslated("em nome da sua honra")}</div>
@@ -1384,7 +1375,7 @@ async function check_challenges(){
                 </div>
             </div>`;
             $('body').append(box);
-    
+
             const {gladCard} = await loader.load("gladcard")
             gladCard.load($('#fog .glad-card-container'), {
                 clickHandler: function(){

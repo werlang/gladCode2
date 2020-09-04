@@ -41,13 +41,15 @@
         if ($nrows == 0){
             $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
             $result = runQuery($sql);
-            echo $hash;
+            $output['status'] = "SUCCESS";
+            $output['hash'] = $hash;
 
             send_node_message(array('tournament list' => array()));
         }
         else
-            echo "EXISTS";
+            $output['status'] = "EXISTS";
 
+        echo json_encode($output);
     }
     else if ($action == "LIST"){
         $output = array();
@@ -248,23 +250,23 @@
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
-            echo "NOTFOUND";
+            $output['status'] = "NOTFOUND";
         else{
             $row = $result->fetch_assoc();
             $tourn = $row['id'];
 
             if ($row['hash'] != ''){
-                echo "STARTED";
+                $output['status'] = "STARTED";
             }
             elseif (check_joined($tourn, $conn) !== false)
-                echo "ALREADYIN";
+                $output['status'] = "ALREADYIN";
             else{
                 $sql = "SELECT t.maxteams AS maxteams FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE t.id = '$tourn'";
                 $result = runQuery($sql);
                 $nrows = $result->num_rows;
                 $row = $result->fetch_assoc();
                 if ($nrows > 0 && $nrows >= $row['maxteams'])
-                    echo "FULL";
+                    $output['status'] = "FULL";
                 else{
                     $sql = "SELECT name FROM teams WHERE name = '$name' AND tournament = $tourn";
                     $result = runQuery($sql);
@@ -288,6 +290,8 @@
                         $output = array();
                         $output['word'] = $word;
                         $output['id'] = $teamid;
+                        $output['status'] = "SUCCESS";
+
                         echo json_encode($output);
         
                         $sql = "SELECT cod FROM gladiators WHERE master = '$user'";
@@ -310,7 +314,7 @@
                         )));
                     }
                     else
-                        echo "EXISTS";
+                        $output['status'] = "EXISTS";
                 }
             }
         }

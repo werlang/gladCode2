@@ -21,13 +21,12 @@ $(document).ready( function() {
         });
     });
 
-    $.post("back_tournament_run.php", {
+    post("back_tournament_run.php", {
         action: "GET",
         hash: hash,
         round: round
-    }).done( function(data){
+    }).then( function(data){
         //console.log(data);
-        data = JSON.parse(data);
 
         if (data.status == "REDIRECT"){
             window.location.href = 'tourn/'+ hash +'/'+ data.round;
@@ -136,13 +135,12 @@ $(document).ready( function() {
                 var nick = data.nick;
 
                 $('#content-box #prepare').off().click( function(){
-                    $.post("back_tournament_run.php", {
+                    post("back_tournament_run.php", {
                         action: "GLADS",
                         hash: hash,
                         round: round
-                    }).done( function(data){
+                    }).then( function(data){
                         //console.log(data);
-                        data = JSON.parse(data);
                        
                         if (data.status == "LOCK"){
                             new Message({message: `Tarde demais. Seu grupo já encerrou as inscrições`}).show();
@@ -161,13 +159,12 @@ $(document).ready( function() {
                             $('.float-box #choose').click( function(){
                                 var gladid = $('.float-box .glad-preview.selected').data('id');
                                 var gladname = $('.float-box .glad-preview.selected .info .glad span').html();
-                                $.post("back_tournament_run.php", {
+                                post("back_tournament_run.php", {
                                     action: "CHOOSE",
                                     id: gladid,
                                     hash: hash
-                                }).done( function(data){
+                                }).then( function(data){
                                     //console.log(data);
-                                    data = JSON.parse(data);
             
                                     if (data.status == "DEAD")
                                         new Message({message: `Este gladiador está gravemente ferido e não poderá mais participar deste torneio`}).show();
@@ -210,11 +207,10 @@ $(document).ready( function() {
                 $('#content-box #prepare').html("ENCERRAR RODADA").removeAttr('disabled');
                 $('#content-box #prepare').off().click( function(){
                     $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
-                    $.post("back_tournament_run.php", {
+                    post("back_tournament_run.php", {
                         action: "END TURN",
                         hash: hash
-                    }).done( function(data){
-                        data = JSON.parse(data);
+                    }).then( function(data){
                         //console.log(data);
                     });
                 });
@@ -268,13 +264,12 @@ $(document).ready( function() {
 });
 
 function refresh_round(){
-    $.post("back_tournament_run.php", {
+    post("back_tournament_run.php", {
         action: "REFRESH",
         hash: hash,
         round: round,
-    }).done( function(data){
+    }).then( function(data){
         //console.log(data);
-        data = JSON.parse(data);
         
         $('#content-box #group-container .team').each( function(){
             if (!$(this).parents('.group').hasClass('hide-info')){
@@ -335,17 +330,16 @@ function refresh_round(){
                                 }).then( function(data){
                                     //console.log(data);
                                     if (data != "ERROR"){
-                                        $.post("back_tournament_run.php",{
+                                        post("back_tournament_run.php",{
                                             action: "UPDATE",
                                             hash: hash
-                                        }).done( function(data){
+                                        }).then( function(data){
                                             //console.log(data);
-                                            data = JSON.parse(data);
                                             if (data.status == "NEXT"){
-                                                $.post("back_sendmail.php",{
+                                                post("back_sendmail.php",{
                                                     action: "TOURNAMENT",
                                                     hash: hash
-                                                }).done( function(data){
+                                                }).then( function(data){
                                                     //console.log(data);
                                                 });
                                             }

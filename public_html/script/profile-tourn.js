@@ -220,7 +220,7 @@ $(document).ready( function(){
                 $('.tourn.window #maxtime input').before(`<span class='tip'>${translator.getTranslated("Formato de hora inválida", true)}</span>`);
             }
             else{
-                $.post("back_tournament.php",{
+                post("back_tournament.php",{
                     action: "CREATE",
                     name: name,
                     pass: pass,
@@ -228,8 +228,8 @@ $(document).ready( function(){
                     maxteams: maxteams,
                     maxtime: maxtime,
                     flex: flex
-                }).done( function(data){
-                    if (data != "EXISTS"){
+                }).then( function(data){
+                    if (data.status != "EXISTS"){
                         $('#fog').remove();
 
                         var content = `<p>${translator.getTranslated("As equipes deverão entrar com os seguintes dados para se inscrever em seu torneio", true)}:</p>
@@ -376,36 +376,34 @@ $(document).ready( function(){
                                     if (data !== false){
                                         var gladid = data.glad;
                                         var showcode = data.showcode;
-                                        $.post("back_tournament.php", {
+                                        post("back_tournament.php", {
                                             action: "TEAM_CREATE",
                                             name: name,
                                             tname: tname,
                                             tpass: tpass,
                                             glad: gladid,
                                             showcode: showcode
-                                        }).done( function(data){
+                                        }).then( function(data){
                                             // console.log(data);
                 
-                                            if (data == "NOTFOUND"){
+                                            if (data.status == "NOTFOUND"){
                                                 new Message({message: "Torneio não encontrado"}).show();
                                             }
-                                            else if (data == "STARTED"){
+                                            else if (data.status == "STARTED"){
                                                 $('#fog.tourn').remove();
                                                 new Message({message: "Este torneio já iniciou"}).show();
                                             }
-                                            else if (data == "ALREADYIN"){
+                                            else if (data.status == "ALREADYIN"){
                                                 new Message({message: "Já está em um time neste torneio"}).show();
                                             }
-                                            else if (data == "EXISTS"){
+                                            else if (data.status == "EXISTS"){
                                                 $('.tourn.window #name').focus();
                                                 $('.tourn.window .input-button').before("<span class='tip'>Esta equipe já está registrada</span>");
                                             }
-                                            else if (data == "FULL"){
+                                            else if (data.status == "FULL"){
                                                 new Message({message: "Este torneio já esgotou o limite de inscrições"}).show();
                                             }
                                             else{
-                                                data = JSON.parse(data);
-
                                                 $('.tourn.window .input-button').remove();
                                                 $('.tourn.window #new').fadeIn();
                 
@@ -461,14 +459,13 @@ var tournpage = {
 function refresh_tourn_list(){
     var step = 10;
     if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
-        $.post("back_tournament.php", {
+        post("back_tournament.php", {
             action: "LIST",
             moffset: tournpage.mine.offset,
             ooffset: tournpage.open.offset
-        }).done( function(data){
+        }).then( function(data){
             // console.log(data);
             if ($('#panel #battle-mode #tourn.button').hasClass('selected')){
-                data = JSON.parse(data);
                 var open = data.open;
                 var mytourn = data.mytourn;
 
@@ -526,12 +523,11 @@ function refresh_tourn_list(){
 
                 $('#panel #battle-container #tourn.wrapper .table .row').not('.head').click( function(){
                     var name = $(this).find('#name').text();
-                    $.post("back_tournament.php",{
+                    post("back_tournament.php",{
                         action: "JOIN",
                         name: name
-                    }).done( function(data){
+                    }).then( function(data){
                         //console.log(data);
-                        data = JSON.parse(data);
 
                         $('#tourn.wrapper #join').click();
                         $('.tourn.window #name').val(data.name);
@@ -560,14 +556,13 @@ function refresh_teams(obj){
         $('#fog.tourn, #fog.team, #fog.glads').remove();
     }
     else if ($('#fog.tourn').length){
-        $.post("back_tournament.php",{
+        post("back_tournament.php",{
             action: "LIST_TEAMS",
             name: obj.name,
             pass: obj.pass,
             tourn: obj.tourn
-        }).done( function(data){
+        }).then( function(data){
             // console.log(data);
-            var data = JSON.parse(data);
 
             if (data.status == "STARTED"){
                 var hash = data.hash;
@@ -643,14 +638,13 @@ function refresh_teams(obj){
                             message: "Deseja remover o torneio?",
                             buttons: {yes: "Sim", no: "NÃO"}
                         }).show().click('yes', () => {
-                            $.post("back_tournament.php",{
+                            post("back_tournament.php",{
                                 action: "DELETE",
                                 name: obj.name,
                                 pass: obj.pass,
                                 tourn: obj.tourn
-                            }).done( function(data){
+                            }).then( function(data){
                                 //console.log(data);
-                                data = JSON.parse(data);
                                 if (data.status == "DELETED"){
                                     new Message({message: "Torneio removido"}).show()
                                     $('#fog').remove();		
@@ -783,15 +777,14 @@ function rebind_team_rows(teamid){
                         }).show().click('ok', data => {
                             if (data !== false){
                                 var pass = data;
-                                $.post("back_tournament.php", {
+                                post("back_tournament.php", {
                                     action: "JOIN_TEAM",
                                     pass: pass,
                                     team: teamid,
                                     glad: gladid,
                                     showcode: showcode
-                                }).done( function(data){
+                                }).then( function(data){
                                     //console.log(data);
-                                    data = JSON.parse(data);
                                     var tournid = data.tourn;
 
                                     if (data.status == "FAIL")
@@ -972,15 +965,14 @@ function refresh_glads(args){
                         if (data !== false){
                             var gladid = data.glad;
                             var showcode = data.showcode;
-                            $.post("back_tournament.php", {
+                            post("back_tournament.php", {
                                 action: "ADD_GLAD",
                                 glad: gladid,
                                 showcode: showcode,
                                 team: teamid,
                                 pass: word
-                            }).done( function(data){
+                            }).then( function(data){
                                 //console.log(data);
-                                data = JSON.parse(data);
                                 if (data.status == "SAMEGLAD")
                                     new Message({message: "Este gladiador já faz parte da equipe"}).show();
                                 else if (data.status == "STARTED"){

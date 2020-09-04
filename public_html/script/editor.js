@@ -297,7 +297,7 @@ $(document).ready( function() {
                             btnbattle_click($('#save-box button'), glads).then( hash => {
                                 // console.log(hash);
                                 if (hash !== false){
-                                    $.post("back_log.php", {
+                                    post("back_log.php", {
                                         action: "DELETE",
                                         hash: hash
                                     });
@@ -380,10 +380,9 @@ s                });
     login.wait().then( data => {
         user = data
         if (user.status == "SUCCESS" ){
-            $.post("back_glad.php",{
+            post("back_glad.php",{
                 action: "GET",
-            }).done( function(data){
-                data = JSON.parse(data);
+            }).then( function(data){
                 // console.log(data);
                 for (let i in data){
                     $('#fog-battle #list').append(template);
@@ -486,7 +485,7 @@ s                });
                         if (data.button == "yes")
                             window.open("play/"+ hash);
                         else{
-                            $.post("back_log.php", {
+                            post("back_log.php", {
                                 action: "DELETE",
                                 hash: hash
                             });
@@ -616,11 +615,11 @@ s                });
             $('#fog').remove();
 
             if (user){
-                $.post("back_login.php",{
+                post("back_login.php",{
                     action: "EDITOR",
                     theme: theme,
                     font: font
-                }).done( function(){
+                }).then( function(){
                     user.theme = theme;
                     user.font = font;
                 });
@@ -842,13 +841,11 @@ function setLoadGlad(){
 
 function getGladFromFile(filename){
     var response = $.Deferred();
-    $.post('back_glad.php', {
+    post('back_glad.php', {
         action: "FILE",
         filename: filename
-    })
-    .done(function(data){
+    }).then(function(data){
         //console.log(data);
-        data = JSON.parse(data);
         if (data.skin)
             data.skin = JSON.stringify(data.skin);
         return response.resolve(data);

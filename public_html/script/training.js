@@ -128,12 +128,12 @@ var selectedGlad = {
 
         $('#fog .glad-box #select').click( async function(){
             let glad = $('#fog .glad-preview.selected').data('id')
-            let data = JSON.parse(await $.post("back_train.php", {
+            let data = await post("back_train.php", {
                 action: "JOIN",
                 hash: hash,
                 glad: glad,
                 redirect: true
-            }))
+            })
             // console.log(data)
 
             if (data.status == "SUCCESS"){
