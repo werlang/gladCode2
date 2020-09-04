@@ -6,15 +6,38 @@ import {Message, createToast} from "./dialog.js"
 var user
 var potions
 
+const translatorReady = (async () => {
+    await login.wait()
+    await translator.translate([
+        "CANCELAR",
+        "Custo",
+        "Encomendar produto",
+        "Estes são os produtos que você pode encomendar",
+        "Informações",
+        "Nível necessário",
+    ])
+})()
+
 $(document).ready( () => {
     post("back_slots.php", {
         action: "ITEMS"
-    }).then (data => {
+    }).then (async data => {
         // console.log(data)
         potions = data.potions
         
-        $('#apot-container #browse').click( function(){
+        const translatedPotions = []
+        for (let i in potions){
+            translatedPotions.push(potions[i].name)
+            translatedPotions.push(potions[i].description)
+        }
+        const translatedPotionsReady = translator.translate(translatedPotions)
+
+        $('#apot-container #browse').click( async function(){
+
             if (!$(this).attr('disabled')){
+                await translatedPotionsReady
+                await translatorReady
+
                 let slotsDOM = ""
                 for (let i in potions){
                     let item = potions[i]
@@ -25,10 +48,10 @@ $(document).ready( () => {
                             <div><i class='fas fa-coins silver'></i><span class='price'>${item.price}</span></div>
                         </div>
                         <div class='bot'>
-                            <span class='name'>${item.name}</span>
+                            <span class='name'>${translator.getTranslated(item.name)}</span>
                             <div class='button-container'>
-                                <span class='info' title='Informações'><i class='fas fa-question-circle'></i></span>
-                                <span class='buy' title='Encomendar produto'><i class='fas fa-thumbs-up'></i></span>
+                                <span class='info' title='${translator.getTranslated("Informações", false)}'><i class='fas fa-question-circle'></i></span>
+                                <span class='buy' title='${translator.getTranslated("Encomendar produto", false)}'><i class='fas fa-thumbs-up'></i></span>
                             </div>
                         </div>
                     </div>`
@@ -36,17 +59,15 @@ $(document).ready( () => {
 
                 $('body').append(`<div id='fog'>
                     <div id='browse-potions'>
-                        <h2>Estes são os produtos que você pode encomendar:</h2>
+                        <h2>${translator.getTranslated("Estes são os produtos que você pode encomendar")}:</h2>
                         <div id='shop-container'>
                             ${slotsDOM}
                         </div>
-                        <button id='close'>CANCELAR</button>
+                        <button id='close'>${translator.getTranslated("CANCELAR")}</button>
                     </div>
                 </div>`)
                 $('#fog').hide().fadeIn()
                 slots.refresh()
-
-                translator.translate($('#browse-potions'))
 
                 $('#browse-potions #close').click( function() {
                     $('#fog').remove()
@@ -55,19 +76,20 @@ $(document).ready( () => {
                 $('#browse-potions .info').click( function() {
                     let id = $(this).parents('.slot').data('id')
                     new Message({ message:
-                        `<h3><b>${potions[id].name}</b></h3>
-                        <div>${potions[id].description}</div>
+                        `<h3><b>${translator.getTranslated(potions[id].name)}</b></h3>
+                        <div>${translator.getTranslated(potions[id].description)}</div>
                         <div id='description-info'>
                             <div class='col'>
-                                <span class='small'>Nível necessário:</span>
+                                <span class='small'>${translator.getTranslated("Nível necessário")}:</span>
                                 <span><i class='fas fa-arrow-alt-circle-up'></i><b>${potions[id].lvl}</b></span>
                             </div>
                             <div class='col'>
-                                <span>Custo:</span>
+                                <span>${translator.getTranslated("Custo")}:</span>
                                 <span><b>${potions[id].price}</b><i class='fas fa-coins silver'></i></span>
                             </div>
                         </div>`,
-                        class: "description"
+                        class: "description",
+                        translate: false
                     }).show()
                 })
         
@@ -78,7 +100,7 @@ $(document).ready( () => {
                         let id = $(this).parents('.slot').data('id')
                         
                         if (apothecary.lvl < potions[id].lvl){
-                            new Message({ message: `Aprimore o apotecário para o nível <b>${potions[id].lvl}</b> para poder encomendar este item` }).show()
+                            new Message({ message: `Aprimore o apotecário para o nível <ignore><b>${potions[id].lvl}</b></ignore> para poder encomendar este item` }).show()
                         }
                         else if (parseInt(user.silver) < potions[id].price){
                             new Message({ message: `Você não possui prata <i class='fas fa-coins silver'></i> suficiente para adquirir este item` }).show()

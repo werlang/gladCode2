@@ -3,9 +3,7 @@ import {Message} from "./dialog.js"
 import {login} from "./header.js"
 
 const translator = {
-    ready: true,
-    prop_number : "995471",
-    prop_text: "foobarproptextfoobar"
+    ready: true
 }
 
 translator.translate = async function(elements){
@@ -29,17 +27,18 @@ translator.translate = async function(elements){
     for (let element of elements){
         if (typeof element === 'string'){
             if (!contents[element]){
-                let el = element
+                const el = element
 
-                if (el.indexOf("<prop-number>") != -1){
-                    el = el.replace(/<prop-number>\d+<\/prop-number>/g, this.prop_number)
+                if (el.indexOf("<ignore>") != -1){
+                    const before = el.split("<ignore>")[0]
+                    const after = el.split("</ignore>")[1]
+
+                    contents[before] = {}
+                    contents[after] = {}
                 }
-
-                if (el.indexOf("<prop-text>") != -1){
-                    el = el.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
+                else{
+                    contents[el] = {}
                 }
-
-                contents[el] = {}
             }
         }
         else{
@@ -58,28 +57,20 @@ translator.translate = async function(elements){
                     if (lang != 'pt'){
                         // replace contents
                         // console.log(e.textContent)
-
-                        // const el_prop_text = e.querySelector("prop-text")
-                        // const el_prop_number = e.querySelector("prop-number")
-                        // if (el_prop_number){
-                        //     e.dataset['propnumber'] = el_prop_number.innerHTML
-                        //     el_prop_number.innerHTML = this.prop_number
-                        // }
-                        // if (el_prop_text){
-                        //     e.dataset['proptext'] = el_prop_text.innerHTML
-                        //     el_prop_text.innerHTML = this.prop_text
-                        // }
         
-                        if (e.parentNode && !e.textContent.includes("\n") && !e.textContent.includes("\t") && !e.classList.contains('translated') && !e.textContent.match(/^[\d\s]+$/) && !e.textContent.match(/^\W+$/)){
-                            let text = e.textContent.replace(/(\w+)/, "$1")
-                            if (text.length && !contents[text]){
-                                contents[text] = {}
-                                // console.log(text)
-                            }
-                            e.parentNode.classList.add('translating')
+                        if (!e.classList.contains('translated') && !e.closest('ignore')){
+                            e.childNodes.forEach(e => {
+                                const text = e.textContent.trim()
+                                if (e.nodeType == 3 && text.length && !contents[text] && !text.match(/^[\d\s]+$/) && !text.match(/^\W+$/)){
+                                    contents[text] = {}
+                                    // console.log(text)
+                                }
+                                e.parentNode.classList.add('translating')
+                            })
                         }
+
                         // replace other fields
-                        let fieldList = ['title', 'placeholder']
+                        let fieldList = ['title', 'placeholder']       
 
                         for (let field of fieldList){
                             if (e[field] && e[field].length && !e.classList.contains('translated')){
@@ -92,9 +83,17 @@ translator.translate = async function(elements){
                     }
                     else{
                         e.classList.remove('translating')
-                        const p = e.closest('.translating') && p.classList.remove('translating')
+                        const parent = e.closest('.translating')
+                        if (parent){
+                            parent.classList.remove('translating')
+                        }
                     }
+
                 }
+            })
+
+            element.querySelectorAll(`ignore`).forEach( e => {
+                e.replaceWith(...e.childNodes)
             })
         }
     }
@@ -128,25 +127,22 @@ translator.translate = async function(elements){
     let stringResponse = []
     for (let element of elements){
         if (typeof element === 'string'){
-            let prop = element
-            let orig_num = element
-            let orig_text = element
-            
-            if (element.indexOf("<prop-number>") != -1){
-                prop = prop.replace(/<prop-number>\d+<\/prop-number>/g, this.prop_number)
-                orig_num = orig_num.match(/<prop-number>(\d+)<\/prop-number>/)[1]
-            }
-            
-            if (element.indexOf("<prop-text>") != -1){
-                prop = prop.replace(/<prop-text>.+<\/prop-text>/g, this.prop_text)
-                orig_text = orig_text.match(/<prop-text>(.+)<\/prop-text>/)[1]
-            }
+            if (element.indexOf("<ignore>") != -1){
+                const before = element.split("<ignore>")[0]
+                const after = element.split("</ignore>")[1]
+                const prop = element.split("<ignore>")[1].split("</ignore>")[0]
 
-            if (contents[prop] && contents[prop][lang]){
-                let resp = contents[prop][lang]
-                resp = resp.replace(this.prop_number, orig_num)
-                resp = resp.replace(this.prop_text, orig_text)
-                stringResponse.push(resp)
+                if (contents[before] && contents[before][lang] && contents[after] && contents[after][lang]){
+                    let resp = contents[before][lang] + prop + contents[after][lang]
+                    stringResponse.push(resp)    
+                }
+    
+            }
+            else{
+                if (contents[element] && contents[element][lang]){
+                    let resp = contents[element][lang]
+                    stringResponse.push(resp)
+                }
             }
         }
         else{
@@ -165,27 +161,19 @@ translator.translate = async function(elements){
                     else if (lang != 'pt'){
                         // replace contents
 
-                        // if (e.dataset && e.dataset['propnumber']){
-                        //     contents[e.textContent][lang] = contents[e.textContent][lang].replace(this.prop_number, e.dataset['propnumber'])
-                        //     delete e.dataset['propnumber']
-                        // }
-
-                        // if (e.dataset && e.dataset['proptext']){
-                        //     contents[e.textContent][lang] = contents[e.textContent][lang].replace(this.prop_text, e.dataset['proptext'])
-                        //     console.log(contents[e.textContent][lang])
-                        //     delete e.dataset['proptext']
-                        // }
-
-                        e.childNodes.forEach(e => {        
-                            if (e.nodeType == 3){
-                                // console.log(e.textContent)
-                                if (contents[e.textContent] && !e.parentNode.classList.contains('translated')){
-                                    e.textContent = ` ${contents[e.textContent][lang]} `
-                                    stringResponse.push(e.textContent)
-                                    translator.bind(e.parentNode)
+                        if (!e.closest('ignore')){
+                            e.childNodes.forEach(e => {  
+                                const text = e.textContent.trim()      
+                                if (e.nodeType == 3 && text.length){
+                                    // console.log(text, !e.parentNode.classList.contains('translated'))
+                                    if (contents[text]){
+                                        e.textContent = ' '+ contents[text][lang] +' '
+                                        stringResponse.push(e.textContent)
+                                        translator.bind(e.parentNode)
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
 
                         // replace other fields
                         let fieldList = ['title', 'placeholder']
@@ -205,7 +193,6 @@ translator.translate = async function(elements){
                 
                 e.classList.remove('translating')
             })
-
         }
     }
 

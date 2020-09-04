@@ -78,35 +78,39 @@ const translatorReady = (async () => {
     })
     
     await translator.translate([
-        'meses',
         'dias',
         'horas',
+        'meses',
         'minutos',
-        "RECORTAR IMAGEM",
-        "Nenhuma batalha para mostrar",
-        "Gladiador",
-        "Renome",
-        "Data",
-        "Nenhum item neste espaço",
-        "de",
-        "Deseja excluir o gladiador",
-        "Sim",
-        "Não",
-        "SIM",
-        "NÃO",
-        "Última atividade",
         "Aceitar solicitação",
-        "Recusar solicitação",
-        "Enviar mensagem",
-        "Enviar convite de amizade",
-        "Mensagem para",
-        "Olá...",
+        "atualizar",
+        "Cancelar",
         "CANCELAR",
         "Clique para criar um novo gladiador",
-        "atualizar",
-        "Link da publicação",
         "COPIAR",
-        "Somente não lidos"
+        "Data",
+        "de",
+        "DESAFIAR",
+        "Deseja excluir o gladiador",
+        "em nome da sua honra",
+        "Enviar convite de amizade",
+        "Enviar mensagem",
+        "Escolha o gladiador que duelará contra",
+        "Gladiador",
+        "Link da publicação",
+        "Mensagem para",
+        "Não",
+        "NÃO",
+        "Nenhum item neste espaço",
+        "Nenhuma batalha para mostrar",
+        "Olá...",
+        "RECORTAR IMAGEM",
+        "Recusar solicitação",
+        "Renome",
+        "Sim",
+        "SIM",
+        "Somente não lidos",
+        "Última atividade",
     ])
 
     return true
@@ -764,15 +768,14 @@ window.onload = function(){
     async function create_duel_box(nick, userid){
         var box = `<div id='fog'>
             <div id='duel-box'>
-                <div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>${nick}</span> em nome da sua honra</div>
+                <div id='title'>${translator.getTranslated("Escolha o gladiador que duelará contra")} <span class='highlight'>${nick}</span> ${translator.getTranslated("em nome da sua honra")}</div>
                 <div class='glad-card-container'></div>
                 <div id='button-container'>
-                    <button id='cancel' class='button'>Cancelar</button><button id='invite' class='button' disabled>DESAFIAR</button>
+                    <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button><button id='invite' class='button' disabled>${translator.getTranslated("DESAFIAR")}</button>
                 </div>
             </div>
         </div>`;
         $('body').append(box);
-        translator.translate($('#fog'))
 
         const {gladCard} = await loader.load("gladcard")
         gladCard.load($('#fog .glad-card-container'), {
@@ -1370,7 +1373,16 @@ async function check_challenges(){
             var nick = row.find('.user').html();
             var id = row.data('id');
     
-            var box = "<div id='fog'><div id='duel-box'><div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>"+ nick +"</span> em nome da sua honra</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='duel' class='button' disabled>DUELAR</button></div></div></div>";
+            var box = `<div id='fog'>
+                <div id='duel-box'>
+                    <div id='title'>${translator.getTranslated("Escolha o gladiador que duelará contra")} <span class='highlight'>${nick}</span> ${translator.getTranslated("em nome da sua honra")}</div>
+                    <div class='glad-card-container'></div>
+                    <div id='button-container'>
+                        <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                        <button id='duel' class='button' disabled>${translator.getTranslated("DESAFIAR")}</button>
+                    </div>
+                </div>
+            </div>`;
             $('body').append(box);
     
             const {gladCard} = await loader.load("gladcard")

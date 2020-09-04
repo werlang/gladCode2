@@ -115,7 +115,7 @@ app.post('/login', function(req,res){
         else if (arg.token){
             var url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${arg.token}`;
             request(url, (error, response, body) => {
-                console.log(body);
+                // console.log(body);
                 if (body){
                     body = JSON.parse(body);
                     if (body.sub){
