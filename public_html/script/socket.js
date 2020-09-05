@@ -1,4 +1,4 @@
-import {post} from "./utils.js"
+import {post, $index} from "./utils.js"
 
 export const socket = {
     serverURL: `//${window.location.hostname}:3000`,
@@ -9,8 +9,7 @@ socket.init = async function(){
     // true to avoid entering this more than once
     this.io = true
     
-    await $.getScript(`${this.serverURL}/socket.io/socket.io.js`)
-
+    await import(`https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js`)
     try{
         this.io = io(this.serverURL, {secure: true})
     }

@@ -58,6 +58,7 @@ app.use(cors({
         'http://127.0.0.1:85',
         'http://127.0.0.1',
         'http://127.0.0.1:8181',
+        'https://localhost',
         'http://gladcode.tk',
         'https://gladcode.tk',
         'http://www.gladcode.tk',
