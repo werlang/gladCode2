@@ -11,6 +11,8 @@ import { loader } from "./loader.js"
 // import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
+// TODO: make profpics from friends load on demand also
+
 var user
 
 header.load()
@@ -519,7 +521,7 @@ window.onload = function(){
         var text = $('#panel #duel.wrapper .input').val();
         filter_friends(text);
     });
-    filter_friends("");
+    
     function filter_friends(text){
         post('back_friends.php', {
             action: "FILTER",
@@ -629,7 +631,7 @@ window.onload = function(){
         post("back_friends.php",{
             action: "GET"
         }).then( async function(data) {
-            //console.log(data);
+            // console.log(data);
             if (data.pending.length > 0)
                 $('#friend-panel #request').removeClass('hidden');
             if (data.confirmed.length > 0)
@@ -823,8 +825,7 @@ window.onload = function(){
         post("back_friends.php", {
             action: "SEARCH",
             text: text,
-        })
-        .done( function(data){
+        }).then( function(data){
             //console.log(data);
             $('#friend-panel #search .table').html("");
             for (var i in data){

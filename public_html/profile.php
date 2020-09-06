@@ -23,16 +23,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
     <link rel='stylesheet' href="css/profile.css"/>
-    <link rel='stylesheet' href="css/croppie.css"/>
-    <link rel='stylesheet' href="css/slider.css"/>
-    <link rel='stylesheet' href="css/radio.css"/>
-    <link rel='stylesheet' href="css/checkboxes.css"/>
-    <link rel='stylesheet' href="css/table2.css"/>
     
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js' async></script>
     
-    <script type="module" src="script/profile.js"></script>
+    <script type="module" src="script/profile.js" async></script>
 
     <!-- 
     <script src="script/radio.js"></script>

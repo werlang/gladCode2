@@ -9,7 +9,21 @@ socket.init = async function(){
     // true to avoid entering this more than once
     this.io = true
     
-    await import(`https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js`)
+    await new Promise( resolve => {
+        checkIoReady()
+        function checkIoReady() {
+            setTimeout(() => {
+                if (io){
+                    resolve(true)
+                }
+                else{
+                    checkIoReady()
+                }
+            }, 50)
+        }
+
+    })
+    
     try{
         this.io = io(this.serverURL, {secure: true})
     }
