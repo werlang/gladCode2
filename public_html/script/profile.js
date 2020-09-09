@@ -1,18 +1,15 @@
 import {header, login} from "./header.js"
-import {post, getDate, getTimeSince} from "./utils.js"
+import {post, getDate, getTimeSince, mergeLog} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {Message, createToast, tooltip} from "./dialog.js"
 import { loader } from "./loader.js"
-// import {Simulation, ProgressButton} from "./runSim.js"
-// import {stats} from "./stats_func.js"
 // import {refresh_tourn_list} from "./profile-tourn.js"
 // import {messages} from "./profile-message.js"
 // import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
 // TODO: make profpics from friends load on demand also
-
 var user
 
 header.load()
@@ -513,8 +510,10 @@ window.onload = function(){
     $('#panel #battle-mode #duel.button').click( function(){
         $('#panel #battle-container .wrapper').hide();
         var duel = $('#panel #battle-container #duel.wrapper');
-        if (duel.css('display') == 'none')
+        if (duel.css('display') == 'none'){
             duel.fadeIn();
+        }
+        filter_friends("")
     });
 
     $('#panel #duel.wrapper .input').on('input', function(){
@@ -561,6 +560,9 @@ window.onload = function(){
     });
 
     $('#battle-container #match-find').click( async function() {
+        const {ProgressButton, Simulation} = await loader.load("runsim")
+        const statsReady = loader.load("stats")
+
         var progbtn = new ProgressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
 
         var selGlad = $('#battle-container .glad-preview.selected').data('data')
@@ -600,7 +602,7 @@ window.onload = function(){
                 ranked: true,
                 origin: "ranked",
                 terminal: true
-            }).run().then( function(data){
+            }).run().then( async function(data){
                 // console.log(data);
                 if (data.error){
                     progbtn.kill()
@@ -609,6 +611,7 @@ window.onload = function(){
                 else{
                     let hash = data.simulation
 
+                    const {stats} = await statsReady
                     stats.save(hash)
 
                     clearInterval(preBattleInt);
@@ -1393,14 +1396,17 @@ async function check_challenges(){
                 }
             });
 
-            $('#fog #duel-box #duel').click( function(){
+            $('#fog #duel-box #duel').click( async function(){
+                const {ProgressButton, Simulation} = await loader.load("runsim")
+
                 var myglad = $('#fog .glad-preview.selected').data('id');
                 var progbtn = new ProgressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
-                runSimulation({
+                
+                new Simulation({
                     duel: id,
                     glads: myglad,
                     origin: "duel"
-                }).then( function(data){
+                }).run().then( async function(data){
                     progbtn.kill();
                     $('#fog').remove();
                     var log = data;
@@ -1426,3 +1432,12 @@ function getXpToNextLvl(){
 function load_svg(e){
     $.get(e.html(), null, null, 'text').then( data => e.removeClass('hidden').html(data))
 }
+
+// post("back_log.php",{
+//     action: "GET",
+//     loghash: '18772b79e3a8bd89',
+// }).then( function(data){
+//     // console.log(data.log)
+//     const merged = mergeLog(data.log)
+//     console.log(merged)
+// })

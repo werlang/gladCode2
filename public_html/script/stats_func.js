@@ -1,4 +1,4 @@
-import {post} from "./utils.js"
+import {post, mergeLog} from "./utils.js"
 
 const stats = {}
 
@@ -8,10 +8,9 @@ stats.save = function(hash){
         action: "GET",
         loghash: hash,
     }).then( function(data){
-        // console.log(data);
+        // console.log(data)
 
-        var steps = [];
-        $.extend(steps, JSON.parse(json.log)); //hard copy json to steps
+        const steps = mergeLog(data.log)
         // console.log(steps)
         
         var abilities = {
@@ -29,14 +28,6 @@ stats.save = function(hash){
         var glads = [];
         for (var g in steps[0].glads)
             glads[g] = {"charge": false};
-    
-        //build a complete log from marging previous steps
-        var tempjson = {};
-        for (let i in steps){
-            tempjson.projectiles = {};
-            $.extend( true, tempjson, steps[i] ); //merge json objects
-            steps[i] = JSON.parse(JSON.stringify(tempjson));
-        }
     
         var wonhab = [];
         var gladwon = [];

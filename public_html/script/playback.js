@@ -1,3 +1,5 @@
+const { mergeLog } = require("./utils");
+
 var code;
 var json = {};
 var hashes = [], newindex = new Array();
@@ -724,14 +726,8 @@ function startBattle(simulation){
             newindex[i] = i;
         }
 
-        for (var i in simulation){
-            json.projectiles = {};
-            $.extend( true, json, simulation[i] ); //merge json objects
-            steps.push(JSON.parse(JSON.stringify(json)));
-            // console.log(simulation[i]);
-        }
-
-        start_timer(steps);
+        steps = mergeLog(simulation)
+        start_timer(steps)
     }
 }
 

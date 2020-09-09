@@ -89,4 +89,41 @@ function $index(elem){
     return Array.from(elem.parentNode.children).indexOf(elem)
 }
 
-export {post, getDate, getTimeSince, $index}
+function deepMerge(a, b){
+    a = {...a}
+    b = {...b}
+
+    for (let i in b){
+        if (a[i] && typeof b[i] == 'object' && typeof a[i] == 'object'){
+            a[i] = deepMerge(a[i], b[i])
+        }
+        else{
+            a[i] = b[i]
+        }
+    }
+
+    return a
+}
+
+function mergeLog(data){
+    const log = typeof data == "string" ? JSON.parse(data) : data
+    for (let i in log){
+        // make projectile id its actual id attribute
+        const newproj = {}
+        for (let j in log[i].projectiles){
+            const proj = log[i].projectiles[j]
+            newproj[proj.id] = proj
+            delete proj.id
+        }
+        log[i].projectiles = newproj
+
+        if (i > 0){
+            const temp = {...log[i-1]}
+            temp.projectiles = {}
+            log[i] = deepMerge(temp, log[i])
+        }
+    }
+    return log
+}
+
+export {post, getDate, getTimeSince, $index, deepMerge, mergeLog}

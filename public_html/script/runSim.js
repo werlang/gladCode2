@@ -1,4 +1,5 @@
 import {showTerminal} from "./dialog.js"
+import {post} from "./utils.js"
 
 //required to provide inside glads object:
 //name, user, code, skin, vstr, vagi, vint

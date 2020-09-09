@@ -14,7 +14,9 @@ const paths = {
     cloudinary: "https://widget.cloudinary.com/v2.0/global/all.js",
     Blockly: "./blocks.js",
     potions: "./profile-potions.js",
-    reports: "./profile-report.js"
+    reports: "./profile-report.js",
+    runsim: "./runSim.js",
+    stats: "./stats_func.js"
 }
 
 const callbacks = {
