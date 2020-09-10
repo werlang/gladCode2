@@ -1,11 +1,11 @@
-import {post, getTimeSince, $index} from "./utils.js"
 import {translator} from "./translate.js"
 import {login} from "./header.js"
-import {listRooms, getChatNotification} from "./chat.js"
+import {chat, listRooms, getChatNotification} from "./chat.js"
+import {post, getTimeSince, $index} from "./utils.js"
 
-let translationReady
-login.wait().then( () => {
-    translationReady = translator.translate([
+const translationReady = (async () => {
+    await login.wait()
+    await translator.translate([
         "Mensagem",
         "Usuário",
         "Última mensagem",
@@ -15,8 +15,9 @@ login.wait().then( () => {
             e.innerHTML = translator.getTranslated("de")
         })
     })
-})
 
+    return true
+})()
 
 export const messages = {
     offset: 0,
@@ -37,6 +38,10 @@ messages.next = function(){
 messages.reload = async function(){
     listRooms({rebuild: true}).then( () => {
         getChatNotification()
+
+        if (chat.hidden){
+            chat.toggle({show: true})
+        }
     })
 
     let data = post("back_message.php",{
@@ -117,14 +122,6 @@ messages.show = async function(room){
     })
 }
 
-document.querySelector("#menu #messages").addEventListener('click', () => {
-    messages.reload()
-})
-
-document.querySelector("#message-panel .page-nav #prev").addEventListener('click', () => {
-    messages.prev()
-})
-
-document.querySelector("#message-panel .page-nav #next").addEventListener('click', () => {
-    messages.next()
-})
+;(async () => {
+    chat.init(document.querySelector('#chat-panel'), {full: false})
+})()

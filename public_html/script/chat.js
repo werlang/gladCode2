@@ -1,8 +1,7 @@
 import {socket} from "./socket.js"
-// import * as _ from "./emoji.js"
 import {post, getTimeSince} from "./utils.js"
 import {createToast} from "./dialog.js"
-import {header, login} from "./header.js"
+import {login} from "./header.js"
 import { translator } from "./translate.js"
 import { loader } from "./loader.js"
 
@@ -78,38 +77,39 @@ const translatorReady = (async () => {
 
 var sendingBuffer = [];
 var clearToSend = true;
-var emoji;
-var recentEmoji = [];
 var visitedRooms = {};
 var uploadWidget = {};
 var scrolling = false;
 
 export const chat = {
-    started: false
+    started: false,
 }
 
 chat.init = async function(wrapper, options){
-    await translatorReady
-
-    var leftButtons = '';
-    var full = 'full';
-
-    if (options && options.full === false){
-        full = '';
-        leftButtons = `<div class='button-container'>
-            <i class='fas fa-exchange-alt' title='${translator.getTranslated("Mostrar/Esconder Chat", false)}' id='show-hide'></i>
-            <i class='fas fa-external-link-alt' title='${translator.getTranslated("Abir chat em nova aba", false)}' id='open-new'></i>
-        </div>`;
+    if (this.started){
+        return true
     }
 
-    var str = `<div id='room-container'></div>
+    translatorReady.then( () => {
+        let leftButtons = '';
+        let full = 'full';
+    
+        if (options && options.full === false){
+            full = '';
+            leftButtons = `<div class='button-container'>
+                <i class='fas fa-exchange-alt' title='${translator.getTranslated("Mostrar/Esconder Chat", false)}' id='show-hide'></i>
+                <i class='fas fa-external-link-alt' title='${translator.getTranslated("Abir chat em nova aba", false)}' id='open-new'></i>
+            </div>`;
+        }
+    
+        let str = `<div id='room-container'></div>
         <div id='view-area'>
             <div id='emoji-ui'>
                 <div id='emoji-container'></div>
                 <div id='category-buttons'>
                     <i id='recent' class='fas fa-star selected' title='${translator.getTranslated("Mais usados", false)} (CTRL+🔢)'></i>
                     <i id='smile' class='fas fa-grin-alt' title='${translator.getTranslated("Carinhas e Pessoas", false)}'></i>
-					<i id='animals' class='fas fa-paw' title='${translator.getTranslated("Animais e Natureza", false)}'></i>
+                    <i id='animals' class='fas fa-paw' title='${translator.getTranslated("Animais e Natureza", false)}'></i>
                     <i id='food' class='fas fa-hamburger' title='${translator.getTranslated("Alimentos", false)}'></i>
                     <i id='activities' class='fas fa-futbol' title='${translator.getTranslated("Esportes e Atividades", false)}'></i>
                     <i id='places' class='fas fa-map-marked-alt' title='${translator.getTranslated("Viagens e Lugares", false)}'></i>
@@ -128,226 +128,84 @@ chat.init = async function(wrapper, options){
                 </div>
             </div>
         </div>`;
-
-    wrapper.addClass(full);
-    wrapper.addClass('preload');
-
-    var defaultOpen = 1340;
-    if (options && options.defaultOpen)
-        defaultOpen = options.defaultOpen;
-        
-    if ($(window).width() < defaultOpen && !$('#chat-panel').hasClass('full'))
-        wrapper.addClass('hidden');
-
-    wrapper.html(str);
-    setTimeout( () => {
-        wrapper.removeClass('preload');
-    }, 1000);
     
+        wrapper.classList.add('hidden')
+        this.hidden = true
 
-    chat.started = true;
-}
+        if (full != ''){
+            wrapper.classList.add(full)
+        }
+    
+        wrapper.innerHTML = str
+        bindUi()
+    })
 
-chat.isStarted = async function(){
-    async function isReady(){
-        return await new Promise(resolve => {
-            setTimeout(() => {
-                if (chat.started)
-                    resolve(true);
-                else
-                    resolve(false);
-            }, 100);
-        });
-    }
-    while (await isReady() === false);
-    return true;
-}
-
-$(document).ready( function(){
-    chat.isStarted().then( () => {
-        socket.isReady().then( function() {
-            socket.request('login', {}).then( function(res, err){
-                if (err) return console.log(err);
-                // console.log(res);
-                if (res.session === true){
-                    listRooms({rebuild: true}).then( () => {
-                        getChatNotification();
-                    });
+    socket.isReady().then( () => {
+        socket.request('login', {}).then( async (res, err) => {
+            if (err) return console.log(err);
+            // console.log(res);
+            if (res.session === true){
+                await chat.isStarted()
+                listRooms({rebuild: true}).then( () => {
+                    getChatNotification();
+                });
+            }
+            else{
+                if (!wrapper.classList.contains('full')){
+                    chat.toggle({hide: true})
                 }
-                else{
-                    if (!$('#chat-panel').hasClass('full'))
-                        $('#chat-panel').addClass('hidden');
-                    else if (!$('#dialog-box').length){
+                else if (!document.querySelector('#dialog-box')){
+                    new Message({
+                        message: `Faça login na gladCode para participar do chat`,
+                        buttons: {ok: "LOGIN"}
+                    }).show().click('ok', async () => {
+                        const google = await loader.load('google')
+                        await google.login()
+                        window.location.reload()
+                    })
+                }
+                wrapper.click( () => {
+                    if (!document.querySelector('#dialog-box')){
                         new Message({
-                            message: `Faça login na gladCode para participar do chat`,
-                            buttons: {ok: "LOGIN"}
+                            message: "Faça login na gladCode para participar do chat",
+                            buttons: {cancel: "Cancelar", ok: "LOGIN"}
                         }).show().click('ok', async () => {
                             const google = await loader.load('google')
                             await google.login()
                             window.location.reload()
                         })
                     }
-                    $('#chat-panel').click( () => {
-                        if (!$('#dialog-box').length){
-                            new Message({
-                                message: "Faça login na gladCode para participar do chat",
-                                buttons: {cancel: "Cancelar", ok: "LOGIN"}
-                            }).show().click('ok', async () => {
-                                const google = await loader.load('google')
-                                await google.login()
-                                window.location.reload()
-                            })
-                        }
-                    });
-                }
-            });
-
-            socket.io.on('chat notification', (data) => {
-                getChatNotification();
-                if ($('#chat-panel .room.open').data('id') == data.room){
-                    getChatMessages({room: data.room, sync: true});
-                }
-            });
-            socket.io.on('chat personal', data => {
-                let msg
-                if (data.status == "KICK"){
-                    msg = `Você foi removido da sala ${data.room_name}`;
-                    listRooms({remove: data.room_name});
-                }
-                else if (data.status == "BAN"){
-                    msg = `Você foi banido da sala ${data.room_name}`;
-                    listRooms({remove: data.name});
-                }
-                else if (data.status == "UNBAN"){
-                    msg = `Seu banimento da sala ${data.room_name} foi removido`
-                }
-                createToast(msg, "info");
-            });
-        });
-
-        //prepare emojis
-        emoji = new EmojiConvertor();
-        emoji.use_sheet = true;
-        emoji.supports_css = true;
-        emoji.img_set = "google";
-        emoji.img_sets.google.sheet = "https://cdn.jsdelivr.net/npm/emoji-datasource-google@4.1.0/img/google/sheets-128/64.png";
-        emoji.init_unified();
-
-        var emoji_categ = ["Smileys & People", "Animals & Nature", "Food & Drink", "Activities", "Travel & Places", "Objects", "Symbols", "Flags"];
-        var emojiStr = [];
-
-        post("back_chat.php", {
-            action: "EMOJI"
-        }).then( data => {
-            // console.log(data);
-            
-            if (data.status != "NOTLOGGED" && data.emoji != '')
-                recentEmoji = JSON.parse(data.emoji);
-
-            emojiStr.push([]);
-            for (let i in recentEmoji){
-                emojiStr[0].push({img: emoji.replace_unified(recentEmoji[i]), unicode: recentEmoji[i], order: i});
-            }
-
-            $('#chat-panel #emoji-container').append("<div id='categ-0' class='categ-container'></div>");
-            for (let i in emoji_categ){
-                var i1 =  Math.floor(i) + 1;
-                $('#chat-panel #emoji-container').append("<div id='categ-"+ i1 +"' class='categ-container'></div>");
-                emojiStr.push([]);
-            }
-        
-            for (let i in emoji.map.unicode){
-                var categ = emoji.map.unicode[i].category;
-                var categi = emoji_categ.indexOf(categ) + 1;
-        
-                if (categi != 0){
-                    emojiStr[categi].push({img: emoji.replace_unified(i), unicode: i, order: emoji.map.unicode[i].order});
-                }
-            }
-        
-            for (let i=0 ; i< emoji_categ.length+1 ; i++){
-                emojiStr[i].sort( function(a, b){
-                    return a.order - b.order;
                 });
-                $('#chat-panel #emoji-container #categ-'+ i).append("<div class='title'>"+ $('#emoji-ui #category-buttons i').eq(i).attr('title') +"</div>");
-
-                //remove repeated that for some reason emoji.map prints
-                for (let j in emojiStr[i]){
-                    while(j < emojiStr[i].length - 1 && emojiStr[i][j].img == emojiStr[i][Math.floor(j)+1].img)
-                        emojiStr[i].splice(j, 1);
-                }
-                for (let j in emojiStr[i]){
-                    var e = emojiStr[i][j].img;
-                    if (i == 0 && j < 10){
-                        let n = (parseInt(j) + 1) % 10;
-                        e = `<div class='shortcut'><span class='number'>${n}</span>${emojiStr[i][j].img}</div>`;
-                    }
-                    $('#chat-panel #emoji-container #categ-'+ i).append(e);
-                    $('#chat-panel #emoji-container #categ-'+ i +' .emoji-outer').last().data('unicode', emojiStr[i][j].unicode);
-                }
             }
-
-            var preventScroll = false;
-            $('#chat-panel #emoji-container').scroll( function(){
-                if (!preventScroll){
-                    for (let i = $(this).find('.categ-container').length-1 ; i>=0 ; i--){
-                        var ct = $(this).find('.categ-container').eq(i).position().top - $(this).position().top;
-                        if(ct <= 10){
-                            $('#chat-panel #category-buttons i').removeClass('selected');
-                            $('#chat-panel #category-buttons i').eq(i).addClass('selected');
-                            break;
-                        }
-                    }
-                }
-            });
-        
-            $('#chat-panel #category-buttons i').click( function(){
-                preventScroll = true;
-                $('#chat-panel #emoji-container').scrollTop(0);
-                var i = $('#chat-panel #category-buttons i').index($(this));
-                var ct = $('#chat-panel #emoji-container .categ-container').eq(i).position().top - $('#chat-panel #emoji-container').position().top;
-                $('#chat-panel #emoji-container').scrollTop(ct);
-                preventScroll = false;
-            });
-            
-            $('#chat-panel #emoji-container .emoji-outer').click( function(){
-                var t = $('#chat-panel #message-box').html();
-                var e = $(this).data('unicode');
-
-                let pos = -1;
-                if (recentEmoji)
-                    pos = recentEmoji.indexOf(e);
-
-                if (pos != -1)
-                    recentEmoji.splice(pos, 1);
-                else{
-                    $('#chat-panel #emoji-container #categ-0 .title').after($(this).clone(true));
-                    $('#chat-panel #emoji-container #categ-0 .emoji-outer').eq(0).wrap("<div class='shortcut'></div>").before("<span class='number'></span>");
-
-                    $('#chat-panel #emoji-container #categ-0 .shortcut').each( function(i,obj){
-                        if (i < 10)
-                            $(obj).find('.number').html((i + 1) % 10);
-                        else if (!$(obj).hasClass('hidden'))
-                            $(obj).addClass('hidden');
-                    });
-
-                }
-
-                if (recentEmoji)
-                    recentEmoji.unshift(e);
-
-                $('#chat-panel #message-box').append( emoji.replace_unified(e) );
-                $('#chat-panel #message-box .emoji-outer').attr('contenteditable', false);
-                $('#chat-panel #message-box .emoji-outer').last().data('unicode', e);
-                $('#chat-panel #message-box').append("<span>0</span>");
-                
-                //gambiarra pra conseguir colocar o cursor na posição final da caixa: da problema quando o span ta vazio
-                var sel = window.getSelection();
-                window.getSelection().collapse($('#chat-panel #message-box span').last()[0].firstChild, 0);
-                $('#chat-panel #message-box span').last().html("<span></span>"); //esse span interno previne que adicione um <br> ao apagar o emoji depois do primeiro???? gambiarra
-            });
         });
 
+        socket.io.on('connect', data => {
+            console.log(data)
+        })
+        socket.io.on('chat notification', (data) => {
+            getChatNotification();
+            if ($('#chat-panel .room.open').data('id') == data.room){
+                chat.getMessages({room: data.room, sync: true});
+            }
+        });
+        socket.io.on('chat personal', data => {
+            let msg
+            if (data.status == "KICK"){
+                msg = `Você foi removido da sala ${data.room_name}`;
+                listRooms({remove: data.room_name});
+            }
+            else if (data.status == "BAN"){
+                msg = `Você foi banido da sala ${data.room_name}`;
+                listRooms({remove: data.name});
+            }
+            else if (data.status == "UNBAN"){
+                msg = `Seu banimento da sala ${data.room_name} foi removido`
+            }
+            createToast(msg, "info");
+        });
+    });
+
+    function bindUi(){
         $('#chat-panel #send').click( function(){
             var text = '';
             var codes = $('#chat-panel #chat-ui #message-box').data('code');
@@ -405,7 +263,7 @@ $(document).ready( function(){
                                 action: "SEND",
                                 message: message,
                                 room: room,
-                                emoji: recentEmoji
+                                emoji: chat.recentEmoji
                             }).then( function(data){
                                 // console.log(data);
                                 //recentEmoji = [];
@@ -634,18 +492,7 @@ $(document).ready( function(){
         });
 
         $('#chat-panel #show-hide').click( () => {
-            if ($('#chat-panel').hasClass('hidden')){
-                $('#chat-panel').removeClass('hidden');
-            }
-            else{
-                if ($('#chat-panel .room.open').length)
-                    $('#chat-panel .room.open').click();
-
-                $('#chat-panel').addClass('hidden');
-
-                if ($('#chat-panel .button-container #emoji').hasClass('selected'))
-                    $('#chat-panel .button-container #emoji').click();
-            }
+            chat.toggle()
         });
 
         $('#chat-panel #open-new').click( function(){
@@ -665,6 +512,172 @@ $(document).ready( function(){
                 }
             }
         });
+    }
+
+    await translatorReady
+    await socket.isReady()
+
+    chat.started = true
+
+    return true
+}
+
+chat.isStarted = async function(){
+    return await new Promise(resolve => {
+        isReady()
+        function isReady(){
+            if (chat.started){
+                resolve(true)
+            }
+            else{
+                setTimeout(() => {
+                    isReady()
+                }, 10)
+            }
+        }
+    });
+}
+
+chat.loadEmoji = async function() {
+    if (this.emoji){
+        return this.emoji
+    }
+
+    await loader.load('emoji')
+
+    const emoji = new EmojiConvertor();
+    emoji.use_sheet = true;
+    emoji.supports_css = true;
+    emoji.img_set = "google";
+    emoji.img_sets.google.sheet = "https://cdn.jsdelivr.net/npm/emoji-datasource-google@4.1.0/img/google/sheets-128/64.png";
+    emoji.init_unified();
+    this.emoji = emoji;
+
+    //prepare emojis
+
+    const emoji_categ = ["Smileys & People", "Animals & Nature", "Food & Drink", "Activities", "Travel & Places", "Objects", "Symbols", "Flags"];
+    const emojiStr = [];
+
+    const data = await post("back_chat.php", {
+        action: "EMOJI"
+    })
+    // console.log(data);
+        
+    let recentEmoji = []
+    if (data.status != "NOTLOGGED" && data.emoji != '')
+        recentEmoji = JSON.parse(data.emoji);
+
+    this.recentEmoji = recentEmoji
+
+    emojiStr.push([]);
+    for (let i in recentEmoji){
+        emojiStr[0].push({img: emoji.replace_unified(recentEmoji[i]), unicode: recentEmoji[i], order: i});
+    }
+
+    $('#chat-panel #emoji-container').append("<div id='categ-0' class='categ-container'></div>");
+    for (let i in emoji_categ){
+        var i1 =  Math.floor(i) + 1;
+        $('#chat-panel #emoji-container').append("<div id='categ-"+ i1 +"' class='categ-container'></div>");
+        emojiStr.push([]);
+    }
+
+    for (let i in emoji.map.unicode){
+        var categ = emoji.map.unicode[i].category;
+        var categi = emoji_categ.indexOf(categ) + 1;
+
+        if (categi != 0){
+            emojiStr[categi].push({img: emoji.replace_unified(i), unicode: i, order: emoji.map.unicode[i].order});
+        }
+    }
+
+    for (let i=0 ; i< emoji_categ.length+1 ; i++){
+        emojiStr[i].sort( function(a, b){
+            return a.order - b.order;
+        });
+        $('#chat-panel #emoji-container #categ-'+ i).append("<div class='title'>"+ $('#emoji-ui #category-buttons i').eq(i).attr('title') +"</div>");
+
+        //remove repeated that for some reason emoji.map prints
+        for (let j in emojiStr[i]){
+            while(j < emojiStr[i].length - 1 && emojiStr[i][j].img == emojiStr[i][Math.floor(j)+1].img)
+                emojiStr[i].splice(j, 1);
+        }
+        for (let j in emojiStr[i]){
+            var e = emojiStr[i][j].img;
+            if (i == 0 && j < 10){
+                let n = (parseInt(j) + 1) % 10;
+                e = `<div class='shortcut'><span class='number'>${n}</span>${emojiStr[i][j].img}</div>`;
+            }
+            $('#chat-panel #emoji-container #categ-'+ i).append(e);
+            $('#chat-panel #emoji-container #categ-'+ i +' .emoji-outer').last().data('unicode', emojiStr[i][j].unicode);
+        }
+    }
+
+    var preventScroll = false;
+    $('#chat-panel #emoji-container').scroll( function(){
+        if (!preventScroll){
+            for (let i = $(this).find('.categ-container').length-1 ; i>=0 ; i--){
+                var ct = $(this).find('.categ-container').eq(i).position().top - $(this).position().top;
+                if(ct <= 10){
+                    $('#chat-panel #category-buttons i').removeClass('selected');
+                    $('#chat-panel #category-buttons i').eq(i).addClass('selected');
+                    break;
+                }
+            }
+        }
+    });
+
+    $('#chat-panel #category-buttons i').click( function(){
+        preventScroll = true;
+        $('#chat-panel #emoji-container').scrollTop(0);
+        var i = $('#chat-panel #category-buttons i').index($(this));
+        var ct = $('#chat-panel #emoji-container .categ-container').eq(i).position().top - $('#chat-panel #emoji-container').position().top;
+        $('#chat-panel #emoji-container').scrollTop(ct);
+        preventScroll = false;
+    });
+    
+    $('#chat-panel #emoji-container .emoji-outer').click( function(){
+        var t = $('#chat-panel #message-box').html();
+        var e = $(this).data('unicode');
+
+        let pos = -1;
+        if (recentEmoji)
+            pos = recentEmoji.indexOf(e);
+
+        if (pos != -1)
+            recentEmoji.splice(pos, 1);
+        else{
+            $('#chat-panel #emoji-container #categ-0 .title').after($(this).clone(true));
+            $('#chat-panel #emoji-container #categ-0 .emoji-outer').eq(0).wrap("<div class='shortcut'></div>").before("<span class='number'></span>");
+
+            $('#chat-panel #emoji-container #categ-0 .shortcut').each( function(i,obj){
+                if (i < 10)
+                    $(obj).find('.number').html((i + 1) % 10);
+                else if (!$(obj).hasClass('hidden'))
+                    $(obj).addClass('hidden');
+            });
+
+        }
+
+        if (recentEmoji)
+            recentEmoji.unshift(e);
+
+        $('#chat-panel #message-box').append( emoji.replace_unified(e) );
+        $('#chat-panel #message-box .emoji-outer').attr('contenteditable', false);
+        $('#chat-panel #message-box .emoji-outer').last().data('unicode', e);
+        $('#chat-panel #message-box').append("<span>0</span>");
+        
+        //gambiarra pra conseguir colocar o cursor na posição final da caixa: da problema quando o span ta vazio
+        var sel = window.getSelection();
+        window.getSelection().collapse($('#chat-panel #message-box span').last()[0].firstChild, 0);
+        $('#chat-panel #message-box span').last().html("<span></span>"); //esse span interno previne que adicione um <br> ao apagar o emoji depois do primeiro???? gambiarra
+    });
+
+    return emoji
+}
+
+$(document).ready( function(){
+    chat.isStarted().then( () => {
+
     });
 });
 
@@ -747,12 +760,13 @@ function sendChatTable(json){
 }
 
 async function listRooms(arg){
+    await chat.isStarted()
     await new Promise( (resolve, reject) => {
         let directnames = post("back_message.php", {
             action: "NAMES"
         })
 
-        socket.io.emit('chat rooms', async function(data){
+        socket.io.emit('chat rooms', async data => {
             // console.log(data);
 
             directnames = (await directnames).rooms
@@ -881,7 +895,7 @@ async function listRooms(arg){
                         $(this).addClass('open');
                         $('#chat-panel .room').not($(this)).removeClass('visible');
                         $(this).find('#title .notification').addClass('hide').html("0");
-                        getChatMessages({room: room.data('id')});
+                        chat.getMessages({room: room.data('id')});
                         $('#chat-panel #chat-ui #message-box').focus();
                     }
 
@@ -889,7 +903,7 @@ async function listRooms(arg){
                         if ($('#chat-window .baloon').length){
                             var postop = $('#chat-window .baloon').first().position().top;
                             if (postop > -100){
-                                getChatMessages({room: room.data('id'), prepend: true});
+                                chat.getMessages({room: room.data('id'), prepend: true});
                             }
                         }
                     });
@@ -932,7 +946,7 @@ function getChatNotification(){
 
 }
 
-function getChatMessages(options){
+chat.getMessages = function(options){
     var id = options.room;
     if (id && !scrolling){ //tem janela aberta
         scrolling = true;
@@ -952,7 +966,7 @@ function getChatMessages(options){
             first: firstid,
             sync: sync,
             visited: visitedRooms[id]
-        }).then( function(data){
+        }).then( async data => {
             //console.log(data);
             if (data.visited || (!visitedRooms[id] && data.visited) )
                 visitedRooms[id] = data.visited;
@@ -984,6 +998,7 @@ function getChatMessages(options){
                             }
                         }
                         else{
+                            const emoji = await this.loadEmoji()
                             messages[i].message = emoji.replace_unified(messages[i].message);
                             var hasText = '';
                             if (messages[i].message.replace(/<span class="emoji[\w\W]+?<\/span><\/span>/g, "") == "")
@@ -1120,6 +1135,38 @@ function getChatMessages(options){
 
         });
     }       
+}
+
+chat.toggle = function(opt){
+    let prevState = false
+    if (this.hidden){
+        prevState = true
+    }
+
+    if (opt){
+        this.hidden = opt.show || !opt.hide ? false : true
+    }
+    else {
+        this.hidden = !this.hidden
+    }
+
+    if (this.hidden != prevState){
+        const panel = document.querySelector('#chat-panel')
+        if (panel.classList.contains('hidden')){
+            panel.classList.remove('hidden')
+        }
+        else{
+            if (panel.querySelector('.room.open')){
+                panel.querySelector('.room.open').click()
+            }
+
+            panel.classList.add('hidden')
+
+            if (panel.querySelector('.button-container #emoji').classList.contains('selected')){
+                panel.querySelector('.button-container #emoji').click()
+            }
+        }
+    }
 }
 
 function getRandomId(size){

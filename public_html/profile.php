@@ -30,11 +30,7 @@
     
     <script type="module" src="script/profile.js" async></script>
 
-    <!-- 
-    <script src="script/radio.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/checkboxes.js"></script>
-    <script src="script/blocks.js"></script> -->
+    <!-- <script src="script/radio.js"></script> -->
     
     </head>
 <body>
@@ -298,7 +294,7 @@
             </div>
         </div>
         <div id='right-panel'></div>
-        <div id='chat-panel'></div>
+        <div id='chat-panel' class='hidden'></div>
     </div>
 </body>
 </html>

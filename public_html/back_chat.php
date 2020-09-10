@@ -11,7 +11,7 @@
     if ($action == "ROOMS"){
         $sql = "SELECT cr.id, cr.name, cu.visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room INNER JOIN chat_messages cm ON cm.room = cr.id WHERE cu.user = '$user' ORDER BY cm.time DESC";
         $result = runQuery($sql);
-        
+
         $output['room'] = array();
         while ($row = $result->fetch_assoc()){
             array_push($output['room'], $row);
@@ -24,7 +24,7 @@
         $id = mysql_escape_string($_POST['id']);
         $first = mysql_escape_string($_POST['first']);
         $sync = mysql_escape_string($_POST['sync']);
-        
+
         if (isset($_POST['visited']))
             $visited = mysql_escape_string($_POST['visited']);
         else
@@ -93,7 +93,7 @@
             // clear message menu notification for me
             send_node_message(array(
                 'profile notification' => array('user' => array($user))
-            )); 
+            ));
         }
     }
     else if ($action == "SEND"){
@@ -108,7 +108,7 @@
             $emojis = json_encode(array_slice($_POST['emoji'], 0, 30), JSON_UNESCAPED_UNICODE);
         else
             $emojis = "";
-        
+
         $sql = "UPDATE usuarios SET emoji = '$emojis' WHERE id = $user";
         $result = runQuery($sql);
 
@@ -125,7 +125,7 @@
                 // if user is in the room
                 $sql = "SELECT cr.direct FROM chat_users cu INNER JOIN chat_rooms cr ON cr.id = cu.room WHERE cu.user = '$user' AND cu.room = $room";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;                
+                $nrows = $result->num_rows;
 
                 if ($nrows == 0)
                     $output['status'] = "NOTJOINED";
@@ -155,7 +155,7 @@
                         if ($direct){
                             $sql = "SELECT cu.user FROM chat_users cu WHERE cu.room = $room";
                             $result = runQuery($sql);
-                
+
                             $userlist = array();
                             $receiver = "";
                             while ($row = $result->fetch_assoc()){
@@ -164,7 +164,7 @@
                                     $receiver = $row['user'];
                                 }
                             }
-                
+
                             // send notification to my direct message target
                             send_node_message(array(
                                 'profile notification' => array('user' => $userlist)
@@ -215,14 +215,14 @@
                 $vis_room = $visited[$id];
                 $sql = "SELECT count(*) AS notif FROM chat_messages cm INNER JOIN chat_users cu ON cu.room = cm.room WHERE UNIX_TIMESTAMP(cm.time) > '$vis_room' AND cm.room = $id AND cu.user = '$user'";
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
-                
+
                 $row2 = $result2->fetch_assoc();
                 $output['notifications'][$id] = $row2['notif'];
             }
 
             $output['status'] = "SUCCESS";
         }
-        
+
     }
     else if ($action == "EMOJI"){
         if (isset($user)){
@@ -261,7 +261,7 @@
         }
     }
 
-    function execCommand($conn, $command, $user, $room){    
+    function execCommand($conn, $command, $user, $room){
         $args = $command['args'];
         $command = $command['command'];
         $output = array();
@@ -336,7 +336,7 @@
             }
             else
                 $room = $argstring;
-            
+
             //search for the room
             $sql = "SELECT cr.id, u.apelido FROM chat_rooms cr INNER JOIN chat_users cu ON cu.room = cr.id INNER JOIN usuarios u ON u.id = cu.user WHERE cr.name = '$room' AND cu.user = '$user'";
             $result = runQuery($sql);
@@ -380,10 +380,10 @@
                 else{
                     $sql = "SELECT cr.name, cr.description, (SELECT count(*) FROM chat_users WHERE room = cr.id) AS members FROM chat_rooms cr WHERE cr.public = 1";
                     $result = runQuery($sql);
-                    
+
                     $output['room'] = array();
                     while($row = $result->fetch_assoc()){
-                        array_push($output['room'], $row);  
+                        array_push($output['room'], $row);
                     }
                     $output['status'] = "LIST";
                 }
@@ -396,10 +396,10 @@
                     $result = runQuery($sql);
                     $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(MINUTE, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, login, u.apelido";
                     $result = runQuery($sql);
-                    
+
                     $output['user'] = array();
                     while($row = $result->fetch_assoc()){
-                        array_push($output['user'], $row);  
+                        array_push($output['user'], $row);
                     }
                     $output['status'] = "LIST";
                 }
@@ -514,7 +514,7 @@
             }
         }
         else if ($command == "ban" || $command == "unban" || $command == "kick"){
-            // set room arg if trying to kick from outside 
+            // set room arg if trying to kick from outside
             if ($command == "kick" && $room == ''){
                 if ($command == "kick"){
                     $str = implode(" ", $args);
@@ -532,7 +532,7 @@
                         else
                             $room = '';
                     }
-                    else   
+                    else
                         $room = '';
                 }
             }
@@ -561,10 +561,10 @@
                             $sql = "SELECT cu.privilege, cu.user FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE u.apelido = '$target' AND cu.room = $room";
                         elseif ($command == "unban")
                             $sql = "SELECT cre.user, 2 AS privilege FROM usuarios u INNER JOIN chat_restrictions cre ON cre.user = u.id WHERE u.apelido = '$target' AND cre.room = $room";
-                        
+
                         $result = runQuery($sql);
                         $nrows = $result->num_rows;
-                        
+
                         if ($nrows == 0){
                             $output['status'] = "NOTARGET";
                             $output['command'] = $command;
@@ -603,7 +603,7 @@
                                     'chat personal' => array(
                                         'user' => $tuser,
                                         'status' => $output['status'],
-                                        'room_name' => $room_name 
+                                        'room_name' => $room_name
                                     )
                                 ));
 
@@ -629,7 +629,7 @@
                 $sql = "SELECT cu.user, u.ativo FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE cu.privilege = 0 AND cu.room = $room AND u.ativo >= (CURRENT_TIME() - INTERVAL 30 DAY) ORDER BY u.ativo DESC";
                 $result = runQuery($sql);
                 $nrows = $result->num_rows;
-    
+
                 if ($nrows == 0){
                     $sql = "SELECT u.apelido FROM usuarios u WHERE u.id = '$user' AND u.id NOT IN (SELECT user FROM chat_restrictions WHERE user = '$user' AND room = $room)";
                     $result = runQuery($sql);
@@ -640,16 +640,16 @@
                     else{
                         $row = $result->fetch_assoc();
                         $nick = $row['apelido'];
-    
+
                         $sql = "UPDATE chat_users SET privilege = 1 WHERE privilege = 0 AND room = $room";
                         $result = runQuery($sql);
-    
+
                         $sql = "UPDATE chat_users SET privilege = 0 WHERE user = '$user'";
                         $result = runQuery($sql);
-    
+
                         $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$nick se autoproclamou o novo líder da sala', 1)";
                         $result = runQuery($sql);
-    
+
                         $output['status'] = "CLAIMED";
                     }
                 }
@@ -658,12 +658,12 @@
                     while ($row = $result->fetch_assoc()){
                         array_push($output['user'], $row);
                     }
-        
+
                     $output['status'] = "ACTIVE";
                 }
             }
         }
-        else if ($command == "edit"){            
+        else if ($command == "edit"){
             if ($room == ''){
                 $str = implode(" ", $args);
                 preg_match('/ -r ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $r);
@@ -679,7 +679,7 @@
                     else
                         $room = '';
                 }
-                else   
+                else
                     $room = '';
             }
 
@@ -711,17 +711,17 @@
                             $public = 1;
                             $str = trim(implode(" ", explode("-pub", $str)));
                         }
-                        
+
                         preg_match('/ -d ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $d);
                         if (isset($d) && is_array($d) && count($d) > 1)
                             $d = trim($d[1]);
-                        else   
+                        else
                             $d = '';
 
                         preg_match('/ -n ([\wáàâãéêíóõôúç\d\s]+)/', " $str", $n);
                         if (isset($n) && is_array($n) && count($n) > 1)
                             $n = trim($n[1]);
-                        else   
+                        else
                             $n = '';
 
                         $fields = array();
@@ -743,7 +743,7 @@
                             else
                                 array_push($messages, "$nick tornou a sala privada");
                         }
-                        
+
                         if (count($fields) == 0)
                             $output['status'] = "BLANK";
                         else{

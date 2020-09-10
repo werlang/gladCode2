@@ -16,13 +16,15 @@ const paths = {
     potions: "./profile-potions.js",
     reports: "./profile-report.js",
     runsim: "./runSim.js",
-    stats: "./stats_func.js"
+    stats: "./stats_func.js",
+    messages: "./profile-message.js",
+    emoji: "./emoji.js"
 }
 
 const callbacks = {
     Prism: () => {
         Prism.plugins.autoloader.languages_path = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/"
-    }
+    },
 }
 
 loader.load = async function(pack){

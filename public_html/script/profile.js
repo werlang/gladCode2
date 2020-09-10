@@ -1,15 +1,15 @@
 import {header, login} from "./header.js"
-import {post, getDate, getTimeSince, mergeLog} from "./utils.js"
+import {post, getDate, getTimeSince} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {Message, createToast, tooltip} from "./dialog.js"
 import { loader } from "./loader.js"
 // import {refresh_tourn_list} from "./profile-tourn.js"
-// import {messages} from "./profile-message.js"
 // import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
 // TODO: make profpics from friends load on demand also
+// TODO: replace import on top with loader
 var user
 
 header.load()
@@ -110,16 +110,13 @@ const translatorReady = (async () => {
         "SIM",
         "Somente não lidos",
         "Última atividade",
+        "Mostrar/Esconder Chat"
     ])
 
     return true
-})();
+})()
 
-(async () => {
-    // const chat = await loader.load("chat")
-    // chat.init($('#chat-panel'), {
-    //     full: false
-    // })
+;(async () => {
 })()
 
 document.querySelector("#menu #profile").addEventListener('click', async () => {
@@ -190,7 +187,22 @@ document.querySelector("#menu #potions").addEventListener('click', async () => {
 })
 
 document.querySelector("#menu #report").addEventListener('click', async () => {
-    loader.load("reports")
+    // loader.load("reports")
+})
+
+document.querySelector("#menu #messages").addEventListener('click', async () => {
+    const {messages} = await loader.load('messages')
+    messages.reload()
+})
+
+document.querySelector("#message-panel .page-nav #prev").addEventListener('click', async () => {
+    const {messages} = await loader.load('messages')
+    messages.prev()
+})
+
+document.querySelector("#message-panel .page-nav #next").addEventListener('click', async () => {
+    const {messages} = await loader.load('messages')
+    messages.next()
 })
 
 window.onload = function(){
@@ -268,6 +280,10 @@ window.onload = function(){
             document.querySelector('#tourn .title #offset .of').innerHTML = translator.getTranslated("de")
             document.querySelector('#train .title #offset .of').innerHTML = translator.getTranslated("de")
             document.querySelector('#bhist-container #unread span').innerHTML = translator.getTranslated("Somente não lidos")
+        })
+
+        loader.load("chat").then( ({chat}) => {
+            chat.init(document.querySelector('#chat-panel'), {full: false})        
         })
     })
 
@@ -520,7 +536,7 @@ window.onload = function(){
         var text = $('#panel #duel.wrapper .input').val();
         filter_friends(text);
     });
-    
+
     function filter_friends(text){
         post('back_friends.php', {
             action: "FILTER",
@@ -1401,7 +1417,7 @@ async function check_challenges(){
 
                 var myglad = $('#fog .glad-preview.selected').data('id');
                 var progbtn = new ProgressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
-                
+
                 new Simulation({
                     duel: id,
                     glads: myglad,
