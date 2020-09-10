@@ -8,8 +8,6 @@ import { loader } from "./loader.js"
 // import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
-// TODO: make profpics from friends load on demand also
-// TODO: replace import on top with loader
 var user
 
 header.load()
@@ -187,7 +185,7 @@ document.querySelector("#menu #potions").addEventListener('click', async () => {
 })
 
 document.querySelector("#menu #report").addEventListener('click', async () => {
-    // loader.load("reports")
+    loader.load("reports")
 })
 
 document.querySelector("#menu #messages").addEventListener('click', async () => {
