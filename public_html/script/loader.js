@@ -18,7 +18,8 @@ const paths = {
     runsim: "./runSim.js",
     stats: "./stats_func.js",
     messages: "./profile-message.js",
-    emoji: "./emoji.js"
+    emoji: "./emoji.js",
+    ranking: "./profile-rank.js"
 }
 
 const callbacks = {

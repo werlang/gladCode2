@@ -30,8 +30,6 @@
     
     <script type="module" src="script/profile.js" async></script>
 
-    <!-- <script src="script/radio.js"></script> -->
-    
     </head>
 <body>
     <?php

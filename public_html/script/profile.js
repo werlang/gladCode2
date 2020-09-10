@@ -5,7 +5,6 @@ import {translator} from "./translate.js"
 import {Message, createToast, tooltip} from "./dialog.js"
 import { loader } from "./loader.js"
 // import {refresh_tourn_list} from "./profile-tourn.js"
-// import * as ranking from "./profile-rank.js"
 // import {trainList} from "./profile-train.js"
 
 var user
@@ -187,6 +186,11 @@ document.querySelector("#menu #potions").addEventListener('click', async () => {
 document.querySelector("#menu #report").addEventListener('click', async () => {
     loader.load("reports")
 })
+
+document.querySelector("#menu #ranking").addEventListener('click', async () => {
+    loader.load("ranking")
+})
+
 
 document.querySelector("#menu #messages").addEventListener('click', async () => {
     const {messages} = await loader.load('messages')
