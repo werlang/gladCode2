@@ -3,61 +3,79 @@ import {login} from "./header.js"
 import {post} from "./utils.js"
 import {translator} from "./translate.js"
 import {Message} from "./dialog.js"
+import { loader } from "./loader.js"
 
-(async () => {
+;(async () => {
     await login.wait()
     await translator.translate([
-        "O identificador precisa ter tamanho 6 ou mais",
-        "O identificador precisa conter somente letras, números ou espaços",
-        "Digite uma senha, ou torne o torneio público",
-        "Informe um número entre 2 e 50",
-        "Formato de hora inválida",
-        "Um torneio com este identificador já existe",
+        "A equipe",
+        "ABANDONAR",
         "As equipes deverão entrar com os seguintes dados para se inscrever em seu torneio",
-        "Identificador",
-        "Senha",
         "As equipes deverão procurar seu torneio na lista de torneios públicos, ou entrar com o seguinte identificador para se inscrever em seu torneio",
-        "Torneio registrado",
-        "Torneio não encontrado",
-        "Torneio",
-        "Equipes inscritas",
-        "Nova Equipe",
-        "REMOVER",
-        "INICIAR TORNEIO",
-        "FECHAR",
-        "Nome da nova equipe",
-        "Nome muito curto",
-        "Esta equipe já está registrada",
+        "Breve descrição",
+        "Cancelar",
+        "Clique para inscrever um novo gladiador",
+        "Criar torneio",
+        "CRIAR",
+        "da equipe",
+        "de",
+        "Descrição",
+        "Deseja remover o gladiador",
+        "Digite uma senha, ou torne o torneio público",
         "Equipe",
-        "registrada",
-        "Os mestres deverão informar a seguinte senha para ingressar nesta equipe",
+        "Equipes inscritas",
+        "Equipes",
+        "Escolha o gladiador que irá lhe representar no torneio",
+        "ESCOLHER",
+        "Esta equipe já está registrada",
+        "Expulsar equipe",
+        "FECHAR",
+        "foi desmantelada",
+        "foi removido da equipe",
+        "Formato de hora inválida",
         "Gladiadores inscritos",
         "Gladiadores",
-        "VOLTAR",
-        "ABANDONAR",
-        "Clique para inscrever um novo gladiador",
-        "Expulsar equipe",
-        "Nenhuma equipe inscrita",
-        "Descrição",
-        "Equipes",
-        "Tem certeza que deseja sair da equipe",
-        "Você não faz mais parte da equipe",
-        "A equipe",
-        "foi desmantelada",
-        "Você ingressou na equipe",
-        "O gladiador",
-        "foi removido da equipe",
+        "Identificador do torneio",
+        "Identificador",
+        "Informe os dados do torneio que deseja participar",
+        "Informe um número entre 2 e 50",
         "INGRESSAR",
-        "Deseja remover o gladiador",
-        "da equipe",
-        "de"
+        "Ingresso em torneio",
+        "INICIAR TORNEIO",
+        "Máximo de equipes",
+        "Mestres podem inscrever mais de um gladiador",
+        "Nenhuma equipe inscrita",
+        "Nome da nova equipe",
+        "Nome muito curto",
+        "nome",
+        "Nova Equipe",
+        "O gladiador",
+        "O identificador precisa conter somente letras, números ou espaços",
+        "O identificador precisa ter tamanho 6 ou mais",
+        "Os mestres deverão informar a seguinte senha para ingressar nesta equipe",
+        "Permitir que minha equipe veja o código do gladiador",
+        "Público",
+        "registrada",
+        "REMOVER",
+        "Senha do torneio",
+        "senha para ingressar",
+        "Senha",
+        "Tem certeza que deseja sair da equipe",
+        "Tempo máximo da rodada",
+        "Torneio não encontrado",
+        "Torneio registrado",
+        "Torneio",
+        "Um torneio com este identificador já existe",
+        "Você ingressou na equipe",
+        "Você não faz mais parte da equipe",
+        "VOLTAR",
     ]).then( () => {
         document.querySelectorAll('.title .of').forEach(e => {
             e.innerHTML = translator.getTranslated("de")
         })
     })
     return true
-})()    
+})()
 
 var teamsync = {id: 0, time: 0};
 var user
@@ -78,64 +96,53 @@ $(document).ready( function(){
     });
 
     login.wait().then( data => {
-        user = data        
+        user = data
     })
 
-    $('#panel #battle-mode #tourn.button').click( async function(){
-        $('#panel #battle-container .wrapper').hide();
-        var duel = $('#panel #battle-container #tourn.wrapper');
-        if (duel.css('display') == 'none')
-            duel.fadeIn();
-
-        refresh_tourn_list();
-    });
-
     $('#panel #tourn.wrapper #create').click( function() {
-        var box = `<div id='fog'>
+        let box = `<div id='fog'>
             <div class='tourn window'>
                 <div id='title'>
-                    <h2>Criar torneio</h2>
+                    <h2>${translator.getTranslated("Criar torneio")}</h2>
                     <div id='public'>
-                        <label>Público<input type='checkbox' class='checkslider'></label>
+                        <label>${translator.getTranslated("Público")}<input type='checkbox' class='checkslider'></label>
                     </div>
                 </div>
-                <input id='name' class='input' placeholder='Identificador do torneio (nome)' maxlength='50'><input type='password' id='pass' class='input' placeholder='senha para ingressar' maxlength='32'>
-                <textarea id='desc' class='input' placeholder='Breve descrição...' maxlength='512'></textarea>
+                <input id='name' class='input' placeholder='${translator.getTranslated("Identificador do torneio", false)} (${translator.getTranslated("nome", false)})' maxlength='50'><input type='password' id='pass' class='input' placeholder='${translator.getTranslated("senha para ingressar", false)}' maxlength='32'>
+                <textarea id='desc' class='input' placeholder='${translator.getTranslated("Breve descrição", false)}...' maxlength='512'></textarea>
                 <div id='options'>
                     <div id='maxteams' class='col'>
-                        <span>Máximo de equipes</span>
+                        <span>${translator.getTranslated("Máximo de equipes")}</span>
                         <input class='input' value='50' maxlength='2'>
                     </div>
                     <div id='maxtime' class='col'>
-                        <span>Tempo máximo da rodada</span>
+                        <span>${translator.getTranslated("Tempo máximo da rodada")}</span>
                         <input class='input' value='23h 59m'>
                     </div>
                     <div id='flex-team'><label>
                         <input type='checkbox' class='checkslider' checked>
-                        <span>Flex: Mestres podem inscrever mais de um gladiador</span>
+                        <span>Flex: ${translator.getTranslated("Mestres podem inscrever mais de um gladiador")}</span>
                     </label></div>
                 </div>
                 <div id='button-container'>
-                    <button id='cancel' class='button'>Cancelar</button>
-                    <button id='create' class='button'>CRIAR</button>
+                    <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                    <button id='create' class='button'>${translator.getTranslated("CRIAR")}</button>
                 </div>
             </div>
         </div>`;
         $('body').append(box);
 
-        translator.translate([$('#fog')])
-
         $('.tourn.window .checkslider').each( function(){
             $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
         })
-    
+
         $('#fog .tourn.window').hide().fadeIn();
         $('#fog .tourn.window #name').focus();
 
         $('.tourn.window #cancel').click( function(){
             $('#fog').remove();
         });
-        
+
         $('.tourn.window #maxtime .input').on('keydown', function(e){
             e.preventDefault();
             var h = '', m = '';
@@ -170,7 +177,7 @@ $(document).ready( function(){
                 v = h + 'h ' + v;
             $(this).val(v);
         });
-        
+
         function validateMaxtime(){
             var v = $('.tourn.window #maxtime .input').val();
             if (v.split('h ').length == 1)
@@ -271,10 +278,20 @@ $(document).ready( function(){
     });
 
     $('#panel #tourn.wrapper #join').click( function() {
-        var box = "<div id='fog' class='tourn'><div class='tourn window'><h2>Ingresso em torneio</h2><p>Informe os dados do torneio que deseja participar</p><input id='name' class='input' placeholder='Identificador do torneio (nome)'><input id='pass' class='input' placeholder='Senha do torneio' type='password'><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='join' class='button'>INGRESSAR</button></div></div></div>";
+        var box = `<div id='fog' class='tourn'>
+            <div class='tourn window'>
+                <h2>${translator.getTranslated("Ingresso em torneio")}</h2>
+                <p>${translator.getTranslated("Informe os dados do torneio que deseja participar")}</p>
+                <input id='name' class='input' placeholder='${translator.getTranslated("Identificador do torneio", false)} (${translator.getTranslated("nome", false)})'>
+                <input id='pass' class='input' placeholder='${translator.getTranslated("Senha do torneio", false)}' type='password'>
+                <div id='button-container'>
+                    <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                    <button id='join' class='button'>${translator.getTranslated("INGRESSAR")}</button>
+                </div>
+            </div>
+        </div>`
         $('body').append(box);
         $('.tourn.window #name').focus();
-        translator.translate($('#fog.tourn'))
 
         $('.tourn.window #cancel').click( function(){
             $('#fog').remove();
@@ -336,7 +353,7 @@ $(document).ready( function(){
 
                     $('.tourn.window #close').click( function(){
                         $('#fog').remove();
-                        
+
                         if (socket){
                             socket.io.emit('tournament leave', {
                                 tname: tname,
@@ -349,7 +366,7 @@ $(document).ready( function(){
                         $('.tourn.window #new').hide().after(`<div class='input-button'><input placeholder='${translator.getTranslated("Nome da nova equipe", false)}' id='name'><button><i class='fas fa-users'></i></button></div>`);
                         // translator.bind()
                         $('.tourn.window #name').focus();
-                        
+
                         $('.tourn.window #name').keyup( function(e){
                             if (e.keyCode == 13)
                                 $('.tourn.window .input-button button').click();
@@ -385,7 +402,7 @@ $(document).ready( function(){
                                             showcode: showcode
                                         }).then( function(data){
                                             // console.log(data);
-                
+
                                             if (data.status == "NOTFOUND"){
                                                 new Message({message: "Torneio não encontrado"}).show();
                                             }
@@ -406,7 +423,7 @@ $(document).ready( function(){
                                             else{
                                                 $('.tourn.window .input-button').remove();
                                                 $('.tourn.window #new').fadeIn();
-                
+
                                                 var box = `<div id='fog' class='message'>
                                                     <div id='tourn-message' class='tourn window'>
                                                         <h2>${translator.getTranslated("Equipe")} <span class='highlight'>${name}</span> ${translator.getTranslated("registrada")}</h2>
@@ -414,7 +431,6 @@ $(document).ready( function(){
                                                         <div>${translator.getTranslated("Senha")}: <span class='highlight'>${data.word}</span></div>
                                                         <div id='button-container'><button class='button'>OK</button></div></div></div>`;
                                                 $('body').append(box);
-                                                // translator.bind()
 
                                                 $('#tourn-message .button').click( function(){
                                                     $('#fog.message').remove();
@@ -426,9 +442,8 @@ $(document).ready( function(){
                                 });
 
                             }
-                            // translator.bind()
                         });
-                    });	
+                    });
                 }
             });
         });
@@ -498,14 +513,14 @@ function refresh_tourn_list(){
                 if (tournpage.open.end == tournpage.open.total)
                     $('#panel #battle-container #tourn.wrapper #offset.open #next').prop('disabled', true);
 
-                $('#panel #battle-container #tourn.wrapper #table-open').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Identificador")}</div><div class='cell'>${translator.getTranslated("Descrição", true)}</div><div class='cell'>${translator.getTranslated("Equipes")}</div><div class='cell'>Flex</div></div>`);
+                $('#panel #battle-container #tourn.wrapper #table-open').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Identificador")}</div><div class='cell'>${translator.getTranslated("Descrição")}</div><div class='cell'>${translator.getTranslated("Equipes")}</div><div class='cell'>Flex</div></div>`);
                 for (let i in open){
                     $('#panel #battle-container #tourn.wrapper #table-open').append("<div class='row'><div class='cell' id='name'>"+ open[i].name +"</div><div class='cell'>"+ open[i].description +"</div><div class='cell'>"+ open[i].teams +"/"+ open[i].maxteams +"</div><div class='cell flex'>"+ open[i].flex +"</div></div>");
                 }
-            
+
                 $('#mytourn.title').hide();
                 if (mytourn.length > 0){
-                    $('#panel #battle-container #tourn.wrapper #table-mytourn').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Identificador")}</div><div class='cell'>${translator.getTranslated("Descrição", true)}</div><div class='cell'>${translator.getTranslated("Equipes")}</div><div class='cell'>Flex</div></div>`);
+                    $('#panel #battle-container #tourn.wrapper #table-mytourn').html(`<div class='row head'><div class='cell'>${translator.getTranslated("Identificador")}</div><div class='cell'>${translator.getTranslated("Descrição")}</div><div class='cell'>${translator.getTranslated("Equipes")}</div><div class='cell'>Flex</div></div>`);
                     for (let i in mytourn){
                         $('#panel #battle-container #tourn.wrapper #table-mytourn').append("<div class='row'><div class='cell' id='name'>"+ mytourn[i].name +"</div><div class='cell'>"+ mytourn[i].description +"</div><div class='cell'>"+ mytourn[i].teams +"/"+ mytourn[i].maxteams +"</div><div class='cell flex'>"+ mytourn[i].flex +"</div></div>");
                     }
@@ -535,8 +550,6 @@ function refresh_tourn_list(){
                         $('.tourn.window #join').click();
                     });
                 });
-
-                translator.translate($('#panel #battle-container #tourn.wrapper .row.head'))
             }
 
         });
@@ -544,24 +557,33 @@ function refresh_tourn_list(){
 }
 
 function refresh_teams(obj){
-    //console.log(obj);
+    // console.log(obj);
+
+    const args = {}
+    if (obj.tourn){
+        args.tourn = obj.tourn
+    }
+    else{
+        args.name = obj.name
+        args.pass = obj.pass
+    }
 
     if (obj.remove){
-        $('#fog.tourn, #fog.team, #fog.glads').remove();
-        new Message({message: "O torneio foi removido"}).show()
+        if ($('#fog.tourn, #fog.team, #fog.glads').length){
+            $('#fog.tourn, #fog.team, #fog.glads').remove();
+            new Message({message: "O torneio foi removido"}).show()
+        }
     }
     else if (obj.start){
-        if ($('#fog.tourn, #fog.team, #fog.glads').length)
+        if ($('#fog.tourn, #fog.team, #fog.glads').length){
+            $('#fog.tourn, #fog.team, #fog.glads').remove();
             new Message({message: "Este torneio já iniciou"}).show();
-        $('#fog.tourn, #fog.team, #fog.glads').remove();
+        }
     }
     else if ($('#fog.tourn').length){
-        post("back_tournament.php",{
-            action: "LIST_TEAMS",
-            name: obj.name,
-            pass: obj.pass,
-            tourn: obj.tourn
-        }).then( function(data){
+        args.action = "LIST_TEAMS"
+
+        post("back_tournament.php", args).then( function(data){
             // console.log(data);
 
             if (data.status == "STARTED"){
@@ -606,11 +628,9 @@ function refresh_teams(obj){
                             buttons: {yes: "Sim", no: "NÃO"}
                         }).show().click('yes', () => {
                             $('.tourn.window #close').click();
-                            post("back_tournament.php",{
-                                action: "START",
-                                name: obj.name,
-                                pass: obj.pass
-                            }).then( data => {
+
+                            args.action = "START"
+                            post("back_tournament.php", args).then( data => {
                                 //console.log(data);
                                 if (data.status == "DONE"){
                                     var hash = data.hash;
@@ -627,7 +647,7 @@ function refresh_teams(obj){
                     });
                 }
                 else
-                    $('.tourn.window #button-container #start').prop('disabled', true);				
+                    $('.tourn.window #button-container #start').prop('disabled', true);
 
                 if (data.manager == true && teams.length == 0){
                     $('.tourn.window #button-container #delete').show();
@@ -638,19 +658,24 @@ function refresh_teams(obj){
                             message: "Deseja remover o torneio?",
                             buttons: {yes: "Sim", no: "NÃO"}
                         }).show().click('yes', () => {
-                            post("back_tournament.php",{
-                                action: "DELETE",
-                                name: obj.name,
-                                pass: obj.pass,
-                                tourn: obj.tourn
-                            }).then( function(data){
-                                //console.log(data);
+                            args.action = "DELETE"
+                            post("back_tournament.php", args).then( function(data){
+                                // console.log(data);
                                 if (data.status == "DELETED"){
-                                    new Message({message: "Torneio removido"}).show()
-                                    $('#fog').remove();		
+                                    if ($('#fog.tourn, #fog.team, #fog.glads').length){
+                                        new Message({message: "Torneio removido"}).show()
+                                        $('#fog.tourn, #fog.team, #fog.glads').remove();
+                                    }
                                 }
-                                else if (data.status == "STARTED")
-                                    new Message({message: "Este torneio já iniciou"}).show()
+                                else if (data.status == "STARTED"){
+                                    if ($('#fog.tourn, #fog.team, #fog.glads').length){
+                                        new Message({message: "Este torneio já iniciou"}).show()
+                                        $('#fog.tourn, #fog.team, #fog.glads').remove()
+                                    }
+                                }
+                                else if (data.status == "PERMISSION"){
+                                    new Message({message: "Você nao possui permissão para remove este torneio"}).show()
+                                }
                                 else{
                                     new Message({message: "Um torneio só pode ser removido quando não possuir equipes"}).show()
                                 }
@@ -708,7 +733,7 @@ function rebind_team_rows(teamid){
                     <h2>${translator.getTranslated("Equipe")} <span class='highlight'>${teamname}</span></h2>
                     <div id='word'>${translator.getTranslated("Senha")}<span class='highlight'></span></div>
                 </div>
-                <h3>${translator.getTranslated("Gladiadores inscritos", true)}</h3>
+                <h3>${translator.getTranslated("Gladiadores inscritos", true)}:</h3>
                 <div class='glad-card-container'></div>
                 <div id='button-container'>
                     <button id='back' class='button'>${translator.getTranslated("VOLTAR")}</button>
@@ -741,7 +766,7 @@ function rebind_team_rows(teamid){
             if ($('.tourn.window #join-leave').text() == translator.getTranslated("ABANDONAR", false)){
                 new Message({
                     message: `Tem certeza que deseja sair da equipe <ignore><b>${teamname}</b>?</ignore>`,
-                    buttons: {no: translator.getTranslated("Não"), yes: translator.getTranslated("SIM")}
+                    buttons: {yes: "SIM", no: "Não"},
                 }).show().click('yes', async () => {
                     let data = await post("back_tournament.php", {
                         action: "LEAVE_TEAM",
@@ -751,7 +776,7 @@ function rebind_team_rows(teamid){
 
                     $('#fog.team').remove();
                     $('#fog #dialog-box').parents('#fog').remove();
-                    
+
                     if (data.status == "STARTED")
                         (new Message({message: "Este torneio já iniciou"})).show()
                     else{
@@ -831,8 +856,6 @@ function refresh_glads(args){
 
         if (teamsync.id != teamid)
             teamsync = {id: teamid, time: 0};
-        
-        const gladCardModule = import("./glad-card.js")
 
         post("back_tournament.php", {
             action: "TEAM",
@@ -842,7 +865,6 @@ function refresh_glads(args){
             // console.log(data);
 
             if (data.status == "DONE"){
-                var tname = data.name;
                 var word = data.word;
                 var flex = data.flex;
                 var joined = false;
@@ -859,8 +881,12 @@ function refresh_glads(args){
                 else{
                     $('#fog.team .tourn.window #word').remove()
                 }
-                
+
+                $('.tourn.window .glad-preview').addClass('remove')
+
+                const {gladCard} = await loader.load('gladcard')
                 await new Promise(resolve => {
+                    $('.tourn.window .glad-preview.remove').remove()
                     for (let i in data){
                         if (data[i].name){
                             gladCard.load($('.tourn.window .glad-card-container'), {
@@ -877,17 +903,17 @@ function refresh_glads(args){
                                 }],
                                 append: true
                             }).then( () => {
+
                                 if (data[i].owner && data[i].owner === true){
                                     $('.tourn.window .glad-preview').eq(i).addClass('mine');
                                 }
-    
+
                                 $('.glad-preview.mine .delete').click( function(){
                                     var id = $(this).parents('.mine').data('id');
                                     var name = $(this).parents('.mine').find('.row.glad span').html();
                                     new Message({
-                                        message: `${translator.getTranslated("Deseja remover o gladiador")} <b>${name}</b> ${translator.getTranslated("da equipe")}?`,
-                                        buttons: {yes: translator.getTranslated("Sim"), no: translator.getTranslated("Não")},
-                                        translate: false
+                                        message: `Deseja remover o gladiador <ignore><b>${name}</b></ignore> da equipe?`,
+                                        buttons: {yes: "Sim", no: "Não"}
                                     }).show().click('yes', async () => {
                                         let data = await post("back_tournament.php", {
                                             action: "REMOVE_GLAD",
@@ -895,7 +921,7 @@ function refresh_glads(args){
                                             team: teamid
                                         })
                                         // console.log(data);
-            
+
                                         if (data.status == "STARTED"){
                                             $('#fog.team').remove();
                                             new Message({message: "Este torneio já iniciou"}).show();
@@ -911,7 +937,7 @@ function refresh_glads(args){
                                             new Message({message: `${translator.getTranslated("O gladiador")} <b>${name}</b> ${translator.getTranslated("foi removido da equipe")}`}).show().click('ok', () => {
                                                 $('.tourn.window .row.signed').click()
                                             })
-                                            
+
                                         }
                                         else{
                                             new Message({message: data.status}).show()
@@ -944,7 +970,8 @@ function refresh_glads(args){
 
                 })
 
-                for (let i = 0 ; i < 3 - data.length ; i++){
+                const totalCards = $('.tourn.window .glad-preview').length + $('.tourn.window .glad-add').length
+                for (let i = 0 ; i < 3 - totalCards ; i++){
                     $('.tourn.window .glad-card-container').append(`<div class='glad-add'><div class='image'></div><div class='info'>${translator.getTranslated("Clique para inscrever um novo gladiador")}</div></div>`);
                 }
                 if ($('.tourn.window .glad-preview.blurred').length > 0){
@@ -994,44 +1021,52 @@ function refresh_glads(args){
 }
 
 function choose_tourn_glad(){
-    var response = $.Deferred();
+    return new Promise( async resolve => {
+        const box = `<div id='fog' class='glads'>
+            <div id='duel-box'>
+                <div id='title'>${translator.getTranslated("Escolha o gladiador que irá lhe representar no torneio")}</div>
+                <div class='glad-card-container'></div>
+                <div id='show-code'><label><input type='checkbox' class='checkslider'>${translator.getTranslated("Permitir que minha equipe veja o código do gladiador")}</label></div>
+                <div id='button-container'>
+                    <button id='cancel' class='button'>${translator.getTranslated("Cancelar")}</button>
+                    <button id='choose' class='button' disabled>${translator.getTranslated("ESCOLHER")}</button>
+                </div>
+            </div>
+        </div>`
+        $('body').append(box);
 
-    var box = "<div id='fog' class='glads'><div id='duel-box'><div id='title'>Escolha o gladiador que irá lhe representar no torneio</div><div class='glad-card-container'></div><div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div><div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>";
-    $('body').append(box);
+        $('#duel-box .checkslider').each( function(){
+            $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+        })
 
-    $('#duel-box .checkslider').each( function(){
-        $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
-    })
-
-    translator.translate($('#fog.glads #duel-box'))
-
-    gladCard.load($('#fog.glads .glad-card-container'), {}).then( () => {
-        $('#fog.glads .glad-preview').not('.old').click( function(){
-            $('#fog.glads #btn-glad-open').removeAttr('disabled');
-            $('#fog.glads .glad-preview').removeClass('selected');
-            $(this).addClass('selected');
-            $('#duel-box #choose').removeAttr('disabled');
-        });
-        
-        $('#fog.glads .glad-preview').dblclick( function(){
-            $('#fog.glads #duel-box #choose').click();
-        });
-    })        
-    
-    $('#duel-box #cancel').click( function(){
-        $('#fog.glads').remove();
-        return response.resolve(false);
-    });
-    $('#duel-box #choose').click( function(){
-        if ($('#fog.glads .glad-preview.selected').length){
-            var gladid = $('#fog.glads .glad-preview.selected').data('id');
-            var showcode = $('#duel-box input.checkslider').prop('checked');
+        $('#duel-box #cancel').click( function(){
             $('#fog.glads').remove();
-            return response.resolve({glad: gladid, showcode: showcode});
-        }
-    });
+            resolve(false);
+        });
 
-    return response.promise();
+        $('#duel-box #choose').click( function(){
+            if ($('#fog.glads .glad-preview.selected').length){
+                var gladid = $('#fog.glads .glad-preview.selected').data('id');
+                var showcode = $('#duel-box input.checkslider').prop('checked');
+                $('#fog.glads').remove();
+                resolve({glad: gladid, showcode: showcode});
+            }
+        });
+
+        const {gladCard} = await loader.load('gladcard')
+        gladCard.load($('#fog.glads .glad-card-container'), {}).then( () => {
+            $('#fog.glads .glad-preview').not('.old').click( function(){
+                $('#fog.glads #btn-glad-open').removeAttr('disabled');
+                $('#fog.glads .glad-preview').removeClass('selected');
+                $(this).addClass('selected');
+                $('#duel-box #choose').removeAttr('disabled');
+            });
+
+            $('#fog.glads .glad-preview').dblclick( function(){
+                $('#fog.glads #duel-box #choose').click();
+            });
+        })
+    })
 }
 
 export {refresh_tourn_list}

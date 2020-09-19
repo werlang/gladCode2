@@ -285,7 +285,7 @@ window.onload = function(){
         })
 
         loader.load("chat").then( ({chat}) => {
-            chat.init(document.querySelector('#chat-panel'), {full: false})        
+            chat.init(document.querySelector('#chat-panel'), {full: false})
         })
     })
 
@@ -513,31 +513,32 @@ window.onload = function(){
         check_challenges()
     });
 
-    $('#panel #battle-mode .button').click( function(){
-        $('#panel #battle-mode .button').removeClass('selected');
-        $(this).addClass('selected');
-    });
+    document.querySelectorAll('#panel #battle-mode .button').forEach(e => e.addEventListener('click', () => {
+        document.querySelectorAll('#panel #battle-mode .button').forEach(e => e.classList.remove('selected'))
+        e.classList.add('selected')
 
-    $('#panel #battle-mode #ranked.button').click( function(){
-        $('#panel #battle-container .wrapper').hide();
-        var ranked = $('#panel #battle-container #ranked.wrapper');
-        if (ranked.css('display') == 'none')
-            ranked.fadeIn();
-    });
+        document.querySelectorAll('#panel #battle-container .wrapper').forEach(e => {
+            e.style.display = 'none'
+            e.classList.add('hidden')
+        })
 
-    $('#panel #battle-mode #duel.button').click( function(){
-        $('#panel #battle-container .wrapper').hide();
-        var duel = $('#panel #battle-container #duel.wrapper');
-        if (duel.css('display') == 'none'){
-            duel.fadeIn();
-        }
+        const wrapper = document.querySelector(`#panel #battle-container #${e.id}.wrapper`)
+        wrapper.style.display = 'block'
+
+        setTimeout( () => {
+            wrapper.classList.remove('hidden')
+        }, 10)
+
+    }))
+
+    document.querySelector('#panel #battle-mode #duel.button').addEventListener('click', () => {
         filter_friends("")
-    });
+    })
 
-    $('#panel #duel.wrapper .input').on('input', function(){
-        var text = $('#panel #duel.wrapper .input').val();
-        filter_friends(text);
-    });
+    document.querySelector('#panel #duel.wrapper .input').addEventListener('input', () => {
+        const text = document.querySelector('#panel #duel.wrapper .input').value
+        filter_friends(text)
+    })
 
     function filter_friends(text){
         post('back_friends.php', {
@@ -645,6 +646,15 @@ window.onload = function(){
         });
 
     });
+
+    document.querySelector('#panel #battle-mode #tourn.button').addEventListener('click', async () => {
+        const {refresh_tourn_list} = await loader.load('tourn')
+        refresh_tourn_list()
+    })
+
+    document.querySelector('#panel #battle-mode #train.button').addEventListener('click', () => {
+        console.log('train')
+    })
 
     $('#friend-panel #request, #friend-panel #friends').addClass('hidden');
 
@@ -1450,12 +1460,3 @@ function getXpToNextLvl(){
 function load_svg(e){
     $.get(e.html(), null, null, 'text').then( data => e.removeClass('hidden').html(data))
 }
-
-// post("back_log.php",{
-//     action: "GET",
-//     loghash: '18772b79e3a8bd89',
-// }).then( function(data){
-//     // console.log(data.log)
-//     const merged = mergeLog(data.log)
-//     console.log(merged)
-// })

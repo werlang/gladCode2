@@ -19,7 +19,8 @@ const paths = {
     stats: "./stats_func.js",
     messages: "./profile-message.js",
     emoji: "./emoji.js",
-    ranking: "./profile-rank.js"
+    ranking: "./profile-rank.js",
+    tourn: "./profile-tourn.js",
 }
 
 const callbacks = {
