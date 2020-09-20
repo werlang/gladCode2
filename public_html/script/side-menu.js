@@ -1,114 +1,123 @@
-$(document).ready( function(){
-    $('#header #search').addClass('visible');
-    $('#header #search').click( function(){
-        if ($(this).hasClass('visible')){
-            $('#side-menu').addClass('mobile');
-            $('#side-menu').hide().show("slide", { direction: "right" }, 300);
-            $('#side-menu input').focus();
-            $('#side-menu a').click(function(){
-                $('#side-menu').fadeOut( function(){
-                    $('#side-menu').removeClass('mobile');
-                });
+export const menu = {}
+
+menu.load = async function(){
+    const search = document.querySelector('#header #search')
+    const menuEl = document.querySelector('#side-menu')
+
+    if (search){
+        search.classList.add('visible');
+        search.addEventListener('click', function(){
+            if (search.classList.contains('visible')){
+                menuEl.classList.add('mobile')
+                menuEl.style.display = 'block'
+                // menu. .hide().show("slide", { direction: "right" }, 300);
+                menuEl.querySelector('input').focus()
+                menuEl.querySelectorAll('a').forEach(e => e.addEventListener('click', () => {
+                    menuEl.classList.remove('mobile')
+                    menuEl.style.display = 'none'
+                    // $('#side-menu').fadeOut( function(){
+                    //     $('#side-menu').removeClass('mobile');
+                    // });
+                }))
+            }
+        })
+    }
+
+    return new Promise( resolve => {
+        fetch("side-menu.html").then( async response => {
+            const content = await response.text()
+            menuEl.innerHTML = content
+    
+            const icon = "<i class='fas fa-chevron-right'></i>";
+            menuEl.querySelectorAll('li').forEach(e => {
+                if (e.nextElementSibling && e.nextElementSibling.tagName == "ul"){
+                    e.insertAdjacentHTML('afterbegin', icon)
+                }
+                e.classList.remove('visible')
+                
+                if (e.querySelector("i")){
+                    e.querySelector("i").classList.remove('open')
+                }
             })
-        }
-    });
+            
+            menuEl.querySelectorAll('#side-menu > ul > li').forEach(e => e.classList.add('visible'))
+            
+            const input = menuEl.querySelector('#search input')
+            input.addEventListener('input', () => {
+                menuEl.querySelectorAll('li').forEach(e => {
+                    e.classList.remove('visible')
+                    e.querySelector('i').classList.remove('open')
+                })
+    
+                const text = input.value
+                if (text.length <= 1){
+                    document.querySelectorAll('#side-menu > ul > li').forEach(e => e.classList.add('visible'))
+                }
+                else{
+                    const pattern = new RegExp(`[\\w]*${text}[\\w]*`,"ig")
+                    menuEl.querySelectorAll('li').forEach(e => {
+                        if (e.textContent.match(pattern)){
+                            e.classList.add('visible')
+                            e.parentNode.previousElementSibling.classList.add('visible').parentNode.previousElementSibling.classList.add('visible')
+                        }
+                        if (e.style.display != 'none'){
+                            e.querySelectorAll('i').forEach(e => e.classList.add('open'))
+                        }
+                    });
+                }
+            });
+    
+            menuEl.querySelectorAll('li').forEach(e => e.addEventListener('click', () => {
+                //console.log($(this));
+                //e.preventDefault();
+                const list = e.nextElementSibling
+    
+                if (list.querySelector('li.visible')){
+                    list.querySelectorAll('li.visible').forEach(e => {
+                        e.classList.remove('visible')
+                        e.querySelector('i').classList.remove('open')
+                    })
+    
+                    e.querySelector('i').classList.remove('open')
+                }
+                else{
+                    list.querySelectorAll('li').forEach(e => e.classList.add('visible'))
 
-    $('#side-menu').load("side-menu.html", function(){
-		var icon = "<i class='fas fa-chevron-right'></i>";
-		$('#side-menu li').each( function(){
-			if ($(this).next('ul').length != 0)
-				$(this).prepend(icon);
-		});
-		
-        $('#side-menu li').removeClass('visible');
-        $('#side-menu li i').removeClass('open');
-        $('#side-menu > ul > li').addClass('visible');
-        
-        $('#side-menu #search input').on('input', function(){
-            $('#side-menu li').removeClass('visible');
-            $('#side-menu li i').removeClass('open');
-            var text = $(this).val();
-            if (text.length <= 1){
-                $('#side-menu > ul > li').addClass('visible');
-            }
-            else{
-                var pattern = new RegExp("[\\w]*"+ text +"[\\w]*","ig");
-                $('#side-menu li').each(function(){
-                    if ($(this).text().match(pattern)){
-                        $(this).addClass('visible');
-                        $(this).parent().prev('li').addClass('visible').parent().prev('li').addClass('visible');
+                    if (e.querySelector('i')){
+                        e.querySelector('i').classList.add('open')
                     }
-                });
-                $('#side-menu li').each(function(){
-					if ($(this).css('display') != 'none')
-						$(this).children('i').addClass('open');
-				});
-            }
-        });
-
-        $('#side-menu li').click( function(e){
-            //console.log($(this));
-            //e.preventDefault();
-            var list = $(this).next('ul');
-            if (list.children().css('display') != 'none'){
-                list.find('li').removeClass('visible');
-                list.find('li i').removeClass('open');
-                $(this).children('i').removeClass('open');
-			}
-            else{
-                list.children('li').addClass('visible');
-				$(this).children('i').addClass('open');
-            }
-        });
-        menuLoadFlag = true;
-    });
-});
-
-function scrollTo(elem, offset){
-    if (elem){
-        if (!offset)
-            offset = 0;
-        $([document.documentElement, document.body]).animate({
-            scrollTop: elem.offset().top + offset
-        }, 1000);
-    }
+                }
+            }))
+    
+            resolve(true)
+        })
+    })
 }
 
-var menuLoadFlag = false;
-function menu_loaded(){
-    var resp = $.Deferred();
-    var intLoad = setInterval( function(){
-        if (menuLoadFlag){
-            clearInterval(intLoad);
-            return resp.resolve(true);
-        }
-    }, 10);
-    return resp.promise();
-}
+// TODO: fix this without JQuery
+// $(document).scroll( function(){
+//     var mindist, winner;
+//     $('#side-menu li a').each( function(){
+//         var loc = window.location.href.split("/");
+//         loc = loc[loc.length - 1].split("#")[0];
+//         var href = $(this).attr('href').split("#");
+//         var hash = href[1];
+//         href = href[0];
+//         if (href == loc && hash && $('#'+ hash).length){
+//             var dist = Math.abs($(document).scrollTop() - $('#'+ hash).offset().top);
+//             if (!mindist || dist < mindist){
+//                 mindist = dist;
+//                 winner = $(this).parent();
+//             }
+//         }
+//     });
+//     if (winner){
+//         winner.siblings('li.here').removeClass('here');
+//         winner.addClass('here');
 
-$(document).scroll( function(){
-    var mindist, winner;
-    $('#side-menu li a').each( function(){
-        var loc = window.location.href.split("/");
-        loc = loc[loc.length - 1].split("#")[0];
-        var href = $(this).attr('href').split("#");
-        var hash = href[1];
-        href = href[0];
-        if (href == loc && hash && $('#'+ hash).length){
-            var dist = Math.abs($(document).scrollTop() - $('#'+ hash).offset().top);
-            if (!mindist || dist < mindist){
-                mindist = dist;
-                winner = $(this).parent();
-            }
-        }
-    });
-    if (winner){
-        winner.siblings('li.here').removeClass('here');
-        winner.addClass('here');
-
-        if (!winner.children('i').hasClass('open'))
-            winner.click();
-        $(winner.siblings('li').find('i.open').click());
-    }
-});
+//         if (!winner.children('i').hasClass('open'))
+//             winner.click();
+//         $(winner.siblings('li').find('i.open').click());
+//     }
+// });
 
