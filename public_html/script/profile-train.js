@@ -3,54 +3,53 @@ import {login} from "./header.js"
 import {post} from "./utils.js"
 import {Message, createToast} from "./dialog.js"
 import {translator} from "./translate.js"
-import {sendChatMessage} from "./chat.js"
-// import {gladCard} from "./glad-card.js"
+import {loader} from "./loader.js"
 
-(async () => {
+;(async () => {
     await login.wait()
     await translator.translate([
-        "Remover treino",
-        "Identificador",
-        "Mestres",
-        "Descrição",
-        "de",
-        "Criar treino",
-        "Identificador do treino (nome)",
-        "Breve descrição...",
-        "Tempo máximo do treino",
-        "Gladiadores por batalha",
-        "Peso do treino",
-        "Cancelar",
-        "CRIAR",
-        "Treino criado",
-        "Os mestres de gladiadores podem ingressar no treino",
-        "Escaneando o QR code em seus celulares",
-        "Usando o link do treino",
-        "Digitando o código do treino",
-        "FECHAR",
-        "O identificador precisa ter tamanho 6 ou mais",
-        "Sala de discussão do treino",
-        "Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo",
-        "Reduzir fonte",
-        "Copiar link",
-        "Aumentar fonte",
-        "Escolha o gladiador que participará do treino",
-        "SELECIONAR",
-        "Treino",
-        "Participantes",
-        "Batalhas compostas por",
-        "REMOVER",
-        "INICIAR TREINO",
-        "mestres",
         "Adicione uma descrição",
-        "Clique para alterar",
         "Ampliar QR code",
-        "Renovar link",
-        "Nenhum participante",
+        "Aumentar fonte",
+        "Batalhas compostas por",
+        "Breve descrição...",
+        "Cancelar",
+        "Clique para alterar",
+        "Copiar link",
+        "Criar treino",
+        "CRIAR",
+        "de",
+        "Descrição",
+        "Digitando o código do treino",
         "e",
-        "Mestre",
+        "Escaneando o QR code em seus celulares",
+        "Escolha o gladiador que participará do treino",
+        "Expulsar participante",
+        "FECHAR",
         "Gladiador",
-        "Expulsar participante"
+        "Gladiadores por batalha",
+        "Identificador do treino (nome)",
+        "Identificador",
+        "INICIAR TREINO",
+        "Mestre",
+        "mestres",
+        "Mestres",
+        "Nenhum participante",
+        "O identificador precisa ter tamanho 6 ou mais",
+        "Os mestres de gladiadores podem ingressar no treino",
+        "Para ingressar no treino acesse no menu BATALHA > Treino de equipes > PARTICIPAR DE TREINO, e informe o código abaixo",
+        "Participantes",
+        "Peso do treino",
+        "Reduzir fonte",
+        "Remover treino",
+        "REMOVER",
+        "Renovar link",
+        "Sala de discussão do treino",
+        "SELECIONAR",
+        "Tempo máximo do treino",
+        "Treino criado",
+        "Treino",
+        "Usando o link do treino",
     ])
     return true
 })()
@@ -67,20 +66,13 @@ $(document).ready( function(){
 
     login.wait().then( data => {
         if (!login.user.premium){
-            $('#panel #train.wrapper #create').hide()        
+            $('#panel #train.wrapper #create').hide()
         }
     })
 
-    $('#panel #battle-mode #train.button').click( function(){
-        $('#panel #battle-container .wrapper').hide();
-        var train = $('#panel #battle-container #train.wrapper');
-        if (train.css('display') == 'none')
-            train.fadeIn();
+    const chat = loader.load('chat')
 
-        trainList.refresh();
-    })
-    
-    $('#panel #train.wrapper #create').click( function() {
+    $('#panel #train.wrapper #create').click( async () => {
         if (!login.user.premium){
             new Message({
                 message: `
@@ -127,7 +119,8 @@ $(document).ready( function(){
                 </div>
             </div>`
             $('body').append(box);
-            
+
+            await loader.load('jqueryui')
             $( ".train.window #players #slider" ).slider({
                 range: "min",
                 min: 2,
@@ -223,13 +216,14 @@ $(document).ready( function(){
 
                     if (data.status == "NOPREMIUM"){
                         createToast(`Esta função só pode ser usada por contas verificadas de instituições de ensino`, "error")
-                        login.user.premium = false            
+                        login.user.premium = false
                     }
                     else if (data.status == "NOCREDITS"){
                         createToast("Você não possui créditos para utilizar essa função", "error")
                         login.user.credits = 0
                     }
                     else if (data.status == "SUCCESS"){
+                        const {sendChatMessage} = await chat
                         sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d ${translator.getTranslated("Sala de discussão do treino")} ${name}`})
 
                         $('#fog').remove()
@@ -321,13 +315,13 @@ $(document).ready( function(){
                             $('#big-info #increase').click( function(){
                                 let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
                                 $('#big-info .link').css({'font-size': parseInt(size * 1.1) + 'px'})
-                                
+
                             })
 
                             $('#big-info #reduce').click( function(){
                                 let size = parseInt($('#big-info .link').css('font-size').split('px')[0])
                                 $('#big-info .link').css({'font-size': parseInt(size * 0.9) + 'px'})
-                                
+
                             })
                         })
                     }
@@ -349,7 +343,7 @@ $(document).ready( function(){
                 hash: hash
             })
             // console.log(data)
-    
+
             if (data.status == "NOTFOUND")
                 createToast(`Treino não encontrado`, "error")
             else if (data.status == "STARTED")
@@ -358,8 +352,8 @@ $(document).ready( function(){
                 createToast(`O código para ingresso deste treino expirou. Requisite o novo código`, "info")
             else if (data.status == "COLLISION"){
                 new Message({
-                    message: `Colisão de hash. Informar o administrador?`, 
-                    buttons: {ok: "OK", cancel: "Cancelar"} 
+                    message: `Colisão de hash. Informar o administrador?`,
+                    buttons: {ok: "OK", cancel: "Cancelar"}
                 }).show().click('ok', () => {
                     post("back_message.php", {
                         action: "SEND",
@@ -384,7 +378,8 @@ $(document).ready( function(){
                     </div>
                 </div>`;
                 $('body').append(box);
-    
+
+                const {gladCard} = await loader.load('gladcard')
                 gladCard.load($('#fog .glad-card-container'), {
                     clickHandler: function(){
                         if (!$(this).hasClass('old')){
@@ -399,11 +394,11 @@ $(document).ready( function(){
                             $('#fog #duel-box #select').click();
                     }
                 })
-    
+
                 $('#fog #duel-box #cancel').click( function(){
                     $('#fog').remove();
                 })
-    
+
                 // after selecting glad, finally join
                 $('#fog #duel-box #select').click( async function(){
                     var myglad = $('#fog .glad-preview.selected').data('id');
@@ -416,14 +411,16 @@ $(document).ready( function(){
                     if (data.status == "SUCCESS"){
                         createToast("Bem-vindo ao treino", "success")
                         $('#fog').remove()
-                        if (!roomList[data.id])
+                        if (!roomList[data.id]){
                             roomList.create({id: data.id})
+                        }
                         await roomList[data.id].show()
+                        const {sendChatMessage} = await chat
                         sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
                     }
                     else
                         createToast("Erro ao ingressar, tente novamente", "error")
-                    
+
                 });
             }
 
@@ -483,17 +480,17 @@ export const trainList = {
                         this.page[set].offset = parseInt(data.pages[set].offset)
                         this.page[set].total = parseInt(data.pages[set].total)
                         this.page[set].end = Math.min(this.page[set].total, this.page[set].offset + this.page.step)
-    
+
                         $(`#train.wrapper #offset.${set} .start`).html(this.page[set].offset + 1)
                         $(`#train.wrapper #offset.${set} .end`).html(this.page[set].end)
                         $(`#train.wrapper #offset.${set} .total`).html(this.page[set].total)
-    
+
                         $(`#train.wrapper #offset.${set} button`).removeAttr('disabled');
                         if (this.page[set].offset == 0)
                             $(`#train.wrapper #offset.${set} #prev`).prop('disabled', true);
                         if (this.page[set].end == this.page[set].total)
                             $(`#train.wrapper #offset.${set} #next`).prop('disabled', true);
-    
+
                         $(`#train.wrapper #table-${set}`).html(`<div class='row head'><div class='cell'>${translator.getTranslated("Identificador")}</div><div class='cell'>${translator.getTranslated("Descrição")}</div><div class='cell'>${translator.getTranslated("Mestres")}</div>${set == 'manage' ? `<div class='cell'></div>` : ''}</div>`);
                         for (let row of data[set]){
                             $(`#train.wrapper #table-${set}`).append(`<div class='row'>
@@ -506,10 +503,10 @@ export const trainList = {
                             if (!roomList[row.id])
                                 roomList.create(row)
                         }
-        
+
                     }
                 }
-            
+
                 $('#train.wrapper .table .row').not('.head').click( function(){
                     let id = $(this).data('id')
                     roomList[id].show()
@@ -545,9 +542,9 @@ export const trainList = {
                         buttons: {ok: "OK", cancel: "CANCELAR"},
                         input: true
                     })
-                })  
+                })
             }
-    
+
             if (data.redirect){
                 roomList[data.redirect].show()
             }
@@ -561,6 +558,8 @@ var roomList = {
         this[info.id] = {
             id: info.id,
             show: async function(){
+                const chat = loader.load('chat')
+
                 var id = this.id
                 let data = await post("back_train.php", {
                     action: "ROOM",
@@ -579,7 +578,7 @@ var roomList = {
                     var manager = false
                     if(data.status == "MANAGE")
                         manager = true
-            
+
                     this.manager = manager
                     $('body').append(`<div id='fog'>
                         <div class='train window'>
@@ -607,7 +606,7 @@ var roomList = {
                             </div>
                         </div>
                     </div>`);
-            
+
                     if (manager){
                         if ($('.train.window #train-desc').text().length == 0){
                             $('.train.window #train-desc').html(translator.getTranslated("Adicione uma descrição", false))
@@ -621,9 +620,9 @@ var roomList = {
 
                         $('.train.window #delete').click( async () => {
                             new Message({
-                                message: `Abandonar o treino?`, 
-                                buttons: {yes: "Sim", no: "Não"} 
-                            }).show().click('yes', () => {
+                                message: `Abandonar o treino?`,
+                                buttons: {yes: "Sim", no: "Não"}
+                            }).show().click('yes', async () => {
                                 this.left = true
 
                                 post("back_train.php", {
@@ -632,20 +631,21 @@ var roomList = {
                                     myself: true
                                 })
 
+                                const {sendChatMessage} = await chat
                                 sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                             })
 
                         })
                     }
-            
+
                     $('.train.window .edit').attr('title', translator.getTranslated("Clique para alterar", false))
-            
+
                     let qrcode = new Image()
                     if (!data.expired){
                         qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
-                        
+
                         $('.train.window #link').before(`<button id='renew'><i class='fas fa-spinner fa-pulse'></i></button>`)
-            
+
                         qrcode.onload = function(){
                             $('.train.window #qr').html(qrcode).attr('title', translator.getTranslated("Ampliar QR code", false)).removeClass('blur')
                             $('.train.window #link').append(`<span>${data.hash}</span>`)
@@ -657,14 +657,14 @@ var roomList = {
                         $('.train.window #qr').html(`<i id='fake-qr' class='fas fa-qrcode'></i>`)
                         $('.train.window #link').append(`<span class='blur'>XXXX</span>`).before(`<button id='renew' title='${translator.getTranslated("Renovar link", false)}'><i class='fas fa-redo'></i></button>`)
                     }
-            
+
                     $('.train.window #close').click( function(){
                         $('#fog').remove()
 
                         if (socket)
                             socket.io.emit('training room leave', {id: id})
                     })
-            
+
                     $('.train.window .edit').click( function(){
                         var textEdit = {
                             object: $(this),
@@ -673,7 +673,7 @@ var roomList = {
                             field: $(this).data('field'),
                             width: $(this).outerWidth(),
                             height: $(this).outerHeight(),
-            
+
                             create: function(){
                                 this.object.after(`<textarea id='input-edit'>${this.text}</textarea>`).addClass('hidden')
                                 this.input = $('.train.window #input-edit')
@@ -682,7 +682,7 @@ var roomList = {
                                     'width': this.width + 70,
                                     'height': this.height
                                 }).focus().select()
-            
+
                                 this.input.focusout( () => {
                                     let newtext = this.input.val()
                                     if (newtext != this.text)
@@ -690,23 +690,23 @@ var roomList = {
                                     else
                                         this.cancel()
                                 })
-                    
+
                                 this.input.keyup( e => {
                                     if (e.keyCode == 27 || (e.keyCode == 13 && this.input.val().trim() == this.text))
                                         this.cancel()
                                     else if (e.keyCode == 13)
                                         this.post()
-                                    
+
                                 })
                             },
-            
+
                             post: async function(){
                                 let oldtext = this.text
                                 this.text = this.input.val().trim()
                                 this.input.remove()
                                 this.object.html(this.text).removeClass('hidden')
                                 let oldname = roomList[id].name
-            
+
                                 let data = await post("back_train.php", {
                                     action: "EDIT",
                                     id: id,
@@ -722,20 +722,21 @@ var roomList = {
                                     createToast(`Campo alterado com sucesso`, "success")
                                     roomList[id][this.field] = this.text
                                     if (this.field == 'name'){
+                                        const {sendChatMessage} = await chat
                                         sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d ${translator.getTranslated("Sala de discussão do treino")} ${this.text}`})
                                     }
                                 }
                             },
-            
+
                             cancel: function(){
                                 this.input.remove()
                                 this.object.html(this.text).removeClass('hidden')
                             }
                         }
-            
+
                         textEdit.create()
                     })
-            
+
                     $('.train.window #renew').click( async e => {
                         let renew = $(e.currentTarget)
                         renew.find('i').remove()
@@ -748,12 +749,14 @@ var roomList = {
                         if (data.status == "SUCCESS"){
                             let qrcode = new Image()
                             qrcode.src = `https://api.qrserver.com/v1/create-qr-code/?data=https://gladcode.dev/train/${data.hash}&size=500x500`
-                            qrcode.onload = () => {
+                            qrcode.onload = async () => {
                                 $('.train.window #qr').html(qrcode).removeClass('blur')
                                 $('.train.window #qr').attr('title', translator.getTranslated('Ampliar QR code', false))
                                 $('.train.window #link span').html(data.hash).removeClass('blur')
                                 $('.train.window #renew').remove()
                                 showQR($('.train.window #qr img').clone())
+
+                                const {sendChatMessage} = await chat
                                 sendChatMessage({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
                                 this.hash = data.hash
                             }
@@ -768,8 +771,9 @@ var roomList = {
             },
 
             refresh: async function(){
-                var id = this.id
+                const chat = loader.load('chat')
 
+                var id = this.id
                 let data = await post("back_train.php", {
                     action: "ROOM",
                     id: id
@@ -818,29 +822,30 @@ var roomList = {
                             showQR($('.train.window #qr img').clone())
                         }
                     }
-            
+
                     let nglads = data.glads.length
                     if (nglads == 0){
                         $('.train.window .table').html(`<div class='row'>${translator.getTranslated("Nenhum participante")}</div>`);
                         $('.train.window h3 #count').html("");
-            
+
                         if (manager){
                             $('.train.window #start').hide()
                             $('.train.window #delete').show().off().click( async () => {
                                 new Message({
-                                    message: `Deseja excluir o treino?`, 
-                                    buttons: {yes: "Sim", no: "Não"} 
+                                    message: `Deseja excluir o treino?`,
+                                    buttons: {yes: "Sim", no: "Não"}
                                 }).show().click('yes', async () => {
                                     let data = await post("back_train.php", {
                                         action: "DELETE",
                                         id: id
                                     })
                                     // console.log(data)
-            
+
                                     if (data.status == "SUCCESS"){
                                         $('#fog').remove()
                                         createToast("Treino removido", "success")
 
+                                        const {sendChatMessage} = await chat
                                         sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                                     }
                                 })
@@ -879,13 +884,13 @@ var roomList = {
                         for (let glad of data.glads){
                             $('.train.window .table').append(`<div class='row'><div class='cell'>${glad.master}</div><div class='cell'>${glad.gladiator}</div><div class='kick' title='${translator.getTranslated("Expulsar participante", false)}'><i class='fas fa-times-circle'></i></div></div>`);
                             $('.train.window .table .row').last().data('id', glad.id)
-            
+
                             if (glad.mine)
                                 $('.train.window .table .row').last().addClass('signed')
                         }
-            
+
                         $('.train.window h3 #count').html(data.glads.length);
-            
+
                         if (manager){
                             $('.train.window #start').show()
                             $('.train.window #delete').hide()
@@ -893,8 +898,8 @@ var roomList = {
                             if (data.glads.length >= this.players){
                                 $('.train.window #start').removeAttr('disabled').off().click( async function(){
                                     new Message({
-                                        message: `Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados`, 
-                                        buttons: {yes: "Sim", no: "Não"} 
+                                        message: `Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados`,
+                                        buttons: {yes: "Sim", no: "Não"}
                                     }).show().click('yes', async () => {
                                         $('.train.window #close').click();
 
@@ -914,12 +919,12 @@ var roomList = {
                             else
                                 $('.train.window #start').attr('disabled', true).off()
                         }
-                        
+
                         if (manager){
                             $('.train.window .table .kick').click(async e => {
                                 let kick = $(e.currentTarget)
                                 let gladid = kick.parents('.row').data('id')
-                                
+
                                 let data = await post("back_train.php", {
                                     action: "KICK",
                                     glad: gladid,
@@ -929,14 +934,15 @@ var roomList = {
                                 if (data.status == "SUCCESS"){
                                     createToast("Participante removido", "success")
                                     let name = kick.parent().find('.cell').eq(0).html()
+                                    const {sendChatMessage} = await chat
                                     sendChatMessage({text: `/kick ${name} -r ${this.name}_${this.hash}`})
                                 }
                             })
                         }
                         else{
                             $('.train.window .table .kick').remove()
-        
-                            $('.train.window .table .row.signed').click( function(){
+
+                            $('.train.window .table .row.signed').click( async () => {
                                 var box = `<div id='fog'>
                                     <div id='duel-box'>
                                         <div id='title'>${translator.getTranslated("Escolha o gladiador que participará do treino")}</div>
@@ -948,7 +954,8 @@ var roomList = {
                                     </div>
                                 </div>`;
                                 $('body').append(box);
-                    
+
+                                const {gladCard} = await loader.load('gladcard')
                                 gladCard.load($('#fog .glad-card-container'), {
                                     clickHandler: function(){
                                         if (!$(this).hasClass('old')){
@@ -963,13 +970,13 @@ var roomList = {
                                             $('#fog #duel-box #select').click();
                                     }
                                 })
-                    
+
                                 $('#fog #duel-box #cancel').click( function(){
                                     $(this).parents('#fog').remove();
                                 })
-                    
+
                                 $('#fog #duel-box #select').click( async function(){
-        
+
                                     var myglad = $('#fog .glad-preview.selected').data('id');
                                     let data = await post("back_train.php", {
                                         action: "CHANGE",
@@ -984,7 +991,7 @@ var roomList = {
                                     }
                                     else
                                         createToast("ERRO", "error")
-                                    
+
                                 });
                             })
                         }
@@ -1013,7 +1020,7 @@ function showQR(qrcode){
             $('#fog').addClass('black')
             $('#fog #big-info').fadeIn()
         }
-        
+
     })
 
 }

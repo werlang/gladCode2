@@ -21,6 +21,7 @@ const paths = {
     emoji: "./emoji.js",
     ranking: "./profile-rank.js",
     tourn: "./profile-tourn.js",
+    train: "./profile-train.js",
 }
 
 const callbacks = {

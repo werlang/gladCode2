@@ -4,8 +4,6 @@ import {socket} from "./socket.js"
 import {translator} from "./translate.js"
 import {Message, createToast, tooltip} from "./dialog.js"
 import { loader } from "./loader.js"
-// import {refresh_tourn_list} from "./profile-tourn.js"
-// import {trainList} from "./profile-train.js"
 
 var user
 
@@ -190,7 +188,6 @@ document.querySelector("#menu #report").addEventListener('click', async () => {
 document.querySelector("#menu #ranking").addEventListener('click', async () => {
     loader.load("ranking")
 })
-
 
 document.querySelector("#menu #messages").addEventListener('click', async () => {
     const {messages} = await loader.load('messages')
@@ -652,8 +649,9 @@ window.onload = function(){
         refresh_tourn_list()
     })
 
-    document.querySelector('#panel #battle-mode #train.button').addEventListener('click', () => {
-        console.log('train')
+    document.querySelector('#panel #battle-mode #train.button').addEventListener('click', async () => {
+        const {trainList} = await loader.load('train')
+        trainList.refresh()
     })
 
     $('#friend-panel #request, #friend-panel #friends').addClass('hidden');
