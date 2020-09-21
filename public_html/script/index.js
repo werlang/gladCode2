@@ -69,7 +69,6 @@ header.load().then( () => {
     $('#header').addClass('big');
     $('#header-container').addClass('small');
 })
-tooltip()
 
 window.onload = async function() {
     await login.wait()

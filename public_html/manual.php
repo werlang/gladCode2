@@ -8,31 +8,13 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
 
-	<!-- <link rel='stylesheet' href="css/table.css"/> -->
     <link rel='stylesheet' href="css/manual.css"/>
-    <!-- <link rel='stylesheet' href="css/side-menu.css"/> -->
-    <!-- <link rel='stylesheet' href="css/header.css"/> -->
     
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-    <!-- <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script> -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js' async></script>
     
     <script type="module" src="script/manual.js" async></script>
 
-    <!-- <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
-	<script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script> -->
-
-    <!-- <script src="script/blocks.js"></script> -->
-    <!-- <script src="script/side-menu.js"></script> -->
-    <!-- <script src="script/googlelogin.js"></script> -->
-    <!-- <script src="script/socket.js"></script> -->
-    <!-- <script src="script/header.js"></script> -->
-    
     </head>
 <body>
 	<div id='frame'>
@@ -286,21 +268,21 @@ def loop():
 
                 <p>Porém, existem situações em que o gladiador não consegue executar todos os comando da função loop() em um único intervalo da simulação, como no caso abaixo:</p>
 
-                <pre><code class="language-c">// Exemplo linguagem C
+                <ignore><pre><code class="language-c">// Exemplo linguagem C
 loop(){
     int i;
     for (i=0 ; i&lt10 ; i++) // faz 10 chamadas da função stepForward
         stepForward();
     turnLeft(5); // função que rotaciona no sentido anti-horário
-}</code></pre>
+}</code></pre></ignore>
 
 
-                <pre><code class="language-python"># Exemplo linguagem Python
+                <ignore><pre><code class="language-python"># Exemplo linguagem Python
 def loop():
     for i in range(10): # faz 10 chamadas da função stepForward
         stepForward()
     turnLeft(5) # função que rotaciona no sentido anti-horário
-</code></pre>
+</code></pre></ignore>
 
                 <div id='sample-2' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_repeat_ext" id="QRs$h]i%}G}r{b;mAEgZ"><value name="TIMES"><shadow type="math_number" id="o3IiHfo:VmiR4Ts%m_Uc"><field name="NUM">10</field></shadow></value><statement name="DO"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement><next><block type="turn" id="+-]rflEcarW4v.O7=s:|"><mutation xmlns="http://www.w3.org/1999/xhtml" where="LEFT" use-return="false"></mutation><field name="COMPLEMENT">LEFT</field><value name="ANGLE"><shadow type="math_number" id="VdX3=M8c$3$qnk`U4U2C"><field name="NUM">5</field></shadow></value></block></next></block></statement></block></xml></div>
 

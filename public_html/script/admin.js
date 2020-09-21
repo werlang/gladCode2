@@ -6,7 +6,6 @@ const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
 header.load()
-tooltip()
 
 window.onload = async function(){
 

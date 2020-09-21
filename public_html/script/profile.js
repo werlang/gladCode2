@@ -2,13 +2,12 @@ import {header, login} from "./header.js"
 import {post, getDate, getTimeSince} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
-import {Message, createToast, tooltip} from "./dialog.js"
+import {Message, createToast} from "./dialog.js"
 import { loader } from "./loader.js"
 
 var user
 
 header.load()
-tooltip()
 
 var tipArray = [
     "Obrigado por fazer parte da versão beta da gladCode",

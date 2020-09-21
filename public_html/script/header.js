@@ -1,7 +1,7 @@
 import {post} from "./utils.js"
 import {socket} from "./socket.js"
 import {translator} from "./translate.js"
-import {Message} from "./dialog.js"
+import {Message, tooltip} from "./dialog.js"
 
 const login = {
     logged: false
@@ -37,13 +37,41 @@ login.wait = async function(){
     }
 }
 
-const header = {}
+const header = {
+    loading: false,
+    ready: false
+}
+
+header.wait = function() {
+    return new Promise( resolve => {
+        check()
+        function check(){
+            setTimeout( () => {
+                if (header.ready){
+                    resolve(true)
+                }
+                else{
+                    check()
+                }
+            }, 10)
+        }
+    })
+}
 
 header.load = async function() {
+    if (this.loading){
+        return await header.wait()
+    }
+    this.loading = true
+
     return new Promise( resolve => {
         fetch("header.html").then( async response => {
             const header = await response.text()
             document.querySelector('body').insertAdjacentHTML('afterbegin', header)
+
+            tooltip()
+            
+            this.ready = true
             resolve(true)
             
             document.querySelector('#menu-button').addEventListener('click', () => {
