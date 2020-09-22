@@ -1,27 +1,34 @@
-import {header} from "./header.js";
+import {header, login} from "./header.js";
+import {menu} from "./side-menu.js";
+import { translator } from "./translate.js";
 
-header.load()
+;(async () => {
+    const translatorReady = new Promise( async resolve => {
+        await login.wait()
+        await translator.translate(document.querySelector("#content"))
+        resolve(true)
+    })
 
-window.onload = function(){
-}
+    await header.load()
+    await menu.load(document.querySelector("#side-menu"))
 
-$(document).ready( async function(){
-    await menu_loaded()
+    document.querySelector('#learn').classList.add('here')
 
-    var loc = window.location.href.split("/");
-    loc = loc[loc.length - 1];
-    $('#side-menu #'+loc).addClass('here');
-    $('#side-menu #'+loc).click();
-    
-    $('#learn').addClass('here');
+    fetch(`script/functions.json`).then(async response => {
+        const data = await response.json()
 
-    $.get(`script/functions.json`, async data => {
-        
-        let page = window.location.href.split("/").splice(-1,1)[0].split("#")[0]
-        // console.log(page)
-        $('.t-funcs a').map( (i,e) => {
-            let match = $(e).attr('href')
-            // console.log(match)
+        let translations = []
+        for (let i in data){
+            translations.push(data[i].description.brief)
+        }
+        await translatorReady
+        await translator.translate(translations)
+
+        const page = window.location.href.split("/").splice(-1,1)[0].split("#")[0]
+
+        document.querySelectorAll('.t-funcs a').forEach(e => {
+            let match = e.href.split("/").slice(-1)[0]
+
             let fakePath = 'function'
             let nameLang = 'default'
             let ext = ''
@@ -34,8 +41,10 @@ $(document).ready( async function(){
                 nameLang = 'pt'
             }
 
-            $(e).attr('href', `${fakePath}/${match}${ext}`).html(data[match].name[nameLang])
-            $(e).parent().siblings('td').html(data[match].description.brief)
+            e.href = `${fakePath}/${match}${ext}`
+            e.innerHTML = `<ignore>${data[match].name[nameLang]}</ignore>`
+            e.parentNode.nextElementSibling.innerHTML = translator.getTranslated(data[match].description.brief)
         })
+
     })
-});
+})()

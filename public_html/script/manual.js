@@ -8,7 +8,7 @@ import {translator} from "./translate.js"
     login.wait().then( () => translator.translate(document.querySelector('#content-box')))
 
     header.load()
-    
+
     await menu.load(document.querySelector('#side-menu'))
 
     loader.load('Prism')
@@ -21,13 +21,13 @@ import {translator} from "./translate.js"
             document.querySelectorAll('.block-container').forEach((e,i) => {
                 const xml = e.innerHTML
                 e.innerHTML = `<div id='code-ws-${i}' class='block'></div>`
-    
+
                 // console.log(xml)
                 const ws = Blockly.inject(`code-ws-${i}`, {
                     scrollbars: true,
                     readOnly: true
                 })
-    
+
                 const xmlDom = Blockly.Xml.textToDom(xml)
                 Blockly.Xml.domToWorkspace(xmlDom, ws)
             })

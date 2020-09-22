@@ -349,9 +349,7 @@ body{
 .improve-box {
     position: fixed;
     z-index: 1;
-    color: #003c6f;
     background-color: white;
-    font-size: 2.5rem;
     display: none;
     transition: 0.3s;
     cursor: pointer;
@@ -361,13 +359,19 @@ body{
     width: 3.3rem;
     align-items: center;
     justify-content: center;
+    font-size: 2.5rem;
+
+    i.fa-language {
+        color: #003c6f !important;
+        margin: 0 !important;
+    }
 
     &.visible {
         display: flex;
     }
 
-    &:hover {
-        color: #00638d;
+    &:hover i.fa-language{
+        color: #00638d !important;
     }
 }
 
