@@ -5,21 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Sobre</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel='stylesheet' href="css/about.css"/>
-    <link rel='stylesheet' href="css/radio.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
     
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
-    <script src="script/about.js"></script>
-    <script src="script/radio.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
+    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
+    <script type="module" src="script/about.js" async></script>
     
     </head>
 <body>
@@ -91,33 +82,38 @@
                 <img src='icon/swords.png'>
                 <span class='time'>Mar 2020</span>
             </div>
+            <div class='row'>
+                <span class='text'>Parceria com a escola SuperGeeks JP, implementação do modo treino e realização do primeiro torneio GladCode da SuperGeeks.</span>
+                <img src='icon/swords.png'>
+                <span class='time'>Abr 2020</span>
+            </div>
+            <div class='row'>
+                <span class='text'>Versão multi idiomas da gladCode. Tradução para o inglês e templates para outros idomas.</span>
+                <img src='icon/swords.png'>
+                <span class='time'>Out 2020</span>
+            </div>
+            <div class='row future'>
+                <span class='text'>Loja de skins e sistema de monetização da página.</span>
+                <img src='icon/swords.png'>
+                <span class='time'>2021</span>
+            </div>
             <div class='row future'>
                 <span class='text'>Modo lendário, onde gladiadores mantém seus níveis e a morte é definitiva.</span>
                 <img src='icon/swords.png'>
-                <span class='time'>2020</span>
+                <span class='time'>2021</span>
             </div>
             <div class='row future'>
                 <span class='text'>Lançamento de novas habilidades.</span>
                 <img src='icon/swords.png'>
-                <span class='time'>2020</span>
+                <span class='time'>2021</span>
             </div>
             <div class='row future'>
                 <span class='text'>Implementação de itens para uso dos gladiadores durante as batalhas.</span>
                 <img src='icon/swords.png'>
-                <span class='time'>2020</span>
-            </div>
-            <div class='row future'>
-                <span class='text'>Loja de skins e mercado de gladiadores da gladCode.</span>
-                <img src='icon/swords.png'>
-                <span class='time'>2021</span>
+                <span class='time'>2022</span>
             </div>
             <div class='row future'>
                 <span class='text'>Árvore de habilidades e achievements dos mestres.</span>
-                <img src='icon/swords.png'>
-                <span class='time'>2021</span>
-            </div>
-            <div class='row future'>
-                <span class='text'>Versão multi idiomas da gladCode. Tradução para o inglês e templates para outros idomas.</span>
                 <img src='icon/swords.png'>
                 <span class='time'>2022</span>
             </div>

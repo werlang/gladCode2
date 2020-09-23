@@ -1,4 +1,6 @@
 import {Blockly} from "./blockly-python.js"
+import {translator} from "./translate.js"
+
 export {Blockly}
 
 var funcList = {};
@@ -1372,14 +1374,15 @@ Blockly.Python['itemready'] = function(block) {
 };
 
 async function getTooltip(name){
-    if (funcList[name])
-        return funcList[name];
+    if (funcList[name]){
+        return funcList[name]
+    }
 
-    let json = await $.getJSON(`script/functions/${name.toLowerCase()}.json`, async data => {
-        funcList[name] = data.description.brief;
-    });
-
-    return json.description.brief;
+    const json = await (await fetch(`script/functions/${name.toLowerCase()}.json`)).json()
+    const tooltip = await translator.translate(json.description.brief)
+    // console.log(json)
+    funcList[name] = tooltip
+    return tooltip
 }
 
 function setBlockInfo(block){

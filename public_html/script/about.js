@@ -1,11 +1,13 @@
-import {header} from "./header"
+import {header, login} from "./header.js"
+import {translator} from "./translate.js"
 
-header.load()
+;(async () => {
+    header.load()
+    await login.wait()
+    translator.translate(document.querySelector("#frame"))
+})()
 
-window.onload = function(){
-}
-
-$(document).ready( function(){
+$(document).ready( function(){    
     $('#support input').click( function(){
         if ($('#support #one-time:checked').length)
             $('#support #method').slideDown();
@@ -37,7 +39,7 @@ $(document).ready( function(){
     });
 
     $('.discontinued').click( () => {
-        create_tooltip("Este modo não existe mais na gladCode. Os torneio agora podem ser criados a partir do peril do usuário.", $('.discontinued'));
+        // create_tooltip("Este modo não existe mais na gladCode. Os torneio agora podem ser criados a partir do peril do usuário.", $('.discontinued'));
     });
 
     $('#paypal, #pagseguro').click( function(){
