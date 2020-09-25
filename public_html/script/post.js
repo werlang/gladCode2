@@ -1,35 +1,41 @@
 import {getDate, post} from "./utils.js"
-import {header} from "./header.js";
+import {header, login} from "./header.js";
+import { translator } from "./translate.js";
 
-header.load()
 
-window.onload = function(){
-}
+;(async () => {
+    header.load()
+    const loginReady = login.wait()
+    loginReady.then( () => translator.translate(document.querySelector("#button-container")) )
 
-$(document).ready( async function() {
     let data = await post("back_news.php",{
         action: "GET",
-        hash: $('#hash').html()
+        hash: document.querySelector('#hash').innerHTML
     })
     // console.log(data);
 
     if (data.status == "EMPTY"){
-        window.location.href = "index";
+        window.location.href = "index"
     }
     else if (data.status == "SUCCESS"){
-        $('#post').html(`<div class='post'>
+        document.querySelector('#post').innerHTML = `<div class='post'>
             <div class='title'>${data.post.title}</div>
             <div class='time'>Publicado em ${getDate(data.post.time, { month_full: true })}</div>
             <div class='body'>${data.post.body}</div>
-        </div>`);
+        </div>`
 
         if (data.prev){
-            $('#prev').removeClass('disabled').attr('href', `post/${data.prev}`);
+            document.querySelector('#prev').classList.remove('disabled')
+            document.querySelector('#prev').href = `post/${data.prev}`
         }
         if (data.next){
-            $('#next').removeClass('disabled').attr('href', `post/${data.next}`);
+            document.querySelector('#next').classList.remove('disabled')
+            document.querySelector('#next').href = `post/${data.next}`
         }
+
+        loginReady.then( () => translator.translate(document.querySelector('#post')) )
     }
 
-    $('#hash').remove();
-});
+    document.querySelector('#hash').remove()
+
+})()
