@@ -11,7 +11,7 @@ const paths = {
     gladcard: "./glad-card.js",
     google: "./googlelogin.js",
     chat: "./chat.js",
-    cloudinary: "https://widget.cloudinary.com/v2.0/global/all.js",
+    cloudinary: "./cloudinary.js",
     Blockly: "./blocks.js",
     potions: "./profile-potions.js",
     reports: "./profile-report.js",

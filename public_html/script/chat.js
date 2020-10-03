@@ -93,7 +93,7 @@ chat.init = async function(wrapper, options){
     translatorReady.then( () => {
         let leftButtons = '';
         let full = 'full';
-    
+
         if (options && options.full === false){
             full = '';
             leftButtons = `<div class='button-container'>
@@ -101,7 +101,7 @@ chat.init = async function(wrapper, options){
                 <i class='fas fa-external-link-alt' title='${translator.getTranslated("Abir chat em nova aba", false)}' id='open-new'></i>
             </div>`;
         }
-    
+
         let str = `<div id='room-container'></div>
         <div id='view-area'>
             <div id='emoji-ui'>
@@ -128,14 +128,15 @@ chat.init = async function(wrapper, options){
                 </div>
             </div>
         </div>`;
-    
-        wrapper.classList.add('hidden')
-        this.hidden = true
 
-        if (full != ''){
+        if (full == ''){
+            wrapper.classList.add('hidden')
+            this.hidden = true
+        }
+        else{
             wrapper.classList.add(full)
         }
-    
+
         wrapper.innerHTML = str
         bindUi()
     })
@@ -241,14 +242,14 @@ chat.init = async function(wrapper, options){
             if (text == '/help'){
                 $('#chat-panel #help').click();
                 $('#chat-panel #chat-ui #message-box').html("").focus();
-            }   
+            }
             else{
-                sendingBuffer.push(text);   
+                sendingBuffer.push(text);
                 $('#chat-panel #chat-ui #message-box').html("").focus();
 
                 if ($('#chat-panel .button-container #emoji').hasClass('selected'))
                     $('#chat-panel .button-container #emoji').click();
-            
+
                 sendMessage();
 
                 function sendMessage(){
@@ -354,7 +355,7 @@ chat.init = async function(wrapper, options){
                                 if (sendingBuffer.length > 0){
                                     sendMessage();
                                 }
-                            
+
                             });
                         }
                         else
@@ -398,7 +399,7 @@ chat.init = async function(wrapper, options){
             if (input.find('span').length == 0)
                 input.append("<span></span>");
             input.find('span').last().focus();
-        
+
             if (e.ctrlKey && e.keyCode == 'E'.charCodeAt(0)){ //CTRL+E
                 $('#chat-panel #emoji').click();
                 e.preventDefault();
@@ -484,9 +485,9 @@ chat.init = async function(wrapper, options){
                     setTimeout( function(){
                         setCaretEndDiv($('#chat-panel #message-box')[0]);
                     }, 300);
-                    
+
                 });
-                
+
             }
 
         });
@@ -516,6 +517,7 @@ chat.init = async function(wrapper, options){
 
     await translatorReady
     await socket.isReady()
+    await loader.load('Prism')
 
     chat.started = true
 
@@ -562,7 +564,7 @@ chat.loadEmoji = async function() {
         action: "EMOJI"
     })
     // console.log(data);
-        
+
     let recentEmoji = []
     if (data.status != "NOTLOGGED" && data.emoji != '')
         recentEmoji = JSON.parse(data.emoji);
@@ -634,7 +636,7 @@ chat.loadEmoji = async function() {
         $('#chat-panel #emoji-container').scrollTop(ct);
         preventScroll = false;
     });
-    
+
     $('#chat-panel #emoji-container .emoji-outer').click( function(){
         var t = $('#chat-panel #message-box').html();
         var e = $(this).data('unicode');
@@ -665,7 +667,7 @@ chat.loadEmoji = async function() {
         $('#chat-panel #message-box .emoji-outer').attr('contenteditable', false);
         $('#chat-panel #message-box .emoji-outer').last().data('unicode', e);
         $('#chat-panel #message-box').append("<span>0</span>");
-        
+
         //gambiarra pra conseguir colocar o cursor na posição final da caixa: da problema quando o span ta vazio
         var sel = window.getSelection();
         window.getSelection().collapse($('#chat-panel #message-box span').last()[0].firstChild, 0);
@@ -674,12 +676,6 @@ chat.loadEmoji = async function() {
 
     return emoji
 }
-
-$(document).ready( function(){
-    chat.isStarted().then( () => {
-
-    });
-});
 
 function create_code_modal(obj){
     $('body').append(`<div id='fog'>
@@ -923,17 +919,17 @@ function getChatNotification(){
             visited: JSON.stringify(visitedRooms)
         }).then( function(data){
             // console.log(data);
-    
+
             if (data.status == "SUCCESS"){
                 var notif = data.notifications;
                 $('#chat-panel .room').each( function(){
                     var id = $(this).data('id');
-    
+
                     var notif_val = parseInt(notif[id]);
                     if (notif_val > 0 && !$(this).hasClass('open')){
                         $(this).find('#title .notification').removeClass('hide').html(notif_val);
                         $(this).find('#title i').addClass('hide');
-    
+
                         if (notif_val >= 1000)
                             $(this).find('#title .notification').addClass('small');
                         else if ($(this).find('#title .notification').hasClass('small'))
@@ -972,13 +968,13 @@ chat.getMessages = function(options){
                 visitedRooms[id] = data.visited;
 
             scrolling = false;
-            
+
             if ($('#chat-panel #chat-window')[0]){
                 var oldHeight = $('#chat-panel #chat-window')[0].scrollHeight;
                 var oldPos = $('#chat-panel #chat-window')[0].scrollTop;
             }
 
-            var nowid = $('#chat-panel .room.open').data('id'); 
+            var nowid = $('#chat-panel .room.open').data('id');
             if (data.status == "SUCCESS"){
                 if ($('#chat-panel #chat-window').length && nowid == id){
                     if (prepend)
@@ -1019,7 +1015,7 @@ chat.getMessages = function(options){
                             //if prepending and first baloon is from same person than previous
                             if (prepend && $('#chat-panel .baloon-container').eq(0).find('.name').html() == messages[i].apelido)
                                 $('#chat-panel .baloon-container').eq(0).addClass('sequence');
-                            
+
                             //replace code tag
                             messages[i].message = messages[i].message.replace(/&lt;code&gt;([\w\W]*?)&lt;\/code&gt;/g, "<pre class='language-c'><code>$1</code></pre>");
 
@@ -1046,7 +1042,7 @@ chat.getMessages = function(options){
                                 $('#chat-panel #chat-window').append(str);
                                 baloon = $('#chat-panel #chat-window .baloon-container').last();
                                 baloon.hide().fadeIn(600);
-                                
+
                             }
 
                             baloon.data('id', messages[i].id);
@@ -1078,7 +1074,7 @@ chat.getMessages = function(options){
                                                 $(this).removeClass('open').off();
                                                 rebind();
                                             });
-                                        }); 
+                                        });
                                     }
                                 }
                             });
@@ -1115,9 +1111,9 @@ chat.getMessages = function(options){
                                     }
                                 })
                             }
-                            
+
                         }
-                        
+
                     }
 
                     if (prepend){
@@ -1129,12 +1125,12 @@ chat.getMessages = function(options){
                     }
                     else
                         $('#chat-panel #chat-window').scrollTop($('#chat-panel #chat-window')[0].scrollHeight);
-                    
+
                 }
             }
 
         });
-    }       
+    }
 }
 
 chat.toggle = function(opt){
@@ -1267,14 +1263,14 @@ async function testImage(baloon, url) {
         img.onload = function() {
             callback(url, "success");
         };
-    
+
         function callback(url, status){
             if (status == "success")
                 resolve({baloon: baloon, url: url, status: true});
             else
                 resolve({baloon: baloon, url: url, status: false});
         }
-        
+
         img.src = url;
 
     });
@@ -1322,7 +1318,7 @@ async function start_cloudinary(){
             }
         }
     },
-    function(error, result) { 
+    function(error, result) {
         //console.log(result);
         if(error){
             //console.log(error);
@@ -1343,7 +1339,7 @@ async function upload_image(){
     if (!uploadWidget.widget){
         uploadWidget.widget = await start_cloudinary()
     }
-    
+
     uploadWidget.widget.open();
 
     return await new Promise( resolve => {

@@ -1,4 +1,4 @@
-import {post, $index} from "./utils.js"
+import {post} from "./utils.js"
 
 export const socket = {
     serverURL: `//${window.location.hostname}:3000`,
@@ -8,12 +8,12 @@ export const socket = {
 socket.init = async function(){
     // true to avoid entering this more than once
     this.io = true
-    
+
     await new Promise( resolve => {
         checkIoReady()
         function checkIoReady() {
             setTimeout(() => {
-                if (io){
+                if (socket.io){
                     resolve(true)
                 }
                 else{
@@ -23,12 +23,13 @@ socket.init = async function(){
         }
 
     })
-    
+
     try{
         this.io = io(this.serverURL, {secure: true})
     }
     catch(e){
         this.io = null
+        // console.log(e)
     }
 
     return this
@@ -42,7 +43,7 @@ socket.admin = async function(obj){
             window.location.reload()
         }
     })
-    
+
     const resp = post("back_login.php", {
         action: "SET",
         admin: JSON.stringify(obj)
