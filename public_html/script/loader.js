@@ -57,6 +57,7 @@ loader.load = async function(pack){
                 this[pack] = import(paths[pack])
             }
 
+            await this[pack]
             // if the pack has a callback, run it after the import is done
             if (callbacks[pack]){
                 this[pack].then( () => {

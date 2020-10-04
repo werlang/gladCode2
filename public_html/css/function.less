@@ -1,0 +1,90 @@
+@import (less) "docs.less";
+
+h1 {
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #00638d;
+    width: 100%;
+    box-shadow: 0px -1px 0px rgba(0,0,0,0.2);
+    padding-top: 15px;
+    margin: 10px 0px 20px;
+}
+
+p.syntax {
+    font-family: 'Source Code Pro', monospace;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background-color: rgba(0,0,0,0.1);
+    padding: 2px 15px;
+    display: inline-block;
+}
+
+pre {
+    width: 100%;
+    max-width: calc(100vw - 30px);
+    margin: 0px 10px;
+
+    @media @size800 {
+        max-width: calc(100vw - 400px);
+    }
+}
+
+.table.t-funcs {
+    width: 100%;
+    margin: auto;
+
+    @media @size600 {
+        width: 100%;
+        margin-left: 0px;
+    }
+
+}
+
+#temp-seealso tr {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#language {
+    margin-bottom: 25px;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    
+    label {
+        margin-right: 10px;
+    }
+    
+    select {
+        padding: 5px 10px;
+        border: 2px solid #616161;
+        border-radius: 5px;
+        transition: 0.3s;
+        cursor: pointer;
+        width: 125px;
+        font-size: 1em;
+
+        &:hover {
+            border-color: #00638d;
+            background-color: fade(#00638d, 10%);
+        }
+    }
+}
+
+#sample-ws {
+    height: 400px;
+    width: 100%;
+}
+
+#syntax-ws {
+    height: 55px;
+    width: 100%;
+}

@@ -2,19 +2,26 @@
 // WHEN MESSING WITH FUNCS, DONT FORGET TO RUN compress_functions.php AFTER
 // ------------------------------------------------------------------------
 
-import {header} from "./header.js";
+import {login} from "./header.js"
+import {menu} from "./side-menu.js"
+import {translator} from "./translate.js"
+import {loader} from "./loader.js"
 
-header.load()
+const translatorReady = new Promise( async resolve => {
+    await login.wait()
+    await translator.translate(document.querySelector("#right-side #content"))
 
-window.onload = function(){
-}
+    return true
+})
+
+menu.load(document.querySelector("#side-menu"))
 
 var langDict = false
 var user;
 
-$(document).ready( function() {
+window.onload = function(){
     $('#learn').addClass('here');
-    
+
     var func = "";
     if ($('#vget').length)
         func = $('#vget').val();
@@ -29,22 +36,19 @@ $(document).ready( function() {
     if (func == "")
         load_content("");
     else{
-        $('#language select').selectmenu({
-            change: function( event, ui ) {
-                let ext = {
-                    c: "c",
-                    python: "py",
-                    blocks: "blk"
-                };
-
-                window.location.href = `${lang_word}/${func}.${ext[ui.item.value]}`;
+        document.querySelector('#language select').addEventListener('change', e => {
+            const ext = {
+                c: "c",
+                python: "py",
+                blocks: "blk"
             }
-        });
-            
+
+            window.location.href = `${lang_word}/${func}.${ext[e.target.value]}`;
+        })
+
         $.getJSON(`script/functions.json`, async data => {
-            await load_content(func, data);        
-            await menu_loaded();
-            
+            await load_content(func, data);
+
             let loc = window.location.href.split("/")
             let place = loc[loc.length - 2]
             let funcName = loc[loc.length - 1].split(".")
@@ -77,7 +81,7 @@ $(document).ready( function() {
         });
     }
 
-});
+}
 
 async function load_content(item, fileData){
     if (!item || item == ""){
@@ -88,7 +92,7 @@ async function load_content(item, fileData){
 
     item = fileData[item]
 
-    user = await login.wait();
+    user = await login.wait()
 
     var language;
 
@@ -105,7 +109,7 @@ async function load_content(item, fileData){
 
         $('#get-lang').remove();
     }
-    
+
     // if language is not set in GET, or set wrong, set user language, else set c
     if (!language){
         if (user)
@@ -130,7 +134,7 @@ async function load_content(item, fileData){
         }
     }
 
-    $('#language select').val(language).selectmenu('refresh');
+    document.querySelector("#language select").value = language
 
     if (!item.syntax[language])
         window.location.href = `function/${item.name.default.toLowerCase()}.c`
@@ -141,13 +145,15 @@ async function load_content(item, fileData){
         $('#temp-syntax').parent().after(`<div id='syntax-ws'></div>`).remove()
 
         let xml = `<xml>${item.syntax.blocks}</xml>`
-        let ws = Blockly.inject('syntax-ws', { readOnly: true });
-        xmlDom = Blockly.Xml.textToDom(xml);
-        Blockly.Xml.domToWorkspace(xmlDom, ws);
+        loader.load("Blockly").then( ({Blockly}) => {
+            const ws = Blockly.inject('syntax-ws', { readOnly: true });
+            const xmlDom = Blockly.Xml.textToDom(xml);
+            Blockly.Xml.domToWorkspace(xmlDom, ws);
 
-        new ResizeObserver(() => {
-            Blockly.svgResize(ws);
-        }).observe($('#syntax-ws')[0])
+            new ResizeObserver(() => {
+                Blockly.svgResize(ws);
+            }).observe($('#syntax-ws')[0])
+        })
     }
     else{
         $('title').html("gladCode - "+ item.name.default)
@@ -156,27 +162,43 @@ async function load_content(item, fileData){
         $('#temp-syntax').html(item.syntax[language])
 
         $('#temp-syntax').attr('class', `language-${language}`)
-        Prism.highlightElement($('#temp-syntax')[0])
+
+        loader.load("Prism").then( () => {
+            Prism.highlightElement($('#temp-syntax')[0])
+        })
     }
 
-    $('#temp-description').html(item.description.long)
-
-    var param = item.param.default;
-    if (user && item.param[language])
-        param = item.param[language];
-
-    for (let i in param){
-        if (param[i].name == "void")
-            $('#temp-param').append("<p>"+ param[i].description +"</p>");
-        else
-            $('#temp-param').append("<p class='syntax'>"+ param[i].name +"</p><p>"+ param[i].description +"</p>");
+    let param = item.param.default
+    if (user && item.param[language]){
+        param = item.param[language]
     }
+
+    let treturn = item.treturn.default
+    if (user && item.treturn[language]){
+        treturn = item.treturn[language]
+    }
+
+    const description = document.createElement("DIV")
+    description.innerHTML = `<p>${item.description.long}</p>`
+    translator.translate(description).then( () => {
+        document.querySelector('#temp-description').innerHTML = description.innerHTML
+    })
+
+    translator.translate([
+        ...param.map(e => e.description),
+        treturn
+    ]).then( translations => {
+        for (let i in param){
+            if (param[i].name == "void"){
+                $('#temp-param').append(`<p>${translator.getTranslated(param[i].description)}</p>`)
+            }
+            else{
+                $('#temp-param').append(`<p class='syntax'>${param[i].name}</p><p>${translator.getTranslated(param[i].description)}</p>`)
+            }
+        }
     
-    var treturn = item.treturn.default;
-    if (user && item.treturn[language])
-        treturn = item.treturn[language];
-
-    $('#temp-return').html(treturn);
+        document.querySelector('#temp-return').innerHTML = translator.getTranslated(treturn)
+    })
 
     let filename = item.sample.explain.split(".")[0] + '.json'
     var loadSample = $.get(`script/functions/samples/${filename}`, async code => {
@@ -184,22 +206,26 @@ async function load_content(item, fileData){
             // load blocks into div, create workspace and observe resize
             $('#temp-sample').parent().after(`<div id='sample-ws'></div>`).remove()
 
-            let ws = Blockly.inject('sample-ws', {
-                scrollbars: true,
-                readOnly: true
-            });
-    
-            xmlDom = Blockly.Xml.textToDom(code.blocks);
-            Blockly.Xml.domToWorkspace(xmlDom, ws);
+            loader.load("Blockly").then( ({Blockly}) => {
+                let ws = Blockly.inject('sample-ws', {
+                    scrollbars: true,
+                    readOnly: true
+                });
 
-            new ResizeObserver(() => {
-                Blockly.svgResize(ws);
-            }).observe($('#sample-ws')[0])  
+                const xmlDom = Blockly.Xml.textToDom(code.blocks);
+                Blockly.Xml.domToWorkspace(xmlDom, ws);
+
+                new ResizeObserver(() => {
+                    Blockly.svgResize(ws);
+                }).observe($('#sample-ws')[0])
+            })
         }
         else{
             // load code into div and use prism to highlight code
             $('#temp-sample').html(code[language]).attr('class', `language-${language}`)
-            Prism.highlightElement($('#temp-sample')[0])
+            loader.load("Prism").then( () => {
+                Prism.highlightElement($('#temp-sample')[0])
+            })
         }
 
         // put functions into seealso
@@ -214,7 +240,7 @@ async function load_content(item, fileData){
         for (let e of funcs){
             if (e != item.name.default && item.seealso.indexOf(e) == -1 && reserved.indexOf(e) == -1)
                 item.seealso.push(e)
-        }   
+        }
 
         // translate functions in brackets {} in explian text
         let matches = code.explain.match(/\{[\w\W]+?\}/g)
@@ -235,8 +261,10 @@ async function load_content(item, fileData){
                     code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), func)
             }
         }
-        $('#temp-explain').html(code.explain);
-    
+        translator.translate(code.explain).then( explain => {
+            $('#temp-explain').html(explain)
+        })
+
         return code
     })
 
@@ -247,19 +275,29 @@ async function load_content(item, fileData){
 
     await loadSample
 
+    const funcTranslate = []
     for (let i in item.seealso){
-        let data = fileData[item.seealso[i].toLowerCase()]
+        const data = fileData[item.seealso[i].toLowerCase()]
+        if (data ){
+            funcTranslate.push(data.description.brief)
+        }
+    }
+    await translator.translate(funcTranslate)
+
+    for (let i in item.seealso){
+        const data = fileData[item.seealso[i].toLowerCase()]
         if (data){
-            let link = data.name.default.toLowerCase()
+            const link = data.name.default.toLowerCase()
             let name = data.name.default
 
             if (language == 'blocks')
                 name = data.name.block
 
-            if (name)
+            if (name){
                 $('#temp-seealso').append(`<tr>
                     <td><a href='function/${link}'>${name}</a></td>
-                    <td>${data.description.brief}</td></tr>`)
+                    <td>${translator.getTranslated(data.description.brief)}</td></tr>`)
+            }
 
             if (langDict)
                 funcsDict[data.name.default] = data.name[langDict]
