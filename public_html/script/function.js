@@ -11,7 +11,7 @@ const translatorReady = new Promise( async resolve => {
     await login.wait()
     await translator.translate(document.querySelector("#right-side #content"))
 
-    return true
+    resolve(true)
 })
 
 menu.load(document.querySelector("#side-menu"))
@@ -19,7 +19,7 @@ menu.load(document.querySelector("#side-menu"))
 var langDict = false
 var user;
 
-window.onload = function(){
+window.onload = async function(){
     $('#learn').addClass('here');
 
     var func = "";
@@ -47,46 +47,51 @@ window.onload = function(){
         })
 
         $.getJSON(`script/functions.json`, async data => {
-            await load_content(func, data);
+            // console.log(data)
+            if (data[func]){
+                await load_content(func, data);
 
-            let loc = window.location.href.split("/")
-            let place = loc[loc.length - 2]
-            let funcName = loc[loc.length - 1].split(".")
-            let ext = ''
+                let loc = window.location.href.split("/")
+                let place = loc[loc.length - 2]
+                let funcName = loc[loc.length - 1].split(".")
+                let ext = ''
 
-            let submenu
+                let submenu
 
-            if (funcName[1] == 'blk'){
-                ext = '.'+ funcName[1]
-                submenu = $(`#docs-blocks`).next('ul')
-            }
-            else if (place == 'funcao'){
-                submenu = $(`#docs-ptbr`).next('ul')
+                if (funcName[1] == 'blk'){
+                    ext = '.'+ funcName[1]
+                    submenu = $(`#docs-blocks`).next('ul')
+                }
+                else if (place == 'funcao'){
+                    submenu = $(`#docs-ptbr`).next('ul')
+                }
+                else{
+                    submenu = $(`#docs`).next('ul')
+                }
+
+                funcName = funcName[0]
+
+                submenu.find(`li a`).each( function(){
+                    if ($(this).attr('href') == `${place}/${funcName}${ext}`){
+                        $(this).parent().addClass('here visible').siblings('li').addClass('visible');
+                        $(this).parents('ul').prev('li').addClass('here visible');
+                        $('li.here i').addClass('open');
+                    }
+                });
             }
             else{
-                submenu = $(`#docs`).next('ul')
+                load_content("")
             }
-
-            funcName = funcName[0]
-
-            submenu.find(`li a`).each( function(){
-                if ($(this).attr('href') == `${place}/${funcName}${ext}`){
-                    $(this).parent().addClass('here visible').siblings('li').addClass('visible');
-                    $(this).parents('ul').prev('li').addClass('here visible');
-                    $('li.here i').addClass('open');
-                }
-            });
-        }).fail( function(){
-            load_content("");
-        });
+        })
     }
 
 }
 
 async function load_content(item, fileData){
+    // console.log(item)
     if (!item || item == ""){
         var func = $('#vget').val();
-        $('#content').html("<h1>Função <i>"+ func +"</i> não encontrada.</h1><p><a href='docs'>Voltar para documentação</a></p>")
+        $('#content').html("<h1>Função <ignore><i>"+ func +"</i></ignore> não encontrada.</h1><p><a href='docs'>Voltar para documentação</a></p>")
         return false;
     }
 
@@ -178,6 +183,7 @@ async function load_content(item, fileData){
         treturn = item.treturn[language]
     }
 
+    document.querySelector('#temp-description').innerHTML = "Carregando..."
     const description = document.createElement("DIV")
     description.innerHTML = `<p>${item.description.long}</p>`
     translator.translate(description).then( () => {

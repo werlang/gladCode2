@@ -25,7 +25,20 @@ const paths = {
 }
 
 const callbacks = {
-    Prism: () => {
+    Prism: async () => {
+        await new Promise(resolve => {
+            checkAutoloader()
+            function checkAutoloader(){
+                if (Prism.plugins.autoloader){
+                    resolve(true)
+                }
+                else{
+                    setTimeout( () => {
+                        checkAutoloader()
+                    }, 50)
+                }
+            }
+        })
         Prism.plugins.autoloader.languages_path = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/"
     },
 }
@@ -57,12 +70,10 @@ loader.load = async function(pack){
                 this[pack] = import(paths[pack])
             }
 
-            await this[pack]
             // if the pack has a callback, run it after the import is done
             if (callbacks[pack]){
-                this[pack].then( () => {
-                    callbacks[pack]()
-                })
+                await this[pack]
+                await callbacks[pack]()
             }
         }
         // return the import promise

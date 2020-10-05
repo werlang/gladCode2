@@ -68,8 +68,9 @@
             foreach($curl as $i => $val){
                 $response[$i] = curl_multi_getcontent($val);
                 curl_multi_remove_handle($multiCurl, $val);
-                $response[$i] = mysql_escape_string(htmlspecialchars_decode(json_decode($response[$i], true)['data']['translations'][0]['translatedText'], ENT_QUOTES));
-                $output['response'][$data[$i]] = $response[$i];
+                $unescaped = htmlspecialchars_decode(json_decode($response[$i], true)['data']['translations'][0]['translatedText'], ENT_QUOTES);
+                $response[$i] = mysql_escape_string($unescaped);
+                $output['response'][$data[$i]] = $unescaped;
 
                 // check if template
                 preg_match('/\{\{(\w+)\}\}/', $data[$i], $matches);
