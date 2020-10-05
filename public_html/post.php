@@ -15,7 +15,6 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 
 	<title>gladCode - Publicação</title>
-	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 
     <link rel='stylesheet' href="css/post.css"/>
 

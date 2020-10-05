@@ -18,13 +18,11 @@
     <!-- <meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com"> -->
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Perfil</title>
-    <link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 
     <link rel='stylesheet' href="css/profile.css"/>
     
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
-    
     <script type="module" src="script/profile.js" async></script>
 
     </head>

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Créditos</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <link rel='stylesheet' href="css/index.css"/>
     
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>

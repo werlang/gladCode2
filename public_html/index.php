@@ -17,7 +17,6 @@
     <meta property="og:description" content="Batalha de agentes virtuais autônomos.">
     
     <title>gladCode</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     
     <link rel='stylesheet' href="css/index.css"/>
     

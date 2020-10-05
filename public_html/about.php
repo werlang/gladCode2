@@ -7,7 +7,6 @@
     <title>gladCode - Sobre</title>
     
     <link rel='stylesheet' href="css/about.css"/>
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 
     <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>

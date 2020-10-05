@@ -20,7 +20,6 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Atualização</title>
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='css/admin.css'/> 
 
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
