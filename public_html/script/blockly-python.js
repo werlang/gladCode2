@@ -1,4 +1,4 @@
-import {Blockly} from "./blockly-pt-br.js"
+import {Blockly} from "./blockly.js"
 export {Blockly}
 
 Blockly.Python = new Blockly.Generator("Python");

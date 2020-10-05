@@ -10,7 +10,7 @@
         "blocks": "<block type='turnangle'><field name='COMPLEMENT'>TURN</field></block>"
     },
     "description": {
-        "long": "Rotaciona o gladiador uma quantidade de graus determinada pelo parâmetro. Caso o ângulo seja negativo o gladiador irá rotacionar no sentido anti-horário, ou no sentido horário caso seja positivo. O gladiador ficará travado na ação até que complete toda a rotação. Isto pode levar mais que um intervalo de tempo, dependendo do atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>).",
+        "long": "Rotaciona o gladiador uma quantidade de graus determinada pelo parâmetro. Caso o ângulo seja negativo o gladiador irá rotacionar no sentido anti-horário, ou no sentido horário caso seja positivo. O gladiador ficará travado na ação até que complete toda a rotação. Isto pode levar mais que um intervalo de tempo, dependendo do atributo <a href='manual.php#nav-glad'>velocidade de rotação</a>.",
         "brief": "Rotaciona o gladiador."
     },
     "param": {

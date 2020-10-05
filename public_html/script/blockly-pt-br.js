@@ -1,7 +1,5 @@
-import {Blockly} from "./blockly.js"
-export {Blockly}
-
-Blockly.Msg = {};
+export const Blockly = {}
+Blockly.Msg = {}
 
 Blockly.Msg["ADD_COMMENT"] = "Adicionar comentário";
 Blockly.Msg["CANNOT_DELETE_VARIABLE_PROCEDURE"] = "Não se pode deletar a variável '%1' porque é parte da definição da função '%2'";

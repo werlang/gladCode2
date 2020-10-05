@@ -1,9 +1,29 @@
 import {Blockly} from "./blockly-python.js"
 import {translator} from "./translate.js"
+import {login} from "./header.js"
+import {customBlocks} from "./blocks-text.js"
 
 export {Blockly}
 
-var funcList = {};
+let user = {}
+
+login.wait().then( async data => {
+    user = data
+    if (user.speak == 'pt'){
+        const module = await import(`./blockly-pt-br.js`)
+        Blockly.Msg = module.Blockly.Msg
+        // refresh workspace render
+        const xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace)
+        Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+    }
+    else if (user.speak == 'en'){
+    }
+
+    Blockly.customBlocks = customBlocks
+})
+
+
+const funcList = {};
 
 Blockly.Blocks['loop'] = {
     init: function() {
@@ -11,7 +31,11 @@ Blockly.Blocks['loop'] = {
             .appendField("loop");
         this.appendStatementInput("CONTENT");
         this.setColour("#00638d");
-        this.setTooltip("Função que o gladiador irá executar a cada 0.1s");
+
+        translator.translate("Função que o gladiador irá executar a cada 0.1s").then( text => {
+            this.setTooltip(text[0]);
+        })
+
         this.setHelpUrl("manual");
         this.setDeletable(false);
     }
@@ -45,9 +69,10 @@ Blockly.Python['loop'] = function(block) {
 
 Blockly.Blocks['move'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Mover para")
-            .appendField(new Blockly.FieldDropdown([["Posição","TO"], ["Alvo","TARGET"]], this.selection.bind(this)), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"TO"], [text.dropdown[1],"TARGET"]], this.selection.bind(this)), "COMPLEMENT");
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -141,9 +166,10 @@ Blockly.Python['move'] = function(block) {
 
 Blockly.Blocks['step'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Passo para")
-            .appendField(new Blockly.FieldDropdown([["Frente","FORWARD"], ["Trás","BACK"], ["Esquerda","LEFT"], ["Direita","RIGHT"]]), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"FORWARD"], [text.dropdown[1],"BACK"], [text.dropdown[2],"LEFT"], [text.dropdown[3],"RIGHT"]]), "COMPLEMENT");
         this.setInputsInline(true);
         this.setOutput(false);
         this.setPreviousStatement(true);
@@ -192,13 +218,14 @@ Blockly.Python['step'] = function(block) {
 
 Blockly.Blocks['moveforward'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Mover para frente")
+            .appendField(text.field[0])
         this.appendValueInput("STEPS")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
         this.appendDummyInput()
-            .appendField("passos");
+            .appendField(text.field[1]);
         this.setInputsInline(true);
         this.setPreviousStatement(true);
         this.setNextStatement(true);
@@ -217,9 +244,10 @@ Blockly.Python['moveforward'] = function(block) {
 
 Blockly.Blocks['turn'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Virar para")
-            .appendField(new Blockly.FieldDropdown([["Posição","TO"], ["Alvo","TARGET"], ["Ataque recebido","HIT"], ["Esquerda","LEFT"], ["Direita","RIGHT"]], this.selection.bind(this)), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"TO"], [text.dropdown[1],"TARGET"], [text.dropdown[2],"HIT"], [text.dropdown[3],"LEFT"], [text.dropdown[4],"RIGHT"]], this.selection.bind(this)), "COMPLEMENT");
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -360,12 +388,13 @@ Blockly.Python['turn'] = function(block) {
 
 Blockly.Blocks['turnangle'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendValueInput("ANGLE")
             .setCheck("Number")
-            .appendField("Virar");
+            .appendField(text.field[0]);
         this.appendDummyInput()
-            .appendField("Graus relativo")
-            .appendField(new Blockly.FieldDropdown([["ao gladiador","TURN"], ["à arena","ANGLE"]], this.selection.bind(this)), "COMPLEMENT")
+            .appendField(text.field[1])
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"TURN"], [text.dropdown[1],"ANGLE"]], this.selection.bind(this)), "COMPLEMENT")
             .setAlign(Blockly.ALIGN_RIGHT);
         this.setOutput(false);
         this.setNextStatement(true);
@@ -431,8 +460,9 @@ Blockly.Python['turnangle'] = function(block) {
 
 Blockly.Blocks['fireball'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Bola de fogo em")
+            .appendField(text.field)
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -483,8 +513,9 @@ Blockly.Python['fireball'] = function(block) {
 
 Blockly.Blocks['teleport'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Teletransporte para")
+            .appendField(text.field)
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -534,8 +565,9 @@ Blockly.Python['teleport'] = function(block) {
 
 Blockly.Blocks['charge'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Investida");
+            .appendField(text.field);
         this.setOutput(false);
         this.setPreviousStatement(true);
         this.setNextStatement(true);
@@ -573,8 +605,9 @@ Blockly.Python['charge'] = function(block) {
 
 Blockly.Blocks['block'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Bloquear");
+            .appendField(text.field);
         this.setOutput(false);
         this.setPreviousStatement(true);
         this.setNextStatement(true);
@@ -612,8 +645,9 @@ Blockly.Python['block'] = function(block) {
 
 Blockly.Blocks['assassinate'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Assassinar em")
+            .appendField(text.field)
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -663,8 +697,9 @@ Blockly.Python['assassinate'] = function(block) {
 
 Blockly.Blocks['ambush'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Emboscada");
+            .appendField(text.field);
         this.setOutput(false);
         this.setPreviousStatement(true);
         this.setNextStatement(true);
@@ -702,8 +737,9 @@ Blockly.Python['ambush'] = function(block) {
 
 Blockly.Blocks['melee'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Ataque Corpo-a-corpo")
+            .appendField(text.field)
         this.setOutput(false);
         this.setNextStatement(true);
         this.setPreviousStatement(true);
@@ -720,8 +756,9 @@ Blockly.Python['melee'] = function(block) {
 
 Blockly.Blocks['ranged'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Ataque à distância em")
+            .appendField(text.field)
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -771,9 +808,10 @@ Blockly.Python['ranged'] = function(block) {
 
 Blockly.Blocks['get_info'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Pegar informação")
-            .appendField(new Blockly.FieldDropdown([["Coordenada X","X"], ["Coordenada Y","Y"], ["Atributo Força","STR"], ["Atributo Agilidade","AGI"], ["Atributo Inteligência","INT"], ["Nível","Lvl"], ["Pontos de vida","Hp"], ["Pontos de habilidade","Ap"], ["Velocidade","Speed"], ["Direção","Head"]]), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"X"], [text.dropdown[1],"Y"], [text.dropdown[2],"STR"], [text.dropdown[3],"AGI"], [text.dropdown[4],"INT"], [text.dropdown[5],"Lvl"], [text.dropdown[6],"Hp"], [text.dropdown[7],"Ap"], [text.dropdown[8],"Speed"], [text.dropdown[9],"Head"]]), "COMPLEMENT");
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#b79337');
@@ -792,8 +830,9 @@ Blockly.Python['get_info'] = function(block) {
 
 Blockly.Blocks['gethit'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Fui acertado?");
+            .appendField(text.field);
         this.setOutput(true, "Boolean");
         this.setColour('#b79337');
         this.func = 'getHit';
@@ -808,9 +847,11 @@ Blockly.Python['gethit'] = function(block) {
 
 Blockly.Blocks['get_time'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Tempo restante")
-            .appendField(new Blockly.FieldDropdown([["Resistência","Block"], ["Invisibilidade","Ambush"], ["Queimadura","Burn"]]), "COMPLEMENT");
+            .appendField(text.field[0])
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"Block"], [text.dropdown[1],"Ambush"], [text.dropdown[2],"Burn"]]), "COMPLEMENT")
+            .appendField(text.field[1])
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#b79337');
@@ -829,9 +870,10 @@ Blockly.Python['get_time'] = function(block) {
 
 Blockly.Blocks['get_lasthit'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField(new Blockly.FieldDropdown([["Tempo","Time"], ["Ângulo","Angle"]]), "COMPLEMENT")
-            .appendField("do ataque recebido");
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"Time"], [text.dropdown[0],"Angle"]]), "COMPLEMENT")
+            .appendField(text.field);
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#b79337');
@@ -850,9 +892,10 @@ Blockly.Python['get_lasthit'] = function(block) {
 
 Blockly.Blocks['upgrade'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Melhorar")
-            .appendField(new Blockly.FieldDropdown([["Força","STR"], ["Agilidade","AGI"], ["Inteligência","INT"]]), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"STR"], [text.dropdown[1],"AGI"], [text.dropdown[2],"INT"]]), "COMPLEMENT");
         this.appendValueInput("VALUE")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -899,10 +942,11 @@ Blockly.Python['upgrade'] = function(block) {
 
 Blockly.Blocks['speak'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendValueInput("TEXT")
             .setCheck("String")
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Falar");
+            .appendField(text.field);
         this.setOutput(false);
         this.setNextStatement(true);
         this.setPreviousStatement(true);
@@ -920,9 +964,10 @@ Blockly.Python['speak'] = function(block) {
 
 Blockly.Blocks['getdist'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Distância para")
-            .appendField(new Blockly.FieldDropdown([["Posição","POSITION"], ["Alvo","TARGET"]], this.selection.bind(this)), "COMPLEMENT");
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"POSITION"], [text.dropdown[0],"TARGET"]], this.selection.bind(this)), "COMPLEMENT");
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#5B67A5');
@@ -989,8 +1034,9 @@ Blockly.Python['getdist'] = function(block) {
 
 Blockly.Blocks['getangle'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Ângulo para")
+            .appendField(text.field)
         this.appendValueInput("X")
             .setCheck("Number")
             .setAlign(Blockly.ALIGN_RIGHT)
@@ -1017,9 +1063,10 @@ Blockly.Python['getangle'] = function(block) {
 
 Blockly.Blocks['is_status'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Alvo está")
-            .appendField(new Blockly.FieldDropdown([["Visível","TargetVisible"], ["Atordoado","Stunned"], ["Queimando","Burning"], ["Protegido", "Protected"], ["Correndo", "Running"], ["Lento", "Slowed"]]), "COMPLEMENT")
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"TargetVisible"], [text.dropdown[1],"Stunned"], [text.dropdown[2],"Burning"], [text.dropdown[3], "Protected"], [text.dropdown[4], "Running"], [text.dropdown[5], "Slowed"]]), "COMPLEMENT")
             .appendField("?");
         this.setInputsInline(true);
         this.setOutput(true, "Boolean");
@@ -1038,9 +1085,11 @@ Blockly.Python['is_status'] = function(block) {
 
 Blockly.Blocks['get_enemy'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Selecionar alvo")
-            .appendField(new Blockly.FieldDropdown([["Mais Próximo","CloseEnemy"], ["Mais Distante","FarEnemy"], ["Com menos Vida","LowHp"], ["Com mais vida", "HighHp"]]), "COMPLEMENT");
+            .appendField(text.field[0])
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"CloseEnemy"], [text.dropdown[1],"FarEnemy"], [text.dropdown[2],"LowHp"], [text.dropdown[3], "HighHp"]]), "COMPLEMENT")
+            .appendField(text.field[1])
         this.setInputsInline(true);
         this.setOutput(true, "Boolean");
         this.setColour('#52b2b2');
@@ -1079,10 +1128,11 @@ Blockly.Python['get_enemy'] = function(block) {
 
 Blockly.Blocks['get_target'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Pegar")
-            .appendField(new Blockly.FieldDropdown([["Coordenada X","X"], ["Coordenada Y","Y"], ["Saúde","Health"], ["Velocidade","Speed"], ["Direção","Head"]]), "COMPLEMENT")
-            .appendField("do alvo");
+            .appendField(text.field[0])
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"X"], [text.dropdown[1],"Y"], [text.dropdown[2],"Health"], [text.dropdown[3],"Speed"], [text.dropdown[4],"Head"]]), "COMPLEMENT")
+            .appendField(text.field[1]);
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#52b2b2');
@@ -1100,9 +1150,10 @@ Blockly.Python['get_target'] = function(block) {
 
 Blockly.Blocks['issafe'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("É seguro")
-            .appendField(new Blockly.FieldDropdown([["Aqui","Here"], ["Na posição","There"]], this.selection.bind(this)), "COMPLEMENT")
+            .appendField(text.field)
+            .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"Here"], [text.dropdown[1],"There"]], this.selection.bind(this)), "COMPLEMENT")
             .appendField("?");
         this.setInputsInline(true);
         this.setOutput(true, "Boolean");
@@ -1170,8 +1221,9 @@ Blockly.Python['issafe'] = function(block) {
 
 Blockly.Blocks['getsaferadius'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Raio seguro");
+            .appendField(text.field);
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#52b2b2');
@@ -1187,8 +1239,9 @@ Blockly.Python['getsaferadius'] = function(block) {
 
 Blockly.Blocks['howmanyenemies'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Quantos inimigos vejo?");
+            .appendField(text.field);
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#52b2b2');
@@ -1204,8 +1257,9 @@ Blockly.Python['howmanyenemies'] = function(block) {
 
 Blockly.Blocks['doyouseeme'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Inimigo me enxerga?");
+            .appendField(text.field);
         this.setInputsInline(true);
         this.setOutput(true, "Boolean");
         this.setColour('#52b2b2');
@@ -1221,8 +1275,9 @@ Blockly.Python['doyouseeme'] = function(block) {
 
 Blockly.Blocks['getsimtime'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Tempo da simulação");
+            .appendField(text.field);
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#52b2b2');
@@ -1238,13 +1293,17 @@ Blockly.Python['getsimtime'] = function(block) {
 
 Blockly.Blocks['pot_hp'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Poção de vitalidade")
+            .appendField(text.field)
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");
         this.setColour('#9eb553');
-        this.setTooltip("Recupera pontos de vida do gladiador");
+
+        translator.translate("Recupera pontos de vida do gladiador").then( text => {
+            this.setTooltip(text[0]);
+        })
     },
 };
 
@@ -1256,13 +1315,17 @@ Blockly.Python['pot_hp'] = function(block) {
 
 Blockly.Blocks['pot_ap'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Poção da concentração")
+            .appendField(text.field)
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"], ["V", "5"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");
         this.setColour('#9eb553');
-        this.setTooltip("Recupera pontos de habilidade do gladiador");
+
+        translator.translate("Recupera pontos de habilidade do gladiador").then( text => {
+            this.setTooltip(text[0]);
+        })
     },
 };
 
@@ -1274,13 +1337,17 @@ Blockly.Python['pot_ap'] = function(block) {
 
 Blockly.Blocks['pot_atr'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Tônico fortificante")
+            .appendField(text.field)
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"], ["IV", "4"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");
         this.setColour('#9eb553');
-        this.setTooltip("Aprimora o atributo mais forte do gladiador");
+
+        translator.translate("Concede pontos de atributo para o gladiador").then( text => {
+            this.setTooltip(text[0]);
+        })
     },
 };
 
@@ -1292,13 +1359,17 @@ Blockly.Python['pot_atr'] = function(block) {
 
 Blockly.Blocks['pot_xp'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
-            .appendField("Elixir da sabedoria")
+            .appendField(text.field)
             .appendField(new Blockly.FieldDropdown([["I","1"], ["II","2"], ["III","3"]]), "COMPLEMENT")
         this.setInputsInline(true);
         this.setOutput(true, "String");
         this.setColour('#9eb553');
-        this.setTooltip("Aumenta a experiência do gladiador");
+
+        translator.translate("Aumenta a experiência do gladiador").then( text => {
+            this.setTooltip(text[0]);
+        })
     },
 };
 
@@ -1310,9 +1381,10 @@ Blockly.Python['pot_xp'] = function(block) {
 
 Blockly.Blocks['useitem'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendValueInput("POTION")
             .setCheck("String")
-            .appendField("Usar item")
+            .appendField(text.field)
             .setAlign(Blockly.ALIGN_RIGHT);
         this.setInputsInline(false);
         this.setOutput(false);
@@ -1354,9 +1426,10 @@ Blockly.Python['useitem'] = function(block) {
 
 Blockly.Blocks['itemready'] = {
     init: function() {
+        const text = Blockly.customBlocks[user.speak][this.type]
         this.appendValueInput("POTION")
             .setCheck("String")
-            .appendField("Item disponível")
+            .appendField(text.field)
             .setAlign(Blockly.ALIGN_RIGHT);
         this.setInputsInline(false);
         this.setOutput(true, "Boolean");
