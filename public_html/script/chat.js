@@ -1,7 +1,8 @@
 import {socket} from "./socket.js"
 import {post, getTimeSince} from "./utils.js"
-import {createToast} from "./dialog.js"
+import {createToast, Message} from "./dialog.js"
 import {login} from "./header.js"
+
 import { translator } from "./translate.js"
 import { loader } from "./loader.js"
 
@@ -160,7 +161,7 @@ chat.init = async function(wrapper, options){
                         message: `Faça login na gladCode para participar do chat`,
                         buttons: {ok: "LOGIN"}
                     }).show().click('ok', async () => {
-                        const google = await loader.load('google')
+                        const {google} = await loader.load('google')
                         await google.login()
                         window.location.reload()
                     })

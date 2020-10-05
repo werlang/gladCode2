@@ -24,13 +24,15 @@ socket.init = async function(){
 
     })
 
-    try{
-        this.io = io(this.serverURL, {secure: true})
-    }
-    catch(e){
-        this.io = null
-        // console.log(e)
-    }
+    import(`./socket.io.js`).then( async () => {
+        try{
+            this.io = io(this.serverURL, {secure: true})
+        }
+        catch(e){
+            this.io = null
+            console.log(e)
+        }
+    })
 
     return this
 }

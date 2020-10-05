@@ -26,7 +26,6 @@
     
     <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js' async></script>
     
     <script type="module" src="script/profile.js" async></script>
 
