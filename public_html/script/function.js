@@ -6,6 +6,7 @@ import {login} from "./header.js"
 import {menu} from "./side-menu.js"
 import {translator} from "./translate.js"
 import {loader} from "./loader.js"
+import {jQueryReady} from "./utils.js"
 
 const translatorReady = new Promise( async resolve => {
     await login.wait()
@@ -19,7 +20,8 @@ menu.load(document.querySelector("#side-menu"))
 var langDict = false
 var user;
 
-window.onload = async function(){
+(async () => {
+    await jQueryReady()
     $('#learn').addClass('here');
 
     var func = "";
@@ -46,7 +48,8 @@ window.onload = async function(){
             window.location.href = `${lang_word}/${func}.${ext[e.target.value]}`;
         })
 
-        $.getJSON(`script/functions.json`, async data => {
+        fetch(`script/functions.json`).then(async response => {
+            const data = await response.json()
             // console.log(data)
             if (data[func]){
                 await load_content(func, data);
@@ -85,7 +88,7 @@ window.onload = async function(){
         })
     }
 
-}
+})()
 
 async function load_content(item, fileData){
     // console.log(item)
@@ -193,7 +196,7 @@ async function load_content(item, fileData){
     translator.translate([
         ...param.map(e => e.description),
         treturn
-    ]).then( translations => {
+    ]).then( () => {
         for (let i in param){
             if (param[i].name == "void"){
                 $('#temp-param').append(`<p>${translator.getTranslated(param[i].description)}</p>`)
