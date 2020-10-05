@@ -19,20 +19,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Atualização</title>
+
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='css/admin.css'/> 
 
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-    <script type="module" src="script/admin.js"></script>
-    <!-- <script type="text/javascript" src="script/googlelogin.js"></script>
-    <script type="text/javascript" src="script/dialog.js"></script>
-    <script type="text/javascript" src="script/socket.js"></script>
-    <script type="text/javascript" src="script/header.js"></script>
-    <script type="text/javascript" src="script/translate.js"></script>
-    <script type="text/javascript" src="script/socket.js"></script> -->
+    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js" async></script>
+    <script type="module" src="script/admin.js" async></script>
 </head>
 <body>
     <div id='frame'>

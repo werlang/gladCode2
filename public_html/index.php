@@ -21,11 +21,10 @@
     
     <link rel='stylesheet' href="css/index.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
+    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
 
-    <script src="script/index.js" type="module"></script>
+    <script src="script/index.js" type="module" async></script>
 </head>
 
 <body>

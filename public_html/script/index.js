@@ -2,7 +2,7 @@ import {socket} from "./socket.js"
 import {login, header} from "./header.js"
 import {google} from "./googlelogin.js"
 import {translator} from "./translate.js"
-import {Message, tooltip} from "./dialog.js"
+import {Message} from "./dialog.js"
 
 window.admin_auth = socket.admin
 
@@ -70,11 +70,11 @@ header.load().then( () => {
     $('#header-container').addClass('small');
 })
 
-window.onload = async function() {
+;(async () => {
     await login.wait()
     document.querySelectorAll(".card").forEach(e => {
         // console.log(e)
         translator.translate(e)
     })
 
-}
+})()
