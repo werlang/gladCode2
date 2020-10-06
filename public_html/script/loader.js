@@ -41,6 +41,25 @@ const callbacks = {
         })
         Prism.plugins.autoloader.languages_path = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/"
     },
+
+    Blockly: async module => {
+        // console.log((await module))
+        return (await module).Blockly.initCustomBlocks()
+    }
+}
+
+const status = {}
+status.isLoaded = async function(pack){
+    return new Promise(resolve => {
+        (function checkReady(){
+            if (status[pack] && status[pack].loaded){
+                resolve(true)
+            }
+            else{
+                setTimeout(() => checkReady(), 50)
+            }
+        })()
+    })
 }
 
 loader.load = async function(pack){
@@ -56,6 +75,7 @@ loader.load = async function(pack){
     else{
         // not loaded yet. if already loaded, do not import again
         if (!this[pack]){
+            status[pack] = { pending: true }
             // if there is more than one script to load in the pack
             if (Array.isArray(paths[pack])){
                 let importArray = []
@@ -73,9 +93,22 @@ loader.load = async function(pack){
             // if the pack has a callback, run it after the import is done
             if (callbacks[pack]){
                 await this[pack]
-                await callbacks[pack]()
+                await callbacks[pack](this[pack])
+                status[pack].pending = false
+                status[pack].loaded = true
             }
+            else{
+                this[pack].then( () => {
+                    status[pack].pending = false
+                    status[pack].loaded = true
+                })
+            }
+    }
+
+        if (status[pack].pending){
+            await status.isLoaded(pack)
         }
+
         // return the import promise
         return this[pack]
     }
