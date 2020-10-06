@@ -2,7 +2,10 @@
     "name": {
         "default": "getX",
         "pt": "pegaX",
-        "block": "Pegar informação [Coordenada X]"
+        "block": {
+            "pt": "Pegar informação [Coordenada X]",
+            "en": "Get [X]"
+        }
     },
     "syntax": {
         "c": "float getX ( void );",

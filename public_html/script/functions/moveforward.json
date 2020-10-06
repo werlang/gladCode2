@@ -2,7 +2,10 @@
     "name": {
         "default": "moveForward",
         "pt": "moveFrente",
-        "block": "Mover para frente"
+        "block": {
+            "pt": "Mover para frente",
+            "en": "Move forward"
+        }
     },
     "syntax": {
         "c": "void moveForward ( float passos );",

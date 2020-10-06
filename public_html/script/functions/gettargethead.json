@@ -2,7 +2,10 @@
     "name": {
         "default": "getTargetHead",
         "pt": "pegaDirecaoAlvo",
-        "block": "Pegar [Direção] do alvo"
+        "block": {
+            "pt": "Pegar [Direção] do alvo",
+            "en": "Get target [Heading]"
+        }
     },
     "syntax": {
         "c": "float getTargetHead ( void );",

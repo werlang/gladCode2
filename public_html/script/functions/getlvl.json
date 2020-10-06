@@ -2,7 +2,10 @@
     "name": {
         "default": "getLvl",
         "pt": "pegaNivel",
-        "block": "Pegar informação [Nível]"
+        "block": {
+            "pt": "Pegar informação [Nível]",
+            "en": "Get [Level]"
+        }
     },
     "syntax": {
         "c": "int getLvl ( void );",

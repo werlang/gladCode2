@@ -2,7 +2,10 @@
     "name": {
         "default": "doYouSeeMe",
         "pt": "voceMeVe",
-        "block": "Inimigo me enxerga?"
+        "block": {
+            "pt": "Inimigo me enxerga?",
+            "en": "Enemy see me?"
+        }
     },
     "syntax": {
         "c": "int doYouSeeMe ( void );",

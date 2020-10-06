@@ -2,7 +2,10 @@
     "name": {
         "default": "turnRight",
         "pt": "viraDireita",
-        "block": "Virar para [Direita]"
+        "block": {
+            "pt": "Virar para [Direita]",
+            "en": "Turn to [Right]"
+        }
     },
     "syntax": {
         "c": "float turnRight ( float angulo );",

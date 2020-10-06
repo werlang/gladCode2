@@ -2,7 +2,10 @@
     "name": {
         "default": "getBlockTimeLeft",
         "pt": "tempoBloqueio",
-        "block": "Tempo restante [Resistência]"
+        "block": {
+            "pt": "Tempo restante [Resistência]",
+            "en": "Get [Resistance] time left"
+        }
     },
     "syntax": {
         "c": "float getBlockTimeLeft ( void );",

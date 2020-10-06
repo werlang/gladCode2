@@ -2,7 +2,10 @@
     "name": {
         "default": "turnLeft",
         "pt": "viraEsquerda",
-        "block": "Virar para [Esquerda]"
+        "block": {
+            "pt": "Virar para [Esquerda]",
+            "en": "Turn to [Left]"
+        }
     },
     "syntax": {
         "c": "float turnLeft ( float angulo );",

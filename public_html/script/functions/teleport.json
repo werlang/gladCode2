@@ -2,7 +2,10 @@
     "name": {
         "default": "teleport",
         "pt": "teletransporte",
-        "block": "Teletransporte"
+        "block": {
+            "pt": "Teletransporte",
+            "en": "Teleport"
+        }
     },
     "syntax": {
         "c": "int teleport ( float x, float y );",

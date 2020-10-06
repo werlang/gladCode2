@@ -2,7 +2,10 @@
     "name": {
         "default": "getDistToTarget",
         "pt": "pegaDistanciaAlvo",
-        "block": "Distância para [Alvo]"
+        "block": {
+            "pt": "Distância para [Alvo]",
+            "en": "Get distance to [Target]"
+        }
     },
     "syntax": {
         "c": "float getDistToTarget ( void );",

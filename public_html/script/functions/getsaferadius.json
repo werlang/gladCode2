@@ -2,7 +2,10 @@
     "name": {
         "default": "getSafeRadius",
         "pt": "pegaRaioSeguro",
-        "block": "Raio seguro"
+        "block": {
+            "pt": "Raio seguro",
+            "en": "Get safe radius"
+        }
     },
     "syntax": {
         "c": "float getSafeRadius ( void );",

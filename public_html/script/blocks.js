@@ -13,8 +13,9 @@ login.wait().then( async data => {
         const module = await import(`./blockly-pt-br.js`)
         Blockly.Msg = module.Blockly.Msg
         // refresh workspace render
-        const xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace)
-        Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+        // const xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace)
+        // Blockly.Xml.domToWorkspace(xmlDom, Blockly.mainWorkspace)
+        Blockly.svgResize(Blockly.mainWorkspace);
     }
     else if (user.speak == 'en'){
     }
@@ -872,8 +873,9 @@ Blockly.Blocks['get_lasthit'] = {
     init: function() {
         const text = Blockly.customBlocks[user.speak][this.type]
         this.appendDummyInput()
+            .appendField(text.field[0])
             .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"Time"], [text.dropdown[0],"Angle"]]), "COMPLEMENT")
-            .appendField(text.field);
+            .appendField(text.field[1])
         this.setInputsInline(true);
         this.setOutput(true, "Number");
         this.setColour('#b79337');
@@ -1460,7 +1462,8 @@ async function getTooltip(name){
 
 function setBlockInfo(block){
     getTooltip(block.func).then( data => {
-        block.setTooltip(data);
+        // console.log(data[0])
+        block.setTooltip(data[0]);
     });
     block.setHelpUrl(`function/${block.func.toLowerCase()}.blk`);
 }

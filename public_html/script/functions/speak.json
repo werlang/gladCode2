@@ -2,7 +2,10 @@
     "name": {
         "default": "speak",
         "pt": "fala",
-        "block": "Falar"
+        "block": {
+            "pt": "Falar",
+            "en": "Speak"
+        }
     },
     "syntax": {
         "c": "void speak ( char * formato, ... );",

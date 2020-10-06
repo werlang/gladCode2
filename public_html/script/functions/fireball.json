@@ -2,7 +2,10 @@
     "name": {
         "default": "fireball",
         "pt": "bolaFogo",
-        "block": "Bola de fogo"
+        "block": {
+            "pt": "Bola de fogo",
+            "en": "Fireball"
+        }
     },
     "syntax": {
         "c": "int fireball ( float x, float y );",

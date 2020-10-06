@@ -2,7 +2,10 @@
     "name": {
         "default": "assassinate",
         "pt": "assassinar",
-        "block": "Assassinar"
+        "block": {
+            "pt": "Assassinar",
+            "en": "Assassinate"
+        }
     },
     "syntax": {
         "c": "int assassinate ( float x, float y );",

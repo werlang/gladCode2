@@ -2,7 +2,10 @@
     "name": {
         "default": "getSTR",
         "pt": "pegaFOR",
-        "block": "Pegar informação [Atributo Força]"
+        "block": {
+            "pt": "Pegar informação [Atributo Força]",
+            "en": "Get [Strength]"
+        }
     },
     "syntax": {
         "c": "int getSTR ( void );",

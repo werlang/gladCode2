@@ -2,7 +2,10 @@
     "name": {
         "default": "upgradeAGI",
         "pt": "melhoraAGI",
-        "block": "Melhorar [Agilidade]"
+        "block": {
+            "pt": "Melhorar [Agilidade]",
+            "en": "Upgrade [Agility]"
+        }
     },
     "syntax": {
         "c": "int upgradeAGI ( int pontos );",

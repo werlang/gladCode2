@@ -2,7 +2,10 @@
     "name": {
         "default": "getTargetY",
         "pt": "pegaYAlvo",
-        "block": "Pegar [Coordenada Y] do alvo"
+        "block": {
+            "pt": "Pegar [Coordenada Y] do alvo",
+            "en": "Get target [Y]"
+        }
     },
     "syntax": {
         "c": "float getTargetY ( void );",

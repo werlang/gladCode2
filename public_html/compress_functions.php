@@ -1,22 +1,22 @@
 <?php
-    $dir = 'script/functions/';
+    $dir = '/home/gladcode/public_html/script';
     $contents = array();
     
     // get file contents
-    if ($handle = opendir($dir)) {
+    if ($handle = opendir("$dir/functions/")) {
         while (false !== ($entry = readdir($handle))) {
-            if ($entry != "." && $entry != ".." && !is_dir($entry)) {
-                $contents[explode(".", $entry)[0]] = json_decode(file_get_contents($dir . $entry), true);
+            if ($entry != "." && $entry != ".." && !is_dir("$dir/functions/$entry")) {
+                $contents[explode(".", $entry)[0]] = json_decode(file_get_contents("$dir/functions/$entry"), true);
             }
         }
         closedir($handle);
     }
 
     $str = json_encode($contents);
-    file_put_contents('script/functions.json', $str);
+    file_put_contents("$dir/functions.json", $str);
 
     // get samples and explanation and put in the same file
-    $dir = 'script/functions/samples/';
+    $dir = "$dir/functions/samples/";
     $fileList = array();
     if ($handle = opendir($dir)) {
         while (false !== ($entry = readdir($handle))) {
@@ -34,9 +34,10 @@
         $codes[$file] = array();
 
     foreach($contents as $func => $data){
+        // echo $func ." -- ". json_encode($data['sample']) ."\n";
         foreach($data['sample'] as $lang => $filename){
             $file = explode(".", $filename)[0];
-            if (count($codes[$file][$lang]) == 0)
+            if (!isset($codes[$file][$lang]))
                 $codes[$file][$lang] = file_get_contents("$dir$filename");
         }
     }

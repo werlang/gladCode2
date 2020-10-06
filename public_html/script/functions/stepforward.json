@@ -2,7 +2,10 @@
     "name": {
         "default": "stepForward",
         "pt": "passoFrente",
-        "block": "Passo para [Frente]"
+        "block": {
+            "pt": "Passo para [Frente]",
+            "en": "Step [Forward]"
+        }
     },
     "syntax": {
         "c": "float stepForward ( void );",

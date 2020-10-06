@@ -60,7 +60,7 @@ customBlocks.pt['get_time'].field = ["Tempo restante", ""]
 customBlocks.pt['get_time'].dropdown = ["Resistência", "Invisibilidade", "Queimadura"]
 
 customBlocks.pt['get_lasthit'] = {}
-customBlocks.pt['get_lasthit'].field = "do ataque recebido"
+customBlocks.pt['get_lasthit'].field = ["", "do ataque recebido"]
 customBlocks.pt['get_lasthit'].dropdown = ["Tempo", "Ângulo"]
 
 customBlocks.pt['upgrade'] = {}
@@ -121,7 +121,7 @@ customBlocks.pt['useitem'] = {}
 customBlocks.pt['useitem'].field = "Usar item"
 
 customBlocks.pt['itemready'] = {}
-customBlocks.pt['itemready'].field = "Item disponível"
+customBlocks.pt['itemready'].field = "Item disponível?"
 
 
 // english language
@@ -145,7 +145,7 @@ customBlocks.en['turn'].dropdown = ["Position", "Target", "Last hit", "Left", "R
 
 customBlocks.en['turnangle'] = {}
 customBlocks.en['turnangle'].field = ["Turn", "deg. relative to"]
-customBlocks.en['turnangle'].dropdown = ["gladiator", "arena"]
+customBlocks.en['turnangle'].dropdown = ["Gladiator", "Arena"]
 
 
 customBlocks.en['fireball'] = {}
@@ -184,7 +184,7 @@ customBlocks.en['get_time'].field = ["Get", "time left"]
 customBlocks.en['get_time'].dropdown = ["Resistance", "Invisibility", "Burning"]
 
 customBlocks.en['get_lasthit'] = {}
-customBlocks.en['get_lasthit'].field = "Last hit"
+customBlocks.en['get_lasthit'].field = ["Get last hit", ""]
 customBlocks.en['get_lasthit'].dropdown = ["Time", "Angle"]
 
 customBlocks.en['upgrade'] = {}
@@ -195,19 +195,19 @@ customBlocks.en['speak'] = {}
 customBlocks.en['speak'].field = "Speak"
 
 customBlocks.en['getdist'] = {}
-customBlocks.en['getdist'].field = "Distance to"
+customBlocks.en['getdist'].field = "Get distance to"
 customBlocks.en['getdist'].dropdown = ["Position", "Target"]
 
 customBlocks.en['getangle'] = {}
-customBlocks.en['getangle'].field = "Angle to"
+customBlocks.en['getangle'].field = "Get angle to"
 
 customBlocks.en['is_status'] = {}
 customBlocks.en['is_status'].field = "Is target"
 customBlocks.en['is_status'].dropdown = ["Visible", "Stunned", "Burning", "Protected", "Running", "Slowed"]
 
 customBlocks.en['get_enemy'] = {}
-customBlocks.en['get_enemy'].field = ["Get", "target"]
-customBlocks.en['get_enemy'].dropdown = ["Nearest", "Farther", "Less healthy", "More healthy"]
+customBlocks.en['get_enemy'].field = ["Get", "enemy"]
+customBlocks.en['get_enemy'].dropdown = ["Closest", "Farther", "Lower health", "Higher health"]
 
 customBlocks.en['get_target'] = {}
 customBlocks.en['get_target'].field = ["Get target", ""]
@@ -245,5 +245,5 @@ customBlocks.en['useitem'] = {}
 customBlocks.en['useitem'].field = "Use item"
 
 customBlocks.en['itemready'] = {}
-customBlocks.en['itemready'].field = "Is item ready"
+customBlocks.en['itemready'].field = "Is item ready?"
 

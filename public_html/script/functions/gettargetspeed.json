@@ -2,7 +2,10 @@
     "name": {
         "default": "getTargetSpeed",
         "pt": "pegaVelocidadeAlvo",
-        "block": "Pegar [Velocidade] do alvo"
+        "block": {
+            "pt": "Pegar [Velocidade] do alvo",
+            "en": "Get target [Speed]"
+        }
     },
     "syntax": {
         "c": "float getTargetSpeed ( void );",

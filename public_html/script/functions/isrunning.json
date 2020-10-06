@@ -2,7 +2,10 @@
     "name": {
         "default": "isRunning",
         "pt": "estaCorrendo",
-        "block": "Alvo está [Correndo]?"
+        "block": {
+            "pt": "Alvo está [Correndo]?",
+            "en": "Is target [Running]?"
+        }
     },
     "syntax": {
         "c": "int isRunning ( void );",

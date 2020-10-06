@@ -2,7 +2,10 @@
     "name": {
         "default": "attackMelee",
         "pt": "ataqueCorpo",
-        "block": "Ataque Corpo-a-corpo"
+        "block": {
+            "pt": "Ataque Corpo-a-corpo",
+            "en": "Melee attack"
+        }
     },
     "syntax": {
         "c": "void attackMelee ( void );",

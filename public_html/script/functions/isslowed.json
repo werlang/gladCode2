@@ -2,7 +2,10 @@
     "name": {
         "default": "isSlowed",
         "pt": "estaLento",
-        "block": "Alvo está [Lento]?"
+        "block": {
+            "pt": "Alvo está [Lento]?",
+            "en": "Is target [Slowed]?"
+        }
     },
     "syntax": {
         "c": "int isSlowed ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "moveTo",
         "pt": "movePara",
-        "block": "Mover para [Posição]"
+        "block": {
+            "pt": "Mover para [Posição]",
+            "en": "Move to [Position]"
+        }
     },
     "syntax": {
         "c": "int moveTo ( float x, float y );",

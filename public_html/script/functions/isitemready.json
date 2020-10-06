@@ -2,7 +2,10 @@
     "name": {
         "default": "isItemReady",
         "pt": "itemPronto",
-        "block": "Item disponível"
+        "block": {
+            "pt": "Item disponível?",
+            "en": "Is item ready?"
+        }
     },
     "syntax": {
         "c": "int isItemReady ( char *item );",

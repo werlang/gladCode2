@@ -2,7 +2,10 @@
     "name": {
         "default": "getHp",
         "pt": "pegaPv",
-        "block": "Pegar informação [Pontos de vida]"
+        "block": {
+            "pt": "Pegar informação [Pontos de vida]",
+            "en": "Get [Health points]"
+        }
     },
     "syntax": {
         "c": "float getHp ( void );",

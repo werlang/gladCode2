@@ -2,7 +2,10 @@
     "name": {
         "default": "block",
         "pt": "bloqueio",
-        "block": "Bloquear"
+        "block": {
+            "pt": "Bloquear",
+            "en": "Block"
+        }
     },
     "syntax": {
         "c": "int block ( void );",

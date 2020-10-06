@@ -2,7 +2,10 @@
     "name": {
         "default": "isStunned",
         "pt": "estaAtordoado",
-        "block": "Alvo está [Atordoado]?"
+        "block": {
+            "pt": "Alvo está [Atordoado]?",
+            "en": "Is target [Stunned]?"
+        }
     },
     "syntax": {
         "c": "int isStunned ( void );",

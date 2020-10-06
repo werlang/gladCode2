@@ -2,7 +2,10 @@
     "name": {
         "default": "getY",
         "pt": "pegaY",
-        "block": "Pegar informação [Coordenada Y]"
+        "block": {
+            "pt": "Pegar informação [Coordenada Y]",
+            "en": "Get [Y]"
+        }
     },
     "syntax": {
         "c": "float getY ( void );",

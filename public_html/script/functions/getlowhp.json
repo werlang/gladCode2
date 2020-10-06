@@ -2,7 +2,10 @@
     "name": {
         "default": "getLowHp",
         "pt": "pegaVidaBaixa",
-        "block": "Selecionar alvo [Com menos vida]"
+        "block": {
+            "pt": "Selecionar alvo [Com menos vida]",
+            "en": "Get [Lower health] enemy"
+        }
     },
     "syntax": {
         "c": "int getLowHp ( void );",

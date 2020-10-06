@@ -2,7 +2,10 @@
     "name": {
         "default": "useItem",
         "pt": "usaItem",
-        "block": "Usar item"
+        "block": {
+            "pt": "Usar item",
+            "en": "Use item"
+        }
     },
     "syntax": {
         "c": "int useItem ( char *item );",

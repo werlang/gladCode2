@@ -2,7 +2,10 @@
     "name": {
         "default": "getFarEnemy",
         "pt": "pegaInimigoDistante",
-        "block": "Selecionar alvo [Mais Distante]"
+        "block": {
+            "pt": "Selecionar alvo [Mais Distante]",
+            "en": "Get [Farther] enemy"
+        }
     },
     "syntax": {
         "c": "int getFarEnemy ( void );",

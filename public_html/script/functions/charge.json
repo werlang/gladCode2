@@ -2,7 +2,10 @@
     "name": {
         "default": "charge",
         "pt": "investida",
-        "block": "Investida"
+        "block": {
+            "pt": "Investida",
+            "en": "Charge"
+        }
     },
     "syntax": {
         "c": "int charge ( void );",

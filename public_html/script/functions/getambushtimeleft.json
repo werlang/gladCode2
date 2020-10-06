@@ -2,7 +2,10 @@
     "name": {
         "default": "getAmbushTimeLeft",
         "pt": "tempoEmboscada",
-        "block": "Tempo restante [Invisibilidade]"
+        "block": {
+            "pt": "Tempo restante [Invisibilidade]",
+            "en": "Get [Invisibility] time left"
+        }
     },
     "syntax": {
         "c": "float getAmbushTimeLeft ( void );",

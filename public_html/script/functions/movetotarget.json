@@ -2,7 +2,10 @@
     "name": {
         "default": "moveToTarget",
         "pt": "moveParaAlvo",
-        "block": "Mover para [Alvo]"
+        "block": {
+            "pt": "Mover para [Alvo]",
+            "en": "Move to [Target]"
+        }
     },
     "syntax": {
         "c": "int moveToTarget ( void );",

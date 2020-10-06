@@ -2,7 +2,10 @@
     "name": {
         "default": "getHead",
         "pt": "pegaDirecao",
-        "block": "Pegar informação [Direção]"
+        "block": {
+            "pt": "Pegar informação [Direção]",
+            "en": "Get [Heading]"
+        }
     },
     "syntax": {
         "c": "float getHead ( void );",

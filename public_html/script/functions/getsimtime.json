@@ -2,7 +2,10 @@
     "name": {
         "default": "getSimTime",
         "pt": "pegaTempo",
-        "block": "Tempo da simulação"
+        "block": {
+            "pt": "Tempo da simulação",
+            "en": "Get simulation time"
+        }
     },
     "syntax": {
         "c": "float getSimTime ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "getHit",
         "pt": "fuiAcertado",
-        "block": "Fui acertado?"
+        "block": {
+            "pt": "Fui acertado?",
+            "en": "Have I been hit?"
+        }
     },
     "syntax": {
         "c": "int getHit ( void );",

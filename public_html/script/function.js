@@ -102,7 +102,7 @@ async function load_content(item, fileData){
 
     user = await login.wait()
 
-    var language;
+    let language;
 
     // set language to c or python only, and only if set in GET
     if ($('#get-lang').length){
@@ -149,7 +149,7 @@ async function load_content(item, fileData){
 
     if (language == 'blocks'){
         $('title').html("gladCode - "+ item.name.block)
-        $('#temp-name').html(item.name.block)
+        $('#temp-name').html(item.name.block[user.speak])
         $('#temp-syntax').parent().after(`<div id='syntax-ws'></div>`).remove()
 
         let xml = `<xml>${item.syntax.blocks}</xml>`
@@ -205,7 +205,7 @@ async function load_content(item, fileData){
                 $('#temp-param').append(`<p class='syntax'>${param[i].name}</p><p>${translator.getTranslated(param[i].description)}</p>`)
             }
         }
-    
+
         document.querySelector('#temp-return').innerHTML = translator.getTranslated(treturn)
     })
 
@@ -243,12 +243,13 @@ async function load_content(item, fileData){
             codesearch = code.c
 
         let funcs = codesearch.match(/\w+\(/g)
-        funcs = funcs.map(e => { return e.split("(")[0]})
+        funcs = funcs.map(e => e.split("(")[0])
 
         let reserved = ['loops', 'if', 'elif', 'while', 'for']
         for (let e of funcs){
-            if (e != item.name.default && item.seealso.indexOf(e) == -1 && reserved.indexOf(e) == -1)
+            if (e != item.name.default && item.seealso.indexOf(e) == -1 && reserved.indexOf(e) == -1){
                 item.seealso.push(e)
+            }
         }
 
         // translate functions in brackets {} in explian text
@@ -296,20 +297,24 @@ async function load_content(item, fileData){
     for (let i in item.seealso){
         const data = fileData[item.seealso[i].toLowerCase()]
         if (data){
-            const link = data.name.default.toLowerCase()
+            let link = data.name.default.toLowerCase()
             let name = data.name.default
 
-            if (language == 'blocks')
-                name = data.name.block
+            if (language == 'blocks'){
+                name = data.name.block[user.speak]
+                link = link + '.blk'
+            }
 
             if (name){
                 $('#temp-seealso').append(`<tr>
                     <td><a href='function/${link}'>${name}</a></td>
-                    <td>${translator.getTranslated(data.description.brief)}</td></tr>`)
+                    <td>${translator.getTranslated(data.description.brief)}</td>
+                </tr>`)
             }
 
-            if (langDict)
+            if (langDict){
                 funcsDict[data.name.default] = data.name[langDict]
+            }
         }
     }
 
@@ -318,7 +323,7 @@ async function load_content(item, fileData){
         loadDict(funcsDict)
     }
 
-    return true;
+    return true
 }
 
 function loadDict(func){

@@ -2,7 +2,10 @@
     "name": {
         "default": "upgradeINT",
         "pt": "melhoraINT",
-        "block": "Melhorar [Inteligência]"
+        "block": {
+            "pt": "Melhorar [Inteligência]",
+            "en": "Upgrade [Intelligence]"
+        }
     },
     "syntax": {
         "c": "int upgradeINT ( int pontos );",

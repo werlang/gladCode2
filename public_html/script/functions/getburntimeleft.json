@@ -2,7 +2,10 @@
     "name": {
         "default": "getBurnTimeLeft",
         "pt": "tempoQueimadura",
-        "block": "Tempo restante [Queimadura]"
+        "block": {
+            "pt": "Tempo restante [Queimadura]",
+            "en": "Get [Burning] time left"
+        }
     },
     "syntax": {
         "c": "float getBurnTimeLeft ( void );",

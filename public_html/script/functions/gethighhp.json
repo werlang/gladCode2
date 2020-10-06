@@ -2,7 +2,10 @@
     "name": {
         "default": "getHighHp",
         "pt": "pegaVidaAlta",
-        "block": "Selecionar alvo [Com mais vida]"
+        "block": {
+            "pt": "Selecionar alvo [Com mais vida]",
+            "en": "Get [Higher health] enemy"
+        }
     },
     "syntax": {
         "c": "int getHighHp ( void );",

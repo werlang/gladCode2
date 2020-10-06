@@ -2,7 +2,10 @@
     "name": {
         "default": "turn",
         "pt": "vira",
-        "block": "Virar relativo [ao gladiador]"
+        "block": {
+            "pt": "Virar relativo [ao gladiador]",
+            "en": "Turn relative to [Gladiator]"
+        }
     },
     "syntax": {
         "c": "void turn ( float angulo );",

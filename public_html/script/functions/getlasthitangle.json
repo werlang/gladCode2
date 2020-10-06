@@ -2,7 +2,10 @@
     "name": {
         "default": "getLastHitAngle",
         "pt": "anguloFuiAcertado",
-        "block": "[Ângulo] do ataque recebido"
+        "block": {
+            "pt": "[Ângulo] do ataque recebido",
+            "en": "Get last hit [Angle]"
+        }
     },
     "syntax": {
         "c": "float getLastHitAngle ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "isSafeThere",
         "pt": "seguroLa",
-        "block": "É seguro [Na posição]?"
+        "block": {
+            "pt": "É seguro [Na posição]?",
+            "en": "Is safe [There]?"
+        }
     },
     "syntax": {
         "c": "int isSafeThere ( float x, float y );",

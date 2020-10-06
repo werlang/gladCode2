@@ -2,7 +2,10 @@
     "name": {
         "default": "stepBack",
         "pt": "passoTras",
-        "block": "Passo para [Trás]"
+        "block": {
+            "pt": "Passo para [Trás]",
+            "en": "Step [Back]"
+        }
     },
     "syntax": {
         "c": "float stepBack ( void );",

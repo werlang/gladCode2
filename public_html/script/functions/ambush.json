@@ -2,7 +2,10 @@
     "name": {
         "default": "ambush",
         "pt": "emboscada",
-        "block": "Emboscada"
+        "block": {
+            "pt": "Emboscada",
+            "en": "Ambush"
+        }
     },
     "syntax": {
         "c": "int ambush ( void );",

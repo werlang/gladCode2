@@ -2,7 +2,10 @@
     "name": {
         "default": "turnToTarget",
         "pt": "viraParaAlvo",
-        "block": "Virar para [Alvo]"
+        "block": {
+            "pt": "Virar para [Alvo]",
+            "en": "Turn to [Target]"
+        }
     },
     "syntax": {
         "c": "int turnToTarget ( void );",

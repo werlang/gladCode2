@@ -2,7 +2,10 @@
     "name": {
         "default": "upgradeSTR",
         "pt": "melhoraFOR",
-        "block": "Melhorar [Força]"
+        "block": {
+            "pt": "Melhorar [Força]",
+            "en": "Upgrade [Strength]"
+        }
     },
     "syntax": {
         "c": "int upgradeSTR ( int pontos );",

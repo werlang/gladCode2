@@ -2,7 +2,10 @@
     "name": {
         "default": "turnToAngle",
         "pt": "viraParaAngulo",
-        "block": "Virar relativo [à arena]"
+        "block": {
+            "pt": "Virar relativo [à arena]",
+            "en": "Turn relative to [Arena]"
+        }
     },
     "syntax": {
         "c": "int turnToAngle ( float angulo );",

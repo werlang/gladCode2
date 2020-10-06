@@ -2,7 +2,10 @@
     "name": {
         "default": "getSpeed",
         "pt": "pegaVelocidade",
-        "block": "Pegar informação [Velocidade]"
+        "block": {
+            "pt": "Pegar informação [Velocidade]",
+            "en": "Get [Speed]"
+        }
     },
     "syntax": {
         "c": "float getSpeed ( void );",

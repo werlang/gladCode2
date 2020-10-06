@@ -2,7 +2,10 @@
     "name": {
         "default": "getLastHitTime",
         "pt": "tempoFuiAcertado",
-        "block": "[Tempo] do ataque recebido"
+        "block": {
+            "pt": "[Tempo] do ataque recebido",
+            "en": "Get last hit [Time]"
+        }
     },
     "syntax": {
         "c": "float getLastHitTime ( void );",

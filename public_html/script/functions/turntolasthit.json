@@ -2,7 +2,10 @@
     "name": {
         "default": "turnToLastHit",
         "pt": "viraFuiAcertado",
-        "block": "Virar para [Ataque recebido]"
+        "block": {
+            "pt": "Virar para [Ataque recebido]",
+            "en": "Turn to [Last hit]"
+        }
     },
     "syntax": {
         "c": "int turnToLastHit ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "getCloseEnemy",
         "pt": "pegaInimigoProximo",
-        "block": "Selecionar alvo [Mais Próximo]"
+        "block": {
+            "pt": "Selecionar alvo [Mais Próximo]",
+            "en": "Get [Closest] enemy"
+        }
     },
     "syntax": {
         "c": "int getCloseEnemy ( void );",

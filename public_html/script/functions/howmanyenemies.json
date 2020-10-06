@@ -2,7 +2,10 @@
     "name": {
         "default": "howManyEnemies",
         "pt": "quantosInimigos",
-        "block": "Quanto inimigos vejo?"
+        "block": {
+            "pt": "Quanto inimigos vejo?",
+            "en": "How many enemies?"
+        }
     },
     "syntax": {
         "c": "int howManyEnemies ( void );",

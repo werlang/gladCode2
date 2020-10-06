@@ -2,7 +2,10 @@
     "name": {
         "default": "getAngle",
         "pt": "pegaAngulo",
-        "block": "Ângulo para"
+        "block": {
+            "pt": "Ângulo para",
+            "en": "Get angle"
+        }
     },
     "syntax": {
         "c": "float getAngle ( float x, float y );",

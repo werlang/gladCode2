@@ -2,7 +2,10 @@
     "name": {
         "default": "getTargetHealth",
         "pt": "pegaSaudeAlvo",
-        "block": "Pegar [Saúde] do alvo"
+        "block": {
+            "pt": "Pegar [Saúde] do alvo",
+            "en": "Get target [Health]"
+        }
     },
     "syntax": {
         "c": "float getTargetHealth ( void );",

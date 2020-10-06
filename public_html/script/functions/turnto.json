@@ -2,7 +2,10 @@
     "name": {
         "default": "turnTo",
         "pt": "viraPara",
-        "block": "Virar para [Posição]"
+        "block": {
+            "pt": "Virar para [Posição]",
+            "en": "Turn to [Position]"
+        }
     },
     "syntax": {
         "c": "int turnTo ( float x, float y );",

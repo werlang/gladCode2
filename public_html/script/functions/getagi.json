@@ -2,7 +2,10 @@
     "name": {
         "default": "getAGI",
         "pt": "pegaAGI",
-        "block": "Pegar informação [Atributo Agilidade]"
+        "block": {
+            "pt": "Pegar informação [Atributo Agilidade]",
+            "en": "Get [Agility]"
+        }
     },
     "syntax": {
         "c": "int getAGI ( void );",

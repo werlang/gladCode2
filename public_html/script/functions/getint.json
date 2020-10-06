@@ -2,7 +2,10 @@
     "name": {
         "default": "getINT",
         "pt": "pegaINT",
-        "block": "Pegar informação [Atributo Inteligência]"
+        "block": {
+            "pt": "Pegar informação [Atributo Inteligência]",
+            "en": "Get [Intelligence]"
+        }
     },
     "syntax": {
         "c": "int getINT ( void );",

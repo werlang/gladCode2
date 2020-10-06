@@ -2,7 +2,10 @@
     "name": {
         "default": "stepRight",
         "pt": "passoDireita",
-        "block": "Passo para [Direita]"
+        "block": {
+            "pt": "Passo para [Direita]",
+            "en": "Step [Right]"
+        }
     },
     "syntax": {
         "c": "float stepRight ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "getAp",
         "pt": "pegaPh",
-        "block": "Pegar informação [Pontos de habilidade]"
+        "block": {
+            "pt": "Pegar informação [Pontos de habilidade]",
+            "en": "Get [Ability points]"
+        }
     },
     "syntax": {
         "c": "float getAp ( void );",

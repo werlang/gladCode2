@@ -2,7 +2,10 @@
     "name": {
         "default": "isSafeHere",
         "pt": "seguroAqui",
-        "block": "É seguro [Aqui]?"
+        "block": {
+            "pt": "É seguro [Aqui]?",
+            "en": "Is safe [Here]?"
+        }
     },
     "syntax": {
         "c": "int isSafeHere ( void );",

@@ -2,7 +2,10 @@
     "name": {
         "default": "isProtected",
         "pt": "estaProtegido",
-        "block": "Alvo está [Protegido]?"
+        "block": {
+            "pt": "Alvo está [Protegido]?",
+            "en": "Is target [Protected]?"
+        }
     },
     "syntax": {
         "c": "int isProtected ( void );",

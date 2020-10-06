@@ -2,7 +2,10 @@
     "name": {
         "default": "attackRanged",
         "pt": "ataqueDistancia",
-        "block": "Ataque à distância"
+        "block": {
+            "pt": "Ataque à distância",
+            "en": "Ranged attack"
+        }
     },
     "syntax": {
         "c": "int attackRanged ( float x, float y );",

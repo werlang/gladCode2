@@ -2,7 +2,10 @@
     "name": {
         "default": "isBurning",
         "pt": "estaQueimando",
-        "block": "Alvo está [Queimando]?"
+        "block": {
+            "pt": "Alvo está [Queimando]?",
+            "en": "Is target [Burning]?"
+        }
     },
     "syntax": {
         "c": "int isBurning ( void );",
