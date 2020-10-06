@@ -148,7 +148,7 @@ async function load_content(item, fileData){
         window.location.href = `function/${item.name.default.toLowerCase()}.c`
 
     if (language == 'blocks'){
-        $('title').html("gladCode - "+ item.name.block)
+        $('title').html("gladCode - "+ item.name.block[user.speak])
         $('#temp-name').html(item.name.block[user.speak])
         $('#temp-syntax').parent().after(`<div id='syntax-ws'></div>`).remove()
 
@@ -210,7 +210,10 @@ async function load_content(item, fileData){
     })
 
     let filename = item.sample.explain.split(".")[0] + '.json'
-    var loadSample = $.get(`script/functions/samples/${filename}`, async code => {
+    const loadSample = fetch(`script/functions/samples/${filename}`)
+    loadSample.then(async response => {
+        const code = await response.json()
+        // console.log(code)
         if (language == 'blocks'){
             // load blocks into div, create workspace and observe resize
             $('#temp-sample').parent().after(`<div id='sample-ws'></div>`).remove()
@@ -265,7 +268,7 @@ async function load_content(item, fileData){
                 // translate explain text to reflect blocks names
                 if (language == 'blocks'){
                     let data = fileData[func.toLowerCase()]
-                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block)
+                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block[user.speak])
                 }
                 else
                     code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), func)

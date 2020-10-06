@@ -249,6 +249,7 @@
 
                 <p>O funcionamento é bem simples. Na função loop será colocado todo o comportamento do gladiador. A cada intervalo de tempo (0.1s) o gladiador irá tentar executar todas as tarefas descritas dentro desta função:</p>
 
+                <ignore>
                 <pre><code class="language-c">// Exemplo linguagem C
 loop(){
     stepForward(); // função que faz mover para frente
@@ -260,6 +261,8 @@ def loop():
 </code></pre>
 
                 <div id='sample-1' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="AzJiEtm=7QSIS@J281fR" deletable="false"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="step" id="DD:(Bz1s(+?|H6aP|Wg|"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><field name="COMPLEMENT">FORWARD</field></block></statement></block></xml></div>
+
+                </ignore>
 
                 <p>No código acima, a cada intervalo de tempo (0.1s) o gladiador irá mover-se o quanto conseguir (depende de sua agilidade) para frente, resultando em sucessivas chamadas da função <a href='function/stepforward' target='_blank'>stepForward</a> ao longo do tempo.</p>
 
@@ -405,19 +408,19 @@ reward = ( rewardBase / mmr * avgmmr ) * ( 1 + ((0.001 * mmr - 1) * lowmmr) )</e
 
                 <p>Para usar um item durante o combate, seu gladiador precisa usar a função <a href='function/useitem'>useItem</a>. Como argumento você deve informar uma String com o <b>identificador</b> do item desejado. Cada item encomendado e ativo só poderá ser usado uma vez durante cada batalha.</p>
 
-                <pre><code class="language-c">// Linguagem C
+                <ignore><pre><code class="language-c">// Linguagem C
 loop(){
     if (getHp() < 100){
         useItem("pot-hp-1");
     }
 }
-                </code></pre>
+                </code></pre></ignore>
 
-                <pre><code class="language-python"># Linguagem Python
+                <ignore><pre><code class="language-python"># Linguagem Python
 def loop():
     if getHp() < 100:
         useItem("pot-hp-1")
-                </code></pre>
+                </code></pre></ignore>
 
                 <div id='sample-3' class='block-container'><xml xmlns="https://developers.google.com/blockly/xml"><block type="loop" id="YE7%z0YaVxJr`5WsA=Gq" deletable="false" x="0" y="0"><comment pinned="false" h="80" w="160">Exemplo em blocos</comment><statement name="CONTENT"><block type="controls_if" id="?S[$exC;_2n]]J=^dNL!"><value name="IF0"><block type="logic_compare" id=",IWL8qN1c6Ijr^+[)ZKq"><field name="OP">LT</field><value name="A"><block type="get_info" id="NE9L%W_n|TSwbD$W)U7,"><field name="COMPLEMENT">Hp</field></block></value><value name="B"><block type="math_number" id="JM:^L2Od;kf}U,1ET0B!"><field name="NUM">100</field></block></value></block></value><statement name="DO0"><block type="useitem" id="xFkSVwt;a`_Q[VDM#]dQ"><mutation xmlns="http://www.w3.org/1999/xhtml" use-return="false"></mutation><value name="POTION"><block type="pot_hp" id="S7BZ)M1ZLl)w3/g1U(Z#"><field name="COMPLEMENT">1</field></block></value></block></statement></block></statement></block></xml></div>
 

@@ -3,8 +3,9 @@ import {menu} from "./side-menu.js";
 import { translator } from "./translate.js";
 
 ;(async () => {
+    let user
     const translatorReady = new Promise( async resolve => {
-        await login.wait()
+        user = await login.wait()
         await translator.translate(document.querySelector("#content"))
         resolve(true)
     })
@@ -30,19 +31,19 @@ import { translator } from "./translate.js";
             let match = e.href.split("/").slice(-1)[0]
 
             let fakePath = 'function'
-            let nameLang = 'default'
+            let name = data[match].name.default
             let ext = ''
             if (page == 'docs-blocks'){
-                nameLang = 'block'
                 ext = '.blk'
+                name = data[match].name.block[user.speak]
             }
             else if (page == 'docs-ptbr'){
                 fakePath = 'funcao'
-                nameLang = 'pt'
+                name = data[match].name.pt
             }
 
             e.href = `${fakePath}/${match}${ext}`
-            e.innerHTML = `<ignore>${data[match].name[nameLang]}</ignore>`
+            e.innerHTML = `<ignore>${name}</ignore>`
             e.parentNode.nextElementSibling.innerHTML = translator.getTranslated(data[match].description.brief)
         })
 

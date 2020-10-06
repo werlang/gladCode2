@@ -5,13 +5,14 @@ import {loader} from "./loader.js"
 import {translator} from "./translate.js"
 
 ;(async () => {
-    login.wait().then( () => translator.translate(document.querySelector('#content-box')))
+    login.wait().then(async () => {
+        await translator.translate(document.querySelector('#content-box'))
+        loader.load('Prism')
+    })
 
     header.load()
 
     await menu.load(document.querySelector('#side-menu'))
-
-    loader.load('Prism')
 
     document.querySelector('#learn').classList.add('here')
 

@@ -36,12 +36,25 @@ menu.load = async function(menuEl){
                     document.querySelector("#docs-ptbr").nextElementSibling.remove()
                     document.querySelector("#docs-ptbr").remove()
 
-                    // translator ignore function names
-                    document.querySelectorAll("#side-menu a").forEach(e => {
-                        if (e.href.indexOf("function/") != -1){
-                            e.innerHTML = `<ignore>${e.innerHTML}</ignore>`
-                        }
+                    // get function names
+                    fetch("script/functions.json").then(async response => {
+                        const funcs = await response.json()
+
+                        // translator ignore function names
+                        document.querySelectorAll("#side-menu a").forEach(e => {
+                            if (e.href.indexOf("function/") != -1){
+                                let name = e.innerHTML
+
+                                const filename = e.href.split("function/")[1].split('.')
+                                if (filename.length > 1 && filename[1] == 'blk'){
+                                    name = funcs[filename[0]].name.block[user.speak]
+                                }
+    
+                                e.innerHTML = `<ignore>${name}</ignore>`
+                            }
+                        })
                     })
+
 
                     translator.translate(menuEl)
                 }

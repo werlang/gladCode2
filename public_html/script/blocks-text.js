@@ -230,7 +230,7 @@ customBlocks.en['getsimtime'] = {}
 customBlocks.en['getsimtime'].field = "Get simulation time"
 
 customBlocks.en['pot_hp'] = {}
-customBlocks.en['pot_hp'].field = "Vitality potion"
+customBlocks.en['pot_hp'].field = "Potion of vitality"
 
 customBlocks.en['pot_ap'] = {}
 customBlocks.en['pot_ap'].field = "Concentration potion"
