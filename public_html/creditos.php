@@ -7,8 +7,6 @@
     <title>gladCode - Créditos</title>
     <link rel='stylesheet' href="css/index.css"/>
     
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-    
     <script>
         ;(async () => {
             const {header, login} = await import("./script/header.js")

@@ -6,15 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode</title>
-
     <link rel='stylesheet' href="css/function.css"/>
-    
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
-
     <script type="module" src="script/function.js" async></script>
-    
-    </head>
+</head>
 <body>
     <div id='frame'>
         <div id='side-menu'></div>

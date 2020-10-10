@@ -8,6 +8,7 @@ const paths = {
         "https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"
     ],
     jqueryui: "https://code.jquery.com/ui/1.12.1/jquery-ui.min.js",
+    jquery: "https://code.jquery.com/jquery-3.4.1.min.js",
     gladcard: "./glad-card.js",
     google: "./googlelogin.js",
     chat: "./chat.js",

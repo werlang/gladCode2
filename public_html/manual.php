@@ -5,11 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Documentação</title>
-
     <link rel='stylesheet' href="css/manual.css"/>
-    
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-    
     <script type="module" src="script/manual.js" async></script>
 
     </head>

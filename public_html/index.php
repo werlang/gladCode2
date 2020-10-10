@@ -19,10 +19,6 @@
     <title>gladCode</title>
     
     <link rel='stylesheet' href="css/index.css"/>
-    
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js' async></script>
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-
     <script src="script/index.js" type="module" async></script>
 </head>
 

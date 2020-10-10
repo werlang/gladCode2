@@ -22,7 +22,6 @@
 
     <link type='text/css' rel='stylesheet' href='css/admin.css'/> 
 
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js" async></script>
     <script type="module" src="script/admin.js" async></script>
 </head>

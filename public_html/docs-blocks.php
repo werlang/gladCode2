@@ -6,9 +6,6 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Documentação</title>
     <link rel='stylesheet' href="css/docs.css"/>
-    
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-
     <script type="module" src="script/docs.js" async></script>
     
     </head>

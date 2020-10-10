@@ -6,7 +6,6 @@ import {login} from "./header.js"
 import {menu} from "./side-menu.js"
 import {translator} from "./translate.js"
 import {loader} from "./loader.js"
-import {jQueryReady} from "./utils.js"
 
 const translatorReady = new Promise( async resolve => {
     await login.wait()
@@ -21,7 +20,7 @@ var langDict = false
 var user;
 
 (async () => {
-    await jQueryReady()
+    await loader.load("jquery")
     $('#learn').addClass('here');
 
     var func = "";

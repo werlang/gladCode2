@@ -126,19 +126,4 @@ function mergeLog(data){
     return log
 }
 
-function jQueryReady(){
-    return new Promise(resolve => {
-        (function checkReady(){
-            if (window.jQuery){
-                resolve(true)
-            }
-            else{
-                setTimeout( () => {
-                    checkReady()
-                }, 50)
-            }
-        })()
-    })
-}
-
-export {post, getDate, getTimeSince, $index, deepMerge, mergeLog, jQueryReady}
+export {post, getDate, getTimeSince, $index, deepMerge, mergeLog}

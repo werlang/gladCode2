@@ -17,9 +17,6 @@
 	<title>gladCode - Publicação</title>
 
     <link rel='stylesheet' href="css/post.css"/>
-
-	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous" async></script>
-
     <script type="module" src="script/post.js" async></script>
 
     </head>

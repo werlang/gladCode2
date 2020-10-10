@@ -110,9 +110,6 @@ const translatorReady = (async () => {
     return true
 })()
 
-;(async () => {
-})()
-
 document.querySelector("#menu #profile").addEventListener('click', async () => {
     if (!document.querySelector("#img-upload").dropzone){
         await loader.load(["Dropzone", "Croppie"])
@@ -199,7 +196,8 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
     messages.next()
 })
 
-window.onload = function(){
+;(async () => {
+    await loader.load("jquery")
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
 
@@ -958,7 +956,7 @@ window.onload = function(){
         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
     })
 
-}
+})()
 
 async function checkNotifications(){
     return post("back_notification.php", {
