@@ -5,7 +5,7 @@ import {translator} from "./translate.js"
 import {Message, createToast} from "./dialog.js"
 import { loader } from "./loader.js"
 
-var user
+let user
 
 header.load()
 
@@ -153,7 +153,7 @@ document.querySelector("#menu #profile").addEventListener('click', async () => {
                                 'background-image': "url("+ dataImg +")",
                                 'background-size': 'cover'
                             });
-                            login.user.foto = dataImg;
+                            user.foto = dataImg;
                             //console.log(dataImg);
                             $('#img-preview-container').hide();
                         });
@@ -169,11 +169,7 @@ document.querySelector("#menu #profile").addEventListener('click', async () => {
         })
     }
 
-    loader.load("jqueryui").then( () => {
-        let language = $('#profile-panel #language select');
-        language.selectmenu().val(user.language).selectmenu('refresh');
-    })
-
+    document.querySelector('#profile-panel #language select').value = user.language    
 })
 
 document.querySelector("#menu #potions").addEventListener('click', async () => {

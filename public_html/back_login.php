@@ -44,10 +44,12 @@
                 $info['language'] = $row['pref_language'];
                 $info['apothecary'] = $row['apothecary'];
 
-                if (exif_imagetype($row['foto']) == IMAGETYPE_PNG){
+                $img_type = exif_imagetype($row['foto']);
+                if ($img_type == IMAGETYPE_PNG || $img_type == IMAGETYPE_JPEG){
                     $foto = $row['foto'];
                 }
                 else{
+                    unlink($row['foto']);
                     $gladcode = 'gladcodehashsecret36';
                     $email = $row['email'];
                     $hash = md5( $gladcode . strtolower( trim( $email ) ) );
@@ -198,20 +200,24 @@
             $result = runQuery($sql);
 
             if ($result->num_rows == 0){
-                if (explode("/", $picture)[0] != "profpics"){
-                    $sql = "SELECT foto, pasta, UNIX_TIMESTAMP(now(3)) AS time FROM usuarios WHERE id = '$user'";
-                    $result = runQuery($sql);
-                    $row = $result->fetch_assoc();
-                    $dir = md5($row['time']. $row['pasta']);
+                $sql = "SELECT foto, pasta, UNIX_TIMESTAMP(now(3)) AS time FROM usuarios WHERE id = '$user'";
+                $result = runQuery($sql);
+                $row = $result->fetch_assoc();
 
+                $pattern = '#^data:image/\w+;base64,#i';
+                $output['foto'] = $picture;
+                if (preg_match($pattern, $picture)){
                     if (explode("/", $row['foto'])[0] == "profpics"){
                         unlink($row['foto']);
                     }
-
-                    $pattern = '#^data:image/\w+;base64,#i';
+                    
+                    $filename = md5($row['time']. $row['pasta']);
                     $picture = base64_decode(preg_replace($pattern, '', $picture));
-                    file_put_contents("profpics/$dir.jpg", $picture);
-                    $picture = "profpics/$dir.jpg";
+                    file_put_contents("profpics/$filename.jpg", $picture);
+                    $picture = "profpics/$filename.jpg";
+                }
+                else{
+                    $picture = $row['foto'];
                 }
                 
                 $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language', pref_translation = '$pref_translation' WHERE id = '$user'";

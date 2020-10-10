@@ -120,69 +120,70 @@ $(document).ready( function(){
             </div>`
             $('body').append(box);
 
-            await loader.load('jqueryui')
-            $( ".train.window #players #slider" ).slider({
-                range: "min",
-                min: 2,
-                max: 5,
-                step: 1,
-                value: 3,
-                create: function( event, ui ) {
-                    var val = $(this).slider('option','value');
-                    $(this).find('.ui-slider-handle').html(val);
-                },
-                slide: function( event, ui ) {
-                    $(this).find('.ui-slider-handle').each( (index, obj) => {
-                        $(obj).html(ui.value);
-                    });
-                }
-            })
-
-            $( ".train.window #maxtime #slider" ).slider({
-                range: "min",
-                min: 5,
-                max: 120,
-                step: 5,
-                value: 45,
-                create: function( event, ui ) {
-                    var val = $(this).slider('option','value');
-                    $(this).find('.ui-slider-handle').html(val + 'm');
-                },
-                slide: function( event, ui ) {
-                    $(this).find('.ui-slider-handle').each( (index, obj) => {
-                        $(obj).html(ui.value + 'm');
-                    });
-                }
-            });
-
-            $( ".train.window #weight #slider" ).slider({
-                range: "min",
-                min: 0,
-                max: 8,
-                step: 1,
-                value: 1,
-                eqValue: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10],
-                create: function( event, ui ) {
-                    let eqValue = $(this).slider('option','eqValue')
-                    let value = $(this).slider('option','value')
-                    let text = eqValue[value]
-                    text = text == 10 ? text : text.toFixed(1)
-                    $(this).find('.ui-slider-handle').html(text + 'x')
-                },
-                slide: function( event, ui ) {
-                    $(this).find('.ui-slider-handle').each( (index, obj) => {
+            loader.load('jqueryui').then( () => {
+                $( ".train.window #players #slider" ).slider({
+                    range: "min",
+                    min: 2,
+                    max: 5,
+                    step: 1,
+                    value: 3,
+                    create: function( event, ui ) {
+                        var val = $(this).slider('option','value');
+                        $(this).find('.ui-slider-handle').html(val);
+                    },
+                    slide: function( event, ui ) {
+                        $(this).find('.ui-slider-handle').each( (index, obj) => {
+                            $(obj).html(ui.value);
+                        });
+                    }
+                })
+    
+                $( ".train.window #maxtime #slider" ).slider({
+                    range: "min",
+                    min: 5,
+                    max: 120,
+                    step: 5,
+                    value: 45,
+                    create: function( event, ui ) {
+                        var val = $(this).slider('option','value');
+                        $(this).find('.ui-slider-handle').html(val + 'm');
+                    },
+                    slide: function( event, ui ) {
+                        $(this).find('.ui-slider-handle').each( (index, obj) => {
+                            $(obj).html(ui.value + 'm');
+                        });
+                    }
+                });
+    
+                $( ".train.window #weight #slider" ).slider({
+                    range: "min",
+                    min: 0,
+                    max: 8,
+                    step: 1,
+                    value: 1,
+                    eqValue: [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10],
+                    create: function( event, ui ) {
                         let eqValue = $(this).slider('option','eqValue')
-                        let text = eqValue[ui.value]
+                        let value = $(this).slider('option','value')
+                        let text = eqValue[value]
                         text = text == 10 ? text : text.toFixed(1)
-                        $(obj).html(text + 'x')
-                    });
-                },
-                getWeight: function(){
-                    let eqValue = $( ".train.window #weight #slider" ).slider('option','eqValue')
-                    let value = $( ".train.window #weight #slider" ).slider('option','value')
-                    return eqValue[value]
-                }
-            });
+                        $(this).find('.ui-slider-handle').html(text + 'x')
+                    },
+                    slide: function( event, ui ) {
+                        $(this).find('.ui-slider-handle').each( (index, obj) => {
+                            let eqValue = $(this).slider('option','eqValue')
+                            let text = eqValue[ui.value]
+                            text = text == 10 ? text : text.toFixed(1)
+                            $(obj).html(text + 'x')
+                        });
+                    },
+                    getWeight: function(){
+                        let eqValue = $( ".train.window #weight #slider" ).slider('option','eqValue')
+                        let value = $( ".train.window #weight #slider" ).slider('option','value')
+                        return eqValue[value]
+                    }
+                });
+            })
 
             $('#fog .train.window').hide().fadeIn();
             $('#fog .train.window #name').focus();
