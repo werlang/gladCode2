@@ -16,7 +16,7 @@ customBlocks.pt['moveforward'] = {}
 customBlocks.pt['moveforward'].field = ["Mover para frente", "passos"]
 
 customBlocks.pt['turn'] = {}
-customBlocks.pt['turn'].field = "Virar para"
+customBlocks.pt['turn'].field = ["Virar para", "Graus"]
 customBlocks.pt['turn'].dropdown = ["Posição", "Alvo", "Ataque recebido", "Esquerda", "Direita"]
 
 customBlocks.pt['turnangle'] = {}
@@ -64,7 +64,7 @@ customBlocks.pt['get_lasthit'].field = ["", "do ataque recebido"]
 customBlocks.pt['get_lasthit'].dropdown = ["Tempo", "Ângulo"]
 
 customBlocks.pt['upgrade'] = {}
-customBlocks.pt['upgrade'].field = "Melhorar"
+customBlocks.pt['upgrade'].field = ["Melhorar", "em", ""]
 customBlocks.pt['upgrade'].dropdown = ["Força", "Agilidade", "Inteligência"]
 
 customBlocks.pt['speak'] = {}
@@ -140,7 +140,7 @@ customBlocks.en['moveforward'] = {}
 customBlocks.en['moveforward'].field = ["Move forward", "steps"]
 
 customBlocks.en['turn'] = {}
-customBlocks.en['turn'].field = "Turn to"
+customBlocks.en['turn'].field = ["Turn to", "deg."]
 customBlocks.en['turn'].dropdown = ["Position", "Target", "Last hit", "Left", "Right"]
 
 customBlocks.en['turnangle'] = {}
@@ -188,7 +188,7 @@ customBlocks.en['get_lasthit'].field = ["Get last hit", ""]
 customBlocks.en['get_lasthit'].dropdown = ["Time", "Angle"]
 
 customBlocks.en['upgrade'] = {}
-customBlocks.en['upgrade'].field = "Upgrade"
+customBlocks.en['upgrade'].field = ["Upgrade", "", "points"]
 customBlocks.en['upgrade'].dropdown = ["Strength", "Agility", "Intelligence"]
 
 customBlocks.en['speak'] = {}

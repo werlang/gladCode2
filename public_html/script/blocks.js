@@ -241,7 +241,7 @@ Blockly.initCustomBlocks = async function(){
         init: function() {
             const text = Blockly.customBlocks[user.speak][this.type]
             this.appendDummyInput()
-                .appendField(text.field)
+                .appendField(text.field[0])
                 .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"TO"], [text.dropdown[1],"TARGET"], [text.dropdown[2],"HIT"], [text.dropdown[3],"LEFT"], [text.dropdown[4],"RIGHT"]], this.selection.bind(this)), "COMPLEMENT");
             this.appendValueInput("X")
                 .setCheck("Number")
@@ -280,6 +280,7 @@ Blockly.initCustomBlocks = async function(){
             });
         },
         reshape({useReturn, option}){
+            const text = Blockly.customBlocks[user.speak][this.type]
             if (["TO", "TARGET", "HIT", "LEFT", "RIGHT"].indexOf(option) != -1){
                 var input_now = [];
                 for (let i in this.inputList){
@@ -327,7 +328,7 @@ Blockly.initCustomBlocks = async function(){
                         this.appendValueInput("ANGLE")
                             .setCheck("Number")
                         this.appendDummyInput("TEXT")
-                            .appendField("Graus")
+                            .appendField(text.field[1])
                             .setAlign(Blockly.ALIGN_RIGHT);
     
                         connectShadow(this, 'ANGLE');
@@ -890,12 +891,14 @@ Blockly.initCustomBlocks = async function(){
         init: function() {
             const text = Blockly.customBlocks[user.speak][this.type]
             this.appendDummyInput()
-                .appendField(text.field)
+                .appendField(text.field[0])
                 .appendField(new Blockly.FieldDropdown([[text.dropdown[0],"STR"], [text.dropdown[1],"AGI"], [text.dropdown[2],"INT"]]), "COMPLEMENT");
             this.appendValueInput("VALUE")
                 .setCheck("Number")
                 .setAlign(Blockly.ALIGN_RIGHT)
-                .appendField("em");
+                .appendField(text.field[1]);
+            this.appendDummyInput()
+                .appendField(text.field[2])
             this.setInputsInline(true);
             this.setOutput(false);
             this.setPreviousStatement(true);
