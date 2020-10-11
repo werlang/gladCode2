@@ -7,10 +7,7 @@
     <title>gladCode - Estatísticas</title>
     <link rel='stylesheet' href="css/stats.css"/>
     <script type="module" src="script/stats.js" async></script>
-<!--     
-    <script src="script/dialog.js"></script>
-     -->
-    </head>
+</head>
 <body>
     <div id='frame'>
         <div id='side-menu'></div>

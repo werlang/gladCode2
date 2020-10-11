@@ -208,12 +208,20 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
         // console.log(user);
 
         if ($('#tab').length){
-            var id = $('#tab').html();
-            $('#'+ id).click();
-            $('#tab').remove();
+            var id = $('#tab').html()
+            $('#'+ id).click()
+            $('#tab').remove()
         }
-        else
-            $('#menu #profile').click();
+        else{
+            $('#menu #profile').click()
+        }
+
+        if ($('#subtab').length){
+            let subtab = $('#subtab').html()
+            $('#subtab').remove()
+            $(`#panel #battle-mode #${subtab}.button`).click()
+        }
+        
         $('#profile-ui #picture img').attr('src',user.foto);
         $('#profile-ui #nickname').html(user.apelido);
 
@@ -554,12 +562,6 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
         var nick = $('#panel #duel.wrapper #table-friends .row.selected .cell.nick').text();
         create_duel_box(nick, userid);
     });
-
-    if ($('#subtab').length){
-        let subtab = $('#subtab').html()
-        $('#subtab').remove()
-        $(`#panel #battle-mode #${subtab}.button`).click()
-    }
 
     post("back_glad.php",{
         action: "GET",

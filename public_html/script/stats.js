@@ -20,9 +20,9 @@ loader.load('jquery').then( () => {
     menu.load().then( function(data){
         var loc = window.location.href.split("/");
         loc = loc[loc.length - 1];
-        $('#side-menu #'+loc).addClass('here');
+        document.querySelector('#side-menu #'+loc).classList.add('here')
     });
-    $('#about').addClass('here');
+    document.querySelector('#about').classList.add('here')
 
     $(document).ready( function() {
         loader.load('jqueryui').then( async () => {
