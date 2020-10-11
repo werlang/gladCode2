@@ -4,6 +4,9 @@ import {translator} from "./translate.js"
 export const menu = {}
 
 menu.load = async function(menuEl){
+    if (!menuEl){
+        menuEl = document.querySelector("#side-menu")
+    }
     await header.load()
 
     const search = document.querySelector('#header #search')

@@ -1,5 +1,24 @@
 import {translator} from "./translate.js";
 
+translator.translate([
+    "dias",
+    "meses",
+    "horas",
+    "minutos",
+    "Janeiro",
+    "Fevereiro", 
+    "Março", 
+    "Abril", 
+    "Maio", 
+    "Junho", 
+    "Julho", 
+    "Agosto", 
+    "Setembro", 
+    "Outubro", 
+    "Novembro", 
+    "Dezembro"
+])
+
 const post = async function(path, args){
     // console.log(new URLSearchParams(args).toString())
     const response = await fetch(path, {
@@ -21,25 +40,6 @@ const post = async function(path, args){
 
     return data
 }
-
-translator.translate([
-    "dias",
-    "meses",
-    "horas",
-    "minutos",
-    "Janeiro",
-    "Fevereiro", 
-    "Março", 
-    "Abril", 
-    "Maio", 
-    "Junho", 
-    "Julho", 
-    "Agosto", 
-    "Setembro", 
-    "Outubro", 
-    "Novembro", 
-    "Dezembro"
-])
 
 function getTimeSince(min){
     min = parseInt(min);

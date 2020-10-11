@@ -1,13 +1,16 @@
-import {post} from "./utils.js"
 import {Message} from "./dialog.js"
-import {login} from "./header.js"
+import {loader} from "./loader.js"
+
+// const loginReady = login.wait()
 
 const translator = {
     ready: true
 }
 
 translator.translate = async function(elements){
-    let lang = this.language ? this.language : 'pt'
+    const {login} = await loader.load("header")
+    const user = await login.wait()
+    let lang = this.language ? this.language : user.speak
     let contents = this.translations ? this.translations : {}
     
     // console.log(elements)
@@ -108,6 +111,7 @@ translator.translate = async function(elements){
     }
 
     if (toTranslate.length){
+        const {post} = await loader.load("utils")
         let data = await post("back_translation.php", {
             action: "TRANSLATE",
             language: lang,
@@ -304,11 +308,15 @@ translator.bind = function (obj){
                                         new: input.input
                                     }
                                     
+                                    const {post} = await loader.load("utils")
+                                    const {login} = await loader.load("header")
+                                    const user = await login.wait()
+
                                     let data = await post("back_translation.php", {
                                         action: "SUGGEST",
                                         original: advice.old,
                                         suggestion: advice.new,
-                                        language: login.user.speak
+                                        language: user.speak
                                     })
                                     // console.log(data)
         

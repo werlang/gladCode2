@@ -23,6 +23,9 @@ const paths = {
     ranking: "./profile-rank.js",
     tourn: "./profile-tourn.js",
     train: "./profile-train.js",
+    translator: "./translate.js",
+    utils: "./utils.js",
+    header: "./header.js",
 }
 
 const callbacks = {

@@ -12,7 +12,7 @@ stats.save = function(hash){
 
         const steps = mergeLog(data.log)
         // console.log(steps)
-        
+
         var abilities = {
             'fireball': {'id': 0, 'uses': 0},
             'teleport': {'id': 1, 'uses': 0},
@@ -24,11 +24,11 @@ stats.save = function(hash){
             'ranged': {'id': 7, 'uses': 0},
             'win': {}
         };
-        
+
         var glads = [];
         for (var g in steps[0].glads)
             glads[g] = {"charge": false};
-    
+
         var wonhab = [];
         var gladwon = [];
         var potionuse = []
@@ -43,7 +43,7 @@ stats.save = function(hash){
             }
         }
         // console.log(gladwon);
-    
+
         for (var s in steps){
             for (var a in abilities){
                 for (var g in steps[s].glads){
@@ -59,7 +59,7 @@ stats.save = function(hash){
                     }
                 }
                 if (gladwon.length){
-                    for (let i in gladwon){                    
+                    for (let i in gladwon){
                         if (steps[s].glads[gladwon[i]].action == abilities[a].id){
                             var ex = false;
                             for (var k in wonhab){
@@ -77,7 +77,7 @@ stats.save = function(hash){
                 let glad = steps[s].glads[g]
                 if (parseInt(glad.action) == 11){
                     let potion = glad.code.split("useItem(\"")[1].split("\"")[0]
-                    
+
                     if (!potionuse.includes(potion)){
                         potionuse.push(potion)
                     }
@@ -154,28 +154,30 @@ stats.save = function(hash){
         }
         // console.log(args)
         post("back_stats.php", args)
-    
+
     });
-    
+
 }
 
 stats.load = function(args){
-    var date = '';
-    var mmr = '';
-    if (args && args.date)
-        date = args.date;
-    if (args && args.mmr)
-        mmr = args.mmr;
-    var ajax = post( "back_stats.php", {
+    let date = ''
+    let mmr = ''
+
+    if (args && args.date){
+        date = args.date
+    }
+
+    if (args && args.mmr){
+        mmr = args.mmr
+    }
+
+    return post( "back_stats.php", {
         action: 'load',
         start: date.start,
         end: date.end,
         smmr: mmr.start,
         emmr: mmr.end
-    }).then(function( data ) {
-        // console.log(data);
-    });	
-    return ajax;
+    })
 }
 
 export {stats}

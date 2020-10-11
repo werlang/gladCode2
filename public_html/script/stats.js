@@ -1,66 +1,88 @@
 import {stats} from "./stats_func.js"
 import {header} from "./header.js";
+import {post} from "./utils.js";
+import {menu} from "./side-menu.js";
+import {loader} from "./loader.js";
+import {translator} from "./translate.js";
 
 header.load()
 
-window.onload = function(){
-}
+const translatorReady = Promise.all([
+    translator.translate(document.querySelector('#frame')),
+    translator.translate([
+        "Nenhuma batalha encontrada",
+        "Quantidade de batalhas que a poção foi utilizada",
+        "Percentual de batalhas que o gladiador que usou a poção venceu"
+    ])
+])
 
-$(document).ready( function() {
-    menu_loaded().then( function(data){
+loader.load('jquery').then( () => {
+    menu.load().then( function(data){
         var loc = window.location.href.split("/");
         loc = loc[loc.length - 1];
         $('#side-menu #'+loc).addClass('here');
-    });    
+    });
     $('#about').addClass('here');
 
-    $( "#mmr-slider" ).slider({
-        range: true,
-        min: 0,
-        max: 4000,
-        step: 100,
-        values: [500, 3500],
-        create: function( event, ui ) {
-            var val = $(this).slider('option','values');
-            $(this).find('.ui-slider-handle').eq(0).html(val[0]);
-            $(this).find('.ui-slider-handle').eq(1).append(val[1]);
-        },
-        slide: function( event, ui ) {
-            $(this).find('.ui-slider-handle').each( (index, obj) => {
-                $(obj).html(ui.values[index]);
+    $(document).ready( function() {
+        loader.load('jqueryui').then( async () => {
+            $( "#mmr-slider" ).slider({
+                range: true,
+                min: 0,
+                max: 4000,
+                step: 100,
+                values: [500, 3500],
+                create: function( event, ui ) {
+                    var val = $(this).slider('option','values');
+                    $(this).find('.ui-slider-handle').eq(0).html(val[0]);
+                    $(this).find('.ui-slider-handle').eq(1).append(val[1]);
+                },
+                slide: function( event, ui ) {
+                    $(this).find('.ui-slider-handle').each( (index, obj) => {
+                        $(obj).html(ui.values[index]);
+                    });
+                },
+                stop: function( event, ui ) {
+                    search();
+                }
             });
-        },
-        stop: function( event, ui ) {
-            search();
-        }
-    });
-    
-    $( "#date-str, #date-end" ).datepicker({
-        showAnim: "slideDown",
-        dateFormat: "dd/mm/yy",
-        dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-        dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
-        dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
-        monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-        monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-        nextText: 'Próximo',
-        prevText: 'Anterior'
-    });
-    
-    $( "#date-str, #date-end" ).change( function() {
-        search();
-    });
-    
-    search();
 
-    $('.table .info').click( function() {
-        //create_tooltip($(this).attr('title'), $(this));
+            loader.load("header").then(({login}) => login.wait().then(user => {
+                let opt = {showAnim: "slideDown"}
+                if (user.speak == 'pt'){
+                    opt = {
+                        showAnim: "slideDown",
+                        dateFormat: "dd/mm/yy",
+                        dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                        dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+                        dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+                        monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                        monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                        nextText: 'Próximo',
+                        prevText: 'Anterior'
+                    }
+                }
+                
+                $( "#date-str, #date-end" ).datepicker(opt)
+            }))
+        })
+
+        $( "#date-str, #date-end" ).change( function() {
+            search();
+        });
+
+        search();
+
+        $('.table .info').click( function() {
+            //create_tooltip($(this).attr('title'), $(this));
+        });
     });
-});
+})
 
 async function search(){
+    await loader.load('jqueryui')
     var mmr = $( "#mmr-slider" ).slider('option','values');
-    
+
     let st = stats.load({
         date: {
             start: $("#date-str").val(),
@@ -71,17 +93,17 @@ async function search(){
             end: mmr[1]
         }
     })
-    
+    // console.log(await st)
+
+    await translatorReady
     let potions = post("back_slots.php", { action: "ITEMS" })
 
     load_table(await st, (await potions).potions)
-
 }
 
 function load_table(data, potions){
-    data = JSON.parse(data);
     // console.log(data);
-    
+
     $('#t-hab tbody').html("");
     $('#t-glad tbody td').not('.fixed').remove();
     if (data.average.length != 0){
@@ -108,7 +130,7 @@ function load_table(data, potions){
                 winner = winner.toFixed(1);
             else
                 winner = '-';
-    
+
             if (a != 'lvl' && avg != '-')
                 avg += '%';
             if (a != 'lvl' && winner != '-')
@@ -127,13 +149,15 @@ function load_table(data, potions){
             $('#avg-time').html('-');
 
         if (data.potions.battles < data.nbattles.total){
-            $('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.potions.battles} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();
+            translator.translate(`Somente <ignore>${data.potions.battles}</ignore> batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).then( data => {
+                $('#single-stats #low-battles').removeClass('hidden').attr('title', data).tooltip()
+            })
         }
         else if (!$('#single-stats #low-battles').hasClass('hidden'))
             $('#single-stats #low-battles').addClass('hidden');
     }
     else{
-        $('#t-hab tbody').html("<tr><td colspan=4>Nenhuma batalha encontrada</td></tr>");
+        $('#t-hab tbody').html(`<tr><td colspan=4>${translator.getTranslated("Nenhuma batalha encontrada")}</td></tr>`);
         $('#t-glad tbody tr').each( function(){
             $(this).append(`<td colspan=2></td>`)
         })
@@ -141,13 +165,13 @@ function load_table(data, potions){
         $('#nbattles').html("0");
         $('#single-stats #low-battles').addClass('hidden')
     }
-    
+
     let table = {}
     for (let p in potions){
         let potkind = p.split("-").splice(0,2).join("-")
         if (!table[potkind]){
             let name = potions[p].name.split(" ")
-            name = name.splice(0, name.length-1).join(" ") 
+            name = name.splice(0, name.length-1).join(" ")
             table[potkind] = {name: name, lvl: []}
         }
 
@@ -163,24 +187,28 @@ function load_table(data, potions){
         table[potkind].lvl[lvl-1] = {use: uses, win: wins}
     }
 
-    let str = []
-    for (let p in table){
-        row = []
-        for (let i=0 ; i<5 ; i++){
-            if (!table[p].lvl[i] || table[p].lvl[i].use == 0){
-                row.push(`<td>-</td>`)    
+    translator.translate(Object.values(table).map(e => e.name)).then(translatedPotions => {
+        // console.log(translatedPotions)
+        const str = []
+        for (let p in table){
+            const row = []
+            for (let i=0 ; i<5 ; i++){
+                if (!table[p].lvl[i] || table[p].lvl[i].use == 0){
+                    row.push(`<td>-</td>`)
+                }
+                else{
+                    let uses = table[p].lvl[i].use
+                    let wins = table[p].lvl[i].win / table[p].lvl[i].use * 100
+                    row.push(`<td><div>
+                        <span class='up' title='${translator.getTranslated("Quantidade de batalhas que a poção foi utilizada", false)}'>${uses}</span>/
+                        <span class='down' title='${translator.getTranslated("Percentual de batalhas que o gladiador que usou a poção venceu", false)}'>${wins == 100 ? wins.toFixed(0) : wins.toFixed(1)}%</span>
+                    </div></td>`)
+                }
             }
-            else{
-                let uses = table[p].lvl[i].use
-                let wins = table[p].lvl[i].win / table[p].lvl[i].use * 100
-                row.push(`<td><div>
-                    <span class='up' title='Quantidade de batalhas que a poção foi utilizada'>${uses}</span>/
-                    <span class='down' title='Percentual de batalhas que o gladiador que usou a poção venceu'>${wins == 100 ? wins.toFixed(0) : wins.toFixed(1)}%</span>
-                </div></td>`)
-            }
+            str.push(`<tr><td>${translatedPotions.shift()}</td>${row.join("")}</tr>`)
         }
-        str.push(`<tr><td>${table[p].name}</td>${row.join("")}</tr>`)
-    }
+    
+        $('#t-pot tbody').html(str.join(""))
+    })
 
-    $('#t-pot tbody').html(str.join(""))
 }
