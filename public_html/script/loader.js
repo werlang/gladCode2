@@ -26,6 +26,7 @@ const paths = {
     translator: "./translate.js",
     utils: "./utils.js",
     header: "./header.js",
+    ace: "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js",
 }
 
 const callbacks = {
@@ -49,6 +50,15 @@ const callbacks = {
     Blockly: async module => {
         // console.log((await module))
         return (await module).Blockly.initCustomBlocks()
+    },
+
+    ace: async () => {
+        window.define = ace.define
+
+        ace.config.set("packaged", true)
+        ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/")
+    
+        return await import("https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.min.js")
     }
 }
 

@@ -1,34 +1,143 @@
-import {gladCard} from "./glad-card.js"
-import {google} from "./googlelogin.js"
-import {header} from "./header.js";
+import {loader} from "./loader.js"
+import {header,login} from "./header.js"
+import { post } from "./utils.js";
 
 header.load()
 
-window.onload = function(){
-}
-
-var editor;
 var saved = true;
 var tested = true;
 var gladid;
-var user;
-var nick;
-var hash;
 var pieces;
-var loadGlad = false;
 var wannaSave = false;
 var blocksEditor = false;
 var sim
 
-$(document).ready( function() {
-    $('#header-editor').addClass('here');
+let user = false
+let loadGlad = false
+
+const editor = {
+    ready: false
+}
+
+editor.init = async function(){
+    await loader.load("ace")
     
-    login.wait().then(data => {
+    const langTools = ace.require("ace/ext/language_tools");
+    const tempEditor = ace.edit("code")
+    for (let i in tempEditor){
+        editor[i] = tempEditor[i]
+    }
+
+    editor.session.setUseSoftTabs(true);
+    editor.session.setOption("tabSize", 4)
+    editor.setTheme("ace/theme/dreamweaver");
+    editor.setFontSize(18);
+    editor.getSession().setUseWrapMode(true);
+    editor.$blockScrolling = Infinity;
+    
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
+    });
+
+    // ---
+    var table = [];
+    const dataTable = await new Promise( (resolve, reject) => {
+        $.get("docs.php", function(content) {
+            var docs = content.matchAll(/<td><a href=['"]([\w]+?)['"]><\/a><\/td>/g);
+            var length = 0;
+            for (let m of docs){
+                $.getJSON(`script/functions/${m[1]}.json`, function(data){
+                    // console.log(m[1]);
+                    table.push({
+                        name: data.name.default,
+                        syntax: data.syntax,
+                        description: data.description.brief,
+                        snippet: data.snippet
+                    });
+                    if (table.length == length){
+                        resolve(table);
+                    }
+                }).fail( function(e){
+                    console.log(e);
+                    length--;
+                });
+                length++;
+            }
+        });
+    });
+    // ---
+    var customCompleter = {
+        getCompletions: function(editor, session, pos, prefix, callback) {
+            if (prefix.length === 0) { callback(null, []); return }
+
+            callback(null, dataTable.map(function(table) {
+                var syntax = table.syntax[editor.language];
+                var snippet = table.snippet[editor.language];
+
+                return {
+                    value: syntax,
+                    caption: table.name,
+                    snippet: snippet,
+                    description: table.description,
+                    syntax: syntax,
+                    score: 1000,
+                    meta: `gladCode-${editor.language}`
+                };
+            }));	
+        },
+        getDocTooltip: function(item) {
+            if (item.meta == 'gladCode'){
+                if (editor.language == 'c')
+                    var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
+                else if (editor.language == 'python')
+                    var func = `<b>${item.syntax}</b>`;
+
+                item.docHTML = `${func}<hr></hr>${item.description}`;
+            }
+            else if (item.snippet) {
+                item.docHTML = `<b>${item.caption}</b><hr></hr>${item.snippet}`;
+            }
+        }
+    }
+    langTools.addCompleter(customCompleter);
+}
+
+editor.init()
+
+loader.load("chat").then( ({chat}) => {
+    chat.init(document.querySelector('#chat-panel'), {
+        full: false,
+        expandWidth: "-65px"
+    }).then( () => {
+        document.querySelector('#chat-panel #show-hide').addEventListener('click', () => {
+            change_size()
+        })
+    
+        // $(window).resize( () => {
+        //     setTimeout( () => {
+        //         change_size();
+        //     },1000);
+        // })
+    
+        function change_size(){
+            const w = document.querySelector('#chat-panel').clientWidth
+            console.log(w)
+            document.querySelector('#panel-right').clientWidth = w
+            // editor.resize();
+            document.querySelector('#float-card').style['margin-right'] = w
+        }
+    })
+})
+
+loader.load("jquery").then( () => $(document).ready(async () => {
+    $('#header-editor').addClass('here')
+    
+    login.wait().then(async data => {
         //console.log(data);
         user = data
         if (user.status == "SUCCESS"){
-            $('#login').html(user.nome);
-            
             if (user.tutor == "1"){
                 tutorial.enabled = true
                 tutorial.show()
@@ -42,18 +151,43 @@ $(document).ready( function() {
                 $('#profile-icon img').attr('src', "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");
             }
 
-            if (user.language == 'blocks')
+            if (user.language == 'blocks'){
                 toggleBlocks({ask: false, active: true})
-
-            editor.setTheme("ace/theme/"+ user.theme);
-            editor.setFontSize(user.font +"px");
-
-            if ($('#newglad').length){
-                $('#newglad').remove();
-                $('#fog-skin').fadeIn();
             }
-            else if (!loadGlad)
-                $('#open').click();
+
+            // editor.setTheme("ace/theme/"+ user.theme);
+            // editor.setFontSize(user.font +"px");
+
+            if (document.querySelector('#glad-code')){
+                const glads = await post("back_glad.php", {
+                    action: "GET"
+                })
+                // console.log(glads)
+                for (let i in glads){
+                    if (glads[i].id == document.querySelector('#glad-code').innerHTML){
+                        loadGlad = glads[i]
+
+                        document.querySelector('#glad-code').remove()
+                
+                        if (loadGlad.blocks){
+                            // TODO load blocks before use
+                            toggleBlocks({ask: false, active: true, load: true})
+                        }
+
+                        break
+                    }
+                }
+            }
+        
+            // if ($('#newglad').length){
+            //     $('#newglad').remove();
+            //     $('#fog-skin').fadeIn();
+            // }
+            // else if (!loadGlad){
+            //     $('#open').click()
+            // }
+
+
         }
         else{
             $('#fog-skin').fadeIn();
@@ -63,37 +197,18 @@ $(document).ready( function() {
     
     $('.fog').hide();
 
-    if ($('#glad-code').length){
-        loadGlad = {
-            id: $('#glad-code #idglad').html(),
-            name: $('#glad-code #name').html(),
-            user: $('#glad-code #user').html(),
-            code: $('#glad-code #code').html(),
-            blocks: $('#glad-code #blocks').html(),
-            vstr: $('#glad-code #vstr').html(),
-            vagi: $('#glad-code #vagi').html(),
-            vint: $('#glad-code #vint').html(),
-            skin: $('#glad-code #skin').html()
-        };
-        nick = $('#glad-code #user').html();
-        $('#glad-code').remove();
-
-        if (loadGlad.blocks){
-            toggleBlocks({ask: false, active: true, load: true})
-        }
-    }
-
-    load_glad_generator($('#fog-skin'));
+    // load_glad_generator($('#fog-skin'));
 
     $('#header-container').addClass('small');
     
-    load_editor();
-    editor.focus();
+    // load_editor();
+    // editor.focus();
 
     $('#float-card .glad-preview').click( function(){
         $('#skin').click();
     });
     
+    // mobile only
     $('#panel-left-opener').click( function(){
         if ($(this).hasClass('open')){
             $('#panel-left').width(0).addClass('hidden');
@@ -107,12 +222,12 @@ $(document).ready( function() {
     
     $('#profile-icon').click( function(){
         if (user){
-            window.location.href = "news";
+            window.location.href = "news"
         }
         else{
-            google.login().then(function(data) {
-                window.location.href = "news";
-            });
+            google.login().then( () => {
+                window.location.href = "news"
+            })
         }
     });
 
@@ -326,7 +441,7 @@ $(document).ready( function() {
                             window.location.href = "news";
                         });
                     });
-s                });
+                });
             }
         }
     });
@@ -672,144 +787,114 @@ s                });
         });
     });
     
-    editor.on("change", function() {
-        saved = false;
-        tested = false;
+    // editor.on("change", function() {
+    //     saved = false;
+    //     tested = false;
 
-        var text = editor.getValue();
+    //     var text = editor.getValue();
 
-        if ($('#float-card .glad-preview').html() != "" && text != ""){
-            $('#download').removeClass('disabled');
-        }
-        else{
-            $('#download').addClass('disabled');
-        }
+    //     if ($('#float-card .glad-preview').html() != "" && text != ""){
+    //         $('#download').removeClass('disabled');
+    //     }
+    //     else{
+    //         $('#download').addClass('disabled');
+    //     }
         
-        var lang = getLanguage(text);
-        if (lang == "c" && editor.language != 'c'){
-            editor.session.setMode("ace/mode/c_cpp");
-            editor.language = 'c';
-        }
-        else if (lang == "python" && editor.language != 'python'){
-            editor.session.setMode("ace/mode/python");
-            editor.language = 'python';
-        }
+    //     var lang = getLanguage(text);
+    //     if (lang == "c" && editor.language != 'c'){
+    //         editor.session.setMode("ace/mode/c_cpp");
+    //         editor.language = 'c';
+    //     }
+    //     else if (lang == "python" && editor.language != 'python'){
+    //         editor.session.setMode("ace/mode/python");
+    //         editor.language = 'python';
+    //     }
 
-        if (tutorial.enabled && user.language == 'blocks'){
-            tutorial.show([
-                'checkStep'
-            ])
-        }
+    //     if (tutorial.enabled && user.language == 'blocks'){
+    //         tutorial.show([
+    //             'checkStep'
+    //         ])
+    //     }
 
-    });
+    // });
+    
+    // editor.on("guttermousedown", function(e) {
+    //     var target = e.domEvent.target;
 
-    init_chat($('#chat-panel'), {
-        full: false,
-        expandWidth: "-65px"
-    });
-    chat.isStarted().then( () => {
-        $('#chat-panel #show-hide').click( () => {
-            resizeInt = setInterval( () => {
-                change_size();
-            },10);
-            setTimeout( () => {
-                clearInterval(resizeInt);
-            },1000);
-        });
-
-        $(window).resize( () => {
-            setTimeout( () => {
-                change_size();
-            },1000);
-        });
-
-        change_size();
-        function change_size(){
-            var w = $('#chat-panel').width();
-            $('#panel-right').width(w);
-            editor.resize();
-            $('#float-card').css({'margin-right': w});
-        }
+    //     if (e.domEvent.button != 0) //left mouse button
+    //         return;
         
-    });
+    //     if (target.className.indexOf("ace_gutter-cell") == -1){
+    //         return;
+    //     }
     
-    editor.on("guttermousedown", function(e) {
-        var target = e.domEvent.target;
-
-        if (e.domEvent.button != 0) //left mouse button
-            return;
-        
-        if (target.className.indexOf("ace_gutter-cell") == -1){
-            return;
-        }
+    //     if (!editor.isFocused()){
+    //         return; 
+    //     }
     
-        if (!editor.isFocused()){
-            return; 
-        }
+    //     var breakpoints = e.editor.session.getBreakpoints(row, 0);
+    //     var row = e.getDocumentPosition().row;
     
-        var breakpoints = e.editor.session.getBreakpoints(row, 0);
-        var row = e.getDocumentPosition().row;
+    //     var Range = require('ace/range').Range;
+
+    //     // If there's a breakpoint already defined, it should be removed, offering the toggle feature
+    //     if(typeof breakpoints[row] === typeof undefined){
+    //         let lang = getLanguage(editor.getValue())
+    //         var brackets = 0;
+    //         for (let i=0 ; i < editor.session.getLength() ; i++){				
+    //             var line = editor.session.getLine(i);
+    //             var ln = parseInt($(target).text()) - 1;
+
+    //             if (i == ln){
+    //                 var rowdif = row;
+    //                 if (editor.session.getLine(ln).indexOf("else") != -1){
+    //                     rowdif = row + 1;
+    //                 }
+
+    //                 if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
+    //                     new Message({message: `Breakpoints só podem ser inseridos dentro de funções`}).show();
+    //                 }
+    //                 else{
+    //                     e.editor.session.setBreakpoint(rowdif);
+
+    //                     var marker = editor.session.getMarkers();
+    //                     var marked = false;
+    //                     for (let i in marker){
+    //                         if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
+    //                             marked = true;
+    //                         }
+    //                     }
+    //                     if (!marked)
+    //                         editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
+    //                 }
     
-        var Range = require('ace/range').Range;
+    //             }
 
-        // If there's a breakpoint already defined, it should be removed, offering the toggle feature
-        if(typeof breakpoints[row] === typeof undefined){
-            let lang = getLanguage(editor.getValue())
-            var brackets = 0;
-            for (let i=0 ; i < editor.session.getLength() ; i++){				
-                var line = editor.session.getLine(i);
-                var ln = parseInt($(target).text()) - 1;
+    //             if (lang == 'c'){
+    //                 if (line.indexOf("{") != -1)
+    //                     brackets++;
+    //                 if (line.indexOf("}") != -1)
+    //                     brackets--;
+    //             }
+    //         }
 
-                if (i == ln){
-                    var rowdif = row;
-                    if (editor.session.getLine(ln).indexOf("else") != -1){
-                        rowdif = row + 1;
-                    }
+    //     }else{
+    //         e.editor.session.clearBreakpoint(row);
 
-                    if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
-                        new Message({message: `Breakpoints só podem ser inseridos dentro de funções`}).show();
-                    }
-                    else{
-                        e.editor.session.setBreakpoint(rowdif);
+    //         var marker = editor.session.getMarkers();
+    //         for (let i in marker){
+    //             if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
+    //                 editor.session.removeMarker(marker[i].id);
+    //             }
+    //         }
+    //     }
 
-                        var marker = editor.session.getMarkers();
-                        var marked = false;
-                        for (let i in marker){
-                            if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
-                                marked = true;
-                            }
-                        }
-                        if (!marked)
-                            editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
-                    }
-    
-                }
+    //     e.stop();
+    // });
 
-                if (lang == 'c'){
-                    if (line.indexOf("{") != -1)
-                        brackets++;
-                    if (line.indexOf("}") != -1)
-                        brackets--;
-                }
-            }
-
-        }else{
-            e.editor.session.clearBreakpoint(row);
-
-            var marker = editor.session.getMarkers();
-            for (let i in marker){
-                if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
-                    editor.session.removeMarker(marker[i].id);
-                }
-            }
-        }
-
-        e.stop();
-    });
-
-    editor.on("guttermouseup", function(e) {
-    });
-});
+    // editor.on("guttermouseup", function(e) {
+    // });
+}))
 
 function setLoadGlad(){
     loadGlad = {};
@@ -818,7 +903,7 @@ function setLoadGlad(){
         skin.push(i);
     loadGlad.skin = JSON.stringify(skin);
     loadGlad.id = gladid;
-    loadGlad.user = nick;
+    loadGlad.user = user.apelido;
     loadGlad.name = $('#distribuicao #nome').val();
     loadGlad.vstr = $('#distribuicao .slider').eq(0).val();
     loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
@@ -851,90 +936,6 @@ function getGladFromFile(filename){
         return response.resolve(data);
     });
     return response.promise();
-}
-
-function load_editor(){
-    var langTools = ace.require("ace/ext/language_tools");
-    editor = ace.edit("code");
-    editor.session.setUseSoftTabs(true);
-    editor.session.setOption("tabSize", 4)
-    editor.setTheme("ace/theme/dreamweaver");
-    editor.setFontSize(18);
-    editor.getSession().setUseWrapMode(true);
-    editor.$blockScrolling = Infinity;
-    
-    editor.setOptions({
-        enableBasicAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true
-    });
-    
-
-    buildDataTable().then( function(dataTable){
-        var customCompleter = {
-            getCompletions: function(editor, session, pos, prefix, callback) {
-                if (prefix.length === 0) { callback(null, []); return }
-
-                callback(null, dataTable.map(function(table) {
-                    var syntax = table.syntax[editor.language];
-                    var snippet = table.snippet[editor.language];
-
-                    return {
-                        value: syntax,
-                        caption: table.name,
-                        snippet: snippet,
-                        description: table.description,
-                        syntax: syntax,
-                        score: 1000,
-                        meta: `gladCode-${editor.language}`
-                    };
-                }));	
-            },
-            getDocTooltip: function(item) {
-                if (item.meta == 'gladCode'){
-                    if (editor.language == 'c')
-                        var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
-                    else if (editor.language == 'python')
-                        var func = `<b>${item.syntax}</b>`;
-
-                    item.docHTML = `${func}<hr></hr>${item.description}`;
-                }
-                else if (item.snippet) {
-                    item.docHTML = `<b>${item.caption}</b><hr></hr>${item.snippet}`;
-                }
-            }
-        }
-        langTools.addCompleter(customCompleter);
-
-    });
-}
-
-async function buildDataTable(){
-    var table = [];
-    return await new Promise( (resolve, reject) => {
-        $.get("docs.php", function(content) {
-            var docs = content.matchAll(/<td><a href=['"]([\w]+?)['"]><\/a><\/td>/g);
-            var length = 0;
-            for (let m of docs){
-                $.getJSON(`script/functions/${m[1]}.json`, function(data){
-                    // console.log(m[1]);
-                    table.push({
-                        name: data.name.default,
-                        syntax: data.syntax,
-                        description: data.description.brief,
-                        snippet: data.snippet
-                    });
-                    if (table.length == length){
-                        resolve(table);
-                    }
-                }).fail( function(e){
-                    console.log(e);
-                    length--;
-                });
-                length++;
-            }
-        });
-    });
 }
 
 var menus = {
