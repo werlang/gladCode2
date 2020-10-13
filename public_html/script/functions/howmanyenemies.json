@@ -36,7 +36,7 @@
         "istargetvisible"
     ],
     "snippet": {
-        "c": "int ${1:num_enemies} = howManyEnemies();",
-        "python": "${1:num_enemies} = howManyEnemies()"
+        "c": "howManyEnemies()",
+        "python": "howManyEnemies()"
     }
 }

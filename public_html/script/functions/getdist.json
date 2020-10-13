@@ -41,7 +41,7 @@
         "getdisttotarget"
     ],
     "snippet": {
-        "c": "float ${1:dist} = getDist(${2:X}, ${3:Y});",
-        "python": "${1:dist} = getDist(${2:X}, ${3:Y})"
+        "c": "getDist(${1:X}, ${2:Y})",
+        "python": "getDist(${1:X}, ${2:Y})"
     }
 }

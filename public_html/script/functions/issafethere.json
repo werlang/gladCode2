@@ -42,7 +42,7 @@
         "getsaferadius"
     ],
     "snippet": {
-        "c": "int ${1:safe} = isSafeThere(${2:X}, ${3:Y});",
-        "python": "${1:safe} = isSafeThere(${2:X}, ${3:Y})"
+        "c": "isSafeThere(${1:X}, ${2:Y})",
+        "python": "isSafeThere(${1:X}, ${2:Y})"
     }
 }

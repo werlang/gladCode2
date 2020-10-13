@@ -42,7 +42,7 @@
         "turntotarget"
     ],
     "snippet": {
-        "c": "turnRight(${1:angle});",
+        "c": "turnRight(${1:angle})",
         "python": "turnRight(${1:angle})"
     }
 }

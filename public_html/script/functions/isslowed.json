@@ -40,7 +40,7 @@
         "getspeed"
     ],
     "snippet": {
-        "c": "int ${1:slowed} = isSlowed();",
-        "python": "${1:slowed} = isSlowed()"
+        "c": "isSlowed()",
+        "python": "isSlowed()"
     }
 }

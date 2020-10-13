@@ -41,7 +41,7 @@
         "turn"
     ],
     "snippet": {
-        "c": "turnToAngle(${1:angle});",
+        "c": "turnToAngle(${1:angle})",
         "python": "turnToAngle(${1:angle})"
     }
 }

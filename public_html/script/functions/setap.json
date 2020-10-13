@@ -30,7 +30,7 @@
         "lvlup"
     ],
     "snippet": {
-        "c": "setAp(${1:value});",
+        "c": "setAp(${1:value})",
         "python": "setAp(${1:value})"
     }
 }

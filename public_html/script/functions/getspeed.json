@@ -36,7 +36,7 @@
         "gettargetspeed"
     ],
     "snippet": {
-        "c": "float ${1:speed} = getSpeed();",
-        "python": "${1:speed} = getSpeed()"
+        "c": "getSpeed()",
+        "python": "getSpeed()"
     }
 }

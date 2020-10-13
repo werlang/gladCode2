@@ -37,7 +37,7 @@
         "isprotected"
     ],
     "snippet": {
-        "c": "float ${1:block_time} = getBlockTimeLeft();",
-        "python": "${1:block_time} = getBlockTimeLeft()"
+        "c": "getBlockTimeLeft()",
+        "python": "getBlockTimeLeft()"
     }
 }

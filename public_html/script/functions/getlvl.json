@@ -33,7 +33,7 @@
     },
     "seealso": [],
     "snippet": {
-        "c": "int ${1:lvl} = getLvl();",
-        "python": "${1:lvl} = getLvl()"
+        "c": "getLvl()",
+        "python": "getLvl()"
     }
 }

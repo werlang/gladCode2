@@ -37,7 +37,7 @@
         "isburning"
     ],
     "snippet": {
-        "c": "float ${1:burn_time} = getBurnTimeLeft();",
-        "python": "${1:burn_time} = getBurnTimeLeft()"
+        "c": "getBurnTimeLeft()",
+        "python": "getBurnTimeLeft()"
     }
 }

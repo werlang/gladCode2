@@ -38,7 +38,7 @@
         "turntotarget"
     ],
     "snippet": {
-        "c": "moveToTarget();",
+        "c": "moveToTarget()",
         "python": "moveToTarget()"
     }
 }

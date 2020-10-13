@@ -30,7 +30,7 @@
         "setname"
     ],
     "snippet": {
-        "c": "setSTR(${1:value});",
+        "c": "setSTR(${1:value})",
         "python": "setSTR(${1:value})"
     }
 }

@@ -40,7 +40,7 @@
         "getblocktimeleft"
     ],
     "snippet": {
-        "c": "int ${1:protect} = isProtected();",
-        "python": "${1:protect} = isProtected()"
+        "c": "isProtected()",
+        "python": "isProtected()"
     }
 }

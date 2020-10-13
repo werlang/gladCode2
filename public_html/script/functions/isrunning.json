@@ -40,7 +40,7 @@
         "getspeed"
     ],
     "snippet": {
-        "c": "int ${1:running} = isRunning();",
-        "python": "${1:running} = isRunning()"
+        "c": "isRunning()",
+        "python": "isRunning()"
     }
 }

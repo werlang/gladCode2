@@ -37,7 +37,7 @@
         "gettargethead"
     ],
     "snippet": {
-        "c": "float ${1:target_health} = getTargetHealth();",
-        "python": "${1:target_health} = getTargetHealth()"
+        "c": "getTargetHealth()",
+        "python": "getTargetHealth()"
     }
 }

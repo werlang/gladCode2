@@ -35,7 +35,7 @@
         "getlasthittime"
     ],
     "snippet": {
-        "c": "float ${1:sim_time} = getSimTime();",
-        "python": "${1:sim_time} = getSimTime()"
+        "c": "getSimTime()",
+        "python": "getSimTime()"
     }
 }

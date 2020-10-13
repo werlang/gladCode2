@@ -36,7 +36,7 @@
         "getint"
     ],
     "snippet": {
-        "c": "int ${1:myagi} = getAGI();",
-        "python": "${1:myagi} = getAGI()"
+        "c": "getAGI()",
+        "python": "getAGI()"
     }
 }

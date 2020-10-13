@@ -38,7 +38,7 @@
         "gettargethealth"
     ],
     "snippet": {
-        "c": "float ${1:target_speed} = getTargetSpeed();",
-        "python": "${1:target_speed} = getTargetSpeed()"
+        "c": "getTargetSpeed()",
+        "python": "getTargetSpeed()"
     }
 }

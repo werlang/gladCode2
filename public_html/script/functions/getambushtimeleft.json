@@ -37,7 +37,7 @@
         "isstunned"
     ],
     "snippet": {
-        "c": "float ${1:ambush_time} = getAmbushTimeLeft();",
-        "python": "${1:ambush_time} = getAmbushTimeLeft()"
+        "c": "getAmbushTimeLeft()",
+        "python": "getAmbushTimeLeft()"
     }
 }

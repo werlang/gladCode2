@@ -40,7 +40,7 @@
         "getambushtimeleft"
     ],
     "snippet": {
-        "c": "int ${1:stunned} = isStunned();",
-        "python": "${1:stunned} = isStunned()"
+        "c": "isStunned()",
+        "python": "isStunned()"
     }
 }

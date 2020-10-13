@@ -37,7 +37,7 @@
         "getlasthitangle"
     ],
     "snippet": {
-        "c": "int ${1:hit} = getHit();",
-        "python": "${1:hit} = getHit()"
+        "c": "getHit()",
+        "python": "getHit()"
     }
 }

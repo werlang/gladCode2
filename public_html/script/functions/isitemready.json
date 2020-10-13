@@ -38,7 +38,7 @@
     "seealso": [
     ],
     "snippet": {
-        "c": "float ${1:ready} = isItemReady(${2:item});",
-        "python": "${1:ready} = isItemReady(${2:item})"
+        "c": "isItemReady(${1:item})",
+        "python": "isItemReady(${1:item})"
     }
 }

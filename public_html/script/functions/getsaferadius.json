@@ -37,7 +37,7 @@
         "getdist"
     ],
     "snippet": {
-        "c": "float ${1:safe_radius} = getSafeRadius();",
-        "python": "${1:safe_radius} = getSafeRadius()"
+        "c": "getSafeRadius()",
+        "python": "getSafeRadius()"
     }
 }

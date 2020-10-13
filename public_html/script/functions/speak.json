@@ -39,7 +39,7 @@
     },
     "seealso": [],
     "snippet": {
-        "c": "speak(\"${1:text}\");",
+        "c": "speak(\"${1:text}\")",
         "python": "speak(\"${1:text}\")"
     }
 }

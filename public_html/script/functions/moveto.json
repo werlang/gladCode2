@@ -44,7 +44,7 @@
         "moveForward"
     ],
     "snippet": {
-        "c": "moveTo(${1:X}, ${2:Y});",
+        "c": "moveTo(${1:X}, ${2:Y})",
         "python": "moveTo(${1:X}, ${2:Y})"
     }
 }

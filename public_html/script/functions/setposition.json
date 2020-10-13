@@ -31,7 +31,7 @@
         "setap"
     ],
     "snippet": {
-        "c": "setPosition(${1:X}, ${2:Y});",
+        "c": "setPosition(${1:X}, ${2:Y})",
         "python": "setPosition(${1:X}, ${2:Y})"
     }
 }

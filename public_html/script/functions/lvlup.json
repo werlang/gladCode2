@@ -30,7 +30,7 @@
         "setap"
     ],
     "snippet": {
-        "c": "lvlUp(${1:value});",
+        "c": "lvlUp(${1:value})",
         "python": "lvlUp(${1:value})"
     }
 }

@@ -37,7 +37,7 @@
         "gettargety"
     ],
     "snippet": {
-        "c": "float ${1:y} = getY();",
-        "python": "${1:y} = getY()"
+        "c": "getY()",
+        "python": "getY()"
     }
 }

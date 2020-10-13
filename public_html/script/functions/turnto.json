@@ -45,7 +45,7 @@
         "turntotarget"
     ],
     "snippet": {
-        "c": "turnTo(${1:X}, ${2:Y});",
+        "c": "turnTo(${1:X}, ${2:Y})",
         "python": "turnTo(${1:X}, ${2:Y})"
     }
 }

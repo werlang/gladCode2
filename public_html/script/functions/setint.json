@@ -30,7 +30,7 @@
         "setname"
     ],
     "snippet": {
-        "c": "setINT(${1:value});",
+        "c": "setINT(${1:value})",
         "python": "setINT(${1:value})"
     }
 }

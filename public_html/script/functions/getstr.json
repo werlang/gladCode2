@@ -36,7 +36,7 @@
         "getint"
     ],
     "snippet": {
-        "c": "int ${1:mystr} = getSTR();",
-        "python": "${1:mystr} = getSTR()"
+        "c": "getSTR()",
+        "python": "getSTR()"
     }
 }

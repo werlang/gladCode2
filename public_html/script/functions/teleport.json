@@ -41,7 +41,7 @@
         "fireball"
     ],
     "snippet": {
-        "c": "teleport(${1:X}, ${2:Y});",
+        "c": "teleport(${1:X}, ${2:Y})",
         "python": "teleport(${1:X}, ${2:Y})"
     }
 }

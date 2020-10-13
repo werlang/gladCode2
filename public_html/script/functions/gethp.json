@@ -35,7 +35,7 @@
         "getap"
     ],
     "snippet": {
-        "c": "float ${1:hp} = getHp();",
-        "python": "${1:hp} = getHp()"
+        "c": "getHp()",
+        "python": "getHp()"
     }
 }

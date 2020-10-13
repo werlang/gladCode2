@@ -40,7 +40,7 @@
         "getburntimeleft"
     ],
     "snippet": {
-        "c": "int ${1:burn} = isBurning();",
-        "python": "${1:burn} = isBurning()"
+        "c": "isBurning()",
+        "python": "isBurning()"
     }
 }

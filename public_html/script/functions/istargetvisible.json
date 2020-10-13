@@ -37,7 +37,7 @@
         "howmanyenemies"
     ],
     "snippet": {
-        "c": "int ${1:target} = isTargetVisible();",
-        "python": "${1:target} = isTargetVisible()"
+        "c": "isTargetVisible()",
+        "python": "isTargetVisible()"
     }
 }

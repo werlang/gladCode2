@@ -41,7 +41,7 @@
         "ambush"
     ],
     "snippet": {
-        "c": "assassinate(${1:X}, ${2:Y});",
+        "c": "assassinate(${1:X}, ${2:Y})",
         "python": "assassinate(${1:X}, ${2:Y})"
     }
 }

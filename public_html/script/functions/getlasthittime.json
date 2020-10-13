@@ -36,7 +36,7 @@
         "gethit"
     ],
     "snippet": {
-        "c": "float ${1:hit_time} = getLastHitTime();",
-        "python": "${1:hit_time} = getLastHitTime()"
+        "c": "getLastHitTime()",
+        "python": "getLastHitTime()"
     }
 }

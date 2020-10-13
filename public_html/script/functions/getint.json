@@ -36,7 +36,7 @@
         "getagi"
     ],
     "snippet": {
-        "c": "int ${1:myint} = getINT();",
-        "python": "${1:myint} = getINT()"
+        "c": "getINT()",
+        "python": "getINT()"
     }
 }

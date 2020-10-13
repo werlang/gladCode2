@@ -37,7 +37,7 @@
         "getsaferadius"
     ],
     "snippet": {
-        "c": "int ${1:safe} = isSafeHere();",
-        "python": "${1:safe} = isSafeHere()"
+        "c": "isSafeHere()",
+        "python": "isSafeHere()"
     }
 }

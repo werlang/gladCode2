@@ -40,7 +40,7 @@
         "getdist"
     ],
     "snippet": {
-        "c": "float ${1:angle} = getAngle(${2:X}, ${3:Y});",
-        "python": "${1:angle} = getAngle(${2:X}, ${3:Y})"
+        "c": "getAngle(${1:X}, ${2:Y})",
+        "python": "getAngle(${1:X}, ${2:Y})"
     }
 }

@@ -36,7 +36,7 @@
         "getdist"
     ],
     "snippet": {
-        "c": "float ${1:dist} = getDistToTarget();",
-        "python": "${1:dist} = getDistToTarget()"
+        "c": "getDistToTarget()",
+        "python": "getDistToTarget()"
     }
 }

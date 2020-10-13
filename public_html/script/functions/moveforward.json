@@ -37,7 +37,7 @@
         "stepforward"
     ],
     "snippet": {
-        "c": "moveForward(${1:steps});",
+        "c": "moveForward(${1:steps})",
         "python": "moveForward(${1:steps})"
     }
 }

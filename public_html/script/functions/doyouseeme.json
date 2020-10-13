@@ -37,7 +37,7 @@
         "howmanyenemies"
     ],
     "snippet": {
-        "c": "int ${1:seen} = doYouSeeMe();",
-        "python": "${1:seen} = doYouSeeMe()"
+        "c": "doYouSeeMe()",
+        "python": "doYouSeeMe()"
     }
 }

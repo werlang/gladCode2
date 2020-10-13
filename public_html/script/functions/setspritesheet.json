@@ -26,7 +26,7 @@
     },
     "seealso": [],
     "snippet": {
-        "c": "setSpritesheet(${1:hash});",
+        "c": "setSpritesheet(${1:hash})",
         "python": "setSpritesheet(${1:hash})"
     }
 }

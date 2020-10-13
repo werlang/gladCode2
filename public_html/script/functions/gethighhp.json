@@ -38,7 +38,7 @@
         "getfarenemy"
     ],
     "snippet": {
-        "c": "int ${1:enemy} = getHighHp();",
-        "python": "${1:enemy} = getHighHp()"
+        "c": "getHighHp()",
+        "python": "getHighHp()"
     }
 }

@@ -41,7 +41,7 @@
         "attackmelee"
     ],
     "snippet": {
-        "c": "attackRanged(${1:X}, ${2:Y});",
+        "c": "attackRanged(${1:X}, ${2:Y})",
         "python": "attackRanged(${1:X}, ${2:Y})"
     }
 }

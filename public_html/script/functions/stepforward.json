@@ -37,7 +37,7 @@
         "stepright"
     ],
     "snippet": {
-        "c": "stepForward();",
+        "c": "stepForward()",
         "python": "stepForward()"
     }
 }

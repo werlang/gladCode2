@@ -30,7 +30,7 @@
         "setname"
     ],
     "snippet": {
-        "c": "setAGI(${1:value});",
+        "c": "setAGI(${1:value})",
         "python": "setAGI(${1:value})"
     }
 }

@@ -34,7 +34,7 @@
         "attackranged"
     ],
     "snippet": {
-        "c": "attackMelee();",
+        "c": "attackMelee()",
         "python": "attackMelee()"
     }
 }

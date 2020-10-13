@@ -36,7 +36,7 @@
         "gettargethead"
     ],
     "snippet": {
-        "c": "float ${1:head} = getHead();",
-        "python": "${1:head} = getHead()"
+        "c": "getHead()",
+        "python": "getHead()"
     }
 }
