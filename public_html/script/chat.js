@@ -1159,8 +1159,9 @@ chat.toggle = function(opt){
 
             panel.classList.add('hidden')
 
-            if (panel.querySelector('.button-container #emoji').classList.contains('selected')){
-                panel.querySelector('.button-container #emoji').click()
+            const emojiBtn = panel.querySelector('.button-container #emoji')
+            if (emojiBtn && emojiBtn.classList.contains('selected')){
+                emojiBtn.click()
             }
         }
     }

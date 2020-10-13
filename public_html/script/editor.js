@@ -1,11 +1,9 @@
 import {loader} from "./loader.js"
 import {header,login} from "./header.js"
-import { post } from "./utils.js";
+import { post, waitFor } from "./utils.js";
 
 header.load()
 
-var saved = true;
-var tested = true;
 var gladid;
 var pieces;
 var wannaSave = false;
@@ -15,102 +13,125 @@ var sim
 let user = false
 let loadGlad = false
 
-const editor = {
-    ready: false
+const codeEditor = {
+    ready: false,
+    saved: true,
+    tested: true
 }
 
-editor.init = async function(){
+codeEditor.init = async function(){
     await loader.load("ace")
-    
-    const langTools = ace.require("ace/ext/language_tools");
-    const tempEditor = ace.edit("code")
-    for (let i in tempEditor){
-        editor[i] = tempEditor[i]
-    }
 
-    editor.session.setUseSoftTabs(true);
+    const editor = ace.edit("code")
+
+    editor.session.setUseSoftTabs(true)
     editor.session.setOption("tabSize", 4)
-    editor.setTheme("ace/theme/dreamweaver");
-    editor.setFontSize(18);
-    editor.getSession().setUseWrapMode(true);
-    editor.$blockScrolling = Infinity;
-    
+    editor.setTheme("ace/theme/dreamweaver")
+    editor.setFontSize(18)
+    editor.getSession().setUseWrapMode(true)
+    editor.$blockScrolling = Infinity
+
     editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: true
     });
 
-    // ---
-    var table = [];
-    const dataTable = await new Promise( (resolve, reject) => {
-        $.get("docs.php", function(content) {
-            var docs = content.matchAll(/<td><a href=['"]([\w]+?)['"]><\/a><\/td>/g);
-            var length = 0;
-            for (let m of docs){
-                $.getJSON(`script/functions/${m[1]}.json`, function(data){
-                    // console.log(m[1]);
-                    table.push({
-                        name: data.name.default,
-                        syntax: data.syntax,
-                        description: data.description.brief,
-                        snippet: data.snippet
-                    });
-                    if (table.length == length){
-                        resolve(table);
+    // get functions info
+    fetch("script/functions.json").then(async data => {
+        data = await data.json()
+        const dataTable = Object.values(data).map(data => {
+            return {
+                name: data.name.default,
+                syntax: data.syntax,
+                description: data.description.brief,
+                snippet: data.snippet
+            }
+        })
+        // console.log(dataTable)
+
+        // create snippet completer
+        const langTools = ace.require("ace/ext/language_tools")
+        langTools.addCompleter({
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                if (prefix.length === 0) { callback(null, []); return }
+    
+                callback(null, dataTable.map( function(table) {
+                    return {
+                        value: table.syntax[editor.language],
+                        caption: table.name,
+                        snippet: table.snippet[editor.language],
+                        description: table.description,
+                        syntax: table.syntax[editor.language],
+                        score: 1000,
+                        meta: `gladCode-${editor.language}`
                     }
-                }).fail( function(e){
-                    console.log(e);
-                    length--;
-                });
-                length++;
+                }))	
+            },
+            getDocTooltip: function(item) {
+                if (item.meta.split('-')[0] == 'gladCode'){
+                    let func
+                    if (editor.language == 'c'){
+                        func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`
+                    }
+                    else if (editor.language == 'python'){
+                        func = `<b>${item.syntax}</b>`
+                    }
+    
+                    item.docHTML = `${func}<hr>${item.description}<hr>${item.snippet}`
+                }
+                else if (item.snippet) {
+                    item.docHTML = `<b>${item.caption}</b><hr>${item.snippet}`
+                }
+                // console.log(item)
             }
-        });
-    });
-    // ---
-    var customCompleter = {
-        getCompletions: function(editor, session, pos, prefix, callback) {
-            if (prefix.length === 0) { callback(null, []); return }
+        })
+    })
 
-            callback(null, dataTable.map(function(table) {
-                var syntax = table.syntax[editor.language];
-                var snippet = table.snippet[editor.language];
-
-                return {
-                    value: syntax,
-                    caption: table.name,
-                    snippet: snippet,
-                    description: table.description,
-                    syntax: syntax,
-                    score: 1000,
-                    meta: `gladCode-${editor.language}`
-                };
-            }));	
-        },
-        getDocTooltip: function(item) {
-            if (item.meta == 'gladCode'){
-                if (editor.language == 'c')
-                    var func = `<b>${item.syntax.replace(/(int[ \*]{0,1} |float[ \*]{0,1} |double[ \*]{0,1} |char[ \*]{0,1} |void[ \*]{0,1})/g, "</b>$1<b>")}</b>`;
-                else if (editor.language == 'python')
-                    var func = `<b>${item.syntax}</b>`;
-
-                item.docHTML = `${func}<hr></hr>${item.description}`;
-            }
-            else if (item.snippet) {
-                item.docHTML = `<b>${item.caption}</b><hr></hr>${item.snippet}`;
-            }
+    editor.on("change", () => {
+        this.saved = false
+        this.tested = false
+    
+        const lang = getLanguage(editor.getValue())
+        if (lang == "c" && editor.language != 'c'){
+            editor.session.setMode("ace/mode/c_cpp")
+            editor.language = 'c';
         }
-    }
-    langTools.addCompleter(customCompleter);
+        else if (lang == "python" && editor.language != 'python'){
+            editor.session.setMode("ace/mode/python")
+            editor.language = 'python'
+        }
+    
+        // if (tutorial.enabled && user.language == 'blocks'){
+        //     tutorial.show([
+        //         'checkStep'
+        //     ])
+        // }
+    
+    });
+    
+    this.ready = true
+    this.editor = editor
+    editor.focus()
+
+    return editor
 }
 
-editor.init()
+codeEditor.isReady = function(){
+    return waitFor(this.ready)
+}
 
-loader.load("chat").then( ({chat}) => {
+let editor
+codeEditor.init().then( d => editor = d)
+
+
+// handle editor resize when chat is toggled
+login.wait().then( () => loader.load("chat").then( ({chat}) => {
     chat.init(document.querySelector('#chat-panel'), {
         full: false,
         expandWidth: "-65px"
-    }).then( () => {
+    }).then( async () => {
+        await codeEditor.isReady()
         document.querySelector('#chat-panel #show-hide').addEventListener('click', () => {
             change_size()
         })
@@ -122,17 +143,20 @@ loader.load("chat").then( ({chat}) => {
         // })
     
         function change_size(){
-            const w = document.querySelector('#chat-panel').clientWidth
-            console.log(w)
-            document.querySelector('#panel-right').clientWidth = w
-            // editor.resize();
-            document.querySelector('#float-card').style['margin-right'] = w
+            setTimeout(() => {
+                const w = document.querySelector('#chat-panel').clientWidth
+                document.querySelector('#panel-right').style.width = `${w}px`
+                editor.resize()
+                document.querySelector('#float-card').style['margin-right'] = `${w}px`
+            }, 1000);
         }
     })
-})
+}))
 
 loader.load("jquery").then( () => $(document).ready(async () => {
     $('#header-editor').addClass('here')
+    
+    await codeEditor.isReady()
     
     login.wait().then(async data => {
         //console.log(data);
@@ -155,8 +179,8 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 toggleBlocks({ask: false, active: true})
             }
 
-            // editor.setTheme("ace/theme/"+ user.theme);
-            // editor.setFontSize(user.font +"px");
+            editor.setTheme("ace/theme/"+ user.theme);
+            editor.setFontSize(user.font +"px");
 
             if (document.querySelector('#glad-code')){
                 const glads = await post("back_glad.php", {
@@ -201,9 +225,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
     $('#header-container').addClass('small');
     
-    // load_editor();
-    // editor.focus();
-
     $('#float-card .glad-preview').click( function(){
         $('#skin').click();
     });
@@ -220,38 +241,40 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         }
     });
     
-    $('#profile-icon').click( function(){
-        if (user){
+    $('#profile-icon').click(async function(){
+        if (user.logged){
             window.location.href = "news"
         }
         else{
+            const {google} = await loader.load("google")
             google.login().then( () => {
-                window.location.href = "news"
+                window.location.reload()
             })
         }
     });
 
     $('#new').click( function(){
-        if (saved)
+        if (codeEditor.saved)
             window.location.href = "newglad";
         else{
             new Message({
                 message: "Deseja criar um novo gladiador e perder as alterações feitas no gladiador atual?",
                 buttons: {yes: "Sim", no: "Não"}
             }).show().click('yes', () => {
-                saved = true
+                codeEditor.saved = true
                 window.location.href = "newglad"
             })
         }
     });
     
-    $('#open').click( function(){
+    $('#open').click(async function(){
         if (!$(this).hasClass('disabled')){
-            if (!user){
+            if (!user.logged){
                 new Message({
                     message: "Você precisa fazer LOGIN no sistema para visualizar seus gladiadores",
                     buttons: {cancel: "Cancelar", ok: "LOGIN"}
-                }).show().click('ok', () => {
+                }).show().click('ok', async () => {
+                    const {google} = await loader.load("google")
                     google.login().then(function(data) {
                         //console.log(data);
                         user = data.email;
@@ -267,6 +290,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 $('#fog-glads .glad-preview').remove();
                 $('#fog-glads #btn-glad-open').prop('disabled',true);
 
+                const {gladCard} = await loader.load("gladcard")
                 gladCard.load($('#fog-glads .glad-card-container')).then( () => {
                     if ($('#fog-glads .glad-preview').length == 0){
                         window.location.href = "newglad";
@@ -290,7 +314,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         $('#fog-glads').hide();
     });
     $('#fog-glads #btn-glad-open').click( function(){
-        if (saved){
+        if (codeEditor.saved){
             var id = $('#fog-glads .glad-preview.selected').data('id');
             window.location.href = "glad-"+id;
         }
@@ -300,7 +324,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 message: `Deseja abrir o gladiador <ignore><b>${name}</b></ignore> para edição? Todas alterações no gladiador atual serão perdidas`,
                 buttons: {yes: "Sim", no: "Não"}
             }).show().click('yes', () => {
-                saved = true;
+                codeEditor.saved = true;
                 var id = $('#fog-glads .glad-preview.selected').data('id');
                 window.location.href = "glad-"+id;
             })
@@ -324,7 +348,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
     $('#save').click( function(){
         if (!$(this).hasClass('disabled')){
-            if (user){
+            if (user.logged){
                 setLoadGlad();
                 //console.log(loadGlad);
 
@@ -337,7 +361,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                         msg += "</ul>"
                         showMessage(msg);
                     }
-                    else if (tested){
+                    else if (codeEditor.tested){
                         var action = "INSERT";
                         if (gladid)
                             action = "UPDATE";
@@ -379,7 +403,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                                 else{
                                     new Message({message: `Gladiador <ignore><b>${nome}</b></ignore> gravado`}).show();
                                 }
-                                saved = true;
+                                codeEditor.saved = true;
                             }
                         });
                     }
@@ -417,7 +441,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                                         hash: hash
                                     });
     
-                                    tested = true;
+                                    codeEditor.tested = true;
                                     $('#save').click();
                                 }
                                 else{
@@ -432,7 +456,8 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 new Message({
                     message: `Você precisa fazer LOGIN no sistema para salvar seu gladiador`, 
                     buttons: {cancel: "Cancelar", ok: "LOGIN"}
-                }).show().click('ok', () => {
+                }).show().click('ok', async () => {
+                    const {google} = await loader.load("google")
                     google.login().then(function(data) {
                         //console.log(data);
                         user = data.email;
@@ -517,7 +542,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             if ($(this).data('filename'))
                 filename = "samples/gladbots/"+ $(this).data('filename') +".c";
 
-            var code, blocks;
             if ($(this).hasClass('selected')){
                 $(this).removeClass('selected');
                 $('#fog-battle .glad-card-container').html("");
@@ -534,9 +558,10 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                     loadCard(obj.data('info'));
                 }
 
-                function loadCard(data){
+                async function loadCard(data){
                     //console.log(data);
 
+                    const {gladCard} = await loader.load("gladcard")
                     gladCard.load($('#fog-battle .glad-card-container'), {
                         code: true,
                         customLoad: [data]
@@ -685,12 +710,12 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
         for (var i in themes){
             $('#settings-window #list').append("<div class='theme'>"+ themes[i] +"</div>");
-            if (user && user.theme == themes[i] || !user && themes[i] == "dreamweaver")
+            if (user.logged && user.theme == themes[i] || !user.logged && themes[i] == "dreamweaver")
                 $('#settings-window #list .theme').last().addClass('selected');
         }
 
         var sample = ace.edit("code-sample");
-        if (user){
+        if (user.logged){
             sample.setTheme("ace/theme/"+ user.theme);
             sample.setFontSize(user.font +"px");
         }
@@ -729,7 +754,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             editor.setFontSize(sample.getFontSize());
             $('#fog').remove();
 
-            if (user){
+            if (user.logged){
                 post("back_login.php",{
                     action: "EDITOR",
                     theme: theme,
@@ -786,38 +811,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             }
         });
     });
-    
-    // editor.on("change", function() {
-    //     saved = false;
-    //     tested = false;
-
-    //     var text = editor.getValue();
-
-    //     if ($('#float-card .glad-preview').html() != "" && text != ""){
-    //         $('#download').removeClass('disabled');
-    //     }
-    //     else{
-    //         $('#download').addClass('disabled');
-    //     }
         
-    //     var lang = getLanguage(text);
-    //     if (lang == "c" && editor.language != 'c'){
-    //         editor.session.setMode("ace/mode/c_cpp");
-    //         editor.language = 'c';
-    //     }
-    //     else if (lang == "python" && editor.language != 'python'){
-    //         editor.session.setMode("ace/mode/python");
-    //         editor.language = 'python';
-    //     }
-
-    //     if (tutorial.enabled && user.language == 'blocks'){
-    //         tutorial.show([
-    //             'checkStep'
-    //         ])
-    //     }
-
-    // });
-    
     // editor.on("guttermousedown", function(e) {
     //     var target = e.domEvent.target;
 
@@ -1037,15 +1031,15 @@ function load_glad_generator(element){
             pct.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
             $('#cv').html(cvpoint);
             
-            saved = false;
-            tested = false;
+            codeEditor.saved = false;
+            codeEditor.tested = false;
         });	
         
         $('#get-code').click( function() {
             createFloatCard();
         });
 
-        function createFloatCard(arg){
+        async function createFloatCard(arg){
             var nome = $('#distribuicao #nome').val();
             if (nome.length <= 2 || !nome.match(/^[\w À-ú]+?$/g) ){
                 $('#distribuicao #nome').addClass('error');
@@ -1079,6 +1073,7 @@ function load_glad_generator(element){
                     $('#fog-skin').hide();
                     $('#back').click();
 
+                    const {gladCard} = await loader.load("gladcard")
                     gladCard.load($('#fog-battle .glad-card-container'), {
                         customLoad: [{
                             name: nome,
@@ -1091,8 +1086,8 @@ function load_glad_generator(element){
                     
                 }
             }
-            saved = false;
-            tested = false;
+            codeEditor.saved = false;
+            codeEditor.tested = false;
         }
 
         $('#back').click( function() {
@@ -1261,7 +1256,7 @@ function load_glad_generator(element){
                     });
                 }
 
-                saved = true;
+                codeEditor.saved = true;
             }
         });
     });
@@ -1679,7 +1674,7 @@ function setGladImage(index, skin){
 }
 
 window.onbeforeunload = function() {
-    if (saved)
+    if (codeEditor.saved)
         return null;
     else
         return true;

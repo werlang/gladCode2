@@ -16,6 +16,7 @@ if (isset($_GET['g'])){
     <link rel='stylesheet' href="css/editor.css"/>
     <script type="module" src="script/editor.js" async></script>
 
+
 <!-- 
     <link rel='stylesheet' href="css/sprite.css"/>
     <link rel='stylesheet' href="css/slider.css"/>

@@ -126,4 +126,24 @@ function mergeLog(data){
     return log
 }
 
-export {post, getDate, getTimeSince, $index, deepMerge, mergeLog}
+async function waitFor(what, time, value){
+    if (!value){
+        value = true
+    }
+    if (!time){
+        time = 10
+    }
+
+    return new Promise(resolve => {
+        (function checkReady() {
+            if (what === value){
+                resolve(true)
+            }
+            else{
+                setTimeout(() => checkReady(), time);
+            }
+        })()
+    })
+}
+
+export {post, getDate, getTimeSince, $index, deepMerge, mergeLog, waitFor}
