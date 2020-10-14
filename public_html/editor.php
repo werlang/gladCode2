@@ -128,8 +128,8 @@ if (isset($_GET['g'])){
             <div class='glad-preview'></div>
         </div>
     </div>
-    <div id='fog-skin' class='fog'></div>
-    <div id='fog-glads' class='fog'>
+    <div id='fog-skin' class='fog hidden'></div>
+    <div id='fog-glads' class='fog hidden'>
         <div id='open-glad'>
             <div id='message'>
                 <h2>Editar gladiador</h2>
@@ -142,7 +142,7 @@ if (isset($_GET['g'])){
             </div>
         </div>
     </div>
-    <div id='fog-battle' class='fog'>
+    <div id='fog-battle' class='fog hidden'>
         <div id='battle-window'>
             <div id='message'>
                 <h2>Testar gladiador</h2>

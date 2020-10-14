@@ -126,17 +126,14 @@ function mergeLog(data){
     return log
 }
 
-async function waitFor(what, time, value){
-    if (!value){
-        value = true
-    }
+async function waitFor(callback, time){
     if (!time){
         time = 10
     }
 
     return new Promise(resolve => {
         (function checkReady() {
-            if (what === value){
+            if (callback()){
                 resolve(true)
             }
             else{

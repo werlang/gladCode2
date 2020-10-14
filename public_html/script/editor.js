@@ -1,6 +1,7 @@
 import {loader} from "./loader.js"
-import {header,login} from "./header.js"
-import { post, waitFor } from "./utils.js";
+import {header, login} from "./header.js"
+import {Message} from "./dialog.js"
+import { post, waitFor } from "./utils.js"
 
 header.load()
 
@@ -17,6 +18,21 @@ const codeEditor = {
     ready: false,
     saved: true,
     tested: true
+}
+
+const sampleGlads = {
+    'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
+    'Runner': {'difficulty': 1, 'filename': 'Runner'},
+    'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
+    'Arch': {'difficulty': 2, 'filename': 'Arch'},
+    'Patient': {'difficulty': 2, 'filename': 'Patient'},
+    'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
+    'Mage': {'difficulty': 2, 'filename': 'Mage'},
+    'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
+    'Archie': {'difficulty': 3, 'filename': 'Archie'},
+    'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
+    'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
+    'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
 }
 
 codeEditor.init = async function(){
@@ -118,12 +134,215 @@ codeEditor.init = async function(){
 }
 
 codeEditor.isReady = function(){
-    return waitFor(this.ready)
+    return waitFor(() => this.ready)
 }
 
 let editor
 codeEditor.init().then( d => editor = d)
 
+const buttons = {}
+
+buttons.skin = {
+    ready: false,
+    init: function(){
+        console.log("skin-init")
+        this.ready = true
+    },
+    click: function(){
+        console.log("skin-click")
+    }
+}
+
+buttons.open = {
+    ready: false,
+    init: function() {
+        $('#fog-glads #btn-glad-cancel').click( function(){
+            buttons.fade(document.querySelector('#fog-glads'))
+        });
+        $('#fog-glads #btn-glad-open').click( function(){
+            if (codeEditor.saved){
+                var id = $('#fog-glads .glad-preview.selected').data('id');
+                window.location.href = "glad-"+id;
+            }
+            else{
+                var name = $('#fog-glads .glad-preview.selected .glad span').html()
+                new Message({
+                    message: `Deseja abrir o gladiador <ignore><b>${name}</b></ignore> para edição? Todas alterações no gladiador atual serão perdidas`,
+                    buttons: {yes: "Sim", no: "Não"}
+                }).show().click('yes', () => {
+                    codeEditor.saved = true;
+                    var id = $('#fog-glads .glad-preview.selected').data('id');
+                    window.location.href = "glad-"+id;
+                })
+            }
+        });    
+    },
+    click: async function(){
+        if (!this.ready){
+            this.init()
+            this.ready = true
+        }
+
+        buttons.fade(document.querySelector('#fog-glads'))
+        $('#fog-glads #btn-glad-open').prop('disabled',true);
+    
+        const {gladCard} = await loader.load("gladcard")
+        await gladCard.load($('#fog-glads .glad-card-container'), {
+            remove: true,
+            mmr: true
+        })
+    
+        if ($('#fog-glads .glad-preview').length == 0){
+            window.location.href = "newglad";
+        }
+                
+        $('#fog-glads .glad-preview').click( function(){
+            $('#fog-glads #btn-glad-open').removeAttr('disabled');
+            $('#fog-glads .glad-preview').removeClass('selected');
+            $(this).addClass('selected');
+        });
+        
+        $('#fog-glads .glad-preview').dblclick( function(){
+            $('#fog-glads #btn-glad-open').click();
+        });
+    }
+}
+
+buttons.test = {
+    ready: false,
+    init: function(){
+        const num = ["","one","two","three"];
+        let enemyBox = ""
+        for (var i in sampleGlads){
+            enemyBox += `<div class='glad'>
+                <div class='name'>${i}</div>
+                <div class='diff ${num[sampleGlads[i].difficulty]}'>
+                    <div class='bar'></div><div class='bar'></div><div class='bar'></div>
+                </div>
+            </div>`
+        }
+        document.querySelector('#fog-battle #list').innerHTML = enemyBox
+        document.querySelectorAll('#fog-battle #list .glad').forEach(e => bindGladList($(e)))
+    
+        login.wait().then(async data => {
+            user = data
+            if (user.status == "SUCCESS" ){
+                const data = await post("back_glad.php",{
+                    action: "GET",
+                })
+                // console.log(data);
+
+                let enemyBox = ""
+                for (let i in data){
+                    enemyBox += `<div class='glad'>
+                        <div class='name'>${data[i].name}</div>
+                        <div class='diff none'>
+                            <div class='bar'></div><div class='bar'></div><div class='bar'></div>
+                        </div>
+                    </div>`
+                }
+
+                document.querySelector('#fog-battle #list').insertAdjacentHTML('beforeend', enemyBox)
+                document.querySelectorAll('#fog-battle #list .glad').forEach((e,i) => bindGladList($(e, data[i])))
+
+            }
+        })
+        
+        function bindGladList(obj, info){
+            console.log(info)
+            obj.click( function(){
+                let glad = sampleGlads[obj.find(".name")]
+                let filename
+                if (glad){
+                    filename = "samples/gladbots/"+ glad.filename +".c";
+                }
+                console.log(filename)
+    
+                if ($(this).hasClass('selected')){
+                    $(this).removeClass('selected');
+                    $('#fog-battle .glad-card-container').html("");
+                }
+                else if ($('#fog-battle #list .glad.selected').length < 4){
+                    $(this).addClass('selected');
+    
+                    if (filename){
+                        getGladFromFile(filename).then(data => loadCard(data))
+                    }
+                    else{
+                        loadCard(info)
+                    }
+    
+                    async function loadCard(data){
+                        const {gladCard} = await loader.load("gladcard")
+                        gladCard.load($('#fog-battle .glad-card-container'), {
+                            code: true,
+                            customLoad: [data]
+                        })
+                    }
+                }
+    
+                
+                if ($('#fog-battle #list .glad.selected').length > 0){
+                    const length = $('#fog-battle #list .glad.selected').length;
+                    $('#fog-battle #btn-battle').removeAttr('disabled');
+                    $('#fog-battle #list-title span').html(length +" selecionados");
+                }
+                else{
+                    $('#fog-battle #btn-battle').prop('disabled',true);
+                    $('#fog-battle #list-title span').html("");
+                }
+            });
+        }
+    },
+    click: function(){
+        if (!this.ready){
+            this.init()
+            this.ready = true
+        }
+
+        if (!$(this).hasClass('disabled')){
+            showTestWindow()
+            
+            function showTestWindow(){
+                // let t = tutorial.show([
+                //     'checkStep',
+                //     'oponent',
+                //     'learnAttack',
+                //     'checkAttack',
+                //     'checkGetHit',
+                //     'checkReact',
+                //     'checkSafe',
+                //     'checkFireball',
+                //     'checkTeleport',
+                //     'checkUpgrade',
+                //     'checkBreakpoint'
+                // ])
+                let t = false
+
+                if (t === false){
+                    setLoadGlad();
+                    if (!$(this).hasClass('disabled')){
+                        buttons.fade(document.querySelector('#fog-battle'))
+                        const name = $('#float-card .glad-preview .glad span').html()
+                        $('#fog-battle h3 span').html(name)
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+buttons.fade = function(window){
+    if (window.classList.contains("hidden")){
+        window.classList.remove("hidden")
+        window.classList.add("fade")
+        setTimeout(() => window.classList.remove("fade"), 1)
+    }
+    else{
+        window.classList.add("hidden")
+    }
+}
 
 // handle editor resize when chat is toggled
 login.wait().then( () => loader.load("chat").then( ({chat}) => {
@@ -155,7 +374,6 @@ login.wait().then( () => loader.load("chat").then( ({chat}) => {
 
 loader.load("jquery").then( () => $(document).ready(async () => {
     $('#header-editor').addClass('here')
-    
     await codeEditor.isReady()
     
     login.wait().then(async data => {
@@ -214,19 +432,15 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
         }
         else{
-            $('#fog-skin').fadeIn();
+            buttons.skin.click()
         }
 
     });
     
-    $('.fog').hide();
-
-    // load_glad_generator($('#fog-skin'));
-
-    $('#header-container').addClass('small');
+    document.querySelector('#header-container').classList.add('small')
     
     $('#float-card .glad-preview').click( function(){
-        $('#skin').click();
+        buttons.skin.click()
     });
     
     // mobile only
@@ -243,7 +457,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     
     $('#profile-icon').click(async function(){
         if (user.logged){
-            window.location.href = "news"
+            window.location.href = "glads"
         }
         else{
             const {google} = await loader.load("google")
@@ -282,69 +496,15 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                         $('#login').html(data.nome).off().click( function(){
                             window.location.href = "news";
                         });
+                        buttons.open.click()
                     });
                 });
             }
             else{
-                $('#fog-glads').fadeIn();
-                $('#fog-glads .glad-preview').remove();
-                $('#fog-glads #btn-glad-open').prop('disabled',true);
-
-                const {gladCard} = await loader.load("gladcard")
-                gladCard.load($('#fog-glads .glad-card-container')).then( () => {
-                    if ($('#fog-glads .glad-preview').length == 0){
-                        window.location.href = "newglad";
-                    }
-                            
-                    $('#fog-glads .glad-preview').click( function(){
-                        $('#fog-glads #btn-glad-open').removeAttr('disabled');
-                        $('#fog-glads .glad-preview').removeClass('selected');
-                        $(this).addClass('selected');
-                    });
-                    
-                    $('#fog-glads .glad-preview').dblclick( function(){
-                        $('#fog-glads #btn-glad-open').click();
-                    });
-
-                })
+                buttons.open.click()
             }
         }
     });
-    $('#fog-glads #btn-glad-cancel').click( function(){
-        $('#fog-glads').hide();
-    });
-    $('#fog-glads #btn-glad-open').click( function(){
-        if (codeEditor.saved){
-            var id = $('#fog-glads .glad-preview.selected').data('id');
-            window.location.href = "glad-"+id;
-        }
-        else{
-            var name = $('#fog-glads .glad-preview.selected .glad span').html()
-            new Message({
-                message: `Deseja abrir o gladiador <ignore><b>${name}</b></ignore> para edição? Todas alterações no gladiador atual serão perdidas`,
-                buttons: {yes: "Sim", no: "Não"}
-            }).show().click('yes', () => {
-                codeEditor.saved = true;
-                var id = $('#fog-glads .glad-preview.selected').data('id');
-                window.location.href = "glad-"+id;
-            })
-        }
-    });
-
-    var sampleGlads = {
-        'Wanderer': {'difficulty': 1, 'filename': 'Wanderer'},
-        'Runner': {'difficulty': 1, 'filename': 'Runner'},
-        'Blinker': {'difficulty': 1, 'filename': 'Blinker'},
-        'Arch': {'difficulty': 2, 'filename': 'Arch'},
-        'Patient': {'difficulty': 2, 'filename': 'Patient'},
-        'Warrior': {'difficulty': 2, 'filename': 'Warrior'},
-        'Mage': {'difficulty': 2, 'filename': 'Mage'},
-        'Rogue': {'difficulty': 2, 'filename': 'Rogue'},
-        'Archie': {'difficulty': 3, 'filename': 'Archie'},
-        'War Maker': {'difficulty': 3, 'filename': 'WarMaker'},
-        'Magnus': {'difficulty': 3, 'filename': 'Magnus'},
-        'Rouge': {'difficulty': 3, 'filename': 'Rouge'},
-    };
 
     $('#save').click( function(){
         if (!$(this).hasClass('disabled')){
@@ -472,115 +632,14 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     });
     
     $('#skin').click( function(){
-        $('#fog-skin').fadeIn();
+        buttons.skin.click()
     });
 
     $('#test').click( function(){
-        if (!$(this).hasClass('disabled')){
-            showTestWindow()
-            
-            function showTestWindow(){
-                let t = tutorial.show([
-                    'checkStep',
-                    'oponent',
-                    'learnAttack',
-                    'checkAttack',
-                    'checkGetHit',
-                    'checkReact',
-                    'checkSafe',
-                    'checkFireball',
-                    'checkTeleport',
-                    'checkUpgrade',
-                    'checkBreakpoint'
-                ])
-
-                if (t === false){
-                    setLoadGlad();
-                    if (!$(this).hasClass('disabled')){
-                        $('#fog-battle').fadeIn();
-                        var name = $('#float-card .glad-preview .glad span').html();
-                        $('#fog-battle h3 span').html(name);
-                    }
-                }
-            }
-        }
-    });
-
-    var num = ["","one","two","three"];
-    var template = "<div class='glad'><div class='name'></div><div class='diff'><div class='bar'></div><div class='bar'></div><div class='bar'></div></div></div>";
-    for (var i in sampleGlads){
-        $('#fog-battle #list').append(template);
-        $('#fog-battle #list .glad').last().data('filename',sampleGlads[i].filename);
-        $('#fog-battle #list .glad .name').last().html(i);
-        $('#fog-battle #list .glad .diff').last().addClass(num[sampleGlads[i].difficulty]);
-
-        bindGladList($('#fog-battle #list .glad').last());
-    }
-
-    login.wait().then( data => {
-        user = data
-        if (user.status == "SUCCESS" ){
-            post("back_glad.php",{
-                action: "GET",
-            }).then( function(data){
-                // console.log(data);
-                for (let i in data){
-                    $('#fog-battle #list').append(template);
-                    $('#fog-battle #list .glad .name').last().html(data[i].name);
-                    $('#fog-battle #list .glad .diff').last().addClass('none');
-                    $('#fog-battle #list .glad').last().data('info',data[i]);
-    
-                    bindGladList($('#fog-battle #list .glad').last());
-                }
-            });
-        }
+        buttons.test.click()
     })
-    
-    function bindGladList(obj){
-        obj.click( function(){
-            var filename = null;
-            if ($(this).data('filename'))
-                filename = "samples/gladbots/"+ $(this).data('filename') +".c";
 
-            if ($(this).hasClass('selected')){
-                $(this).removeClass('selected');
-                $('#fog-battle .glad-card-container').html("");
-            }
-            else if ($('#fog-battle #list .glad.selected').length < 4){
-                $(this).addClass('selected');
 
-                if (filename){
-                    getGladFromFile(filename).then( function(data){
-                        loadCard(data);
-                    });
-                }
-                else{
-                    loadCard(obj.data('info'));
-                }
-
-                async function loadCard(data){
-                    //console.log(data);
-
-                    const {gladCard} = await loader.load("gladcard")
-                    gladCard.load($('#fog-battle .glad-card-container'), {
-                        code: true,
-                        customLoad: [data]
-                    })
-                }
-            }
-
-            
-            if ($('#fog-battle #list .glad.selected').length > 0){
-                var length = $('#fog-battle #list .glad.selected').length;
-                $('#fog-battle #btn-battle').removeAttr('disabled');
-                $('#fog-battle #list-title span').html(length +" selecionados");
-            }
-            else{
-                $('#fog-battle #btn-battle').prop('disabled',true);
-                $('#fog-battle #list-title span').html("");
-            }
-        });
-    }
 
     var progbtn;
     $('#fog-battle #btn-cancel').click( function(){
