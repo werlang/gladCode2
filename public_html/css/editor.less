@@ -182,6 +182,33 @@ body{
     }
 }
 
+.button {
+    outline: none;
+    background-color: #00638d;
+    color: white;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 3px;
+    padding: 0px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: 0.3s;
+
+    &:hover {
+        background-color: #1e86d8;
+    }
+
+    &:active {
+        background-color: #004c6d;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: #bcbcbc;
+    }
+    
+}
 
 #fog-glads #button-container,
 #fog-battle #button-container {

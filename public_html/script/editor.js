@@ -1,6 +1,6 @@
 import {loader} from "./loader.js"
 import {header, login} from "./header.js"
-import {Message} from "./dialog.js"
+import {createToast, Message} from "./dialog.js"
 import { post, waitFor } from "./utils.js"
 
 header.load()
@@ -187,7 +187,7 @@ buttons.open = {
         $('#fog-glads #btn-glad-open').prop('disabled',true);
     
         const {gladCard} = await loader.load("gladcard")
-        await gladCard.load($('#fog-glads .glad-card-container'), {
+        const gladData = await gladCard.load($('#fog-glads .glad-card-container'), {
             remove: true,
             mmr: true
         })
@@ -205,6 +205,25 @@ buttons.open = {
         $('#fog-glads .glad-preview').dblclick( function(){
             $('#fog-glads #btn-glad-open').click();
         });
+
+        document.querySelectorAll('#fog-glads .glad-preview .delete').forEach((e,i) => {
+            e.addEventListener('click', () => {
+                const card = e.closest('.glad-preview')
+                const glad = card.querySelector('.info .glad').textContent
+                new Message({
+                    message: `Deseja remover o gladiador <ignore><b>${glad}</b></ignore>?`,
+                    buttons: {yes: "SIM", no: "NÃO"}
+                }).show().click('yes', async () => {
+                    card.style.opacity = 0.5
+                    await post("back_glad.php",{
+                        action: "DELETE",
+                        id: gladData[i].id
+                    })
+                    card.remove()
+                    createToast("Gladiador removido", "success")
+                })
+            })
+        })
     }
 }
 
@@ -230,7 +249,7 @@ buttons.test = {
                 const data = await post("back_glad.php",{
                     action: "GET",
                 })
-                // console.log(data);
+                // console.log(data);   
 
                 let enemyBox = ""
                 for (let i in data){

@@ -201,6 +201,7 @@ function fetchSpritesheet(json) {
 // options.master: if you want to show master's name
 //      customLoad[i].user is the master name
 gladCard.load = async function(obj, options){
+    // console.log(options)
     return new Promise( resolve => {
         if (!options.customLoad){
             post("back_glad.php",{
@@ -264,7 +265,8 @@ gladCard.load = async function(obj, options){
 
                 card = obj.find(".glad-preview").last()
                 card.data('id',data[i].id);
-
+                // card[0].setAttribute('data-id', data[i].id)
+                
                 if (options.code){
                     let code = data[i].code
                     let blocks = data[i].blocks
