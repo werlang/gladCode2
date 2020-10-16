@@ -202,6 +202,11 @@ function fetchSpritesheet(json) {
 //      customLoad[i].user is the master name
 gladCard.load = async function(obj, options){
     // console.log(options)
+
+    if (window.jQuery && !(obj instanceof jQuery)){
+        obj = $(obj)
+    }
+
     return new Promise( resolve => {
         if (!options.customLoad){
             post("back_glad.php",{
@@ -347,4 +352,15 @@ gladCard.load = async function(obj, options){
             resolve(data)
         }
     })
+}
+
+gladCard.getFromFile = async function(filename){
+    const data = await post('back_glad.php', {
+        action: "FILE",
+        filename: filename
+    })
+    if (data.skin){
+        data.skin = JSON.stringify(data.skin)
+    }
+    return data
 }

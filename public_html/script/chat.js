@@ -518,7 +518,6 @@ chat.init = async function(wrapper, options){
 
     await translatorReady
     await socket.isReady()
-    await loader.load('Prism')
 
     chat.started = true
 
@@ -1051,7 +1050,7 @@ chat.getMessages = function(options){
                             //place code on the baloon
                             baloon.find('code').each( function() {
                                 var lines = ($(this).text().match(/\n/g) || []).length + 1;
-                                Prism.highlightElement(this);
+                                loader.load('Prism').then( () => Prism.highlightElement(this))
 
                                 if (!$(this).parents('.baloon-container').hasClass('me'))
                                     $(this).addClass('dark');
