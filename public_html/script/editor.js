@@ -1,6 +1,6 @@
 import {loader} from "./loader.js"
 import {header, login} from "./header.js"
-import {createToast, Message} from "./dialog.js"
+import {createToast, Message, tooltip} from "./dialog.js"
 import { post, waitFor } from "./utils.js"
 
 header.load()
@@ -8,7 +8,6 @@ header.load()
 var gladid;
 var pieces;
 var wannaSave = false;
-var blocksEditor = false;
 var sim
 
 let user = false
@@ -420,7 +419,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             }
 
             if (user.language == 'blocks'){
-                toggleBlocks({ask: false, active: true})
+                blocks.toggle({ask: false, active: true, create: true})
             }
 
             editor.setTheme("ace/theme/"+ user.theme);
@@ -445,7 +444,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     
                             if (loadGlad.blocks){
                                 // TODO load blocks before use
-                                toggleBlocks({ask: false, active: true, load: true})
+                                blocks.toggle({ask: false, active: true, load: true})
                             }
     
                             editor.setValue(loadGlad.code)
@@ -790,8 +789,8 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     }
 
     $('#switch').click( function(){
-        toggleBlocks();
-    });
+        blocks.toggle({ask: true})
+    })
 
     $('#settings').click( function(){
         var themes = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn", "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic", "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal", "textmate", "tomorrow", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "tomorrow_night", "twilight", "vibrant_ink", "xcode"];
@@ -1003,8 +1002,9 @@ function setLoadGlad(){
         var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`;
         loadGlad.code = setup + editor.getValue();
 
-        if (language == 'blocks')
-            loadGlad.blocks = saveBlocks()
+        if (language == 'blocks'){
+            loadGlad.blocks = blocks.save()
+        }
     }
 }
 
@@ -1770,7 +1770,7 @@ async function getBannedFunctions(code){
 
 function getLanguage(code){
     var language = "c";
-    if (blocksEditor.active)
+    if (blocks.active)
         language = 'blocks'
     else if (code.indexOf("def loop():") != -1)
         language = "python";
@@ -1778,102 +1778,128 @@ function getLanguage(code){
     return language;
 }
 
-async function toggleBlocks(args){
-    if (args){
-        var active = args.active
-        var ask = args.ask
-        var load = args.load
+const blocks = {
+    ready: false,
+    active: false
+}
+
+blocks.init = async function(){
+    if (this.ready){
+        return this.Blockly
     }
 
-    if (!blocksEditor){
-        blocksEditor = {};
+    const {Blockly} = await loader.load("Blockly")
+    this.Blockly = Blockly
 
-        $('#blocks').load("blockly_toolbox.xml", function(){
-            blocksEditor.workspace = Blockly.inject('blocks', {
-                toolbox: $('#blocks #toolbox')[0],
-                zoom: { controls: true },
-                grid: { spacing: 20, length: 0, snap: true },
-                scrollbars: true,
-                trashcan: true
-            });
+    this.editor = {};
 
-            blocksEditor.workspace.addChangeListener( function(){
-                var code = Blockly.Python.workspaceToCode(blocksEditor.workspace)
+    const toolbox = await (await fetch("blockly_toolbox.xml")).text()
+    document.querySelector('#blocks').innerHTML = toolbox
+    
+    this.editor.workspace = Blockly.inject('blocks', {
+        toolbox: document.querySelector('#blocks #toolbox'),
+        zoom: { controls: true },
+        grid: { spacing: 20, length: 0, snap: true },
+        scrollbars: true,
+        trashcan: true
+    })
 
-                if (code != "def loop():\n  pass\n")
-                    editor.setValue(code);
-                // console.log(code);
-            });
+    this.editor.workspace.addChangeListener( () => {
+        const code = Blockly.Python.workspaceToCode(this.editor.workspace)
 
-            if (!load){
-                var loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
-                xmlDom = Blockly.Xml.textToDom(loop);
-                Blockly.Xml.domToWorkspace(xmlDom, blocksEditor.workspace);
-            }
-            else
-                loadBlocks({xml: decodeHTML(loadGlad.blocks)})
+        if (code != "def loop():\n  pass\n"){
+            editor.setValue(code)
+            console.log(code)
+        }
+    })
 
-            new ResizeObserver(() => {
-                Blockly.svgResize(blocksEditor.workspace);
-            }).observe($('#blocks')[0])
+    const loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
+    const xmlDom = Blockly.Xml.textToDom(loop);
+    Blockly.Xml.domToWorkspace(xmlDom, this.editor.workspace)
+
+    this.ready = true
+
+    return Blockly
+}
+
+blocks.toggle = async function({active = null, ask = false, load = false, create = false} = {}){
+    const Blockly = await this.init()
+
+    if (create){
+        const loop = `<xml><block type="loop" x="60" y="50"></block></xml>`;
+        const xmlDom = Blockly.Xml.textToDom(loop);
+        Blockly.Xml.domToWorkspace(xmlDom, this.editor.workspace)
+    }
+    else if (load){
+        this.load({xml: decodeHTML(loadGlad.blocks)})
+    }
+
+    new ResizeObserver(() => {
+        Blockly.svgResize(this.editor.workspace);
+    }).observe(document.querySelector('#blocks'))
+
+    if (active === true || active === false){
+        this.active = active
+    }
+    else{
+        this.active = !this.active
+    }
+
+    if (!this.active){
+        document.querySelector('#blocks').classList.remove('active')
+        document.querySelector('#code').classList.add('active')
+
+        this.active = false
+
+        document.querySelector('#switch i').classList.remove('fa-code')
+        document.querySelector('#switch i').classList.add('fa-puzzle-piece')
+        document.querySelector('#switch').title = 'Alternar para editor de blocos'
+        tooltip()
+
+        editor.focus()
+    }
+    else if (!ask){
+        change()
+    }
+    else{
+        this.active = false
+        new Message({
+            message: `Se você alternar para o editor de blocos perderá seu código. Deseja continuar?`,
+            buttons: {yes: "SIM", no: "NÃO"}
+        }).show().click('yes', () => {
+            change()
         });
     }
 
-    if (active === true)
-        blocksEditor.active = false
-    if (active === false)
-        blocksEditor.active = true
+    function change(){
+        document.querySelector('#blocks').classList.add('active')
+        document.querySelector('#code').classList.remove('active')
 
-    if (blocksEditor.active){
-        $('#blocks').hide();
-        $('#code').show();
+        blocks.active = true
 
-        blocksEditor.active = false;
-
-        $('#switch i').removeClass('fa-code').addClass('fa-puzzle-piece');
-        $('#switch').tooltip({content: 'Alternar para editor de blocos'});
-    }
-    else{
-        if (ask === false)
-            change()
-        else{
-            new Message({
-                message: `Se você alternar para o editor de blocos perderá seu código. Deseja continuar?`,
-                buttons: {yes: "SIM", no: "NÃO"}
-            }).show().click('yes', () => {
-                change()
-            });
-        }
-
-        function change(){
-            $('#code').hide();
-            $('#blocks').show();
-
-            blocksEditor.active = true;
-
-            $('#switch i').removeClass('fa-puzzle-piece').addClass('fa-code');
-            $('#switch').tooltip({content: 'Alternar para editor de código'});
-        }
+        document.querySelector('#switch i').classList.remove('fa-puzzle-piece')
+        document.querySelector('#switch i').classList.add('fa-code')
+        
+        document.querySelector('#switch').title = 'Alternar para editor de código'
+        tooltip()
     }
 }
 
-function saveBlocks(){
-    var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-    var xmlText = Blockly.Xml.domToText(xmlDom);
-    return xmlText
+blocks.save = async function(){
+    const Blockly = await this.init()
+    const xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    return Blockly.Xml.domToText(xmlDom);
 }
 
-function loadBlocks({path, xml}){
+blocks.load = async function({path, xml}){
+    const Blockly = await this.init()
+
     if (path){
-        $.get(path, xml => {
-            Blockly.mainWorkspace.clear();
-            let dom = Blockly.Xml.textToDom(xml)
-            Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
-        }, 'text')
+        xml = await (await fetch(path)).text()
     }
-    else if (xml){
-        Blockly.mainWorkspace.clear();
-        let dom = Blockly.Xml.textToDom(xml)
-        Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace);
-    }
+
+    Blockly.mainWorkspace.clear()
+    const dom = Blockly.Xml.textToDom(xml)
+    Blockly.Xml.domToWorkspace(dom, Blockly.mainWorkspace)
 }
+

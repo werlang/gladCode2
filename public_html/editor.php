@@ -117,7 +117,7 @@ if (isset($_GET['g'])){
         </div>
         <div id='panel-left-opener' class='open'></div>
         <div id='editor'>
-            <pre id='code'></pre>
+            <pre id='code' class='active'></pre>
             <div id='blocks'></div>
         </div>
         <div id='panel-right'>
