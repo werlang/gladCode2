@@ -177,6 +177,11 @@ buttons.open = {
         });
     },
     click: async function(){
+        const container = document.querySelector('#fog-glads .glad-card-container')
+        if (container.innerHTML == ""){
+            container.innerHTML = `<i class='fas fa-spinner fa-pulse'></i>`
+        }
+
         if (!this.ready){
             this.init()
             this.ready = true
@@ -186,10 +191,14 @@ buttons.open = {
         $('#fog-glads #btn-glad-open').prop('disabled',true);
 
         const {gladCard} = await loader.load("gladcard")
-        const gladData = await gladCard.load($('#fog-glads .glad-card-container'), {
+        const gladData = await gladCard.load(container, {
             remove: true,
             mmr: true
         })
+
+        if (container.querySelector('.fa-spinner')){
+            container.querySelector('.fa-spinner').remove()
+        }
 
         if ($('#fog-glads .glad-preview').length == 0){
             window.location.href = "newglad";
@@ -419,7 +428,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             }
 
             if (user.language == 'blocks'){
-                blocks.toggle({ask: false, active: true, create: true})
+                blocks.toggle({active: true, create: true})
             }
 
             editor.setTheme("ace/theme/"+ user.theme);
@@ -444,7 +453,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     
                             if (loadGlad.blocks){
                                 // TODO load blocks before use
-                                blocks.toggle({ask: false, active: true, load: true})
+                                blocks.toggle({active: true, load: true})
                             }
     
                             editor.setValue(loadGlad.code)
@@ -1783,6 +1792,35 @@ const blocks = {
     active: false
 }
 
+blocks.toolbox = async function(){
+    const tabs = [
+        {pt: "Lógica", en: "Logic"},
+        {pt: "Repetições", en: "Loops"},
+        {pt: "Matemática", en: "Math"},
+        {pt: "Valores", en: "Values"},
+        {pt: "Variáveis", en: "Variables"},
+        {pt: "Funções", en: "Functions"},
+        {pt: "Melhorias", en: "Upgrade"},
+        {pt: "Movimentação", en: "Movement"},
+        {pt: "Ataque", en: "Attack"},
+        {pt: "Informações", en: "Information"},
+        {pt: "Percepção", en: "Perception"},
+        {pt: "Habilidades", en: "Abilities"},
+        {pt: "Itens", en: "Items"},
+    ]
+
+    let xml_text = await (await fetch("blockly_toolbox.xml")).text()
+
+    const user = await login.wait()
+    if (user.speak != 'pt'){
+        tabs.forEach(e => {
+            const pattern = new RegExp(`category name="${e.pt}"`, 'g')
+            xml_text = xml_text.replace(pattern, `category name="${e[user.speak]}"`)
+        })
+    }
+    return xml_text
+}
+
 blocks.init = async function(){
     if (this.ready){
         return this.Blockly
@@ -1793,8 +1831,7 @@ blocks.init = async function(){
 
     this.editor = {};
 
-    const toolbox = await (await fetch("blockly_toolbox.xml")).text()
-    document.querySelector('#blocks').innerHTML = toolbox
+    document.querySelector('#blocks').innerHTML = await this.toolbox()
     
     this.editor.workspace = Blockly.inject('blocks', {
         toolbox: document.querySelector('#blocks #toolbox'),
@@ -1809,7 +1846,7 @@ blocks.init = async function(){
 
         if (code != "def loop():\n  pass\n"){
             editor.setValue(code)
-            console.log(code)
+            // console.log(code)
         }
     })
 
@@ -1818,6 +1855,8 @@ blocks.init = async function(){
     Blockly.Xml.domToWorkspace(xmlDom, this.editor.workspace)
 
     this.ready = true
+    codeEditor.saved = true
+    codeEditor.tested = true
 
     return Blockly
 }
@@ -1831,7 +1870,7 @@ blocks.toggle = async function({active = null, ask = false, load = false, create
         Blockly.Xml.domToWorkspace(xmlDom, this.editor.workspace)
     }
     else if (load){
-        this.load({xml: decodeHTML(loadGlad.blocks)})
+        this.load({xml: loadGlad.blocks})
     }
 
     new ResizeObserver(() => {
@@ -1856,6 +1895,9 @@ blocks.toggle = async function({active = null, ask = false, load = false, create
         document.querySelector('#switch').title = 'Alternar para editor de blocos'
         tooltip()
 
+        const code = Blockly.Python.workspaceToCode(this.editor.workspace)
+        editor.setValue(code)
+        editor.gotoLine(1,0,true)
         editor.focus()
     }
     else if (!ask){

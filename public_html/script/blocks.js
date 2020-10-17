@@ -8,8 +8,20 @@ export {Blockly}
 const funcList = {};
 let user = {}
 
+const translatorReady = translator.translate([
+    "Usar retorno",
+    "Ignorar retorno",
+    "Função que o gladiador irá executar a cada 0.1s",
+    "Recupera pontos de vida do gladiador",
+    "Recupera pontos de habilidade do gladiador",
+    "Concede pontos de atributo para o gladiador",
+    "Aumenta a experiência do gladiador"
+])
+
 Blockly.initCustomBlocks = async function(){
     user = await login.wait()
+    await translatorReady
+
     if (user.speak == 'pt'){
         const module = await import(`./blockly-pt-br.js`)
         Blockly.Msg = module.Blockly.Msg
@@ -26,18 +38,14 @@ Blockly.initCustomBlocks = async function(){
                 .appendField("loop");
             this.appendStatementInput("CONTENT");
             this.setColour("#00638d");
-    
-            translator.translate("Função que o gladiador irá executar a cada 0.1s").then( text => {
-                this.setTooltip(text[0]);
-            })
-    
+            this.setTooltip(translator.getTranslated("Função que o gladiador irá executar a cada 0.1s", false))
             this.setHelpUrl("manual");
             this.setDeletable(false);
         }
     };
     
     Blockly.Python['loop'] = function(block) {
-        var code = Blockly.Python.statementToCode(block, 'CONTENT');
+        let code = Blockly.Python.statementToCode(block, 'CONTENT');
         var globals = [];
     
         if (code == ""){
@@ -147,7 +155,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `moveToTarget()`;
+        let code = `moveToTarget()`;
         if (dropdown_complement == "TO")
             code = `moveTo(${value_x}, ${value_y})`;
     
@@ -201,7 +209,7 @@ Blockly.initCustomBlocks = async function(){
             RIGHT: "Right"
         };
     
-        code = `step${values[dropdown_complement]}()`;
+        let code = `step${values[dropdown_complement]}()`;
         this.func = `step${values[dropdown_complement]}`;
         setBlockInfo(this);
         
@@ -232,7 +240,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['moveforward'] = function(block) {
         var steps = (Blockly.Python.valueToCode(block, 'STEPS', Blockly.Python.ORDER_ATOMIC) || 0);
-        code = `moveForward(${steps})\n`;
+        let code = `moveForward(${steps})\n`;
     
         return code;
     };
@@ -359,7 +367,7 @@ Blockly.initCustomBlocks = async function(){
             HIT: "ToLastHit"
         };
     
-        var code = `turn${values[dropdown_where]}`;
+        let code = `turn${values[dropdown_where]}`;
         this.func = code;
         setBlockInfo(this);
     
@@ -438,7 +446,7 @@ Blockly.initCustomBlocks = async function(){
         var value_angle = (Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_ATOMIC) || 0);
         var dropdown_op = block.getFieldValue('COMPLEMENT');
     
-        var code = "turn";
+        let code = "turn";
     
         if (dropdown_op == "ANGLE")
             code += "ToAngle";
@@ -499,7 +507,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `fireball(${value_x}, ${value_y})`;
+        let code = `fireball(${value_x}, ${value_y})`;
     
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
@@ -552,7 +560,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `teleport(${value_x}, ${value_y})`;
+        let code = `teleport(${value_x}, ${value_y})`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -592,7 +600,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['charge'] = function(block) {
-        var code = `charge()`;
+        let code = `charge()`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -632,7 +640,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['block'] = function(block) {
-        var code = `block()`;
+        let code = `block()`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -684,7 +692,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `assassinate(${value_x}, ${value_y})`;
+        let code = `assassinate(${value_x}, ${value_y})`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -724,7 +732,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['ambush'] = function(block) {
-        var code = `ambush()`;
+        let code = `ambush()`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -746,7 +754,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['melee'] = function(block) {
-        var code = `attackMelee()\n`;
+        let code = `attackMelee()\n`;
         return code;
     };
     
@@ -795,7 +803,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `attackRanged(${value_x}, ${value_y})`;
+        let code = `attackRanged(${value_x}, ${value_y})`;
         if (this.useReturn)
             return [code, Blockly.Python.ORDER_NONE];
         else
@@ -816,7 +824,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['get_info'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `get${info}()`;
+        let code = `get${info}()`;
     
         this.func = `get${info}`;
         setBlockInfo(this);
@@ -837,7 +845,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['gethit'] = function(block) {
-        var code = `getHit()`;
+        let code = `getHit()`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -856,7 +864,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['get_time'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `get${info}TimeLeft()`;
+        let code = `get${info}TimeLeft()`;
     
         this.func = `get${info}TimeLeft`;
         setBlockInfo(this);
@@ -879,7 +887,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['get_lasthit'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `getLastHit${info}()`;
+        let code = `getLastHit${info}()`;
     
         this.func = `getLastHit${info}`;
         setBlockInfo(this);
@@ -929,7 +937,7 @@ Blockly.initCustomBlocks = async function(){
         var attr = this.getFieldValue('COMPLEMENT');
         var value = (Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `upgrade${attr}(${value})`;
+        let code = `upgrade${attr}(${value})`;
         this.func = `upgrade${attr}`;
         setBlockInfo(this);
     
@@ -957,7 +965,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['speak'] = function(block) {
         var text = (Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "");
-        var code = `speak(${text})\n`;
+        let code = `speak(${text})\n`;
         return code;
     };
     
@@ -1056,7 +1064,7 @@ Blockly.initCustomBlocks = async function(){
         var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
         var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
     
-        var code = `getAngle(${value_x}, ${value_y})`;
+        let code = `getAngle(${value_x}, ${value_y})`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -1075,7 +1083,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['is_status'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `is${info}()`;
+        let code = `is${info}()`;
         this.func = `is${info}`;
         setBlockInfo(this);
     
@@ -1115,7 +1123,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['get_enemy'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `get${info}()`;
+        let code = `get${info}()`;
         this.func = `get${info}`;
         setBlockInfo(this);
     
@@ -1140,7 +1148,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['get_target'] = function(block) {
         var info = this.getFieldValue('COMPLEMENT');
-        var code = `getTarget${info}()`;
+        let code = `getTarget${info}()`;
         this.func = `getTarget${info}`;
         setBlockInfo(this);
     
@@ -1232,7 +1240,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['getsaferadius'] = function(block) {
-        var code = `getSafeRadius()`;
+        let code = `getSafeRadius()`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -1250,7 +1258,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['howmanyenemies'] = function(block) {
-        var code = `howManyEnemies()`;
+        let code = `howManyEnemies()`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -1268,7 +1276,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['doyouseeme'] = function(block) {
-        var code = `doYouSeeMe()`;
+        let code = `doYouSeeMe()`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -1286,7 +1294,7 @@ Blockly.initCustomBlocks = async function(){
     };
     
     Blockly.Python['getsimtime'] = function(block) {
-        var code = `getSimTime()`;
+        let code = `getSimTime()`;
         return [code, Blockly.Python.ORDER_NONE];
     };
     
@@ -1299,10 +1307,7 @@ Blockly.initCustomBlocks = async function(){
             this.setInputsInline(true);
             this.setOutput(true, "String");
             this.setColour('#9eb553');
-    
-            translator.translate("Recupera pontos de vida do gladiador").then( text => {
-                this.setTooltip(text[0]);
-            })
+            this.setTooltip(translator.getTranslated("Recupera pontos de vida do gladiador", false))
         },
     };
     
@@ -1321,10 +1326,7 @@ Blockly.initCustomBlocks = async function(){
             this.setInputsInline(true);
             this.setOutput(true, "String");
             this.setColour('#9eb553');
-    
-            translator.translate("Recupera pontos de habilidade do gladiador").then( text => {
-                this.setTooltip(text[0]);
-            })
+            this.setTooltip(translator.getTranslated("Recupera pontos de habilidade do gladiador", false))
         },
     };
     
@@ -1343,10 +1345,7 @@ Blockly.initCustomBlocks = async function(){
             this.setInputsInline(true);
             this.setOutput(true, "String");
             this.setColour('#9eb553');
-    
-            translator.translate("Concede pontos de atributo para o gladiador").then( text => {
-                this.setTooltip(text[0]);
-            })
+            this.setTooltip(translator.getTranslated("Concede pontos de atributo para o gladiador", false))
         },
     };
     
@@ -1365,10 +1364,7 @@ Blockly.initCustomBlocks = async function(){
             this.setInputsInline(true);
             this.setOutput(true, "String");
             this.setColour('#9eb553');
-    
-            translator.translate("Aumenta a experiência do gladiador").then( text => {
-                this.setTooltip(text[0]);
-            })
+            this.setTooltip(translator.getTranslated("Aumenta a experiência do gladiador", false))
         },
     };
     
@@ -1438,7 +1434,7 @@ Blockly.initCustomBlocks = async function(){
     
     Blockly.Python['itemready'] = function(block) {
         let pot = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
-        var code = `isItemReady("${pot}")`;
+        let code = `isItemReady("${pot}")`;
         this.func = `isItemReady`;
         setBlockInfo(this);
     
@@ -1472,13 +1468,13 @@ function toggleUseReturn(block, options){
     var option = {};
     option.enabled = true;
     if (!block.useReturn){
-        option.text = 'Usar retorno';
+        option.text = translator.getTranslated('Usar retorno', false)
         option.callback = () => {
             block.reshape({useReturn: true});
         };
     }
     else{
-        option.text = 'Ignorar retorno';
+        option.text = translator.getTranslated('Ignorar retorno', false)
         option.callback = () => {
             block.reshape({useReturn: false});
         };
