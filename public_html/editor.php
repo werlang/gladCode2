@@ -1,12 +1,5 @@
 <!DOCTYPE html>
 
-<?php
-if (isset($_GET['g'])){
-    $id = $_GET['g'];
-    echo "<div id='glad-code' hidden>$id</div>";
-}
-?>
-
 <html>
 <head>
     <meta charset='utf-8' />
@@ -47,43 +40,10 @@ if (isset($_GET['g'])){
     </head>
 <body>
     <?php
-        // include_once "connection.php";
-        // session_start();
-        
-        // if(isset($_SESSION['user']) && isset($_GET['g'])) {
-        //     $user = $_SESSION['user'];
-        //     unset($_SESSION['code']);
-        //     $id = mysql_escape_string($_GET['g']);
-        //     if ($id == 0){
-        //         echo "<div id='newglad'></div>";
-        //     }
-        //     else{
-        //         $sql = "SELECT * FROM gladiators INNER JOIN usuarios ON id = master WHERE master = '$user' AND cod = $id";
-        //         $result = runQuery($sql);
-        //         if ($result->num_rows > 0){
-        //             $row = $result->fetch_assoc();
-        //             $name = $row['name'];
-        //             $vstr = $row['vstr'];
-        //             $vagi = $row['vagi'];
-        //             $vint = $row['vint'];
-        //             $skin = $row['skin'];
-        //             $nick = $row['apelido'];
-        //             $code = htmlspecialchars($row['code']);
-        //             $blocks = htmlspecialchars($row['blocks']);
-        //             echo "<div id='glad-code' hidden>
-        //                 <div id='idglad'>$id</div>
-        //                 <div id='name'>$name</div>
-        //                 <div id='vstr'>$vstr</div>
-        //                 <div id='vagi'>$vagi</div>
-        //                 <div id='vint'>$vint</div>
-        //                 <div id='skin'>$skin</div>
-        //                 <div id='code'>$code</div>
-        //                 <div id='blocks'>$blocks</div>
-        //                 <div id='user'>$nick</div>
-        //             </div>";
-        //         }
-        //     }
-        // }
+        if (isset($_GET['g'])){
+            $id = $_GET['g'];
+            echo "<div id='glad-code' hidden>$id</div>";
+        }
     ?>
     <div id='frame'>
         <div id='panel-left'>
