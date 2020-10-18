@@ -1,6 +1,7 @@
 export const assets = {}
 
-assets.images = {
+// private
+const images = {
     //gender
     'male': {'path': 'male.png', 'png': true, 'height': 256, 'width': 256, 'parent': 'gender', 'default': true},
     'female': {'path': 'female.png', 'png': true, 'height': 256, 'width': 256, 'parent': 'gender'},
@@ -177,12 +178,12 @@ assets.fill = function(){
 
     // beards
     styles[0].forEach(s => colors.forEach(c => {
-        this.images[`${s}_${c}`] = {path: `facial/male/${s}/${c}.png`, parent: ["facial", "bcolor"], layer: 1, scale: 4}
+        images[`${s}_${c}`] = {path: `facial/male/${s}/${c}.png`, parent: ["facial", "bcolor"], layer: 1, scale: 4}
     }))
 
     // heair
     styles[1].forEach(s => colors.forEach(c => {
-        this.images[`${s}_${c}`] = {path: `hair/male/${s}/${c}.png`, parent: ["style", "color"], layer: 5}
+        images[`${s}_${c}`] = {path: `hair/male/${s}/${c}.png`, parent: ["style", "color"], layer: 5}
     }))
 
     //shirts
@@ -196,17 +197,16 @@ assets.fill = function(){
     gender.forEach((g,gi) => colors.forEach(c => styles[gi].forEach((s,si) => {
         const path = [
             [`torso/shirts/longsleeve/male/${c}_${s}.png`],
-            [`torso/shirts/sleeveless/female/${c}_${s}.png', 'torso/shirts/sleeveless/female/${c}_${s}.png', 'torso/corset_female/${s}_${c}.png`]
+            [`torso/shirts/sleeveless/female/${c}_${s}.png`, `torso/shirts/sleeveless/female/${c}_${s}.png`, `torso/corset_female/${s}_${c}.png`]
         ]
-        this.images[`${g}_${s}_${c}`] = {path: path[gi][si], parent: "shirt", req: g, layer: 1}
+        images[`${g}_${s}_${c}`] = {path: path[gi][si], parent: "shirt", req: g, layer: 1}
     })))
 
     //pants
     colors = ['black', 'dark-blue', 'teal', 'green', 'brown', 'red', 'magenta', 'white'];
-    templates = "{\"id\": \"D_pants_B\", \"path\": \"legs/pants/D/B_pants_D.png\", \"parent\": \"legs\", \"req\": \"D\", \"layer\": 1}";
 
     gender.forEach(g => colors.forEach(c => {
-        this.images[`${g}_pants_${c}`] = {path: `legs/pants/${g}/${c}_pants_${g}.png`, parent: "legs", req: g, layer: 1}
+        images[`${g}_pants_${c}`] = {path: `legs/pants/${g}/${c}_pants_${g}.png`, parent: "legs", req: g, layer: 1}
     }))
 
     //weapons
@@ -221,51 +221,42 @@ assets.fill = function(){
     ]
 
     gender.forEach(g => weapons.forEach(w => {
-        this.images[`${g}_${w.name}`] = {path: `weapons/${w.type}/${g}/${w.name}.png`, parent: "melee", req: g, layer: {default: 6, down: 7}, line: w.line, move: w.type}
+        images[`${g}_${w.name}`] = {path: `weapons/${w.type}/${g}/${w.name}.png`, parent: "melee", req: g, layer: {default: 6, down: 7}, line: w.line, move: w.type}
     }))
 
     //shields
     var names = ['1', '9', '10', '5', '6', '3', '4', '7', '8'];
 
     gender.forEach(g => names.forEach(n => {
-        this.images[`${g}_shield_${n}`] = {path: `weapons/shield pack/${g}/${n}.png`, parent: "shield", req: g, layer: 6}
+        images[`${g}_shield_${n}`] = {path: `weapons/shield pack/${g}/${n}.png`, parent: "shield", req: g, layer: 6}
     }))
 
     //cape
     colors = ['black', 'blue', 'brown', 'gray', 'green', 'lavender', 'pink', 'red', 'white', 'yellow'];
-    var templates = ["{\"id\": \"cape_B\", \"path\": \"torso/back/cape/normal/female/cape_B.png\", \"parent\": \"cape\", \"layer\": 4, \"select\": \"cape_B_behind\", \"line\": 8}", "{\"id\": \"cape_B_behind\", \"path\": \"behind_body/cape/normal/female/cape_B.png\", \"parent\": \"none\", \"layer\": -1, \"line\": 8}", "{\"id\": \"tattercape_B\", \"path\": \"torso/back/cape/tattered/female/tattercape_B.png\", \"parent\": \"cape\", \"layer\": 4, \"select\": \"tattercape_B_behind\", \"line\": 8}", "{\"id\": \"tattercape_B_behind\", \"path\": \"behind_body/cape/tattered/female/tattercape_B.png\", \"parent\": \"none\", \"layer\": -1, \"line\": 8}"];
 
     colors.forEach(c => {
-        this.images[`cape_${c}`] = {path: `torso/back/cape/normal/female/cape_${c}.png`, parent: "cape", layer: 4, select: `cape_${c}_behind`, line: 8}
-        this.images[`cape_${c}_behind`] = {path: `behind_body/cape/normal/female/cape_${c}.png`, parent: "none", layer: -1, line: 8}
-        this.images[`tattercape_${c}`] = {path: `torso/back/cape/tattered/female/tattercape_${c}.png`, parent: "cape", layer: 4, select: `tattercape_${c}_behind`, line: 8}
-        this.images[`tattercape_${c}_behind`] = {path: `behind_body/cape/tattered/female/tattercape_${c}.png`, parent: "none", layer: -1, line: 8}
+        images[`cape_${c}`] = {path: `torso/back/cape/normal/female/cape_${c}.png`, parent: "cape", layer: 4, select: `cape_${c}_behind`, line: 8}
+        images[`cape_${c}_behind`] = {path: `behind_body/cape/normal/female/cape_${c}.png`, parent: "none", layer: -1, line: 8}
+        images[`tattercape_${c}`] = {path: `torso/back/cape/tattered/female/tattercape_${c}.png`, parent: "cape", layer: 4, select: `tattercape_${c}_behind`, line: 8}
+        images[`tattercape_${c}_behind`] = {path: `behind_body/cape/tattered/female/tattercape_${c}.png`, parent: "none", layer: -1, line: 8}
     })
 
     //overside weapons sword pack
-    var names = ['1', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27'];
-    gender = ['male', 'female'];
-    templates = "{\"id\": \"A_oversize_B\", \"path\": \"weapons/weapon pack/A/bigslash/B.png\", \"parent\": \"melee\", \"req\": \"A\", \"layer\": {\"default\": 6, \"down\": 7}, \"line\": 1, \"move\": \"slash\", \"oversize\": true, \"scale\": 3, \"posx\": 150, \"posy\": 110}";
+    names = ['1', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27'];
 
-    for (let k=0 ; k<gender.length ; k++){
-        for (let j=0 ; j<names.length ; j++){
-            var new_osw = templates;
-            new_osw = new_osw.replace(/A/g,gender[k]);
-            new_osw = new_osw.replace(/B/g,names[j]);
-            this.images.push(JSON.parse(new_osw));
-        }
-    }
-
+    gender.forEach(g => names.forEach(n => {
+        images[`${g}_oversize_${n}`] = {path: `weapons/weapon pack/${g}/bigslash/${n}.png`, parent: "melee", req: g, layer: {default: 6, down: 7}, line: 1, move: "slash", oversize: true, scale: 3, posx: 150, posy: 110}
+    }))
 }
 
 assets.fetchSpritesheet = async function(json) {
-    return await new Promise((resolve, reject) => {
-        var move = {
-            'walk': {'sprites': 9, 'line': 8},
-            'cast': {'sprites': 7, 'line': 0},
-            'thrust': {'sprites': 8, 'line': 4},
-            'slash': {'sprites': 6, 'line': 12},
-            'shoot': {'sprites': 13, 'line': 16},
+    return await new Promise(resolve => {
+        const move = {
+            walk: {'sprites': 9, 'line': 8},
+            cast: {'sprites': 7, 'line': 0},
+            thrust: {'sprites': 8, 'line': 4},
+            slash: {'sprites': 6, 'line': 12},
+            shoot: {'sprites': 13, 'line': 16},
         };
 
         var errorload = false;
@@ -277,19 +268,20 @@ assets.fetchSpritesheet = async function(json) {
             json = {};
         }
 
-        var spritesheet = document.createElement("canvas");
+        let spritesheet = document.createElement("canvas");
         spritesheet.setAttribute("width", 192 * 13);
         spritesheet.setAttribute("height", 192 * 21);
-        var spritectx = spritesheet.getContext("2d");
+        let spritectx = spritesheet.getContext("2d");
 
-        var imgReady = 0;
-        var selectedArray = [];
-        for (var i in json){
-            if (getImage(json[i]))
-                selectedArray.push(getImage(json[i]));
+        const selectedArray = [];
+        json.filter(e => this.getImage(e)).forEach(e => {
+            selectedArray.push(this.getImage(e))
+        })
+    
+
+        if (!this.validateSkin(selectedArray)){
+            errorload = true
         }
-        if (!assets.validatSkin(selectedArray))
-            errorload = true;
 
         if (!errorload){
             selectedArray.sort(function(a, b){
@@ -306,54 +298,47 @@ assets.fetchSpritesheet = async function(json) {
                 }
             });
 
-            spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
-            var img = new Array();
-            for(var i=0 ; i < selectedArray.length ; i++){
-                if (selectedArray[i] && selectedArray[i].path != '' && !selectedArray[i].png){
-                    img[i] = new Image();
-                    img[i].src = "sprite/Universal-LPC-spritesheet/" + selectedArray[i].path
-                    img[i].onload = function() {
-                        imgReady++;
-                        if (imgReady == selectedArray.length){
-                            drawSprite();
-                            resolve(spritesheet)
+            spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height)
+            selectedArray.forEach(e => {
+                if (e && e.path != '' && !e.png){
+                    const img = new Image()
+                    img.src = "sprite/Universal-LPC-spritesheet/" + e.path
+                    const load = new Promise(resolve => {
+                        img.onload = function() {
+                            resolve(true)
                         }
-                    };
+                    })
+                    e.img = {image: img, load: load}
                 }
-                else{
-                    imgReady++;
-                    if (imgReady == selectedArray.length){
-                        drawSprite()
-                        resolve(spritesheet)
-                    }
-                }
-            }
+            })
 
-            function drawSprite() {
-                for(var i=0 ; i < selectedArray.length ; i++){
-                    if (img[i]){
-                        if (selectedArray[i].oversize){
-                            var line = move[selectedArray[i].move].line
-                            var sprites = move[selectedArray[i].move].sprites
-                            for (var k=0 ; k<4 ; k++){
-                                for (var j=0 ; j<sprites ; j++){
-                                    spritectx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192)
-                                }
-                            }
-                        }
-                        else{
-                            for (var k=0 ; k<21 ; k++){
-                                for (var j=0 ; j<13 ; j++){
-                                    spritectx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64)
-                                }
+            // wait for all the promises
+            Promise.all(selectedArray.filter(e => e.img).map(e => e.img.load)).then( () => {
+                selectedArray.filter(e => e.img).forEach(e => {
+                    if (e.oversize){
+                        const line = move[e.move].line
+                        const sprites = move[e.move].sprites
+                        for (let k=0 ; k<4 ; k++){
+                            for (let j=0 ; j<sprites ; j++){
+                                spritectx.drawImage(e.img.image, j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192)
                             }
                         }
                     }
-                }
-            }
+                    else{
+                        for (let k=0 ; k<21 ; k++){
+                            for (let j=0 ; j<13 ; j++){
+                                spritectx.drawImage(e.img.image, j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64)
+                            }
+                        }
+                    }
+                })
+
+                resolve(spritesheet)
+            })
+
         }
         else{
-            var img = new Image()
+            const img = new Image()
             img.src = "res/glad.png"
             img.onload = function() {
                 for (var k=0 ; k<21 ; k++){
@@ -376,32 +361,12 @@ assets.validateSkin = function(selectedArray){
     return false;
 }
 
-// assets.getSpriteThumb = function(spritesheet, move, direction){
-//     var dirEnum = {
-//         'walk': {'row': 8, 'col': 0},
-//         'cast': {'row': 0, 'col': 0},
-//         'thrust': {'row': 4, 'col': 0},
-//         'slash': {'row': 12, 'col': 0},
-//         'shoot': {'row': 16, 'col': 0},
-//         'die': {'row': 20, 'col': 5},
-//         'up': 0,
-//         'left': 1,
-//         'down': 2,
-//         'right': 3,
-//     };
-//     var row = dirEnum[move].row + dirEnum[direction];
-//     var col = dirEnum[move].col;
-//     var thumb = document.createElement("canvas");
-//     thumb.setAttribute("width", 64);
-//     thumb.setAttribute("height", 64);
-//     var ctx = thumb.getContext("2d");
-//     ctx.drawImage(spritesheet, col*192 + 64, row*192 + 64, 64, 64, 0, 0, 64, 64); //10: linha do walk down
-//     return thumb;
-// }
+assets.getImage = function(key){
+    return images[key]
+}
 
-function getImage(key){
-    for (var i in images){
-        if (images[i].id == key)
-            return images[i];
+assets.forAllImages = function(callback){
+    for (let i in images){
+        callback(images[i], i)
     }
 }

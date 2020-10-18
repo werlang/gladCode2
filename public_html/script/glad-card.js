@@ -27,7 +27,7 @@ const translatorReady = (async () => {
 const gladCard = {}
 
 gladCard.create = function(parent, index, skin, dead){
-    fetchSpritesheet(skin).then( function(data){
+    assets.fetchSpritesheet(skin).then( function(data){
         var frame = 'walk';
         if (dead)
             frame = 'die';
@@ -36,20 +36,12 @@ gladCard.create = function(parent, index, skin, dead){
 }
 
 gladCard.appendImage = async function({container, data, dead}){
-    const spriteSheet = await fetchSpritesheet(data)
+    const spriteSheet = await assets.fetchSpritesheet(data)
     const frame = dead ? 'die' : 'walk'
     container.html(getSpriteThumb(spriteSheet, frame, 'down'))
 }
 
 export {gladCard}
-
-function getImage(id){
-    for (var i in assets.images){ //assets.images is in assets.js
-        if (assets.images[i].id == id)
-            return assets.images[i];
-    }
-    return false;
-}
 
 function getSpriteThumb(spritesheet, move, direction){
     var dirEnum = {
@@ -78,116 +70,6 @@ function getSpriteThumb(spritesheet, move, direction){
     var ctx = thumb.getContext("2d");
     ctx.drawImage(spritesheet, row*192 + 64, line*192 + 64, 64, 64, 0, 0, 64, 64); //10: linha do walk down
     return thumb;
-}
-
-function fetchSpritesheet(json) {
-    var response = $.Deferred();
-    var move = {
-        'walk': {'sprites': 9, 'line': 8},
-        'cast': {'sprites': 7, 'line': 0},
-        'thrust': {'sprites': 8, 'line': 4},
-        'slash': {'sprites': 6, 'line': 12},
-        'shoot': {'sprites': 13, 'line': 16},
-        'die': {'sprites': 6, 'line': 20}
-    };
-
-    var errorload = false;
-    try{
-        json = JSON.parse(json);
-    }
-    catch(error){
-        errorload = true;
-        json = {};
-    }
-
-    var spritesheet = document.createElement("canvas");
-    spritesheet.setAttribute("width", 192 * 13);
-    spritesheet.setAttribute("height", 192 * 21);
-    var spritectx = spritesheet.getContext("2d");
-    
-    var imgReady = 0;
-    var selectedArray = [];
-    for (var i in json){
-        if (getImage(json[i]))
-            selectedArray.push(getImage(json[i]));
-    }
-    if (!assets.validateSkin(selectedArray))
-        errorload = true;
-    
-    if (!errorload){
-        selectedArray.sort(function(a, b){
-            if (a.layer == null)
-                return -1;
-            else if (b.layer == null)
-                return 1;
-            else{
-                if (typeof a.layer === 'object')
-                    a.layer = a.layer.down;
-                if (typeof b.layer === 'object')
-                    b.layer = b.layer.down;
-                return a.layer - b.layer;
-            }
-        });
-        
-        spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
-        var img = new Array();
-        for(var i=0 ; i < selectedArray.length ; i++){
-            if (selectedArray[i] && selectedArray[i].path != '' && !selectedArray[i].png){
-                img[i] = new Image();	
-                img[i].src = "sprite/Universal-LPC-spritesheet/" + selectedArray[i].path;
-                img[i].onload = function() {
-                    imgReady++;
-                    if (imgReady == selectedArray.length){
-                        drawSprite();
-                        return response.resolve(spritesheet);
-                    }
-                };
-            }
-            else{
-                imgReady++;
-                if (imgReady == selectedArray.length){
-                    drawSprite();
-                    return response.resolve(spritesheet);
-                }
-            }
-        }
-            
-        function drawSprite() {
-            for(var i=0 ; i < selectedArray.length ; i++){
-                if (img[i]){
-                    if (selectedArray[i].oversize){
-                        var line = move[selectedArray[i].move].line;
-                        var sprites = move[selectedArray[i].move].sprites;
-                        for (var k=0 ; k<4 ; k++){
-                            for (var j=0 ; j<sprites ; j++){
-                                spritectx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
-                            }
-                        }
-                    }
-                    else{
-                        for (var k=0 ; k<21 ; k++){
-                            for (var j=0 ; j<13 ; j++){
-                                spritectx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    else{
-        var img = new Image();	
-        img.src = "res/glad.png";
-        img.onload = function() {
-            for (var k=0 ; k<21 ; k++){
-                for (var j=0 ; j<13 ; j++){
-                    spritectx.drawImage(img, j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
-                }
-            }
-            return response.resolve(spritesheet);
-        };
-    }
-    return response.promise();
 }
 
 // If using customLoad, you must provide following info:
