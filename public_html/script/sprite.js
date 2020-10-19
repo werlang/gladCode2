@@ -1,46 +1,500 @@
+import {assets} from "./assets.js"
+
+// var lastcolor = 'black';
+// var direction = 2;
+// var scale = 1;
+// var animationOn = false;
+// var selected = {};
+// var parentTree = new Array();
+
+// var anim_num = 0;
+// var move = [
+//     {'name': 'walk', 'sprites': 9, 'line': 8, 'image': 'walk'},
+//     {'name': 'cast', 'sprites': 7, 'line': 0, 'image': 'magic'},
+//     {'name': 'thrust', 'sprites': 8, 'line': 4, 'image': 'thrust'},
+//     {'name': 'slash', 'sprites': 6, 'line': 12, 'image': 'slash'},
+//     {'name': 'shoot', 'sprites': 13, 'line': 16, 'image': 'arrows'},
+// ];
+// var moveEnum = {'walk': 0, 'cast': 1, 'thrust': 2, 'slash': 3, 'shoot': 4};
+
 export const spriteGen = {
     active: false,
     ready: false
 }
 
 spriteGen.init = async function(el){
-    const template = await (await fetch('glad-create.html')).text()
+    assets.fill()
+
+    this.canvas = document.createElement("canvas");
+    this.canvas.setAttribute("width", 192);
+    this.canvas.setAttribute("height", 192);
+    this.ctx = this.canvas.getContext("2d");
+    this.spritesheet = document.createElement("canvas");
+    this.spritesheet.setAttribute("width", 192 * 13);
+    this.spritesheet.setAttribute("height", 192 * 21);
+    this.spritectx = this.spritesheet.getContext("2d");
+
+    this.selected = []
+    this.childTree = {}
+    this.visible = []
+    
+    // build child tree
+    assets.forAllImages((e,n) => {
+        if (e.parent){
+            const parent = Array.isArray(e.parent) ? e.parent : [e.parent]
+            for (let i in parent){
+                if (!this.childTree[parent[i]]){
+                    this.childTree[parent[i]] = []
+                }
+                this.childTree[parent[i]].push(n)
+            }
+        }
+
+        if (e.default){
+            this.selected.push(n)
+        }
+    })
+    // console.log(this.childTree)
+
+    el.innerHTML = await (await fetch('glad-create.html')).text()
+
+    document.querySelectorAll('.img-button.sub').forEach(e => e.classList.add('hidden'))
+    document.querySelector('#middle-container').appendChild(this.canvas)
+
+    document.querySelectorAll('.img-button').forEach(e => e.addEventListener('click', () => {
+        this.open(e.id)
+    }))
+
+    // $('.img-button.sub').click( function() {
+    //     if (!$(this).hasClass('n-av')){
+    //         $('.img-button.sub').removeClass('selected');
+    //         $(this).addClass('selected');
+    //         reload_reqs();
+    //     }
+    // });
+
+    document.querySelector("#fog-skin .close").addEventListener("click", () => {
+        this.active = false
+        document.querySelector("#fog-skin").classList.add("hidden")
+    })
 
     this.ready = true
 }
 
-function buildIndex(){
-    for (let i=0 ; i<images.length ; i++) {
-        imageIndex[ images[i].id ] = i;
-
-        if (images[i].parent){
-            if (Array.isArray(images[i].parent)){
-                for (j in images[i].parent){
-                    if (!parentTree[images[i].parent[j]]){
-                        parentTree.push(images[i].parent[j]);
-                        parentTree[images[i].parent[j]] = new Array();
-                    }
-                    parentTree[images[i].parent[j]].push(images[i].id);
-                }
-            }
-            else{
-                if (!parentTree[images[i].parent]){
-                    parentTree.push(images[i].parent);
-                    parentTree[images[i].parent] = new Array();
-                }
-                parentTree[images[i].parent].push(images[i].id);
-            }
-        }
-        if (images[i].default)
-            selected[images[i].id] = images[i];
+spriteGen.open = function(id){
+    const menus = {
+        body: ['gender', 'shape', 'ears', 'eyes'],
+        hair: ['style', 'color', 'facial', 'bcolor'],
+        cloth: ['shirt', 'armor', 'legs', 'feet'],
+        misc: ['head', 'shoulder', 'hands', 'cape', 'belt'],
+        equip: ['melee', 'ranged', 'shield'],
+    }
+    
+    // first level
+    if (menus[id]){
+        document.querySelectorAll(`.img-button.cat.selected`).forEach(e => e.classList.remove('selected'))
+        document.querySelector(`#${id}.img-button.cat`).classList.add('selected')
+        document.querySelectorAll(`.img-button.sub`).forEach(e => e.classList.add('hidden'))
+        menus[id].forEach(e => document.querySelector(`#${e}.img-button.sub.hidden`).classList.remove('hidden'))
+    }
+    // second level
+    else if (this.childTree[id]){
+        document.querySelectorAll(`.img-button.sub.selected`).forEach(e => e.classList.remove('selected'))
+        document.querySelector(`#${id}.img-button.sub`).classList.add('selected')
+        
+        document.querySelector('#right-container').innerHTML = ""
+        // for (let i in this.childTree)
+        this.childTree[id].forEach(e => {
+            this.loadItem(assets.getImage(e), e)
+        })
     }
 }
 
+spriteGen.loadItem = function(info, name){
+    // console.log(info, name)
+    const prev = document.createElement("canvas")
+    prev.setAttribute("width", 64)
+    prev.setAttribute("height", 64)
+    const prevctx = prev.getContext("2d")
+
+    const img = new Image()
+    img.src = info.png ? `sprite/images/${info.path}` : `sprite/Universal-LPC-spritesheet/${info.path}`
+    img.onload = () => {
+        try {
+            let line = info.line || 10
+            let col = info.col || 0
+            let s = info.oversize ? 192 : 64
+
+            if (info.png){
+                prevctx.drawImage(img, 0, 0, info.width, info.height, 0, 0, 64, 64)
+            }
+            else if (info.scale){
+                let dx = info.posx || 0
+                let dy = info.posy || 0
+                prevctx.drawImage(img, col * s, line * s, s, s, s/2 - info.scale*s/2 + dx, s/2 - info.scale*s/2 + dy, 64*info.scale, 64*info.scale)
+            }
+            else{
+                prevctx.drawImage(img, col * s, line * s, s, s, 0, -5, 64, 64)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    if (!document.querySelector(`#${name}.img-button.item`)){
+        document.querySelector('#right-container').insertAdjacentHTML('beforeend', `<div class='img-button item' id='${name}'></div>`)
+    }
+    const item = document.querySelector(`#${name}.img-button.item`)
+    item.appendChild(prev)
+
+    if (info.default){
+        item.classList.add('selected')
+    }
+
+    item.addEventListener('click', () => {
+        const imageParent = Array.isArray(info.parent) ? info.parent : [info.parent]
+
+        // for (let i in selected){
+        //     var selectedParent = [];
+        //     if (Array.isArray(selected[i].parent))
+        //         selectedParent = selected[i].parent;
+        //     else
+        //         selectedParent.push(selected[i].parent);
+
+        //     for (var j in selectedParent){
+        //         for (var k in imageParent){
+        //             if (selectedParent[j] == imageParent[k])
+        //                 delete selected[i];
+        //         }
+        //     }
+        // }
+        // selected[image.id] = image;
+
+        document.querySelectorAll('.img-button.item').forEach(e=> e.classList.remove('selected'))
+        item.classList.add('selected')
+    })
+}
+
+function load_assets(image) {
+    var prev = document.createElement("canvas");
+    prev.setAttribute("width", 64);
+    prev.setAttribute("height", 64);
+    var prevctx = prev.getContext("2d");
+    var imgRef = image.path;
+
+    var img = new Image();
+
+    if (image.png)
+        img.src = "sprite/images/" + imgRef;
+    else
+        img.src = "sprite/Universal-LPC-spritesheet/" + imgRef;
+
+    img.onload = function() { callback(img) };
+
+    if ( $('.img-button.item#'+ image.id).length == 0)
+        $('#right-container').append("<div class='img-button item' id='"+ image.id +"'></div>");
+    $('.img-button.item#'+ image.id).append(prev);
+
+    if (image.default)
+        $('.img-button.item#'+ image.id).addClass('selected');
+    for (var i in selected){
+        if (selected[i].id == image.id){
+            $('.img-button.item').removeClass('selected');
+            $('.img-button.item#'+ image.id).addClass('selected');
+        }
+    }
+
+    var callback = function(img) {
+        try {
+            var line = 10, col = 0;
+            var s = 64;
+            if (image.line)
+                line = image.line;
+            if (image.col)
+                col = image.col;
+
+            if (image.oversize)
+                s = 192;
+
+            if (image.png)
+                prevctx.drawImage(img, 0, 0, image.width, image.height, 0, 0, 64, 64);
+            else if (image.scale){
+                var dx = 0, dy = 0;
+                if (image.posx)
+                    dx = image.posx;
+                if (image.posy)
+                    dy = image.posy;
+                prevctx.drawImage(img, col * s, line * s, s, s, s/2 - image.scale*s/2 + dx, s/2 - image.scale*s/2 + dy, 64*image.scale, 64*image.scale);
+            }
+            else
+                prevctx.drawImage(img, col * s, line * s, s, s, 0, -5, 64, 64);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    $('.img-button.item#'+ image.id).click( function() {
+        var imageParent = [];
+        if (Array.isArray(image.parent))
+            imageParent = image.parent;
+        else
+            imageParent.push(image.parent);
+
+        for (var i in selected){
+            var selectedParent = [];
+            if (Array.isArray(selected[i].parent))
+                selectedParent = selected[i].parent;
+            else
+                selectedParent.push(selected[i].parent);
+
+            for (var j in selectedParent){
+                for (var k in imageParent){
+                    if (selectedParent[j] == imageParent[k])
+                        delete selected[i];
+                }
+            }
+        }
+        selected[image.id] = image;
+        $('.img-button.item').removeClass('selected');
+        $(this).addClass('selected');
+        //console.log(selected);
+        reload_reqs(true);
+    });
+}
+
+// spriteGen.reload = function(){
+//     // document.querySelector('#right-container').innerHTML = ""
+
+//     // make 
+//     assets.forAllImages((e,i) => {
+//         if (e.parent){
+//             function isParentSelected(e) {
+//                 const isSelected = e => document.querySelector(`.img-button#${e}`).classList.contains('selected')
+//                 return Array.isArray(e) ? e.some(e => isSelected(e)) : isSelected(e)
+//             }
+            
+//             if (isParentSelected(e.parent)){
+//                 this.visible.push(i)
+//             }
+//         }
+//     })
+// }
+
+function reload_reqs(keepItems){
+    if (!keepItems)
+        $('#right-container').html("");
+    var visible = {};
+    setTimeout( function(){
+        var parentList = parentTree[$('.img-button.sub.selected').attr('id')];
+        //verifique quem é visivel pelo parent
+        $.each( parentList , function(index, image) {
+            image = getImage(image);
+            var visibleFlag = true;
+
+            //define quais vao ser visiveis baseado no parent
+            if (Array.isArray(image.parent)){
+                for (let i=0 ; i < image.parent.length ; i++){
+                    if ( $('.img-button#'+image.parent[i]).hasClass('selected') )
+                        break;
+                }
+                if (i == image.parent.length)
+                    visibleFlag = false;
+            }
+            else{
+                if ( !$('.img-button#'+image.parent).hasClass('selected') )
+                    visibleFlag = false;
+            }
+
+            if (visibleFlag)
+                visible[image.id] = image;
+
+        });
+
+        //torna invivel pelo requerimento
+        $.each(images, function(index,image) {
+            if (image.req){
+                if (image.req.or){
+                    for (let i=0 ; i<image.req.or.length ; i++){
+                        if( selected[image.req.or[i]] )
+                            break;
+                    }
+                    if (i == image.req.or.length){
+                        delete visible[image.id];
+                        delete selected[image.id];
+                    }
+                }
+                else if (image.req.and){
+                    for (let i=0 ; i<image.req.and.length ; i++){
+                        if( !selected[image.req.and[i]] ){
+                            delete visible[image.id];
+                            delete selected[image.id];
+                            break;
+                        }
+                    }
+                }
+                else if (image.req.not){
+                    for (let i=0 ; i<image.req.not.length ; i++){
+                        if( selected[image.req.not[i]] ){
+                            delete visible[image.id];
+                            delete selected[image.id];
+                            break;
+                        }
+                    }
+                }
+                else{
+                    if( !selected[image.req] ){
+                        delete visible[image.id];
+                        delete selected[image.id];
+                    }
+                }
+            }
+        });
+
+        //reseta o shape se troca de sexo
+        var shapeOK = false;
+        $.each(selected, function(index,image) {
+            if (image.parent == 'shape')
+                shapeOK = true;
+        });
+        if (!shapeOK){
+            if (selected['male'])
+                selected['male-light'] = getImage('male-light');
+            else
+                selected['female-light'] = getImage('female-light');
+        }
+
+        //torna visivel cores do cabelo
+        if ($('#style').hasClass('selected')){
+            var color = lastcolor;
+            $.each(selected, function(index,image) {
+                if (image.parent[1] == 'color'){
+                    color = image.id.split("_")[1];
+                    lastcolor = color;
+                }
+            });
+            $.each(images, function(index,image) {
+                if (image.parent[1] == 'color'){
+                    if ($(this).attr('id').split("_")[1] == color)
+                        visible[image.id] = image;
+                    else
+                        delete visible[image.id];
+                }
+
+            });
+        }
+        //torna visivel cores da barba
+        if ($('#facial').hasClass('selected')){
+            var color = lastcolor;
+            $.each(selected, function(index,image) {
+                if (image.parent[1] == 'bcolor'){
+                    color = image.id.split("_")[1];
+                    lastcolor = color;
+                }
+            });
+            $.each(images, function(index,image) {
+                if (image.parent[1] == 'bcolor'){
+                    if (image.id.split("_")[1] == color)
+                        visible[image.id] = image;
+                    else
+                        delete visible[image.id];
+                }
+
+            });
+        }
+        //torna visivel estilos de cabelo
+        if ($('#color').hasClass('selected')){
+            var style;
+            $.each(selected, function(index,image) {
+                if (image.parent[0] == 'style')
+                    style = image.id.split("_")[0];
+            });
+            $.each(images, function(index,image) {
+                if (image.parent[0] == 'style'){
+                    if (image.id.split("_")[0] == style)
+                        visible[image.id] = image;
+                    else
+                        delete visible[image.id];
+                }
+            });
+        }
+        //torna visivel cores de barba
+        if ($('#bcolor').hasClass('selected')){
+            var facial;
+            $.each(selected, function(index,image) {
+                if (image.parent[0] == 'facial'){
+                    facial = image.id.split("_")[0];
+                }
+            });
+            $.each(images, function(index,image) {
+                if (image.parent[0] == 'facial'){
+                    if (image.id.split("_")[0] == facial)
+                        visible[image.id] = image;
+                    else
+                        delete visible[image.id];
+                }
+            });
+        }
+        //coloca not available
+        $('.img-button.sub.n-av').removeClass('n-av');
+
+        if ( selected['male-orc'] || selected['male-red_orc'] || selected['skeleton'] || selected['female-orc'] || selected['female-red_orc'] )
+            $('#eyes, #ears').addClass('n-av');
+
+        if ( selected['hair_none'] )
+            $('#color').addClass('n-av');
+
+        if ( selected['facial_none'] )
+            $('#bcolor').addClass('n-av');
+
+        if ( selected['male_chain'] || selected['female_chain'] )
+            $('#shirt, #legs').addClass('n-av');
+
+        $.each( selected , function(index,image) {
+            //torna invisivel pelo block
+            if (Array.isArray(image.block)){
+                for (let i=0 ; i<image.block.length ; i++)
+                    $('#'+ image.block[i]).addClass('n-av');
+            }
+            else
+                $('#'+ image.block).addClass('n-av');
+
+            //selectiona a move no botao la em cima
+            if (image.move && $('.img-button#'+image.parent).hasClass('selected')){
+                anim_num = moveEnum[image.move];
+                $('#animation').find('img').attr('src', 'sprite/images/'+ move[anim_num].image +'.png' );
+            }
+
+            //seleciona os itens agregados (arrows)
+            if (image.parent == 'none' && selected[image.id])
+                delete selected[image.id]
+
+            if (image.select){
+                selected[image.select] = getImage(image.select);
+            }
+
+
+        });
+        //remove os items not avaliable
+        $.each( $('.img-button.sub.n-av') , function() {
+            var list = parentTree[$(this).attr('id')];
+            for (var i in list){
+                if (selected[list[i]])
+                    delete selected[list[i]];
+            }
+        });
+
+        if (!keepItems){
+            for (var i in visible){
+                load_assets(visible[i]);
+            }
+        }
+        draw();
+    },1);
+}
 
 function load_glad_generator(element){
 
     element.load('glad-create.html', function(){
-        buildIndex();
+        // buildIndex();
 
         $('.img-button.sub').addClass('hidden');
         $('#middle-container').append(canvas);
@@ -329,3 +783,73 @@ function load_glad_generator(element){
         });
     });
 }
+
+function draw() {
+    var imgReady = 0;
+    var selectedArray = [];
+    for (var i in selected)
+        selectedArray.push(selected[i]);
+
+    selectedArray.sort(function(a, b){
+        return getLayer(a) - getLayer(b);
+    });
+
+    function getLayer(a){
+        var directionEnum = ['up', 'left', 'down', 'right'];
+        if (a.layer && a.layer.default){
+            if (a.layer[ directionEnum[direction] ])
+                return a.layer[ directionEnum[direction] ];
+            else
+                return a.layer.default;
+        }
+        return a.layer;
+
+    }
+
+    var img = new Array();
+    for(i=0 ; i < selectedArray.length ; i++){
+        if (selectedArray[i].path != '' && !selectedArray[i].png){
+            img[i] = new Image();
+            img[i].src = "sprite/Universal-LPC-spritesheet/" + selectedArray[i].path;
+            img[i].onload = function() {
+                imgReady++;
+            };
+        }
+        else
+            imgReady++;
+    }
+
+    var tempss = document.createElement("canvas");
+    tempss.width = spritesheet.width;
+    tempss.height = spritesheet.height;
+    var tempctx = tempss.getContext("2d");
+
+    interval = setInterval( function() {
+        if (imgReady == selectedArray.length){
+            clearInterval(interval);
+            for(i=0 ; i < selectedArray.length ; i++){
+                if (img[i]){
+                    if (selectedArray[i].oversize){
+                        var line = move[moveEnum[selectedArray[i].move]].line;
+                        var sprites = move[moveEnum[selectedArray[i].move]].sprites;
+                        for (let k=0 ; k<4 ; k++){
+                            for (let j=0 ; j<sprites ; j++){
+                                tempctx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
+                            }
+                        }
+                    }
+                    else{
+                        for (let k=0 ; k<21 ; k++){
+                            for (let j=0 ; j<13 ; j++){
+                                tempctx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
+                            }
+                        }
+                    }
+                }
+            }
+            spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
+            spritectx.drawImage(tempss, 0, 0);
+        }
+    }, 10);
+}
+

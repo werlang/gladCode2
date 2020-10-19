@@ -207,7 +207,8 @@ chat.init = async function(wrapper, options){
         });
     });
 
-    function bindUi(){
+    async function bindUi(){
+        await loader.load("jquery")
         $('#chat-panel #send').click( function(){
             var text = '';
             var codes = $('#chat-panel #chat-ui #message-box').data('code');

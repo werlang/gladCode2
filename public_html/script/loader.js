@@ -27,6 +27,7 @@ const paths = {
     utils: "./utils.js",
     header: "./header.js",
     ace: "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js",
+    spritegen: "./sprite.js"
 }
 
 const callbacks = {
