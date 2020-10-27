@@ -37,7 +37,9 @@ spriteGen.init = async function(el){
     this.selected = []
     this.childTree = {}
     this.visible = []
-    
+    this.color = 'black'
+    this.bcolor = 'black'
+
     // build child tree
     assets.forAllImages((e,n) => {
         if (e.parent){
@@ -62,21 +64,17 @@ spriteGen.init = async function(el){
     document.querySelector('#middle-container').appendChild(this.canvas)
 
     document.querySelectorAll('.img-button').forEach(e => e.addEventListener('click', () => {
-        this.open(e.id)
+        if (!e.classList.contains("n-av")){
+            this.open(e.id)
+        }
     }))
-
-    // $('.img-button.sub').click( function() {
-    //     if (!$(this).hasClass('n-av')){
-    //         $('.img-button.sub').removeClass('selected');
-    //         $(this).addClass('selected');
-    //         reload_reqs();
-    //     }
-    // });
 
     document.querySelector("#fog-skin .close").addEventListener("click", () => {
         this.active = false
         document.querySelector("#fog-skin").classList.add("hidden")
     })
+
+    this.reload()
 
     this.ready = true
 }
@@ -89,7 +87,7 @@ spriteGen.open = function(id){
         misc: ['head', 'shoulder', 'hands', 'cape', 'belt'],
         equip: ['melee', 'ranged', 'shield'],
     }
-    
+
     // first level
     if (menus[id]){
         document.querySelectorAll(`.img-button.cat.selected`).forEach(e => e.classList.remove('selected'))
@@ -101,12 +99,12 @@ spriteGen.open = function(id){
     else if (this.childTree[id]){
         document.querySelectorAll(`.img-button.sub.selected`).forEach(e => e.classList.remove('selected'))
         document.querySelector(`#${id}.img-button.sub`).classList.add('selected')
-        
-        document.querySelector('#right-container').innerHTML = ""
-        // for (let i in this.childTree)
-        this.childTree[id].forEach(e => {
-            this.loadItem(assets.getImage(e), e)
-        })
+
+        // remove menus from selected
+        this.selected = this.selected.filter(e => !(Object.keys(menus).includes(e) || Object.values(menus).some(a => a.includes(e))))
+        this.selected.push(id)
+
+        this.reload()
     }
 }
 
@@ -117,61 +115,63 @@ spriteGen.loadItem = function(info, name){
     prev.setAttribute("height", 64)
     const prevctx = prev.getContext("2d")
 
-    const img = new Image()
-    img.src = info.png ? `sprite/images/${info.path}` : `sprite/Universal-LPC-spritesheet/${info.path}`
-    img.onload = () => {
-        try {
-            let line = info.line || 10
-            let col = info.col || 0
-            let s = info.oversize ? 192 : 64
-
-            if (info.png){
-                prevctx.drawImage(img, 0, 0, info.width, info.height, 0, 0, 64, 64)
-            }
-            else if (info.scale){
-                let dx = info.posx || 0
-                let dy = info.posy || 0
-                prevctx.drawImage(img, col * s, line * s, s, s, s/2 - info.scale*s/2 + dx, s/2 - info.scale*s/2 + dy, 64*info.scale, 64*info.scale)
-            }
-            else{
-                prevctx.drawImage(img, col * s, line * s, s, s, 0, -5, 64, 64)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
     if (!document.querySelector(`#${name}.img-button.item`)){
         document.querySelector('#right-container').insertAdjacentHTML('beforeend', `<div class='img-button item' id='${name}'></div>`)
     }
     const item = document.querySelector(`#${name}.img-button.item`)
-    item.appendChild(prev)
+    if (info.path){
+        item.innerHTML = `<i class='fas fa-spinner fa-pulse'></i>`
 
-    if (info.default){
-        item.classList.add('selected')
+        if (!this.loadedItems){
+            this.loadedItems = {}
+        }
+
+        const src = info.png ? `sprite/images/${info.path}` : `sprite/Universal-LPC-spritesheet/${info.path}`
+
+        if (this.loadedItems[src]){
+            item.innerHTML = ""
+            item.appendChild(this.loadedItems[src])
+        }
+        else{
+            const img = new Image()
+            img.src = src
+            img.onload = () => {
+                try {
+                    let line = info.line || 10
+                    let col = info.col || 0
+                    let s = info.oversize ? 192 : 64
+
+                    if (info.png){
+                        prevctx.drawImage(img, 0, 0, info.width, info.height, 0, 0, 64, 64)
+                    }
+                    else if (info.scale){
+                        let dx = info.posx || 0
+                        let dy = info.posy || 0
+                        prevctx.drawImage(img, col * s, line * s, s, s, s/2 - info.scale*s/2 + dx, s/2 - info.scale*s/2 + dy, 64*info.scale, 64*info.scale)
+                    }
+                    else{
+                        prevctx.drawImage(img, col * s, line * s, s, s, 0, -5, 64, 64)
+                    }
+                    item.innerHTML = ""
+                    item.appendChild(prev)
+                    this.loadedItems[src] = prev
+                } catch (err) {
+                    console.log(err)
+                }
+            }
+        }
     }
 
     item.addEventListener('click', () => {
         const imageParent = Array.isArray(info.parent) ? info.parent : [info.parent]
-
-        // for (let i in selected){
-        //     var selectedParent = [];
-        //     if (Array.isArray(selected[i].parent))
-        //         selectedParent = selected[i].parent;
-        //     else
-        //         selectedParent.push(selected[i].parent);
-
-        //     for (var j in selectedParent){
-        //         for (var k in imageParent){
-        //             if (selectedParent[j] == imageParent[k])
-        //                 delete selected[i];
-        //         }
-        //     }
-        // }
-        // selected[image.id] = image;
+        // remove from selected the siblings
+        this.selected = this.selected.filter(e => !imageParent.some(a => this.childTree[a].includes(e)))
+        this.selected.push(name)
 
         document.querySelectorAll('.img-button.item').forEach(e=> e.classList.remove('selected'))
         item.classList.add('selected')
+
+        this.reload()
     })
 }
 
@@ -261,23 +261,82 @@ function load_assets(image) {
     });
 }
 
-// spriteGen.reload = function(){
-//     // document.querySelector('#right-container').innerHTML = ""
+spriteGen.reload = function(){
+    // console.log(this.selected)
 
-//     // make 
-//     assets.forAllImages((e,i) => {
-//         if (e.parent){
-//             function isParentSelected(e) {
-//                 const isSelected = e => document.querySelector(`.img-button#${e}`).classList.contains('selected')
-//                 return Array.isArray(e) ? e.some(e => isSelected(e)) : isSelected(e)
-//             }
-            
-//             if (isParentSelected(e.parent)){
-//                 this.visible.push(i)
-//             }
-//         }
-//     })
-// }
+    document.querySelector('#right-container').innerHTML = ""
+
+    if (document.querySelector(`.img-button.sub.selected`)){
+        const id = document.querySelector(`.img-button.sub.selected`).id
+
+        // make visible by parents
+        this.visible = this.childTree[id]
+
+        // make visible by requirements
+        this.visible.forEach(e => {
+            const img = assets.getImage(e)
+            if (img.req){
+                const removeOr = img.req.or && !img.req.or.some(e => this.selected.includes(e))
+                const removeAnd = img.req.and && !img.req.and.every(e => this.selected.includes(e))
+                const removeNot = img.req.not && !img.req.not.some(e => this.selected.includes(e))
+                const removeSingle = typeof img.req == 'string' && !this.selected.includes(img.req)
+                
+                if (removeSingle || removeOr || removeAnd || removeNot){
+                    this.visible = this.visible.filter(a => a != e)
+                }
+            }
+        })
+
+        // make visible only matching hair styles and colors
+        if (this.selected.includes('style')){
+            // get hair color
+            let color = this.selected.filter(e => assets.getImage(e) && assets.getImage(e).parent.includes('color'))
+            this.color = color.length ? color[0].split("_")[1] : this.color
+
+            this.visible = this.visible.filter(e => [this.color, 'none'].includes(e.split("_")[1]))
+        }
+        else if (this.selected.includes('color')){
+            // get hair style
+            let style = this.selected.filter(e => assets.getImage(e) && assets.getImage(e).parent.includes('style'))[0].split("_")[0]
+
+            this.visible = this.visible.filter(e => e.split("_")[0] == style)
+        }
+        else if (this.selected.includes('facial')){
+            // get beard color
+            let color = this.selected.filter(e => assets.getImage(e) && assets.getImage(e).parent.includes('bcolor'))
+            this.bcolor = color.length ? color[0].split("_")[1] : this.bcolor
+
+            this.visible = this.visible.filter(e => [this.bcolor, 'none'].includes(e.split("_")[1]))
+        }
+        else if (this.selected.includes('bcolor')){
+            // get hair style
+            let style = this.selected.filter(e => assets.getImage(e) && assets.getImage(e).parent.includes('facial'))[0].split("_")[0]
+
+            this.visible = this.visible.filter(e => e.split("_")[0] == style)
+        }
+
+    }
+
+    // disable buttons
+    document.querySelectorAll(".img-button.n-av").forEach(e => e.classList.remove("n-av"))
+    this.selected.forEach(e => {
+        const img = assets.getImage(e)
+        if (img && img.block){
+            const block = Array.isArray(img.block) ? img.block : [img.block]
+            block.forEach(e => document.querySelector(`#${e}.img-button`).classList.add('n-av'))
+        }
+    })
+
+    // console.log(this.visible)
+    // console.log(this.selected)
+    this.visible.forEach(e => {
+        this.loadItem(assets.getImage(e), e)
+
+        if (this.selected.includes(e)){
+            document.querySelector(`#${e}.img-button.item`).classList.add('selected')
+        }
+    })
+}
 
 function reload_reqs(keepItems){
     if (!keepItems)

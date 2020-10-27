@@ -16,9 +16,9 @@ const images = {
     'male-black': {'path': 'body/male/man_black.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
     'male-darkelf2': {'path': 'body/male/darkelf2.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
     'male-darkelf': {'path': 'body/male/darkelf.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-    'male-orc': {'path': 'body/male/orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-    'male-red_orc': {'path': 'body/male/red_orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
-    'skeleton': {'path': 'body/male/skeleton.png', 'parent': 'shape', 'req': 'male', 'layer': 0},
+    'male-orc': {'path': 'body/male/orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0, 'block': ['eyes', 'ears']},
+    'male-red_orc': {'path': 'body/male/red_orc.png', 'parent': 'shape', 'req': 'male', 'layer': 0, 'block': ['eyes', 'ears']},
+    'skeleton': {'path': 'body/male/skeleton.png', 'parent': 'shape', 'req': 'male', 'layer': 0, 'block': ['eyes', 'ears']},
     //female body
     'female-light': {'path': 'body/female/light.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
     'female-tanned': {'path': 'body/female/tanned.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
@@ -30,12 +30,12 @@ const images = {
     'female-black': {'path': 'body/female/woman_black.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
     'female-darkelf2': {'path': 'body/female/darkelf2.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
     'female-darkelf': {'path': 'body/female/darkelf.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-    'female-orc': {'path': 'body/female/orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
-    'female-red_orc': {'path': 'body/female/red_orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0},
+    'female-orc': {'path': 'body/female/orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0, 'block': ['eyes', 'ears']},
+    'female-red_orc': {'path': 'body/female/red_orc.png', 'parent': 'shape', 'req': 'female', 'layer': 0, 'block': ['eyes', 'ears']},
     //hair style
-    'hair_none': {'path': '', 'parent': 'style', 'layer': 1, 'default': true},
+    'hair_none': {'path': '', 'parent': 'style', 'layer': 1, 'default': true, 'block': 'color'},
     //beards
-    'facial_none': {'path': '', 'parent': 'facial', 'layer': 1, 'default': true},
+    'facial_none': {'path': '', 'parent': 'facial', 'layer': 1, 'default': true, 'block': 'bcolor'},
     'fiveoclock_black': {'path': 'facial/male/fiveoclock/black.png', 'parent': 'facial', 'layer': 1, 'block': 'bcolor', 'scale': 4},
     //eyes
     'eyes_blue': {'path': 'body/male/eyes/blue.png', 'parent': 'eyes', 'layer': 1, 'scale': 3},
@@ -73,11 +73,11 @@ const images = {
     'female_tightdress_lightblue': {'path': 'torso/dress_female/tightdress_lightblue.png', 'parent': 'shirt', 'req': 'female', 'layer': 3, 'block': ['legs', 'armor']},
     //armor
     'armor_none': {'path': '', 'parent': 'armor', 'layer': 2, 'default': true},
-    'male_chain': {'path': 'torso/chain/mail_male.png', 'parent': 'armor', 'req': 'male', 'layer': 2},
+    'male_chain': {'path': 'torso/chain/mail_male.png', 'parent': 'armor', 'req': 'male', 'layer': 2, 'block': ['shirt', 'legs']},
     'male_leather-chest': {'path': 'torso/leather/chest_male.png', 'parent': 'armor', 'req': 'male', 'layer': 2},
     'male_plate-chest': {'path': 'torso/plate/chest_male.png', 'parent': 'armor', 'req': 'male', 'layer': 2},
     'male_gold-chest': {'path': 'torso/gold/chest_male.png', 'parent': 'armor', 'req': 'male', 'layer': 2},
-    'female_chain': {'path': 'torso/chain/mail_female.png', 'parent': 'armor', 'req': 'female', 'layer': 2},
+    'female_chain': {'path': 'torso/chain/mail_female.png', 'parent': 'armor', 'req': 'female', 'layer': 2, 'block': ['shirt', 'legs']},
     'female_leather-chest': {'path': 'torso/leather/chest_female.png', 'parent': 'armor', 'req': 'female', 'layer': 2},
     'female_plate-chest': {'path': 'torso/plate/chest_female.png', 'parent': 'armor', 'req': 'female', 'layer': 2},
     'female_gold-chest': {'path': 'torso/gold/chest_female.png', 'parent': 'armor', 'req': 'female', 'layer': 2},
