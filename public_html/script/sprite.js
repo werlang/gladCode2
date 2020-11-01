@@ -1,22 +1,5 @@
 import {assets} from "./assets.js"
 
-// var lastcolor = 'black';
-// var direction = 2;
-// var scale = 1;
-// var animationOn = false;
-// var selected = {};
-// var parentTree = new Array();
-
-// var anim_num = 0;
-// var move = [
-//     {'name': 'walk', 'sprites': 9, 'line': 8, 'image': 'walk'},
-//     {'name': 'cast', 'sprites': 7, 'line': 0, 'image': 'magic'},
-//     {'name': 'thrust', 'sprites': 8, 'line': 4, 'image': 'thrust'},
-//     {'name': 'slash', 'sprites': 6, 'line': 12, 'image': 'slash'},
-//     {'name': 'shoot', 'sprites': 13, 'line': 16, 'image': 'arrows'},
-// ];
-// var moveEnum = {'walk': 0, 'cast': 1, 'thrust': 2, 'slash': 3, 'shoot': 4};
-
 export const spriteGen = {
     active: false,
     ready: false
@@ -37,8 +20,26 @@ spriteGen.init = async function(el){
     this.selected = []
     this.childTree = {}
     this.visible = []
+    this.loadedItems = {}
+    this.loadedSpritesheets = {}
+
     this.color = 'black'
     this.bcolor = 'black'
+    this.animation = {
+        enabled: false,
+        type: 'walk',
+        direction: 2,
+        frame: 0
+    }
+    this.scale = 1
+
+    this.move = {
+        walk: {'sprites': 9, 'line': 8, 'image': 'walk'},
+        cast: {'sprites': 7, 'line': 0, 'image': 'magic'},
+        thrust: {'sprites': 8, 'line': 4, 'image': 'thrust'},
+        slash: {'sprites': 6, 'line': 12, 'image': 'slash'},
+        shoot: {'sprites': 13, 'line': 16, 'image': 'arrows'},
+    }
 
     // build child tree
     assets.forAllImages((e,n) => {
@@ -74,6 +75,7 @@ spriteGen.init = async function(el){
         document.querySelector("#fog-skin").classList.add("hidden")
     })
 
+    this.draw()
     this.reload()
 
     this.ready = true
@@ -122,10 +124,6 @@ spriteGen.loadItem = function(info, name){
     if (info.path){
         item.innerHTML = `<i class='fas fa-spinner fa-pulse'></i>`
 
-        if (!this.loadedItems){
-            this.loadedItems = {}
-        }
-
         const src = info.png ? `sprite/images/${info.path}` : `sprite/Universal-LPC-spritesheet/${info.path}`
 
         if (this.loadedItems[src]){
@@ -155,6 +153,7 @@ spriteGen.loadItem = function(info, name){
                     item.innerHTML = ""
                     item.appendChild(prev)
                     this.loadedItems[src] = prev
+                    this.loadedSpritesheets[src] = img
                 } catch (err) {
                     console.log(err)
                 }
@@ -172,6 +171,91 @@ spriteGen.loadItem = function(info, name){
         item.classList.add('selected')
 
         this.reload()
+        this.draw()
+    })
+}
+
+spriteGen.draw = function(){
+    // draw on the main canvas
+    // console.log(this.selected)
+    const getLayer = a => {
+        const directionEnum = ['up', 'left', 'down', 'right']
+        const i = assets.getImage(a)
+        if (!i){
+            return false
+        }
+        else if (i.layer && i.layer.default){
+            return i.layer[ directionEnum[this.animation.direction] ] || i.layer.default
+        }
+        else{
+            return i.layer
+        }
+    }
+    this.selected.sort((a,b) => getLayer(a) - getLayer(b))
+    // console.log(this.selected)
+    
+    const tempss = document.createElement("canvas");
+    tempss.width = this.spritesheet.width;
+    tempss.height = this.spritesheet.height;
+    const tempctx = tempss.getContext("2d");
+
+    const loaded = []
+    this.selected.forEach(e => {
+        const meta = assets.getImage(e)
+        if (meta && meta.path && !meta.png){
+            const src = `sprite/Universal-LPC-spritesheet/${meta.path}`
+            loaded.push(new Promise(resolve => {
+                if (this.loadedSpritesheets[src]){
+                    resolve({img: this.loadedSpritesheets[src], meta: meta})
+                }
+                else{
+                    const img = new Image()
+                    img.src = src
+                    img.onload = () => {
+                        this.loadedSpritesheets[src] = img
+                        resolve({img: img, meta: meta})
+                    }
+                }
+            }))
+        }
+    })
+
+    // when all images loaded
+    Promise.all(loaded).then(res => {
+        res.forEach(e => {
+            if (e.meta.oversize){
+                const line = this.move[e.meta.move].line
+                const sprites = this.move[e.meta.move].sprites
+                for (let k=0 ; k<4 ; k++){
+                    for (let j=0 ; j<sprites ; j++){
+                        tempctx.drawImage(e.img, j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192)
+                    }
+                }
+            }
+            else{
+                for (let k=0 ; k<21 ; k++){
+                    for (let j=0 ; j<13 ; j++){
+                        tempctx.drawImage(e.img, j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64)
+                    }
+                }
+            }
+        })
+
+        this.spritectx.clearRect(0, 0, this.spritesheet.width, this.spritesheet.height)
+        this.spritectx.drawImage(tempss, 0, 0)
+        
+        // update canvas with spritesheet
+        const updateCanvas = () => {
+            const line = (this.animation.direction + this.move[this.animation.type].line)
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+            this.ctx.drawImage(this.spritesheet, 192*this.animation.frame, 192*line, 192, 192, 192/2 - 192*this.scale/2, 192/2 - 192*this.scale/2 - 5, 192*this.scale, 192*this.scale)
+    
+            if (this.animation.enabled){
+                this.animation.frame = (this.animation.frame + 1) % this.move[this.animation.type].sprites
+                setTimeout( () => updateCanvas, 100)
+            }
+        }
+        updateCanvas()
     })
 }
 
@@ -266,6 +350,10 @@ spriteGen.reload = function(){
 
     document.querySelector('#right-container').innerHTML = ""
 
+    // match equipment with gender
+    const gender = this.selected.includes('male') ? 'male' : 'female'
+    this.selected = this.selected.map(e => e.replace(/(?:fe){0,1}male/, gender)).filter(e => assets.getImage(e))
+    
     if (document.querySelector(`.img-button.sub.selected`)){
         const id = document.querySelector(`.img-button.sub.selected`).id
 
@@ -323,7 +411,10 @@ spriteGen.reload = function(){
         const img = assets.getImage(e)
         if (img && img.block){
             const block = Array.isArray(img.block) ? img.block : [img.block]
-            block.forEach(e => document.querySelector(`#${e}.img-button`).classList.add('n-av'))
+            block.forEach(e => {
+                document.querySelector(`#${e}.img-button`).classList.add('n-av')
+                this.selected = this.selected.filter(a => a != e && !this.childTree[e].includes(a))
+            })
         }
     })
 
@@ -760,16 +851,16 @@ function load_glad_generator(element){
             $(this).find('img').attr('src', 'sprite/images/'+ move[anim_num].image +'.png' );
         });
 
-        setInterval( function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (animationOn)
-                j++;
-            if ( j >= move[anim_num].sprites )
-                j = 0;
-            i = (direction + move[anim_num].line);
-            //ctx.drawImage(spritesheet, j*64, i*64, 64, 64, 0, -5, 64, 64);
-            ctx.drawImage(spritesheet, 192*j, 192*i, 192, 192, 192/2 - 192*scale/2, 192/2 - 192*scale/2 - 5, 192*scale, 192*scale);
-        }, 1000/10);
+        // setInterval( function() {
+        //     ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //     if (animationOn)
+        //         j++;
+        //     if ( j >= move[anim_num].sprites )
+        //         j = 0;
+        //     i = (direction + move[anim_num].line);
+        //     //ctx.drawImage(spritesheet, j*64, i*64, 64, 64, 0, -5, 64, 64);
+        //     ctx.drawImage(spritesheet, 192*j, 192*i, 192, 192, 192/2 - 192*scale/2, 192/2 - 192*scale/2 - 5, 192*scale, 192*scale);
+        // }, 1000/10);
 
         function calcAttrValue(slider) {
             if (slider == 0)
