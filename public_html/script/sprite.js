@@ -79,6 +79,55 @@ spriteGen.init = async function(el){
     this.reload()
 
     this.ready = true
+
+    // bind buttons' actions
+    document.querySelector('#fog-skin #turn').addEventListener('click', () => {
+        this.animation.direction = (this.animation.direction + 1) % 4
+        this.draw()
+    })
+
+    document.querySelector('#fog-skin #down-scale').addEventListener('click', () => {
+        this.scale = Math.max(this.scale - 0.5, 1)
+        this.draw()
+    })
+
+    document.querySelector('#fog-skin #up-scale').addEventListener('click', () => {
+        this.scale = Math.min(this.scale + 0.5, 3.5)
+        this.draw()
+    })
+
+    document.querySelector('#fog-skin #play-pause').addEventListener('click', event => {
+        const obj = event.target
+        if (this.animation.enabled){
+            this.animation.enabled = false
+            this.animation.frame = 0
+            obj.src = 'sprite/images/play.png'
+        }
+        else{
+            this.animation.enabled = true
+            obj.src = 'sprite/images/pause.png'
+        }
+        this.draw()
+    })
+
+    document.querySelector('#fog-skin #animation').addEventListener('click', event => {
+        const attacks = {walk: true, cast: true, thrust: false, slash: false, shoot: false}
+        this.selected.forEach(e => {
+            const img = assets.getImage(e)
+            if (img && img.move){
+                attacks[img.move] = true
+            }
+        })
+        
+        const avMoves = Object.entries(attacks).filter(e => e[1]).map(e => e[0])
+        const newIndex = (avMoves.indexOf(this.animation.type) + 1) % avMoves.length
+        this.animation.type = avMoves[newIndex]
+
+        this.animation.frame = 0
+
+        event.target.src = `sprite/images/${this.move[this.animation.type].image}.png`
+    })
+
 }
 
 spriteGen.open = function(id){
@@ -170,6 +219,18 @@ spriteGen.loadItem = function(info, name){
         document.querySelectorAll('.img-button.item').forEach(e=> e.classList.remove('selected'))
         item.classList.add('selected')
 
+        // switch to matching animation
+        if (info.move){
+            this.animation.type = info.move
+            this.animation.frame = 0
+            document.querySelector("#fog-skin #animation img").src = `sprite/images/${this.move[info.move].image}.png`
+        }
+
+        // select aggregate items (arrows)
+        if (info.select){
+            this.selected.push(info.select)
+        }
+
         this.reload()
         this.draw()
     })
@@ -181,7 +242,7 @@ spriteGen.draw = function(){
     const getLayer = a => {
         const directionEnum = ['up', 'left', 'down', 'right']
         const i = assets.getImage(a)
-        if (!i){
+        if (!i || !i.layer){
             return false
         }
         else if (i.layer && i.layer.default){
@@ -252,10 +313,16 @@ spriteGen.draw = function(){
     
             if (this.animation.enabled){
                 this.animation.frame = (this.animation.frame + 1) % this.move[this.animation.type].sprites
-                setTimeout( () => updateCanvas, 100)
+                this.animation.running = true
+                setTimeout( () => updateCanvas(), 100)
+            }
+            else{
+                this.animation.running = false
             }
         }
-        updateCanvas()
+        if (!this.animation.running){
+            updateCanvas()
+        }
     })
 }
 
@@ -806,50 +873,50 @@ function load_glad_generator(element){
             }
         });
 
-        $('#turn').click( function() {
-            direction = (direction + 1)%4;
-            draw();
-        });
+        // $('#turn').click( function() {
+        //     direction = (direction + 1)%4;
+        //     draw();
+        // });
 
-        $('#down-scale').click( function() {
-            if (scale > 1)
-                scale -= 0.5;
-            draw();
-        });
-        $('#up-scale').click( function() {
-            if (scale < 3.5)
-                scale += 0.5;
-            draw();
-        });
-        var j=0;
-        $('#play-pause').click( function(){
-            if (animationOn){
-                animationOn = false;
-                j = 0;
-                $(this).find('img').attr('src','sprite/images/play.png');
-            }
-            else{
-                animationOn = true;
-                $(this).find('img').attr('src','sprite/images/pause.png');
-            }
-            draw();
-        });
+        // $('#down-scale').click( function() {
+        //     if (scale > 1)
+        //         scale -= 0.5;
+        //     draw();
+        // });
+        // $('#up-scale').click( function() {
+        //     if (scale < 3.5)
+        //         scale += 0.5;
+        //     draw();
+        // });
+        // var j=0;
+        // $('#play-pause').click( function(){
+        //     if (animationOn){
+        //         animationOn = false;
+        //         j = 0;
+        //         $(this).find('img').attr('src','sprite/images/play.png');
+        //     }
+        //     else{
+        //         animationOn = true;
+        //         $(this).find('img').attr('src','sprite/images/pause.png');
+        //     }
+        //     draw();
+        // });
 
-        $('#animation').click( function(){
-            var attacks = {'walk': true, 'cast': true, 'thrust': false, 'slash': false, 'shoot': false};
-            $.each( selected, function(index,image) {
-                if (image.move)
-                    attacks[image.move] = true;
-            });
+        // $('#animation').click( function(){
+        //     var attacks = {'walk': true, 'cast': true, 'thrust': false, 'slash': false, 'shoot': false};
+        //     $.each( selected, function(index,image) {
+        //         if (image.move)
+        //             attacks[image.move] = true;
+        //     });
 
-            do{
-                anim_num = (anim_num + 1) % move.length;
-            }while(!attacks[ move[anim_num].name ]);
+        //     do{
+        //         anim_num = (anim_num + 1) % move.length;
+        //     }while(!attacks[ move[anim_num].name ]);
 
-            j = 0;
+        //     j = 0;
 
-            $(this).find('img').attr('src', 'sprite/images/'+ move[anim_num].image +'.png' );
-        });
+        //     $(this).find('img').attr('src', 'sprite/images/'+ move[anim_num].image +'.png' );
+        // });
 
         // setInterval( function() {
         //     ctx.clearRect(0, 0, canvas.width, canvas.height);
