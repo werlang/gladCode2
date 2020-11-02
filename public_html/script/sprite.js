@@ -1,4 +1,5 @@
 import {assets} from "./assets.js"
+import { loader } from "./loader.js";
 
 export const spriteGen = {
     active: false,
@@ -70,10 +71,10 @@ spriteGen.init = async function(el){
         }
     }))
 
-    document.querySelector("#fog-skin .close").addEventListener("click", () => {
+    document.querySelectorAll("#fog-skin .close").forEach(e => e.addEventListener("click", () => {
         this.active = false
         document.querySelector("#fog-skin").classList.add("hidden")
-    })
+    }))
 
     this.draw()
     this.reload()
@@ -96,7 +97,7 @@ spriteGen.init = async function(el){
         this.draw()
     })
 
-    document.querySelector('#fog-skin #play-pause').addEventListener('click', event => {
+    document.querySelector('#fog-skin #play-pause').addEventListener('click', async event => {
         const obj = event.target
         if (this.animation.enabled){
             this.animation.enabled = false
@@ -128,6 +129,143 @@ spriteGen.init = async function(el){
         event.target.src = `sprite/images/${this.move[this.animation.type].image}.png`
     })
 
+    document.querySelector('#fog-skin #save-glad').addEventListener('click', () => {
+        document.querySelector('#fog-skin #distribuicao-container').style.display = 'flex'
+        document.querySelector('#fog-skin #skin-container').style.display = 'none'
+
+        const cvpoint = document.createElement('canvas')
+        cvpoint.setAttribute("width", 64)
+        cvpoint.setAttribute("height", 64)
+        const pct = cvpoint.getContext("2d")
+        pct.drawImage(this.canvas, 64, 64, 64, 64, 0, 0, 64, 64)
+        document.querySelector('#fog-skin #cv').innerHTML = ""
+        document.querySelector('#fog-skin #cv').appendChild(cvpoint)
+    })
+
+    document.querySelector('#fog-skin #back').addEventListener('click', () => {
+        document.querySelector('#fog-skin #distribuicao-container').style.display = 'none'
+        document.querySelector('#fog-skin #skin-container').style.display = 'flex'
+    })
+
+    document.querySelector('#fog-skin #reset').addEventListener('click', () => {
+        document.querySelectorAll('.img-button').forEach(e => e.classList.remove('selected'))
+        document.querySelectorAll('.img-button.sub').forEach(e => e.classList.add('hidden'))
+        document.querySelector('#distribuicao #nome').value = ""
+        // $('#distribuicao .slider').val(0).change();
+        
+        this.selected = []
+        this.visible = []
+        assets.forAllImages((e,n) => {
+            if (e.default){
+                this.selected.push(n)
+            }
+        })
+    
+        this.reload()
+        this.draw()
+
+        document.querySelector('#fog-skin #back').click()
+    })
+
+    document.querySelector('#fog-skin #get-code').addEventListener('click', async () => {
+        const name = document.querySelector('#distribuicao #nome')
+        if (name.value.length <= 2 || !name.value.match(/^[\w À-ú]+?$/g) ){
+            name.classList.add('error')
+            name.focus()
+        }
+        else{
+            name.classList.remove('error')
+
+            this.gladiator = {}
+
+            this.gladiator.name = name.value
+            this.gladiator.skin = this.selected
+            
+            this.gladiator.vstr = document.querySelector('#distribuicao #str .slider-input').value
+            this.gladiator.vagi = document.querySelector('#distribuicao #agi .slider-input').value
+            this.gladiator.vint = document.querySelector('#distribuicao #int .slider-input').value
+            
+            const {login} = await loader.load("header")
+            this.gladiator.code = login.user.language == 'python' ? "def loop():\n    #comportamento do gladiador\n" : "loop(){\n    //comportamento do gladiador\n}"
+
+            // console.log(this.gladiator)
+
+            document.querySelector("#fog-skin .close").click()
+        }
+    })
+
+    // slider action
+    document.querySelectorAll('#distribuicao .slider').forEach(e => e.addEventListener('input', () => {
+        function calcAttrValue(slider) {
+            return slider == 0 ? 0 : calcAttrValue(slider - 1) + Math.ceil(slider/6)
+        }
+        e.closest('.slider-container').querySelector('.slider-value').textContent = calcAttrValue(e.value)
+        e.closest('.slider-container').querySelector('.slider-input').value = e.value
+
+        let sum = 0
+        document.querySelectorAll('#distribuicao .slider-value').forEach(e => sum += parseInt(e.textContent))
+
+        const numobj = document.querySelector('#distribuicao #remaining span')
+        numobj.innerHTML = 50 - sum
+
+        const button = document.querySelector('#get-code')
+        button.setAttribute('disabled', true)
+        numobj.classList.remove('red', 'green')
+        if (sum == 50){
+            button.innerHTML = "GERAR CÓDIGO"
+            button.removeAttribute('disabled')
+            numobj.classList.add('green')
+        }
+        else if (sum > 50){
+            numobj.classList.add('red')
+        }
+    }))
+
+    // slider hover info
+    document.querySelectorAll('#distribuicao .slider-container').forEach(e => e.addEventListener('mouseenter', () => {
+        const text = {
+            str: {
+                'path': 'sprite/images/strength.png',
+                'title': 'Força - STR',
+                'description': 'Força física e resistência do gladiador.',
+                'list': [
+                    {'path': 'sprite/images/decapitation.png',	'description': 'Dano físico, o dano causado com armas corpo-a-corpo'},
+                    {'path': 'sprite/images/healing.png',	'description': 'Pontos de vida, responsáveis por manter o gladiador vivo'}
+                ]
+            },
+            agi: {
+                'path': 'sprite/images/agility.png',
+                'title': 'Agilidade - AGI',
+                'description': 'Agilidade, rapidez e destreza do gladiador.',
+                'list': [
+                    {'path': 'sprite/images/bullseye.png',	'description': 'Precisão, o dano causado com armas à distância'},
+                    {'path': 'sprite/images/sprint.png',	'description': 'Velocidade de movimento dentro da arena'},
+                    {'path': 'sprite/images/blades.png',	'description': 'Velocidade de execução de ataques'}
+                ]
+            },
+            int: {
+                'path': 'sprite/images/smart.png',
+                'title': 'Inteligência - INT',
+                'description': 'Rapidez de raciocínio e Capacidade intelectual do gladiador.',
+                'list': [
+                    {'path': 'sprite/images/energy.png',	'description': 'Poder mágico, o dano causado com habilidades mágicas'},
+                    {'path': 'sprite/images/3balls.png',	'description': 'Velocidade de execução de uma habilidade'},
+                    {'path': 'sprite/images/energise.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'}
+                ]
+            }
+        }
+        // console.log(text[e.id])
+
+        document.querySelector('#info').innerHTML = `
+        <div id='title'>
+            <img src='${text[e.id].path}'><span>${text[e.id].title}</span>
+        </div>
+        <div id='body'>
+            <p class='fill'>${text[e.id].description}</p>
+            <p>Determina as seguintes características:</p>
+            <ul>${text[e.id].list.map(e => `<li><div class='blue'><img src='${e.path}'></div><span>${e.description}</span></li>`).join("")}</ul>
+        </div>`
+    }))
 }
 
 spriteGen.open = function(id){
@@ -496,6 +634,10 @@ spriteGen.reload = function(){
     })
 }
 
+spriteGen.getGlad = function(){
+    return this.gladiator || false
+}
+
 function reload_reqs(keepItems){
     if (!keepItems)
         $('#right-container').html("");
@@ -717,161 +859,161 @@ function load_glad_generator(element){
         $('#middle-container').append(canvas);
         reload_reqs();
 
-        $('.slider-container').on('touchstart mouseenter', function() {
-            text = [
-                {
-                    'path': 'sprite/images/strength.png',
-                    'title': 'Força - STR',
-                    'description': 'Força física e resistência do gladiador.',
-                    'list': [
-                        {'path': 'sprite/images/decapitation.png',	'description': 'Dano físico, o dano causado com armas corpo-a-corpo'},
-                        {'path': 'sprite/images/healing.png',	'description': 'Pontos de vida, responsáveis por manter o gladiador vivo'}
-                    ]
-                },
-                {
-                    'path': 'sprite/images/agility.png',
-                    'title': 'Agilidade - AGI',
-                    'description': 'Agilidade, rapidez e destreza do gladiador.',
-                    'list': [
-                        {'path': 'sprite/images/bullseye.png',	'description': 'Precisão, o dano causado com armas à distância'},
-                        {'path': 'sprite/images/sprint.png',	'description': 'Velocidade de movimento dentro da arena'},
-                        {'path': 'sprite/images/blades.png',	'description': 'Velocidade de execução de ataques'}
-                    ]
-                },
-                {
-                    'path': 'sprite/images/smart.png',
-                    'title': 'Inteligência - INT',
-                    'description': 'Rapidez de raciocínio e Capacidade intelectual do gladiador.',
-                    'list': [
-                        {'path': 'sprite/images/energy.png',	'description': 'Poder mágico, o dano causado com habilidades mágicas'},
-                        {'path': 'sprite/images/3balls.png',	'description': 'Velocidade de execução de uma habilidade'},
-                        {'path': 'sprite/images/energise.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'}
-                    ]
-                },
-            ];
+        // $('.slider-container').on('touchstart mouseenter', function() {
+        //     text = [
+        //         {
+        //             'path': 'sprite/images/strength.png',
+        //             'title': 'Força - STR',
+        //             'description': 'Força física e resistência do gladiador.',
+        //             'list': [
+        //                 {'path': 'sprite/images/decapitation.png',	'description': 'Dano físico, o dano causado com armas corpo-a-corpo'},
+        //                 {'path': 'sprite/images/healing.png',	'description': 'Pontos de vida, responsáveis por manter o gladiador vivo'}
+        //             ]
+        //         },
+        //         {
+        //             'path': 'sprite/images/agility.png',
+        //             'title': 'Agilidade - AGI',
+        //             'description': 'Agilidade, rapidez e destreza do gladiador.',
+        //             'list': [
+        //                 {'path': 'sprite/images/bullseye.png',	'description': 'Precisão, o dano causado com armas à distância'},
+        //                 {'path': 'sprite/images/sprint.png',	'description': 'Velocidade de movimento dentro da arena'},
+        //                 {'path': 'sprite/images/blades.png',	'description': 'Velocidade de execução de ataques'}
+        //             ]
+        //         },
+        //         {
+        //             'path': 'sprite/images/smart.png',
+        //             'title': 'Inteligência - INT',
+        //             'description': 'Rapidez de raciocínio e Capacidade intelectual do gladiador.',
+        //             'list': [
+        //                 {'path': 'sprite/images/energy.png',	'description': 'Poder mágico, o dano causado com habilidades mágicas'},
+        //                 {'path': 'sprite/images/3balls.png',	'description': 'Velocidade de execução de uma habilidade'},
+        //                 {'path': 'sprite/images/energise.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'}
+        //             ]
+        //         },
+        //     ];
 
-            index = $('.slider-container').index($(this));
-            $('#info #title img').attr('src', text[index].path);
-            $('#info #title span').html(text[index].title);
-            $('#info #body .fill').html(text[index].description);
-            $('#info ul').html("");
-            $.each( text[index].list , function(i, item) {
-                $('#info ul').append("<li><img src='"+ item.path +"'><span>"+ item.description +"</span></li>");
-            });
+        //     index = $('.slider-container').index($(this));
+        //     $('#info #title img').attr('src', text[index].path);
+        //     $('#info #title span').html(text[index].title);
+        //     $('#info #body .fill').html(text[index].description);
+        //     $('#info ul').html("");
+        //     $.each( text[index].list , function(i, item) {
+        //         $('#info ul').append("<li><img src='"+ item.path +"'><span>"+ item.description +"</span></li>");
+        //     });
 
-        });
+        // });
 
-        $('#save-glad').click( function() {
-            $('#distribuicao-container').css({'display':'flex', 'height':$('#skin-container').outerHeight()});
-            $('#skin-container').hide();
+        // $('#save-glad').click( function() {
+        //     $('#distribuicao-container').css({'display':'flex', 'height':$('#skin-container').outerHeight()});
+        //     $('#skin-container').hide();
 
-            var cvpoint = document.createElement('canvas');
-            cvpoint.setAttribute("width", 64);
-            cvpoint.setAttribute("height", 64);
-            var pct = cvpoint.getContext("2d");
-            pct.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
-            $('#cv').html(cvpoint);
+        //     var cvpoint = document.createElement('canvas');
+        //     cvpoint.setAttribute("width", 64);
+        //     cvpoint.setAttribute("height", 64);
+        //     var pct = cvpoint.getContext("2d");
+        //     pct.drawImage(canvas, 64, 64, 64, 64, 0, 0, 64, 64);
+        //     $('#cv').html(cvpoint);
 
-            codeEditor.saved = false;
-            codeEditor.tested = false;
-        });
+        //     codeEditor.saved = false;
+        //     codeEditor.tested = false;
+        // });
 
-        $('#get-code').click( function() {
-            createFloatCard();
-        });
+        // $('#get-code').click( function() {
+        //     createFloatCard();
+        // });
 
-        async function createFloatCard(arg){
-            var nome = $('#distribuicao #nome').val();
-            if (nome.length <= 2 || !nome.match(/^[\w À-ú]+?$/g) ){
-                $('#distribuicao #nome').addClass('error');
-                $('#distribuicao #nome').focus();
-            }
-            else{
-                $('#distribuicao #nome').removeClass('error');
+        // async function createFloatCard(arg){
+        //     var nome = $('#distribuicao #nome').val();
+        //     if (nome.length <= 2 || !nome.match(/^[\w À-ú]+?$/g) ){
+        //         $('#distribuicao #nome').addClass('error');
+        //         $('#distribuicao #nome').focus();
+        //     }
+        //     else{
+        //         $('#distribuicao #nome').removeClass('error');
 
-                pieces = []
-                $.each( selected, function(index, image) {
-                    pieces.push(image.id);
-                });
+        //         pieces = []
+        //         $.each( selected, function(index, image) {
+        //             pieces.push(image.id);
+        //         });
 
-                var vstr = $('#distribuicao .slider-input').eq(0).val();
-                var vagi = $('#distribuicao .slider-input').eq(1).val();
-                var vint = $('#distribuicao .slider-input').eq(2).val();
-                var codigo = "loop(){\n    //comportamento do gladiador\n}";
-                if (user.language == 'python')
-                    codigo = "def loop():\n    #comportamento do gladiador\n";
+        //         var vstr = $('#distribuicao .slider-input').eq(0).val();
+        //         var vagi = $('#distribuicao .slider-input').eq(1).val();
+        //         var vint = $('#distribuicao .slider-input').eq(2).val();
+        //         var codigo = "loop(){\n    //comportamento do gladiador\n}";
+        //         if (user.language == 'python')
+        //             codigo = "def loop():\n    #comportamento do gladiador\n";
 
-                if (tutorial.getLesson() == 'skin')
-                    tutorial.next(true)
+        //         if (tutorial.getLesson() == 'skin')
+        //             tutorial.next(true)
 
-                if (editor){
-                    if (editor.getValue() == ""){
-                        editor.setValue(codigo);
-                        editor.gotoLine(1,0,true);
-                    }
-                    editor.focus();
-                    $('#save, #test').removeClass('disabled');
-                    $('#fog-skin').hide();
-                    $('#back').click();
+        //         if (editor){
+        //             if (editor.getValue() == ""){
+        //                 editor.setValue(codigo);
+        //                 editor.gotoLine(1,0,true);
+        //             }
+        //             editor.focus();
+        //             $('#save, #test').removeClass('disabled');
+        //             $('#fog-skin').hide();
+        //             $('#back').click();
 
-                    const {gladCard} = await loader.load("gladcard")
-                    gladCard.load($('#fog-battle .glad-card-container'), {
-                        customLoad: [{
-                            name: nome,
-                            vstr: vstr,
-                            vagi: vagi,
-                            vint: vint,
-                            skin: JSON.stringify(pieces)
-                        }]
-                    })
+        //             const {gladCard} = await loader.load("gladcard")
+        //             gladCard.load($('#fog-battle .glad-card-container'), {
+        //                 customLoad: [{
+        //                     name: nome,
+        //                     vstr: vstr,
+        //                     vagi: vagi,
+        //                     vint: vint,
+        //                     skin: JSON.stringify(pieces)
+        //                 }]
+        //             })
 
-                }
-            }
-            codeEditor.saved = false;
-            codeEditor.tested = false;
-        }
+        //         }
+        //     }
+        //     codeEditor.saved = false;
+        //     codeEditor.tested = false;
+        // }
 
-        $('#back').click( function() {
-            $('#distribuicao-container').hide();
-            $('#skin-container').show();
-        });
-        $('#reset').click( function() {
-            $('.img-button').removeClass('selected');
-            $('.img-button .sub').addClass('hidden');
-            $('#distribuicao #nome').val("");
-            $('#distribuicao .slider').val(0).change();
-            selected = {};
-            for (var i in images){
-                if (images[i].default)
-                    selected[images[i].id] = images[i];
-            }
-            reload_reqs();
-            $('#distribuicao-container').hide();
-            $('#skin-container').show();
-        });
-        $('.img-button.cat').click( function() {
-            if (!$(this).hasClass('n-av')){
-                $('.img-button.cat').removeClass('selected');
-                $('.img-button.sub').removeClass('selected');
+        // $('#back').click( function() {
+        //     $('#distribuicao-container').hide();
+        //     $('#skin-container').show();
+        // });
+        // $('#reset').click( function() {
+        //     $('.img-button').removeClass('selected');
+        //     $('.img-button .sub').addClass('hidden');
+        //     $('#distribuicao #nome').val("");
+        //     $('#distribuicao .slider').val(0).change();
+        //     selected = {};
+        //     for (var i in images){
+        //         if (images[i].default)
+        //             selected[images[i].id] = images[i];
+        //     }
+        //     reload_reqs();
+        //     $('#distribuicao-container').hide();
+        //     $('#skin-container').show();
+        // });
+        // $('.img-button.cat').click( function() {
+        //     if (!$(this).hasClass('n-av')){
+        //         $('.img-button.cat').removeClass('selected');
+        //         $('.img-button.sub').removeClass('selected');
 
-                $('.img-button.sub').addClass('hidden');
-                $.each( menus[$(this).attr('id')], function(index, name) {
-                    $('#'+ name).removeClass('hidden');
-                });
+        //         $('.img-button.sub').addClass('hidden');
+        //         $.each( menus[$(this).attr('id')], function(index, name) {
+        //             $('#'+ name).removeClass('hidden');
+        //         });
 
-                $(this).addClass('selected');
+        //         $(this).addClass('selected');
 
-                reload_reqs();
-            }
-        });
+        //         reload_reqs();
+        //     }
+        // });
 
-        $('.img-button.sub').click( function() {
-            if (!$(this).hasClass('n-av')){
-                $('.img-button.sub').removeClass('selected');
-                $(this).addClass('selected');
-                reload_reqs();
-            }
-        });
+        // $('.img-button.sub').click( function() {
+        //     if (!$(this).hasClass('n-av')){
+        //         $('.img-button.sub').removeClass('selected');
+        //         $(this).addClass('selected');
+        //         reload_reqs();
+        //     }
+        // });
 
         // $('#turn').click( function() {
         //     direction = (direction + 1)%4;
@@ -929,39 +1071,39 @@ function load_glad_generator(element){
         //     ctx.drawImage(spritesheet, 192*j, 192*i, 192, 192, 192/2 - 192*scale/2, 192/2 - 192*scale/2 - 5, 192*scale, 192*scale);
         // }, 1000/10);
 
-        function calcAttrValue(slider) {
-            if (slider == 0)
-                return 0;
-            return calcAttrValue(slider - 1) + Math.ceil(slider/6);
-        }
+        // function calcAttrValue(slider) {
+        //     if (slider == 0)
+        //         return 0;
+        //     return calcAttrValue(slider - 1) + Math.ceil(slider/6);
+        // }
 
-        $(document).on('input change', '#distribuicao .slider', function() {
-            $(this).parents('.slider-container').find('.slider-value').html(calcAttrValue($(this).val()));
-            $(this).parents('.slider-container').find('.slider-input').val($(this).val());
-            $('#get-code').prop('disabled','true');
+        // $(document).on('input change', '#distribuicao .slider', function() {
+        //     $(this).parents('.slider-container').find('.slider-value').html(calcAttrValue($(this).val()));
+        //     $(this).parents('.slider-container').find('.slider-input').val($(this).val());
+        //     $('#get-code').prop('disabled','true');
 
-            var soma = 0;
-            $('#distribuicao .slider-value').each( function() {
-                soma += parseInt($(this).html());
-            });
+        //     var soma = 0;
+        //     $('#distribuicao .slider-value').each( function() {
+        //         soma += parseInt($(this).html());
+        //     });
 
-            var numobj = $('#distribuicao #remaining span');
-            numobj.html(50 - soma);
+        //     var numobj = $('#distribuicao #remaining span');
+        //     numobj.html(50 - soma);
 
-            if (soma == 50){
-                $('#get-code').html("GERAR CÓDIGO");
-                $('#get-code').removeAttr('disabled');
-                numobj.css('color','#4caf50');
-            }
-            else if (soma > 50)
-                numobj.css('color','#f44336');
-            else
-                numobj.css('color','black');
-        });
+        //     if (soma == 50){
+        //         $('#get-code').html("GERAR CÓDIGO");
+        //         $('#get-code').removeAttr('disabled');
+        //         numobj.css('color','#4caf50');
+        //     }
+        //     else if (soma > 50)
+        //         numobj.css('color','#f44336');
+        //     else
+        //         numobj.css('color','black');
+        // });
 
-        $('.close').click( function(){
-            $('#fog-skin').hide();
-        });
+        // $('.close').click( function(){
+        //     $('#fog-skin').hide();
+        // });
 
         login.wait().then( data => {
             user = data

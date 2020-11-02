@@ -155,7 +155,7 @@ buttons.skin = {
             this.ready = true
         }
 
-        document.querySelector("#fog-skin").classList.remove("hidden")
+        buttons.fade(document.querySelector('#fog-skin'))
         this.active = true
     }
 }
