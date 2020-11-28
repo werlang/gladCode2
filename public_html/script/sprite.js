@@ -557,7 +557,7 @@ spriteGen.reload = function(){
 
     // match equipment with gender
     const gender = this.selected.includes('male') ? 'male' : 'female'
-    this.selected = this.selected.map(e => e.replace(/(?:fe){0,1}male/, gender)).filter(e => assets.getImage(e))
+    this.selected = this.selected.map(e => e.replace(/(?:fe){0,1}male/, gender)).filter(e => assets.getImage(e) || Array.from(document.querySelectorAll(`.img-button.sub.selected`)).some(d => d.id == e))
     
     if (document.querySelector(`.img-button.sub.selected`)){
         const id = document.querySelector(`.img-button.sub.selected`).id
@@ -850,14 +850,14 @@ function reload_reqs(keepItems){
     },1);
 }
 
-function load_glad_generator(element){
+// function load_glad_generator(element){
 
-    element.load('glad-create.html', function(){
-        // buildIndex();
+    // element.load('glad-create.html', function(){
+    //     // buildIndex();
 
-        $('.img-button.sub').addClass('hidden');
-        $('#middle-container').append(canvas);
-        reload_reqs();
+    //     $('.img-button.sub').addClass('hidden');
+    //     $('#middle-container').append(canvas);
+    //     reload_reqs();
 
         // $('.slider-container').on('touchstart mouseenter', function() {
         //     text = [
@@ -1105,110 +1105,110 @@ function load_glad_generator(element){
         //     $('#fog-skin').hide();
         // });
 
-        login.wait().then( data => {
-            user = data
-            if (loadGlad){
-                selected = {};
-                var skin;
-                var errorSkin = false;
-                try{
-                    skin = JSON.parse(loadGlad.skin);
-                }
-                catch(error){
-                    errorSkin = true;
-                    skin = [];
-                }
-                for (var i in skin){
-                    if (getImage(skin[i]))
-                        selected[skin[i]] = getImage(skin[i]);
-                }
+    //     login.wait().then( data => {
+    //         user = data
+    //         if (loadGlad){
+    //             selected = {};
+    //             var skin;
+    //             var errorSkin = false;
+    //             try{
+    //                 skin = JSON.parse(loadGlad.skin);
+    //             }
+    //             catch(error){
+    //                 errorSkin = true;
+    //                 skin = [];
+    //             }
+    //             for (var i in skin){
+    //                 if (getImage(skin[i]))
+    //                     selected[skin[i]] = getImage(skin[i]);
+    //             }
 
-                //console.log(selected);
-                gladid = loadGlad.id;
-                $('#distribuicao #nome').val(loadGlad.name);
-                $('#distribuicao .slider').eq(0).val(loadGlad.vstr);
-                $('#distribuicao .slider').eq(1).val(loadGlad.vagi);
-                $('#distribuicao .slider').eq(2).val(loadGlad.vint);
-                $('#distribuicao .slider').change();
+    //             //console.log(selected);
+    //             gladid = loadGlad.id;
+    //             $('#distribuicao #nome').val(loadGlad.name);
+    //             $('#distribuicao .slider').eq(0).val(loadGlad.vstr);
+    //             $('#distribuicao .slider').eq(1).val(loadGlad.vagi);
+    //             $('#distribuicao .slider').eq(2).val(loadGlad.vint);
+    //             $('#distribuicao .slider').change();
 
-                if (!errorSkin){
-                    fetchSpritesheet(JSON.stringify(skin)).then( function(data){
-                        createFloatCard({image: getSpriteThumb(data,'walk','down')});
-                    });
-                }
+    //             if (!errorSkin){
+    //                 fetchSpritesheet(JSON.stringify(skin)).then( function(data){
+    //                     createFloatCard({image: getSpriteThumb(data,'walk','down')});
+    //                 });
+    //             }
 
-                codeEditor.saved = true;
-            }
-        });
-    });
-}
+    //             codeEditor.saved = true;
+    //         }
+    //     });
+    // });
+// }
 
-function draw() {
-    var imgReady = 0;
-    var selectedArray = [];
-    for (var i in selected)
-        selectedArray.push(selected[i]);
+// function draw() {
+//     var imgReady = 0;
+//     var selectedArray = [];
+//     for (var i in selected)
+//         selectedArray.push(selected[i]);
 
-    selectedArray.sort(function(a, b){
-        return getLayer(a) - getLayer(b);
-    });
+//     selectedArray.sort(function(a, b){
+//         return getLayer(a) - getLayer(b);
+//     });
 
-    function getLayer(a){
-        var directionEnum = ['up', 'left', 'down', 'right'];
-        if (a.layer && a.layer.default){
-            if (a.layer[ directionEnum[direction] ])
-                return a.layer[ directionEnum[direction] ];
-            else
-                return a.layer.default;
-        }
-        return a.layer;
+//     function getLayer(a){
+//         var directionEnum = ['up', 'left', 'down', 'right'];
+//         if (a.layer && a.layer.default){
+//             if (a.layer[ directionEnum[direction] ])
+//                 return a.layer[ directionEnum[direction] ];
+//             else
+//                 return a.layer.default;
+//         }
+//         return a.layer;
 
-    }
+//     }
 
-    var img = new Array();
-    for(i=0 ; i < selectedArray.length ; i++){
-        if (selectedArray[i].path != '' && !selectedArray[i].png){
-            img[i] = new Image();
-            img[i].src = "sprite/Universal-LPC-spritesheet/" + selectedArray[i].path;
-            img[i].onload = function() {
-                imgReady++;
-            };
-        }
-        else
-            imgReady++;
-    }
+//     var img = new Array();
+//     for(i=0 ; i < selectedArray.length ; i++){
+//         if (selectedArray[i].path != '' && !selectedArray[i].png){
+//             img[i] = new Image();
+//             img[i].src = "sprite/Universal-LPC-spritesheet/" + selectedArray[i].path;
+//             img[i].onload = function() {
+//                 imgReady++;
+//             };
+//         }
+//         else
+//             imgReady++;
+//     }
 
-    var tempss = document.createElement("canvas");
-    tempss.width = spritesheet.width;
-    tempss.height = spritesheet.height;
-    var tempctx = tempss.getContext("2d");
+//     var tempss = document.createElement("canvas");
+//     tempss.width = spritesheet.width;
+//     tempss.height = spritesheet.height;
+//     var tempctx = tempss.getContext("2d");
 
-    interval = setInterval( function() {
-        if (imgReady == selectedArray.length){
-            clearInterval(interval);
-            for(i=0 ; i < selectedArray.length ; i++){
-                if (img[i]){
-                    if (selectedArray[i].oversize){
-                        var line = move[moveEnum[selectedArray[i].move]].line;
-                        var sprites = move[moveEnum[selectedArray[i].move]].sprites;
-                        for (let k=0 ; k<4 ; k++){
-                            for (let j=0 ; j<sprites ; j++){
-                                tempctx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
-                            }
-                        }
-                    }
-                    else{
-                        for (let k=0 ; k<21 ; k++){
-                            for (let j=0 ; j<13 ; j++){
-                                tempctx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
-                            }
-                        }
-                    }
-                }
-            }
-            spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
-            spritectx.drawImage(tempss, 0, 0);
-        }
-    }, 10);
-}
+//     interval = setInterval( function() {
+//         if (imgReady == selectedArray.length){
+//             clearInterval(interval);
+//             for(i=0 ; i < selectedArray.length ; i++){
+//                 if (img[i]){
+//                     if (selectedArray[i].oversize){
+//                         var line = move[moveEnum[selectedArray[i].move]].line;
+//                         var sprites = move[moveEnum[selectedArray[i].move]].sprites;
+//                         for (let k=0 ; k<4 ; k++){
+//                             for (let j=0 ; j<sprites ; j++){
+//                                 tempctx.drawImage(img[i], j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192);
+//                             }
+//                         }
+//                     }
+//                     else{
+//                         for (let k=0 ; k<21 ; k++){
+//                             for (let j=0 ; j<13 ; j++){
+//                                 tempctx.drawImage(img[i], j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64);
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//             spritectx.clearRect(0, 0, spritesheet.width, spritesheet.height);
+//             spritectx.drawImage(tempss, 0, 0);
+//         }
+//     }, 10);
+// }
 
