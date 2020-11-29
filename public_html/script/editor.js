@@ -147,6 +147,7 @@ buttons.skin = {
         const {spriteGen} = await loader.load("spritegen")
         await spriteGen.init(document.querySelector("#fog-skin"))
 
+        this.spriteGen = spriteGen
         this.ready = true
     },
     click: async function(){
@@ -155,7 +156,23 @@ buttons.skin = {
             this.ready = true
         }
 
-        buttons.fade(document.querySelector('#fog-skin'))
+        this.spriteGen.show()
+        const glad = await this.spriteGen.createGladiator()
+        if (glad){
+            // create float card
+            const {gladCard} = await loader.load("gladcard")
+            gladCard.load($('#float-card .glad-card-container'), {
+                customLoad: [glad],
+                clickHandler: () => {
+                    this.click()
+                }
+            })
+
+            if (editor.getValue() == ""){
+                editor.setValue(glad.code)
+            }
+        }
+
         this.active = true
     }
 }
@@ -463,7 +480,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                                 // TODO load blocks before use
                                 blocks.toggle({active: true, load: true})
                             }
-    
                             editor.setValue(loadGlad.code)
                             editor.gotoLine(1,0,true)
                             codeEditor.saved = true

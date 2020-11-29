@@ -59,7 +59,7 @@
                 $info[$i]['vstr'] = $row['vstr'];
                 $info[$i]['vagi'] = $row['vagi'];
                 $info[$i]['vint'] = $row['vint'];
-                $info[$i]['code'] = htmlspecialchars($row['code']);
+                $info[$i]['code'] = $row['code'];
                 $info[$i]['blocks'] = $row['blocks'];
                 $info[$i]['skin'] = $row['skin'];
                 $info[$i]['mmr'] = $row['mmr'];

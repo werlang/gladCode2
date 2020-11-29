@@ -250,6 +250,7 @@ assets.fill = function(){
 }
 
 assets.fetchSpritesheet = async function(json) {
+    // console.log(json)
     return await new Promise(resolve => {
         const move = {
             walk: {'sprites': 9, 'line': 8},
@@ -260,12 +261,14 @@ assets.fetchSpritesheet = async function(json) {
         };
 
         var errorload = false;
-        try{
-            json = JSON.parse(json);
-        }
-        catch(error){
-            errorload = true;
-            json = {};
+        if (typeof json === 'string'){
+            try{
+                json = JSON.parse(json);
+            }
+            catch(error){
+                errorload = true;
+                json = {};
+            }
         }
 
         let spritesheet = document.createElement("canvas");

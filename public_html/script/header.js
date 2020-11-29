@@ -263,21 +263,4 @@ async function change_spoken_language(lang){
     }
 }
 
-// function decodeHTML(str) {
-//     var escapeMap = {
-//         '&': '&amp;',
-//         '<': '&lt;',
-//         '>': '&gt;',
-//         '"': '&quot;',
-//         "'": '&#x27;',
-//         '`': '&#x60;',
-//         '\'': '&#39;'
-//     };
-//     for (var i in escapeMap){
-//         var regexp = new RegExp(escapeMap[i],"g");
-//         str = str.replace(regexp, i);
-//     }
-//     return str;
-// }
-
 export {login, header}
