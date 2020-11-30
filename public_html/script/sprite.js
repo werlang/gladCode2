@@ -1,6 +1,5 @@
 import {assets} from "./assets.js"
 import { loader } from "./loader.js"
-import { waitFor } from "./utils.js"
 
 export const spriteGen = {
     active: false,
@@ -8,6 +7,10 @@ export const spriteGen = {
 }
 
 spriteGen.init = async function(el){
+    if (this.ready){
+        return true
+    }
+
     assets.fill()
 
     this.element = el
@@ -79,7 +82,7 @@ spriteGen.init = async function(el){
         document.querySelector("#fog-skin").classList.add("hidden")
     }))
 
-    this.draw()
+    await this.draw()
     this.reload()
 
     this.ready = true
@@ -384,9 +387,13 @@ spriteGen.loadItem = function(info, name){
     })
 }
 
-spriteGen.draw = function(){
+spriteGen.draw = async function(){
     // draw on the main canvas
     // console.log(this.selected)
+    if (!this.selected){
+        return false
+    }
+
     const getLayer = a => {
         const directionEnum = ['up', 'left', 'down', 'right']
         const i = assets.getImage(a)
@@ -430,48 +437,48 @@ spriteGen.draw = function(){
     })
 
     // when all images loaded
-    Promise.all(loaded).then(res => {
-        res.forEach(e => {
-            if (e.meta.oversize){
-                const line = this.move[e.meta.move].line
-                const sprites = this.move[e.meta.move].sprites
-                for (let k=0 ; k<4 ; k++){
-                    for (let j=0 ; j<sprites ; j++){
-                        tempctx.drawImage(e.img, j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192)
-                    }
+    const res = await Promise.all(loaded)
+
+    res.forEach(e => {
+        if (e.meta.oversize){
+            const line = this.move[e.meta.move].line
+            const sprites = this.move[e.meta.move].sprites
+            for (let k=0 ; k<4 ; k++){
+                for (let j=0 ; j<sprites ; j++){
+                    tempctx.drawImage(e.img, j*192, k*192, 192, 192, j*192, line*192 + k*192, 192, 192)
                 }
-            }
-            else{
-                for (let k=0 ; k<21 ; k++){
-                    for (let j=0 ; j<13 ; j++){
-                        tempctx.drawImage(e.img, j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64)
-                    }
-                }
-            }
-        })
-
-        this.spritectx.clearRect(0, 0, this.spritesheet.width, this.spritesheet.height)
-        this.spritectx.drawImage(tempss, 0, 0)
-
-        // update canvas with spritesheet
-        const updateCanvas = () => {
-            const line = (this.animation.direction + this.move[this.animation.type].line)
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-            this.ctx.drawImage(this.spritesheet, 192*this.animation.frame, 192*line, 192, 192, 192/2 - 192*this.scale/2, 192/2 - 192*this.scale/2 - 5, 192*this.scale, 192*this.scale)
-
-            if (this.animation.enabled){
-                this.animation.frame = (this.animation.frame + 1) % this.move[this.animation.type].sprites
-                this.animation.running = true
-                setTimeout( () => updateCanvas(), 100)
-            }
-            else{
-                this.animation.running = false
             }
         }
-        if (!this.animation.running){
-            updateCanvas()
+        else{
+            for (let k=0 ; k<21 ; k++){
+                for (let j=0 ; j<13 ; j++){
+                    tempctx.drawImage(e.img, j*64, k*64, 64, 64, 64 + 3*j*64, 64 + 3*k*64, 64, 64)
+                }
+            }
         }
     })
+
+    this.spritectx.clearRect(0, 0, this.spritesheet.width, this.spritesheet.height)
+    this.spritectx.drawImage(tempss, 0, 0)
+
+    // update canvas with spritesheet
+    const updateCanvas = () => {
+        const line = (this.animation.direction + this.move[this.animation.type].line)
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.ctx.drawImage(this.spritesheet, 192*this.animation.frame, 192*line, 192, 192, 192/2 - 192*this.scale/2, 192/2 - 192*this.scale/2 - 5, 192*this.scale, 192*this.scale)
+
+        if (this.animation.enabled){
+            this.animation.frame = (this.animation.frame + 1) % this.move[this.animation.type].sprites
+            this.animation.running = true
+            setTimeout( () => updateCanvas(), 100)
+        }
+        else{
+            this.animation.running = false
+        }
+    }
+    if (!this.animation.running){
+        updateCanvas()
+    }
 }
 
 spriteGen.reload = function(){
@@ -558,7 +565,26 @@ spriteGen.reload = function(){
     })
 }
 
-spriteGen.createGladiator = async function(){
+spriteGen.createGladiator = async function(glad){
+    if (glad && glad.skin){
+        this.selected = typeof glad.skin === 'string' ? JSON.parse(glad.skin) : glad.skin
+
+        if (!this.ready){
+            await this.init()
+        }
+
+        this.draw()
+
+        document.querySelector('#distribuicao #nome').value = glad.name
+
+        document.querySelectorAll('#distribuicao .slider').forEach(e => {
+            e.value = glad[`v${e.parentNode.id}`]
+            e.dispatchEvent(new Event('input'))
+        })
+    }
+    
+    this.show()
+
     return await new Promise(resolve => {
         const check = () => {
             if (this.gladiator){

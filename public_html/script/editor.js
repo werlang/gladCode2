@@ -11,7 +11,7 @@ var wannaSave = false;
 var sim
 
 let user = false
-let loadGlad = false
+let loadGlad = {}
 
 const codeEditor = {
     ready: false,
@@ -107,7 +107,9 @@ codeEditor.init = async function(){
         this.saved = false
         this.tested = false
 
-        const lang = getLanguage(editor.getValue())
+        const value = editor.getValue()
+        loadGlad.code = value
+        const lang = getLanguage(value)
         if (lang == "c" && editor.language != 'c'){
             editor.session.setMode("ace/mode/c_cpp")
             editor.language = 'c';
@@ -122,7 +124,6 @@ codeEditor.init = async function(){
         //         'checkStep'
         //     ])
         // }
-
     });
 
     this.ready = true
@@ -156,12 +157,12 @@ buttons.skin = {
             this.ready = true
         }
 
-        this.spriteGen.show()
-        const glad = await this.spriteGen.createGladiator()
+        const glad = await this.spriteGen.createGladiator(loadGlad)
+        // console.log(glad)
         if (glad){
             // create float card
             const {gladCard} = await loader.load("gladcard")
-            gladCard.load($('#float-card .glad-card-container'), {
+            gladCard.load(document.querySelector('#float-card .glad-card-container'), {
                 customLoad: [glad],
                 clickHandler: () => {
                     this.click()
@@ -170,7 +171,14 @@ buttons.skin = {
 
             if (editor.getValue() == ""){
                 editor.setValue(glad.code)
+                editor.gotoLine(1,0,true)
             }
+
+            codeEditor.saved = false
+            codeEditor.tested = false
+
+            loadGlad = glad
+            buttons.test.enable()
         }
 
         this.active = true
@@ -262,6 +270,7 @@ buttons.open = {
 
 buttons.test = {
     ready: false,
+    disabled: true,
     init: function(){
         const num = ["","one","two","three"];
         let enemyBox = ""
@@ -352,43 +361,43 @@ buttons.test = {
                 }
             });
         }
+
+        this.ready = true
     },
     click: function(){
         if (!this.ready){
             this.init()
-            this.ready = true
         }
 
-        if (!document.querySelector("#test").classList.contains('disabled')){
-            showTestWindow()
+        console.log(this.disabled)
+        if (!this.disabled){
+            // let t = tutorial.show([
+            //     'checkStep',
+            //     'oponent',
+            //     'learnAttack',
+            //     'checkAttack',
+            //     'checkGetHit',
+            //     'checkReact',
+            //     'checkSafe',
+            //     'checkFireball',
+            //     'checkTeleport',
+            //     'checkUpgrade',
+            //     'checkBreakpoint'
+            // ])
+            let t = false
 
-            function showTestWindow(){
-                // let t = tutorial.show([
-                //     'checkStep',
-                //     'oponent',
-                //     'learnAttack',
-                //     'checkAttack',
-                //     'checkGetHit',
-                //     'checkReact',
-                //     'checkSafe',
-                //     'checkFireball',
-                //     'checkTeleport',
-                //     'checkUpgrade',
-                //     'checkBreakpoint'
-                // ])
-                let t = false
-
-                if (t === false){
-                    setLoadGlad();
-                    if (!document.querySelector("#test").contains('disabled')){
-                        buttons.fade(document.querySelector('#fog-battle'))
-                        const name = document.querySelector('#float-card .glad-preview .glad span').innerHTML
-                        document.querySelector('#fog-battle h3 span').innerHTML = name
-                    }
-                }
+            if (t === false){
+                buttons.fade(document.querySelector('#fog-battle'))
+                document.querySelector('#fog-battle h3 span').innerHTML = loadGlad.name
             }
         }
 
+    },
+    enable: function(){
+        if (this.disabled){
+            this.disabled = false
+            document.querySelector("#test").classList.remove('disabled')
+        }
     }
 }
 
@@ -411,23 +420,13 @@ login.wait().then( () => loader.load("chat").then( ({chat}) => {
     }).then( async () => {
         await codeEditor.isReady()
         document.querySelector('#chat-panel #show-hide').addEventListener('click', () => {
-            change_size()
-        })
-
-        // $(window).resize( () => {
-        //     setTimeout( () => {
-        //         change_size();
-        //     },1000);
-        // })
-
-        function change_size(){
             setTimeout(() => {
                 const w = document.querySelector('#chat-panel').clientWidth
                 document.querySelector('#panel-right').style.width = `${w}px`
                 editor.resize()
                 document.querySelector('#float-card').style['margin-right'] = `${w}px`
-            }, 1000);
-        }
+            }, 1000)
+        })
     })
 }))
 
@@ -459,34 +458,42 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             editor.setTheme("ace/theme/"+ user.theme);
             editor.setFontSize(user.font +"px");
 
-            const glad = document.querySelector('#glad-code')
-            if (glad){
-                if (glad.innerHTML == "0"){
-                    glad.remove()
+            const gladDiv = document.querySelector('#glad-code')
+            if (gladDiv){
+                if (gladDiv.innerHTML == "0"){
+                    gladDiv.remove()
                     buttons.skin.click()
                 }
                 else{
                     const glads = await post("back_glad.php", {
                         action: "GET"
                     })
-                    // console.log(glads)
-                    for (let i in glads){
-                        if (glads[i].id == glad.innerHTML){
-                            loadGlad = glads[i]
-    
-                            glad.remove()
-    
-                            if (loadGlad.blocks){
-                                // TODO load blocks before use
-                                blocks.toggle({active: true, load: true})
-                            }
-                            editor.setValue(loadGlad.code)
-                            editor.gotoLine(1,0,true)
-                            codeEditor.saved = true
-                            codeEditor.tested = true
-    
-                            break
+                    const glad = glads.filter(e => e.id == gladDiv.innerHTML)[0]
+                    if (glad){
+                        loadGlad = glad
+
+                        gladDiv.remove()
+
+                        if (loadGlad.blocks){
+                            // TODO load blocks before use
+                            blocks.toggle({active: true, load: true})
                         }
+
+                        // create float card
+                        const {gladCard} = await loader.load("gladcard")
+                        gladCard.load($('#float-card .glad-card-container'), {
+                            customLoad: [loadGlad],
+                            clickHandler: () => {
+                                buttons.skin.click()
+                            }
+                        })
+
+                        editor.setValue(loadGlad.code)
+                        editor.gotoLine(1,0,true)
+                        codeEditor.saved = true
+                        codeEditor.tested = true
+
+                        buttons.test.enable()
                     }
                 }
             }
@@ -555,7 +562,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                     google.login().then(function(data) {
                         //console.log(data);
                         user = data.email;
-                        setLoadGlad();
                         $('#login').html(data.nome).off().click( function(){
                             window.location.href = "news";
                         });
@@ -683,8 +689,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                     const {google} = await loader.load("google")
                     google.login().then(function(data) {
                         //console.log(data);
-                        user = data.email;
-                        setLoadGlad();
                         $('#login').html(data.nome).off().click( function(){
                             window.location.href = "news";
                         });
@@ -694,26 +698,26 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         }
     });
 
-    $('#skin').click( function(){
+    document.querySelector('#skin').addEventListener('click', () => {
         buttons.skin.click()
-    });
+    })
 
-    $('#test').click( function(){
+    document.querySelector('#test').addEventListener('click', () => {
         buttons.test.click()
     })
 
-
-
-    var progbtn;
-    $('#fog-battle #btn-cancel').click( function(){
+    let progbtn = null
+    document.querySelector('#fog-battle #btn-cancel').addEventListener('click', () => {
         if (progbtn && progbtn.isActive()){
-            progbtn.kill();
+            progbtn.kill()
             if (sim && sim.running)
                 sim.abort();
         }
-        else
-            $('#fog-battle').hide();
+        else{
+            document.querySelector('#fog-battle').classList.add('hidden')
+        }
     });
+
 
     $('#fog-battle #btn-battle').click( function(){
         var glads = [];
@@ -1047,17 +1051,9 @@ function setLoadGlad(){
 }
 
 async function getBannedFunctions(code){
-    return new Promise( (resolve, reject) => {
-        $.getJSON("banned_functions.json", function(banned){
-            banned = banned.functions;
-            var found = [];
-            for (let i in banned){
-                if (code.indexOf(banned[i]) != -1)
-                    found.push(banned[i]);
-            }
-            resolve(found);
-        });
-    });
+    const req = await fetch("banned_functions.json")
+    const banned = (await req.json()).functions
+    return banned.filter(e => code.indexOf(e) != -1)
 }
 
 function getLanguage(code){
