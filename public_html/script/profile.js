@@ -574,7 +574,7 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
         const {ProgressButton, Simulation} = await loader.load("runsim")
         const statsReady = loader.load("stats")
 
-        var progbtn = new ProgressButton($(this), await translator.translate(["Executando batalha...","Aguardando resposta do servidor"]));
+        var progbtn = new ProgressButton($(this), ["Executando batalha...","Aguardando resposta do servidor"]);
 
         var selGlad = $('#battle-container .glad-preview.selected').data('data')
         var thisglad = {

@@ -8,7 +8,6 @@ header.load()
 var gladid;
 var pieces;
 var wannaSave = false;
-var sim
 
 let user = false
 let loadGlad = {}
@@ -173,6 +172,9 @@ buttons.skin = {
                 editor.setValue(glad.code)
                 editor.gotoLine(1,0,true)
             }
+            else{
+                glad.code = editor.getValue()
+            }
 
             codeEditor.saved = false
             codeEditor.tested = false
@@ -286,7 +288,7 @@ buttons.test = {
         const sampleRows = document.createElement("DIV")
         sampleRows.innerHTML = enemyBox
         sampleRows.querySelectorAll('.glad').forEach((e,i) => {
-            bindGladList(e, Object.values(sampleGlads)[i].filename)
+            this.bindGladList(e, Object.values(sampleGlads)[i].filename)
             document.querySelector('#fog-battle #list').appendChild(e)
         })
         
@@ -311,65 +313,142 @@ buttons.test = {
                 const myRows = document.createElement("DIV")
                 myRows.innerHTML = enemyBox
                 myRows.querySelectorAll('.glad').forEach((e,i) => {
-                    bindGladList(e, data[i])
+                    this.bindGladList(e, data[i])
                     document.querySelector('#fog-battle #list').appendChild(e)
                 })
             }
         })
 
-        function bindGladList(obj, info){
-            if (window.jQuery && obj instanceof jQuery){
-                obj = $(obj)[0]
+        document.querySelector('#fog-battle #btn-cancel').addEventListener('click', () => {
+            if (this.progress && this.progress.isActive()){
+                this.progress.kill()
+                // if (sim && sim.running){
+                //     sim.abort()
+                // }
             }
-
-            obj.addEventListener('click', function(){
-                const filename = typeof info == "string" ? info : null
-                if (obj.classList.contains('selected')){
-                    obj.classList.remove('selected')
-                    document.querySelector('#fog-battle .glad-card-container').innerHTML = ""
-                }
-                else if (document.querySelectorAll('#fog-battle #list .glad.selected').length < 4){
-                    obj.classList.add('selected')
-                    
-                    loader.load("gladcard").then( ({gladCard}) => {
-                        if (filename){
-                            gladCard.getFromFile(filename).then(data => loadCard(data))
-                        }
-                        else{
-                            loadCard(info)
-                        }
-    
-                        function loadCard(data){
-                            gladCard.load(document.querySelector('#fog-battle .glad-card-container'), {
-                                code: true,
-                                customLoad: [data]
-                            })
-                        }
-                    })
-
-                }
-
-                const rows_selected = document.querySelectorAll('#fog-battle #list .glad.selected')
-                if (rows_selected.length > 0){
-                    const length = rows_selected.length
-                    document.querySelector('#fog-battle #btn-battle').removeAttribute('disabled')
-                    document.querySelector('#fog-battle #list-title span').innerHTML = length +" selecionados"
+            else{
+                document.querySelector('#fog-battle').classList.add('hidden')
+            }
+        }) 
+        
+        document.querySelector('#fog-battle #btn-battle').addEventListener('click', async () => {
+            let glads = []
+            document.querySelectorAll('#fog-battle #list .glad.selected').forEach(e => {
+                const name = e.querySelector('.name').innerHTML
+                //my own glads
+                // console.log(this.glads)
+                if (this.glads[name] && this.glads[name].id){
+                    glads.push(this.glads[name].id);
                 }
                 else{
-                    document.querySelector('#fog-battle #btn-battle').setAttribute('disabled',true)
-                    document.querySelector('#fog-battle #list-title span').innerHTML = ""
+                    glads.push(new Promise(async resolve => {
+                        const {gladCard} = await loader.load("gladcard")
+                        const filename = sampleGlads[name].filename
+                        const data = await gladCard.getFromFile(filename)
+                        resolve(data.code)
+                    }))
                 }
-            });
-        }
+            })
+
+            glads = (await Promise.all(glads)).map(e => e.code || e)
+
+            this.battle(document.querySelector('#fog-battle #btn-battle'), glads).then( hash => {
+                if (hash !== false){
+                    new Message({
+                        message: `Deseja visualizar a batalha?`,
+                        buttons: {yes: "Sim", no: "Não"}
+                    }).show().click(null, data => {
+                        if (data.button == "yes"){
+                            window.open("play/"+ hash)
+                        }
+                        else{
+                            post("back_log.php", {
+                                action: "DELETE",
+                                hash: hash
+                            });
+                        }
+                        if (wannaSave){
+                            new Message({
+                                message: `Gladiador testado com sucesso. Deseja gravá-lo?`,
+                                buttons: {yes: "Sim", no: "Não"}
+                            }).show().click('yes', () => {
+                                document.querySelector('#save').click()
+                            });
+                            wannaSave = false;
+                        }
+    
+                        // tutorial.show([
+                        //     'watchCodeMove',
+                        //     'moveBackForth',
+                        //     'askMoveNext',
+                        //     'detectEnemy',
+                        //     'getHit',
+                        //     'reactHit',
+                        //     'safe',
+                        //     'fireball',
+                        //     'teleport',
+                        //     'upgrade',
+                        //     'breakpoint'
+                        // ])
+                    });
+                    this.progress.kill()
+                    //$('#fog-battle #btn-cancel').removeAttr('disabled');
+                    document.querySelector('#fog-battle').classList.add('hidden')
+                }
+            })
+        })
 
         this.ready = true
+    },
+    bindGladList: function(obj, info){
+        if (window.jQuery && obj instanceof jQuery){
+            obj = $(obj)[0]
+        }
+
+        obj.addEventListener('click', () => {
+            const filename = typeof info == "string" ? info : null
+            if (obj.classList.contains('selected')){
+                obj.classList.remove('selected')
+                document.querySelector('#fog-battle .glad-card-container').innerHTML = ""
+            }
+            else if (document.querySelectorAll('#fog-battle #list .glad.selected').length < 4){
+                obj.classList.add('selected')
+                
+                loader.load("gladcard").then( async ({gladCard}) => {
+                    if (filename){
+                        info = await gladCard.getFromFile(filename)
+                    }
+
+                    if (!this.glads){
+                        this.glads = {}
+                    }
+                    this.glads[info.name] = info
+
+                    gladCard.load(document.querySelector('#fog-battle .glad-card-container'), {
+                        code: true,
+                        customLoad: [info]
+                    })
+                })
+
+            }
+
+            const rows_selected = document.querySelectorAll('#fog-battle #list .glad.selected')
+            if (rows_selected.length > 0){
+                document.querySelector('#fog-battle #btn-battle').removeAttribute('disabled')
+                document.querySelector('#fog-battle #list-title span').innerHTML = rows_selected.length +" selecionados"
+            }
+            else{
+                document.querySelector('#fog-battle #btn-battle').setAttribute('disabled',true)
+                document.querySelector('#fog-battle #list-title span').innerHTML = ""
+            }
+        })
     },
     click: function(){
         if (!this.ready){
             this.init()
         }
 
-        console.log(this.disabled)
+        // console.log(this.disabled)
         if (!this.disabled){
             // let t = tutorial.show([
             //     'checkStep',
@@ -398,6 +477,38 @@ buttons.test = {
             this.disabled = false
             document.querySelector("#test").classList.remove('disabled')
         }
+    },
+    battle: async function(button, glads){
+        const {ProgressButton, Simulation} = await loader.load("runsim")
+        this.progress = new ProgressButton(button, ["Executando batalha...","Aguardando resposta do servidor"]);
+
+        const breakpoints = Array.from(document.querySelectorAll('.ace_breakpoint')).filter(e => e.textContent)
+    
+        glads.push(appendSetup(loadGlad.code))
+    
+        // console.log(loadGlad)
+        return new Promise(resolve => {
+            // console.log(glads)
+            this.sim = new Simulation({
+                glads: glads,
+                savecode: true,
+                origin: "editor",
+                single: true,
+                breakpoints: breakpoints.length ? breakpoints : false,
+                terminal: true,
+            })
+            this.sim.run().then( data => {
+                // console.log(data);
+                if (data.error){
+                    document.querySelector('#fog-battle').classList.add('hidden')
+                    resolve(false)
+                }
+                else{
+                    resolve(data.simulation)
+                }
+                this.progress.kill()
+            })
+        })
     }
 }
 
@@ -662,7 +773,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                         }
 
                         function loadReady(glads){
-                            btnbattle_click($('#save-box button'), glads).then( hash => {
+                            buttons.test.battle(document.querySelector('#save-box button'), glads).then( hash => {
                                 // console.log(hash);
                                 if (hash !== false){
                                     post("back_log.php", {
@@ -705,125 +816,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     document.querySelector('#test').addEventListener('click', () => {
         buttons.test.click()
     })
-
-    let progbtn = null
-    document.querySelector('#fog-battle #btn-cancel').addEventListener('click', () => {
-        if (progbtn && progbtn.isActive()){
-            progbtn.kill()
-            if (sim && sim.running)
-                sim.abort();
-        }
-        else{
-            document.querySelector('#fog-battle').classList.add('hidden')
-        }
-    });
-
-
-    $('#fog-battle #btn-battle').click( function(){
-        var glads = [];
-        var totalGlads = $('#fog-battle #list .glad.selected').length;
-        $('#fog-battle #list .glad.selected').each( function(){
-            var selected = $(this)
-            var name = $(this).find('.name').html();
-            if (!selected.data('info')){
-                const filename = sampleGlads[name].filename
-                getGladFromFile(filename).then( function(data){
-                    glads.push(data.code);
-                    if (glads.length == totalGlads)
-                        loadReady(glads);
-                });
-            }
-            //my own glads
-            else{
-                glads.push(selected.data('info').id);
-                if (glads.length == totalGlads)
-                    loadReady(glads);
-            }
-        });
-
-        function loadReady(glads){
-            btnbattle_click($('#fog-battle #btn-battle'), glads).then( hash => {
-                if (hash !== false){
-                    new Message({
-                        message: `Deseja visualizar a batalha?`,
-                        buttons: {yes: "Sim", no: "Não"}
-                    }).show().click(null, data => {
-                        if (data.button == "yes")
-                            window.open("play/"+ hash);
-                        else{
-                            post("back_log.php", {
-                                action: "DELETE",
-                                hash: hash
-                            });
-                        }
-                        if (wannaSave){
-                            new Message({
-                                message: `Gladiador testado com sucesso. Deseja gravá-lo?`,
-                                buttons: {yes: "Sim", no: "Não"}
-                            }).show().click('yes', () => {
-                                $('#save').click();
-                            });
-                            wannaSave = false;
-                        }
-
-                        tutorial.show([
-                            'watchCodeMove',
-                            'moveBackForth',
-                            'askMoveNext',
-                            'detectEnemy',
-                            'getHit',
-                            'reactHit',
-                            'safe',
-                            'fireball',
-                            'teleport',
-                            'upgrade',
-                            'breakpoint'
-                        ])
-                    });
-                    progbtn.kill();
-                    //$('#fog-battle #btn-cancel').removeAttr('disabled');
-                    $('#fog-battle').hide();
-                }
-            });
-        }
-    });
-
-    async function btnbattle_click(btn, glads){
-        progbtn = new ProgressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
-
-        var breakpoints = [];
-        $('.ace_breakpoint').each( function() {
-            breakpoints.push($(this).text());
-        });
-        if (!breakpoints.length)
-            breakpoints = false;
-
-        glads.push(loadGlad.code);
-
-        return new Promise( (resolve, reject) => {
-            // console.log(glads)
-            sim = new Simulation({
-                glads: glads,
-                savecode: true,
-                origin: "editor",
-                single: true,
-                breakpoints: breakpoints,
-                terminal: true,
-            })
-            sim.run().then( data => {
-                // console.log(data);
-                if (data.error){
-                    //$('#fog-battle #btn-cancel').removeAttr('disabled');
-                    $('#fog-battle').hide();
-                    resolve(false);
-                }
-                else{
-                    resolve(data.simulation);
-                }
-                progbtn.kill();
-            })
-        });
-    }
 
     $('#switch').click( function(){
         blocks.toggle({ask: true})
@@ -1021,33 +1013,21 @@ window.onbeforeunload = function() {
     return codeEditor.saved ? null : true
 }
 
-function setLoadGlad(){
-    loadGlad = {};
-    var skin = [];
-    for (var i in selected)
-        skin.push(i);
-    loadGlad.skin = JSON.stringify(skin);
-    loadGlad.id = gladid;
-    loadGlad.user = user.apelido;
-    loadGlad.name = $('#distribuicao #nome').val();
-    loadGlad.vstr = $('#distribuicao .slider').eq(0).val();
-    loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
-    loadGlad.vint = $('#distribuicao .slider').eq(2).val();
-    delete loadGlad.blocks
-
-    var language = getLanguage(editor.getValue());
+function appendSetup(){
+    const language = getLanguage(editor.getValue())
+    let setup = ""
     if (language == "c"){
-        var setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n    setSlots(\"-1,-1,-1,-1\");\n}\n\n`;
-        loadGlad.code = setup + editor.getValue();
+        setup = `setup(){\n    setName(\"${loadGlad.name}\");\n    setSTR(${loadGlad.vstr});\n    setAGI(${loadGlad.vagi});\n    setINT(${loadGlad.vint});\n    setSkin(\"${loadGlad.skin}\");\n    setUser(\"${loadGlad.user}\");\n    setSlots(\"-1,-1,-1,-1\");\n}\n\n`
     }
     else if (language == "python" || language == 'blocks'){
-        var setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`;
-        loadGlad.code = setup + editor.getValue();
-
+        setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`
+        
         if (language == 'blocks'){
             loadGlad.blocks = blocks.save()
         }
     }
+
+    return setup + editor.getValue()
 }
 
 async function getBannedFunctions(code){
@@ -1206,10 +1186,9 @@ blocks.toggle = async function({active = null, ask = false, load = false, create
     }
 }
 
-blocks.save = async function(){
-    const Blockly = await this.init()
-    const xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-    return Blockly.Xml.domToText(xmlDom);
+blocks.save = function(){
+    const xmlDom = this.Blockly.Xml.workspaceToDom(this.Blockly.mainWorkspace);
+    return this.Blockly.Xml.domToText(xmlDom);
 }
 
 blocks.load = async function({path, xml}){
