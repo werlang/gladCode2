@@ -6,7 +6,6 @@ import { post, waitFor } from "./utils.js"
 header.load()
 
 var gladid;
-var pieces;
 var wannaSave = false;
 
 let user = false
@@ -19,18 +18,18 @@ const codeEditor = {
 }
 
 const sampleGlads = {
-    'Wanderer': {'difficulty': 1, 'filename': 'samples/gladbots/Wanderer.c'},
-    'Runner': {'difficulty': 1, 'filename': 'samples/gladbots/Runner.c'},
-    'Blinker': {'difficulty': 1, 'filename': 'samples/gladbots/Blinker.c'},
-    'Arch': {'difficulty': 2, 'filename': 'samples/gladbots/Arch.c'},
-    'Patient': {'difficulty': 2, 'filename': 'samples/gladbots/Patient.c'},
-    'Warrior': {'difficulty': 2, 'filename': 'samples/gladbots/Warrior.c'},
-    'Mage': {'difficulty': 2, 'filename': 'samples/gladbots/Mage.c'},
-    'Rogue': {'difficulty': 2, 'filename': 'samples/gladbots/Rogue.c'},
-    'Archie': {'difficulty': 3, 'filename': 'samples/gladbots/Archie.c'},
+    'Wanderer':  {'difficulty': 1, 'filename': 'samples/gladbots/Wanderer.c'},
+    'Runner':    {'difficulty': 1, 'filename': 'samples/gladbots/Runner.c'},
+    'Blinker':   {'difficulty': 1, 'filename': 'samples/gladbots/Blinker.c'},
+    'Arch':      {'difficulty': 2, 'filename': 'samples/gladbots/Arch.c'},
+    'Patient':   {'difficulty': 2, 'filename': 'samples/gladbots/Patient.c'},
+    'Warrior':   {'difficulty': 2, 'filename': 'samples/gladbots/Warrior.c'},
+    'Mage':      {'difficulty': 2, 'filename': 'samples/gladbots/Mage.c'},
+    'Rogue':     {'difficulty': 2, 'filename': 'samples/gladbots/Rogue.c'},
+    'Archie':    {'difficulty': 3, 'filename': 'samples/gladbots/Archie.c'},
     'War Maker': {'difficulty': 3, 'filename': 'samples/gladbots/WarMaker.c'},
-    'Magnus': {'difficulty': 3, 'filename': 'samples/gladbots/Magnus.c'},
-    'Rouge': {'difficulty': 3, 'filename': 'samples/gladbots/Rouge.c'},
+    'Magnus':    {'difficulty': 3, 'filename': 'samples/gladbots/Magnus.c'},
+    'Rouge':     {'difficulty': 3, 'filename': 'samples/gladbots/Rouge.c'},
 }
 
 codeEditor.init = async function(){
@@ -178,8 +177,9 @@ buttons.skin = {
 
             codeEditor.saved = false
             codeEditor.tested = false
-
+            
             loadGlad = glad
+            buttons.save.enable()
             buttons.test.enable()
         }
 
@@ -523,6 +523,122 @@ buttons.fade = function(window){
     }
 }
 
+buttons.save = {
+    disabled: true,
+    enable: function(){
+        if (this.disabled){
+            this.disabled = false
+            document.querySelector("#save").classList.remove('disabled')
+        }
+    },
+    click: async function() {
+        if (!this.disabled){
+            if (user.logged){
+                //console.log(loadGlad);
+
+                const banned = await getBannedFunctions(editor.getValue())
+                if (banned.length){
+                    showMessage(`Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:<li><b>${banned.join("</b></li><li><b>")}</b></li></ul>`)
+                }
+                else if (codeEditor.tested){
+                    const action = loadGlad.id ? "UPDATE" : "INSERT"
+
+                    const args = {
+                        action: action,
+                        nome: loadGlad.name,
+                        vstr: loadGlad.vstr,
+                        vagi: loadGlad.vagi,
+                        vint: loadGlad.vint,
+                        skin: loadGlad.skin,
+                    }
+
+                    if (loadGlad.blocks){
+                        args.blocks = loadGlad.blocks
+                    }
+                    if (loadGlad.id){
+                        args.id = loadGlad.id
+                    }
+
+                    // console.log(args)
+                    const data = await post("back_glad.php", args)
+                    //console.log(data);
+
+                    if (data.status == "LIMIT"){
+                        new Message({message: `Você não pode possuir mais de <ignore><b>${data.value}</b></ignore> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`}).show()
+                    }
+                    else if (data.status == "EXISTS"){
+                        new Message({message: `O nome <ignore><b>${loadGlad.name}</b></ignore> já está sendo usado por outro gladiador`}).show()
+                    }
+                    else if (data.status == "INVALID"){
+                        new Message({message: `CHEATER`}).show()
+                    }
+                    else if (data.status == "SUCCESS"){
+                        loadGlad.id = data.id;
+                        if (action == "INSERT"){
+                            new Message({
+                                message: `O gladiador <ignore><b>${loadGlad.name}</b></ignore> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`,
+                                buttons: {yes: "Sim", no: "Agora não"}
+                            }).show().click('yes', () => {
+                                window.open('battle.ranked')
+                            })
+                        }
+                        else{
+                            new Message({message: `Gladiador <ignore><b>${loadGlad.name}</b></ignore> gravado`}).show()
+                        }
+                        codeEditor.saved = true
+                    }
+                }
+                else{
+                    document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog' class='save'>
+                        <div id='save-box'>
+                            <div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
+                            <div id='button-container'><button class='button'>OK</button></div>
+                        </div>
+                    </div>`)
+
+                    const sample = ['Archie', 'War Maker', 'Magnus', 'Rouge']
+                    const glads = await Promise.all(sample.map(async e => {
+                        const {gladCard} = await loader.load("gladcard")
+                        const data = await gladCard.getFromFile(sampleGlads[e].filename)
+                        return data.code
+                    }))
+
+                    const hash = await buttons.test.battle(document.querySelector('#save-box button'), glads)
+                    // console.log(hash);
+                    if (hash !== false){
+                        post("back_log.php", {
+                            action: "DELETE",
+                            hash: hash
+                        })
+
+                        codeEditor.tested = true
+                        document.querySelector('#fog.save').remove()
+                        this.click()
+                    }
+                    else{
+                        document.querySelector('#fog.save').remove()
+                    }
+                }
+            }
+            else{
+                new Message({
+                    message: `Você precisa fazer LOGIN no sistema para salvar seu gladiador`,
+                    buttons: {cancel: "Cancelar", ok: "LOGIN"}
+                }).show().click('ok', async () => {
+                    const {google} = await loader.load("google")
+                    google.login().then(function(data) {
+                        //console.log(data);
+                        $('#login').html(data.nome).off().click( function(){
+                            window.location.href = "news";
+                        });
+                    });
+                });
+            }
+        }
+    }
+}
+
+
 // handle editor resize when chat is toggled
 login.wait().then( () => loader.load("chat").then( ({chat}) => {
     chat.init(document.querySelector('#chat-panel'), {
@@ -543,6 +659,7 @@ login.wait().then( () => loader.load("chat").then( ({chat}) => {
 
 loader.load("jquery").then( () => $(document).ready(async () => {
     $('#header-editor').addClass('here')
+    document.querySelector('#header-container').classList.add('small')
     await codeEditor.isReady()
 
     login.wait().then(async data => {
@@ -569,9 +686,11 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             editor.setTheme("ace/theme/"+ user.theme);
             editor.setFontSize(user.font +"px");
 
+            // load glad from url
             const gladDiv = document.querySelector('#glad-code')
             if (gladDiv){
-                if (gladDiv.innerHTML == "0"){
+                const gladid = parseInt(gladDiv.innerHTML)
+                if (gladid == 0){
                     gladDiv.remove()
                     buttons.skin.click()
                 }
@@ -579,9 +698,10 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                     const glads = await post("back_glad.php", {
                         action: "GET"
                     })
-                    const glad = glads.filter(e => e.id == gladDiv.innerHTML)[0]
+                    const glad = glads.filter(e => e.id == gladid)[0]
                     if (glad){
                         loadGlad = glad
+                        loadGlad.id = gladid
 
                         gladDiv.remove()
 
@@ -592,7 +712,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
                         // create float card
                         const {gladCard} = await loader.load("gladcard")
-                        gladCard.load($('#float-card .glad-card-container'), {
+                        gladCard.load(document.querySelector('#float-card .glad-card-container'), {
                             customLoad: [loadGlad],
                             clickHandler: () => {
                                 buttons.skin.click()
@@ -605,6 +725,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                         codeEditor.tested = true
 
                         buttons.test.enable()
+                        buttons.save.enable()
                     }
                 }
             }
@@ -617,8 +738,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         }
 
     });
-
-    document.querySelector('#header-container').classList.add('small')
 
     $('#float-card .glad-preview').click( function(){
         buttons.skin.click()
@@ -686,127 +805,8 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         }
     });
 
-    $('#save').click( function(){
-        if (!$(this).hasClass('disabled')){
-            if (user.logged){
-                setLoadGlad();
-                //console.log(loadGlad);
-
-                getBannedFunctions(editor.getValue()).then( function(banned){
-                    if (banned.length){
-                        var msg = "Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:";
-                        for (let i in banned){
-                            msg += `<li><b>${banned[i]}</b></li>`;
-                        }
-                        msg += "</ul>"
-                        showMessage(msg);
-                    }
-                    else if (codeEditor.tested){
-                        var action = "INSERT";
-                        if (gladid)
-                            action = "UPDATE";
-                        var nome = $('#distribuicao #nome').val();
-
-                        let args = {
-                            action: action,
-                            id: gladid,
-                            nome: nome,
-                            vstr: $('#float-card .glad-preview .info .attr .str span').html(),
-                            vagi: $('#float-card .glad-preview .info .attr .agi span').html(),
-                            vint: $('#float-card .glad-preview .info .attr .int span').html(),
-                            skin: JSON.stringify(pieces),
-                        }
-
-                        if (loadGlad.blocks)
-                            args.blocks = loadGlad.blocks
-
-                        // console.log(args)
-                        post("back_glad.php", args).then( function(data){
-                            //console.log(data);
-                            $('#fog').remove();
-                            if (data.search("LIMIT") != -1)
-                                new Message({message: `Você não pode possuir mais de <ignore><b>${data.LIMIT}</b></ignore> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`}).show();
-                            else if (data == "EXISTS")
-                                new Message({message: `O nome <ignore><b>${nome}</b></ignore> já está sendo usado por outro gladiador`}).show();
-                            else if (data == "INVALID")
-                                new Message({message: `CHEATER`}).show();
-                            else if (data.search("ID") != -1){
-                                gladid = JSON.parse(data).ID;
-                                if (action == "INSERT"){
-                                    new Message({
-                                        message: `O gladiador <ignore><b>${nome}</b></ignore> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`,
-                                        buttons: {yes: "Sim", no: "Agora não"}
-                                    }).show().click('yes', () => {
-                                        window.open('battle.ranked')
-                                    })
-                                }
-                                else{
-                                    new Message({message: `Gladiador <ignore><b>${nome}</b></ignore> gravado`}).show();
-                                }
-                                codeEditor.saved = true;
-                            }
-                        });
-                    }
-                    else{
-                        $('body').append(`<div id='fog'>
-                            <div id='save-box'>
-                                <div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
-                                <div id='button-container'><button class='button'>OK</button></div>
-                            </div>
-                        </div>`);
-
-                        var sample = {
-                            "Archie": sampleGlads['Archie'],
-                            "War Maker": sampleGlads['War Maker'],
-                            "Magnus": sampleGlads['Magnus'],
-                            "Rouge": sampleGlads['Rouge']
-                        };
-
-                        var glads = [];
-                        for (let i in sample){
-                            var filename = `samples/gladbots/${sample[i].filename}.c`;
-                            getGladFromFile(filename).then( function(data){
-                                glads.push(data.code);
-                                if (glads.length == 4)
-                                    loadReady(glads);
-                            });
-                        }
-
-                        function loadReady(glads){
-                            buttons.test.battle(document.querySelector('#save-box button'), glads).then( hash => {
-                                // console.log(hash);
-                                if (hash !== false){
-                                    post("back_log.php", {
-                                        action: "DELETE",
-                                        hash: hash
-                                    });
-
-                                    codeEditor.tested = true;
-                                    $('#save').click();
-                                }
-                                else{
-                                    $('#fog').remove();
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-            else{
-                new Message({
-                    message: `Você precisa fazer LOGIN no sistema para salvar seu gladiador`,
-                    buttons: {cancel: "Cancelar", ok: "LOGIN"}
-                }).show().click('ok', async () => {
-                    const {google} = await loader.load("google")
-                    google.login().then(function(data) {
-                        //console.log(data);
-                        $('#login').html(data.nome).off().click( function(){
-                            window.location.href = "news";
-                        });
-                    });
-                });
-            }
-        }
+    document.querySelector('#save').addEventListener('click', () => {
+        buttons.save.click()
     });
 
     document.querySelector('#skin').addEventListener('click', () => {

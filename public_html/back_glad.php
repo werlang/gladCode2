@@ -84,6 +84,8 @@
             ));
         }
         else{
+            $output = array();
+
             if (isset($_POST['id']))
                 $id = mysql_escape_string($_POST['id']);
             else
@@ -107,12 +109,16 @@
                     if ($_POST['action'] == "INSERT"){
                         $sql = "SELECT * FROM gladiators WHERE master = '$user'";
                         $result = runQuery($sql);
-                        if ($result->num_rows >= $limit)
-                            echo "{\"LIMIT\":$limit}";
+                        if ($result->num_rows >= $limit){
+                            $output['status'] = "LIMIT";
+                            $output['value'] = $limit;
+                        }
                         else{
                             $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
                             $result = runQuery($sql);
-                            echo "{\"ID\":". $conn->insert_id ."}";
+                            $output['status'] = "SUCCESS";
+                            $output['operation'] = "INSERT";
+                            $output['id'] = $conn->insert_id;
 
                             send_node_message(array(
                                 'profile notification' => array('user' => array($user))
@@ -122,15 +128,20 @@
                     elseif ($_POST['action'] == "UPDATE"){
                         $sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', blocks = '$blocks', version = '$version' WHERE cod = '$id' AND master = '$user'";
                         $result = runQuery($sql);
-                        echo "{\"ID\":". $id ."}";
+                        $output['status'] = "SUCCESS";
+                        $output['operation'] = "UPDATE";
+                        $output['id'] = $id;
                     }
                 }
-                else
-                    echo "EXISTS";
+                else{
+                    $output['status'] = "EXISTS";
+                }
             }
             else {
-                echo "INVALID";
+                $output['status'] = "INVALID";
             }
+
+            echo json_encode($output);
         }		
     }
     else{
