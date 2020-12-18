@@ -78,6 +78,10 @@
         else{
             $output['status'] = "NOTLOGGED";
             $output['logged'] = false;
+
+            if (isset($_SESSION['guest_language'])){
+                $output['language'] = $_SESSION['guest_language'];
+            }
         }
 
         if (isset($_SESSION['language'])){
@@ -244,6 +248,10 @@
             $language = mysql_escape_string($_POST['language']);
             $sql = "UPDATE usuarios SET pref_language = '$language' WHERE id = '$user'";
             $result = runQuery($sql);
+            $output['status'] = "SUCCESS";
+        }
+        else{
+            $_SESSION['guest_language'] = mysql_escape_string($_POST['language']);
             $output['status'] = "SUCCESS";
         }
     }
