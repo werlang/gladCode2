@@ -129,6 +129,85 @@ codeEditor.init = async function(){
     this.editor = editor
     editor.focus()
 
+    // breakpoints
+    editor.on("guttermousedown", function(e) {
+        var target = e.domEvent.target;
+
+        if (e.domEvent.button != 0) //left mouse button
+            return;
+
+        if (target.className.indexOf("ace_gutter-cell") == -1){
+            return;
+        }
+
+        if (!editor.isFocused()){
+            return;
+        }
+
+        const row = e.getDocumentPosition().row;
+        const breakpoints = e.editor.session.getBreakpoints(row, 0);
+
+        const Range = require('ace/range').Range;
+
+        // If there's a breakpoint already defined, it should be removed, offering the toggle feature
+        if(typeof breakpoints[row] === typeof undefined){
+            let lang = getLanguage(editor.getValue())
+            var brackets = 0;
+            for (let i=0 ; i < editor.session.getLength() ; i++){
+                var line = editor.session.getLine(i);
+                var ln = parseInt($(target).text()) - 1;
+
+                if (i == ln){
+                    var rowdif = row;
+                    if (editor.session.getLine(ln).indexOf("else") != -1){
+                        rowdif = row + 1;
+                    }
+
+                    if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
+                        new Message({message: `Breakpoints só podem ser inseridos dentro de funções`}).show();
+                    }
+                    else{
+                        e.editor.session.setBreakpoint(rowdif);
+
+                        var marker = editor.session.getMarkers();
+                        var marked = false;
+                        for (let i in marker){
+                            if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
+                                marked = true;
+                            }
+                        }
+                        if (!marked){
+                            editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
+                        }
+                    }
+
+                }
+
+                if (lang == 'c'){
+                    if (line.indexOf("{") != -1)
+                        brackets++;
+                    if (line.indexOf("}") != -1)
+                        brackets--;
+                }
+            }
+
+        }else{
+            e.editor.session.clearBreakpoint(row);
+
+            const marker = editor.session.getMarkers();
+            for (let i in marker){
+                if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
+                    editor.session.removeMarker(marker[i].id);
+                }
+            }
+        }
+
+        e.stop();
+    });
+
+    // editor.on("guttermouseup", function(e) {
+    // });
+
     return editor
 }
 
@@ -674,7 +753,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
     await codeEditor.isReady()
 
     login.wait().then(async data => {
-        //console.log(data);
+        // console.log(data)
         user = data
         if (user.status == "SUCCESS"){
             if (user.tutor == "1"){
@@ -690,15 +769,16 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 $('#profile-icon img').attr('src', "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=");
             }
 
-            if (user.language == 'blocks'){
+            editor.setTheme("ace/theme/"+ user.theme);
+            editor.setFontSize(user.font +"px");
+            
+            // load glad from url
+            const gladDiv = document.querySelector('#glad-code')
+
+            if (user.language == 'blocks' && !gladDiv){
                 blocks.toggle({active: true, create: true})
             }
 
-            editor.setTheme("ace/theme/"+ user.theme);
-            editor.setFontSize(user.font +"px");
-
-            // load glad from url
-            const gladDiv = document.querySelector('#glad-code')
             if (gladDiv){
                 const gladid = parseInt(gladDiv.innerHTML)
                 if (gladid == 0){
@@ -718,7 +798,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
                         if (loadGlad.blocks){
                             // TODO load blocks before use
-                            blocks.toggle({active: true, load: true})
+                            blocks.toggle({active: true, load: loadGlad.blocks})
                         }
 
                         // create float card
@@ -941,83 +1021,6 @@ loader.load("jquery").then( () => $(document).ready(async () => {
             }
         });
     });
-
-    // editor.on("guttermousedown", function(e) {
-    //     var target = e.domEvent.target;
-
-    //     if (e.domEvent.button != 0) //left mouse button
-    //         return;
-
-    //     if (target.className.indexOf("ace_gutter-cell") == -1){
-    //         return;
-    //     }
-
-    //     if (!editor.isFocused()){
-    //         return;
-    //     }
-
-    //     var breakpoints = e.editor.session.getBreakpoints(row, 0);
-    //     var row = e.getDocumentPosition().row;
-
-    //     var Range = require('ace/range').Range;
-
-    //     // If there's a breakpoint already defined, it should be removed, offering the toggle feature
-    //     if(typeof breakpoints[row] === typeof undefined){
-    //         let lang = getLanguage(editor.getValue())
-    //         var brackets = 0;
-    //         for (let i=0 ; i < editor.session.getLength() ; i++){
-    //             var line = editor.session.getLine(i);
-    //             var ln = parseInt($(target).text()) - 1;
-
-    //             if (i == ln){
-    //                 var rowdif = row;
-    //                 if (editor.session.getLine(ln).indexOf("else") != -1){
-    //                     rowdif = row + 1;
-    //                 }
-
-    //                 if ((lang == 'c' && brackets == 0) || (lang == 'python' && line.indexOf('  ') == -1)){
-    //                     new Message({message: `Breakpoints só podem ser inseridos dentro de funções`}).show();
-    //                 }
-    //                 else{
-    //                     e.editor.session.setBreakpoint(rowdif);
-
-    //                     var marker = editor.session.getMarkers();
-    //                     var marked = false;
-    //                     for (let i in marker){
-    //                         if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == rowdif){
-    //                             marked = true;
-    //                         }
-    //                     }
-    //                     if (!marked)
-    //                         editor.session.addMarker(new Range(rowdif,0,rowdif,1),'line-breakpoint','fullLine');
-    //                 }
-
-    //             }
-
-    //             if (lang == 'c'){
-    //                 if (line.indexOf("{") != -1)
-    //                     brackets++;
-    //                 if (line.indexOf("}") != -1)
-    //                     brackets--;
-    //             }
-    //         }
-
-    //     }else{
-    //         e.editor.session.clearBreakpoint(row);
-
-    //         var marker = editor.session.getMarkers();
-    //         for (let i in marker){
-    //             if (marker[i].clazz == 'line-breakpoint' && marker[i].range.start.row == row){
-    //                 editor.session.removeMarker(marker[i].id);
-    //             }
-    //         }
-    //     }
-
-    //     e.stop();
-    // });
-
-    // editor.on("guttermouseup", function(e) {
-    // });
 }))
 
 // trying to leave page
@@ -1058,7 +1061,8 @@ function getLanguage(code){
     return language;
 }
 
-loader.load('editorblocks').then(module => {
+loader.load('editorblocks').then(async module => {
     blocks = module.blocks
+    await codeEditor.isReady()
     blocks.init(codeEditor)
 })

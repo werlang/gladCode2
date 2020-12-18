@@ -186,7 +186,7 @@ tutorial.lesson.skin = async function(){
 }
 
 tutorial.lesson.firstStep = async function(){
-    await new Message({message: `Cada gladiador pode executar uma ação a cada 0.1s, que é o intervalo da simulação. Na <b>função loop</b> é onde você diz o que seu gladiador deve fazer em cada intervalo de tempo da simulação`}).show().click()
+    await new Message({message: `Cada gladiador pode executar uma ação a cada 0.1s, que é o intervalo da simulação. Na <b>função loop</b> é onde você diz o que seu gladiador deve fazer em cada intervalo de tempo da simulação`, class: "large"}).show().click()
 
     let text = {
         c: `Experimente colocar a função <b>stepForward()</b> dentro das chaves da função loop. Quando terminar, clique no botão para testar seu gladiador. É o sexto botão no menu à esquerda, com o ícone de um controle de videogame`,
@@ -955,7 +955,7 @@ tutorial.lesson.end = async function(){
     tutorial.enabled = false
 }
 
-function showDialog(message, buttons){
+function showDialog(message, buttons, large=true){
     return new Promise( resolve => {
         const b = {}
         for (let i in buttons){
@@ -964,7 +964,8 @@ function showDialog(message, buttons){
 
         new Message({
             message: message,
-            buttons: b
+            buttons: b,
+            class: large ? "large" : ""
         }).show().click(null, data => {
             resolve(b[data.button])
         })

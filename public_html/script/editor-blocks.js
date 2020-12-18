@@ -71,9 +71,11 @@ blocks.init = async function(code){
 
     this.ready = true
 
-    code.saved = true
-    code.tested = true
-    this.code = code
+    if (code){
+        code.saved = true
+        code.tested = true
+        this.code = code
+    }
 
     return Blockly
 }
@@ -87,7 +89,7 @@ blocks.toggle = async function({active = null, ask = false, load = false, create
         Blockly.Xml.domToWorkspace(xmlDom, this.editor.workspace)
     }
     else if (load){
-        this.load({xml: loadGlad.blocks})
+        this.load({xml: load})
     }
 
     new ResizeObserver(() => {
