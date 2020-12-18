@@ -1,5 +1,6 @@
 import {assets} from "./assets.js"
 import { loader } from "./loader.js"
+import { tutorial } from "./tutorial.js"
 
 export const spriteGen = {
     active: false,
@@ -202,8 +203,9 @@ spriteGen.init = async function(el){
 
             document.querySelector("#fog-skin .close").click()
 
-            // if (tutorial.getLesson() == 'skin')
-            //     tutorial.next(true)
+            if (tutorial.getLesson() == 'skin'){
+                tutorial.next(true)
+            }
         }
     })
 

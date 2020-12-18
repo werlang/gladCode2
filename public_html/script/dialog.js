@@ -314,12 +314,12 @@ class Message {
                         if (fn){
                             if (this.input){
                                 fn({
-                                    button: e.id.split('-')[2],
+                                    button: e.id.split('dialog-button-')[1],
                                     input: box.querySelector('.input').value
                                 })
                             }
                             else{
-                                fn({ button: e.id.split('-')[2] })
+                                fn({ button: e.id.split('dialog-button-')[1] })
                             }
                         }
         
@@ -334,7 +334,7 @@ class Message {
                             })
                         }
                         else{
-                            resolve({ button: e.id.split('-')[2] })
+                            resolve({ button: e.id.split('dialog-button-')[1] })
                         }    
                     })
                 })
