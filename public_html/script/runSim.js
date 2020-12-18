@@ -96,77 +96,100 @@ class Simulation{
 
 class ProgressButton {
     constructor(obj, text){
-        if (!(obj instanceof jQuery)){
-            obj = $(obj)
+        if (obj instanceof jQuery){
+            obj = $(obj)[0]
         }
 
-        this.oldhtml = obj.html();
+        this.oldhtml = obj.innerHTML
 
-        obj.html("<div id='bar'></div><div id='oldcontent'></div>");
-        obj.find('#bar').css({
-            'background-color':'#00638d',
-            'width':'0px',
-            'height':'100%',
-            'border-radius':'3px'
-        });
-        obj.prop('disabled','true');
-        obj.css('padding','0');
-        obj.append("<div id='oldcontent'></div>");
-        $('#oldcontent').css({
-            'display':'flex',
-            'align-items':'center',
-            'justify-content':'center',
-            'width':'100%',
-            'height':'100%',
-            'margin-top':obj.outerHeight()*-1
-        });
+        obj.innerHTML = "<div id='bar'></div><div id='oldcontent'><span></span></div>"
 
-        this.bsize = 0;
-        this.obj = obj;
-        var self = this;
-        var roul = 0, rcont = 0;
+        const bar = obj.querySelector('#bar')
+        bar.style['background-color'] = '#00638d'
+        bar.style['border-radius'] = '3px'
+        bar.style['width'] = '0px'
+        bar.style['height'] = '100%'
 
-        translator.translate(text).then(text => {
-            this.progint = setInterval(function(){
-                var maxtime = 20;
-                var uni = obj.width() / (maxtime * 100);
-                self.bsize += uni;
-                obj.find('#bar').width(self.bsize.toFixed(0));
-                obj.find('#oldcontent').html(text[roul]);
-                rcont++;
-                if (rcont % 200 == 0)
-                    roul = (roul + 1) % text.length;
-                if (obj.find('#bar').width() >= obj.width()){
-                    self.kill()
-                    translator.translate(["ERRO DE CONEXÃO", "Falha ao obter resposta do servidor dentro do tempo limite."]).then(text => showTerminal(text[0], text[1]))
-                }
-            }, 10);
+        obj.setAttribute('disabled', true)
+        obj.style.padding = 0
+
+        const old = obj.querySelector('#oldcontent')
+        old.style['display'] = 'flex'
+        old.style['align-items'] = 'center'
+        old.style['justify-content'] = 'center'
+        old.style['width'] = '100%'
+        old.style['height'] = '100%'
+        old.style['white-space'] = 'nowrap'
+        old.style['overflow-x'] = 'hidden'
+        old.style['margin-top'] = `-${obj.offsetHeight}px`
+        old.querySelector('span').innerHTML = text[0]
+
+        this.bsize = 0
+        this.obj = obj
+        this.active = true
+
+        const maxTime = 1020
+        const roulTime = 2
+        const uni = obj.offsetWidth / (maxTime * 100)
+        let roul = 0, rcont = 0
+
+        translator.translate(text).then(data => {
+            text = data
+            old.querySelector('span').innerHTML = text[0]            
         })
+
+        const run = () => {
+            if (bar.offsetWidth >= obj.offsetWidth){
+                this.active = false
+            }
+
+            if (this.active){
+                this.bsize += uni
+                bar.style.width = `${this.bsize.toFixed(0)}px`
+                
+                rcont++
+                if (rcont % (roulTime * 100) == 0){
+                    const span = old.querySelector('span')
+                    span.innerHTML = text[roul]
+                    span.style = {position: "absolute"}
+                    roul = (roul + 1) % text.length
+                    while (span.offsetWidth > old.offsetWidth - 15){
+                        const font = parseFloat(document.defaultView.getComputedStyle(span).getPropertyValue('font-size').split("px")[0])
+                        span.style['font-size'] = `${font - 0.1}px`
+                    }
+                }
+
+                setTimeout(() => run(), 10)
+            }
+            else {
+                // this.kill()
+                // translator.translate(["ERRO DE CONEXÃO", "Falha ao obter resposta do servidor dentro do tempo limite."]).then(text => showTerminal(text[0], text[1]))
+            }
+        }
+        run()
     }
 
     kill(){
-        clearInterval(this.progint);
-        this.obj.html(this.oldhtml);
-        this.obj.removeAttr('disabled');
-        $('#oldcontent').remove();
+        this.obj.innerHTML = this.oldhtml
+        this.obj.removeAttribute('disabled')
+        const old = this.obj.querySelector('#oldcontent')
+        old && old.remove()
     }
 
     set(text, porc){
-        this.obj.html("<div id='bar'></div>");
-        this.obj.find('#bar').css({'background-color':'#00638d','width':'0px','height':'100%','border-radius':'3px'});
-        this.obj.prop('disabled','true');
-        this.obj.css('padding','0');
-        this.obj.append("<div id='oldcontent'>"+ text +"</div>");
-        $('#oldcontent').css({'margin':this.obj.css('margin'),'display':'flex','align-items':'center','justify-content':'center','position':'absolute','top':this.obj.position().top,'left':this.obj.position().left,'width':this.obj.width(),'height':this.obj.height()});
-        this.bsize = this.obj.width() / 100 * porc;
-        this.obj.find('#bar').width(this.bsize.toFixed(0));
+        console.log("PROGRESSBAR: 'SET' METHOD IS DISABLED")
+        // this.obj.html("<div id='bar'></div>");
+        // this.obj.find('#bar').css({'background-color':'#00638d','width':'0px','height':'100%','border-radius':'3px'});
+        // this.obj.prop('disabled','true');
+        // this.obj.css('padding','0');
+        // this.obj.append("<div id='oldcontent'>"+ text +"</div>");
+        // $('#oldcontent').css({'margin':this.obj.css('margin'),'display':'flex','align-items':'center','justify-content':'center','position':'absolute','top':this.obj.position().top,'left':this.obj.position().left,'width':this.obj.width(),'height':this.obj.height()});
+        // this.bsize = this.obj.width() / 100 * porc;
+        // this.obj.find('#bar').width(this.bsize.toFixed(0));
     }
 
     isActive(){
-        if (this.obj.find('#oldcontent').length > 0)
-            return true;
-        else
-            return false;
+        return this.obj.querySelector('#oldcontent') ? true : false
     }
 }
 
