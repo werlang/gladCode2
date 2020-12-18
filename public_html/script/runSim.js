@@ -128,7 +128,7 @@ class ProgressButton {
         this.obj = obj
         this.active = true
 
-        const maxTime = 1020
+        const maxTime = 20
         const roulTime = 2
         const uni = obj.offsetWidth / (maxTime * 100)
         let roul = 0, rcont = 0

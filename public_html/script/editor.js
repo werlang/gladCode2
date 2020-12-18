@@ -640,22 +640,33 @@ buttons.save = {
 
 
 // handle editor resize when chat is toggled
-login.wait().then( () => loader.load("chat").then( ({chat}) => {
-    chat.init(document.querySelector('#chat-panel'), {
-        full: false,
-        expandWidth: "-65px"
-    }).then( async () => {
-        await codeEditor.isReady()
-        document.querySelector('#chat-panel #show-hide').addEventListener('click', () => {
-            setTimeout(() => {
-                const w = document.querySelector('#chat-panel').clientWidth
-                document.querySelector('#panel-right').style.width = `${w}px`
-                editor.resize()
-                document.querySelector('#float-card').style['margin-right'] = `${w}px`
-            }, 1000)
+login.wait().then(async () => {
+    if (login.user.logged){
+        loader.load("chat").then( ({chat}) => {
+            chat.init(document.querySelector('#chat-panel'), {
+                full: false,
+                expandWidth: "-65px"
+            }).then( async () => {
+                await codeEditor.isReady()
+                document.querySelector('#chat-panel #show-hide').addEventListener('click', () => {
+                    setTimeout(() => {
+                        const w = document.querySelector('#chat-panel').clientWidth
+                        document.querySelector('#panel-right').style.width = `${w}px`
+                        editor.resize()
+                        document.querySelector('#float-card').style['margin-right'] = `${w}px`
+                    }, 1000)
+                })
+            })
         })
-    })
-}))
+    }
+    else{
+        await codeEditor.isReady()
+        document.querySelector('#chat-panel').style.display = 'none'
+        document.querySelector('#panel-right').style.width = `0px`
+        editor.resize()
+        document.querySelector('#float-card').style['margin-right'] = `0px`
+    }
+})
 
 loader.load("jquery").then( () => $(document).ready(async () => {
     $('#header-editor').addClass('here')
