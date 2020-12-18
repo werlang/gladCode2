@@ -127,17 +127,14 @@ function mergeLog(data){
 }
 
 async function waitFor(callback, time){
-    if (!time){
-        time = 10
-    }
-
     return new Promise(resolve => {
         (function checkReady() {
-            if (callback()){
-                resolve(true)
+            const resp = callback()
+            if (resp){
+                resolve(resp)
             }
             else{
-                setTimeout(() => checkReady(), time);
+                setTimeout(() => checkReady(), time || 10)
             }
         })()
     })
