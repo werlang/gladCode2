@@ -3,6 +3,68 @@ import { header, login } from "./header.js"
 import { createToast, Message } from "./dialog.js"
 import { post, waitFor } from "./utils.js"
 import { tutorial } from "./tutorial.js"
+import { translator } from "./translate.js"
+
+const translatorReady = translator.translate([
+    "ABRIR",
+    "Aguarde",
+    "ALTERAR",
+    "BATALHA",
+    "Cancelar",
+    "CANCELAR",
+    "Dificuldade",
+    "Editar gladiador",
+    "Editor de gladiadores",
+    "Gravando alterações no gladiador",
+    "Habilidades e efeitos",
+    "Introdução e conceitos",
+    "Leitura",
+    "Manual da gladCode",
+    "Preferências do editor",
+    "Programação com blocos",
+    "Programando gladiadores",
+    "Que tipo de ajuda você gostaria?",
+    "Referência das funções",
+    "Selecione os gladiadores que serão os oponentes de ",
+    "Selecione um de seus gladiadores",
+    "Tamanho da fonte",
+    "Temas",
+    "Testar gladiador",
+    "Vídeo",
+    "Visualização",
+]).then(() => {
+    document.querySelector("#fog-glads").innerHTML = `<div id='open-glad'>
+        <div id='message'>
+            <h2>${translator.getTranslated("Editar gladiador")}</h2>
+            <h3>${translator.getTranslated("Selecione um de seus gladiadores")}</h3>
+        </div>
+        <div class='glad-card-container'></div>
+        <div id='button-container'>
+            <button id='btn-glad-cancel' class='button'>${translator.getTranslated("CANCELAR")}</button>
+            <button id='btn-glad-open' class='button' disabled>${translator.getTranslated("ABRIR")}</button>
+        </div>
+    </div>`
+
+    document.querySelector("#fog-battle").innerHTML = `<div id='battle-window'>
+        <div id='message'>
+            <h2>${translator.getTranslated("Testar gladiador")}</h2>
+            <h3></h3>
+        </div>
+        <div id='selection-container'>
+            <div id='list-container'>
+                <div id='list-title'><span></span><img src='icon/death-skull.png' title='${translator.getTranslated("Dificuldade", false)}'></div>
+                <div id='list'></div>
+            </div>
+            <div class='glad-card-container'></div>
+        </div>
+        <div id='button-container'>
+            <button id='btn-cancel' class='button'>${translator.getTranslated("CANCELAR")}</button>
+            <button id='btn-battle' class='button' disabled>${translator.getTranslated("BATALHA")}</button>
+        </div>
+    </div>`
+})
+
+translator.translate(document.querySelector('#frame #panel-left'))
 
 header.load()
 
@@ -257,7 +319,7 @@ buttons.skin = {
 
             codeEditor.saved = false
             codeEditor.tested = false
-            
+
             loadGlad = glad
             buttons.save.enable()
             buttons.test.enable()
@@ -292,6 +354,7 @@ buttons.open = {
         });
     },
     click: async function(){
+        await translatorReady
         const container = document.querySelector('#fog-glads .glad-card-container')
         if (container.innerHTML == ""){
             container.innerHTML = `<i class='fas fa-spinner fa-pulse'></i>`
@@ -371,7 +434,7 @@ buttons.test = {
             this.bindGladList(e, Object.values(sampleGlads)[i].filename)
             document.querySelector('#fog-battle #list').appendChild(e)
         })
-        
+
         login.wait().then(async data => {
             user = data
             if (user.status == "SUCCESS" ){
@@ -409,8 +472,8 @@ buttons.test = {
             else{
                 document.querySelector('#fog-battle').classList.add('hidden')
             }
-        }) 
-        
+        })
+
         document.querySelector('#fog-battle #btn-battle').addEventListener('click', async () => {
             let glads = []
             document.querySelectorAll('#fog-battle #list .glad.selected').forEach(e => {
@@ -456,7 +519,7 @@ buttons.test = {
                             });
                             wannaSave = false;
                         }
-    
+
                         tutorial.show([
                             'watchCodeMove',
                             'moveBackForth',
@@ -493,7 +556,7 @@ buttons.test = {
             }
             else if (document.querySelectorAll('#fog-battle #list .glad.selected').length < 4){
                 obj.classList.add('selected')
-                
+
                 loader.load("gladcard").then( async ({gladCard}) => {
                     if (filename){
                         info = await gladCard.getFromFile(filename)
@@ -546,7 +609,8 @@ buttons.test = {
 
             if (t === false){
                 buttons.fade(document.querySelector('#fog-battle'))
-                document.querySelector('#fog-battle h3 span').innerHTML = loadGlad.name
+                document.querySelector('#fog-battle h3').innerHTML = `<span>Selecione os gladiadores que serão os oponentes de <ignore><span id='name'>${loadGlad.name}</span></ignore></span>`
+                translator.translate(document.querySelector('#fog-battle h3'))
             }
         }
 
@@ -562,9 +626,9 @@ buttons.test = {
         this.progress = new ProgressButton(button, ["Executando batalha...","Aguardando resposta do servidor"]);
 
         const breakpoints = Array.from(document.querySelectorAll('.ace_breakpoint')).filter(e => e.textContent)
-    
+
         glads.push(appendSetup(loadGlad.code))
-    
+
         // console.log(loadGlad)
         return new Promise(resolve => {
             // console.log(glads)
@@ -670,7 +734,7 @@ buttons.save = {
                 else{
                     document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog' class='save'>
                         <div id='save-box'>
-                            <div id='message'>Gravando alterações no gladiador <span class='highlight'>${loadGlad.name}</span>. Aguarde...</div>
+                            <div id='message'>${translator.getTranslated("Gravando alterações no gladiador")} <span class='highlight'>${loadGlad.name}</span>. ${translator.getTranslated("Aguarde")}...</div>
                             <div id='button-container'><button class='button'>OK</button></div>
                         </div>
                     </div>`)
@@ -748,6 +812,7 @@ login.wait().then(async () => {
 })
 
 loader.load("jquery").then( () => $(document).ready(async () => {
+    await header.wait()
     $('#header-editor').addClass('here')
     document.querySelector('#header-container').classList.add('small')
     await codeEditor.isReady()
@@ -771,7 +836,7 @@ loader.load("jquery").then( () => $(document).ready(async () => {
 
             editor.setTheme("ace/theme/"+ user.theme);
             editor.setFontSize(user.font +"px");
-            
+
             // load glad from url
             const gladDiv = document.querySelector('#glad-code')
 
@@ -912,18 +977,44 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         blocks.toggle({ask: true})
     })
 
-    $('#settings').click( function(){
-        var themes = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn", "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic", "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal", "textmate", "tomorrow", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "tomorrow_night", "twilight", "vibrant_ink", "xcode"];
+    document.querySelector('#settings').addEventListener('click', () => {
+        const themes = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn", "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic", "katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal", "textmate", "tomorrow", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "tomorrow_night", "twilight", "vibrant_ink", "xcode"]
 
-        $('body').append("<div id='fog'><div id='settings-window'><div id='title'><h2>Preferências do editor</h2></div><div id='settings-content'><div id='options'><h3>Temas</h3><div id='list'></div><h3>Tamanho da fonte</h3><div id='font-size'><button class='button font-small'><img src='icon/font_minus.png'></button><button class='button font-big'><img src='icon/font_plus.png'></button></div></div><div id='sample'><h3>Visualização</h3><pre id='code-sample'></pre></div></div><div id='button-container'><button class='button' id='cancel'>Cancelar</button><button class='button' id='change'>ALTERAR</button></div></div></div>");
+        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
+            <div id='settings-window'>
+                <div id='title'>
+                    <h2>${translator.getTranslated("Preferências do editor")}</h2>
+                </div>
+                <div id='settings-content'>
+                    <div id='options'>
+                        <h3>${translator.getTranslated("Temas")}</h3>
+                        <div id='list'></div>
+                        <h3>${translator.getTranslated("Tamanho da fonte")}</h3>
+                        <div id='font-size'>
+                            <button class='button font-small'><img src='icon/font_minus.png'></button>
+                            <button class='button font-big'><img src='icon/font_plus.png'></button>
+                        </div>
+                    </div>
+                    <div id='sample'>
+                        <h3>${translator.getTranslated("Visualização")}</h3>
+                        <pre id='code-sample'></pre>
+                    </div>
+                </div>
+                <div id='button-container'>
+                    <button class='button' id='cancel'>${translator.getTranslated("Cancelar")}</button>
+                    <button class='button' id='change'>${translator.getTranslated("ALTERAR")}</button>
+                </div>
+            </div>
+        </div>`)
 
-        for (var i in themes){
-            $('#settings-window #list').append("<div class='theme'>"+ themes[i] +"</div>");
-            if (user.logged && user.theme == themes[i] || !user.logged && themes[i] == "dreamweaver")
-                $('#settings-window #list .theme').last().addClass('selected');
-        }
+        themes.forEach(t => {
+            $('#settings-window #list').append(`<div class='theme'>${t}</div>`)
+            if (user.logged && user.theme == t || !user.logged && t == "dreamweaver"){
+                $('#settings-window #list .theme').last().addClass('selected')
+            }
+        })
 
-        var sample = ace.edit("code-sample");
+        const sample = ace.edit("code-sample")
         if (user.logged){
             sample.setTheme("ace/theme/"+ user.theme);
             sample.setFontSize(user.font +"px");
@@ -977,8 +1068,17 @@ loader.load("jquery").then( () => $(document).ready(async () => {
         });
     });
 
-    $('#help').click( function(){
-        $('body').append("<div id='fog'><div id='help-window'><div id='title'>Que tipo de ajuda você gostaria?</div><div id='cat-container'><div id='docs' class='categories'><img src='icon/document.png'><span>Leitura</span></div><div id='video' class='categories'><img src='icon/video.png'><span>Vídeo</span></div><div id='tutorial' class='categories'><img src='icon/tutor.png'><span>Tutorial</span></div></div>");
+    document.querySelector("#help").addEventListener('click', () => {
+        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
+            <div id='help-window'>
+                <div id='title'>${translator.getTranslated("Que tipo de ajuda você gostaria?")}</div>
+                <div id='cat-container'>
+                    <div id='docs' class='categories'><img src='icon/document.png'><span class='text'>${translator.getTranslated("Leitura")}</span></div>
+                    <div id='video' class='categories'><img src='icon/video.png'><span class='text'>${translator.getTranslated("Vídeo")}</span></div>
+                    <div id='tutorial' class='categories'><img src='icon/tutor.png'><span class='text'>Tutorial</span></div>
+                </div>
+            </div>
+        </div>`)
 
         $('#fog').hide().fadeIn();
         $('#fog').click( function(){
@@ -995,7 +1095,10 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 $('#help-window .categories').removeClass('selected');
                 $(this).addClass('selected');
                 $('#help-window #subcat').remove();
-                $('#help-window').append("<div id='subcat'><a href='manual' class='button' target='_blank'>Manual da gladCode</a><a href='docs' class='button' target='_blank'>Referência das funções</a></div>");
+                $('#help-window').append(`<div id='subcat'>
+                    <a href='manual' class='button' target='_blank'>${translator.getTranslated("Manual da gladCode")}</a>
+                    <a href='docs' class='button' target='_blank'>${translator.getTranslated("Referência das funções")}</a>
+                </div>`)
                 $('#help-window #subcat').hide().slideDown();
             }
         });
@@ -1005,7 +1108,13 @@ loader.load("jquery").then( () => $(document).ready(async () => {
                 $('#help-window .categories').removeClass('selected');
                 $(this).addClass('selected');
                 $('#help-window #subcat').remove();
-                $('#help-window').append("<div id='subcat'><button class='video button' data-video='te1M98UDKiM'>Introdução e conceitos</button><button class='video button' data-video='tjMjqQ14AS8'>Editor de gladiadores</button><button class='video button' data-video='Wrc-0_Kq-_4'>Programando gladiadores</button><button class='video button' data-video='5QQtfruq8_8'>Habilidades e efeitos</button><button class='video button' data-video='hzxe5rmyODI'>Programação com blocos</button></div>");
+                $('#help-window').append(`<div id='subcat'>
+                    <button class='video button' data-video='te1M98UDKiM'>${translator.getTranslated("Introdução e conceitos")}</button>
+                    <button class='video button' data-video='tjMjqQ14AS8'>${translator.getTranslated("Editor de gladiadores")}</button>
+                    <button class='video button' data-video='Wrc-0_Kq-_4'>${translator.getTranslated("Programando gladiadores")}</button>
+                    <button class='video button' data-video='5QQtfruq8_8'>${translator.getTranslated("Habilidades e efeitos")}</button>
+                    <button class='video button' data-video='hzxe5rmyODI'>${translator.getTranslated("Programação com blocos")}</button>
+                </div>`)
                 $('#help-window #subcat').hide().slideDown();
 
                 $('#help-window .video.button').click( function(){
@@ -1036,7 +1145,7 @@ function appendSetup(){
     }
     else if (language == "python" || language == 'blocks'){
         setup = `def setup():\n    setName(\"${loadGlad.name}\")\n    setSTR(${loadGlad.vstr})\n    setAGI(${loadGlad.vagi})\n    setINT(${loadGlad.vint})\n    setSkin(\"${loadGlad.skin}\")\n    setUser(\"${loadGlad.user}\")\n    setSlots(\"-1,-1,-1,-1\")\n# start of user code\n`
-        
+
         if (language == 'blocks'){
             loadGlad.blocks = blocks.save()
         }

@@ -8,36 +8,7 @@
     <title>gladCode - Editor</title>
     <link rel='stylesheet' href="css/editor.css"/>
     <script type="module" src="script/editor.js" async></script>
-
-
-<!-- 
-    <link rel='stylesheet' href="css/sprite.css"/>
-    <link rel='stylesheet' href="css/slider.css"/>
--->
-<!-- 
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
- -->
-<!-- 
-    <script src="script/assets.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/tutorial.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/emoji.js"></script>
-    <script src="script/chat.js"></script>
-    <script src="script/blocks.js"></script>
-     -->
-    </head>
+</head>
 <body>
     <?php
         if (isset($_GET['g'])){
@@ -89,39 +60,8 @@
         </div>
     </div>
     <div id='fog-skin' class='fog hidden'></div>
-    <div id='fog-glads' class='fog hidden'>
-        <div id='open-glad'>
-            <div id='message'>
-                <h2>Editar gladiador</h2>
-                <h3>Selecione um de seus gladiadores</h3>
-            </div>
-            <div class='glad-card-container'></div>
-            <div id='button-container'>
-                <button id='btn-glad-cancel' class='button'>CANCELAR</button>
-                <button id='btn-glad-open' class='button' disabled>ABRIR</button>
-            </div>
-        </div>
-    </div>
-    <div id='fog-battle' class='fog hidden'>
-        <div id='battle-window'>
-            <div id='message'>
-                <h2>Testar gladiador</h2>
-                <h3>Selecione os gladiadores que serão os oponentes de <span></span></h3>
-            </div>
-            <div id='selection-container'>
-                <div id='list-container'>
-                    <div id='list-title'><span></span><img src='icon/death-skull.png' title='Dificuldade'></div>
-                    <div id='list'></div>
-                </div>
-                <div class='glad-card-container'>
-                </div>
-            </div>
-            <div id='button-container'>
-                <button id='btn-cancel' class='button'>CANCELAR</button>
-                <button id='btn-battle' class='button' disabled>BATALHA</button>
-            </div>
-        </div>
-    </div>
+    <div id='fog-glads' class='fog hidden'></div>
+    <div id='fog-battle' class='fog hidden'></div>
     <div id='chat-panel'></div>
 </body>
 </html>
