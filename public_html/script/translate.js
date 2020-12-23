@@ -290,7 +290,7 @@ translator.bind = function (obj){
                                 e.preventDefault()
                                 e.stopPropagation()
                                 this.remove()
-                                let text = obj.textContent.trim()
+                                let text = obj.textContent.trim() || obj.getAttribute('placeholder') || obj.getAttribute('tooltip') || obj.getAttribute('tooltip') 
 
                                 if (document.querySelector('#dialog-box')){
                                     document.querySelector('#dialog-box').closest('#fog').remove()
