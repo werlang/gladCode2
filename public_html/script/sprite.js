@@ -1,6 +1,25 @@
 import {assets} from "./assets.js"
 import { loader } from "./loader.js"
 import { tutorial } from "./tutorial.js"
+import { translator } from "./translate.js"
+
+const translatorReady = translator.translate([
+    "Agilidade, rapidez e destreza do gladiador.",
+    "Agilidade",
+    "Dano físico, o dano causado com armas corpo-a-corpo",
+    "Força física e resistência do gladiador.",
+    "Força",
+    "Inteligência",
+    "Poder mágico, o dano causado com habilidades mágicas",
+    "Pontos de habilidade, usados para lançar habilidades",
+    "Pontos de vida, responsáveis por manter o gladiador vivo",
+    "Precisão, o dano causado com armas à distância",
+    "Rapidez de raciocínio e Capacidade intelectual do gladiador.",
+    "Velocidade de execução de ataques",
+    "Velocidade de execução de uma habilidade",
+    "Velocidade de movimento dentro da arena",
+    "Determina as seguintes características",
+])
 
 export const spriteGen = {
     active: false,
@@ -68,6 +87,7 @@ spriteGen.init = async function(el){
     // console.log(this.childTree)
 
     el.innerHTML = await (await fetch('glad-create.html')).text()
+    translator.translate(el)
 
     document.querySelectorAll('.img-button.sub').forEach(e => e.classList.add('hidden'))
     document.querySelector('#middle-container').appendChild(this.canvas)
@@ -237,39 +257,40 @@ spriteGen.init = async function(el){
     }))
 
     // slider hover info
-    document.querySelectorAll('#distribuicao .slider-container').forEach(e => e.addEventListener('mouseenter', () => {
+    document.querySelectorAll('#distribuicao .slider-container').forEach(e => e.addEventListener('mouseenter', async () => {
         const text = {
             str: {
                 'path': 'sprite/images/strength.png',
-                'title': 'Força - STR',
-                'description': 'Força física e resistência do gladiador.',
+                'title': `${translator.getTranslated("Força")} - STR`,
+                'description': translator.getTranslated("Força física e resistência do gladiador."),
                 'list': [
-                    {'path': 'sprite/images/decapitation.png',	'description': 'Dano físico, o dano causado com armas corpo-a-corpo'},
-                    {'path': 'sprite/images/healing.png',	'description': 'Pontos de vida, responsáveis por manter o gladiador vivo'}
+                    {'path': 'sprite/images/decapitation.png',	'description': translator.getTranslated("Dano físico, o dano causado com armas corpo-a-corpo")},
+                    {'path': 'sprite/images/healing.png',	'description': translator.getTranslated("Pontos de vida, responsáveis por manter o gladiador vivo")}
                 ]
             },
             agi: {
                 'path': 'sprite/images/agility.png',
-                'title': 'Agilidade - AGI',
-                'description': 'Agilidade, rapidez e destreza do gladiador.',
+                'title': `${translator.getTranslated("Agilidade")} - AGI`,
+                'description': translator.getTranslated("Agilidade, rapidez e destreza do gladiador."),
                 'list': [
-                    {'path': 'sprite/images/bullseye.png',	'description': 'Precisão, o dano causado com armas à distância'},
-                    {'path': 'sprite/images/sprint.png',	'description': 'Velocidade de movimento dentro da arena'},
-                    {'path': 'sprite/images/blades.png',	'description': 'Velocidade de execução de ataques'}
+                    {'path': 'sprite/images/bullseye.png',	'description': translator.getTranslated("Precisão, o dano causado com armas à distância")},
+                    {'path': 'sprite/images/sprint.png',	'description': translator.getTranslated("Velocidade de movimento dentro da arena")},
+                    {'path': 'sprite/images/blades.png',	'description': translator.getTranslated("Velocidade de execução de ataques")}
                 ]
             },
             int: {
                 'path': 'sprite/images/smart.png',
-                'title': 'Inteligência - INT',
-                'description': 'Rapidez de raciocínio e Capacidade intelectual do gladiador.',
+                'title': `${translator.getTranslated("Inteligência")} - INT`,
+                'description': translator.getTranslated("Rapidez de raciocínio e Capacidade intelectual do gladiador."),
                 'list': [
-                    {'path': 'sprite/images/energy.png',	'description': 'Poder mágico, o dano causado com habilidades mágicas'},
-                    {'path': 'sprite/images/3balls.png',	'description': 'Velocidade de execução de uma habilidade'},
-                    {'path': 'sprite/images/energise.png',	'description': 'Pontos de habilidade, usados para lançar habilidades'}
+                    {'path': 'sprite/images/energy.png',	'description': translator.getTranslated("Poder mágico, o dano causado com habilidades mágicas")},
+                    {'path': 'sprite/images/3balls.png',	'description': translator.getTranslated("Velocidade de execução de uma habilidade")},
+                    {'path': 'sprite/images/energise.png',	'description': translator.getTranslated("Pontos de habilidade, usados para lançar habilidades")}
                 ]
             }
         }
         // console.log(text[e.id])
+        await translatorReady
 
         document.querySelector('#info').innerHTML = `
         <div id='title'>
@@ -277,7 +298,7 @@ spriteGen.init = async function(el){
         </div>
         <div id='body'>
             <p class='fill'>${text[e.id].description}</p>
-            <p>Determina as seguintes características:</p>
+            <p>${translator.getTranslated("Determina as seguintes características")}:</p>
             <ul>${text[e.id].list.map(e => `<li><div class='blue'><img src='${e.path}'></div><span>${e.description}</span></li>`).join("")}</ul>
         </div>`
     }))

@@ -27,6 +27,7 @@ const translatorReady = translator.translate([
     "Referência das funções",
     "Selecione os gladiadores que serão os oponentes de ",
     "Selecione um de seus gladiadores",
+    "selecionados",
     "Tamanho da fonte",
     "Temas",
     "Testar gladiador",
@@ -578,7 +579,7 @@ buttons.test = {
             const rows_selected = document.querySelectorAll('#fog-battle #list .glad.selected')
             if (rows_selected.length > 0){
                 document.querySelector('#fog-battle #btn-battle').removeAttribute('disabled')
-                document.querySelector('#fog-battle #list-title span').innerHTML = rows_selected.length +" selecionados"
+                document.querySelector('#fog-battle #list-title span').innerHTML = `${rows_selected.length} ${translator.getTranslated("selecionados")}`
             }
             else{
                 document.querySelector('#fog-battle #btn-battle').setAttribute('disabled',true)
