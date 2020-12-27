@@ -9,10 +9,10 @@
         $user = $_SESSION['user'];
 
     $output = array();
-    $outtext = ""; 
+    $outtext = "";
     $error = "";
     $cancel_run = false;
-    
+
     $foldername = md5('folder'.microtime()*rand());
     $path = "/home/gladcode";
 
@@ -67,7 +67,7 @@
             if ($row['log'] == null){
                 $sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
                 $result = runQuery($sql);
-    
+
                 while($row = $result->fetch_assoc()){
                     array_push($glads, $row['gladiator']);
                 }
@@ -96,7 +96,7 @@
             if (is_null($row['log'])){
                 $sql = "SELECT gladiator FROM gladiator_training WHERE groupid = '$groupid'";
                 $result = runQuery($sql);
-    
+
                 while($row = $result->fetch_assoc()){
                     array_push($glads, $row['gladiator']);
                 }
@@ -139,7 +139,7 @@
                     $row = $result->fetch_assoc();
                     $skins[$name .'@'. $nick] = $row['skin'];
                 }
-            }	
+            }
 
             $pattern = '/setName\("([\w À-ú]+?)"\)/';
             $replacement = 'setName("$1@'. $nick .'")';
@@ -175,7 +175,7 @@
                 $hint = preg_replace('/\s*(.*?)[{};]*\n/', "$1", $code[$line]);
                 $code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
                 $code = preg_replace($pattern, $replacement, $code);
-                    
+
             }
         }
         else if ($language == 'python'){
@@ -194,7 +194,7 @@
                 $hint = preg_replace('/(\s*)(.*)/', "$2", $code[$line]);
                 $tab = preg_replace('/(\s*)(.*)/', "$1", $code[$line]);
                 $code[$line] = $tab ."breakpoint(\"". $hint ."\")". PHP_EOL . $code[$line];
-                    
+
             }
         }
 
@@ -265,9 +265,9 @@
 
     if ($cancel_run)
         $output['simulation'] = null;
-    elseif (!$invalid_attr){		
+    elseif (!$invalid_attr){
         system("$path/script/call_socket.sh $foldername &>> $path/temp/$foldername/error.txt");
-        
+
         if (file_exists("$path/temp/$foldername/outputc.txt"))
             $outtext .= file_get_contents ("$path/temp/$foldername/outputc.txt");
         if (file_exists("$path/temp/$foldername/outputs.txt"))
@@ -281,14 +281,14 @@
 
         $spechar = array("\n", "\r", "\t", "\"");
         $repchar = array("\\n", "\\r", "\\t", '\\"');
-        
+
         if ($error != ""){
             $error = str_replace($spechar, $repchar, $error);
         }
         if ($outtext != ""){
             $outtext = str_replace($spechar, $repchar, $outtext);
         }
-        
+
         //stream the file contents
         if ($error == "" && file_exists("$path/temp/$foldername/simlog")){
             if (isset($args['savecode']) && $args['savecode'] === true){
@@ -336,7 +336,7 @@
             //$output['test'] = json_encode($simulation);
 
             $file = json_encode($simulation);
-            
+
             $hash = save_log($conn, $file, $args['origin']);
 
             if (isset($args['ranked'])){
@@ -371,24 +371,24 @@
                     $result = runQuery($sql);
                 }
             }
-			if (isset($args['training']) && $groupid != null){
-				$sql = "SELECT id FROM logs WHERE hash = '$hash'";
-				$result = runQuery($sql);
-				$row = $result->fetch_assoc();
+            if (isset($args['training']) && $groupid != null){
+                $sql = "SELECT id FROM logs WHERE hash = '$hash'";
+                $result = runQuery($sql);
+                $row = $result->fetch_assoc();
                 $logid = $row['id'];
 
-				$sql = "SELECT tg.log, t.hash FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id INNER JOIN training t ON t.id = gt.training WHERE tg.id = $groupid";
-				$result = runQuery($sql);
-				$row = $result->fetch_assoc();
-				if (is_null($row['log'])){
-					$sql = "UPDATE training_groups SET log = '$logid' WHERE id = '$groupid'";
+                $sql = "SELECT tg.log, t.hash FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id INNER JOIN training t ON t.id = gt.training WHERE tg.id = $groupid";
+                $result = runQuery($sql);
+                $row = $result->fetch_assoc();
+                if (is_null($row['log'])){
+                    $sql = "UPDATE training_groups SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
-                    
+
                     send_node_message(array('training refresh' => array(
                         'hash' => $row['hash']
                     )));
-				}
-			}
+                }
+            }
 
             $output['simulation'] = $hash;
             //echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"$hash\"}";
@@ -396,7 +396,7 @@
         $output['error'] = $error;
         $output['output'] = $outtext;
             //echo "{\"error\":\"$error\",\"output\":\"$output\",\"simulation\":\"\"}";
-        
+
     }
     else{
         //echo "{\"error\":\"INVALID_ATTR\",\"output\":\"\",\"simulation\":\"\"}";
@@ -406,7 +406,7 @@
     echo json_encode($output);
 
     system("rm -rf $path/temp/$foldername");
-    
+
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
         $hash = codeMatch($subject, $pattern);
@@ -428,7 +428,7 @@
         $pattern = '/setSTR\(([\d]{1,2})\)[;]{0,1}/';
         return codeMatch($subject, $pattern);
     }
-    
+
     function getAGI($subject) {
         $pattern = '/setAGI\(([\d]{1,2})\)[;]{0,1}/';
         return codeMatch($subject, $pattern);
@@ -471,7 +471,7 @@
 
         $sql = "INSERT INTO logs (time, version, hash, origin) VALUES (now(), '$version', '$hash', '$origin')";
         $result = runQuery($sql);
-        
+
         $id = $conn->insert_id;
         file_put_contents("logs/$id", gzencode($log));
         return $hash;
@@ -504,7 +504,7 @@
 
         $nglads = count($glads);
         $rewards = updateMMR($glads, $conn);
-        
+
         $glad_rewards = array();
         foreach($glads as $i => $glad)
             $glad_rewards[$glad['id']] = $rewards[$i];
@@ -519,10 +519,10 @@
         $glad = $glads[$thisglad];
         $lvl = $glad['masterlvl'];
         $xp = $glad['masterxp'];
-        
+
         /*
             $income = 1000 + 30% de bonus em cima do mmr = dinheiro que a arena arrecadou
-            $silver = income * 
+            $silver = income *
                 0.7 -> 30% lucro do governo
                 300 -> manutencao da arena
                 /10 -> /2 porque metade é apostas e metade é ingressos, /5 porque os ingressos vao pra cada gladiador
@@ -551,9 +551,9 @@
         // get how many battles with bonus today
         $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.bonus = '1'";
         $result = runQuery($sql);
-        // cut silver if not managed battle        
+        // cut silver if not managed battle
         $silver = $result->num_rows < 20 ? $silver : $silver / 10;
-        
+
         /*
         y = ax+b;
         a = 2; b = 0 = numeros de lutas que precisa ganhar
@@ -570,7 +570,7 @@
             $lvl++;
             $xp -= $tonext;
         }
-        
+
         $sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp', silver = silver + $silver WHERE id = '$user'";
         $result = runQuery($sql);
 
@@ -583,27 +583,27 @@
 
     function updateMMR($glads, $conn){
         $reward = calcReward($glads);
-                
+
         foreach($glads as $i => $glad){
             $mmr = $reward[$i];
             $id = $glad['id'];
-            
+
             $sql = "UPDATE gladiators SET mmr = mmr + '$mmr' WHERE cod = '$id'";
             $result = runQuery($sql);
-        }		
-        
+        }
+
         return $reward;
     }
-    
+
     function calcReward($glads){
         $maxReward = 10;
         $timeWeight = 1.5;
         $winWeight = 1;
         $nglad = count($glads);
-        
+
         $rewardRaw = array();
         $timeDiff = $glads[1]['time'] - $glads[$nglad-1]['time'];
-        
+
         $avgmmr = 0;
         foreach($glads as $i => $glad){
             $diff = $glad['time'] - $glads[$nglad-1]['time'];
@@ -624,27 +624,27 @@
         $evenReward = array_sum($rewardRaw) / $nglad;
         $rewardWeighted = array();
         $rewardDev = array();
-        
+
         foreach($glads as $i => $glad){
             $rewardWeighted[$i] = $rewardRaw[$i] - $evenReward;
             $rewardNorm = $rewardWeighted[$i] / $rewardWeighted[0] * $maxReward;
 
             $mmrDev = $glad['mmr'] / $avgmmr;
-            
+
             if ($rewardNorm > 0)
                 $rewardDev[$i] = $rewardNorm / max($mmrDev, 0.5);
             else
                 $rewardDev[$i] = $rewardNorm * min($mmrDev, 2);
-            
+
             //faz perder menos quanto mais próximo de mmr 0
-            if ($rewardDev[$i] < 0 && $glad['mmr'] < 1000){ 
+            if ($rewardDev[$i] < 0 && $glad['mmr'] < 1000){
                 $bias = 0.001 * $glad['mmr'] - 1;
                 $rewardDev[$i] = $rewardDev[$i] + $rewardDev[$i] * $bias;
             }
-        }		
-        
+        }
+
         return $rewardDev;
-    }	
+    }
 
     function death_times($conn, $ids, $log){
         $log = json_decode($log, true);
@@ -698,7 +698,7 @@
         $result = runQuery($sql);
         $row = $result->fetch_assoc();
         $log = $row['id'];
-        
+
         $masters = array();
         foreach($rewards as $glad => $reward){
             $sql = "SELECT master FROM gladiators WHERE cod = $glad";
@@ -710,7 +710,7 @@
                 $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.bonus = '1'";
                 $result = runQuery($sql);
                 $bonus = $result->num_rows < 20 ? 1 : 0;
-                
+
                 $fields = "(log, gladiator, reward, started, bonus)";
                 $values = "('$log', '$glad', '$reward', '1', '$bonus')";
             }
@@ -733,7 +733,7 @@
         $language = "c";
         if (strpos($code, "def loop():") !== false)
             $language = "python";
-        
+
         return $language;
     }
 ?>

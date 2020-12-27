@@ -3,8 +3,8 @@
     session_start();
     $output = array();
 
-    if ($_POST['action'] == "GET"){
-        $loghash = $_POST['loghash'];
+    if ($_POST['action'] == "GET" || isset($_GET['log'])){
+        $loghash = isset($_GET['log']) ? $_GET['log'] : $_POST['loghash'];
         $sql = "SELECT * FROM logs WHERE hash = '$loghash'";
         $result = runQuery($sql);
         $nrows = $result->num_rows;

@@ -87,6 +87,7 @@ int initClient(){
 		if (!attempts)
 			return 0;
 		*/
+        usleep(10000); // 10ms
     }
 	//printf("Connected");
     return 1;
