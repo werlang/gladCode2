@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <?php
     $log = "";
-    $tnm = "";
     if (isset($_GET['log']))
         $loghash = mysql_escape_string( $_GET['log']);
-    if (isset($_GET['t']))
-        $tnm = mysql_escape_string($_GET['t']);
 
     if (strpos($_SERVER['REQUEST_URI'], "playback.php?log=") !== false){
         header("Location: play/". $loghash);
@@ -54,7 +51,6 @@
         </div>
     </div>
     <div id='log' hidden><?php echo $loghash; ?></div>
-    <div id='tourn' hidden><?php echo $tnm; ?></div>
     <div id='frame'>
         <div id='canvas-container'>
             <div id='ui-container'></div>

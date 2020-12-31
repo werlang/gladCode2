@@ -420,7 +420,7 @@ buttons.test = {
     init: function(){
         const num = ["","one","two","three"];
         let enemyBox = ""
-        for (var i in sampleGlads){
+        for (let i in sampleGlads){
             enemyBox += `<div class='glad'>
                 <div class='name'>${i}</div>
                 <div class='diff ${num[sampleGlads[i].difficulty]}'>

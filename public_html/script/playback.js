@@ -8,7 +8,7 @@ var timestep = 0;
 var pausesim = true;
 var stepIncrement = 1;
 var istep;
-var tournHash, loghash;
+var loghash;
 var fullscreen = false;
 var timeSlider = 0; 
 var potionList = {}
@@ -17,11 +17,6 @@ $(document).ready( function() {
     $('#loadbar #status').html("Página carregada");
 
     $('#footer-wrapper').addClass('white');
-
-    if ($('#tourn').html().length){
-        tournHash = $('#tourn').html();
-    }
-    $('#tourn').remove();
     
     if ($('#log').html().length){
         var log;
@@ -102,12 +97,8 @@ $(document).ready( function() {
                         clearInterval(istep)
                     }
                     else if (data.status != "SUCCESS"){
-                        if (tournHash)
-                            window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
-                        else{
-                            // window.location.href = "https://gladcode.dev";
-                            $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`)
-                        }
+                        // window.location.href = "https://gladcode.dev";
+                        $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`)
                         clearInterval(istep)
                     }
                     else{
@@ -633,8 +624,6 @@ function start_timer(steps){
                 $('#end-message #retornar').click( function() {
                     show_final_score = false;
                     $('#fog').remove();
-                    if (tournHash)
-                        window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
                 });
 
                 $('#end-message #share').click( function() {
