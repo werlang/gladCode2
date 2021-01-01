@@ -15,7 +15,8 @@
     <BASE href="../">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Visualizar batalha</title>
-    <link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
+
+    <!-- <link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     
     <link rel='stylesheet' href="css/checkboxes.css"/>
@@ -33,9 +34,12 @@
     <script src="script/dialog.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/playback.js"></script>
-    <script src="script/socket.js"></script>
-    
-    </head>
+    <script src="script/socket.js"></script> -->
+
+    <link rel='stylesheet' href="css/playback.css"/>
+    <script type="module" src="script/playback.js" async></script>
+
+</head>
 <body>
     <div id='fog' class='load'>
         <div id='loadbar'>
@@ -62,7 +66,7 @@
                     <div class='button' id='fullscreen' title='Modo tela cheia'><img src='icon/full_screen.png'></div>
                     <div class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></div>
                     <div class='button' id='fowd-step' title='Avançar simulação'><div class='speed'>1x</div></div>
-                    <div class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png' hidden><img id='img-pause' src='icon/pause.png'></div>
+                    <div class='button' id='pause' title='Parar/Continuar simulação'><img id='img-play' src='icon/play.png'><img id='img-pause' src='icon/pause.png'></div>
                     <div class='button' id='sound' title='Áudio normal/mudo'><img src='icon/music.png'></div>
                     <div class='button' id='help' title='Ajuda'><img src='icon/question.png'></div>
                 </div>

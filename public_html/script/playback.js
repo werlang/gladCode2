@@ -1,23 +1,231 @@
-const { mergeLog } = require("./utils");
+import { mergeLog } from "./utils.js"
+import { loader } from "./loader.js"
+import { header } from "./header.js"
 
-var code;
 var json = {};
 var hashes = [], newindex = new Array();
 var steps = new Array();
-var timestep = 0;
-var pausesim = true;
-var stepIncrement = 1;
 var istep;
 var loghash;
 var fullscreen = false;
 var timeSlider = 0; 
 var potionList = {}
 
-$(document).ready( function() {
-    $('#loadbar #status').html("Página carregada");
+header.load()
 
-    $('#footer-wrapper').addClass('white');
+const simulation = {
+    paused: true,
+    time: 0,
+
+    stepButton: {
+        index: 4,
+        options: [-10,-5,-2,-1,1,2,5,10],
+
+        getValue: function(){
+            return Math.round(this.options[this.index])
+        },
+        setValue: function(value){
+            const i = this.options.indexOf(value)
+            this.index = i != -1 ? i : 4
+        },
+        back: function(){
+            this.index = this.index > 0 ? this.index - 1 : 0
+        },    
+        forward: function(){
+            this.index = this.index < this.options.length - 1 ? this.index + 1 : this.options.length - 1
+        },    
+    },
+
+    advance: function(direction) {
+        if (this.paused){
+            this.stepButton.setValue(direction == 'back' ? -1 : 1)
+
+            document.querySelector('#fowd-step .speed').innerHTML = ""
+            document.querySelector('#back-step .speed').innerHTML = this.stepButton.getValue()
+        }
+        else{
+            this.stepButton[direction]()
+            
+            if (this.stepButton.getValue() > 0){
+                document.querySelector('#back-step .speed').innerHTML = ""
+                document.querySelector('#fowd-step .speed').innerHTML = this.stepButton.getValue() + 'x'
+            }
+            else{
+                document.querySelector('#fowd-step .speed').innerHTML = ""
+                document.querySelector('#back-step .speed').innerHTML = this.stepButton.getValue() + 'x'
+            }
+        }
+
+        clearTimeout(this.timeout)
+        this.startTimer()
+    },
+
+    back: function(){
+        this.advance('back')
+    },
     
+    forward: function(){
+        this.advance('forward')
+    },
+
+    pause: function(){
+        this.step.setValue(1)
+
+        if (this.paused){
+            this.paused = false
+            document.querySelector('#pause').classList.add('paused')
+            document.querySelector('#back-step .speed').innerHTML = '-1x'
+            document.querySelector('#fowd-step .speed').innerHTML = '1x'
+        }
+        else{
+            this.paused = true
+            document.querySelector('#pause').classList.remove('paused')
+            document.querySelector('#back-step .speed').innerHTML = '-1'
+            document.querySelector('#fowd-step .speed').innerHTML = '+1'
+            this.step.setValue(1)
+        }
+
+        clearTimeout(this.timeout)
+        this.startTimer()
+    },
+
+    startTimer: function(){
+        this.timeout = setTimeout(() => {
+            if (this.time < 0){
+                this.time = 0
+            }
+            else if (this.time > this.steps.length - 1){
+                this.time = this.steps.length - 1
+
+                const winner = {}
+                this.steps[this.time].glads.forEach((e,i) => {
+                    //revive gladiator when running backwards
+                    if (parseFloat(e.hp) > 0 && !document.querySelector('.ui-glad')[i].classList.contains('dead') &&
+                    !winner.id || winner.hp < parseFloat(e.hp)){
+                        winner.name = e.name
+                        winner.hp = parseFloat(e.hp)
+                        winner.team = e.user
+                        winner.id = i
+                    }
+                })
+
+                if (this.showScore && !document.querySelector('#end-message')){
+                    if (!winner.id){
+                        winner.name = "Empate"
+                        winner.team = ""
+                    }
+                    document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
+                        <div id='end-message'>
+                            <div id='victory'>VITÓRIA</div>
+                            <div id='image-container'>
+                                <div id='image'></div>
+                                <div id='name-team-container'>
+                                    <span id='name'>${name}</span>
+                                    <span id='team'>${team}</span>
+                                </div>
+                            </div>
+                            <div id='button-container'>
+                                <button class='button' id='retornar' title='Retornar para a batalha'>OK</button>
+                                <button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>`)
+
+                    document.querySelector('#end-message #retornar').addEventListener('click', () => {
+                        this.showScore = false
+                        document.querySelector('#fog').remove()
+                    })
+
+                    document.querySelector('#end-message #share').click('click', () => {
+                        document.querySelector('#end-message').classList.add('hidden')
+
+                        const link = "play/"+ loghash
+
+                        const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`
+
+                        const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`
+
+                        const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`
+
+                        document.querySelector('#fog').insertAdjacentHTML('beforeend', `<div id='url'>
+                            <div id='link'>
+                                <span id='title'>Compartilhar batalha</span>
+                                <span id='site'>gladcode.dev/play/</span>
+                                <span id='hash'>${loghash}</span>
+                            </div>
+                            <div id='social'>
+                                <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
+                                ${twitter + facebook + whatsapp}
+                            </div>
+                            <button id='close' class='button'>OK</button>
+                        </div>`)
+                        
+                        document.querySelector('#url #social #getlink').addEventListener('click', () => {
+                            copyToClipboard(link)
+                            document.querySelector('#url #hash').innerHTML = 'Link copiado'
+                            document.querySelector('#url #hash').classList.add('clicked')
+                            setTimeout(() => {
+                                document.querySelector('#url #hash').classList.remove('clicked')
+                                document.querySelector('#url #hash').innerHTML = loghash
+                            }, 500)
+                        })
+                        
+                        document.querySelector('#url #close').addEventListener('click', () => {
+                            document.querySelector('#url').remove()
+                            document.querySelector('#end-message').classList.remove('hidden')
+                        })
+                    })
+
+                    if (winner.id){
+                        document.querySelector('#end-message #image').innerHTML = getSpriteThumb(hashes[newindex[winner.id]],'walk','down')
+                    }
+                    
+                    document.querySelector('#end-message').classList.add('fadein')
+                    setTimeout(() => {
+                        document.querySelector('#end-message').classList.remove('fadein')
+                    }, 1000)
+
+                    music.pause()
+                    victory.play('', 0, music.volume / 0.1)
+                }
+            }
+            else if (!this.showScore){
+                document.querySelector('#fog').remove()
+                this.showScore = true
+                music.resume()
+            }
+            phaser_update(this.steps[this.time])
+            if (!this.paused){
+                this.time += this.stepButton.getValue() > 0 ? 1 : -1
+            }
+        }, 100 / this.step.getValue())
+    }
+
+}
+
+(async () => {
+    document.querySelector('#loadbar #status').innerHTML = "Página carregada"
+    document.querySelector('#footer-wrapper').classList.add('white')
+
+    document.querySelector('#back-step').addEventListener('click', () => {
+        simulation.back()
+    })
+
+    document.querySelector('#fowd-step').addEventListener('click', () => {
+        simulation.forward()
+    })
+
+    document.querySelector('#pause').addEventListener('click', () => {
+        simulation.pause()
+    })
+
+    document.querySelector('#fullscreen').addEventListener('click', () => {
+        setFullScreen(!isFullScreen())
+    })
+
+})()
+
+$(document).ready( function() {    
     if ($('#log').html().length){
         var log;
         
@@ -136,7 +344,23 @@ $(document).ready( function() {
 
                                 if (hashes.length == glads.length){
                                     setTimeout( function(){
-                                        startBattle(log);
+                                        const simulation = log
+                                        json = {};
+                                                    
+                                        $('#loadbar #status').html("Carregando render");
+                                        if (load_phaser()){
+                                            //console.log(simulation[0]);
+                                            create_ui(simulation[0].glads.length);
+                                            $( "#time" ).slider("option", "max", simulation.length);
+                                            for (let i=0 ; i<simulation[0].glads.length ; i++){
+                                                simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
+                                                simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
+                                                newindex[i] = i;
+                                            }
+                                    
+                                            steps = mergeLog(simulation)
+                                            start_timer(steps)
+                                        }
                                     }, 100);
                                 }
                             });
@@ -149,81 +373,6 @@ $(document).ready( function() {
     }
     $('#log').remove();
     
-    var stepprogi = 4, stepprog = [-10,-5,-2,-1,1,2,5,10];
-    $('#back-step').click( function(){
-        if (pausesim){
-            stepIncrement = -1;
-            timestep += Math.round(stepIncrement);
-            $('#fowd-step .speed').html("");
-            $('#back-step .speed').html(Math.round(stepIncrement));
-        }
-        else{
-            if (stepprogi > 0)
-                stepprogi--;
-            stepIncrement = stepprog[stepprogi];
-            
-            if (stepprogi <= 3){
-                $('#fowd-step .speed').html("");
-                $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-            else{
-                $('#back-step .speed').html("");
-                $('#fowd-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-        }
-        clearInterval(istep);
-        start_timer(steps);
-    });
-    $('#fowd-step').click( function(){
-        if (pausesim){
-            stepIncrement = 1;
-            timestep += Math.round(stepIncrement);
-            $('#back-step .speed').html("");
-            $('#fowd-step .speed').html("+"+ Math.round(stepIncrement));
-        }
-        else{
-            if (stepprogi < stepprog.length - 1)
-                stepprogi++;
-            stepIncrement = stepprog[stepprogi];
-            
-            if (stepprogi <= 3){
-                $('#fowd-step .speed').html("");
-                $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-            else{
-                $('#back-step .speed').html("");
-                $('#fowd-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-        }
-        clearInterval(istep);
-        start_timer(steps);
-    });
-    $('#pause').click( function(){
-        stepIncrement = 1;
-        stepprogi = 4;
-        if (pausesim){
-            pausesim = false;
-            $('#pause #img-play').hide();
-            $('#pause #img-pause').show();
-            $('#back-step .speed').html('-1x');
-            $('#fowd-step .speed').html('1x');
-        }
-        else{
-            pausesim = true;
-            $('#pause #img-pause').hide();
-            $('#pause #img-play').show();
-            stepIncrement = 1;
-            stepprogi = 4;
-            $('#back-step .speed').html('-1');
-            $('#fowd-step .speed').html('+1');
-        }
-        clearInterval(istep);
-        start_timer(steps);
-    });
-    $('#fullscreen').click( function(){
-        setFullScreen(!isFullScreen());
-    });
-
     $('#help').click( function(){
         $('body').append(`<div id='fog'>
         <div id='help-window' class='blue-window'>
@@ -595,86 +744,6 @@ function resize() {
     }
 }
 
-var show_final_score = true;
-function start_timer(steps){
-    istep = setInterval( function(){
-        //console.log(steps[timestep]);
-        if (timestep < 0)
-            timestep = 0;
-        if (timestep > steps.length - 1){
-            timestep = steps.length - 1;
-            var name, team, id, hp;
-            for (i in steps[timestep].glads){
-                //revive gladiator when running backwards
-                if (parseFloat(steps[timestep].glads[i].hp) > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
-                    if (!id || hp < parseFloat(steps[timestep].glads[i].hp)){
-                        name = steps[timestep].glads[i].name;
-                        hp = parseFloat(steps[timestep].glads[i].hp);
-                        team = steps[timestep].glads[i].user;
-                        id = i;
-                    }
-                }
-            }
-            if (show_final_score && !$('#end-message').length){
-                if (!id){
-                    name = "Empate";
-                    team = "";
-                }
-                $('body').append(`<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>${name}</span><span id='team'>${team}</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button></div></div></div>`);
-                $('#end-message #retornar').click( function() {
-                    show_final_score = false;
-                    $('#fog').remove();
-                });
-
-                $('#end-message #share').click( function() {
-                    $('#end-message').hide();
-
-                    var link = "gladcode.dev/play/"+ loghash;
-
-                    var twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
-
-                    var facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
-
-                    var whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
-
-                    $('#fog').append(`<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.dev/play/</span><span id='hash'>${loghash}</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>${twitter + facebook + whatsapp}</div><button id='close' class='button'>OK</button></div>`);
-                    
-                    $('#url #social #getlink').click( function(){
-                        copyToClipboard(link);
-                        $('#url #hash').html('Link copiado');
-                        $('#url #hash').addClass('clicked');
-                        setTimeout(function(){
-                            $('#url #hash').removeClass('clicked');
-                            $('#url #hash').html(loghash);
-                        },500);
-                    });
-                    
-                    $('#url #close').click( function(){
-                        $('#url').remove();
-                        $('#end-message').show();
-                    });
-                });
-
-                if (id)
-                    $('#end-message #image').html(getSpriteThumb(hashes[newindex[id]],'walk','down'));
-                $('#end-message').hide();
-                $('#end-message').fadeIn(1000);
-                music.pause();
-                victory.play('', 0, music.volume / 0.1);
-            }
-        }
-        else if (!show_final_score){
-            $('#fog').remove();
-            show_final_score = true;
-            music.resume();
-        }
-        phaser_update(steps[timestep]);
-        if (!pausesim){
-            timestep += stepIncrement / Math.abs(stepIncrement);
-        }
-    }, 100 / Math.abs(stepIncrement));	
-}
-
 //the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
 uiVars = [];
 function create_ui(nglad){
@@ -699,25 +768,6 @@ function create_ui(nglad){
         uiVars.push({});
     }
     uiVars.showtext = true;
-}
-
-function startBattle(simulation){
-    json = {};
-                
-    $('#loadbar #status').html("Carregando render");
-    if (load_phaser()){
-        //console.log(simulation[0]);
-        create_ui(simulation[0].glads.length);
-        $( "#time" ).slider("option", "max", simulation.length);
-        for (let i=0 ; i<simulation[0].glads.length ; i++){
-            simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-            simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
-            newindex[i] = i;
-        }
-
-        steps = mergeLog(simulation)
-        start_timer(steps)
-    }
 }
 
 function copyToClipboard(text) {
