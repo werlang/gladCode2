@@ -177,6 +177,18 @@ body{
         }
     }
 
+    #sound {
+        img {
+            display: none;
+        }
+
+        &.on #on,
+        &.off #off,
+        &.mute #mute{
+            display: flex;
+        }
+    }
+
     .button{
         box-sizing: border-box;
         padding: 5px 10px;

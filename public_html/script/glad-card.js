@@ -41,7 +41,7 @@ gladCard.appendImage = async function({container, data, dead}){
     container.html(getSpriteThumb(spriteSheet, frame, 'down'))
 }
 
-export {gladCard}
+export {gladCard, getSpriteThumb}
 
 function getSpriteThumb(spritesheet, move, direction){
     var dirEnum = {

@@ -12,18 +12,6 @@ var loadCache = false;
 var stab, gender;
 var simtimenow;
 var dt = 0;
-var prefs = {
-    bars: true,
-    frames: true,
-    fps: false,
-    text: true,
-    speech: true,
-    sound: {
-        music: 1,
-        sfx: 1
-    },
-    crowd: 1
-}
 
 var actionlist = [
     {'name': 'fireball', 'value': 0, 'animation': 'cast'},

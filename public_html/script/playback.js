@@ -1,12 +1,12 @@
 import { mergeLog } from "./utils.js"
-import { loader } from "./loader.js"
 import { header } from "./header.js"
+import { post } from "./utils.js"
+import { loader } from "./loader.js"
 
 var json = {};
 var hashes = [], newindex = new Array();
 var steps = new Array();
 var istep;
-var loghash;
 var fullscreen = false;
 var timeSlider = 0; 
 var potionList = {}
@@ -16,6 +16,7 @@ header.load()
 const simulation = {
     paused: true,
     time: 0,
+    log: null,
 
     stepButton: {
         index: 4,
@@ -34,6 +35,19 @@ const simulation = {
         forward: function(){
             this.index = this.index < this.options.length - 1 ? this.index + 1 : this.options.length - 1
         },    
+    },
+
+    preferences: {
+        bars: true,
+        frames: true,
+        fps: false,
+        text: true,
+        speech: true,
+        sound: {
+            music: 1,
+            sfx: 1
+        },
+        crowd: 1
     },
 
     advance: function(direction) {
@@ -139,19 +153,16 @@ const simulation = {
                     document.querySelector('#end-message #share').click('click', () => {
                         document.querySelector('#end-message').classList.add('hidden')
 
-                        const link = "play/"+ loghash
-
+                        const link = "play/"+ simulation.log
                         const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`
-
                         const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`
-
                         const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`
 
                         document.querySelector('#fog').insertAdjacentHTML('beforeend', `<div id='url'>
                             <div id='link'>
                                 <span id='title'>Compartilhar batalha</span>
                                 <span id='site'>gladcode.dev/play/</span>
-                                <span id='hash'>${loghash}</span>
+                                <span id='hash'>${simulation.log}</span>
                             </div>
                             <div id='social'>
                                 <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
@@ -166,7 +177,7 @@ const simulation = {
                             document.querySelector('#url #hash').classList.add('clicked')
                             setTimeout(() => {
                                 document.querySelector('#url #hash').classList.remove('clicked')
-                                document.querySelector('#url #hash').innerHTML = loghash
+                                document.querySelector('#url #hash').innerHTML = simulation.log
                             }, 500)
                         })
                         
@@ -177,7 +188,9 @@ const simulation = {
                     })
 
                     if (winner.id){
-                        document.querySelector('#end-message #image').innerHTML = getSpriteThumb(hashes[newindex[winner.id]],'walk','down')
+                        loader.load('gladcard').then(({ getSpriteThumb }) => {
+                            document.querySelector('#end-message #image').innerHTML = getSpriteThumb(hashes[newindex[winner.id]],'walk','down')
+                        })
                     }
                     
                     document.querySelector('#end-message').classList.add('fadein')
@@ -200,381 +213,374 @@ const simulation = {
             }
         }, 100 / this.step.getValue())
     }
-
 }
 
 (async () => {
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
     document.querySelector('#footer-wrapper').classList.add('white')
 
-    document.querySelector('#back-step').addEventListener('click', () => {
-        simulation.back()
+    document.querySelector('#back-step').addEventListener('click', () => simulation.back())
+
+    document.querySelector('#fowd-step').addEventListener('click', () => simulation.forward())
+
+    document.querySelector('#pause').addEventListener('click', () => simulation.pause())
+
+    document.querySelector('#fullscreen').addEventListener('click', () => setFullScreen(!isFullScreen()))
+
+    document.querySelector('#help').addEventListener('click', () => {
+        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
+            <div id='help-window' class='blue-window'>
+                <div id='content'>
+                    <h2>Controle da câmera</h2>
+                    <div class='table'>
+                        <div class='row'>
+                            <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
+                            <div class='cell'>Mover a câmera</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
+                            <div class='cell'>Zoom da arena</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
+                            <div class='cell'>Acompanhar um gladiador</div>
+                        </div>
+                    </div>
+                    <h2>Teclas de atalho</h2>
+                    <div class='table'>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>A</span></div>
+                            <div class='cell'>Retroceder simulação</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>D</span></div>
+                            <div class='cell'>Avançar simulação</div>
+                        </div>
+                        <div class='row'>
+                            <div class='cell'><span class='key'>S</span></div>
+                            <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
+                        </div>
+                    </div>
+                </div>
+                <div id='button-container'><button class='button' id='ok'>OK</button></div>
+            </div>
+        </div>`)
+
+        document.querySelector('#help-window #ok').addEventListener('click', () => {
+            document.querySelector('#fog').remove()
+        })
     })
 
-    document.querySelector('#fowd-step').addEventListener('click', () => {
-        simulation.forward()
+    document.querySelector('#settings').addEventListener('click', async () => {
+        const uiChecked = document.querySelector('#ui-container').style.display == 'flex'
+
+        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
+            <div id='settings-window' class='blue-window'>
+                <h2>Preferências</h2>
+                <div class='check-container'>
+                    <div id='pref-bars'><label><input type='checkbox' class='checkslider' ${simulation.preferences.bars ? "checked" : ""}>Mostrar barras de hp e ap (B)</label></div>
+                    <div id='pref-frames'><label><input type='checkbox' class='checkslider' ${uiChecked ? "checked" : ""}>Mostrar molduras dos gladiadores (M)</label></div>
+                    <div id='pref-fps'><label><input type='checkbox' class='checkslider' ${simulation.preferences.fps ? "checked" : ""}>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
+                    <div id='pref-text'><label><input type='checkbox' class='checkslider' ${simulation.preferences.text ? "checked" : ""}>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
+                    <div id='pref-speech'><label><input type='checkbox' class='checkslider' ${simulation.preferences.speech ? "checked" : ""}>Mostrar balões de fala</label></div>
+                    <div id='volume-container'>
+                        <h3>Volume do áudio</h3>
+                        <p>Efeitos sonoros</p>
+                        <div id='sfx-volume'></div>
+                        <p>Música</p>
+                        <div id='music-volume'></div>
+                    </div>
+                    <div id='crowd-container'>
+                        <h3>Número de espectadores</h3>
+                        <div id='n-crowd'></div>
+                    </div>
+                </div>
+                <div id='button-container'><button class='button' id='ok'>OK</button></div>
+            </div>
+        </div>`)
+
+        const render = await loader.load('render')
+        const soundtest = render.game.add.audio('lvlup')
+        // TODO: verificar como arrumar os sliders.
+        // $( "#sfx-volume" ).slider({
+        //     range: "min",
+        //     min: 0,
+        //     max: 1,
+        //     step: 0.01,
+        //     create: function( event, ui ) {
+        //         $(this).slider('value', simulation.preferences.sound.sfx);
+        //     },
+        //     slide: function( event, ui ) {
+        //         simulation.preferences.sound.sfx = ui.value;
+        //         soundtest.stop();
+        //         soundtest.play('', 0.5, simulation.preferences.sound.sfx);
+
+        //         changeSoundIcon();
+        //     },
+        // });
+
+        // $( "#music-volume" ).slider({
+        //     range: "min",
+        //     min: 0,
+        //     max: 0.1,
+        //     value: 0.1,
+        //     step: 0.001,
+        //     create: function( event, ui ) {
+        //         $(this).slider('value', music.volume);
+        //     },
+        //     slide: function( event, ui ) {
+        //         music.volume = ui.value;
+
+        //         changeSoundIcon();
+        //     },
+        // });
+
+        // $( "#n-crowd" ).slider({
+        //     range: "min",
+        //     min: 0,
+        //     max: 1,
+        //     value: simulation.preferences.crowd,
+        //     step: 0.1,
+        //     create: function( event, ui ) {
+        //     },
+        //     slide: ( event, ui ) => {
+        //         changeCrowd(ui.value);
+        //         simulation.preferences.crowd = ui.value;
+        //     }
+        // });
+
+        // TODO: verificar se isso é necessário, e se não, como contornar.
+        // document.querySelectorAll('.checkslider').forEach(e => {
+        //     e.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>") //.hide()
+        // })
+
+        document.querySelector('#settings-window #ok').addEventListener('click', () => {
+            post("back_play.php", {
+                action: "SET_PREF",
+                show_bars: simulation.preferences.bars,
+                show_frames: document.querySelector('#pref-frames input').getAttribute('checked'),
+                show_fps: simulation.preferences.fps,
+                show_text: simulation.preferences.text,
+                show_speech: simulation.preferences.speech,
+                sfx_volume: simulation.preferences.sound.sfx,
+                music_volume: music.volume,
+                crowd: simulation.preferences.crowd
+            })
+
+            document.querySelector('#fog').remove()
+        })
+
+        document.querySelector('#pref-bars input').addEventListener('change', () => {
+            simulation.preferences.bars = document.querySelector('#pref-bars input').hasAttribute('checked')
+        })
+
+        document.querySelector('#pref-frames input').addEventListener('change', () => {
+            if (document.querySelector('#pref-frames input').hasAttribute('checked')){
+                // TODO: fazer um proper fadein
+                document.querySelector('#ui-container').style.display = "flex"
+                simulation.preferences.frames = true
+            }
+            else{
+                document.querySelector('#ui-container').style.display = "none"
+                simulation.preferences.frames = false
+            }
+        })
+
+        document.querySelector('#pref-fps input').addEventListener('change', () => {
+            simulation.preferences.fps = document.querySelector('#pref-fps input').hasAttribute('checked')
+        })
+
+        document.querySelector('#pref-text input').addEventListener('change', () => {
+            simulation.preferences.text = document.querySelector('#pref-text input').hasAttribute('checked')
+        })
+
+        document.querySelector('#pref-speech input').addEventListener('change', () => {
+            simulation.preferences.speech = document.querySelector('#pref-speech input').hasAttribute('checked')
+        })
     })
 
-    document.querySelector('#pause').addEventListener('click', () => {
-        simulation.pause()
-    })
-
-    document.querySelector('#fullscreen').addEventListener('click', () => {
-        setFullScreen(!isFullScreen())
-    })
-
-})()
-
-$(document).ready( function() {    
-    if ($('#log').html().length){
-        var log;
-        
-        if ($('#log').html().length > 32)
-            new Message({message: `Erro na URL`}).show();
+    if (document.querySelector('#log')){
+        if (document.querySelector('#log').innerHTML.length > 32){
+            new Message({message: `Erro na URL`}).show()
+        }
         else{
-            loghash = $('#log').html();
-            queryLog();
+            simulation.log = document.querySelector('#log').innerHTML
 
             post("back_play.php", {
                 action: "GET_PREF"
-            }).then( function(data){
-                // console.log(data);
-                prefs.bars = (data.show_bars === true || data.show_bars == 'true');
-                prefs.fps = (data.show_fps === true || data.show_fps == 'true');
-                prefs.text = (data.show_text === true || data.show_text == 'true');
-                prefs.speech = (data.show_speech === true || data.show_speech == 'true');
+            }).then( data => {
+                // console.log(data)
+                simulation.preferences.bars = (data.show_bars === true || data.show_bars == 'true')
+                simulation.preferences.fps = (data.show_fps === true || data.show_fps == 'true')
+                simulation.preferences.text = (data.show_text === true || data.show_text == 'true')
+                simulation.preferences.speech = (data.show_speech === true || data.show_speech == 'true')
                 
-                prefs.crowd = parseFloat(data.crowd);
+                simulation.preferences.crowd = parseFloat(data.crowd)
 
-                prefs.sound.music = parseFloat(data.music_volume);
-                $('#sound').data('music', parseFloat(data.music_volume));
-                prefs.sound.sfx = parseFloat(data.sfx_volume);
-                $('#sound').data('sfx', parseFloat(data.sfx_volume));
-                changeSoundIcon();
+                simulation.preferences.sound.music = parseFloat(data.music_volume)
+                simulation.preferences.sound.sfx = parseFloat(data.sfx_volume)
+                changeSoundIcon()
 
                 if (data.show_frames === true || data.show_frames == 'true'){
-                    $('#ui-container').fadeIn();
-                    prefs.frames = true;
+                    document.querySelector('#ui-container').style.display = "flex"
+                    simulation.preferences.frames = true
                 }
                 else{
-                    $('#ui-container').fadeOut();
-                    prefs.frames = false;
+                    document.querySelector('#ui-container').style.display = "none"
+                    simulation.preferences.frames = false
                 }
-            });
+            })
+
+            post("back_log.php", {
+                action: "GET",
+                loghash: simulation.log
+            }).then( data => {
+                // console.log(data)
+                if (data.status == "EXPIRED"){
+                    document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
+                }
+                else if (data.status != "SUCCESS"){
+                    // window.location.href = "https://gladcode.dev";
+                    document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
+                }
+                else{
+                    const render = loader.load('render')
+                    render.stab = []
+                    render.gender = []
+                    
+                    const assets = loader.load('assets')
+
+                    const log = data.log
+                    const glads = log[0].glads
+                    const skinsReady = []
+
+                    // console.log(log);
+                    glads.forEach((g,i) => {
+                        //console.log(g.skin)
+                        let skin = g.skin
+
+                        skinsReady.push(new Promise(resolve => {
+                            assets.fetchSpritesheet(skin).then(data => {
+                                resolve(data)
+                            })
+                        }))
+
+                        skin = JSON.parse(skin)
+                        
+                        render.stab[i] = "0"
+                        render.gender[i] = "male"
+
+                        skin.forEach(s => {
+                            const item = assets.getImage(s)
+                            if (item.move == 'thrust'){
+                                render.stab[i] = "1"
+                            }
+                            if (item.id == 'female'){
+                                render.gender[i] = "female"
+                            }
+                        })
+                    })
+
+                    Promise.all(skinsReady).then(() => {
+                        const simulation = log
+                        json = {};
+                                    
+                        document.querySelector('#loadbar #status').innerHTML = "Carregando render"
+                        console.log('started')
+
+                        // TODO: fazer chamada pro load_phaser e start timer
+                        // if (load_phaser()){
+                        //     //console.log(simulation[0]);
+                        //     create_ui(simulation[0].glads.length);
+                        //     $( "#time" ).slider("option", "max", simulation.length);
+                        //     for (let i=0 ; i<simulation[0].glads.length ; i++){
+                        //         simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
+                        //         simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
+                        //         newindex[i] = i;
+                        //     }
+                    
+                        //     steps = mergeLog(simulation)
+                        //     start_timer(steps)
+                        // }
+                    })
+                    
+                    // function keepOrder(i, hashes, skin){
+                    //     fetchSpritesheet(skin).then( function(data){
+                    //         hashes[i] = data;
+                    //         // var pct = (100 * hashes.length / glads.length).toFixed(0);
+                    //         // $('#loadbar #status').html("Montando gladiadores");
+                    //         // $('#loadbar #second .bar').width(pct +"%");
+                    //         // $('#loadbar #main .bar').width(25 + pct/4 +"%");
+
+                    //         if (hashes.length == glads.length){
+                    //             setTimeout( function(){
+                    //             }, 100);
+                    //         }
+                    //     });
+                    // }
+
+                }
+            })
+
+            // TODO: arrumar o ajax pro load progress
+            // $.ajax({
+            //     xhr: function() {
+            //         var xhr = new window.XMLHttpRequest();
+            //         xhr.upload.addEventListener("progress", function(evt) {
+            //             if (evt.lengthComputable) {
+            //                 var percentComplete = evt.loaded / evt.total;
+            //                 //Do something with upload progress here
+            //             }
+            //        }, false);
+            
+            //        xhr.addEventListener("progress", function(evt) {
+            //            if (evt.lengthComputable) {
+            //                var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
+            //                $('#loadbar #status').html("Fazendo download do log de batalha");
+            //                $('#loadbar #second .bar').width(percentComplete +"%");
+            //                $('#loadbar #main .bar').width(percentComplete/4 +"%");
+            //            }
+            //        }, false);
+            
+            //        return xhr;
+            //     },
+            //     type: 'POST',
+            //     url: "back_log.php",
+            //     data: {
+            //         action: "GET",
+            //         loghash: simulation.log
+            //     },
+            //     success: function(data){
+            //         // console.log(data);
+            //         try{
+            //             data = JSON.parse(data);
+            //         }
+            //         catch(error){
+            //             console.log(error);
+            //         }
+
+            //         // TODO: need to resolve progress issue
+            //     }
+            // })
         }
         
-        function queryLog(){
-            $.ajax({
-                xhr: function() {
-                    var xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function(evt) {
-                        if (evt.lengthComputable) {
-                            var percentComplete = evt.loaded / evt.total;
-                            //Do something with upload progress here
-                        }
-                   }, false);
-            
-                   xhr.addEventListener("progress", function(evt) {
-                       if (evt.lengthComputable) {
-                           var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
-                           $('#loadbar #status').html("Fazendo download do log de batalha");
-                           $('#loadbar #second .bar').width(percentComplete +"%");
-                           $('#loadbar #main .bar').width(percentComplete/4 +"%");
-                       }
-                   }, false);
-            
-                   return xhr;
-                },
-                type: 'POST',
-                url: "back_log.php",
-                data: {
-                    action: "GET",
-                    loghash: loghash
-                },
-                success: function(data){
-                    // console.log(data);
-                    try{
-                        data = JSON.parse(data);
-                    }
-                    catch(error){
-                        console.log(error);
-                    }
-
-                    if (data.status == "EXPIRED"){
-                        $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`)
-                        clearInterval(istep)
-                    }
-                    else if (data.status != "SUCCESS"){
-                        // window.location.href = "https://gladcode.dev";
-                        $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`)
-                        clearInterval(istep)
-                    }
-                    else{
-                        let log = JSON.parse(data.log)
-                        // console.log(log)
-                        var glads = log[0].glads;
-                        stab = [];
-                        gender = [];
-                        
-                        // console.log(log);
-                        for (var i in glads){
-                            //console.log(glads[i].skin);
-                            var skin = glads[i].skin;
-                            keepOrder(i,hashes,skin);
-                            skin = JSON.parse(skin);
-                            
-                            stab[i] = "0";
-                            gender[i] = "male";
-                            for (var j in skin){
-                                var item = getImage(skin[j]);
-                                if (item.move == 'thrust')
-                                    stab[i] = "1";
-                                if (item.id == 'female')
-                                    gender[i] = "female";
-                            }
-                        }
-                        
-                        function keepOrder(i, hashes, skin){
-                            fetchSpritesheet(skin).then( function(data){
-                                hashes[i] = data;
-                                var pct = (100 * hashes.length / glads.length).toFixed(0);
-                                $('#loadbar #status').html("Montando gladiadores");
-                                $('#loadbar #second .bar').width(pct +"%");
-                                $('#loadbar #main .bar').width(25 + pct/4 +"%");
-
-                                if (hashes.length == glads.length){
-                                    setTimeout( function(){
-                                        const simulation = log
-                                        json = {};
-                                                    
-                                        $('#loadbar #status').html("Carregando render");
-                                        if (load_phaser()){
-                                            //console.log(simulation[0]);
-                                            create_ui(simulation[0].glads.length);
-                                            $( "#time" ).slider("option", "max", simulation.length);
-                                            for (let i=0 ; i<simulation[0].glads.length ; i++){
-                                                simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-                                                simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
-                                                newindex[i] = i;
-                                            }
-                                    
-                                            steps = mergeLog(simulation)
-                                            start_timer(steps)
-                                        }
-                                    }, 100);
-                                }
-                            });
-                        }
-
-                    }
-                }
-            });
-        }
+        document.querySelector('#log').remove()
     }
-    $('#log').remove();
-    
-    $('#help').click( function(){
-        $('body').append(`<div id='fog'>
-        <div id='help-window' class='blue-window'>
-            <div id='content'>
-                <h2>Controle da câmera</h2>
-                <div class='table'>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
-                        <div class='cell'>Mover a câmera</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
-                        <div class='cell'>Zoom da arena</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
-                        <div class='cell'>Acompanhar um gladiador</div>
-                    </div>
-                </div>
-                <h2>Teclas de atalho</h2>
-                <div class='table'>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>A</span></div>
-                        <div class='cell'>Retroceder simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>D</span></div>
-                        <div class='cell'>Avançar simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>S</span></div>
-                        <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
-                    </div>
-                </div>
-            </div>
-            <div id='button-container'><button class='button' id='ok'>OK</button></div>
-        </div>
-        </div>`);
+})()
 
-        $('#help-window #ok').click( function(){
-            $('#fog').remove();
-        });
-    });
-
-    $('#settings').click( function(){
-        $('body').append(`<div id='fog'>
-        <div id='settings-window' class='blue-window'>
-            <h2>Preferências</h2>
-            <div class='check-container'>
-                <div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap (B)</label></div>
-                <div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores (M)</label></div>
-                <div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
-                <div id='pref-text'><label><input type='checkbox' class='checkslider'>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
-                <div id='pref-speech'><label><input type='checkbox' class='checkslider'>Mostrar balões de fala</label></div>
-                <div id='volume-container'>
-                    <h3>Volume do áudio</h3>
-                    <p>Efeitos sonoros</p>
-                    <div id='sfx-volume'></div>
-                    <p>Música</p>
-                    <div id='music-volume'></div>
-                </div>
-                <div id='crowd-container'>
-                    <h3>Número de espectadores</h3>
-                    <div id='n-crowd'></div>
-                </div>
-            </div>
-            <div id='button-container'><button class='button' id='ok'>OK</button></div></div>
-        </div>`);
-
-        var soundtest = game.add.audio('lvlup');
-        $( "#sfx-volume" ).slider({
-            range: "min",
-            min: 0,
-            max: 1,
-            step: 0.01,
-            create: function( event, ui ) {
-                $(this).slider('value', prefs.sound.sfx);
-            },
-            slide: function( event, ui ) {
-                prefs.sound.sfx = ui.value;
-                soundtest.stop();
-                soundtest.play('', 0.5, prefs.sound.sfx);
-
-                changeSoundIcon();
-            },
-        });
-
-        $( "#music-volume" ).slider({
-            range: "min",
-            min: 0,
-            max: 0.1,
-            value: 0.1,
-            step: 0.001,
-            create: function( event, ui ) {
-                $(this).slider('value', music.volume);
-            },
-            slide: function( event, ui ) {
-                music.volume = ui.value;
-
-                changeSoundIcon();
-            },
-        });
-
-        $( "#n-crowd" ).slider({
-            range: "min",
-            min: 0,
-            max: 1,
-            value: prefs.crowd,
-            step: 0.1,
-            create: function( event, ui ) {
-            },
-            slide: ( event, ui ) => {
-                changeCrowd(ui.value);
-                prefs.crowd = ui.value;
-            }
-        });
-
-        if (prefs.bars)
-            $('#pref-bars input').prop('checked', true);
-        if ($('#ui-container').css('display') == 'flex')
-            $('#pref-frames input').prop('checked', true);
-        if (prefs.fps)
-            $('#pref-fps input').prop('checked', true);
-        if (prefs.text)
-            $('#pref-text input').prop('checked', true);
-        if (prefs.speech)
-            $('#pref-speech input').prop('checked', true);
-
-        $('.checkslider').each( function(){
-            $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
-        })
-
-        $('#settings-window #ok').click( function(){
-            post("back_play.php", {
-                action: "SET_PREF",
-                show_bars: prefs.bars,
-                show_frames: $('#pref-frames input').prop('checked'),
-                show_fps: prefs.fps,
-                show_text: prefs.text,
-                show_speech: prefs.speech,
-                sfx_volume: prefs.sound.sfx,
-                music_volume: music.volume,
-                crowd: prefs.crowd
-            }).then( function(data){
-                //console.log(data);
-            });
-
-            $('#fog').remove();
-        });
-
-        $('#pref-bars input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.bars = true;
-            else
-                prefs.bars = false;
-        });
-
-        $('#pref-frames input').change( function(){
-            if ($(this).prop('checked')){
-                $('#ui-container').fadeIn();
-                prefs.frames = true;
-            }
-            else{
-                $('#ui-container').fadeOut();
-                prefs.frames = false;
-            }
-        });
-
-        $('#pref-fps input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.fps = true;
-            else
-                prefs.fps = false;
-        });		
-
-        $('#pref-text input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.text = true;
-            else
-                prefs.text = false;
-        });		
-
-        $('#pref-speech input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.speech = true;
-            else
-                prefs.speech = false;
-        });		
-    });
-
+$(document).ready( function() {    
     $('#sound').click( function(){
         if (music.volume > 0){
             $(this).data('music', music.volume);
@@ -601,15 +607,6 @@ $(document).ready( function() {
             sfx_volume: prefs.sound.sfx
         });
     })
-
-    function changeSoundIcon(){
-        if ((!music && parseFloat($('#sound').data('music')) > 0) || (music && music.volume > 0))
-            $('#sound').find('img').prop('src','icon/music.png');
-        else if (prefs.sound.sfx > 0)
-            $('#sound').find('img').prop('src','icon/music-off.png');
-        else
-            $('#sound').find('img').prop('src','icon/mute.png');
-    }
     
     $( "#time" ).slider({
         range: "min",
@@ -645,17 +642,27 @@ $(document).ready( function() {
         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
     })
     
-});
+})
+
+function changeSoundIcon(){
+    const soundObj = document.querySelector('#sound')
+    soundObj.classList.remove("on", "off", "mute")
+    if ((!simulation.music && simulation.preferences.music > 0) || (simulation.music && simulation.music.volume > 0)){
+        soundObj.classList.add("on")
+    }
+    else if (simulation.preferences.sound.sfx > 0){
+        soundObj.classList.add("off")
+    }
+    else{
+        soundObj.classList.add("mute")
+    }
+}
 
 function isFullScreen(){
-    var isfs = (document.fullscreenElement && document.fullscreenElement !== null) ||
+    return (document.fullscreenElement && document.fullscreenElement !== null) ||
         (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
         (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
-        (document.msFullscreenElement && document.msFullscreenElement !== null);
-    if (isfs)
-        return true;
-    else
-        return false;
+        (document.msFullscreenElement && document.msFullscreenElement !== null)    
 }
 
 function setFullScreen(state){
