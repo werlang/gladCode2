@@ -5,10 +5,6 @@ import { loader } from "./loader.js"
 
 var json = {};
 var hashes = [], newindex = new Array();
-var steps = new Array();
-var istep;
-var fullscreen = false;
-var timeSlider = 0; 
 var potionList = {}
 
 header.load()
@@ -17,6 +13,7 @@ const simulation = {
     paused: true,
     time: 0,
     log: null,
+    fullscreen: true,
 
     stepButton: {
         index: 4,
@@ -212,12 +209,110 @@ const simulation = {
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
         }, 100 / this.step.getValue())
+    },
+
+    isFullScreen: function(){
+        this.fullscreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+            (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+            (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+            (document.msFullscreenElement && document.msFullscreenElement !== null)
+        return this.fullscreen
+    },
+
+    setFullScreen: function(state){
+        if (typeof state == 'undefined'){
+            state = !this.isFullScreen()
+        }
+    
+        if (state){
+            const elem = document.querySelector("body")
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen()
+            }
+            else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen()
+            }
+            else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                elem.webkitRequestFullscreen()
+            }
+            else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen()
+            }
+            this.fullscreen = true
+        }
+        else{
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+            else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+            else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            this.fullscreen = false;
+        }
+    
+        setTimeout(() => {
+            this.resize()
+        }, 100)
+    },
+    
+    resize: function() {
+        loader.load('render').then(({render}) => {
+            if (render.game){
+                const game = render.game
+                var canvasH, canvasW;
+                if ($(window).width() > $(window).height()){
+                    var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
+                    canvasH = $(window).height();
+                    canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+                    game.camera.scale.x = $(window).height() * usefulRatio / screenH;
+                    game.camera.scale.y = $(window).height() * usefulRatio / screenH;
+                    if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
+                        new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
+                    }
+        
+                }
+                else{
+                    if ($('#dialog-box').length){
+                        $('#fog').remove();
+                    }
+        
+                    var usefulRatio = screenW / arenaD;
+                    canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
+                    canvasW = $(window).width();
+                    game.camera.scale.x = $(window).width() * usefulRatio / screenW;
+                    game.camera.scale.y = $(window).width() * usefulRatio / screenW;
+                    if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
+                        new Message({
+                            message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
+                            buttons: {no: 'Não', yes: 'SIM'} 
+                        }).show().click('yes', () => {
+                            this.setFullScreen(true);
+                            $('#fog').remove();
+                            this.fullscreen = true;
+                        });
+                    }
+                }	
+                game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
+                game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
+                game.camera.bounds.height = screenH;
+                game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
+                game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
+        
+                $('#canvas-div canvas').click();
+            }
+        })
     }
 }
 
-(async () => {
+;(async () => {
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
-    document.querySelector('#footer-wrapper').classList.add('white')
+    // document.querySelector('#footer-wrapper').classList.add('white')
 
     document.querySelector('#back-step').addEventListener('click', () => simulation.back())
 
@@ -225,7 +320,7 @@ const simulation = {
 
     document.querySelector('#pause').addEventListener('click', () => simulation.pause())
 
-    document.querySelector('#fullscreen').addEventListener('click', () => setFullScreen(!isFullScreen()))
+    document.querySelector('#fullscreen').addEventListener('click', () => simulation.setFullScreen())
 
     document.querySelector('#help').addEventListener('click', () => {
         document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
@@ -311,8 +406,8 @@ const simulation = {
             </div>
         </div>`)
 
-        const render = await loader.load('render')
-        const soundtest = render.game.add.audio('lvlup')
+        // const render = await loader.load('render')
+        // const soundtest = render.game.add.audio('lvlup')
         // TODO: verificar como arrumar os sliders.
         // $( "#sfx-volume" ).slider({
         //     range: "min",
@@ -446,7 +541,7 @@ const simulation = {
             post("back_log.php", {
                 action: "GET",
                 loghash: simulation.log
-            }).then( data => {
+            }).then( async data => {
                 // console.log(data)
                 if (data.status == "EXPIRED"){
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
@@ -456,19 +551,19 @@ const simulation = {
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
                 }
                 else{
-                    const render = loader.load('render')
-                    render.stab = []
-                    render.gender = []
+                    // const render = await loader.load('render')
+                    // render.stab = []
+                    // render.gender = []
                     
-                    const assets = loader.load('assets')
+                    const {assets} = await loader.load('assets')
 
-                    const log = data.log
+                    const log = JSON.parse(data.log)
                     const glads = log[0].glads
                     const skinsReady = []
 
                     // console.log(log);
-                    glads.forEach((g,i) => {
-                        //console.log(g.skin)
+                    glads.forEach(g => {
+                        // console.log(g)
                         let skin = g.skin
 
                         skinsReady.push(new Promise(resolve => {
@@ -479,16 +574,21 @@ const simulation = {
 
                         skin = JSON.parse(skin)
                         
-                        render.stab[i] = "0"
-                        render.gender[i] = "male"
+                        // render.stab[i] = "0"
+                        // render.gender[i] = "male"
 
                         skin.forEach(s => {
                             const item = assets.getImage(s)
-                            if (item.move == 'thrust'){
-                                render.stab[i] = "1"
+                            if (item){
+                                if (item.move == 'thrust'){
+                                    // render.stab[i] = "1"
+                                }
+                                if (item.id == 'female'){
+                                    // render.gender[i] = "female"
+                                }
                             }
-                            if (item.id == 'female'){
-                                render.gender[i] = "female"
+                            else{
+                                // console.log(`Asset ${s} cannot be loaded`)
                             }
                         })
                     })
@@ -580,69 +680,72 @@ const simulation = {
     }
 })()
 
-$(document).ready( function() {    
-    $('#sound').click( function(){
-        if (music.volume > 0){
-            $(this).data('music', music.volume);
-            music.volume = 0;
-        }
-        else if (prefs.sound.sfx > 0){
-            $(this).data('sfx', prefs.sound.sfx);
-            prefs.sound.sfx = 0;
-        }
-        else{
-            music.volume = $(this).data('music');
-            if (music.volume == 0)
-                music.volume = 0.1;
-    
-            prefs.sound.sfx = $(this).data('sfx');
-            if (prefs.sound.sfx == 0)
-                prefs.sound.sfx = 1;
-        }
-        changeSoundIcon();
+window.onresize = () => simulation.resize()
 
-        post("back_play.php",{
-            action: "SET_PREF",
-            music_volume: music.volume,
-            sfx_volume: prefs.sound.sfx
-        });
-    })
-    
-    $( "#time" ).slider({
-        range: "min",
-        min: 0,
-        max: 0,
-        value: timestep,
-        create: function( event, ui ) {
-            $(this).append("<div class='ui-slider-time'></div>");
-        },
-        change: function( event, ui ) {
-            var h = Math.floor(ui.value/600);
-            var m = Math.floor(ui.value/10)%60;
-            if (m < 10)
-                m = "0"+ m;
-            var time = h +":"+ m;
-            $(this).find('.ui-slider-time').html(time);
-            $(this).find('.ui-slider-time').css('left', $(this).find('.ui-slider-handle').css('left'));
-        },
-        slide: function( event, ui ) {
-            timestep = ui.value;
-        }
-    });
 
-    $([window, document]).focusin(function(){
-        //console.log("entrou");
-    }).focusout(function(){
-        pausesim = false; //coloca false na var
-        $('#pause').click(); //clica no botao e pause fica true
-    });	
-
-    // checkbox
-    $('.checkslider').each( function(){
-        $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
-    })
+// $(document).ready( function() {    
+//     $('#sound').click( function(){
+//         if (music.volume > 0){
+//             $(this).data('music', music.volume);
+//             music.volume = 0;
+//         }
+//         else if (prefs.sound.sfx > 0){
+//             $(this).data('sfx', prefs.sound.sfx);
+//             prefs.sound.sfx = 0;
+//         }
+//         else{
+//             music.volume = $(this).data('music');
+//             if (music.volume == 0)
+//                 music.volume = 0.1;
     
-})
+//             prefs.sound.sfx = $(this).data('sfx');
+//             if (prefs.sound.sfx == 0)
+//                 prefs.sound.sfx = 1;
+//         }
+//         changeSoundIcon();
+
+//         post("back_play.php",{
+//             action: "SET_PREF",
+//             music_volume: music.volume,
+//             sfx_volume: prefs.sound.sfx
+//         });
+//     })
+    
+//     $( "#time" ).slider({
+//         range: "min",
+//         min: 0,
+//         max: 0,
+//         value: timestep,
+//         create: function( event, ui ) {
+//             $(this).append("<div class='ui-slider-time'></div>");
+//         },
+//         change: function( event, ui ) {
+//             var h = Math.floor(ui.value/600);
+//             var m = Math.floor(ui.value/10)%60;
+//             if (m < 10)
+//                 m = "0"+ m;
+//             var time = h +":"+ m;
+//             $(this).find('.ui-slider-time').html(time);
+//             $(this).find('.ui-slider-time').css('left', $(this).find('.ui-slider-handle').css('left'));
+//         },
+//         slide: function( event, ui ) {
+//             timestep = ui.value;
+//         }
+//     });
+
+//     $([window, document]).focusin(function(){
+//         //console.log("entrou");
+//     }).focusout(function(){
+//         pausesim = false; //coloca false na var
+//         $('#pause').click(); //clica no botao e pause fica true
+//     });	
+
+//     // checkbox
+//     $('.checkslider').each( function(){
+//         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
+//     })
+    
+// })
 
 function changeSoundIcon(){
     const soundObj = document.querySelector('#sound')
@@ -658,101 +761,8 @@ function changeSoundIcon(){
     }
 }
 
-function isFullScreen(){
-    return (document.fullscreenElement && document.fullscreenElement !== null) ||
-        (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
-        (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
-        (document.msFullscreenElement && document.msFullscreenElement !== null)    
-}
-
-function setFullScreen(state){
-    if (state){
-        var elem = $("body")[0];
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        }
-        else if (elem.mozRequestFullScreen) { /* Firefox */
-            elem.mozRequestFullScreen();
-        }
-        else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-            elem.webkitRequestFullscreen();
-        }
-        else if (elem.msRequestFullscreen) { /* IE/Edge */
-            elem.msRequestFullscreen();
-        }
-        fullscreen = true;
-    }
-    else{
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-        else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
-        else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        }
-        else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-        fullscreen = false;
-    }
-    setTimeout( function(){
-        resize();
-    }, 100);
-}
-
-$(window).resize( function() {
-    resize();
-});
-
-function resize() {
-    if (game){
-        var canvasH, canvasW;
-        if ($(window).width() > $(window).height()){
-            var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
-            canvasH = $(window).height();
-            canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-            game.camera.scale.x = $(window).height() * usefulRatio / screenH;
-            game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-            if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-                new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
-            }
-
-        }
-        else{
-            if ($('#dialog-box').length){
-                $('#fog').remove();
-            }
-
-            var usefulRatio = screenW / arenaD;
-            canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
-            canvasW = $(window).width();
-            game.camera.scale.x = $(window).width() * usefulRatio / screenW;
-            game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-            if ($(window).height() < 600 && !isFullScreen() && !fullscreen && $('#dialog-box').length == 0){
-                new Message({
-                    message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
-                    buttons: {no: 'Não', yes: 'SIM'} 
-                }).show().click('yes', () => {
-                    setFullScreen(true);
-                    $('#fog').remove();
-                    fullscreen = true;
-                });
-            }
-        }	
-        game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
-        game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
-        game.camera.bounds.height = screenH;
-        game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
-        game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
-
-        $('#canvas-div canvas').click();
-    }
-}
-
 //the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
-uiVars = [];
+// uiVars = [];
 function create_ui(nglad){
     $('#ui-container').html("");
     for (let i=0 ; i<nglad ; i++){
@@ -778,10 +788,10 @@ function create_ui(nglad){
 }
 
 function copyToClipboard(text) {
-    $('body').append("<input type='text' id='icopy' value='"+ text +"'>");
-    $('#icopy').select();
-    document.execCommand("copy");
-    $('#icopy').remove();
+    document.querySelector('body').insertAdjacentHTML('beforeend', `<input type='text' id='icopy' value='${text}'>`)
+    document.querySelector('#icopy').select()
+    document.execCommand("copy")
+    document.querySelector('#icopy').remove()
 }	
 
 function changeCrowd (value) {
