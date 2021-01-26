@@ -365,7 +365,7 @@ assets.validateSkin = function(selectedArray){
 }
 
 assets.getImage = function(key){
-    return images[key]
+    return images[key] || false
 }
 
 assets.forAllImages = function(callback){

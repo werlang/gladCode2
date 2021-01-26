@@ -1,4 +1,28 @@
-export const render = {
+import { assets } from "./assets.js"
+
+const glads = {
+    load: async function(info){
+        glads.members = []
+
+        info.forEach(async (e,i) => {
+            const skin = JSON.parse(e.skin)
+            this.members.push({
+                id: i,
+                name: e.name,
+                user: e.user,
+                skin: skin,
+                spritesheet: await assets.fetchSpritesheet(e.skin),
+                gender: skin.some(s => s == 'female' ) ? 'female' : 'male',
+                move: skin.some(s => {
+                    const item = assets.getImage(s)
+                    return item.move && item.move == 'thrust'
+                }) ? 'stab' : 'slash'
+            })
+        })
+    }
+}
+
+const render = {
     init: async function(){
         if (this.game){
             return true
@@ -21,6 +45,8 @@ export const render = {
     }
     
 }
+
+export { render, glads }
 
 // var tileD = 32; //size of a single tile
 // var screenW = tileD * 42; //how many tiles there is in the entire image

@@ -2,11 +2,8 @@ import { mergeLog } from "./utils.js"
 import { header } from "./header.js"
 import { post } from "./utils.js"
 import { loader } from "./loader.js"
-import { assets } from "./assets.js"
-import { render } from "./render.js"
+import { render, glads } from "./render.js"
 
-var json = {};
-var hashes = [], newindex = new Array();
 var potionList = {}
 
 header.load()
@@ -19,7 +16,7 @@ const simulation = {
 
     stepButton: {
         index: 4,
-        options: [-10,-5,-2,-1,1,2,5,10],
+        options: [-10, -5, -2, -1, 1, 2, 5, 10],
 
         getValue: function(){
             return Math.round(this.options[this.index])
@@ -113,7 +110,7 @@ const simulation = {
                 const winner = {}
                 this.steps[this.time].glads.forEach((e,i) => {
                     //revive gladiator when running backwards
-                    if (parseFloat(e.hp) > 0 && !document.querySelector('.ui-glad')[i].classList.contains('dead') &&
+                    if (parseFloat(e.hp) > 0 && !ui.glads[i].isDead &&
                     !winner.id || winner.hp < parseFloat(e.hp)){
                         winner.name = e.name
                         winner.hp = parseFloat(e.hp)
@@ -133,8 +130,8 @@ const simulation = {
                             <div id='image-container'>
                                 <div id='image'></div>
                                 <div id='name-team-container'>
-                                    <span id='name'>${name}</span>
-                                    <span id='team'>${team}</span>
+                                    <span id='name'>${winner.name}</span>
+                                    <span id='team'>${winner.team}</span>
                                 </div>
                             </div>
                             <div id='button-container'>
@@ -188,7 +185,7 @@ const simulation = {
 
                     if (winner.id){
                         loader.load('gladcard').then(({ getSpriteThumb }) => {
-                            document.querySelector('#end-message #image').innerHTML = getSpriteThumb(hashes[newindex[winner.id]],'walk','down')
+                            document.querySelector('#end-message #image').innerHTML = getSpriteThumb(glads.members[winner.id].spritesheet,'walk','down')
                         })
                     }
                     
@@ -197,20 +194,20 @@ const simulation = {
                         document.querySelector('#end-message').classList.remove('fadein')
                     }, 1000)
 
-                    music.pause()
-                    victory.play('', 0, music.volume / 0.1)
+                    // music.pause()
+                    // victory.play('', 0, music.volume / 0.1)
                 }
             }
             else if (!this.showScore){
                 document.querySelector('#fog').remove()
                 this.showScore = true
-                music.resume()
+                // music.resume()
             }
             render.update(this.steps[this.time])
             if (!this.paused){
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
-        }, 100 / this.step.getValue())
+        }, 100 / this.stepButton.getValue())
     },
 
     isFullScreen: function(){
@@ -314,9 +311,13 @@ const ui = {
     showText: false,
     glads: [],
 
-    init: function(nglad){
+    init: async function(){
         const container = document.createElement("div")
-        for (let i=0 ; i<nglad ; i++){
+        container.id = "ui-container"
+
+        const template = await (await fetch("ui_template.html")).text()
+
+        for (let i=0 ; i<glads.members.length ; i++){
             const glad = document.createElement("div")
             glad.classList.add("ui-glad")
             container.appendChild(glad)
@@ -348,7 +349,7 @@ const ui = {
                 }
             })
 
-            fetch("ui_template.html").then(data => data.text().then(content => glad.innerHTML = content))
+            glad.innerHTML = template
         }
 
         this.glads.forEach(g => {
@@ -604,7 +605,7 @@ const ui = {
                 show_text: simulation.preferences.text,
                 show_speech: simulation.preferences.speech,
                 sfx_volume: simulation.preferences.sound.sfx,
-                music_volume: music.volume,
+                // music_volume: music.volume,
                 crowd: simulation.preferences.crowd
             })
 
@@ -675,7 +676,7 @@ const ui = {
             post("back_log.php", {
                 action: "GET",
                 loghash: simulation.logHash
-            }).then(data => {
+            }).then(async data => {
                 // console.log(data)
                 if (data.status == "EXPIRED"){
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
@@ -685,62 +686,19 @@ const ui = {
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
                 }
                 else{
-                    // render.stab = []
-                    // render.gender = []
-                    
                     simulation.log = JSON.parse(data.log)
-                    const glads = log[0].glads
-                    const skinsReady = []
-
-                    // console.log(log);
-                    glads.forEach(g => {
-                        // console.log(g)
-                        let skin = g.skin
-
-                        skinsReady.push(new Promise(resolve => {
-                            assets.fetchSpritesheet(skin).then(data => {
-                                resolve(data)
-                            })
-                        }))
-
-                        skin = JSON.parse(skin)
-                        
-                        // render.stab[i] = "0"
-                        // render.gender[i] = "male"
-
-                        skin.forEach(s => {
-                            const item = assets.getImage(s)
-                            if (item){
-                                if (item.move == 'thrust'){
-                                    // render.stab[i] = "1"
-                                }
-                                if (item.id == 'female'){
-                                    // render.gender[i] = "female"
-                                }
-                            }
-                            else{
-                                // console.log(`Asset ${s} cannot be loaded`)
-                            }
-                        })
+                    simulation.steps = mergeLog(simulation.log)
+                    simulation.log[0].glads.forEach(g => {
+                        // destroca os # nos nomes por espaços
+                        g.name = g.name.split("#").join(" ")
+                        g.user = g.user.split("#").join(" ")
                     })
 
-                    Promise.all(skinsReady).then(async () => {
-                        document.querySelector('#loadbar #status').innerHTML = "Carregando render"
-                        await render.init()
+                    await glads.load(simulation.log[0].glads)
 
-                        ui.init(simulation.log[0].glads.length)
-
-                        // TODO: atualizar
-                        // $( "#time" ).slider("option", "max", simulation.log.length)
-                        // for (let i=0 ; i<simulation.log[0].glads.length ; i++){
-                        //     simulation.log[0].glads[i].name = simulation.log[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-                        //     simulation.log[0].glads[i].user = simulation.log[0].glads[i].user.replace(/#/g," ");
-                        //     newindex[i] = i;
-                        // }
+                    await ui.init()
                 
-                        simulation.steps = mergeLog(simulation.log)
-                        simulation.startTimer()
-                    })
+                    simulation.startTimer()
                 }
             })
 
