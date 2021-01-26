@@ -2,6 +2,8 @@ import { mergeLog } from "./utils.js"
 import { header } from "./header.js"
 import { post } from "./utils.js"
 import { loader } from "./loader.js"
+import { assets } from "./assets.js"
+import { render } from "./render.js"
 
 var json = {};
 var hashes = [], newindex = new Array();
@@ -150,7 +152,7 @@ const simulation = {
                     document.querySelector('#end-message #share').click('click', () => {
                         document.querySelector('#end-message').classList.add('hidden')
 
-                        const link = "play/"+ simulation.log
+                        const link = "play/"+ simulation.logHash
                         const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`
                         const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`
                         const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`
@@ -159,7 +161,7 @@ const simulation = {
                             <div id='link'>
                                 <span id='title'>Compartilhar batalha</span>
                                 <span id='site'>gladcode.dev/play/</span>
-                                <span id='hash'>${simulation.log}</span>
+                                <span id='hash'>${simulation.logHash}</span>
                             </div>
                             <div id='social'>
                                 <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
@@ -174,7 +176,7 @@ const simulation = {
                             document.querySelector('#url #hash').classList.add('clicked')
                             setTimeout(() => {
                                 document.querySelector('#url #hash').classList.remove('clicked')
-                                document.querySelector('#url #hash').innerHTML = simulation.log
+                                document.querySelector('#url #hash').innerHTML = simulation.logHash
                             }, 500)
                         })
                         
@@ -204,7 +206,7 @@ const simulation = {
                 this.showScore = true
                 music.resume()
             }
-            phaser_update(this.steps[this.time])
+            render.update(this.steps[this.time])
             if (!this.paused){
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
@@ -262,55 +264,188 @@ const simulation = {
     },
     
     resize: function() {
-        loader.load('render').then(({render}) => {
-            if (render.game){
-                const game = render.game
-                var canvasH, canvasW;
-                if ($(window).width() > $(window).height()){
-                    var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
-                    canvasH = $(window).height();
-                    canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-                    game.camera.scale.x = $(window).height() * usefulRatio / screenH;
-                    game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-                    if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-                        new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
-                    }
-        
+        if (render.game){
+            const game = render.game
+            var canvasH, canvasW;
+            if ($(window).width() > $(window).height()){
+                var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
+                canvasH = $(window).height();
+                canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+                game.camera.scale.x = $(window).height() * usefulRatio / screenH;
+                game.camera.scale.y = $(window).height() * usefulRatio / screenH;
+                if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
+                    new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
                 }
-                else{
-                    if ($('#dialog-box').length){
-                        $('#fog').remove();
-                    }
-        
-                    var usefulRatio = screenW / arenaD;
-                    canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
-                    canvasW = $(window).width();
-                    game.camera.scale.x = $(window).width() * usefulRatio / screenW;
-                    game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-                    if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
-                        new Message({
-                            message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
-                            buttons: {no: 'Não', yes: 'SIM'} 
-                        }).show().click('yes', () => {
-                            this.setFullScreen(true);
-                            $('#fog').remove();
-                            this.fullscreen = true;
-                        });
-                    }
-                }	
-                game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
-                game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
-                game.camera.bounds.height = screenH;
-                game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
-                game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
-        
-                $('#canvas-div canvas').click();
+    
             }
-        })
+            else{
+                if ($('#dialog-box').length){
+                    $('#fog').remove();
+                }
+    
+                var usefulRatio = screenW / arenaD;
+                canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
+                canvasW = $(window).width();
+                game.camera.scale.x = $(window).width() * usefulRatio / screenW;
+                game.camera.scale.y = $(window).width() * usefulRatio / screenW;
+                if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
+                    new Message({
+                        message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
+                        buttons: {no: 'Não', yes: 'SIM'} 
+                    }).show().click('yes', () => {
+                        this.setFullScreen(true);
+                        $('#fog').remove();
+                        this.fullscreen = true;
+                    });
+                }
+            }	
+            game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
+            game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
+            game.camera.bounds.height = screenH;
+            game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
+            game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
+    
+            $('#canvas-div canvas').click();
+        }
     }
 }
 
+const ui = {
+    showText: false,
+    glads: [],
+
+    init: function(nglad){
+        const container = document.createElement("div")
+        for (let i=0 ; i<nglad ; i++){
+            const glad = document.createElement("div")
+            glad.classList.add("ui-glad")
+            container.appendChild(glad)
+
+            this.glads.push({
+                id: i,
+                isDead: false,
+                isFollow: false,
+                element: glad,
+                follow: function(state){
+                    if (state === true){
+                        this.element.classList.add('follow')
+
+                        if (!this.isFollow){
+                            this.isFollow = true
+                            render.game.camera.follow()
+                            this.detailedWindow.create()
+                        }
+                    }
+                    else{
+                        this.element.classList.remove('follow')
+
+                        if (this.isFollow){
+                            this.isFollow = false
+                            render.game.camera.unfollow()
+                            this.detailedWindow.destroy()
+                        }
+                    }
+                }
+            })
+
+            fetch("ui_template.html").then(data => data.text().then(content => glad.innerHTML = content))
+        }
+
+        this.glads.forEach(g => {
+            g.element.addEventListener('click', () => {
+                this.glads.filter(e => e != g).forEach(e => e.follow(false))
+                g.follow(!(g.isFollow || g.isDead))
+            })
+        })
+
+        document.querySelector('#ui-container').replaceWith(container)
+        this.showText = true
+    },
+
+    detailedWindow: {
+        destroy: function(){
+            document.querySelector('#details').remove()
+        },
+
+        create: function(){
+            const index = ui.glads.filter(e => e.isFollow)[0].id
+            const glad = simulation.log.glads[index]
+            const buffBox = glad.buffs.map((e,i) => `<span>${i}</span><span>0.0</span><span>0.0</span>`).join("")
+
+            this.destroy()
+            document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='details'>
+                <div id='title' class='span-col-2'>
+                    <i class="fas fa-arrows-alt" title='Mover'></i>
+                    <span>Detalhes do gladiador</span>
+                    <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
+                </div>
+                <div id='content'>
+                    <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
+                    <span>LVL:</span><input readonly>
+                    <span>XP:</span><input readonly>
+                    <span>X:</span><input readonly>
+                    <span>HP:</span><input readonly>
+                    <span>Y:</span><input readonly>
+                    <span>AP:</span><input readonly>
+                    <span>STR:</span><input readonly>
+                    <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
+                    <span>AGI:</span><input readonly>
+                    <span>Action:</span><input readonly>
+                    <span>INT:</span><input readonly>
+                    <div id='buffs'>
+                        <span>Buffs:</span>
+                        <span>Valor</span>
+                        <span>Tempo</span>
+                        <div id='box'>${buffBox}</div>
+                    </div>
+                    <span>AS:</span><input readonly>
+                    <span>CS:</span><input readonly>
+                    <span>Speed:</span><input readonly>
+                    <span>Locked:</span><input readonly>
+                    <div id='items'>
+                        <span>Items:</span>
+                        <div id='box'></div>
+                    </div>
+                    <div id='code'>
+                        <span>Comandos:</span>
+                        <span>Durac.</span>
+                        <span>Tempo</span>
+                        <div id='box'></div>
+                    </div>
+                </div>
+            </div>`)
+               
+            // TODO: ver substituto pro draggable
+            // $('#details').hide().fadeIn().draggable({
+            //     handle: "#title"
+            // });
+        
+            document.querySelector('#details #minimize').addEventListener('click', () => {
+                // TODO: animate disso aqui
+                // $('#details').animate({
+                //     "top": $(window).height() - 33,
+                //     "left": $(window).width() - 350
+                // });
+        
+            });
+        
+            if (Object.keys(potionList).length == 0){
+                potionList.ready = post("back_slots.php", {
+                    action: "ITEMS"
+                }).then( data => {
+                    // console.log(data.potions)
+                    data.potions.forEach((e,i) => potionList[e.id] = i)
+                    // console.log(potionList)
+                })
+            }
+        
+        }
+    } 
+}
+
 ;(async () => {
+    render.init()
+
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
     // document.querySelector('#footer-wrapper').classList.add('white')
 
@@ -378,7 +513,7 @@ const simulation = {
         })
     })
 
-    document.querySelector('#settings').addEventListener('click', async () => {
+    document.querySelector('#settings').addEventListener('click', () => {
         const uiChecked = document.querySelector('#ui-container').style.display == 'flex'
 
         document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
@@ -406,7 +541,6 @@ const simulation = {
             </div>
         </div>`)
 
-        // const render = await loader.load('render')
         // const soundtest = render.game.add.audio('lvlup')
         // TODO: verificar como arrumar os sliders.
         // $( "#sfx-volume" ).slider({
@@ -511,7 +645,7 @@ const simulation = {
             new Message({message: `Erro na URL`}).show()
         }
         else{
-            simulation.log = document.querySelector('#log').innerHTML
+            simulation.logHash = document.querySelector('#log').innerHTML
 
             post("back_play.php", {
                 action: "GET_PREF"
@@ -540,8 +674,8 @@ const simulation = {
 
             post("back_log.php", {
                 action: "GET",
-                loghash: simulation.log
-            }).then( async data => {
+                loghash: simulation.logHash
+            }).then(data => {
                 // console.log(data)
                 if (data.status == "EXPIRED"){
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
@@ -551,13 +685,10 @@ const simulation = {
                     document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
                 }
                 else{
-                    // const render = await loader.load('render')
                     // render.stab = []
                     // render.gender = []
                     
-                    const {assets} = await loader.load('assets')
-
-                    const log = JSON.parse(data.log)
+                    simulation.log = JSON.parse(data.log)
                     const glads = log[0].glads
                     const skinsReady = []
 
@@ -593,44 +724,23 @@ const simulation = {
                         })
                     })
 
-                    Promise.all(skinsReady).then(() => {
-                        const simulation = log
-                        json = {};
-                                    
+                    Promise.all(skinsReady).then(async () => {
                         document.querySelector('#loadbar #status').innerHTML = "Carregando render"
-                        console.log('started')
+                        await render.init()
 
-                        // TODO: fazer chamada pro load_phaser e start timer
-                        // if (load_phaser()){
-                        //     //console.log(simulation[0]);
-                        //     create_ui(simulation[0].glads.length);
-                        //     $( "#time" ).slider("option", "max", simulation.length);
-                        //     for (let i=0 ; i<simulation[0].glads.length ; i++){
-                        //         simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-                        //         simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
-                        //         newindex[i] = i;
-                        //     }
-                    
-                        //     steps = mergeLog(simulation)
-                        //     start_timer(steps)
+                        ui.init(simulation.log[0].glads.length)
+
+                        // TODO: atualizar
+                        // $( "#time" ).slider("option", "max", simulation.log.length)
+                        // for (let i=0 ; i<simulation.log[0].glads.length ; i++){
+                        //     simulation.log[0].glads[i].name = simulation.log[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
+                        //     simulation.log[0].glads[i].user = simulation.log[0].glads[i].user.replace(/#/g," ");
+                        //     newindex[i] = i;
                         // }
+                
+                        simulation.steps = mergeLog(simulation.log)
+                        simulation.startTimer()
                     })
-                    
-                    // function keepOrder(i, hashes, skin){
-                    //     fetchSpritesheet(skin).then( function(data){
-                    //         hashes[i] = data;
-                    //         // var pct = (100 * hashes.length / glads.length).toFixed(0);
-                    //         // $('#loadbar #status').html("Montando gladiadores");
-                    //         // $('#loadbar #second .bar').width(pct +"%");
-                    //         // $('#loadbar #main .bar').width(25 + pct/4 +"%");
-
-                    //         if (hashes.length == glads.length){
-                    //             setTimeout( function(){
-                    //             }, 100);
-                    //         }
-                    //     });
-                    // }
-
                 }
             })
 
@@ -660,7 +770,7 @@ const simulation = {
             //     url: "back_log.php",
             //     data: {
             //         action: "GET",
-            //         loghash: simulation.log
+            //         loghash: simulation.logHash
             //     },
             //     success: function(data){
             //         // console.log(data);
@@ -761,32 +871,6 @@ function changeSoundIcon(){
     }
 }
 
-//the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
-// uiVars = [];
-function create_ui(nglad){
-    $('#ui-container').html("");
-    for (let i=0 ; i<nglad ; i++){
-        $('#ui-container').append("<div class='ui-glad'></div>");
-        $('.ui-glad').last().load("ui_template.html", function(){
-            $(this).click( function(){
-                if ($(this).hasClass('follow') || $(this).hasClass('dead')){
-                    game.camera.unfollow();
-                    $('.ui-glad').removeClass('follow');
-                    $('#details').remove();
-                }
-                else{
-                    game.camera.follow(sprite[i]);
-                    $('.ui-glad').removeClass('follow');
-                    $(this).addClass('follow');
-                    createDetailedWindow();
-                }
-            });
-        });
-        uiVars.push({});
-    }
-    uiVars.showtext = true;
-}
-
 function copyToClipboard(text) {
     document.querySelector('body').insertAdjacentHTML('beforeend', `<input type='text' id='icopy' value='${text}'>`)
     document.querySelector('#icopy').select()
@@ -807,87 +891,6 @@ function changeCrowd (value) {
                 npc[i].sprite[j].kill();
         }
     }
-}
-
-function createDetailedWindow(){
-    var index = $('.ui-glad').index($('.follow'));
-    var glad = json.glads[index];
-
-    $('#details').remove();
-    $('body').append(`<div id='details'>
-        <div id='title' class='span-col-2'>
-            <i class="fas fa-arrows-alt" title='Mover'></i>
-            <span>Detalhes do gladiador</span>
-            <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
-        </div>
-        <div id='content'>
-            <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
-            <span>LVL:</span><input readonly>
-            <span>XP:</span><input readonly>
-            <span>X:</span><input readonly>
-            <span>HP:</span><input readonly>
-            <span>Y:</span><input readonly>
-            <span>AP:</span><input readonly>
-            <span>STR:</span><input readonly>
-            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
-            <span>AGI:</span><input readonly>
-            <span>Action:</span><input readonly>
-            <span>INT:</span><input readonly>
-            <div id='buffs'>
-                <span>Buffs:</span>
-                <span>Valor</span>
-                <span>Tempo</span>
-                <div id='box'><div></div><div></div><div></div></div>
-            </div>
-            <span>AS:</span><input readonly>
-            <span>CS:</span><input readonly>
-            <span>Speed:</span><input readonly>
-            <span>Locked:</span><input readonly>
-            <div id='items'>
-                <span>Items:</span>
-                <div id='box'></div>
-            </div>
-            <div id='code'>
-                <span>Comandos:</span>
-                <span>Durac.</span>
-                <span>Tempo</span>
-                <div id='box'></div>
-            </div>
-        </div>
-    </div>`);
-
-    var box = "";
-    for (let i in glad.buffs){
-        box += `<span>${i}</span><span>0.0</span><span>0.0</span>`;
-    }
-    $('#details #buffs #box').html(box);
-
-    $('#details').hide().fadeIn().draggable({
-        handle: "#title"
-    });
-
-    $('#details #minimize').click( function(){
-        $('#details').animate({
-            "top": $(window).height() - 33,
-            "left": $(window).width() - 350
-        });
-
-    });
-
-    if (Object.keys(potionList).length == 0){
-        potionList.ready = post("back_slots.php", {
-            action: "ITEMS"
-        }).then( data => {
-            let potions = data.potions
-            // console.log(potions)
-            for (i in potions){
-                let p = potions[i]
-                potionList[p.id] = i
-            }
-            // console.log(potionList)
-        })
-    }
-
 }
 
 async function updateDetailedWindow(){
