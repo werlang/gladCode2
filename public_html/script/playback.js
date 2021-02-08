@@ -4,7 +4,23 @@ import { post } from "./utils.js"
 import { loader } from "./loader.js"
 import { render, glads } from "./render.js"
 
-var potionList = {}
+const potions = {
+    ready: false,
+    list: {},
+
+    init: async function(){
+        if (!this.ready){
+            post("back_slots.php", {
+                action: "ITEMS"
+            }).then( data => {
+                // console.log(data.potions)
+                data.potions.forEach((e,i) => this.list[e.id] = i)
+                // console.log(potionList)
+                this.ready = true
+            })
+        }
+    }
+}
 
 header.load()
 
@@ -27,10 +43,10 @@ const simulation = {
         },
         back: function(){
             this.index = this.index > 0 ? this.index - 1 : 0
-        },    
+        },
         forward: function(){
             this.index = this.index < this.options.length - 1 ? this.index + 1 : this.options.length - 1
-        },    
+        },
     },
 
     preferences: {
@@ -55,7 +71,7 @@ const simulation = {
         }
         else{
             this.stepButton[direction]()
-            
+
             if (this.stepButton.getValue() > 0){
                 document.querySelector('#back-step .speed').innerHTML = ""
                 document.querySelector('#fowd-step .speed').innerHTML = this.stepButton.getValue() + 'x'
@@ -73,7 +89,7 @@ const simulation = {
     back: function(){
         this.advance('back')
     },
-    
+
     forward: function(){
         this.advance('forward')
     },
@@ -101,6 +117,10 @@ const simulation = {
 
     startTimer: function(){
         this.timeout = setTimeout(() => {
+            if (!this.paused){
+                this.startTimer()
+            }
+
             if (this.time < 0){
                 this.time = 0
             }
@@ -166,7 +186,7 @@ const simulation = {
                             </div>
                             <button id='close' class='button'>OK</button>
                         </div>`)
-                        
+
                         document.querySelector('#url #social #getlink').addEventListener('click', () => {
                             copyToClipboard(link)
                             document.querySelector('#url #hash').innerHTML = 'Link copiado'
@@ -176,7 +196,7 @@ const simulation = {
                                 document.querySelector('#url #hash').innerHTML = simulation.logHash
                             }, 500)
                         })
-                        
+
                         document.querySelector('#url #close').addEventListener('click', () => {
                             document.querySelector('#url').remove()
                             document.querySelector('#end-message').classList.remove('hidden')
@@ -188,7 +208,7 @@ const simulation = {
                             document.querySelector('#end-message #image').innerHTML = getSpriteThumb(glads.members[winner.id].spritesheet,'walk','down')
                         })
                     }
-                    
+
                     document.querySelector('#end-message').classList.add('fadein')
                     setTimeout(() => {
                         document.querySelector('#end-message').classList.remove('fadein')
@@ -203,7 +223,9 @@ const simulation = {
                 this.showScore = true
                 // music.resume()
             }
-            render.update(this.steps[this.time])
+            render.step = this.steps[this.time]
+            ui.update(render.step)
+
             if (!this.paused){
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
@@ -222,7 +244,7 @@ const simulation = {
         if (typeof state == 'undefined'){
             state = !this.isFullScreen()
         }
-    
+
         if (state){
             const elem = document.querySelector("body")
             if (elem.requestFullscreen) {
@@ -254,56 +276,56 @@ const simulation = {
             }
             this.fullscreen = false;
         }
-    
+
         setTimeout(() => {
             this.resize()
         }, 100)
     },
-    
+
     resize: function() {
-        if (render.game){
-            const game = render.game
-            var canvasH, canvasW;
-            if ($(window).width() > $(window).height()){
-                var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
-                canvasH = $(window).height();
-                canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-                game.camera.scale.x = $(window).height() * usefulRatio / screenH;
-                game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-                if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-                    new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
-                }
-    
-            }
-            else{
-                if ($('#dialog-box').length){
-                    $('#fog').remove();
-                }
-    
-                var usefulRatio = screenW / arenaD;
-                canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
-                canvasW = $(window).width();
-                game.camera.scale.x = $(window).width() * usefulRatio / screenW;
-                game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-                if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
-                    new Message({
-                        message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`, 
-                        buttons: {no: 'Não', yes: 'SIM'} 
-                    }).show().click('yes', () => {
-                        this.setFullScreen(true);
-                        $('#fog').remove();
-                        this.fullscreen = true;
-                    });
-                }
-            }	
-            game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
-            game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
-            game.camera.bounds.height = screenH;
-            game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
-            game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
-    
-            $('#canvas-div canvas').click();
-        }
+        // if (render.game){
+        //     const game = render.game
+        //     var canvasH, canvasW;
+        //     if ($(window).width() > $(window).height()){
+        //         var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
+        //         canvasH = $(window).height();
+        //         canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+        //         game.camera.scale.x = $(window).height() * usefulRatio / screenH;
+        //         game.camera.scale.y = $(window).height() * usefulRatio / screenH;
+        //         if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
+        //             new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
+        //         }
+
+        //     }
+        //     else{
+        //         if ($('#dialog-box').length){
+        //             $('#fog').remove();
+        //         }
+
+        //         var usefulRatio = screenW / arenaD;
+        //         canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
+        //         canvasW = $(window).width();
+        //         game.camera.scale.x = $(window).width() * usefulRatio / screenW;
+        //         game.camera.scale.y = $(window).width() * usefulRatio / screenW;
+        //         if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
+        //             new Message({
+        //                 message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`,
+        //                 buttons: {no: 'Não', yes: 'SIM'}
+        //             }).show().click('yes', () => {
+        //                 this.setFullScreen(true);
+        //                 $('#fog').remove();
+        //                 this.fullscreen = true;
+        //             });
+        //         }
+        //     }
+        //     game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
+        //     game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
+        //     game.camera.bounds.height = screenH;
+        //     game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
+        //     game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
+
+        //     $('#canvas-div canvas').click();
+        // }
     }
 }
 
@@ -327,6 +349,9 @@ const ui = {
                 isDead: false,
                 isFollow: false,
                 element: glad,
+
+                buffs: {},
+
                 follow: function(state){
                     if (state === true){
                         this.element.classList.add('follow')
@@ -360,12 +385,119 @@ const ui = {
         })
 
         document.querySelector('#ui-container').replaceWith(container)
+        this.container = container
         this.showText = true
+    },
+
+    update: function(step){
+        if (simulation.preferences.frames){
+            // TODO: HERE
+            if (simulation.preferences.text && !this.showtext){
+                this.showtext = true
+                this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
+            }
+            else if (!simulation.preferences.text && this.showtext){
+                this.showtext = false
+                this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.add('hidden'))
+            }
+
+            // console.log(step)
+            step.glads.forEach(g => {
+                const glad = this.glads.filter(e => e.id == g.id)[0]
+
+                if (glad){
+                    // TODO: find out how to get posion (boolean)
+                    // if (gladArray[i])
+                    //     var poison = gladArray[i].poison;
+
+                    if (g.name != glad.name){
+                        glad.element.querySelector('.glad-name span').innerHTML = g.name
+                        loader.load('gladcard').then(({ getSpriteThumb }) => {
+                            glad.element.querySelector('.glad-portrait').innerHTML = getSpriteThumb(glads.members[g.id].spritesheet,'walk','down')
+                            // ta colocando "Obejct canvas" ao inves do canvas em si
+                        })
+                    }
+
+                    if (g.STR != glad.STR){
+                        glad.element.querySelector('.glad-str span').innerHTML = g.STR
+                    }
+
+                    if (g.AGI != glad.AGI){
+                        glad.element.querySelector('.glad-agi span').innerHTML = g.AGI
+                    }
+
+                    if (g.INT != glad.INT){
+                        glad.element.querySelector('.glad-int span').innerHTML = g.INT
+                    }
+
+                    if (g.lvl != glad.lvl){
+                        glad.element.querySelector('.lvl-value span').innerHTML = g.lvl
+
+                        glad.element.querySelector('.lvl-value').classList.add('up')
+                        setTimeout(() => glad.element.querySelector('.lvl-value').classList.remove('up'), 500)
+                    }
+
+                    if (g.xp != glad.xp){
+                        glad.element.querySelector('.xp-bar .filled').style.height = (g.xp / g.tonext * 100) + '%'
+                    }
+
+                    if (g.hp != glad.hp){
+                        glad.element.querySelector('.hp-bar .filled').style.width = (g.hp / g.maxhp * 100) + '%'
+                        glad.element.querySelector('.hp-bar .text').innerHTML = `${g.hp.toFixed(0)} / ${g.maxhp}`
+                    }
+
+                    if (g.hp <= 0){
+                        glad.isDead = true
+                        glad.element.querySelector('.ui-glad').classList.add('dead')
+                    }
+                    else if (glad.isDead){
+                        glad.isDead = false
+                        glad.element.querySelector('.ui-glad').classList.remove('dead')
+                    }
+
+                    if (g.ap != glad.ap){
+                        glad.element.querySelector('.ap-bar .filled').style.width = (g.ap / g.maxap * 100) + '%'
+                        glad.element.querySelector('.ap-bar .text').innerHTML = `${g.ap.toFixed(0)} / ${g.maxap}`
+                    }
+
+                    ["burn", "resist", "stun", "invisible", "speed", "poison"].forEach(b => {
+                        if (g.buffs[b] && g.buffs[b].timeleft){
+                            glad.buffs[b] = true
+                            glad.element.querySelector(`.buff-${b}`).classList.add('active')
+                        }
+                        else if (glad.buffs[b]){
+                            glad.buffs[b] = false
+                            glad.element.querySelector(`.buff-${b}`).classList.remove('active')
+                        }
+                    })
+
+                    if (glad.element.classList.contains("follow")){
+                        this.detailedWindow.update()
+                    }
+                }
+
+                
+                [
+                    "name",
+                    "STR", "AGI", "INT", 
+                    "hp", "maxhp", "ap", "maxap", 
+                    "lvl", "xp", "tonext", 
+                    "x", "y", "head", 
+                    "as", "cs", "spd",
+                    "lockedfor", "action"
+                ].forEach(e => glad[e] = g[e]);
+
+                ["burn", "resist", "invisible", "stun", "speeds"].forEach(e => glad.buffs[e] = g.buffs && g.buffs[e] ? g.buffs[e].timeleft : 0)
+
+            })
+        }
     },
 
     detailedWindow: {
         destroy: function(){
-            document.querySelector('#details').remove()
+            if (this.element){
+                this.element.remove()
+            }
         },
 
         create: function(){
@@ -374,7 +506,11 @@ const ui = {
             const buffBox = glad.buffs.map((e,i) => `<span>${i}</span><span>0.0</span><span>0.0</span>`).join("")
 
             this.destroy()
-            document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='details'>
+
+            this.element = document.createElement("div")
+            this.element.id = "details"
+
+            this.element.innerHTML = `<div id='details'>
                 <div id='title' class='span-col-2'>
                     <i class="fas fa-arrows-alt" title='Mover'></i>
                     <span>Detalhes do gladiador</span>
@@ -414,34 +550,120 @@ const ui = {
                         <div id='box'></div>
                     </div>
                 </div>
-            </div>`)
-               
+            </div>`
+
+            document.querySelector('body').insertAdjacentElement('beforeend', this.element)
+
             // TODO: ver substituto pro draggable
             // $('#details').hide().fadeIn().draggable({
             //     handle: "#title"
             // });
-        
-            document.querySelector('#details #minimize').addEventListener('click', () => {
+
+            this.element.querySelector('#minimize').addEventListener('click', () => {
                 // TODO: animate disso aqui
                 // $('#details').animate({
                 //     "top": $(window).height() - 33,
                 //     "left": $(window).width() - 350
                 // });
-        
+
             });
-        
-            if (Object.keys(potionList).length == 0){
-                potionList.ready = post("back_slots.php", {
-                    action: "ITEMS"
-                }).then( data => {
-                    // console.log(data.potions)
-                    data.potions.forEach((e,i) => potionList[e.id] = i)
-                    // console.log(potionList)
-                })
+
+            potions.init()
+        },
+
+        update: async function(){
+            const glad = ui.glads.members.filter(e => e.element.classList.contains("follow"))[0]
+
+            const info = [
+                glad.name,
+                glad.lvl,
+                `${glad.xp} / ${glad.tonext}`,
+                glad.x.toFixed(1),
+                `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
+                glad.y.toFixed(1),
+                `${glad.ap.toFixed(1)} / ${glad.maxap}`,
+                glad.STR,
+                glad.head.toFixed(1),
+                glad.AGI,
+                render.actionList.filter(e => e.value == glad.action)[0].name,
+                glad.INT,
+                glad.as.toFixed(1),
+                glad.cs.toFixed(1),
+                glad.spd.toFixed(1),
+                glad.lockedfor.toFixed(1)
+            ];
+
+            this.element.querySelectorAll('input').forEach((e,i) => e.value = info[i])
+
+            this.element.querySelector('#head span').style.transform = `rotate(${glad.head.toFixed(0)}deg)`
+
+            // var c = 0;
+            glad.buffs.forEach(b => {
+                if (parseFloat(glad.buffs[i].timeleft) > 0 && !$('#details #buffs #box span').eq(c*3).hasClass('active')){
+                    for (let j=0 ; j<3 ; j++)
+                        $('#details #buffs #box span').eq(j + c*3).addClass('active');
+                }
+                else if (parseFloat(glad.buffs[i].timeleft) == 0 && $('#details #buffs #box span').eq(c*3).hasClass('active')){
+                    for (let j=0 ; j<3 ; j++)
+                        $('#details #buffs #box span').eq(j + c*3).removeClass('active');
+                }
+    
+                $('#details #buffs #box span').eq(1 + c*3).html(glad.buffs[i].value.toFixed(1));
+                $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
+    
+                c++;
+            })
+            for (let i in glad.buffs){
             }
-        
+
+            if (glad.code){
+                if (glad.code != $('#details #code #box .name').last().text()){
+                    $('#details #code #box').append(`<div class='row'>
+                        <div class='name'>${glad.code}</div>
+                        <div class='duration'>0.1</div>
+                        <div class='time'>${json.simtime.toFixed(1)}</div>
+                    </div>`)
+
+                    if ($('#details #code #box .row').length > 5){
+                        $('#details #code #box .row').first().remove()
+                    }
+                }
+                else{
+                    let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
+                    $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
+                }
+            }
+
+            let allPotions = '😎'
+            await potionList.ready
+            for (let i in glad.items){
+                let item = $('#details #items #box .row').eq(i).find('span')
+
+                if (item.length){
+                    let text = item.text()
+                    if (text == '-' || glad.items[i] == 0){
+                        item.addClass('used')
+                    }
+                    else {
+                        item.removeClass('used')
+                    }
+                }
+                else{
+                    let potion
+                    if (glad.items[i] > 0){
+                        potion = potionList[glad.items[i]]
+                    }
+                    else if (glad.items[i] == 0){
+                        potion = '-'
+                    }
+                    else if (glad.items[i] == -1){
+                        potion = allPotions
+                    }
+                    $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
+                }
+            }
         }
-    } 
+    }
 }
 
 ;(async () => {
@@ -656,7 +878,7 @@ const ui = {
                 simulation.preferences.fps = (data.show_fps === true || data.show_fps == 'true')
                 simulation.preferences.text = (data.show_text === true || data.show_text == 'true')
                 simulation.preferences.speech = (data.show_speech === true || data.show_speech == 'true')
-                
+
                 simulation.preferences.crowd = parseFloat(data.crowd)
 
                 simulation.preferences.sound.music = parseFloat(data.music_volume)
@@ -695,9 +917,8 @@ const ui = {
                     })
 
                     await glads.load(simulation.log[0].glads)
-
                     await ui.init()
-                
+
                     simulation.startTimer()
                 }
             })
@@ -712,7 +933,7 @@ const ui = {
             //                 //Do something with upload progress here
             //             }
             //        }, false);
-            
+
             //        xhr.addEventListener("progress", function(evt) {
             //            if (evt.lengthComputable) {
             //                var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
@@ -721,7 +942,7 @@ const ui = {
             //                $('#loadbar #main .bar').width(percentComplete/4 +"%");
             //            }
             //        }, false);
-            
+
             //        return xhr;
             //     },
             //     type: 'POST',
@@ -743,7 +964,7 @@ const ui = {
             //     }
             // })
         }
-        
+
         document.querySelector('#log').remove()
     }
 })()
@@ -751,7 +972,7 @@ const ui = {
 window.onresize = () => simulation.resize()
 
 
-// $(document).ready( function() {    
+// $(document).ready( function() {
 //     $('#sound').click( function(){
 //         if (music.volume > 0){
 //             $(this).data('music', music.volume);
@@ -765,7 +986,7 @@ window.onresize = () => simulation.resize()
 //             music.volume = $(this).data('music');
 //             if (music.volume == 0)
 //                 music.volume = 0.1;
-    
+
 //             prefs.sound.sfx = $(this).data('sfx');
 //             if (prefs.sound.sfx == 0)
 //                 prefs.sound.sfx = 1;
@@ -778,7 +999,7 @@ window.onresize = () => simulation.resize()
 //             sfx_volume: prefs.sound.sfx
 //         });
 //     })
-    
+
 //     $( "#time" ).slider({
 //         range: "min",
 //         min: 0,
@@ -806,13 +1027,13 @@ window.onresize = () => simulation.resize()
 //     }).focusout(function(){
 //         pausesim = false; //coloca false na var
 //         $('#pause').click(); //clica no botao e pause fica true
-//     });	
+//     });
 
 //     // checkbox
 //     $('.checkslider').each( function(){
 //         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
 //     })
-    
+
 // })
 
 function changeSoundIcon(){
@@ -834,7 +1055,7 @@ function copyToClipboard(text) {
     document.querySelector('#icopy').select()
     document.execCommand("copy")
     document.querySelector('#icopy').remove()
-}	
+}
 
 function changeCrowd (value) {
     for (let i in npc){
@@ -849,106 +1070,4 @@ function changeCrowd (value) {
                 npc[i].sprite[j].kill();
         }
     }
-}
-
-async function updateDetailedWindow(){
-    var index = $('.ui-glad').index($('.follow'));
-    var glad = json.glads[index];
-
-    var info = [
-        glad.name,
-        glad.lvl,
-        `${glad.xp} / ${glad.tonext}`,
-        glad.x.toFixed(1),
-        `${glad.hp.toFixed(1)} / ${glad.maxhp}`,
-        glad.y.toFixed(1),
-        `${glad.ap.toFixed(1)} / ${glad.maxap}`,
-        glad.STR,
-        glad.head.toFixed(1),
-        glad.AGI,
-        getActionName(glad.action),
-        glad.INT,
-        glad.as.toFixed(1),
-        glad.cs.toFixed(1),
-        glad.spd.toFixed(1),
-        glad.lockedfor.toFixed(1)
-    ];
-
-    $('#details input').each( function(i){
-        $(this).val(info[i]);
-    });
-
-    $('#details #head span').css({"transform": `rotate(${glad.head.toFixed(0)}deg)`});
-
-    var c = 0;
-    for (let i in glad.buffs){
-        if (parseFloat(glad.buffs[i].timeleft) > 0 && !$('#details #buffs #box span').eq(c*3).hasClass('active')){
-            for (let j=0 ; j<3 ; j++)
-                $('#details #buffs #box span').eq(j + c*3).addClass('active');
-        }
-        else if (parseFloat(glad.buffs[i].timeleft) == 0 && $('#details #buffs #box span').eq(c*3).hasClass('active')){
-            for (let j=0 ; j<3 ; j++)
-                $('#details #buffs #box span').eq(j + c*3).removeClass('active');
-        }
-
-        $('#details #buffs #box span').eq(1 + c*3).html(glad.buffs[i].value.toFixed(1));
-        $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
-
-        c++;
-    }
-
-    if (glad.code){
-        if (glad.code != $('#details #code #box .name').last().text()){
-            $('#details #code #box').append(`<div class='row'>
-                <div class='name'>${glad.code}</div>
-                <div class='duration'>0.1</div>
-                <div class='time'>${json.simtime.toFixed(1)}</div>
-            </div>`)
-
-            if ($('#details #code #box .row').length > 5){
-                $('#details #code #box .row').first().remove()
-            }
-        }
-        else{
-            let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
-            $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
-        }
-    }
-
-    let allPotions = '😎'
-    await potionList.ready
-    for (let i in glad.items){
-        let item = $('#details #items #box .row').eq(i).find('span')
-        
-        if (item.length){
-            let text = item.text()
-            if (text == '-' || glad.items[i] == 0){
-                item.addClass('used')
-            }
-            else {
-                item.removeClass('used')
-            }
-        }
-        else{
-            let potion
-            if (glad.items[i] > 0){
-                potion = potionList[glad.items[i]]
-            }
-            else if (glad.items[i] == 0){
-                potion = '-'
-            }
-            else if (glad.items[i] == -1){
-                potion = allPotions
-            }
-            $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
-        }
-    }
-}
-
-function getActionName(action){
-    for (let item of actionlist){
-        if (item.value == action)
-            return item.name;
-    }
-    return false;
 }

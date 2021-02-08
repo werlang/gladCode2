@@ -16,9 +16,33 @@ const glads = {
                 move: skin.some(s => {
                     const item = assets.getImage(s)
                     return item.move && item.move == 'thrust'
-                }) ? 'stab' : 'slash'
+                }) ? 'stab' : 'slash',
+                str: e.STR,
+                agi: e.AGI,
+                int: e.INT,
+                hp: e.hp,
+                maxhp: e.maxhp,
+                ap: e.ap,
+                maxap: e.maxap
             })
         })
+
+        // TODO: insert this on glads
+        // var name = json.glads[i].name;
+        //         var STR = json.glads[i].STR;
+        //         var AGI = json.glads[i].AGI;
+        //         var INT = json.glads[i].INT;
+        //         var hp = parseFloat(json.glads[i].hp);
+        //         var maxhp = parseFloat(json.glads[i].maxhp);
+        //         var ap = parseFloat(json.glads[i].ap);
+        //         var maxap = parseFloat(json.glads[i].maxap);
+        //         var lvl = parseInt(json.glads[i].lvl);
+        //         var xp = parseInt(json.glads[i].xp);
+        //         var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
+        //         var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
+        //         var stun = parseFloat(json.glads[i].buffs.stun.timeleft);
+        //         var invisible = parseFloat(json.glads[i].buffs.invisible.timeleft);
+        //         var speed = parseFloat(json.glads[i].buffs.movement.timeleft);
     }
 }
 
@@ -42,11 +66,26 @@ const render = {
         });
             
         return true
-    }
-    
+    },        
 }
 
-export { render, glads }
+const actionlist = [
+    { name: 'fireball',     value: 0,   animation: 'cast' },
+    { name: 'teleport',     value: 1,   animation: 'cast' },
+    { name: 'charge',       value: 2,   animation: 'walk' },
+    { name: 'block',        value: 3,   animation: 'cast' },
+    { name: 'assassinate',  value: 4,   animation: 'shoot' },
+    { name: 'ambush',       value: 5,   animation: 'cast' },
+    { name: 'melee',        value: 6,   animation: 'melee' },
+    { name: 'ranged',       value: 7,   animation: 'shoot' },
+    { name: 'movement',     value: 8,   animation: 'walk' },
+    { name: 'waiting',      value: 9,   animation: 'none' },
+    { name: 'none',         value: 10,  animation: 'none' },
+    { name: 'potion',       value: 11,  animation: 'cast' }
+]
+
+
+export { render, glads, actionList }
 
 // var tileD = 32; //size of a single tile
 // var screenW = tileD * 42; //how many tiles there is in the entire image
@@ -56,27 +95,11 @@ export { render, glads }
 // var arenaY1 = tileD * 14;
 // var arenaD = screenW - (2 * arenaX1); //tiles not valid in the left and right side
 // var arenaRate = arenaD / 25;
-// var nglad = 0;
-// var json, loadglads = false, startsim = false;
-// var loadCache = false;
+// var loadglads = false, startsim = false;
 // var stab, gender;
 // var simtimenow;
 // var dt = 0;
 
-// var actionlist = [
-//     {'name': 'fireball', 'value': 0, 'animation': 'cast'},
-//     {'name': 'teleport', 'value': 1, 'animation': 'cast'},
-//     {'name': 'charge', 'value': 2, 'animation': 'walk'},
-//     {'name': 'block', 'value': 3, 'animation': 'cast'},
-//     {'name': 'assassinate', 'value': 4, 'animation': 'shoot'},
-//     {'name': 'ambush', 'value': 5, 'animation': 'cast'},
-//     {'name': 'melee', 'value': 6, 'animation': 'melee'},
-//     {'name': 'ranged', 'value': 7, 'animation': 'shoot'},
-//     {'name': 'movement', 'value': 8, 'animation': 'walk'},
-//     {'name': 'waiting', 'value': 9, 'animation': 'none'},
-//     {'name': 'none', 'value': 10, 'animation': 'none'},
-//     {'name': 'potion', 'value': 11, 'animation': 'cast'}
-// ];
 // var animationlist = {
 //     'walk': {
 //         'start': 8, 'frames': 9},
@@ -91,12 +114,6 @@ export { render, glads }
 //     'die': {
 //         'start': 20, 'frames': 6},
 // };
-
-// function phaser_update(step){
-//     json = step;
-//     if (nglad == 0 && loadCache)
-//         nglad = json.glads.length;
-// }
 
 function preload() {
 //     game.load.onLoadStart.add(() => {
@@ -157,7 +174,7 @@ function preload() {
 //     game.load.atlas('background', 'res/layers.png', 'res/layers.json');
 
 //     game.load.start();
-//     loadCache = true;
+//     this.preload = true
 //     resize();
 //     $('#canvas-div canvas').focus();
 //     if (game.camera)
@@ -947,157 +964,6 @@ function update() {
 //         var start =  (animationlist[name].start + i) * 13;
 //         var end = start + animationlist[name].frames - 1;
 //         sprite[glad].animations.add(action + sufix[i], arrayFill(start, end), 15, false);
-//     }
-// }
-
-// function update_ui(json){
-//     if (prefs.frames){
-//         if (prefs.text && !uiVars.showtext){
-//             uiVars.showtext = true;
-//             $('.ap-bar .text, .hp-bar .text').removeClass('hidden');
-//         }
-//         else if (!prefs.text && uiVars.showtext){
-//             uiVars.showtext = false;
-//             $('.ap-bar .text, .hp-bar .text').addClass('hidden');
-//         }
-    
-//         var nglad = json.glads.length;
-//         for (let i=0 ; i<nglad ; i++){
-//             var name = json.glads[i].name;
-//             var STR = json.glads[i].STR;
-//             var AGI = json.glads[i].AGI;
-//             var INT = json.glads[i].INT;
-//             var hp = parseFloat(json.glads[i].hp);
-//             var maxhp = parseFloat(json.glads[i].maxhp);
-//             var ap = parseFloat(json.glads[i].ap);
-//             var maxap = parseFloat(json.glads[i].maxap);
-//             var lvl = parseInt(json.glads[i].lvl);
-//             var xp = parseInt(json.glads[i].xp);
-//             var burn = parseFloat(json.glads[i].buffs.burn.timeleft);
-//             var resist = parseFloat(json.glads[i].buffs.resist.timeleft);
-//             var stun = parseFloat(json.glads[i].buffs.stun.timeleft);
-//             var invisible = parseFloat(json.glads[i].buffs.invisible.timeleft);
-//             var speed = parseFloat(json.glads[i].buffs.movement.timeleft);
-//             if (gladArray[i])
-//                 var poison = gladArray[i].poison;
-        
-//             if (!uiVars[i].name){
-//                 uiVars[i].name = name;
-//                 $('.glad-name span').eq(i).html(name);
-//                 $('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
-//             }
-            
-//             if (uiVars[i].STR !== STR){
-//                 uiVars[i].STR = STR;
-//                 $('.glad-str span').eq(i).html(STR);
-//             }
-
-//             if (uiVars[i].AGI !== AGI){
-//                 uiVars[i].AGI = AGI;
-//                 $('.glad-agi span').eq(i).html(AGI);
-//             }
-
-//             if (uiVars[i].INT !== INT){
-//                 uiVars[i].INT = INT;
-//                 $('.glad-int span').eq(i).html(INT);
-//             }
-
-//             if (uiVars[i].lvl != lvl){
-//                 uiVars[i].lvl = lvl;
-//                 $('.lvl-value span').eq(i).html(lvl);
-                
-//                 $('.lvl-value').eq(i).addClass('up');
-//                 let j = i;
-//                 setTimeout( function(){
-//                     $('.lvl-value').eq(j).removeClass('up');
-//                 }, 500);
-//             }
-            
-//             if (uiVars[i].xp != xp){
-//                 uiVars[i].xp = xp;
-//                 $('.xp-bar .filled').eq(i).height((xp / json.glads[i].tonext * 100) +'%');
-//             }
-            
-//             if (uiVars[i].hp != hp){
-//                 uiVars[i].hp = hp;
-//                 $('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
-//                 $('.hp-bar .text').eq(i).html(`${hp.toFixed(0)} / ${maxhp}`);
-//             }
-            
-//             if (hp <= 0){
-//                 uiVars[i].dead = true;
-//                 $('.ui-glad').eq(i).addClass('dead');
-//             }
-//             else if (uiVars[i].dead){
-//                 uiVars[i].dead = false;
-//                 $('.ui-glad').eq(i).removeClass('dead');
-//             }
-            
-//             if (uiVars[i].ap != ap){
-//                 uiVars[i].ap = ap;
-//                 $('.ap-bar .filled').eq(i).width(ap/maxap*100 +'%');
-//                 $('.ap-bar .text').eq(i).html(`${ap.toFixed(0)} / ${maxap}`);
-//             }
-            
-//             if (burn){
-//                 uiVars[i].burn = true;
-//                 $('.buff-burn').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].burn){
-//                 uiVars[i].burn = false;
-//                 $('.buff-burn').eq(i).removeClass('active');
-//             }
-            
-//             if (resist){
-//                 uiVars[i].resist = true;
-//                 $('.buff-resist').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].resist){
-//                 uiVars[i].resist = false;
-//                 $('.buff-resist').eq(i).removeClass('active');
-//             }
-            
-//             if (stun){
-//                 uiVars[i].stun = true;
-//                 $('.buff-stun').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].stun){
-//                 uiVars[i].stun = false;
-//                 $('.buff-stun').eq(i).removeClass('active');
-//             }
-
-//             if (invisible){
-//                 uiVars[i].invisible = true;
-//                 $('.buff-invisible').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].invisible){
-//                 uiVars[i].invisible = false;
-//                 $('.buff-invisible').eq(i).removeClass('active');
-//             }
-
-//             if (speed){
-//                 uiVars[i].speed = true;
-//                 $('.buff-speed').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].speed){
-//                 uiVars[i].speed = false;
-//                 $('.buff-speed').eq(i).removeClass('active');
-//             }
-
-//             if (poison){
-//                 uiVars[i].poison = true;
-//                 $('.buff-poison').eq(i).addClass('active');
-//             }
-//             else if (uiVars[i].poison){
-//                 uiVars[i].poison = false;
-//                 $('.buff-poison').eq(i).removeClass('active');
-//             }
-
-//             if ($('.ui-glad.follow').length && i == $('.ui-glad').index($('.follow'))){
-//                 updateDetailedWindow()
-//             }
-    
-//         }        
 //     }
 // }
 
