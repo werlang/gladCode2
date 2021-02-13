@@ -95,7 +95,7 @@ const simulation = {
     },
 
     pause: function(){
-        this.step.setValue(1)
+        this.stepButton.setValue(1)
 
         if (this.paused){
             this.paused = false
@@ -108,7 +108,7 @@ const simulation = {
             document.querySelector('#pause').classList.remove('paused')
             document.querySelector('#back-step .speed').innerHTML = '-1'
             document.querySelector('#fowd-step .speed').innerHTML = '+1'
-            this.step.setValue(1)
+            this.stepButton.setValue(1)
         }
 
         clearTimeout(this.timeout)
@@ -214,15 +214,16 @@ const simulation = {
                         document.querySelector('#end-message').classList.remove('fadein')
                     }, 1000)
 
-                    // music.pause()
-                    // victory.play('', 0, music.volume / 0.1)
+                    render.music.main.pause();
+                    render.music.victory.play('', 0, render.music.main.volume / 0.1);
                 }
             }
-            else if (!this.showScore){
-                document.querySelector('#fog').remove()
-                this.showScore = true
-                // music.resume()
-            }
+            // TODO: tem que ver ainda onde isso se encaixa
+            // else if (!this.showScore){
+            //     document.querySelector('#fog').remove()
+            //     this.showScore = true
+            //     // music.resume()
+            // }
             render.step = this.steps[this.time]
             ui.update(render.step)
 
@@ -339,6 +340,8 @@ const ui = {
 
         const template = await (await fetch("ui_template.html")).text()
 
+        await glads.wait()
+
         for (let i=0 ; i<glads.members.length ; i++){
             const glad = document.createElement("div")
             glad.classList.add("ui-glad")
@@ -359,7 +362,7 @@ const ui = {
                         if (!this.isFollow){
                             this.isFollow = true
                             render.game.camera.follow()
-                            this.detailedWindow.create()
+                            ui.detailedWindow.create()
                         }
                     }
                     else{
@@ -368,7 +371,7 @@ const ui = {
                         if (this.isFollow){
                             this.isFollow = false
                             render.game.camera.unfollow()
-                            this.detailedWindow.destroy()
+                            ui.detailedWindow.destroy()
                         }
                     }
                 }
@@ -376,7 +379,7 @@ const ui = {
 
             glad.innerHTML = template
         }
-
+    
         this.glads.forEach(g => {
             g.element.addEventListener('click', () => {
                 this.glads.filter(e => e != g).forEach(e => e.follow(false))
@@ -402,7 +405,7 @@ const ui = {
             }
 
             // console.log(step)
-            step.glads.forEach(g => {
+            Object.values(step.glads).forEach(g => {
                 const glad = this.glads.filter(e => e.id == g.id)[0]
 
                 if (glad){
@@ -413,8 +416,7 @@ const ui = {
                     if (g.name != glad.name){
                         glad.element.querySelector('.glad-name span').innerHTML = g.name
                         loader.load('gladcard').then(({ getSpriteThumb }) => {
-                            glad.element.querySelector('.glad-portrait').innerHTML = getSpriteThumb(glads.members[g.id].spritesheet,'walk','down')
-                            // ta colocando "Obejct canvas" ao inves do canvas em si
+                            glad.element.querySelector('.glad-portrait').appendChild(getSpriteThumb(glads.members[g.id].spritesheet,'walk','down'))
                         })
                     }
 
@@ -448,11 +450,11 @@ const ui = {
 
                     if (g.hp <= 0){
                         glad.isDead = true
-                        glad.element.querySelector('.ui-glad').classList.add('dead')
+                        glad.element.classList.add('dead')
                     }
                     else if (glad.isDead){
                         glad.isDead = false
-                        glad.element.querySelector('.ui-glad').classList.remove('dead')
+                        glad.element.classList.remove('dead')
                     }
 
                     if (g.ap != glad.ap){
@@ -476,7 +478,6 @@ const ui = {
                     }
                 }
 
-                
                 [
                     "name",
                     "STR", "AGI", "INT", 
@@ -667,7 +668,7 @@ const ui = {
 }
 
 ;(async () => {
-    render.init()
+    render.init().then(() => changeCrowd(simulation.preferences.crowd))
 
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
     // document.querySelector('#footer-wrapper').classList.add('white')
@@ -827,7 +828,7 @@ const ui = {
                 show_text: simulation.preferences.text,
                 show_speech: simulation.preferences.speech,
                 sfx_volume: simulation.preferences.sound.sfx,
-                // music_volume: music.volume,
+                music_volume: render.music.main.volume,
                 crowd: simulation.preferences.crowd
             })
 
@@ -978,25 +979,25 @@ window.onresize = () => simulation.resize()
 //             $(this).data('music', music.volume);
 //             music.volume = 0;
 //         }
-//         else if (prefs.sound.sfx > 0){
-//             $(this).data('sfx', prefs.sound.sfx);
-//             prefs.sound.sfx = 0;
+//         else if (simulation.preferences.sound.sfx > 0){
+//             $(this).data('sfx', simulation.preferences.sound.sfx);
+//             simulation.preferences.sound.sfx = 0;
 //         }
 //         else{
 //             music.volume = $(this).data('music');
 //             if (music.volume == 0)
 //                 music.volume = 0.1;
 
-//             prefs.sound.sfx = $(this).data('sfx');
-//             if (prefs.sound.sfx == 0)
-//                 prefs.sound.sfx = 1;
+//             simulation.preferences.sound.sfx = $(this).data('sfx');
+//             if (simulation.preferences.sound.sfx == 0)
+//                 simulation.preferences.sound.sfx = 1;
 //         }
 //         changeSoundIcon();
 
 //         post("back_play.php",{
 //             action: "SET_PREF",
 //             music_volume: music.volume,
-//             sfx_volume: prefs.sound.sfx
+//             sfx_volume: simulation.preferences.sound.sfx
 //         });
 //     })
 
@@ -1039,7 +1040,7 @@ window.onresize = () => simulation.resize()
 function changeSoundIcon(){
     const soundObj = document.querySelector('#sound')
     soundObj.classList.remove("on", "off", "mute")
-    if ((!simulation.music && simulation.preferences.music > 0) || (simulation.music && simulation.music.volume > 0)){
+    if ((!render.music && simulation.preferences.music > 0) || (render.music && simulation.music.volume > 0)){
         soundObj.classList.add("on")
     }
     else if (simulation.preferences.sound.sfx > 0){
@@ -1058,16 +1059,16 @@ function copyToClipboard(text) {
 }
 
 function changeCrowd (value) {
-    for (let i in npc){
-        var r = Math.random();
-        var alive = npc[i].sprite.body.alive;
+    for (let i in render.npc){
+        const r = Math.random();
+        const alive = render.npc[i].sprite.body.alive;
         if (r < value && !alive){
-            for (let j in npc[i].sprite)
-                npc[i].sprite[j].revive();
+            for (let j in render.npc[i].sprite)
+                render.npc[i].sprite[j].revive();
         }
         else if (r > value && alive){
-            for (let j in npc[i].sprite)
-                npc[i].sprite[j].kill();
+            for (let j in render.npc[i].sprite)
+                render.npc[i].sprite[j].kill();
         }
     }
 }

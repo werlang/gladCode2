@@ -37,6 +37,7 @@
     <script src="script/socket.js"></script> -->
 
     <link rel='stylesheet' href="css/playback.css"/>
+    <script src="script/phaser.min.js"></script>
     <script type="module" src="script/playback.js" async></script>
 
 </head>
