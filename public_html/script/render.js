@@ -1,4 +1,212 @@
+import { create } from "domain"
 import { assets } from "./assets.js"
+import { simulation, ui } from "./playback.js"
+
+class Gladiator {
+    constructor(info){
+        for (let k in info){
+            this[k] = info[k];
+        }
+
+        this.message = '';
+        this.diff = {};
+    }
+
+    getPositionOnCanvas(){
+        const ph = render.game.camera.scale.y * render.tileD;
+        const pw = render.game.camera.scale.x * render.tileD;
+        
+        const x = pw * ((render.arenaX1 / render.tileD) + this.x / 25*26);
+        const y = ph * ((render.arenaY1 / render.tileD) + this.y / 25*26);
+        
+        const ct = render.canvas.offsetTop - render.game.camera.view.y;
+        const cl = render.canvas.offsetLeft - render.game.camera.view.x;
+
+        return {x: x+cl, y: y+ct};
+    }
+    
+    showBaloon(){
+        if (this.message != "" && simulation.preferences.speech && this.hp > 0){
+            const gpos = this.getPositionOnCanvas();
+    
+            if (!this.baloon){
+                this.baloon = document.createElement("div")
+                this.baloon.classList.add(`baloon`, `glad-${this.id}`)
+                document.querySelector('#canvas-div').insertAdjacentElement('beforeend', this.baloon)
+            }
+
+            this.baloon.innerHTML = this.message
+    
+            const x = gpos.x + 15 * render.game.camera.scale.x;
+            const y = gpos.y - 15 * render.game.camera.scale.y - this.baloon.offsetHeight;
+
+            this.baloon.style.left = `${x}px`;
+            this.baloon.style.top = `${y}px`;
+
+            if (this.baloon.offsetWidth < 200 && this.baloon.offsetHeight >= 50){
+                this.baloon.style.left = `${x - 230}px`;
+                this.baloon.classList.add('left');
+            }
+            else if (this.baloon.classList.contains('left')){
+                this.baloon.classList.remove('left');
+            }
+        }
+        else if (this.baloon){
+            this.baloon.classList.add("fadeout")
+            setTimeout(() => {
+                this.baloon.remove();
+                delete this.baloon;
+            }, 1000);
+        }
+        
+    }
+
+    showBars(){
+        if (simulation.preferences.bars){
+            if (!this.bars){
+                const b = {};
+                b.back = render.game.add.sprite(0,0, render.bars.back);
+                b.back.alpha = 0.15;
+                b.hp = render.game.add.sprite(0,0, render.bars.hp);
+                b.hp.alpha = 0.4;
+                b.ap = render.game.add.sprite(0,0, render.bars.ap);
+                b.ap.alpha = 0.4;
+    
+                this.bars = b;
+            }
+        
+            if (this.hp > 0){
+                const x = render.arenaX1 + this.x * render.arenaRate;
+                const y = render.arenaY1 + this.y * render.arenaRate;
+                const barsize = 30;
+    
+                this.bars.back.x = x + -barsize/2;
+                this.bars.back.y = y + -35;
+                this.bars.back.width = barsize;
+                this.bars.back.height = 9;
+        
+                this.bars.hp.x = x + -barsize/2;
+                this.bars.hp.y = y + -35;
+                this.bars.hp.width = this.hp / this.maxhp * barsize;
+                this.bars.hp.height = 5;
+    
+                this.bars.ap.x = x + -barsize/2;
+                this.bars.ap.y = y + -30;
+                this.bars.ap.width = this.ap / this.maxap * barsize;
+                this.bars.ap.height = 4;
+    
+                if (!this.bars.back.alive){
+                    this.bars.back.revive();
+                    this.bars.hp.revive();
+                    this.bars.ap.revive();
+                }
+            }
+            else{
+                this.bars.back.kill();
+                this.bars.hp.kill();
+                this.bars.ap.kill();
+            }
+        }
+        else if (this.bars && this.bars.back.alive){
+            this.bars.back.kill();
+            this.bars.hp.kill();
+            this.bars.ap.kill();
+        }
+    }
+    
+    showBreakpoint(){
+        if (this.breakpoint && this.hp > 0){
+            if (!simulation.paused){
+                simulation.pause(true);
+            }
+    
+            const gpos = this.getPositionOnCanvas();
+    
+            if (!this.bpBaloon){
+                this.bpBaloon = document.createElement("div")
+                this.bpBaloon.classList.add(`breakpoint`, `glad-${this.id}`)
+                this.bpBaloon.title = "Expandir breakpoint";
+                document.querySelector('#canvas-div').insertAdjacentElement('beforeend', this.bpBaloon)
+
+                this.bpBaloon.addEventListener("click", () => {
+                    if (!this.bpBaloon.classList.contains('expanded')){
+                        this.bpBaloon.classList.add("expanded")
+                        this.bpBaloon.title = "";
+                    }
+                });    
+            }
+
+            this.bpBaloon.innerHTML = this.breakpoint
+                        
+            const x = gpos.x - 7.5;
+            const y = gpos.y - 25 * render.game.camera.scale.y - this.bpBaloon.offsetHeight;
+            this.bpBaloon.style.top = `${y}px`;
+            this.bpBaloon.style.left = `${x}px`;
+            
+            if (this.bpBaloon.offsetWidth < 200 && this.bpBaloon.offsetHeight >= 50){
+                this.bpBaloon.style.left = `${x - 230}px`;
+                this.bpBaloon.classList.add("left");
+            }
+            else if (this.bpBaloon.classList.contains('left')){
+                this.bpBaloon.classList.remove('left');
+            }
+        }
+        else if (this.breakpoint && !simulation.paused){
+            this.bpBaloon.classList.add("fadeout");
+            setTimeout(() => {
+                this.bpBaloon.remove();
+                delete this.bpBaloon;
+            }, 1000);
+        }
+    }
+
+    addSprite(name){
+        const anim = {
+            lvlup: {key: 'level', frames: 20, frameRate: 15, loop: false},
+            explode: {key: 'explosion', frames: 12, frameRate: 15, loop: true},
+            stun: {key: 'stun', frames: 6, frameRate: 15, loop: true},
+            shield: {key: 'shield', frames: 20, frameRate: 15, loop: false},
+            mana: {key: 'mana', frames: 25, frameRate: 15, loop: false},
+            heal: {key: 'heal', frames: 25, frameRate: 15, loop: false},
+            tonic: {key: 'tonic', frames: 35, frameRate: 15, loop: false},
+            elixir: {key: 'elixir', frames: 25, frameRate: 15, loop: false}
+        };
+    
+        if (this.sprites[name]){
+            this.sprites[name].x = this.x;
+            this.sprites[name].y = this.y;
+            this.sprites[name].revive();
+        }
+        else{
+            const nz = anim[name].frames >= 10 ? 2 : 1
+            this.sprites[name] = render.game.add.sprite(this.x, this.y, 'atlas_effects');
+            const frames = Phaser.Animation.generateFrameNames(anim[name].key +'/', 0, anim[name].frames-1, '', nz)
+            this.sprites[name].animations.add(name, frames, anim[name].frameRate, anim[name].loop);
+        }
+    
+        return this.sprites[name];
+    }
+
+    update(data){
+        const toDiff = ['lvl', 'hp'];
+        toDiff.forEach(e => this.diff[e] = data[e] - this[e]);
+
+        const toUpdate = ['x', 'y', 'head', 'hp', 'maxhp', 'ap', 'maxap', 'str', 'agi', 'int', 'message', 'breakpoint', 'action', 'xp', 'lvl', 'code', 'buffs', 'lockedfor'];
+        toUpdate.forEach(e => this[e] = data[e]);
+
+        // boolean attr indicationg buff presence
+        // const alias = {
+        //     resist: 'block',
+        // };
+        // for (let i in data.buffs){
+        //     this[alias[i] ? alias[i] : i] = data.buffs[i].timeleft > 0.1;
+        // }
+    }
+
+    getDiff(attr){
+        return this.diff[attr];
+    }
+}
 
 const glads = {
     loaded: false,
@@ -10,7 +218,7 @@ const glads = {
         info.forEach((e,i) => {
             ready.push(new Promise(async resolve => {
                 const skin = JSON.parse(e.skin)
-                this.members.push({
+                this.members.push(new Gladiator({
                     id: i,
                     name: e.name,
                     user: e.user,
@@ -27,8 +235,26 @@ const glads = {
                     hp: e.hp,
                     maxhp: e.maxhp,
                     ap: e.ap,
-                    maxap: e.maxap
-                })
+                    maxap: e.maxap,
+                    x: e.x,
+                    y: e.y,  
+                    
+                    // alive: true,
+                    // dmgFloat = 0,
+                    // fade: 0,
+                    // clone: null,
+                    // invisible: false,
+                    // stun: false,
+                    // assassinate: false,
+                    // lvl: 1,
+                    // block: false,
+                    // charge: false,
+                    // poison: false,
+                    // xp: parseInt(json.glads[i].xp),
+                    // time: false,
+                    // sprites: {},
+        
+                }))
                 resolve(true)
             }))
         })
@@ -40,10 +266,43 @@ const glads = {
 
     wait: async function() {
         return this.loaded ? true : new Promise( resolve => setTimeout( async () => resolve(await this.wait()), 10))
+    },
+
+    update: function(step){
+        step.forEach(e => {
+            const glad = this.get(e.id);
+            if (glad){
+                // change some keys/values before passing
+                e.str = e.STR;
+                e.agi = e.AGI;
+                e.int = e.INT;
+                e.action = getAction(e.action);
+
+                glad.update(e);
+            }
+        })
+    },
+
+    get: function(id){
+        const glad = this.members.filter(e => e.id == id);
+        return glad.length ? glad[0] : false;
+    },
+
+    killBaloons: function(){
+        this.members.forEach(e => {
+            if (e.baloon){
+                e.baloon.remove();
+                delete e.baloon;
+            }
+        })
     }
+
 }
 
 const render = {
+    paused: true,
+    started: false,
+
     init: async function(){
         if (this.game){
             return true
@@ -57,254 +316,7 @@ const render = {
             antialias: true,
             multitexture: true,
             enableDebug: false,
-            state: {
-                preload: () => {
-                    // TODO: arrumar o progress
-                    this.game.load.onLoadStart.add(() => {
-                        document.querySelector('#loadbar #status').innerHTML = "Preparando recursos"
-                        document.querySelector('#loadbar #second .bar').style.width = '0px'
-                    }, this)
-                    this.game.load.onFileComplete.add( progress => {
-                        document.querySelector('#loadbar #status').innerHTML = "Carregando recursos"
-                        document.querySelector('#loadbar #second .bar').style.width = `${progress}%`
-                        document.querySelector('#loadbar #main .bar').style.width = `${50 + progress / 2}%`
-                    }, this)
-                    this.game.load.onLoadComplete.add(() => document.querySelector('#loadbar #status').innerHTML = "Tudo pronto", this)
-
-                    glads.wait().then( () => {
-                        for (let i=0 ; i < glads.members.length ; i++){
-                            try{
-                                this.game.cache.addSpriteSheet(`glad${glads.members[i].id}`, null, glads.members[i].spritesheet, 192, 192)
-                            }
-                            catch(e){
-                                console.log(e)
-                                console.log(glads)
-                            }
-                        }	
-                    })
-
-                    this.game.load.atlas('atlas_crowd', 'res/atlas_crowd.png', 'res/atlas_crowd.json')
-                    this.game.load.atlas('atlas_effects', 'res/atlas_effects.png', 'res/atlas_effects.json')
-                    this.game.load.atlas('background', 'res/layers.png', 'res/layers.json')
-
-                    this.game.load.audio('music', 'res/audio/adventure.mp3')
-                    this.game.load.audio('ending', 'res/audio/ending.mp3')
-                    this.game.load.audio('victory', 'res/audio/victory.mp3')
-                    this.game.load.audio('fireball', 'res/audio/fireball.mp3')
-                    this.game.load.audio('explosion', 'res/audio/explosion.mp3')
-                    this.game.load.audio('teleport', 'res/audio/teleport.mp3')
-                    this.game.load.audio('charge_male', 'res/audio/charge_male.mp3')
-                    this.game.load.audio('charge_female', 'res/audio/charge_female.mp3')
-                    this.game.load.audio('block', 'res/audio/block.mp3')
-                    this.game.load.audio('assassinate', 'res/audio/assassinate.mp3')
-                    this.game.load.audio('ambush', 'res/audio/ambush.mp3')
-                    this.game.load.audio('ranged', 'res/audio/ranged.mp3')
-                    this.game.load.audio('arrow_hit', 'res/audio/arrow_hit.mp3')
-                    this.game.load.audio('stun', 'res/audio/stun.mp3')
-                    this.game.load.audio('melee', 'res/audio/melee.mp3')
-                    this.game.load.audio('lvlup', 'res/audio/lvlup.mp3')
-                    this.game.load.audio('heal', 'res/audio/heal.mp3')
-                    this.game.load.audio('mana', 'res/audio/mana.mp3')
-                    this.game.load.audio('tonic', 'res/audio/tonic.mp3')
-                    this.game.load.audio('elixir', 'res/audio/elixir.mp3')
-                    this.game.load.audio('death_male', 'res/audio/death_male.mp3')
-                    this.game.load.audio('death_female', 'res/audio/death_female.mp3')
-                    this.game.load.spritesheet('dummy', 'res/glad.png', 64, 64)
-
-                    this.game.load.start()
-                    this.preload = true
-                    // simulation.resize()
-                    document.querySelector('#canvas-div canvas').focus()
-                    
-                    if (this.game.camera){
-                        this.game.camera.focusOnXY(this.screenW * this.game.camera.scale.x / 2, this.screenH * this.game.camera.scale.y / 2)
-                    }
-
-                },
-
-                create: () => {
-                    this.game.physics.startSystem(Phaser.Physics.ARCADE);
-                    
-                    this.groups = {}
-                    this.groups.glad = this.game.add.group();
-                    this.groups.gas = this.game.add.group();
-                    this.groups.npc = []
-                    this.groups.npc.push(this.game.add.group());
-                    this.groups.npc.push(this.game.add.group());
-
-                    this.groups.glad.add(this.groups.gas);
-                    this.groups.glad.add(this.groups.npc[0]);
-                    this.groups.glad.add(this.groups.npc[1]);
-
-                    this.layers = []
-                    for (let i=0 ; i<=3 ; i++){
-                        this.layers.push(this.game.add.image(0, 0, 'background', 'layer_'+ i));
-                        this.groups.glad.add(this.layers[i]);
-                    }
-                    
-                    this.music = {}
-                    this.music.main = this.game.add.audio('music', 0.5, true);
-                    this.music.ending = this.game.add.audio('ending');
-                    this.music.victory = this.game.add.audio('victory');
-
-                    window.addEventListener("wheel", event => {
-                        if (event.path[0].closest('#canvas-div')){
-                            zoomWheel({ deltaY: event.deltaY });
-                        }
-                    });
-
-                    this.game.input.onDown.add( input => {
-                        if (input.button === Phaser.Mouse.LEFT_BUTTON){
-                            this.game.input.mouse.drag = true;
-                        }
-                    }, this);
-                    this.game.input.mouse.drag = false;
-                    this.game.input.onUp.add( () => {
-                        this.game.input.mouse.drag = false;
-                    }, this);
-
-                    initBars();
-
-                    fillPeople();
-                    
-                    for (let n in this.npc){
-                        const v = this.npc[n]
-
-                        const pos = getPosArena(v.x, v.y, true);
-                        v.sprite = {};
-                        
-                        if (n.match(/royalguard\d/g) || n.match(/commonguard\d/g) || n.match(/archer\d/g)){
-                            v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-                            v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-
-                            if (n.match(/archer\d/g)){
-                                const frames = [0,1,2,2,1,0];
-                                const prefix = {
-                                    body: `dummy_grey_${v.gender}_`,
-                                    gear: `archer_${v.gender}_`
-                                };
-                                                
-                                v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
-                                v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
-                                this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
-                                    v.sprite.body.animations.play('guard');
-                                    v.sprite.gear.animations.play('guard');
-                                }, this);
-                            }
-                            else if (n.match(/royalguard\d/g)){
-                                const frames = [-1,0,1,0];
-                                const prefix = {
-                                    body: `dummy_grey_${v.gender}_`,
-                                    gear: `royal_${v.gender}_`
-                                };
-
-                                v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
-                                v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
-                                this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
-                                    v.sprite.body.animations.play('guard');
-                                    v.sprite.gear.animations.play('guard');
-                                }, this);
-                            }
-                            else if (n.match(/commonguard\d/g)){
-                                const frames = [0,1];
-                                const prefix = {
-                                    body: `dummy_grey_${v.gender}_`,
-                                    gear: `guard_${v.gender}_`
-                                };
-
-                                v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, true);
-                                v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear, 0, {start: 0, end: 3}), v.time, true);
-                                v.sprite.body.animations.play('guard');
-                                v.sprite.gear.animations.play('guard');
-                            }
-                            v.sprite.body.animations.play('guard');
-                            v.sprite.gear.animations.play('guard');
-                        }
-                        else if (n == 'king' || n == 'queen'){
-                            v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-
-                            const frames = [0,1,0];
-                            const prefix = {
-                                body: `dummy_grey_${v.gender}_`,
-                                gear: `guard_${v.gender}_`,
-                                hair: `hair_${v.gender}_${v.hair.style}_0`
-                            };
-
-                            v.sprite.body.animations.add('watch', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
-                            v.sprite.body.animations.play('watch');
-                            this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
-                                v.sprite.body.animations.play('watch');
-                            }, this);
-
-                            if (v.color){
-                                v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-blue');
-                            }
-                            else{
-                                v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-red');
-                            }
-
-                            if (v.hair.style != 'no_hair'){
-                                v.sprite.hair = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', prefix.hair + v.start.hair);
-                            }
-                        }
-                        else{
-                            v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-
-                            if (v.hair.style != 'no_hair'){
-                                v.sprite.hair = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-                            }
-
-                            v.sprite.shirt = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-                            v.sprite.pants = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-                            v.sprite.shoes = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
-                        }
-
-                        for (let i in v.sprite){
-                            this.groups.npc[v.layer-1].add(v.sprite[i]);
-                            v.sprite[i].scale.setTo(this.game.camera.scale.x, this.game.camera.scale.y);
-                            v.sprite[i].anchor.setTo(0.5, 0.5);
-
-                            if (i == 'hair' && v.hair.style != 'no_hair'){
-                                const prefix = `hair_${v.gender}_${v.hair.style}_`;
-                                let anim = v.cheer ? v.anim.hair : [0];
-                                v.sprite[i].animations.add('cheer', buildFrames(prefix, anim, v.start.hair, 2), v.time, true);
-                                v.sprite[i].tint = v.hair.color;
-                            }
-                            else if (i == 'shoes'){
-                                const prefix = `shoes_${v.gender}_`;
-                                const digits = v.gender == "male" ? 1 : 2
-                                v.sprite[i].animations.add('cheer', buildFrames(prefix, [0], v.start.shoes, digits), v.time, true);
-                            }
-                            else{
-                                let prefix;
-
-                                if (i == 'body'){
-                                    v.sprite[i].tint = v.skin.tint;
-                                    prefix = `cheer_${v.gender}_`;
-                                }
-                                else if (i == 'pants' || i == 'shirt'){
-                                    v.sprite[i].tint = clothesColor();
-                                    let n = '';
-                                    if (i == 'shirt' && v.gender == 'female'){
-                                        n = parseInt(Math.random() * 2 + 1);
-                                    }
-                                    prefix = `cheer_${i}${n}_${v.gender}_`;
-                                }
-                                
-                                v.sprite[i].animations.add('cheer', buildFrames(prefix, [0,1], v.start.body, 2), v.time, true);
-                            }
-
-                            if (v.cheer){
-                                v.sprite[i].animations.play('cheer');
-                            }
-                        }
-                    } 
-                },
-                
-                update: () => {
-
-                }
-            }
+            state: { preload: this.preload, create: this.create, update: this.update}
         })
 
         this.tileD = 32 // size of a single tile
@@ -315,10 +327,830 @@ const render = {
         this.arenaY1 = this.tileD * 14
         this.arenaD = this.screenW - (2 * this.arenaX1) // tiles not valid in the left and right side
         this.arenaRate = this.arenaD / 25
-            
+           
+        this.gas = {
+            depth: 4, // gas layer depth
+            amount: 25, // gas per layer
+            layers: [],
+        };
+
+        // fill actionList with animationList values
+        actionList.forEach(e => {
+            const newVal = animationList[e.animation] || {};
+            newVal.name = e.animation;
+            e.animation = newVal;
+        });        
+
         return true
-    },        
+    },
+
+    preload: function() {
+        this.game.load.onLoadStart.add(() => {
+            document.querySelector('#loadbar #status').innerHTML = "Preparando recursos"
+            document.querySelector('#loadbar #second .bar').style.width = '0px'
+        }, this)
+        this.game.load.onFileComplete.add( progress => {
+            document.querySelector('#loadbar #status').innerHTML = "Carregando recursos"
+            document.querySelector('#loadbar #second .bar').style.width = `${progress}%`
+            document.querySelector('#loadbar #main .bar').style.width = `${50 + progress / 2}%`
+        }, this)
+        this.game.load.onLoadComplete.add(() => document.querySelector('#loadbar #status').innerHTML = "Tudo pronto", this)
+
+        glads.wait().then( () => {
+            for (let i=0 ; i < glads.members.length ; i++){
+                try{
+                    this.game.cache.addSpriteSheet(`glad${glads.members[i].id}`, null, glads.members[i].spritesheet, 192, 192)
+                }
+                catch(e){
+                    console.log(e)
+                    console.log(glads)
+                }
+            }	
+        })
+
+        this.game.load.atlas('atlas_crowd', 'res/atlas_crowd.png', 'res/atlas_crowd.json')
+        this.game.load.atlas('atlas_effects', 'res/atlas_effects.png', 'res/atlas_effects.json')
+        this.game.load.atlas('background', 'res/layers.png', 'res/layers.json')
+
+        this.game.load.audio('music', 'res/audio/adventure.mp3')
+        this.game.load.audio('ending', 'res/audio/ending.mp3')
+        this.game.load.audio('victory', 'res/audio/victory.mp3')
+        this.game.load.audio('fireball', 'res/audio/fireball.mp3')
+        this.game.load.audio('explosion', 'res/audio/explosion.mp3')
+        this.game.load.audio('teleport', 'res/audio/teleport.mp3')
+        this.game.load.audio('charge_male', 'res/audio/charge_male.mp3')
+        this.game.load.audio('charge_female', 'res/audio/charge_female.mp3')
+        this.game.load.audio('block', 'res/audio/block.mp3')
+        this.game.load.audio('assassinate', 'res/audio/assassinate.mp3')
+        this.game.load.audio('ambush', 'res/audio/ambush.mp3')
+        this.game.load.audio('ranged', 'res/audio/ranged.mp3')
+        this.game.load.audio('arrow_hit', 'res/audio/arrow_hit.mp3')
+        this.game.load.audio('stun', 'res/audio/stun.mp3')
+        this.game.load.audio('melee', 'res/audio/melee.mp3')
+        this.game.load.audio('lvlup', 'res/audio/lvlup.mp3')
+        this.game.load.audio('heal', 'res/audio/heal.mp3')
+        this.game.load.audio('mana', 'res/audio/mana.mp3')
+        this.game.load.audio('tonic', 'res/audio/tonic.mp3')
+        this.game.load.audio('elixir', 'res/audio/elixir.mp3')
+        this.game.load.audio('death_male', 'res/audio/death_male.mp3')
+        this.game.load.audio('death_female', 'res/audio/death_female.mp3')
+        this.game.load.spritesheet('dummy', 'res/glad.png', 64, 64)
+
+        this.game.load.start()
+
+        render.canvas = document.querySelector('#canvas-div canvas')
+    },
+
+    create: function() {
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        
+        this.groups = {};
+        this.groups.glad = this.game.add.group();
+        this.groups.gas = this.game.add.group();
+        this.groups.npc = [];
+        this.groups.npc.push(this.game.add.group());
+        this.groups.npc.push(this.game.add.group());
+
+        this.groups.glad.add(this.groups.gas);
+        this.groups.glad.add(this.groups.npc[0]);
+        this.groups.glad.add(this.groups.npc[1]);
+
+        this.layers = [];
+        for (let i=0 ; i<=3 ; i++){
+            this.layers.push(this.game.add.image(0, 0, 'background', 'layer_'+ i));
+            this.groups.glad.add(this.layers[i]);
+        }
+        
+        this.music = {};
+        this.music.main = this.game.add.audio('music', 0.5, true);
+        this.music.ending = this.game.add.audio('ending');
+        this.music.victory = this.game.add.audio('victory');
+
+        this.audio = {};
+
+        window.addEventListener("wheel", event => {
+            if (event.path[0].closest('#canvas-div')){
+                render.zoomWheel({ deltaY: event.deltaY });
+            }
+        });
+
+        this.game.input.onDown.add( input => {
+            if (input.button === Phaser.Mouse.LEFT_BUTTON){
+                this.game.input.mouse.drag = true;
+            }
+        }, this);
+        this.game.input.mouse.drag = false;
+        this.game.input.onUp.add( () => {
+            this.game.input.mouse.drag = false;
+        }, this);
+
+        initBars();
+
+        fillPeople();
+        
+        for (let n in this.npc){
+            const v = this.npc[n]
+
+            const pos = getPosArena(v.x, v.y, true);
+            v.sprite = {};
+            
+            if (n.match(/royalguard\d/g) || n.match(/commonguard\d/g) || n.match(/archer\d/g)){
+                v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+                v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+
+                if (n.match(/archer\d/g)){
+                    const frames = [0,1,2,2,1,0];
+                    const prefix = {
+                        body: `dummy_grey_${v.gender}_`,
+                        gear: `archer_${v.gender}_`
+                    };
+                                    
+                    v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
+                    v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
+                    this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+                        v.sprite.body.animations.play('guard');
+                        v.sprite.gear.animations.play('guard');
+                    }, this);
+                }
+                else if (n.match(/royalguard\d/g)){
+                    const frames = [-1,0,1,0];
+                    const prefix = {
+                        body: `dummy_grey_${v.gender}_`,
+                        gear: `royal_${v.gender}_`
+                    };
+
+                    v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
+                    v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear), v.time, false);
+                    this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+                        v.sprite.body.animations.play('guard');
+                        v.sprite.gear.animations.play('guard');
+                    }, this);
+                }
+                else if (n.match(/commonguard\d/g)){
+                    const frames = [0,1];
+                    const prefix = {
+                        body: `dummy_grey_${v.gender}_`,
+                        gear: `guard_${v.gender}_`
+                    };
+
+                    v.sprite.body.animations.add('guard', buildFrames(prefix.body, frames, v.start.body, 2), v.time, true);
+                    v.sprite.gear.animations.add('guard', buildFrames(prefix.gear, frames, v.start.gear, 0, {start: 0, end: 3}), v.time, true);
+                    v.sprite.body.animations.play('guard');
+                    v.sprite.gear.animations.play('guard');
+                }
+                v.sprite.body.animations.play('guard');
+                v.sprite.gear.animations.play('guard');
+            }
+            else if (n == 'king' || n == 'queen'){
+                v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+
+                const frames = [0,1,0];
+                const prefix = {
+                    body: `dummy_grey_${v.gender}_`,
+                    gear: `guard_${v.gender}_`,
+                    hair: `hair_${v.gender}_${v.hair.style}_0`
+                };
+
+                v.sprite.body.animations.add('watch', buildFrames(prefix.body, frames, v.start.body, 2), v.time, false);
+                v.sprite.body.animations.play('watch');
+                this.game.time.events.repeat(Phaser.Timer.SECOND * v.interval, 1000, function(){
+                    v.sprite.body.animations.play('watch');
+                }, this);
+
+                if (v.color){
+                    v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-blue');
+                }
+                else{
+                    v.sprite.gear = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', n + '-red');
+                }
+
+                if (v.hair.style != 'no_hair'){
+                    v.sprite.hair = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd', prefix.hair + v.start.hair);
+                }
+            }
+            else{
+                v.sprite.body = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+
+                if (v.hair.style != 'no_hair'){
+                    v.sprite.hair = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+                }
+
+                v.sprite.shirt = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+                v.sprite.pants = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+                v.sprite.shoes = this.game.add.sprite(pos.x, pos.y, 'atlas_crowd');
+            }
+
+            for (let i in v.sprite){
+                this.groups.npc[v.layer-1].add(v.sprite[i]);
+                v.sprite[i].scale.setTo(this.game.camera.scale.x, this.game.camera.scale.y);
+                v.sprite[i].anchor.setTo(0.5, 0.5);
+
+                if (i == 'hair' && v.hair.style != 'no_hair'){
+                    const prefix = `hair_${v.gender}_${v.hair.style}_`;
+                    let anim = v.cheer ? v.anim.hair : [0];
+                    v.sprite[i].animations.add('cheer', buildFrames(prefix, anim, v.start.hair, 2), v.time, true);
+                    v.sprite[i].tint = v.hair.color;
+                }
+                else if (i == 'shoes'){
+                    const prefix = `shoes_${v.gender}_`;
+                    const digits = v.gender == "male" ? 1 : 2
+                    v.sprite[i].animations.add('cheer', buildFrames(prefix, [0], v.start.shoes, digits), v.time, true);
+                }
+                else{
+                    let prefix;
+
+                    if (i == 'body'){
+                        v.sprite[i].tint = v.skin.tint;
+                        prefix = `cheer_${v.gender}_`;
+                    }
+                    else if (i == 'pants' || i == 'shirt'){
+                        v.sprite[i].tint = clothesColor();
+                        let n = '';
+                        if (i == 'shirt' && v.gender == 'female'){
+                            n = parseInt(Math.random() * 2 + 1);
+                        }
+                        prefix = `cheer_${i}${n}_${v.gender}_`;
+                    }
+                    
+                    v.sprite[i].animations.add('cheer', buildFrames(prefix, [0,1], v.start.body, 2), v.time, true);
+                }
+
+                if (v.cheer){
+                    v.sprite[i].animations.play('cheer');
+                }
+            }
+        } 
+
+        document.querySelector('#canvas-div canvas').focus()
+
+        if (this.game.camera){
+            this.game.camera.focusOnXY(this.screenW * this.game.camera.scale.x / 2, this.screenH * this.game.camera.scale.y / 2)
+        }
+
+        // remove the loading screen
+        document.querySelector("#fog.load").remove()
+        this.paused = false
+        this.started = true
+
+        document.querySelector('#canvas-container').classList.remove("hidden");
+        simulation.resize()
+
+        glads.members.forEach(e => {            
+            e.sprite = this.game.add.sprite(this.arenaX1 + e.x * this.arenaRate, this.arenaY1 + e.y * this.arenaRate, `glad${e.id}`);
+            e.sprite.anchor.setTo(0.5, 0.5);
+            
+            createAnimation(e, ['walk', 'melee', 'slash', 'stab', 'shoot', 'cast']);
+            e.sprite.animations.add('die', arrayFill(260,265), 10, false);
+            
+            this.groups.glad.add(e.sprite);
+        })
+        
+        this.music.play();
+        this.music.volume = simulation.preferences.sound.music;
+    },
+    
+    update: function() {
+        // poison
+        if (this.step.poison){
+            this.poison = this.step.poison;
+            
+            const gasadv = Math.sqrt(2 * Math.pow(this.arenaD / 2, 2)) / this.arenaRate / this.poison;
+    
+            if (gasadv >= 1 && (this.gas.layers.length == 0 || (17 - this.poison) / this.gas.depth > this.gas.layers.length - 1)){
+                const gas = [];
+                for (let j=0 ; j < this.gas.amount ; j++){
+                    gas.push(game.add.image(0,0, 'atlas_effects', 'gas/gas'));
+                    gas[j].anchor.setTo(0.5, 0.5);
+                    gas[j].scale.setTo(gas[j].width / this.arenaRate * 3); //size = 1p
+                    gas[j].rotSpeed = Math.random() * 1 - 0.5;
+                    gas[j].alpha = 0;
+                    this.groups.gas.add(gas[j]);
+                }
+                this.gas.layers.push(gas);
+            }
+            this.gas.layers.forEach((l,i) => {
+                for (let j=0 ; j < l.length ; j++){
+                    const radi = (360 / l.length * j) * Math.PI / 180;
+                    const x = 12.5 + (this.poison + i * this.gas.depth + l[j].width / 2 / this.arenaRate ) * Math.sin(radi);
+                    const y = 12.5 + (this.poison + i * this.gas.depth + l[j].height / 2 / this.arenaRate) * Math.cos(radi);
+                    l[j].angle += l[j].rotSpeed;
+                    if (l[j].alpha < 1) {
+                        l[j].alpha += 0.005;
+                    }
+                    l[j].x = this.arenaX1 + x * this.arenaRate;
+                    l[j].y = this.arenaY1 + y * this.arenaRate;
+                }
+            })
+        
+        }
+        
+        if (this.time != this.step.simtime){
+            glads.update(this.step.glads);
+
+            this.step.glads.forEach(g => {
+                const glad = glads.get(g.id)
+
+                glad.sprite.x = this.arenaX1 + glad.x * this.arenaRate;
+                glad.sprite.y = this.arenaY1 + glad.y * this.arenaRate;
+
+                glad.showBaloon();
+                glad.showBars();
+                glad.showBreakpoint();
+
+                //lvlup
+                if (glad.getDiff('lvl')){
+                    const lvlup = glad.addSprite('lvlup');
+                    lvlup.anchor.setTo(0.5, 0.35);
+                    lvlup.animations.play('lvlup', null, false, true);
+                    this.groups.glad.add(lvlup);
+                    this.playAudio('lvlup', simulation.preferences.sound.sfx);
+                }
+
+                // used potion
+                if (glad.action.name == 'potion') {
+                    glad.potion = glad.code.split("-")[1];
+                }
+                else{
+                    glad.potion = false;
+                }
+
+                //took damage
+                if (glad.getDiff('hp')) {
+                    //explodiu na cara
+                    if (glad.action.name == 'fireball'){
+                        const pos = glad.code.split('fireball(')[1].split(')')[0].split(',');
+                        if (Math.sqrt(Math.pow(pos[0] - glad.x, 2) + Math.pow(pos[1] - glad.y, 2)) <= 2){
+                            const fire = glad.addSprite('explode');
+                            fire.anchor.setTo(0.5, 0.5);
+                            fire.alpha = 0.5;
+                            fire.width = 5 * this.arenaRate;
+                            fire.height = 3 * this.arenaRate;
+                            fire.animations.play('explode', null, false, true);
+                            this.playAudio('explosion', simulation.preferences.sound.sfx);
+                        }
+                    }
+                    
+                    if (simulation.preferences.text){
+                        let dmg = glad.getDiff('hp');
+                        let color = "#ffffff";
+                        let floattime = 400;
+                        let fillColor = "#000000";
+
+                        if (dmg < 0){
+                            fillColor = "#2dbc2d";
+                            dmg = -dmg;
+                        }
+                        else if (glad.burn){
+                            color = "#d36464";
+                            floattime = 100;
+                        }
+                        else if (glad.poison){
+                            color = "#7ae67a";
+                        }
+                        
+                        else if (glad.block){
+                            color = "#9c745a";
+                        }
+
+                        glad.dmgFloat += dmg;
+
+                        if (glad.dmgFloat > 0.01 * glad.maxhp){
+                            new FloatingText(this.game, {
+                                text: glad.dmgFloat.toFixed(0),
+                                animation: 'up',
+                                textOptions: {
+                                    fontSize: 16,
+                                    fill: fillColor,
+                                    stroke: color,
+                                    strokeThickness: 3
+                                },
+                                x: glad.sprite.x,
+                                y: glad.sprite.y - 20,
+                                timeToLive: floattime // ms
+                            });
+
+                            glad.dmgFloat = 0;
+                        }
+                    }
+                }
+                
+                if (glad.hp <= 0){
+                    if (glad.alive){
+                        glad.sprite.animations.play('die');
+                        render.playAudio(`death_${glad.gender}`, simulation.preferences.sound.sfx);
+                    }
+                    glad.alive = false;
+                }
+                // play standard glad animation
+                else {
+                    glad.alive = true;
+
+                    const anim = glad.action.animation.name + '-' + getActionDirection(glad.head);
+                    if (glad.action.name == "movement"){
+                        glad.sprite.animations.play(anim);
+                    }
+                    // this marks the start of an action
+                    else if (glad.action.name == "charge"){
+                        if (!glad.charge){
+                            glad.sprite.animations.stop();
+                            glad.sprite.animations.play(anim, 50, true);
+                            glad.charge = true;
+                            render.playAudio(`charge_${glad.gender}`, simulation.preferences.sound.sfx);
+                        }
+                    }
+                    else if (glad.action.animation.name != 'none' && glad.time != this.step.simtime){
+                        const frames = glad.action.animation.frames;
+                        //lockedfor + 0,1 porque quando chega nesse ponto já descontou do turno atual
+                        //e multiplica por 2 porque os locked dos ataques são divididos em 2 partes
+                        let timelocked = glad.lockedfor + 0.1;
+                        if (glad.action.name == "ranged" || glad.action.name == "melee"){
+                            timelocked *= 2;
+                        }
+                        const actionspeed = Math.max(10, frames / timelocked);
+    
+                        //console.log({action: actionspeed, name: this.step.glads[i].name, lock: lockedfor});
+
+                        glad.sprite.animations.stop();
+                        glad.sprite.animations.play(anim, actionspeed);
+                        glad.time = this.step.simtime;
+                        
+                        if (glad.action.name == "teleport" && !glad.fade){
+                            glad.fade = 1; // fading
+                            glad.arenaX = glad.sprite.x;
+                            glad.arenaY = glad.sprite.y;
+                            render.playAudio('teleport', simulation.preferences.sound.sfx);
+                        }
+                        if (glad.action.name == "assassinate"){
+                            glad.assassinate = true;
+                        }
+                        if (glad.action.name == "block"){
+                            glad.block = false;
+                        }
+                        if (glad.action.name == "ranged"){
+                            render.playAudio('ranged', simulation.preferences.sound.sfx);
+                        }
+                        if (glad.action.name == "melee"){
+                            render.playAudio('melee', simulation.preferences.sound.sfx);
+                        }
+                    }
+                }
+                
+                //ambush
+                glad.invisible = glad.buffs.invisible.timeleft > 0.1;
+                if (glad.invisible){
+                    if (glad.sprite.alpha >= 1){
+                        render.playAudio('ambush', simulation.preferences.sound.sfx);
+                    }
+                    if (glad.sprite.alpha > 0.3){
+                        glad.sprite.alpha -= 0.05;
+                    }
+                }
+                else if (glad.sprite.alpha < 1){
+                    glad.sprite.alpha += 0.05;
+                }
+                
+                // TODO: need to fix. gladArray[i].x was supposed to hold sprite[i].x. Now it holds json.glads[i].x
+                //fade do teleport
+                if (glad.fade == 1 && (glad.arenaX != glad.sprite.x || glad.arenaY != glad.sprite.y) ){
+                    const clone = game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
+                    clone.anchor.setTo(0.5, 0.5);
+                    clone.alpha = 1;
+                    glad.sprite.alpha = 0;
+                    this.clones.push(clone);
+                    
+                    glad.fade = 2; // totally faded
+                }
+                else if (glad.fade == 2){
+                    glad.sprite.alpha += 0.05;
+                    if (glad.sprite.alpha >= 1){
+                        glad.sprite.alpha = 1;
+                        glad.fade = 0; // not fading
+                    }
+                }
+
+                // update/delete teleport clones
+                this.clones = this.clones.filter(e => {
+                    e.alpha -= 0.05;
+                    if (e.alpha <= 0){
+                        e.destroy();
+                        return false;
+                    }
+                    return true;
+                });
+                    
+                //stun
+                if (!glad.stun && glad.buffs.stun.timeleft > 0.1 && glad.alive){
+                    glad.stun = glad.addSprite('stun'); // addSprite(gladArray[i], 'stun', sprite[i].x, sprite[i].y);
+                    glad.stun.anchor.setTo(0.5, 1);
+                    glad.stun.scale.setTo(0.6);
+                    glad.stun.animations.play('stun', null, true, false);
+                    render.playAudio('stun', simulation.preferences.sound.sfx);
+                }
+                else if (glad.stun && (glad.buffs.stun.timeleft <= 0.1 || !glad.alive)){
+                    glad.stun.kill();
+                    glad.stun = false;
+                }
+                
+                // TODO: here
+                //block
+                if (!gladArray[i].block && this.step.glads[i].buffs.resist.timeleft > 0.1){
+                    gladArray[i].block = true;
+                    var shield = glad.addSprite('shield'); // addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
+                    shield.anchor.setTo(0.5);
+                    groupglad.add(shield);
+                    shield.animations.play('shield', null, false, true);
+                    shield.alpha = 0.5;
+                    render.playAudio('block', simulation.preferences.sound.sfx);
+                }
+                else if (gladArray[i].block && this.step.glads[i].buffs.resist.timeleft <= 0.1){
+                    gladArray[i].block = false;
+                }
+
+                // potion
+                if (glad.action.name == "potion" && gladArray[i].potion){
+                    // console.log(gladArray[i].potion)
+                    let name, alpha = 1, scale = 1
+                    if (gladArray[i].potion == 'hp'){
+                        name = 'heal'
+                    }
+                    else if (gladArray[i].potion == 'ap'){
+                        name = 'mana'
+                        alpha = 0.5
+                    }
+                    else if (gladArray[i].potion == 'atr'){
+                        name = 'tonic'
+                        scale = 0.7
+                    }
+                    else if (gladArray[i].potion == 'xp'){
+                        name = 'elixir'
+                    }
+                    
+                    // console.log(name)
+                    var potion = glad.addSprite(name); // addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
+                    potion.anchor.setTo(0.5);
+                    potion.scale.setTo(scale);
+                    groupglad.add(potion);
+                    potion.animations.play(name, null, false, true);
+                    potion.alpha = alpha;
+                    render.playAudio(name, simulation.preferences.sound.sfx);
+                }
+                
+                //charge
+                if (gladArray[i].charge) {
+                    if (xp != gladArray[i].xp) {
+                        sprite[i].animations.currentAnim.speed = 15;
+                        if (stab[newindex[i]] == "0")
+                            var anim = 'slash-' + getActionDirection(head);
+                        else
+                            var anim = 'stab-' + getActionDirection(head);
+                        sprite[i].animations.stop();
+                        sprite[i].animations.play(anim, 20);
+                        render.playAudio('melee', simulation.preferences.sound.sfx);
+                    }
+                    else if (glad.action.name != "charge"){
+                        sprite[i].animations.currentAnim.speed = 15;
+                        gladArray[i].charge = false;
+                    }
+                }
+                
+                //poison
+                if (Math.sqrt(Math.pow(12.5 - x, 2) + Math.pow(12.5 - y, 2)) >= poison )
+                    gladArray[i].poison = true;
+                else
+                    gladArray[i].poison = false;
+                    
+                //aplica os tints
+                if (this.step.glads[i].buffs.burn && this.step.glads[i].buffs.burn.timeleft > 0.1)
+                    sprite[i].tint = 0xFFB072;
+                else if (gladArray[i].poison)
+                    sprite[i].tint = 0x96FD96;
+                else if (gladArray[i].block)
+                    sprite[i].tint = 0xFFE533;
+                else
+                    sprite[i].tint = 0xFFFFFF;
+                
+                gladArray[i].xp = xp;
+
+                if (timeSlider != Math.floor(this.step.simtime)){
+                    timeSlider = this.step.simtime;
+                    $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
+                }
+            })
+            
+            update_ui(json);
+
+            var i=0;
+    
+            if (this.step.projectiles && this.step.projectiles.length > 0) {
+    
+                var nproj = this.step.projectiles.length;
+                for (let i=0 ; i<nproj ; i++){
+                    var id = this.step.projectiles[i].id;
+                    var type = this.step.projectiles[i].type;
+                    var j = findProj(id);
+                    if (j == -1){
+                        var spr;
+                        if (this.step.projectiles[i].type == 0){ //ranged attack
+                            spr = newProjectile('arrow');
+                        }
+                        else if (this.step.projectiles[i].type == 1){ //fireball
+                            spr = newProjectile('fireball');
+                            spr.animations.play('fireball');
+                            render.playAudio('fireball', simulation.preferences.sound.sfx);
+                        }
+                        else if (this.step.projectiles[i].type == 2){ //stun
+                            spr = newProjectile('arrow');
+                            spr.tint = 0x00FF00;
+                        }
+                        
+                        //console.log(this.step.simtime +'-'+ this.step.projectiles[i].owner);
+                        if (gladArray[this.step.projectiles[i].owner] && gladArray[this.step.projectiles[i].owner].assassinate){
+                            gladArray[this.step.projectiles[i].owner].assassinate = false;
+                            spr = newProjectile('arrow');
+                            spr.tint = 0xFF0000;
+                            render.playAudio('assassinate', simulation.preferences.sound.sfx);
+                        }
+                                        
+                        spr.anchor.setTo(0.5, 0.5);
+                        j = sproj.length;
+                        sproj.push({'sprite': spr, 'active': true, 'id': id, 'type': type});
+                    }
+                    
+                    sproj[j].sprite.x = arenaX1 + parseFloat(this.step.projectiles[i].x) * arenaRate;
+                    sproj[j].sprite.y = arenaY1 + parseFloat(this.step.projectiles[i].y) * arenaRate;
+                    sproj[j].sprite.angle = parseFloat(this.step.projectiles[i].head) + 90;
+                    sproj[j].active = true;
+                }
+            }
+            
+            //calculate projectile hit
+            for (let x in sproj){
+                if (sproj[x].active === false) {
+                    if (sproj[x].type == 1){
+                        var fire = newProjectile('explode', sproj[x].sprite.x, sproj[x].sprite.y);
+                        fire.anchor.setTo(0.5, 0.5);
+                        fire.alpha = 0.5;
+                        fire.width = 5 * arenaRate;
+                        fire.height = 3 * arenaRate;
+                        fire.animations.play('explode', null, false, true);
+                        render.playAudio('explosion', simulation.preferences.sound.sfx);
+                    }
+                    else{
+                        render.playAudio('arrow_hit', simulation.preferences.sound.sfx);
+                    }
+                    
+                    sproj[x].sprite.kill();
+                    sproj.splice(x,1);
+                }
+                else
+                    sproj[x].active = false;
+            }
+    
+            groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
+            for (var i=0 ; i<nglad ; i++){
+                if (!gladArray[i].alive)
+                    groupglad.sendToBack(sprite[i]);
+            }
+    
+            groupglad.sendToBack(layers[0]);
+            groupglad.bringToTop(groupgas);
+            groupglad.bringToTop(layers[1]);
+            groupglad.bringToTop(groupnpc[0]);
+            groupglad.bringToTop(layers[2]);
+            groupglad.bringToTop(groupnpc[1]);
+            groupglad.bringToTop(layers[3]);
+        }
+        
+        debugTimer();
+                        
+        render.checkInput();
+        
+        this.time = this.step.simtime;
+    },
+
+    checkInput: function(){
+        if (this.game.input.mouse.drag){
+            if (this.game.camera.target){
+                const f = ui.getFollowed();
+                if (f !== false){
+                    f.follow(false);
+                }
+            }
+            this.game.camera.view.y -= this.game.input.speed.y;
+            this.game.camera.view.x -= this.game.input.speed.x;
+
+            glads.killBaloons()
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_ADD) || this.game.input.keyboard.isDown(Phaser.Keyboard.EQUALS)){
+            this.zoomWheel({deltaY: -1});
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_SUBTRACT) || this.game.input.keyboard.isDown(Phaser.Keyboard.UNDERSCORE)){
+            this.zoomWheel({deltaY: 1});
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
+            this.game.camera.view.x -= 10;
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
+            this.game.camera.view.x += 10;
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.UP)){
+            this.game.camera.view.y -= 10;
+        }
+    
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.DOWN)){
+            this.game.camera.view.y += 10;
+        }
+
+    },
+
+    zoomWheel: function(wheel){
+        const scaleValue = 0.05;
+        const delta = 1 - wheel.deltaY / Math.abs(wheel.deltaY) * scaleValue;
+        let canvasW = this.screenW * (this.game.camera.scale.x * delta);
+        let canvasH = this.screenH * (this.game.camera.scale.y * delta);
+    
+        const point = {
+            x: (this.game.input.mouse.input.x + this.game.camera.x) / this.game.camera.scale.x,
+            y: (this.game.input.mouse.input.y + this.game.camera.y) / this.game.camera.scale.y,
+        }
+    
+        let bind = null;
+        if (window.outerWidth > window.outerHeight){
+            bind = canvasH <= window.outerHeight ? "height" : "none";
+        }
+        else{
+            bind = canvasW <= window.outerWidth ? "width" : "none";
+        }
+    
+        if (bind == "width"){
+            canvasW = window.outerWidth;
+            canvasH = window.outerWidth * this.screenH / this.screenW;
+            this.game.camera.scale.x = window.outerWidth / this.screenW;
+            this.game.camera.scale.y = window.outerWidth / this.screenW;
+        }
+        else if (bind == "height"){
+            canvasH = window.outerHeight;
+            canvasW = window.outerHeight * this.screenW / this.screenH;
+            this.game.camera.scale.x = window.outerHeight / this.screenH;
+            this.game.camera.scale.y = window.outerHeight / this.screenH;
+        }
+        else{
+            this.game.camera.scale.x *= delta;
+            this.game.camera.scale.y *= delta;
+        }
+    
+        if (canvasW > window.outerWidth){
+            canvasW = window.outerWidth;
+        }
+        if (canvasH > window.outerHeight){
+            canvasH = window.outerHeight;
+        }
+    
+        this.game.scale.setGameSize(canvasW, canvasH);
+        this.game.camera.bounds.width = this.screenW;
+        this.game.camera.bounds.height = this.screenH;
+    
+        if (bind == "none"){
+            const mx = this.game.input.mouse.input.x;
+            const my = this.game.input.mouse.input.y;
+            const sx = this.game.camera.scale.x;
+            const sy = this.game.camera.scale.y;
+    
+            this.game.camera.x = point.x * sx - mx;
+            this.game.camera.y = point.y * sy - my;
+        }
+        document.querySelector('.baloon').remove();
+    },
+    
+    playAudio: function(marker, volume){
+        if (!this.audio[marker]){
+            this.audio[marker] = [];
+        }
+    
+        const inactive = this.audio[marker].filter(e => !e.isPlaying);
+        if (inactive.length){
+            inactive[0].volume = volume;
+            inactive[0].play();
+        }
+        else{
+            this.audio[marker].push(this.game.add.audio(marker, volume).play());
+        }
+    },
 }
+
+const animationList = {
+    walk: { start: 8, frames: 9 },
+    cast: { start: 0, frames: 7 },
+    shoot: { start: 16, frames: 10 },
+    stab: { start: 4, frames: 8 },
+    slash: { start: 12, frames: 6 },
+    die: { start: 20, frames: 6 },
+};
 
 const actionList = [
     { name: 'fireball',     value: 0,   animation: 'cast' },
@@ -333,65 +1165,15 @@ const actionList = [
     { name: 'waiting',      value: 9,   animation: 'none' },
     { name: 'none',         value: 10,  animation: 'none' },
     { name: 'potion',       value: 11,  animation: 'cast' }
-]
+];
 
-function zoomWheel(wheel){
-    const scaleValue = 0.05;
-    const delta = 1 - wheel.deltaY / Math.abs(wheel.deltaY) * scaleValue;
-    let canvasW = render.screenW * (render.game.camera.scale.x * delta);
-    let canvasH = render.screenH * (render.game.camera.scale.y * delta);
-
-    const point = {
-        x: (render.game.input.mouse.input.x + render.game.camera.x) / render.game.camera.scale.x,
-        y: (render.game.input.mouse.input.y + render.game.camera.y) / render.game.camera.scale.y,
+function getAction(value){
+    if (typeof value == 'string'){
+        return actionList.filter(e => e.name == value)[0];
     }
-
-    let bind = null;
-    if (window.outerWidth > window.outerHeight){
-        bind = canvasH <= window.outerHeight ? "height" : "none";
+    else {
+        return actionList[options.value];
     }
-    else{
-        bind = canvasW <= window.outerWidth ? "width" : "none";
-    }
-
-    if (bind == "width"){
-        canvasW = window.outerWidth;
-        canvasH = window.outerWidth * render.screenH / render.screenW;
-        render.game.camera.scale.x = window.outerWidth / render.screenW;
-        render.game.camera.scale.y = window.outerWidth / render.screenW;
-    }
-    else if (bind == "height"){
-        canvasH = window.outerHeight;
-        canvasW = window.outerHeight * render.screenW / render.screenH;
-        render.game.camera.scale.x = window.outerHeight / render.screenH;
-        render.game.camera.scale.y = window.outerHeight / render.screenH;
-    }
-    else{
-        render.game.camera.scale.x *= delta;
-        render.game.camera.scale.y *= delta;
-    }
-
-    if (canvasW > window.outerWidth){
-        canvasW = window.outerWidth;
-    }
-    if (canvasH > window.outerHeight){
-        canvasH = window.outerHeight;
-    }
-
-    render.game.scale.setGameSize(canvasW, canvasH);
-    render.game.camera.bounds.width = render.screenW;
-    render.game.camera.bounds.height = render.screenH;
-
-    if (bind == "none"){
-        const mx = render.game.input.mouse.input.x;
-        const my = render.game.input.mouse.input.y;
-        const sx = render.game.camera.scale.x;
-        const sy = render.game.camera.scale.y;
-
-        render.game.camera.x = point.x * sx - mx;
-        render.game.camera.y = point.y * sy - my;
-    }
-    document.querySelector('.baloon').remove();
 }
 
 function initBars(){
@@ -743,27 +1525,53 @@ function buildFrames(prefix, frames, start=0, digits=0, loop){
     return strings;
 }
 
-export { render, glads, actionList }
+function createAnimation(glad, action){
+    if (!Array.isArray(action)){
+        action = [action]
+    }
+
+    action.forEach(e => {
+        const sufix = ['-up', '-left', '-down', '-right'];
+        const name = e == "melee" ? glad.move : e;
+    
+        for (let i=0 ; i<4 ; i++) {
+            const start = (animationList[name].start + i) * 13;
+            const end = start + animationList[name].frames - 1;
+            glad.sprite.animations.add(e + sufix[i], arrayFill(start, end), 15, false);
+        }
+    })
+}
+
+function arrayFill(s,e){
+    const arr = [];
+    for(let i=s ; i<=e ; i++){
+        arr.push(i);
+    }
+    return arr;
+}
+
+function getActionDirection(head){
+    if (head >= 45 && head <= 135){
+        return 'right';
+    }
+    else if (head > 135 && head < 225){
+        return 'down';
+    }
+    else if (head >= 225 && head <= 315){
+        return 'left';
+    }
+    else{
+        return 'up';
+    }
+}
+
+
+export { render, glads, getAction }
 
 // var loadglads = false, startsim = false;
 // var stab, gender;
 // var simtimenow;
 // var dt = 0;
-
-// var animationlist = {
-//     'walk': {
-//         'start': 8, 'frames': 9},
-//     'cast': {
-//         'start': 0, 'frames': 7},
-//     'shoot': {
-//         'start': 16, 'frames': 10},
-//     'stab': {
-//         'start': 4, 'frames': 8},
-//     'slash': {
-//         'start': 12, 'frames': 6},
-//     'die': {
-//         'start': 20, 'frames': 6},
-// };
 
 // var layers = [];
 
@@ -804,532 +1612,6 @@ export { render, glads, actionList }
 //     }
 // }
 
-// var gasld = 4; //gas layer depth
-// var gaspl = 25; //gas per layer
-function update() {
-//     if (json.poison){
-//         poison = parseFloat(json.poison);
-        
-//         var gasadv = Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate / poison;
-
-//         if (gasadv >= 1 && (gasl.length == 0 || (17-poison) / gasld > gasl.length - 1)){
-//             var gas = [];
-//             for (let j = 0 ; j< gaspl ; j++){
-//                 gas.push(game.add.image(0,0, 'atlas_effects', 'gas/gas'));
-//                 gas[j].anchor.setTo(0.5, 0.5);
-//                 gas[j].scale.setTo(gas[j].width / arenaRate * 3); //size = 1p
-//                 gas[j].rotSpeed = Math.random() * 1 - 0.5;
-//                 gas[j].alpha = 0;
-//                 groupgas.add(gas[j]);
-//             }
-//             gasl.push(gas);
-//         }
-//         for (let i=0 ; i<gasl.length ; i++){
-//             for (let j=0 ; j<gasl[i].length ; j++){
-//                 var radi = 360 / gasl[i].length * j;
-//                 radi = radi * Math.PI / 180;
-//                 let x = 12.5 + (poison + i*gasld + gasl[i][j].width/2 / arenaRate ) * Math.sin(radi);
-//                 let y = 12.5 + (poison + i*gasld + gasl[i][j].height/2 / arenaRate) * Math.cos(radi);
-//                 gasl[i][j].angle += gasl[i][j].rotSpeed;
-//                 if (gasl[i][j].alpha < 1) 
-//                     gasl[i][j].alpha += 0.005;
-//                 gasl[i][j].x = arenaX1 + x * arenaRate;
-//                 gasl[i][j].y = arenaY1 + y * arenaRate;
-//             }
-//         }
-    
-//     }
-    
-//     if (nglad > 0 && !loadglads) {
-//         loadglads = true;
-//         for (let i=0 ; i<nglad ; i++){
-//             //console.log(json.glads[i].x);
-//             //if (textures.length < game.renderer.maxTextures){
-//                 //game.renderer.currentBatchedTextures.push('glad'+newindex[i]);
-//             //}
-
-//             sprite[i] = game.add.sprite(arenaX1 + parseFloat(json.glads[i].x) * arenaRate, arenaY1 + parseFloat(json.glads[i].y) * arenaRate, 'glad'+newindex[i]);
-//             sprite[i].anchor.setTo(0.5, 0.5);
-            
-//             createAnimation(i, 'walk');
-//             createAnimation(i, 'melee');
-//             createAnimation(i, 'slash');
-//             createAnimation(i, 'stab');
-//             createAnimation(i, 'shoot');
-//             createAnimation(i, 'cast');
-            
-//             sprite[i].animations.add('die', arrayFill(260,265), 10, false);
-            
-//             groupglad.add(sprite[i]);
-                        
-//             gladArray[i] = {
-//                 x: 0,
-//                 y: 0,
-//                 hp: parseFloat(json.glads[i].hp),
-//                 alive: true,
-//                 fade: 0,
-//                 clone: null,
-//                 invisible: false,
-//                 stun: false,
-//                 assassinate: false,
-//                 level: 1,
-//                 block: false,
-//                 charge: false,
-//                 poison: false,
-//                 xp: parseInt(json.glads[i].xp),
-//                 time: false,
-//                 sprites: {},
-//                 dmgfloat: 0
-//             };
-
-//             //var w = arenaX1 + 25 * arenaRate;
-//             //var h = arenaY1 + 25 * arenaRate;
-//             //gladArray[i].bars = game.add.bitmapData(w,h);
-//             //gladArray[i].bars.addToWorld();
-//         }
-//         music.play();
-//         music.volume = prefs.sound.music;
-//     }
-//     else if (sprite.length > 0){
-//         if (!startsim){
-//             startsim = true;
-//             $('#fog').remove();
-//             $('#canvas-container').css({'opacity':1});
-//             resize();	
-//             pausesim = false;
-//         }
-
-//         if (json && simtimenow != json.simtime){
-            
-//             for (let i=0 ; i<nglad ; i++){
-//                 var x = parseFloat(json.glads[i].x);
-//                 var y = parseFloat(json.glads[i].y);
-
-//                 var action = parseInt(json.glads[i].action);
-//                 var level = parseInt(json.glads[i].lvl);
-//                 var xp = parseInt(json.glads[i].xp);
-//                 var head = parseFloat(json.glads[i].head);
-//                 var hp = parseFloat(json.glads[i].hp);
-//                 var lockedfor = parseFloat(json.glads[i].lockedfor);
-
-//                 sprite[i].x = arenaX1 + x * arenaRate;
-//                 sprite[i].y = arenaY1 + y * arenaRate;
-
-//                 showMessageBaloon(i);
-//                 showHpApBars(i);
-//                 showBreakpoint(i);
-
-//                 //lvlup
-//                 if (level != gladArray[i].level){
-//                     gladArray[i].level = level;
-//                     var lvlup = addSprite(gladArray[i], 'lvlup', sprite[i].x, sprite[i].y);
-//                     lvlup.anchor.setTo(0.5, 0.35);
-//                     lvlup.animations.play('lvlup', null, false, true);
-//                     groupglad.add(lvlup);
-//                     playAudio('lvlup', prefs.sound.sfx);
-//                 }
-
-//                 // used potion
-//                 if (actionList[action].name == 'potion') {
-//                     gladArray[i].potion = json.glads[i].code.split("-")[1]
-//                 }
-//                 else{
-//                     gladArray[i].potion = false;
-//                 }
-
-//                 //took damage
-//                 if (hp != gladArray[i].hp) {
-//                     //explodiu na cara
-//                     if (actionList[action].name == 'fireball'){
-//                         let pos = json.glads[i].code.split('fireball(')[1].split(')')[0].split(',')
-//                         let x = parseFloat(pos[0])
-//                         let y = parseFloat(pos[1])
-//                         if (Math.sqrt(Math.pow(x - json.glads[i].x, 2) + Math.pow(y - json.glads[i].y, 2)) <= 2){
-//                             // console.log(Math.sqrt(Math.pow(x - json.glads[i].x) + Math.pow(y - json.glads[i].y)))
-//                             var fire = addSprite(gladArray[i], 'explode', sprite[i].x, sprite[i].y);
-//                             fire.anchor.setTo(0.5, 0.5);
-//                             fire.alpha = 0.5;
-//                             fire.width = 5 * arenaRate;
-//                             fire.height = 3 * arenaRate;
-//                             fire.animations.play('explode', null, false, true);
-//                             playAudio('explosion', prefs.sound.sfx);
-//                         }
-//                     }
-                    
-//                     if (prefs.text){
-//                         var dmg = gladArray[i].hp - hp;
-//                         var color = "#ffffff";
-//                         var floattime = 400;
-//                         var fill_color = "#000000";
-
-//                         if (dmg < 0){
-//                             fill_color = "#2dbc2d";
-//                             dmg = -dmg;
-//                         }
-//                         else if (json.glads[i].buffs.burn && json.glads[i].buffs.burn.timeleft > 0.1){
-//                             color = "#d36464";
-//                             floattime = 100;
-//                         }
-//                         else if (gladArray[i].poison)
-//                             color = "#7ae67a";
-//                         else if (gladArray[i].block)
-//                             color = "#9c745a";
-
-//                         gladArray[i].dmgfloat += dmg;
-
-//                         if (gladArray[i].dmgfloat > 0.01 * json.glads[i].maxhp){
-//                             new FloatingText(this, {
-//                                 text: gladArray[i].dmgfloat.toFixed(0),
-//                                 animation: 'up',
-//                                 textOptions: {
-//                                     fontSize: 16,
-//                                     fill: fill_color,
-//                                     stroke: color,
-//                                     strokeThickness: 3
-//                                 },
-//                                 x: sprite[i].x,
-//                                 y: sprite[i].y - 20,
-//                                 timeToLive: floattime // ms
-//                             });
-
-//                             gladArray[i].dmgfloat = 0;
-//                         }
-//                     }
-
-//                     gladArray[i].hp = hp;
-
-//                 }
-                
-//                 if (hp <= 0){
-//                     if (gladArray[i].alive){
-//                         sprite[i].animations.play('die');
-//                         if (gender[newindex[i]] == "male"){
-//                             playAudio('death_male', prefs.sound.sfx);
-//                         }
-//                         else{
-//                             playAudio('death_female', prefs.sound.sfx);
-//                         }
-//                     }
-//                     gladArray[i].alive = false;
-//                 }
-//                 // play standard glad animation
-//                 else {
-//                     gladArray[i].alive = true;
-
-//                     var anim = actionList[action].animation + '-' + getActionDirection(head);
-//                     if (actionList[action].name == "movement"){
-//                         sprite[i].animations.play(anim);
-//                     }
-//                     else if (actionList[action].name == "charge"){
-//                         if (!gladArray[i].charge){
-//                             sprite[i].animations.stop();
-//                             sprite[i].animations.play(anim, 50, true);
-//                             gladArray[i].charge = true;
-//                             if (gender[newindex[i]] == "male"){
-//                                 playAudio('charge_male', prefs.sound.sfx);
-//                             }
-//                             else{
-//                                 playAudio('charge_female', prefs.sound.sfx);
-//                             }
-//                         }
-//                     }
-//                     else if (actionList[action] && actionList[action].animation != 'none' && gladArray[i].time != json.simtime){
-//                         var frames = animationlist[actionList[action].animation].frames;
-//                         //lockedfor + 0,1 porque quando chega nesse ponto já descontou do turno atual
-//                         //e multiplica por 2 porque os locked dos ataques são divididos em 2 partes
-//                         var timelocked = lockedfor + 0.1;
-//                         if (actionList[action].name == "ranged" || actionList[action].name == "melee")
-//                             timelocked *= 2;
-//                         var actionspeed = Math.max(10, frames / timelocked);
-    
-//                         //console.log({action: actionspeed, name: json.glads[i].name, lock: lockedfor});
-
-//                         sprite[i].animations.stop();
-//                         sprite[i].animations.play(anim, actionspeed);
-//                         gladArray[i].time = json.simtime;
-                        
-//                         if (actionList[action].name == "teleport" && gladArray[i].fade == 0){
-//                             gladArray[i].fade = 1;
-//                             gladArray[i].x = sprite[i].x;
-//                             gladArray[i].y = sprite[i].y;
-//                             playAudio('teleport', prefs.sound.sfx);
-//                         }
-//                         if (actionList[action].name == "assassinate"){
-//                             gladArray[i].assassinate = true;
-//                         }
-//                         if (actionList[action].name == "block"){
-//                             gladArray[i].block = false;
-//                         }
-//                         if (actionList[action].name == "ranged"){
-//                             playAudio('ranged', prefs.sound.sfx);
-//                         }
-//                         if (actionList[action].name == "melee"){
-//                             playAudio('melee', prefs.sound.sfx);
-//                         }
-//                     }
-//                 }
-                
-//                 //ambush
-//                 if (json.glads[i].buffs.invisible.timeleft > 0.1)
-//                     gladArray[i].invisible = true;
-//                 else
-//                     gladArray[i].invisible = false;
-                
-//                 if (gladArray[i].invisible){
-//                     if (sprite[i].alpha >= 1)
-//                         playAudio('ambush', prefs.sound.sfx);
-//                     if (sprite[i].alpha > 0.3)
-//                         sprite[i].alpha -= 0.05;
-//                 }
-//                 else if (sprite[i].alpha < 1)
-//                         sprite[i].alpha += 0.05;
-                    
-//                 //fade do teleport
-//                 if (gladArray[i].fade == 1 && (gladArray[i].x != sprite[i].x || gladArray[i].y != sprite[i].y) ){
-//                     clones.push(game.add.sprite(gladArray[i].x, gladArray[i].y, sprite[i].key, sprite[i].frame));
-//                     clones[clones.length-1].anchor.setTo(0.5, 0.5);
-//                     clones[clones.length-1].alpha = 1;
-//                     sprite[i].alpha = 0;
-
-//                     gladArray[i].fade = 2;
-//                 }
-//                 else if (gladArray[i].fade == 2){
-//                     sprite[i].alpha += 0.05;
-//                     if (sprite[i].alpha >= 1){
-//                         sprite[i].alpha = 1;
-//                         gladArray[i].fade = 0;
-//                     }
-//                 }
-
-//                 //clone do teleport
-//                 for (j in clones){
-//                     clones[j].alpha -= 0.05;
-//                     if (clones[j].alpha <= 0){
-//                         clones[j].destroy();
-//                         clones.splice(j,1);
-//                     }
-//                 }
-                    
-//                 //stun
-//                 if (!gladArray[i].stun && json.glads[i].buffs.stun.timeleft > 0.1 && gladArray[i].alive){
-//                     gladArray[i].stun = addSprite(gladArray[i], 'stun', sprite[i].x, sprite[i].y);
-//                     gladArray[i].stun.anchor.setTo(0.5, 1);
-//                     gladArray[i].stun.scale.setTo(0.6);
-//                     gladArray[i].stun.animations.play('stun', null, true, false);
-//                     playAudio('stun', prefs.sound.sfx);
-//                 }
-//                 else if (gladArray[i].stun && (json.glads[i].buffs.stun.timeleft <= 0.1 || !gladArray[i].alive)){
-//                     gladArray[i].stun.kill();
-//                     gladArray[i].stun = false;
-//                 }
-                
-//                 //block
-//                 if (!gladArray[i].block && json.glads[i].buffs.resist.timeleft > 0.1){
-//                     gladArray[i].block = true;
-//                     var shield = addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
-//                     shield.anchor.setTo(0.5);
-//                     groupglad.add(shield);
-//                     shield.animations.play('shield', null, false, true);
-//                     shield.alpha = 0.5;
-//                     playAudio('block', prefs.sound.sfx);
-//                 }
-//                 else if (gladArray[i].block && json.glads[i].buffs.resist.timeleft <= 0.1){
-//                     gladArray[i].block = false;
-//                 }
-
-//                 // potion
-//                 if (actionList[action].name == "potion" && gladArray[i].potion){
-//                     // console.log(gladArray[i].potion)
-//                     let name, alpha = 1, scale = 1
-//                     if (gladArray[i].potion == 'hp'){
-//                         name = 'heal'
-//                     }
-//                     else if (gladArray[i].potion == 'ap'){
-//                         name = 'mana'
-//                         alpha = 0.5
-//                     }
-//                     else if (gladArray[i].potion == 'atr'){
-//                         name = 'tonic'
-//                         scale = 0.7
-//                     }
-//                     else if (gladArray[i].potion == 'xp'){
-//                         name = 'elixir'
-//                     }
-                    
-//                     // console.log(name)
-//                     var potion = addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
-//                     potion.anchor.setTo(0.5);
-//                     potion.scale.setTo(scale);
-//                     groupglad.add(potion);
-//                     potion.animations.play(name, null, false, true);
-//                     potion.alpha = alpha;
-//                     playAudio(name, prefs.sound.sfx);
-//                 }
-                
-//                 //charge
-//                 if (gladArray[i].charge) {
-//                     if (xp != gladArray[i].xp) {
-//                         sprite[i].animations.currentAnim.speed = 15;
-//                         if (stab[newindex[i]] == "0")
-//                             var anim = 'slash-' + getActionDirection(head);
-//                         else
-//                             var anim = 'stab-' + getActionDirection(head);
-//                         sprite[i].animations.stop();
-//                         sprite[i].animations.play(anim, 20);
-//                         playAudio('melee', prefs.sound.sfx);
-//                     }
-//                     else if (actionList[action].name != "charge"){
-//                         sprite[i].animations.currentAnim.speed = 15;
-//                         gladArray[i].charge = false;
-//                     }
-//                 }
-                
-//                 //poison
-//                 if (Math.sqrt(Math.pow(12.5 - x, 2) + Math.pow(12.5 - y, 2)) >= poison )
-//                     gladArray[i].poison = true;
-//                 else
-//                     gladArray[i].poison = false;
-                    
-//                 //aplica os tints
-//                 if (json.glads[i].buffs.burn && json.glads[i].buffs.burn.timeleft > 0.1)
-//                     sprite[i].tint = 0xFFB072;
-//                 else if (gladArray[i].poison)
-//                     sprite[i].tint = 0x96FD96;
-//                 else if (gladArray[i].block)
-//                     sprite[i].tint = 0xFFE533;
-//                 else
-//                     sprite[i].tint = 0xFFFFFF;
-                
-//                 gladArray[i].xp = xp;
-
-//                 if (timeSlider != Math.floor(json.simtime)){
-//                     timeSlider = json.simtime;
-//                     $( "#time" ).slider("value", parseFloat(json.simtime) * 10);
-//                 }
-//             }
-            
-//             update_ui(json);
-//         }
-        
-//         debugTimer();
-//     }
-    
-//     if (simtimenow != json.simtime ){
-//         var i=0;
-
-//         if (json.projectiles && json.projectiles.length > 0) {
-
-//             var nproj = json.projectiles.length;
-//             for (let i=0 ; i<nproj ; i++){
-//                 var id = json.projectiles[i].id;
-//                 var type = json.projectiles[i].type;
-//                 var j = findProj(id);
-//                 if (j == -1){
-//                     var spr;
-//                     if (json.projectiles[i].type == 0){ //ranged attack
-//                         spr = newProjectile('arrow');
-//                     }
-//                     else if (json.projectiles[i].type == 1){ //fireball
-//                         spr = newProjectile('fireball');
-//                         spr.animations.play('fireball');
-//                         playAudio('fireball', prefs.sound.sfx);
-//                     }
-//                     else if (json.projectiles[i].type == 2){ //stun
-//                         spr = newProjectile('arrow');
-//                         spr.tint = 0x00FF00;
-//                     }
-                    
-//                     //console.log(json.simtime +'-'+ json.projectiles[i].owner);
-//                     if (gladArray[json.projectiles[i].owner] && gladArray[json.projectiles[i].owner].assassinate){
-//                         gladArray[json.projectiles[i].owner].assassinate = false;
-//                         spr = newProjectile('arrow');
-//                         spr.tint = 0xFF0000;
-//                         playAudio('assassinate', prefs.sound.sfx);
-//                     }
-                                    
-//                     spr.anchor.setTo(0.5, 0.5);
-//                     j = sproj.length;
-//                     sproj.push({'sprite': spr, 'active': true, 'id': id, 'type': type});
-//                 }
-                
-//                 sproj[j].sprite.x = arenaX1 + parseFloat(json.projectiles[i].x) * arenaRate;
-//                 sproj[j].sprite.y = arenaY1 + parseFloat(json.projectiles[i].y) * arenaRate;
-//                 sproj[j].sprite.angle = parseFloat(json.projectiles[i].head) + 90;
-//                 sproj[j].active = true;
-//             }
-//         }
-        
-//         //calculate projectile hit
-//         for (let x in sproj){
-//             if (sproj[x].active === false) {
-//                 if (sproj[x].type == 1){
-//                     var fire = newProjectile('explode', sproj[x].sprite.x, sproj[x].sprite.y);
-//                     fire.anchor.setTo(0.5, 0.5);
-//                     fire.alpha = 0.5;
-//                     fire.width = 5 * arenaRate;
-//                     fire.height = 3 * arenaRate;
-//                     fire.animations.play('explode', null, false, true);
-//                     playAudio('explosion', prefs.sound.sfx);
-//                 }
-//                 else{
-//                     playAudio('arrow_hit', prefs.sound.sfx);
-//                 }
-                
-//                 sproj[x].sprite.kill();
-//                 sproj.splice(x,1);
-//             }
-//             else
-//                 sproj[x].active = false;
-//         }
-
-//         groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
-//         for (var i=0 ; i<nglad ; i++){
-//             if (!gladArray[i].alive)
-//                 groupglad.sendToBack(sprite[i]);
-//         }
-
-//         groupglad.sendToBack(layers[0]);
-//         groupglad.bringToTop(groupgas);
-//         groupglad.bringToTop(layers[1]);
-//         groupglad.bringToTop(groupnpc[0]);
-//         groupglad.bringToTop(layers[2]);
-//         groupglad.bringToTop(groupnpc[1]);
-//         groupglad.bringToTop(layers[3]);
-//     }
-
-//     if (game.input.mouse.drag){
-//         if (game.camera.target){
-//             $('.ui-glad').removeClass('follow');
-//             game.camera.unfollow();
-//             $('#details').remove();
-//         }
-//         game.camera.view.y -= game.input.speed.y;
-//         game.camera.view.x -= game.input.speed.x;
-//         $('.baloon').remove();
-//     }
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_ADD) || game.input.keyboard.isDown(Phaser.Keyboard.EQUALS))
-//         zoomWheel({deltaY: -1});
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_SUBTRACT) || game.input.keyboard.isDown(Phaser.Keyboard.UNDERSCORE))
-//         zoomWheel({deltaY: 1});
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
-//         game.camera.view.x -= 10;
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
-//         game.camera.view.x += 10;
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
-//         game.camera.view.y -= 10;
-
-//     if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
-//         game.camera.view.y += 10;
-
-    
-//     simtimenow = json.simtime;
-}
-
 // function findProj(id){
 //     for (i in sproj){
 //         if (sproj[i].id == id)
@@ -1338,48 +1620,11 @@ function update() {
 //     return -1;
 // }
 
-// function arrayFill(s,e){
-//     a = new Array();
-//     for(var i=s ; i<=e ; i++)
-//         a.push(i);
-//     return a;
-// }
-
-// function getActionDirection(head){
-//     if (head >= 45 && head <= 135)
-//         return 'right';
-//     else if (head > 135 && head < 225)
-//         return 'down';
-//     else if (head >= 225 && head <= 315)
-//         return 'left';
-//     else
-//         return 'up';
-// }
-
-// function createAnimation(glad, action){
-//     var name;
-//     var sufix = ['-up', '-left', '-down', '-right'];
-//     if (action == "melee"){
-//         if (stab[newindex[glad]] == "0")
-//             name = 'slash';
-//         else
-//             name = 'stab';
-//         animationlist.melee = animationlist[name];
-//     }
-//     else
-//         name = action;
-//     for (var i=0 ; i<4 ; i++) {
-//         var start =  (animationlist[name].start + i) * 13;
-//         var end = start + animationlist[name].frames - 1;
-//         sprite[glad].animations.add(action + sufix[i], arrayFill(start, end), 15, false);
-//     }
-// }
-
 // var oldTime = null;
 // var avgFPS = 0, contFPS = 0;
 // var avgFPS5 = [];
 // function debugTimer(){
-//     if (prefs.fps){
+//     if (simulation.preferences.fps){
 //         if (!oldTime)
 //             oldTime = new Date();
 //         else{
@@ -1431,45 +1676,45 @@ function update() {
 //     }
 
 //     if(event.keyCode == Phaser.Keyboard.F){
-//         prefs.fps = (prefs.fps + 1) % 2;
+//         simulation.preferences.fps = (simulation.preferences.fps + 1) % 2;
     
 //         post("back_play.php", {
 //             action: "SET_PREF",
-//             show_fps: (prefs.fps == 1)
+//             show_fps: (simulation.preferences.fps == 1)
 //         });
 //     }
 
 //     if(event.keyCode == Phaser.Keyboard.B){
-//         prefs.bars = (prefs.bars + 1) % 2;
+//         simulation.preferences.bars = (simulation.preferences.bars + 1) % 2;
     
 //         post("back_play.php", {
 //             action: "SET_PREF",
-//             show_bars: (prefs.bars == 1)
+//             show_bars: (simulation.preferences.bars == 1)
 //         });
 //     }
 
 //     if(event.keyCode == Phaser.Keyboard.M){
-//         if (prefs.frames){
+//         if (simulation.preferences.frames){
 //             $('#ui-container').fadeOut();
-//             prefs.frames = false;
+//             simulation.preferences.frames = false;
 //         }
 //         else{
 //             $('#ui-container').fadeIn();
-//             prefs.frames = true;
+//             simulation.preferences.frames = true;
 //         }
 
 //         post("back_play.php", {
 //             action: "SET_PREF",
-//             show_frames: prefs.frames
+//             show_frames: simulation.preferences.frames
 //         });
 //     }
 
 //     if(event.keyCode == Phaser.Keyboard.T){
-//         prefs.text = (prefs.text + 1) % 2;
+//         simulation.preferences.text = (simulation.preferences.text + 1) % 2;
 
 //         post("back_play.php", {
 //             action: "SET_PREF",
-//             show_text: (prefs.text == 1)
+//             show_text: (simulation.preferences.text == 1)
 //         });
 //     }
 
@@ -1488,181 +1733,6 @@ function update() {
 //     }
 
 // });
-
-// function getGladPositionOnCanvas(gladid){
-//     var ph = game.camera.scale.y * tileD;
-//     var pw = game.camera.scale.x * tileD;
-    
-//     //var x = pw*(arenaX1/tileD) + pw * parseFloat(25);
-//     var x = pw * ((arenaX1/tileD) + parseFloat(json.glads[gladid].x)/25*26);
-//     var y = ph * ((arenaY1/tileD) + parseFloat(json.glads[gladid].y)/25*26);
-//     //console.log(json.glads[gladid].y);
-//     var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
-//     var cl = $('#canvas-div canvas').position().left - game.camera.view.x;
-//     return {x: x+cl, y: y+ct};
-// }
-
-// function showMessageBaloon(gladid){
-//     var message = json.glads[gladid].message;
-
-//     if (prefs.speech && message != "" && json.glads[gladid].hp > 0){
-//         var gpos = getGladPositionOnCanvas(gladid);
-
-//         if ($('.baloon.glad-'+ gladid).length)
-//             $('.baloon.glad-'+ gladid).html(message);
-//         else
-//             $('#canvas-div').append("<div class='baloon glad-"+ gladid +"'>"+ message +"</div>");
-
-//         var baloon = $('.baloon.glad-'+ gladid);
-//         var x = gpos.x + 15 * game.camera.scale.x;
-//         var y = gpos.y - 15 * game.camera.scale.y - baloon.outerHeight();
-//         baloon.css({'top': y, 'left': x});
-//         if (baloon.width() < 200 && baloon.height() >= 50){
-//             baloon.css({'left': x-230});
-//             baloon.addClass('left');
-//         }
-//         else if (baloon.hasClass('left'))
-//             baloon.removeClass('left');
-            
-//         gladArray[gladid].baloon = true;
-//     }
-//     else if (gladArray[gladid].baloon){
-//         $('.baloon.glad-'+ gladid).fadeOut( function(){
-//             $(this).remove();
-//             gladArray[gladid].baloon = null;
-//         });
-//     }
-    
-// }
-
-// function showBreakpoint(gladid){
-//     if (json.glads[gladid].breakpoint && json.glads[gladid].hp > 0){
-//         if (!pausesim)
-//             $('#pause').click();
-
-//         var gpos = getGladPositionOnCanvas(gladid);
-//         var bp = json.glads[gladid].breakpoint;
-
-//         if ($(`.breakpoint.glad-${gladid}`).length)
-//             $('.breakpoint.glad-'+ gladid).remove();
-//         $('#canvas-div').append(`<div class='breakpoint glad-${gladid}' title='Expandir breakpoint'>${bp}</div>`);
-
-//         var baloon = $('.breakpoint.glad-'+ gladid);
-//         baloon.hide().fadeIn();
-
-//         var x = gpos.x - 7.5;
-//         var y = gpos.y - 25 * game.camera.scale.y - baloon.outerHeight();
-//         baloon.css({'top': y, 'left': x});
-//         if (baloon.width() < 200 && baloon.height() >= 50){
-//             baloon.css({'left': x-230});
-//             baloon.addClass('left');
-//         }
-//         else if (baloon.hasClass('left'))
-//             baloon.removeClass('left');
-            
-//         gladArray[gladid].breakpoint = true;
-        
-//         baloon.click( () => {
-//             if (!baloon.hasClass('expanded'))
-//                 baloon.addClass('expanded').removeAttr('title');
-//         });
-//     }
-//     else if (gladArray[gladid].breakpoint && !pausesim){
-//         gladArray[gladid].breakpoint = false;
-//         $('.breakpoint.glad-'+ gladid).fadeOut(function(){
-//             $(this).remove();
-//         });
-//     }
-// }
-
-// function showHpApBars(gladid){
-//     if (prefs.bars){
-//         if (!gladArray[gladid].bars){
-//             var b = {};
-//             b.back = game.add.sprite(0,0, render.bars.back);
-//             b.back.alpha = 0.15;
-//             b.hp = game.add.sprite(0,0, render.bars.hp);
-//             b.hp.alpha = 0.4;
-//             b.ap = game.add.sprite(0,0, render.bars.ap);
-//             b.ap.alpha = 0.4;
-
-//             gladArray[gladid].bars = b;
-//         }
-    
-//         if (json.glads[gladid].hp > 0){
-//             var x = arenaX1 + json.glads[gladid].x * arenaRate;
-//             var y = arenaY1 + json.glads[gladid].y * arenaRate;
-//             var hp = parseFloat(json.glads[gladid].hp);
-//             var maxhp = parseFloat(json.glads[gladid].maxhp);
-//             var ap = parseFloat(json.glads[gladid].ap);
-//             var maxap = parseFloat(json.glads[gladid].maxap);
-//             var barsize = 30;
-
-//             gladArray[gladid].bars.back.x = x + -barsize/2;
-//             gladArray[gladid].bars.back.y = y + -35;
-//             gladArray[gladid].bars.back.width = barsize;
-//             gladArray[gladid].bars.back.height = 9;
-    
-//             gladArray[gladid].bars.hp.x = x + -barsize/2;
-//             gladArray[gladid].bars.hp.y = y + -35;
-//             gladArray[gladid].bars.hp.width = hp/maxhp * barsize;
-//             gladArray[gladid].bars.hp.height = 5;
-
-//             gladArray[gladid].bars.ap.x = x + -barsize/2;
-//             gladArray[gladid].bars.ap.y = y + -30;
-//             gladArray[gladid].bars.ap.width = ap/maxap * barsize;
-//             gladArray[gladid].bars.ap.height = 4;
-
-//             if (!gladArray[gladid].bars.back.alive){
-//                 gladArray[gladid].bars.back.revive();
-//                 gladArray[gladid].bars.hp.revive();
-//                 gladArray[gladid].bars.ap.revive();
-//             }
-//         }
-//         else{
-//             gladArray[gladid].bars.back.kill();
-//             gladArray[gladid].bars.hp.kill();
-//             gladArray[gladid].bars.ap.kill();
-//         }
-//     }
-//     else if (gladArray[gladid].bars && gladArray[gladid].bars.back.alive){
-//         gladArray[gladid].bars.back.kill();
-//         gladArray[gladid].bars.hp.kill();
-//         gladArray[gladid].bars.ap.kill();
-//     }
-
-
-    
-// }
-
-// function addSprite(glad, name, x, y){
-//     var anim = {
-//         lvlup: {key: 'level', frames: 20, frameRate: 15, loop: false},
-//         explode: {key: 'explosion', frames: 12, frameRate: 15, loop: true},
-//         stun: {key: 'stun', frames: 6, frameRate: 15, loop: true},
-//         shield: {key: 'shield', frames: 20, frameRate: 15, loop: false},
-//         mana: {key: 'mana', frames: 25, frameRate: 15, loop: false},
-//         heal: {key: 'heal', frames: 25, frameRate: 15, loop: false},
-//         tonic: {key: 'tonic', frames: 35, frameRate: 15, loop: false},
-//         elixir: {key: 'elixir', frames: 25, frameRate: 15, loop: false}
-//     };
-
-
-//     if (glad.sprites[name]){
-//         glad.sprites[name].x = x;
-//         glad.sprites[name].y = y;
-//         glad.sprites[name].revive();
-//     }
-//     else{
-//         let nz = anim[name].frames >= 10 ? 2 : 1
-//         glad.sprites[name] = game.add.sprite(x, y, 'atlas_effects');
-//         var frames = Phaser.Animation.generateFrameNames(anim[name].key +'/', 0, anim[name].frames-1, '', nz)
-//         glad.sprites[name].animations.add(name, frames, anim[name].frameRate, anim[name].loop);
-//     }
-
-//     return glad.sprites[name];
-
-// }
 
 // projSprites = {arrow: [], fireball: [], explode: []};
 // function newProjectile(type, x, y){
@@ -1704,24 +1774,4 @@ function update() {
 //     }
 
 //     return projSprites[type][newi];
-// }
-
-// function playAudio(marker, volume){
-//     if (!audio[marker])
-//         audio[marker] = [];
-
-//     var newi = null;
-//     for (let i in audio[marker]){
-//         if (!audio[marker][i].isPlaying){
-//             newi = i;
-//             break;
-//         }
-//     }
-
-//     if (newi){
-//         audio[marker][newi].volume = volume;
-//         audio[marker][newi].play()
-//     }
-//     else
-//         audio[marker].push(game.add.audio(marker, volume).play());
 // }

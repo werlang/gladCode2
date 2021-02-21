@@ -57,7 +57,7 @@
     </div>
     <?php echo "<div id='log' hidden>$loghash</div>"; ?>
     <div id='frame'>
-        <div id='canvas-container'>
+        <div id='canvas-container' class="hidden">
             <div id='ui-container'></div>
             <div id='canvas-div'></div>
             <div id='button-container'>

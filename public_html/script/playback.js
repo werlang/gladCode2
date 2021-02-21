@@ -2,7 +2,7 @@ import { mergeLog } from "./utils.js"
 import { header } from "./header.js"
 import { post } from "./utils.js"
 import { loader } from "./loader.js"
-import { render, glads } from "./render.js"
+import { render, glads, getAction } from "./render.js"
 
 const potions = {
     ready: false,
@@ -94,18 +94,18 @@ const simulation = {
         this.advance('forward')
     },
 
-    pause: function(){
+    pause: function(force){
         this.stepButton.setValue(1)
 
-        if (this.paused){
+        if (force === false || this.paused){
             this.paused = false
-            document.querySelector('#pause').classList.add('paused')
+            document.querySelector('#pause').classList.remove('paused')
             document.querySelector('#back-step .speed').innerHTML = '-1x'
             document.querySelector('#fowd-step .speed').innerHTML = '1x'
         }
-        else{
+        else if (force === true || !this.paused){
             this.paused = true
-            document.querySelector('#pause').classList.remove('paused')
+            document.querySelector('#pause').classList.add('paused')
             document.querySelector('#back-step .speed').innerHTML = '-1'
             document.querySelector('#fowd-step .speed').innerHTML = '+1'
             this.stepButton.setValue(1)
@@ -119,6 +119,10 @@ const simulation = {
         this.timeout = setTimeout(() => {
             if (!this.paused){
                 this.startTimer()
+            }
+
+            if (!render.started){
+                this.pause(true)
             }
 
             if (this.time < 0){
@@ -222,7 +226,7 @@ const simulation = {
             // else if (!this.showScore){
             //     document.querySelector('#fog').remove()
             //     this.showScore = true
-            //     // music.resume()
+            //     render.music.resume()
             // }
             render.step = this.steps[this.time]
             ui.update(render.step)
@@ -392,9 +396,13 @@ const ui = {
         this.showText = true
     },
 
+    getFollowed: function(){
+        const g = this.glads.filter(e => e.isFollow)
+        return g.length ? g[0] : false
+    },
+
     update: function(step){
         if (simulation.preferences.frames){
-            // TODO: HERE
             if (simulation.preferences.text && !this.showtext){
                 this.showtext = true
                 this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
@@ -586,7 +594,7 @@ const ui = {
                 glad.STR,
                 glad.head.toFixed(1),
                 glad.AGI,
-                render.actionList.filter(e => e.value == glad.action)[0].name,
+                getAction(glad.action).name,
                 glad.INT,
                 glad.as.toFixed(1),
                 glad.cs.toFixed(1),
@@ -1072,3 +1080,5 @@ function changeCrowd (value) {
         }
     }
 }
+
+export { simulation, ui };

@@ -69,8 +69,11 @@ body{
     padding: 0;
     border: none;
     position: absolute;
-    opacity: 0;
     transition: opacity 1s;
+    
+    &.hidden {
+        opacity: 0;
+    }
 }
 
 #canvas-div {
@@ -888,11 +891,17 @@ body{
     overflow: hidden;
     pointer-events: none;
     opacity: 0.7;
+    transition: 0.5s opacity;
+
+    &.fadeout {
+        opacity: 0;
+    }
+
+    &.left {
+        border-radius: 7px 7px 0px 7px;
+    }
 }
 
-.baloon.left {
-    border-radius: 7px 7px 0px 7px;
-}
 
 .blue-window {
     max-width: 600px;
