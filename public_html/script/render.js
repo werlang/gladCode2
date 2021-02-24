@@ -1,3 +1,4 @@
+import { throws } from "assert";
 import { create } from "domain"
 import { assets } from "./assets.js"
 import { simulation, ui } from "./playback.js"
@@ -188,7 +189,7 @@ class Gladiator {
     }
 
     update(data){
-        const toDiff = ['lvl', 'hp'];
+        const toDiff = ['lvl', 'hp', 'xp'];
         toDiff.forEach(e => this.diff[e] = data[e] - this[e]);
 
         const toUpdate = ['x', 'y', 'head', 'hp', 'maxhp', 'ap', 'maxap', 'str', 'agi', 'int', 'message', 'breakpoint', 'action', 'xp', 'lvl', 'code', 'buffs', 'lockedfor'];
@@ -207,6 +208,52 @@ class Gladiator {
         return this.diff[attr];
     }
 }
+
+class Projectile {
+    constructor(data) {
+        for (let i in data){
+            this[i] = data[i];
+        }
+
+        if (this.type == 0){ // ranged
+            this.sprite = render.game.add.image(0, 0, 'atlas_effects', 'arrow/arrow');
+        }
+        else if (this.type == 1){ // fireball
+            this.sprite = render.game.add.sprite(0, 0, 'atlas_effects')
+            const frames = Phaser.Animation.generateFrameNames('fireball/', 0, 7, '', 2);
+            this.sprite.animations.add('fireball', frames, 15, true);
+            this.sprite.animations.play('fireball');
+            render.playAudio('fireball', simulation.preferences.sound.sfx);
+        }
+        else if (this.type == 2){ // stun
+            this.sprite = render.game.add.image(0, 0, 'atlas_effects', 'arrow/arrow');
+            this.sprite.tint = 0x00FF00;
+        }
+
+        this.sprite.anchor.setTo(0.5, 0.5);
+
+        const glad = glads.get(this.owner);
+        if (glad.assassinate){
+            glad.assassinate = false;
+            this.sprite = render.game.add.image(0, 0, 'atlas_effects', 'arrow/arrow');
+            this.sprite.tint = 0xFF0000;
+            render.playAudio('assassinate', simulation.preferences.sound.sfx);
+        }
+
+        this.update(data);
+    }
+
+    update(data){
+        for (let i in data){
+            this[i] = data[i];
+        }
+
+        this.sprite.x = render.arenaX1 + this.x * render.arenaRate;
+        this.sprite.y = render.arenaY1 + this.y * render.arenaRate;
+        this.sprite.angle = this.head + 90;
+    }
+}
+
 
 const glads = {
     loaded: false,
@@ -237,23 +284,7 @@ const glads = {
                     ap: e.ap,
                     maxap: e.maxap,
                     x: e.x,
-                    y: e.y,  
-                    
-                    // alive: true,
-                    // dmgFloat = 0,
-                    // fade: 0,
-                    // clone: null,
-                    // invisible: false,
-                    // stun: false,
-                    // assassinate: false,
-                    // lvl: 1,
-                    // block: false,
-                    // charge: false,
-                    // poison: false,
-                    // xp: parseInt(json.glads[i].xp),
-                    // time: false,
-                    // sprites: {},
-        
+                    y: e.y,
                 }))
                 resolve(true)
             }))
@@ -297,6 +328,51 @@ const glads = {
         })
     }
 
+}
+
+const projectiles = {
+    members: [],
+
+    update: function(step){
+        step.projectiles.forEach(e => {
+            const proj = this.find(e.id);
+            if (proj){
+                proj.update(e);
+                proj.time = step.simtime;
+            }
+            else{
+                const newProj = new Projectile(e);
+                newProj.time = step.simtime;
+                this.members.push(newProj);
+            }
+        })
+
+        const inactive = this.members.filter(e => e.time < step.simtime);
+        this.members = this.members.filter(e => e.time == step.simtime);
+        inactive.forEach(e => {
+            if (e.type == 1){ // fireball
+                const fire = render.game.add.sprite(e.sprite.x, e.sprite.y, 'atlas_effects');
+                const frames = Phaser.Animation.generateFrameNames('explosion/', 0, 11, '', 2);
+                fire.animations.add('explode', frames, 15, true);
+
+                fire.anchor.setTo(0.5, 0.5);
+                fire.alpha = 0.5;
+                fire.width = 5 * render.arenaRate;
+                fire.height = 3 * render.arenaRate;
+                fire.animations.play('explode', null, false, true);
+                render.playAudio('explosion', simulation.preferences.sound.sfx);
+            }
+            else{
+                render.playAudio('arrow_hit', simulation.preferences.sound.sfx);
+            }
+
+            e.sprite.kill();
+        });
+    },
+
+    find(id){
+        return this.members.filter(e => e.id == id)[0] || false;
+    }
 }
 
 const render = {
@@ -619,7 +695,7 @@ const render = {
             if (gasadv >= 1 && (this.gas.layers.length == 0 || (17 - this.poison) / this.gas.depth > this.gas.layers.length - 1)){
                 const gas = [];
                 for (let j=0 ; j < this.gas.amount ; j++){
-                    gas.push(game.add.image(0,0, 'atlas_effects', 'gas/gas'));
+                    gas.push(this.game.add.image(0,0, 'atlas_effects', 'gas/gas'));
                     gas[j].anchor.setTo(0.5, 0.5);
                     gas[j].scale.setTo(gas[j].width / this.arenaRate * 3); //size = 1p
                     gas[j].rotSpeed = Math.random() * 1 - 0.5;
@@ -812,7 +888,7 @@ const render = {
                 // TODO: need to fix. gladArray[i].x was supposed to hold sprite[i].x. Now it holds json.glads[i].x
                 //fade do teleport
                 if (glad.fade == 1 && (glad.arenaX != glad.sprite.x || glad.arenaY != glad.sprite.y) ){
-                    const clone = game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
+                    const clone = this.game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
                     clone.anchor.setTo(0.5, 0.5);
                     clone.alpha = 1;
                     glad.sprite.alpha = 0;
@@ -851,177 +927,101 @@ const render = {
                     glad.stun = false;
                 }
                 
-                // TODO: here
-                //block
-                if (!gladArray[i].block && this.step.glads[i].buffs.resist.timeleft > 0.1){
-                    gladArray[i].block = true;
-                    var shield = glad.addSprite('shield'); // addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
+                // block
+                if (!glad.block && glads.buffs.resist.timeleft > 0.1){
+                    glad.block = true;
+                    const shield = glad.addSprite('shield'); // addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
                     shield.anchor.setTo(0.5);
-                    groupglad.add(shield);
+                    this.groups.glad.add(shield);
                     shield.animations.play('shield', null, false, true);
                     shield.alpha = 0.5;
                     render.playAudio('block', simulation.preferences.sound.sfx);
                 }
-                else if (gladArray[i].block && this.step.glads[i].buffs.resist.timeleft <= 0.1){
-                    gladArray[i].block = false;
+                else if (glad.block && glad.buffs.resist.timeleft <= 0.1){
+                    glad.block = false;
                 }
 
                 // potion
-                if (glad.action.name == "potion" && gladArray[i].potion){
+                if (glad.action.name == "potion" && glad.potion){
                     // console.log(gladArray[i].potion)
-                    let name, alpha = 1, scale = 1
-                    if (gladArray[i].potion == 'hp'){
-                        name = 'heal'
+                    let name, alpha = 1, scale = 1;
+                    if (glad.potion == 'hp'){
+                        name = 'heal';
                     }
-                    else if (gladArray[i].potion == 'ap'){
-                        name = 'mana'
-                        alpha = 0.5
+                    else if (glad.potion == 'ap'){
+                        name = 'mana';
+                        alpha = 0.5;
                     }
-                    else if (gladArray[i].potion == 'atr'){
-                        name = 'tonic'
-                        scale = 0.7
+                    else if (glad.potion == 'atr'){
+                        name = 'tonic';
+                        scale = 0.7;
                     }
-                    else if (gladArray[i].potion == 'xp'){
-                        name = 'elixir'
+                    else if (glad.potion == 'xp'){
+                        name = 'elixir';
                     }
                     
                     // console.log(name)
-                    var potion = glad.addSprite(name); // addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
+                    const potion = glad.addSprite(name); // addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
                     potion.anchor.setTo(0.5);
                     potion.scale.setTo(scale);
-                    groupglad.add(potion);
+                    this.groups.glad.add(potion);
                     potion.animations.play(name, null, false, true);
                     potion.alpha = alpha;
                     render.playAudio(name, simulation.preferences.sound.sfx);
                 }
                 
                 //charge
-                if (gladArray[i].charge) {
-                    if (xp != gladArray[i].xp) {
-                        sprite[i].animations.currentAnim.speed = 15;
-                        if (stab[newindex[i]] == "0")
-                            var anim = 'slash-' + getActionDirection(head);
-                        else
-                            var anim = 'stab-' + getActionDirection(head);
-                        sprite[i].animations.stop();
-                        sprite[i].animations.play(anim, 20);
+                if (glad.charge) {
+                    if (glad.getDiff('xp')) {
+                        glad.sprite.animations.currentAnim.speed = 15;
+                        glad.sprite.animations.stop();
+                        glad.sprite.animations.play(`${glad.move}-${getActionDirection(head)}`, 20);
                         render.playAudio('melee', simulation.preferences.sound.sfx);
                     }
                     else if (glad.action.name != "charge"){
-                        sprite[i].animations.currentAnim.speed = 15;
-                        gladArray[i].charge = false;
+                        glad.sprite.animations.currentAnim.speed = 15;
+                        glad.charge = false;
                     }
                 }
                 
                 //poison
-                if (Math.sqrt(Math.pow(12.5 - x, 2) + Math.pow(12.5 - y, 2)) >= poison )
-                    gladArray[i].poison = true;
-                else
-                    gladArray[i].poison = false;
+                glad.poison = Math.sqrt(Math.pow(12.5 - glad.x, 2) + Math.pow(12.5 - glad.y, 2)) >= this.poison;
                     
                 //aplica os tints
-                if (this.step.glads[i].buffs.burn && this.step.glads[i].buffs.burn.timeleft > 0.1)
-                    sprite[i].tint = 0xFFB072;
-                else if (gladArray[i].poison)
-                    sprite[i].tint = 0x96FD96;
-                else if (gladArray[i].block)
-                    sprite[i].tint = 0xFFE533;
-                else
-                    sprite[i].tint = 0xFFFFFF;
-                
-                gladArray[i].xp = xp;
-
-                if (timeSlider != Math.floor(this.step.simtime)){
-                    timeSlider = this.step.simtime;
-                    $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
+                if (glad.buffs.burn.timeleft > 0.1){
+                    glad.sprite.tint = 0xFFB072;
                 }
+                else if (glad.poison){
+                    glad.sprite.tint = 0x96FD96;
+                }
+                else if (glad.block){
+                    glad.sprite.tint = 0xFFE533;
+                }
+                else{
+                    glad.sprite.tint = 0xFFFFFF;
+                }
+                
+                // if (timeSlider != Math.floor(this.step.simtime)){
+                //     timeSlider = this.step.simtime;
+                //     $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
+                // }
             })
             
-            update_ui(json);
-
-            var i=0;
+            projectiles.update(this.step);
     
-            if (this.step.projectiles && this.step.projectiles.length > 0) {
+            this.groups.glad.sort('y', Phaser.Group.SORT_ASCENDING);
+            glads.members.forEach(e => e.alive && this.groups.glad.sendToBack(e.sprite));
     
-                var nproj = this.step.projectiles.length;
-                for (let i=0 ; i<nproj ; i++){
-                    var id = this.step.projectiles[i].id;
-                    var type = this.step.projectiles[i].type;
-                    var j = findProj(id);
-                    if (j == -1){
-                        var spr;
-                        if (this.step.projectiles[i].type == 0){ //ranged attack
-                            spr = newProjectile('arrow');
-                        }
-                        else if (this.step.projectiles[i].type == 1){ //fireball
-                            spr = newProjectile('fireball');
-                            spr.animations.play('fireball');
-                            render.playAudio('fireball', simulation.preferences.sound.sfx);
-                        }
-                        else if (this.step.projectiles[i].type == 2){ //stun
-                            spr = newProjectile('arrow');
-                            spr.tint = 0x00FF00;
-                        }
-                        
-                        //console.log(this.step.simtime +'-'+ this.step.projectiles[i].owner);
-                        if (gladArray[this.step.projectiles[i].owner] && gladArray[this.step.projectiles[i].owner].assassinate){
-                            gladArray[this.step.projectiles[i].owner].assassinate = false;
-                            spr = newProjectile('arrow');
-                            spr.tint = 0xFF0000;
-                            render.playAudio('assassinate', simulation.preferences.sound.sfx);
-                        }
-                                        
-                        spr.anchor.setTo(0.5, 0.5);
-                        j = sproj.length;
-                        sproj.push({'sprite': spr, 'active': true, 'id': id, 'type': type});
-                    }
-                    
-                    sproj[j].sprite.x = arenaX1 + parseFloat(this.step.projectiles[i].x) * arenaRate;
-                    sproj[j].sprite.y = arenaY1 + parseFloat(this.step.projectiles[i].y) * arenaRate;
-                    sproj[j].sprite.angle = parseFloat(this.step.projectiles[i].head) + 90;
-                    sproj[j].active = true;
-                }
-            }
-            
-            //calculate projectile hit
-            for (let x in sproj){
-                if (sproj[x].active === false) {
-                    if (sproj[x].type == 1){
-                        var fire = newProjectile('explode', sproj[x].sprite.x, sproj[x].sprite.y);
-                        fire.anchor.setTo(0.5, 0.5);
-                        fire.alpha = 0.5;
-                        fire.width = 5 * arenaRate;
-                        fire.height = 3 * arenaRate;
-                        fire.animations.play('explode', null, false, true);
-                        render.playAudio('explosion', simulation.preferences.sound.sfx);
-                    }
-                    else{
-                        render.playAudio('arrow_hit', simulation.preferences.sound.sfx);
-                    }
-                    
-                    sproj[x].sprite.kill();
-                    sproj.splice(x,1);
-                }
-                else
-                    sproj[x].active = false;
-            }
-    
-            groupglad.sort('y', Phaser.Group.SORT_ASCENDING);
-            for (var i=0 ; i<nglad ; i++){
-                if (!gladArray[i].alive)
-                    groupglad.sendToBack(sprite[i]);
-            }
-    
-            groupglad.sendToBack(layers[0]);
-            groupglad.bringToTop(groupgas);
-            groupglad.bringToTop(layers[1]);
-            groupglad.bringToTop(groupnpc[0]);
-            groupglad.bringToTop(layers[2]);
-            groupglad.bringToTop(groupnpc[1]);
-            groupglad.bringToTop(layers[3]);
+            this.groups.glad.sendToBack(this.layers[0]);
+            this.groups.glad.bringToTop(this.groups.gas);
+            this.groups.glad.bringToTop(this.layers[1]);
+            this.groups.glad.bringToTop(this.groups.npc[0]);
+            this.groups.glad.bringToTop(this.layers[2]);
+            this.groups.glad.bringToTop(this.groups.npc[1]);
+            this.groups.glad.bringToTop(this.layers[3]);
         }
         
-        debugTimer();
+        render.debugTimer();
                         
         render.checkInput();
         
@@ -1141,6 +1141,53 @@ const render = {
             this.audio[marker].push(this.game.add.audio(marker, volume).play());
         }
     },
+
+    // debugTimer: function(){
+    //     if (simulation.preferences.fps){
+    //         if (!oldTime)
+    //             oldTime = new Date();
+    //         else{
+    //             var newTime = new Date();
+    //             avgFPS += newTime - oldTime;
+    //             contFPS++;
+    //             oldTime = newTime;
+    //         }
+    //         if (!$('#fps').length){
+    //             $('#canvas-container').append("<div id='fps'></fps>");
+    //             intFPS();
+    //         }
+    //         function intFPS(){
+    //             setTimeout( function() {
+    //                 if (contFPS > 0){
+    //                     avgFPS = 1000/(avgFPS/contFPS);
+    //                     contFPS = 0;
+    
+    //                     //calculate average FPS in last 5 seconds
+    //                     avgFPS5.push(avgFPS);
+    //                     if (avgFPS5.length > 5)
+    //                         avgFPS5.splice(0,1);
+    //                     avgFPS = 0;
+    //                     for (let i in avgFPS5)
+    //                         avgFPS += avgFPS5[i];
+    //                     avgFPS /= avgFPS5.length;
+    
+    //                     $('#fps').html("FPS: "+ parseFloat(avgFPS).toFixed(1));
+    //                 }
+                    
+    //                 if ($('#fps').length)
+    //                     intFPS();
+    //                 else{
+    //                     avgFPS5 = [];
+    //                     avgFPS = 0;
+    //                     contFPS = 0;
+    //                 }
+    //             }, 1000);
+    //         }
+    //     }
+    //     else if ($('#fps').length){
+    //         $('#fps').remove();
+    //     }
+    // },
 }
 
 const animationList = {
@@ -1623,52 +1670,6 @@ export { render, glads, getAction }
 // var oldTime = null;
 // var avgFPS = 0, contFPS = 0;
 // var avgFPS5 = [];
-// function debugTimer(){
-//     if (simulation.preferences.fps){
-//         if (!oldTime)
-//             oldTime = new Date();
-//         else{
-//             var newTime = new Date();
-//             avgFPS += newTime - oldTime;
-//             contFPS++;
-//             oldTime = newTime;
-//         }
-//         if (!$('#fps').length){
-//             $('#canvas-container').append("<div id='fps'></fps>");
-//             intFPS();
-//         }
-//         function intFPS(){
-//             setTimeout( function() {
-//                 if (contFPS > 0){
-//                     avgFPS = 1000/(avgFPS/contFPS);
-//                     contFPS = 0;
-
-//                     //calculate average FPS in last 5 seconds
-//                     avgFPS5.push(avgFPS);
-//                     if (avgFPS5.length > 5)
-//                         avgFPS5.splice(0,1);
-//                     avgFPS = 0;
-//                     for (let i in avgFPS5)
-//                         avgFPS += avgFPS5[i];
-//                     avgFPS /= avgFPS5.length;
-
-//                     $('#fps').html("FPS: "+ parseFloat(avgFPS).toFixed(1));
-//                 }
-                
-//                 if ($('#fps').length)
-//                     intFPS();
-//                 else{
-//                     avgFPS5 = [];
-//                     avgFPS = 0;
-//                     contFPS = 0;
-//                 }
-//             }, 1000);
-//         }
-//     }
-//     else if ($('#fps').length){
-//         $('#fps').remove();
-//     }
-// }
 
 // $(window).keydown(function(event) {
 //     if(event.keyCode == Phaser.Keyboard.S){
@@ -1734,44 +1735,3 @@ export { render, glads, getAction }
 
 // });
 
-// projSprites = {arrow: [], fireball: [], explode: []};
-// function newProjectile(type, x, y){
-//     var newi = null
-//     for (let i in projSprites[type]){
-//         if (!projSprites[type][i].alive){
-//             newi = i;
-//             break;
-//         }
-//     }
-
-//     if (type != 'explode'){
-//         x = 0;
-//         y = 0;
-//     }
-
-//     if (newi){
-//         projSprites[type][newi].x = x;
-//         projSprites[type][newi].y = y;
-//         projSprites[type][newi].tint = 0xFFFFFF;
-//         projSprites[type][newi].revive();
-//     }
-//     else{
-//         newi = projSprites[type].length;
-//         if (type == 'arrow')
-//             projSprites[type].push(game.add.image(x, y, 'atlas_effects', 'arrow/arrow'));
-//         else{
-//             projSprites[type].push(game.add.sprite(x, y, 'atlas_effects'));
-
-//             if (type == 'fireball'){
-//                 var frames = Phaser.Animation.generateFrameNames('fireball/', 0, 7, '', 2);
-//                 projSprites[type][newi].animations.add('fireball', frames, 15, true);
-//             }
-//             if (type == 'explode'){
-//                 var frames = Phaser.Animation.generateFrameNames('explosion/', 0, 11, '', 2);
-//                 projSprites[type][newi].animations.add('explode', frames, 15, true);
-//             }
-//         }
-//     }
-
-//     return projSprites[type][newi];
-// }
