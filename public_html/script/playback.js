@@ -228,7 +228,8 @@ const simulation = {
             //     this.showScore = true
             //     render.music.resume()
             // }
-            render.step = this.steps[this.time]
+            render.updateStep(this.steps[this.time]);
+            console.log(render.step);
             ui.update(render.step)
 
             if (!this.paused){
@@ -512,7 +513,7 @@ const ui = {
         create: function(){
             const index = ui.glads.filter(e => e.isFollow)[0].id
             const glad = simulation.log.glads[index]
-            const buffBox = glad.buffs.map((e,i) => `<span>${i}</span><span>0.0</span><span>0.0</span>`).join("")
+            const buffBox = glad.buffs.map((e,i) => `<div class='row'><span>${i}</span><span>0.0</span><span>0.0</span></div>`).join("")
 
             this.destroy()
 
@@ -606,24 +607,18 @@ const ui = {
 
             this.element.querySelector('#head span').style.transform = `rotate(${glad.head.toFixed(0)}deg)`
 
-            // var c = 0;
-            glad.buffs.forEach(b => {
-                if (parseFloat(glad.buffs[i].timeleft) > 0 && !$('#details #buffs #box span').eq(c*3).hasClass('active')){
-                    for (let j=0 ; j<3 ; j++)
-                        $('#details #buffs #box span').eq(j + c*3).addClass('active');
+            glad.buffs.forEach((b,i) => {
+                const row = this.element.querySelectorAll('#buffs #box .row')[i];
+                if (b.timeleft > 0 && !row.classList.contains('active')){
+                    row.classList.add('active');
                 }
-                else if (parseFloat(glad.buffs[i].timeleft) == 0 && $('#details #buffs #box span').eq(c*3).hasClass('active')){
-                    for (let j=0 ; j<3 ; j++)
-                        $('#details #buffs #box span').eq(j + c*3).removeClass('active');
+                else if (b.timeleft == 0 && row.classList.contains('active')){
+                    row.classList.remove('active');
                 }
     
-                $('#details #buffs #box span').eq(1 + c*3).html(glad.buffs[i].value.toFixed(1));
-                $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
-    
-                c++;
+                row.querySelectorAll("span")[1].innerHTML = glad.buffs[i].value.toFixed(1);
+                row.querySelectorAll("span")[2].innerHTML = glad.buffs[i].timeleft.toFixed(1);
             })
-            for (let i in glad.buffs){
-            }
 
             if (glad.code){
                 if (glad.code != $('#details #code #box .name').last().text()){

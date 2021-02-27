@@ -1,5 +1,3 @@
-import { throws } from "assert";
-import { create } from "domain"
 import { assets } from "./assets.js"
 import { simulation, ui } from "./playback.js"
 
@@ -378,6 +376,7 @@ const projectiles = {
 const render = {
     paused: true,
     started: false,
+    debug: { fps: { avg: 0, cont: 0 }},
 
     init: async function(){
         if (this.game){
@@ -392,7 +391,7 @@ const render = {
             antialias: true,
             multitexture: true,
             enableDebug: false,
-            state: { preload: this.preload, create: this.create, update: this.update}
+            state: { preload: () => this.preload(), create: () => this.create(), update: () => this.update()}
         })
 
         this.tileD = 32 // size of a single tile
@@ -415,7 +414,9 @@ const render = {
             const newVal = animationList[e.animation] || {};
             newVal.name = e.animation;
             e.animation = newVal;
-        });        
+        }); 
+        
+        this.clones = [];
 
         return true
     },
@@ -671,361 +672,366 @@ const render = {
         document.querySelector('#canvas-container').classList.remove("hidden");
         simulation.resize()
 
-        glads.members.forEach(e => {            
-            e.sprite = this.game.add.sprite(this.arenaX1 + e.x * this.arenaRate, this.arenaY1 + e.y * this.arenaRate, `glad${e.id}`);
-            e.sprite.anchor.setTo(0.5, 0.5);
+        glads.wait().then(() => {
+            glads.members.forEach(e => {            
+                e.sprite = this.game.add.sprite(this.arenaX1 + e.x * this.arenaRate, this.arenaY1 + e.y * this.arenaRate, `glad${e.id}`);
+                e.sprite.anchor.setTo(0.5, 0.5);
+                
+                createAnimation(e, ['walk', 'melee', 'slash', 'stab', 'shoot', 'cast']);
+                e.sprite.animations.add('die', arrayFill(260,265), 10, false);
+                
+                this.groups.glad.add(e.sprite);
+            })
             
-            createAnimation(e, ['walk', 'melee', 'slash', 'stab', 'shoot', 'cast']);
-            e.sprite.animations.add('die', arrayFill(260,265), 10, false);
-            
-            this.groups.glad.add(e.sprite);
+            this.music.main.play();
+            this.music.main.volume = simulation.preferences.sound.music;
         })
-        
-        this.music.play();
-        this.music.volume = simulation.preferences.sound.music;
     },
     
     update: function() {
         // poison
-        if (this.step.poison){
-            this.poison = this.step.poison;
-            
-            const gasadv = Math.sqrt(2 * Math.pow(this.arenaD / 2, 2)) / this.arenaRate / this.poison;
-    
-            if (gasadv >= 1 && (this.gas.layers.length == 0 || (17 - this.poison) / this.gas.depth > this.gas.layers.length - 1)){
-                const gas = [];
-                for (let j=0 ; j < this.gas.amount ; j++){
-                    gas.push(this.game.add.image(0,0, 'atlas_effects', 'gas/gas'));
-                    gas[j].anchor.setTo(0.5, 0.5);
-                    gas[j].scale.setTo(gas[j].width / this.arenaRate * 3); //size = 1p
-                    gas[j].rotSpeed = Math.random() * 1 - 0.5;
-                    gas[j].alpha = 0;
-                    this.groups.gas.add(gas[j]);
-                }
-                this.gas.layers.push(gas);
-            }
-            this.gas.layers.forEach((l,i) => {
-                for (let j=0 ; j < l.length ; j++){
-                    const radi = (360 / l.length * j) * Math.PI / 180;
-                    const x = 12.5 + (this.poison + i * this.gas.depth + l[j].width / 2 / this.arenaRate ) * Math.sin(radi);
-                    const y = 12.5 + (this.poison + i * this.gas.depth + l[j].height / 2 / this.arenaRate) * Math.cos(radi);
-                    l[j].angle += l[j].rotSpeed;
-                    if (l[j].alpha < 1) {
-                        l[j].alpha += 0.005;
+        if (this.step){
+            console.log(this.step);
+            if (this.step.poison){
+                this.poison = this.step.poison;
+                
+                const gasadv = Math.sqrt(2 * Math.pow(this.arenaD / 2, 2)) / this.arenaRate / this.poison;
+        
+                if (gasadv >= 1 && (this.gas.layers.length == 0 || (17 - this.poison) / this.gas.depth > this.gas.layers.length - 1)){
+                    const gas = [];
+                    for (let j=0 ; j < this.gas.amount ; j++){
+                        gas.push(this.game.add.image(0,0, 'atlas_effects', 'gas/gas'));
+                        gas[j].anchor.setTo(0.5, 0.5);
+                        gas[j].scale.setTo(gas[j].width / this.arenaRate * 3); //size = 1p
+                        gas[j].rotSpeed = Math.random() * 1 - 0.5;
+                        gas[j].alpha = 0;
+                        this.groups.gas.add(gas[j]);
                     }
-                    l[j].x = this.arenaX1 + x * this.arenaRate;
-                    l[j].y = this.arenaY1 + y * this.arenaRate;
+                    this.gas.layers.push(gas);
                 }
-            })
-        
-        }
-        
-        if (this.time != this.step.simtime){
-            glads.update(this.step.glads);
+                this.gas.layers.forEach((l,i) => {
+                    for (let j=0 ; j < l.length ; j++){
+                        const radi = (360 / l.length * j) * Math.PI / 180;
+                        const x = 12.5 + (this.poison + i * this.gas.depth + l[j].width / 2 / this.arenaRate ) * Math.sin(radi);
+                        const y = 12.5 + (this.poison + i * this.gas.depth + l[j].height / 2 / this.arenaRate) * Math.cos(radi);
+                        l[j].angle += l[j].rotSpeed;
+                        if (l[j].alpha < 1) {
+                            l[j].alpha += 0.005;
+                        }
+                        l[j].x = this.arenaX1 + x * this.arenaRate;
+                        l[j].y = this.arenaY1 + y * this.arenaRate;
+                    }
+                })
+            
+            }
+            
+            if (this.time != this.step.simtime){
+                glads.update(this.step.glads);
 
-            this.step.glads.forEach(g => {
-                const glad = glads.get(g.id)
+                this.step.glads.forEach(g => {
+                    const glad = glads.get(g.id)
 
-                glad.sprite.x = this.arenaX1 + glad.x * this.arenaRate;
-                glad.sprite.y = this.arenaY1 + glad.y * this.arenaRate;
+                    glad.sprite.x = this.arenaX1 + glad.x * this.arenaRate;
+                    glad.sprite.y = this.arenaY1 + glad.y * this.arenaRate;
 
-                glad.showBaloon();
-                glad.showBars();
-                glad.showBreakpoint();
+                    glad.showBaloon();
+                    glad.showBars();
+                    glad.showBreakpoint();
 
-                //lvlup
-                if (glad.getDiff('lvl')){
-                    const lvlup = glad.addSprite('lvlup');
-                    lvlup.anchor.setTo(0.5, 0.35);
-                    lvlup.animations.play('lvlup', null, false, true);
-                    this.groups.glad.add(lvlup);
-                    this.playAudio('lvlup', simulation.preferences.sound.sfx);
-                }
+                    //lvlup
+                    if (glad.getDiff('lvl')){
+                        const lvlup = glad.addSprite('lvlup');
+                        lvlup.anchor.setTo(0.5, 0.35);
+                        lvlup.animations.play('lvlup', null, false, true);
+                        this.groups.glad.add(lvlup);
+                        this.playAudio('lvlup', simulation.preferences.sound.sfx);
+                    }
 
-                // used potion
-                if (glad.action.name == 'potion') {
-                    glad.potion = glad.code.split("-")[1];
-                }
-                else{
-                    glad.potion = false;
-                }
+                    // used potion
+                    if (glad.action.name == 'potion') {
+                        glad.potion = glad.code.split("-")[1];
+                    }
+                    else{
+                        glad.potion = false;
+                    }
 
-                //took damage
-                if (glad.getDiff('hp')) {
-                    //explodiu na cara
-                    if (glad.action.name == 'fireball'){
-                        const pos = glad.code.split('fireball(')[1].split(')')[0].split(',');
-                        if (Math.sqrt(Math.pow(pos[0] - glad.x, 2) + Math.pow(pos[1] - glad.y, 2)) <= 2){
-                            const fire = glad.addSprite('explode');
-                            fire.anchor.setTo(0.5, 0.5);
-                            fire.alpha = 0.5;
-                            fire.width = 5 * this.arenaRate;
-                            fire.height = 3 * this.arenaRate;
-                            fire.animations.play('explode', null, false, true);
-                            this.playAudio('explosion', simulation.preferences.sound.sfx);
+                    //took damage
+                    if (glad.getDiff('hp')) {
+                        //explodiu na cara
+                        if (glad.action.name == 'fireball'){
+                            const pos = glad.code.split('fireball(')[1].split(')')[0].split(',');
+                            if (Math.sqrt(Math.pow(pos[0] - glad.x, 2) + Math.pow(pos[1] - glad.y, 2)) <= 2){
+                                const fire = glad.addSprite('explode');
+                                fire.anchor.setTo(0.5, 0.5);
+                                fire.alpha = 0.5;
+                                fire.width = 5 * this.arenaRate;
+                                fire.height = 3 * this.arenaRate;
+                                fire.animations.play('explode', null, false, true);
+                                this.playAudio('explosion', simulation.preferences.sound.sfx);
+                            }
+                        }
+                        
+                        if (simulation.preferences.text){
+                            let dmg = glad.getDiff('hp');
+                            let color = "#ffffff";
+                            let floattime = 400;
+                            let fillColor = "#000000";
+
+                            if (dmg < 0){
+                                fillColor = "#2dbc2d";
+                                dmg = -dmg;
+                            }
+                            else if (glad.burn){
+                                color = "#d36464";
+                                floattime = 100;
+                            }
+                            else if (glad.poison){
+                                color = "#7ae67a";
+                            }
+                            
+                            else if (glad.block){
+                                color = "#9c745a";
+                            }
+
+                            glad.dmgFloat += dmg;
+
+                            if (glad.dmgFloat > 0.01 * glad.maxhp){
+                                new FloatingText(this.game, {
+                                    text: glad.dmgFloat.toFixed(0),
+                                    animation: 'up',
+                                    textOptions: {
+                                        fontSize: 16,
+                                        fill: fillColor,
+                                        stroke: color,
+                                        strokeThickness: 3
+                                    },
+                                    x: glad.sprite.x,
+                                    y: glad.sprite.y - 20,
+                                    timeToLive: floattime // ms
+                                });
+
+                                glad.dmgFloat = 0;
+                            }
                         }
                     }
                     
-                    if (simulation.preferences.text){
-                        let dmg = glad.getDiff('hp');
-                        let color = "#ffffff";
-                        let floattime = 400;
-                        let fillColor = "#000000";
-
-                        if (dmg < 0){
-                            fillColor = "#2dbc2d";
-                            dmg = -dmg;
+                    if (glad.hp <= 0){
+                        if (glad.alive){
+                            glad.sprite.animations.play('die');
+                            render.playAudio(`death_${glad.gender}`, simulation.preferences.sound.sfx);
                         }
-                        else if (glad.burn){
-                            color = "#d36464";
-                            floattime = 100;
-                        }
-                        else if (glad.poison){
-                            color = "#7ae67a";
-                        }
-                        
-                        else if (glad.block){
-                            color = "#9c745a";
-                        }
-
-                        glad.dmgFloat += dmg;
-
-                        if (glad.dmgFloat > 0.01 * glad.maxhp){
-                            new FloatingText(this.game, {
-                                text: glad.dmgFloat.toFixed(0),
-                                animation: 'up',
-                                textOptions: {
-                                    fontSize: 16,
-                                    fill: fillColor,
-                                    stroke: color,
-                                    strokeThickness: 3
-                                },
-                                x: glad.sprite.x,
-                                y: glad.sprite.y - 20,
-                                timeToLive: floattime // ms
-                            });
-
-                            glad.dmgFloat = 0;
-                        }
+                        glad.alive = false;
                     }
-                }
-                
-                if (glad.hp <= 0){
-                    if (glad.alive){
-                        glad.sprite.animations.play('die');
-                        render.playAudio(`death_${glad.gender}`, simulation.preferences.sound.sfx);
-                    }
-                    glad.alive = false;
-                }
-                // play standard glad animation
-                else {
-                    glad.alive = true;
+                    // play standard glad animation
+                    else {
+                        glad.alive = true;
 
-                    const anim = glad.action.animation.name + '-' + getActionDirection(glad.head);
-                    if (glad.action.name == "movement"){
-                        glad.sprite.animations.play(anim);
-                    }
-                    // this marks the start of an action
-                    else if (glad.action.name == "charge"){
-                        if (!glad.charge){
+                        const anim = glad.action.animation.name + '-' + getActionDirection(glad.head);
+                        if (glad.action.name == "movement"){
+                            glad.sprite.animations.play(anim);
+                        }
+                        // this marks the start of an action
+                        else if (glad.action.name == "charge"){
+                            if (!glad.charge){
+                                glad.sprite.animations.stop();
+                                glad.sprite.animations.play(anim, 50, true);
+                                glad.charge = true;
+                                render.playAudio(`charge_${glad.gender}`, simulation.preferences.sound.sfx);
+                            }
+                        }
+                        else if (glad.action.animation.name != 'none' && glad.time != this.step.simtime){
+                            const frames = glad.action.animation.frames;
+                            //lockedfor + 0,1 porque quando chega nesse ponto já descontou do turno atual
+                            //e multiplica por 2 porque os locked dos ataques são divididos em 2 partes
+                            let timelocked = glad.lockedfor + 0.1;
+                            if (glad.action.name == "ranged" || glad.action.name == "melee"){
+                                timelocked *= 2;
+                            }
+                            const actionspeed = Math.max(10, frames / timelocked);
+        
+                            //console.log({action: actionspeed, name: this.step.glads[i].name, lock: lockedfor});
+
                             glad.sprite.animations.stop();
-                            glad.sprite.animations.play(anim, 50, true);
-                            glad.charge = true;
-                            render.playAudio(`charge_${glad.gender}`, simulation.preferences.sound.sfx);
+                            glad.sprite.animations.play(anim, actionspeed);
+                            glad.time = this.step.simtime;
+                            
+                            if (glad.action.name == "teleport" && !glad.fade){
+                                glad.fade = 1; // fading
+                                glad.arenaX = glad.sprite.x;
+                                glad.arenaY = glad.sprite.y;
+                                render.playAudio('teleport', simulation.preferences.sound.sfx);
+                            }
+                            if (glad.action.name == "assassinate"){
+                                glad.assassinate = true;
+                            }
+                            if (glad.action.name == "block"){
+                                glad.block = false;
+                            }
+                            if (glad.action.name == "ranged"){
+                                render.playAudio('ranged', simulation.preferences.sound.sfx);
+                            }
+                            if (glad.action.name == "melee"){
+                                render.playAudio('melee', simulation.preferences.sound.sfx);
+                            }
                         }
                     }
-                    else if (glad.action.animation.name != 'none' && glad.time != this.step.simtime){
-                        const frames = glad.action.animation.frames;
-                        //lockedfor + 0,1 porque quando chega nesse ponto já descontou do turno atual
-                        //e multiplica por 2 porque os locked dos ataques são divididos em 2 partes
-                        let timelocked = glad.lockedfor + 0.1;
-                        if (glad.action.name == "ranged" || glad.action.name == "melee"){
-                            timelocked *= 2;
+                    
+                    //ambush
+                    glad.invisible = glad.buffs.invisible.timeleft > 0.1;
+                    if (glad.invisible){
+                        if (glad.sprite.alpha >= 1){
+                            render.playAudio('ambush', simulation.preferences.sound.sfx);
                         }
-                        const actionspeed = Math.max(10, frames / timelocked);
-    
-                        //console.log({action: actionspeed, name: this.step.glads[i].name, lock: lockedfor});
-
-                        glad.sprite.animations.stop();
-                        glad.sprite.animations.play(anim, actionspeed);
-                        glad.time = this.step.simtime;
+                        if (glad.sprite.alpha > 0.3){
+                            glad.sprite.alpha -= 0.05;
+                        }
+                    }
+                    else if (glad.sprite.alpha < 1){
+                        glad.sprite.alpha += 0.05;
+                    }
+                    
+                    // TODO: need to fix. gladArray[i].x was supposed to hold sprite[i].x. Now it holds json.glads[i].x
+                    //fade do teleport
+                    if (glad.fade == 1 && (glad.arenaX != glad.sprite.x || glad.arenaY != glad.sprite.y) ){
+                        const clone = this.game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
+                        clone.anchor.setTo(0.5, 0.5);
+                        clone.alpha = 1;
+                        glad.sprite.alpha = 0;
+                        this.clones.push(clone);
                         
-                        if (glad.action.name == "teleport" && !glad.fade){
-                            glad.fade = 1; // fading
-                            glad.arenaX = glad.sprite.x;
-                            glad.arenaY = glad.sprite.y;
-                            render.playAudio('teleport', simulation.preferences.sound.sfx);
+                        glad.fade = 2; // totally faded
+                    }
+                    else if (glad.fade == 2){
+                        glad.sprite.alpha += 0.05;
+                        if (glad.sprite.alpha >= 1){
+                            glad.sprite.alpha = 1;
+                            glad.fade = 0; // not fading
                         }
-                        if (glad.action.name == "assassinate"){
-                            glad.assassinate = true;
+                    }
+
+                    // update/delete teleport clones
+                    this.clones = this.clones.filter(e => {
+                        e.alpha -= 0.05;
+                        if (e.alpha <= 0){
+                            e.destroy();
+                            return false;
                         }
-                        if (glad.action.name == "block"){
-                            glad.block = false;
+                        return true;
+                    });
+                        
+                    //stun
+                    if (!glad.stun && glad.buffs.stun.timeleft > 0.1 && glad.alive){
+                        glad.stun = glad.addSprite('stun'); // addSprite(gladArray[i], 'stun', sprite[i].x, sprite[i].y);
+                        glad.stun.anchor.setTo(0.5, 1);
+                        glad.stun.scale.setTo(0.6);
+                        glad.stun.animations.play('stun', null, true, false);
+                        render.playAudio('stun', simulation.preferences.sound.sfx);
+                    }
+                    else if (glad.stun && (glad.buffs.stun.timeleft <= 0.1 || !glad.alive)){
+                        glad.stun.kill();
+                        glad.stun = false;
+                    }
+                    
+                    // block
+                    if (!glad.block && glad.buffs.resist.timeleft > 0.1){
+                        glad.block = true;
+                        const shield = glad.addSprite('shield'); // addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
+                        shield.anchor.setTo(0.5);
+                        this.groups.glad.add(shield);
+                        shield.animations.play('shield', null, false, true);
+                        shield.alpha = 0.5;
+                        render.playAudio('block', simulation.preferences.sound.sfx);
+                    }
+                    else if (glad.block && glad.buffs.resist.timeleft <= 0.1){
+                        glad.block = false;
+                    }
+
+                    // potion
+                    if (glad.action.name == "potion" && glad.potion){
+                        // console.log(gladArray[i].potion)
+                        let name, alpha = 1, scale = 1;
+                        if (glad.potion == 'hp'){
+                            name = 'heal';
                         }
-                        if (glad.action.name == "ranged"){
-                            render.playAudio('ranged', simulation.preferences.sound.sfx);
+                        else if (glad.potion == 'ap'){
+                            name = 'mana';
+                            alpha = 0.5;
                         }
-                        if (glad.action.name == "melee"){
+                        else if (glad.potion == 'atr'){
+                            name = 'tonic';
+                            scale = 0.7;
+                        }
+                        else if (glad.potion == 'xp'){
+                            name = 'elixir';
+                        }
+                        
+                        // console.log(name)
+                        const potion = glad.addSprite(name); // addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
+                        potion.anchor.setTo(0.5);
+                        potion.scale.setTo(scale);
+                        this.groups.glad.add(potion);
+                        potion.animations.play(name, null, false, true);
+                        potion.alpha = alpha;
+                        render.playAudio(name, simulation.preferences.sound.sfx);
+                    }
+                    
+                    //charge
+                    if (glad.charge) {
+                        if (glad.getDiff('xp')) {
+                            glad.sprite.animations.currentAnim.speed = 15;
+                            glad.sprite.animations.stop();
+                            glad.sprite.animations.play(`${glad.move}-${getActionDirection(head)}`, 20);
                             render.playAudio('melee', simulation.preferences.sound.sfx);
                         }
-                    }
-                }
-                
-                //ambush
-                glad.invisible = glad.buffs.invisible.timeleft > 0.1;
-                if (glad.invisible){
-                    if (glad.sprite.alpha >= 1){
-                        render.playAudio('ambush', simulation.preferences.sound.sfx);
-                    }
-                    if (glad.sprite.alpha > 0.3){
-                        glad.sprite.alpha -= 0.05;
-                    }
-                }
-                else if (glad.sprite.alpha < 1){
-                    glad.sprite.alpha += 0.05;
-                }
-                
-                // TODO: need to fix. gladArray[i].x was supposed to hold sprite[i].x. Now it holds json.glads[i].x
-                //fade do teleport
-                if (glad.fade == 1 && (glad.arenaX != glad.sprite.x || glad.arenaY != glad.sprite.y) ){
-                    const clone = this.game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
-                    clone.anchor.setTo(0.5, 0.5);
-                    clone.alpha = 1;
-                    glad.sprite.alpha = 0;
-                    this.clones.push(clone);
-                    
-                    glad.fade = 2; // totally faded
-                }
-                else if (glad.fade == 2){
-                    glad.sprite.alpha += 0.05;
-                    if (glad.sprite.alpha >= 1){
-                        glad.sprite.alpha = 1;
-                        glad.fade = 0; // not fading
-                    }
-                }
-
-                // update/delete teleport clones
-                this.clones = this.clones.filter(e => {
-                    e.alpha -= 0.05;
-                    if (e.alpha <= 0){
-                        e.destroy();
-                        return false;
-                    }
-                    return true;
-                });
-                    
-                //stun
-                if (!glad.stun && glad.buffs.stun.timeleft > 0.1 && glad.alive){
-                    glad.stun = glad.addSprite('stun'); // addSprite(gladArray[i], 'stun', sprite[i].x, sprite[i].y);
-                    glad.stun.anchor.setTo(0.5, 1);
-                    glad.stun.scale.setTo(0.6);
-                    glad.stun.animations.play('stun', null, true, false);
-                    render.playAudio('stun', simulation.preferences.sound.sfx);
-                }
-                else if (glad.stun && (glad.buffs.stun.timeleft <= 0.1 || !glad.alive)){
-                    glad.stun.kill();
-                    glad.stun = false;
-                }
-                
-                // block
-                if (!glad.block && glads.buffs.resist.timeleft > 0.1){
-                    glad.block = true;
-                    const shield = glad.addSprite('shield'); // addSprite(gladArray[i], 'shield', sprite[i].x, sprite[i].y);
-                    shield.anchor.setTo(0.5);
-                    this.groups.glad.add(shield);
-                    shield.animations.play('shield', null, false, true);
-                    shield.alpha = 0.5;
-                    render.playAudio('block', simulation.preferences.sound.sfx);
-                }
-                else if (glad.block && glad.buffs.resist.timeleft <= 0.1){
-                    glad.block = false;
-                }
-
-                // potion
-                if (glad.action.name == "potion" && glad.potion){
-                    // console.log(gladArray[i].potion)
-                    let name, alpha = 1, scale = 1;
-                    if (glad.potion == 'hp'){
-                        name = 'heal';
-                    }
-                    else if (glad.potion == 'ap'){
-                        name = 'mana';
-                        alpha = 0.5;
-                    }
-                    else if (glad.potion == 'atr'){
-                        name = 'tonic';
-                        scale = 0.7;
-                    }
-                    else if (glad.potion == 'xp'){
-                        name = 'elixir';
+                        else if (glad.action.name != "charge"){
+                            glad.sprite.animations.currentAnim.speed = 15;
+                            glad.charge = false;
+                        }
                     }
                     
-                    // console.log(name)
-                    const potion = glad.addSprite(name); // addSprite(gladArray[i], name, sprite[i].x, sprite[i].y);
-                    potion.anchor.setTo(0.5);
-                    potion.scale.setTo(scale);
-                    this.groups.glad.add(potion);
-                    potion.animations.play(name, null, false, true);
-                    potion.alpha = alpha;
-                    render.playAudio(name, simulation.preferences.sound.sfx);
-                }
-                
-                //charge
-                if (glad.charge) {
-                    if (glad.getDiff('xp')) {
-                        glad.sprite.animations.currentAnim.speed = 15;
-                        glad.sprite.animations.stop();
-                        glad.sprite.animations.play(`${glad.move}-${getActionDirection(head)}`, 20);
-                        render.playAudio('melee', simulation.preferences.sound.sfx);
-                    }
-                    else if (glad.action.name != "charge"){
-                        glad.sprite.animations.currentAnim.speed = 15;
-                        glad.charge = false;
-                    }
-                }
-                
-                //poison
-                glad.poison = Math.sqrt(Math.pow(12.5 - glad.x, 2) + Math.pow(12.5 - glad.y, 2)) >= this.poison;
-                    
-                //aplica os tints
-                if (glad.buffs.burn.timeleft > 0.1){
-                    glad.sprite.tint = 0xFFB072;
-                }
-                else if (glad.poison){
-                    glad.sprite.tint = 0x96FD96;
-                }
-                else if (glad.block){
-                    glad.sprite.tint = 0xFFE533;
-                }
-                else{
-                    glad.sprite.tint = 0xFFFFFF;
-                }
-                
-                // if (timeSlider != Math.floor(this.step.simtime)){
-                //     timeSlider = this.step.simtime;
-                //     $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
-                // }
-            })
-            
-            projectiles.update(this.step);
-    
-            this.groups.glad.sort('y', Phaser.Group.SORT_ASCENDING);
-            glads.members.forEach(e => e.alive && this.groups.glad.sendToBack(e.sprite));
-    
-            this.groups.glad.sendToBack(this.layers[0]);
-            this.groups.glad.bringToTop(this.groups.gas);
-            this.groups.glad.bringToTop(this.layers[1]);
-            this.groups.glad.bringToTop(this.groups.npc[0]);
-            this.groups.glad.bringToTop(this.layers[2]);
-            this.groups.glad.bringToTop(this.groups.npc[1]);
-            this.groups.glad.bringToTop(this.layers[3]);
-        }
-        
-        render.debugTimer();
+                    //poison
+                    glad.poison = Math.sqrt(Math.pow(12.5 - glad.x, 2) + Math.pow(12.5 - glad.y, 2)) >= this.poison;
                         
-        render.checkInput();
+                    //aplica os tints
+                    if (glad.buffs.burn.timeleft > 0.1){
+                        glad.sprite.tint = 0xFFB072;
+                    }
+                    else if (glad.poison){
+                        glad.sprite.tint = 0x96FD96;
+                    }
+                    else if (glad.block){
+                        glad.sprite.tint = 0xFFE533;
+                    }
+                    else{
+                        glad.sprite.tint = 0xFFFFFF;
+                    }
+                    
+                    // if (timeSlider != Math.floor(this.step.simtime)){
+                    //     timeSlider = this.step.simtime;
+                    //     $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
+                    // }
+                })
+                
+                projectiles.update(this.step);
         
-        this.time = this.step.simtime;
+                this.groups.glad.sort('y', Phaser.Group.SORT_ASCENDING);
+                glads.members.forEach(e => e.alive && this.groups.glad.sendToBack(e.sprite));
+        
+                this.groups.glad.sendToBack(this.layers[0]);
+                this.groups.glad.bringToTop(this.groups.gas);
+                this.groups.glad.bringToTop(this.layers[1]);
+                this.groups.glad.bringToTop(this.groups.npc[0]);
+                this.groups.glad.bringToTop(this.layers[2]);
+                this.groups.glad.bringToTop(this.groups.npc[1]);
+                this.groups.glad.bringToTop(this.layers[3]);
+            }
+            
+            render.debugTimer();
+                            
+            render.checkInput();
+            
+            this.time = this.step.simtime;
+        }
     },
 
     checkInput: function(){
@@ -1124,7 +1130,10 @@ const render = {
             this.game.camera.x = point.x * sx - mx;
             this.game.camera.y = point.y * sy - my;
         }
-        document.querySelector('.baloon').remove();
+
+        if (document.querySelector('.baloon')){
+            document.querySelectorAll('.baloon').forEach(e => e.remove());
+        }
     },
     
     playAudio: function(marker, volume){
@@ -1142,52 +1151,63 @@ const render = {
         }
     },
 
-    // debugTimer: function(){
-    //     if (simulation.preferences.fps){
-    //         if (!oldTime)
-    //             oldTime = new Date();
-    //         else{
-    //             var newTime = new Date();
-    //             avgFPS += newTime - oldTime;
-    //             contFPS++;
-    //             oldTime = newTime;
-    //         }
-    //         if (!$('#fps').length){
-    //             $('#canvas-container').append("<div id='fps'></fps>");
-    //             intFPS();
-    //         }
-    //         function intFPS(){
-    //             setTimeout( function() {
-    //                 if (contFPS > 0){
-    //                     avgFPS = 1000/(avgFPS/contFPS);
-    //                     contFPS = 0;
+    debugTimer: function(){
+        let box = document.querySelector('#fps');
+        if (simulation.preferences.fps){
+            if (!this.debug.time){
+                this.debug.time = new Date();
+            }
+            else{
+                const newTime = new Date();
+                this.debug.fps.avg += newTime - this.debug.time;
+                this.debug.fps.cont++;
+                this.debug.time = newTime;
+            }
+            if (!box){
+                box = document.createElement("div");
+                box.id = 'fps';
+                document.querySelector('#canvas-container').insertAdjacentElement('beforeend', box);
+                intFPS();
+            }
+            function intFPS(){
+                setTimeout( () => {
+                    if (this.debug.fps.cont > 0){
+                        this.debug.fps.avg = 1000 / (this.debug.fps.avg / this.debug.fps.cont);
+                        this.debug.fps.cont = 0;
     
-    //                     //calculate average FPS in last 5 seconds
-    //                     avgFPS5.push(avgFPS);
-    //                     if (avgFPS5.length > 5)
-    //                         avgFPS5.splice(0,1);
-    //                     avgFPS = 0;
-    //                     for (let i in avgFPS5)
-    //                         avgFPS += avgFPS5[i];
-    //                     avgFPS /= avgFPS5.length;
+                        //calculate average FPS in last 5 seconds
+                        this.debug.fps.avg5.push(this.debug.fps.avg);
+                        if (this.debug.fps.avg5.length > 5){
+                            this.debug.fps.avg5.splice(0,1);
+                        }
+                        this.debug.fps.avg = 0;
+                        for (let i in this.debug.fps.avg5){
+                            this.debug.fps.avg += this.debug.fps.avg5[i];
+                        }
+                        this.debug.fps.avg /= this.debug.fps.avg5.length;
     
-    //                     $('#fps').html("FPS: "+ parseFloat(avgFPS).toFixed(1));
-    //                 }
+                        box.innerHTML = `FPS: ${this.debug.fps.avg.toFixed(1)}`;
+                    }
                     
-    //                 if ($('#fps').length)
-    //                     intFPS();
-    //                 else{
-    //                     avgFPS5 = [];
-    //                     avgFPS = 0;
-    //                     contFPS = 0;
-    //                 }
-    //             }, 1000);
-    //         }
-    //     }
-    //     else if ($('#fps').length){
-    //         $('#fps').remove();
-    //     }
-    // },
+                    if (box){
+                        intFPS();
+                    }
+                    else{
+                        this.debug.fps.avg5 = [];
+                        this.debug.fps.avg = 0;
+                        this.debug.fps.cont = 0;
+                    }
+                }, 1000);
+            }
+        }
+        else if (box){
+            box.remove();
+        }
+    },
+
+    updateStep: function(step){
+        this.step = step;
+    }
 }
 
 const animationList = {
@@ -1219,7 +1239,7 @@ function getAction(value){
         return actionList.filter(e => e.name == value)[0];
     }
     else {
-        return actionList[options.value];
+        return actionList[value];
     }
 }
 
@@ -1612,64 +1632,7 @@ function getActionDirection(head){
     }
 }
 
-
 export { render, glads, getAction }
-
-// var loadglads = false, startsim = false;
-// var stab, gender;
-// var simtimenow;
-// var dt = 0;
-
-// var layers = [];
-
-// var sprite = new Array();
-// var sproj = new Array();
-// var gladArray = new Array();
-// var projArray = new Array();
-// var music, ending, victory; // this.music.main, ending, victory
-// var clones = new Array();
-
-// var poison = (Math.sqrt(2*Math.pow(arenaD/2,2)) / arenaRate);
-// var gasl = [];
-// var groupglad, groupgas; // turned into render.groups.glad
-// var groupnpc = [];
-// var bar = {};
-// var npc;
-// var audio = {};
-// var textures;
-
-// //function created to debug code. pass argument 's' when you want to start measure and 'e' when to end.
-// //it gives the average time per second the code takes to execute
-// var mt, ma = null, ta=0, tc=0;
-// function measureTime(m){
-//     if (!ma)
-//         ma = new Date();
-
-//     if (m == 's')
-//         mt = new Date();
-//     else if (m == 'e'){
-//         ta += new Date() - mt;
-//         tc++;
-//         if (new Date() - ma >= 1000){
-//             console.log(ta/tc);
-//             ma = null;
-//             tc = 0;
-//             ta = 0;
-//         }
-//     }
-// }
-
-// function findProj(id){
-//     for (i in sproj){
-//         if (sproj[i].id == id)
-//             return i;
-//     }
-//     return -1;
-// }
-
-// var oldTime = null;
-// var avgFPS = 0, contFPS = 0;
-// var avgFPS5 = [];
 
 // $(window).keydown(function(event) {
 //     if(event.keyCode == Phaser.Keyboard.S){
