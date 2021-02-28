@@ -62,7 +62,7 @@
             <div id='canvas-div'></div>
             <div id='button-container'>
                 <div id='time-container' title='Selecionar um ponto da simulação'></div>
-                <div class='row'>
+                <div id='buttons' class='row'>
                     <div class='button' id='settings' title='Preferências'><img src='icon/settings.png'></div>
                     <div class='button' id='fullscreen' title='Modo tela cheia'><img src='icon/full_screen.png'></div>
                     <div class='button' id='back-step' title='Retroceder simulação'><div class='speed'>-1x</div></div>

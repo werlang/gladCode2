@@ -239,7 +239,7 @@ const simulation = {
             }
 
             // update slider
-            this.slider.setValue(100 * this.time / this.steps.length);
+            this.slider.setValue(this.time / 10);
 
         }, 100 / this.stepButton.getValue())
     },
@@ -680,25 +680,36 @@ const ui = {
 class Slider {
     constructor(domParent, options){
         domParent.innerHTML = `<div class='slider'>
-            <div class='background'>
+            <div class='range'>
                 <div class='filled'></div>
-                <div class='handle'></div>
+                <div class='handle'>
+                    ${options.time ? `<div class='time'></div>` : ''}
+                </div>
                 <div class='preview-filled'></div>
-                <div class='preview-handle'></div>
+                <div class='preview-handle'>
+                    ${options.time ? `<div class='preview-time'></div>` : ''}
+                </div>
             </div>
         </div>`;
 
+        this.min = options.min || 0;
+        this.max = options.max || 100;
+        this.increment = options.increment || 1;
+        this.value = options.value || this.min;
+        this.previewValue = this.min;
+
         this.domElement = domParent.querySelector('.slider');
         this.domElement.addEventListener('mousemove', e => {
-            const total = this.domElement.querySelector('.background').offsetWidth;
-            this.previewValue = e.offsetX / total * 100;
+            const total = this.domElement.querySelector('.range').offsetWidth;
+            const valueRange = e.offsetX / total * (this.max - this.min) + this.min;
+            this.previewValue = parseInt(valueRange / this.increment) * this.increment;
             this.update();
         });
 
         this.callbacks = {};
 
         this.domElement.addEventListener('click', () => {
-            this.value = this.previewValue;
+            this.setValue(this.previewValue);
 
             if (this.callbacks.click){
                 this.callbacks.click(this.previewValue);
@@ -709,7 +720,7 @@ class Slider {
     }
 
     setValue(value){
-        this.value = value;
+        this.value = parseInt(Math.max(Math.min(value, this.max), this.min) / this.increment) * this.increment;
 
         if (this.callbacks.change){
             this.callbacks.change(value);
@@ -723,9 +734,9 @@ class Slider {
     }
 
     update(){
-        const total = this.domElement.querySelector('.background').offsetWidth;
-        const progressWidth = this.value / 100 * total;
-        const previewWidth = this.previewValue / 100 * total;
+        const total = this.domElement.querySelector('.range').offsetWidth;
+        const progressWidth = (this.value - this.min) / (this.max - this.min) * total;
+        const previewWidth = (this.previewValue - this.min) / (this.max - this.min) * total;
         const width = previewWidth - progressWidth;
         
         if (width >= 0){
@@ -739,6 +750,9 @@ class Slider {
 
         this.domElement.querySelector('.preview-filled').style.width = `${Math.abs(width)}px`;
         this.domElement.querySelector('.filled').style.width = `${progressWidth}px`;
+
+        this.domElement.querySelector('.time').innerHTML = this.value.toFixed(1);
+        this.domElement.querySelector('.preview-time').innerHTML = this.previewValue.toFixed(1);
     }
 
     on(event, callback){
@@ -748,11 +762,6 @@ class Slider {
 
 ;(async () => {
     render.init().then(() => changeCrowd(simulation.preferences.crowd))
-
-    simulation.slider = new Slider(document.querySelector('#time-container'));
-    simulation.slider.on('click', value => {
-        simulation.time = parseInt(value / 100 * simulation.steps.length);
-    })
 
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
     // document.querySelector('#footer-wrapper').classList.add('white')
@@ -1001,6 +1010,16 @@ class Slider {
                         g.name = g.name.split("#").join(" ")
                         g.user = g.user.split("#").join(" ")
                     })
+
+                    simulation.slider = new Slider(document.querySelector('#time-container'), {
+                        min: 0,
+                        max: simulation.steps.length / 10,
+                        increment: 0.1,
+                        time: true,
+                    });
+                    simulation.slider.on('click', value => {
+                        simulation.time = value * 10;
+                    })                
 
                     await glads.load(simulation.log[0].glads)
                     await ui.init()

@@ -143,7 +143,11 @@ body{
 
     @media @size600 {
         margin-top: -85px;
-        width: auto;
+        width: 500px;
+    }
+
+    #buttons.row {
+        justify-content: space-around;
     }
 
     #back-step {
@@ -238,18 +242,14 @@ body{
             border-radius: 10px;
             
             &:hover{
-                .handle {
+                .filled,
+                .preview-filled,
+                .handle,
+                .preview-handle,
+                .time,
+                .preview-time {
                     opacity: 1;
                 }
-
-                .time {
-                    opacity: 1;
-                }
-
-                .preview-filled, .preview-handle {
-                    opacity: 1;
-                }
-
             }
 
             .handle {
@@ -282,7 +282,7 @@ body{
             }
 
                         
-            .background{
+            .range{
                 transition: background-color 0.5s;
                 height: 7px;
                 width: 100%;
@@ -311,17 +311,38 @@ body{
             .time {
                 opacity: 0;
                 position: absolute;
-                top: -24px;
                 background-color: #646464;
                 color: white;
-                width: 40px;
+                width: 45px;
+                height: 25px;
                 text-align: center;
                 border-radius: 3px;
-                margin-left: -18px;
-                transition: opacity 0.3s;
-                font-family: 'Acme', sans-serif;
+                transition: opacity .3s;
+                font-family: 'Acme',sans-serif;
                 font-size: 1.3em;
-                cursor: default;
+                pointer-events: none;
+                margin-top: -27px;
+                margin-left: -15px;
+            }
+
+            .preview-time {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                position: absolute;
+                background-color: #646464a5;
+                color: #ffffffc5;
+                width: 40px;
+                height: 20px;
+                text-align: center;
+                border-radius: 3px;
+                transition: opacity .3s;
+                font-family: 'Acme',sans-serif;
+                font-size: 1.1em;
+                pointer-events: none;
+                margin-top: -23px;
+                margin-left: -15px;
             }            
         }
     }
