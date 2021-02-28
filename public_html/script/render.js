@@ -691,7 +691,7 @@ const render = {
     update: function() {
         // poison
         if (this.step){
-            console.log(this.step);
+            // console.log(this.step);
             if (this.step.poison){
                 this.poison = this.step.poison;
                 
@@ -1005,11 +1005,6 @@ const render = {
                     else{
                         glad.sprite.tint = 0xFFFFFF;
                     }
-                    
-                    // if (timeSlider != Math.floor(this.step.simtime)){
-                    //     timeSlider = this.step.simtime;
-                    //     $( "#time" ).slider("value", parseFloat(this.step.simtime) * 10);
-                    // }
                 })
                 
                 projectiles.update(this.step);

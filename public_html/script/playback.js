@@ -222,19 +222,25 @@ const simulation = {
                     render.music.victory.play('', 0, render.music.main.volume / 0.1);
                 }
             }
-            // TODO: tem que ver ainda onde isso se encaixa
-            // else if (!this.showScore){
-            //     document.querySelector('#fog').remove()
-            //     this.showScore = true
-            //     render.music.resume()
-            // }
+            else if (!this.showScore){
+                // document.querySelector('#fog').remove();
+                // this.showScore = true;
+                // if (render.music){
+                //     render.music.main.resume();
+                // }
+            }
+
             render.updateStep(this.steps[this.time]);
-            console.log(render.step);
+            // console.log(this.time);
             ui.update(render.step)
 
             if (!this.paused){
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
+
+            // update slider
+            this.slider.setValue(100 * this.time / this.steps.length);
+
         }, 100 / this.stepButton.getValue())
     },
 
@@ -403,6 +409,7 @@ const ui = {
     },
 
     update: function(step){
+        // console.log(step);
         if (simulation.preferences.frames){
             if (simulation.preferences.text && !this.showtext){
                 this.showtext = true
@@ -670,8 +677,82 @@ const ui = {
     }
 }
 
+class Slider {
+    constructor(domParent, options){
+        domParent.innerHTML = `<div class='slider'>
+            <div class='background'>
+                <div class='filled'></div>
+                <div class='handle'></div>
+                <div class='preview-filled'></div>
+                <div class='preview-handle'></div>
+            </div>
+        </div>`;
+
+        this.domElement = domParent.querySelector('.slider');
+        this.domElement.addEventListener('mousemove', e => {
+            const total = this.domElement.querySelector('.background').offsetWidth;
+            this.previewValue = e.offsetX / total * 100;
+            this.update();
+        });
+
+        this.callbacks = {};
+
+        this.domElement.addEventListener('click', () => {
+            this.value = this.previewValue;
+
+            if (this.callbacks.click){
+                this.callbacks.click(this.previewValue);
+            }
+
+            this.update();
+        });
+    }
+
+    setValue(value){
+        this.value = value;
+
+        if (this.callbacks.change){
+            this.callbacks.change(value);
+        }
+
+        this.update();
+    }
+
+    getValue(){
+        return this.value;
+    }
+
+    update(){
+        const total = this.domElement.querySelector('.background').offsetWidth;
+        const progressWidth = this.value / 100 * total;
+        const previewWidth = this.previewValue / 100 * total;
+        const width = previewWidth - progressWidth;
+        
+        if (width >= 0){
+            this.domElement.querySelector('.preview-filled').removeAttribute('style');
+            this.domElement.querySelector('.preview-handle').removeAttribute('style');
+        }
+        else{
+            this.domElement.querySelector('.preview-filled').style['margin-left'] = `${width}px`;
+            this.domElement.querySelector('.preview-handle').style['margin-left'] = `${width}px`;
+        }
+
+        this.domElement.querySelector('.preview-filled').style.width = `${Math.abs(width)}px`;
+        this.domElement.querySelector('.filled').style.width = `${progressWidth}px`;
+    }
+
+    on(event, callback){
+        this.callbacks[event] = callback;
+    }
+}
+
 ;(async () => {
     render.init().then(() => changeCrowd(simulation.preferences.crowd))
+
+    simulation.slider = new Slider(document.querySelector('#time-container'));
+    simulation.slider.on('click', value => {
+        simulation.time = parseInt(value / 100 * simulation.steps.length);
+    })
 
     document.querySelector('#loadbar #status').innerHTML = "Página carregada"
     // document.querySelector('#footer-wrapper').classList.add('white')
@@ -913,6 +994,7 @@ const ui = {
                 }
                 else{
                     simulation.log = JSON.parse(data.log)
+                    // console.log(simulation.log)
                     simulation.steps = mergeLog(simulation.log)
                     simulation.log[0].glads.forEach(g => {
                         // destroca os # nos nomes por espaços
