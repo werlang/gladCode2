@@ -1,5 +1,6 @@
 @import "https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap";
 @import "https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css";
+@import "https://use.fontawesome.com/releases/v5.15.1/css/all.css";
 @import (less) "dialog.less";
 @import (less) "checkbox.less";
 @import (less) "header.less";
@@ -746,173 +747,167 @@ body{
     margin-bottom: 0.2rem;
 }
 
-#end-message,
-#url {
-    width: 400px;
-    max-width: 100%;
-    background-color: #00638dcc;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    border-radius: 3px;
-    box-shadow: 3px 3px 15px -1px black;
-    font-family: 'Acme', sans-serif;
-    font-size: 2.5rem;
-    color: #cee1e8;
-    border: 2px solid #3c839e;
-    text-shadow: 1px 1px 5px black;
-    box-sizing: border-box;
+#fog.ending {
+    #end-message,
+    #url {
+        width: 400px;
+        max-width: 100%;
+        background-color: #00638dcc;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        border-radius: 3px;
+        box-shadow: 3px 3px 15px -1px black;
+        font-family: 'Acme', sans-serif;
+        font-size: 2.5rem;
+        color: #cee1e8;
+        border: 2px solid #3c839e;
+        text-shadow: 1px 1px 5px black;
+        box-sizing: border-box;
+    
+        &.hidden {
+            display: none;
+        }
+    }
+    
+    #end-message {
+        #victory {
+            border-top: 3px solid;
+            border-bottom: 3px solid;
+            width: 100%;
+            text-align: center;
+            margin: 15px 0px;
+            border-image: linear-gradient(to right,#00000000 7%,#6BBBDA 50%,#00000000 93%) 1 round;
+            color: white;
+            background-image: linear-gradient(to right,#00000000 7%,#6bbbda61 50%,#00000000 93%);
+        }
 
-    &.hidden {
-        display: none;
+        #image-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0px 15px 15px;
+            box-sizing: border-box;
+
+            #image {
+                margin-right: 10px;
+            }
+            
+            #name-team-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                
+                #name {
+                    overflow-x: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    margin-bottom: 5px;
+                    color: #cfffd7;
+                }
+                
+                #team {
+                    font-size: 0.7em;
+                }
+            }
+        }        
+        
+        #button-container {
+            width: 100%;
+            border-top: 2px solid #3c839e;
+            border-radius: 0px 0px 3px 3px;
+            display: flex;
+            justify-content: space-around;
+            
+            .button {
+                margin: 0;
+                width: 100%;
+                height: 50px;
+                
+                &.small {
+                    width: 80px;
+                }
+            }
+        }
+    }
+    
+    #url {
+        font-size: 2.5rem;
+        box-sizing: border-box;
+        justify-content: center;
+        cursor: default;
+        
+        #link {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px 5px;
+            box-sizing: border-box;
+
+            #title {
+                font-size: 1.3em;
+                margin-bottom: 10px;
+                margin-left: 15px;
+            }
+            
+            #site {
+                margin-left: 10px;
+            }
+            
+            #hash {
+                background-color: #02364c;
+                padding: 15px 50px;
+                border-radius: 3px;
+                width: 100%;
+                height: 1em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Source Code Pro', monospace;
+                box-sizing: border-box;
+                margin-top: 5px;
+                transition: all 1s;
+                
+                &.clicked {
+                    background-color: #2ca62291;
+                    border-color: #3c9e4a;
+                    opacity: 0;
+                }
+            }
+        }
+        
+        #social {
+            display: flex;
+            width: 100%;
+            justify-content: space-evenly;
+            
+            .button {
+                background-color: transparent;
+                width: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 5px 10px;
+                text-decoration: none;
+                
+                &:hover {
+                    background-color: #1e86d8;
+                }
+            }
+        }
+        
+        #close {
+            width: 100%;
+            border-radius: 0px 0px 3px 3px;
+            margin-top: 15px;
+            height: 35px;
+        }
     }
 }
 
-#end-message #image-container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0px 15px 15px;
-    box-sizing: border-box;
-}
-
-#end-message #image {
-    margin-right: 10px;
-}
-
-#end-message #victory {
-    border-top: 3px solid;
-    border-bottom: 3px solid;
-    width: 100%;
-    text-align: center;
-    margin: 15px 0px;
-    border-image: linear-gradient(to right,#00000000 7%,#6BBBDA 50%,#00000000 93%) 1 round;
-    color: white;
-    background-image: linear-gradient(to right,#00000000 7%,#6bbbda61 50%,#00000000 93%);
-}
-
-#end-message #name-team-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-#end-message #name {
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-bottom: 5px;
-    color: #cfffd7;
-}
-
-#end-message #team {
-    font-size: 0.7em;
-}
-
-#end-message #button-container {
-    width: 100%;
-    border-top: 2px solid #3c839e;
-    border-radius: 0px 0px 3px 3px;
-    display: flex;
-    justify-content: space-around;
-}
-
-#end-message .button {
-    margin: 0;
-    width: 100%;
-    height: 50px;
-}
-
-#end-message .button.small {
-    width: 80px;
-}
-
-#end-message #button-container img {
-    height: 100%;
-    padding: 8px 0px;
-    box-sizing: border-box;
-}
-
-
-#url {
-    font-size: 2.5rem;
-    box-sizing: border-box;
-    justify-content: center;
-    cursor: default;
-}
-
-#url #link {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 15px 5px;
-    box-sizing: border-box;
-}
-
-#url #title {
-    font-size: 1.3em;
-    margin-bottom: 10px;
-    margin-left: 15px;
-}
-
-#url #site {
-    margin-left: 10px;
-}
-
-#url #hash {
-    background-color: #02364c;
-    padding: 15px 50px;
-    border-radius: 3px;
-    width: 100%;
-    height: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Source Code Pro', monospace;
-    box-sizing: border-box;
-    margin-top: 5px;
-    transition: all 1s;
-}
-
-#url #hash.clicked {
-    background-color: #2ca62291;
-    border-color: #3c9e4a;
-    opacity: 0;
-}
-
-#url #social {
-    display: flex;
-    width: 100%;
-    justify-content: space-evenly;
-}
-
-#url #social .button {
-    background-color: transparent;
-    width: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px;
-    text-decoration: none;
-}
-
-#url #social img {
-    height: 30px;
-}
-
-#url #social .button:hover {
-    background-color: #1e86d8;
-}
-
-#url #close {
-    width: 100%;
-    border-radius: 0px 0px 3px 3px;
-    margin-top: 15px;
-    height: 35px;
-}
 
 #fps{
     position: fixed;

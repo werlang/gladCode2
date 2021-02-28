@@ -1,6 +1,6 @@
 import { mergeLog } from "./utils.js"
 import { header } from "./header.js"
-import { post } from "./utils.js"
+import { post, copyToClipboard, fadeIn } from "./utils.js"
 import { loader } from "./loader.js"
 import { render, glads, getAction } from "./render.js"
 
@@ -29,6 +29,7 @@ const simulation = {
     time: 0,
     log: null,
     fullscreen: true,
+    showScore: true,
 
     stepButton: {
         index: 4,
@@ -129,105 +130,10 @@ const simulation = {
                 this.time = 0
             }
             else if (this.time > this.steps.length - 1){
-                this.time = this.steps.length - 1
-
-                const winner = {}
-                this.steps[this.time].glads.forEach((e,i) => {
-                    //revive gladiator when running backwards
-                    if (parseFloat(e.hp) > 0 && !ui.glads[i].isDead &&
-                    !winner.id || winner.hp < parseFloat(e.hp)){
-                        winner.name = e.name
-                        winner.hp = parseFloat(e.hp)
-                        winner.team = e.user
-                        winner.id = i
-                    }
-                })
-
-                if (this.showScore && !document.querySelector('#end-message')){
-                    if (!winner.id){
-                        winner.name = "Empate"
-                        winner.team = ""
-                    }
-                    document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
-                        <div id='end-message'>
-                            <div id='victory'>VITÓRIA</div>
-                            <div id='image-container'>
-                                <div id='image'></div>
-                                <div id='name-team-container'>
-                                    <span id='name'>${winner.name}</span>
-                                    <span id='team'>${winner.team}</span>
-                                </div>
-                            </div>
-                            <div id='button-container'>
-                                <button class='button' id='retornar' title='Retornar para a batalha'>OK</button>
-                                <button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button>
-                            </div>
-                        </div>
-                    </div>`)
-
-                    document.querySelector('#end-message #retornar').addEventListener('click', () => {
-                        this.showScore = false
-                        document.querySelector('#fog').remove()
-                    })
-
-                    document.querySelector('#end-message #share').click('click', () => {
-                        document.querySelector('#end-message').classList.add('hidden')
-
-                        const link = "play/"+ simulation.logHash
-                        const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`
-                        const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`
-                        const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`
-
-                        document.querySelector('#fog').insertAdjacentHTML('beforeend', `<div id='url'>
-                            <div id='link'>
-                                <span id='title'>Compartilhar batalha</span>
-                                <span id='site'>gladcode.dev/play/</span>
-                                <span id='hash'>${simulation.logHash}</span>
-                            </div>
-                            <div id='social'>
-                                <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
-                                ${twitter + facebook + whatsapp}
-                            </div>
-                            <button id='close' class='button'>OK</button>
-                        </div>`)
-
-                        document.querySelector('#url #social #getlink').addEventListener('click', () => {
-                            copyToClipboard(link)
-                            document.querySelector('#url #hash').innerHTML = 'Link copiado'
-                            document.querySelector('#url #hash').classList.add('clicked')
-                            setTimeout(() => {
-                                document.querySelector('#url #hash').classList.remove('clicked')
-                                document.querySelector('#url #hash').innerHTML = simulation.logHash
-                            }, 500)
-                        })
-
-                        document.querySelector('#url #close').addEventListener('click', () => {
-                            document.querySelector('#url').remove()
-                            document.querySelector('#end-message').classList.remove('hidden')
-                        })
-                    })
-
-                    if (winner.id){
-                        loader.load('gladcard').then(({ getSpriteThumb }) => {
-                            document.querySelector('#end-message #image').innerHTML = getSpriteThumb(glads.members[winner.id].spritesheet,'walk','down')
-                        })
-                    }
-
-                    document.querySelector('#end-message').classList.add('fadein')
-                    setTimeout(() => {
-                        document.querySelector('#end-message').classList.remove('fadein')
-                    }, 1000)
-
-                    render.music.main.pause();
-                    render.music.victory.play('', 0, render.music.main.volume / 0.1);
-                }
+                this.endGame();
             }
-            else if (!this.showScore){
-                // document.querySelector('#fog').remove();
-                // this.showScore = true;
-                // if (render.music){
-                //     render.music.main.resume();
-                // }
+            else{
+                this.showScore = true;
             }
 
             render.updateStep(this.steps[this.time]);
@@ -242,6 +148,91 @@ const simulation = {
             this.slider.setValue(this.time / 10);
 
         }, 100 / this.stepButton.getValue())
+    },
+
+    endGame: function(){
+        this.time = this.steps.length - 1;
+
+        if (!this.winner){
+            const glads = this.steps[this.time].glads;
+            this.winner = glads.filter(e => e.hp > 0);
+            this.winner = this.winner.length > 1 ? { name: 'Empate', user: ''} : this.winner[0];
+        }
+
+        if (this.showScore){
+            const box = document.createElement('div');
+            box.id = 'fog';
+            box.classList.add('ending');
+            box.innerHTML = `<div id='end-message'>
+                <div id='victory'>VITÓRIA</div>
+                <div id='image-container'>
+                    <div id='image'></div>
+                    <div id='name-team-container'>
+                        <span id='name'>${this.winner.name}</span>
+                        <span id='team'>${this.winner.user}</span>
+                    </div>
+                </div>
+                <div id='button-container'>
+                    <button class='button' id='retornar' title='Retornar para a batalha'>OK</button>
+                    <button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button>
+                </div>
+            </div>`;
+
+            box.querySelector('#retornar').addEventListener('click', () => {
+                box.remove();
+            })
+
+            box.querySelector('#share').addEventListener('click', () => {
+                box.querySelector('#end-message').classList.add('hidden');
+
+                const link = `https://gladcode.dev/play/${simulation.logHash}`;
+                const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
+                const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
+                const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
+
+                box.insertAdjacentHTML('beforeend', `<div id='url'>
+                    <div id='link'>
+                        <span id='title'>Compartilhar batalha</span>
+                        <span id='site'>gladcode.dev/play/</span>
+                        <span id='hash'>${simulation.logHash}</span>
+                    </div>
+                    <div id='social'>
+                        <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
+                        ${twitter + facebook + whatsapp}
+                    </div>
+                    <button id='close' class='button'>OK</button>
+                </div>`);
+
+                box.querySelector('#url #social #getlink').addEventListener('click', () => {
+                    copyToClipboard(link);
+                    box.querySelector('#url #hash').innerHTML = 'Link copiado';
+                    box.querySelector('#url #hash').classList.add('clicked');
+                    setTimeout(() => {
+                        box.querySelector('#url #hash').classList.remove('clicked');
+                        box.querySelector('#url #hash').innerHTML = simulation.logHash;
+                    }, 500);
+                })
+
+                box.querySelector('#url #close').addEventListener('click', () => {
+                    box.querySelector('#url').remove();
+                    box.querySelector('#end-message').classList.remove('hidden');
+                })
+            })
+
+            if (this.winner.name != 'Empate'){
+                // console.log(this.winner);
+                loader.load('gladcard').then(({ getSpriteThumb }) => box.querySelector('#image').appendChild(getSpriteThumb(glads.get(this.winner.id).spritesheet, 'walk', 'down')));
+            }
+
+            document.querySelector('body').insertAdjacentElement('beforeend', box);
+            fadeIn(box.querySelector('#end-message'), { time: 1 });
+
+            render.music.main.pause();
+            render.music.victory.play('', 0, render.music.main.volume / 0.1);
+
+            this.showScore = false;
+            simulation.pause(true);
+        }
     },
 
     isFullScreen: function(){
@@ -420,7 +411,6 @@ const ui = {
                 this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.add('hidden'))
             }
 
-            // console.log(step)
             Object.values(step.glads).forEach(g => {
                 const glad = this.glads.filter(e => e.id == g.id)[0]
 
@@ -1018,7 +1008,11 @@ class Slider {
                         time: true,
                     });
                     simulation.slider.on('click', value => {
-                        simulation.time = value * 10;
+                        simulation.time = parseInt(value * 10);
+                        // advance a single step if paused, so we can see the effect of clicking on the slider.
+                        if (simulation.paused){
+                            simulation.startTimer();
+                        }
                     })                
 
                     await glads.load(simulation.log[0].glads)
@@ -1153,13 +1147,6 @@ function changeSoundIcon(){
     else{
         soundObj.classList.add("mute")
     }
-}
-
-function copyToClipboard(text) {
-    document.querySelector('body').insertAdjacentHTML('beforeend', `<input type='text' id='icopy' value='${text}'>`)
-    document.querySelector('#icopy').select()
-    document.execCommand("copy")
-    document.querySelector('#icopy').remove()
 }
 
 function changeCrowd (value) {

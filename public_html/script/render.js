@@ -332,8 +332,8 @@ const projectiles = {
     members: [],
 
     update: function(step){
-        step.projectiles.forEach(e => {
-            const proj = this.find(e.id);
+        for (let i in step.projectiles){
+            const proj = step.projectiles[i]
             if (proj){
                 proj.update(e);
                 proj.time = step.simtime;
@@ -343,7 +343,7 @@ const projectiles = {
                 newProj.time = step.simtime;
                 this.members.push(newProj);
             }
-        })
+        }
 
         const inactive = this.members.filter(e => e.time < step.simtime);
         this.members = this.members.filter(e => e.time == step.simtime);
@@ -367,10 +367,6 @@ const projectiles = {
             e.sprite.kill();
         });
     },
-
-    find(id){
-        return this.members.filter(e => e.id == id)[0] || false;
-    }
 }
 
 const render = {
@@ -685,6 +681,8 @@ const render = {
             
             this.music.main.play();
             this.music.main.volume = simulation.preferences.sound.music;
+
+            simulation.pause(false);
         })
     },
     
@@ -1232,6 +1230,9 @@ const actionList = [
 function getAction(value){
     if (typeof value == 'string'){
         return actionList.filter(e => e.name == value)[0];
+    }
+    else if (typeof value == 'object'){
+        return value;
     }
     else {
         return actionList[value];

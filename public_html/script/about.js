@@ -1,6 +1,7 @@
 import {header, login} from "./header.js"
 import {translator} from "./translate.js"
 import {loader} from "./loader.js"
+import { copyToClipboard } from "./utils.js"
 
 ;(async () => {
     header.load()
@@ -133,11 +134,4 @@ function showWallet(curr){
         });
 
     }
-}
-
-function copyToClipboard(text) {
-    $('body').append("<input type='text' id='icopy' value='"+ text +"'>");
-    $('#icopy').select();
-    document.execCommand("copy");
-    $('#icopy').remove();
 }

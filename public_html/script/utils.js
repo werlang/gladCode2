@@ -139,4 +139,27 @@ async function waitFor(callback, time){
     })
 }
 
-export {post, getDate, getTimeSince, $index, deepMerge, mergeLog, waitFor}
+function copyToClipboard(text) {
+    const input = document.createElement('input');
+    input.value = text;
+    document.querySelector('body').insertAdjacentElement('beforeend', input);
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+}
+
+function fadeIn(element, options){
+    if (options && options.css){
+        element.classList.add('fadein');
+        setTimeout(() => element.classList.remove('fadein'), 1);
+    }
+    else{
+        const time = options && options.time ? options.time : 0.3;
+        element.style.opacity = '0';
+        element.style.transition = `${time}s opacity`;
+        setTimeout(() => element.style.opacity = '1', 1);
+        setTimeout(() => element.removeAttribute('style'), time * 1000);
+    }
+}
+
+export {post, getDate, getTimeSince, $index, deepMerge, mergeLog, waitFor, copyToClipboard, fadeIn}
