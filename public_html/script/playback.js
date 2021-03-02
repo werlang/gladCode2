@@ -280,9 +280,7 @@ const simulation = {
             this.fullscreen = false;
         }
 
-        setTimeout(() => {
-            this.resize()
-        }, 100)
+        setTimeout(() => this.resize(), 100);
     },
 
     resize: function() {
@@ -329,6 +327,40 @@ const simulation = {
 
         //     $('#canvas-div canvas').click();
         // }
+    },
+
+    mute: {
+        music: 0,
+        sfx: 0,
+
+        toggle: function(){
+            // need to mute music
+            if (this.music == 0 && simulation.preferences.sound.music != 0){
+                this.music = simulation.preferences.sound.music;
+                simulation.preferences.sound.music = 0;
+                render.music.main.volume = 0;
+            }
+            // need to mute sfx
+            else if (this.sfx == 0 && simulation.preferences.sound.sfx != 0){
+                this.sfx = simulation.preferences.sound.sfx;
+                simulation.preferences.sound.sfx = 0;
+            }
+            // unmute all
+            else{
+                simulation.preferences.sound.music = this.music || 0.1;
+                simulation.preferences.sound.sfx = this.sfx || 1;
+    
+                render.music.main.volume = simulation.preferences.sound.music;            
+            }
+
+            changeSoundIcon();
+
+            post("back_play.php",{
+                action: "SET_PREF",
+                music_volume: simulation.preferences.sound.music,
+                sfx_volume: simulation.preferences.sound.sfx
+            });
+        },
     }
 }
 
@@ -400,8 +432,16 @@ const ui = {
     },
 
     update: function(step){
-        // console.log(step);
+        // console.log(simulation.preferences);
+
+        const container = document.querySelector('#ui-container');
+
         if (simulation.preferences.frames){
+            if (container.classList.contains('hidden')){
+                container.classList.remove('hidden');
+                setTimeout(() => container.classList.remove('fade'), 10);
+            }
+
             if (simulation.preferences.text && !this.showtext){
                 this.showtext = true
                 this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
@@ -497,6 +537,10 @@ const ui = {
                 ["burn", "resist", "invisible", "stun", "speeds"].forEach(e => glad.buffs[e] = g.buffs && g.buffs[e] ? g.buffs[e].timeleft : 0)
 
             })
+        }
+        else if (!container.classList.contains('fade')){
+            setTimeout(() => container.classList.add('hidden'), 1000);
+            container.classList.add('fade');
         }
     },
 
@@ -763,90 +807,90 @@ class Slider {
     document.querySelector('#pause').addEventListener('click', () => simulation.pause())
 
     document.querySelector('#fullscreen').addEventListener('click', () => simulation.setFullScreen())
+    
+    document.querySelector('#sound').addEventListener('click', () => simulation.mute.toggle())
 
     document.querySelector('#help').addEventListener('click', () => {
-        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
-            <div id='help-window' class='blue-window'>
-                <div id='content'>
-                    <h2>Controle da câmera</h2>
-                    <div class='table'>
-                        <div class='row'>
-                            <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
-                            <div class='cell'>Mover a câmera</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
-                            <div class='cell'>Zoom da arena</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
-                            <div class='cell'>Acompanhar um gladiador</div>
-                        </div>
+        const box = document.createElement('div');
+        box.id = 'fog';
+        box.innerHTML = `<div id='help-window' class='blue-window'>
+            <div id='content'>
+                <h2>Controle da câmera</h2>
+                <div class='table'>
+                    <div class='row'>
+                        <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
+                        <div class='cell'>Mover a câmera</div>
                     </div>
-                    <h2>Teclas de atalho</h2>
-                    <div class='table'>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>A</span></div>
-                            <div class='cell'>Retroceder simulação</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>D</span></div>
-                            <div class='cell'>Avançar simulação</div>
-                        </div>
-                        <div class='row'>
-                            <div class='cell'><span class='key'>S</span></div>
-                            <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
-                        </div>
+                    <div class='row'>
+                        <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
+                        <div class='cell'>Zoom da arena</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
+                        <div class='cell'>Acompanhar um gladiador</div>
                     </div>
                 </div>
-                <div id='button-container'><button class='button' id='ok'>OK</button></div>
+                <h2>Teclas de atalho</h2>
+                <div class='table'>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>A</span></div>
+                        <div class='cell'>Retroceder simulação</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>D</span></div>
+                        <div class='cell'>Avançar simulação</div>
+                    </div>
+                    <div class='row'>
+                        <div class='cell'><span class='key'>S</span></div>
+                        <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
+                    </div>
+                </div>
             </div>
-        </div>`)
+            <div id='button-container'><button class='button' id='ok'>OK</button></div>
+        </div>`;
+        document.querySelector('body').insertAdjacentElement('beforeend', box);
+        fadeIn(box.querySelector('#help-window'), { time: 0.5 });
 
-        document.querySelector('#help-window #ok').addEventListener('click', () => {
-            document.querySelector('#fog').remove()
-        })
-    })
+        box.querySelector('#ok').addEventListener('click', () => box.remove());
+    });
 
     document.querySelector('#settings').addEventListener('click', () => {
-        const uiChecked = document.querySelector('#ui-container').style.display == 'flex'
-
-        document.querySelector('body').insertAdjacentHTML('beforeend', `<div id='fog'>
-            <div id='settings-window' class='blue-window'>
-                <h2>Preferências</h2>
-                <div class='check-container'>
-                    <div id='pref-bars'><label><input type='checkbox' class='checkslider' ${simulation.preferences.bars ? "checked" : ""}>Mostrar barras de hp e ap (B)</label></div>
-                    <div id='pref-frames'><label><input type='checkbox' class='checkslider' ${uiChecked ? "checked" : ""}>Mostrar molduras dos gladiadores (M)</label></div>
-                    <div id='pref-fps'><label><input type='checkbox' class='checkslider' ${simulation.preferences.fps ? "checked" : ""}>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
-                    <div id='pref-text'><label><input type='checkbox' class='checkslider' ${simulation.preferences.text ? "checked" : ""}>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
-                    <div id='pref-speech'><label><input type='checkbox' class='checkslider' ${simulation.preferences.speech ? "checked" : ""}>Mostrar balões de fala</label></div>
-                    <div id='volume-container'>
-                        <h3>Volume do áudio</h3>
-                        <p>Efeitos sonoros</p>
-                        <div id='sfx-volume'></div>
-                        <p>Música</p>
-                        <div id='music-volume'></div>
-                    </div>
-                    <div id='crowd-container'>
-                        <h3>Número de espectadores</h3>
-                        <div id='n-crowd'></div>
-                    </div>
+        const box = document.createElement('div');
+        box.id = 'fog';
+        box.innerHTML = `<div id='settings-window' class='blue-window'>
+            <h2>Preferências</h2>
+            <div class='check-container'>
+                <div id='pref-bars'><label><input type='checkbox' class='checkslider' ${simulation.preferences.bars ? "checked" : ""}>Mostrar barras de hp e ap (B)</label></div>
+                <div id='pref-frames'><label><input type='checkbox' class='checkslider' ${simulation.preferences.frames ? "checked" : ""}>Mostrar molduras dos gladiadores (M)</label></div>
+                <div id='pref-fps'><label><input type='checkbox' class='checkslider' ${simulation.preferences.fps ? "checked" : ""}>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
+                <div id='pref-text'><label><input type='checkbox' class='checkslider' ${simulation.preferences.text ? "checked" : ""}>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
+                <div id='pref-speech'><label><input type='checkbox' class='checkslider' ${simulation.preferences.speech ? "checked" : ""}>Mostrar balões de fala</label></div>
+                <div id='volume-container'>
+                    <h3>Volume do áudio</h3>
+                    <p>Efeitos sonoros</p>
+                    <div id='sfx-volume'></div>
+                    <p>Música</p>
+                    <div id='music-volume'></div>
                 </div>
-                <div id='button-container'><button class='button' id='ok'>OK</button></div>
+                <div id='crowd-container'>
+                    <h3>Número de espectadores</h3>
+                    <div id='n-crowd'></div>
+                </div>
             </div>
-        </div>`)
+            <div id='button-container'><button class='button' id='ok'>OK</button></div>
+        </div>`;
 
         // const soundtest = render.game.add.audio('lvlup')
         // TODO: verificar como arrumar os sliders.
@@ -902,49 +946,43 @@ class Slider {
         //     e.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>") //.hide()
         // })
 
-        document.querySelector('#settings-window #ok').addEventListener('click', () => {
+        box.querySelector('#ok').addEventListener('click', () => {
             post("back_play.php", {
                 action: "SET_PREF",
                 show_bars: simulation.preferences.bars,
-                show_frames: document.querySelector('#pref-frames input').getAttribute('checked'),
+                show_frames: simulation.preferences.frames,
                 show_fps: simulation.preferences.fps,
                 show_text: simulation.preferences.text,
                 show_speech: simulation.preferences.speech,
                 sfx_volume: simulation.preferences.sound.sfx,
                 music_volume: render.music.main.volume,
                 crowd: simulation.preferences.crowd
-            })
-
-            document.querySelector('#fog').remove()
+            });
+            box.remove();
         })
 
-        document.querySelector('#pref-bars input').addEventListener('change', () => {
-            simulation.preferences.bars = document.querySelector('#pref-bars input').hasAttribute('checked')
-        })
+        box.querySelector('#pref-bars input').addEventListener('change', e => {
+            simulation.preferences.bars = box.querySelector('#pref-bars input').checked;
+        });
 
-        document.querySelector('#pref-frames input').addEventListener('change', () => {
-            if (document.querySelector('#pref-frames input').hasAttribute('checked')){
-                // TODO: fazer um proper fadein
-                document.querySelector('#ui-container').style.display = "flex"
-                simulation.preferences.frames = true
-            }
-            else{
-                document.querySelector('#ui-container').style.display = "none"
-                simulation.preferences.frames = false
-            }
-        })
+        box.querySelector('#pref-frames input').addEventListener('change', () => {
+            simulation.preferences.frames = box.querySelector('#pref-frames input').checked;
+        });
 
-        document.querySelector('#pref-fps input').addEventListener('change', () => {
-            simulation.preferences.fps = document.querySelector('#pref-fps input').hasAttribute('checked')
-        })
+        box.querySelector('#pref-fps input').addEventListener('change', () => {
+            simulation.preferences.fps = box.querySelector('#pref-fps input').checked;
+        });
 
-        document.querySelector('#pref-text input').addEventListener('change', () => {
-            simulation.preferences.text = document.querySelector('#pref-text input').hasAttribute('checked')
-        })
+        box.querySelector('#pref-text input').addEventListener('change', () => {
+            simulation.preferences.text = box.querySelector('#pref-text input').checked;
+        });
 
-        document.querySelector('#pref-speech input').addEventListener('change', () => {
-            simulation.preferences.speech = document.querySelector('#pref-speech input').hasAttribute('checked')
-        })
+        box.querySelector('#pref-speech input').addEventListener('change', () => {
+            simulation.preferences.speech = box.querySelector('#pref-speech input').checked;
+        });
+
+        document.querySelector('body').insertAdjacentElement('beforeend', box);
+        fadeIn(box.querySelector('.blue-window'), { time: 0.5 });
     })
 
     if (document.querySelector('#log')){
@@ -969,14 +1007,7 @@ class Slider {
                 simulation.preferences.sound.sfx = parseFloat(data.sfx_volume)
                 changeSoundIcon()
 
-                if (data.show_frames === true || data.show_frames == 'true'){
-                    document.querySelector('#ui-container').style.display = "flex"
-                    simulation.preferences.frames = true
-                }
-                else{
-                    document.querySelector('#ui-container').style.display = "none"
-                    simulation.preferences.frames = false
-                }
+                simulation.preferences.frames = data.show_frames === true || data.show_frames == 'true';
             })
 
             post("back_log.php", {
@@ -1099,28 +1130,6 @@ window.onresize = () => simulation.resize()
 //         });
 //     })
 
-//     $( "#time" ).slider({
-//         range: "min",
-//         min: 0,
-//         max: 0,
-//         value: timestep,
-//         create: function( event, ui ) {
-//             $(this).append("<div class='ui-slider-time'></div>");
-//         },
-//         change: function( event, ui ) {
-//             var h = Math.floor(ui.value/600);
-//             var m = Math.floor(ui.value/10)%60;
-//             if (m < 10)
-//                 m = "0"+ m;
-//             var time = h +":"+ m;
-//             $(this).find('.ui-slider-time').html(time);
-//             $(this).find('.ui-slider-time').css('left', $(this).find('.ui-slider-handle').css('left'));
-//         },
-//         slide: function( event, ui ) {
-//             timestep = ui.value;
-//         }
-//     });
-
 //     $([window, document]).focusin(function(){
 //         //console.log("entrou");
 //     }).focusout(function(){
@@ -1136,16 +1145,17 @@ window.onresize = () => simulation.resize()
 // })
 
 function changeSoundIcon(){
-    const soundObj = document.querySelector('#sound')
-    soundObj.classList.remove("on", "off", "mute")
-    if ((!render.music && simulation.preferences.music > 0) || (render.music && simulation.music.volume > 0)){
-        soundObj.classList.add("on")
+    const soundObj = document.querySelector('#sound');
+    soundObj.classList.remove("on", "off", "mute");
+
+    if (simulation.preferences.sound.music > 0){
+        soundObj.classList.add("off");
     }
     else if (simulation.preferences.sound.sfx > 0){
-        soundObj.classList.add("off")
+        soundObj.classList.add("mute");
     }
     else{
-        soundObj.classList.add("mute")
+        soundObj.classList.add("on");
     }
 }
 

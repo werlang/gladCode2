@@ -356,6 +356,15 @@ body{
     display: flex;
     margin-top: 10px;
     width: 100%;
+    transition: 1s opacity;
+
+    &.fade {
+        opacity: 0;
+    }
+
+    &.hidden {
+        display: none;
+    }
 }
 
 .ui-glad .row {

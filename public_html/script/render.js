@@ -372,7 +372,7 @@ const projectiles = {
 const render = {
     paused: true,
     started: false,
-    debug: { fps: { avg: 0, cont: 0 }},
+    debug: { fps: { avg: 0, cont: 0, avg5: 0 }},
 
     init: async function(){
         if (this.game){
@@ -1145,10 +1145,12 @@ const render = {
     },
 
     debugTimer: function(){
+        // TODO: mudar a estratégia pra fazer push-shift nos samples. daí faz a média na hora.
         let box = document.querySelector('#fps');
         if (simulation.preferences.fps){
             if (!this.debug.time){
                 this.debug.time = new Date();
+                console.log(this.debug)
             }
             else{
                 const newTime = new Date();
@@ -1164,31 +1166,31 @@ const render = {
             }
             function intFPS(){
                 setTimeout( () => {
-                    if (this.debug.fps.cont > 0){
-                        this.debug.fps.avg = 1000 / (this.debug.fps.avg / this.debug.fps.cont);
-                        this.debug.fps.cont = 0;
+                    if (render.debug.fps.cont > 0){
+                        render.debug.fps.avg = 1000 / (render.debug.fps.avg / render.debug.fps.cont);
+                        render.debug.fps.cont = 0;
     
                         //calculate average FPS in last 5 seconds
-                        this.debug.fps.avg5.push(this.debug.fps.avg);
-                        if (this.debug.fps.avg5.length > 5){
-                            this.debug.fps.avg5.splice(0,1);
+                        render.debug.fps.avg5.push(render.debug.fps.avg);
+                        if (render.debug.fps.avg5.length > 5){
+                            render.debug.fps.avg5.splice(0,1);
                         }
-                        this.debug.fps.avg = 0;
-                        for (let i in this.debug.fps.avg5){
-                            this.debug.fps.avg += this.debug.fps.avg5[i];
+                        render.debug.fps.avg = 0;
+                        for (let i in render.debug.fps.avg5){
+                            render.debug.fps.avg += render.debug.fps.avg5[i];
                         }
-                        this.debug.fps.avg /= this.debug.fps.avg5.length;
+                        render.debug.fps.avg /= render.debug.fps.avg5.length;
     
-                        box.innerHTML = `FPS: ${this.debug.fps.avg.toFixed(1)}`;
+                        box.innerHTML = `FPS: ${render.debug.fps.avg.toFixed(1)}`;
                     }
                     
                     if (box){
                         intFPS();
                     }
                     else{
-                        this.debug.fps.avg5 = [];
-                        this.debug.fps.avg = 0;
-                        this.debug.fps.cont = 0;
+                        render.debug.fps.avg5 = [];
+                        render.debug.fps.avg = 0;
+                        render.debug.fps.cont = 0;
                     }
                 }, 1000);
             }

@@ -156,8 +156,8 @@ function fadeIn(element, options){
     else{
         const time = options && options.time ? options.time : 0.3;
         element.style.opacity = '0';
-        element.style.transition = `${time}s opacity`;
-        setTimeout(() => element.style.opacity = '1', 1);
+        setTimeout(() => element.style.transition = `${time}s opacity`, 10);
+        setTimeout(() => element.style.opacity = '1', 20);
         setTimeout(() => element.removeAttribute('style'), time * 1000);
     }
 }
