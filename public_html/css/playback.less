@@ -3,6 +3,7 @@
 @import "https://use.fontawesome.com/releases/v5.15.1/css/all.css";
 @import (less) "dialog.less";
 @import (less) "checkbox.less";
+@import (less) "slider.less";
 @import (less) "header.less";
 
 html {
@@ -232,119 +233,34 @@ body{
         height: 20px;
         display: flex;
         align-items: center;
-        
-        .slider {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-            border-radius: 10px;
-            
+
+        .slider{
             &:hover{
-                .filled,
-                .preview-filled,
-                .handle,
-                .preview-handle,
-                .time,
-                .preview-time {
+                .handle {
                     opacity: 1;
                 }
             }
 
             .handle {
-                opacity: 0;
-                width: 15px;
-                height: 15px;
-                border-radius: 10px;
                 background-color: #00638d;
-                box-shadow: 0px 0px 1px black;
-                transition: opacity 0.2s;
-                margin-top: -4px;
-                margin-left: -6px;
-                margin-right: -11px;
-                pointer-events: none;
-                z-index: 2;
-            }
-
-            .preview-handle {
                 opacity: 0;
-                border-radius: 10px;
-                box-shadow: 0px 0px 1px black;
-                transition: opacity 0.2s;
-                width: 11px;
-                height: 11px;
+            }
+        
+            .preview-handle {
                 background-color: white;
-                margin-top: -2px;
-                margin-left: -4px;
-                pointer-events: none;
-                z-index: 1;
             }
-
-                        
+        
             .range{
-                transition: background-color 0.5s;
-                height: 7px;
-                width: 100%;
                 background-color: #7895a1;
-                border-radius: 10px;
-                display: flex;
             }
-
+        
             .filled {
                 background-color: #00638d;
-                width: 0%;
-                height: 100%;
-                pointer-events: none;
-                transition: opacity 0.2s;
             }
 
             .preview-filled {
-                opacity: 0;
                 background-color: white;
-                width: 0%;
-                height: 100%;
-                pointer-events: none;
-                transition: opacity 0.2s;
-            }
-
-            .time {
-                opacity: 0;
-                position: absolute;
-                background-color: #646464;
-                color: white;
-                width: 45px;
-                height: 25px;
-                text-align: center;
-                border-radius: 3px;
-                transition: opacity .3s;
-                font-family: 'Acme',sans-serif;
-                font-size: 1.3em;
-                pointer-events: none;
-                margin-top: -27px;
-                margin-left: -15px;
-            }
-
-            .preview-time {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                opacity: 0;
-                position: absolute;
-                background-color: #646464a5;
-                color: #ffffffc5;
-                width: 40px;
-                height: 20px;
-                text-align: center;
-                border-radius: 3px;
-                transition: opacity .3s;
-                font-family: 'Acme',sans-serif;
-                font-size: 1.1em;
-                pointer-events: none;
-                margin-top: -23px;
-                margin-left: -15px;
-            }            
+            }        
         }
     }
 }
@@ -642,10 +558,12 @@ body{
     transition: 0.5s height;
 }
 
-.filled {
-    transition: width 0.5s;
-    box-shadow: 0px 0px 3px black inset;
-    border-radius: 0.3rem;
+#ui-container {
+    .filled {
+        transition: width 0.5s;
+        box-shadow: 0px 0px 3px black inset;
+        border-radius: 0.3rem;
+    }
 }
 
 .glad-buffs {
@@ -1100,44 +1018,53 @@ body{
     transition: 0.5s all;
 }
 
-#volume-container {
-    margin-bottom: 20px;
-}
+#settings-window {
+    #volume-container {
+        margin-bottom: 20px;
+        
+        h3 {
+            margin-bottom: 10px;
+        }
+        
+        p {
+            margin-bottom: 5px;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
 
-#volume-container h3 {
-    margin-bottom: 10px;
-}
+    }
 
-#volume-container p {
-    margin-bottom: 5px;
-    margin-top: 10px;
-    margin-left: 5px;
-}
+    .slider {
+        height: 20px;
+        padding: 0 10px;
 
-#settings-window .ui-slider {
-    height: 10px;
-    background-color: #c8a4a0;
-    border: 1px solid rgba(0,0,0,0.4);
-    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.5) inset;
-    border-radius: 15px;
-}
+        .range {
+            background-color: #c8a4a0;
+            border: 1px solid rgba(0,0,0,0.4);
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.5) inset;
+            border-radius: 15px;
+        }
 
-#settings-window .ui-slider-handle {
-    height: 15px;
-    width: 15px;
-    border-radius: 100%;
-    top: -0.2em;
-    margin-left: -0.3em;
-    background: radial-gradient(#fff5f5, #ccc);
-    border: 1px solid rgba(0,0,0,0.4);
-    box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
-    outline: none;
-}
+        .handle {
+            background: radial-gradient(#fff5f5, #ccc);
+            border: 1px solid rgba(0,0,0,0.4);
+            box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+        }
 
-#settings-window .ui-slider-range-min {
-    background-color: #0d6;
-    border-radius: 15px;
-    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.5);
+        .preview-handle {
+            background-color: #ffffffc0;
+        }
+
+        .filled {
+            background-color: #0d6;
+            box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.5);
+        }
+        
+        .preview-filled {
+            background-color: #ffffffa0;
+        }
+    }
 }
 
 body .ui-tooltip {

@@ -1,4 +1,4 @@
-import { mergeLog } from "./utils.js"
+import { mergeLog, waitFor } from "./utils.js"
 import { header } from "./header.js"
 import { post, copyToClipboard, fadeIn } from "./utils.js"
 import { loader } from "./loader.js"
@@ -726,23 +726,41 @@ class Slider {
             </div>
         </div>`;
 
+        this.showTime = options.time;
         this.min = options.min || 0;
         this.max = options.max || 100;
-        this.increment = options.increment || 1;
-        this.value = options.value || this.min;
+        this.increment = options.increment || options.step || 1;
         this.previewValue = this.min;
+        this.pressed = false;
 
         this.domElement = domParent.querySelector('.slider');
+
         this.domElement.addEventListener('mousemove', e => {
             const total = this.domElement.querySelector('.range').offsetWidth;
-            const valueRange = e.offsetX / total * (this.max - this.min) + this.min;
-            this.previewValue = parseInt(valueRange / this.increment) * this.increment;
-            this.update();
+            const valueRange = Math.min(e.offsetX / total, 1) * (this.max - this.min) + this.min;
+
+            this.previewValue = Math.round(valueRange / this.increment) * this.increment;
+
+            if (this.pressed){
+                this.domElement.click();
+            }
+            else{
+                this.update();
+            }
+            
         });
+
+        this.domElement.addEventListener('mousedown', () => {
+            this.pressed = true;
+            this.domElement.click();
+        });
+        this.domElement.addEventListener('mouseup', () => this.pressed = false );
+        this.domElement.addEventListener('mouseleave', () => this.pressed = false );
 
         this.callbacks = {};
 
         this.domElement.addEventListener('click', () => {
+            console.log('click')
             this.setValue(this.previewValue);
 
             if (this.callbacks.click){
@@ -751,12 +769,16 @@ class Slider {
 
             this.update();
         });
+
+        // wait for dom render
+        waitFor(() => this.domElement.querySelector('.range').offsetWidth > 0).then(() => this.setValue(options.value || this.min));
     }
 
     setValue(value){
+        const oldValue = this.value;
         this.value = parseInt(Math.max(Math.min(value, this.max), this.min) / this.increment) * this.increment;
 
-        if (this.callbacks.change){
+        if (oldValue != this.value && this.callbacks.change){
             this.callbacks.change(value);
         }
 
@@ -785,8 +807,10 @@ class Slider {
         this.domElement.querySelector('.preview-filled').style.width = `${Math.abs(width)}px`;
         this.domElement.querySelector('.filled').style.width = `${progressWidth}px`;
 
-        this.domElement.querySelector('.time').innerHTML = this.value.toFixed(1);
-        this.domElement.querySelector('.preview-time').innerHTML = this.previewValue.toFixed(1);
+        if (this.showTime){
+            this.domElement.querySelector('.time').innerHTML = this.value.toFixed(1);
+            this.domElement.querySelector('.preview-time').innerHTML = this.previewValue.toFixed(1);
+        }
     }
 
     on(event, callback){
@@ -892,6 +916,27 @@ class Slider {
             <div id='button-container'><button class='button' id='ok'>OK</button></div>
         </div>`;
 
+        new Slider(box.querySelector('#sfx-volume'), {
+            min: 0,
+            max: 1,
+            step: 0.01,
+            value: simulation.preferences.sound.sfx,
+        });
+        
+        new Slider(box.querySelector('#music-volume'), {
+            min: 0,
+            max: 0.1,
+            step: 0.001,
+            value: simulation.preferences.sound.music,
+        });
+
+        new Slider(box.querySelector('#n-crowd'), {
+            min: 0,
+            max: 1,
+            step: 0.1,
+            value: simulation.preferences.crowd,
+        });
+
         // const soundtest = render.game.add.audio('lvlup')
         // TODO: verificar como arrumar os sliders.
         // $( "#sfx-volume" ).slider({
@@ -941,10 +986,9 @@ class Slider {
         //     }
         // });
 
-        // TODO: verificar se isso é necessário, e se não, como contornar.
-        // document.querySelectorAll('.checkslider').forEach(e => {
-        //     e.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>") //.hide()
-        // })
+        box.querySelectorAll('.checkslider').forEach(e => {
+            e.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>");
+        });
 
         box.querySelector('#ok').addEventListener('click', () => {
             post("back_play.php", {
