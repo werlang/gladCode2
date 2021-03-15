@@ -19,26 +19,69 @@ translator.translate([
     "Dezembro"
 ])
 
-const post = async function(path, args){
-    // console.log(new URLSearchParams(args).toString())
-    const response = await fetch(path, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(args).toString()
-    })
-    if (!response.ok) { throw response }
-    let data = await response.text()
-    
-    try {
-        data = JSON.parse(data)
-    }
-    catch(e){
-        return {error: e, http: response, data: data}
-    }
+const post = async function(path, args = {}, options = {}){
+    // xhr option. When you want the progress
+    // pass progress event callback.
+    // php must set content-length-uncompressed
+    // js can access e.uncompressedLengthComputable and e.uncompressedTotal as substitutes to e.lengthComputable and e.total
+    if (options.xhr){
+        const request = new XMLHttpRequest();
+        if (options.progress){
+            request.addEventListener('progress', e => {
+                if (!e.lengthComputable){
+                    const uncLength = request.getResponseHeader('content-length-uncompressed');
+                    if (uncLength){
+                        e.uncompressedTotal = parseInt(uncLength);
+                        e.uncompressedLengthComputable = true;
+                    }
+                }
+                options.progress(e);
+            });
+        }
+        request.open('POST', path);
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-    return data
+        const response = new Promise(resolve => {
+            request.onreadystatechange = () => {
+                if(request.readyState == 4 && request.status == 200) {
+                    let data = request.responseText;
+                    // console.log(request.getAllResponseHeaders())
+                    try {
+                        data = JSON.parse(data);
+                    }
+                    catch(e){
+                        resolve({error: e, request: request, data: data});
+                    }
+            
+                    resolve(data);        
+                }
+            }
+        })
+
+        request.send(new URLSearchParams(args).toString());
+
+        return response;
+    }
+    else{
+        const response = await fetch(path, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(args).toString()
+        })
+        if (!response.ok) { throw response }
+        let data = await response.text()
+        
+        try {
+            data = JSON.parse(data)
+        }
+        catch(e){
+            return {error: e, http: response, data: data}
+        }
+    
+        return data
+    }
 }
 
 function getTimeSince(min){

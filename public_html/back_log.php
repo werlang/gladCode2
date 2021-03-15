@@ -29,7 +29,7 @@
                 if (strlen($log) > 0){
                     $output['log'] = $log;
                     $output['status'] = "SUCCESS";
-                    header('Content-Length: ' . strlen(json_encode($output)));
+                    header('content-length-uncompressed: ' . strlen(json_encode($output)));
                 }
                 else{
                     $output['status'] = "ERROR";

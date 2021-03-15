@@ -353,6 +353,7 @@ const simulation = {
                 render.music.main.volume = simulation.preferences.sound.music;            
             }
 
+            // TODO: Fix sometimes clicking the sound icon doesnt work
             changeSoundIcon();
 
             post("back_play.php",{
@@ -760,7 +761,6 @@ class Slider {
         this.callbacks = {};
 
         this.domElement.addEventListener('click', () => {
-            console.log('click')
             this.setValue(this.previewValue);
 
             if (this.callbacks.click){
@@ -771,14 +771,17 @@ class Slider {
         });
 
         // wait for dom render
-        waitFor(() => this.domElement.querySelector('.range').offsetWidth > 0).then(() => this.setValue(options.value || this.min));
+        waitFor(() => this.domElement.querySelector('.range').offsetWidth > 0).then(() => {
+            this.setValue(options.value || this.min);
+            this.ready = true;
+        });
     }
 
     setValue(value){
         const oldValue = this.value;
         this.value = parseInt(Math.max(Math.min(value, this.max), this.min) / this.increment) * this.increment;
 
-        if (oldValue != this.value && this.callbacks.change){
+        if (oldValue != this.value && this.callbacks.change && this.ready){
             this.callbacks.change(value);
         }
 
@@ -916,75 +919,44 @@ class Slider {
             <div id='button-container'><button class='button' id='ok'>OK</button></div>
         </div>`;
 
-        new Slider(box.querySelector('#sfx-volume'), {
+        const sliderSfx = new Slider(box.querySelector('#sfx-volume'), {
             min: 0,
             max: 1,
             step: 0.01,
             value: simulation.preferences.sound.sfx,
         });
+        sliderSfx.on('change', value => {
+            simulation.preferences.sound.sfx = value;
+
+            const soundtest = render.game.add.audio('lvlup')
+            soundtest.stop();
+            soundtest.play('', 0.5, value);
+
+            changeSoundIcon();
+        });
         
-        new Slider(box.querySelector('#music-volume'), {
+        const sliderMusic = new Slider(box.querySelector('#music-volume'), {
             min: 0,
             max: 0.1,
             step: 0.001,
             value: simulation.preferences.sound.music,
         });
+        sliderMusic.on('change', value => {
+            simulation.preferences.sound.music = value;
+            render.music.main.volume = value;
+            changeSoundIcon();
+        });
 
-        new Slider(box.querySelector('#n-crowd'), {
+        const sliderCrowd = new Slider(box.querySelector('#n-crowd'), {
             min: 0,
             max: 1,
             step: 0.1,
             value: simulation.preferences.crowd,
         });
-
-        // const soundtest = render.game.add.audio('lvlup')
-        // TODO: verificar como arrumar os sliders.
-        // $( "#sfx-volume" ).slider({
-        //     range: "min",
-        //     min: 0,
-        //     max: 1,
-        //     step: 0.01,
-        //     create: function( event, ui ) {
-        //         $(this).slider('value', simulation.preferences.sound.sfx);
-        //     },
-        //     slide: function( event, ui ) {
-        //         simulation.preferences.sound.sfx = ui.value;
-        //         soundtest.stop();
-        //         soundtest.play('', 0.5, simulation.preferences.sound.sfx);
-
-        //         changeSoundIcon();
-        //     },
-        // });
-
-        // $( "#music-volume" ).slider({
-        //     range: "min",
-        //     min: 0,
-        //     max: 0.1,
-        //     value: 0.1,
-        //     step: 0.001,
-        //     create: function( event, ui ) {
-        //         $(this).slider('value', music.volume);
-        //     },
-        //     slide: function( event, ui ) {
-        //         music.volume = ui.value;
-
-        //         changeSoundIcon();
-        //     },
-        // });
-
-        // $( "#n-crowd" ).slider({
-        //     range: "min",
-        //     min: 0,
-        //     max: 1,
-        //     value: simulation.preferences.crowd,
-        //     step: 0.1,
-        //     create: function( event, ui ) {
-        //     },
-        //     slide: ( event, ui ) => {
-        //         changeCrowd(ui.value);
-        //         simulation.preferences.crowd = ui.value;
-        //     }
-        // });
+        sliderCrowd.on('change', value => {
+            changeCrowd(value);
+            simulation.preferences.crowd = value;
+        });
 
         box.querySelectorAll('.checkslider').forEach(e => {
             e.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>");
@@ -1057,6 +1029,19 @@ class Slider {
             post("back_log.php", {
                 action: "GET",
                 loghash: simulation.logHash
+            }, {
+                xhr: true,
+                progress: e => {
+                    // console.log(e)
+                    const total = e.lengthComputable ? e.total : e.uncompressedLengthComputable ? e.uncompressedTotal : false;
+                    if (total) {
+                        const percentComplete = (100 * e.loaded / total).toFixed(0);
+                        // console.log(percentComplete)
+                        document.querySelector('#loadbar #status').innerHTML = "Fazendo download do log de batalha";
+                        document.querySelector('#loadbar #second .bar').style.width = `${percentComplete}%`;
+                        document.querySelector('#loadbar #main .bar').style.width = `${percentComplete/4}%`;
+                    }
+                },
             }).then(async data => {
                 // console.log(data)
                 if (data.status == "EXPIRED"){
@@ -1092,51 +1077,10 @@ class Slider {
 
                     await glads.load(simulation.log[0].glads)
                     await ui.init()
-
-                    simulation.startTimer()
                 }
-            })
+            });
 
-            // TODO: arrumar o ajax pro load progress
-            // $.ajax({
-            //     xhr: function() {
-            //         var xhr = new window.XMLHttpRequest();
-            //         xhr.upload.addEventListener("progress", function(evt) {
-            //             if (evt.lengthComputable) {
-            //                 var percentComplete = evt.loaded / evt.total;
-            //                 //Do something with upload progress here
-            //             }
-            //        }, false);
 
-            //        xhr.addEventListener("progress", function(evt) {
-            //            if (evt.lengthComputable) {
-            //                var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
-            //                $('#loadbar #status').html("Fazendo download do log de batalha");
-            //                $('#loadbar #second .bar').width(percentComplete +"%");
-            //                $('#loadbar #main .bar').width(percentComplete/4 +"%");
-            //            }
-            //        }, false);
-
-            //        return xhr;
-            //     },
-            //     type: 'POST',
-            //     url: "back_log.php",
-            //     data: {
-            //         action: "GET",
-            //         loghash: simulation.logHash
-            //     },
-            //     success: function(data){
-            //         // console.log(data);
-            //         try{
-            //             data = JSON.parse(data);
-            //         }
-            //         catch(error){
-            //             console.log(error);
-            //         }
-
-            //         // TODO: need to resolve progress issue
-            //     }
-            // })
         }
 
         document.querySelector('#log').remove()
@@ -1147,32 +1091,6 @@ window.onresize = () => simulation.resize()
 
 
 // $(document).ready( function() {
-//     $('#sound').click( function(){
-//         if (music.volume > 0){
-//             $(this).data('music', music.volume);
-//             music.volume = 0;
-//         }
-//         else if (simulation.preferences.sound.sfx > 0){
-//             $(this).data('sfx', simulation.preferences.sound.sfx);
-//             simulation.preferences.sound.sfx = 0;
-//         }
-//         else{
-//             music.volume = $(this).data('music');
-//             if (music.volume == 0)
-//                 music.volume = 0.1;
-
-//             simulation.preferences.sound.sfx = $(this).data('sfx');
-//             if (simulation.preferences.sound.sfx == 0)
-//                 simulation.preferences.sound.sfx = 1;
-//         }
-//         changeSoundIcon();
-
-//         post("back_play.php",{
-//             action: "SET_PREF",
-//             music_volume: music.volume,
-//             sfx_volume: simulation.preferences.sound.sfx
-//         });
-//     })
 
 //     $([window, document]).focusin(function(){
 //         //console.log("entrou");
@@ -1181,10 +1099,6 @@ window.onresize = () => simulation.resize()
 //         $('#pause').click(); //clica no botao e pause fica true
 //     });
 
-//     // checkbox
-//     $('.checkslider').each( function(){
-//         $(this).after("<div class='checkslider trail'><div class='checkslider thumb'></div></div>").hide()
-//     })
 
 // })
 
@@ -1193,13 +1107,13 @@ function changeSoundIcon(){
     soundObj.classList.remove("on", "off", "mute");
 
     if (simulation.preferences.sound.music > 0){
-        soundObj.classList.add("off");
+        soundObj.classList.add("on");
     }
     else if (simulation.preferences.sound.sfx > 0){
-        soundObj.classList.add("mute");
+        soundObj.classList.add("off");
     }
     else{
-        soundObj.classList.add("on");
+        soundObj.classList.add("mute");
     }
 }
 
