@@ -38,6 +38,12 @@ const post = async function(path, args = {}, options = {}){
                 options.progress(e);
             });
         }
+        if (options.loadend){
+            request.addEventListener('loadend', e => options.loadend(e));
+        }
+        if (options.loadstart){
+            request.addEventListener('loadstart', e => options.loadstart(e));
+        }
         request.open('POST', path);
         request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 

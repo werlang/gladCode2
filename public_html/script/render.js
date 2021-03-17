@@ -417,16 +417,15 @@ const render = {
     },
 
     preload: function() {
-        this.game.load.onLoadStart.add(() => {
-            document.querySelector('#loadbar #status').innerHTML = "Preparando recursos"
-            document.querySelector('#loadbar #second .bar').style.width = '0px'
-        }, this)
+        // this.game.load.onLoadStart.add(() => {
+        // }, this)
         this.game.load.onFileComplete.add( progress => {
-            document.querySelector('#loadbar #status').innerHTML = "Carregando recursos"
-            document.querySelector('#loadbar #second .bar').style.width = `${progress}%`
-            document.querySelector('#loadbar #main .bar').style.width = `${50 + progress / 2}%`
+            simulation.loadBox.secondBar.update('Carregando recursos', progress);
+            simulation.loadBox.mainBar.update(null, 50 + progress / 2);
         }, this)
-        this.game.load.onLoadComplete.add(() => document.querySelector('#loadbar #status').innerHTML = "Tudo pronto", this)
+        this.game.load.onLoadComplete.add(() => {
+            simulation.loadBox.secondBar.update('Tudo pronto');
+        }, this)
 
         glads.wait().then( () => {
             for (let i=0 ; i < glads.members.length ; i++){

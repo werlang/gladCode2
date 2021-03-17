@@ -821,11 +821,46 @@ class Slider {
     }
 }
 
+class loadBar {
+    constructor(bar, status){
+        this.element = bar;
+        this.status = status;
+    }
+
+    update(status, length){
+        if (status){
+            this.status.innerHTML = status;
+        }
+
+        if (length){
+            const oldLength = parseInt(this.element.querySelector('.bar').style.width.split('%')[0]);
+            if (length < oldLength){
+                this.reset();
+            }
+            this.element.querySelector('.bar').style.width = `${length}%`;
+            this.element.classList.remove('loading');
+        }
+        else{
+            this.element.classList.add('loading');
+            this.element.querySelector('.bar').style.width = `100%`;
+        }
+    }
+
+    reset(){
+        this.element.querySelector('.bar').style.transition = `0`;
+        this.element.querySelector('.bar').style.width = `0`;
+        this.element.querySelector('.bar').style.removeProperty('transition');
+    }
+}
+
 ;(async () => {
     render.init().then(() => changeCrowd(simulation.preferences.crowd))
 
-    document.querySelector('#loadbar #status').innerHTML = "Página carregada"
-    // document.querySelector('#footer-wrapper').classList.add('white')
+    simulation.loadBox = {
+        mainBar: new loadBar(document.querySelector('#loadbar #main'), null),
+        secondBar: new loadBar(document.querySelector('#loadbar #second'), document.querySelector('#loadbar #status'))
+    }
+    simulation.loadBox.secondBar.update('Carregando página');
 
     document.querySelector('#back-step').addEventListener('click', () => simulation.back())
 
@@ -1037,10 +1072,12 @@ class Slider {
                     if (total) {
                         const percentComplete = (100 * e.loaded / total).toFixed(0);
                         // console.log(percentComplete)
-                        document.querySelector('#loadbar #status').innerHTML = "Fazendo download do log de batalha";
-                        document.querySelector('#loadbar #second .bar').style.width = `${percentComplete}%`;
-                        document.querySelector('#loadbar #main .bar').style.width = `${percentComplete/4}%`;
+                        simulation.loadBox.secondBar.update('Fazendo download do log de batalha', percentComplete);
+                        simulation.loadBox.mainBar.update(null, percentComplete / 4);
                     }
+                },
+                loadend: () => {
+                    simulation.loadBox.secondBar.update('Carregando interface');
                 },
             }).then(async data => {
                 // console.log(data)
