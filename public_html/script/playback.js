@@ -147,7 +147,7 @@ const simulation = {
             // update slider
             this.slider.setValue(this.time / 10);
 
-        }, 100 / this.stepButton.getValue())
+        }, 100 / Math.abs(this.stepButton.getValue()));
     },
 
     endGame: function(){
@@ -284,49 +284,47 @@ const simulation = {
     },
 
     resize: function() {
-        // if (render.game){
-        //     const game = render.game
-        //     var canvasH, canvasW;
-        //     if ($(window).width() > $(window).height()){
-        //         var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
-        //         canvasH = $(window).height();
-        //         canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-        //         game.camera.scale.x = $(window).height() * usefulRatio / screenH;
-        //         game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-        //         if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-        //             new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show();
-        //         }
+        if (render.game){
+            let canvasW, canvasH;
+            if (window.screen.width > window.screen.height){
+                const usefulRatio = render.screenH / render.arenaD; //ration between entire and useful part of the background
+                canvasH = window.screen.height;
+                canvasW = Math.min(window.screen.width, render.screenW * render.game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+                render.game.camera.scale.x = window.screen.height * usefulRatio / render.screenH;
+                render.game.camera.scale.y = window.screen.height * usefulRatio / render.screenH;
+                if (window.screen.height < 450 && window.screen.height < window.screen.width && !document.querySelector('#dialog-box')){
+                    loader.load('dialog').then(({ Message }) => new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show());
+                }
 
-        //     }
-        //     else{
-        //         if ($('#dialog-box').length){
-        //             $('#fog').remove();
-        //         }
+            }
+            else{
+                if (document.querySelector('#dialog-box')){
+                    document.querySelector('#fog').remove();
+                }
 
-        //         var usefulRatio = screenW / arenaD;
-        //         canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
-        //         canvasW = $(window).width();
-        //         game.camera.scale.x = $(window).width() * usefulRatio / screenW;
-        //         game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-        //         if ($(window).height() < 600 && !this.isFullScreen() && !this.fullscreen && $('#dialog-box').length == 0){
-        //             new Message({
-        //                 message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`,
-        //                 buttons: {no: 'Não', yes: 'SIM'}
-        //             }).show().click('yes', () => {
-        //                 this.setFullScreen(true);
-        //                 $('#fog').remove();
-        //                 this.fullscreen = true;
-        //             });
-        //         }
-        //     }
-        //     game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
-        //     game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
-        //     game.camera.bounds.height = screenH;
-        //     game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
-        //     game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
+                const usefulRatio = render.screenW / render.arenaD;
+                canvasH = Math.min(window.screen.height, render.screenH * render.game.camera.scale.y);
+                canvasW = window.screen.width;
+                render.game.camera.scale.x = window.screen.width * usefulRatio / render.screenW;
+                render.game.camera.scale.y = window.screen.width * usefulRatio / render.screenW;
+                if (window.screen.height < 600 && !this.isFullScreen() && document.querySelector('#dialog-box')){
+                    new Message({
+                        message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`,
+                        buttons: {no: 'Não', yes: 'SIM'}
+                    }).show().click('yes', () => {
+                        this.setFullScreen(true);
+                        document.querySelector('#fog').remove();
+                    });
+                }
+            }
+            render.game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
+            render.game.camera.bounds.width = render.screenW; //leave teh bounds alone, dont mess here
+            render.game.camera.bounds.height = render.screenH;
+            render.game.camera.y = (render.arenaY1 + render.arenaD/2) * render.game.camera.scale.y - render.game.height/2; //middle of the arena minus middle of the screen
+            render.game.camera.x = (render.arenaX1 + render.arenaD/2) * render.game.camera.scale.x - render.game.width/2;
 
-        //     $('#canvas-div canvas').click();
-        // }
+            document.querySelector('#canvas-div canvas').click();
+        }
     },
 
     mute: {

@@ -30,7 +30,8 @@ const paths = {
     spritegen: "./sprite.js",
     editorblocks: "./editor-blocks.js",
     render: "./render.js",
-    assets: "./assets.js"
+    assets: "./assets.js",
+    dialog: "./dialog.js",
 }
 
 const callbacks = {
