@@ -9,6 +9,7 @@ class Gladiator {
 
         this.message = '';
         this.diff = {};
+        this.sprites = {};
     }
 
     getPositionOnCanvas(){
@@ -53,8 +54,10 @@ class Gladiator {
         else if (this.baloon){
             this.baloon.classList.add("fadeout")
             setTimeout(() => {
-                this.baloon.remove();
-                delete this.baloon;
+                if (this.baloon){
+                    this.baloon.remove();
+                    delete this.baloon;
+                }
             }, 1000);
         }
         
@@ -330,22 +333,31 @@ const glads = {
 const projectiles = {
     members: [],
 
+    get: function(name){
+        return this.members.filter(e => e.id == name)[0] || false;
+    },
+
+    // TODO: projectiles are lasting when simulation os backwards.
     update: function(step){
-        for (let i in step.projectiles){
-            const proj = step.projectiles[i]
-            if (proj){
-                proj.update(e);
-                proj.time = step.simtime;
+        // console.log(step)
+        step.projectiles.forEach(e => {
+            const projObj = this.get(e.id);
+            if (projObj){
+                projObj.update(e);
+                projObj.time = step.simtime;
             }
             else{
                 const newProj = new Projectile(e);
                 newProj.time = step.simtime;
                 this.members.push(newProj);
             }
-        }
+        });
 
+        console.log(this.members)
         const inactive = this.members.filter(e => e.time < step.simtime);
+        // remove the inactives
         this.members = this.members.filter(e => e.time == step.simtime);
+        // inactive projectiles end life
         inactive.forEach(e => {
             if (e.type == 1){ // fireball
                 const fire = render.game.add.sprite(e.sprite.x, e.sprite.y, 'atlas_effects');
@@ -659,12 +671,14 @@ const render = {
         }
 
         // remove the loading screen
-        document.querySelector("#fog.load").remove()
-        this.paused = false
-        this.started = true
-
-        document.querySelector('#canvas-container').classList.remove("hidden");
-        simulation.resize()
+        if (simulation.log){
+            document.querySelector("#fog.load").remove()
+            this.paused = false
+            this.started = true
+    
+            document.querySelector('#canvas-container').classList.remove("hidden");
+            simulation.resize()
+        }
 
         glads.wait().then(() => {
             glads.members.forEach(e => {            
@@ -976,7 +990,7 @@ const render = {
                         if (glad.getDiff('xp')) {
                             glad.sprite.animations.currentAnim.speed = 15;
                             glad.sprite.animations.stop();
-                            glad.sprite.animations.play(`${glad.move}-${getActionDirection(head)}`, 20);
+                            glad.sprite.animations.play(`${glad.move}-${getActionDirection(glad.head)}`, 20);
                             render.playAudio('melee', simulation.preferences.sound.sfx);
                         }
                         else if (glad.action.name != "charge"){

@@ -22,7 +22,7 @@ const potions = {
     }
 }
 
-header.load()
+// header.load()
 
 const simulation = {
     paused: true,
@@ -65,10 +65,12 @@ const simulation = {
 
     advance: function(direction) {
         if (this.paused){
-            this.stepButton.setValue(direction == 'back' ? -1 : 1)
+            const step = direction == 'back' ? -1 : 1;
+            this.time = this.time + step;
+            this.stepButton.setValue(step);
 
-            document.querySelector('#fowd-step .speed').innerHTML = ""
-            document.querySelector('#back-step .speed').innerHTML = this.stepButton.getValue()
+            document.querySelector('#fowd-step .speed').innerHTML = '+1';
+            document.querySelector('#back-step .speed').innerHTML = '-1';
         }
         else{
             this.stepButton[direction]()
@@ -286,13 +288,16 @@ const simulation = {
     resize: function() {
         if (render.game){
             let canvasW, canvasH;
-            if (window.screen.width > window.screen.height){
-                const usefulRatio = render.screenH / render.arenaD; //ration between entire and useful part of the background
-                canvasH = window.screen.height;
-                canvasW = Math.min(window.screen.width, render.screenW * render.game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-                render.game.camera.scale.x = window.screen.height * usefulRatio / render.screenH;
-                render.game.camera.scale.y = window.screen.height * usefulRatio / render.screenH;
-                if (window.screen.height < 450 && window.screen.height < window.screen.width && !document.querySelector('#dialog-box')){
+            const windowHeight = document.querySelector('#frame').offsetHeight;
+            const windowWidth = document.querySelector('#frame').offsetWidth;
+
+            if (windowWidth > windowHeight){
+                const usefulRatio = render.screenH / render.arenaD; // ratio between entire and useful part of the background
+                render.game.camera.scale.x = windowHeight * usefulRatio / render.screenH;
+                render.game.camera.scale.y = windowHeight * usefulRatio / render.screenH;
+                canvasH = windowHeight;
+                canvasW = Math.min(windowWidth, render.screenW * render.game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
+                if (windowHeight < 450 && windowHeight < windowWidth && !document.querySelector('#dialog-box')){
                     loader.load('dialog').then(({ Message }) => new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show());
                 }
 
@@ -303,11 +308,11 @@ const simulation = {
                 }
 
                 const usefulRatio = render.screenW / render.arenaD;
-                canvasH = Math.min(window.screen.height, render.screenH * render.game.camera.scale.y);
-                canvasW = window.screen.width;
-                render.game.camera.scale.x = window.screen.width * usefulRatio / render.screenW;
-                render.game.camera.scale.y = window.screen.width * usefulRatio / render.screenW;
-                if (window.screen.height < 600 && !this.isFullScreen() && document.querySelector('#dialog-box')){
+                render.game.camera.scale.x = windowWidth * usefulRatio / render.screenW;
+                render.game.camera.scale.y = windowWidth * usefulRatio / render.screenW;
+                canvasH = Math.min(windowHeight, render.screenH * render.game.camera.scale.y);
+                canvasW = windowWidth;
+                if (windowHeight < 600 && !this.isFullScreen() && document.querySelector('#dialog-box')){
                     new Message({
                         message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`,
                         buttons: {no: 'Não', yes: 'SIM'}

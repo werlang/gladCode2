@@ -148,22 +148,13 @@ function deepMerge(a, b){
             a[i] = b[i];
         }
     }
-    // if all elements have numeric keys, return array, else object
-    return Object.keys(a).map(e => parseInt(e)).some(e => isNaN(e)) ? a : Object.values(a);
-    
+    // if every element have keys labeled as array index return array, else object
+    return Object.keys(a).every((e,i) => e == i) ? Object.values(a) : a;
 }
 
 function mergeLog(data){
     const log = typeof data == "string" ? JSON.parse(data) : data
     for (let i in log){
-        // make projectile id its actual id attribute
-        const newproj = {};
-        log[i].projectiles.forEach(e => {
-            newproj[e.id] = e;
-            delete e.id;
-        })
-        log[i].projectiles = newproj
-
         if (i > 0){
             // create a copy of now and previous. replace provious projectiles log
             const temp = {...log[i-1]};
