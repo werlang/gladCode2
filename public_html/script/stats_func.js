@@ -1,4 +1,4 @@
-import {post, mergeLog} from "./utils.js"
+import {post, parseLog} from "./utils.js"
 
 const stats = {}
 
@@ -10,7 +10,7 @@ stats.save = function(hash){
     }).then( function(data){
         // console.log(data)
 
-        const steps = mergeLog(data.log)
+        const steps = parseLog(data.log)
         // console.log(steps)
 
         var abilities = {

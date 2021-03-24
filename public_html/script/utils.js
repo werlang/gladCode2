@@ -152,10 +152,16 @@ function deepMerge(a, b){
     return Object.keys(a).every((e,i) => e == i) ? Object.values(a) : a;
 }
 
-function mergeLog(data){
+function parseLog(data){
     const log = typeof data == "string" ? JSON.parse(data) : data
     for (let i in log){
-        if (i > 0){
+        if (i == 0){
+            log[i].glads.forEach(e => {
+                e.name = e.name.split('#').join(' ');
+                e.user = e.user.split('#').join(' ');
+            });
+        }
+        else{
             // create a copy of now and previous. replace provious projectiles log
             const temp = {...log[i-1]};
             temp.projectiles = {};
@@ -202,4 +208,4 @@ function fadeIn(element, options){
     }
 }
 
-export {post, getDate, getTimeSince, $index, deepMerge, mergeLog, waitFor, copyToClipboard, fadeIn}
+export {post, getDate, getTimeSince, $index, deepMerge, parseLog, waitFor, copyToClipboard, fadeIn}

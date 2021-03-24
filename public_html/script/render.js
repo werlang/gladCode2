@@ -193,7 +193,7 @@ class Gladiator {
         const toDiff = ['lvl', 'hp', 'xp'];
         toDiff.forEach(e => this.diff[e] = data[e] - this[e]);
 
-        const toUpdate = ['x', 'y', 'head', 'hp', 'maxhp', 'ap', 'maxap', 'str', 'agi', 'int', 'message', 'breakpoint', 'action', 'xp', 'lvl', 'code', 'buffs', 'lockedfor'];
+        const toUpdate = ['x', 'y', 'head', 'hp', 'maxhp', 'ap', 'maxap', 'str', 'agi', 'int', 'message', 'breakpoint', 'action', 'xp', 'lvl', 'code', 'buffs', 'lockedfor', 'items'];
         toUpdate.forEach(e => this[e] = data[e]);
 
         // boolean attr indicationg buff presence
@@ -337,7 +337,6 @@ const projectiles = {
         return this.members.filter(e => e.id == name)[0] || false;
     },
 
-    // TODO: projectiles are lasting when simulation os backwards.
     update: function(step){
         // console.log(step)
         step.projectiles.forEach(e => {
@@ -353,8 +352,8 @@ const projectiles = {
             }
         });
 
-        console.log(this.members)
-        const inactive = this.members.filter(e => e.time < step.simtime);
+        // console.log(this.members)
+        const inactive = this.members.filter(e => e.time != step.simtime);
         // remove the inactives
         this.members = this.members.filter(e => e.time == step.simtime);
         // inactive projectiles end life
@@ -900,7 +899,6 @@ const render = {
                         glad.sprite.alpha += 0.05;
                     }
                     
-                    // TODO: need to fix. gladArray[i].x was supposed to hold sprite[i].x. Now it holds json.glads[i].x
                     //fade do teleport
                     if (glad.fade == 1 && (glad.arenaX != glad.sprite.x || glad.arenaY != glad.sprite.y) ){
                         const clone = this.game.add.sprite(glad.arenaX, glad.arenaY, glad.sprite.key, glad.sprite.frame);
@@ -1628,6 +1626,8 @@ function getActionDirection(head){
 }
 
 export { render, glads, getAction }
+
+// TODO: animações e skins estão zoadas.
 
 // $(window).keydown(function(event) {
 //     if(event.keyCode == Phaser.Keyboard.S){

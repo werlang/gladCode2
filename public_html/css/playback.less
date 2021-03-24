@@ -1120,6 +1120,11 @@ body .ui-tooltip {
     margin-bottom: 3px;
     box-shadow: 1px 1px 5px black;
     width: 340px;
+    transition: 0.5s top, 0.5s left;
+
+    &.minimized {
+        top: calc(100% - 35px);
+    }
 
     #title {
         font-size: 1.4rem;
@@ -1177,7 +1182,7 @@ body .ui-tooltip {
             }
         }
 
-        &.col-3 {
+        .col-3 {
             grid-column: span 3;
         }
 
@@ -1209,7 +1214,9 @@ body .ui-tooltip {
                 border: 1px solid #8e9da4;
                 border-radius: 3px;
                 align-items: center;
-                display: flex;
+                display: grid;
+                grid-template-columns: 1.5fr 1fr 1fr;
+                grid-column: span 3;
 
                 .row {
                     display: grid;

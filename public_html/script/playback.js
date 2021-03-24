@@ -1,4 +1,4 @@
-import { mergeLog, waitFor } from "./utils.js"
+import { parseLog, waitFor } from "./utils.js"
 import { header } from "./header.js"
 import { post, copyToClipboard, fadeIn } from "./utils.js"
 import { loader } from "./loader.js"
@@ -14,7 +14,7 @@ const potions = {
                 action: "ITEMS"
             }).then( data => {
                 // console.log(data.potions)
-                data.potions.forEach((e,i) => this.list[e.id] = i)
+                Object.entries(data.potions).forEach(([i,e]) => this.list[e.id] = i);
                 // console.log(potionList)
                 this.ready = true
             })
@@ -459,10 +459,6 @@ const ui = {
                 const glad = this.glads.filter(e => e.id == g.id)[0]
 
                 if (glad){
-                    // TODO: find out how to get posion (boolean)
-                    // if (gladArray[i])
-                    //     var poison = gladArray[i].poison;
-
                     if (g.name != glad.name){
                         glad.element.querySelector('.glad-name span').innerHTML = g.name
                         loader.load('gladcard').then(({ getSpriteThumb }) => {
@@ -513,7 +509,9 @@ const ui = {
                     }
 
                     ["burn", "resist", "stun", "invisible", "speed", "poison"].forEach(b => {
-                        if (g.buffs[b] && g.buffs[b].timeleft){
+                        const poisoned = b == 'poison' && glads.get(glad.id).poison;
+
+                        if ((g.buffs[b] && g.buffs[b].timeleft) || poisoned){
                             glad.buffs[b] = true
                             glad.element.querySelector(`.buff-${b}`).classList.add('active')
                         }
@@ -556,78 +554,86 @@ const ui = {
         },
 
         create: function(){
-            const index = ui.glads.filter(e => e.isFollow)[0].id
-            const glad = simulation.log.glads[index]
-            const buffBox = glad.buffs.map((e,i) => `<div class='row'><span>${i}</span><span>0.0</span><span>0.0</span></div>`).join("")
+            const glad = glads.get(ui.glads.filter(e => e.isFollow)[0].id);
+            const buffBox = Object.keys(glad.buffs).map(e => `<div class='row'><span>${e}</span><span>0.0</span><span>0.0</span></div>`).join("")
 
             this.destroy()
 
             this.element = document.createElement("div")
-            this.element.id = "details"
+            this.element.id = "details";
 
-            this.element.innerHTML = `<div id='details'>
-                <div id='title' class='span-col-2'>
-                    <i class="fas fa-arrows-alt" title='Mover'></i>
-                    <span>Detalhes do gladiador</span>
-                    <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
+            this.element.innerHTML = `
+            <div id='title' class='span-col-2' draggable='true'>
+                <i class="fas fa-arrows-alt" title='Mover'></i>
+                <span>Detalhes do gladiador</span>
+                <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
+            </div>
+            <div id='content'>
+                <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
+                <span>LVL:</span><input readonly>
+                <span>XP:</span><input readonly>
+                <span>X:</span><input readonly>
+                <span>HP:</span><input readonly>
+                <span>Y:</span><input readonly>
+                <span>AP:</span><input readonly>
+                <span>STR:</span><input readonly>
+                <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
+                <span>AGI:</span><input readonly>
+                <span>Action:</span><input readonly>
+                <span>INT:</span><input readonly>
+                <div id='buffs'>
+                    <span>Buffs:</span>
+                    <span>Valor</span>
+                    <span>Tempo</span>
+                    <div id='box'>${buffBox}</div>
                 </div>
-                <div id='content'>
-                    <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
-                    <span>LVL:</span><input readonly>
-                    <span>XP:</span><input readonly>
-                    <span>X:</span><input readonly>
-                    <span>HP:</span><input readonly>
-                    <span>Y:</span><input readonly>
-                    <span>AP:</span><input readonly>
-                    <span>STR:</span><input readonly>
-                    <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
-                    <span>AGI:</span><input readonly>
-                    <span>Action:</span><input readonly>
-                    <span>INT:</span><input readonly>
-                    <div id='buffs'>
-                        <span>Buffs:</span>
-                        <span>Valor</span>
-                        <span>Tempo</span>
-                        <div id='box'>${buffBox}</div>
-                    </div>
-                    <span>AS:</span><input readonly>
-                    <span>CS:</span><input readonly>
-                    <span>Speed:</span><input readonly>
-                    <span>Locked:</span><input readonly>
-                    <div id='items'>
-                        <span>Items:</span>
-                        <div id='box'></div>
-                    </div>
-                    <div id='code'>
-                        <span>Comandos:</span>
-                        <span>Durac.</span>
-                        <span>Tempo</span>
-                        <div id='box'></div>
-                    </div>
+                <span>AS:</span><input readonly>
+                <span>CS:</span><input readonly>
+                <span>Speed:</span><input readonly>
+                <span>Locked:</span><input readonly>
+                <div id='items'>
+                    <span>Items:</span>
+                    <div id='box'></div>
                 </div>
-            </div>`
+                <div id='code'>
+                    <span>Comandos:</span>
+                    <span>Durac.</span>
+                    <span>Tempo</span>
+                    <div id='box'></div>
+                </div>
+            </div>`;
 
             document.querySelector('body').insertAdjacentElement('beforeend', this.element)
 
-            // TODO: ver substituto pro draggable
-            // $('#details').hide().fadeIn().draggable({
-            //     handle: "#title"
-            // });
+            this.element.querySelector('#title').addEventListener('dragstart', e => {
+                const img = new Image();
+                img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+                e.dataTransfer.setDragImage(img, 0, 0);
+            });
+            
+            const dragEvent = e => {
+                this.element.style['transition'] = `0s all`;
+                if (e.x != 0 || e.y != 0){
+                    this.element.style.top = `${Math.max(e.y, 0)}px`;
+                    this.element.style.left = `${Math.max(e.x, 0)}px`;
+                }
+                this.element.classList.remove('minimized');
+            };
+
+            this.element.querySelector('#title').addEventListener('drag', dragEvent);
+            this.element.querySelector('#title').addEventListener('dragend', dragEvent);
 
             this.element.querySelector('#minimize').addEventListener('click', () => {
-                // TODO: animate disso aqui
-                // $('#details').animate({
-                //     "top": $(window).height() - 33,
-                //     "left": $(window).width() - 350
-                // });
-
+                this.element.classList.toggle('minimized');
+                this.element.removeAttribute('style');
             });
 
             potions.init()
         },
 
         update: async function(){
-            const glad = ui.glads.members.filter(e => e.element.classList.contains("follow"))[0]
+            const glad = ui.glads.filter(e => e.element.classList.contains("follow"))[0];
+            const renderGlad = glads.get(glad.id);
 
             const info = [
                 glad.name,
@@ -652,72 +658,67 @@ const ui = {
 
             this.element.querySelector('#head span').style.transform = `rotate(${glad.head.toFixed(0)}deg)`
 
-            glad.buffs.forEach((b,i) => {
+            Object.values(renderGlad.buffs).forEach((e,i) => {
                 const row = this.element.querySelectorAll('#buffs #box .row')[i];
-                if (b.timeleft > 0 && !row.classList.contains('active')){
+                if (e.timeleft > 0 && !row.classList.contains('active')){
                     row.classList.add('active');
                 }
-                else if (b.timeleft == 0 && row.classList.contains('active')){
+                else if (e.timeleft == 0 && row.classList.contains('active')){
                     row.classList.remove('active');
                 }
     
-                row.querySelectorAll("span")[1].innerHTML = glad.buffs[i].value.toFixed(1);
-                row.querySelectorAll("span")[2].innerHTML = glad.buffs[i].timeleft.toFixed(1);
+                row.querySelectorAll("span")[1].innerHTML = e.value.toFixed(1);
+                row.querySelectorAll("span")[2].innerHTML = e.timeleft.toFixed(1);
             })
 
-            if (glad.code){
-                if (glad.code != $('#details #code #box .name').last().text()){
-                    $('#details #code #box').append(`<div class='row'>
-                        <div class='name'>${glad.code}</div>
-                        <div class='duration'>0.1</div>
-                        <div class='time'>${json.simtime.toFixed(1)}</div>
-                    </div>`)
+            if (renderGlad.code){
+                const rows = Array.from(this.element.querySelectorAll('#code #box .row'));
+                const lastRow = rows.length ? rows[rows.length-1] : false;
 
-                    if ($('#details #code #box .row').length > 5){
-                        $('#details #code #box .row').first().remove()
+                if (!lastRow || renderGlad.code != lastRow.querySelector('.name').textContent){
+                    const newRow = document.createElement('div');
+                    newRow.classList.add('row');
+                    newRow.innerHTML = `<div class='name'>${renderGlad.code}</div><div class='duration'>0.1</div><div class='time'>${render.time}</div>`;
+
+                    rows.push(newRow);
+
+                    if (rows.length > 5){
+                        rows.shift();
                     }
+
+                    this.element.querySelector('#code #box').innerHTML = rows.map(e => e.outerHTML).join('');
                 }
                 else{
-                    let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
-                    $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
+                    const time = parseFloat(lastRow.querySelector('.duration').textContent);
+                    lastRow.querySelector('.duration').textContent = (time + 0.1).toFixed(1);
                 }
             }
 
-            let allPotions = '😎'
-            await potionList.ready
-            for (let i in glad.items){
-                let item = $('#details #items #box .row').eq(i).find('span')
+            const freePotions = '😎';
+            await waitFor(() => potions.ready);
+            renderGlad.items.forEach((e,i) => {
+                const item = this.element.querySelectorAll('#items #box .row span')[i];
 
-                if (item.length){
-                    let text = item.text()
-                    if (text == '-' || glad.items[i] == 0){
-                        item.addClass('used')
+                if (item){
+                    if (item.textContent == '-' || e == 0){
+                        item.classList.add('used');
                     }
                     else {
-                        item.removeClass('used')
+                        item.classList.remove('used');
                     }
                 }
                 else{
-                    let potion
-                    if (glad.items[i] > 0){
-                        potion = potionList[glad.items[i]]
-                    }
-                    else if (glad.items[i] == 0){
-                        potion = '-'
-                    }
-                    else if (glad.items[i] == -1){
-                        potion = allPotions
-                    }
-                    $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
+                    const potion = e > 0 ? potions.list[e] : e == 0 ? '-' : freePotions;
+                    this.element.querySelector('#items #box').insertAdjacentHTML('beforeend', `<div class='row'><span>${potion}</span></div>`);
                 }
-            }
+            });
         }
     }
 }
 
 class Slider {
     constructor(domParent, options){
-        domParent.innerHTML = `<div class='slider'>
+        domParent.innerHTML = `<div class='slider' draggable='false'>
             <div class='range'>
                 <div class='filled'></div>
                 <div class='handle'>
@@ -1094,7 +1095,7 @@ class loadBar {
                 else{
                     simulation.log = JSON.parse(data.log)
                     // console.log(simulation.log)
-                    simulation.steps = mergeLog(simulation.log)
+                    simulation.steps = parseLog(simulation.log)
                     simulation.log[0].glads.forEach(g => {
                         // destroca os # nos nomes por espaços
                         g.name = g.name.split("#").join(" ")
