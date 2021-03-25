@@ -317,34 +317,38 @@ body{
         &.follow, &:hover {
             opacity: 1;
 
-            .glad-name {
-                color: #ffffff;
-                text-shadow: 1px 1px 5px black;
-            }
-
-            .glad-hp, .glad-ap {
-                border: 1px solid #48484896;
-                box-shadow: 0px 0px 5px #0000008f;
-            }
-
-            .hp-bar {
-                background-color: #6b000035;
-                
-                .filled {
-                    background-color: #ff0000ff;
+            .row {
+                .glad-right-side {
+                    .glad-name {
+                        color: #ffffff;
+                        text-shadow: 1px 1px 5px black;
+                    }
+                    
+                    .glad-hp, .glad-ap {
+                        border: 1px solid #48484896;
+                        box-shadow: 0px 0px 5px #0000008f;
+                    }
+        
+                    .hp-bar {
+                        background-color: #6b000035;
+                        
+                        .filled {
+                            background-color: #ff0000ff;
+                        }
+                    }
+        
+                    .ap-bar {
+                        background-color: #00007535;
+            
+                        .filled {
+                            background-color: #0000ffff;
+                        }
+                    }
+                    
+                    .glad-buffs div.active {
+                        opacity: 1;
+                    }
                 }
-            }
-
-            .ap-bar {
-                background-color: #00007535;
-    
-                .filled {
-                    background-color: #0000ffff;
-                }
-            }
-
-            .glad-buffs div.active {
-                opacity: 1;
             }
         }
         
@@ -436,6 +440,17 @@ body{
                             height: 0%;
                             background-color: #fff200;
                             transition: 0.5s height;
+                            margin-bottom: 0;
+
+                            &.up {
+                                transition: 0.5s margin;
+                                margin-bottom: 200%;
+                                height: 100% !important;
+                            }
+
+                            &.reset {
+                                transition: 0s height;
+                            }
                         }
                     }
                 }
