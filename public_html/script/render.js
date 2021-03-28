@@ -1,5 +1,6 @@
 import { assets } from "./assets.js"
 import { simulation, ui } from "./playback.js"
+import { FloatingText } from "./floatingText.js"
 
 class Gladiator {
     constructor(info){
@@ -10,6 +11,7 @@ class Gladiator {
         this.message = '';
         this.diff = {};
         this.sprites = {};
+        this.dmgFloat = 0;
     }
 
     getPositionOnCanvas(){

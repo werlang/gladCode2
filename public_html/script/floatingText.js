@@ -1,4 +1,4 @@
-var FloatingText = function(state, options) {
+export const FloatingText = function(state, options) {
 
     var _obj = {};
     var floatingTextGroup = state.add.group();

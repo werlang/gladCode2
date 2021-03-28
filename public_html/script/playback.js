@@ -339,33 +339,39 @@ const simulation = {
 
         toggle: function(){
             // need to mute music
-            if (this.music == 0 && simulation.preferences.sound.music != 0){
-                this.music = simulation.preferences.sound.music;
-                simulation.preferences.sound.music = 0;
+            let music = simulation.preferences.sound.music;
+            let sfx = simulation.preferences.sound.sfx;
+
+            if (this.music == 0 && music != 0){
+                this.music = music;
+                music = 0;
                 render.music.main.volume = 0;
             }
             // need to mute sfx
-            else if (this.sfx == 0 && simulation.preferences.sound.sfx != 0){
-                this.sfx = simulation.preferences.sound.sfx;
-                simulation.preferences.sound.sfx = 0;
+            else if (this.sfx == 0 && sfx != 0){
+                this.sfx = sfx;
+                sfx = 0;
             }
             // unmute all
             else{
-                simulation.preferences.sound.music = this.music || 0.1;
-                simulation.preferences.sound.sfx = this.sfx || 1;
-    
-                render.music.main.volume = simulation.preferences.sound.music;            
+                music = this.music || 0.1;
+                sfx = this.sfx || 1;
+                this.music = 0;
+                this.sfx = 0;
+                render.music.main.volume = music;            
             }
-
-            // TODO: Fix sometimes clicking the sound icon doesnt work
-            // TODO: skins are fucked up
-            changeSoundIcon();
 
             post("back_play.php",{
                 action: "SET_PREF",
-                music_volume: simulation.preferences.sound.music,
-                sfx_volume: simulation.preferences.sound.sfx
+                music_volume: music,
+                sfx_volume: sfx
             });
+
+            simulation.preferences.sound.music = music;
+            simulation.preferences.sound.sfx = sfx;
+
+            // TODO: skins are fucked up
+            changeSoundIcon();
         },
     }
 }
@@ -909,13 +915,16 @@ document.querySelector('#help').addEventListener('click', () => {
             <h2>Teclas de atalho</h2>
             <div class='table'>
                 <div class='row'>
-                    <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
+                    <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras dos gladiadores na interface de usuário</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
+                    <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap sobre o gladiador na arena</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
+                    <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização (Quadros / segundo) da simulação</div>
+                </div>
+                <div class='row'>
+                    <div class='cell'><span class='key'>T</span></div><div class='cell'>Mostrar/ocultar texto nas barras de hp e ap na UI e texto flutuante de dano na arena</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
@@ -1189,7 +1198,7 @@ document.addEventListener('keydown', e => {
 });
 
 window.addEventListener('blur', () => simulation.pause(true));
-window.addEventListener('focus', () => simulation.pause(false));
+// window.addEventListener('focus', () => simulation.pause(false));
 window.onresize = () => simulation.resize();
 
 function changeSoundIcon(){
