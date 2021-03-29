@@ -1,4 +1,4 @@
-export const FloatingText = function(state, options) {
+export const FloatingText = function (state, options) {
 
     var _obj = {};
     var floatingTextGroup = state.add.group();
@@ -190,16 +190,16 @@ export const FloatingText = function(state, options) {
             tweenObj = state.add.tween(floatingTextGroup).to({
                 x: [startX, firstBezierPointX, secondBezierPointX, endX],
                 y: [startY, firstBezierPointY, secondBezierPointY, endY],
-            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function(v, k) {
+            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function (v, k) {
                 return Phaser.Math.bezierInterpolation(v, k);
             });
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, 0);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -215,16 +215,16 @@ export const FloatingText = function(state, options) {
             tweenObj = state.add.tween(floatingTextGroup).to({
                 x: pointsX,
                 y: pointsY,
-            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function(v, k) {
+            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function (v, k) {
                 return Phaser.Math.bezierInterpolation(v, k);
             });
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, 0);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -239,12 +239,12 @@ export const FloatingText = function(state, options) {
             tweenProperty(floatingTextGroup.position, "position", { x: floatingTextGroup.position.x - scaleX / 2, y: floatingTextGroup.position.y - scaleY / 2 }, 250, 0, Phaser.Easing.Back.Out);
 
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -279,16 +279,16 @@ export const FloatingText = function(state, options) {
             tweenObj = state.add.tween(floatingTextGroup).to({
                 x: pointsX,
                 y: pointsY,
-            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function(v, k) {
+            }, _obj.timeToLive, Phaser.Easing.Circular.Out, true).interpolation(function (v, k) {
                 return Phaser.Math.bezierInterpolation(v, k);
             });
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, 0);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -297,12 +297,12 @@ export const FloatingText = function(state, options) {
                 y: floatingTextGroup.y - _obj._distance
             }, 400, 100, _obj._easing);
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(floatingTextGroup, "alpha", {
                     alpha: 0
                 }, 150, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.removeAll(true);
                     this.destroy();
                 }, this);
@@ -312,12 +312,12 @@ export const FloatingText = function(state, options) {
                 y: floatingTextGroup.y + _obj._distance
             }, 400, 100, _obj._easing);
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -326,12 +326,12 @@ export const FloatingText = function(state, options) {
                 y: floatingTextGroup.x - _obj._distance
             }, 400, 100, _obj._easing);
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -340,12 +340,12 @@ export const FloatingText = function(state, options) {
                 y: floatingTextGroup + _obj._distance
             }, 400, 100, _obj._easing);
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 250, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -355,12 +355,12 @@ export const FloatingText = function(state, options) {
                 alpha: 1
             }, 250, 50, _obj._easing);
 
-            tweenObj.onComplete.addOnce(function() {
+            tweenObj.onComplete.addOnce(function () {
                 var _tweenObj = tweenProperty(this, "alpha", {
                     alpha: 0
                 }, 350, _obj._timeToLive);
 
-                _tweenObj.onComplete.addOnce(function() {
+                _tweenObj.onComplete.addOnce(function () {
                     this.destroy();
                 }, this);
             }, floatingTextGroup);
@@ -404,10 +404,10 @@ export const FloatingText = function(state, options) {
     // TODO: add factory
 
     return {
-        showFloatingText: function() {
+        showFloatingText: function () {
             floatingTextGroup.visible = true;
         },
-        hideFloatingText: function() {
+        hideFloatingText: function () {
             floatingTextGroup.visible = false;
         }
 

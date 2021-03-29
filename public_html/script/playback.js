@@ -1,5 +1,4 @@
 import { parseLog, waitFor } from "./utils.js"
-import { header } from "./header.js"
 import { post, copyToClipboard, fadeIn } from "./utils.js"
 import { loader } from "./loader.js"
 import { render, glads, getAction } from "./render.js"
@@ -8,21 +7,19 @@ const potions = {
     ready: false,
     list: {},
 
-    init: async function(){
-        if (!this.ready){
+    init: async function () {
+        if (!this.ready) {
             post("back_slots.php", {
                 action: "ITEMS"
-            }).then( data => {
+            }).then(data => {
                 // console.log(data.potions)
-                Object.entries(data.potions).forEach(([i,e]) => this.list[e.id] = i);
+                Object.entries(data.potions).forEach(([i, e]) => this.list[e.id] = i);
                 // console.log(potionList)
                 this.ready = true
             })
         }
     }
 }
-
-// header.load()
 
 const simulation = {
     paused: true,
@@ -35,17 +32,17 @@ const simulation = {
         index: 4,
         options: [-10, -5, -2, -1, 1, 2, 5, 10],
 
-        getValue: function(){
+        getValue: function () {
             return Math.round(this.options[this.index])
         },
-        setValue: function(value){
+        setValue: function (value) {
             const i = this.options.indexOf(value)
             this.index = i != -1 ? i : 4
         },
-        back: function(){
+        back: function () {
             this.index = this.index > 0 ? this.index - 1 : 0
         },
-        forward: function(){
+        forward: function () {
             this.index = this.index < this.options.length - 1 ? this.index + 1 : this.options.length - 1
         },
     },
@@ -63,8 +60,8 @@ const simulation = {
         crowd: 1
     },
 
-    advance: function(direction) {
-        if (this.paused){
+    advance: function (direction) {
+        if (this.paused) {
             const step = direction == 'back' ? -1 : 1;
             this.time = this.time + step;
             this.stepButton.setValue(step);
@@ -72,14 +69,14 @@ const simulation = {
             document.querySelector('#fowd-step .speed').innerHTML = '+1';
             document.querySelector('#back-step .speed').innerHTML = '-1';
         }
-        else{
+        else {
             this.stepButton[direction]()
 
-            if (this.stepButton.getValue() > 0){
+            if (this.stepButton.getValue() > 0) {
                 document.querySelector('#back-step .speed').innerHTML = ""
                 document.querySelector('#fowd-step .speed').innerHTML = this.stepButton.getValue() + 'x'
             }
-            else{
+            else {
                 document.querySelector('#fowd-step .speed').innerHTML = ""
                 document.querySelector('#back-step .speed').innerHTML = this.stepButton.getValue() + 'x'
             }
@@ -89,26 +86,26 @@ const simulation = {
         this.startTimer()
     },
 
-    back: function(){
+    back: function () {
         this.advance('back')
     },
 
-    forward: function(){
+    forward: function () {
         this.advance('forward')
     },
 
-    pause: function(force){
+    pause: function (force) {
         this.stepButton.setValue(1)
         const pause = typeof force === 'undefined' ? !this.paused : force === true;
 
-        if (pause){
+        if (pause) {
             this.paused = true
             document.querySelector('#pause').classList.add('paused')
             document.querySelector('#back-step .speed').innerHTML = '-1'
             document.querySelector('#fowd-step .speed').innerHTML = '+1'
             this.stepButton.setValue(1)
         }
-        else{
+        else {
             this.paused = false
             document.querySelector('#pause').classList.remove('paused')
             document.querySelector('#back-step .speed').innerHTML = '-1x'
@@ -119,23 +116,23 @@ const simulation = {
         this.startTimer()
     },
 
-    startTimer: function(){
+    startTimer: function () {
         this.timeout = setTimeout(() => {
-            if (!this.paused){
+            if (!this.paused) {
                 this.startTimer()
             }
 
-            if (!render.started){
+            if (!render.started) {
                 this.pause(true)
             }
 
-            if (this.time < 0){
+            if (this.time < 0) {
                 this.time = 0
             }
-            else if (this.time > this.steps.length - 1){
+            else if (this.time > this.steps.length - 1) {
                 this.endGame();
             }
-            else{
+            else {
                 this.showScore = true;
             }
 
@@ -143,7 +140,7 @@ const simulation = {
             // console.log(this.time);
             ui.update(render.step)
 
-            if (!this.paused){
+            if (!this.paused) {
                 this.time += this.stepButton.getValue() > 0 ? 1 : -1
             }
 
@@ -153,16 +150,16 @@ const simulation = {
         }, 100 / Math.abs(this.stepButton.getValue()));
     },
 
-    endGame: function(){
+    endGame: function () {
         this.time = this.steps.length - 1;
 
-        if (!this.winner){
+        if (!this.winner) {
             const glads = this.steps[this.time].glads;
             this.winner = glads.filter(e => e.hp > 0);
-            this.winner = this.winner.length > 1 ? { name: 'Empate', user: ''} : this.winner[0];
+            this.winner = this.winner.length > 1 ? { name: 'Empate', user: '' } : this.winner[0];
         }
 
-        if (this.showScore){
+        if (this.showScore) {
             const box = document.createElement('div');
             box.id = 'fog';
             box.classList.add('ending');
@@ -222,7 +219,7 @@ const simulation = {
                 })
             })
 
-            if (this.winner.name != 'Empate'){
+            if (this.winner.name != 'Empate') {
                 // console.log(this.winner);
                 loader.load('gladcard').then(({ getSpriteThumb }) => box.querySelector('#image').appendChild(getSpriteThumb(glads.get(this.winner.id).spritesheet, 'walk', 'down')));
             }
@@ -238,7 +235,7 @@ const simulation = {
         }
     },
 
-    isFullScreen: function(){
+    isFullScreen: function () {
         this.fullscreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
             (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
             (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
@@ -246,12 +243,12 @@ const simulation = {
         return this.fullscreen
     },
 
-    setFullScreen: function(state){
-        if (typeof state == 'undefined'){
+    setFullScreen: function (state) {
+        if (typeof state == 'undefined') {
             state = !this.isFullScreen()
         }
 
-        if (state){
+        if (state) {
             const elem = document.querySelector("body")
             if (elem.requestFullscreen) {
                 elem.requestFullscreen()
@@ -267,7 +264,7 @@ const simulation = {
             }
             this.fullscreen = true
         }
-        else{
+        else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
@@ -286,25 +283,25 @@ const simulation = {
         setTimeout(() => this.resize(), 100);
     },
 
-    resize: function() {
-        if (render.game){
+    resize: function () {
+        if (render.game) {
             let canvasW, canvasH;
             const windowHeight = document.querySelector('#frame').offsetHeight;
             const windowWidth = document.querySelector('#frame').offsetWidth;
 
-            if (windowWidth > windowHeight){
+            if (windowWidth > windowHeight) {
                 const usefulRatio = render.screenH / render.arenaD; // ratio between entire and useful part of the background
                 render.game.camera.scale.x = windowHeight * usefulRatio / render.screenH;
                 render.game.camera.scale.y = windowHeight * usefulRatio / render.screenH;
                 canvasH = windowHeight;
                 canvasW = Math.min(windowWidth, render.screenW * render.game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-                if (windowHeight < 450 && windowHeight < windowWidth && !document.querySelector('#dialog-box')){
-                    loader.load('dialog').then(({ Message }) => new Message({message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato`}).show());
+                if (windowHeight < 450 && windowHeight < windowWidth && !document.querySelector('#dialog-box')) {
+                    loader.load('dialog').then(({ Message }) => new Message({ message: `Em dispositivos móveis, a visualização das lutas é melhor no modo retrato` }).show());
                 }
 
             }
-            else{
-                if (document.querySelector('#dialog-box')){
+            else {
+                if (document.querySelector('#dialog-box')) {
                     document.querySelector('#fog').remove();
                 }
 
@@ -313,10 +310,10 @@ const simulation = {
                 render.game.camera.scale.y = windowWidth * usefulRatio / render.screenW;
                 canvasH = Math.min(windowHeight, render.screenH * render.game.camera.scale.y);
                 canvasW = windowWidth;
-                if (windowHeight < 600 && !this.isFullScreen() && document.querySelector('#dialog-box')){
+                if (windowHeight < 600 && !this.isFullScreen() && document.querySelector('#dialog-box')) {
                     new Message({
                         message: `Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?`,
-                        buttons: {no: 'Não', yes: 'SIM'}
+                        buttons: { no: 'Não', yes: 'SIM' }
                     }).show().click('yes', () => {
                         this.setFullScreen(true);
                         document.querySelector('#fog').remove();
@@ -326,8 +323,8 @@ const simulation = {
             render.game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
             render.game.camera.bounds.width = render.screenW; //leave teh bounds alone, dont mess here
             render.game.camera.bounds.height = render.screenH;
-            render.game.camera.y = (render.arenaY1 + render.arenaD/2) * render.game.camera.scale.y - render.game.height/2; //middle of the arena minus middle of the screen
-            render.game.camera.x = (render.arenaX1 + render.arenaD/2) * render.game.camera.scale.x - render.game.width/2;
+            render.game.camera.y = (render.arenaY1 + render.arenaD / 2) * render.game.camera.scale.y - render.game.height / 2; //middle of the arena minus middle of the screen
+            render.game.camera.x = (render.arenaX1 + render.arenaD / 2) * render.game.camera.scale.x - render.game.width / 2;
 
             document.querySelector('#canvas-div canvas').click();
         }
@@ -337,31 +334,31 @@ const simulation = {
         music: 0,
         sfx: 0,
 
-        toggle: function(){
+        toggle: function () {
             // need to mute music
             let music = simulation.preferences.sound.music;
             let sfx = simulation.preferences.sound.sfx;
 
-            if (this.music == 0 && music != 0){
+            if (this.music == 0 && music != 0) {
                 this.music = music;
                 music = 0;
                 render.music.main.volume = 0;
             }
             // need to mute sfx
-            else if (this.sfx == 0 && sfx != 0){
+            else if (this.sfx == 0 && sfx != 0) {
                 this.sfx = sfx;
                 sfx = 0;
             }
             // unmute all
-            else{
+            else {
                 music = this.music || 0.1;
                 sfx = this.sfx || 1;
                 this.music = 0;
                 this.sfx = 0;
-                render.music.main.volume = music;            
+                render.music.main.volume = music;
             }
 
-            post("back_play.php",{
+            post("back_play.php", {
                 action: "SET_PREF",
                 music_volume: music,
                 sfx_volume: sfx
@@ -380,7 +377,7 @@ const ui = {
     showText: false,
     glads: [],
 
-    init: async function(){
+    init: async function () {
         const container = document.createElement("div")
         container.id = "ui-container"
 
@@ -388,7 +385,7 @@ const ui = {
 
         await glads.wait()
 
-        for (let i=0 ; i<glads.members.length ; i++){
+        for (let i = 0; i < glads.members.length; i++) {
             const glad = document.createElement("div")
             glad.classList.add("ui-glad")
             container.appendChild(glad)
@@ -401,20 +398,20 @@ const ui = {
 
                 buffs: {},
 
-                follow: function(state){
-                    if (state === true){
+                follow: function (state) {
+                    if (state === true) {
                         this.element.classList.add('follow')
 
-                        if (!this.isFollow){
+                        if (!this.isFollow) {
                             this.isFollow = true
                             render.game.camera.follow()
                             ui.detailedWindow.create()
                         }
                     }
-                    else{
+                    else {
                         this.element.classList.remove('follow')
 
-                        if (this.isFollow){
+                        if (this.isFollow) {
                             this.isFollow = false
                             render.game.camera.unfollow()
                             ui.detailedWindow.destroy()
@@ -425,7 +422,7 @@ const ui = {
 
             glad.innerHTML = template
         }
-    
+
         this.glads.forEach(g => {
             g.element.addEventListener('click', () => {
                 this.glads.filter(e => e != g).forEach(e => e.follow(false))
@@ -438,27 +435,27 @@ const ui = {
         this.showText = true
     },
 
-    getFollowed: function(){
+    getFollowed: function () {
         const g = this.glads.filter(e => e.isFollow)
         return g.length ? g[0] : false
     },
 
-    update: function(step){
+    update: function (step) {
         // console.log(simulation.preferences);
 
         const container = document.querySelector('#ui-container');
 
-        if (simulation.preferences.frames){
-            if (container.classList.contains('hidden')){
+        if (simulation.preferences.frames) {
+            if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
                 setTimeout(() => container.classList.remove('fade'), 10);
             }
 
-            if (simulation.preferences.text && !this.showtext){
+            if (simulation.preferences.text && !this.showtext) {
                 this.showtext = true
                 this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
             }
-            else if (!simulation.preferences.text && this.showtext){
+            else if (!simulation.preferences.text && this.showtext) {
                 this.showtext = false
                 this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.add('hidden'))
             }
@@ -466,27 +463,27 @@ const ui = {
             Object.values(step.glads).forEach(g => {
                 const glad = this.glads.filter(e => e.id == g.id)[0]
 
-                if (glad){
-                    if (g.name != glad.name){
+                if (glad) {
+                    if (g.name != glad.name) {
                         glad.element.querySelector('.glad-name span').innerHTML = g.name
                         loader.load('gladcard').then(({ getSpriteThumb }) => {
-                            glad.element.querySelector('.glad-portrait').appendChild(getSpriteThumb(glads.members[g.id].spritesheet,'walk','down'))
+                            glad.element.querySelector('.glad-portrait').appendChild(getSpriteThumb(glads.members[g.id].spritesheet, 'walk', 'down'))
                         })
                     }
 
-                    if (g.STR != glad.STR){
+                    if (g.STR != glad.STR) {
                         glad.element.querySelector('.glad-str span').innerHTML = g.STR
                     }
 
-                    if (g.AGI != glad.AGI){
+                    if (g.AGI != glad.AGI) {
                         glad.element.querySelector('.glad-agi span').innerHTML = g.AGI
                     }
 
-                    if (g.INT != glad.INT){
+                    if (g.INT != glad.INT) {
                         glad.element.querySelector('.glad-int span').innerHTML = g.INT
                     }
 
-                    if (g.lvl != glad.lvl){
+                    if (g.lvl != glad.lvl) {
                         glad.element.querySelector('.lvl-value span').innerHTML = g.lvl
 
                         glad.element.querySelector('.lvl-value').classList.add('up')
@@ -502,25 +499,25 @@ const ui = {
                         }, 500);
                     }
 
-                    if (g.xp != glad.xp){
+                    if (g.xp != glad.xp) {
                         glad.element.querySelector('.xp-bar .filled').style.height = (g.xp / g.tonext * 100) + '%'
                     }
 
-                    if (g.hp != glad.hp){
+                    if (g.hp != glad.hp) {
                         glad.element.querySelector('.hp-bar .filled').style.width = (g.hp / g.maxhp * 100) + '%'
                         glad.element.querySelector('.hp-bar .text').innerHTML = `${g.hp.toFixed(0)} / ${g.maxhp}`
                     }
 
-                    if (g.hp <= 0){
+                    if (g.hp <= 0) {
                         glad.isDead = true
                         glad.element.classList.add('dead')
                     }
-                    else if (glad.isDead){
+                    else if (glad.isDead) {
                         glad.isDead = false
                         glad.element.classList.remove('dead')
                     }
 
-                    if (g.ap != glad.ap){
+                    if (g.ap != glad.ap) {
                         glad.element.querySelector('.ap-bar .filled').style.width = (g.ap / g.maxap * 100) + '%'
                         glad.element.querySelector('.ap-bar .text').innerHTML = `${g.ap.toFixed(0)} / ${g.maxap}`
                     }
@@ -528,27 +525,27 @@ const ui = {
                     ["burn", "resist", "stun", "invisible", "speed", "poison"].forEach(b => {
                         const poisoned = b == 'poison' && glads.get(glad.id).poison;
 
-                        if ((g.buffs[b] && g.buffs[b].timeleft) || poisoned){
+                        if ((g.buffs[b] && g.buffs[b].timeleft) || poisoned) {
                             glad.buffs[b] = true
                             glad.element.querySelector(`.buff-${b}`).classList.add('active')
                         }
-                        else if (glad.buffs[b]){
+                        else if (glad.buffs[b]) {
                             glad.buffs[b] = false
                             glad.element.querySelector(`.buff-${b}`).classList.remove('active')
                         }
                     })
 
-                    if (glad.element.classList.contains("follow")){
+                    if (glad.element.classList.contains("follow")) {
                         this.detailedWindow.update()
                     }
                 }
 
                 [
                     "name",
-                    "STR", "AGI", "INT", 
-                    "hp", "maxhp", "ap", "maxap", 
-                    "lvl", "xp", "tonext", 
-                    "x", "y", "head", 
+                    "STR", "AGI", "INT",
+                    "hp", "maxhp", "ap", "maxap",
+                    "lvl", "xp", "tonext",
+                    "x", "y", "head",
                     "as", "cs", "spd",
                     "lockedfor", "action"
                 ].forEach(e => glad[e] = g[e]);
@@ -557,20 +554,20 @@ const ui = {
 
             })
         }
-        else if (!container.classList.contains('fade')){
+        else if (!container.classList.contains('fade')) {
             setTimeout(() => container.classList.add('hidden'), 1000);
             container.classList.add('fade');
         }
     },
 
     detailedWindow: {
-        destroy: function(){
-            if (this.element){
+        destroy: function () {
+            if (this.element) {
                 this.element.remove()
             }
         },
 
-        create: function(){
+        create: function () {
             const glad = glads.get(ui.glads.filter(e => e.isFollow)[0].id);
             const buffBox = Object.keys(glad.buffs).map(e => `<div class='row'><span>${e}</span><span>0.0</span><span>0.0</span></div>`).join("")
 
@@ -627,10 +624,10 @@ const ui = {
                 img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
                 e.dataTransfer.setDragImage(img, 0, 0);
             });
-            
+
             const dragEvent = e => {
                 this.element.style['transition'] = `0s all`;
-                if (e.x != 0 || e.y != 0){
+                if (e.x != 0 || e.y != 0) {
                     this.element.style.top = `${Math.max(e.y, 0)}px`;
                     this.element.style.left = `${Math.max(e.x, 0)}px`;
                 }
@@ -648,7 +645,7 @@ const ui = {
             potions.init()
         },
 
-        update: async function(){
+        update: async function () {
             const glad = ui.glads.filter(e => e.element.classList.contains("follow"))[0];
             const renderGlad = glads.get(glad.id);
 
@@ -671,41 +668,41 @@ const ui = {
                 glad.lockedfor.toFixed(1)
             ];
 
-            this.element.querySelectorAll('input').forEach((e,i) => e.value = info[i])
+            this.element.querySelectorAll('input').forEach((e, i) => e.value = info[i])
 
             this.element.querySelector('#head span').style.transform = `rotate(${glad.head.toFixed(0)}deg)`
 
-            Object.values(renderGlad.buffs).forEach((e,i) => {
+            Object.values(renderGlad.buffs).forEach((e, i) => {
                 const row = this.element.querySelectorAll('#buffs #box .row')[i];
-                if (e.timeleft > 0 && !row.classList.contains('active')){
+                if (e.timeleft > 0 && !row.classList.contains('active')) {
                     row.classList.add('active');
                 }
-                else if (e.timeleft == 0 && row.classList.contains('active')){
+                else if (e.timeleft == 0 && row.classList.contains('active')) {
                     row.classList.remove('active');
                 }
-    
+
                 row.querySelectorAll("span")[1].innerHTML = e.value.toFixed(1);
                 row.querySelectorAll("span")[2].innerHTML = e.timeleft.toFixed(1);
             })
 
-            if (renderGlad.code){
+            if (renderGlad.code) {
                 const rows = Array.from(this.element.querySelectorAll('#code #box .row'));
-                const lastRow = rows.length ? rows[rows.length-1] : false;
+                const lastRow = rows.length ? rows[rows.length - 1] : false;
 
-                if (!lastRow || renderGlad.code != lastRow.querySelector('.name').textContent){
+                if (!lastRow || renderGlad.code != lastRow.querySelector('.name').textContent) {
                     const newRow = document.createElement('div');
                     newRow.classList.add('row');
                     newRow.innerHTML = `<div class='name'>${renderGlad.code}</div><div class='duration'>0.1</div><div class='time'>${render.time}</div>`;
 
                     rows.push(newRow);
 
-                    if (rows.length > 5){
+                    if (rows.length > 5) {
                         rows.shift();
                     }
 
                     this.element.querySelector('#code #box').innerHTML = rows.map(e => e.outerHTML).join('');
                 }
-                else{
+                else {
                     const time = parseFloat(lastRow.querySelector('.duration').textContent);
                     lastRow.querySelector('.duration').textContent = (time + 0.1).toFixed(1);
                 }
@@ -713,18 +710,18 @@ const ui = {
 
             const freePotions = '😎';
             await waitFor(() => potions.ready);
-            renderGlad.items.forEach((e,i) => {
+            renderGlad.items.forEach((e, i) => {
                 const item = this.element.querySelectorAll('#items #box .row span')[i];
 
-                if (item){
-                    if (item.textContent == '-' || e == 0){
+                if (item) {
+                    if (item.textContent == '-' || e == 0) {
                         item.classList.add('used');
                     }
                     else {
                         item.classList.remove('used');
                     }
                 }
-                else{
+                else {
                     const potion = e > 0 ? potions.list[e] : e == 0 ? '-' : freePotions;
                     this.element.querySelector('#items #box').insertAdjacentHTML('beforeend', `<div class='row'><span>${potion}</span></div>`);
                 }
@@ -734,7 +731,7 @@ const ui = {
 }
 
 class Slider {
-    constructor(domParent, options){
+    constructor(domParent, options) {
         domParent.innerHTML = `<div class='slider' draggable='false'>
             <div class='range'>
                 <div class='filled'></div>
@@ -763,28 +760,28 @@ class Slider {
 
             this.previewValue = Math.round(valueRange / this.increment) * this.increment;
 
-            if (this.pressed){
+            if (this.pressed) {
                 this.domElement.click();
             }
-            else{
+            else {
                 this.update();
             }
-            
+
         });
 
         this.domElement.addEventListener('mousedown', () => {
             this.pressed = true;
             this.domElement.click();
         });
-        this.domElement.addEventListener('mouseup', () => this.pressed = false );
-        this.domElement.addEventListener('mouseleave', () => this.pressed = false );
+        this.domElement.addEventListener('mouseup', () => this.pressed = false);
+        this.domElement.addEventListener('mouseleave', () => this.pressed = false);
 
         this.callbacks = {};
 
         this.domElement.addEventListener('click', () => {
             this.setValue(this.previewValue);
 
-            if (this.callbacks.click){
+            if (this.callbacks.click) {
                 this.callbacks.click(this.previewValue);
             }
 
@@ -798,32 +795,32 @@ class Slider {
         });
     }
 
-    setValue(value){
+    setValue(value) {
         const oldValue = this.value;
         this.value = parseInt(Math.max(Math.min(value, this.max), this.min) / this.increment) * this.increment;
 
-        if (oldValue != this.value && this.callbacks.change && this.ready){
+        if (oldValue != this.value && this.callbacks.change && this.ready) {
             this.callbacks.change(value);
         }
 
         this.update();
     }
 
-    getValue(){
+    getValue() {
         return this.value;
     }
 
-    update(){
+    update() {
         const total = this.domElement.querySelector('.range').offsetWidth;
         const progressWidth = (this.value - this.min) / (this.max - this.min) * total;
         const previewWidth = (this.previewValue - this.min) / (this.max - this.min) * total;
         const width = previewWidth - progressWidth;
-        
-        if (width >= 0){
+
+        if (width >= 0) {
             this.domElement.querySelector('.preview-filled').removeAttribute('style');
             this.domElement.querySelector('.preview-handle').removeAttribute('style');
         }
-        else{
+        else {
             this.domElement.querySelector('.preview-filled').style['margin-left'] = `${width}px`;
             this.domElement.querySelector('.preview-handle').style['margin-left'] = `${width}px`;
         }
@@ -831,43 +828,43 @@ class Slider {
         this.domElement.querySelector('.preview-filled').style.width = `${Math.abs(width)}px`;
         this.domElement.querySelector('.filled').style.width = `${progressWidth}px`;
 
-        if (this.showTime){
+        if (this.showTime) {
             this.domElement.querySelector('.time').innerHTML = this.value.toFixed(1);
             this.domElement.querySelector('.preview-time').innerHTML = this.previewValue.toFixed(1);
         }
     }
 
-    on(event, callback){
+    on(event, callback) {
         this.callbacks[event] = callback;
     }
 }
 
 class loadBar {
-    constructor(bar, status){
+    constructor(bar, status) {
         this.element = bar;
         this.status = status;
     }
 
-    update(status, length){
-        if (status){
+    update(status, length) {
+        if (status) {
             this.status.innerHTML = status;
         }
 
-        if (length){
+        if (length) {
             const oldLength = parseInt(this.element.querySelector('.bar').style.width.split('%')[0]);
-            if (length < oldLength){
+            if (length < oldLength) {
                 this.reset();
             }
             this.element.querySelector('.bar').style.width = `${length}%`;
             this.element.classList.remove('loading');
         }
-        else{
+        else {
             this.element.classList.add('loading');
             this.element.querySelector('.bar').style.width = `100%`;
         }
     }
 
-    reset(){
+    reset() {
         this.element.querySelector('.bar').style.transition = `0`;
         this.element.querySelector('.bar').style.width = `0`;
         this.element.querySelector('.bar').style.removeProperty('transition');
@@ -992,7 +989,7 @@ document.querySelector('#settings').addEventListener('click', () => {
 
         changeSoundIcon();
     });
-    
+
     const sliderMusic = new Slider(box.querySelector('#music-volume'), {
         min: 0,
         max: 0.1,
@@ -1059,16 +1056,16 @@ document.querySelector('#settings').addEventListener('click', () => {
     fadeIn(box.querySelector('.blue-window'), { time: 0.5 });
 })
 
-if (document.querySelector('#log')){
-    if (document.querySelector('#log').innerHTML.length > 32){
-        new Message({message: `Erro na URL`}).show()
+if (document.querySelector('#log')) {
+    if (document.querySelector('#log').innerHTML.length > 32) {
+        new Message({ message: `Erro na URL` }).show()
     }
-    else{
+    else {
         simulation.logHash = document.querySelector('#log').innerHTML
 
         post("back_play.php", {
             action: "GET_PREF"
-        }).then( data => {
+        }).then(data => {
             // console.log(data)
             simulation.preferences.bars = (data.show_bars === true || data.show_bars == 'true')
             simulation.preferences.fps = (data.show_fps === true || data.show_fps == 'true')
@@ -1104,14 +1101,14 @@ if (document.querySelector('#log')){
             },
         }).then(async data => {
             // console.log(data)
-            if (data.status == "EXPIRED"){
+            if (data.status == "EXPIRED") {
                 document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
             }
-            else if (data.status != "SUCCESS"){
+            else if (data.status != "SUCCESS") {
                 // window.location.href = "https://gladcode.dev";
                 document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
             }
-            else{
+            else {
                 simulation.log = JSON.parse(data.log)
                 // console.log(simulation.log)
                 simulation.steps = parseLog(simulation.log)
@@ -1130,7 +1127,7 @@ if (document.querySelector('#log')){
                 simulation.slider.on('click', value => {
                     simulation.time = parseInt(value * 10);
                     // advance a single step if paused, so we can see the effect of clicking on the slider.
-                    if (simulation.paused){
+                    if (simulation.paused) {
                         simulation.startTimer();
                     }
                 });
@@ -1149,49 +1146,49 @@ if (document.querySelector('#log')){
 document.addEventListener('keydown', e => {
     const togglePreferences = (pref) => {
         simulation.preferences[pref] = !simulation.preferences[pref];
-    
+
         const options = { action: "SET_PREF" };
         options[`show_${pref}`] = simulation.preferences[pref];
         post("back_play.php", options);
     }
 
-    if (e.code == 'KeyS'){
+    if (e.code == 'KeyS') {
         simulation.mute.toggle();
     }
-    else if (e.code == 'KeyF'){
+    else if (e.code == 'KeyF') {
         togglePreferences('fps');
     }
-    else if(e.code == 'KeyB'){
+    else if (e.code == 'KeyB') {
         togglePreferences('bars');
     }
-    else if(e.code == 'KeyM'){
+    else if (e.code == 'KeyM') {
         togglePreferences('frames');
     }
-    else if(e.code == 'KeyT'){
+    else if (e.code == 'KeyT') {
         togglePreferences('text');
     }
-    else if(e.code == 'Space'){
+    else if (e.code == 'Space') {
         simulation.pause();
     }
-    else if(e.code == 'KeyA'){
+    else if (e.code == 'KeyA') {
         simulation.back();
     }
-    else if(e.code == 'KeyD'){
+    else if (e.code == 'KeyD') {
         simulation.forward();
     }
-    else if(!isNaN(e.key) && parseInt(e.key) >= 1 && parseInt(e.key) <= 5){
+    else if (!isNaN(e.key) && parseInt(e.key) >= 1 && parseInt(e.key) <= 5) {
         const index = parseInt(e.key) - 1;
         const followed = ui.getFollowed();
-        if (followed){
-            if (followed.id == index){
+        if (followed) {
+            if (followed.id == index) {
                 ui.glads[index].follow(false);
             }
-            else{
+            else {
                 ui.glads[followed.id].follow(false);
                 ui.glads[index].follow(!ui.glads[index].isDead);
             }
         }
-        else if (!ui.glads[index].isDead){
+        else if (!ui.glads[index].isDead) {
             ui.glads[index].follow(true);
         }
     }
@@ -1201,30 +1198,30 @@ window.addEventListener('blur', () => simulation.pause(true));
 // window.addEventListener('focus', () => simulation.pause(false));
 window.onresize = () => simulation.resize();
 
-function changeSoundIcon(){
+function changeSoundIcon() {
     const soundObj = document.querySelector('#sound');
     soundObj.classList.remove("on", "off", "mute");
 
-    if (simulation.preferences.sound.music > 0){
+    if (simulation.preferences.sound.music > 0) {
         soundObj.classList.add("on");
     }
-    else if (simulation.preferences.sound.sfx > 0){
+    else if (simulation.preferences.sound.sfx > 0) {
         soundObj.classList.add("off");
     }
-    else{
+    else {
         soundObj.classList.add("mute");
     }
 }
 
-function changeCrowd (value) {
-    for (let i in render.npc){
+function changeCrowd(value) {
+    for (let i in render.npc) {
         const r = Math.random();
         const alive = render.npc[i].sprite.body.alive;
-        if (r < value && !alive){
+        if (r < value && !alive) {
             for (let j in render.npc[i].sprite)
                 render.npc[i].sprite[j].revive();
         }
-        else if (r > value && alive){
+        else if (r > value && alive) {
             for (let j in render.npc[i].sprite)
                 render.npc[i].sprite[j].kill();
         }
