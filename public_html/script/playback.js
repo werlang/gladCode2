@@ -367,7 +367,6 @@ const simulation = {
             simulation.preferences.sound.music = music;
             simulation.preferences.sound.sfx = sfx;
 
-            // TODO: skins are fucked up
             changeSoundIcon();
         },
     }
