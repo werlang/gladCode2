@@ -2,6 +2,21 @@ import { parseLog, waitFor } from "./utils.js"
 import { post, copyToClipboard, fadeIn } from "./utils.js"
 import { loader } from "./loader.js"
 import { render, glads, getAction } from "./render.js"
+import { translator } from "./translate.js"
+
+const translatorReady = (async () => {
+    await translator.translate([
+        'Carregando página',
+        'Fazendo download do log de batalha',
+        'Carregando interface',
+        'Esta batalha é muito antiga e não está mais acessível',
+        'Esta batalha não consta nos registros',
+    ]);
+
+    return true;
+})();
+
+// TODO: check if initial translation are done
 
 const potions = {
     ready: false,
@@ -876,7 +891,98 @@ simulation.loadBox = {
     mainBar: new loadBar(document.querySelector('#loadbar #main'), null),
     secondBar: new loadBar(document.querySelector('#loadbar #second'), document.querySelector('#loadbar #status'))
 }
-simulation.loadBox.secondBar.update('Carregando página');
+
+translatorReady.then(() => {
+    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando página',));
+
+    if (document.querySelector('#log')) {
+        if (document.querySelector('#log').innerHTML.length > 32) {
+            new Message({ message: `Erro na URL` }).show()
+        }
+        else {
+            simulation.logHash = document.querySelector('#log').innerHTML
+
+            post("back_play.php", {
+                action: "GET_PREF"
+            }).then(data => {
+                // console.log(data)
+                simulation.preferences.bars = (data.show_bars === true || data.show_bars == 'true')
+                simulation.preferences.fps = (data.show_fps === true || data.show_fps == 'true')
+                simulation.preferences.text = (data.show_text === true || data.show_text == 'true')
+                simulation.preferences.speech = (data.show_speech === true || data.show_speech == 'true')
+
+                simulation.preferences.crowd = parseFloat(data.crowd)
+
+                simulation.preferences.sound.music = parseFloat(data.music_volume)
+                simulation.preferences.sound.sfx = parseFloat(data.sfx_volume)
+                changeSoundIcon()
+
+                simulation.preferences.frames = data.show_frames === true || data.show_frames == 'true';
+            })
+
+            post("back_log.php", {
+                action: "GET",
+                loghash: simulation.logHash
+            }, {
+                xhr: true,
+                progress: e => {
+                    // console.log(e)
+                    const total = e.lengthComputable ? e.total : e.uncompressedLengthComputable ? e.uncompressedTotal : false;
+                    if (total) {
+                        const percentComplete = (100 * e.loaded / total).toFixed(0);
+                        // console.log(percentComplete)
+                        simulation.loadBox.secondBar.update(translator.getTranslated('Fazendo download do log de batalha'), percentComplete);
+                        simulation.loadBox.mainBar.update(null, percentComplete / 4);
+                    }
+                },
+                loadend: () => {
+                    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando interface'));
+                },
+            }).then(async data => {
+                // console.log(data)
+                if (data.status == "EXPIRED") {
+                    document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>${translator.getTranslated('Esta batalha é muito antiga e não está mais acessível')}</span></div>`;
+                }
+                else if (data.status != "SUCCESS") {
+                    // window.location.href = "https://gladcode.dev";
+                    document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>${translator.getTranslated(`Esta batalha não consta nos registros`)}</span></div>`;
+                }
+                else {
+                    simulation.log = JSON.parse(data.log)
+                    // console.log(simulation.log)
+                    simulation.steps = parseLog(simulation.log)
+                    simulation.log[0].glads.forEach(g => {
+                        // destroca os # nos nomes por espaços
+                        g.name = g.name.split("#").join(" ")
+                        g.user = g.user.split("#").join(" ")
+                    })
+
+                    simulation.slider = new Slider(document.querySelector('#time-container'), {
+                        min: 0,
+                        max: simulation.steps.length / 10,
+                        increment: 0.1,
+                        time: true,
+                    });
+                    simulation.slider.on('click', value => {
+                        simulation.time = parseInt(value * 10);
+                        // advance a single step if paused, so we can see the effect of clicking on the slider.
+                        if (simulation.paused) {
+                            simulation.startTimer();
+                        }
+                    });
+
+                    await glads.load(simulation.log[0].glads)
+                    await ui.init()
+                }
+            });
+
+
+        }
+
+        document.querySelector('#log').remove()
+    }
+    
+});
 
 document.querySelector('#back-step').addEventListener('click', () => simulation.back())
 
@@ -946,6 +1052,7 @@ document.querySelector('#help').addEventListener('click', () => {
 
     box.querySelector('#ok').addEventListener('click', () => box.remove());
 });
+translator.translate(document.querySelector('#help'));
 
 document.querySelector('#settings').addEventListener('click', () => {
     const box = document.createElement('div');
@@ -1053,94 +1160,8 @@ document.querySelector('#settings').addEventListener('click', () => {
 
     document.querySelector('body').insertAdjacentElement('beforeend', box);
     fadeIn(box.querySelector('.blue-window'), { time: 0.5 });
-})
-
-if (document.querySelector('#log')) {
-    if (document.querySelector('#log').innerHTML.length > 32) {
-        new Message({ message: `Erro na URL` }).show()
-    }
-    else {
-        simulation.logHash = document.querySelector('#log').innerHTML
-
-        post("back_play.php", {
-            action: "GET_PREF"
-        }).then(data => {
-            // console.log(data)
-            simulation.preferences.bars = (data.show_bars === true || data.show_bars == 'true')
-            simulation.preferences.fps = (data.show_fps === true || data.show_fps == 'true')
-            simulation.preferences.text = (data.show_text === true || data.show_text == 'true')
-            simulation.preferences.speech = (data.show_speech === true || data.show_speech == 'true')
-
-            simulation.preferences.crowd = parseFloat(data.crowd)
-
-            simulation.preferences.sound.music = parseFloat(data.music_volume)
-            simulation.preferences.sound.sfx = parseFloat(data.sfx_volume)
-            changeSoundIcon()
-
-            simulation.preferences.frames = data.show_frames === true || data.show_frames == 'true';
-        })
-
-        post("back_log.php", {
-            action: "GET",
-            loghash: simulation.logHash
-        }, {
-            xhr: true,
-            progress: e => {
-                // console.log(e)
-                const total = e.lengthComputable ? e.total : e.uncompressedLengthComputable ? e.uncompressedTotal : false;
-                if (total) {
-                    const percentComplete = (100 * e.loaded / total).toFixed(0);
-                    // console.log(percentComplete)
-                    simulation.loadBox.secondBar.update('Fazendo download do log de batalha', percentComplete);
-                    simulation.loadBox.mainBar.update(null, percentComplete / 4);
-                }
-            },
-            loadend: () => {
-                simulation.loadBox.secondBar.update('Carregando interface');
-            },
-        }).then(async data => {
-            // console.log(data)
-            if (data.status == "EXPIRED") {
-                document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`
-            }
-            else if (data.status != "SUCCESS") {
-                // window.location.href = "https://gladcode.dev";
-                document.querySelector('#loadbar').innerHTML = `<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`
-            }
-            else {
-                simulation.log = JSON.parse(data.log)
-                // console.log(simulation.log)
-                simulation.steps = parseLog(simulation.log)
-                simulation.log[0].glads.forEach(g => {
-                    // destroca os # nos nomes por espaços
-                    g.name = g.name.split("#").join(" ")
-                    g.user = g.user.split("#").join(" ")
-                })
-
-                simulation.slider = new Slider(document.querySelector('#time-container'), {
-                    min: 0,
-                    max: simulation.steps.length / 10,
-                    increment: 0.1,
-                    time: true,
-                });
-                simulation.slider.on('click', value => {
-                    simulation.time = parseInt(value * 10);
-                    // advance a single step if paused, so we can see the effect of clicking on the slider.
-                    if (simulation.paused) {
-                        simulation.startTimer();
-                    }
-                });
-
-                await glads.load(simulation.log[0].glads)
-                await ui.init()
-            }
-        });
-
-
-    }
-
-    document.querySelector('#log').remove()
-}
+});
+translator.translate(document.querySelector('#settings'));
 
 document.addEventListener('keydown', e => {
     const togglePreferences = (pref) => {

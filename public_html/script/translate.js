@@ -212,6 +212,8 @@ translator.translate = async function(elements){
     
 }
 
+// dom = translate a dom element (true) or something else (false)
+// bind = bind the translation suggestion prompt
 translator.getTranslated = function(str, dom=true, bind=true){
     if (!this.translations || !this.translations[str] || !this.translations[str][this.language]){
         return str
