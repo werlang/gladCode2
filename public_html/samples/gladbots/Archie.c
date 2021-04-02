@@ -9,27 +9,27 @@ setup(){
 int f = 0;
 
 loop(){
-	upgradeAGI(1);
-	if (!getCloseEnemy()){
-		if (f){
-			if (getDist(12.5,12.5) > 5)
-				f = 0;
-			else
-			turnRight(100);
-		}
-		else if (moveTo(12.5,12.5))
-			f = 1;
-	}
-	else{
-		if (getDist(getTargetX(), getTargetY()) < 2){
-			if (getDist(12.5,12.5) > 10){
-				turnTo(getTargetX(), getTargetY());
-				stepLeft();
-			}
-			else
-				stepBack();
-		}
-		else
-			attackRanged(getTargetX(), getTargetY());
-	}
+    upgradeAGI(1);
+    if (!getCloseEnemy()){
+        if (f){
+            if (getDist(12.5,12.5) > 5)
+                f = 0;
+            else
+            turnRight(100);
+        }
+        else if (moveTo(12.5,12.5))
+            f = 1;
+    }
+    else{
+        if (getDist(getTargetX(), getTargetY()) < 2){
+            if (getDist(12.5,12.5) > 10){
+                turnTo(getTargetX(), getTargetY());
+                stepLeft();
+            }
+            else
+                stepBack();
+        }
+        else
+            attackRanged(getTargetX(), getTargetY());
+    }
 }

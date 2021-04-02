@@ -9,21 +9,21 @@ setup(){
 int start = 1;
 
 loop(){
-	upgradeSTR(1);
-	if (getCloseEnemy()){
-		float dist = getDist(getTargetX(), getTargetY());
-		if (dist < 0.8 && isTargetVisible()){
-			attackMelee();
-		}
-		else
-			moveToTarget();
-	}
-	else{
-		if (start){
-			if(moveTo(12.5,12.5))
-				start = 0;
-		}
-		else
-			turnLeft(50);
-	}
+    upgradeSTR(1);
+    if (getCloseEnemy()){
+        float dist = getDist(getTargetX(), getTargetY());
+        if (dist < 0.8 && isTargetVisible()){
+            attackMelee();
+        }
+        else
+            moveToTarget();
+    }
+    else{
+        if (start){
+            if(moveTo(12.5,12.5))
+                start = 0;
+        }
+        else
+            turnLeft(50);
+    }
 }

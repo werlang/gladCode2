@@ -9,18 +9,17 @@ setup(){
 float x = 5, y = 5;
 
 vai(){
-	while(getX() != x || getY() != y)
-		teleport(x,y);
+    while(getX() != x || getY() != y)
+        teleport(x,y);
 }
 
 loop(){
-	vai();
-	x = 20;
-	vai();
-	y = 20;
-	vai();
-	x = 5;
-	vai();
-	y = 5;
+    vai();
+    x = 20;
+    vai();
+    y = 20;
+    vai();
+    x = 5;
+    vai();
+    y = 5;
 }
-	

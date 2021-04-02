@@ -7,17 +7,17 @@ setup(){
 }
 
 loop(){
-	if (getHit()){
-		turnToAngle(getLastHitAngle());
-		while (howManyEnemies() > 0)
-			stepBack();
-	}
-	else{
-		while (!isSafeHere() && !getHit()){
-			moveTo(12,12);
-		}
-		while (!getHit() && isSafeHere() && !moveTo(20,5));
-		while (!getHit() && isSafeHere() && !moveTo(5,20));
-	}
-	
+    if (getHit()){
+        turnToAngle(getLastHitAngle());
+        while (howManyEnemies() > 0)
+            stepBack();
+    }
+    else{
+        while (!isSafeHere() && !getHit()){
+            moveTo(12,12);
+        }
+        while (!getHit() && isSafeHere() && !moveTo(20,5));
+        while (!getHit() && isSafeHere() && !moveTo(5,20));
+    }
+
 }

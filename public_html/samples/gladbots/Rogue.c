@@ -9,33 +9,33 @@ setup(){
 int start = 1;
 
 loop(){
-	upgradeAGI(1);
-	if (start){
-		if(moveTo(12.5,12.5))
-			start = 0;
-	}
-	
-	if (getLowHp()){
-		if(doYouSeeMe()){
-			if (getAmbushTimeLeft() <= 0){
-				ambush();
-			}
-			else{
-				turnTo(getTargetX(), getTargetY());
-				stepLeft();
-			}
-		}
-		else{
-			if (getAmbushTimeLeft() > 0){
-				attackRanged(getTargetX(), getTargetY());
-				assassinate(getTargetX(), getTargetY());
-			}
-			else{
-				ambush();
-			}
-		}
-		
-	}
-	else if (!start)
-		turn(50);
+    upgradeAGI(1);
+    if (start){
+        if(moveTo(12.5,12.5))
+            start = 0;
+    }
+
+    if (getLowHp()){
+        if(doYouSeeMe()){
+            if (getAmbushTimeLeft() <= 0){
+                ambush();
+            }
+            else{
+                turnTo(getTargetX(), getTargetY());
+                stepLeft();
+            }
+        }
+        else{
+            if (getAmbushTimeLeft() > 0){
+                attackRanged(getTargetX(), getTargetY());
+                assassinate(getTargetX(), getTargetY());
+            }
+            else{
+                ambush();
+            }
+        }
+
+    }
+    else if (!start)
+        turn(50);
 }
