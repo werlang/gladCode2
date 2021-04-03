@@ -6,17 +6,66 @@ import { translator } from "./translate.js"
 
 const translatorReady = (async () => {
     await translator.translate([
-        'Carregando página',
-        'Fazendo download do log de batalha',
+        'Acompanhar um gladiador',
+        'Avançar simulação',
+        'Carregando batalha',
         'Carregando interface',
+        'Carregando página',
+        'Carregando recursos',
+        'Comandos',
+        'Compartilhar batalha',
+        'Compartilhar pelo Facebook',
+        'Compartilhar pelo Twitter',
+        'Compartilhar pelo Whatsapp',
+        'Compartilhar',
+        'Controle da câmera',
+        'Copiar link',
+        'Detalhes do gladiador',
+        'Durac',
+        'Efeitos sonoros',
+        'Empate',
+        'ESPAÇO',
         'Esta batalha é muito antiga e não está mais acessível',
         'Esta batalha não consta nos registros',
+        'Fazendo download do log de batalha',
+        'Liga/desliga Música e efeitos sonoros',    
+        'Link copiado',
+        'Minimizar',
+        'Mostrar balões de fala',
+        'Mostrar barras de hp e ap',
+        'Mostrar molduras dos gladiadores',
+        'Mostrar taxa de atualização da tela',
+        'Mostrar valores numéricos de hp, ap e dano',
+        'Mostrar/ocultar barras de hp e ap sobre o gladiador na arena',
+        'Mostrar/ocultar molduras dos gladiadores na interface de usuário',
+        'Mostrar/ocultar taxa de atualização (Quadros / segundo) da simulação',
+        'Mostrar/ocultar texto nas barras de hp e ap na UI e texto flutuante de dano na arena',
+        'Mover a câmera',
+        'Mover',
+        'Música',
+        'Número de espectadores',    
+        'Parar/Continuar simulação',
+        'Preferências',
+        'Retornar para a batalha',
+        'Retroceder simulação',
+        'Teclas de atalho',
+        'Tempo',
+        'Tudo pronto',
+        'Valor',
+        'Veja esta batalha',
+        'VITÓRIA',
+        'Volume do áudio',
+        'Zoom da arena',
     ]);
 
     return true;
 })();
 
-// TODO: check if initial translation are done
+translatorReady.then(() => {
+    document.querySelector('#fog.load #fixed.text').innerHTML = translator.getTranslated('Carregando batalha', false);
+});
+
+translator.translate(document.querySelector('#canvas-container #button-container'));
 
 const potions = {
     ready: false,
@@ -171,7 +220,7 @@ const simulation = {
         if (!this.winner) {
             const glads = this.steps[this.time].glads;
             this.winner = glads.filter(e => e.hp > 0);
-            this.winner = this.winner.length > 1 ? { name: 'Empate', user: '' } : this.winner[0];
+            this.winner = this.winner.length > 1 ? { name: translator.getTranslated('Empate', false), user: '' } : this.winner[0];
         }
 
         if (this.showScore) {
@@ -179,7 +228,7 @@ const simulation = {
             box.id = 'fog';
             box.classList.add('ending');
             box.innerHTML = `<div id='end-message'>
-                <div id='victory'>VITÓRIA</div>
+                <div id='victory'>${translator.getTranslated('VITÓRIA')}</div>
                 <div id='image-container'>
                     <div id='image'></div>
                     <div id='name-team-container'>
@@ -188,31 +237,29 @@ const simulation = {
                     </div>
                 </div>
                 <div id='button-container'>
-                    <button class='button' id='retornar' title='Retornar para a batalha'>OK</button>
-                    <button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button>
+                    <button class='button' id='retornar' title='${translator.getTranslated('Retornar para a batalha', false)}'>OK</button>
+                    <button class='button small' id='share' title='${translator.getTranslated('Compartilhar', false)}'><i class="fas fa-share-alt"></i></button>
                 </div>
             </div>`;
 
-            box.querySelector('#retornar').addEventListener('click', () => {
-                box.remove();
-            })
+            box.querySelector('#retornar').addEventListener('click', () => box.remove());
 
             box.querySelector('#share').addEventListener('click', () => {
                 box.querySelector('#end-message').classList.add('hidden');
 
                 const link = `https://gladcode.dev/play/${simulation.logHash}`;
-                const twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
-                const facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
-                const whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
-
+                const twitter = `<a id='twitter' class='button' title='${translator.getTranslated('Compartilhar pelo Twitter', false)}' href='https://twitter.com/intent/tweet?text=${translator.getTranslated('Veja esta batalha', false)}:&url=${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
+                const facebook = `<a id='facebook' class='button' title='${translator.getTranslated('Compartilhar pelo Facebook', false)}' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
+                const whatsapp = `<a id='whatsapp' class='button' title='${translator.getTranslated('Compartilhar pelo Whatsapp', false)}' href='https://api.whatsapp.com/send?text=${translator.getTranslated('Veja esta batalha', false)}:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
+    
                 box.insertAdjacentHTML('beforeend', `<div id='url'>
                     <div id='link'>
-                        <span id='title'>Compartilhar batalha</span>
+                        <span id='title'>${translator.getTranslated('Compartilhar batalha')}</span>
                         <span id='site'>gladcode.dev/play/</span>
                         <span id='hash'>${simulation.logHash}</span>
                     </div>
                     <div id='social'>
-                        <div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>
+                        <div id='getlink' class='button' title='${translator.getTranslated('Copiar link', false)}'><i class="fas fa-link"></i></div>
                         ${twitter + facebook + whatsapp}
                     </div>
                     <button id='close' class='button'>OK</button>
@@ -220,7 +267,7 @@ const simulation = {
 
                 box.querySelector('#url #social #getlink').addEventListener('click', () => {
                     copyToClipboard(link);
-                    box.querySelector('#url #hash').innerHTML = 'Link copiado';
+                    box.querySelector('#url #hash').innerHTML = translator.getTranslated('Link copiado', false);
                     box.querySelector('#url #hash').classList.add('clicked');
                     setTimeout(() => {
                         box.querySelector('#url #hash').classList.remove('clicked');
@@ -234,7 +281,7 @@ const simulation = {
                 })
             })
 
-            if (this.winner.name != 'Empate') {
+            if (this.winner.name != translator.getTranslated('Empate', false)) {
                 // console.log(this.winner);
                 loader.load('gladcard').then(({ getSpriteThumb }) => box.querySelector('#image').appendChild(getSpriteThumb(glads.get(this.winner.id).spritesheet, 'walk', 'down')));
             }
@@ -397,6 +444,19 @@ const ui = {
 
         const template = await (await fetch("ui_template.html")).text()
 
+        // translate ui template
+        const templateDOM = document.createElement('div');
+        templateDOM.innerHTML = template;
+        const toTranslate = Array.from(templateDOM.querySelectorAll('*')).filter(e => e.title).map(e => e.title);
+        const translations = translator.translate(toTranslate);
+        translations.then(data => {
+            templateDOM.querySelectorAll('*').forEach(e => {
+                if (e.title){
+                    e.title = data.shift();
+                }
+            });
+        });
+
         await glads.wait()
 
         for (let i = 0; i < glads.members.length; i++) {
@@ -434,7 +494,8 @@ const ui = {
                 }
             })
 
-            glad.innerHTML = template
+            await translations;
+            glad.innerHTML = templateDOM.innerHTML;
         }
 
         this.glads.forEach(g => {
@@ -592,9 +653,9 @@ const ui = {
 
             this.element.innerHTML = `
             <div id='title' class='span-col-2' draggable='true'>
-                <i class="fas fa-arrows-alt" title='Mover'></i>
-                <span>Detalhes do gladiador</span>
-                <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
+                <i class="fas fa-arrows-alt" title='${translator.getTranslated('Mover', false)}'></i>
+                <span>${translator.getTranslated('Detalhes do gladiador')}</span>
+                <i id='minimize' class="fas fa-window-minimize" title='${translator.getTranslated('Minimizar', false)}'></i>
             </div>
             <div id='content'>
                 <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
@@ -611,8 +672,8 @@ const ui = {
                 <span>INT:</span><input readonly>
                 <div id='buffs'>
                     <span>Buffs:</span>
-                    <span>Valor</span>
-                    <span>Tempo</span>
+                    <span>${translator.getTranslated('Valor')}</span>
+                    <span>${translator.getTranslated('Tempo')}</span>
                     <div id='box'>${buffBox}</div>
                 </div>
                 <span>AS:</span><input readonly>
@@ -624,9 +685,9 @@ const ui = {
                     <div id='box'></div>
                 </div>
                 <div id='code'>
-                    <span>Comandos:</span>
-                    <span>Durac.</span>
-                    <span>Tempo</span>
+                    <span>${translator.getTranslated('Comandos')}:</span>
+                    <span>${translator.getTranslated('Durac')}.</span>
+                    <span>${translator.getTranslated('Tempo')}</span>
                     <div id='box'></div>
                 </div>
             </div>`;
@@ -860,7 +921,7 @@ class loadBar {
     }
 
     update(status, length) {
-        if (status) {
+        if (status && this.status.innerHTML != status) {
             this.status.innerHTML = status;
         }
 
@@ -885,15 +946,13 @@ class loadBar {
     }
 }
 
-render.init().then(() => changeCrowd(simulation.preferences.crowd))
-
 simulation.loadBox = {
     mainBar: new loadBar(document.querySelector('#loadbar #main'), null),
-    secondBar: new loadBar(document.querySelector('#loadbar #second'), document.querySelector('#loadbar #status'))
+    secondBar: new loadBar(document.querySelector('#loadbar #second'), document.querySelector('#loadbar #status')),
 }
 
 translatorReady.then(() => {
-    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando página',));
+    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando página', false));
 
     if (document.querySelector('#log')) {
         if (document.querySelector('#log').innerHTML.length > 32) {
@@ -931,12 +990,13 @@ translatorReady.then(() => {
                     if (total) {
                         const percentComplete = (100 * e.loaded / total).toFixed(0);
                         // console.log(percentComplete)
-                        simulation.loadBox.secondBar.update(translator.getTranslated('Fazendo download do log de batalha'), percentComplete);
+                        simulation.loadBox.secondBar.update(translator.getTranslated('Fazendo download do log de batalha', false), percentComplete);
                         simulation.loadBox.mainBar.update(null, percentComplete / 4);
                     }
                 },
                 loadend: () => {
-                    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando interface'));
+                    simulation.loadBox.secondBar.update(translator.getTranslated('Carregando interface', false));
+                    render.init().then(() => changeCrowd(simulation.preferences.crowd));
                 },
             }).then(async data => {
                 // console.log(data)
@@ -999,49 +1059,49 @@ document.querySelector('#help').addEventListener('click', () => {
     box.id = 'fog';
     box.innerHTML = `<div id='help-window' class='blue-window'>
         <div id='content'>
-            <h2>Controle da câmera</h2>
+            <h2>${translator.getTranslated('Controle da câmera')}</h2>
             <div class='table'>
                 <div class='row'>
                     <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
-                    <div class='cell'>Mover a câmera</div>
+                    <div class='cell'>${translator.getTranslated('Mover a câmera')}</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
-                    <div class='cell'>Zoom da arena</div>
+                    <div class='cell'>${translator.getTranslated('Zoom da arena')}</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
-                    <div class='cell'>Acompanhar um gladiador</div>
+                    <div class='cell'>${translator.getTranslated('Acompanhar um gladiador')}</div>
                 </div>
             </div>
-            <h2>Teclas de atalho</h2>
+            <h2>${translator.getTranslated('Teclas de atalho')}</h2>
             <div class='table'>
                 <div class='row'>
-                    <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras dos gladiadores na interface de usuário</div>
+                    <div class='cell'><span class='key'>M</span></div><div class='cell'>${translator.getTranslated('Mostrar/ocultar molduras dos gladiadores na interface de usuário')}</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap sobre o gladiador na arena</div>
+                    <div class='cell'><span class='key'>B</span></div><div class='cell'>${translator.getTranslated('Mostrar/ocultar barras de hp e ap sobre o gladiador na arena')}</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização (Quadros / segundo) da simulação</div>
+                    <div class='cell'><span class='key'>F</span></div><div class='cell'>${translator.getTranslated('Mostrar/ocultar taxa de atualização (Quadros / segundo) da simulação')}</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>T</span></div><div class='cell'>Mostrar/ocultar texto nas barras de hp e ap na UI e texto flutuante de dano na arena</div>
+                    <div class='cell'><span class='key'>T</span></div><div class='cell'>${translator.getTranslated('Mostrar/ocultar texto nas barras de hp e ap na UI e texto flutuante de dano na arena')}</div>
                 </div>
                 <div class='row'>
-                    <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
+                    <div class='cell'><span class='key'>${translator.getTranslated('ESPAÇO')}</span></div><div class='cell'>${translator.getTranslated('Parar/Continuar simulação')}</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><span class='key'>A</span></div>
-                    <div class='cell'>Retroceder simulação</div>
+                    <div class='cell'>${translator.getTranslated('Retroceder simulação')}</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><span class='key'>D</span></div>
-                    <div class='cell'>Avançar simulação</div>
+                    <div class='cell'>${translator.getTranslated('Avançar simulação')}</div>
                 </div>
                 <div class='row'>
                     <div class='cell'><span class='key'>S</span></div>
-                    <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
+                    <div class='cell'>${translator.getTranslated('Liga/desliga Música e efeitos sonoros')}</div>
                 </div>
             </div>
         </div>
@@ -1058,22 +1118,22 @@ document.querySelector('#settings').addEventListener('click', () => {
     const box = document.createElement('div');
     box.id = 'fog';
     box.innerHTML = `<div id='settings-window' class='blue-window'>
-        <h2>Preferências</h2>
+        <h2>${translator.getTranslated('Preferências')}</h2>
         <div class='check-container'>
-            <div id='pref-bars'><label><input type='checkbox' class='checkslider' ${simulation.preferences.bars ? "checked" : ""}>Mostrar barras de hp e ap (B)</label></div>
-            <div id='pref-frames'><label><input type='checkbox' class='checkslider' ${simulation.preferences.frames ? "checked" : ""}>Mostrar molduras dos gladiadores (M)</label></div>
-            <div id='pref-fps'><label><input type='checkbox' class='checkslider' ${simulation.preferences.fps ? "checked" : ""}>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
-            <div id='pref-text'><label><input type='checkbox' class='checkslider' ${simulation.preferences.text ? "checked" : ""}>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
-            <div id='pref-speech'><label><input type='checkbox' class='checkslider' ${simulation.preferences.speech ? "checked" : ""}>Mostrar balões de fala</label></div>
+            <div id='pref-bars'><label><input type='checkbox' class='checkslider' ${simulation.preferences.bars ? "checked" : ""}>${translator.getTranslated('Mostrar barras de hp e ap')} (B)</label></div>
+            <div id='pref-frames'><label><input type='checkbox' class='checkslider' ${simulation.preferences.frames ? "checked" : ""}>${translator.getTranslated('Mostrar molduras dos gladiadores')} (M)</label></div>
+            <div id='pref-fps'><label><input type='checkbox' class='checkslider' ${simulation.preferences.fps ? "checked" : ""}>${translator.getTranslated('Mostrar taxa de atualização da tela')} (FPS) (F)</label></div>
+            <div id='pref-text'><label><input type='checkbox' class='checkslider' ${simulation.preferences.text ? "checked" : ""}>${translator.getTranslated('Mostrar valores numéricos de hp, ap e dano')} (T)</label></div>
+            <div id='pref-speech'><label><input type='checkbox' class='checkslider' ${simulation.preferences.speech ? "checked" : ""}>${translator.getTranslated('Mostrar balões de fala')}</label></div>
             <div id='volume-container'>
-                <h3>Volume do áudio</h3>
-                <p>Efeitos sonoros</p>
+                <h3>${translator.getTranslated('Volume do áudio')}</h3>
+                <p>${translator.getTranslated('Efeitos sonoros')}</p>
                 <div id='sfx-volume'></div>
-                <p>Música</p>
+                <p>${translator.getTranslated('Música')}</p>
                 <div id='music-volume'></div>
             </div>
             <div id='crowd-container'>
-                <h3>Número de espectadores</h3>
+                <h3>${translator.getTranslated('Número de espectadores')}</h3>
                 <div id='n-crowd'></div>
             </div>
         </div>

@@ -1,6 +1,8 @@
 import { assets } from "./assets.js"
 import { simulation, ui } from "./playback.js"
 import { FloatingText } from "./floatingText.js"
+import { waitFor } from "./utils.js";
+import { translator } from "./translate.js";
 
 class Gladiator {
     constructor(info) {
@@ -431,13 +433,14 @@ const render = {
 
     preload: function () {
         // this.game.load.onLoadStart.add(() => {
-        // }, this)
+        // }, this);
         this.game.load.onFileComplete.add(progress => {
-            simulation.loadBox.secondBar.update('Carregando recursos', progress);
+            simulation.loadBox.secondBar.update(translator.getTranslated('Carregando recursos', false), progress);
             simulation.loadBox.mainBar.update(null, 50 + progress / 2);
-        }, this)
+        }, this);
+
         this.game.load.onLoadComplete.add(() => {
-            simulation.loadBox.secondBar.update('Tudo pronto');
+            simulation.loadBox.secondBar.update(translator.getTranslated('Tudo pronto', false));
         }, this)
 
         glads.wait().then(() => {
@@ -682,7 +685,11 @@ const render = {
         }
 
         glads.wait().then(() => {
-            glads.members.forEach(e => {
+            glads.members.forEach(async e => {
+                if (!this.game.cache.checkKey(Phaser.Cache.IMAGE, `glad${e.id}`)){
+                    await waitFor(() => this.game.cache.checkKey(Phaser.Cache.IMAGE, `glad${e.id}`));
+                }
+
                 e.sprite = this.game.add.sprite(this.arenaX1 + e.x * this.arenaRate, this.arenaY1 + e.y * this.arenaRate, `glad${e.id}`);
                 e.sprite.anchor.setTo(0.5, 0.5);
 

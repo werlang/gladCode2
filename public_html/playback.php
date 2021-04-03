@@ -45,7 +45,7 @@
     <div id='fog' class='load'>
         <div id='loadbar'>
             <img src='icon/logo.png'>
-            <span class='text'>Carregando batalha</span>
+            <span id='fixed' class='text'></span>
             <div id='main' class='bar-container'>
                 <div class='bar'></div>
             </div>
