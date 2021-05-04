@@ -1,48 +1,72 @@
-import {post} from "./utils.js"
+import { post, waitFor } from "./utils.js"
 
 export const socket = {
-    serverURL: `//${window.location.hostname}:3000`,
-    io: null
+    serverURL: window.location.hostname,
+    port: '8080',
+    connected: false,
+    actionList: {},
 }
 
-socket.init = async function(){
-    // true to avoid entering this more than once
-    this.io = true
+socket.connect = function () {
+    if (!this.connected) {
+        this.ws = new WebSocket(`ws://${this.serverURL}:${this.port}`);
 
-    await new Promise( resolve => {
-        checkIoReady()
-        function checkIoReady() {
-            setTimeout(() => {
-                if (socket.io){
-                    resolve(true)
-                }
-                else{
-                    checkIoReady()
-                }
-            }, 50)
+        this.ws.onopen = () => {
+            console.log('connected to websocket server');
+            this.connected = true;
         }
 
-    })
-
-    import(`./socket.io.js`).then( async () => {
-        try{
-            this.io = io(this.serverURL, {secure: true})
+        this.ws.onclose = () => {
+            if (this.connected) {
+                console.log('websocket disconnected');
+            }
+            else {
+                console.log('reconnecting to websocket server...');
+            }
+            this.connected = false;
+            setTimeout(() => this.connect(), 1000);
         }
-        catch(e){
-            this.io = null
-            console.log(e)
-        }
-    })
 
-    return this
+        // run callback event for receiving message for a room
+        this.ws.onmessage = event => {
+            const msg = JSON.parse(event.data);
+            if (this.actionList[msg.action]) {
+                this.actionList[msg.action](msg);
+            }
+        }
+    }
 }
 
-socket.admin = async function(obj){
-    socket.request('login', obj).then( (res, err) => {
+socket.join = function (room) {
+    this.ws.send(JSON.stringify({ command: 'join', room: room }));
+}
+
+socket.leave = function (room) {
+    this.ws.send(JSON.stringify({ command: 'leave', room: room }));
+}
+
+// send message to specific room in the ws server
+socket.emit = function (action, data) {
+    this.ws.send(JSON.stringify({ action: action, data: data }));
+}
+
+// register callback for when receive message from a specific room
+socket.on = function (action, callback) {
+    this.actionList[action] = callback;
+}
+
+
+socket.init = async function () {
+    this.connect();
+    return this;
+}
+
+socket.admin = async function (obj) {
+    socket.request('login', obj).then((res, err) => {
         if (err) return console.log(err)
         console.log(res);
-        if (res.session == true){
-            window.location.reload()
+        if (res.session == true) {
+            // window.location.reload()
         }
     })
 
@@ -53,7 +77,7 @@ socket.admin = async function(obj){
     // console.log(await resp)
 }
 
-socket.request = async function(route, data){
+socket.request = async function (route, data) {
     // return await $.ajax({
     //     type: "POST",
     //     url: `${this.serverURL}/${route}`,
@@ -75,21 +99,11 @@ socket.request = async function(route, data){
     return await request.json()
 }
 
-socket.isReady = async function(){
-    if (!this.io){
-        await this.init()
+socket.isReady = async function () {
+    if (!this.connected) {
+        await this.init();
     }
-    return await new Promise(resolve => {
-        checkAgain()
-        function checkAgain(){
-            if (socket.io && socket.io.connected){
-                resolve(socket)
-            }
-            else{
-                setTimeout(() => {
-                    checkAgain()
-                }, 10);
-            }
-        }
-    });
+
+    await waitFor(() => this.connected);
+    return this;
 }

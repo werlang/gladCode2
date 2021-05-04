@@ -520,118 +520,120 @@ const ui = {
 
         const container = document.querySelector('#ui-container');
 
-        if (simulation.preferences.frames) {
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                setTimeout(() => container.classList.remove('fade'), 10);
-            }
-
-            if (simulation.preferences.text && !this.showtext) {
-                this.showtext = true
-                this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
-            }
-            else if (!simulation.preferences.text && this.showtext) {
-                this.showtext = false
-                this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.add('hidden'))
-            }
-
-            Object.values(step.glads).forEach(g => {
-                const glad = this.glads.filter(e => e.id == g.id)[0]
-
-                if (glad) {
-                    if (g.name != glad.name) {
-                        glad.element.querySelector('.glad-name span').innerHTML = g.name
-                        loader.load('gladcard').then(({ getSpriteThumb }) => {
-                            glad.element.querySelector('.glad-portrait').appendChild(getSpriteThumb(glads.members[g.id].spritesheet, 'walk', 'down'))
-                        })
-                    }
-
-                    if (g.STR != glad.STR) {
-                        glad.element.querySelector('.glad-str span').innerHTML = g.STR
-                    }
-
-                    if (g.AGI != glad.AGI) {
-                        glad.element.querySelector('.glad-agi span').innerHTML = g.AGI
-                    }
-
-                    if (g.INT != glad.INT) {
-                        glad.element.querySelector('.glad-int span').innerHTML = g.INT
-                    }
-
-                    if (g.lvl != glad.lvl) {
-                        glad.element.querySelector('.lvl-value span').innerHTML = g.lvl
-
-                        glad.element.querySelector('.lvl-value').classList.add('up')
-                        setTimeout(() => glad.element.querySelector('.lvl-value').classList.remove('up'), 500)
-
-                        const xpBar = glad.element.querySelector('.xp-bar .filled');
-                        xpBar.classList.add('up');
-                        setTimeout(() => {
-                            xpBar.classList.add('reset');
-                            xpBar.classList.remove('up');
-
-                            setTimeout(() => xpBar.classList.remove('reset'), 150);
-                        }, 500);
-                    }
-
-                    if (g.xp != glad.xp) {
-                        glad.element.querySelector('.xp-bar .filled').style.height = (g.xp / g.tonext * 100) + '%'
-                    }
-
-                    if (g.hp != glad.hp) {
-                        glad.element.querySelector('.hp-bar .filled').style.width = (g.hp / g.maxhp * 100) + '%'
-                        glad.element.querySelector('.hp-bar .text').innerHTML = `${g.hp.toFixed(0)} / ${g.maxhp}`
-                    }
-
-                    if (g.hp <= 0) {
-                        glad.isDead = true
-                        glad.element.classList.add('dead')
-                    }
-                    else if (glad.isDead) {
-                        glad.isDead = false
-                        glad.element.classList.remove('dead')
-                    }
-
-                    if (g.ap != glad.ap) {
-                        glad.element.querySelector('.ap-bar .filled').style.width = (g.ap / g.maxap * 100) + '%'
-                        glad.element.querySelector('.ap-bar .text').innerHTML = `${g.ap.toFixed(0)} / ${g.maxap}`
-                    }
-
-                    ["burn", "resist", "stun", "invisible", "speed", "poison"].forEach(b => {
-                        const poisoned = b == 'poison' && glads.get(glad.id).poison;
-
-                        if ((g.buffs[b] && g.buffs[b].timeleft) || poisoned) {
-                            glad.buffs[b] = true
-                            glad.element.querySelector(`.buff-${b}`).classList.add('active')
-                        }
-                        else if (glad.buffs[b]) {
-                            glad.buffs[b] = false
-                            glad.element.querySelector(`.buff-${b}`).classList.remove('active')
-                        }
-                    })
-
-                    if (glad.element.classList.contains("follow")) {
-                        this.detailedWindow.update()
-                    }
+        if (container){
+            if (simulation.preferences.frames) {
+                if (container.classList.contains('hidden')) {
+                    container.classList.remove('hidden');
+                    setTimeout(() => container.classList.remove('fade'), 10);
                 }
-
-                [
-                    "name",
-                    "STR", "AGI", "INT",
-                    "hp", "maxhp", "ap", "maxap",
-                    "lvl", "xp", "tonext",
-                    "x", "y", "head",
-                    "as", "cs", "spd",
-                    "lockedfor", "action"
-                ].forEach(e => glad[e] = g[e]);
-
-                ["burn", "resist", "invisible", "stun", "speeds"].forEach(e => glad.buffs[e] = g.buffs && g.buffs[e] ? g.buffs[e].timeleft : 0)
-
-            })
-        }
-        else if (!container.classList.contains('fade')) {
-            setTimeout(() => container.classList.add('hidden'), 1000);
-            container.classList.add('fade');
+    
+                if (simulation.preferences.text && !this.showtext) {
+                    this.showtext = true
+                    this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.remove('hidden'))
+                }
+                else if (!simulation.preferences.text && this.showtext) {
+                    this.showtext = false
+                    this.container.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(e => e.classList.add('hidden'))
+                }
+    
+                Object.values(step.glads).forEach(g => {
+                    const glad = this.glads.filter(e => e.id == g.id)[0]
+    
+                    if (glad) {
+                        if (g.name != glad.name) {
+                            glad.element.querySelector('.glad-name span').innerHTML = g.name
+                            loader.load('gladcard').then(({ getSpriteThumb }) => {
+                                glad.element.querySelector('.glad-portrait').appendChild(getSpriteThumb(glads.members[g.id].spritesheet, 'walk', 'down'))
+                            })
+                        }
+    
+                        if (g.STR != glad.STR) {
+                            glad.element.querySelector('.glad-str span').innerHTML = g.STR
+                        }
+    
+                        if (g.AGI != glad.AGI) {
+                            glad.element.querySelector('.glad-agi span').innerHTML = g.AGI
+                        }
+    
+                        if (g.INT != glad.INT) {
+                            glad.element.querySelector('.glad-int span').innerHTML = g.INT
+                        }
+    
+                        if (g.lvl != glad.lvl) {
+                            glad.element.querySelector('.lvl-value span').innerHTML = g.lvl
+    
+                            glad.element.querySelector('.lvl-value').classList.add('up')
+                            setTimeout(() => glad.element.querySelector('.lvl-value').classList.remove('up'), 500)
+    
+                            const xpBar = glad.element.querySelector('.xp-bar .filled');
+                            xpBar.classList.add('up');
+                            setTimeout(() => {
+                                xpBar.classList.add('reset');
+                                xpBar.classList.remove('up');
+    
+                                setTimeout(() => xpBar.classList.remove('reset'), 150);
+                            }, 500);
+                        }
+    
+                        if (g.xp != glad.xp) {
+                            glad.element.querySelector('.xp-bar .filled').style.height = (g.xp / g.tonext * 100) + '%'
+                        }
+    
+                        if (g.hp != glad.hp) {
+                            glad.element.querySelector('.hp-bar .filled').style.width = (g.hp / g.maxhp * 100) + '%'
+                            glad.element.querySelector('.hp-bar .text').innerHTML = `${g.hp.toFixed(0)} / ${g.maxhp}`
+                        }
+    
+                        if (g.hp <= 0) {
+                            glad.isDead = true
+                            glad.element.classList.add('dead')
+                        }
+                        else if (glad.isDead) {
+                            glad.isDead = false
+                            glad.element.classList.remove('dead')
+                        }
+    
+                        if (g.ap != glad.ap) {
+                            glad.element.querySelector('.ap-bar .filled').style.width = (g.ap / g.maxap * 100) + '%'
+                            glad.element.querySelector('.ap-bar .text').innerHTML = `${g.ap.toFixed(0)} / ${g.maxap}`
+                        }
+    
+                        ["burn", "resist", "stun", "invisible", "speed", "poison"].forEach(b => {
+                            const poisoned = b == 'poison' && glads.get(glad.id).poison;
+    
+                            if ((g.buffs[b] && g.buffs[b].timeleft) || poisoned) {
+                                glad.buffs[b] = true
+                                glad.element.querySelector(`.buff-${b}`).classList.add('active')
+                            }
+                            else if (glad.buffs[b]) {
+                                glad.buffs[b] = false
+                                glad.element.querySelector(`.buff-${b}`).classList.remove('active')
+                            }
+                        })
+    
+                        if (glad.element.classList.contains("follow")) {
+                            this.detailedWindow.update()
+                        }
+                    }
+    
+                    [
+                        "name",
+                        "STR", "AGI", "INT",
+                        "hp", "maxhp", "ap", "maxap",
+                        "lvl", "xp", "tonext",
+                        "x", "y", "head",
+                        "as", "cs", "spd",
+                        "lockedfor", "action"
+                    ].forEach(e => glad[e] = g[e]);
+    
+                    ["burn", "resist", "invisible", "stun", "speeds"].forEach(e => glad.buffs[e] = g.buffs && g.buffs[e] ? g.buffs[e].timeleft : 0)
+    
+                })
+            }
+            else if (!container.classList.contains('fade')) {
+                setTimeout(() => container.classList.add('hidden'), 1000);
+                container.classList.add('fade');
+            }
         }
     },
 
