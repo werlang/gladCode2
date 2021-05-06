@@ -46,8 +46,10 @@ socket.leave = function (room) {
 }
 
 // send message to specific room in the ws server
-socket.emit = function (action, data) {
-    this.ws.send(JSON.stringify({ action: action, data: data }));
+socket.emit = function (action, data, reply) {
+    const timestamp = new Date().getTime();
+    this.ws.send(JSON.stringify({ action: action, data: data, timestamp: timestamp }));
+    socket.on(`reply-${timestamp}`, reply);
 }
 
 // register callback for when receive message from a specific room

@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-export const server = new WebSocket.Server({
+const server = new WebSocket.Server({
     port: 8080
 });
 
@@ -19,11 +19,16 @@ server.on('connection', function (socket) {
         if (message.command){
             // call join or leave function
             if (['join', 'leave'].includes(message.command)) {
-                this[message.command](message.room, socket);
+                socket[message.command](message.room);
             }
         }
         else if (message.action && this.actionList[message.action]){
-            this.actionList[message.action](data);
+            let replyData;
+            this.actionList[message.action](message.data, reply => replyData = reply);
+
+            if (message.timestamp && replyData){
+                socket.send(JSON.stringify({ action: `reply-${message.timestamp}`, message: replyData }));
+            }
         }        
     });
     
@@ -35,33 +40,38 @@ server.on('connection', function (socket) {
             message: 'Disconnected from WebSocket server'
         } }));    
     });
-});
 
-server.join = function(room, client) {
-    if (this.roomList[room]){
-        this.roomList[room].push(client);
-    }
-    else{
-        this.roomList[room] = [client];
-    }
-}
-
-server.leave = function(room, client) {
-    if (this.roomList[room]){
-        this.roomList[room] = this.roomList[room].filter(e => e != client);
-
-        if (this.roomList[room] == 0){
-            delete this.roomList[room];
+    socket.join = room => {
+        if (this.roomList[room]){
+            this.roomList[room].push(socket);
+        }
+        else{
+            this.roomList[room] = [socket];
         }
     }
-}
+    
+    socket.leave = room => {
+        if (this.roomList[room]){
+            this.roomList[room] = this.roomList[room].filter(e => e != socket);
+    
+            if (this.roomList[room] == 0){
+                delete this.roomList[room];
+            }
+        }
+    }
+    
+    socket.addAction = (action, callback) => {
+        this.actionList[action] = callback;
+    }    
+
+    if (this.init){
+        this.init(socket);
+    }
+});
 
 server.emit = function(room = 'everyone', action, data) {
     const clients = room == 'everyone' ? this.clientList : (this.roomList[room] || []);
     clients.forEach(c => c.send(JSON.stringify({ action: action, data: data })));
 }
 
-server.addAction = function(action, callback){
-    this.actionList[action] = callback;
-}
-
+module.exports = server;

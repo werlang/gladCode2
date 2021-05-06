@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const wsServer = require('./wsserver');
 
 var config = JSON.parse(fs.readFileSync('config.json'));
 if (config.credentials){
@@ -9,22 +10,17 @@ if (config.credentials){
 }
 const server = require(config.protocol).createServer(config.credentials, app);
 
-const io = require('socket.io')(server);
 const mysql = require('mysql');
 const crypto = require('crypto');
 const request = require('request');
 const expsession = require('express-session');
 const MySQLStore = require('express-mysql-session')(expsession);
 const cors = require('cors');
-const bodyParser = require('body-parser')
 
-//what groups are trying to run simulation
+// what groups are trying to run simulation
 var tournament_run = {};
 
-
-//var exec = require('child_process');
-
-//mysql
+// mysql
 var mysql_options = {
     host     : 'localhost',
     port     : 3306,
@@ -40,7 +36,7 @@ connection.connect(function(err){
     console.log(`Connected Mysql database ${cfg.database}@${cfg.host}:${cfg.port}`);
 });
 
-//sessions
+// sessions
 app.use(expsession({
     secret: 'eita3686eita',
     resave: true,
@@ -52,7 +48,7 @@ app.use(expsession({
     store: sessionStore
 }));
 
-//cors
+// cors
 app.use(cors({
     origin: [
         'http://127.0.0.1:85',
@@ -70,11 +66,10 @@ app.use(cors({
         'https://www.gladcode.dev'
     ],
     credentials: true,
-
 }));
 
 // parse application/json
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 //login and session route
 var session;
@@ -146,64 +141,65 @@ app.post('/login', function(req,res){
     }
 });
 
-//php route
-var parser = bodyParser.json();
+// php route
+const parser = express.json();
 app.post('/phpcallback', parser, function(req, res) {
     var content = req.body;
     //console.log(content);
     //emit notifications
     if (content['chat notification']){
         var msg = content['chat notification'];
-        io.to(`chat-room-${msg.room}`).emit('chat notification', msg);
+        wsServer.emit(`chat-room-${msg.room}`, 'chat notification', msg);
+        wsServer.emit(`chat-room-${msg.room}`, 'chat notification', msg);
     }
     else if (content['chat personal']){
         var msg = content['chat personal'];
-        io.to(`user-${msg.user}`).emit('chat personal', msg);
+        wsServer.emit(`user-${msg.user}`, 'chat personal', msg);
     }
     else if (content['profile notification']){
         var users = content['profile notification'].user;
         for (let i in users){
             //console.log(`send to: user-${users[i]}`);
-            io.to(`user-${users[i]}`).emit('profile notification', true);
+            wsServer.emit(`user-${users[i]}`, 'profile notification', true);
         }
     }
     else if (content['tournament list']){
-        io.to('tournament-list').emit('tournament list', true);
+        wsServer.emit('tournament-list', 'tournament list', true);
     }
     else if (content['tournament teams']){
         var data = content['tournament teams'];
-        io.to(`tournament-${data.id}`).emit('tournament teams', data);
+        wsServer.emit(`tournament-${data.id}`, 'tournament teams', data);
     }
     else if (content['tournament glads']){
         var data = content['tournament glads'];
-        io.to(`team-${data.team}`).emit('tournament glads', data);
+        wsServer.emit(`team-${data.team}`, 'tournament glads', data);
     }
     else if (content['tournament refresh']){
         var data = content['tournament refresh'];
-        io.to(`tournament-${data.hash}`).emit('tournament refresh', true);
+        wsServer.emit(`tournament-${data.hash}`, 'tournament refresh', true);
     }
     else if (content['training refresh']){
         var data = content['training refresh'];
-        io.to(`training-${data.hash.toLowerCase()}`).emit('training refresh', true);
+        wsServer.emit(`training-${data.hash.toLowerCase()}`, 'training refresh', true);
     }
     else if (content['training end']){
         var data = content['training end'];
-        io.to(`training-${data.hash.toLowerCase()}`).emit('training end', true);
+        wsServer.emit(`training-${data.hash.toLowerCase()}`, 'training end', true);
     }
     else if (content['training list']){
-        io.to('training-list').emit('training list', true);
+        wsServer.emit('training-list', 'training list', true);
     }
     else if (content['training room']){
         var data = content['training room'];
-        io.to(`training-room-${data.id}`).emit('training room', data);
+        wsServer.emit(`training-room-${data.id}`, 'training room', data);
     }
     res.end();
 });
 
-io.on('connection', function(socket){
+wsServer.init = function(socket){
     console.log("New client: " +socket.id);
 
-    connection.query("SET time_zone='-03:00';", error => {});
+    connection.query("SET time_zone='-03:00';", () => {});
     
     wait_session().then( () => {
         //set active time
@@ -215,23 +211,19 @@ io.on('connection', function(socket){
         socket.join(`user-${session.user}`);
     }, () => {});
 
-
-    socket.on('disconnect', function(){
-    });
-
     //list rooms
-    socket.on('chat rooms', (fn) => {
+    socket.addAction('chat rooms', (_, reply) => {
         if (session && session.user){
             let user = session.user
             let output = {}
 
             let sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited, cr.direct FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
             connection.query(sql, function (error, results, fields){
-                if(error){ fn(error); return;}
+                if(error){ reply(error); return;}
 
                 output.room = results
                 output.status = "OK"
-                fn(output);
+                reply(output);
 
                 for (let i in results){
                     socket.join(`chat-room-${results[i].id}`);
@@ -239,19 +231,19 @@ io.on('connection', function(socket){
             });
         }
         else
-            fn({status: "NOTLOGGED"});
+            reply({status: "NOTLOGGED"});
 
     });
 
-    socket.on('tournament run request', (args, fn) => {
+    socket.addAction('tournament run request', (args, reply) => {
         var hashgroup = `${args.hash}-${args.group}`;
         if (!tournament_run[hashgroup]){
             tournament_run[hashgroup] = true;
             dismiss(hashgroup);
-            fn({permission: 'granted'});
+            reply({permission: 'granted'});
         }
         else{
-            fn({permission: 'denied'});
+            reply({permission: 'denied'});
         }
 
         function dismiss(key){
@@ -261,41 +253,41 @@ io.on('connection', function(socket){
         }
     });
 
-    socket.on('tournament join', args => {
+    socket.addAction('tournament join', args => {
         tournament_join_leave('join', args);
     });
-    socket.on('tournament leave', args => {
+    socket.addAction('tournament leave', args => {
         tournament_join_leave('leave', args);
     });
 
-    socket.on('team join', args => {
+    socket.addAction('team join', args => {
         socket.join(`team-${args.team}`);
     });
-    socket.on('team leave', args => {
+    socket.addAction('team leave', args => {
         socket.leave(`team-${args.team}`);
     });
 
-    socket.on('tournament list join', args => {
+    socket.addAction('tournament list join', () => {
         socket.join(`tournament-list`);
     });
 
-    socket.on('tournament run join', args => {
+    socket.addAction('tournament run join', args => {
         socket.join(`tournament-${args.hash}`);
     });
 
-    socket.on('training run join', args => {
+    socket.addAction('training run join', args => {
         socket.join(`training-${args.hash.toLowerCase()}`);
     });
 
-    socket.on('training list join', args => {
+    socket.addAction('training list join', () => {
         socket.join(`training-list`);
     });
     
-    socket.on('training room join', args => {
+    socket.addAction('training room join', args => {
         socket.join(`training-room-${args.id}`);
     });
 
-    socket.on('training room leave', args => {
+    socket.addAction('training room leave', args => {
         socket.leave(`training-room-${args.id}`);
     });
 
@@ -314,10 +306,10 @@ io.on('connection', function(socket){
         });
     }
     
-});
+}
 
-server.listen(3000, function(){
-    console.log('listening on *:3000');
+const a = app.listen(3000, function(){
+    console.log(`listening on *:${a.address().port}`);
 });
 
 async function wait_session(){
