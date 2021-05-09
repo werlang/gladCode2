@@ -15,6 +15,7 @@ server.on('connection', function (socket) {
 
     socket.on('message', message => {
         message = JSON.parse(message);
+        // console.log(message);
         
         if (message.command){
             // call join or leave function
@@ -23,12 +24,11 @@ server.on('connection', function (socket) {
             }
         }
         else if (message.action && this.actionList[message.action]){
-            let replyData;
-            this.actionList[message.action](message.data, reply => replyData = reply);
-
-            if (message.timestamp && replyData){
-                socket.send(JSON.stringify({ action: `reply-${message.timestamp}`, message: replyData }));
-            }
+            this.actionList[message.action](message.data, reply => {
+                if (message.timestamp && reply){
+                    socket.send(JSON.stringify({ action: `reply-${message.timestamp}`, message: reply }));
+                }
+            });
         }        
     });
     
@@ -70,6 +70,7 @@ server.on('connection', function (socket) {
 });
 
 server.emit = function(room = 'everyone', action, data) {
+    // console.log({ room: room, action: action, data: data });
     const clients = room == 'everyone' ? this.clientList : (this.roomList[room] || []);
     clients.forEach(c => c.send(JSON.stringify({ action: action, data: data })));
 }

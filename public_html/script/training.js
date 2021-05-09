@@ -69,10 +69,10 @@ $(document).ready(async function(){
         window.location.href = ''
 
     socket.isReady().then( () => {
-        socket.io.emit('training run join', {
+        socket.emit('training run join', {
             hash: hash
         });
-        socket.io.on('training refresh', () => {
+        socket.on('training refresh', () => {
             if (!training.refreshCalls)
                 training.refreshCalls = 0
             
@@ -84,7 +84,7 @@ $(document).ready(async function(){
             }
             training.refreshCalls++
         });
-        socket.io.on('training end', () => {
+        socket.on('training end', () => {
             window.location.href = `train/${training.hash}/0`
         });
 
@@ -508,7 +508,7 @@ training.refresh = async function(args){
                 origin: "train"
             })
             await socket.isReady()
-            socket.io.emit('tournament run request', {
+            socket.emit('tournament run request', {
                 hash: this.hash,
                 group: gid
             }, async data => {
@@ -549,7 +549,7 @@ training.refresh = async function(args){
 
             if (data.newround){
                 await socket.isReady()
-                socket.io.emit('tournament run request', {
+                socket.emit('tournament run request', {
                     hash: this.hash,
                     group: 'newround'
                 }, async data => {

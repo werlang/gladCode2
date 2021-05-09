@@ -197,7 +197,7 @@ app.post('/phpcallback', parser, function(req, res) {
 });
 
 wsServer.init = function(socket){
-    console.log("New client: " +socket.id);
+    console.log("New client connected");
 
     connection.query("SET time_zone='-03:00';", () => {});
     
@@ -215,15 +215,12 @@ wsServer.init = function(socket){
     socket.addAction('chat rooms', (_, reply) => {
         if (session && session.user){
             let user = session.user
-            let output = {}
 
             let sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited, cr.direct FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
             connection.query(sql, function (error, results, fields){
                 if(error){ reply(error); return;}
 
-                output.room = results
-                output.status = "OK"
-                reply(output);
+                reply({ room: results, status: 'OK' });
 
                 for (let i in results){
                     socket.join(`chat-room-${results[i].id}`);

@@ -82,17 +82,17 @@ var user
 
 $(document).ready( function(){
     socket.isReady().then( () => {
-        socket.io.on('tournament list', data =>{
+        socket.on('tournament list', {}, data =>{
             refresh_tourn_list();
         });
-        socket.io.on('tournament teams', data =>{
+        socket.on('tournament teams', {}, data =>{
             refresh_teams(data);
         });
-        socket.io.on('tournament glads', data =>{
+        socket.on('tournament glads', {}, data =>{
             refresh_glads(data);
         });
 
-        socket.io.emit('tournament list join', {})
+        socket.emit('tournament list join', {})
     });
 
     login.wait().then( data => {
@@ -328,7 +328,7 @@ $(document).ready( function(){
                     refresh_teams({name: tname, pass: tpass});
 
                     if (socket){
-                        socket.io.emit('tournament join', {
+                        socket.emit('tournament join', {
                             tname: tname,
                             tpass: tpass
                         });
@@ -355,7 +355,7 @@ $(document).ready( function(){
                         $('#fog').remove();
 
                         if (socket){
-                            socket.io.emit('tournament leave', {
+                            socket.emit('tournament leave', {
                                 tname: tname,
                                 tpass: tpass
                             });
@@ -746,7 +746,7 @@ function rebind_team_rows(teamid){
         // translator.bind()
 
         if (socket){
-            socket.io.emit('team join', {
+            socket.emit('team join', {
                 team: teamid
             });
         }
@@ -756,7 +756,7 @@ function rebind_team_rows(teamid){
             $('#fog .tourn.window').fadeIn();
 
             if (socket){
-                socket.io.emit('team leave', {
+                socket.emit('team leave', {
                     team: teamid
                 });
             }
@@ -840,7 +840,7 @@ function rebind_team_rows(teamid){
 function refresh_glads(args){
     if (args.remove){
         if (socket){
-            socket.io.emit('team leave', {
+            socket.emit('team leave', {
                 team: args.team
             });
         }

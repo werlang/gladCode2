@@ -181,16 +181,16 @@ chat.init = async function(wrapper, options){
             }
         });
 
-        socket.io.on('connect', data => {
+        socket.on('connect', data => {
             console.log(data)
         })
-        socket.io.on('chat notification', (data) => {
+        socket.on('chat notification', (data) => {
             getChatNotification();
             if ($('#chat-panel .room.open').data('id') == data.room){
                 chat.getMessages({room: data.room, sync: true});
             }
         });
-        socket.io.on('chat personal', data => {
+        socket.on('chat personal', data => {
             let msg
             if (data.status == "KICK"){
                 msg = `Você foi removido da sala ${data.room_name}`;
@@ -763,7 +763,7 @@ async function listRooms(arg){
             action: "NAMES"
         })
 
-        socket.io.emit('chat rooms', async data => {
+        socket.emit('chat rooms', {}, async data => {
             // console.log(data);
 
             directnames = (await directnames).rooms

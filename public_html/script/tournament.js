@@ -13,10 +13,10 @@ $(document).ready( function() {
     $('#hash, #round').remove();
 
     socket.isReady().then( () => {
-        socket.io.emit('tournament run join', {
+        socket.emit('tournament run join', {
             hash: hash
         });
-        socket.io.on('tournament refresh', data =>{
+        socket.on('tournament refresh', data => {
             refresh_round();
         });
     });
@@ -318,7 +318,7 @@ function refresh_round(){
 
                 if (data.groups[i].status == "RUN"){
                     socket.isReady().then( () => {
-                        socket.io.emit('tournament run request', {
+                        socket.emit('tournament run request', {
                             hash: hash,
                             group: i
                         }, function(data){

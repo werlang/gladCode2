@@ -56,10 +56,10 @@ import {loader} from "./loader.js"
 
 $(document).ready( function(){
     socket.isReady().then( () => {
-        socket.io.on('training list', data =>{
+        socket.on('training list', data =>{
             trainList.refresh()
         })
-        socket.io.on('training room', data =>{
+        socket.on('training room', data =>{
             roomList[data.id].refresh()
         });
     });
@@ -455,7 +455,7 @@ export const trainList = {
     refresh: async function(){
         if (!this.listening){
             socket.isReady().then( () => {
-                socket.io.emit('training list join', {})
+                socket.emit('training list join', {})
             })
             this.listening = true
         }
@@ -663,7 +663,7 @@ var roomList = {
                         $('#fog').remove()
 
                         if (socket)
-                            socket.io.emit('training room leave', {id: id})
+                            socket.emit('training room leave', {id: id})
                     })
 
                     $('.train.window .edit').click( function(){
@@ -765,7 +765,7 @@ var roomList = {
                     })
 
                     if (socket)
-                        socket.io.emit('training room join', {id: id})
+                        socket.emit('training room join', {id: id})
 
                     this.refresh()
                 }
@@ -801,7 +801,7 @@ var roomList = {
                         new Message({message: `Você foi removido do treino`}).show()
                     }
                     if (socket)
-                        socket.io.emit('training room leave', {id: id})
+                        socket.emit('training room leave', {id: id})
                 }
                 else if (data.status == "MANAGE" || data.status == "PARTICIPATE"){
                     let manager = false

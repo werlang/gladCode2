@@ -252,7 +252,7 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
 
         socket.isReady().then( () => {
             // console.log("socket ready");
-            socket.io.on('profile notification', data =>{
+            socket.on('profile notification', data =>{
                 // console.log("server message");
                 checkNotifications();
             });
@@ -631,7 +631,7 @@ document.querySelector("#message-panel .page-nav #next").addEventListener('click
                     $('#fog').remove();
                     $('#menu #battle').click();
 
-                    afterBattleShow(hash, oldStatus)
+                    // afterBattleShow(hash, oldStatus)
                 }
             });
 
@@ -1091,128 +1091,129 @@ function afterBattleShow(hash, oldStatus){
         </div>
     </div>`)
 
-    translator.translate($('#after-battle'))
+    // translator.translate($('#after-battle'))
 
-    const gladCardModule = loader.load("gladcard")
+    // const gladCardModule = loader.load("gladcard")
 
-    $('#fog #after-battle span.svg').each( function() {
-        load_svg($(this))
-    })
+    // $('#fog #after-battle span.svg').each( function() {
+    //     const e = $(this);
+    //     $.get(e.html(), null, null, 'text').then( data => e.removeClass('hidden').html(data));
+    // })
 
-    post("back_notification.php", {
-        action: "SUMMARY",
-        hash: hash
-    }).then( data => {
-        // console.log(data)
+    // post("back_notification.php", {
+    //     action: "SUMMARY",
+    //     hash: hash
+    // }).then( data => {
+    //     // console.log(data)
 
-        $('#fog #after-battle #lvl .value').html(data.lvl)
+    //     $('#fog #after-battle #lvl .value').html(data.lvl)
 
-        let xpincrease = data.xp - oldStatus.xp.value
-        if (oldStatus.lvl != data.lvl){
-            $('#fog #after-battle #lvl #plusone').removeClass('hidden')
-            xpincrease = (parseFloat(data.xp) + parseFloat(oldStatus.xp.total) - parseFloat(oldStatus.xp.value)).toFixed(0)
-        }
+    //     let xpincrease = data.xp - oldStatus.xp.value
+    //     if (oldStatus.lvl != data.lvl){
+    //         $('#fog #after-battle #lvl #plusone').removeClass('hidden')
+    //         xpincrease = (parseFloat(data.xp) + parseFloat(oldStatus.xp.total) - parseFloat(oldStatus.xp.value)).toFixed(0)
+    //     }
 
-        let time = 1500
-        let steps = 100
+    //     let time = 1500
+    //     let steps = 100
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: 0,
-            end: xpincrease,
-            onStep: data => {
-                if (data != 0){
-                    $('#fog #after-battle #xp-increase').html(`(+${parseInt(data)})`)
-                }
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: 0,
+    //     //     end: xpincrease,
+    //     //     onStep: data => {
+    //     //         if (data != 0){
+    //     //             $('#fog #after-battle #xp-increase').html(`(+${parseInt(data)})`)
+    //     //         }
+    //     //     }
+    //     // }).run()
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: oldStatus.xp.value,
-            end: data.xp,
-            onStep: data => {
-                $('#fog #after-battle #xp-now').html(parseInt(data))
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: oldStatus.xp.value,
+    //     //     end: data.xp,
+    //     //     onStep: data => {
+    //     //         $('#fog #after-battle #xp-now').html(parseInt(data))
+    //     //     }
+    //     // }).run()
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: oldStatus.xp.value / oldStatus.xp.total * 100,
-            end: data.xp / getXpToNextLvl() * 100,
-            onStep: data => {
-                $('#fog #after-battle #xp-bar #filled').css('width', `${data}%`)
-            }
-        }).run()
-        $('#fog #after-battle #xp-total').html(parseInt(getXpToNextLvl()))
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: oldStatus.xp.value / oldStatus.xp.total * 100,
+    //     //     end: data.xp / getXpToNextLvl() * 100,
+    //     //     onStep: data => {
+    //     //         $('#fog #after-battle #xp-bar #filled').css('width', `${data}%`)
+    //     //     }
+    //     // }).run()
+    //     // $('#fog #after-battle #xp-total').html(parseInt(getXpToNextLvl()))
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: 0,
-            end: data.silver - oldStatus.silver,
-            onStep: data => {
-                $('#fog #after-battle #silver-now .value').html(`+${parseInt(data)}`)
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: 0,
+    //     //     end: data.silver - oldStatus.silver,
+    //     //     onStep: data => {
+    //     //         $('#fog #after-battle #silver-now .value').html(`+${parseInt(data)}`)
+    //     //     }
+    //     // }).run()
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: oldStatus.silver,
-            end: data.silver,
-            onStep: data => {
-                $('#fog #after-battle #silver-total').html(data.toFixed(0))
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: oldStatus.silver,
+    //     //     end: data.silver,
+    //     //     onStep: data => {
+    //     //         $('#fog #after-battle #silver-total').html(data.toFixed(0))
+    //     //     }
+    //     // }).run()
 
-        let mmrdiff = parseInt(data.glad.mmr) - parseInt(oldStatus.mmr)
-        if (mmrdiff > 0){
-            $('#fog #after-battle #renown-now .value').addClass('green')
-        }
-        else if (mmrdiff < 0){
-            $('#fog #after-battle #renown-now .value').addClass('red')
-        }
+    //     let mmrdiff = parseInt(data.glad.mmr) - parseInt(oldStatus.mmr)
+    //     if (mmrdiff > 0){
+    //         $('#fog #after-battle #renown-now .value').addClass('green')
+    //     }
+    //     else if (mmrdiff < 0){
+    //         $('#fog #after-battle #renown-now .value').addClass('red')
+    //     }
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: 0,
-            end: mmrdiff,
-            onStep: data => {
-                data = mmrdiff > 0 ? `+${parseInt(data)}` : parseInt(data)
-                $('#fog #after-battle #renown-now .value').html(data)
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: 0,
+    //     //     end: mmrdiff,
+    //     //     onStep: data => {
+    //     //         data = mmrdiff > 0 ? `+${parseInt(data)}` : parseInt(data)
+    //     //         $('#fog #after-battle #renown-now .value').html(data)
+    //     //     }
+    //     // }).run()
 
-        new valueAnimator({
-            time: time,
-            steps: steps,
-            start: oldStatus.mmr,
-            end: data.glad.mmr,
-            onStep: data => {
-                $('#fog #after-battle #renown-total').html(parseInt(data))
-            }
-        }).run()
+    //     // new valueAnimator({
+    //     //     time: time,
+    //     //     steps: steps,
+    //     //     start: oldStatus.mmr,
+    //     //     end: data.glad.mmr,
+    //     //     onStep: data => {
+    //     //         $('#fog #after-battle #renown-total').html(parseInt(data))
+    //     //     }
+    //     // }).run()
 
-        gladCardModule.then( e => {
-            e.gladCard.load($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
-        })
+    //     gladCardModule.then( e => {
+    //         e.gladCard.load($('#fog #after-battle .glad-card-container'), { customLoad: [data.glad]})
+    //     })
 
-        $('#fog #after-battle #nbattles').text(20 - data.battles.total)
-        if (data.battles.total == 20){
-            $('#fog #after-battle #nbattles').addClass('red')
-        }
+    //     $('#fog #after-battle #nbattles').text(20 - data.battles.total)
+    //     if (data.battles.total == 20){
+    //         $('#fog #after-battle #nbattles').addClass('red')
+    //     }
 
-        timeCounter($('#fog #after-battle #nextbonus'), data.battles.next)
+    //     // timeCounter($('#fog #after-battle #nextbonus'), data.battles.next)
 
-        $('#fog #after-battle #code').click( () => {
-            window.open(`glad-${data.glad.id}`)
-        })
-    })
+    //     $('#fog #after-battle #code').click( () => {
+    //         window.open(`glad-${data.glad.id}`)
+    //     })
+    // })
 
     $('#fog #after-battle #close').click( () => {
         $('#fog').remove()
@@ -1448,8 +1449,4 @@ async function check_challenges(){
 
 function getXpToNextLvl(){
     return (parseInt(user.lvl) * 1.9 + 1) * 130;
-}
-
-function load_svg(e){
-    $.get(e.html(), null, null, 'text').then( data => e.removeClass('hidden').html(data))
 }
