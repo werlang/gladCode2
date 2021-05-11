@@ -31,10 +31,10 @@ socket.connect = function () {
         // run callback event for receiving message for a room
         this.ws.onmessage = event => {
             const msg = JSON.parse(event.data);
-            // console.log(msg, this.actionList);
+            // console.log(msg);
 
             if (this.actionList[msg.action]) {
-                this.actionList[msg.action](msg.message);
+                this.actionList[msg.action](msg.data);
             }
         }
     }

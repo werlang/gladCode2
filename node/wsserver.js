@@ -26,7 +26,8 @@ server.on('connection', function (socket) {
         else if (message.action && this.actionList[message.action]){
             this.actionList[message.action](message.data, reply => {
                 if (message.timestamp && reply){
-                    socket.send(JSON.stringify({ action: `reply-${message.timestamp}`, message: reply }));
+                    // console.log(reply);
+                    socket.send(JSON.stringify({ action: `reply-${message.timestamp}`, data: reply }));
                 }
             });
         }        
