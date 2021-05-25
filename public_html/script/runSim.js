@@ -100,7 +100,7 @@ class ProgressButton {
             obj = $(obj)[0]
         }
 
-        this.oldhtml = obj.innerHTML
+        this.oldhtml = obj.innerHTML;
 
         obj.innerHTML = "<div id='bar'></div><div id='oldcontent'><span></span></div>"
 
@@ -155,7 +155,10 @@ class ProgressButton {
                     roul = (roul + 1) % text.length
                     while (span.offsetWidth > old.offsetWidth - 15){
                         const font = parseFloat(document.defaultView.getComputedStyle(span).getPropertyValue('font-size').split("px")[0])
-                        span.style['font-size'] = `${font - 0.1}px`
+                        span.style['font-size'] = `${font - 0.1}px`;
+                        if (!this.active){
+                            break;
+                        }
                     }
                 }
 
@@ -166,14 +169,19 @@ class ProgressButton {
                 // translator.translate(["ERRO DE CONEXÃO", "Falha ao obter resposta do servidor dentro do tempo limite."]).then(text => showTerminal(text[0], text[1]))
             }
         }
-        run()
+        run();
+
+        return this;
     }
 
     kill(){
-        this.obj.innerHTML = this.oldhtml
-        this.obj.removeAttribute('disabled')
-        const old = this.obj.querySelector('#oldcontent')
-        old && old.remove()
+        this.obj.removeAttribute('disabled');
+        const old = this.obj.querySelector('#oldcontent');
+        if (old) {
+            this.active = false;
+            old.remove();
+        }
+        this.obj.innerHTML = this.oldhtml;
     }
 
     set(text, porc){
@@ -189,7 +197,8 @@ class ProgressButton {
     }
 
     isActive(){
-        return this.obj.querySelector('#oldcontent') ? true : false
+        return this.active;
+        // return this.obj.querySelector('#oldcontent') ? true : false
     }
 }
 
