@@ -10,7 +10,7 @@
             $user = $_SESSION['user'];
 
             $sql = "SELECT * FROM usuarios WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             $nrows = $result->num_rows;			
@@ -53,10 +53,10 @@
                     $gladcode = 'gladcodehashsecret36';
                     $email = $row['email'];
                     $hash = md5( $gladcode . strtolower( trim( $email ) ) );
-                    $foto = mysql_escape_string("https://www.gravatar.com/avatar/$hash?d=retro");
+                    $foto = "https://www.gravatar.com/avatar/$hash?d=retro";
 
                     $sql = "UPDATE usuarios SET foto = '$foto' WHERE id = '$user'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                 }
                 $info['foto'] = $foto;
 
@@ -68,10 +68,10 @@
                 $output['status'] = "NOTFOUND";
             
             $sql = "UPDATE usuarios SET ativo = now() WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $sql = "SELECT now(), ativo FROM usuarios WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             //$output['debug'] = $row;
         }
@@ -87,23 +87,25 @@
         if (isset($_SESSION['language'])){
             $output['speak'] = $_SESSION['language'];
         }
+        $output['language'] = $_SESSION;
+
     }
     elseif ($action == "SET"){
         if (isset($_POST['admin'])){
             $admin = json_decode($_POST['admin'], true);
 
-            $pass = mysql_escape_string($admin['pass']);
+            $pass = $admin['pass'];
             if (md5($pass) == '07aec7e86e12014f87918794f521183b'){
                 if (isset($admin['glad'])){
-                    $glad = mysql_escape_string($admin['glad']);
+                    $glad = $admin['glad'];
                     $sql = "SELECT u.id FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = $glad";
                 }
                 else if (isset($admin['user'])){
-                    $user = mysql_escape_string($admin['user']);
+                    $user = $admin['user'];
                     $sql = "SELECT id FROM usuarios WHERE id = $user";
                 }
 
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
                 $_SESSION['user'] = $row['id'];
                 $output['status'] = "ADMIN";
@@ -134,7 +136,7 @@
                     $foto = "https://www.gravatar.com/avatar/$hash?d=retro";
             
                     $sql = "SELECT * FROM usuarios WHERE email = '$email' OR googleid = '$googleid'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
                     $row = $result->fetch_assoc();
                     
@@ -142,14 +144,14 @@
                         $apelido = $nome . rand(100,999);
                         $pasta = md5($email);
                         $sql = "INSERT INTO usuarios (googleid,email,nome,apelido,sobrenome,pasta,ativo,foto) VALUES ('$googleid','$email','$nome','$apelido','$sobrenome','$pasta',now(), '$foto')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $path = "/home/gladcode/user";
                         system("mkdir $path/$pasta");
                         $id = $conn->insert_id;
 
                         //join gladcode room
                         $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES (1, '$id', now(3), now(3), 1)";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                     }
                     else{
                         $pasta = $row['pasta'];
@@ -157,7 +159,7 @@
             
                         if (is_null($row['googleid']) || $row['email'] != $email){
                             $sql = "UPDATE usuarios SET googleid = '$googleid', email = '$email' WHERE id = $id";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                         }
                     }
                     
@@ -189,8 +191,8 @@
     elseif ($action == "UPDATE"){
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
-            $nickname = mysql_escape_string($_POST['nickname']);
-            $language = mysql_escape_string($_POST['language']);
+            $nickname = $_POST['nickname'];
+            $language = $_POST['language'];
             $picture = $_POST['picture'];
             $preferences = (array)json_decode($_POST['preferences']);
             $pref_message = $preferences['message'];
@@ -201,11 +203,11 @@
             $pref_translation = $preferences['translation'];
             
             $sql = "SELECT id FROM usuarios WHERE apelido = '$nickname' AND id != '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             if ($result->num_rows == 0){
                 $sql = "SELECT foto, pasta, UNIX_TIMESTAMP(now(3)) AS time FROM usuarios WHERE id = '$user'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
 
                 $pattern = '#^data:image/\w+;base64,#i';
@@ -225,7 +227,7 @@
                 }
                 
                 $sql = "UPDATE usuarios SET apelido = '$nickname', foto = '$picture', pref_message = '$pref_message', pref_friend = '$pref_friend', pref_update = '$pref_update', pref_duel = '$pref_duel', pref_tourn = '$pref_tourn', pref_language = '$language', pref_translation = '$pref_translation' WHERE id = '$user'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $output['status'] = "SUCCESS";
             }
             else
@@ -238,37 +240,37 @@
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
             $sql = "UPDATE usuarios SET showTutorial = '0' WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $output['status'] = "SUCCESS";
         }
     }
     elseif ($action == "TUTORIAL_LANGUAGE"){
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
-            $language = mysql_escape_string($_POST['language']);
+            $language = $_POST['language'];
             $sql = "UPDATE usuarios SET pref_language = '$language' WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $output['status'] = "SUCCESS";
         }
         else{
-            $_SESSION['guest_language'] = mysql_escape_string($_POST['language']);
+            $_SESSION['guest_language'] = $_POST['language'];
             $output['status'] = "SUCCESS";
         }
     }
     elseif ($action == "EDITOR"){
         $user = $_SESSION['user'];
-        $theme = mysql_escape_string($_POST['theme']);
-        $font = mysql_escape_string($_POST['font']);
+        $theme = $_POST['theme'];
+        $font = $_POST['font'];
 
         $sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE id = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
     }
     elseif ($action == "PREMIUM"){
         $output['status'] = "NOSUPPORT";
 
         // $user = $_SESSION['user'];
         // $sql = "SELECT premium FROM usuarios WHERE id = $user";
-        // $result = runQuery($sql);
+        // $result = runQuery($sql, []);
         // $row = $result->fetch_assoc();
         
         // if (!is_null($row['premium'])){
@@ -276,13 +278,13 @@
         // }
         // else{
         //     $sql = "UPDATE usuarios SET premium = now(), credits = 30 WHERE id = $user";
-        //     $result = runQuery($sql);
+        //     $result = runQuery($sql, []);
 
         //     $output['status'] = "SUCCESS";
         // }
     }
     elseif ($action == "SPOKEN_LANGUAGE"){
-        $lang = mysql_escape_string($_POST['language']);
+        $lang = $_POST['language'];
         $available_languages = array('pt', 'en');
         $default = "en";
 
@@ -292,7 +294,7 @@
                 $user = $_SESSION['user'];
 
                 $sql = "UPDATE usuarios SET spoken_language = '$lang' WHERE id = $user";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $output['status'] = "SUCCESS";
             }
@@ -305,6 +307,7 @@
             $output['status'] = "INVALID";
         }
         
+        $output["a"] = [$_SESSION['language'], $newlang];
         $output['reload'] = $_SESSION['language'] != $newlang;
         $_SESSION['language'] = $newlang;
     }

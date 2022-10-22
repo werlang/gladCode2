@@ -6,7 +6,7 @@
     if ($_POST['action'] == "GET" || isset($_GET['log'])){
         $loghash = isset($_GET['log']) ? $_GET['log'] : $_POST['loghash'];
         $sql = "SELECT * FROM logs WHERE hash = '$loghash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows > 0){
@@ -43,13 +43,13 @@
     elseif ($_POST['action'] == "DELETE"){
         $hash = $_POST['hash'];
         $sql = "SELECT id FROM logs WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $id = $row['id'];
         unlink("logs/$id");
 
         $sql = "DELETE FROM logs WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['status'] = "SUCCESS";
     }

@@ -8,11 +8,11 @@
             $user = $_SESSION['user'];
             $output = array();
 
-            $id = mysql_escape_string($_POST['id']);
+            $id = $_POST['id'];
             $pool = 10;
             
             $sql = "SELECT version FROM gladiators WHERE cod = $id";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
 
             if ($row['version'] == $version){
@@ -21,7 +21,7 @@
                 $pos = "SELECT count(*) FROM gladiators g2 WHERE g2.mmr < g.mmr";
                 $gladsclose = "SELECT g.cod FROM gladiators g WHERE g.master != '$user' AND g.version = '$version' ORDER BY ABS(($pos) - ($mypos)) LIMIT $pool";
                 $sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN ($gladsclose) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $i = 0;
                 $ids = array();

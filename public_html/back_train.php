@@ -9,15 +9,15 @@
     $output = array();
 
     if ($action == "CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $desc = mysql_escape_string($_POST['desc']);
-        $maxtime = mysql_escape_string($_POST['maxtime']);
-        $players = mysql_escape_string($_POST['players']);
-        $weight = mysql_escape_string($_POST['weight']);
+        $name = $_POST['name'];
+        $desc = $_POST['desc'];
+        $maxtime = $_POST['maxtime'];
+        $players = $_POST['players'];
+        $weight = $_POST['weight'];
         $hash = newHash();
 
         $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         if (is_null($row['premium'])){
@@ -28,7 +28,7 @@
         }
         else{
             $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, weight, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, $weight, '$hash', now(3) + INTERVAL 1 HOUR);";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             
             send_node_message(array('training list' => array()));
     
@@ -38,8 +38,8 @@
 
     }
     else if ($action == "LIST"){
-        $moffset = mysql_escape_string($_POST['moffset']);
-        $poffset = mysql_escape_string($_POST['poffset']);
+        $moffset = $_POST['moffset'];
+        $poffset = $_POST['poffset'];
         $limit = 10;
 
         if ($moffset < 0)
@@ -54,12 +54,12 @@
         $fromwhere = "FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE g.master = $user";
 
         $sql = "SELECT t.id $fromwhere";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $npart = $result->num_rows;
 
         if ($npart > 0){
             $sql = "$select $fromwhere ORDER BY t.creation DESC LIMIT $limit OFFSET $poffset";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             if ($poffset >= $npart)
                 $poffset -= $limit;
@@ -78,12 +78,12 @@
         $fromwhere = "FROM training t WHERE t.manager = $user";
 
         $sql = "SELECT t.id $fromwhere";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nmanage = $result->num_rows;
 
         if ($nmanage > 0){
             $sql = "$select $fromwhere ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             if ($moffset >= $nmanage)
                 $moffset -= $limit;
@@ -122,11 +122,11 @@
         }
     }
     elseif ($action == "JOIN"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         // time since expired
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -142,7 +142,7 @@
                 $output['status'] = "STARTED";
             else{
                 $sql = "SELECT g.cod FROM gladiators g INNER JOIN gladiator_training gt ON gt.gladiator = g.cod WHERE g.master = $user AND gt.training = $trainid";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows > 0){
@@ -154,11 +154,11 @@
                 elseif (!isset($_POST['glad']))
                     $output['status'] = "ALLOWED";
                 else{
-                    $glad = mysql_escape_string($_POST['glad']);
+                    $glad = $_POST['glad'];
 
                     // check if the glad is mine
                     $sql = "SELECT cod FROM gladiators WHERE master = $user AND cod = $glad";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
 
                     if ($nrows == 0)
@@ -166,7 +166,7 @@
                     else{
                         // add glad into training
                         $sql = "INSERT INTO gladiator_training (gladiator, training, score) VALUES ($glad, $trainid, 0)";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $output['id'] = $trainid; 
                         $output['name'] = $trainname;
                         $output['status'] = "SUCCESS";    
@@ -176,7 +176,7 @@
                         )));
 
                         // check if I want to redirect to another page
-                        $redirect = mysql_escape_string($_POST['redirect']);
+                        $redirect = $_POST['redirect'];
                         if ($redirect == "true"){
                             $_SESSION['redirect'] = "train_join:$trainid";
                         }
@@ -188,10 +188,10 @@
 
     }
     elseif ($action == "ROOM"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training t WHERE id = $trainid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -218,7 +218,7 @@
 
                     // TODO mandar junto a lista de players/gladiadores pra compor a janela
                     $sql = "SELECT g.name AS gladiator, u.apelido AS master, g.cod as id FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE g.cod IN (SELECT gladiator FROM gladiator_training WHERE training = $trainid)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['glads'] = array();
                     while ($row = $result->fetch_assoc()){
@@ -229,7 +229,7 @@
                 }
                 else{
                     $sql = "SELECT t.name, t.description, t.maxtime, t.players, t.hash FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id WHERE t.id = $trainid AND gt.gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
 
                     if ($nrows == 0)
@@ -239,7 +239,7 @@
                         $output = $row;
 
                         $sql = "SELECT g.name AS gladiator, u.apelido AS master, g.master AS masterid FROM usuarios u INNER JOIN gladiators g ON u.id = g.master INNER JOIN gladiator_training gt ON g.cod = gt.gladiator WHERE gt.training = $trainid";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $output['glads'] = array();
                         while ($row = $result->fetch_assoc()){
@@ -268,9 +268,9 @@
 
     }
     elseif ($action == "EDIT"){
-        $trainid = mysql_escape_string($_POST['id']);
-        $field = mysql_escape_string($_POST['field']);
-        $value = mysql_escape_string(trim($_POST['value']));
+        $trainid = $_POST['id'];
+        $field = $_POST['field'];
+        $value = trim($_POST['value']);
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -281,14 +281,14 @@
             }
             else{
                 $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
                     $output['status'] = "NOTALLOWED";
                 else{
                     $sql = "UPDATE training SET $field = '$value' WHERE id = $trainid";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['status'] = "SUCCESS";
                     send_node_message(array('training list' => array()));
@@ -300,13 +300,13 @@
         }
     }
     elseif ($action == "RENEW"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
         else{
             $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
@@ -315,7 +315,7 @@
                 $hash = newHash();
 
                 $sql = "UPDATE training SET hash = '$hash', hash_valid = now() + INTERVAL 1 HOUR WHERE id = $trainid";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $output['status'] = "SUCCESS";
                 $output['hash'] = $hash;
@@ -327,9 +327,9 @@
         }
     }
     elseif ($action == "KICK"){
-        $trainid = mysql_escape_string($_POST['id']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $myself = mysql_escape_string($_POST['myself']);
+        $trainid = $_POST['id'];
+        $glad = $_POST['glad'];
+        $myself = $_POST['myself'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -340,7 +340,7 @@
                 $managersql = "manager = $user";
 
             $sql = "SELECT id FROM training WHERE id = $trainid AND $managersql";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
@@ -352,7 +352,7 @@
                     $gladsql = "gladiator = $glad";
 
                 $sql = "SELECT id FROM gladiator_training WHERE training = $trainid AND $gladsql";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
@@ -362,7 +362,7 @@
                     $id = $row['id'];
 
                     $sql = "DELETE FROM gladiator_training WHERE id = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "SUCCESS";
                     send_node_message(array('training list' => array()));
                     send_node_message(array('training room' => array(
@@ -374,24 +374,24 @@
         }
     }
     elseif ($action == "DELETE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
             $output['status'] = "NOTALLOWED";
         else{
             $sql = "SELECT id FROM gladiator_training WHERE training = $trainid";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows > 0)
                 $output['status'] = "NOTEMPTY";
             else{
                 $sql = "DELETE FROM training WHERE id = $trainid";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $output['status'] = "SUCCESS";
 
                 send_node_message(array('training list' => array()));
@@ -402,30 +402,30 @@
         }
     }
     elseif ($action == "CHANGE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
         else{
             $sql = "SELECT gladiator FROM gladiator_training WHERE training = $trainid AND gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows > 0){
                 $row = $result->fetch_assoc();
                 $oldglad = $row['gladiator'];
 
-                $glad = mysql_escape_string($_POST['glad']);
+                $glad = $_POST['glad'];
 
                 $sql = "SELECT master FROM gladiators WHERE cod = $glad";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 $row = $result->fetch_assoc();
 
                 if ($row['master'] == $user){
                     $sql = "UPDATE gladiator_training SET gladiator = $glad WHERE training = $trainid AND gladiator = $oldglad";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['status'] = "SUCCESS";    
                     send_node_message(array('training room' => array(
@@ -442,10 +442,10 @@
 
     }
     elseif ($action == "START"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT manager, maxtime, players FROM training WHERE id = $trainid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -461,7 +461,7 @@
                 $output['status'] = "NOTALLOWED";
             else{
                 $sql = "SELECT gt.id, t.hash FROM gladiator_training gt INNER JOIN training t ON t.id = gt.training WHERE t.id = $trainid";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nplayers = $result->num_rows;
 
                 if ($nplayers < $maxplayers)
@@ -487,19 +487,19 @@
                         // create group if not every one needed is created
                         if (count($groups) < $ngroups){
                             $sql = "INSERT INTO training_groups () VALUES ()";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                             array_push($groups, $conn->insert_id);
                         }
 
                         // cycle groups inserting it on every participant
                         $groupid = $groups[$i % $ngroups];
                         $sql = "UPDATE gladiator_training SET groupid = $groupid WHERE id = $id";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                     }
 
                     // set training deadline
                     $sql = "UPDATE training SET deadline = now(3) + INTERVAL $maxtime MINUTE WHERE id = $trainid";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     send_node_message(array('training room' => array(
                         'id' => $trainid
@@ -512,10 +512,10 @@
         }
     }
     elseif ($action == "REMOVE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT manager FROM training WHERE id = $trainid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         if ($row['manager'] != $user){
@@ -523,22 +523,22 @@
         }
         else{
             $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $groups = array();
             while ($row = $result->fetch_assoc())
                 array_push($groups, $row['groupid']);
             $groups = implode(",", $groups);
 
             $sql = "DELETE FROM gladiator_training WHERE training = $trainid";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             if (strlen($groups) > 0){
                 $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
             }
 
             $sql = "DELETE FROM training WHERE id = $trainid";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             send_node_message(array('training list' => array()));
             send_node_message(array('training room' => array(
@@ -562,7 +562,7 @@
             $hash = strtoupper(base_convert(md5(md5(microtime(true)*mt_rand(0,1000000)) . $salt) ,16, 36));
             $subhash = substr($hash, 0, $size);
             $sql = "SELECT count(*) AS collision FROM training WHERE hash = '$subhash'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             if ($row['collision'] == 0)
                 $collision = false;
@@ -573,7 +573,7 @@
 
     function isStarted($id){
         $sql = "SELECT groupid FROM gladiator_training WHERE training = $id";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         while($row = $result->fetch_assoc()){
             if (!is_null($row['groupid']))
                 return true;

@@ -13,12 +13,12 @@
     date_default_timezone_set('America/Sao_Paulo');
 
     if ($action == "GET"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         //check maxround
         $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $maxround = $row['maxround'];
 
@@ -26,7 +26,7 @@
             //find those teams not dead
             $gladsalive = "SELECT count(*) FROM gladiator_teams glt INNER JOIN teams te2 ON glt.team = te2.id INNER JOIN group_teams grt ON te2.id = grt.team INNER JOIN tournament t ON t.id = te2.tournament INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND glt.dead = '0' AND te2.id = te.id AND gr.round = $maxround AND glt.gladiator IS NOT NULL";
             $sql = "SELECT te.id FROM teams te WHERE ($gladsalive) > 0";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nteams = $result->num_rows;
 
             if ($nteams > 1){
@@ -36,7 +36,7 @@
             else{
                 //get the final ranking order
                 $sql = "SELECT te.id, te.name AS team, t.name AS tournament FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND te.id NOT IN (SELECT grt2.team FROM groups gr2 INNER JOIN group_teams grt2 ON grt2.groupid = gr2.id WHERE gr2.round > gr.round) ORDER BY gr.round DESC, grt.lasttime DESC";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $rank = array();
                 while ($row = $result->fetch_assoc()){
@@ -54,7 +54,7 @@
         else{
             //get info about my team
             $sql = "SELECT te.id AS teamid, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON te.id = gt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = '$user' AND t.hash = '$hash'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             
             $myteam = '';
             $nrows = $result->num_rows;
@@ -67,7 +67,7 @@
             //get info from tournament, lasttime and dead
             $alive = "SELECT count(*) FROM group_teams grt INNER JOIN groups gr ON gr.id = grt.groupid INNER JOIN teams te2 ON te2.id = grt.team INNER JOIN gladiator_teams glt ON te2.id = glt.team WHERE (glt.dead = '0' OR glt.dead >= '$round') AND gr.round = '$round' AND te.id = te2.id AND glt.gladiator IS NOT NULL";
             $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, t.name AS tname, t.description, te.name, grt.groupid, ($alive) AS alive, grt.lasttime, gr.locked, gr.deadline, now(3) AS timenow, t.manager FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round' ORDER BY grt.groupid, grt.lasttime DESC";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $nrows = $result->num_rows;
             if ($nrows > 0){
@@ -114,16 +114,16 @@
 
     }
     elseif ($action == "GLADS"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
         $version = file_get_contents("version");
-        $round = mysql_escape_string($_POST['round']);
+        $round = $_POST['round'];
 
         //see if group which I belong is locked
         $myteams = "SELECT te.id FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE g.master = '$user'";
 
         $sql = "SELECT gr.locked FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
 
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         $locked = false;
         if ($nrows > 0){
@@ -134,7 +134,7 @@
             //get info from glads into my team from this tournament
             $sql = "SELECT g.cod AS id, g.name, g.skin, g.code, g.blocks, u.apelido AS user, g.vstr, g.vagi, g.vint, g.version, glt.dead, glt.visible FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND te.id IN ($myteams) AND gr.round = '$round'";
 
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             if ($nrows > 0){
                 $output['glads'] = array();
@@ -171,15 +171,15 @@
             $output['status'] = "LOCK";
     }
     elseif ($action == "CHOOSE"){
-        $gladid = mysql_escape_string($_POST['id']);
-        $hash = mysql_escape_string($_POST['hash']);
+        $gladid = $_POST['id'];
+        $hash = $_POST['hash'];
         $version = file_get_contents("version");
 
         //check if this glad is in my team
         $myteams = "SELECT te.id FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE g.master = '$user'";
         $sql = "SELECT glt.dead, g.cod AS gladid, te.id AS teamid, g.version FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE t.hash = '$hash' AND te.id IN ($myteams) AND g.cod = '$gladid'";
 
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows > 0){
@@ -197,12 +197,12 @@
                 $roundsql = "SELECT max(gr.round) FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
                 $sql = "SELECT gr.id FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id WHERE gr.round = ($roundsql) AND grt.team = '$teamid'";
 
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
                 $groupid = $row['id'];
 
                 $sql = "UPDATE group_teams SET gladiator = '$gladid' WHERE groupid = '$groupid' AND team = '$teamid'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $output['status'] = "SUCCESS";
 
@@ -215,12 +215,12 @@
             $output['status'] = "NOTFOUND";
     }
     elseif ($action == "REFRESH"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         //check if there is any battle left to be done
         $sql = "SELECT gr.deadline, now() AS now FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         
         $timeup = false;
@@ -239,7 +239,7 @@
         //check how many alive and lasttime for each team in the tournament
         $alive = "SELECT count(*) FROM group_teams grt INNER JOIN teams te2 ON te2.id = grt.team INNER JOIN gladiator_teams glt ON glt.team = te2.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE (glt.dead = '0' OR glt.dead > '$round') AND gr.round = '$round' AND te.id = te2.id AND glt.gladiator IS NOT NULL";
         $sql = "SELECT grt.gladiator AS ready, te.id AS teamid, te.name, ($alive) AS alive, grt.lasttime FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = '$round'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['teams'] = array();
 
@@ -256,7 +256,7 @@
         //check the groups that remain to choose a glad for the current round
         $remaining = "SELECT count(*) FROM group_teams gt2 INNER JOIN teams te ON te.id = gt2.team INNER JOIN tournament t ON t.id = te.tournament WHERE gt2.gladiator IS NULL AND t.hash = '$hash' AND gt2.groupid = grt.groupid";
         $sql = "SELECT grt.groupid AS id, count(*) AS total, ($remaining) AS rem FROM group_teams grt INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' GROUP BY grt.groupid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         while ($row = $result->fetch_assoc()){
             $groupid = $row['id'];
@@ -312,12 +312,12 @@
             //find those teams not dead
             $gladsalive = "SELECT count(*) FROM gladiator_teams glt INNER JOIN teams te2 ON glt.team = te2.id INNER JOIN group_teams grt ON te2.id = grt.team INNER JOIN tournament t ON t.id = te2.tournament INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND glt.dead = '0' AND te2.id = te.id AND gr.round = $round AND glt.gladiator IS NOT NULL";
             $sql = "SELECT te.id FROM teams te WHERE ($gladsalive) > 0";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nteams = $result->num_rows;
 
             //check maxround
             $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             $maxround = $row['maxround'];
 
@@ -332,11 +332,11 @@
             $output['status'] = "SUCCESS";       
     }
     elseif ($action == "UPDATE"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         //max round number found
         $sql = "SELECT max(gr.round) AS maxround, t.maxtime FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $maxround = $row['maxround'];
         $maxtime = $row['maxtime'];
@@ -362,7 +362,7 @@
                             $nick = preg_replace('/#/', " ", $glad['user']);
                             
                             $sql = "SELECT g.cod, glt.team FROM gladiators g INNER JOIN usuarios u ON u.id = g.master INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND g.name = '$name' AND u.apelido = '$nick'";                            
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                             $row = $result->fetch_assoc();
 
                             $teams[$i] = array();
@@ -396,7 +396,7 @@
                 $round = null;
                 //get info from grt, glt about the battle with specific logid
                 $sql = "SELECT grt.id AS grt, grt.gladiator, gr.round, glt.id AS glt FROM group_teams grt INNER JOIN groups gr ON gr.id = grt.groupid INNER JOIN gladiators g ON g.cod = grt.gladiator INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log = $logid AND t.hash = '$hash'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 while ($row = $result->fetch_assoc()){
                     $map[$row['gladiator']] = array('grt' => $row['grt'], 'glt' => $row['glt']);
                     if (!$round)
@@ -408,12 +408,12 @@
                     $grt = $map[$team['glad']]['grt'];
                     $lasttime = $team['time'];
                     $sql = "UPDATE group_teams SET lasttime = '$lasttime' WHERE id = $grt";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     if (!isset($team['winner'])){
                         $glt = $map[$team['glad']]['glt'];
                         $sql = "UPDATE gladiator_teams SET dead = '$round' WHERE id = $glt";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                     }
 
                     array_push($teams_total, $team);
@@ -424,7 +424,7 @@
 
         //how many battles left to be done
         $sql = "SELECT gr.log FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.log IS NULL";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         $output['status'] = "SUCCESS";
@@ -435,7 +435,7 @@
             //find those teams not dead
             $gladsalive = "SELECT count(*) FROM gladiator_teams glt INNER JOIN teams te2 ON glt.team = te2.id INNER JOIN group_teams grt ON te2.id = grt.team INNER JOIN tournament t ON t.id = te2.tournament INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND glt.dead = '0' AND te2.id = te.id AND gr.round = '$maxround' AND glt.gladiator IS NOT NULL";
             $sql = "SELECT te.id FROM teams te WHERE ($gladsalive) > 0";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nteams = $result->num_rows;
 
             if ($nteams > 1){
@@ -459,7 +459,7 @@
                 $teami = 0;
                 for ($i=0 ; $i<$ngroups ; $i++){
                     $sql = "INSERT INTO groups(round, deadline) VALUES ('$newround', ADDTIME(now(), TIME('$maxtime')))";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $group = $conn->insert_id;
 
                     //fill remaining teams into those groups
@@ -468,7 +468,7 @@
                     for ($j=0 ; $j<$teamsgroup ; $j++){
                         $teamid = $teams[$teami]['team'];
                         $sql = "INSERT INTO group_teams (team, groupid) VALUES ('$teamid', '$group')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $teami++;
                     }
                     $remteams = $remteams - $teamsgroup;
@@ -486,11 +486,11 @@
         )));
     }
     elseif ($action == "END TURN"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         //max round number found
         $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND t.manager = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $maxround = $row['maxround'];
 
@@ -499,7 +499,7 @@
         else{
             //get id from groups on the last round
             $sql = "SELECT DISTINCT gr.id FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND gr.round = $maxround";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             while ($row = $result->fetch_assoc()){
                 $groupid = $row['id'];

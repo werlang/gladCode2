@@ -9,7 +9,7 @@
     foreach($modes as $mode => $period){
         $fav = $mode == "ranked" ? " AND id NOT IN (SELECT DISTINCT log FROM reports WHERE favorite = 1)" : "";
         $sql = "SELECT id FROM logs WHERE origin = '$mode' AND time < now() - INTERVAL $period AND expired = 0 $fav";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         
         if ($result->num_rows > 0){
             $ids = array();
@@ -20,7 +20,7 @@
             }		
             $ids = implode(",", $ids);
             $sql = "UPDATE logs SET expired = 1 WHERE id IN ($ids)";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
         }
     }
 ?>

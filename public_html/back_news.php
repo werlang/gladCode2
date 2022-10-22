@@ -10,10 +10,10 @@
     // read news from profile page
     if ($action == "READ"){
         // TODO infinite scrolling for news page
-        $page = mysql_escape_string($_POST['page']);
+        $page = $_POST['page'];
 
         $sql = "SELECT $id AS id, title, time, post FROM news ORDER BY time DESC LIMIT 5 OFFSET $page";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['posts'] = array();
         while ($row = $result->fetch_assoc()){
@@ -21,16 +21,16 @@
         }
 
         $sql = "UPDATE usuarios SET read_news = now(3) WHERE id = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['status'] = "SUCCESS";
     }
     // read from post page
     else if ($action == "GET"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         $sql = "SELECT title, time, post FROM news WHERE $id = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         if ($result->num_rows == 0)
             $output['status'] = "EMPTY";
@@ -46,7 +46,7 @@
 
             // get previous post
             $sql = "SELECT $id AS id FROM news WHERE time < ($basetime) ORDER BY time DESC LIMIT 1";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             if ($result->num_rows > 0){
                 $row = $result->fetch_assoc();
                 $output['prev'] = $row['id'];
@@ -54,7 +54,7 @@
     
             // get next post
             $sql = "SELECT $id AS id FROM news WHERE time > ($basetime) ORDER BY time LIMIT 1";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             if ($result->num_rows > 0){
                 $row = $result->fetch_assoc();
                 $output['next'] = $row['id'];
@@ -66,7 +66,7 @@
     // get all news
     else if ($action == "LIST"){
         $sql = "SELECT title, time, post, $id AS id FROM news ORDER BY time DESC";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['posts'] = array();
         while ($row = $result->fetch_assoc()){
@@ -82,9 +82,9 @@
         $output['status'] = "SUCCESS";
     }
     else if ($action == "POST"){
-        $title = mysql_escape_string($_POST['title']);
-        $post = mysql_escape_string($_POST['html']);
-        $hash = mysql_escape_string($_POST['hash']);
+        $title = $_POST['title'];
+        $post = $_POST['html'];
+        $hash = $_POST['hash'];
 
         if ($hash == 'false'){
             $sql = "INSERT INTO news (title, time, post) VALUES ('$title', now(3), '$post')";
@@ -92,7 +92,7 @@
         else{
             $sql = "UPDATE news SET title = '$title', time = now(3), post = '$post' WHERE $id = '$hash'";
         }
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['status'] = "SUCCESS";
         $output['sql'] = $sql;

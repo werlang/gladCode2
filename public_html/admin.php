@@ -5,7 +5,7 @@
     include_once "connection.php";
 
     $sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
-    $result = runQuery($sql);
+    $result = runQuery($sql, []);
     $row = $result->fetch_assoc();
     $id = $row['id'];
 

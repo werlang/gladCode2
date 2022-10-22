@@ -23,12 +23,12 @@
             $potionwin = $_POST['potionwin'];
 
             $sql = "SELECT avg(g.mmr) AS mmr FROM gladiators g INNER JOIN reports r ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE l.hash = '$loghash'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             $mmr = $row['mmr'];
 
             $sql = "INSERT INTO stats (time, fireball, teleport, charge, block, assassinate, ambush, melee, ranged, win, avglvl, winnerlvl, duration, highstr, highagi, highint, avgmmr, potionuse, potionwin) VALUES (now(), '$fireball', '$teleport', '$charge', '$block', '$assassinate', '$ambush', '$melee', '$ranged', '$win', '$avglvl', '$winnerlvl', '$duration', '$highstr', '$highagi', '$highint', '$mmr', '$potionuse', '$potionwin')";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
         }
         elseif ($_POST['action'] == 'load'){
             if ($_POST['start'] == ''){
@@ -53,7 +53,7 @@
             $sql = "SELECT * FROM stats WHERE time >= '$start' AND time <= '$end' AND (avgmmr IS NULL OR (avgmmr >= '$smmr' AND avgmmr <= '$emmr'))";
             //echo $sql;
             
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             $uses = array();
             $abwin = array();

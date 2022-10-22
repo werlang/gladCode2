@@ -9,12 +9,12 @@
     $output = array();
     
     if ($action == "CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $pass = mysql_escape_string($_POST['pass']);
-        $desc = mysql_escape_string($_POST['desc']);
-        $maxteams = mysql_escape_string($_POST['maxteams']);
-        $maxtime = mysql_escape_string($_POST['maxtime']);
-        $flex = mysql_escape_string($_POST['flex']);
+        $name = $_POST['name'];
+        $pass = $_POST['pass'];
+        $desc = $_POST['desc'];
+        $maxteams = $_POST['maxteams'];
+        $maxtime = $_POST['maxtime'];
+        $flex = $_POST['flex'];
         if ($flex == "true")
             $flex = 1;
         else
@@ -35,12 +35,12 @@
         	$maxtime = "00:". $maxtime;
 
         $sql = "SELECT * FROM tournament WHERE name = '$name'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0){
             $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $output['status'] = "SUCCESS";
             $output['hash'] = $hash;
 
@@ -53,8 +53,8 @@
     }
     else if ($action == "LIST"){
         $output = array();
-        $moffset = mysql_escape_string($_POST['moffset']);
-        $ooffset = mysql_escape_string($_POST['ooffset']);
+        $moffset = $_POST['moffset'];
+        $ooffset = $_POST['ooffset'];
         $limit = 10;
 
         if ($moffset < 0)
@@ -64,7 +64,7 @@
 
         //how many open 
         $sql = "SELECT t.id FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = ''";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nopen = $result->num_rows;
 
         if ($ooffset >= $nopen)
@@ -72,7 +72,7 @@
 
         //show open tournaments not started and not filled
         $sql = "SELECT * FROM tournament t WHERE t.password = '' AND (SELECT count(*) FROM teams te WHERE te.tournament = t.id) < t.maxteams AND hash = '' ORDER BY t.creation DESC LIMIT $limit OFFSET $ooffset";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         
         $open = array();
@@ -91,7 +91,7 @@
 
         //how many mine
         $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nmine = $result->num_rows;
 
         if ($moffset >= $nmine)
@@ -101,7 +101,7 @@
 
         //show tournaments which I am the manager or I have joined
         $sql = "SELECT DISTINCT t.id AS id, t.name AS name, t.description AS description, t.maxteams AS maxteams, t.flex AS flex FROM teams te INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator RIGHT JOIN tournament t ON t.id = te.tournament WHERE (g.master = '$user' AND t.manager != '$user') OR t.manager = '$user' ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         
         $mytourn = array();
@@ -134,18 +134,18 @@
         echo json_encode($output);
     }
     else if ($action == "JOIN"){
-        $name = mysql_escape_string($_POST['name']);
+        $name = $_POST['name'];
 
         if (isset($_POST['pass']))
-            $pass = mysql_escape_string($_POST['pass']);
+            $pass = $_POST['pass'];
         else{
             $sql = "SELECT password FROM tournament WHERE name = '$name' AND manager = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0){
                 $sql = "SELECT t.password AS password FROM tournament t INNER JOIN teams te ON t.id = te.tournament INNER JOIN gladiator_teams gt ON gt.team = te.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE g.master = '$user' AND t.name = '$name'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
             }
 
             $row = $result->fetch_assoc();
@@ -153,7 +153,7 @@
         }
 
         $sql = "SELECT * FROM tournament WHERE name = '$name' AND password = '$pass'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -176,16 +176,16 @@
         $output = array();
 
         if (isset($_POST['tourn'])){
-            $tournid = mysql_escape_string($_POST['tourn']);
+            $tournid = $_POST['tourn'];
             $sql = "SELECT * FROM tournament WHERE id = '$tournid'";
         }
         else{
-            $name = mysql_escape_string($_POST['name']);
-            $pass = mysql_escape_string($_POST['pass']);
+            $name = $_POST['name'];
+            $pass = $_POST['pass'];
             $sql = "SELECT * FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         if ($row['hash'] == ''){
             $tournid = $row['id'];
@@ -204,7 +204,7 @@
 
             //list id and name from temns in a giver tournament
             $sql = "SELECT id, name FROM teams WHERE tournament = '$tournid'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             while ($row = $result->fetch_assoc()){
                 $team = array();
                 $team['name'] = $row['name'];
@@ -220,7 +220,7 @@
             }
 
             $sql = "SELECT te.id FROM teams te WHERE (SELECT count(*) FROM gladiator_teams WHERE team = te.id) < 3 AND te.tournament = '$tournid'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             
             if ($nrows == 0)
@@ -238,15 +238,15 @@
         echo json_encode($output);
     }
     elseif ($action == "TEAM_CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $tname = mysql_escape_string($_POST['tname']);
-        $tpass = mysql_escape_string($_POST['tpass']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
+        $name = $_POST['name'];
+        $tname = $_POST['tname'];
+        $tpass = $_POST['tpass'];
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
         $tourn = "";
 
         $sql = "SELECT id, hash FROM tournament WHERE name = '$tname' AND password = '$tpass'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -262,14 +262,14 @@
                 $output['status'] = "ALREADYIN";
             else{
                 $sql = "SELECT t.maxteams AS maxteams FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE t.id = '$tourn'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
                 $row = $result->fetch_assoc();
                 if ($nrows > 0 && $nrows >= $row['maxteams'])
                     $output['status'] = "FULL";
                 else{
                     $sql = "SELECT name FROM teams WHERE name = '$name' AND tournament = $tourn";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
                     if ($nrows == 0){
                         $vow = "aeiouy";
@@ -284,7 +284,7 @@
                         }            
             
                         $sql = "INSERT INTO teams (name, tournament, password, modified) VALUES ('$name', $tourn, '$word', now())";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $teamid = $conn->insert_id;
             
                         $output = array();
@@ -295,7 +295,7 @@
                         echo json_encode($output);
         
                         $sql = "SELECT cod FROM gladiators WHERE master = '$user'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $nrows = $result->num_rows;
         
                         if ($nrows > 0){
@@ -303,7 +303,7 @@
                                 $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$teamid', '1')";
                             else
                                 $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$teamid')";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                         }
 
                         send_node_message(array('tournament list' => array()));
@@ -321,12 +321,12 @@
 
     }
     elseif ($action == "TEAM"){
-        $teamid = mysql_escape_string($_POST['id']);
-        $sync = mysql_escape_string($_POST['sync']);
+        $teamid = $_POST['id'];
+        $sync = $_POST['sync'];
         $output = array();
 
         $sql = "SELECT modified FROM teams WHERE id = '$teamid'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         if ($row['modified'] != $sync){
@@ -336,7 +336,7 @@
             $output['glads'] = array();
 
             $sql = "SELECT gt.gladiator, t.name, t.password, t.tournament, tn.flex FROM teams t INNER JOIN gladiator_teams gt ON t.id = gt.team INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN tournament tn ON tn.id = t.tournament WHERE gt.team = '$teamid' AND g.master = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             if ($nrows > 0){
                 $row = $result->fetch_assoc();
@@ -347,7 +347,7 @@
             }
             
             $sql = "SELECT g.cod, g.name, g.vstr, g.vagi, g.vint, g.skin, u.apelido, master FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE g.cod IN (SELECT gladiator FROM gladiator_teams WHERE team = '$teamid')";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             if ($nrows == 0){
                 while ($row = $result->fetch_assoc())
@@ -375,11 +375,11 @@
         echo json_encode($output);
     }
     elseif ($action == "LEAVE_TEAM"){
-        $teamid = mysql_escape_string($_POST['id']);
+        $teamid = $_POST['id'];
 
         $output = array();
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$teamid'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -391,7 +391,7 @@
             $tpass = $row['password'];
 
             $sql = "SELECT hash FROM tournament WHERE id = $tournid";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             
             if ($row['hash'] != '')
@@ -400,7 +400,7 @@
                 $output['tourn'] = $tournid;
     
                 $sql = "SELECT gt.id AS id FROM gladiator_teams gt INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE gt.team = '$teamid' AND g.master = '$user'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
         
                 $ids = array();
                 while ($row = $result->fetch_assoc())
@@ -408,15 +408,15 @@
                 $ids = implode(",", $ids);
         
                 $sql = "DELETE FROM gladiator_teams WHERE id IN ($ids)";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
         
                 $sql = "SELECT id FROM gladiator_teams WHERE team = '$teamid'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
         
                 if ($nrows == 0){
                     $sql = "DELETE FROM teams WHERE id = '$teamid'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "REMOVED";
 
                     send_node_message(array('tournament list' => array()));
@@ -429,7 +429,7 @@
                 }
                 else{
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$teamid'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "LEFT";
 
                     send_node_message(array('tournament glads' => array( 'team' => $teamid )));
@@ -448,14 +448,14 @@
         echo json_encode($output);
     }
     elseif ($action == "JOIN_TEAM"){
-        $word = mysql_escape_string($_POST['pass']);
-        $team = mysql_escape_string($_POST['team']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
+        $word = $_POST['pass'];
+        $team = $_POST['team'];
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
         $output = array();
 
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$team'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         $tourn = $row['id'];
@@ -463,14 +463,14 @@
         $tpass = $row['password'];
 
         $sql = "SELECT t.id FROM gladiators g INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON gt.team = te.id INNER JOIN tournament t ON te.tournament = t.id WHERE t.id = '$tourn' AND g.master = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows > 0)
             $output['status'] = "SIGNED";
         else{
             $sql = "SELECT t.id FROM tournament t WHERE t.id = '$tourn' AND t.hash = ''";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             
             if ($nrows == 0)
@@ -479,12 +479,12 @@
                 $output['tourn'] = $tourn;
 
                 $sql = "SELECT * FROM teams WHERE id = '$team' AND password = '$word'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows > 0){
                     $sql = "SELECT cod FROM gladiators WHERE master = '$user' AND cod = '$glad'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
 
                     if ($nrows > 0 ){
@@ -492,9 +492,9 @@
                             $sql = "INSERT INTO gladiator_teams (gladiator, team, visible) VALUES ('$glad', '$team', '1')";
                         else
                             $sql = "INSERT INTO gladiator_teams (gladiator, team) VALUES ('$glad', '$team')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
             
                         $output['status'] = "SUCCESS";
 
@@ -518,15 +518,15 @@
         echo json_encode($output);
     }
     elseif ($action == "ADD_GLAD"){
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
-        $team = mysql_escape_string($_POST['team']);
-        $pass = mysql_escape_string($_POST['pass']);
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
+        $team = $_POST['team'];
+        $pass = $_POST['pass'];
            
         $nglads = "SELECT count(*) FROM gladiator_teams WHERE team = '$team'";
         $signed = "SELECT count(*) FROM gladiator_teams gt INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE gt.team = '$team' AND g.master = '$user'";
         $sql = "SELECT t.id AS tournid, t.name AS tname, t.password AS tpass, te.password AS pass, ($nglads) AS nglads, t.flex AS flex, ($signed) AS signed, t.hash FROM gladiators g INNER JOIN gladiator_teams gt ON gt.gladiator = g.cod INNER JOIN teams te ON te.id = gt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = '$user' AND te.id = '$team'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         $output = array();
@@ -548,13 +548,13 @@
                 $tpass = $row['tpass'];
 
                 $sql = "SELECT * FROM gladiator_teams WHERE gladiator = '$glad' && team = '$team'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
                 if ($nrows > 0)
                     $output['status'] = "SAMEGLAD";
                 else{
                     $sql = "SELECT master FROM gladiators WHERE cod = '$glad'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $row = $result->fetch_assoc();
                     if ($row['master'] != $user)
                         $output['status'] = "PERMISSION";
@@ -563,9 +563,9 @@
                             $sql = "INSERT INTO gladiator_teams(gladiator, team, visible) VALUES ('$glad','$team', '1')";
                         else
                             $sql = "INSERT INTO gladiator_teams(gladiator, team) VALUES ('$glad','$team')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $output['status'] = "DONE";
 
                         send_node_message(array('tournament teams' => array(
@@ -585,16 +585,16 @@
     }
     elseif ($action == "DELETE"){
         if (isset($_POST['tourn'])){
-            $tournid = mysql_escape_string($_POST['tourn']);
+            $tournid = $_POST['tourn'];
             $sql = "SELECT id, manager, hash FROM tournament WHERE id = '$tournid'";
         }
         else{
-            $name = mysql_escape_string($_POST['name']);
-            $pass = mysql_escape_string($_POST['pass']);
+            $name = $_POST['name'];
+            $pass = $_POST['pass'];
             $sql = "SELECT id, manager, hash FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $tournid = $row['id'];
         $manager = $row['manager'];
@@ -605,12 +605,12 @@
             $output['status'] = "STARTED";
         else{
             $sql = "SELECT id FROM teams WHERE tournament = '$tournid'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0){
                 $sql = "DELETE FROM tournament WHERE id = '$tournid'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $output['status'] = "DELETED";
 
                 send_node_message(array('tournament list' => array()));
@@ -628,13 +628,13 @@
         echo json_encode($output);
     }
     elseif ($action == "REMOVE_GLAD"){
-        $team = mysql_escape_string($_POST['team']);
-        $glad = mysql_escape_string($_POST['glad']);
+        $team = $_POST['team'];
+        $glad = $_POST['glad'];
 
         $output = array();
 
         $sql = "SELECT t.id, t.name, t.password, t.hash FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE te.id = $team";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         if ($row['hash'] != '')
@@ -645,34 +645,34 @@
             $tpass = $row['password'];
 
             $sql = "SELECT * FROM gladiators g INNER JOIN gladiator_teams gt ON g.cod = gt.gladiator WHERE g.master = '$user' AND gt.team = '$team' AND gt.gladiator = '$glad'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
                 $output['status'] = "NOTFOUND";
             else{
                 $sql = "DELETE FROM gladiator_teams WHERE gladiator = '$glad' AND team = '$team'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $sql = "SELECT t.id AS id FROM tournament t INNER JOIN teams te ON te.tournament = t.id WHERE te.id = '$team'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
                 $output['tournid'] = $row['id'];
 
                 $sql = "SELECT * FROM gladiator_teams WHERE team = '$team'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
                 
                 if ($nrows > 0){
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$team'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "DONE";
 
                     send_node_message(array('tournament glads' => array( 'team' => $team )));
                 }
                 else{
                     $sql = "DELETE FROM teams WHERE id = '$team'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "REMOVED";
 
                     send_node_message(array('tournament list' => array()));
@@ -696,14 +696,14 @@
         echo json_encode($output);
     }
     elseif ($action == "KICK"){
-        $team = mysql_escape_string($_POST['teamname']);
-        $tname = mysql_escape_string($_POST['name']);
-        $tpass = mysql_escape_string($_POST['pass']);
+        $team = $_POST['teamname'];
+        $tname = $_POST['name'];
+        $tpass = $_POST['pass'];
 
         $output = array();
 
         $sql = "SELECT te.tournament, t.name, t.password, te.id AS id FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE t.manager = '$user' AND t.name = '$tname' AND t.password = '$tpass' AND te.name = '$team'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -716,9 +716,9 @@
             $tpass = $row['password'];
 
             $sql = "DELETE FROM gladiator_teams WHERE team = '$team'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $sql = "DELETE FROM teams WHERE id = '$team'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             
             $output['status'] = "DONE";
 
@@ -740,13 +740,13 @@
         echo json_encode($output);
     }
     elseif ($action == "START"){
-        $tname = mysql_escape_string($_POST['name']);
-        $tpass = mysql_escape_string($_POST['pass']);
+        $tname = $_POST['name'];
+        $tpass = $_POST['pass'];
 
         $output = array();
 
         $sql = "SELECT t.id AS id, t.maxtime FROM tournament t WHERE t.name = '$tname' AND t.password = '$tpass' AND t.manager = '$user' AND t.hash = ''";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         $row = $result->fetch_assoc();
         $tournid = $row['id'];
@@ -756,7 +756,7 @@
             $output['status'] = "NOTFOUND";
         else{
             $sql = "SELECT id FROM teams WHERE tournament = '$tournid'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nteams = $result->num_rows;
 
             if ($nteams <= 1)
@@ -768,7 +768,7 @@
                 shuffle($teams);
 
                 $sql = "SELECT te.id FROM teams te WHERE (SELECT count(*) FROM gladiator_teams WHERE team = te.id) < 3 AND te.tournament = '$tournid'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
                 
                 if ($nrows > 0)
@@ -776,7 +776,7 @@
                 else{
                     $hash = substr(md5('tourn'.microtime()*rand()), 0,16);
                     $sql = "UPDATE tournament t SET t.hash = '$hash' WHERE t.id = '$tournid'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     create_chat($conn, $tournid);
 
@@ -791,14 +791,14 @@
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
                         $sql = "INSERT INTO groups(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         array_push($groups, $conn->insert_id);
                     }
 
                     foreach($teams as $i => $team){
                         $group = $groups[$i % $ngroups];
                         $sql = "INSERT INTO group_teams (team, groupid) VALUES ('$team', '$group')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                     }
 
                     $output['status'] = "DONE";
@@ -814,7 +814,7 @@
 
         $sql = "SELECT t.id AS id FROM teams t INNER JOIN gladiator_teams gt ON gt.team = t.id INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE t.tournament = '$tournid' AND g.master = '$user'";
         
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
         
         if ($nrows > 0){
@@ -829,7 +829,7 @@
     function create_chat($conn, $tourn){
         //check if room exists
         $sql = "SELECT cr.id, t.name, t.manager FROM chat_rooms cr RIGHT JOIN tournament t ON t.name = cr.name WHERE t.id = $tourn";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $row = $result->fetch_assoc();
         $name = $row['name'];
@@ -840,12 +840,12 @@
 
         //create chat room
         $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), 'Sala de discussão do torneio $name', 0)";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $room = $conn->insert_id;
 
         //get who is in the tournament
         $sql = "SELECT DISTINCT g.master FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE te.tournament = $tourn";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $masters = array();
         while ($row = $result->fetch_assoc()){
@@ -860,11 +860,11 @@
                 $privilege = 0;
             //insert every user from the tournament in the new chat room
             $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($room, '$master', now(3), now(3), $privilege)";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
         }
 
         $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         send_node_message(array(
             'chat notification' => array(

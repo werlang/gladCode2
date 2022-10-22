@@ -7,7 +7,7 @@
     $output = array();
 
     if ($action == "GET"){
-        $offset = mysql_escape_string($_POST['offset']);
+        $offset = $_POST['offset'];
         $limit = 10;
 
         $fav = "";
@@ -21,7 +21,7 @@
         }
 
         $sql = "SELECT id FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav $unread";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $total = $result->num_rows;
         $output['total'] = $total;
 
@@ -39,7 +39,7 @@
         }
         
         $sql = "SELECT r.id, time, name, isread, hash, reward, favorite, comment, expired FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav $unread ORDER BY time DESC LIMIT $limit OFFSET $offset";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         
         $infos = array();
         $ids = array();
@@ -72,7 +72,7 @@
                 $ids = implode(",", $ids);
 
                 $sql = "UPDATE reports SET isread = '1' WHERE id IN ($ids)";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 send_node_message(array(
                     'profile notification' => array('user' => array($user))
@@ -81,21 +81,21 @@
         }
     }
     elseif ($action == "DELETE"){
-        $id = mysql_escape_string($_POST['id']);
+        $id = $_POST['id'];
         $sql = "DELETE FROM reports WHERE id = '$id' AND gladiator IN (SELECT cod FROM gladiators WHERE master = '$user')";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['status'] = "SUCCESS";
     }
     else if ($action == "FAVORITE"){
-        $favorite = mysql_escape_string($_POST['favorite']);
+        $favorite = $_POST['favorite'];
 
         if ($favorite === "true" || $favorite === "false"){
-            $id = mysql_escape_string($_POST['id']);
-            $comment = mysql_escape_string($_POST['comment']);
+            $id = $_POST['id'];
+            $comment = $_POST['comment'];
             
             $sql = "UPDATE reports SET favorite = $favorite, comment = '$comment' WHERE id = $id";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $output['status'] = "SUCCESS";
         }
         else{

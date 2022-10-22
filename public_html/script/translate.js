@@ -10,7 +10,7 @@ const translator = {
 translator.translate = async function(elements){
     const {login} = await loader.load("header")
     const user = await login.wait()
-    let lang = this.language ? this.language : user.speak
+    let lang = this.language || user.speak || 'en';
     let contents = this.translations ? this.translations : {}
     
     // console.log(elements)

@@ -28,7 +28,7 @@ login.wait = async function(){
                 }
 
                 if (!login.user.speak){
-                    change_spoken_language(navigator.language.split("-")[0])
+                    change_spoken_language(window.navigator.language.split("-")[0])
                 }
 
                 resolve(login.user)

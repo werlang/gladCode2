@@ -10,7 +10,7 @@
 
     if ($action == "ROOMS"){
         $sql = "SELECT cr.id, cr.name, cu.visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room INNER JOIN chat_messages cm ON cm.room = cr.id WHERE cu.user = '$user' ORDER BY cm.time DESC";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['room'] = array();
         while ($row = $result->fetch_assoc()){
@@ -21,18 +21,18 @@
 
     }
     else if ($action == "MESSAGES"){
-        $id = mysql_escape_string($_POST['id']);
-        $first = mysql_escape_string($_POST['first']);
-        $sync = mysql_escape_string($_POST['sync']);
+        $id = $_POST['id'];
+        $first = $_POST['first'];
+        $sync = $_POST['sync'];
 
         if (isset($_POST['visited']))
-            $visited = mysql_escape_string($_POST['visited']);
+            $visited = $_POST['visited'];
         else
             $visited = '';
 
         //check if user is in the room and not banned
         $sql = "SELECT cu.id FROM chat_users cu WHERE cu.user = '$user' AND cu.room = $id";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0)
@@ -40,7 +40,7 @@
         else{
             //check if banned
             $sql = "SELECT cre.time FROM chat_restrictions cre WHERE cre.ban = 1 AND cre.user = '$user' AND cre.room = $id";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
@@ -67,9 +67,9 @@
 
             //get message info
             $sql = "SET lc_time_names = 'pt_BR'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $sql = "SELECT UNIX_TIMESTAMP(now(3)) AS visited, UNIX_TIMESTAMP(cm.time) AS realtime, cm.id, cm.message, DATE_FORMAT(cm.time, '%e %b %k:%i') AS time, um.apelido, cm.system, um.id AS userid, um.foto FROM chat_messages cm INNER JOIN chat_rooms cr ON cr.id = cm.room INNER JOIN chat_users cu ON cu.room = cr.id INNER JOIN usuarios um ON um.id = cm.sender WHERE cr.id = $id AND cu.user = '$user' $bantime $first $sync ORDER BY cm.time DESC, cm.id DESC LIMIT $limit";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $output['sql'] = $sql;
 
             $output['messages'] = array();
@@ -86,7 +86,7 @@
             }
 
             $sql = "UPDATE chat_users SET visited = now(3) WHERE room = $id AND user = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $output['status'] = "SUCCESS";
 
@@ -97,10 +97,10 @@
         }
     }
     else if ($action == "SEND"){
-        $message = trim(mysql_escape_string($_POST['message']));
+        $message = trim($_POST['message']);
 
         if (isset($_POST['room']) && $_POST['room'] != "false")
-            $room = mysql_escape_string($_POST['room']);
+            $room = $_POST['room'];
         else
             $room = '';
 
@@ -110,7 +110,7 @@
             $emojis = "";
 
         $sql = "UPDATE usuarios SET emoji = '$emojis' WHERE id = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         if ($message == '')
             $output['status'] = "EMPTY";
@@ -124,7 +124,7 @@
             else{
                 // if user is in the room
                 $sql = "SELECT cr.direct FROM chat_users cu INNER JOIN chat_rooms cr ON cr.id = cu.room WHERE cu.user = '$user' AND cu.room = $room";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
@@ -136,7 +136,7 @@
 
                     //check if user have any restrictions
                     $sql = "SELECT ban, time FROM chat_restrictions WHERE user = '$user' AND room = $room";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $row = $result->fetch_assoc();
                     $nrows = $result->num_rows;
                     if ($nrows > 0 && $row['ban'] == 0){
@@ -148,13 +148,13 @@
                     else{
                         //send message
                         $sql = "INSERT INTO chat_messages (room, time, sender, message) VALUES ($room, now(3), '$user', '$message')";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $output['status'] = "SENT";
 
                         if ($direct){
                             $sql = "SELECT cu.user FROM chat_users cu WHERE cu.room = $room";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
 
                             $userlist = array();
                             $receiver = "";
@@ -172,7 +172,7 @@
 
                             // get when was the last message I sent
                             $sql = "SELECT TIMESTAMPDIFF(MINUTE, time, now()) AS timesince FROM chat_messages WHERE sender = $user AND room = $room ORDER BY time DESC LIMIT 1 OFFSET 1 ";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
 
                             if ($result->num_rows > 0){
                                 $row = $result->fetch_assoc();
@@ -201,7 +201,7 @@
 
         //all rooms I am in and not banned
         $sql = "SELECT cr.id FROM chat_rooms cr INNER JOIN chat_users cu ON cu.room = cr.id WHERE cu.user = '$user' AND cr.id NOT IN (SELECT room FROM chat_restrictions WHERE ban = 1 AND user = '$user')";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $nrows = $result->num_rows;
 
         if ($nrows == 0){
@@ -227,7 +227,7 @@
     else if ($action == "EMOJI"){
         if (isset($user)){
             $sql = "SELECT emoji FROM usuarios WHERE id = $user";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
 
             $output['emoji'] = $row['emoji'];
@@ -269,7 +269,7 @@
         $direct = false;
         if ($room != ''){
             $sql = "SELECT direct FROM chat_rooms WHERE id = $room";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             $row = $result->fetch_assoc();
             $direct = $row['direct'] == "1";
@@ -282,7 +282,7 @@
             $room = implode(" ", $args);
             //search for the room
             $sql = "SELECT id FROM chat_rooms WHERE name = '$room'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
 
             if ($nrows == 0)
@@ -293,33 +293,33 @@
                 $desc = $row['description'];
 
                 $sql = "SELECT count(*) FROM chat_users WHERE user = '$user' AND room = $id";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $row = $result->fetch_assoc();
                 if ($row['count(*)'] > 0)
                     $output['status'] = "ALREADYJOINED";
                 else{
                     $sql = "SELECT apelido from usuarios WHERE id = '$user'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $row = $result->fetch_assoc();
                     $nick = $row['apelido'];
 
                     $sql = "INSERT INTO chat_users (room, user, joined, visited) VALUES ($id, '$user', now(3), now(3))";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $output['status'] = "JOINED";
                     $output['id'] = $id;
                     $output['name'] = $room;
 
                     $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick entrou na sala', 1)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     //if there is no user in the room, I am the new master
                     $sql = "SELECT count(*) FROM chat_users WHERE room = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $row = $result->fetch_assoc();
                     if ($row['count(*)'] == 1){
                         $sql = "UPDATE chat_users SET privilege = 0 WHERE room = $id AND user = '$user'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $output['owner'] = true;
                     }
@@ -330,7 +330,7 @@
             $argstring = implode(" ", $args);
             if ($room != '' && $argstring == ''){
                 $sql = "SELECT name FROM chat_rooms WHERE id = $room";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
                 $room = $row['name'];
             }
@@ -339,7 +339,7 @@
 
             //search for the room
             $sql = "SELECT cr.id, u.apelido FROM chat_rooms cr INNER JOIN chat_users cu ON cu.room = cr.id INNER JOIN usuarios u ON u.id = cu.user WHERE cr.name = '$room' AND cu.user = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $nrows = $result->num_rows;
             if ($nrows == 0)
                 $output['status'] = "NOTFOUND";
@@ -349,27 +349,27 @@
                 $nick = $row['apelido'];
 
                 $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick saiu da sala', 1)";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $sql = "DELETE FROM chat_users WHERE user = '$user' AND room = $id";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $output['status'] = "LEFT";
                 $output['name'] = $room;
 
                 //check if there are anyone left in the room
                 $sql = "SELECT count(*) FROM chat_users WHERE room = $id";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $row = $result->fetch_assoc();
 
                 if ($row['count(*)'] == 0){
                     //if there is not, delete the room
                     $sql = "DELETE FROM chat_messages WHERE room = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $sql = "DELETE FROM chat_rooms WHERE id = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $sql = "DELETE FROM chat_restrictions WHERE room = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                 }
             }
         }
@@ -379,7 +379,7 @@
                     $output['status'] = "NOROOM";
                 else{
                     $sql = "SELECT cr.name, cr.description, (SELECT count(*) FROM chat_users WHERE room = cr.id) AS members FROM chat_rooms cr WHERE cr.public = 1";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['room'] = array();
                     while($row = $result->fetch_assoc()){
@@ -393,9 +393,9 @@
                     $output['status'] = "NOROOM";
                 else{
                     $sql = "SET lc_time_names = 'pt_BR'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $sql = "SELECT u.apelido, cu.privilege, DATE_FORMAT(cu.joined, '%e %b %Y') AS since, TIMESTAMPDIFF(MINUTE, u.ativo, now()) AS login FROM usuarios u INNER JOIN chat_users cu ON u.id = cu.user WHERE cu.room = $room ORDER BY cu.privilege, login, u.apelido";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['user'] = array();
                     while($row = $result->fetch_assoc()){
@@ -432,7 +432,7 @@
             else{
                 //check if room exists
                 $sql = "SELECT id FROM chat_rooms WHERE name = '$name'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 $row = $result->fetch_assoc();
@@ -442,19 +442,19 @@
                 }
                 else{
                     $sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $row = $result->fetch_assoc();
                     $nick = $row['apelido'];
 
                     $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), '$description', $public)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $id = $conn->insert_id;
 
                     $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($id, '$user', now(3), now(3), 0)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick criou a sala $name', 1)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['status'] = "CREATED";
                     $output['name'] = $name;
@@ -467,7 +467,7 @@
                 $output['status'] = "NOROOM";
             else{
                 $sql = "SELECT cu.privilege, u.apelido FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE cu.user = '$user' AND cu.room = $room";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
@@ -482,7 +482,7 @@
                         $target = implode(" ", $args);
 
                         $sql = "SELECT cu.privilege, cu.user FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE u.apelido = '$target' AND cu.room = $room";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $nrows = $result->num_rows;
 
                         if ($nrows == 0){
@@ -496,12 +496,12 @@
 
                             if ($tpriv == 1){
                                 $sql = "UPDATE chat_users SET privilege = 0 WHERE user = '$tuser' AND room = $room";
-                                $result = runQuery($sql);
+                                $result = runQuery($sql, []);
 
                                 $output['status'] = "PROMOTED";
 
                                 $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$target foi promovido por $nick', 1)";
-                                $result = runQuery($sql);
+                                $result = runQuery($sql, []);
 
                             }
                             else
@@ -523,7 +523,7 @@
                     if (isset($d) && is_array($d) && count($d) > 1){
                         $r = trim($d[1]);
                         $sql = "SELECT id FROM chat_rooms WHERE name = '$r'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $nrows = $result->num_rows;
                         if ($nrows > 0){
                             $row = $result->fetch_assoc();
@@ -542,7 +542,7 @@
             }
             else{
                 $sql = "SELECT cu.privilege, u.apelido, cr.name FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user INNER JOIN chat_rooms cr ON cr.id = cu.room WHERE cu.user = '$user' AND cu.room = $room";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
@@ -562,7 +562,7 @@
                         elseif ($command == "unban")
                             $sql = "SELECT cre.user, 2 AS privilege FROM usuarios u INNER JOIN chat_restrictions cre ON cre.user = u.id WHERE u.apelido = '$target' AND cre.room = $room";
 
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $nrows = $result->num_rows;
 
                         if ($nrows == 0){
@@ -576,7 +576,7 @@
 
                             //check if user is already banned
                             $sql = "SELECT id FROM chat_restrictions WHERE user = '$tuser' AND room = $room AND ban = 1";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                             $banned = $result->num_rows;
                             if ($banned > 0 && $command == 'ban'){
                                 $output['status'] = "ALREADYBANNED";
@@ -607,10 +607,10 @@
                                     )
                                 ));
 
-                                $result = runQuery($sql);
+                                $result = runQuery($sql, []);
 
                                 $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$msg', 1)";
-                                $result = runQuery($sql);
+                                $result = runQuery($sql, []);
 
                             }
                             else
@@ -627,12 +627,12 @@
                 $output['status'] = "NOROOM";
             else{
                 $sql = "SELECT cu.user, u.ativo FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE cu.privilege = 0 AND cu.room = $room AND u.ativo >= (CURRENT_TIME() - INTERVAL 30 DAY) ORDER BY u.ativo DESC";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0){
                     $sql = "SELECT u.apelido FROM usuarios u WHERE u.id = '$user' AND u.id NOT IN (SELECT user FROM chat_restrictions WHERE user = '$user' AND room = $room)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
 
                     if ($nrows == 0)
@@ -642,13 +642,13 @@
                         $nick = $row['apelido'];
 
                         $sql = "UPDATE chat_users SET privilege = 1 WHERE privilege = 0 AND room = $room";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $sql = "UPDATE chat_users SET privilege = 0 WHERE user = '$user'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$nick se autoproclamou o novo líder da sala', 1)";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
 
                         $output['status'] = "CLAIMED";
                     }
@@ -670,7 +670,7 @@
                 if (isset($r) && is_array($r) && count($r) > 1){
                     $r = trim($r[1]);
                     $sql = "SELECT id FROM chat_rooms WHERE name = '$r'";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
                     $nrows = $result->num_rows;
                     if ($nrows > 0){
                         $row = $result->fetch_assoc();
@@ -687,7 +687,7 @@
                 $output['status'] = "NOROOM";
             else{
                 $sql = "SELECT cu.privilege, u.apelido FROM chat_users cu INNER JOIN usuarios u ON u.id = cu.user WHERE cu.user = '$user' AND cu.room = $room";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows == 0)
@@ -750,11 +750,11 @@
                             $fields = implode(", ", $fields);
 
                             $sql = "UPDATE chat_rooms SET $fields WHERE id = $room";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
 
                             foreach ($messages as $message){
                                 $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$message', 1)";
-                                $result = runQuery($sql);
+                                $result = runQuery($sql, []);
                             }
 
                             $output['status'] = "EDITED";

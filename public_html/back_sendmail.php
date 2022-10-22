@@ -40,20 +40,20 @@
         }
     }
     elseif ($action  == 'MESSAGE'){
-        $message = mysql_escape_string($_POST['message']);
-        $id = mysql_escape_string($_POST['receiver']);
+        $message = $_POST['message'];
+        $id = $_POST['receiver'];
 
         session_start();
         $user = $_SESSION['user'];
         
         $sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         
         $usernick = $row['apelido'];
         
         $sql = "SELECT apelido, email, pref_message FROM usuarios WHERE id = $id";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         
         $receivername = $row['apelido'];
@@ -75,18 +75,18 @@
         $msgbody = message_replace($doc->saveHTML(), $vars);
     }
     elseif ($action  == 'FRIEND'){
-        $receiveremail = mysql_escape_string($_POST['friend']);
+        $receiveremail = $_POST['friend'];
         session_start();
         $user = $_SESSION['user'];
         
         $sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         
         $usernick = $row['apelido'];
         
         $sql = "SELECT apelido, pref_friend FROM usuarios WHERE email = '$receiveremail'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         
         $receivername = $row['apelido'];
@@ -111,7 +111,7 @@
         $postlink = $_POST['postlink'];
         
         $sql = "SELECT apelido, email FROM usuarios WHERE pref_update = '1' AND email_update != '$version'";// AND email IN('pswerlang@gmail.com','lixoacc@gmail.com')";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $receiveremail = array();
         $receivername = array();
         while($row = $result->fetch_assoc()){
@@ -131,21 +131,21 @@
         $msgbody = message_replace($doc->saveHTML(), $vars);
     }
     elseif ($action  == 'DUEL'){
-        $friend = mysql_escape_string($_POST['friend']);
+        $friend = $_POST['friend'];
         session_start();
         $user = $_SESSION['user'];
         
         $sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         if ($result->num_rows != 0){
             $sql = "SELECT apelido from usuarios WHERE id = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $row = $result->fetch_assoc();
             $usernick = $row['apelido'];
             
             $sql = "SELECT apelido, pref_duel, email FROM usuarios WHERE id = '$friend'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
             
             $friendnick = $row['apelido'];
@@ -170,11 +170,11 @@
         }
     }
     elseif ($action  == 'TOURNAMENT'){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         //get email from those participating in the tournament and not dead
         $sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.id AND glt.dead = 0 AND t.hash = '$hash') > 0)";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $receiveremail = array();
         $receivername = array();
@@ -185,7 +185,7 @@
 
         $sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
         ";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $maxround = $row['maxround'];
         $tourn = $row['name'];
@@ -264,7 +264,7 @@
             if ($action == "UPDATE"){
                 $em = $receiveremail[$i];
                 $sql = "UPDATE usuarios SET email_update = '$version' WHERE email = '$em'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
             }
         }

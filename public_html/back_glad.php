@@ -13,7 +13,7 @@
         $hash = getSpriteHash($code);
         
         $sql = "SELECT skin FROM skins WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $info = array();
 
@@ -36,7 +36,7 @@
         $user = $_SESSION['user'];
         
         $sql = "SELECT * FROM usuarios WHERE id = '$user'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $lvl = $row['lvl'];
         
@@ -48,7 +48,7 @@
         
         if ($_POST['action'] == "GET"){
             $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $i = 0;
             $info = array();
@@ -75,9 +75,9 @@
             ));
         }
         elseif ($_POST['action'] == "DELETE"){
-            $id = mysql_escape_string($_POST['id']);
+            $id = $_POST['id'];
             $sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             send_node_message(array(
                 'profile notification' => array('user' => array($user))
@@ -87,35 +87,35 @@
             $output = array();
 
             if (isset($_POST['id']))
-                $id = mysql_escape_string($_POST['id']);
+                $id = $_POST['id'];
             else
                 $id = '';
-            $skin = mysql_escape_string($_POST['skin']);
-            $name = mysql_escape_string($_POST['nome']);
+            $skin = $_POST['skin'];
+            $name = $_POST['nome'];
             preg_match ( '/^[\w À-ú]+?$/' , $name , $name_match );
-            $vstr = mysql_escape_string($_POST['vstr']);
-            $vagi = mysql_escape_string($_POST['vagi']);
-            $vint = mysql_escape_string($_POST['vint']);
-            $code = mysql_escape_string($_SESSION['code']);
+            $vstr = $_POST['vstr'];
+            $vagi = $_POST['vagi'];
+            $vint = $_POST['vint'];
+            $code = $_SESSION['code'];
 
             $blocks = "";
             if (isset($_POST['blocks']))
-                $blocks = mysql_escape_string($_POST['blocks']);
+                $blocks = $_POST['blocks'];
 
             if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
                 $sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 if ($result->num_rows == 0){
                     if ($_POST['action'] == "INSERT"){
                         $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         if ($result->num_rows >= $limit){
                             $output['status'] = "LIMIT";
                             $output['value'] = $limit;
                         }
                         else{
                             $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
-                            $result = runQuery($sql);
+                            $result = runQuery($sql, []);
                             $output['status'] = "SUCCESS";
                             $output['operation'] = "INSERT";
                             $output['id'] = $conn->insert_id;
@@ -127,7 +127,7 @@
                     }
                     elseif ($_POST['action'] == "UPDATE"){
                         $sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', blocks = '$blocks', version = '$version' WHERE cod = '$id' AND master = '$user'";
-                        $result = runQuery($sql);
+                        $result = runQuery($sql, []);
                         $output['status'] = "SUCCESS";
                         $output['operation'] = "UPDATE";
                         $output['id'] = $id;

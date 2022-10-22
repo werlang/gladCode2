@@ -12,7 +12,7 @@
 
     if ($action == "ITEMS"){
         $sql = "SELECT * FROM items ORDER BY price";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['potions'] = array();
         while($row = $result->fetch_assoc()){
@@ -32,7 +32,7 @@
     }
     elseif ($action == "SLOTS"){
         $sql = "SELECT s.id AS 'sid', i.identifier AS 'id', i.icon, i.name, TIME_TO_SEC(TIMEDIFF(s.expire, now())) AS 'time' FROM slots s INNER JOIN items i ON i.id = s.item WHERE s.user = $user AND expire > now() ORDER BY s.expire LIMIT 4";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $output['slots'] = array();
         while ($row = $result->fetch_assoc()){
@@ -40,7 +40,7 @@
         }
 
         $sql = "SELECT lvl FROM usuarios WHERE id = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $lvl = $row['lvl'];
 
@@ -57,10 +57,10 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "BUY"){
-        $identifier = mysql_escape_string($_POST['id']);
+        $identifier = $_POST['id'];
 
         $sql = "SELECT silver, lvl, apothecary FROM usuarios WHERE id = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         $silver = $row['silver'];
@@ -76,7 +76,7 @@
 
         $used = "SELECT count(*) FROM slots s WHERE s.user = $user AND expire > now()";
         $sql = "SELECT id, price, ($used) AS 'used_slots', lvl FROM items WHERE identifier = '$identifier'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
 
         $price = $row['price'];
@@ -95,11 +95,11 @@
         }
         else{
             $sql = "UPDATE usuarios SET silver = silver - $price WHERE id = $user";
-            runQuery($sql);
+            runQuery($sql, []);
 
             $hours = $apot_times[$apot - 1];
             $sql = "INSERT INTO slots (user, item, expire) VALUES ($user, $item, now() + INTERVAL $hours HOUR)";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $output['id'] = $conn->insert_id;
             $output['status'] = "SUCCESS";
@@ -107,7 +107,7 @@
 
     }
     elseif ($action == "UPGRADE"){
-        $command = mysql_escape_string($_POST['command']);
+        $command = $_POST['command'];
         $prices = array(1500,5000,15000,35000,0);
     
         if ($command == "COSTS"){
@@ -116,7 +116,7 @@
         }
         elseif ($command == "APOT"){
             $sql = "SELECT apothecary,silver FROM usuarios WHERE id = $user";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
 
             $row = $result->fetch_assoc();
             $apot = $row['apothecary'];
@@ -131,7 +131,7 @@
             }
             else{
                 $sql = "UPDATE usuarios SET apothecary = apothecary + 1, silver = silver - $cost WHERE id = $user";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
 
                 $output['silver'] = $silver - $cost;
                 $output['apot'] = $apot + 1;
@@ -141,15 +141,15 @@
         }
     }
     elseif ($action == "EXPIRE") {
-        $id = mysql_escape_string($_POST['id']);
+        $id = $_POST['id'];
 
         $sql = "SELECT user FROM slots WHERE id = $id";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $row = $result->fetch_assoc();
         if ($user == $row['user']){
             $sql = "UPDATE slots SET expire = now() WHERE id = $id";
-            runQuery($sql);
+            runQuery($sql, []);
             
             $output['status'] = "SUCCESS";
         }

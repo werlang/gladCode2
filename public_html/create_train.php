@@ -6,12 +6,12 @@
         $nplayers = $_GET['p'];
 
         $sql = "SELECT id FROM training WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $trainid = $row['id'];
         
         $sql = "SELECT g.cod FROM gladiators g GROUP BY g.master";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $glads = array();
         while ($row = $result->fetch_assoc()){
@@ -27,29 +27,29 @@
         $sqlvalue = implode(", ", $sqlvalue);
 
         $sql = "INSERT INTO gladiator_training (gladiator, training) VALUES $sqlvalue";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
     }
     if (isset($_GET['d'])){
         $hash = $_GET['d'];
 
         $sql = "SELECT id FROM training WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $trainid = $row['id'];
 
         $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $groups = array();
         while ($row = $result->fetch_assoc())
             array_push($groups, $row['groupid']);
         $groups = implode(",", $groups);
 
         $sql = "DELETE FROM gladiator_training WHERE training = $trainid";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         if (strlen($groups) > 0){
             $sql = "DELETE FROM training_groups WHERE id IN ($groups)";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
         }
     }
     echo "DONE";

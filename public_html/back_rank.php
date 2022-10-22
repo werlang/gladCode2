@@ -8,18 +8,18 @@
     $output = array();
     
     if ($action == "GET"){
-        $offset = mysql_escape_string($_POST['offset']);
+        $offset = $_POST['offset'];
 
         $search = "";
         if (isset($_POST['search'])){
-            $search = mysql_escape_string($_POST['search']);
+            $search = $_POST['search'];
             if ($search != ""){
                 $search = " WHERE g.name LIKE '%$search%' OR u.apelido LIKE '%$search%'";
             }
         }
         
         $sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $total = $result->num_rows;
 
         $limit = 10;
@@ -36,7 +36,7 @@
         $from = "";
         $position = "SELECT count(*) FROM gladiators g2 WHERE g2.mmr >= g.mmr";
         $sql = "SELECT g.name, g.mmr, u.apelido, ($sumreward) AS sumreward, ($position) AS position FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search ORDER BY g.mmr DESC LIMIT $limit OFFSET $offset";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         
         $output['total'] = $total;
 
@@ -53,7 +53,7 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "WATCH TAB"){
-        $name = mysql_escape_string(trim($_POST['name']));
+        $name = trim($_POST['name']);
         if (isset($_POST['add'])){
             $watch = 1;
         }
@@ -66,7 +66,7 @@
         }
         else{
             $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $row = $result->fetch_assoc();
 
             if (is_null($row['premium'])){
@@ -77,7 +77,7 @@
             }
             else{
                 $sql = "SELECT id FROM user_tabs WHERE name = '$name' AND owner = $user";
-                $result = runQuery($sql);
+                $result = runQuery($sql, []);
                 $nrows = $result->num_rows;
 
                 if ($nrows > 0){
@@ -85,13 +85,13 @@
                     $id = $row['id'];
 
                     $sql = "UPDATE user_tabs SET watch = $watch WHERE id = $id";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
 
                     $output['status'] = "SUCCESS";
                 }
                 else{
                     $sql = "INSERT INTO user_tabs (name, owner, watch) VALUES ('$name', $user, $watch)";
-                    $result = runQuery($sql);
+                    $result = runQuery($sql, []);
         
                     $output['id'] = $conn->insert_id;
                     $output['status'] = "SUCCESS";
@@ -104,7 +104,7 @@
 
         // get tags from training I own
         $sql = "SELECT DISTINCT t.description FROM training t WHERE t.manager = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         while($row = $result->fetch_assoc()){
             preg_match_all("/#(\w+)/", $row['description'], $matches);
             if (is_array($matches) && count($matches) > 1){
@@ -116,7 +116,7 @@
         
         // get tags from training I am participating
         $sql = "SELECT DISTINCT t.description FROM gladiator_training gt INNER JOIN gladiators g ON gt.gladiator = g.cod INNER JOIN training t ON t.id = gt.training WHERE g.master = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         while($row = $result->fetch_assoc()){
             preg_match_all("/#(\w+)/", $row['description'], $matches);
             if (is_array($matches) && count($matches) > 1){
@@ -131,7 +131,7 @@
 
         // see if the tags are blocked to not be watched
         $sql = "SELECT name, watch FROM user_tabs WHERE owner = $user";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         while($row = $result->fetch_assoc()){
             if ($row['watch'] == 0 && in_array($row['name'], $tags)){
                 array_splice($tags, array_search($row['name'], $tags), 1);
@@ -147,11 +147,11 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "FETCH"){
-        $tab = mysql_escape_string($_POST['tab']);
-        $search = strtolower(mysql_escape_string($_POST['search']));
+        $tab = $_POST['tab'];
+        $search = strtolower($_POST['search']);
 
         $sql = "SELECT t.id, t.name, t.weight FROM training t WHERE t.description LIKE '%#$tab%'";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
 
         $training = array();
         while($row = $result->fetch_assoc()){
@@ -170,7 +170,7 @@
             // need to calc avg time manually, because we need to subtract 1000 when the user won and ignore time 0 
             $manualtime = "SELECT avg(IF(gt2.lasttime > 1000, gt2.lasttime - 1000, gt2.lasttime)) FROM gladiator_training gt2 INNER JOIN gladiators g2 ON g2.cod = gt2.gladiator WHERE gt2.training = gt.training AND g2.master = g.master AND gt2.lasttime > 0";
             $sql = "SELECT sum(gt.score) AS score, ($manualtime) AS time, g.master, u.apelido FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY g.master ORDER BY score DESC, time DESC";
-            $result = runQuery($sql);
+            $result = runQuery($sql, []);
             $i = 0;
             while($row = $result->fetch_assoc()){
                 // if the training was not started, time is null
@@ -233,7 +233,7 @@
     }
     elseif ($action == 'MAXMINE'){
         $sql = "SELECT count(*) AS 'offset' FROM gladiators WHERE mmr > (SELECT max(mmr) FROM gladiators WHERE master = $user)";
-        $result = runQuery($sql);
+        $result = runQuery($sql, []);
         $row = $result->fetch_assoc();
         $output['offset'] = $row['offset'];
         $output['status'] = "SUCCESS";
