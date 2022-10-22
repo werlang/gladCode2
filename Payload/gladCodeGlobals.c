@@ -44,7 +44,7 @@ globais do ambiente, herdado do gladCode1
 #define MSG_BREAKPOINT 9
 
 //custos de cada habilidade. os indices batem com as constantes dos buffs
-int abilitycost[6] = {50,50,30,50,30,70};
+int abilitycost[6] = {50,60,30,50,30,70};
 
 struct buff {
     float timeleft;

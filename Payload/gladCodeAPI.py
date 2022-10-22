@@ -261,10 +261,10 @@ def lvlUp(n):
     sendMessage("lvlUp {}".format(n))
 
 def useItem(item):
-    return bool(sendMessage("useItem {}".format(item)))
+    return bool(int(sendMessage("useItem {}".format(item))))
 
 def setSlots(slots):
     sendMessage("setSlots {}".format(slots))
 
 def isItemReady(item):
-    return bool(sendMessage("isItemReady {}".format(item)))
+    return bool(int(sendMessage("isItemReady {}".format(item))))
