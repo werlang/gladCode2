@@ -30,13 +30,15 @@
     }
 
     $codes = array();
-    foreach($fileList as $file)
+    foreach($fileList as $file){
         $codes[$file] = array();
-
+    }
+    
     foreach($contents as $func => $data){
         foreach($data['sample'] as $lang => $filename){
             $file = explode(".", $filename)[0];
-            if (count($codes[$file][$lang]) == 0)
+
+            if (!isset($codes[$file][$lang]))
                 $codes[$file][$lang] = file_get_contents("$dir$filename");
         }
     }
