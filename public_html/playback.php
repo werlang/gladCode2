@@ -40,6 +40,16 @@
     <script src="script/socket.js"></script>
     
     </head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT4EF5GTBP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-VT4EF5GTBP');
+    </script>
+
 <body>
     <div id='fog' class='load'>
         <div id='loadbar'>
