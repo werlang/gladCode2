@@ -6,6 +6,7 @@
 <html>
 <head>
     <meta name="google-signin-client_id" content="1036458629781-8j247asma3gm7u956gbn3d0m0nobqhie.apps.googleusercontent.com">
+    <script src="https://cdn.socket.io/socket.io-2.3.1.js" ></script>
     <script src="https://apis.google.com/js/platform.js?onload=onLoadCallback" async defer></script>
 </head>
 <body>
