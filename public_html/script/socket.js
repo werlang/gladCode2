@@ -2,14 +2,15 @@ var socket;
 var serverURL = `//${window.location.hostname}:3000`;
 
 $(document).ready( function(){
-    $.getScript(`${serverURL}/socket.io/socket.io.js`, function(){
-        try{
-            socket = io(serverURL, {secure: true});
-        }
-        catch(e){
-            socket = null;
-        }
-    });
+    try{
+        socket = io(serverURL, { secure: window.location.protocol == 'https:' });
+    }
+    catch(e){
+        console.log(e)
+        socket = null;
+    }
+    // $.getScript(`${serverURL}/socket.io`, function(){
+    // });
 });
 
 function admin_auth(obj){
@@ -17,7 +18,7 @@ function admin_auth(obj){
         if (err) return console.log(err);
         console.log(res);
         if (res.session == true){
-            window.location.reload();
+            // window.location.reload();
         }
     });
 
@@ -25,7 +26,9 @@ function admin_auth(obj){
         action: "SET",
         admin: JSON.stringify(obj)
     }).done( function(data){
-        // console.log(data);
+        console.log(data);
+    }).fail((xht, status, error) => {
+        console.log(xht, status, error)
     });
 }
 

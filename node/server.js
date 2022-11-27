@@ -2,12 +2,18 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 
+let production = false;
 var config = JSON.parse(fs.readFileSync('config.json'));
-if (config.credentials){
-    for (i in config.credentials)
-        config.credentials[i] = fs.readFileSync(config.credentials[i]);
+if (config.protocol == 'https') {
+    production = true;
+    if (config.credentials){
+        for (i in config.credentials)
+            config.credentials[i] = fs.readFileSync(config.credentials[i]);
+    }
 }
-const server = require(config.protocol).createServer(config.credentials, app);
+const server = production ?
+    require(config.protocol).createServer(config.credentials, app) :
+    require(config.protocol).createServer(app);
 
 const io = require('socket.io')(server);
 const mysql = require('mysql');
