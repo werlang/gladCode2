@@ -261,12 +261,16 @@ $(document).ready( function() {
 });
 
 function refresh_round(){
+    $.post("back_tournament_run.php",{
+        action: "UPDATE",
+        hash: hash
+    });
     $.post("back_tournament_run.php", {
         action: "REFRESH",
         hash: hash,
         round: round,
     }).done( function(data){
-        //console.log(data);
+        // console.log(data);
         data = JSON.parse(data);
         
         $('#content-box #group-container .team').each( function(){
@@ -326,21 +330,24 @@ function refresh_round(){
                                     tournament: i,
                                     origin: "tourn"
                                 }).then( function(data){
-                                    //console.log(data);
+                                    // console.log(data);
                                     if (data != "ERROR"){
                                         $.post("back_tournament_run.php",{
                                             action: "UPDATE",
                                             hash: hash
                                         }).done( function(data){
-                                            //console.log(data);
+                                            // console.log(data);
                                             data = JSON.parse(data);
                                             if (data.status == "NEXT"){
-                                                $.post("back_sendmail.php",{
-                                                    action: "TOURNAMENT",
-                                                    hash: hash
-                                                }).done( function(data){
-                                                    //console.log(data);
-                                                });
+                                                // $.post("back_sendmail.php",{
+                                                //     action: "TOURNAMENT",
+                                                //     hash: hash
+                                                // }).done( function(data){
+                                                //     //console.log(data);
+                                                // });
+                                            }
+                                            else if (data.status == "RERUN"){
+                                                window.location.reload();
                                             }
                                         });
                                     }

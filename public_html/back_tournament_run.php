@@ -345,6 +345,8 @@
         $sql = "SELECT DISTINCT gr.log FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND gr.round = $maxround";
         if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
+        $output['status'] = "SUCCESS";
+
         $teams_total = array();
         while ($row2 = $result2->fetch_assoc()){
             $logid = $row2['log'];
@@ -352,6 +354,12 @@
             if ($logid != null){
 
                 $log = get_battle(file_get_contents("logs/$logid"));
+
+                if (!$log) {
+                    $output["status"] = "RERUN";
+                    reset_round($hash);
+                    break;
+                }
 
                 //get glad id and death times in each log
                 $teams = array();
@@ -426,8 +434,6 @@
         $sql = "SELECT gr.log FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.log IS NULL";
         $result = runQuery($sql);
         $nrows = $result->num_rows;
-
-        $output['status'] = "SUCCESS";
 
         if ($nrows == 0){
             $teams = $teams_total;
@@ -520,6 +526,10 @@
     echo json_encode($output);
 
     function get_battle($log){
+        if ($log == "null") {
+            return false;
+        }
+
         $log = json_decode($log, true);
         $merged = array();
         $battle = array();
@@ -573,6 +583,34 @@
             return true;
         else
             return false;
+    }
+
+    function reset_round($hash) {
+        $sql = "DELETE FROM group_teams WHERE id IN(
+            SELECT id FROM group_teams WHERE lasttime IS NULL AND gladiator IS NULL AND groupid IN(
+                SELECT id FROM groups WHERE id IN(
+                    SELECT groupid FROM group_teams WHERE team IN(
+                        SELECT id FROM teams WHERE tournament IN(
+                            SELECT id FROM tournament WHERE hash = '$hash'
+                        )
+                    )
+                )
+            )
+        );";
+        $result = runQuery($sql);
+
+        $sql = "UPDATE groups SET log = NULL, locked = NULL WHERE id IN(
+            SELECT DISTINCT groupid FROM group_teams WHERE lasttime IS NULL AND gladiator IS NOT NULL AND groupid IN(
+                SELECT id FROM groups WHERE id IN(
+                    SELECT groupid FROM group_teams WHERE team IN(
+                        SELECT id FROM teams WHERE tournament IN(
+                            SELECT id FROM tournament WHERE hash = '$hash'
+                        )
+                    )
+                )
+            )
+        );";
+        $result = runQuery($sql);
     }
 ?>
 
