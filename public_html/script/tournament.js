@@ -1,4 +1,4 @@
-var hash, round;
+var hash, round, isManager;
 
 $(document).ready( function() {
     hash = $('#hash').html();
@@ -19,7 +19,7 @@ $(document).ready( function() {
         hash: hash,
         round: round
     }).done( function(data){
-        //console.log(data);
+        // console.log(data);
         data = JSON.parse(data);
 
         if (data.status == "REDIRECT"){
@@ -118,7 +118,7 @@ $(document).ready( function() {
                 });
             }
 
-            var manager = data.tournament.manager;
+            isManager = data.tournament.manager;
             if (hasteam){
                 $('#content-box #prepare').html("PREPARAR-SE").removeAttr('disabled');
 
@@ -199,7 +199,7 @@ $(document).ready( function() {
                 });
 
             }
-            else if (manager){
+            else if (isManager){
                 $('#content-box #prepare').html("ENCERRAR RODADA").removeAttr('disabled');
                 $('#content-box #prepare').off().click( function(){
                     $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
@@ -261,10 +261,6 @@ $(document).ready( function() {
 });
 
 function refresh_round(){
-    $.post("back_tournament_run.php",{
-        action: "UPDATE",
-        hash: hash
-    });
     $.post("back_tournament_run.php", {
         action: "REFRESH",
         hash: hash,
@@ -272,6 +268,20 @@ function refresh_round(){
     }).done( function(data){
         // console.log(data);
         data = JSON.parse(data);
+
+        if (data.status == 'NEXT') {
+            $.post("back_tournament_run.php",{
+                action: "UPDATE",
+                hash: hash
+            }).done( function(data){
+                console.log(data);
+                data = JSON.parse(data);
+                if (data.status == "RERUN"){
+                    window.location.reload();
+                }
+            });
+
+        }
         
         $('#content-box #group-container .team').each( function(){
             if (!$(this).parents('.group').hasClass('hide-info')){
@@ -318,7 +328,7 @@ function refresh_round(){
                 if ((groupobj).find('.team.myteam').length > 0)
                     $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
 
-                if (data.groups[i].status == "RUN"){
+                if (data.groups[i].status == "RUN") {// && isManager){
                     socket_ready().then( () => {
                         socket.emit('tournament run request', {
                             hash: hash,
@@ -332,24 +342,24 @@ function refresh_round(){
                                 }).then( function(data){
                                     // console.log(data);
                                     if (data != "ERROR"){
-                                        $.post("back_tournament_run.php",{
-                                            action: "UPDATE",
-                                            hash: hash
-                                        }).done( function(data){
-                                            // console.log(data);
-                                            data = JSON.parse(data);
-                                            if (data.status == "NEXT"){
-                                                // $.post("back_sendmail.php",{
-                                                //     action: "TOURNAMENT",
-                                                //     hash: hash
-                                                // }).done( function(data){
-                                                //     //console.log(data);
-                                                // });
-                                            }
-                                            else if (data.status == "RERUN"){
-                                                window.location.reload();
-                                            }
-                                        });
+                                        // $.post("back_tournament_run.php",{
+                                        //     action: "UPDATE",
+                                        //     hash: hash
+                                        // }).done( function(data){
+                                        //     // console.log(data);
+                                        //     data = JSON.parse(data);
+                                        //     if (data.status == "NEXT"){
+                                        //         // $.post("back_sendmail.php",{
+                                        //         //     action: "TOURNAMENT",
+                                        //         //     hash: hash
+                                        //         // }).done( function(data){
+                                        //         //     //console.log(data);
+                                        //         // });
+                                        //     }
+                                        //     else if (data.status == "RERUN"){
+                                        //         window.location.reload();
+                                        //     }
+                                        // });
                                     }
                                     else{
                                         window.location.reload();
@@ -394,13 +404,13 @@ function msToTime(ms) {
     s = s % 60;
     var h = Math.floor(m / 60);
     m = m % 60;
-  
+
     if (h < 10)
         h = '0' + h;
     if (m < 10)
         m = '0' + m;
     if (s < 10)
         s = '0' + s;
-        
-    return [h,m,s];
-  }
+
+    return [h, m, s];
+}
