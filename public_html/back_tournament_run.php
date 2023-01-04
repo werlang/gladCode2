@@ -288,7 +288,7 @@
 
                 if ($row2['hash'] == null){
                     if (!is_locked($row2['locked'])){
-                        $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid'";
+                        $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid' AND locked IS NULL";
                         if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
                         if (!isset($_SESSION['tourn-group']))
@@ -355,9 +355,15 @@
 
                 $log = get_battle(file_get_contents("logs/$logid"));
 
+                // reset this battle so it needs to be rerun
                 if (!$log) {
                     $output["status"] = "RERUN";
-                    reset_round($hash);
+                    
+                    $sql = "UPDATE groups SET log = NULL, locked = NULL WHERE log = $logid";
+                    if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+
+                    send_node_message(['tournament refresh' => [ 'hash' => $hash ]]);
+        
                     break;
                 }
 
@@ -473,9 +479,16 @@
                     $teamsgroup = ceil($remteams / $remgroups);
                     for ($j=0 ; $j<$teamsgroup ; $j++){
                         $teamid = $teams[$teami]['team'];
-                        $sql = "INSERT INTO group_teams (team, groupid) VALUES ('$teamid', '$group')";
+
+                        // last check to prevent inserting duplicates of new groups
+                        $sql = "SELECT gr.* FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN group_teams grt ON grt.team = te.id INNER JOIN groups gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND gr.round = $newround AND grt.team = $teamid";
                         $result = runQuery($sql);
-                        $teami++;
+                        $nrows = $result->num_rows;
+                        if ($nrows == 0) {
+                            $sql = "INSERT INTO group_teams (team, groupid) VALUES ('$teamid', '$group')";
+                            $result = runQuery($sql);
+                            $teami++;
+                        }
                     }
                     $remteams = $remteams - $teamsgroup;
                 }
@@ -485,11 +498,11 @@
             else{
                 $output['status'] = "END";
             }
+
+            send_node_message(array('tournament refresh' => array(
+                'hash' => $hash
+            )));    
         }
-        
-        send_node_message(array('tournament refresh' => array(
-            'hash' => $hash
-        )));
     }
     elseif ($action == "END TURN"){
         $hash = mysql_escape_string($_POST['hash']);

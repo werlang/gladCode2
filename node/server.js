@@ -61,6 +61,7 @@ app.use(expsession({
 //cors
 app.use(cors({
     origin: [
+        'http://localhost',
         'http://127.0.0.1:85',
         'http://127.0.0.1',
         'http://gladcode.tk',
