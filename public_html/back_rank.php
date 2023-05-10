@@ -20,7 +20,7 @@
         
         $sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id $search";
         $result = runQuery($sql);
-        $total = $result->num_rows;
+        $total = $result->rowCount();
 
         $limit = 10;
         // when requesting all rows
@@ -41,7 +41,7 @@
         $output['total'] = $total;
 
         $output['ranking'] = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             array_push($output['ranking'], array(
                 'glad' => $row['name'],
                 'mmr' => $row['mmr'],
@@ -67,7 +67,7 @@
         else{
             $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
 
             if (is_null($row['premium'])){
                 $output['status'] = "NOPREMIUM";
@@ -78,10 +78,10 @@
             else{
                 $sql = "SELECT id FROM user_tabs WHERE name = '$name' AND owner = $user";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->rowCount();
 
                 if ($nrows > 0){
-                    $row = $result->fetch_assoc();
+                    $row = $result->fetch();
                     $id = $row['id'];
 
                     $sql = "UPDATE user_tabs SET watch = $watch WHERE id = $id";
@@ -105,7 +105,7 @@
         // get tags from training I own
         $sql = "SELECT DISTINCT t.description FROM training t WHERE t.manager = $user";
         $result = runQuery($sql);
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             preg_match_all("/#(\w+)/", $row['description'], $matches);
             if (is_array($matches) && count($matches) > 1){
                 foreach($matches[1] as $match){
@@ -117,7 +117,7 @@
         // get tags from training I am participating
         $sql = "SELECT DISTINCT t.description FROM gladiator_training gt INNER JOIN gladiators g ON gt.gladiator = g.cod INNER JOIN training t ON t.id = gt.training WHERE g.master = $user";
         $result = runQuery($sql);
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             preg_match_all("/#(\w+)/", $row['description'], $matches);
             if (is_array($matches) && count($matches) > 1){
                 foreach($matches[1] as $match){
@@ -132,7 +132,7 @@
         // see if the tags are blocked to not be watched
         $sql = "SELECT name, watch FROM user_tabs WHERE owner = $user";
         $result = runQuery($sql);
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             if ($row['watch'] == 0 && in_array($row['name'], $tags)){
                 array_splice($tags, array_search($row['name'], $tags), 1);
             }
@@ -150,24 +150,29 @@
         $tab = mysql_escape_string($_POST['tab']);
         $search = strtolower(mysql_escape_string($_POST['search']));
 
-        $sql = "SELECT t.id, t.name FROM training t WHERE t.description LIKE '%#$tab%'";
+        $sql = "SELECT t.id, t.name, t.weight FROM training t WHERE t.description LIKE '%#$tab%'";
         $result = runQuery($sql);
 
         $training = array();
-        while($row = $result->fetch_assoc()){
-            array_push($training, $row['id']);
+        while($row = $result->fetch()){
+            $train = array();
+            $train['id'] = $row['id'];
+            $train['weight'] = $row['weight'];
+            array_push($training, $train);
         }
 
         $prize = array(10, 6, 4, 3, 2);
         $ranking = array();
         // get rank from a given training ordered by higher summed score, and average lasttime as tiebreaker
-        foreach ($training as $trainid){
+        foreach ($training as $train){
+            $trainid = $train['id'];
+            $weight = $train['weight'];
             // need to calc avg time manually, because we need to subtract 1000 when the user won and ignore time 0 
             $manualtime = "SELECT avg(IF(gt2.lasttime > 1000, gt2.lasttime - 1000, gt2.lasttime)) FROM gladiator_training gt2 INNER JOIN gladiators g2 ON g2.cod = gt2.gladiator WHERE gt2.training = gt.training AND g2.master = g.master AND gt2.lasttime > 0";
             $sql = "SELECT sum(gt.score) AS score, ($manualtime) AS time, g.master, u.apelido FROM gladiator_training gt INNER JOIN gladiators g ON g.cod = gt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE gt.training = $trainid GROUP BY g.master ORDER BY score DESC, time DESC";
             $result = runQuery($sql);
             $i = 0;
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 // if the training was not started, time is null
                 if (!is_null($row['time'])){
                     $id = $row['master'];
@@ -178,7 +183,7 @@
                             'fights' => 0
                         );
                     }
-                    $ranking[$id]['score'] += isset($prize[$i]) ? $prize[$i] : 0;
+                    $ranking[$id]['score'] += (isset($prize[$i]) ? $prize[$i] : 0) * $weight;
                     $ranking[$id]['time'] += $row['time'] > 1000 ? $row['time'] - 1000 : $row['time'];
                     $ranking[$id]['fights']++;
                     $ranking[$id]['nick'] = $row['apelido'];
@@ -229,7 +234,7 @@
     elseif ($action == 'MAXMINE'){
         $sql = "SELECT count(*) AS 'offset' FROM gladiators WHERE mmr > (SELECT max(mmr) FROM gladiators WHERE master = $user)";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $output['offset'] = $row['offset'];
         $output['status'] = "SUCCESS";
     }

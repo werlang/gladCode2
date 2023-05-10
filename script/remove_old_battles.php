@@ -11,9 +11,9 @@
         $sql = "SELECT id FROM logs WHERE origin = '$mode' AND time < now() - INTERVAL $period AND expired = 0 $fav";
         $result = runQuery($sql);
         
-        if ($result->num_rows > 0){
+        if ($result->rowCount() > 0){
             $ids = array();
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 $id = $row['id'];
                 unlink("/home/gladcode/public_html/logs/$id");
                 array_push($ids, $id);

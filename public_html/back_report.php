@@ -22,7 +22,7 @@
 
         $sql = "SELECT id FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') $fav $unread";
         $result = runQuery($sql);
-        $total = $result->num_rows;
+        $total = $result->rowCount();
         $output['total'] = $total;
 
         if (!isset($offset)){
@@ -43,7 +43,7 @@
         
         $infos = array();
         $ids = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $info = array();
             $info['id'] = $row['id'];
             $info['time'] = $row['time'];

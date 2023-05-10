@@ -24,7 +24,7 @@
 
             $sql = "SELECT avg(g.mmr) AS mmr FROM gladiators g INNER JOIN reports r ON g.cod = r.gladiator INNER JOIN logs l ON l.id = r.log WHERE l.hash = '$loghash'";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $mmr = $row['mmr'];
 
             $sql = "INSERT INTO stats (time, fireball, teleport, charge, block, assassinate, ambush, melee, ranged, win, avglvl, winnerlvl, duration, highstr, highagi, highint, avgmmr, potionuse, potionwin) VALUES (now(), '$fireball', '$teleport', '$charge', '$block', '$assassinate', '$ambush', '$melee', '$ranged', '$win', '$avglvl', '$winnerlvl', '$duration', '$highstr', '$highagi', '$highint', '$mmr', '$potionuse', '$potionwin')";
@@ -54,7 +54,7 @@
             //echo $sql;
             
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
             $uses = array();
             $abwin = array();
             $abilities = array(
@@ -88,7 +88,7 @@
                 'battles' => 0
             );
 
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 //set uses of each ability
                 foreach ($row as $key => $value){
                     if (in_array($key, $abilities)){

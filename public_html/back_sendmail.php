@@ -47,7 +47,7 @@
 			$sql = "SELECT u.email AS sender FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod = '$id'";
 			$result = runQuery($sql);
 
-			$row = $result->fetch_assoc();
+			$row = $result->fetch();
 			$receiveremail = $row['sender'];
 		}
 		else
@@ -58,14 +58,14 @@
 		
 		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
 		$result = runQuery($sql);
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		
 		$usernick = $row['apelido'];
 		
 		
 		$sql = "SELECT * FROM usuarios WHERE email = '$receiveremail'";
 		$result = runQuery($sql);
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		
 		$receivername = $row['apelido'];
 		
@@ -91,13 +91,13 @@
 		
 		$sql = "SELECT apelido FROM usuarios WHERE id = '$user'";
 		$result = runQuery($sql);
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		
 		$usernick = $row['apelido'];
 		
 		$sql = "SELECT apelido, pref_friend FROM usuarios WHERE email = '$receiveremail'";
 		$result = runQuery($sql);
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		
 		$receivername = $row['apelido'];
 		
@@ -124,7 +124,7 @@
 		$result = runQuery($sql);
 		$receiveremail = array();
 		$receivername = array();
-		while($row = $result->fetch_assoc()){
+		while($row = $result->fetch()){
 			array_push($receivername, $row['apelido']);
 			array_push($receiveremail, $row['email']);
 		}
@@ -147,16 +147,16 @@
 		
 		$sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 		$result = runQuery($sql);
-		if ($result->num_rows != 0){
+		if ($result->rowCount() != 0){
 			$sql = "SELECT apelido from usuarios WHERE id = '$user'";
 			$result = runQuery($sql);
 
-			$row = $result->fetch_assoc();
+			$row = $result->fetch();
 			$usernick = $row['apelido'];
 			
 			$sql = "SELECT apelido, pref_duel, email FROM usuarios WHERE id = '$friend'";
 			$result = runQuery($sql);
-			$row = $result->fetch_assoc();
+			$row = $result->fetch();
 			
 			$friendnick = $row['apelido'];
 			$friendemail = $row['email'];
@@ -188,7 +188,7 @@
 
 		$receiveremail = array();
 		$receivername = array();
-		while($row = $result->fetch_assoc()){
+		while($row = $result->fetch()){
 			array_push($receivername, $row['apelido']);
 			array_push($receiveremail, $row['email']);
 		}
@@ -196,7 +196,7 @@
 		$sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
 		";
 		$result = runQuery($sql);
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		$maxround = $row['maxround'];
 		$tourn = $row['name'];
 		$limit = date_format(date_create($row['tlimit']), "d/m/Y à\s H:i:s");

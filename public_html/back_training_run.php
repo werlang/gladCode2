@@ -14,7 +14,7 @@
 
         $sql = "SELECT t.id, t.name, t.description, t.maxtime, t.hash_valid AS expire, t.deadline, now(3) AS 'now', t.manager, max(tg.round) AS maxround FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         
         $trainid = $row['id'];
         $output['name'] = $row['name'];
@@ -41,7 +41,7 @@
             $result = runQuery($sql);
 
             $output['ranking'] = array();
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 array_push($output['ranking'], $row);
             }
 
@@ -60,7 +60,7 @@
             $result = runQuery($sql);
             
             $groups = array();
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 if (!isset($output['round'])){
                     $output['round'] = $round;
                     $output['deadline'] = $row['deadline'];
@@ -80,7 +80,7 @@
                 // get summed score
                 $sql = "SELECT sum(gt.score) AS score FROM gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.gladiator = $gladid AND gt.training = $trainid AND tg.round < $round";
                 $result2 = runQuery($sql);
-                $row = $result2->fetch_assoc();
+                $row = $result2->fetch();
 
                 if (is_null($row['score']))
                     $team['score'] = 0;
@@ -104,12 +104,12 @@
 
         $sql = "SELECT manager, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             if ($row['manager'] != $user)
                 $output['status'] = "NOTALLOWED";
             // end training
@@ -130,7 +130,7 @@
                 $sql = "SELECT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE gt.training = $trainid AND tg.round = $round";
                 $result = runQuery($sql);
                 $groups = array();
-                while ($row = $result->fetch_assoc())
+                while ($row = $result->fetch())
                     array_push($groups, $row['id']);
                 $groups = implode(",", $groups);
                 
@@ -140,7 +140,7 @@
                 $group = explode(",",$groups)[0];
                 $sql = "SELECT deadline FROM training_groups WHERE id = $group";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
 
                 $output['deadline'] = $row['deadline'];
                 $output['status'] = "SUCCESS";
@@ -158,12 +158,12 @@
 
         $sql = "SELECT id, deadline FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $trainid = $row['id'];
             $train_deadline = $row['deadline'];
 
@@ -172,7 +172,7 @@
 
             $hasLog = false;
             $groups = array();
-            while ($row = $result->fetch_assoc()){
+            while ($row = $result->fetch()){
                 if (!isset($output['now'])){
                     $now = $row['now'];
                     $deadline = $row['deadline'];
@@ -217,9 +217,9 @@
                     $tolerance = 7;
                     $sql = "SELECT log FROM training_groups WHERE locked + INTERVAL $tolerance SECOND < now(3) AND id = $gid";
                     $result = runQuery($sql);
-                    $nrows = $result->num_rows;
+                    $nrows = $result->rowCount();
                     if ($nrows > 0){
-                        $row = $result->fetch_assoc();
+                        $row = $result->fetch();
                         if (is_null($row['log'])){
                             unset($groups[$gid]['locked']);
                         }
@@ -254,7 +254,7 @@
                             // check if new round already exists
                             $sql = "SELECT max(tg.round) AS maxround FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE gt.training = $trainid";
                             $result = runQuery($sql);
-                            $row = $result->fetch_assoc();
+                            $row = $result->fetch();
                             $maxround = $row['maxround'];
 
                             if ($round == $maxround && !$endtrain){
@@ -283,7 +283,7 @@
 
         $sql = "SELECT players, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $maxplayers = $row['players'];
         $trainid = $row['id'];
 
@@ -291,7 +291,7 @@
         $result = runQuery($sql);
 
         $glads = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             array_push($glads, $row['gladiator']);
             if (!isset($deadline)){
                 $deadline = $row['deadline'];
@@ -313,7 +313,7 @@
 
             $sql = "SELECT tg.id FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id WHERE tg.round = $newround AND gt.training = $trainid";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
             if ($nrows > 0){
                 $output['status'] = "EXISTS";
@@ -366,12 +366,12 @@
 
         $sql = "SELECT manager, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             if ($row['manager'] != $user)
                 $output['status'] = "NOTALLOWED";
             else{
@@ -399,7 +399,7 @@
             if (is_int($id)){
                 $sql = "SELECT score, lasttime FROM gladiator_training WHERE id = $id";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 if ($row['lasttime'] != 0){
                     $group[$id]['score'] = $row['score'];
                     $group[$id]['time'] = $row['lasttime'];
@@ -422,7 +422,7 @@
                         // find point in time when every glad was killed
                         $sql = "SELECT gt.id FROM gladiators g INNER JOIN usuarios u ON u.id = g.master INNER JOIN gladiator_training gt ON gt.gladiator = g.cod INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE gt.training = $trainid AND g.name = '$name' AND u.apelido = '$nick' AND tg.round = $round";                            
                         $result = runQuery($sql);
-                        $row = $result->fetch_assoc();
+                        $row = $result->fetch();
 
                         $teams[$i] = array();
                         $teams[$i]['id'] = $row['id'];;

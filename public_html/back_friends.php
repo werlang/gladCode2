@@ -12,7 +12,7 @@
 			$result = runQuery($sql);
 			
 			$pending = array();
-			while($row = $result->fetch_assoc()){
+			while($row = $result->fetch()){
 				$p = array();
 				$p['id'] = $row['cod'];
 				$p['nick'] = $row['apelido'];
@@ -26,7 +26,7 @@
 			$result = runQuery($sql);
 
 			$confirmed = array();
-			while($row = $result->fetch_assoc()){
+			while($row = $result->fetch()){
 				$c = array();
 				$c['id'] = $row['cod'];
 				$c['user'] = $row['id'];
@@ -61,7 +61,7 @@
 			$result = runQuery($sql);
 
 			$output = array();
-			while($row = $result->fetch_assoc()){
+			while($row = $result->fetch()){
 				$person = array();
 				$person['nick'] = $row['apelido'];
 				$person['user'] = $row['id'];
@@ -80,7 +80,7 @@
 			$friend = mysql_escape_string($_POST['user']);
 			$sql = "SELECT * FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 			$result = runQuery($sql);
-			if ($result->num_rows == 0){
+			if ($result->rowCount() == 0){
 				$sql = "INSERT INTO amizade (usuario1,usuario2) VALUES ('$user','$friend')";
 				$result = runQuery($sql);
 				echo "OK";
@@ -100,7 +100,7 @@
 
 			$friends = array();
 			$c = 0;
-			while($row = $result->fetch_assoc()){
+			while($row = $result->fetch()){
 				$friends[$c] = array();
 				$friends[$c]['id'] = $row['cod'];
 				$friends[$c]['user'] = $row['id'];

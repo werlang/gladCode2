@@ -22,10 +22,10 @@
 		$hash = $_POST['hash'];
 		$sql = "SELECT * FROM tournment WHERE hash = '$hash'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
-		$nrows = $result->num_rows;
+		$nrows = $result->rowCount();
 
 		if ($nrows > 0){
-			$row = $result->fetch_assoc();
+			$row = $result->fetch();
 			$resp['bnum'] = $row['bnum'];
 			$resp['winners'] = $row['winners'];
 			$resp['round'] = $row['round'];

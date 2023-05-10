@@ -17,7 +17,7 @@
     //tournament
     $sql = "SELECT id, maxtime FROM tournament WHERE name = '$tname'";
     $result = runQuery($sql);
-    $row = $result->fetch_assoc();
+    $row = $result->fetch();
     $tourn = $row['id'];
     $maxtime =$row['maxtime'];
 
@@ -26,7 +26,7 @@
         $sql = "SELECT id FROM teams WHERE tournament = $tourn";
         $result = runQuery($sql);
         $teams = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($teams, $row['id']);
         }
         $teams = implode(',', $teams);
@@ -37,7 +37,7 @@
         $sql = "SELECT id FROM gladiator_teams WHERE team IN ($teams)";
         $result = runQuery($sql);
         $glt = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($glt, $row['id']);
         }
         $glt = implode(',', $glt);
@@ -46,7 +46,7 @@
         $sql = "SELECT id FROM group_teams WHERE team IN ($teams)";
         $result = runQuery($sql);
         $grt = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($grt, $row['id']);
         }
         $grt = implode(',', $grt);
@@ -57,7 +57,7 @@
         $sql = "SELECT groupid FROM group_teams WHERE id IN ($grt)";
         $result = runQuery($sql);
         $groups = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($groups, $row['groupid']);
         }
         $groups = implode(',', $groups);
