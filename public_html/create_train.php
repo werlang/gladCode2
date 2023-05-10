@@ -7,14 +7,14 @@
 
         $sql = "SELECT id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $trainid = $row['id'];
         
         $sql = "SELECT g.cod FROM gladiators g GROUP BY g.master";
         $result = runQuery($sql);
 
         $glads = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($glads, $row['cod']);
         }
         shuffle($glads);
@@ -34,13 +34,13 @@
 
         $sql = "SELECT id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $trainid = $row['id'];
 
         $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
         $result = runQuery($sql);
         $groups = array();
-        while ($row = $result->fetch_assoc())
+        while ($row = $result->fetch())
             array_push($groups, $row['groupid']);
         $groups = implode(",", $groups);
 

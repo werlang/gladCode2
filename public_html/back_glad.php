@@ -17,8 +17,8 @@
 
         $info = array();
 
-        if ($result->num_rows > 0){
-            $row = $result->fetch_assoc();
+        if ($result->rowCount() > 0){
+            $row = $result->fetch();
             $info['skin'] = json_decode($row['skin']);
         }
         else
@@ -37,7 +37,7 @@
         
         $sql = "SELECT * FROM usuarios WHERE id = '$user'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $lvl = $row['lvl'];
         
         $initglads = 1;		
@@ -52,7 +52,7 @@
 
             $i = 0;
             $info = array();
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 $info[$i] = array();
                 $info[$i]['id'] = $row['cod'];
                 $info[$i]['name'] = $row['name'];
@@ -103,11 +103,11 @@
             if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
                 $sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
                 $result = runQuery($sql);
-                if ($result->num_rows == 0){
+                if ($result->rowCount() == 0){
                     if ($_POST['action'] == "INSERT"){
                         $sql = "SELECT * FROM gladiators WHERE master = '$user'";
                         $result = runQuery($sql);
-                        if ($result->num_rows >= $limit)
+                        if ($result->rowCount() >= $limit)
                             echo "{\"LIMIT\":$limit}";
                         else{
                             $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";

@@ -15,7 +15,7 @@
         $result = runQuery($sql);
 
         $output['posts'] = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($output['posts'], $row);
         }
 
@@ -31,10 +31,10 @@
         $sql = "SELECT title, time, post FROM news WHERE $id = '$hash'";
         $result = runQuery($sql);
         $output['sql'] = $sql;
-        if ($result->num_rows == 0)
+        if ($result->rowCount() == 0)
             $output['status'] = "EMPTY";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $output['post'] = array();
 
             $output['post']['title'] = $row['title'];
@@ -45,15 +45,15 @@
 
             $sql = "SELECT $id AS id FROM news WHERE time < ($basetime) ORDER BY time DESC LIMIT 1";
             $result = runQuery($sql);
-            if ($result->num_rows > 0){
-                $row = $result->fetch_assoc();
+            if ($result->rowCount() > 0){
+                $row = $result->fetch();
                 $output['prev'] = $row['id'];
             }
     
             $sql = "SELECT $id AS id FROM news WHERE time > ($basetime) ORDER BY time LIMIT 1";
             $result = runQuery($sql);
-            if ($result->num_rows > 0){
-                $row = $result->fetch_assoc();
+            if ($result->rowCount() > 0){
+                $row = $result->fetch();
                 $output['next'] = $row['id'];
             }
                 

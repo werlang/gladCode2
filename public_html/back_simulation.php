@@ -37,7 +37,7 @@
         $id = mysql_escape_string($args['duel']);
         $sql = "SELECT gladiator1 FROM duels WHERE id = '$id' AND user2 = '$user' AND log IS NULL";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $userglad = $glads;
         $glads = array($glads, $row['gladiator1']);
 
@@ -45,7 +45,7 @@
         $glads_string = implode(",", $glads);
         $sql = "SELECT version FROM gladiators WHERE cod IN ($glads_string)";
         $result = runQuery($sql);
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             if ($version != $row['version'])
                 $cancel_run = true;
         }
@@ -63,12 +63,12 @@
 
             $sql = "SELECT log FROM groups WHERE id = $groupid";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             if ($row['log'] == null){
                 $sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
                 $result = runQuery($sql);
     
-                while($row = $result->fetch_assoc()){
+                while($row = $result->fetch()){
                     array_push($glads, $row['gladiator']);
                 }
             }
@@ -92,12 +92,12 @@
 
             $sql = "SELECT log FROM training_groups WHERE id = $groupid";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             if (is_null($row['log'])){
                 $sql = "SELECT gladiator FROM gladiator_training WHERE groupid = '$groupid'";
                 $result = runQuery($sql);
     
-                while($row = $result->fetch_assoc()){
+                while($row = $result->fetch()){
                     array_push($glads, $row['gladiator']);
                 }
             }
@@ -135,8 +135,8 @@
             else{
                 $sql = "SELECT skin FROM skins WHERE hash = '$hash'";
                 $result = runQuery($sql);
-                if ($result->num_rows > 0){
-                    $row = $result->fetch_assoc();
+                if ($result->rowCount() > 0){
+                    $row = $result->fetch();
                     $skins[$name .'@'. $nick] = $row['skin'];
                 }
             }	
@@ -208,7 +208,7 @@
         $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
 
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $code = $row['code'];
             $nick = $row['apelido'];
             $name = $row['name'];
@@ -223,7 +223,7 @@
             $result2 = runQuery($sql);
             $potions = array();
             for ($i=0 ; $i<4 ; $i++){
-                if ($row = $result2->fetch_assoc()){
+                if ($row = $result2->fetch()){
                     array_push($potions, $row['item']);
                 }
                 else {
@@ -351,7 +351,7 @@
 
                 $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
 
                 send_node_message(array( 'profile notification' => array(
                     'user' => array($row['user1'], $row['user2'])
@@ -360,19 +360,19 @@
             if (isset($args['tournament']) && $groupid != null){
                 $sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 $logid = $row['id'];
 
                 $sql = "SELECT log FROM groups WHERE id = $groupid";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 if ($row['log'] == null){
                     $sql = "UPDATE groups SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
 
                     $sql = "SELECT hash FROM tournament WHERE id = (SELECT tournament FROM teams WHERE id = (SELECT team FROM group_teams WHERE groupid = $groupid LIMIT 1))";
                     $result = runQuery($sql);
-                    $row = $result->fetch_assoc();
+                    $row = $result->fetch();
 
                     send_node_message(['tournament refresh' => [ 'hash' => $row["hash"] ]]);
                 }
@@ -380,12 +380,12 @@
 			if (isset($args['training']) && $groupid != null){
 				$sql = "SELECT id FROM logs WHERE hash = '$hash'";
 				$result = runQuery($sql);
-				$row = $result->fetch_assoc();
+				$row = $result->fetch();
                 $logid = $row['id'];
 
 				$sql = "SELECT tg.log, t.hash FROM training_groups tg INNER JOIN gladiator_training gt ON gt.groupid = tg.id INNER JOIN training t ON t.id = gt.training WHERE tg.id = $groupid";
 				$result = runQuery($sql);
-				$row = $result->fetch_assoc();
+				$row = $result->fetch();
 				if (is_null($row['log'])){
 					$sql = "UPDATE training_groups SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
@@ -497,7 +497,7 @@
 
         $glads = array();
         $i = 0;
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $glads[$i] = array();
             $glads[$i]['id'] = $row['cod'];
             $glads[$i]['time'] = $times[$i];
@@ -558,7 +558,7 @@
         $sql = "SELECT l.id FROM reports r INNER JOIN gladiators g ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE g.master = $user AND l.time > now() - INTERVAL 1 DAY AND r.started = '1'";
         $result = runQuery($sql);
         // cut silver if not managed battle        
-        $silver = $result->num_rows < 20 ? $silver : $silver / 10;
+        $silver = $result->rowCount() < 20 ? $silver : $silver / 10;
         
         /*
         y = ax+b;
@@ -681,7 +681,7 @@
             $sql = "SELECT g.cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.name = '$name' AND u.apelido = '$nick'";
             $result = runQuery($sql);
 
-            while($row = $result->fetch_assoc()){
+            while($row = $result->fetch()){
                 $deaths[$i]['id'] = $row['cod'];
             }
         }
@@ -702,14 +702,14 @@
 
         $sql = "SELECT id FROM logs WHERE hash = '$log'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $log = $row['id'];
         
         $masters = array();
         foreach($rewards as $glad => $reward){
             $sql = "SELECT master FROM gladiators WHERE cod = $glad";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             array_push($masters, $row['master']);
 
             if ($row['master'] == $user){

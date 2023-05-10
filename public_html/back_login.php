@@ -11,11 +11,11 @@
 
             $sql = "SELECT * FROM usuarios WHERE id = '$user'";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
-            $nrows = $result->num_rows;			
+            $nrows = $result->rowCount();			
             if ($nrows == 1){
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 
                 $info = array();
                 $info['id'] = $row['id'];
@@ -68,7 +68,7 @@
 
             $sql = "SELECT now(), ativo FROM usuarios WHERE id = '$user'";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             //$output['debug'] = $row;
         }
         else
@@ -90,7 +90,7 @@
                 }
 
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 $_SESSION['user'] = $row['id'];
                 $output['status'] = "ADMIN";
             }
@@ -121,8 +121,8 @@
             
                     $sql = "SELECT * FROM usuarios WHERE email = '$email' OR googleid = '$googleid'";
                     $result = runQuery($sql);
-                    $nrows = $result->num_rows;
-                    $row = $result->fetch_assoc();
+                    $nrows = $result->rowCount();
+                    $row = $result->fetch();
                     
                     if ($nrows == 0){
                         $apelido = $nome . rand(100,999);
@@ -188,10 +188,10 @@
             $sql = "SELECT id FROM usuarios WHERE apelido = '$nickname' AND id != '$user'";
             $result = runQuery($sql);
 
-            if ($result->num_rows == 0){
+            if ($result->rowCount() == 0){
                 $sql = "SELECT pasta FROM usuarios WHERE id = '$user'";
                 $result = runQuery($sql);
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 $pasta = $row['pasta'];
 
                 $pattern = '#^data:image/\w+;base64,#i';
@@ -243,7 +243,7 @@
         // $user = $_SESSION['user'];
         // $sql = "SELECT premium FROM usuarios WHERE id = $user";
         // $result = runQuery($sql);
-        // $row = $result->fetch_assoc();
+        // $row = $result->fetch();
         
         // if (!is_null($row['premium'])){
         //     $output['status'] = "PREMIUM";

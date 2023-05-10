@@ -10,7 +10,7 @@
 
 		$sql = "SELECT cod FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user'";
 		$result = runQuery($sql);
-		$total = $result->num_rows;
+		$total = $result->rowCount();
 
 		$units = 10;
 		
@@ -32,11 +32,11 @@
 		$meta['page'] = $page;
 		$meta['total'] = $total;
 		$meta['start'] = $offset + 1;
-		$meta['end'] = $offset + $result->num_rows;
+		$meta['end'] = $offset + $result->rowCount();
 
 		$info = array();
 		$i = 0;
-		while($row = $result->fetch_assoc()){
+		while($row = $result->fetch()){
 			$info[$i] = array();
 			$info[$i]['id'] = $row['cod'];
 			$info[$i]['sender'] = $row['sender'];
@@ -90,7 +90,7 @@
 		$sql = "SELECT * FROM messages WHERE cod = '$id' AND receiver = '$sender'";
 		$result = runQuery($sql);
 
-		$row = $result->fetch_assoc();
+		$row = $result->fetch();
 		$receiver = $row['sender'];
 		$oldmessage = $row['message'];
 		$message = "<quote>$oldmessage</quote>$message";

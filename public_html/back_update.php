@@ -5,7 +5,7 @@
 
 	$sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
 	$result = runQuery($sql);
-	$row = $result->fetch_assoc();
+	$row = $result->fetch();
 	$id = $row['id'];
 
 	if (isset($_SESSION['user']) && $_SESSION['user'] == $id){

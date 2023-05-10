@@ -10,7 +10,7 @@
         $sql = "SELECT lvl, xp, silver FROM usuarios WHERE id = '$user'";
         $result = runQuery($sql);
 
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $lvl = $row['lvl'];
         $xp = $row['xp'];
         
@@ -27,19 +27,19 @@
         $sql = "SELECT u.id FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE receiver = '$user' AND isread = '0'";
         $result = runQuery($sql);
         
-        $output['messages'] = $result->num_rows;
+        $output['messages'] = $result->rowCount();
         
         //pending friend requests
         $sql = "SELECT u.id FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE usuario2 = '$user' AND pendente = 1";
         $result = runQuery($sql);
         
-        $output['friends'] = $result->num_rows;
+        $output['friends'] = $result->rowCount();
         
         //gladiators remaining
         $sql = "SELECT master FROM gladiators WHERE master = '$user'";
         $result = runQuery($sql);
 
-        $nglads = $result->num_rows;
+        $nglads = $result->rowCount();
 
         //calc max glads according to master lvl
         $initglad = 1;
@@ -56,27 +56,27 @@
         $sql = "SELECT master FROM gladiators WHERE master = '$user' AND version != '$version'";
         $result = runQuery($sql);
         
-        $output['glads']['obsolete'] = $result->num_rows;
+        $output['glads']['obsolete'] = $result->rowCount();
         
         //reports
         $output['reports'] = array();
         $sql = "SELECT r.id FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE gladiator IN (SELECT cod FROM gladiators WHERE master = '$user') AND isread = '0'";
         $result = runQuery($sql);
-        $output['reports']['ranked'] = $result->num_rows;
+        $output['reports']['ranked'] = $result->rowCount();
 
         $sql = "SELECT d.id FROM duels d WHERE d.isread = 0 AND d.log IS NOT NULL AND (d.user1 = $user OR d.user2 = $user)";
         $result = runQuery($sql);
-        $output['reports']['duel'] = $result->num_rows;
+        $output['reports']['duel'] = $result->rowCount();
 
         //duels
         $sql = "SELECT d.id FROM duels d WHERE d.log IS NULL AND d.user2 = '$user'";
         $result = runQuery($sql);
-        $output['duels'] = $result->num_rows;
+        $output['duels'] = $result->rowCount();
         
         //news
         $sql = "SELECT id FROM news WHERE time > (SELECT read_news FROM usuarios WHERE id = $user)";
         $result = runQuery($sql);
-        $output['news'] = $result->num_rows;
+        $output['news'] = $result->rowCount();
 
         $output['status'] = "SUCCESS";
     }
@@ -85,7 +85,7 @@
 
         $sql = "SELECT u.lvl, u.xp, u.silver, g.mmr, g.name, g.skin, g.vstr, g.vint, g.vagi, g.cod AS 'id' FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN reports r ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE u.id = $user AND l.hash = '$hash'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
 
         $output['lvl'] = $row['lvl'];
         $output['xp'] = $row['xp'];

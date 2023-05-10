@@ -1,17 +1,24 @@
 <?php
-    $servername = "localhost";
-    $username = "gladcode";
-    $password = "s0r3tmhr";
-    $database = "gladcode_";
+    $config = json_decode(file_get_contents('config.json'), true);
+    $host = $config["mysql"]["host"];
+    $port = $config["mysql"]["port"];
+    $user = $config["mysql"]["user"];
+    $password = $config["mysql"]["password"];
+    $database = $config["mysql"]["database"];
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $database);
-    mysqli_set_charset($conn,"utf8mb4");
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='TRADITIONAL'"
+    ];
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    $conn = new PDO(
+        "mysql:host=$host:$port;dbname=$database",
+        $user,
+        $password,
+        $options
+    );
+
 
     function runQuery($sql){
         global $conn;

@@ -13,7 +13,7 @@
             
             $sql = "SELECT version FROM gladiators WHERE cod = $id";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
 
             if ($row['version'] == $version){
                 $mymmr = "SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user'";
@@ -25,7 +25,7 @@
 
                 $i = 0;
                 $ids = array();
-                while($row = $result->fetch_assoc()){
+                while($row = $result->fetch()){
                     $output[$i] = array();
                     $output[$i]['name'] = $row['name']; 
                     $output[$i]['user'] = $row['apelido']; 

@@ -12,7 +12,7 @@ if (isset($_GET['n']) && isset($_GET['t'])){
     
     $sql = "SELECT id FROM usuarios WHERE email = 'pswerlang@gmail.com'";
     $result = runQuery($sql);
-    $row = $result->fetch_assoc();
+    $row = $result->fetch();
     $manager = $row['id'];
 
     $sql = "INSERT INTO tournament (name, creation, maxteams, maxtime, flex, manager, hash, password, description) VALUES ('$name', now(), 50, '00:30:00', 1, '$manager', '', '', '')";
@@ -30,7 +30,7 @@ if (isset($_GET['n']) && isset($_GET['t'])){
     $glads = array();
     $sql = "SELECT g.cod FROM gladiators g GROUP BY g.master LIMIT $limit";
     $result = runQuery($sql);
-    while ($row = $result->fetch_assoc()){
+    while ($row = $result->fetch()){
         array_push($glads, $row['cod']);
     }
 

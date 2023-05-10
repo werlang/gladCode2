@@ -18,7 +18,7 @@
 
         $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
 
         if (is_null($row['premium'])){
             $output['status'] = "NOPREMIUM";
@@ -55,7 +55,7 @@
 
         $sql = "SELECT t.id $fromwhere";
         $result = runQuery($sql);
-        $npart = $result->num_rows;
+        $npart = $result->rowCount();
 
         if ($npart > 0){
             $sql = "$select $fromwhere ORDER BY t.creation DESC LIMIT $limit OFFSET $poffset";
@@ -68,7 +68,7 @@
 
             $part = array();
             if ($npart > 0){
-                while ($row = $result->fetch_assoc()){
+                while ($row = $result->fetch()){
                     array_push($part, $row);
                 }
             }
@@ -79,7 +79,7 @@
 
         $sql = "SELECT t.id $fromwhere";
         $result = runQuery($sql);
-        $nmanage = $result->num_rows;
+        $nmanage = $result->rowCount();
 
         if ($nmanage > 0){
             $sql = "$select $fromwhere ORDER BY t.creation DESC LIMIT $limit OFFSET $moffset";
@@ -92,7 +92,7 @@
 
             $manage = array();
             if ($nmanage > 0){
-                while ($row = $result->fetch_assoc()){
+                while ($row = $result->fetch()){
                     array_push($manage, $row);
                 }
             }
@@ -127,14 +127,14 @@
         // time since expired
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         elseif ($nrows > 1)
             $output['status'] = "COLLISION";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $trainid = $row['id'];
             $trainname = $row['name'];
 
@@ -143,7 +143,7 @@
             else{
                 $sql = "SELECT g.cod FROM gladiators g INNER JOIN gladiator_training gt ON gt.gladiator = g.cod WHERE g.master = $user AND gt.training = $trainid";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->rowCount();
 
                 if ($nrows > 0){
                     $output['id'] = $trainid;
@@ -159,7 +159,7 @@
                     // check if the glad is mine
                     $sql = "SELECT cod FROM gladiators WHERE master = $user AND cod = $glad";
                     $result = runQuery($sql);
-                    $nrows = $result->num_rows;
+                    $nrows = $result->rowCount();
 
                     if ($nrows == 0)
                         $output['status'] = "NOGLAD";
@@ -192,12 +192,12 @@
 
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training t WHERE id = $trainid";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
 
             if (isStarted($trainid)){
                 $output['status'] = "STARTED";
@@ -221,7 +221,7 @@
                     $result = runQuery($sql);
 
                     $output['glads'] = array();
-                    while ($row = $result->fetch_assoc()){
+                    while ($row = $result->fetch()){
                         array_push($output['glads'], $row);
                     }
 
@@ -230,19 +230,19 @@
                 else{
                     $sql = "SELECT t.name, t.description, t.maxtime, t.players, t.hash FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id WHERE t.id = $trainid AND gt.gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
                     $result = runQuery($sql);
-                    $nrows = $result->num_rows;
+                    $nrows = $result->rowCount();
 
                     if ($nrows == 0)
                         $output['status'] = "NOTALLOWED";
                     else{
-                        $row = $result->fetch_assoc();
+                        $row = $result->fetch();
                         $output = $row;
 
                         $sql = "SELECT g.name AS gladiator, u.apelido AS master, g.master AS masterid FROM usuarios u INNER JOIN gladiators g ON u.id = g.master INNER JOIN gladiator_training gt ON g.cod = gt.gladiator WHERE gt.training = $trainid";
                         $result = runQuery($sql);
 
                         $output['glads'] = array();
-                        while ($row = $result->fetch_assoc()){
+                        while ($row = $result->fetch()){
                             $glad = array();
                             $glad['gladiator'] = $row['gladiator'];
                             $glad['master'] = $row['master'];
@@ -282,7 +282,7 @@
             else{
                 $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->rowCount();
 
                 if ($nrows == 0)
                     $output['status'] = "NOTALLOWED";
@@ -307,7 +307,7 @@
         else{
             $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
             if ($nrows == 0)
                 $output['status'] = "NOTALLOWED";
@@ -341,7 +341,7 @@
 
             $sql = "SELECT id FROM training WHERE id = $trainid AND $managersql";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
             if ($nrows == 0)
                 $output['status'] = "NOTALLOWED";
@@ -353,12 +353,12 @@
 
                 $sql = "SELECT id FROM gladiator_training WHERE training = $trainid AND $gladsql";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->rowCount();
 
                 if ($nrows == 0)
                     $output['status'] = "NOGLAD";
                 else{
-                    $row = $result->fetch_assoc();
+                    $row = $result->fetch();
                     $id = $row['id'];
 
                     $sql = "DELETE FROM gladiator_training WHERE id = $id";
@@ -378,14 +378,14 @@
 
         $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTALLOWED";
         else{
             $sql = "SELECT id FROM gladiator_training WHERE training = $trainid";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
             if ($nrows > 0)
                 $output['status'] = "NOTEMPTY";
@@ -409,19 +409,19 @@
         else{
             $sql = "SELECT gladiator FROM gladiator_training WHERE training = $trainid AND gladiator IN (SELECT cod FROM gladiators WHERE master = $user)";
             $result = runQuery($sql);
-            $nrows = $result->num_rows;
+            $nrows = $result->rowCount();
 
             if ($nrows > 0){
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
                 $oldglad = $row['gladiator'];
 
                 $glad = mysql_escape_string($_POST['glad']);
 
                 $sql = "SELECT master FROM gladiators WHERE cod = $glad";
                 $result = runQuery($sql);
-                $nrows = $result->num_rows;
+                $nrows = $result->rowCount();
 
-                $row = $result->fetch_assoc();
+                $row = $result->fetch();
 
                 if ($row['master'] == $user){
                     $sql = "UPDATE gladiator_training SET gladiator = $glad WHERE training = $trainid AND gladiator = $oldglad";
@@ -446,14 +446,14 @@
 
         $sql = "SELECT manager, maxtime, players FROM training WHERE id = $trainid";
         $result = runQuery($sql);
-        $nrows = $result->num_rows;
+        $nrows = $result->rowCount();
 
         if ($nrows == 0)
             $output['status'] = "NOTFOUND";
         elseif (isStarted($trainid))
             $output['status'] = "STARTED";
         else{
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $manager = $row['manager'];
             $maxtime = $row['maxtime'];
             $maxplayers = $row['players'];
@@ -462,14 +462,14 @@
             else{
                 $sql = "SELECT gt.id, t.hash FROM gladiator_training gt INNER JOIN training t ON t.id = gt.training WHERE t.id = $trainid";
                 $result = runQuery($sql);
-                $nplayers = $result->num_rows;
+                $nplayers = $result->rowCount();
 
                 if ($nplayers < $maxplayers)
                     $output['status'] = "FEWPLAYERS";
                 else{
                     // calculate number of groups and place ids from participants in array
                     $gtids = array(); 
-                    while ($row = $result->fetch_assoc()){
+                    while ($row = $result->fetch()){
                         if (!isset($ngroups)){
                             $hash = $row['hash'];
                             $ngroups = ceil($nplayers / $maxplayers);
@@ -516,7 +516,7 @@
 
         $sql = "SELECT manager FROM training WHERE id = $trainid";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
 
         if ($row['manager'] != $user){
             $output['status'] = "NOPERMISSION";
@@ -525,7 +525,7 @@
             $sql = "SELECT groupid FROM gladiator_training WHERE training = $trainid";
             $result = runQuery($sql);
             $groups = array();
-            while ($row = $result->fetch_assoc())
+            while ($row = $result->fetch())
                 array_push($groups, $row['groupid']);
             $groups = implode(",", $groups);
 
@@ -563,7 +563,7 @@
             $subhash = substr($hash, 0, $size);
             $sql = "SELECT count(*) AS collision FROM training WHERE hash = '$subhash'";
             $result = runQuery($sql);
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             if ($row['collision'] == 0)
                 $collision = false;
         }
@@ -574,7 +574,7 @@
     function isStarted($id){
         $sql = "SELECT groupid FROM gladiator_training WHERE training = $id";
         $result = runQuery($sql);
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             if (!is_null($row['groupid']))
                 return true;
         }

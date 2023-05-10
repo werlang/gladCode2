@@ -15,7 +15,7 @@
         $result = runQuery($sql);
 
         $output['potions'] = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $id = $row['identifier'];
             $potion = array();
             $potion['id'] = $row['id'];
@@ -35,13 +35,13 @@
         $result = runQuery($sql);
 
         $output['slots'] = array();
-        while ($row = $result->fetch_assoc()){
+        while ($row = $result->fetch()){
             array_push($output['slots'], $row);
         }
 
         $sql = "SELECT lvl FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         $lvl = $row['lvl'];
 
         $nslots = 0;
@@ -61,7 +61,7 @@
 
         $sql = "SELECT silver, lvl, apothecary FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
 
         $silver = $row['silver'];
         $lvl = $row['lvl'];
@@ -77,7 +77,7 @@
         $used = "SELECT count(*) FROM slots s WHERE s.user = $user AND expire > now()";
         $sql = "SELECT id, price, ($used) AS 'used_slots', lvl FROM items WHERE identifier = '$identifier'";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
 
         $price = $row['price'];
         $lvl = $row['lvl'];
@@ -118,7 +118,7 @@
             $sql = "SELECT apothecary,silver FROM usuarios WHERE id = $user";
             $result = runQuery($sql);
 
-            $row = $result->fetch_assoc();
+            $row = $result->fetch();
             $apot = $row['apothecary'];
             $silver = $row['silver'];
             $cost = $prices[$apot - 1];
@@ -146,7 +146,7 @@
         $sql = "SELECT user FROM slots WHERE id = $id";
         $result = runQuery($sql);
 
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         if ($user == $row['user']){
             $sql = "UPDATE slots SET expire = now() WHERE id = $id";
             runQuery($sql);

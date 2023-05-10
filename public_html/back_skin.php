@@ -8,7 +8,7 @@
 		$sql = "SELECT * FROM skins WHERE skin = '$skin'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-		if ($result->num_rows == 0){
+		if ($result->rowCount() == 0){
 			$sql = "INSERT INTO skins (hash,skin) VALUES ('$hash','$skin')";
 			if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 		}
@@ -21,8 +21,8 @@
 		$sql = "SELECT * FROM skins WHERE hash = '$hash'";
 		if(!$result = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']'); }
 
-		if ($result->num_rows > 0){
-			$row = $result->fetch_assoc();
+		if ($result->rowCount() > 0){
+			$row = $result->fetch();
 			echo $row['skin'];
 		}
 	}

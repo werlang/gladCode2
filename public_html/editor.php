@@ -81,8 +81,8 @@
             else{
                 $sql = "SELECT * FROM gladiators INNER JOIN usuarios ON id = master WHERE master = '$user' AND cod = $id";
                 $result = runQuery($sql);
-                if ($result->num_rows > 0){
-                    $row = $result->fetch_assoc();
+                if ($result->rowCount() > 0){
+                    $row = $result->fetch();
                     $name = $row['name'];
                     $vstr = $row['vstr'];
                     $vagi = $row['vagi'];

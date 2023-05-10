@@ -11,7 +11,7 @@
         $result = runQuery($sql);
 
         $info = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $duel = array();
             $duel['id'] = $row['id'];
             $duel['time'] = $row['time'];
@@ -29,17 +29,17 @@
         $glad = mysql_escape_string($_POST['glad']);
         $sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
         $result = runQuery($sql);
-        if ($result->num_rows == 0)
+        if ($result->rowCount() == 0)
             $output['status'] = "NOT_FRIEND";
         else{
             $sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = '$glad' AND g.master = '$user'";
             $result = runQuery($sql);
-            if ($result->num_rows == 0)
+            if ($result->rowCount() == 0)
                 $output['status'] = "NOT_GLAD";
             else{
                 $sql = "SELECT id FROM duels WHERE user2 = '$friend' AND gladiator1 = '$glad' AND log IS NULL";
                 $result = runQuery($sql);
-                if ($result->num_rows > 0)
+                if ($result->rowCount() > 0)
                     $output['status'] = "EXISTS";
                 else{
                     $sql = "INSERT INTO duels (user1, gladiator1, user2, time) VALUES ('$user', '$glad', '$friend', now())";
@@ -61,7 +61,7 @@
 
         $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
         $result = runQuery($sql);
-        $row = $result->fetch_assoc();
+        $row = $result->fetch();
         
         send_node_message(array(
             'profile notification' => array('user' => array($row['user1'], $row['user2']))
@@ -78,7 +78,7 @@
 
         $sql = "SELECT d.id FROM duels d WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL)";
         $result = runQuery($sql);
-        $total = $result->num_rows;
+        $total = $result->rowCount();
         $output['total'] = $total;
 
         if (!isset($_POST['offset'])){
@@ -94,7 +94,7 @@
         $result = runQuery($sql);
 
         $info = array();
-        while($row = $result->fetch_assoc()){
+        while($row = $result->fetch()){
             $duel = array();
             if ($row['user1'] == $user){
                 $duel['glad'] = $row['glad1'];

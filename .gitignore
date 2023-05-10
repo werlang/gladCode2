@@ -4,4 +4,4 @@ node/node_modules
 cwp_stats
 node/package.json
 node/package-lock.json
-node/config.json
+config.json
