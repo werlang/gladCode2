@@ -64,7 +64,7 @@
 
         //delete and update
         if ($grt != ''){
-            $sql = "DELETE FROM group_teams WHERE id IN ($grt) AND groupid IN (SELECT id FROM groups WHERE round > $round)";
+            $sql = "DELETE FROM group_teams WHERE id IN ($grt) AND groupid IN (SELECT id FROM `groups` WHERE round > $round)";
             $result = runQuery($sql);
 
             if (isset($remake)){
@@ -72,14 +72,14 @@
                 $result = runQuery($sql);
             }
             else if ($round > 0){
-                $sql = "UPDATE group_teams SET gladiator = NULL, lasttime = NULL WHERE id IN ($grt) AND groupid IN (SELECT id FROM groups WHERE round = $round)";
+                $sql = "UPDATE group_teams SET gladiator = NULL, lasttime = NULL WHERE id IN ($grt) AND groupid IN (SELECT id FROM `groups` WHERE round = $round)";
                 $result = runQuery($sql);
             }
         }
     }
 
     if (isset($groups) && $groups != ''){
-        $sql = "DELETE FROM groups WHERE id IN ($groups) AND round > $round";
+        $sql = "DELETE FROM `groups` WHERE id IN ($groups) AND round > $round";
         $result = runQuery($sql);
 
         if (isset($remake)){

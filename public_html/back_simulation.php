@@ -61,7 +61,7 @@
             }
             unset($_SESSION['tourn-group'][$groupid]);
 
-            $sql = "SELECT log FROM groups WHERE id = $groupid";
+            $sql = "SELECT log FROM `groups` WHERE id = $groupid";
             $result = runQuery($sql);
             $row = $result->fetch();
             if ($row['log'] == null){
@@ -363,7 +363,7 @@
                 $row = $result->fetch();
                 $logid = $row['id'];
 
-                $sql = "SELECT log FROM groups WHERE id = $groupid";
+                $sql = "SELECT log FROM `groups` WHERE id = $groupid";
                 $result = runQuery($sql);
                 $row = $result->fetch();
                 if ($row['log'] == null){

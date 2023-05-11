@@ -257,7 +257,7 @@
                     $output['id'] = $id;
                     $output['name'] = $room;
 
-                    $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick entrou na sala', 1)";
+                    $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($id, now(3), '$user', '$nick entrou na sala', 1)";
                     $result = runQuery($sql);
 
                     //if there is no user in the room, I am the new master
@@ -295,7 +295,7 @@
                 $id = $row['id'];
                 $nick = $row['apelido'];
 
-                $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick saiu da sala', 1)";
+                $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($id, now(3), '$user', '$nick saiu da sala', 1)";
                 $result = runQuery($sql);
 
                 $sql = "DELETE FROM chat_users WHERE user = '$user' AND room = $id";
@@ -424,7 +424,7 @@
                     $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($id, '$user', now(3), now(3), 0)";
                     $result = runQuery($sql);
 
-                    $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($id, now(3), '$user', '$nick criou a sala $name', 1)";
+                    $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($id, now(3), '$user', '$nick criou a sala $name', 1)";
                     $result = runQuery($sql);
 
                     $output['status'] = "CREATED";
@@ -471,7 +471,7 @@
 
                                 $output['status'] = "PROMOTED";
 
-                                $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$target foi promovido por $nick', 1)";
+                                $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$user', '$target foi promovido por $nick', 1)";
                                 $result = runQuery($sql);
 
                             }
@@ -580,7 +580,7 @@
 
                                 $result = runQuery($sql);
 
-                                $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$msg', 1)";
+                                $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$user', '$msg', 1)";
                                 $result = runQuery($sql);
 
                             }
@@ -618,7 +618,7 @@
                         $sql = "UPDATE chat_users SET privilege = 0 WHERE user = '$user'";
                         $result = runQuery($sql);
     
-                        $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$nick se autoproclamou o novo líder da sala', 1)";
+                        $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$user', '$nick se autoproclamou o novo líder da sala', 1)";
                         $result = runQuery($sql);
     
                         $output['status'] = "CLAIMED";
@@ -724,7 +724,7 @@
                             $result = runQuery($sql);
 
                             foreach ($messages as $message){
-                                $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$user', '$message', 1)";
+                                $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$user', '$message', 1)";
                                 $result = runQuery($sql);
                             }
 
