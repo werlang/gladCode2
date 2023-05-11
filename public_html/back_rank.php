@@ -93,7 +93,7 @@
                     $sql = "INSERT INTO user_tabs (name, owner, watch) VALUES ('$name', $user, $watch)";
                     $result = runQuery($sql);
         
-                    $output['id'] = $conn->insert_id;
+                    $output['id'] = $conn->lastInsertId();
                     $output['status'] = "SUCCESS";
                 }
             }

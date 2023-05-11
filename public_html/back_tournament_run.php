@@ -287,17 +287,19 @@
                 $row2 = $result2->fetch();
 
                 if ($row2['hash'] == null){
-                    if (!is_locked($row2['locked'])){
-                        $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid' AND locked IS NULL";
-                        if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                    // set to run. only the manager on the front may call it the runSim
+                    $output['groups'][$groupid]['status'] = "RUN";
+                    // if (!is_locked($row2['locked'])){
+                    //     $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid' AND locked IS NULL";
+                    //     if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-                        if (!isset($_SESSION['tourn-group']))
-                            $_SESSION['tourn-group'] = array();
-                        $_SESSION['tourn-group'][$groupid] = md5("tourn-group-$groupid-id");
-                        $output['groups'][$groupid]['status'] = "RUN";
-                    }
-                    else
-                        $output['groups'][$groupid]['status'] = "LOCK";
+                    //     if (!isset($_SESSION['tourn-group']))
+                    //         $_SESSION['tourn-group'] = array();
+                    //     $_SESSION['tourn-group'][$groupid] = md5("tourn-group-$groupid-id");
+                    //     $output['groups'][$groupid]['status'] = "RUN";
+                    // }
+                    // else
+                    //     $output['groups'][$groupid]['status'] = "LOCK";
                 }
                 else{
                     $output['groups'][$groupid]['status'] = "DONE";
@@ -472,7 +474,7 @@
                 for ($i=0 ; $i<$ngroups ; $i++){
                     $sql = "INSERT INTO groups(round, deadline) VALUES ('$newround', ADDTIME(now(), TIME('$maxtime')))";
                     $result = runQuery($sql);
-                    $group = $conn->insert_id;
+                    $group = $conn->lastInsertId();
 
                     //fill remaining teams into those groups
                     $remgroups = $ngroups - $i;

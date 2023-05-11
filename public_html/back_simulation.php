@@ -478,7 +478,7 @@
         $sql = "INSERT INTO logs (time, version, hash, origin) VALUES (now(), '$version', '$hash', '$origin')";
         $result = runQuery($sql);
         
-        $id = $conn->insert_id;
+        $id = $conn->lastInsertId();
         file_put_contents("logs/$id",$log);
         return $hash;
     }

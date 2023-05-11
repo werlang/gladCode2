@@ -17,13 +17,13 @@ if (isset($_GET['n']) && isset($_GET['t'])){
 
     $sql = "INSERT INTO tournament (name, creation, maxteams, maxtime, flex, manager, hash, password, description) VALUES ('$name', now(), 50, '00:30:00', 1, '$manager', '', '', '')";
     $result = runQuery($sql);
-    $tournid = $conn->insert_id;
+    $tournid = $conn->lastInsertId();
 
     $teams = array();
     for ($i=0 ; $i<$nteams ; $i++){
         $sql = "INSERT INTO teams (name, password, tournament, modified) VALUES ('eq$i','bababa', $tournid, now())";
         $result = runQuery($sql);
-        array_push($teams, $conn->insert_id);
+        array_push($teams, $conn->lastInsertId());
     }
 
     $limit = $nteams*3;

@@ -22,10 +22,20 @@
 
     function runQuery($sql){
         global $conn;
-        if(!$result = $conn->query($sql)){
+        try {
+            if(!$result = $conn->query($sql)){
+                $error = array(
+                    'status' => "SQLERROR",
+                    'message' => $conn->error,
+                    'sql' => $sql
+                );
+                die(json_encode($error));
+            }
+        }
+        catch(PDOException $e){
             $error = array(
                 'status' => "SQLERROR",
-                'message' => $conn->error,
+                'message' => $e->getMessage(),
                 'sql' => $sql
             );
             die(json_encode($error));
