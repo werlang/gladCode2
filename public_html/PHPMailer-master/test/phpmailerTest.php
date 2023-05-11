@@ -979,7 +979,7 @@ EOT;
         }
 
         //Make sure that trying to attach a nonexistent file fails
-        $this->assertFalse($this->Mail->addAttachment(__FILE__ . md5(microtime()), 'nonexistent_file.txt'));
+        $this->assertFalse($this->Mail->addAttachment(__FILE__ . md5(microtime(true)), 'nonexistent_file.txt'));
 
         $this->buildBody();
         $this->assertTrue($this->Mail->send(), $this->Mail->ErrorInfo);
