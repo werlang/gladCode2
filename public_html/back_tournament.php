@@ -771,7 +771,7 @@
                 if ($nrows > 0)
                     $output['status'] = "FEWGLADS";
                 else{
-                    $hash = substr(md5('tourn'.microtime()*rand()), 0,16);
+                    $hash = substr(md5('tourn'.microtime(true)*rand()), 0,16);
                     $sql = "UPDATE tournament t SET t.hash = '$hash' WHERE t.id = '$tournid'";
                     $result = runQuery($sql);
 
@@ -787,7 +787,7 @@
                     $ngroups = ceil($nteams / 5);
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
-                        $sql = "INSERT INTO groups(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
+                        $sql = "INSERT INTO `groups`(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
                         $result = runQuery($sql);
                         array_push($groups, $conn->lastInsertId());
                     }
@@ -860,7 +860,7 @@
             $result = runQuery($sql);
         }
 
-        $sql = "INSERT INTO chat_messages (room, time, sender, message, system) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
+        $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
         $result = runQuery($sql);
 
         send_node_message(array(

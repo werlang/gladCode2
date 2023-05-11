@@ -193,7 +193,7 @@
 			array_push($receiveremail, $row['email']);
 		}
 
-		$sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
+		$sql = "SELECT max(gr.round) AS maxround, t.name, max(gr.deadline) AS tlimit FROM `groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash';
 		";
 		$result = runQuery($sql);
 		$row = $result->fetch();
