@@ -50,7 +50,7 @@
                     $gladcode = 'gladcodehashsecret36';
                     $email = $row['email'];
                     $hash = md5( $gladcode . strtolower( trim( $email ) ) );
-                    $foto = mysql_escape_string("https://www.gravatar.com/avatar/$hash?d=retro");
+                    $foto = "https://www.gravatar.com/avatar/$hash?d=retro";
 
                     $sql = "UPDATE usuarios SET foto = '$foto' WHERE id = '$user'";
                     $result = runQuery($sql);
@@ -78,14 +78,14 @@
         if (isset($_POST['admin'])){
             $admin = json_decode($_POST['admin'], true);
 
-            $pass = mysql_escape_string($admin['pass']);
+            $pass = $admin['pass'];
             if (md5($pass) == '07aec7e86e12014f87918794f521183b'){
                 if (isset($admin['glad'])){
-                    $glad = mysql_escape_string($admin['glad']);
+                    $glad = $admin['glad'];
                     $sql = "SELECT u.id FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = $glad";
                 }
                 else if (isset($admin['user'])){
-                    $user = mysql_escape_string($admin['user']);
+                    $user = $admin['user'];
                     $sql = "SELECT id FROM usuarios WHERE id = $user";
                 }
 
@@ -175,8 +175,8 @@
     elseif ($action == "UPDATE"){
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
-            $nickname = mysql_escape_string($_POST['nickname']);
-            $language = mysql_escape_string($_POST['language']);
+            $nickname = $_POST['nickname'];
+            $language = $_POST['language'];
             $picture = $_POST['picture'];
             $preferences = (array)json_decode($_POST['preferences']);
             $pref_message = $preferences['message'];
@@ -223,7 +223,7 @@
     elseif ($action == "TUTORIAL_LANGUAGE"){
         if(isset($_SESSION['user'])){
             $user = $_SESSION['user'];
-            $language = mysql_escape_string($_POST['language']);
+            $language = $_POST['language'];
             $sql = "UPDATE usuarios SET pref_language = '$language' WHERE id = '$user'";
             $result = runQuery($sql);
             $output['status'] = "SUCCESS";
@@ -231,8 +231,8 @@
     }
     elseif ($action == "EDITOR"){
         $user = $_SESSION['user'];
-        $theme = mysql_escape_string($_POST['theme']);
-        $font = mysql_escape_string($_POST['font']);
+        $theme = $_POST['theme'];
+        $font = $_POST['font'];
 
         $sql = "UPDATE usuarios SET editor_theme = '$theme', editor_font = '$font' WHERE id = '$user'";
         $result = runQuery($sql);

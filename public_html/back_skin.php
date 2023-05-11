@@ -2,7 +2,7 @@
 	include_once "connection.php";
 	
 	if ($_POST['action'] == "SAVE"){
-		$skin = mysql_escape_string($_POST['skin']);
+		$skin = $_POST['skin'];
 		$hash = md5('skinhash'. $skin);
 		
 		$sql = "SELECT * FROM skins WHERE skin = '$skin'";

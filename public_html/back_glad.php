@@ -75,7 +75,7 @@
             ));
         }
         elseif ($_POST['action'] == "DELETE"){
-            $id = mysql_escape_string($_POST['id']);
+            $id = $_POST['id'];
             $sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
             $result = runQuery($sql);
 
@@ -85,20 +85,20 @@
         }
         else{
             if (isset($_POST['id']))
-                $id = mysql_escape_string($_POST['id']);
+                $id = $_POST['id'];
             else
                 $id = '';
-            $skin = mysql_escape_string($_POST['skin']);
-            $name = mysql_escape_string($_POST['nome']);
+            $skin = $_POST['skin'];
+            $name = $_POST['nome'];
             preg_match ( '/^[\w À-ú]+?$/' , $name , $name_match );
-            $vstr = mysql_escape_string($_POST['vstr']);
-            $vagi = mysql_escape_string($_POST['vagi']);
-            $vint = mysql_escape_string($_POST['vint']);
-            $code = mysql_escape_string($_SESSION['code']);
+            $vstr = $_POST['vstr'];
+            $vagi = $_POST['vagi'];
+            $vint = $_POST['vint'];
+            $code = $_SESSION['code'];
 
             $blocks = "";
             if (isset($_POST['blocks']))
-                $blocks = mysql_escape_string($_POST['blocks']);
+                $blocks = $_POST['blocks'];
 
             if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
                 $sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";

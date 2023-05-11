@@ -25,8 +25,8 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "CHALLENGE"){
-        $friend = mysql_escape_string($_POST['friend']);
-        $glad = mysql_escape_string($_POST['glad']);
+        $friend = $_POST['friend'];
+        $glad = $_POST['glad'];
         $sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
         $result = runQuery($sql);
         if ($result->rowCount() == 0)
@@ -57,7 +57,7 @@
         }
     }
     elseif ($action == "DELETE"){
-        $id = mysql_escape_string($_POST['id']);
+        $id = $_POST['id'];
 
         $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
         $result = runQuery($sql);
@@ -73,7 +73,7 @@
         $output['status'] = "OK";
     }
     elseif ($action == "REPORT"){
-        $offset = mysql_escape_string($_POST['offset']);
+        $offset = $_POST['offset'];
         $limit = 10;
 
         $sql = "SELECT d.id FROM duels d WHERE ((d.user1 = '$user' OR d.user2 = '$user') AND d.log IS NOT NULL) OR (d.user1 = '$user' AND d.log IS NULL)";

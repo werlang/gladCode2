@@ -13,8 +13,8 @@
     date_default_timezone_set('America/Sao_Paulo');
 
     if ($action == "GET"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         //check maxround
         $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
@@ -114,9 +114,9 @@
 
     }
     elseif ($action == "GLADS"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
         $version = file_get_contents("version");
-        $round = mysql_escape_string($_POST['round']);
+        $round = $_POST['round'];
 
         //see if group which I belong is locked
         $myteams = "SELECT te.id FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE g.master = '$user'";
@@ -171,8 +171,8 @@
             $output['status'] = "LOCK";
     }
     elseif ($action == "CHOOSE"){
-        $gladid = mysql_escape_string($_POST['id']);
-        $hash = mysql_escape_string($_POST['hash']);
+        $gladid = $_POST['id'];
+        $hash = $_POST['hash'];
         $version = file_get_contents("version");
 
         //check if this glad is in my team
@@ -215,8 +215,8 @@
             $output['status'] = "NOTFOUND";
     }
     elseif ($action == "REFRESH"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         //check if there is any battle left to be done
         $sql = "SELECT gr.deadline, now() AS now FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE gr.log IS NULL AND t.hash = '$hash' AND gr.round = '$round'";
@@ -332,7 +332,7 @@
             $output['status'] = "SUCCESS";       
     }
     elseif ($action == "UPDATE"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         //max round number found
         $sql = "SELECT max(gr.round) AS maxround, t.maxtime FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash'";
@@ -505,7 +505,7 @@
         }
     }
     elseif ($action == "END TURN"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         //max round number found
         $sql = "SELECT max(gr.round) AS maxround FROM groups gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' AND t.manager = $user";

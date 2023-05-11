@@ -7,7 +7,7 @@
     $output = array();
 
     if ($action == "GET"){
-        $offset = mysql_escape_string($_POST['offset']);
+        $offset = $_POST['offset'];
         $limit = 10;
 
         $fav = "";
@@ -81,18 +81,18 @@
         }
     }
     elseif ($action == "DELETE"){
-        $id = mysql_escape_string($_POST['id']);
+        $id = $_POST['id'];
         $sql = "DELETE FROM reports WHERE id = '$id' AND gladiator IN (SELECT cod FROM gladiators WHERE master = '$user')";
         $result = runQuery($sql);
 
         $output['status'] = "SUCCESS";
     }
     else if ($action == "FAVORITE"){
-        $favorite = mysql_escape_string($_POST['favorite']);
+        $favorite = $_POST['favorite'];
 
         if ($favorite === "true" || $favorite === "false"){
-            $id = mysql_escape_string($_POST['id']);
-            $comment = mysql_escape_string($_POST['comment']);
+            $id = $_POST['id'];
+            $comment = $_POST['comment'];
             
             $sql = "UPDATE reports SET favorite = $favorite, comment = '$comment' WHERE id = $id";
             $result = runQuery($sql);

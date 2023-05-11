@@ -3,10 +3,10 @@
 <?php
     session_start();
     if (isset($_GET['h'])){
-        $hash = mysql_escape_string($_GET['h']);
+        $hash = $_GET['h'];
 
         if (isset($_GET['r']))
-            $round = mysql_escape_string($_GET['r']);
+            $round = $_GET['r'];
         else
             header("Location: $hash/0");
     }

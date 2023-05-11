@@ -9,8 +9,8 @@
     $output = array();
 
     if ($action == "GET"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         $sql = "SELECT t.id, t.name, t.description, t.maxtime, t.hash_valid AS expire, t.deadline, now(3) AS 'now', t.manager, max(tg.round) AS maxround FROM training t INNER JOIN gladiator_training gt ON gt.training = t.id INNER JOIN training_groups tg ON tg.id = gt.groupid WHERE hash = '$hash'";
         $result = runQuery($sql);
@@ -98,9 +98,9 @@
         }
     }
     elseif ($action == "DEADLINE"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $time = mysql_escape_string($_POST['time']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $time = $_POST['time'];
+        $round = $_POST['round'];
 
         $sql = "SELECT manager, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
@@ -153,8 +153,8 @@
         }
     }
     elseif ($action == "REFRESH"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $round = mysql_escape_string($_POST['round']);
+        $hash = $_POST['hash'];
+        $round = $_POST['round'];
 
         $sql = "SELECT id, deadline FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
@@ -278,8 +278,8 @@
         }
     }
     elseif ($action == "NEW ROUND"){
-        $round = mysql_escape_string($_POST['round']);
-        $hash = mysql_escape_string($_POST['hash']);
+        $round = $_POST['round'];
+        $hash = $_POST['hash'];
 
         $sql = "SELECT players, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);
@@ -361,8 +361,8 @@
         }
     }
     elseif ($action == "RERUN"){
-        $hash = mysql_escape_string($_POST['hash']);
-        $group = mysql_escape_string($_POST['group']);
+        $hash = $_POST['hash'];
+        $group = $_POST['group'];
 
         $sql = "SELECT manager, id FROM training WHERE hash = '$hash'";
         $result = runQuery($sql);

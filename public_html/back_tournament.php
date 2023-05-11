@@ -9,12 +9,12 @@
     $output = array();
     
     if ($action == "CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $pass = mysql_escape_string($_POST['pass']);
-        $desc = mysql_escape_string($_POST['desc']);
-        $maxteams = mysql_escape_string($_POST['maxteams']);
-        $maxtime = mysql_escape_string($_POST['maxtime']);
-        $flex = mysql_escape_string($_POST['flex']);
+        $name = $_POST['name'];
+        $pass = $_POST['pass'];
+        $desc = $_POST['desc'];
+        $maxteams = $_POST['maxteams'];
+        $maxtime = $_POST['maxtime'];
+        $flex = $_POST['flex'];
         if ($flex == "true")
             $flex = 1;
         else
@@ -51,8 +51,8 @@
     }
     else if ($action == "LIST"){
         $output = array();
-        $moffset = mysql_escape_string($_POST['moffset']);
-        $ooffset = mysql_escape_string($_POST['ooffset']);
+        $moffset = $_POST['moffset'];
+        $ooffset = $_POST['ooffset'];
         $limit = 10;
 
         if ($moffset < 0)
@@ -132,10 +132,10 @@
         echo json_encode($output);
     }
     else if ($action == "JOIN"){
-        $name = mysql_escape_string($_POST['name']);
+        $name = $_POST['name'];
 
         if (isset($_POST['pass']))
-            $pass = mysql_escape_string($_POST['pass']);
+            $pass = $_POST['pass'];
         else{
             $sql = "SELECT password FROM tournament WHERE name = '$name' AND manager = '$user'";
             $result = runQuery($sql);
@@ -174,12 +174,12 @@
         $output = array();
 
         if (isset($_POST['tourn'])){
-            $tournid = mysql_escape_string($_POST['tourn']);
+            $tournid = $_POST['tourn'];
             $sql = "SELECT * FROM tournament WHERE id = '$tournid'";
         }
         else{
-            $name = mysql_escape_string($_POST['name']);
-            $pass = mysql_escape_string($_POST['pass']);
+            $name = $_POST['name'];
+            $pass = $_POST['pass'];
             $sql = "SELECT * FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
@@ -236,11 +236,11 @@
         echo json_encode($output);
     }
     elseif ($action == "TEAM_CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $tname = mysql_escape_string($_POST['tname']);
-        $tpass = mysql_escape_string($_POST['tpass']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
+        $name = $_POST['name'];
+        $tname = $_POST['tname'];
+        $tpass = $_POST['tpass'];
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
         $tourn = "";
 
         $sql = "SELECT id, hash FROM tournament WHERE name = '$tname' AND password = '$tpass'";
@@ -317,8 +317,8 @@
 
     }
     elseif ($action == "TEAM"){
-        $teamid = mysql_escape_string($_POST['id']);
-        $sync = mysql_escape_string($_POST['sync']);
+        $teamid = $_POST['id'];
+        $sync = $_POST['sync'];
         $output = array();
 
         $sql = "SELECT modified FROM teams WHERE id = '$teamid'";
@@ -371,7 +371,7 @@
         echo json_encode($output);
     }
     elseif ($action == "LEAVE_TEAM"){
-        $teamid = mysql_escape_string($_POST['id']);
+        $teamid = $_POST['id'];
 
         $output = array();
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$teamid'";
@@ -444,10 +444,10 @@
         echo json_encode($output);
     }
     elseif ($action == "JOIN_TEAM"){
-        $word = mysql_escape_string($_POST['pass']);
-        $team = mysql_escape_string($_POST['team']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
+        $word = $_POST['pass'];
+        $team = $_POST['team'];
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
         $output = array();
 
         $sql = "SELECT t.id, t.name, t.password FROM teams te INNER JOIN tournament t ON t.id = te.tournament WHERE te.id = '$team'";
@@ -514,10 +514,10 @@
         echo json_encode($output);
     }
     elseif ($action == "ADD_GLAD"){
-        $glad = mysql_escape_string($_POST['glad']);
-        $showcode = mysql_escape_string($_POST['showcode']);
-        $team = mysql_escape_string($_POST['team']);
-        $pass = mysql_escape_string($_POST['pass']);
+        $glad = $_POST['glad'];
+        $showcode = $_POST['showcode'];
+        $team = $_POST['team'];
+        $pass = $_POST['pass'];
            
         $nglads = "SELECT count(*) FROM gladiator_teams WHERE team = '$team'";
         $signed = "SELECT count(*) FROM gladiator_teams gt INNER JOIN gladiators g ON g.cod = gt.gladiator WHERE gt.team = '$team' AND g.master = '$user'";
@@ -581,12 +581,12 @@
     }
     elseif ($action == "DELETE"){
         if (isset($_POST['tourn'])){
-            $tournid = mysql_escape_string($_POST['tourn']);
+            $tournid = $_POST['tourn'];
             $sql = "SELECT id, manager, hash FROM tournament WHERE id = '$tournid'";
         }
         else{
-            $name = mysql_escape_string($_POST['name']);
-            $pass = mysql_escape_string($_POST['pass']);
+            $name = $_POST['name'];
+            $pass = $_POST['pass'];
             $sql = "SELECT id, manager, hash FROM tournament WHERE name = '$name' AND password = '$pass'";
         }
 
@@ -624,8 +624,8 @@
         echo json_encode($output);
     }
     elseif ($action == "REMOVE_GLAD"){
-        $team = mysql_escape_string($_POST['team']);
-        $glad = mysql_escape_string($_POST['glad']);
+        $team = $_POST['team'];
+        $glad = $_POST['glad'];
 
         $output = array();
 
@@ -692,9 +692,9 @@
         echo json_encode($output);
     }
     elseif ($action == "KICK"){
-        $team = mysql_escape_string($_POST['teamname']);
-        $tname = mysql_escape_string($_POST['name']);
-        $tpass = mysql_escape_string($_POST['pass']);
+        $team = $_POST['teamname'];
+        $tname = $_POST['name'];
+        $tpass = $_POST['pass'];
 
         $output = array();
 
@@ -736,8 +736,8 @@
         echo json_encode($output);
     }
     elseif ($action == "START"){
-        $tname = mysql_escape_string($_POST['name']);
-        $tpass = mysql_escape_string($_POST['pass']);
+        $tname = $_POST['name'];
+        $tpass = $_POST['pass'];
 
         $output = array();
 

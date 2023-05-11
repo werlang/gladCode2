@@ -34,7 +34,7 @@
 
     $userglad = "";
     if (isset($args['duel'])){
-        $id = mysql_escape_string($args['duel']);
+        $id = $args['duel'];
         $sql = "SELECT gladiator1 FROM duels WHERE id = '$id' AND user2 = '$user' AND log IS NULL";
         $result = runQuery($sql);
         $row = $result->fetch();
@@ -54,7 +54,7 @@
 
     if (isset($args['tournament'])){
         if (isset($_SESSION['tourn-group'])){
-            $groupid = mysql_escape_string($args['tournament']);
+            $groupid = $args['tournament'];
             if (isset($_SESSION['tourn-group'][$groupid]) && $_SESSION['tourn-group'][$groupid] != md5("tourn-group-$groupid-id")){
                 $groupid = null;
                 $cancel_run = true;
@@ -83,7 +83,7 @@
 
     if (isset($args['training'])){
         if (isset($_SESSION['train-run'])){
-            $groupid = mysql_escape_string($args['training']);
+            $groupid = $args['training'];
             if (!isset($_SESSION['train-run']) || $_SESSION['train-run']['id'] != md5("train-$groupid-id")){
                 $groupid = null;
                 $cancel_run = true;
@@ -345,7 +345,7 @@
                 send_reports($rewards, $hash);
             }
             if (isset($args['duel']) && !$cancel_run){
-                $id = mysql_escape_string($args['duel']);
+                $id = $args['duel'];
                 $sql = "UPDATE duels SET log = '$hash', gladiator2 = '$userglad', time = now() WHERE id = '$id' AND user2 = '$user'";
                 $result = runQuery($sql);
 

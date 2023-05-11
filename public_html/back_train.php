@@ -9,11 +9,11 @@
     $output = array();
 
     if ($action == "CREATE"){
-        $name = mysql_escape_string($_POST['name']);
-        $desc = mysql_escape_string($_POST['desc']);
-        $maxtime = mysql_escape_string($_POST['maxtime']);
-        $players = mysql_escape_string($_POST['players']);
-        $weight = mysql_escape_string($_POST['weight']);
+        $name = $_POST['name'];
+        $desc = $_POST['desc'];
+        $maxtime = $_POST['maxtime'];
+        $players = $_POST['players'];
+        $weight = $_POST['weight'];
         $hash = newHash();
 
         $sql = "SELECT premium, credits FROM usuarios WHERE id = $user";
@@ -38,8 +38,8 @@
 
     }
     else if ($action == "LIST"){
-        $moffset = mysql_escape_string($_POST['moffset']);
-        $poffset = mysql_escape_string($_POST['poffset']);
+        $moffset = $_POST['moffset'];
+        $poffset = $_POST['poffset'];
         $limit = 10;
 
         if ($moffset < 0)
@@ -122,7 +122,7 @@
         }
     }
     elseif ($action == "JOIN"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         // time since expired
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training WHERE hash = '$hash'";
@@ -154,7 +154,7 @@
                 elseif (!isset($_POST['glad']))
                     $output['status'] = "ALLOWED";
                 else{
-                    $glad = mysql_escape_string($_POST['glad']);
+                    $glad = $_POST['glad'];
 
                     // check if the glad is mine
                     $sql = "SELECT cod FROM gladiators WHERE master = $user AND cod = $glad";
@@ -176,7 +176,7 @@
                         )));
 
                         // check if I want to redirect to another page
-                        $redirect = mysql_escape_string($_POST['redirect']);
+                        $redirect = $_POST['redirect'];
                         if ($redirect == "true"){
                             $_SESSION['redirect'] = "train_join:$trainid";
                         }
@@ -188,7 +188,7 @@
 
     }
     elseif ($action == "ROOM"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT *, TIME_TO_SEC(TIMEDIFF(now(), hash_valid)) as timediff FROM training t WHERE id = $trainid";
         $result = runQuery($sql);
@@ -268,9 +268,9 @@
 
     }
     elseif ($action == "EDIT"){
-        $trainid = mysql_escape_string($_POST['id']);
-        $field = mysql_escape_string($_POST['field']);
-        $value = mysql_escape_string(trim($_POST['value']));
+        $trainid = $_POST['id'];
+        $field = $_POST['field'];
+        $value = trim($_POST['value']);
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -300,7 +300,7 @@
         }
     }
     elseif ($action == "RENEW"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -327,9 +327,9 @@
         }
     }
     elseif ($action == "KICK"){
-        $trainid = mysql_escape_string($_POST['id']);
-        $glad = mysql_escape_string($_POST['glad']);
-        $myself = mysql_escape_string($_POST['myself']);
+        $trainid = $_POST['id'];
+        $glad = $_POST['glad'];
+        $myself = $_POST['myself'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -374,7 +374,7 @@
         }
     }
     elseif ($action == "DELETE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT id FROM training WHERE id = $trainid AND manager = $user";
         $result = runQuery($sql);
@@ -402,7 +402,7 @@
         }
     }
     elseif ($action == "CHANGE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         if (isStarted($trainid))
             $output['status'] = "STARTED";
@@ -415,7 +415,7 @@
                 $row = $result->fetch();
                 $oldglad = $row['gladiator'];
 
-                $glad = mysql_escape_string($_POST['glad']);
+                $glad = $_POST['glad'];
 
                 $sql = "SELECT master FROM gladiators WHERE cod = $glad";
                 $result = runQuery($sql);
@@ -442,7 +442,7 @@
 
     }
     elseif ($action == "START"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT manager, maxtime, players FROM training WHERE id = $trainid";
         $result = runQuery($sql);
@@ -512,7 +512,7 @@
         }
     }
     elseif ($action == "REMOVE"){
-        $trainid = mysql_escape_string($_POST['id']);
+        $trainid = $_POST['id'];
 
         $sql = "SELECT manager FROM training WHERE id = $trainid";
         $result = runQuery($sql);
