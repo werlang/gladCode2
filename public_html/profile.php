@@ -81,9 +81,9 @@
     <?php
         include("header.php");
         if(isset($_GET['t']))
-            echo "<div id='tab' hidden>". mysql_escape_string($_GET['t']) ."</div>";
+            echo "<div id='tab' hidden>". $_GET['t'] ."</div>";
         if(isset($_GET['s']))
-            echo "<div id='subtab' hidden>". mysql_escape_string($_GET['s']) ."</div>";
+            echo "<div id='subtab' hidden>". $_GET['s'] ."</div>";
     ?>
     <div id='frame'>
         <div id='menu'>

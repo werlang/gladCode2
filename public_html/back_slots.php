@@ -57,7 +57,7 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "BUY"){
-        $identifier = mysql_escape_string($_POST['id']);
+        $identifier = $_POST['id'];
 
         $sql = "SELECT silver, lvl, apothecary FROM usuarios WHERE id = $user";
         $result = runQuery($sql);
@@ -107,7 +107,7 @@
 
     }
     elseif ($action == "UPGRADE"){
-        $command = mysql_escape_string($_POST['command']);
+        $command = $_POST['command'];
         $prices = array(1500,5000,15000,35000,0);
     
         if ($command == "COSTS"){
@@ -141,7 +141,7 @@
         }
     }
     elseif ($action == "EXPIRE") {
-        $id = mysql_escape_string($_POST['id']);
+        $id = $_POST['id'];
 
         $sql = "SELECT user FROM slots WHERE id = $id";
         $result = runQuery($sql);

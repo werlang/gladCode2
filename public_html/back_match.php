@@ -8,7 +8,7 @@
             $user = $_SESSION['user'];
             $output = array();
 
-            $id = mysql_escape_string($_POST['id']);
+            $id = $_POST['id'];
             $pool = 10;
             
             $sql = "SELECT version FROM gladiators WHERE cod = $id";

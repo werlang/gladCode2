@@ -2,9 +2,9 @@
 	include_once "connection.php";	
 
 	if ($_POST['action'] == "save"){
-		$round = mysql_escape_string($_POST['round']);
+		$round = $_POST['round'];
 		$bnum = $_POST['bnum'];
-		$winners = mysql_escape_string($_POST['winners']);
+		$winners = $_POST['winners'];
 
 		if (!isset($_POST['hash'])){
 			$hash = md5(time()*rand());

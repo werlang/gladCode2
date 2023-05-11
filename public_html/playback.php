@@ -3,9 +3,9 @@
     $log = "";
     $tnm = "";
     if (isset($_GET['log']))
-        $loghash = mysql_escape_string( $_GET['log']);
+        $loghash =  $_GET['log'];
     if (isset($_GET['t']))
-        $tnm = mysql_escape_string($_GET['t']);
+        $tnm = $_GET['t'];
 
     if (strpos($_SERVER['REQUEST_URI'], "playback.php?log=") !== false){
         header("Location: play/". $loghash);

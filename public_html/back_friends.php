@@ -56,7 +56,7 @@
 			));
 		}
 		elseif ($action == "SEARCH"){
-			$text = mysql_escape_string($_POST['text']);
+			$text = $_POST['text'];
 			$sql = "SELECT apelido, id, email FROM usuarios WHERE apelido LIKE '%$text%' AND id != '$user' LIMIT 10";
 			$result = runQuery($sql);
 
@@ -71,13 +71,13 @@
 			echo json_encode($output);
 		}
 		elseif ($action == "DELETE"){
-			$id = mysql_escape_string($_POST['user']);
+			$id = $_POST['user'];
 			$sql = "DELETE FROM amizade WHERE cod = '$id' AND (usuario1 = '$user' OR usuario2 = '$user')";
 			$result = runQuery($sql);
 			echo "OK";
 		}
 		elseif ($action == "ADD"){
-			$friend = mysql_escape_string($_POST['user']);
+			$friend = $_POST['user'];
 			$sql = "SELECT * FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
 			$result = runQuery($sql);
 			if ($result->rowCount() == 0){
@@ -93,7 +93,7 @@
 				echo "EXISTS";
 		}
 		elseif ($action == "FILTER"){
-			$text = mysql_escape_string($_POST['text']);
+			$text = $_POST['text'];
 			$fields = "a.cod, u.id, u.apelido, u.lvl, u.foto";
 			$sql = "SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = '$user' AND pendente = 0 AND apelido LIKE '%$text%' UNION SELECT $fields FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = '$user' AND pendente = 0 AND apelido LIKE '%$text%'";
 			$result = runQuery($sql);

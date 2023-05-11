@@ -6,7 +6,7 @@
 
 	if ($action == "GET"){
 		$user = $_SESSION['user'];
-		$page = mysql_escape_string($_POST['page']);
+		$page = $_POST['page'];
 
 		$sql = "SELECT cod FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.receiver = '$user'";
 		$result = runQuery($sql);
@@ -54,8 +54,8 @@
 	}
 	elseif ($action == "SEND"){
 		$sender = $_SESSION['user'];
-		$receiver = mysql_escape_string($_POST['id']);
-		$message = mysql_escape_string(htmlentities($_POST['message']));
+		$receiver = $_POST['id'];
+		$message = htmlentities($_POST['message']);
 		
 		$sql = "INSERT INTO messages (time, sender, receiver, message) VALUES (now(), '$sender', '$receiver', '$message')";
 		echo $sql;
@@ -67,8 +67,8 @@
 	}
 	elseif ($action == "READ"){
 		$user = $_SESSION['user'];
-		$id = mysql_escape_string($_POST['id']);
-		$val = mysql_escape_string($_POST['value']);
+		$id = $_POST['id'];
+		$val = $_POST['value'];
 		$sql = "UPDATE messages SET isread = '$val' WHERE cod = '$id' AND receiver = '$user'";
 		$result = runQuery($sql);
 
@@ -78,14 +78,14 @@
 	}
 	elseif ($action == "DELETE"){
 		$user = $_SESSION['user'];
-		$id = mysql_escape_string($_POST['id']);
+		$id = $_POST['id'];
 		$sql = "DELETE FROM messages WHERE cod = '$id' AND receiver = '$user'";
 		$result = runQuery($sql);
 	}
 	elseif ($action == "REPLY"){
 		$sender = $_SESSION['user'];
-		$id = mysql_escape_string($_POST['replyid']);
-		$message = mysql_escape_string(htmlentities($_POST['message']));
+		$id = $_POST['replyid'];
+		$message = htmlentities($_POST['message']);
 		
 		$sql = "SELECT * FROM messages WHERE cod = '$id' AND receiver = '$sender'";
 		$result = runQuery($sql);

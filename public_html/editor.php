@@ -74,7 +74,7 @@
         if(isset($_SESSION['user']) && isset($_GET['g'])) {
             $user = $_SESSION['user'];
             unset($_SESSION['code']);
-            $id = mysql_escape_string($_GET['g']);
+            $id = $_GET['g'];
             if ($id == 0){
                 echo "<div id='newglad'></div>";
             }

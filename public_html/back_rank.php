@@ -8,11 +8,11 @@
     $output = array();
     
     if ($action == "GET"){
-        $offset = mysql_escape_string($_POST['offset']);
+        $offset = $_POST['offset'];
 
         $search = "";
         if (isset($_POST['search'])){
-            $search = mysql_escape_string($_POST['search']);
+            $search = $_POST['search'];
             if ($search != ""){
                 $search = " WHERE g.name LIKE '%$search%' OR u.apelido LIKE '%$search%'";
             }
@@ -53,7 +53,7 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "WATCH TAB"){
-        $name = mysql_escape_string(trim($_POST['name']));
+        $name = trim($_POST['name']);
         if (isset($_POST['add'])){
             $watch = 1;
         }
@@ -147,8 +147,8 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "FETCH"){
-        $tab = mysql_escape_string($_POST['tab']);
-        $search = strtolower(mysql_escape_string($_POST['search']));
+        $tab = $_POST['tab'];
+        $search = strtolower($_POST['search']);
 
         $sql = "SELECT t.id, t.name, t.weight FROM training t WHERE t.description LIKE '%#$tab%'";
         $result = runQuery($sql);

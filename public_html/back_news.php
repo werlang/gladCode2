@@ -8,7 +8,7 @@
 
     if ($action == "GET"){
         //todo infinite scrolling for news page
-        $page = mysql_escape_string($_POST['page']);
+        $page = $_POST['page'];
 
         $id = "SUBSTR( md5(CONCAT(id, 'news-post-86')) , 1, 4)";
         $sql = "SELECT $id AS id, title, time, post FROM news ORDER BY time DESC LIMIT 5 OFFSET $page";
@@ -25,7 +25,7 @@
         $output['status'] = "SUCCESS";
     }
     else if ($action == "POST"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         $id = "SUBSTR( md5(CONCAT(id, 'news-post-86')) , 1, 4)";
         $sql = "SELECT title, time, post FROM news WHERE $id = '$hash'";

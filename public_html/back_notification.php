@@ -81,7 +81,7 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "SUMMARY"){
-        $hash = mysql_escape_string($_POST['hash']);
+        $hash = $_POST['hash'];
 
         $sql = "SELECT u.lvl, u.xp, u.silver, g.mmr, g.name, g.skin, g.vstr, g.vint, g.vagi, g.cod AS 'id' FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN reports r ON r.gladiator = g.cod INNER JOIN logs l ON l.id = r.log WHERE u.id = $user AND l.hash = '$hash'";
         $result = runQuery($sql);

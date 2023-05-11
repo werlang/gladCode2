@@ -21,12 +21,12 @@
 
     }
     else if ($action == "MESSAGES"){
-        $id = mysql_escape_string($_POST['id']);
-        $first = mysql_escape_string($_POST['first']);
-        $sync = mysql_escape_string($_POST['sync']);
+        $id = $_POST['id'];
+        $first = $_POST['first'];
+        $sync = $_POST['sync'];
         
         if (isset($_POST['visited']))
-            $visited = mysql_escape_string($_POST['visited']);
+            $visited = $_POST['visited'];
         else
             $visited = '';
 
@@ -93,10 +93,10 @@
         }
     }
     else if ($action == "SEND"){
-        $message = trim(mysql_escape_string($_POST['message']));
+        $message = trim($_POST['message']);
 
         if (isset($_POST['room']))
-            $room = mysql_escape_string($_POST['room']);
+            $room = $_POST['room'];
         else
             $room = '';
 

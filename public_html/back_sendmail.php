@@ -43,7 +43,7 @@
 		$message = $_POST['message'];
 
 		if(isset($_POST['replyid'])){
-			$id = mysql_escape_string($_POST['replyid']);
+			$id = $_POST['replyid'];
 			$sql = "SELECT u.email AS sender FROM messages m INNER JOIN usuarios u ON u.id = m.sender WHERE m.cod = '$id'";
 			$result = runQuery($sql);
 
@@ -51,7 +51,7 @@
 			$receiveremail = $row['sender'];
 		}
 		else
-			$receiveremail = mysql_escape_string($_POST['receiver']);
+			$receiveremail = $_POST['receiver'];
 		
 		session_start();
 		$user = $_SESSION['user'];
@@ -85,7 +85,7 @@
 		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
 	elseif ($action  == 'FRIEND'){
-		$receiveremail = mysql_escape_string($_POST['friend']);
+		$receiveremail = $_POST['friend'];
 		session_start();
 		$user = $_SESSION['user'];
 		
@@ -141,7 +141,7 @@
 		$msgbody = message_replace($doc->saveHTML(), $vars);
 	}
 	elseif ($action  == 'DUEL'){
-		$friend = mysql_escape_string($_POST['friend']);
+		$friend = $_POST['friend'];
 		session_start();
 		$user = $_SESSION['user'];
 		
@@ -180,7 +180,7 @@
 		}
 	}
 	elseif ($action  == 'TOURNAMENT'){
-		$hash = mysql_escape_string($_POST['hash']);
+		$hash = $_POST['hash'];
 
 		//get email from those participating in the tournament and not dead
 		$sql = "SELECT DISTINCT u.email, u.apelido FROM usuarios u INNER JOIN gladiators g ON g.master = u.id INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod WHERE u.pref_tourn = 1 AND glt.team IN (SELECT te.id FROM tournament t INNER JOIN teams te ON te.tournament = t.id INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN usuarios u ON u.id = g.master WHERE t.hash = '$hash' AND (SELECT count(*) FROM gladiator_teams glt INNER JOIN gladiators g ON g.cod = glt.gladiator INNER JOIN teams te ON te.id = glt.team INNER JOIN tournament t ON t.id = te.tournament WHERE g.master = u.id AND glt.dead = 0 AND t.hash = '$hash') > 0)";
