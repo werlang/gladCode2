@@ -13,7 +13,7 @@
     $error = "";
     $cancel_run = false;
     
-    $foldername = md5('folder'.microtime()*rand());
+    $foldername = md5('folder'.microtime(true)*rand());
     $path = "/home/gladcode";
 
     system("mkdir $path/temp/$foldername && cp $path/Payload/* $path/temp/$foldername");
@@ -473,7 +473,7 @@
 
     function save_log($conn, $log, $origin){
         $version = file_get_contents("version");
-        $hash = substr(md5('log'.microtime()*rand()), 0,16);
+        $hash = substr(md5('log'.microtime(true)*rand()), 0,16);
 
         $sql = "INSERT INTO logs (time, version, hash, origin) VALUES (now(), '$version', '$hash', '$origin')";
         $result = runQuery($sql);
