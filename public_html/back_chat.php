@@ -419,7 +419,7 @@
 
                     $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), '$description', $public)";
                     $result = runQuery($sql);
-                    $id = $conn->insert_id;
+                    $id = $conn->lastInsertId();
 
                     $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($id, '$user', now(3), now(3), 0)";
                     $result = runQuery($sql);

@@ -488,7 +488,7 @@
                         if (count($groups) < $ngroups){
                             $sql = "INSERT INTO training_groups () VALUES ()";
                             $result = runQuery($sql);
-                            array_push($groups, $conn->insert_id);
+                            array_push($groups, $conn->lastInsertId());
                         }
 
                         // cycle groups inserting it on every participant

@@ -326,7 +326,7 @@
                         $result = runQuery($sql);
 
                         $group = array(
-                            'id' => $conn->insert_id,
+                            'id' => $conn->lastInsertId(),
                             'nglads' => 1
                         );
                         array_push($groups, $group);

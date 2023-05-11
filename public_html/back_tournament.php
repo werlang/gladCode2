@@ -41,7 +41,6 @@
         if ($nrows == 0){
             $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
             $result = runQuery($sql);
-            echo $hash;
 
             send_node_message(array('tournament list' => array()));
         }
@@ -283,7 +282,8 @@
             
                         $sql = "INSERT INTO teams (name, tournament, password, modified) VALUES ('$name', $tourn, '$word', now())";
                         $result = runQuery($sql);
-                        $teamid = $conn->insert_id;
+                        // $teamid = $conn->lastInsertId();
+                        $teamid = $conn->lastInsertId();
             
                         $output = array();
                         $output['word'] = $word;
@@ -745,12 +745,13 @@
         $result = runQuery($sql);
         $nrows = $result->rowCount();
         $row = $result->fetch();
-        $tournid = $row['id'];
-        $maxtime = $row['maxtime'];
-
-        if ($nrows == 0)
+        
+        if ($nrows == 0){
             $output['status'] = "NOTFOUND";
+        }
         else{
+            $tournid = $row['id'];
+            $maxtime = $row['maxtime'];
             $sql = "SELECT id FROM teams WHERE tournament = '$tournid'";
             $result = runQuery($sql);
             $nteams = $result->rowCount();
@@ -788,7 +789,7 @@
                     for ($i=0 ; $i<$ngroups ; $i++){
                         $sql = "INSERT INTO groups(round, deadline) VALUES ('1', ADDTIME(now(), TIME('$maxtime')))";
                         $result = runQuery($sql);
-                        array_push($groups, $conn->insert_id);
+                        array_push($groups, $conn->lastInsertId());
                     }
 
                     foreach($teams as $i => $team){
@@ -837,7 +838,7 @@
         //create chat room
         $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), 'Sala de discussão do torneio $name', 0)";
         $result = runQuery($sql);
-        $room = $conn->insert_id;
+        $room = $conn->lastInsertId();
 
         //get who is in the tournament
         $sql = "SELECT DISTINCT g.master FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE te.tournament = $tourn";

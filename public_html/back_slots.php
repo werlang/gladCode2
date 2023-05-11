@@ -101,7 +101,7 @@
             $sql = "INSERT INTO slots (user, item, expire) VALUES ($user, $item, now() + INTERVAL $hours HOUR)";
             $result = runQuery($sql);
 
-            $output['id'] = $conn->insert_id;
+            $output['id'] = $conn->lastInsertId();
             $output['status'] = "SUCCESS";
         }
 

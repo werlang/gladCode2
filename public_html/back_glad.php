@@ -112,7 +112,7 @@
                         else{
                             $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
                             $result = runQuery($sql);
-                            echo "{\"ID\":". $conn->insert_id ."}";
+                            echo "{\"ID\":". $conn->lastInsertId() ."}";
 
                             send_node_message(array(
                                 'profile notification' => array('user' => array($user))

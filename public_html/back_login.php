@@ -131,7 +131,7 @@
                         $result = runQuery($sql);
                         $path = "/home/gladcode/user";
                         system("mkdir $path/$pasta");
-                        $id = $conn->insert_id;
+                        $id = $conn->lastInsertId();
 
                         //join gladcode room
                         $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES (1, '$id', now(3), now(3), 1)";
