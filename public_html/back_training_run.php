@@ -338,7 +338,7 @@
 
                 $fields = array();
 
-                // groups has nglads, which indicates how many glads in each group
+                // `groups` has nglads, which indicates how many glads in each group
                 foreach($groups as $group){
                     for($i=0 ; $i<$group['nglads'] ; $i++){
                         if (!isset($groups[$i]['glads'])){

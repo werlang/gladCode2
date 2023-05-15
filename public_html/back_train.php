@@ -467,7 +467,7 @@
                 if ($nplayers < $maxplayers)
                     $output['status'] = "FEWPLAYERS";
                 else{
-                    // calculate number of groups and place ids from participants in array
+                    // calculate number of `groups` and place ids from participants in array
                     $gtids = array(); 
                     while ($row = $result->fetch()){
                         if (!isset($ngroups)){
@@ -491,7 +491,7 @@
                             array_push($groups, $conn->lastInsertId());
                         }
 
-                        // cycle groups inserting it on every participant
+                        // cycle `groups` inserting it on every participant
                         $groupid = $groups[$i % $ngroups];
                         $sql = "UPDATE gladiator_training SET groupid = $groupid WHERE id = $id";
                         $result = runQuery($sql);
