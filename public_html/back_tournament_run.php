@@ -253,7 +253,7 @@
         }
 
         $output['groups'] = array();
-        //check the groups that remain to choose a glad for the current round
+        //check the `groups` that remain to choose a glad for the current round
         $remaining = "SELECT count(*) FROM group_teams gt2 INNER JOIN teams te ON te.id = gt2.team INNER JOIN tournament t ON t.id = te.tournament WHERE gt2.gladiator IS NULL AND t.hash = '$hash' AND gt2.groupid = grt.groupid";
         $sql = "SELECT grt.groupid AS id, count(*) AS total, ($remaining) AS rem FROM group_teams grt INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament WHERE t.hash = '$hash' GROUP BY grt.groupid";
         $result = runQuery($sql);
@@ -286,20 +286,18 @@
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
                 $row2 = $result2->fetch();
 
-                if ($row2['hash'] == null){
-                    // set to run. only the manager on the front may call it the runSim
-                    $output['groups'][$groupid]['status'] = "RUN";
-                    // if (!is_locked($row2['locked'])){
-                    //     $sql = "UPDATE groups SET locked = now() WHERE id = '$groupid' AND locked IS NULL";
-                    //     if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
+                if (!$row2 || $row2['hash'] == null){
+                    if (!$row2 || !is_locked($row2['locked'])){
+                        // $sql = "UPDATE `groups` SET locked = now() WHERE id = '$groupid' AND locked IS NULL";
+                        // if(!$result3 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-                    //     if (!isset($_SESSION['tourn-group']))
-                    //         $_SESSION['tourn-group'] = array();
-                    //     $_SESSION['tourn-group'][$groupid] = md5("tourn-group-$groupid-id");
-                    //     $output['groups'][$groupid]['status'] = "RUN";
-                    // }
-                    // else
-                    //     $output['groups'][$groupid]['status'] = "LOCK";
+                        if (!isset($_SESSION['tourn-group']))
+                            $_SESSION['tourn-group'] = array();
+                        $_SESSION['tourn-group'][$groupid] = md5("tourn-group-$groupid-id");
+                        $output['groups'][$groupid]['status'] = "RUN";
+                    }
+                    else
+                        $output['groups'][$groupid]['status'] = "LOCK";
                 }
                 else{
                     $output['groups'][$groupid]['status'] = "DONE";
@@ -361,7 +359,7 @@
                 if (!$log) {
                     $output["status"] = "RERUN";
                     
-                    $sql = "UPDATE groups SET log = NULL, locked = NULL WHERE log = $logid";
+                    $sql = "UPDATE `groups` SET log = NULL, locked = NULL WHERE log = $logid";
                     if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
                     send_node_message(['tournament refresh' => [ 'hash' => $hash ]]);
@@ -525,7 +523,7 @@
             while ($row = $result->fetch()){
                 $groupid = $row['id'];
 
-                $sql = "UPDATE groups SET deadline = now(3) WHERE id = $groupid";
+                $sql = "UPDATE `groups` SET deadline = now(3) WHERE id = $groupid";
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
                 send_node_message(array('tournament refresh' => array(
@@ -614,7 +612,7 @@
         );";
         $result = runQuery($sql);
 
-        $sql = "UPDATE groups SET log = NULL, locked = NULL WHERE id IN(
+        $sql = "UPDATE `groups` SET log = NULL, locked = NULL WHERE id IN(
             SELECT DISTINCT groupid FROM group_teams WHERE lasttime IS NULL AND gladiator IS NOT NULL AND groupid IN(
                 SELECT id FROM `groups` WHERE id IN(
                     SELECT groupid FROM group_teams WHERE team IN(

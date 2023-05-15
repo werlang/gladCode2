@@ -111,7 +111,7 @@
     }
 
     foreach ($glads as $glad){
-        if (ctype_digit($glad)){
+        if (ctype_digit($glad) || is_int($glad)){
             array_push($ids, $glad);
         }
         else{
@@ -367,7 +367,7 @@
                 $result = runQuery($sql);
                 $row = $result->fetch();
                 if ($row['log'] == null){
-                    $sql = "UPDATE groups SET log = '$logid' WHERE id = '$groupid'";
+                    $sql = "UPDATE `groups` SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
 
                     $sql = "SELECT hash FROM tournament WHERE id = (SELECT tournament FROM teams WHERE id = (SELECT team FROM group_teams WHERE groupid = $groupid LIMIT 1))";

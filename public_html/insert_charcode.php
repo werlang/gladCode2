@@ -83,11 +83,11 @@
         $result = runQuery($sql);
 
         if (isset($remake)){
-            $sql = "UPDATE groups SET log = NULL, locked = NULL WHERE id = $remake";
+            $sql = "UPDATE `groups` SET log = NULL, locked = NULL WHERE id = $remake";
             $result = runQuery($sql);
         }
         else if ($round > 0){
-            $sql = "UPDATE groups SET log = NULL, locked = NULL, deadline = ADDTIME(now(), TIME('$maxtime')) WHERE id IN ($groups) AND round = $round";
+            $sql = "UPDATE `groups` SET log = NULL, locked = NULL, deadline = ADDTIME(now(), TIME('$maxtime')) WHERE id IN ($groups) AND round = $round";
             $result = runQuery($sql);
         }
     }
