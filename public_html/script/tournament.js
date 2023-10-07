@@ -201,18 +201,18 @@ $(document).ready( function() {
             }
             else if (isManager){
                 $('#content-box #prepare').html("ENCERRAR RODADA").removeAttr('disabled');
-                $('#content-box #prepare').off().click( function(){
+                $('#content-box #prepare').off().click( function() {
                     $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
                     $.post("back_tournament_run.php", {
                         action: "END TURN",
                         hash: hash
-                    }).done( function(data){
+                    }).done(function (data) {
                         data = JSON.parse(data);
                         //console.log(data);
                     });
                 });
             }
-            else{
+            else {
                 $('#content-box #prepare').remove();
                 $('#button-container .arrow').addClass('nobutton');
             }
@@ -265,23 +265,9 @@ function refresh_round(){
         action: "REFRESH",
         hash: hash,
         round: round,
-    }).done( function(data){
-        // console.log(data);
+    }).done( async function(data){
         data = JSON.parse(data);
-
-        if (data.status == 'NEXT') {
-            $.post("back_tournament_run.php",{
-                action: "UPDATE",
-                hash: hash
-            }).done( function(data){
-                console.log(data);
-                data = JSON.parse(data);
-                if (data.status == "RERUN"){
-                    window.location.reload();
-                }
-            });
-
-        }
+        // console.log(data);
         
         $('#content-box #group-container .team').each( function(){
             if (!$(this).parents('.group').hasClass('hide-info')){
@@ -320,54 +306,48 @@ function refresh_round(){
                     window.open('play/'+ data.groups[i].hash);
                     $(this).parents('.group').removeClass('hide-info');
                 });
-            }
-            else if (data.groups[i].status == "LOCK" || data.groups[i].status == "RUN"){
-                groupobj.addClass('hide-info');
-                groupobj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
 
-                if ((groupobj).find('.team.myteam').length > 0)
-                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
-
-                if (data.groups[i].status == "RUN") {// && isManager){
-                    socket_ready().then( () => {
-                        socket.emit('tournament run request', {
-                            hash: hash,
-                            group: i
-                        }, function(data){
-                            // console.log(data);
-                            if (data.permission == 'granted'){
-                                runSimulation({
-                                    tournament: i,
-                                    origin: "tourn"
-                                }).then( function(data){
-                                    // console.log(data);
-                                    if (data != "ERROR"){
-                                        // $.post("back_tournament_run.php",{
-                                        //     action: "UPDATE",
-                                        //     hash: hash
-                                        // }).done( function(data){
-                                        //     // console.log(data);
-                                        //     data = JSON.parse(data);
-                                        //     if (data.status == "NEXT"){
-                                        //         // $.post("back_sendmail.php",{
-                                        //         //     action: "TOURNAMENT",
-                                        //         //     hash: hash
-                                        //         // }).done( function(data){
-                                        //         //     //console.log(data);
-                                        //         // });
-                                        //     }
-                                        //     else if (data.status == "RERUN"){
-                                        //         window.location.reload();
-                                        //     }
-                                        // });
-                                    }
-                                    else{
-                                        window.location.reload();
-                                    }
-                                });
-                            }
+                if (isManager) {
+                    $(this).find('.foot .button').html("<span>VISUALIZAR BATALHA</span><span class='reload' title='Executar batalha novamente'>🔄️</span>");
+                    $(this).find('.foot .button .reload').click( function(e){
+                        e.stopPropagation();
+                        groupobj.find('.foot .button').attr('disabled', true).html("Aguardando batalha...");
+                        $.post("back_tournament_run.php", {
+                            action: "REWIND",
+                            group: i,
+                        }).done(function (data) {
+                            console.log(data);
+                            runSimulation({
+                                tournament: i,
+                                origin: "tourn"
+                            }).then( function(data){
+                                // console.log(data);
+                                refresh_round();
+                            });
                         });
-                    });            
+                    });
+                }
+            }
+            else if (data.groups[i].status == "RUN"){
+                groupobj.addClass('hide-info');
+                groupobj.find('.foot .button').html("Grupo pronto. Aguardando batalha...");
+
+                if ((groupobj).find('.team.myteam').length > 0) {
+                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
+                }
+
+                if (isManager){
+                    groupobj.find('.foot .button').html("Executar Batalha").removeAttr('disabled').click( function(){
+                        groupobj.find('.foot .button').attr('disabled', true).html("Aguardando batalha...");
+                        runSimulation({
+                            tournament: i,
+                            origin: "tourn"
+                        }).then( function(data){
+                            console.log(data);
+                            refresh_round();
+                        });
+                    });
+
 
                 }
             }
@@ -378,9 +358,23 @@ function refresh_round(){
             }
         });
 
+        // console.log(data)
         if (data.status == "NEXT" || data.status == "END"){
+
+            $('#content-box #prepare').html("PRÓXIMA RODADA").removeAttr('disabled');
+            $('#content-box #prepare').off().click(function () {
+                $.post("back_tournament_run.php", {
+                    action: "UPDATE",
+                    hash: hash
+                }).done(function (data) {
+                    console.log(data);
+                    data = JSON.parse(data);
+                    window.location.href = 'tourn/'+ hash +'/0';
+                });
+            });
+
             $('#content-box #next-round').removeAttr('disabled');
-            $('#content-box #prepare').remove();
+            // $('#content-box #prepare').remove();
             $('#button-container .arrow').addClass('nobutton');
 
             $('#content-box #next-round').off().click( function(){
