@@ -24,7 +24,7 @@ const MySQLStore = require('express-mysql-session')(expsession);
 const cors = require('cors');
 const bodyParser = require('body-parser')
 
-//what groups are trying to run simulation
+//what `groups` are trying to run simulation
 var tournament_run = {};
 
 
