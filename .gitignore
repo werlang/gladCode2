@@ -6,3 +6,5 @@ node/package.json
 node/package-lock.json
 node/config.json
 config.json
+public_html/logs/*
+public_html/profpics/*
