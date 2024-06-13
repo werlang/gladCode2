@@ -22,11 +22,17 @@
     $codes = array();
     $skins = array();
 
-    $args = json_decode($_POST['args'], true);
+    // received from postman to force simulation run
+    // if (isset($_POST['json'])) {
+    //     $_POST['args'] = json_decode($_POST['json'], true);
+    // }
 
+    $args = json_decode($_POST['args'], true);
+    
     $glads = array();
-    if (isset($args['glads']))
+    if (isset($args['glads'])) {
         $glads = $args["glads"];
+    }
     if (isset($_SESSION['match'])){
         $glads = array_merge($glads, $_SESSION["match"]);
         unset($_SESSION['match']);
@@ -110,8 +116,9 @@
         }
     }
 
+    
     foreach ($glads as $glad){
-        if (ctype_digit($glad)){
+        if (ctype_digit($glad) || is_int($glad)){
             array_push($ids, $glad);
         }
         else{
@@ -207,6 +214,8 @@
         $ids = implode(",", $ids);
         $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
+
+
 
         while($row = $result->fetch_assoc()){
             $code = $row['code'];

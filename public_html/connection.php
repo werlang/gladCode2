@@ -1,8 +1,11 @@
 <?php
-    $servername = "localhost";
-    $username = "gladcode";
-    $password = "s0r3tmhr";
-    $database = "gladcode_";
+    $config = file_get_contents("config.json");
+    $config = json_decode($config, true);
+
+    $servername = $config['servername'];
+    $username = $config['username'];
+    $password = $config['password'];
+    $database = $config['database'];
 
     // Create connection
     $conn = new mysqli($servername, $username, $password, $database);
