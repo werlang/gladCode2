@@ -31,13 +31,7 @@ var tournament_run = {};
 //var exec = require('child_process');
 
 //mysql
-var mysql_options = {
-    host     : 'localhost',
-    port     : 3306,
-    user     : 'gladcode',
-    password : 's0r3tmhr',
-    database : 'gladcode_'
-};
+var mysql_options = require('./config.json').mysql;
 var connection = mysql.createConnection(mysql_options);
 var sessionStore = new MySQLStore({}, connection);
 connection.connect(function(err){
@@ -61,17 +55,7 @@ app.use(expsession({
 //cors
 app.use(cors({
     origin: [
-        'http://localhost',
-        'http://127.0.0.1:85',
-        'http://127.0.0.1',
-        'http://gladcode.tk',
-        'https://gladcode.tk',
-        'http://www.gladcode.tk',
-        'https://www.gladcode.tk',
-        'http://gladcode.dev',
-        'https://gladcode.dev',
-        'http://www.gladcode.dev',
-        'https://www.gladcode.dev'
+        'https://gladcode.localhost',
     ],
     credentials: true,
 
@@ -213,7 +197,7 @@ io.on('connection', function(socket){
         //set active time
         var sql = `UPDATE usuarios SET ativo = now() WHERE id = '${session.user}'`;
         connection.query(sql, function (error, results, fields){
-            if(error){ fn(error); return;}
+            if(error){ console.log(error); return;}
         });
         //console.log(`join: user-${session.user}`);
         socket.join(`user-${session.user}`);

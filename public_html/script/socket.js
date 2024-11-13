@@ -1,9 +1,10 @@
 var socket;
-var serverURL = `//${window.location.hostname}:3000`;
+var serverURL = `//api.${window.location.hostname}`;
 
 $(document).ready( function(){
     try{
         socket = io(serverURL, { secure: window.location.protocol == 'https:' });
+        // console.log(socket);
     }
     catch(e){
         console.log(e)

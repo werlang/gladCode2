@@ -5,3 +5,5 @@ cwp_stats
 node/package.json
 node/package-lock.json
 config.json
+nginx/*
+.env

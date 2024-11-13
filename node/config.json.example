@@ -1,0 +1,10 @@
+{
+    "protocol": "http",
+    "mysql": {
+        "host": "host",
+        "port": 3306,
+        "user": "user",
+        "password": "pass",
+        "database": "database"
+    }
+}

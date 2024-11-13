@@ -1,0 +1,49 @@
+services:
+    apache:
+        image: pswerlang/php-apache
+        restart: unless-stopped
+        volumes:
+            - ./public_html:/var/www/html
+    # supress warnings
+    # mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+    # service apache2 restart
+
+    node:
+        build: .
+        volumes:
+            - ./node:/app
+            - node_modules:/app/node_modules
+        restart: unless-stopped
+        working_dir: /app
+        command: npm run dev
+    mysql:
+        image: mysql:8.0
+        restart: unless-stopped
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - mysql:/var/lib/mysql
+            - .:/app
+        ports:
+            - 127.0.0.1:${MYSQL_PORT}:3306
+
+    # to fix this error: Client does not support authentication protocol requested by server; consider upgrading MySQL client
+    # ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'asdf1234';
+    # flush privileges;
+
+    nginx:
+        image: pswerlang/nginx-auto-ssl
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx:/etc/nginx/conf.d
+        environment:
+            - SITES=api.gladcode.localhost=node:3000;gladcode.localhost=apache
+            - ALLOWED_DOMAINS=gladcode.dev
+            - FORCE_HTTPS=true
+volumes:
+    node_modules:
+    mysql:
