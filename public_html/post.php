@@ -16,13 +16,13 @@
 
 	<title>gladCode - Publicação</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
     <link rel='stylesheet' href="css/header.css"/>
     <link rel='stylesheet' href="css/post.css"/>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
     <script src="script/googlelogin.js"></script>
     <script src="script/socket.js"></script>

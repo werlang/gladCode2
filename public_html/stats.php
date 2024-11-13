@@ -7,6 +7,8 @@
     <title>gladCode - Estatísticas</title>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+
     <link rel='stylesheet' href="css/side-menu.css"/>
     <link rel='stylesheet' href="css/table.css"/>
     <link rel='stylesheet' href="css/stats.css"/>
@@ -15,7 +17,6 @@
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://kit.fontawesome.com/c1a16f97ec.js" crossorigin="anonymous"></script>
 
     <script src="script/stats.js"></script>
     <script src="script/stats_func.js"></script>
