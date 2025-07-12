@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
     <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+    
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ext-language_tools.js"></script>
@@ -19,9 +20,9 @@
     <script src="script/code.js"></script>
     <script src="script/tabs.js"></script>
     <script src="script/keybinds.js"></script>
-    <script src="script/socket.js"></script>
+    
     <script src="script/file_manager.js"></script>
-    <script src="script/googlelogin.js"></script>
+    <script type="module" src="script/google-login.js"></script>
     
     </head>
 <body>

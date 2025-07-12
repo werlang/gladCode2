@@ -81,12 +81,11 @@ int initClient(){
 	int attempts = 100;
     while (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0)
     {
-		/*
+        usleep(100000); //wait 0.1 second before retrying
         puts("Error connecting to server socket. Attepting again...");
-		attempts--;
-		if (!attempts)
-			return 0;
-		*/
+		// attempts--;
+		// if (!attempts)
+		// 	return 0;
     }
 	//printf("Connected");
     return 1;

@@ -1,12 +1,12 @@
 $(document).ready( function(){
-    socket_ready().then( () => {
-        socket.on('training list', data =>{
-            trainList.refresh()
-        })
-        socket.on('training room', data =>{
-            roomList[data.id].refresh()
-        });
-    });
+    // socket_ready().then( () => {
+    //     socket.on('training list', data =>{
+    //         trainList.refresh()
+    //     })
+    //     socket.on('training room', data =>{
+    //         roomList[data.id].refresh()
+    //     });
+    // });
 
     waitLogged().then( () => {
         if (!user.premium){
@@ -386,9 +386,9 @@ var trainList = {
 
     refresh: async function(){
         if (!this.listening){
-            socket_ready().then( () => {
-                socket.emit('training list join', {})
-            })
+            // socket_ready().then( () => {
+            //     socket.emit('training list join', {})
+            // })
             this.listening = true
         }
 

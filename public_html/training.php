@@ -33,16 +33,17 @@
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
     <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+    
 
-    <script src="script/header.js"></script>
+    <script type="module" src="script/header.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/emoji.js"></script>
-    <script src="script/socket.js"></script>
+    
     <script src="script/chat.js"></script>
-    <script src="script/googlelogin.js"></script>
+    <script type="module" src="script/google-login.js"></script>
     <script src="script/training.js"></script>
 
     </head>

@@ -11,6 +11,7 @@ codigo inicial do servidor.
 #include<stdarg.h>
 #include<math.h>
 #include<sys/socket.h>
+#include <sys/time.h>
 #include<arpa/inet.h> //inet_addr
 #include<unistd.h>    //write
 #include<pthread.h> //for threading , link with lpthread
@@ -41,9 +42,10 @@ void *connection_handler(void *p){
 
     //Receive a message from client
     int endcomm = 0;
-    
+
     while(!endcomm){
         read_size = recv(sock , client_message , 2000 , 0);
+        
         if(read_size > 0){
             struct stringFunc *func = decodeFuncArg(client_message);
             
@@ -409,7 +411,7 @@ int main(int argc , char *argv[]){
     g = NULL;
     p = NULL;
     
-    outArq = fopen("usercode/simlog","w");
+    outArq = fopen("simlog","w");
     if (!outArq)
         printf("Error creating file");
             
@@ -456,11 +458,11 @@ int main(int argc , char *argv[]){
 
     for( i=0 ; i<nglad ; i++){
         char name[10];
-        sprintf(name,"usercode/code%i.py",i);
+        sprintf(name,"code%i.py",i);
 
         // is a C file
         if (fopen(name,"r") == NULL) {
-            sprintf(name,"usercode/code%i",i);
+            sprintf(name,"code%i",i);
             FILE *f = NULL;
 
             struct timeval wait_start, wait_now;
@@ -483,7 +485,7 @@ int main(int argc , char *argv[]){
         else{
             FILE *f = NULL;
             do {
-                f = fopen("usercode/errorc.txt", "r");
+                f = fopen("errorc.txt", "r");
             } while(f == NULL);
             char text[20] = "";
             fgets(text, 10, f);

@@ -338,7 +338,7 @@ void recordSteps(){
     char resp[6000*nglad];
 
     int i,j;
-    char buffer[1000], buffs[300];
+    char buffer[10000], buffs[300];
     float simtime;
     for (i=0 ; i<nglad ; i++){
         if ((g+i)->hp > 0){

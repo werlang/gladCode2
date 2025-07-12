@@ -28,6 +28,7 @@
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+    
 
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
@@ -37,7 +38,7 @@
     <script src="script/dropzone.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/playback.js"></script>
-    <script src="script/socket.js"></script>
+    
     
     </head>
     <!-- Google tag (gtag.js) -->

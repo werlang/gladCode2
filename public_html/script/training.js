@@ -56,31 +56,31 @@ $(document).ready(async function(){
     else
         window.location.href = ''
 
-    socket_ready().then( () => {
-        socket.emit('training run join', {
-            hash: hash
-        });
-        socket.on('training refresh', () => {
-            if (!training.refreshCalls)
-                training.refreshCalls = 0
+    // socket_ready().then( () => {
+    //     socket.emit('training run join', {
+    //         hash: hash
+    //     });
+    //     socket.on('training refresh', () => {
+    //         if (!training.refreshCalls)
+    //             training.refreshCalls = 0
             
-            if (training.refreshCalls == 0){
-                setTimeout(() => {
-                    training.refreshCalls = 0
-                    training.refresh()
-                }, 500)
-            }
-            training.refreshCalls++
-        });
-        socket.on('training end', () => {
-            window.location.href = `train/${training.hash}/0`
-        });
+    //         if (training.refreshCalls == 0){
+    //             setTimeout(() => {
+    //                 training.refreshCalls = 0
+    //                 training.refresh()
+    //             }, 500)
+    //         }
+    //         training.refreshCalls++
+    //     });
+    //     socket.on('training end', () => {
+    //         window.location.href = `train/${training.hash}/0`
+    //     });
 
-        init_chat($('#chat-panel'), {
-            full: false,
-            defaultOpen: 900
-        });
-    })
+    //     init_chat($('#chat-panel'), {
+    //         full: false,
+    //         defaultOpen: 900
+    //     });
+    // })
 
 })
 
@@ -492,7 +492,7 @@ training.refresh = async function(args){
                 training: gid,
                 origin: "train"
             })
-            await socket_ready()
+            // await socket_ready()
             socket.emit('tournament run request', {
                 hash: this.hash,
                 group: gid
@@ -533,7 +533,7 @@ training.refresh = async function(args){
             })
 
             if (data.newround){
-                await socket_ready()
+                // await socket_ready()
                 socket.emit('tournament run request', {
                     hash: this.hash,
                     group: 'newround'

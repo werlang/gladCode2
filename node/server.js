@@ -2,20 +2,13 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 
-let production = false;
-var config = JSON.parse(fs.readFileSync('config.json'));
-if (config.protocol == 'https') {
-    production = true;
-    if (config.credentials){
-        for (i in config.credentials)
-            config.credentials[i] = fs.readFileSync(config.credentials[i]);
-    }
-}
-const server = production ?
-    require(config.protocol).createServer(config.credentials, app) :
-    require(config.protocol).createServer(app);
+const server = require('http').createServer(app);
 
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*"
+    }
+});
 const mysql = require('mysql');
 const crypto = require('crypto');
 const request = require('request');
@@ -55,14 +48,13 @@ app.use(expsession({
 //cors
 app.use(cors({
     origin: [
-        'https://gladcode.localhost',
-    ],
-    credentials: true,
-
+        'http://localhost',
+    ]
 }));
 
 // parse application/json
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //login and session route
 var session;
@@ -303,8 +295,8 @@ io.on('connection', function(socket){
     
 });
 
-server.listen(3000, function(){
-    console.log('listening on *:3000');
+server.listen(80, '0.0.0.0', function(){
+    console.log('listening on *:80');
 });
 
 async function wait_session(){

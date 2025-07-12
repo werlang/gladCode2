@@ -22,13 +22,14 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
+    
 
     <script src="script/blocks.js"></script>
     <script src="script/manual.js"></script>
     <script src="script/side-menu.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
+    <script type="module" src="script/google-login.js"></script>
+    
+    <script type="module" src="script/header.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->

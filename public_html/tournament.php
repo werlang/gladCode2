@@ -42,6 +42,7 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
+    
 
     <script src="script/assets.js"></script>
     <script src="script/glad-card.js"></script>
@@ -50,9 +51,9 @@
     <script src="script/tournament.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/emoji.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
+    
+    <script type="module" src="script/google-login.js"></script>
+    <script type="module" src="script/header.js"></script>
     <script src="script/blocks.js"></script>
     
     </head>

@@ -14,12 +14,12 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
+    	
     <script src="script/about.js"></script>
     <script src="script/radio.js"></script>
     <script src="script/dialog.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
+    <script type="module" src="script/google-login.js"></script>
+    <script type="module" src="script/header.js"></script>
     
     </head>
 <body>

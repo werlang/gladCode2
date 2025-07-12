@@ -34,9 +34,9 @@
     <script src="script/blocks.js"></script>
     <script src="script/function.js"></script>
     <script src="script/side-menu.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
+    <script type="module" src="script/google-login.js"></script>
+    
+    <script type="module" src="script/header.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->

@@ -28,7 +28,7 @@ $(document).ready( function() {
     
     if ($('#loginhash').length){
         var tab = $('#loginhash').html();
-        $('#loginhash').remove();
+        // $('#loginhash').remove();
         
         var loginMessage = {
             'messages': "Faça login para visualizar sua mensagem",

@@ -1,17 +1,17 @@
 var teamsync = {id: 0, time: 0};
 
 $(document).ready( function(){
-    socket_ready().then( () => {
-        socket.on('tournament list', data =>{
-            refresh_tourn_list();
-        });
-        socket.on('tournament teams', data =>{
-            refresh_teams(data);
-        });
-        socket.on('tournament glads', data =>{
-            refresh_glads(data);
-        });
-    });
+    // socket_ready().then( () => {
+    //     socket.on('tournament list', data =>{
+    //         refresh_tourn_list();
+    //     });
+    //     socket.on('tournament teams', data =>{
+    //         refresh_teams(data);
+    //     });
+    //     socket.on('tournament glads', data =>{
+    //         refresh_glads(data);
+    //     });
+    // });
 
     $('#panel #tourn.wrapper #create').click( function() {
         var box = `<div id='fog'>

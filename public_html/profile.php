@@ -43,6 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
+    
     <script src="script/assets.js"></script>
     <script src="script/dropzone.js"></script>
     <script src="script/croppie.js"></script>
@@ -53,16 +54,16 @@
     <script src="script/profile-potions.js"></script>
     <script src="script/chat.js"></script>
     <script src="script/glad-card.js"></script>
-    <script src="script/profile.js"></script>
+    <script type="module" src="script/profile.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/radio.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/stats_func.js"></script>
     <script src="script/emoji.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/header.js"></script>
+    
+    <script type="module" src="script/google-login.js"></script>
+    <script type="module" src="script/header.js"></script>
     <script src="script/blocks.js"></script>
     
     </head>

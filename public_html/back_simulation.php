@@ -14,9 +14,9 @@
     $cancel_run = false;
     
     $foldername = md5('folder'.microtime(true)*rand());
-    $path = "/home/gladcode";
+    $path = "./runs";
 
-    system("mkdir $path/temp/$foldername && cp $path/Payload/* $path/temp/$foldername");
+    system("mkdir $path/$foldername && cp /app/payload/* $path/$foldername");
 
     $ids = array();
     $codes = array();
@@ -255,42 +255,56 @@
         $language = getLanguage($code);
         if ($language == "c"){
             $code = "#include \"gladCodeCore.c\"\n". $code;
-            file_put_contents("$path/temp/$foldername/code$i.c",$code);
+            file_put_contents("$path/$foldername/code$i.c",$code);
         }
         else if ($language == "python"){
             $code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
-            file_put_contents("$path/temp/$foldername/code$i.py",$code);
+            file_put_contents("$path/$foldername/code$i.py",$code);
         }
     }
 
     if ($cancel_run)
         $output['simulation'] = null;
-    elseif (!$invalid_attr){		
-        system("$path/script/call_socket.sh $foldername &>> $path/temp/$foldername/error.txt");
-        
-        if (file_exists("$path/temp/$foldername/outputc.txt"))
-            $outtext .= file_get_contents ("$path/temp/$foldername/outputc.txt");
-        if (file_exists("$path/temp/$foldername/outputs.txt"))
-            $outtext .= file_get_contents ("$path/temp/$foldername/outputs.txt");
-        if (file_exists("$path/temp/$foldername/error.txt"))
-            $error .= file_get_contents ("$path/temp/$foldername/error.txt");
-        if (file_exists("$path/temp/$foldername/errors.txt"))
-            $error .= file_get_contents ("$path/temp/$foldername/errors.txt");
-        if (file_exists("$path/temp/$foldername/errorc.txt"))
-            $error .= file_get_contents ("$path/temp/$foldername/errorc.txt");
+    elseif (!$invalid_attr) {
+        // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
 
-        $spechar = array("\n", "\r", "\t", "\"");
-        $repchar = array("\\n", "\\r", "\\t", '\\"');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        ]));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $response = json_decode($response, true);
+        // if (file_exists("$path/$foldername/outputc.txt"))
+        //     $outtext .= file_get_contents ("$path/$foldername/outputc.txt");
+        // if (file_exists("$path/$foldername/outputs.txt"))
+        //     $outtext .= file_get_contents ("$path/$foldername/outputs.txt");
+        // if (file_exists("$path/$foldername/error.txt"))
+        //     $error .= file_get_contents ("$path/$foldername/error.txt");
+        // if (file_exists("$path/$foldername/errors.txt"))
+        //     $error .= file_get_contents ("$path/$foldername/errors.txt");
+        // if (file_exists("$path/$foldername/errorc.txt"))
+        //     $error .= file_get_contents ("$path/$foldername/errorc.txt");
+
+        $simlog = $response['simlog'] ?? '';
+        $error = $response['error'] ?? '';
+
+        // $spechar = array("\n", "\r", "\t", "\"");
+        // $repchar = array("\\n", "\\r", "\\t", '\\"');
         
-        if ($error != ""){
-            $error = str_replace($spechar, $repchar, $error);
-        }
-        if ($outtext != ""){
-            $outtext = str_replace($spechar, $repchar, $outtext);
-        }
+        // if ($error != ""){
+        //     $error = str_replace($spechar, $repchar, $error);
+        // }
+        // if ($outtext != ""){
+        //     $outtext = str_replace($spechar, $repchar, $outtext);
+        // }
         
         //stream the file contents
-        if ($error == "" && file_exists("$path/temp/$foldername/simlog")){
+        if ($error == "" && $simlog != ""){
             if (isset($args['savecode']) && $args['savecode'] === true){
                 if (isset($args['breakpoints']) && $args['breakpoints'] !== false && isset($args['single'])){
                     $codes[count($codes)-1] = $oldcode;
@@ -317,30 +331,26 @@
                 //echo $_SESSION['code'];
             }
 
-            $file = "[". file_get_contents("$path/temp/$foldername/simlog") ."]";
+            $simulation = json_decode($simlog, true);
 
-            $simulation = json_decode($file);
-            foreach ($simulation[0]->{'glads'} as $gkey => $glad){
-                $nick = preg_replace('/#/', " ", $glad->{'user'});
-                $name = preg_replace('/#/', " ", $glad->{'name'});
+            foreach ($simulation[0]['glads'] as $gkey => $glad){
+                $nick = preg_replace('/#/', " ", $glad['user']);
+                $name = preg_replace('/#/', " ", $glad['name']);
                 foreach($skins as $key => $skin){
                     $key = explode("@", $key);
                     if ($name == $key[0] && $nick == $key[1]){
-                        $simulation[0]->{'glads'}[$gkey]->{'skin'} = $skin;
+                        $simulation[0]['glads'][$gkey]['skin'] = $skin;
                         //cannot uncomment this because C crashes
                         //$simulation[0]->{'glads'}[$gkey]->{'user'} = $user;
                         //$simulation[0]->{'glads'}[$gkey]->{'name'} = $name;
                     }
                 }
             }
-            //$output['test'] = json_encode($simulation);
 
-            $file = json_encode($simulation);
-            
-            $hash = save_log($conn, $file, $args['origin']);
+            $hash = save_log($conn, $simulation, $args['origin']);
 
             if (isset($args['ranked'])){
-                $deaths = death_times($conn, $ids, $file);
+                $deaths = death_times($conn, $ids, $simulation);
                 $rewards = battle_rewards($conn, $deaths, $user);
                 send_reports($rewards, $hash);
             }
@@ -411,7 +421,7 @@
 
     echo json_encode($output);
 
-    system("rm -rf $path/temp/$foldername");
+    system("rm -rf $path/$foldername");
     
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
@@ -479,7 +489,7 @@
         $result = runQuery($sql);
         
         $id = $conn->lastInsertId();
-        file_put_contents("logs/$id",$log);
+        file_put_contents("logs/$id",json_encode($log));
         return $hash;
     }
 
@@ -490,6 +500,8 @@
             array_push($ids,$glad['id']);
             array_push($times,$glad['time']);
         }
+
+        // var_dump($ids);
 
         $ids = implode(",", $ids);
         $sql = "SELECT g.cod, g.mmr, g.master, u.lvl, u.xp FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE cod IN ($ids) ORDER BY FIELD(cod,$ids)";
@@ -653,7 +665,6 @@
     }	
 
     function death_times($conn, $ids, $log){
-        $log = json_decode($log, true);
         $deaths = array();
 
         foreach($log[0]['glads'] as $glad){

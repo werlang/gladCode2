@@ -7,61 +7,61 @@ var uploadWidget = {};
 
 $(document).ready( function(){
     chat_started().then( () => {
-        socket_ready().then( function() {
-            socket_request('login', {}).then( function(res, err){
-                if (err) return console.log(err);
-                //console.log(res);
-                if (res.session === true){
-                    listRooms({rebuild: true}).then( () => {
-                        getChatNotification();
-                    });
-                }
-                else{
-                    if (!$('#chat-panel').hasClass('full'))
-                        $('#chat-panel').addClass('hidden');
-                    else if (!$('#dialog-box').length){
-                        showDialog("Faça login na gladCode para participar do chat",["LOGIN"]).then( function(data){
-                            googleLogin().then(function(data) {
-                                window.location.reload();
-                            });
-                        });
-                    }
-                    $('#chat-panel').click( () => {
-                        if (!$('#dialog-box').length){
-                            showDialog("Faça login na gladCode para participar do chat",["Cancelar","LOGIN"]).then( function(data){
-                                if (data == "LOGIN"){
-                                    googleLogin().then(function(data) {
-                                        window.location.reload();
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+        // socket_ready().then( function() {
+        //     socket_request('login', {}).then( function(res, err){
+        //         if (err) return console.log(err);
+        //         //console.log(res);
+        //         if (res.session === true){
+        //             listRooms({rebuild: true}).then( () => {
+        //                 getChatNotification();
+        //             });
+        //         }
+        //         else{
+        //             if (!$('#chat-panel').hasClass('full'))
+        //                 $('#chat-panel').addClass('hidden');
+        //             else if (!$('#dialog-box').length){
+        //                 showDialog("Faça login na gladCode para participar do chat",["LOGIN"]).then( function(data){
+        //                     googleLogin().then(function(data) {
+        //                         window.location.reload();
+        //                     });
+        //                 });
+        //             }
+        //             $('#chat-panel').click( () => {
+        //                 if (!$('#dialog-box').length){
+        //                     showDialog("Faça login na gladCode para participar do chat",["Cancelar","LOGIN"]).then( function(data){
+        //                         if (data == "LOGIN"){
+        //                             googleLogin().then(function(data) {
+        //                                 window.location.reload();
+        //                             });
+        //                         }
+        //                     });
+        //                 }
+        //             });
+        //         }
+        //     });
 
-            socket.on('chat notification', (data) => {
-                getChatNotification();
-                if ($('#chat-panel .room.open').data('id') == data.room){
-                    getChatMessages({room: data.room, sync: true});
-                }
-            });
-            socket.on('chat personal', data => {
-                let msg
-                if (data.status == "KICK"){
-                    msg = `Você foi removido da sala ${data.room_name}`;
-                    listRooms({remove: data.room_name});
-                }
-                else if (data.status == "BAN"){
-                    msg = `Você foi banido da sala ${data.room_name}`;
-                    listRooms({remove: data.name});
-                }
-                else if (data.status == "UNBAN"){
-                    msg = `Seu banimento da sala ${data.room_name} foi removido`
-                }
-                create_toast(msg, "info");
-            });
-        });
+        //     socket.on('chat notification', (data) => {
+        //         getChatNotification();
+        //         if ($('#chat-panel .room.open').data('id') == data.room){
+        //             getChatMessages({room: data.room, sync: true});
+        //         }
+        //     });
+        //     socket.on('chat personal', data => {
+        //         let msg
+        //         if (data.status == "KICK"){
+        //             msg = `Você foi removido da sala ${data.room_name}`;
+        //             listRooms({remove: data.room_name});
+        //         }
+        //         else if (data.status == "BAN"){
+        //             msg = `Você foi banido da sala ${data.room_name}`;
+        //             listRooms({remove: data.name});
+        //         }
+        //         else if (data.status == "UNBAN"){
+        //             msg = `Seu banimento da sala ${data.room_name} foi removido`
+        //         }
+        //         create_toast(msg, "info");
+        //     });
+        // });
 
         //prepare emojis
         emoji = new EmojiConvertor();

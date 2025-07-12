@@ -1,3 +1,5 @@
+import LocalData from "./local-data.js";
+
 $(document).ready( function(){
     $('#header-container').addClass('small-profile');
     $('#header-profile').addClass('here');
@@ -36,13 +38,13 @@ $(document).ready( function(){
 
         checkNotifications();
 
-        socket_ready().then( () => {
-            //console.log("socket ready");
-            socket.on('profile notification', data =>{
-                //console.log("server message");
-                checkNotifications();
-            });
-        });
+        // socket_ready().then( () => {
+        //     //console.log("socket ready");
+        //     socket.on('profile notification', data =>{
+        //         //console.log("server message");
+        //         checkNotifications();
+        //     });
+        // });
         
         $.post("back_glad.php", {
             action: "GET"
@@ -113,9 +115,11 @@ $(document).ready( function(){
         });
     });
 
-    $('#menu #profile').click( function() {
+    $('#menu #profile').click( async function() {
         $('#nickname .input').val(user.apelido);
 
+        await waitLogged();
+        user = window.user;
         for (var i in preferences){
             if (user.preferences[preferences[i]] == "1")
                 $('#email #pref-'+ preferences[i] +' input.checkslider').prop('checked', true);
@@ -139,8 +143,12 @@ $(document).ready( function(){
             preferences: JSON.stringify(user.preferences),
             language: $('#language select').val()
         })
-        .done( function(data){
+        .done( async function(data){
             //console.log(data);
+
+            const user = await post("back_login.php", { action: "GET" });
+            new LocalData({ id: 'user'}).set({ data: user });
+
             data = JSON.parse(data);
             if (data.status == "SUCCESS"){
                 showMessage("Informações atualizadas");
@@ -461,7 +469,7 @@ $(document).ready( function(){
         }).done( function(data){
             var glads = JSON.parse(data);
             glads.push(thisglad);
-            //console.log(glads);
+            // console.log(glads);
             var preBattleInt = preBattleShow(glads);
             
             new Simulation({
@@ -1428,11 +1436,12 @@ function getMessageTime(msgTime, args){
                 months[i] = months[i].toLowerCase().slice(0,3);
         }
 
-        t = new Date(msgTime);
+        let t = new Date(msgTime);
         var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
         return string;
     }
 }
+window.getMessageTime = getMessageTime;
 
 function validate_skin(selectedArray){
     for (var i in selectedArray){

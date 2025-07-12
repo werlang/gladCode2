@@ -9,9 +9,10 @@
     <link rel='stylesheet' href="css/header.css"/>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src="script/googlelogin.js"></script>
-    <script src="script/socket.js"></script>
-    <script src="script/header.js"></script>
+    
+    <script type="module" src="script/google-login.js"></script>
+    
+    <script type="module" src="script/header.js"></script>
     
     <style>
         body {
