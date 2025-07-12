@@ -7,6 +7,7 @@ node/package-lock.json
 config.json
 nginx/*
 .env
-logs/*
+public_html/logs/*
+public_html/profpics/*
 .DS_Store
 runs/*
