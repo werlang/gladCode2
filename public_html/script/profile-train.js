@@ -164,7 +164,7 @@ $(document).ready( function(){
                         user.credits = 0
                     }
                     else if (data.status == "SUCCESS"){
-                        sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
+                        // sendChatMessage({text: `/create ${name}_${data.hash} -pvt -d Sala de discussão do treino ${name}`})
 
                         $('#fog').remove()
                         let box = `
@@ -351,7 +351,7 @@ $(document).ready( function(){
                     if (!roomList[data.id])
                         roomList.create({id: data.id})
                     await roomList[data.id].show()
-                    sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
+                    // sendChatMessage({text: `/join ${roomList[data.id].name}_${hash}`})
                 }
                 else
                     create_toast("Erro ao ingressar, tente novamente", "error")
@@ -561,7 +561,7 @@ var roomList = {
                                     myself: true
                                 })
 
-                                sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
+                                // sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                             }
 
                         })
@@ -651,7 +651,7 @@ var roomList = {
                                     create_toast(`Campo alterado com sucesso`, "success")
                                     roomList[id][this.field] = this.text
                                     if (this.field == 'name'){
-                                        sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d Sala de discussão do treino ${this.text}`})
+                                        // sendChatMessage({text: `/edit -r ${oldname}_${roomList[id].hash} -n ${this.text}_${roomList[id].hash} -d Sala de discussão do treino ${this.text}`})
                                     }
                                 }
                             },
@@ -683,7 +683,7 @@ var roomList = {
                                 $('.train.window #link span').html(data.hash).removeClass('blur')
                                 $('.train.window #renew').remove()
                                 showQR($('.train.window #qr img').clone())
-                                sendChatMessage({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
+                                // sendChatMessage({text: `/edit -r ${this.name}_${this.hash} -n ${this.name}_${data.hash}`})
                                 this.hash = data.hash
                             }
                         }
@@ -766,7 +766,7 @@ var roomList = {
                                         $('#fog').remove()
                                         create_toast("Treino removido", "success")
 
-                                        sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
+                                        // sendChatMessage({text: `/leave ${this.name}_${this.hash}`})
                                     }
                                 }
                             })
@@ -851,7 +851,7 @@ var roomList = {
                                 if (data.status == "SUCCESS"){
                                     create_toast("Participante removido", "success")
                                     let name = kick.parent().find('.cell').eq(0).html()
-                                    sendChatMessage({text: `/kick ${name} -r ${this.name}_${this.hash}`})
+                                    // sendChatMessage({text: `/kick ${name} -r ${this.name}_${this.hash}`})
                                 }
                             })
                         }

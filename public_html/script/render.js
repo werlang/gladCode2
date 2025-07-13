@@ -300,7 +300,7 @@ function create() {
         }
         for (let i in v.sprite){
             groupnpc[v.layer-1].add(v.sprite[i]);
-            v.sprite[i].scale.setTo(game.camera.scale.x, game.camera.scale.y);
+            // v.sprite[i].scale.setTo(game.camera.scale.x, game.camera.scale.y);
             v.sprite[i].anchor.setTo(0.5, 0.5);
 
             if (i == 'hair' && v.hair.style != 'no_hair'){
@@ -404,7 +404,7 @@ function update() {
         }
     
     }
-    
+
     if (nglad > 0 && !loadglads) {
         loadglads = true;
         for (i=0 ; i<nglad ; i++){

@@ -768,31 +768,31 @@ $(document).ready( function() {
     //     full: false,
     //     expandWidth: "-65px"
     // });
-    chat_started().then( () => {
-        $('#chat-panel #show-hide').click( () => {
-            resizeInt = setInterval( () => {
-                change_size();
-            },10);
-            setTimeout( () => {
-                clearInterval(resizeInt);
-            },1000);
-        });
+    // chat_started().then( () => {
+    //     $('#chat-panel #show-hide').click( () => {
+    //         resizeInt = setInterval( () => {
+    //             change_size();
+    //         },10);
+    //         setTimeout( () => {
+    //             clearInterval(resizeInt);
+    //         },1000);
+    //     });
 
-        $(window).resize( () => {
-            setTimeout( () => {
-                change_size();
-            },1000);
-        });
+    //     $(window).resize( () => {
+    //         setTimeout( () => {
+    //             change_size();
+    //         },1000);
+    //     });
 
-        change_size();
-        function change_size(){
-            var w = $('#chat-panel').width();
-            $('#panel-right').width(w);
-            editor.resize();
-            $('#float-card').css({'margin-right': w});
-        }
+    //     change_size();
+    //     function change_size(){
+    //         var w = $('#chat-panel').width();
+    //         $('#panel-right').width(w);
+    //         editor.resize();
+    //         $('#float-card').css({'margin-right': w});
+    //     }
         
-    });
+    // });
     
     editor.on("guttermousedown", function(e) {
         var target = e.domEvent.target;
