@@ -333,6 +333,13 @@
 
             $simulation = json_decode($simlog, true);
 
+            if ($simulation === null || count($simulation) === 0) {
+                $output['simulation'] = null;
+                $output['error'] = "NO_OUTPUT";
+                echo json_encode($output);
+                exit;
+            }
+
             foreach ($simulation[0]['glads'] as $gkey => $glad){
                 $nick = preg_replace('/#/', " ", $glad['user']);
                 $name = preg_replace('/#/', " ", $glad['name']);
@@ -421,7 +428,7 @@
 
     echo json_encode($output);
 
-    system("rm -rf $path/$foldername");
+    // system("rm -rf $path/$foldername");
     
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';

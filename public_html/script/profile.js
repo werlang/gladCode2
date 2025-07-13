@@ -480,7 +480,7 @@ $(document).ready( function(){
                 // console.log(data);
                 if (data.error){
                     progbtn.kill()
-                    window.location.reload()
+                    // window.location.reload()
                 }
                 else{
                     let hash = data.simulation

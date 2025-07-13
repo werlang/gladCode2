@@ -5,5 +5,9 @@
         "user": "user",
         "password": "password",
         "database": "database"
+    },
+    "mailer": {
+        "user": "<AWS_ACCESS_KEY>",
+        "password": "<AWS_SECRET_KEY>"
     }
 }

@@ -22,6 +22,7 @@ class Simulation{
         return new Promise( (resolve, reject) => {
             this.call.then( data => {
                 console.log(data)
+                $('#fog').remove();
                 try {
                     data = JSON.parse(data)
                 } catch(e){
@@ -50,7 +51,11 @@ class Simulation{
     }
 
     showTerm(data){
-        if (data.error){
+        if (data.error == "NO_OUTPUT"){
+            showTerminal("ERRO NA SIMULAÇÃO","A simulação não produziu saída. Provavelmente um ou mais gladiadores causaram o problema. Tente novamente.");
+            console.log(data)
+        }
+        else if (data.error){
             let error = data.error.split("/usercode/").join("");
             for (let i in this.args.glads){
                 let glad = this.args.glads[i]
