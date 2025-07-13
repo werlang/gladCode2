@@ -1035,6 +1035,23 @@ var move = [
 ];
 var moveEnum = {'walk': 0, 'cast': 1, 'thrust': 2, 'slash': 3, 'shoot': 4};
 
+function decodeHTML(str) {
+    var escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;',
+        '\'': '&#39;'
+    };
+    for (var i in escapeMap){
+        var regexp = new RegExp(escapeMap[i],"g");
+        str = str.replace(regexp, i);
+    }
+    return str;
+}
+
 function load_glad_generator(element){
     
     element.load('glad-create.html', function(){

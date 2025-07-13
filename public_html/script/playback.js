@@ -719,14 +719,28 @@ function startBattle(simulation){
         }
 
         for (var i in simulation){
-            json.projectiles = {};
-            $.extend( true, json, simulation[i] ); //merge json objects
+            json.projectiles = [];
+            json = deepMerge(json, simulation[i]);
             steps.push(JSON.parse(JSON.stringify(json)));
             // console.log(simulation[i]);
         }
 
         start_timer(steps);
     }
+}
+
+function deepMerge(target, source) {
+    for (const key in source) {
+        if (source.hasOwnProperty(key)) {
+            if (typeof source[key] === 'object' && source[key] !== null) {
+                target[key] = target[key] ? target[key] : Array.isArray(source[key]) ? [] : {};
+                deepMerge(target[key], source[key]);
+            } else {
+                target[key] = source[key];
+            }
+        }
+    }
+    return target;
 }
 
 function copyToClipboard(text) {

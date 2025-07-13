@@ -140,23 +140,6 @@ async function post(path, args){
 }
 window.post = post;
 
-function decodeHTML(str) {
-    var escapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '`': '&#x60;',
-        '\'': '&#39;'
-    };
-    for (var i in escapeMap){
-        var regexp = new RegExp(escapeMap[i],"g");
-        str = str.replace(regexp, i);
-    }
-    return str;
-}
-
 var translator = {}
 
 translator.init = function(){

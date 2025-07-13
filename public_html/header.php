@@ -36,20 +36,20 @@
             <div class='item drop-menu' id='about'>
                 <div class='title'><span>{{about}}</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='about' title='{{header_tooltip_about}}'><span>{{header_about_project}}</span></a></div>
-                    <div class='item'><a href='about#support' title='{{header_tooltip_support}}'><span>{{header_about_support}}</span></a></div>
-                    <div class='item'><a href='creditos' title='{{header_tooltip_credits}}'><span>{{header_about_credits}}</span></a></div>
-                    <div class='item'><a href='stats' title='{{header_tooltip_stats}}'><span>{{header_about_stats}}</span></a></div>
+                    <div class='item'><a href='about' title='{{header_tooltip_about}}'><span>O Projeto</span></a></div>
+                    <!-- <div class='item'><a href='about#support' title='{{header_tooltip_support}}'><span>{{header_about_support}}</span></a></div> -->
+                    <div class='item'><a href='creditos' title='{{header_tooltip_credits}}'><span>Créditos</span></a></div>
+                    <div class='item'><a href='stats' title='{{header_tooltip_stats}}'><span>Estatísticas</span></a></div>
                 </div>
             </div>
-            <div class='item drop-menu'>
+            <!-- <div class='item drop-menu'>
                 <div class='title'><span>{{projects}}</span></div>
                 <div class='item-container'>
                     <div class='item'><a href='code' title='{{header_tooltip_compiler}}'><span>{{header_projects_compiler}}</span></a></div>
                     <div class='item'><a href='https://github.com/werlang/gladcode' title='{{header_tooltip_github_gladcode}}' target='_blank'>GLADCODE V1</a></div>
                     <div class='item'><a href='https://github.com/werlang/automin' title='{{header_tooltip_automin}}' target='_blank'>AUTOMIN</a></div>
                 </div>
-            </div>
+            </div> -->
             <!-- <div class='item drop-menu'>
                 <div id='language' class='title'>PORTUGUÊS</div>
                 <div class='item-container'>
