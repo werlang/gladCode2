@@ -310,3 +310,7 @@ body{
 	font-size: 0.9em;
     font-weight: normal;
 }
+
+#google-login {
+	margin-top: 25px;
+}

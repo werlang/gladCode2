@@ -63,7 +63,7 @@ $(document).ready( async function() {
     }
     
     $('.mobile #login, .desktop #login').click( function(){
-        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", []);
+        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
         GoogleLogin.renderButton($('#google-login')[0]);
     });	
 
@@ -96,15 +96,22 @@ $(document).ready( async function() {
         location.href = '/profile';
 
     });
-    
-    $('.mobile #profile, .desktop #login').removeClass('hidden');
 
-    // if ($('#footer').length){
-    //     $('#footer').load("footer.php", async () => {
-    //         // await waitLogged()
-    //         translator.translate($('#footer'))
-    //     });
-    // }
+    $('.mobile #profile, .mobile #login, .desktop #login, .desktop #profile').removeClass('hidden');
+    if (GoogleLogin.getCredential()) {
+        $('.mobile #login, .desktop #login').addClass('hidden');
+    }
+    else {
+        $('.mobile #profile, .desktop #profile').addClass('hidden');
+    }
+
+    if ($('#footer').length){
+        $('#footer').load("footer.php", async () => {
+            // await waitLogged()
+            // translator.translate($('#footer'))
+
+        });
+    }
 
     // await translator.init()
     // await translator.translate($('body'))

@@ -1,3 +1,4 @@
+import GoogleLogin from "./google-login.js";
 import LocalData from "./local-data.js";
 
 $(document).ready( function(){
@@ -923,9 +924,9 @@ $(document).ready( function(){
     }
 
     $('#menu #logout').click( function() {
-        googleLogout().then( function(){
-            window.location.href = 'index';
-        });
+        GoogleLogin.removeCredential();
+        new LocalData({ id: 'user' }).remove();
+        window.location.href = 'index';
     });
         
     $('#img-preview-container').hide();
