@@ -13,8 +13,8 @@
 	//amazon
 	$host = 'email-smtp.us-east-1.amazonaws.com';
 	$port = 587;
-	$senderuser = '';
-	$senderpassword = '';
+	$senderuser = json_decode(file_get_contents('config.json'), true)['mailer']['user'];
+	$senderpassword = json_decode(file_get_contents('config.json'), true)['mailer']['password'];
 	$action = $_POST['action'];
 
 	include_once "connection.php";
