@@ -9,5 +9,5 @@ nginx/*
 .env
 public_html/logs/*
 public_html/profpics/*
+public_html/runs/*
 .DS_Store
-runs/*

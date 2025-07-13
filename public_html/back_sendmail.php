@@ -6,15 +6,15 @@
 	//mailjet
 	$host = 'in-v3.mailjet.com';
 	$port = '80';
-	$senderuser = '3d3198fe000a26c2dfb9656b71063111';
-	$senderpassword = '2190e217582a90175cb145e0f97bc03a';
+	$senderuser = '';
+	$senderpassword = '';
 	*/
 
 	//amazon
 	$host = 'email-smtp.us-east-1.amazonaws.com';
 	$port = 587;
-	$senderuser = 'AKIA6Q3EGWTCMHB4QO4A';
-	$senderpassword = 'BCCp540coFMW2ObhTkmNSKa6HSM6249ak3MoN49XSXby';
+	$senderuser = '';
+	$senderpassword = '';
 	$action = $_POST['action'];
 
 	include_once "connection.php";
