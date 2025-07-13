@@ -54,7 +54,7 @@ canvas {
 	outline: none;
 	border: 0;
 	font-size: 1em;
-	font-family: consolas;
+	font-family: consolas, monospace;
 	font-weight: bold;
 	cursor: pointer;
 	z-index: 1;
@@ -311,7 +311,7 @@ canvas {
 	transition: 0.5s;
 	color: #616161;
     font-size: 1em;
-	font-family: consolas;
+	font-family: consolas, monospace;
 	background-color: transparent;
 }
 .input:focus {
@@ -477,22 +477,26 @@ canvas {
     height: 185px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
 }
 
 #info li {
     display: flex;
-    align-items: center;
     margin-bottom: 5px;
     background-color: #d7dee8;
     border-radius: 5px;
+	font-size: 0.9rem;
+}
+
+#info li .img-container {
+	background-color: #adcaf3;
+	display: flex;
+	align-items: center;
+	border-radius: 5px;
 }
 
 #info ul img {
     padding: 5px;
 	margin: 0;
-    background-color: #adcaf3;
-    border-radius: 5px;
 }
 
 #info ul span {

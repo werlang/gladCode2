@@ -260,7 +260,7 @@
 	border: none;
     background-color: transparent;
     font-size: 1.3em;
-    font-family: consolas;
+    font-family: consolas, monospace;
     font-weight: bold;
     border-radius: 3px;
     color: #00638d;

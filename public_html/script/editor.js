@@ -1100,7 +1100,7 @@ function load_glad_generator(element){
             $('#info #body .fill').html(text[index].description);
             $('#info ul').html("");
             $.each( text[index].list , function(i, item) {
-                $('#info ul').append("<li><img src='"+ item.path +"'><span>"+ item.description +"</span></li>");
+                $('#info ul').append(`<li><div class="img-container"><img src='${item.path}'></div><span>${item.description}</span></li>`);
             });
 
         });
