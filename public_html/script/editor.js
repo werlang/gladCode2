@@ -764,10 +764,10 @@ $(document).ready( function() {
 
     });
 
-    init_chat($('#chat-panel'), {
-        full: false,
-        expandWidth: "-65px"
-    });
+    // init_chat($('#chat-panel'), {
+    //     full: false,
+    //     expandWidth: "-65px"
+    // });
     chat_started().then( () => {
         $('#chat-panel #show-hide').click( () => {
             resizeInt = setInterval( () => {

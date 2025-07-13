@@ -30,7 +30,7 @@
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/tournament.css"/>
-    <link rel='stylesheet' href="css/chat.css"/>
+    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/header.css"/>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
@@ -49,7 +49,7 @@
     <script src="script/runSim.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/tournament.js"></script>
-    <script src="script/chat.js"></script>
+    <!-- <script src="script/chat.js"></script> -->
     <script src="script/emoji.js"></script>
     
     <script type="module" src="script/google-login.js"></script>

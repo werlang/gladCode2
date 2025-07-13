@@ -25,7 +25,7 @@
     <link rel='stylesheet' href="css/profile.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/chat.css"/>
+    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/croppie.css"/>
     <link rel='stylesheet' href="css/slider.css"/>
     <link rel='stylesheet' href="css/radio.css"/>
@@ -52,7 +52,7 @@
     <script src="script/profile-report.js"></script>
     <script src="script/profile-rank.js"></script>
     <script src="script/profile-potions.js"></script>
-    <script src="script/chat.js"></script>
+    <!-- <script src="script/chat.js"></script> -->
     <script src="script/glad-card.js"></script>
     <script type="module" src="script/profile.js"></script>
     <script src="script/dialog.js"></script>

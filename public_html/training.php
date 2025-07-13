@@ -28,7 +28,7 @@
     <link rel='stylesheet' href="css/tournament.css"/>
     <link rel='stylesheet' href="css/training.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
-    <link rel='stylesheet' href="css/chat.css"/>
+    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
 
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
@@ -42,7 +42,7 @@
     <script src="script/assets.js"></script>
     <script src="script/emoji.js"></script>
     
-    <script src="script/chat.js"></script>
+    <!-- <script src="script/chat.js"></script> -->
     <script type="module" src="script/google-login.js"></script>
     <script src="script/training.js"></script>
 

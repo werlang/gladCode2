@@ -13,7 +13,7 @@
     <link rel='stylesheet' href="css/slider.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/chat.css"/>
+    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/header.css"/>
     <link rel='stylesheet' href="css/editor.css"/>
     
@@ -53,7 +53,7 @@
     <script type="module" src="script/header.js"></script>
     
     <script src="script/emoji.js"></script>
-    <script src="script/chat.js"></script>
+    <!-- <script src="script/chat.js"></script> -->
     <script src="script/blocks.js"></script>
     
     </head>

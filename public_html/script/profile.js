@@ -979,9 +979,9 @@ $(document).ready( function(){
         },
     });
 
-    init_chat($('#chat-panel'), {
-        full: false
-    });
+    // init_chat($('#chat-panel'), {
+    //     full: false
+    // });
 });
 
 async function checkNotifications(){

@@ -254,10 +254,10 @@ $(document).ready( function() {
         
     });
 
-    init_chat($('#chat-panel'), {
-        full: false,
-        defaultOpen: 900
-    });
+    // init_chat($('#chat-panel'), {
+    //     full: false,
+    //     defaultOpen: 900
+    // });
 });
 
 function refresh_round(){
