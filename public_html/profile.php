@@ -103,15 +103,15 @@
                 <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
             </div>
             <div id='menu-buttons'>
-                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>{{news}}</span></div>
-                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>{{profile}}</span></div>
-                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>{{glads}}</span></div>
+                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
+                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
+                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
                 <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
-                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>{{battles}}</span></div>
-                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>{{reports}}</span></div>
+                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
+                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>{{messages}}</span></div>
-                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>{{friends}}</span></div>
+                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>MESSAGENS</span></div>
+                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
                 <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
             <div id='footer'></div>

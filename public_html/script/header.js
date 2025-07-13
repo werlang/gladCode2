@@ -99,15 +99,15 @@ $(document).ready( async function() {
     
     $('.mobile #profile, .desktop #login').removeClass('hidden');
 
-    if ($('#footer').length){
-        $('#footer').load("footer.php", async () => {
-            // await waitLogged()
-            translator.translate($('#footer'))
-        });
-    }
+    // if ($('#footer').length){
+    //     $('#footer').load("footer.php", async () => {
+    //         // await waitLogged()
+    //         translator.translate($('#footer'))
+    //     });
+    // }
 
-    await translator.init()
-    await translator.translate($('body'))
+    // await translator.init()
+    // await translator.translate($('body'))
 });
 
 async function waitLogged(){
@@ -142,47 +142,47 @@ window.post = post;
 
 var translator = {}
 
-translator.init = function(){
-    return $.getJSON(`script/translation.json`, data => {
-        this.info = data
-    })
-}
+// translator.init = function(){
+//     return $.getJSON(`script/translation.json`, data => {
+//         this.info = data
+//     })
+// }
 
-translator.translate = async function(element){
-    if (!this.info){
-        return false
-    }
-    else {
-        let info = this.info
-        let lang = user && user.speak ? user.speak : 'pt'
+// translator.translate = async function(element){
+//     if (!this.info){
+//         return false
+//     }
+//     else {
+//         let info = this.info
+//         let lang = user && user.speak ? user.speak : 'pt'
 
-        var fieldcheck = ['title', 'placeholder']
+//         var fieldcheck = ['title', 'placeholder']
 
-        // console.log(data)
-        element.find(`*`).contents().each(function(){
-            // replace contents
-            if (this.nodeType == 3){
-                let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
-                if (v.length && info[v]){
-                    this.textContent = this.textContent.replace(this.textContent, info[v][lang])
-                }
-            }
+//         // console.log(data)
+//         element.find(`*`).contents().each(function(){
+//             // replace contents
+//             if (this.nodeType == 3){
+//                 let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
+//                 if (v.length && info[v]){
+//                     this.textContent = this.textContent.replace(this.textContent, info[v][lang])
+//                 }
+//             }
 
-            let fields = []
-            for (let check of fieldcheck){
-                if (this[check] && this[check] != ""){
-                    fields.push(check)
-                }
-            }
+//             let fields = []
+//             for (let check of fieldcheck){
+//                 if (this[check] && this[check] != ""){
+//                     fields.push(check)
+//                 }
+//             }
     
-            for (let field of fields){
-                let replace = this[field].replace(/\{\{(\w+)\}\}/, "$1")
-                if (replace.length && info[replace]){
-                    this[field] = this[field].replace(this[field], info[replace][lang])
-                }
-            }
-        })
+//             for (let field of fields){
+//                 let replace = this[field].replace(/\{\{(\w+)\}\}/, "$1")
+//                 if (replace.length && info[replace]){
+//                     this[field] = this[field].replace(this[field], info[replace][lang])
+//                 }
+//             }
+//         })
 
-        return this
-    }
-}
+//         return this
+//     }
+// }

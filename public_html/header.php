@@ -19,22 +19,22 @@
             <div class='item drop-menu mobile'>
                 <div class='title'>LOGIN</div>
                 <div class='item-container'>
-                    <div class='item'><a id='login' title='{{header_tooltip_login}}' class='hidden'>{{header_enter}}</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>{{profile}}</span></a></div>
+                    <div class='item'><a id='login' title='{{header_tooltip_login}}' class='hidden'>LOGIN</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>PERFIL</span></a></div>
                 </div>
             </div>
-            <div class='item desktop' id='header-profile'><a id='login' title='{{header_tooltip_login}}' class='hidden'>LOGIN</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>{{profile}}</span></a></div>
-            <div class='item' id='learn'><a href='manual' title='{{header_tooltip_learn}}'><span>{{learn}}</span></a></div>
+            <div class='item desktop' id='header-profile'><a id='login' title='{{header_tooltip_login}}' class='hidden'>LOGIN</a><a id='profile' href='news' title='{{header_tooltip_profile}}' class='hidden'><span>PERFIL</span></a></div>
+            <div class='item' id='learn'><a href='manual' title='{{header_tooltip_learn}}'><span>APRENDER</span></a></div>
             <div class='item' id='header-editor'><a href='editor' title='{{header_tooltip_editor}}'>EDITOR</a></div>
             <div class='item drop-menu'>
-                <div class='title'><span>{{community}}</span></div>
+                <div class='title'><span>COMUNIDADE</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span>{{header_community_reddit}}</span></a></div>
-                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span>{{header_community_facebook}}</span></a></div>
-                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>{{header_community_whatsapp}}</span></a></div>
+                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span>REDDIT</span></a></div>
+                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span>FACEBOOK</span></a></div>
+                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>WHATSAPP</span></a></div>
                 </div>
             </div>
             <div class='item drop-menu' id='about'>
-                <div class='title'><span>{{about}}</span></div>
+                <div class='title'><span>SOBRE</span></div>
                 <div class='item-container'>
                     <div class='item'><a href='about' title='{{header_tooltip_about}}'><span>O Projeto</span></a></div>
                     <!-- <div class='item'><a href='about#support' title='{{header_tooltip_support}}'><span>{{header_about_support}}</span></a></div> -->
