@@ -48,7 +48,7 @@ int getINT(){
 
 
 void setName(char *name){
-    char m[100], *r, bla[100];
+    char m[100], response[10], bla[100];
     int i;
     //faz isso pra trocar todos espeços por #
     strcpy(bla,name);
@@ -57,7 +57,7 @@ void setName(char *name){
             bla[i] = '#';
     }
     sprintf(m, "setName %s", bla);
-    sendMessage(m, r);
+    sendMessage(m, response);
 }
 
 char* getName(){

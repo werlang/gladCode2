@@ -102,12 +102,10 @@
 
             $output = array();
 
-            $call = "curl https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=$token >> auth";
-            system($call);
+            $google_resp_json = file_get_contents("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=$token");
 
-            if (file_exists("auth")){
-                $google_resp = json_decode(file_get_contents("auth"), true);
-                system("rm -rf auth");
+            if ($google_resp_json !== false){
+                $google_resp = json_decode($google_resp_json, true);
 
                 if (isset($google_resp['sub'])){
                     $email = $google_resp['email'];

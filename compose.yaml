@@ -6,10 +6,12 @@ services:
         restart: unless-stopped
         volumes:
             - ./public_html:/var/www/html
-            - ./payload:/app/payload
+            - ./Payload:/app/payload
         ports:
             - 80:80
-
+        logging:
+            options:
+                max-size: "10m"
     runner:
         build:
             context: .
@@ -22,7 +24,7 @@ services:
             - ./public_html/runs:/phppayload
             - runs:/runs
         ports:
-            - 3000:3000
+            - 127.0.0.1:3000:3000
         command: npm run dev
         # command: tail -f /dev/null #idle container
 
@@ -37,19 +39,6 @@ services:
             - .:/app
         ports:
             - 127.0.0.1:${MYSQL_PORT}:3306
-
-    nginx:
-        image: pswerlang/nginx-auto-ssl
-        restart: unless-stopped
-        ports:
-            - "80:80"
-            - "443:443"
-        volumes:
-            - ./nginx:/etc/nginx/conf.d
-        environment:
-            - SITES=api.gladcode.localhost=node:3000;gladcode.localhost=apache
-            - ALLOWED_DOMAINS=gladcode.dev
-            - FORCE_HTTPS=true
 volumes:
     node_modules:
     mysql:
