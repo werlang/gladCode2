@@ -1,3 +1,5 @@
+php_value date.timezone America/Sao_Paulo
+
 RewriteEngine On
 
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]
