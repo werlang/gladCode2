@@ -1,1 +1,0 @@
-ls | grep -P "^[\d\w]{32}$" | xargs -d"\n" -- rm -rf
