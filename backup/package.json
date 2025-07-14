@@ -1,0 +1,14 @@
+{
+    "name": "gladcode2-backup",
+    "version": "1.0.0",
+    "description": "Backup service for Gladcode2",
+    "main": "app.js",
+    "type": "module",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "@google-cloud/storage": "^7.16.0",
+        "mysqldump": "^3.2.0"
+    }
+}

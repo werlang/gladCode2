@@ -1,6 +1,6 @@
 .vscode
 temp/*
-node/node_modules
+node_modules
 cwp_stats
 node/package.json
 node/package-lock.json
@@ -11,3 +11,4 @@ public_html/logs/*
 public_html/profpics/*
 public_html/runs/*
 .DS_Store
+backup/gcloud_config.json
