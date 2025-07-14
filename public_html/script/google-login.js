@@ -25,11 +25,14 @@ export default class GoogleLogin {
             return GoogleLogin;
         }
 
-        return new Promise(resolve => new DynamicScript('https://accounts.google.com/gsi/client', () => {
+        return new Promise(resolve => new DynamicScript('https://accounts.google.com/gsi/client', async () => {
             async function handleCredentialResponse(response) {
                 // console.log(response.credential);
                 GoogleLogin.logged = true;
                 GoogleLogin.saveCredential(response.credential);
+            }
+            while (typeof google === 'undefined') {
+                await new Promise(r => setTimeout(r, 100));
             }
             google.accounts.id.initialize({
                 client_id: '108043684563-ufdkp1teq749udehcfjjtuk277q5h0me.apps.googleusercontent.com',

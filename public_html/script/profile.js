@@ -926,6 +926,7 @@ $(document).ready( function(){
     $('#menu #logout').click( function() {
         GoogleLogin.removeCredential();
         new LocalData({ id: 'user' }).remove();
+        post("back_login.php", { action: "UNSET" });
         window.location.href = 'index';
     });
         

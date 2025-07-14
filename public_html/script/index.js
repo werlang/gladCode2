@@ -1,3 +1,5 @@
+import GoogleLogin from "./google-login.js";
+
 $(document).ready( function() {
     $('#header').addClass('big');
     $('#header-container').addClass('small');
@@ -40,12 +42,10 @@ $(document).ready( function() {
         if (!loginMessage[tab])
             msg = "Faça login para ir para o seu perfil"
 
-        showDialog(msg, ["Cancelar","LOGIN"]).then( function(data){
-            if (data == "LOGIN"){
-                googleLogin().then(function(data) {
-                    window.location.href = tab;
-                });
-            }
-        });
+
+        showDialog(`${msg}<div id='google-login' style='display: flex; justify-content: center'></div>`, ["Cancelar"])
+        GoogleLogin.init().then(() => {
+            GoogleLogin.renderButton($('#google-login')[0]);
+        })
     }
 });

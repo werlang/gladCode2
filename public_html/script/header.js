@@ -6,7 +6,9 @@ window.user = user;
 
 post("back_login.php", {
     action: "GET"
-}).then( data => user = data )
+}).then( data => {
+    user = data
+})
 
 $(document).ready( async function() {
     $('#menu-button').click( function() {
@@ -85,15 +87,15 @@ $(document).ready( async function() {
         const credentialData = {};
         credentialData.googleid = googleCredential;
 
-        await $.post( "back_login.php", {
+        const response = await $.post( "back_login.php", {
             action: "SET",
             token: googleCredential
-        } )
+        });
 
         const user = await post("back_login.php", { action: "GET" });
         console.log(user);
         new LocalData({ id: 'user'}).set({ data: user });
-        location.href = '/profile';
+        location.href = '/news';
 
     });
 
