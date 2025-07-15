@@ -3,6 +3,10 @@
         "setPosition",
         "setHp",
         "setAp",
-        "lvlUp"
+        "lvlUp",
+        "mudaPosicao",
+        "mudaPv",
+        "mudaPh",
+        "sobeNivel"
     ]
 }
