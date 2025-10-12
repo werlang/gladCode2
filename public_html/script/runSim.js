@@ -21,7 +21,7 @@ class Simulation{
         this.call = call
         return new Promise( (resolve, reject) => {
             this.call.then( data => {
-                console.log(data)
+                // console.log(data)
                 $('#fog').remove();
                 try {
                     data = JSON.parse(data)

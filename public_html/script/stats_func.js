@@ -1,4 +1,19 @@
 function save_stats(hash){
+
+    function deepMerge(target, source) {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (typeof source[key] === 'object' && source[key] !== null) {
+                    target[key] = target[key] ? target[key] : Array.isArray(source[key]) ? [] : {};
+                    deepMerge(target[key], source[key]);
+                } else {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    }
+
     var json;
     $.post("back_log.php",{
         action: "GET",
@@ -7,8 +22,7 @@ function save_stats(hash){
         // console.log(data);
         json = JSON.parse(data);
 
-        var steps = [];
-        $.extend(steps, JSON.parse(json.log)); //hard copy json to steps
+        const steps = [...JSON.parse(json.log)];
         // console.log(steps)
         
         var abilities = {
@@ -31,7 +45,7 @@ function save_stats(hash){
         var tempjson = {};
         for (let i in steps){
             tempjson.projectiles = {};
-            $.extend( true, tempjson, steps[i] ); //merge json objects
+            deepMerge(tempjson, steps[i]);
             steps[i] = JSON.parse(JSON.stringify(tempjson));
         }
     
@@ -107,7 +121,7 @@ function save_stats(hash){
 
         //average lvl from those alive
         var avglvl = 0;
-        var winnerlvl = gladwon.map( e => { return laststep.glads[e].lvl }).reduce( (acc,curr) => { return acc + curr}) / gladwon.length
+        var winnerlvl = gladwon.map(e => laststep.glads[e].lvl).reduce((a,c) => a+c, 0) / gladwon.length;
         for (let i in alive){
             avglvl += laststep.glads[alive[i]].lvl;
         }
