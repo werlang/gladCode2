@@ -617,6 +617,10 @@ function start_timer(steps){
                 }
             }
             if (show_final_score && !$('#end-message').length){
+                if (new URLSearchParams(location.search).get('loop') === 'true') {
+                    location.reload();
+                }
+
                 if (!id){
                     name = "Empate";
                     team = "";
