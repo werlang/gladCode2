@@ -218,12 +218,12 @@ $(document).ready( function(){
                 else{
                     refresh_teams({name: tname, pass: tpass});
 
-                    if (socket){
-                        socket.emit('tournament join', {
-                            tname: tname,
-                            tpass: tpass
-                        });
-                    }
+                    // if (socket){
+                    //     socket.emit('tournament join', {
+                    //         tname: tname,
+                    //         tpass: tpass
+                    //     });
+                    // }
 
                     $('.tourn.window').html("<div id='title'><h2>Torneio<span>"+ data.name +"</span></h2><div id='word'>Senha<span>"+ data.pass +"</span></div></div><p>"+ data.description +"</p><h3>Equipes inscritas <span id='count'></span></h3><div class='table'></div><div id='new-container'><button id='new' class='button'>Nova Equipe</button></div><div id='button-container'><button id='delete' class='button' hidden>REMOVER</button><button id='start' class='button' disabled>INICIAR TORNEIO</button><button id='close' class='button'>FECHAR</button></div>");
 
@@ -233,12 +233,12 @@ $(document).ready( function(){
                     $('.tourn.window #close').click( function(){
                         $('#fog').remove();
                         
-                        if (socket){
-                            socket.emit('tournament leave', {
-                                tname: tname,
-                                tpass: tpass
-                            });
-                        }
+                        // if (socket){
+                        //     socket.emit('tournament leave', {
+                        //         tname: tname,
+                        //         tpass: tpass
+                        //     });
+                        // }
                     });
 
                     $('.tourn.window #new').click( function(){
@@ -596,21 +596,21 @@ function rebind_team_rows(teamid){
         $('#fog .tourn.window').hide();
         $('body').append(box);
 
-        if (socket){
-            socket.emit('team join', {
-                team: teamid
-            });
-        }
+        // if (socket){
+        //     socket.emit('team join', {
+        //         team: teamid
+        //     });
+        // }
 
         $('.tourn.window #back').click( function(){
             $('#fog.team').remove();
             $('#fog .tourn.window').fadeIn();
 
-            if (socket){
-                socket.emit('team leave', {
-                    team: teamid
-                });
-            }
+            // if (socket){
+            //     socket.emit('team leave', {
+            //         team: teamid
+            //     });
+            // }
         });
 
         $('.tourn.window #join-leave').click( function(){
@@ -689,11 +689,11 @@ function rebind_team_rows(teamid){
 
 function refresh_glads(args){
     if (args.remove){
-        if (socket){
-            socket.emit('team leave', {
-                team: args.team
-            });
-        }
+        // if (socket){
+        //     socket.emit('team leave', {
+        //         team: args.team
+        //     });
+        // }
 
         if ($('#fog.team, #fog.glads').length)
             showMessage("A equipe foi removida");

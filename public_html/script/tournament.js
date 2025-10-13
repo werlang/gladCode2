@@ -5,14 +5,14 @@ $(document).ready( function() {
     round = $('#round').html();
     $('#hash, #round').remove();
 
-    socket_ready().then( () => {
-        socket.emit('tournament run join', {
-            hash: hash
-        });
-        socket.on('tournament refresh', data =>{
-            refresh_round();
-        });
-    });
+    // socket_ready().then( () => {
+    //     socket.emit('tournament run join', {
+    //         hash: hash
+    //     });
+    //     socket.on('tournament refresh', data =>{
+    //         refresh_round();
+    //     });
+    // });
 
     $.post("back_tournament_run.php", {
         action: "GET",
