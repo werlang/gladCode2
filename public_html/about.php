@@ -211,7 +211,7 @@
                 <a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
             </div>
         </div>
-        <div id='about-footer'>Copyright © 2018-2020 Pablo Werlang</div>
+        <div id='about-footer'>Copyright © 2018-<?php echo date('Y') ?> Pablo Werlang</div>
             <div id='long' hidden>
                 Ainda durante a faculdade um professor apresentou para a turma um programa traria a inspiração para a gladCode anos mais tarde. Este programa possuía uma linguagem própria, e nele, nós alunos deveríamos programar a inteligência de um robô virtual, que deveria batalhar contra os robôs dos outros alunos em um mini torneio realizado após a entrega do trabalho da disciplina.
                 Os anos se passaram. Hoje sou professor do <a href='ifsul.edu.br'>Instituto Federal Sul-Riograndense (IFSul)</a> - Campus Charqueadas e ministro principalmente disciplinas de lógica de programação e linguagem de programação C.
