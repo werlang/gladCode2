@@ -1091,9 +1091,9 @@ int assassinate(int gladid, float x, float y){
                 bonus++;
 
             if (bonus == 2)
-                damage = (g+gladid)->rdmg * 4;
+                damage = (g+gladid)->rdmg * 4.5;
             else if (bonus == 1)
-                damage = (g+gladid)->rdmg * 2;
+                damage = (g+gladid)->rdmg * 2.25;
             else
                 damage = (g+gladid)->rdmg;
             /*
