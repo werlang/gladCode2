@@ -1184,8 +1184,14 @@ function afterBattleShow(hash, oldStatus){
             end: data.silver,
             onStep: data => {
                 $('#fog #after-battle #silver-total').html(data.toFixed(0))
+                document.querySelector('#menu #currencies #silver span').innerHTML = data.toFixed(0);
             }
         }).run()
+
+        const ld = new LocalData({ id: 'user'});
+        const user = ld.get();
+        user.silver = data.silver;
+        ld.set({ data: user });
 
         let mmrdiff = parseInt(data.glad.mmr) - parseInt(oldStatus.mmr)
         if (mmrdiff > 0){
