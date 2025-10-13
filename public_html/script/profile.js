@@ -1189,7 +1189,7 @@ function afterBattleShow(hash, oldStatus){
         }).run()
 
         const ld = new LocalData({ id: 'user'});
-        const user = ld.get();
+        user = ld.get();
         user.silver = data.silver;
         ld.set({ data: user });
 
