@@ -1,0 +1,5 @@
+# Ignore all token files
+*.json
+
+# But track this gitignore
+!.gitignore

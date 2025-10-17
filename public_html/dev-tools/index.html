@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Dev Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .tournament-list {
+            margin-top: 20px;
+        }
+        
+        .tournament-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .tournament-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .tournament-card .info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .tournament-card .info-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .tournament-card .info-item strong {
+            margin-right: 5px;
+        }
+        
+        .tournament-card .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge.started {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge.not-started {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Tournament Dev Tools</h1>
+            <p>Bootstrap and manage test tournaments for development</p>
+        </div>
+
+        <div class="section">
+            <h2>📝 Create Test Tournament</h2>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="name">Tournament Name</label>
+                    <input type="text" id="name" name="name" value="Test Tournament">
+                    <small>Unique name for your test tournament</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teams">Number of Teams</label>
+                    <input type="number" id="teams" name="teams" value="8" min="2" max="50">
+                    <small>Between 2 and 50 teams (each team has 3 gladiators)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maxtime">Max Time per Round</label>
+                    <input type="text" id="maxtime" name="maxtime" value="00:10:00" pattern="\d{2}:\d{2}:\d{2}">
+                    <small>Format: HH:MM:SS (e.g., 00:10:00 for 10 minutes)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="manager">Manager Email</label>
+                    <input type="email" id="manager" name="manager" value="manager@example.com">
+                    <small>Email of the tournament manager</small>
+                </div>
+                
+                <button type="submit" class="btn">🚀 Create Tournament</button>
+            </form>
+            
+            <div class="loading" id="createLoading">
+                <div class="spinner"></div>
+                <p>Creating tournament...</p>
+            </div>
+            
+            <div class="result" id="createResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Test Tournaments</h2>
+            <button class="btn btn-secondary" onclick="loadTournaments()">🔄 Refresh List</button>
+            
+            <div class="loading" id="listLoading">
+                <div class="spinner"></div>
+                <p>Loading tournaments...</p>
+            </div>
+            
+            <div class="tournament-list" id="tournamentList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Create tournament
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData);
+            
+            const resultDiv = document.getElementById('createResult');
+            const loadingDiv = document.getElementById('createLoading');
+            
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch(`bootstrap_tournament.php?${params}`);
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                
+                if (data.status === 'SUCCESS') {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ ${data.message}</h3>
+                        <p><strong>Tournament:</strong> ${data.tournament_name}</p>
+                        <p><strong>Teams:</strong> ${data.total_teams}</p>
+                        <p><strong>Gladiators:</strong> ${data.total_gladiators}</p>
+                        <p><strong>Manager:</strong> ${data.manager}</p>
+                        <p><strong>Cleanup Token:</strong> <code>${data.cleanup_token}</code></p>
+                        <p><strong>Instructions:</strong></p>
+                        <ul>
+                            ${data.instructions.map(i => `<li>${i}</li>`).join('')}
+                        </ul>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    
+                    // Refresh tournament list
+                    setTimeout(() => loadTournaments(), 1000);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p>${data.message}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        });
+
+        // Load tournaments
+        async function loadTournaments() {
+            const listDiv = document.getElementById('tournamentList');
+            const loadingDiv = document.getElementById('listLoading');
+            
+            listDiv.innerHTML = '';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('list_tournaments.php');
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                
+                if (data.status === 'SUCCESS') {
+                    if (data.tournaments.length === 0) {
+                        listDiv.innerHTML = '<p>No test tournaments found. Create one above!</p>';
+                    } else {
+                        listDiv.innerHTML = data.tournaments.map(t => `
+                            <div class="tournament-card">
+                                <h3>${t.name} <span class="badge ${t.started ? 'started' : 'not-started'}">${t.started ? 'Started' : 'Not Started'}</span></h3>
+                                <div class="info">
+                                    <div class="info-item"><strong>ID:</strong> ${t.id}</div>
+                                    <div class="info-item"><strong>Manager:</strong> ${t.manager}</div>
+                                    <div class="info-item"><strong>Teams:</strong> ${t.teams}/${t.max_teams}</div>
+                                    <div class="info-item"><strong>Gladiators:</strong> ${t.gladiators}</div>
+                                    <div class="info-item"><strong>Created:</strong> ${t.created_at}</div>
+                                </div>
+                                ${t.cleanup_token ? `
+                                <div class="actions">
+                                    ${t.started && t.hash ? `
+                                        <button class="btn btn-secondary" onclick="showResetDialog('${t.cleanup_token}', '${t.name}', '${t.hash}')">� Reset Round</button>
+                                        <a href="../tourn/${t.hash}/0" target="_blank" class="btn btn-secondary">👁️ View Tournament</a>
+                                    ` : ''}
+                                    <button class="btn btn-danger" onclick="cleanupTournament('${t.cleanup_token}', '${t.name}')">🗑️ Cleanup</button>
+                                </div>
+                                ` : `
+                                <p style="color: #dc3545; font-size: 14px;">⚠️ No cleanup token found. Tournament may need manual cleanup.</p>
+                                `}
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    listDiv.innerHTML = `<p style="color: #dc3545;">${data.message}</p>`;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                listDiv.innerHTML = `<p style="color: #dc3545;">Error loading tournaments: ${error.message}</p>`;
+            }
+        }
+
+        // Cleanup tournament
+        async function cleanupTournament(token, name) {
+            if (!confirm(`Are you sure you want to delete "${name}" and all its data?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`cleanup_tournament.php?token=${token}`);
+                const data = await response.json();
+                
+                if (data.status === 'SUCCESS') {
+                    alert(`✅ ${data.message}\n\n${data.summary.join('\n')}`);
+                    loadTournaments();
+                } else {
+                    alert(`❌ Error: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Show reset round dialog
+        async function showResetDialog(token, name, hash) {
+            // First, get current tournament info to know max round
+            try {
+                const response = await fetch(`list_tournaments.php`);
+                const data = await response.json();
+                
+                const tournament = data.tournaments.find(t => t.cleanup_token === token);
+                
+                if (!tournament || !tournament.started) {
+                    alert('Tournament has not been started yet.');
+                    return;
+                }
+
+                // Create dialog
+                const dialog = document.createElement('div');
+                dialog.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                `;
+                
+                dialog.innerHTML = `
+                    <div style="background: white; border-radius: 10px; padding: 30px; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <h2 style="margin-bottom: 20px; color: #667eea;">🔄 Reset Tournament Round</h2>
+                        <p style="margin-bottom: 20px;">Reset tournament <strong>${name}</strong> to a specific round.</p>
+                        <p style="margin-bottom: 20px; color: #dc3545; font-size: 14px;">
+                            ⚠️ This will delete all rounds after the selected round and reset that round to its initial state.
+                        </p>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Reset to Round:</label>
+                            <input type="number" id="resetRound" min="1" value="1" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                            <small style="display: block; margin-top: 5px; color: #666;">Enter the round number to reset to (round 1 = tournament start)</small>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button onclick="this.closest('div[style*=fixed]').remove()" style="padding: 10px 20px; border: 2px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Cancel</button>
+                            <button onclick="resetTournament('${token}', '${name}', document.getElementById('resetRound').value)" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Reset</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(dialog);
+                
+                // Close on background click
+                dialog.addEventListener('click', (e) => {
+                    if (e.target === dialog) {
+                        dialog.remove();
+                    }
+                });
+                
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Reset tournament to specific round
+        async function resetTournament(token, name, round) {
+            round = parseInt(round);
+            
+            if (!round || round < 1) {
+                alert('Please enter a valid round number (1 or greater)');
+                return;
+            }
+            
+            if (!confirm(`Reset "${name}" to round ${round}?\n\nThis will:\n- Delete all rounds after round ${round}\n- Reset round ${round} to initial state\n- Revive gladiators that died in/after round ${round}\n- Delete all battle logs\n\nThis cannot be undone!`)) {
+                return;
+            }
+            
+            // Close dialog
+            document.querySelector('div[style*="fixed"]')?.remove();
+            
+            try {
+                const response = await fetch(`reset_tournament.php?token=${token}&round=${round}`);
+                const data = await response.json();
+                
+                if (data.status === 'SUCCESS') {
+                    alert(`✅ ${data.message}\n\n${data.summary.join('\n')}\n\nYou can now continue from round ${round}.`);
+                    loadTournaments();
+                    
+                    // Offer to open the tournament
+                    if (confirm('Would you like to view the tournament now?')) {
+                        window.open(data.round_url, '_blank');
+                    }
+                } else {
+                    alert(`❌ Error: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Load tournaments on page load
+        loadTournaments();
+    </script>
+</body>
+</html>
