@@ -303,7 +303,7 @@ function refresh_round(){
 
             if (data.groups[i].status == "DONE"){
                 $(this).find('.foot .button').removeAttr('disabled').html("VISUALIZAR BATALHA");
-                $(this).find('.foot .button').click( function(){
+                $(this).find('.foot .button').off('click').click( function(){
                     window.open('play/'+ data.groups[i].hash);
                     $(this).parents('.group').removeClass('hide-info');
                 });
@@ -315,7 +315,8 @@ function refresh_round(){
                         groupobj.find('.foot .button').attr('disabled', true).html("Aguardando batalha...");
                         runSimulation({
                             tournament: i,
-                            origin: "tourn"
+                            origin: "tourn",
+                            force: true,
                         }).then( function(data){
                             // console.log(data);
                             refresh_round();
@@ -354,7 +355,7 @@ function refresh_round(){
         });
 
         // all groups done and I'm the manager and there is no next round yet
-        if (Object.values(data.groups).filter(group => group.status == "DONE").length == data.groups.length && isManager && data.status == "SUCCESS"){
+        if (Object.values(data.groups).filter(group => group.status == "DONE").length == Object.keys(data.groups).length && isManager && data.status == "SUCCESS"){
             $('#content-box #prepare').removeAttr('disabled').html("Preparar próxima rodada").click(function () {
                 $.post("back_tournament_run.php", {
                     action: "UPDATE",

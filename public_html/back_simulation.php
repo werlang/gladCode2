@@ -64,7 +64,7 @@
             $sql = "SELECT log FROM `groups` WHERE id = $groupid";
             $result = runQuery($sql);
             $row = $result->fetch();
-            if ($row['log'] == null){
+            if ($row['log'] == null || $args['force'] === true){
                 $sql = "SELECT grt.gladiator FROM group_teams grt WHERE grt.groupid = '$groupid'";
                 $result = runQuery($sql);
     
@@ -383,7 +383,7 @@
                 $sql = "SELECT log FROM `groups` WHERE id = $groupid";
                 $result = runQuery($sql);
                 $row = $result->fetch();
-                if ($row['log'] == null){
+                if ($row['log'] == null || $args['force'] === true){
                     $sql = "UPDATE `groups` SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
 

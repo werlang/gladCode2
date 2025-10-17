@@ -22,7 +22,10 @@
         $row = $result->fetch();
         $maxround = $row['maxround'];
 
-        if ($round == '0'){
+        if (!$maxround){
+            $output['status'] = "NOTFOUND";
+        }
+        else if ($round == '0'){
             //find those teams not dead
             $gladsalive = "SELECT count(*) FROM gladiator_teams glt INNER JOIN teams te2 ON glt.team = te2.id INNER JOIN group_teams grt ON te2.id = grt.team INNER JOIN tournament t ON t.id = te2.tournament INNER JOIN `groups` gr ON gr.id = grt.groupid WHERE t.hash = '$hash' AND glt.dead = '0' AND te2.id = te.id AND gr.round = $maxround AND glt.gladiator IS NOT NULL";
             $sql = "SELECT te.id FROM teams te WHERE ($gladsalive) > 0";
@@ -321,7 +324,10 @@
             $row = $result->fetch();
             $maxround = $row['maxround'];
 
-            if ($nteams > 1 || $round < $maxround){
+            if ($nteams > 1 && $round == $maxround){
+                $output['status'] = "SUCCESS";
+            }
+            else if ($nteams > 1 || $round < $maxround){
                 $output['status'] = "NEXT";
             }
             else{
