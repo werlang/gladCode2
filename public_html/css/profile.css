@@ -10,6 +10,7 @@ body {
   box-sizing: border-box;
 }
 #right-panel {
+  display: none;
   width: 0;
   flex-grow: 1;
   background-color: #f7f7f7;
@@ -41,7 +42,6 @@ body {
   #panel {
     flex-grow: 100;
     flex-basis: 0;
-    max-width: 740px;
   }
   #frame #menu {
     width: auto;
@@ -49,6 +49,8 @@ body {
 }
 #panel .content {
   display: none;
+  max-width: 740px;
+  margin: auto;
 }
 #panel .content.open {
   display: flex;

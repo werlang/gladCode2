@@ -75,9 +75,9 @@
     <div id='frame'>
         <div id='content-wrapper'>
             <div id='content-box'></div>
-            <div id='footer'></div>
         </div>
         <div id='chat-panel' class='tournament'></div>
+        <div id='footer'></div>
     </div>
 </body>
 </html>
