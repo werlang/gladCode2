@@ -23,6 +23,35 @@ Services:
 - MySQL: localhost:3306
 - Node WebSocket: auto-started with runner
 
+### Database Management
+
+Use the dump/restore script for database backups:
+
+```bash
+cd public_html/dev-tools
+./dump_restore.sh dump    # Creates dump_gladcode.sql
+./dump_restore.sh restore # Restores from dump_gladcode.sql
+```
+
+Script automatically reads credentials from `../../.env` file.
+
+### Tournament Testing (Dev Tools)
+
+Complete testing suite at `public_html/dev-tools/` for tournament development:
+
+```bash
+# Web interface (recommended)
+open http://localhost/dev-tools/index.html
+
+# CLI tools
+./tournament.sh list          # List test tournaments
+./tournament.sh create        # Create test tournament
+./tournament.sh reset <id>    # Reset specific tournament
+./tournament.sh cleanup <id>  # Delete tournament
+```
+
+Dev tools support both test and production tournaments with pagination for large datasets.
+
 ### How Battles Work (Critical Flow)
 
 1. User writes C or Python code in editor (`editor.php`) using visual blocks (Blockly) or text (ACE editor)
@@ -80,8 +109,28 @@ Payload supports both: `code0.c` compiled with gcc, `code0.py` run with python3 
 
 - `public_html/config.json` (from `.example`) - MySQL credentials, mailer settings
 - `node/config.json` - Same MySQL config for Node WebSocket server
-- Both MUST match for session sharing to work
 - `.env` file for docker-compose MySQL environment variables
+- Both config.json files MUST match for session sharing to work
+- Dev tools automatically read from `.env` for database operations
+
+### Security & Compilation
+
+User code compilation blocks dangerous functions listed in `banned_functions.json`:
+
+```json
+{
+    "functions": [
+        "setPosition", "setHp", "setAp", "lvlUp",
+        "mudaPosicao", "mudaPv", "mudaPh", "sobeNivel"
+    ]
+}
+```
+
+Compilation process (`payload/socket_compile.sh`):
+- Detects C vs Python by file extension and `#include` directives
+- C code: `gcc -o code{i} code{i}.c -lm` (links math library)
+- Python code: `python3 code{i}.py`
+- Server compilation: `gcc -o gladCodeServerMain gladCodeServerMain.c -lm -lpthread`
 
 ### Frontend JavaScript Modules
 
@@ -98,6 +147,20 @@ User code runs in `gladcode2-vm` container (built from `pswerlang/gladcode2-vm` 
 - Container auto-killed on timeout via `docker kill ${dirname}`
 
 ## Testing & Debugging
+
+### Dev Tools Ecosystem
+
+Complete tournament development suite at `public_html/dev-tools/`:
+
+- **Web Interface** (`index.html`) - GUI for tournament management
+- **CLI Tools** (`tournament.sh`) - Command-line tournament operations
+- **Database Tools** (`dump_restore.sh`) - Backup/restore database
+- **API Endpoints** - `list_real_tournaments.php`, `reset_tournament.php` for production tournaments
+
+**Real tournament reset workflow:**
+1. List production tournaments: `./tournament.sh list-real [page] [limit]`
+2. Reset specific tournament: `./tournament.sh reset-real <id>`
+3. Verify with pagination support for large datasets (61+ tournaments)
 
 ### Local Simulation Testing
 
@@ -149,11 +212,40 @@ io.to(`user-${userId}`).emit('profile notification', true);
 
 Common rooms: `user-{id}`, `chat-room-{id}`, `tournament-{id}`, `training-{id}`
 
+### Error Response Format
+
+PHP backends return structured JSON errors:
+
+```php
+$error = array(
+    'status' => "SQLERROR",
+    'message' => $e->getMessage(),
+    'sql' => $sql  // Only in development
+);
+die(json_encode($error));
+```
+
+### Session Management
+
+Sessions shared between PHP and Node.js via MySQL store. Always check `$_SESSION['user']` in PHP backends:
+
+```php
+$user = null;
+if (isset($_SESSION['user']))
+    $user = $_SESSION['user'];
+else
+    die(json_encode(['status' => 'AUTH_REQUIRED']));
+```
+
 ## Key Files Reference
 
 - `payload/gladCodeAPI.c` - User-facing C API functions (attack, move, cast spells)
 - `payload/gladCodeGlobals.c` - Shared state between server threads (gladiator structs, arena size)
+- `payload/socket_compile.sh` - Compiles user code and launches simulation server
 - `public_html/back_simulation.php` - Main orchestrator for battle execution (759 lines)
 - `runner/runner.js` - Docker container manager for code execution
+- `runner/app.js` - Express server handling simulation requests
 - `public_html/script/render.js` - Phaser.js battle visualization engine
 - `node/server.js` - WebSocket server for live notifications (318 lines)
+- `public_html/dev-tools/` - Complete tournament testing suite (index.html, tournament.sh, dump_restore.sh)
+- `public_html/banned_functions.json` - Security: blocked functions during compilation
