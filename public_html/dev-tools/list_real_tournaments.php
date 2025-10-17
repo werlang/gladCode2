@@ -6,8 +6,8 @@
  * Useful for finding tournaments to reset via dev-tools
  */
 
-chdir(__DIR__ . '/..');
-include_once "connection.php";
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
 
 header('Content-Type: application/json');
 

@@ -5,9 +5,8 @@
  * Removes a test tournament and all its artifacts using the cleanup token
  */
 
-// Change to parent directory for includes
-chdir(__DIR__ . '/..');
-include_once "connection.php";
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
 
 $token = $_GET['token'] ?? $_SERVER['argv'][1] ?? null;
 

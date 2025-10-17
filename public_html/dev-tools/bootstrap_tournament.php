@@ -6,9 +6,8 @@
  * Returns a cleanup token for later removal
  */
 
-// Change to parent directory for includes
-chdir(__DIR__ . '/..');
-include_once "connection.php";
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
 
 // Configuration
 $config = [

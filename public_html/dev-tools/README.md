@@ -2,13 +2,33 @@
 
 > **Purpose**: Tools for creating, managing, and testing tournaments during development without affecting production data.
 
-## 📁 What's Here
+## � Security First!
+
+**IMPORTANT:** Dev-tools are now protected by admin authentication. Before using any tools:
+
+1. **Configure admin access** (first time only):
+   ```bash
+   ./setup_admin.sh
+   ```
+   
+2. **Login to gladCode** with your admin email before accessing dev-tools
+
+3. **Only admins can access** - all endpoints check authentication automatically
+
+See [Security](#-security) section below for details.
+
+## �📁 What's Here
 
 ```
 dev-tools/
 ├── index.html                    # Web UI - START HERE
+├── setup_admin.sh               # Configure admin access (run this first!)
 ├── dump_restore.sh              # Database backup/restore
 ├── tournament.sh                # CLI tool for all operations
+│
+├── Security:
+│   ├── auth.php                   # Admin authentication (edit to add admins)
+│   └── .htaccess                  # Apache security rules
 │
 ├── API Endpoints (used by UI/CLI):
 │   ├── bootstrap_tournament.php   # Create test tournament
@@ -148,10 +168,30 @@ Creates `dump_gladcode.sql` in current directory.
 ## ⚠️ Important Notes
 
 ### Security
-- All tools require Docker environment running
-- No authentication checks (dev environment only!)
-- **Never expose `/dev-tools/` in production**
-- `.htaccess` blocks token directory from web access
+- 🔒 **Admin-only access**: All endpoints require admin authentication
+- 🔑 **Setup required**: Run `./setup_admin.sh` to configure your admin email
+- 👤 **Must be logged in**: Session authentication checks your email against admin list
+- 🚫 **Multiple layers**: `.htaccess` + PHP authentication + session validation
+- 📁 **Protected files**: `auth.php`, `dump_*.sql`, and `.env` blocked by `.htaccess`
+- 🌐 **Production safety**: Even if exposed, only admins can use tools
+- 🔐 **Add more admins**: Edit `auth.php` line 21 to add admin emails
+
+**How it works:**
+1. Every PHP file includes `auth.php` at the top
+2. `auth.php` checks if user is logged in via `$_SESSION['user']`
+3. Queries database to get user's email
+4. Compares email against hardcoded admin list
+5. Returns 403 Forbidden if not admin
+
+**To add more admins:**
+```php
+// Edit auth.php line 21
+$ADMIN_EMAILS = [
+    'admin@gladcode.com',
+    'your-email@example.com',
+    'another-admin@example.com',  // Add more here
+];
+```
 
 ### Performance
 - Test tournaments use real database tables

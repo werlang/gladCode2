@@ -8,9 +8,8 @@
  * Supports both test tournaments (via token) and real tournaments (via hash or ID)
  */
 
-// Change to parent directory for includes
-chdir(__DIR__ . '/..');
-include_once "connection.php";
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
 
 $token = $_GET['token'] ?? $_POST['token'] ?? null;
 $hash = $_GET['hash'] ?? $_POST['hash'] ?? null;

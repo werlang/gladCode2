@@ -6,9 +6,8 @@
  * USE WITH CAUTION!
  */
 
-// Change to parent directory for includes
-chdir(__DIR__ . '/..');
-include_once "connection.php";
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
 
 $confirm = $_GET['confirm'] ?? $_POST['confirm'] ?? null;
 

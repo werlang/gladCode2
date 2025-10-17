@@ -1,2 +1,15 @@
+# Dev Tools - Admin Only Access
 DirectoryIndex index.html
-Options +Indexes
+Options -Indexes
+
+# Deny access to sensitive files
+<FilesMatch "^(auth\.php|dump_.*\.sql|\.env)$">
+    Require all denied
+</FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
