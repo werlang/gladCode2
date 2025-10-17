@@ -4,6 +4,8 @@
  * 
  * Resets a tournament to a specific round by deleting all rounds after it
  * and resetting the state of the target round
+ * 
+ * Supports both test tournaments (via token) and real tournaments (via hash or ID)
  */
 
 // Change to parent directory for includes
@@ -11,12 +13,15 @@ chdir(__DIR__ . '/..');
 include_once "connection.php";
 
 $token = $_GET['token'] ?? $_POST['token'] ?? null;
+$hash = $_GET['hash'] ?? $_POST['hash'] ?? null;
+$tournid = $_GET['tournid'] ?? $_POST['tournid'] ?? null;
 $target_round = $_GET['round'] ?? $_POST['round'] ?? null;
 
-if (!$token) {
+// Must provide either token, hash, or tournament ID
+if (!$token && !$hash && !$tournid) {
     die(json_encode([
         'status' => 'ERROR',
-        'message' => 'No token provided. Usage: reset_tournament.php?token=<token>&round=<round_number>'
+        'message' => 'No tournament identifier provided. Usage: reset_tournament.php?token=<token>&round=<round_number> OR reset_tournament.php?hash=<hash>&round=<round_number> OR reset_tournament.php?tournid=<id>&round=<round_number>'
     ]));
 }
 
@@ -28,19 +33,37 @@ if (!$target_round || !is_numeric($target_round) || $target_round < 1) {
 }
 
 $output = [];
+$is_test_tournament = false;
 
 try {
-    // Load token data
-    $token_file = __DIR__ . "/tokens/{$token}.json";
-    
-    if (!file_exists($token_file)) {
-        throw new Exception("Invalid or expired token: {$token}");
+    // Get tournament ID based on provided identifier
+    if ($token) {
+        // Token-based (test tournaments)
+        $token_file = __DIR__ . "/tokens/{$token}.json";
+        
+        if (!file_exists($token_file)) {
+            throw new Exception("Invalid or expired token: {$token}");
+        }
+
+        $token_data = json_decode(file_get_contents($token_file), true);
+        $tournid = $token_data['tournament_id'];
+        $is_test_tournament = true;
+    } elseif ($hash) {
+        // Hash-based (real tournaments)
+        $sql = "SELECT id FROM tournament WHERE hash = :hash";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['hash' => $hash]);
+        $result = $stmt->fetch();
+        
+        if (!$result) {
+            throw new Exception("Tournament not found with hash: {$hash}");
+        }
+        
+        $tournid = $result['id'];
     }
+    // else $tournid is already set from GET/POST parameter
 
-    $token_data = json_decode(file_get_contents($token_file), true);
-    $tournid = $token_data['tournament_id'];
-
-    // Verify tournament exists and has dev-test marker
+    // Verify tournament exists
     $sql = "SELECT id, name, description, hash FROM tournament WHERE id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->execute(['id' => $tournid]);
@@ -50,8 +73,9 @@ try {
         throw new Exception("Tournament not found (ID: {$tournid})");
     }
 
-    if (strpos($tournament['description'], '[DEV-TEST]') === false) {
-        throw new Exception("Tournament is not marked as dev-test. Refusing to reset for safety.");
+    // Check if it's a test tournament
+    if (strpos($tournament['description'], '[DEV-TEST]') !== false) {
+        $is_test_tournament = true;
     }
 
     if (empty($tournament['hash'])) {
@@ -193,6 +217,7 @@ try {
 
     $output['status'] = 'SUCCESS';
     $output['message'] = "Tournament '{$tournament['name']}' reset to round {$target_round}!";
+    $output['tournament_type'] = $is_test_tournament ? 'test' : 'production';
     $output['stats'] = $stats;
     $output['summary'] = [
         "Removed {$stats['rounds_removed']} round(s) after round {$target_round}",

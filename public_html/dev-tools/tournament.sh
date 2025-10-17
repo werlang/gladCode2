@@ -26,17 +26,31 @@ case "$1" in
     
     reset)
         if [ -z "$2" ] || [ -z "$3" ]; then
-            echo "Error: Token and round number required"
-            echo "Usage: $0 reset <token> <round>"
+            echo "Error: Identifier and round number required"
+            echo "Usage: $0 reset <token|hash> <round>"
             exit 1
         fi
-        echo "Resetting tournament with token $2 to round $3..."
-        curl -s "http://localhost/dev-tools/reset_tournament.php?token=$2&round=$3" | jq
+        
+        # Check if $2 looks like a hash (longer) or token (16 chars)
+        if [ ${#2} -gt 16 ]; then
+            echo "Resetting tournament with hash $2 to round $3..."
+            curl -s "http://localhost/dev-tools/reset_tournament.php?hash=$2&round=$3" | jq
+        else
+            echo "Resetting tournament with token $2 to round $3..."
+            curl -s "http://localhost/dev-tools/reset_tournament.php?token=$2&round=$3" | jq
+        fi
         ;;
     
     list)
         echo "Listing all test tournaments..."
         curl -s "http://localhost/dev-tools/list_tournaments.php" | jq
+        ;;
+    
+    list-real)
+        page="${2:-1}"
+        limit="${3:-10}"
+        echo "Listing production tournaments (page $page, limit $limit)..."
+        curl -s "http://localhost/dev-tools/list_real_tournaments.php?page=$page&limit=$limit" | jq
         ;;
     
     cleanup-all)
@@ -78,13 +92,22 @@ Commands:
         Example:
             $0 cleanup a1b2c3d4e5f6g7h8
     
-    reset <token> <round>
+    reset <token|hash> <round>
         Reset tournament to a specific round
-        Example:
-            $0 reset a1b2c3d4e5f6g7h8 3
+        Works with both test tournaments (token) and real tournaments (hash)
+        Examples:
+            $0 reset a1b2c3d4e5f6g7h8 3    (test tournament by token)
+            $0 reset abc123def456 2          (real tournament by hash)
     
     list
         List all test tournaments
+    
+    list-real [page] [limit]
+        List all production (real) tournaments with pagination
+        Examples:
+            $0 list-real           (page 1, 10 per page)
+            $0 list-real 2         (page 2, 10 per page)
+            $0 list-real 1 20      (page 1, 20 per page)
     
     cleanup-all
         Delete ALL test tournaments (requires confirmation)
