@@ -20,10 +20,18 @@
     );
 
 
-    function runQuery($sql){
+    function runQuery($sql, $data = null){
         global $conn;
         try {
-            if(!$result = $conn->query($sql)){
+            if ($data){
+                $stmt = $conn->prepare($sql);
+                $stmt->execute($data);
+                $result = $stmt;
+            }
+            else{
+                $result = $conn->query($sql);
+            }
+            if(!$result){
                 $error = array(
                     'status' => "SQLERROR",
                     'message' => $conn->error,
