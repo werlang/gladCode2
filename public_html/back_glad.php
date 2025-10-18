@@ -120,8 +120,20 @@
                         }
                     }
                     elseif ($_POST['action'] == "UPDATE"){
-                        $sql = "UPDATE gladiators SET skin = '$skin', name = '$name', vstr = '$vstr', vagi = '$vagi', vint = '$vint', code = '$code', blocks = '$blocks', version = '$version' WHERE cod = '$id' AND master = '$user'";
-                        $result = runQuery($sql);
+                        $sql = "UPDATE gladiators SET skin = :skin, name = :name, vstr = :vstr, vagi = :vagi, vint = :vint, code = :code, blocks = :blocks, version = :version WHERE cod = :id AND master = :master";
+                        $data = [
+                            'skin' => $skin,
+                            'name' => $name,
+                            'vstr' => $vstr,
+                            'vagi' => $vagi,
+                            'vint' => $vint,
+                            'code' => $code,
+                            'blocks' => $blocks,
+                            'version' => $version,
+                            'id' => $id,
+                            'master' => $user
+                        ];
+                        $result = runQuery($sql, $data);
                         echo "{\"ID\":". $id ."}";
                     }
                 }
