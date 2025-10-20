@@ -1,4 +1,21 @@
 services:
+    web-server:
+        build:
+            context: .
+            dockerfile: web-server/Dockerfile
+        restart: unless-stopped
+        volumes:
+            - ./web:/app/web:ro
+            - ./web-server:/app/server
+        ports:
+            - "8080:3000"
+        environment:
+            - NODE_ENV=development
+            - API_BASE_URL=http://apache:80
+        depends_on:
+            - apache
+        command: npm run dev
+
     apache:
         build:
             context: .

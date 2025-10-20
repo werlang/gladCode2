@@ -13,3 +13,7 @@ public_html/runs/*
 .DS_Store
 backup/gcloud_config.json
 *.sql
+
+# Web server
+web-server/node_modules
+web-server/package-lock.json
