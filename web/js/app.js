@@ -11,8 +11,8 @@ import APIService from './services/APIService.js';
 import AuthService from './services/AuthService.js';
 import WebSocketService from './services/WebSocketService.js';
 
-// Import pages (will be created later)
-// import HomePage from './pages/HomePage.js';
+// Import pages
+import HomePage from './pages/HomePage.js';
 // import EditorPage from './pages/EditorPage.js';
 // import ProfilePage from './pages/ProfilePage.js';
 
@@ -81,9 +81,7 @@ class App {
      * Set up application routes
      */
     setupRoutes() {
-        // For now, create a simple placeholder page
-        // These will be replaced with actual page classes later
-        
+        // Create a simple placeholder page for routes not yet implemented
         class PlaceholderPage {
             constructor(options = {}) {
                 this.title = options.title || 'gladCode';
@@ -101,10 +99,10 @@ class App {
                 
                 if (containerEl) {
                     containerEl.innerHTML = `
-                        <div class="placeholder-page">
+                        <div class="placeholder-page" style="padding: var(--space-3xl); text-align: center;">
                             ${this.content}
-                            <p>Esta página está em desenvolvimento.</p>
-                            <a href="#/">Voltar para início</a>
+                            <p style="margin-top: var(--space-md); color: var(--color-text-secondary);">Esta página está em desenvolvimento.</p>
+                            <a href="#/" class="button button--primary" style="margin-top: var(--space-lg);">Voltar para início</a>
                         </div>
                     `;
                 }
@@ -116,10 +114,7 @@ class App {
         }
         
         // Add routes
-        this.router.addRoute('/', PlaceholderPage, {
-            title: 'gladCode - Início',
-            content: '<h1>Bem-vindo ao gladCode</h1>',
-        });
+        this.router.addRoute('/', HomePage);
         
         this.router.addRoute('/editor', PlaceholderPage, {
             title: 'gladCode - Editor',
@@ -139,6 +134,11 @@ class App {
         this.router.addRoute('/training', PlaceholderPage, {
             title: 'gladCode - Treinamento',
             content: '<h1>Treinamento</h1>',
+        });
+        
+        this.router.addRoute('/manual', PlaceholderPage, {
+            title: 'gladCode - Manual',
+            content: '<h1>Manual da Simulação</h1>',
         });
         
         this.router.addRoute('/docs', PlaceholderPage, {
