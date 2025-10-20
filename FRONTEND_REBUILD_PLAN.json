@@ -1,0 +1,363 @@
+{
+  "projectName": "gladCode2 Front-End Rebuild",
+  "description": "Rebuild front-end into modern, modular, vanilla-JS (ES2025) class-based OOP codebase served from Node.js static server",
+  "objectives": [
+    "Create modern vanilla JavaScript architecture with ES2025 features",
+    "Implement class-based OOP design patterns",
+    "Use modern CSS with custom properties, color-mix(), and nesting",
+    "Set up Node.js Express server for static files and API proxying",
+    "Containerize with Docker",
+    "Maintain PHP backend for API endpoints"
+  ],
+  "newDirectories": [
+    "web/",
+    "web/js/",
+    "web/js/core/",
+    "web/js/services/",
+    "web/js/utils/",
+    "web/js/components/",
+    "web/js/pages/",
+    "web/css/",
+    "web/css/components/",
+    "web/css/pages/",
+    "web/assets/",
+    "web/assets/images/",
+    "web/assets/icons/",
+    "web-server/"
+  ],
+  "filesToCreate": [
+    {
+      "path": "web/index.html",
+      "purpose": "Main entry point for the new front-end",
+      "dependencies": ["app.js", "vars.css", "main.css"],
+      "description": "Clean HTML5 structure with module script loading"
+    },
+    {
+      "path": "web/js/app.js",
+      "purpose": "Application bootstrap and initialization",
+      "dependencies": ["core/Router.js", "core/Store.js", "services/APIService.js"],
+      "description": "Main app entry point, initializes router, store, and global services"
+    },
+    {
+      "path": "web/js/core/Component.js",
+      "purpose": "Base component class for all UI components",
+      "dependencies": ["utils/dom.js"],
+      "description": "Abstract base class providing lifecycle methods, state management, and DOM rendering"
+    },
+    {
+      "path": "web/js/core/Page.js",
+      "purpose": "Base page class extending Component",
+      "dependencies": ["core/Component.js"],
+      "description": "Page-level component with routing integration and layout management"
+    },
+    {
+      "path": "web/js/core/Router.js",
+      "purpose": "Client-side routing manager",
+      "dependencies": ["core/Page.js"],
+      "description": "Hash-based or History API router for SPA navigation"
+    },
+    {
+      "path": "web/js/core/Store.js",
+      "purpose": "Global state management",
+      "dependencies": ["core/EventBus.js"],
+      "description": "Centralized store for application state with reactive updates"
+    },
+    {
+      "path": "web/js/core/EventBus.js",
+      "purpose": "Event system for component communication",
+      "dependencies": [],
+      "description": "Pub/sub pattern implementation for decoupled component communication"
+    },
+    {
+      "path": "web/js/services/APIService.js",
+      "purpose": "HTTP client for API calls",
+      "dependencies": [],
+      "description": "Handles all API requests to PHP backend with error handling and retries"
+    },
+    {
+      "path": "web/js/services/AuthService.js",
+      "purpose": "Authentication management",
+      "dependencies": ["services/APIService.js", "utils/storage.js"],
+      "description": "Google OAuth integration, session management, credential storage"
+    },
+    {
+      "path": "web/js/services/WebSocketService.js",
+      "purpose": "WebSocket connection management",
+      "dependencies": ["core/EventBus.js"],
+      "description": "Manages Socket.IO connection for real-time updates"
+    },
+    {
+      "path": "web/js/utils/dom.js",
+      "purpose": "DOM manipulation helpers",
+      "dependencies": [],
+      "description": "Utility functions for DOM operations without jQuery"
+    },
+    {
+      "path": "web/js/utils/storage.js",
+      "purpose": "LocalStorage/SessionStorage wrapper",
+      "dependencies": [],
+      "description": "Type-safe storage interface with JSON serialization"
+    },
+    {
+      "path": "web/js/utils/validators.js",
+      "purpose": "Input validation utilities",
+      "dependencies": [],
+      "description": "Form validation and data sanitization functions"
+    },
+    {
+      "path": "web/js/components/Header.js",
+      "purpose": "Header/navigation component",
+      "dependencies": ["core/Component.js", "services/AuthService.js"],
+      "description": "Top navigation bar with login status and user menu"
+    },
+    {
+      "path": "web/js/components/Dialog.js",
+      "purpose": "Modal dialog component",
+      "dependencies": ["core/Component.js"],
+      "description": "Reusable modal/dialog for confirmations and forms"
+    },
+    {
+      "path": "web/js/components/GladiatorCard.js",
+      "purpose": "Gladiator display card",
+      "dependencies": ["core/Component.js"],
+      "description": "Component for displaying gladiator information in lists"
+    },
+    {
+      "path": "web/js/pages/HomePage.js",
+      "purpose": "Landing page",
+      "dependencies": ["core/Page.js"],
+      "description": "Main landing page with game introduction and features"
+    },
+    {
+      "path": "web/js/pages/EditorPage.js",
+      "purpose": "Code editor page",
+      "dependencies": ["core/Page.js"],
+      "description": "Gladiator code editor with Blockly/ACE integration"
+    },
+    {
+      "path": "web/js/pages/ProfilePage.js",
+      "purpose": "User profile page",
+      "dependencies": ["core/Page.js"],
+      "description": "User profile with gladiator management"
+    },
+    {
+      "path": "web/js/pages/TournamentPage.js",
+      "purpose": "Tournament view page",
+      "dependencies": ["core/Page.js"],
+      "description": "Tournament listing and details"
+    },
+    {
+      "path": "web/css/vars.css",
+      "purpose": "CSS custom properties and design tokens",
+      "dependencies": [],
+      "description": "Color palette, spacing scale, typography, and other design tokens"
+    },
+    {
+      "path": "web/css/reset.css",
+      "purpose": "CSS reset/normalize",
+      "dependencies": [],
+      "description": "Browser consistency and base styles"
+    },
+    {
+      "path": "web/css/main.css",
+      "purpose": "Global styles and layout",
+      "dependencies": ["vars.css", "reset.css"],
+      "description": "Base typography, layout utilities, and common patterns"
+    },
+    {
+      "path": "web/css/components/header.css",
+      "purpose": "Header component styles",
+      "dependencies": ["vars.css"],
+      "description": "Navigation bar styling"
+    },
+    {
+      "path": "web/css/components/dialog.css",
+      "purpose": "Dialog component styles",
+      "dependencies": ["vars.css"],
+      "description": "Modal dialog styling"
+    },
+    {
+      "path": "web/css/components/button.css",
+      "purpose": "Button component styles",
+      "dependencies": ["vars.css"],
+      "description": "Button variations and states"
+    },
+    {
+      "path": "web/css/components/card.css",
+      "purpose": "Card component styles",
+      "dependencies": ["vars.css"],
+      "description": "Card container styling"
+    },
+    {
+      "path": "web/css/pages/home.css",
+      "purpose": "Home page specific styles",
+      "dependencies": ["vars.css"],
+      "description": "Landing page layout and sections"
+    },
+    {
+      "path": "web/css/pages/editor.css",
+      "purpose": "Editor page specific styles",
+      "dependencies": ["vars.css"],
+      "description": "Code editor layout and panels"
+    },
+    {
+      "path": "web/css/pages/profile.css",
+      "purpose": "Profile page specific styles",
+      "dependencies": ["vars.css"],
+      "description": "Profile layout and gladiator grid"
+    },
+    {
+      "path": "web-server/server.js",
+      "purpose": "Node.js Express server",
+      "dependencies": ["express"],
+      "description": "Static file server with API proxy to PHP backend"
+    },
+    {
+      "path": "web-server/package.json",
+      "purpose": "Node.js dependencies",
+      "dependencies": [],
+      "description": "Express, http-proxy-middleware, and dev dependencies"
+    },
+    {
+      "path": "web-server/Dockerfile",
+      "purpose": "Docker configuration for web server",
+      "dependencies": [],
+      "description": "Node.js container with Express server"
+    },
+    {
+      "path": "web-server/.dockerignore",
+      "purpose": "Docker ignore file",
+      "dependencies": [],
+      "description": "Exclude node_modules and unnecessary files from Docker build"
+    },
+    {
+      "path": "web/config.js",
+      "purpose": "Client-side configuration",
+      "dependencies": [],
+      "description": "API endpoints, WebSocket URL, and other runtime config"
+    }
+  ],
+  "filesToUpdate": [
+    {
+      "path": "compose.yaml",
+      "changes": [
+        "Add new 'web-server' service",
+        "Configure volume mounts for web/ directory",
+        "Set up port mapping (e.g., 8080:3000)",
+        "Add dependency on apache service for API proxying"
+      ],
+      "description": "Add web-server service to docker-compose configuration"
+    },
+    {
+      "path": ".gitignore",
+      "changes": [
+        "Add web-server/node_modules",
+        "Add web-server/.env"
+      ],
+      "description": "Ignore web-server dependencies and environment files"
+    }
+  ],
+  "dockerConfiguration": {
+    "newService": "web-server",
+    "baseImage": "node:18-alpine",
+    "ports": ["8080:3000"],
+    "volumes": [
+      "./web:/app/web:ro",
+      "./web-server:/app/server"
+    ],
+    "environment": [
+      "NODE_ENV=development",
+      "API_BASE_URL=http://apache:80"
+    ],
+    "command": "npm run dev",
+    "dependencies": ["apache"]
+  },
+  "implementationPhases": [
+    {
+      "phase": 1,
+      "name": "Core Infrastructure Setup",
+      "tasks": [
+        "Create directory structure",
+        "Set up web-server with Express",
+        "Configure Docker and compose.yaml",
+        "Create base HTML and app.js"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Core Classes Implementation",
+      "tasks": [
+        "Implement Component base class",
+        "Implement Page base class",
+        "Implement Router",
+        "Implement Store and EventBus",
+        "Implement APIService"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "CSS Architecture",
+      "tasks": [
+        "Create CSS variables and design tokens",
+        "Implement reset and base styles",
+        "Create component styles",
+        "Create page-specific styles"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Services Layer",
+      "tasks": [
+        "Implement AuthService with Google OAuth",
+        "Implement WebSocketService",
+        "Create utility modules"
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Components and Pages",
+      "tasks": [
+        "Create shared components (Header, Dialog, Cards)",
+        "Implement HomePage",
+        "Implement EditorPage",
+        "Implement ProfilePage",
+        "Implement TournamentPage"
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Migration and Testing",
+      "tasks": [
+        "Test all routes and pages",
+        "Verify API integration",
+        "Test WebSocket connections",
+        "Update documentation",
+        "Create migration guide"
+      ]
+    }
+  ],
+  "constraints": [
+    "Use only vanilla JavaScript (ES2025), no frameworks",
+    "PHP backend remains unchanged except for CORS headers if needed",
+    "Support same browsers as current version (modern evergreen browsers)",
+    "Maintain all existing functionality",
+    "No breaking changes to API contracts"
+  ],
+  "successCriteria": [
+    "All pages accessible via new front-end",
+    "Google OAuth login working",
+    "WebSocket real-time updates functioning",
+    "API calls successfully proxied to PHP backend",
+    "Modern CSS features working in supported browsers",
+    "Docker containers running without errors",
+    "Performance equal or better than current implementation"
+  ],
+  "notes": [
+    "This is a complete front-end rewrite while keeping PHP backend intact",
+    "The old public_html/ structure will remain for API endpoints",
+    "New web/ directory will contain the modern front-end",
+    "Express server proxies API calls to PHP backend on Apache",
+    "Migration will be incremental - both old and new can coexist during transition",
+    "Consider feature flags for gradual rollout"
+  ]
+}
