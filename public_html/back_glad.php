@@ -110,8 +110,21 @@
                         if ($result->rowCount() >= $limit)
                             echo "{\"LIMIT\":$limit}";
                         else{
-                            $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES ('$user', '$skin', '$name', '$vstr', '$vagi', '$vint', '1', '0', '$code', '$blocks', '$version')";
-                            $result = runQuery($sql);
+                            $sql = "INSERT INTO gladiators (master, skin, name, vstr, vagi, vint, lvl, xp, code, blocks, version) VALUES (:master, :skin, :name, :vstr, :vagi, :vint, :lvl, :xp, :code, :blocks, :version)";
+                            $data = [
+                                'master' => $user,
+                                'skin' => $skin,
+                                'name' => $name,
+                                'vstr' => $vstr,
+                                'vagi' => $vagi,
+                                'vint' => $vint,
+                                'lvl' => 1,
+                                'xp' => 0,
+                                'code' => $code,
+                                'blocks' => $blocks,
+                                'version' => $version,
+                            ];
+                            $result = runQuery($sql, $data);
                             echo "{\"ID\":". $conn->lastInsertId() ."}";
 
                             send_node_message(array(
