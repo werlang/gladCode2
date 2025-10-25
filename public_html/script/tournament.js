@@ -260,6 +260,8 @@ $(document).ready( function() {
     // });
 });
 
+const teamShow = {};
+
 function refresh_round(){
     $.post("back_tournament_run.php", {
         action: "REFRESH",
@@ -270,7 +272,7 @@ function refresh_round(){
         console.log(data);
         
         $('#content-box #group-container .team').each( function(){
-            if (!$(this).parents('.group').hasClass('hide-info')){
+            if (!$(this).parents('.group').hasClass('hide-info') && teamShow[$(this).parents('.group').data('id')] == true){
                 var i = $(this).data('id');
                 // var lasttime = '-';
                 var lasttime = data.teams[i].lasttime;
@@ -300,12 +302,14 @@ function refresh_round(){
         $('#content-box #group-container .group').each( function(){
             var groupobj = $(this);
             var i = $(this).data('id');
-
+            
             if (data.groups[i].status == "DONE"){
                 $(this).find('.foot .button').removeAttr('disabled').html("VISUALIZAR BATALHA");
                 $(this).find('.foot .button').off('click').click( function(){
                     window.open('play/'+ data.groups[i].hash);
                     $(this).parents('.group').removeClass('hide-info');
+                    teamShow[i] = true;
+                    refresh_round();
                 });
 
                 if (isManager) {
