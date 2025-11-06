@@ -248,8 +248,11 @@ Export and import complete tournament data for backup, migration, or testing.
 - Gladiators in each team (code, stats, skin)
 - Groups (tournament rounds/brackets)
 - Team assignments to groups
-- Battle logs (simulation data)
+- Battle logs metadata (hash, time, version, etc.)
+- **Battle log files** (embedded as `file_content` in JSON)
 - Match results
+
+**Note:** Log files are embedded directly in the JSON export. The export file size will be larger (typically 2-3MB) when log files are included. The import process automatically extracts and saves these log files to the `logs/` directory.
 
 ### Import Tournament
 

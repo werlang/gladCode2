@@ -206,20 +206,34 @@ try {
         $summary[] = "Created " . count($data['gladiator_teams']) . " gladiator-team links";
 
         // Import logs
+        $savedLogFiles = 0;
         foreach ($data['logs'] as $log) {
-            $sql = "INSERT INTO logs (hash, time)
-                    VALUES (?, ?)";
+            $sql = "INSERT INTO logs (hash, time, version, origin)
+                    VALUES (?, ?, ?, ?)";
             
             $stmt = $conn->prepare($sql);
             $stmt->execute([
                 $log['hash'],
-                convertDateTime($log['creation'] ?? $log['time'] ?? null)
+                convertDateTime($log['creation'] ?? $log['time'] ?? null),
+                $log['version'] ?? null,
+                $log['origin'] ?? null
             ]);
 
             $newLogId = $conn->lastInsertId();
             $idMaps['logs'][$log['id']] = $newLogId;
+            
+            // Save log file content if present
+            if (isset($log['file_content']) && $log['file_content'] !== null) {
+                $logFilePath = __DIR__ . '/../logs/' . $newLogId;
+                if (file_put_contents($logFilePath, $log['file_content']) !== false) {
+                    $savedLogFiles++;
+                }
+            }
         }
         $summary[] = "Imported " . count($data['logs']) . " logs";
+        if ($savedLogFiles > 0) {
+            $summary[] = "Saved " . $savedLogFiles . " log files";
+        }
 
         // Import groups
         foreach ($data['groups'] as $group) {

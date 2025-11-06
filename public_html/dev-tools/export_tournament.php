@@ -115,6 +115,17 @@ try {
         $sql = "SELECT * FROM logs WHERE id IN ($logIdsStr)";
         $result = runQuery($sql);
         $logs = $result->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Read log file contents and add to log records
+        foreach ($logs as &$log) {
+            $logFile = __DIR__ . '/../logs/' . $log['id'];
+            if (file_exists($logFile)) {
+                $log['file_content'] = file_get_contents($logFile);
+            } else {
+                $log['file_content'] = null;
+            }
+        }
+        unset($log); // Break reference
     }
 
     // Fetch matches (from tournment table)
