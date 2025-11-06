@@ -53,6 +53,75 @@ case "$1" in
         curl -s "http://localhost/dev-tools/list_real_tournaments.php?page=$page&limit=$limit" | jq
         ;;
     
+    export)
+        if [ -z "$2" ]; then
+            echo "Error: Tournament identifier required"
+            echo "Usage: $0 export <id|hash|token> [output_file]"
+            exit 1
+        fi
+        
+        identifier="$2"
+        output="${3:-tournament_${identifier}_export.json}"
+        
+        # Detect if it's an ID (numeric), hash (alphanumeric, longer), or token (16 chars)
+        if [[ "$identifier" =~ ^[0-9]+$ ]]; then
+            echo "Exporting tournament by ID: $identifier"
+            curl -s "http://localhost/dev-tools/export_tournament.php?id=$identifier" -o "$output"
+        elif [ ${#identifier} -eq 16 ]; then
+            echo "Exporting tournament by token: $identifier"
+            curl -s "http://localhost/dev-tools/export_tournament.php?token=$identifier" -o "$output"
+        else
+            echo "Exporting tournament by hash: $identifier"
+            curl -s "http://localhost/dev-tools/export_tournament.php?hash=$identifier" -o "$output"
+        fi
+        
+        if [ -f "$output" ]; then
+            echo "✅ Export saved to: $output"
+            echo "File size: $(du -h "$output" | cut -f1)"
+        else
+            echo "❌ Export failed"
+        fi
+        ;;
+    
+    import)
+        if [ -z "$2" ]; then
+            echo "Error: JSON file required"
+            echo "Usage: $0 import <json_file> [tournament_id]"
+            echo ""
+            echo "Examples:"
+            echo "  $0 import tournament_export.json           # Create new tournament"
+            echo "  $0 import tournament_export.json 129      # Update tournament 129"
+            exit 1
+        fi
+        
+        json_file="$2"
+        tournament_id="$3"
+        
+        if [ ! -f "$json_file" ]; then
+            echo "Error: File not found: $json_file"
+            exit 1
+        fi
+        
+        if [ -z "$tournament_id" ]; then
+            echo "Importing tournament (CREATE mode)..."
+            curl -s -X POST "http://localhost/dev-tools/import_tournament.php" \
+                -F "file=@$json_file" \
+                -F "mode=create" | jq
+        else
+            echo "⚠️  WARNING: This will UPDATE tournament $tournament_id and DELETE all existing data!"
+            read -p "Type 'YES' to confirm: " confirm
+            if [ "$confirm" = "YES" ]; then
+                echo "Importing tournament (UPDATE mode for tournament $tournament_id)..."
+                curl -s -X POST "http://localhost/dev-tools/import_tournament.php" \
+                    -F "file=@$json_file" \
+                    -F "mode=update" \
+                    -F "tournament_id=$tournament_id" | jq
+            else
+                echo "Import cancelled."
+            fi
+        fi
+        ;;
+    
     cleanup-all)
         echo "⚠️  WARNING: This will delete ALL test tournaments!"
         read -p "Type 'YES' to confirm: " confirm
@@ -109,6 +178,23 @@ Commands:
             $0 list-real 2         (page 2, 10 per page)
             $0 list-real 1 20      (page 1, 20 per page)
     
+    export <id|hash|token> [output_file]
+        Export tournament data to JSON file
+        Auto-detects type: numeric=ID, 16chars=token, other=hash
+        Examples:
+            $0 export 129                              (by ID, auto-named file)
+            $0 export 129 my_tournament.json          (by ID, custom filename)
+            $0 export a32eb447a2497e72                (by hash)
+            $0 export a1b2c3d4e5f6g7h8                (by token)
+    
+    import <json_file> [tournament_id]
+        Import tournament data from JSON export
+        Without tournament_id: Creates new tournament (CREATE mode)
+        With tournament_id: Updates existing tournament (UPDATE mode)
+        Examples:
+            $0 import tournament_export.json           (create new)
+            $0 import tournament_export.json 129      (update tournament 129)
+    
     cleanup-all
         Delete ALL test tournaments (requires confirmation)
     
@@ -127,6 +213,15 @@ Examples:
     
     # List all tournaments
     $0 list
+    
+    # Export tournament
+    $0 export 129
+    
+    # Import as new tournament
+    $0 import tournament_129_export.json
+    
+    # Update existing tournament
+    $0 import tournament_129_export.json 129
     
     # Cleanup specific tournament
     $0 cleanup a1b2c3d4e5f6g7h8

@@ -36,7 +36,9 @@ dev-tools/
 │   ├── list_real_tournaments.php  # List production tournaments (paginated)
 │   ├── reset_tournament.php       # Reset tournament to specific round
 │   ├── cleanup_tournament.php     # Delete specific test tournament
-│   └── cleanup_all.php            # Delete ALL test tournaments
+│   ├── cleanup_all.php            # Delete ALL test tournaments
+│   ├── export_tournament.php      # Export tournament to JSON
+│   └── import_tournament.php      # Import tournament from JSON
 │
 └── tokens/                        # Auto-generated cleanup tokens (gitignored)
 ```
@@ -84,6 +86,16 @@ Full-featured GUI with:
 # List tournaments
 ./tournament.sh list              # Test tournaments
 ./tournament.sh list-real 1 20    # Production (page 1, 20 per page)
+
+# Export tournament
+./tournament.sh export 129                        # By ID (auto-named file)
+./tournament.sh export 129 my_export.json         # By ID (custom filename)
+./tournament.sh export a32eb447a2497e72           # By hash
+./tournament.sh export a1b2c3d4e5f6g7h8           # By token
+
+# Import tournament
+./tournament.sh import tournament_export.json     # Create new tournament
+./tournament.sh import tournament_export.json 129 # Update tournament 129
 
 # Reset tournament
 ./tournament.sh reset <token> 3   # Reset to round 3
@@ -204,7 +216,99 @@ $ADMIN_EMAILS = [
 - Production tournaments cannot be deleted (only reset)
 - Resetting deletes ALL rounds after specified round number
 
-## 🐛 Troubleshooting
+## � Export & Import
+
+Export and import complete tournament data for backup, migration, or testing.
+
+### Export Tournament
+
+**Via Web UI:**
+1. Click "📥 Export" button on any tournament card
+2. Or use the Export Tournament form (by ID, hash, or token)
+3. Download saves as `tournament_<id>_export_<timestamp>.json`
+
+**Via CLI:**
+```bash
+# Export by ID
+./tournament.sh export 129
+
+# Export with custom filename
+./tournament.sh export 129 backup.json
+
+# Export by hash
+./tournament.sh export a32eb447a2497e72
+
+# Export by token (test tournaments)
+./tournament.sh export a1b2c3d4e5f6g7h8
+```
+
+**What's exported:**
+- Tournament settings (name, maxteams, maxtime, etc.)
+- All teams and their metadata
+- Gladiators in each team (code, stats, skin)
+- Groups (tournament rounds/brackets)
+- Team assignments to groups
+- Battle logs (simulation data)
+- Match results
+
+### Import Tournament
+
+**Via Web UI:**
+1. Go to "📥 Import Tournament" section
+2. Select JSON export file
+3. Choose mode:
+   - **CREATE**: Makes new tournament with new ID
+   - **UPDATE**: Replaces data in existing tournament
+4. If UPDATE mode, enter tournament ID to update
+5. Click "Import Tournament"
+
+**Via CLI:**
+```bash
+# Create new tournament
+./tournament.sh import tournament_export.json
+
+# Update existing tournament 129
+./tournament.sh import tournament_export.json 129
+```
+
+**Import Modes:**
+
+1. **CREATE Mode** (no tournament_id):
+   - Creates new tournament with new auto-increment ID
+   - All teams, gladiators, groups get new IDs
+   - Safe for copying tournaments between servers
+   - Gladiators reused if they already exist (matched by `cod`)
+
+2. **UPDATE Mode** (with tournament_id):
+   - Updates existing tournament
+   - **DELETES** all existing teams, groups, logs for that tournament
+   - Imports fresh data from export
+   - Useful for:
+     - Restoring tournament from backup
+     - Overwriting test data
+     - Syncing tournament state between dev/prod
+
+**⚠️ UPDATE Mode Warning:**
+- Deletes ALL existing tournament data (teams, gladiators, groups, logs)
+- Cannot be undone!
+- Always export current state before updating
+- Requires confirmation in CLI
+
+**ID Mapping:**
+Export contains old IDs, import creates new ones. The import script:
+- Maps old team IDs → new team IDs (using password as natural key)
+- Maps old group IDs → new group IDs (preserves round order)
+- Maps old log IDs → new log IDs (using hash)
+- Reuses existing gladiators by `cod` (natural key)
+
+**Use Cases:**
+- **Backup**: Export production tournament before changes
+- **Migration**: Move tournament from dev to prod server
+- **Testing**: Import production tournament to dev for testing
+- **Rollback**: Export before update, import if needed
+- **Cloning**: Export + CREATE import to duplicate tournament
+
+## �🐛 Troubleshooting
 
 ### "Token not found"
 - Token expired or typo
@@ -224,6 +328,21 @@ $ADMIN_EMAILS = [
 - Verify `.env` file exists with correct password
 - Check disk space
 
+### Export shows error
+- Tournament ID/hash not found
+- Check ID with `./tournament.sh list` or `./tournament.sh list-real`
+- Token might be invalid for test tournaments
+
+### Import fails
+- Invalid JSON format (must be from export_tournament.php)
+- Tournament ID doesn't exist (UPDATE mode)
+- Missing required fields in JSON
+- Check file permissions
+
+### Import creates duplicate gladiators
+- Shouldn't happen - import reuses existing gladiators by `cod`
+- If it does, check that gladiator `cod` values match exactly
+
 ## 📝 File Purposes
 
 | File | Purpose | When to Use |
@@ -234,6 +353,8 @@ $ADMIN_EMAILS = [
 | `reset_tournament.php` | Deletes rounds after specified number | Retesting tournament progression |
 | `cleanup_tournament.php` | Deletes test tournament completely | Removing test data |
 | `cleanup_all.php` | Deletes ALL test tournaments | Fresh start |
+| `export_tournament.php` | Exports tournament to JSON | Backup, migration, testing |
+| `import_tournament.php` | Imports tournament from JSON | Restore, clone, sync between servers |
 
 ## �� Integration
 

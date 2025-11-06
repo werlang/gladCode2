@@ -303,6 +303,82 @@
                 </button>
             </div>
         </div>
+
+        <div class="section">
+            <h2>📤 Export Tournament</h2>
+            <p style="margin-bottom: 20px; color: #666;">
+                Export complete tournament data to a JSON file for backup or migration to another server.
+            </p>
+            
+            <form id="exportForm">
+                <div class="form-group">
+                    <label for="exportType">Export Type</label>
+                    <select id="exportType" name="exportType" onchange="toggleExportFields()">
+                        <option value="id">By Tournament ID</option>
+                        <option value="hash">By Tournament Hash</option>
+                        <option value="token">By Cleanup Token (Test)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="exportIdField">
+                    <label for="exportId">Tournament ID</label>
+                    <input type="number" id="exportId" name="exportId" placeholder="Enter tournament ID">
+                </div>
+
+                <div class="form-group" id="exportHashField" style="display: none;">
+                    <label for="exportHash">Tournament Hash</label>
+                    <input type="text" id="exportHash" name="exportHash" placeholder="Enter tournament hash">
+                </div>
+
+                <div class="form-group" id="exportTokenField" style="display: none;">
+                    <label for="exportToken">Cleanup Token</label>
+                    <input type="text" id="exportToken" name="exportToken" placeholder="Enter cleanup token">
+                </div>
+                
+                <button type="submit" class="btn">📥 Download Export</button>
+            </form>
+            
+            <div class="result" id="exportResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>📥 Import Tournament</h2>
+            <p style="margin-bottom: 20px; color: #666;">
+                Import tournament data from a JSON export file. Choose CREATE mode to make a new tournament, or UPDATE mode to replace an existing tournament's data.
+            </p>
+            
+            <form id="importForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="importFile">JSON Export File</label>
+                    <input type="file" id="importFile" name="file" accept=".json" required>
+                    <small>Select the tournament export JSON file</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="importMode">Import Mode</label>
+                    <select id="importMode" name="mode" onchange="toggleImportMode()">
+                        <option value="create">CREATE - Create new tournament</option>
+                        <option value="update">UPDATE - Replace existing tournament data</option>
+                    </select>
+                    <small id="importModeHelp">Creates a new tournament with new ID</small>
+                </div>
+
+                <div class="form-group" id="importTournamentIdField" style="display: none;">
+                    <label for="importTournamentId">Tournament ID to Update</label>
+                    <input type="number" id="importTournamentId" name="tournament_id" placeholder="Enter tournament ID">
+                    <small>The existing tournament ID to replace data for</small>
+                </div>
+                
+                <button type="submit" class="btn">📤 Import Tournament</button>
+            </form>
+            
+            <div class="loading" id="importLoading">
+                <div class="spinner"></div>
+                <p>Importing tournament...</p>
+            </div>
+            
+            <div class="result" id="importResult"></div>
+        </div>
     </div>
 
     <script>
@@ -394,9 +470,10 @@
                                 ${t.cleanup_token ? `
                                 <div class="actions">
                                     ${t.started && t.hash ? `
-                                        <button class="btn btn-secondary" onclick="showResetDialog('${t.cleanup_token}', '${t.name}', '${t.hash}')">� Reset Round</button>
+                                        <button class="btn btn-secondary" onclick="showResetDialog('${t.cleanup_token}', '${t.name}', '${t.hash}')">🔄 Reset Round</button>
                                         <a href="../tourn/${t.hash}/0" target="_blank" class="btn btn-secondary">👁️ View Tournament</a>
                                     ` : ''}
+                                    <button class="btn btn-secondary" onclick="exportTournamentById(${t.id}, '${t.name}')">📥 Export</button>
                                     <button class="btn btn-danger" onclick="cleanupTournament('${t.cleanup_token}', '${t.name}')">🗑️ Cleanup</button>
                                 </div>
                                 ` : `
@@ -538,7 +615,7 @@
         
         // Real tournaments pagination state
         let realCurrentPage = 1;
-        const realPageSize = 10;
+        const realPageSize = 5;
         
         loadRealTournaments();
 
@@ -578,9 +655,12 @@
                                 <div class="actions">
                                     <button class="btn btn-secondary" onclick="showRealResetDialog('${t.hash}', '${t.name}', ${t.max_round || 1})">🔄 Reset Round</button>
                                     <a href="../tourn/${t.hash}/0" target="_blank" class="btn btn-secondary">👁️ View Tournament</a>
+                                    <button class="btn btn-secondary" onclick="exportTournamentByHash('${t.hash}', '${t.name}')">📥 Export</button>
                                 </div>
                                 ` : `
-                                <p style="color: #999; font-size: 14px;">Tournament not started yet</p>
+                                <div class="actions">
+                                    <button class="btn btn-secondary" onclick="exportTournamentById(${t.id}, '${t.name}')">📥 Export</button>
+                                </div>
                                 `}
                             </div>
                         `).join('');
@@ -729,6 +809,160 @@
                 alert(`❌ Error: ${error.message}`);
             }
         }
+        
+        // Toggle export fields based on type
+        function toggleExportFields() {
+            const type = document.getElementById('exportType').value;
+            document.getElementById('exportIdField').style.display = type === 'id' ? 'block' : 'none';
+            document.getElementById('exportHashField').style.display = type === 'hash' ? 'block' : 'none';
+            document.getElementById('exportTokenField').style.display = type === 'token' ? 'block' : 'none';
+        }
+
+        // Quick export from tournament card
+        function exportTournamentById(id, name) {
+            if (confirm(`Export tournament "${name}" (ID: ${id})?`)) {
+                window.location.href = `export_tournament.php?id=${id}`;
+            }
+        }
+
+        function exportTournamentByHash(hash, name) {
+            if (confirm(`Export tournament "${name}"?`)) {
+                window.location.href = `export_tournament.php?hash=${hash}`;
+            }
+        }
+
+        // Export tournament
+        document.getElementById('exportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const type = document.getElementById('exportType').value;
+            let param = '';
+            
+            if (type === 'id') {
+                const id = document.getElementById('exportId').value;
+                if (!id) {
+                    alert('Please enter a tournament ID');
+                    return;
+                }
+                param = `id=${id}`;
+            } else if (type === 'hash') {
+                const hash = document.getElementById('exportHash').value;
+                if (!hash) {
+                    alert('Please enter a tournament hash');
+                    return;
+                }
+                param = `hash=${hash}`;
+            } else if (type === 'token') {
+                const token = document.getElementById('exportToken').value;
+                if (!token) {
+                    alert('Please enter a cleanup token');
+                    return;
+                }
+                param = `token=${token}`;
+            }
+            
+            // Download export file
+            window.location.href = `export_tournament.php?${param}`;
+            
+            // Show success message
+            const resultDiv = document.getElementById('exportResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = '<h3>✅ Export started</h3><p>Your download should begin shortly.</p>';
+            
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 3000);
+        });
+
+        // Toggle import mode fields
+        function toggleImportMode() {
+            const mode = document.getElementById('importMode').value;
+            const tournamentIdField = document.getElementById('importTournamentIdField');
+            const helpText = document.getElementById('importModeHelp');
+            
+            if (mode === 'update') {
+                tournamentIdField.style.display = 'block';
+                helpText.textContent = 'Replaces all data in the existing tournament (teams, gladiators, groups, logs)';
+            } else {
+                tournamentIdField.style.display = 'none';
+                helpText.textContent = 'Creates a new tournament with new ID';
+            }
+        }
+
+        // Import tournament
+        document.getElementById('importForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const mode = formData.get('mode');
+            
+            // Validate tournament ID if update mode
+            if (mode === 'update') {
+                const tournamentId = formData.get('tournament_id');
+                if (!tournamentId) {
+                    alert('Please enter a tournament ID for update mode');
+                    return;
+                }
+                
+                if (!confirm(`Are you sure you want to UPDATE tournament ${tournamentId}?\n\nThis will DELETE all existing teams, gladiators, groups, and logs, then import the new data.\n\nThis cannot be undone!`)) {
+                    return;
+                }
+            }
+            
+            const resultDiv = document.getElementById('importResult');
+            const loadingDiv = document.getElementById('importLoading');
+            
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('import_tournament.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                
+                if (data.status === 'SUCCESS') {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ ${data.message}</h3>
+                        <p><strong>Mode:</strong> ${data.mode.toUpperCase()}</p>
+                        <p><strong>Tournament ID:</strong> ${data.tournament_id}</p>
+                        <p><strong>Tournament Name:</strong> ${data.tournament_name}</p>
+                        <h4>Summary:</h4>
+                        <ul>
+                            ${data.summary.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    `;
+                    
+                    // Refresh tournament lists
+                    setTimeout(() => {
+                        loadTournaments();
+                        loadRealTournaments();
+                    }, 1000);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p>${data.message}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        });
     </script>
 </body>
 </html>
