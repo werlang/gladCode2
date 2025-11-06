@@ -1,3 +1,10 @@
+// Auth wall
+fetch('check_auth.php').then(res => res.json()).then(data => {
+    if (data.status === 'FORBIDDEN') {
+        location.href = '/'
+    }
+});
+
 // Create tournament
 document.getElementById('createForm').addEventListener('submit', async (e) => {
     e.preventDefault();
