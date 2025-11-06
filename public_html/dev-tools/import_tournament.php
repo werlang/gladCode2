@@ -165,22 +165,24 @@ try {
             $existing = $stmt->fetch();
 
             if (!$existing) {
-                $sql = "INSERT INTO gladiators (cod, name, code, STR, AGI, `INT`, master, creation, skin, wins, losses)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                
+                $sql = "INSERT INTO gladiators (cod, master, name, vstr, vagi, vint, lvl, xp, skin, code, blocks, mmr, version)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([
                     $glad['cod'],
-                    $glad['name'],
-                    $glad['code'],
-                    $glad['STR'],
-                    $glad['AGI'],
-                    $glad['INT'],
                     $glad['master'],
-                    convertDateTime($glad['creation']),
+                    $glad['name'],
+                    $glad['vstr'],
+                    $glad['vagi'],
+                    $glad['vint'],
+                    $glad['lvl'],
+                    $glad['xp'],
                     $glad['skin'],
-                    $glad['wins'],
-                    $glad['losses']
+                    $glad['code'],
+                    $glad['blocks'],
+                    $glad['mmr'],
+                    $glad['version'],
                 ]);
             }
 
