@@ -54,7 +54,7 @@
 
         <div class="section">
             <h2>📋 Test Tournaments</h2>
-            <button class="btn btn-secondary" onclick="loadTournaments()">🔄 Refresh List</button>
+            <button class="btn btn-secondary" id="refreshTestTournaments">🔄 Refresh List</button>
             
             <div class="loading" id="listLoading">
                 <div class="spinner"></div>
@@ -66,7 +66,7 @@
 
         <div class="section">
             <h2>🏆 Real (Production) Tournaments</h2>
-            <button class="btn btn-secondary" onclick="loadRealTournaments()">🔄 Refresh List</button>
+            <button class="btn btn-secondary" id="refreshRealTournaments">🔄 Refresh List</button>
             <p style="margin: 10px 0; color: #666; font-size: 14px;">
                 ⚠️ These are production tournaments. Reset with caution!
             </p>
@@ -79,11 +79,11 @@
             <div class="tournament-list" id="realTournamentList"></div>
             
             <div id="realPagination" style="display: none; margin-top: 20px; text-align: center;">
-                <button class="btn btn-secondary" id="realPrevPage" onclick="changeRealPage(-1)" disabled>
+                <button class="btn btn-secondary" id="realPrevPage" disabled>
                     ← Previous
                 </button>
                 <span id="realPageInfo" style="margin: 0 20px; font-weight: 600;">Page 1 of 1</span>
-                <button class="btn btn-secondary" id="realNextPage" onclick="changeRealPage(1)" disabled>
+                <button class="btn btn-secondary" id="realNextPage" disabled>
                     Next →
                 </button>
             </div>
@@ -98,7 +98,7 @@
             <form id="exportForm">
                 <div class="form-group">
                     <label for="exportType">Export Type</label>
-                    <select id="exportType" name="exportType" onchange="toggleExportFields()">
+                    <select id="exportType" name="exportType">
                         <option value="id">By Tournament ID</option>
                         <option value="hash">By Tournament Hash</option>
                         <option value="token">By Cleanup Token (Test)</option>
@@ -141,7 +141,7 @@
 
                 <div class="form-group">
                     <label for="importMode">Import Mode</label>
-                    <select id="importMode" name="mode" onchange="toggleImportMode()">
+                    <select id="importMode" name="mode">
                         <option value="create">CREATE - Create new tournament</option>
                         <option value="update">UPDATE - Replace existing tournament data</option>
                     </select>

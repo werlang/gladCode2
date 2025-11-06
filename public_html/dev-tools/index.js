@@ -86,11 +86,11 @@ async function loadTournaments() {
                                 ${t.cleanup_token ? `
                                 <div class="actions">
                                     ${t.started && t.hash ? `
-                                        <button class="btn btn-secondary" onclick="showResetDialog('${t.cleanup_token}', '${t.name}', '${t.hash}')">🔄 Reset Round</button>
+                                        <button class="btn btn-secondary" data-action="reset" data-token="${t.cleanup_token}" data-name="${t.name}" data-hash="${t.hash}">🔄 Reset Round</button>
                                         <a href="../tourn/${t.hash}/0" target="_blank" class="btn btn-secondary">👁️ View Tournament</a>
                                     ` : ''}
-                                    <button class="btn btn-secondary" onclick="exportTournamentById(${t.id}, '${t.name}')">📥 Export</button>
-                                    <button class="btn btn-danger" onclick="cleanupTournament('${t.cleanup_token}', '${t.name}')">🗑️ Cleanup</button>
+                                    <button class="btn btn-secondary" data-action="export-id" data-id="${t.id}" data-name="${t.name}">📥 Export</button>
+                                    <button class="btn btn-danger" data-action="cleanup" data-token="${t.cleanup_token}" data-name="${t.name}">🗑️ Cleanup</button>
                                 </div>
                                 ` : `
                                 <p style="color: #dc3545; font-size: 14px;">⚠️ No cleanup token found. Tournament may need manual cleanup.</p>
@@ -144,6 +144,7 @@ async function showResetDialog(token, name, hash) {
 
         // Create dialog
         const dialog = document.createElement('div');
+        dialog.setAttribute('data-dialog', 'reset-tournament');
         dialog.style.cssText = `
                     position: fixed;
                     top: 0;
@@ -170,20 +171,13 @@ async function showResetDialog(token, name, hash) {
                             <small style="display: block; margin-top: 5px; color: #666;">Enter the round number to reset to (round 1 = tournament start)</small>
                         </div>
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                            <button onclick="this.closest('div[style*=fixed]').remove()" style="padding: 10px 20px; border: 2px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Cancel</button>
-                            <button onclick="resetTournament('${token}', '${name}', document.getElementById('resetRound').value)" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Reset</button>
+                            <button data-action="close-dialog" style="padding: 10px 20px; border: 2px solid #ddd; background: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Cancel</button>
+                            <button data-action="confirm-reset" data-token="${token}" data-name="${name}" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 5px; cursor: pointer; font-weight: 600;">Reset</button>
                         </div>
                     </div>
                 `;
 
         document.body.appendChild(dialog);
-
-        // Close on background click
-        dialog.addEventListener('click', (e) => {
-            if (e.target === dialog) {
-                dialog.remove();
-            }
-        });
 
     } catch (error) {
         alert(`❌ Error: ${error.message}`);
@@ -235,6 +229,105 @@ const realPageSize = 5;
 
 loadRealTournaments();
 
+// Setup event listeners for static elements
+document.addEventListener('DOMContentLoaded', () => {
+    // Refresh buttons
+    document.getElementById('refreshTestTournaments')?.addEventListener('click', loadTournaments);
+    document.getElementById('refreshRealTournaments')?.addEventListener('click', () => loadRealTournaments());
+    
+    // Pagination buttons
+    document.getElementById('realPrevPage')?.addEventListener('click', () => changeRealPage(-1));
+    document.getElementById('realNextPage')?.addEventListener('click', () => changeRealPage(1));
+    
+    // Export type selector
+    document.getElementById('exportType')?.addEventListener('change', toggleExportFields);
+    
+    // Import mode selector
+    document.getElementById('importMode')?.addEventListener('change', toggleImportMode);
+});
+
+// Event delegation for dynamically generated tournament cards
+document.addEventListener('click', (e) => {
+    const target = e.target;
+    
+    // Handle cleanup tournament button
+    if (target.closest('[data-action="cleanup"]')) {
+        const button = target.closest('[data-action="cleanup"]');
+        const token = button.dataset.token;
+        const name = button.dataset.name;
+        cleanupTournament(token, name);
+    }
+    
+    // Handle reset tournament button (test tournaments)
+    if (target.closest('[data-action="reset"]')) {
+        const button = target.closest('[data-action="reset"]');
+        const token = button.dataset.token;
+        const name = button.dataset.name;
+        const hash = button.dataset.hash;
+        showResetDialog(token, name, hash);
+    }
+    
+    // Handle reset real tournament button
+    if (target.closest('[data-action="reset-real"]')) {
+        const button = target.closest('[data-action="reset-real"]');
+        const hash = button.dataset.hash;
+        const name = button.dataset.name;
+        const currentRound = parseInt(button.dataset.round);
+        showRealResetDialog(hash, name, currentRound);
+    }
+    
+    // Handle export by ID button
+    if (target.closest('[data-action="export-id"]')) {
+        const button = target.closest('[data-action="export-id"]');
+        const id = button.dataset.id;
+        const name = button.dataset.name;
+        exportTournamentById(id, name);
+    }
+    
+    // Handle export by hash button
+    if (target.closest('[data-action="export-hash"]')) {
+        const button = target.closest('[data-action="export-hash"]');
+        const hash = button.dataset.hash;
+        const name = button.dataset.name;
+        exportTournamentByHash(hash, name);
+    }
+    
+    // Handle dialog cancel buttons
+    if (target.closest('[data-action="close-dialog"]')) {
+        target.closest('[data-dialog]')?.remove();
+    }
+    
+    // Handle dialog reset buttons
+    if (target.closest('[data-action="confirm-reset"]')) {
+        const button = target.closest('[data-action="confirm-reset"]');
+        const token = button.dataset.token;
+        const name = button.dataset.name;
+        const roundInput = document.getElementById('resetRound');
+        if (roundInput) {
+            resetTournament(token, name, roundInput.value);
+        }
+    }
+    
+    // Handle real tournament reset confirmation
+    if (target.closest('[data-action="confirm-reset-real"]')) {
+        const button = target.closest('[data-action="confirm-reset-real"]');
+        const hash = button.dataset.hash;
+        const name = button.dataset.name;
+        const roundInput = document.getElementById('realResetRound');
+        if (roundInput) {
+            resetRealTournament(hash, name, roundInput.value);
+        }
+    }
+});
+
+// Close dialog on background click
+document.addEventListener('click', (e) => {
+    if (e.target.hasAttribute('data-dialog')) {
+        e.target.remove();
+    }
+});
+
+
 // Load real tournaments
 async function loadRealTournaments(page = 1) {
     const listDiv = document.getElementById('realTournamentList');
@@ -269,13 +362,13 @@ async function loadRealTournaments(page = 1) {
                                 </div>
                                 ${t.started ? `
                                 <div class="actions">
-                                    <button class="btn btn-secondary" onclick="showRealResetDialog('${t.hash}', '${t.name}', ${t.max_round || 1})">🔄 Reset Round</button>
+                                    <button class="btn btn-secondary" data-action="reset-real" data-hash="${t.hash}" data-name="${t.name}" data-round="${t.max_round || 1}">🔄 Reset Round</button>
                                     <a href="../tourn/${t.hash}/0" target="_blank" class="btn btn-secondary">👁️ View Tournament</a>
-                                    <button class="btn btn-secondary" onclick="exportTournamentByHash('${t.hash}', '${t.name}')">📥 Export</button>
+                                    <button class="btn btn-secondary" data-action="export-hash" data-hash="${t.hash}" data-name="${t.name}">📥 Export</button>
                                 </div>
                                 ` : `
                                 <div class="actions">
-                                    <button class="btn btn-secondary" onclick="exportTournamentById(${t.id}, '${t.name}')">📥 Export</button>
+                                    <button class="btn btn-secondary" data-action="export-id" data-id="${t.id}" data-name="${t.name}">📥 Export</button>
                                 </div>
                                 `}
                             </div>
@@ -323,6 +416,7 @@ function changeRealPage(delta) {
 // Show reset dialog for real tournaments
 function showRealResetDialog(hash, name, currentRound) {
     const dialog = document.createElement('div');
+    dialog.setAttribute('data-dialog', 'reset-real-tournament');
     dialog.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -362,11 +456,11 @@ function showRealResetDialog(hash, name, currentRound) {
                     </div>
                     
                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button onclick="this.closest('div[style*=fixed]').remove()" 
+                        <button data-action="close-dialog" 
                                 style="padding: 10px 20px; border: none; background: #6c757d; color: white; border-radius: 5px; cursor: pointer;">
                             Cancel
                         </button>
-                        <button onclick="resetRealTournament('${hash}', '${name}', document.getElementById('realResetRound').value)" 
+                        <button data-action="confirm-reset-real" data-hash="${hash}" data-name="${name}" 
                                 style="padding: 10px 20px; border: none; background: #dc3545; color: white; border-radius: 5px; cursor: pointer; font-weight: 600;">
                             Reset Tournament
                         </button>
@@ -375,13 +469,6 @@ function showRealResetDialog(hash, name, currentRound) {
             `;
 
     document.body.appendChild(dialog);
-
-    // Close on outside click
-    dialog.addEventListener('click', (e) => {
-        if (e.target === dialog) {
-            dialog.remove();
-        }
-    });
 }
 
 // Reset real tournament
