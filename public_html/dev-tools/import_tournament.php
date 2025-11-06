@@ -13,6 +13,9 @@
  * Response: JSON with import status and summary
  */
 
+// Require admin authentication
+require_once __DIR__ . '/auth.php';
+
 header('Content-Type: application/json');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
