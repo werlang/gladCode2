@@ -1,3 +1,5 @@
+import GoogleLogin from './google-login.js';
+
 var editor;
 var saved = true;
 var tested = true;
@@ -9,14 +11,14 @@ var pieces;
 var loadGlad = false;
 var wannaSave = false;
 var blocksEditor = false;
-var sim
+var sim;
 
 $(document).ready( function() {
     $('#header-editor').addClass('here');
     
-    waitLogged().then(user => {
-        //console.log(user);
-        if (user.status == "SUCCESS"){
+    waitLogged().then(loggedUser => {
+        user = loggedUser;
+        if (user && user.status == "SUCCESS"){
             $('#login').html(user.nome);
             
             if (user.tutor == "1"){
@@ -100,9 +102,8 @@ $(document).ready( function() {
             window.location.href = "news";
         }
         else{
-            googleLogin().then(function(data) {
-                window.location.href = "news";
-            });
+            showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+            GoogleLogin.renderButton($('#google-login')[0]);
         }
     });
 
@@ -127,14 +128,8 @@ $(document).ready( function() {
             if (!user){
                 showDialog("Você precisa fazer LOGIN no sistema para visualizar seus gladiadores",["Cancelar","LOGIN"]).then( function(data){
                     if (data == "LOGIN"){
-                        googleLogin().then(function(data) {
-                            //console.log(data);
-                            user = data.email;
-                            setLoadGlad();
-                            $('#login').html(data.nome).off().click( function(){
-                                window.location.href = "news";
-                            });
-                        });
+                        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+                        GoogleLogin.renderButton($('#google-login')[0]);
                     }
                 });
             }
@@ -345,14 +340,8 @@ $(document).ready( function() {
             else{
                 showDialog("Você precisa fazer LOGIN no sistema para salvar seu gladiador",["Cancelar","LOGIN"]).then( function(data){
                     if (data == "LOGIN"){
-                        googleLogin().then(function(data) {
-                            //console.log(data);
-                            user = data.email;
-                            setLoadGlad();
-                            $('#login').html(data.nome).off().click( function(){
-                                window.location.href = "news";
-                            });
-                        });
+                        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+                        GoogleLogin.renderButton($('#google-login')[0]);
                     }
                 });
             }
@@ -405,8 +394,9 @@ $(document).ready( function() {
         bindGladList($('#fog-battle #list .glad').last());
     }
 
-    waitLogged().then( () => {
-        if (user.status == "SUCCESS" ){
+    waitLogged().then( (loggedUser) => {
+        if (loggedUser) user = loggedUser;
+        if (user && user.status == "SUCCESS" ){
             $.post("back_glad.php",{
                 action: "GET",
             }).done( function(data){
@@ -586,6 +576,8 @@ $(document).ready( function() {
     async function btnbattle_click(btn, glads){
         progbtn = new progressButton(btn, ["Executando batalha...","Aguardando resposta do servidor"]);
 
+        setLoadGlad();
+
         var breakpoints = [];
         $('.ace_breakpoint').each( function() {
             breakpoints.push($(this).text());
@@ -732,12 +724,14 @@ $(document).ready( function() {
             }
         });
     });
+
+    let text = editor.getValue();
     
     editor.on("change", function() {
         saved = false;
         tested = false;
 
-        var text = editor.getValue();
+        text = editor.getValue();
 
         if ($('#float-card .glad-preview').html() != "" && text != ""){
             $('#download').removeClass('disabled');
@@ -1062,7 +1056,7 @@ function load_glad_generator(element){
         reload_reqs();
         
         $('.slider-container').on('touchstart mouseenter', function() {
-            text = [
+            const text = [
                 {
                     'path': 'sprite/images/strength.png',
                     'title': 'Força - STR', 
@@ -1094,7 +1088,7 @@ function load_glad_generator(element){
                 },
             ];
             
-            index = $('.slider-container').index($(this));
+            const index = $('.slider-container').index($(this));
             $('#info #title img').attr('src', text[index].path);
             $('#info #title span').html(text[index].title);
             $('#info #body .fill').html(text[index].description);
@@ -1320,7 +1314,8 @@ function load_glad_generator(element){
             $('#fog-skin').hide();
         });
         
-        waitLogged().then( () => {
+        waitLogged().then( (loggedUser) => {
+            if (loggedUser) user = loggedUser;
             if (loadGlad){
                 selected = {};
                 var skin;
@@ -1399,7 +1394,7 @@ function draw() {
     tempss.height = spritesheet.height;
     var tempctx = tempss.getContext("2d");
     
-    interval = setInterval( function() {
+    let interval = setInterval( function() {
         if (imgReady == selectedArray.length){
             clearInterval(interval);
             for(i=0 ; i < selectedArray.length ; i++){

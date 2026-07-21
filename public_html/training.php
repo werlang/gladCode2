@@ -42,9 +42,8 @@
     <script src="script/assets.js"></script>
     <script src="script/emoji.js"></script>
     
-    <!-- <script src="script/chat.js"></script> -->
     <script type="module" src="script/google-login.js"></script>
-    <script src="script/training.js"></script>
+    <script type="module" src="script/training.js"></script>
 
     </head>
         <!-- Google tag (gtag.js) -->

@@ -13,9 +13,8 @@ $(document).ready( function() {
     });	
     
     $('#account').click( function(){
-        googleLogin().then(function(data) {
-            window.location.href = "news";
-        });
+        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+        GoogleLogin.renderButton($('#google-login')[0]);
     });
     
     $('#section-2 .card .video').click( function() {

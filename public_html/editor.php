@@ -44,12 +44,11 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
 
-    <script src="script/editor.js"></script>
+    <script type="module" src="script/editor.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/tutorial.js"></script>
-    <script type="module" src="script/google-login.js"></script>
     <script type="module" src="script/header.js"></script>
     
     <script src="script/emoji.js"></script>

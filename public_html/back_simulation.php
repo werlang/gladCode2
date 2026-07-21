@@ -126,8 +126,8 @@
             $code = preg_replace('/setSkin\("[\W\w]*?"\)[;]{0,1}/', "", $code);
             $code = preg_replace('/setUser\("[\W\w]*?"\)[;]{0,1}/', "", $code);
 
-            preg_match('/setName\("([\W\w]*?)"\)/', $code, $name);
-            $name = $name[1];
+            preg_match('/setName\("([\W\w]*?)"\)/', $code, $name_match);
+            $name = isset($name_match[1]) ? $name_match[1] : "Gladiador";
 
             if (strlen($hash) != 32){
                 $skins[$name .'@'. $nick] = $hash;
@@ -275,23 +275,18 @@
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
+        $raw_response = curl_exec($ch);
+        $curl_err = curl_error($ch);
         curl_close($ch);
 
-        $response = json_decode($response, true);
-        // if (file_exists("$path/$foldername/outputc.txt"))
-        //     $outtext .= file_get_contents ("$path/$foldername/outputc.txt");
-        // if (file_exists("$path/$foldername/outputs.txt"))
-        //     $outtext .= file_get_contents ("$path/$foldername/outputs.txt");
-        // if (file_exists("$path/$foldername/error.txt"))
-        //     $error .= file_get_contents ("$path/$foldername/error.txt");
-        // if (file_exists("$path/$foldername/errors.txt"))
-        //     $error .= file_get_contents ("$path/$foldername/errors.txt");
-        // if (file_exists("$path/$foldername/errorc.txt"))
-        //     $error .= file_get_contents ("$path/$foldername/errorc.txt");
-
-        $simlog = $response['simlog'] ?? '';
-        $error = $response['error'] ?? '';
+        if ($raw_response === false) {
+            $error = "CURL Error: " . $curl_err;
+            $simlog = '';
+        } else {
+            $response = json_decode($raw_response, true);
+            $simlog = $response['simlog'] ?? '';
+            $error = $response['error'] ?? '';
+        }
 
         // $spechar = array("\n", "\r", "\t", "\"");
         // $repchar = array("\\n", "\\r", "\\t", '\\"');

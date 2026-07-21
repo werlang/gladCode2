@@ -1,3 +1,5 @@
+import GoogleLogin from "./google-login.js";
+
 $(document).ready(async function(){
     // got here from train link
     let hash = $('#hash').html()
@@ -11,8 +13,8 @@ $(document).ready(async function(){
             if (data == "Não")
                 window.location.href = ''
             else if (data == "Login"){
-                await googleLogin()
-                window.location.reload()
+                showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+                GoogleLogin.renderButton($('#google-login')[0]);
             }
         }
 

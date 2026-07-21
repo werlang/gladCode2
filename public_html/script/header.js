@@ -7,8 +7,10 @@ window.user = user;
 post("back_login.php", {
     action: "GET"
 }).then( data => {
-    user = data
-})
+    user = data;
+    window.user = data;
+    new LocalData({ id: 'user'}).set({ data: user });
+});
 
 $(document).ready( async function() {
     $('#menu-button').click( function() {
@@ -24,9 +26,8 @@ $(document).ready( async function() {
             e.stopPropagation();
         });
         $('#fog #login').click( function(){
-            googleLogin().then( function(data){
-                window.location.href = "news";
-            });
+            showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
+            GoogleLogin.renderButton($('#google-login')[0]);
         });	
         
         $('#fog #menu').toggle("slide", 300); //precisa jquery ui
@@ -124,7 +125,7 @@ async function waitLogged(){
         loginReady();
         function loginReady(){
             setTimeout( async function() {
-                const data = new LocalData({ id: 'user' }).get();
+                const data = window.user || new LocalData({ id: 'user' }).get();
                 if (data) {
                     window.user = data;
                     resolve(data);
