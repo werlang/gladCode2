@@ -1,0 +1,23 @@
+{
+  "skill_name": "gladcode-simulation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I debug a failed gladiator battle simulation that returns an empty simlog?",
+      "expected_output": "The agent should explain how to inspect public_html/runs/{hash}/errorc.txt inside the temporary run directory, check for GCC compilation errors or Python tracebacks, verify banned_functions.json function restrictions, and identify 30-second Docker container timeouts caused by infinite loops lacking API yields.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "How do I backup and restore the gladCode MySQL database using dev-tools?",
+      "expected_output": "The agent should instruct running dump_restore.sh dump and dump_restore.sh restore inside the apache Docker container (docker compose exec apache bash -c 'cd /var/www/html/dev-tools && ./dump_restore.sh dump').",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "What functions are available in the gladCode C API for movement and combat?",
+      "expected_output": "The agent should reference stepForward(), turnLeft(), turnTo(), attackMelee(), attackRanged(), castSpell(), getHp(), and explain the synchronous TCP socket IPC protocol between gladiator code and gladCodeServerMain.",
+      "files": []
+    }
+  ]
+}
