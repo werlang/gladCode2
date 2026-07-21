@@ -873,12 +873,23 @@ function setLoadGlad(){
         skin.push(i);
     loadGlad.skin = JSON.stringify(skin);
     loadGlad.id = gladid;
-    loadGlad.user = nick;
-    loadGlad.name = $('#distribuicao #nome').val();
-    loadGlad.vstr = $('#distribuicao .slider').eq(0).val();
-    loadGlad.vagi = $('#distribuicao .slider').eq(1).val();
-    loadGlad.vint = $('#distribuicao .slider').eq(2).val();
-    delete loadGlad.blocks
+    loadGlad.user = nick || "user";
+    loadGlad.name = $('#distribuicao #nome').val() || "Gladiador";
+
+    var vstr = parseInt($('#distribuicao .slider-input').eq(0).val()) || 0;
+    var vagi = parseInt($('#distribuicao .slider-input').eq(1).val()) || 0;
+    var vint = parseInt($('#distribuicao .slider-input').eq(2).val()) || 0;
+
+    if (vstr === 0 && vagi === 0 && vint === 0) {
+        vstr = 14;
+        vagi = 14;
+        vint = 2;
+    }
+
+    loadGlad.vstr = vstr;
+    loadGlad.vagi = vagi;
+    loadGlad.vint = vint;
+    delete loadGlad.blocks;
 
     var language = getLanguage(editor.getValue());
     if (language == "c"){
