@@ -1,169 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Dev Tools</title>
+    <title>gladCode Dev Cockpit — Tournament Management</title>
     <link rel="stylesheet" href="index.css">
     <script type="module" src="index.js" defer></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎮 Tournament Dev Tools</h1>
-            <p>Bootstrap and manage test tournaments for development</p>
-        </div>
+<body class="bg-base text-main antialiased selection:bg-indigo-500 selection:text-white">
+    <!-- Top Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="brand-text">
+                    <h1>gladCode 2 <span class="badge badge-dev">DEV COCKPIT</span></h1>
+                    <p>Simulation Engine & Tournament Controls</p>
+                </div>
+            </div>
 
-        <div class="section">
-            <h2>📝 Create Test Tournament</h2>
-            <form id="createForm">
-                <div class="form-group">
-                    <label for="name">Tournament Name</label>
-                    <input type="text" id="name" name="name" value="Test Tournament">
-                    <small>Unique name for your test tournament</small>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="tab-test">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <span>Test Tournaments</span>
+                </button>
+                <button class="nav-tab" data-tab="tab-production">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>Production</span>
+                </button>
+                <button class="nav-tab" data-tab="tab-migration">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Export & Import</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Shell -->
+    <main class="main-container">
+        
+        <!-- Tab 1: Test Tournaments -->
+        <section id="tab-test" class="tab-pane active">
+            <div class="panel-header">
+                <div>
+                    <h2>Test Tournaments</h2>
+                    <p class="panel-subtitle">Manage isolated local simulation environments and test brackets</p>
+                </div>
+                <div class="action-bar">
+                    <button class="btn btn-secondary" id="refreshTestTournaments">
+                        <svg class="icon-spin-target" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Refresh</span>
+                    </button>
+                    <button class="btn btn-primary" id="toggleCreatePanel">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>Bootstrap New</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Create Tournament Form Section (Collapsible / Card) -->
+            <div class="card create-card" id="createSection">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        Bootstrap Test Tournament
+                    </div>
+                    <span class="text-muted text-sm">Creates bracket, populates teams & gladiators</span>
                 </div>
                 
-                <div class="form-group">
-                    <label for="teams">Number of Teams</label>
-                    <input type="number" id="teams" name="teams" value="8" min="2" max="50">
-                    <small>Between 2 and 50 teams (each team has 3 gladiators)</small>
+                <form id="createForm" class="grid-form">
+                    <div class="form-group">
+                        <label for="name">Tournament Name</label>
+                        <input type="text" id="name" name="name" value="Test Tournament" placeholder="e.g. Speed Trial Alpha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teams">Teams Count</label>
+                        <input type="number" id="teams" name="teams" value="8" min="2" max="50" required>
+                        <small>3 gladiators generated per team</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxtime">Max Round Duration</label>
+                        <input type="text" id="maxtime" name="maxtime" value="00:10:00" pattern="\d{2}:\d{2}:\d{2}" placeholder="HH:MM:SS" required>
+                        <small>Format: HH:MM:SS (e.g. 00:10:00)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manager">Manager Email</label>
+                        <input type="email" id="manager" name="manager" value="manager@example.com" placeholder="manager@domain.com" required>
+                    </div>
+                    
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            <span>Generate Bracket</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="loading-state" id="createLoading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Bootstrapping database tables & gladiator code payload...</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="maxtime">Max Time per Round</label>
-                    <input type="text" id="maxtime" name="maxtime" value="00:10:00" pattern="\d{2}:\d{2}:\d{2}">
-                    <small>Format: HH:MM:SS (e.g., 00:10:00 for 10 minutes)</small>
+                <div class="result-box" id="createResult" style="display: none;"></div>
+            </div>
+
+            <!-- List Container -->
+            <div class="loading-state" id="listLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Fetching active test tournaments...</p>
+            </div>
+            
+            <div class="tournament-grid" id="tournamentList"></div>
+        </section>
+
+        <!-- Tab 2: Production Tournaments -->
+        <section id="tab-production" class="tab-pane">
+            <div class="panel-header">
+                <div>
+                    <h2>Production Tournaments</h2>
+                    <p class="panel-subtitle">Live tournament instances from main database</p>
                 </div>
-
-                <div class="form-group">
-                    <label for="manager">Manager Email</label>
-                    <input type="email" id="manager" name="manager" value="manager@example.com">
-                    <small>Email of the tournament manager</small>
+                <div class="action-bar">
+                    <button class="btn btn-secondary" id="refreshRealTournaments">
+                        <svg class="icon-spin-target" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Refresh</span>
+                    </button>
                 </div>
-                
-                <button type="submit" class="btn">🚀 Create Tournament</button>
-            </form>
-            
-            <div class="loading" id="createLoading">
-                <div class="spinner"></div>
-                <p>Creating tournament...</p>
             </div>
-            
-            <div class="result" id="createResult"></div>
-        </div>
 
-        <div class="section">
-            <h2>📋 Test Tournaments</h2>
-            <button class="btn btn-secondary" id="refreshTestTournaments">🔄 Refresh List</button>
-            
-            <div class="loading" id="listLoading">
-                <div class="spinner"></div>
-                <p>Loading tournaments...</p>
+            <div class="alert alert-warning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div>
+                    <strong>Production Environment Safeguards Active</strong>
+                    <p>Modifications directly alter real tournament state and battle round histories. Proceed with caution.</p>
+                </div>
             </div>
             
-            <div class="tournament-list" id="tournamentList"></div>
-        </div>
-
-        <div class="section">
-            <h2>🏆 Real (Production) Tournaments</h2>
-            <button class="btn btn-secondary" id="refreshRealTournaments">🔄 Refresh List</button>
-            <p style="margin: 10px 0; color: #666; font-size: 14px;">
-                ⚠️ These are production tournaments. Reset with caution!
-            </p>
-            
-            <div class="loading" id="realListLoading" style="display: none;">
+            <div class="loading-state" id="realListLoading" style="display: none;">
                 <div class="spinner"></div>
-                <p>Loading tournaments...</p>
+                <p>Reading production database...</p>
             </div>
             
-            <div class="tournament-list" id="realTournamentList"></div>
+            <div class="tournament-grid" id="realTournamentList"></div>
             
-            <div id="realPagination" style="display: none; margin-top: 20px; text-align: center;">
+            <div id="realPagination" class="pagination-bar" style="display: none;">
                 <button class="btn btn-secondary" id="realPrevPage" disabled>
-                    ← Previous
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Previous
                 </button>
-                <span id="realPageInfo" style="margin: 0 20px; font-weight: 600;">Page 1 of 1</span>
+                <span id="realPageInfo" class="pagination-info">Page 1 of 1</span>
                 <button class="btn btn-secondary" id="realNextPage" disabled>
-                    Next →
+                    Next
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
             </div>
-        </div>
+        </section>
 
-        <div class="section">
-            <h2>📤 Export Tournament</h2>
-            <p style="margin-bottom: 20px; color: #666;">
-                Export complete tournament data to a JSON file for backup or migration to another server.
-            </p>
-            
-            <form id="exportForm">
-                <div class="form-group">
-                    <label for="exportType">Export Type</label>
-                    <select id="exportType" name="exportType">
-                        <option value="id">By Tournament ID</option>
-                        <option value="hash">By Tournament Hash</option>
-                        <option value="token">By Cleanup Token (Test)</option>
-                    </select>
+        <!-- Tab 3: Migration (Export & Import) -->
+        <section id="tab-migration" class="tab-pane">
+            <div class="panel-header">
+                <div>
+                    <h2>Tournament Data Migration</h2>
+                    <p class="panel-subtitle">Export and import complete tournament state schemas</p>
                 </div>
-
-                <div class="form-group" id="exportIdField">
-                    <label for="exportId">Tournament ID</label>
-                    <input type="number" id="exportId" name="exportId" placeholder="Enter tournament ID">
-                </div>
-
-                <div class="form-group" id="exportHashField" style="display: none;">
-                    <label for="exportHash">Tournament Hash</label>
-                    <input type="text" id="exportHash" name="exportHash" placeholder="Enter tournament hash">
-                </div>
-
-                <div class="form-group" id="exportTokenField" style="display: none;">
-                    <label for="exportToken">Cleanup Token</label>
-                    <input type="text" id="exportToken" name="exportToken" placeholder="Enter cleanup token">
-                </div>
-                
-                <button type="submit" class="btn">📥 Download Export</button>
-            </form>
-            
-            <div class="result" id="exportResult"></div>
-        </div>
-
-        <div class="section">
-            <h2>📥 Import Tournament</h2>
-            <p style="margin-bottom: 20px; color: #666;">
-                Import tournament data from a JSON export file. Choose CREATE mode to make a new tournament, or UPDATE mode to replace an existing tournament's data.
-            </p>
-            
-            <form id="importForm" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="importFile">JSON Export File</label>
-                    <input type="file" id="importFile" name="file" accept=".json" required>
-                    <small>Select the tournament export JSON file</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="importMode">Import Mode</label>
-                    <select id="importMode" name="mode">
-                        <option value="create">CREATE - Create new tournament</option>
-                        <option value="update">UPDATE - Replace existing tournament data</option>
-                    </select>
-                    <small id="importModeHelp">Creates a new tournament with new ID</small>
-                </div>
-
-                <div class="form-group" id="importTournamentIdField" style="display: none;">
-                    <label for="importTournamentId">Tournament ID to Update</label>
-                    <input type="number" id="importTournamentId" name="tournament_id" placeholder="Enter tournament ID">
-                    <small>The existing tournament ID to replace data for</small>
-                </div>
-                
-                <button type="submit" class="btn">📤 Import Tournament</button>
-            </form>
-            
-            <div class="loading" id="importLoading">
-                <div class="spinner"></div>
-                <p>Importing tournament...</p>
             </div>
-            
-            <div class="result" id="importResult"></div>
-        </div>
-    </div>
+
+            <div class="migration-grid">
+                <!-- Export Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export Tournament JSON
+                        </div>
+                    </div>
+                    
+                    <form id="exportForm" class="stacked-form">
+                        <div class="form-group">
+                            <label for="exportType">Lookup Target By</label>
+                            <select id="exportType" name="exportType">
+                                <option value="id">Tournament ID</option>
+                                <option value="hash">Tournament Hash String</option>
+                                <option value="token">Cleanup Token (Test Instance)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="exportIdField">
+                            <label for="exportId">Tournament ID</label>
+                            <input type="number" id="exportId" name="exportId" placeholder="e.g. 42">
+                        </div>
+
+                        <div class="form-group" id="exportHashField" style="display: none;">
+                            <label for="exportHash">Tournament Hash</label>
+                            <input type="text" id="exportHash" name="exportHash" placeholder="e.g. a1b2c3d4e5f6...">
+                        </div>
+
+                        <div class="form-group" id="exportTokenField" style="display: none;">
+                            <label for="exportToken">Cleanup Token</label>
+                            <input type="text" id="exportToken" name="exportToken" placeholder="e.g. test_token_123">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download Export Payload
+                        </button>
+                    </form>
+                    
+                    <div class="result-box" id="exportResult" style="display: none;"></div>
+                </div>
+
+                <!-- Import Panel -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Import Tournament JSON
+                        </div>
+                    </div>
+                    
+                    <form id="importForm" enctype="multipart/form-data" class="stacked-form">
+                        <div class="form-group">
+                            <label for="importFile">JSON Backup File</label>
+                            <div class="file-dropzone" id="dropzone">
+                                <input type="file" id="importFile" name="file" accept=".json" required>
+                                <div class="dropzone-content">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                                    <span id="fileNameDisplay">Choose or drop JSON file</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="importMode">Import Execution Mode</label>
+                            <select id="importMode" name="mode">
+                                <option value="create">CREATE — Generate new tournament record</option>
+                                <option value="update">UPDATE — Overwrite existing tournament ID</option>
+                            </select>
+                            <small id="importModeHelp" class="text-muted">Creates a brand new tournament with fresh ID</small>
+                        </div>
+
+                        <div class="form-group" id="importTournamentIdField" style="display: none;">
+                            <label for="importTournamentId">Target Tournament ID</label>
+                            <input type="number" id="importTournamentId" name="tournament_id" placeholder="Enter target ID to overwrite">
+                            <small class="text-danger">Replaces all gladiators, teams, groups, and logs</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Execute Import Operation
+                        </button>
+                    </form>
+                    
+                    <div class="loading-state" id="importLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Parsing JSON schema and restoring records...</p>
+                    </div>
+                    
+                    <div class="result-box" id="importResult" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
 </body>
 </html>
+
