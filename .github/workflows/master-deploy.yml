@@ -1,0 +1,45 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          REPO_PATH: ${{ vars.REPO_PATH }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REPO_PATH
+          script: |
+            set -e
+            cd ${{ vars.REPO_PATH }}
+            echo "[Deploy] Starting deployment to path: ${{ vars.REPO_PATH }}"
+            echo "[Deploy] Fetching latest changes..."
+            git fetch origin --prune
+            git checkout main
+            git reset --hard origin/main
+            echo "[Deploy] Code synchronized with origin/main."
+            echo "[Deploy] Restarting services..."
+            docker compose build
+            echo "[Deploy] Restarting services..."
+            docker compose up -d --force-recreate
+            echo "[Deploy] Services restarted successfully."
+      - name: Notify success
+        if: success()
+        run: echo "[Deploy] Deployment successful! Services restarted and assets recompiled."
+
+      - name: Notify failure
+        if: failure()
+        run: echo "[Deploy] Deployment failed! Please check the logs for details."
