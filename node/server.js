@@ -96,27 +96,33 @@ app.post('/login', function(req,res){
         //google login
         else if (arg.token){
             var url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${arg.token}`;
-            request(url, (error, response, body) => {
-                console.log(body);
-                if (body){
-                    body = JSON.parse(body);
-                    if (body.sub){
-                        var sql = `SELECT u.id FROM usuarios u WHERE u.email = '${body.email}' OR u.googleid = '${body.sub}'`;
-                        connection.query(sql, function (error, results, fields){
-                            if(error) return console.log(error);
-                            if (results.length > 0){
-                                session.user = results[0].id;
-                                res.send({session: true});
-                            }
-                            else
-                                res.send({session: false});
-                        });
+            https.get(url, (resApi) => {
+                let body = '';
+                resApi.on('data', (chunk) => { body += chunk; });
+                resApi.on('end', () => {
+                    if (body){
+                        body = JSON.parse(body);
+                        if (body.sub){
+                            var sql = `SELECT u.id FROM usuarios u WHERE u.email = '${body.email}' OR u.googleid = '${body.sub}'`;
+                            connection.query(sql, function (error, results, fields){
+                                if(error) return console.log(error);
+                                if (results.length > 0){
+                                    session.user = results[0].id;
+                                    res.send({session: true});
+                                }
+                                else
+                                    res.send({session: false});
+                            });
+                        }
+                        else
+                            res.send({session: false, status: "INVALID"});
                     }
                     else
-                        res.send({session: false, status: "INVALID"});
-                }
-                else
-                    res.send({session: false, status: "ERROR"});
+                        res.send({session: false, status: "ERROR"});
+                });
+            }).on('error', (err) => {
+                console.log(err);
+                res.send({session: false, status: "ERROR"});
             });
         }
         else if (arg.logout){
