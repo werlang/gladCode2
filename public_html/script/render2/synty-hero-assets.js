@@ -1,4 +1,5 @@
 import { getSyntyHeroConfig } from './synty-hero-config.js';
+import { HERO_BONE_NAMES } from './synty-hero-animation.js';
 
 const ASSET_ROOT = 'assets/synty-modular-heroes';
 const CHARACTER_ASSET = `${ASSET_ROOT}/FBX/ModularCharactersFixedScale.fbx`;
@@ -10,7 +11,7 @@ function loadFbx(loader, url, onProgress = undefined) {
     return new Promise((resolve, reject) => loader.load(url, resolve, onProgress, reject));
 }
 
-/** Removes unused modular meshes and their disconnected bones from a clone. */
+/** Removes modular meshes that are not part of this fighter. */
 function pruneCharacter(character, selectedNames) {
     const discardedMeshes = [];
     const selectedMeshes = [];
@@ -22,24 +23,152 @@ function pruneCharacter(character, selectedNames) {
     });
     discardedMeshes.forEach((mesh) => mesh.removeFromParent());
 
-    const requiredBones = new Set();
+    return selectedMeshes;
+}
+
+/** Distinguishes the pack's duplicated left/right finger bone names. */
+function getBoneKey(bone) {
+    if (!bone?.name) return '';
+    if (!/^(?:Thumb|IndexFinger|Finger)_/.test(bone.name)) return bone.name;
+
+    let current = bone.parent;
+    while (current?.isBone) {
+        if (current.name === 'Hand_L') return `${bone.name}:L`;
+        if (current.name === 'Hand_R') return `${bone.name}:R`;
+        current = current.parent;
+    }
+    return bone.name;
+}
+
+/** Finds the nearest ancestor that does not repeat the same pack bone name. */
+function getCanonicalParentKey(bone) {
+    const ownKey = getBoneKey(bone);
+    let parent = bone.parent;
+    while (parent?.isBone && getBoneKey(parent) === ownKey) parent = parent.parent;
+    return parent?.isBone ? getBoneKey(parent) : null;
+}
+
+/** Scores the authored transform above the pack's identity wrapper bones. */
+function getBoneRepresentativeScore(bone) {
+    const transformed = bone.position.lengthSq() > 1e-8
+        || Math.abs(bone.quaternion.w - 1) > 1e-6
+        || Math.abs(bone.quaternion.x) > 1e-6
+        || Math.abs(bone.quaternion.y) > 1e-6
+        || Math.abs(bone.quaternion.z) > 1e-6;
+    return Number(transformed);
+}
+
+/**
+ * Rebinds every selected modular mesh to one canonical skeleton.
+ *
+ * The source FBX contains identity-wrapped copies of the rig for each modular
+ * part. Animating every same-named copy makes the pieces diverge. Reusing one
+ * authored transform per semantic bone keeps every mesh seam connected.
+ */
+function consolidateCharacterRig(THREE, character, selectedMeshes) {
+    const sourceBones = new Set();
     selectedMeshes.forEach((mesh) => {
         mesh.skeleton?.bones.forEach((bone) => {
             let current = bone;
-            while (current && current !== character.parent) {
-                requiredBones.add(current);
+            while (current?.isBone) {
+                sourceBones.add(current);
                 current = current.parent;
             }
         });
     });
 
-    const discardedBones = [];
-    character.traverse((object) => {
-        if (object.isBone && !requiredBones.has(object)) discardedBones.push(object);
+    const representatives = new Map();
+    sourceBones.forEach((bone) => {
+        const key = getBoneKey(bone);
+        const current = representatives.get(key);
+        if (!current || getBoneRepresentativeScore(bone) > getBoneRepresentativeScore(current)) {
+            representatives.set(key, bone);
+        }
     });
-    discardedBones.forEach((bone) => bone.removeFromParent());
 
-    return selectedMeshes;
+    const bones = new Map();
+    representatives.forEach((source, key) => {
+        const bone = new THREE.Bone();
+        bone.name = key;
+        bone.position.copy(source.position);
+        bone.quaternion.copy(source.quaternion);
+        bone.scale.copy(source.scale);
+        bones.set(key, bone);
+    });
+
+    representatives.forEach((source, key) => {
+        const bone = bones.get(key);
+        const parent = bones.get(getCanonicalParentKey(source));
+        if (parent) parent.add(bone);
+        else character.add(bone);
+    });
+
+    character.updateMatrixWorld(true);
+    selectedMeshes.forEach((mesh) => {
+        const mappedBones = mesh.skeleton.bones.map((sourceBone) => bones.get(getBoneKey(sourceBone)));
+        if (mappedBones.some((bone) => !bone)) {
+            throw new Error(`Synty skeleton mapping is incomplete for ${mesh.name}.`);
+        }
+        const boneInverses = mesh.skeleton.boneInverses.map((inverse) => inverse.clone());
+        mesh.bind(new THREE.Skeleton(mappedBones, boneInverses), mesh.bindMatrix.clone());
+    });
+
+    const originalRoots = [];
+    character.traverse((object) => {
+        if (object.isBone && sourceBones.has(object) && !object.parent?.isBone) originalRoots.push(object);
+    });
+    originalRoots.forEach((root) => root.removeFromParent());
+    character.updateMatrixWorld(true);
+
+    return bones;
+}
+
+/** Applies authored local rotation deltas to the consolidated Synty skeleton. */
+class SyntyHeroRig {
+    #bones;
+    #deltaQuaternion;
+    #euler;
+    #restQuaternions = new Map();
+
+    constructor(THREE, bones) {
+        this.#bones = bones;
+        this.#euler = new THREE.Euler(0, 0, 0, 'XYZ');
+        this.#deltaQuaternion = new THREE.Quaternion();
+        HERO_BONE_NAMES.forEach((name) => {
+            const bone = bones.get(name);
+            if (bone) this.#restQuaternions.set(name, bone.quaternion.clone());
+        });
+    }
+
+    /** Applies a complete pose relative to the pack's authored bind pose. */
+    applyPose(pose) {
+        HERO_BONE_NAMES.forEach((name) => {
+            const bone = this.#bones.get(name);
+            const rest = this.#restQuaternions.get(name);
+            const rotation = pose.bones[name];
+            if (!bone || !rest || !rotation) return;
+            this.#euler.set(rotation.x, rotation.y, rotation.z);
+            this.#deltaQuaternion.setFromEuler(this.#euler);
+            bone.quaternion.copy(rest).multiply(this.#deltaQuaternion);
+        });
+    }
+
+    /** Mounts world-normalized equipment on either canonical hand. */
+    attachEquipment(THREE, equipment, contentScale, {
+        handName = 'Hand_R',
+        rotation = [0, 0, 0],
+    } = {}) {
+        const hand = this.#bones.get(handName);
+        if (!hand || !equipment) return null;
+
+        const mount = new THREE.Group();
+        mount.name = 'synty-weapon-mount';
+        mount.scale.setScalar(1 / contentScale);
+        mount.rotation.set(...rotation);
+        mount.add(equipment);
+        hand.add(mount);
+        return mount;
+    }
 }
 
 /** Disposes unique loader-owned geometry and material resources. */
@@ -136,7 +265,7 @@ export class SyntyHeroAssets {
      *
      * @param {{ name?: string, user?: string }} gladiator Fighter metadata.
      * @param {ReturnType<import('./gladiator-appearance.js').getGladiatorAppearance>} appearance Visual contract.
-     * @returns {{ object: import('three').Group, material: import('three').MeshStandardMaterial, mixer: import('three').AnimationMixer|null, action: import('three').AnimationAction|null, weapon: import('three').Group|null, dispose(): void }} Hero resources.
+     * @returns {{ object: import('three').Group, material: import('three').MeshStandardMaterial, rig: SyntyHeroRig, contentScale: number, weapon: import('three').Group|null, dispose(): void }} Hero resources.
      */
     createHero(gladiator, appearance) {
         if (!this.#characterSource) throw new Error('Synty hero assets are not loaded.');
@@ -162,6 +291,7 @@ export class SyntyHeroAssets {
             mesh.receiveShadow = true;
             mesh.frustumCulled = false;
         });
+        const rig = new SyntyHeroRig(THREE, consolidateCharacterRig(THREE, character, selectedMeshes));
 
         character.updateMatrixWorld(true);
         const bounds = new THREE.Box3().setFromObject(character);
@@ -177,26 +307,21 @@ export class SyntyHeroAssets {
         object.name = 'synty-modular-hero';
         object.add(content);
 
-        let mixer = null;
-        let action = null;
-        if (this.#characterSource.animations.length) {
-            mixer = new THREE.AnimationMixer(character);
-            action = mixer.clipAction(this.#characterSource.animations[0]);
-            action.setLoop(THREE.LoopPingPong, Infinity);
-            action.setEffectiveWeight(0.24);
-            action.play();
+        const weapon = this.#createWeapon(config.weaponAsset, material);
+        if (weapon) {
+            weapon.position.y = appearance.weapon === 'staff' || appearance.weapon === 'spear' ? 0.34 : 0.28;
+            rig.attachEquipment(THREE, weapon, scale, {
+                rotation: [0, 0, appearance.weapon === 'staff' || appearance.weapon === 'spear' ? -Math.PI / 2 : Math.PI / 2],
+            });
         }
 
         return {
             object,
             material,
-            mixer,
-            action,
-            weapon: this.#createWeapon(config.weaponAsset, material),
-            dispose() {
-                mixer?.stopAllAction();
-                if (mixer) mixer.uncacheRoot(character);
-            },
+            rig,
+            contentScale: scale,
+            weapon,
+            dispose() {},
         };
     }
 

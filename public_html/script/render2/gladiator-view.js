@@ -1,26 +1,33 @@
 import { ACTIONS, headingToRadians, isOutsideSafeZone, toArenaPosition } from './battle-state.js';
 import { getGladiatorAppearance } from './gladiator-appearance.js';
+import { blendHeroPoses, getHeroActionDuration, sampleHeroPose } from './synty-hero-animation.js';
 
 /** Three.js representation of one engine-controlled gladiator. */
 export class GladiatorView {
     #THREE;
     #accentMaterial;
+    #activeAction = null;
+    #actionStartTime = 0;
     #appearance;
     #armorMaterial;
     #baseArmorColor;
     #baseOpacities = new Map();
     #body;
+    #currentPose = null;
+    #deathStartedAt = null;
     #heroController = null;
     #index;
-    #lastAnimationTime = null;
     #materials = [];
     #model;
+    #observedAction = null;
     #root;
     #shield;
     #state;
     #statusRing;
     #stunStars;
     #tracker;
+    #transitionFromPose = null;
+    #usesSyntyHero = false;
     #weaponPivot;
 
     /**
@@ -36,7 +43,7 @@ export class GladiatorView {
         this.#model = tracker.track(new THREE.Group());
         this.#root.add(this.#model);
         this.#buildModel(heroAssets, gladiator);
-        this.setState(gladiator, 17.68);
+        this.setState(gladiator, 17.68, 0);
     }
 
     /** @returns {import('three').Group} Root object placed on the arena plane. */
@@ -146,26 +153,22 @@ export class GladiatorView {
     #buildSyntyHero(heroAssets, gladiator) {
         const hero = heroAssets.createHero(gladiator, this.#appearance);
         this.#heroController = hero;
+        this.#usesSyntyHero = true;
         this.#tracker.track(hero.object);
         this.#model.add(hero.object);
         this.#body = hero.object;
         this.#armorMaterial = this.#registerMaterial(hero.material);
         this.#baseArmorColor = new this.#THREE.Color(0xffffff);
 
-        this.#weaponPivot = this.#tracker.track(new this.#THREE.Group());
-        this.#weaponPivot.position.set(0.52, 1.34, -0.04);
-        this.#model.add(this.#weaponPivot);
-        if (hero.weapon) {
-            this.#tracker.track(hero.weapon);
-            this.#weaponPivot.add(hero.weapon);
-            this.#weaponPivot.rotation.z = this.#appearance.weapon === 'spear' ? -0.5 : -0.34;
-        }
-        else {
+        if (!hero.weapon) {
+            this.#weaponPivot = this.#tracker.track(new this.#THREE.Group());
             const darkMaterial = new this.#THREE.MeshStandardMaterial({ color: 0x392b22, roughness: 0.82 });
             this.#buildWeapon(darkMaterial);
+            hero.rig.attachEquipment(this.#THREE, this.#weaponPivot, hero.contentScale, {
+                handName: 'Hand_L',
+                rotation: [0, -Math.PI / 2, 0],
+            });
         }
-
-        if (hero.mixer) hero.mixer.setTime(this.#index * 0.37);
     }
 
     /** Retains the prior geometry as a graceful fallback for missing assets. */
@@ -265,7 +268,8 @@ export class GladiatorView {
     }
 
     /** Applies a complete simlog state directly to the model transform. */
-    setState(gladiator, safeRadius) {
+    setState(gladiator, safeRadius, simulationTime = 0) {
+        const wasAlive = !this.#state || Number(this.#state.hp) > 0;
         this.#state = gladiator;
         const position = toArenaPosition({ x: gladiator.x, y: gladiator.y });
         this.#root.position.set(position.x, position.y, position.z);
@@ -279,8 +283,14 @@ export class GladiatorView {
         const isResistant = Number(buffs.resist?.timeleft) > 0.1;
         const isPoisoned = isOutsideSafeZone(gladiator, safeRadius);
 
-        this.#model.rotation.z = isAlive ? 0 : -Math.PI / 2;
-        this.#model.position.y = isAlive ? 0 : 0.28;
+        if (isAlive) {
+            this.#deathStartedAt = null;
+            this.#model.rotation.z = 0;
+            this.#model.position.y = 0;
+        }
+        else if (wasAlive) {
+            this.#deathStartedAt = Number(simulationTime) || 0;
+        }
         this.#shield.visible = isAlive && isResistant;
         this.#stunStars.visible = isAlive && Number(buffs.stun?.timeleft) > 0.1;
 
@@ -309,59 +319,81 @@ export class GladiatorView {
     }
 
     /** Advances rig motion and action poses without changing engine positions. */
-    animate(elapsedSeconds) {
-        const delta = this.#lastAnimationTime === null ? 0 : Math.min(Math.max(elapsedSeconds - this.#lastAnimationTime, 0), 0.1);
-        this.#lastAnimationTime = elapsedSeconds;
-        if (!this.#state || Number(this.#state.hp) <= 0) return;
-
-        const action = Number(this.#state.action);
-        const phase = elapsedSeconds * 8 + this.#index * 1.9;
-        let bob = Math.sin(phase) * 0.025;
-        let weaponSwing = -0.34;
-        let bodyLean = 0;
-        let rigSpeed = 0.32;
-        let rigWeight = 0.2;
-
-        if (action === ACTIONS.movement) {
-            bob = Math.abs(Math.sin(phase * 1.7)) * 0.1;
-            rigSpeed = 1.05;
-            rigWeight = 0.46;
-        }
-        else if (action === ACTIONS.charge) {
-            bob = Math.abs(Math.sin(phase * 2.2)) * 0.08;
-            bodyLean = -0.18;
-            weaponSwing = -0.72;
-            rigSpeed = 1.35;
-            rigWeight = 0.62;
-        }
-        else if (action === ACTIONS.melee || action === ACTIONS.assassinate) {
-            weaponSwing = -0.35 + Math.sin(phase * 2.4) * 1.05;
-            rigSpeed = 1.65;
-            rigWeight = 0.78;
-        }
-        else if (action === ACTIONS.ranged) {
-            weaponSwing = -0.2 + Math.sin(phase) * 0.18;
-            bodyLean = 0.08;
-            rigSpeed = 0.55;
-            rigWeight = 0.54;
-        }
-        else if ([ACTIONS.fireball, ACTIONS.teleport, ACTIONS.block, ACTIONS.ambush, ACTIONS.potion].includes(action)) {
-            weaponSwing = -0.34 + Math.sin(phase * 1.3) * 0.35;
-            rigSpeed = 0.72;
-            rigWeight = 0.58;
+    animate(simulationTime, reducedMotion = false) {
+        if (!this.#state) return;
+        if (Number(this.#state.hp) <= 0) {
+            this.#animateDeath(simulationTime, reducedMotion);
+            return;
         }
 
-        if (this.#heroController?.mixer) {
-            this.#heroController.mixer.timeScale = rigSpeed;
-            this.#heroController.action?.setEffectiveWeight(rigWeight);
-            this.#heroController.mixer.update(delta);
+        const observedAction = Number(this.#state.action);
+        const observedChanged = this.#observedAction !== observedAction;
+        if (observedChanged && getHeroActionDuration(observedAction)) {
+            this.#startAction(observedAction, simulationTime);
         }
-        this.#model.position.y = bob;
-        this.#body.rotation.x = bodyLean;
-        this.#weaponPivot.rotation.z = weaponSwing;
-        this.#statusRing.scale.setScalar(1 + Math.sin(phase * 0.65) * 0.045);
-        this.#shield.rotation.z = elapsedSeconds * 0.55;
-        this.#stunStars.rotation.y = elapsedSeconds * 2.8;
+        this.#observedAction = observedAction;
+
+        if (this.#activeAction === null) this.#startAction(observedAction, simulationTime);
+        const activeDuration = getHeroActionDuration(this.#activeAction);
+        const activeTime = Math.abs(simulationTime - this.#actionStartTime);
+        if (activeDuration && activeTime >= activeDuration && observedAction !== this.#activeAction) {
+            this.#startAction(observedAction, simulationTime);
+        }
+        else if (!activeDuration && observedAction !== this.#activeAction) {
+            this.#startAction(observedAction, simulationTime);
+        }
+
+        const actionTime = reducedMotion
+            ? (this.#activeAction === ACTIONS.waiting || this.#activeAction === ACTIONS.none ? 0 : 0.38)
+            : Math.abs(simulationTime - this.#actionStartTime);
+        const targetPose = sampleHeroPose(this.#activeAction, actionTime, {
+            weapon: this.#appearance.weapon,
+            seed: this.#index * 0.173,
+        });
+        const transitionAmount = reducedMotion
+            ? 1
+            : Math.min(Math.abs(simulationTime - this.#actionStartTime) / 0.12, 1);
+        this.#currentPose = this.#transitionFromPose
+            ? blendHeroPoses(this.#transitionFromPose, targetPose, transitionAmount)
+            : targetPose;
+        if (transitionAmount >= 1) this.#transitionFromPose = null;
+
+        this.#heroController?.rig.applyPose(this.#currentPose);
+        if (this.#usesSyntyHero) {
+            this.#body.position.y = this.#currentPose.body.y;
+            this.#body.rotation.x = this.#currentPose.body.z;
+            this.#body.rotation.z = this.#currentPose.body.x;
+        }
+        else {
+            this.#model.position.y = this.#currentPose.body.y;
+            this.#body.rotation.x = this.#currentPose.body.x;
+            if (this.#weaponPivot) {
+                this.#weaponPivot.rotation.z = -0.34 + this.#currentPose.weapon.emphasis * 0.8;
+            }
+        }
+
+        const ambientTime = reducedMotion ? 0 : simulationTime;
+        this.#statusRing.scale.setScalar(1 + Math.sin(ambientTime * 5.2 + this.#index) * 0.045);
+        this.#shield.rotation.z = ambientTime * 0.55;
+        this.#stunStars.rotation.y = ambientTime * 2.8;
+    }
+
+    /** Starts one action without discarding the outgoing blended pose. */
+    #startAction(action, simulationTime) {
+        this.#transitionFromPose = this.#currentPose;
+        this.#activeAction = action;
+        this.#actionStartTime = Number(simulationTime) || 0;
+    }
+
+    /** Animates a readable fall while allowing replay seeks to restore life. */
+    #animateDeath(simulationTime, reducedMotion) {
+        if (this.#deathStartedAt === null) this.#deathStartedAt = simulationTime;
+        const linear = reducedMotion
+            ? 1
+            : Math.min(Math.abs(simulationTime - this.#deathStartedAt) / 0.68, 1);
+        const eased = 1 - (1 - linear) ** 3;
+        this.#model.rotation.z = -Math.PI / 2 * eased;
+        this.#model.position.y = 0.28 * eased;
     }
 
     /** @returns {import('three').Vector3} World-space label anchor. */
@@ -369,7 +401,7 @@ export class GladiatorView {
         return this.#root.localToWorld(new this.#THREE.Vector3(0, 2.65, 0));
     }
 
-    /** Releases the animation mixer before shared geometry is disposed. */
+    /** Releases per-fighter resources before shared asset teardown. */
     destroy() {
         this.#heroController?.dispose();
     }

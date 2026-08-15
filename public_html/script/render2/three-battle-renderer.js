@@ -30,6 +30,7 @@ export class ThreeBattleRenderer {
     #renderer;
     #resizeObserver;
     #scene;
+    #stateUpdatedAt = performance.now();
     #tracker;
     #views = [];
     #viewsById = new Map();
@@ -168,7 +169,7 @@ export class ThreeBattleRenderer {
         gladiators.forEach((gladiator, index) => {
             const view = this.#views[index];
             if (!view) return;
-            view.setState(gladiator, safeRadius);
+            view.setState(gladiator, safeRadius, Number(state.simtime));
             const compatibilityState = window.gladArray[index] ?? {};
             compatibilityState.alive = Number(gladiator.hp) > 0;
             compatibilityState.hp = Number(gladiator.hp);
@@ -190,6 +191,7 @@ export class ThreeBattleRenderer {
         }
 
         this.#currentState = state;
+        this.#stateUpdatedAt = performance.now();
         this.#syncCrowdPreference();
         this.#showBattleWhenReady();
     }
@@ -243,15 +245,27 @@ export class ThreeBattleRenderer {
      */
     #animate = (timestamp) => {
         const elapsedSeconds = timestamp / 1000;
+        const simulationTime = this.#getAnimationTime();
         this.resize();
         this.#controls.update();
         this.#arena.animate(this.#reducedMotion ? 0 : elapsedSeconds);
-        this.#views.forEach((view) => view.animate(this.#reducedMotion ? 0 : elapsedSeconds));
+        this.#views.forEach((view) => view.animate(simulationTime, this.#reducedMotion));
         this.#effects.animate(elapsedSeconds);
         this.#overlay.updatePositions(this.#views, window.prefs ?? {});
         this.#renderer.render(this.#scene, this.#camera);
         this.#updateFps(timestamp);
     };
+
+    /** Interpolates only rig time between authoritative 100 ms replay frames. */
+    #getAnimationTime() {
+        const frameTime = Number(this.#currentState?.simtime) || 0;
+        if (window.pausesim) return frameTime;
+
+        const increment = Number(window.stepIncrement) || 1;
+        const direction = Math.sign(increment) || 1;
+        const elapsed = (performance.now() - this.#stateUpdatedAt) / 1000 * Math.abs(increment);
+        return frameTime + direction * Math.min(elapsed, 0.1);
+    }
 
     /**
      * Updates the optional FPS badge from actual WebGL animation frames.
