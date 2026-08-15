@@ -1,6 +1,6 @@
 # Battle Simulation Execution Flow & Architecture
 
-This reference describes the step-by-step lifecycle of a gladiator battle simulation in gladCode 2, from user interaction in the web browser down to the C game engine and Phaser.js visualization.
+This reference describes the step-by-step lifecycle of a gladiator battle simulation in gladCode 2, from user interaction in the web browser down to the C game engine and the selectable Phaser.js or Three.js visualization.
 
 ---
 
@@ -33,8 +33,12 @@ This reference describes the step-by-step lifecycle of a gladiator battle simula
    │ 13. Reads simlog JSON or errorc.txt
    │ 14. Returns JSON payload to browser
    ▼
-[Phaser.js Visualizer (script/render.js)]
-   │ 15. Replays turn-by-turn combat animation
+[Shared Playback State (script/playback.js + script/render2/battle-state.js)]
+   │ 15. Expands incremental patches into complete 100 ms frames
+   ▼
+[Selected Renderer]
+   ├── Classic 2D: Phaser.js (script/render.js)
+   └── Coliseum 3D: Three.js (script/render2.js)
 ```
 
 ---
@@ -79,37 +83,66 @@ The Runner service (`runner/app.js` and `runner/runner.js`) manages execution in
 
 ## 📜 `simlog` JSON Trace Format
 
-The simulation produces a JSON array representation of turn-by-turn battle events:
+The simulation produces a JSON array whose first entry is complete and whose later entries contain only changed fields. `projectiles` is a complete current-frame list rather than an inherited patch. An inactive gladiator may be emitted as `[]`, which means that fighter's previous state is retained.
 
 ```json
 [
   {
-    "turn": 1,
-    "time": 0.1,
-    "gladiators": [
+    "simtime": 0.1,
+    "poison": 17.68,
+    "glads": [
       {
         "id": 0,
         "x": 10.5,
         "y": 15.2,
         "head": 90,
         "hp": 100,
+        "maxhp": 100,
         "ap": 50,
-        "action": "walk",
-        "speak": "For Honor!"
+        "maxap": 50,
+        "action": 8,
+        "message": "For Honor!",
+        "buffs": {
+          "burn": { "value": 0, "timeleft": 0 },
+          "movement": { "value": 0, "timeleft": 0 },
+          "resist": { "value": 0, "timeleft": 0 },
+          "invisible": { "value": 0, "timeleft": 0 },
+          "stun": { "value": 0, "timeleft": 0 }
+        }
       },
       {
         "id": 1,
-        "x": 25.0,
-        "y": 15.2,
+        "x": 20.0,
+        "y": 8.5,
         "head": 270,
-        "hp": 95,
-        "ap": 45,
-        "action": "attackMelee",
-        "damageTaken": 5
+        "hp": 120,
+        "maxhp": 120,
+        "ap": 40,
+        "maxap": 40,
+        "action": 10,
+        "message": "",
+        "buffs": {
+          "burn": { "value": 0, "timeleft": 0 },
+          "movement": { "value": 0, "timeleft": 0 },
+          "resist": { "value": 0, "timeleft": 0 },
+          "invisible": { "value": 0, "timeleft": 0 },
+          "stun": { "value": 0, "timeleft": 0 }
+        }
       }
+    ],
+    "projectiles": []
+  },
+  {
+    "simtime": 0.2,
+    "glads": [
+      { "x": 10.7 },
+      []
+    ],
+    "projectiles": [
+      { "id": 7, "owner": 0, "type": 0, "x": 11.1, "y": 15.2, "head": 90 }
     ]
   }
 ]
 ```
 
-Client frontend `script/render.js` reads this JSON structure, initializing Phaser.js sprites, health bars, chat bubbles, hit animations, and sound effects.
+`script/render2/battle-state.js` applies the legacy recursive merge semantics without mutating the source log. The selected renderer then reads the same complete frame data for positions, headings, poison radius, projectiles, health and ability points, buffs, messages, breakpoints, effects, and audio.

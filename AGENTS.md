@@ -42,6 +42,9 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 - **`connection.php`**: Database singleton loading credentials from `config.json`. Exposes `runQuery($sql, $data = null)`. Uses PDO with strict error mode.
 - **`back_simulation.php`**: Main simulation orchestrator (750+ lines). Handles setup of temporary run folders (`public_html/runs/{hash}/`), security function checks, file copying, invoking the Runner API, and returning JSON responses.
 - **`back_tournament.php` / `back_train.php`**: Handlers for tournaments and practice sessions.
+- **`playback.php` / `script/playback.js`**: Shared replay entrypoint, controls, preferences, and incremental simlog expansion used by both battle renderers.
+- **`script/render.js`**: Classic Phaser.js 2D battle renderer.
+- **`script/render2.js` / `script/render2/`**: Selectable Three.js top-down 3D renderer and its state, arena, gladiator, effects, audio, camera, and DOM-overlay modules.
 - **`banned_functions.json`**: Security policy listing forbidden C function names (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
 - **`dev-tools/`**: Complete suite for database backup/restore (`dump_restore.sh`) and tournament resetting (`tournament.sh`, `index.html`).
 
