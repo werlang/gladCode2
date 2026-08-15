@@ -35,6 +35,14 @@
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
     <script src="script/render.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+            }
+        }
+    </script>
     <script type="module" src="script/render2.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>

@@ -1,6 +1,6 @@
 import { ThreeBattleRenderer } from './render2/three-battle-renderer.js';
+import { SyntyHeroAssets } from './render2/synty-hero-assets.js';
 
-const THREE_MODULE_URL = 'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js';
 const classicLoadRenderer = window.load_phaser;
 const classicUpdateRenderer = window.phaser_update;
 let renderer = null;
@@ -20,13 +20,32 @@ async function installThreeRenderer() {
     if (status) status.textContent = 'Carregando arena 3D';
 
     try {
-        const THREE = await import(THREE_MODULE_URL);
+        const [THREE, { FBXLoader }, SkeletonUtils] = await Promise.all([
+            import('three'),
+            import('three/addons/loaders/FBXLoader.js'),
+            import('three/addons/utils/SkeletonUtils.js'),
+        ]);
         const container = document.querySelector('#canvas-div');
         if (!(container instanceof HTMLElement)) {
             throw new Error('Battle canvas container was not found.');
         }
 
-        renderer = new ThreeBattleRenderer({ THREE, container });
+        let heroAssets = null;
+        try {
+            if (status) status.textContent = 'Preparando heróis modulares';
+            heroAssets = new SyntyHeroAssets({ THREE, FBXLoader, SkeletonUtils });
+            await heroAssets.load((ratio) => {
+                if (status) status.textContent = `Preparando heróis modulares ${Math.round(ratio * 100)}%`;
+            });
+        }
+        catch (error) {
+            heroAssets?.dispose();
+            heroAssets = null;
+            console.warn('Modelos Synty indisponíveis; usando gladiadores geométricos.', error);
+            if (status) status.textContent = 'Carregando modelos alternativos';
+        }
+
+        renderer = new ThreeBattleRenderer({ THREE, container, heroAssets });
         window.threeBattleRenderer = renderer;
         window.game = renderer.createLegacyFacade();
         window.music = renderer.music;

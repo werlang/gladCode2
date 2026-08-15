@@ -21,6 +21,7 @@ export class ThreeBattleRenderer {
     #effects;
     #fpsFrames = 0;
     #fpsStartedAt = performance.now();
+    #heroAssets;
     #lastCrowdDensity = null;
     #lastSize = { width: 0, height: 0 };
     #overlay;
@@ -34,11 +35,12 @@ export class ThreeBattleRenderer {
     #viewsById = new Map();
 
     /**
-     * @param {{ THREE: typeof import('three'), container: HTMLElement }} options Renderer dependencies.
+     * @param {{ THREE: typeof import('three'), container: HTMLElement, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null }} options Renderer dependencies.
      */
-    constructor({ THREE, container }) {
+    constructor({ THREE, container, heroAssets = null }) {
         this.#THREE = THREE;
         this.#container = container;
+        this.#heroAssets = heroAssets;
         this.#tracker = new ResourceTracker(THREE);
         this.#audio = new BattleAudioManager();
         this.#reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -129,6 +131,7 @@ export class ThreeBattleRenderer {
             const view = new GladiatorView({
                 THREE: this.#THREE,
                 tracker: this.#tracker,
+                heroAssets: this.#heroAssets,
                 gladiator,
                 index,
             });
@@ -362,7 +365,9 @@ export class ThreeBattleRenderer {
         this.#overlay.destroy();
         this.#effects.destroy();
         this.#audio.destroy();
+        this.#views.forEach((view) => view.destroy());
         this.#tracker.dispose();
+        this.#heroAssets?.dispose();
         this.#renderer.dispose();
         this.#renderer.domElement.remove();
         document.querySelector('#fps')?.remove();

@@ -129,7 +129,7 @@ cd public_html/dev-tools
 3. **Execution Request**: `public_html/back_simulation.php` prepares a temporary run folder under `public_html/runs/{hash}/` with `payload/` files and user scripts (`code0.c`, `code1.c`, etc.), then sends an HTTP POST to `http://runner:3000/{hash}`.
 4. **Container Isolation**: Runner spawns `gladcode2-vm` container with restricted CPU (`--cpu-quota=50000`) and a 30-second execution deadline.
 5. **Simulation Execution**: `socket_compile.sh` compiles gladiator code, launches `gladCodeServerMain`, and manages socket IPC between gladiators and the C game engine.
-6. **Log Replay**: The simulation writes an incremental JSON execution trace (`simlog`). `script/playback.js` expands it into complete frames, then the saved battle setting selects either the classic Phaser renderer (`script/render.js`) or the top-down Three.js renderer (`script/render2.js`). Both renderers use the same 100 ms simulation cadence and authoritative arena coordinates.
+6. **Log Replay**: The simulation writes an incremental JSON execution trace (`simlog`). `script/playback.js` expands it into complete frames, then the saved battle setting selects either the classic Phaser renderer (`script/render.js`) or the top-down Three.js renderer (`script/render2.js`). The 3D renderer assembles deterministic Synty modular heroes from each persisted skin, drives their rig from the current engine action, and retains the geometric character as an asset-failure fallback. Both renderers use the same 100 ms simulation cadence and authoritative arena coordinates.
 
 ---
 
@@ -145,6 +145,7 @@ gladcode2/
 ├── node/                    # Node.js Socket.IO WebSocket server
 ├── payload/                 # C battle simulation engine & socket API source
 ├── public_html/             # Apache web root (PHP backends, JS, CSS, dev-tools)
+│   ├── assets/              # Runtime 3D character source, palette atlases, and weapon models
 │   ├── back_simulation.php  # Simulation orchestrator
 │   ├── banned_functions.json# Security function filter
 │   ├── dev-tools/           # Tournament & DB management CLI/Web suite
