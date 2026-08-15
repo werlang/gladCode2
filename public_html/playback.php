@@ -18,6 +18,7 @@
     <BASE href="../">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Visualizar batalha</title>
+    <script src="script/battle-renderer-preference.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
@@ -25,6 +26,7 @@
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/playback.css"/>
+    <link rel='stylesheet' href="css/playback-render2.css"/>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
@@ -33,6 +35,7 @@
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
     <script src="script/render.js"></script>
+    <script type="module" src="script/render2.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/dropzone.js"></script>

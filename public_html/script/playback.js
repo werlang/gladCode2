@@ -293,6 +293,18 @@ $(document).ready( function() {
         <div id='settings-window' class='blue-window'>
             <h2>Preferências</h2>
             <div class='check-container'>
+                <fieldset id='renderer-choice' class='renderer-choice'>
+                    <legend>Visual da arena</legend>
+                    <label class='renderer-option'>
+                        <input type='radio' name='battle-renderer' value='classic'>
+                        <span><strong>Clássico 2D</strong><small>Sprites originais em Phaser</small></span>
+                    </label>
+                    <label class='renderer-option'>
+                        <input type='radio' name='battle-renderer' value='three'>
+                        <span><strong>Coliseu 3D</strong><small>Câmera top-down em Three.js</small></span>
+                    </label>
+                    <p>A batalha será recarregada ao trocar o visual.</p>
+                </fieldset>
                 <div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap (B)</label></div>
                 <div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores (M)</label></div>
                 <div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
@@ -371,12 +383,17 @@ $(document).ready( function() {
             $('#pref-text input').prop('checked', true);
         if (prefs.speech)
             $('#pref-speech input').prop('checked', true);
+        $(`#renderer-choice input[value='${window.BattleRendererPreference.get()}']`).prop('checked', true);
 
         $('.checkslider').each( function(){
             create_checkbox($(this));
         });
     
         $('#settings-window #ok').click( function(){
+            const selectedRenderer = $('#renderer-choice input:checked').val() || window.BattleRendererPreference.CLASSIC;
+            const rendererChanged = selectedRenderer !== window.BattleRendererPreference.get();
+            window.BattleRendererPreference.set(selectedRenderer);
+
             $.post("back_play.php", {
                 action: "SET_PREF",
                 show_bars: prefs.bars,
@@ -387,11 +404,15 @@ $(document).ready( function() {
                 sfx_volume: prefs.sound.sfx,
                 music_volume: music.volume,
                 crowd: prefs.crowd
-            }).done( function(data){
-                //console.log(data);
+            }).always( function(){
+                if (rendererChanged){
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('renderer');
+                    window.location.assign(url);
+                    return;
+                }
+                $('#fog').remove();
             });
-
-            $('#fog').remove();
         });
 
         $('#pref-bars input').change( function(){
@@ -554,6 +575,11 @@ $(window).resize( function() {
 });
 
 function resize() {
+    if (window.battleRendererVersion === window.BattleRendererPreference?.THREE){
+        window.threeBattleRenderer?.resize();
+        return;
+    }
+
     if (game){
         var canvasH, canvasW;
         if ($(window).width() > $(window).height()){
@@ -684,67 +710,54 @@ function start_timer(steps){
 
 //the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
 uiVars = [];
-function create_ui(nglad){
+async function create_ui(nglad){
     $('#ui-container').html("");
+    uiVars = [];
+    const templateLoads = [];
     for (let i=0 ; i<nglad ; i++){
-        $('#ui-container').append("<div class='ui-glad'></div>");
-        $('.ui-glad').last().load("ui_template.html", function(){
-            $(this).click( function(){
-                if ($(this).hasClass('follow') || $(this).hasClass('dead')){
-                    game.camera.unfollow();
-                    $('.ui-glad').removeClass('follow');
-                    $('#details').remove();
-                }
-                else{
-                    game.camera.follow(sprite[i]);
-                    $('.ui-glad').removeClass('follow');
-                    $(this).addClass('follow');
-                    createDetailedWindow();
-                }
+        const uiGlad = $("<div class='ui-glad'></div>");
+        $('#ui-container').append(uiGlad);
+        templateLoads.push(new Promise((resolve) => {
+            uiGlad.load("ui_template.html", function(){
+                $(this).click( function(){
+                    if ($(this).hasClass('follow') || $(this).hasClass('dead')){
+                        game.camera.unfollow();
+                        $('.ui-glad').removeClass('follow');
+                        $('#details').remove();
+                    }
+                    else{
+                        game.camera.follow(sprite[i]);
+                        $('.ui-glad').removeClass('follow');
+                        $(this).addClass('follow');
+                        createDetailedWindow();
+                    }
+                });
+                resolve();
             });
-        });
+        }));
         uiVars.push({});
     }
+    await Promise.all(templateLoads);
     uiVars.showtext = true;
 }
 
-function startBattle(simulation){
+async function startBattle(simulation){
     json = {};
                 
     $('#loadbar #status').html("Carregando render");
+    await (window.battleRendererReady || Promise.resolve());
     if (load_phaser()){
-        //console.log(simulation[0]);
-        create_ui(simulation[0].glads.length);
+        await create_ui(simulation[0].glads.length);
         $( "#time" ).slider("option", "max", simulation.length);
         for (i=0 ; i<simulation[0].glads.length ; i++){
-            simulation[0].glads[i].name = simulation[0].glads[i].name.replace(/#/g," "); //destroca os # nos nomes por espaços
-            simulation[0].glads[i].user = simulation[0].glads[i].user.replace(/#/g," ");
             newindex[i] = i;
         }
 
-        for (var i in simulation){
-            json.projectiles = [];
-            json = deepMerge(json, simulation[i]);
-            steps.push(JSON.parse(JSON.stringify(json)));
-            // console.log(simulation[i]);
-        }
+        const { expandSimulation } = await import('./render2/battle-state.js');
+        steps = expandSimulation(simulation);
 
         start_timer(steps);
     }
-}
-
-function deepMerge(target, source) {
-    for (const key in source) {
-        if (source.hasOwnProperty(key)) {
-            if (typeof source[key] === 'object' && source[key] !== null) {
-                target[key] = target[key] ? target[key] : Array.isArray(source[key]) ? [] : {};
-                deepMerge(target[key], source[key]);
-            } else {
-                target[key] = source[key];
-            }
-        }
-    }
-    return target;
 }
 
 function copyToClipboard(text) {
