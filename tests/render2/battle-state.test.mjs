@@ -9,6 +9,8 @@ import {
     getPlaybackIntervalMs,
     headingToRadians,
     isOutsideSafeZone,
+    lerp,
+    lerpAngle,
     toArenaPosition,
 } from '../../public_html/script/render2/battle-state.js';
 
@@ -174,4 +176,23 @@ test('matches the legacy 100 ms replay cadence at every signed speed', () => {
     assert.equal(getPlaybackIntervalMs(2), 50);
     assert.equal(getPlaybackIntervalMs(-5), 20);
     assert.equal(getPlaybackIntervalMs(10), 10);
+});
+
+test('blends scalars clamped to the unit interval', () => {
+    assert.equal(lerp(2, 6, 0.25), 3);
+    assert.equal(lerp(2, 6, 1), 6);
+    assert.equal(lerp(2, 6, -1), 2);
+    assert.equal(lerp(2, 6, 4), 6);
+});
+
+test('blends angles through their shortest signed arc', () => {
+    const halfPi = Math.PI / 2;
+
+    assert.ok(Math.abs(lerpAngle(0, halfPi, 0.5) - halfPi / 2) < 1e-9);
+    // 350° → 10° must wrap through 360°, not spin backwards across 180°.
+    const wrapped = lerpAngle(-Math.PI / 18, Math.PI / 18, 0.5);
+    assert.ok(Math.abs(wrapped) < 1e-9);
+    // 0° → 342° takes the short 18° path backwards instead of spinning forward.
+    const longWay = lerpAngle(0, Math.PI * 1.9, 0.5);
+    assert.ok(Math.abs(longWay + Math.PI * 0.05) < 1e-9);
 });

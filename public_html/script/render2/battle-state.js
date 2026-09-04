@@ -169,6 +169,32 @@ export function headingToRadians(heading) {
 }
 
 /**
+ * Blends two scalar values.
+ *
+ * @param {number} from Value at zero progress.
+ * @param {number} to Value at full progress.
+ * @param {number} amount Progress from zero to one.
+ * @returns {number} Interpolated value.
+ */
+export function lerp(from, to, amount) {
+    return from + (to - from) * Math.min(Math.max(Number(amount) || 0, 0), 1);
+}
+
+/**
+ * Blends two angles in radians through their shortest signed arc.
+ *
+ * @param {number} from Angle at zero progress in radians.
+ * @param {number} to Angle at full progress in radians.
+ * @param {number} amount Progress from zero to one.
+ * @returns {number} Interpolated angle in radians.
+ */
+export function lerpAngle(from, to, amount) {
+    const range = Math.PI * 2;
+    const delta = ((to - from) % range + range * 1.5) % range - range / 2;
+    return from + delta * Math.min(Math.max(Number(amount) || 0, 0), 1);
+}
+
+/**
  * Reports whether a point is on or beyond the poison radius.
  *
  * @param {{ x: number|string, y: number|string }} position Engine position.
