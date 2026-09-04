@@ -41,10 +41,13 @@ export function splitSqlStatements(sqlContent) {
  * its own transaction and is recorded only on success, so a failed run can
  * simply be retried. A named MySQL lock serializes concurrent runners.
  *
- * @param {{ db?: typeof Mysql, dir?: string }} [options]
+ * @param {{ db?: typeof Mysql, dir?: string, baseline?: number }} [options]
+ * `baseline` adopts a pre-existing database: files with version <= baseline
+ * are recorded as applied WITHOUT executing them (their schema is assumed
+ * present), then newer files apply normally.
  * @returns {Promise<void>}
  */
-export async function migrate({ db = Mysql, dir = MIGRATIONS_DIR } = {}) {
+export async function migrate({ db = Mysql, dir = MIGRATIONS_DIR, baseline = 0 } = {}) {
     await db.connect();
 
     try {
@@ -87,6 +90,15 @@ export async function migrate({ db = Mysql, dir = MIGRATIONS_DIR } = {}) {
                 continue;
             }
 
+            if (version <= baseline) {
+                console.log(`Marking migration ${file} as applied (baseline, not executed)...`);
+                await db.query(
+                    'INSERT INTO schema_migrations (version, name) VALUES (?, ?)',
+                    [version, file]
+                );
+                continue;
+            }
+
             const filePath = path.join(dir, file);
             const sqlContent = await fs.readFile(filePath, 'utf-8');
             const statements = splitSqlStatements(sqlContent);
@@ -109,7 +121,17 @@ export async function migrate({ db = Mysql, dir = MIGRATIONS_DIR } = {}) {
 }
 
 if (process.argv[1] === __filename) {
-    migrate()
+    const baselineArg = process.argv.find(arg => arg.startsWith('--baseline'));
+    let baseline = 0;
+    if (baselineArg !== undefined) {
+        const match = baselineArg.match(/^--baseline=(\d+)$/);
+        if (!match) {
+            console.error(`Invalid flag '${baselineArg}'. Usage: node scripts/migrate.js [--baseline=N]`);
+            process.exit(2);
+        }
+        baseline = parseInt(match[1], 10);
+    }
+    migrate({ baseline })
         .then(() => {
             console.log('Database migration completed successfully.');
             return Mysql.close();

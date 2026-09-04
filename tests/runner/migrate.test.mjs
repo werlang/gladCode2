@@ -65,7 +65,7 @@ test('keeps dashes inside string literals and HTML bodies intact', () => {
 });
 
 test('acquires lock, bootstraps tracking table, skips applied versions, releases lock', async () => {
-    const db = makeFakeDb({ applied: [1] });
+    const db = makeFakeDb({ applied: [1, 2] });
     await migrate({ db });
 
     const poolCalls = db.calls.filter(call => call.scope === 'pool');
@@ -104,4 +104,39 @@ test('refuses to run without the lock and still releases it', async () => {
     await assert.rejects(() => migrate({ db }), /Could not acquire migration lock/);
     assert.ok(!db.calls.some(call => call.scope === 'tx'));
     assert.ok(db.calls.some(call => call.sql.includes('RELEASE_LOCK')));
+});
+
+test('carries current-version gladiators forward once the baseline applied', async () => {
+    const db = makeFakeDb({ applied: [1] });
+    await migrate({ db });
+
+    const txSql = db.calls
+        .filter(call => call.scope === 'tx')
+        .map(call => call.sql)
+        .join('\n');
+    assert.match(txSql, /UPDATE `gladiators` SET `version` = '2\.9\.3' WHERE `version` = '2\.9\.2'/);
+    assert.ok(!txSql.includes('CREATE TABLE'));
+
+    const record = db.calls.find(call => call.sql.startsWith('INSERT INTO schema_migrations'));
+    assert.deepEqual(record.params, [2, '002_bump_gladiators_to_2_9_3.sql']);
+});
+
+test('baseline records old files without executing them, then migrates forward', async () => {
+    const db = makeFakeDb({ applied: [] });
+    await migrate({ db, baseline: 1 });
+
+    const txSql = db.calls
+        .filter(call => call.scope === 'tx')
+        .map(call => call.sql)
+        .join('\n');
+    assert.ok(!txSql.includes('CREATE TABLE'));
+    assert.match(txSql, /UPDATE `gladiators`/);
+
+    const records = db.calls
+        .filter(call => call.sql.startsWith('INSERT INTO schema_migrations'))
+        .map(call => call.params);
+    assert.deepEqual(records, [
+        [1, '001_initial_schema.sql'],
+        [2, '002_bump_gladiators_to_2_9_3.sql'],
+    ]);
 });
