@@ -34,23 +34,6 @@ services:
         command: npm run dev
         # command: tail -f /dev/null #idle container
 
-    migrate:
-        build:
-            context: .
-            dockerfile: Dockerfile-migrate
-        environment:
-            - MYSQL_HOST=mysql
-            - MYSQL_PORT=${MYSQL_PORT}
-            - MYSQL_USER=root
-            - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-        depends_on:
-            mysql:
-                condition: service_healthy
-        restart: "no"
-        profiles:
-            - tools
-
     mysql:
         image: mysql:8.0
         restart: unless-stopped
@@ -58,12 +41,6 @@ services:
             - TZ=America/Sao_Paulo
             - MYSQL_DATABASE=${MYSQL_DATABASE}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-            interval: 5s
-            timeout: 3s
-            retries: 20
-            start_period: 15s
         volumes:
             - mysql:/var/lib/mysql
             - .:/app

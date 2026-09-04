@@ -32,11 +32,11 @@ jobs:
             git reset --hard origin/main
             echo "[Deploy] Code synchronized with origin/main."
             echo "[Deploy] Restarting services..."
-            docker compose --profile tools build
+            docker compose build
             echo "[Deploy] Restarting services..."
             docker compose up -d --force-recreate
             echo "[Deploy] Running database migrations in a one-shot container..."
-            docker compose --profile tools run --rm migrate
+            ./runner/migrate.sh
             echo "[Deploy] Services restarted successfully."
       - name: Notify success
         if: success()
