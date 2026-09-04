@@ -36,7 +36,7 @@ jobs:
             echo "[Deploy] Restarting services..."
             docker compose up -d --force-recreate
             echo "[Deploy] Running database migrations in a one-shot container..."
-            ./runner/migrate.sh
+            ./migrations/migrate.sh
             echo "[Deploy] Services restarted successfully."
       - name: Notify success
         if: success()

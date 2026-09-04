@@ -1,0 +1,12 @@
+{
+    "name": "gladcode2-migrations",
+    "version": "1.0.0",
+    "description": "Versioned MySQL migrations for gladcode2",
+    "type": "module",
+    "scripts": {
+        "db:migrate": "node scripts/migrate.js"
+    },
+    "dependencies": {
+        "mysql2": "^3.24.3"
+    }
+}

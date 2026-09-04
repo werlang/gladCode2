@@ -27,7 +27,7 @@ For specialized component specifications, consult these reference guides:
 - ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: Deep dive into `back_simulation.php`, Runner API, container VM isolation, `socket_compile.sh`, `simlog` format, and Phaser.js visualization.
 - 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: Complete guide to `public_html/dev-tools/`, `tournament.sh`, and `dump_restore.sh`.
 - ⚖️ **[Balance Patch Workflow](references/balance_patch.md)**: End-to-end procedure for rebalances — tuning payload values, verifying the server compile, syncing `manual.php` + function JSONs + regenerated bundle, bumping `version`, and publishing the news post.
-- 🗃️ **[Database Migrations](references/database_migrations.md)**: Versioned MySQL flow (`runner/migrations/`, `db:migrate`, deploy hook) ported from node-aec.
+- 🗃️ **[Database Migrations](references/database_migrations.md)**: Versioned MySQL flow (`migrations/`, `db:migrate`, deploy hook) ported from node-aec.
 
 ---
 

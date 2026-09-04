@@ -6,7 +6,7 @@ import { Mysql } from '../helpers/mysql.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const MIGRATIONS_DIR = path.join(__dirname, '../migrations');
+const MIGRATIONS_DIR = path.join(__dirname, '..');
 const LOCK_NAME = 'gladcode_migrations';
 const LOCK_TIMEOUT_SECONDS = 10;
 

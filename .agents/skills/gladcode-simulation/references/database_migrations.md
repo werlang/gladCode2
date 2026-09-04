@@ -7,22 +7,28 @@ named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 
 ## Layout
 
-- `runner/migrations/NNN_name.sql` — forward-only migration files, applied in
+- `migrations/NNN_name.sql` — forward-only migration files, applied in
   numeric order. `001_initial_schema.sql` is the schema-only baseline
   (27 tables, no data) extracted from `database-2025.3.sql`.
-- `runner/scripts/migrate.js` — exports `splitSqlStatements()` and
-  `migrate()`; runnable directly as `npm run db:migrate` from `runner/`.
-- `runner/helpers/mysql.js` — shared driver helper (env-configured pool,
+- `migrations/scripts/migrate.js` — exports `splitSqlStatements()` and
+  `migrate()`; runnable directly as `npm run db:migrate` from `migrations/`
+  (needs dependencies installed there).
+- `migrations/migrate.sh` — builds the migrate image and runs it with plain
+  `docker run` (see Running).
+- `migrations/package.json`, `migrations/Dockerfile`,
+  `migrations/.dockerignore` — self-contained packaging: the folder owns
+  every dependency, no other service is involved.
+- `migrations/helpers/mysql.js` — shared driver helper (env-configured pool,
   `{ rows }` result normalization, `withTransaction`). Models are the only
   normal production callers.
-- `tests/runner/migrate.test.mjs` — `node:test` coverage for the splitter
+- `tests/migrations/migrate.test.mjs` — `node:test` coverage for the splitter
   and the runner (fake-DB injected, no live database needed).
 
 ## How it works
 
 1. Connects with `MYSQL_HOST/PORT/USER/PASSWORD/DATABASE` (defaults
-   `mysql:3306`, `root`, `gladcode`; the `runner` compose service injects
-   these from `.env`).
+   `mysql:3306`, `root`, `gladcode`; `migrations/migrate.sh` loads these
+   from the environment, falling back to the repo `.env`).
 2. Takes the `gladcode_migrations` named lock (10s timeout) so concurrent
    runners serialize; the lock releases in a `finally`.
 3. Creates `schema_migrations(version, name, applied_at)` if missing.
@@ -45,7 +51,7 @@ named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 
 ## Running
 
-Migrations run via `./runner/migrate.sh`, which builds the migrate image
+Migrations run via `./migrations/migrate.sh`, which builds the migrate image
 and runs it with plain `docker run` on the MySQL container's network. It
 deliberately does NOT use `docker compose run` and does NOT depend on the
 long-lived `runner` service (or its `node_modules` volume): dependencies
@@ -57,7 +63,7 @@ accept connections before launching. Extra arguments are forwarded to
 # Deploy (also in .github/workflows/master-deploy.yml)
 docker compose build
 docker compose up -d --force-recreate
-./runner/migrate.sh
+./migrations/migrate.sh
 ```
 
 DB connection comes from the environment, falling back to `.env`, then to
@@ -72,7 +78,7 @@ A database created before this flow (e.g. production) must NOT run the
 migrate forward normally:
 
 ```bash
-./runner/migrate.sh --baseline=1
+./migrations/migrate.sh --baseline=1
 ```
 
 `--baseline=N` records every migration with version <= N as applied WITHOUT

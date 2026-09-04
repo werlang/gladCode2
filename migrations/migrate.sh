@@ -6,13 +6,14 @@
 # does NOT depend on the long-lived `runner` service (or its node_modules
 # volume): dependencies are baked into the image at build time.
 #
-# Usage: ./runner/migrate.sh [--baseline=N]
+# Usage: ./migrations/migrate.sh [--baseline=N]
 #   Extra arguments are forwarded to `npm run db:migrate`.
 #   DB connection comes from the environment, falling back to `.env`, then
 #   to compose defaults (host `mysql`, port 3306, user `root`, db `gladcode`).
 set -eu
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+MIGRATIONS_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # Load .env for variables not already exported (shell wins, like compose).
 if [ -f "$ROOT/.env" ]; then
@@ -36,7 +37,7 @@ MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-gladcode}"
 
 echo "[migrate] Building gladcode2-migrate image..."
-docker build -f "$ROOT/Dockerfile-migrate" -t gladcode2-migrate "$ROOT"
+docker build -f "$MIGRATIONS_DIR/Dockerfile" -t gladcode2-migrate "$MIGRATIONS_DIR"
 
 # The MySQL container name follows compose naming for this checkout.
 PROJECT=$(basename "$ROOT")

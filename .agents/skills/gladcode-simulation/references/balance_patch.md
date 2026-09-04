@@ -73,7 +73,7 @@ Also bump `public_html/version` (plain `x.y.z`, no trailing newline):
 cancels duels whose gladiators predate it and stamps it on battle logs.
 
 For non-breaking bumps, ship a carry-forward migration
-`runner/migrations/NNN_bump_gladiators_to_X_Y_Z.sql` updating only rows on
+`migrations/NNN_bump_gladiators_to_X_Y_Z.sql` updating only rows on
 the replaced version (see Database Migrations); omit it for BREAKING bumps.
 
 ## 4. Publish the patch-notes news post

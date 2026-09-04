@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { migrate, splitSqlStatements } from '../../runner/scripts/migrate.js';
+import { migrate, splitSqlStatements } from '../../migrations/scripts/migrate.js';
 
 /**
  * Builds an in-memory fake of the Mysql helper contract ({ connect, query,
