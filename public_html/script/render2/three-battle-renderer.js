@@ -5,11 +5,11 @@ import { BattleCameraController } from './camera-controller.js';
 import { BattleDomOverlay } from './dom-overlay.js';
 import { BattleEffectsLayer } from './effects-layer.js';
 import { GladiatorView } from './gladiator-view.js';
-import { ResourceTracker } from './resource-tracker.js';
+import { ResourceTracker } from './resource-tracker.js';/** Trauma is clamped so chained explosions never exceed one full shake. */
+const MAX_SHAKE_TRAUMA = 1;
+const SHAKE_DECAY_PER_SECOND = 1.9;
+const SHAKE_MAX_OFFSET = 0.34;
 
-/**
- * Three.js battle renderer that treats expanded simlog frames as authoritative.
- */
 export class ThreeBattleRenderer {
     #THREE;
     #arena;
@@ -21,27 +21,34 @@ export class ThreeBattleRenderer {
     #effects;
     #fpsFrames = 0;
     #fpsStartedAt = performance.now();
+    #animationLibrary = null;
     #heroAssets;
     #lastCrowdDensity = null;
+    #lastPixelsPerUnit = 0;
     #lastSize = { width: 0, height: 0 };
+    #lastTimestamp = null;
     #overlay;
+    #propAssets;
     #ready = false;
     #reducedMotion;
     #renderer;
     #resizeObserver;
     #scene;
+    #shakeTrauma = 0;
     #stateUpdatedAt = performance.now();
     #tracker;
     #views = [];
     #viewsById = new Map();
 
     /**
-     * @param {{ THREE: typeof import('three'), container: HTMLElement, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null }} options Renderer dependencies.
+     * @param {{ THREE: typeof import('three'), container: HTMLElement, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null, animationLibrary?: import('./animation-library.js').SyntyAnimationLibrary|null, propAssets?: import('./synty-prop-packs.js').SyntyPropAssets|null, RoomEnvironment?: typeof import('three/addons/environments/RoomEnvironment.js').RoomEnvironment|null }} options Renderer dependencies.
      */
-    constructor({ THREE, container, heroAssets = null }) {
+    constructor({ THREE, container, heroAssets = null, animationLibrary = null, propAssets = null, RoomEnvironment = null }) {
         this.#THREE = THREE;
         this.#container = container;
         this.#heroAssets = heroAssets;
+        this.#animationLibrary = animationLibrary;
+        this.#propAssets = propAssets;
         this.#tracker = new ResourceTracker(THREE);
         this.#audio = new BattleAudioManager();
         this.#reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -54,21 +61,29 @@ export class ThreeBattleRenderer {
         this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.#renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.#renderer.toneMappingExposure = 1.05;
+        this.#renderer.toneMappingExposure = 0.94;
         this.#renderer.shadowMap.enabled = true;
-        this.#renderer.shadowMap.type = THREE.PCFShadowMap;
+        this.#renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.#renderer.domElement.id = 'battle-render2-canvas';
         this.#renderer.domElement.tabIndex = 0;
         this.#renderer.domElement.setAttribute('aria-label', 'Arena 3D da batalha');
         container.appendChild(this.#renderer.domElement);
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x15191d);
-        this.#scene.fog = new THREE.FogExp2(0x15191d, 0.018);
-        this.#camera = new THREE.OrthographicCamera(-16, 16, 16, -16, 0.1, 100);
+        // Matches the sky-dome horizon so distant geometry fades seamlessly.
+        this.#scene.background = new THREE.Color(0x232c35);
+        this.#scene.fog = new THREE.FogExp2(0x232c35, 0.0075);
+        this.#applyEnvironment(RoomEnvironment);
+        this.#camera = new THREE.OrthographicCamera(-16, 16, 16, -16, 0.1, 120);
         this.#buildLights();
-        this.#arena = new ArenaView({ THREE, scene: this.#scene, tracker: this.#tracker });
-        this.#effects = new BattleEffectsLayer({ THREE, scene: this.#scene, audio: this.#audio });
+        this.#arena = new ArenaView({ THREE, scene: this.#scene, tracker: this.#tracker, propAssets });
+        this.#effects = new BattleEffectsLayer({
+            THREE,
+            scene: this.#scene,
+            audio: this.#audio,
+            onShake: (trauma) => this.addShake(trauma),
+            arrowFactory: heroAssets?.createArrow.bind(heroAssets) ?? null,
+        });
         this.#controls = new BattleCameraController({
             THREE,
             camera: this.#camera,
@@ -99,13 +114,27 @@ export class ThreeBattleRenderer {
     /** @type {import('./audio-manager.js').AudioTrack} */
     victory;
 
-    /** Builds bounded lighting for readable silhouettes and shadows. */
+    /** Bakes a neutral image-based light so metals and cloth read with depth. */
+    #applyEnvironment(RoomEnvironment) {
+        if (!RoomEnvironment) return;
+        try {
+            const generator = new this.#THREE.PMREMGenerator(this.#renderer);
+            this.#scene.environment = generator.fromScene(new RoomEnvironment(), 0.04).texture;
+            this.#scene.environmentIntensity = 0.22;
+            generator.dispose();
+        }
+        catch (error) {
+            console.warn('Ambiente PMREM indisponível; seguindo apenas com luzes.', error);
+        }
+    }
+
+    /** Builds bounded lighting for readable silhouettes and soft shadows. */
     #buildLights() {
         const THREE = this.#THREE;
-        const hemisphere = this.#tracker.track(new THREE.HemisphereLight(0xb9d9e9, 0x573f28, 1.55));
+        const hemisphere = this.#tracker.track(new THREE.HemisphereLight(0xbfd9e8, 0x5a4429, 0.95));
         this.#scene.add(hemisphere);
 
-        const sun = this.#tracker.track(new THREE.DirectionalLight(0xffe4b5, 2.35));
+        const sun = this.#tracker.track(new THREE.DirectionalLight(0xffe0b0, 1.7));
         sun.position.set(-11, 24, 14);
         sun.castShadow = true;
         sun.shadow.mapSize.set(2048, 2048);
@@ -115,9 +144,11 @@ export class ThreeBattleRenderer {
         sun.shadow.camera.bottom = -22;
         sun.shadow.camera.near = 1;
         sun.shadow.camera.far = 65;
+        sun.shadow.bias = -0.00015;
+        sun.shadow.normalBias = 0.02;
         this.#scene.add(sun);
 
-        const rim = this.#tracker.track(new THREE.DirectionalLight(0x5bc0de, 0.65));
+        const rim = this.#tracker.track(new THREE.DirectionalLight(0x5bc0de, 0.5));
         rim.position.set(12, 10, -12);
         this.#scene.add(rim);
     }
@@ -151,7 +182,7 @@ export class ThreeBattleRenderer {
     }
 
     /**
-     * Consumes one complete replay frame without interpolating its coordinates.
+     * Consumes one complete replay frame; rendering bridges frames smoothly.
      *
      * @param {Record<string, unknown>} state Complete expanded simlog frame.
      */
@@ -163,13 +194,14 @@ export class ThreeBattleRenderer {
         const safeRadius = Number(state.poison);
         const previous = this.#currentState;
         const isNewStep = !previous || Number(previous.simtime) !== Number(state.simtime);
+        const simulationTime = Number(state.simtime) || 0;
         const preferences = window.prefs ?? {};
 
         this.#arena.updateSafeZone(safeRadius);
         gladiators.forEach((gladiator, index) => {
             const view = this.#views[index];
             if (!view) return;
-            view.setState(gladiator, safeRadius, Number(state.simtime));
+            view.setState(gladiator, safeRadius, simulationTime);
             const compatibilityState = window.gladArray[index] ?? {};
             compatibilityState.alive = Number(gladiator.hp) > 0;
             compatibilityState.hp = Number(gladiator.hp);
@@ -179,11 +211,14 @@ export class ThreeBattleRenderer {
         });
 
         const projectiles = Array.isArray(state.projectiles) ? state.projectiles : [];
-        this.#effects.updateProjectiles(projectiles, this.#viewsById);
+        this.#effects.updateProjectiles(projectiles, this.#viewsById, simulationTime);
 
         if (isNewStep) {
             const events = deriveStepEvents(previous, state);
-            this.#effects.handleEvents(events, this.#viewsById, this.#overlay, preferences);
+            this.#effects.handleEvents(events, this.#viewsById, this.#overlay, {
+                ...preferences,
+                reducedMotion: this.#reducedMotion,
+            }, simulationTime);
             this.#effects.handleBuffTransitions(previous, state, this.#viewsById, preferences);
             this.#pauseAtNewBreakpoints(previous, state);
             window.update_ui?.(state);
@@ -239,18 +274,42 @@ export class ThreeBattleRenderer {
     }
 
     /**
-     * Renders an animation frame while keeping all game positions state-driven.
+     * Adds camera trauma; the offset decays exponentially while playing.
+     *
+     * @param {number} trauma Shake strength from zero to one.
+     */
+    addShake(trauma) {
+        if (this.#reducedMotion) return;
+        this.#shakeTrauma = Math.min(MAX_SHAKE_TRAUMA, this.#shakeTrauma + Number(trauma) || 0);
+    }
+
+    /**
+     * Renders an animation frame while keeping game truth replay-driven.
      *
      * @param {number} timestamp requestAnimationFrame timestamp in milliseconds.
      */
     #animate = (timestamp) => {
+        const deltaSeconds = this.#lastTimestamp === null ? 1 / 60 : Math.min((timestamp - this.#lastTimestamp) / 1000, 0.1);
+        this.#lastTimestamp = timestamp;
         const elapsedSeconds = timestamp / 1000;
         const simulationTime = this.#getAnimationTime();
+        const frameProgress = this.#getFrameProgress(timestamp);
         this.resize();
+        this.#syncParticleScale();
         this.#controls.update();
+
+        // Trauma-squared falloff keeps small hits subtle and big hits punchy.
+        if (this.#shakeTrauma > 0) {
+            this.#shakeTrauma = Math.max(0, this.#shakeTrauma - SHAKE_DECAY_PER_SECOND * deltaSeconds);
+            const magnitude = this.#shakeTrauma ** 2 * SHAKE_MAX_OFFSET;
+            this.#camera.position.x += Math.sin(elapsedSeconds * 31.7) * magnitude;
+            this.#camera.position.z += Math.cos(elapsedSeconds * 27.3) * magnitude;
+            this.#camera.position.y += Math.sin(elapsedSeconds * 41.1) * magnitude * 0.4;
+        }
+
         this.#arena.animate(this.#reducedMotion ? 0 : elapsedSeconds);
-        this.#views.forEach((view) => view.animate(simulationTime, this.#reducedMotion));
-        this.#effects.animate(elapsedSeconds);
+        this.#views.forEach((view) => view.animate(simulationTime, this.#reducedMotion, frameProgress, deltaSeconds));
+        this.#effects.animate(elapsedSeconds, simulationTime, deltaSeconds, frameProgress);
         this.#overlay.updatePositions(this.#views, window.prefs ?? {});
         this.#renderer.render(this.#scene, this.#camera);
         this.#updateFps(timestamp);
@@ -265,6 +324,30 @@ export class ThreeBattleRenderer {
         const direction = Math.sign(increment) || 1;
         const elapsed = (performance.now() - this.#stateUpdatedAt) / 1000 * Math.abs(increment);
         return frameTime + direction * Math.min(elapsed, 0.1);
+    }
+
+    /**
+     * Progress between the previous and current replay frame for placement
+     * blending. Wall-clock based: zero right after a frame lands, one once the
+     * next frame is due, and frozen at one while paused.
+     *
+     * @param {number} now Wall-clock milliseconds.
+     * @returns {number} Progress from zero to one.
+     */
+    #getFrameProgress(now) {
+        if (window.pausesim || this.#reducedMotion) return 1;
+        const increment = Math.abs(Number(window.stepIncrement) || 1);
+        const elapsed = (now - this.#stateUpdatedAt) / 1000 * increment;
+        return Math.min(Math.max(elapsed / 0.1, 0), 1);
+    }
+
+    /** Keeps particle point sizes stable across zoom and resize changes. */
+    #syncParticleScale() {
+        const height = Math.max(1, this.#container.clientHeight);
+        const pixelsPerUnit = height / this.#controls.viewSize / this.#camera.zoom;
+        if (Math.abs(pixelsPerUnit - this.#lastPixelsPerUnit) < 0.5) return;
+        this.#lastPixelsPerUnit = pixelsPerUnit;
+        this.#effects.setPixelsPerUnit(pixelsPerUnit);
     }
 
     /**
@@ -356,10 +439,10 @@ export class ThreeBattleRenderer {
             id: Number(view.state.id),
             engineX: Number(view.state.x),
             engineY: Number(view.state.y),
-            worldX: view.root.position.x,
-            worldZ: view.root.position.z,
+            worldX: view.settledPlacement.x,
+            worldZ: view.settledPlacement.z,
             heading: Number(view.state.head),
-            rotation: view.root.rotation.y,
+            rotation: view.settledPlacement.heading,
             hp: Number(view.state.hp),
             ap: Number(view.state.ap),
         }));
@@ -381,6 +464,7 @@ export class ThreeBattleRenderer {
         this.#audio.destroy();
         this.#views.forEach((view) => view.destroy());
         this.#tracker.dispose();
+        this.#propAssets?.dispose();
         this.#heroAssets?.dispose();
         this.#renderer.dispose();
         this.#renderer.domElement.remove();

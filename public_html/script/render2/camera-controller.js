@@ -39,6 +39,11 @@ export class BattleCameraController extends BaseComponent {
         return this.#followTarget;
     }
 
+    /** @returns {number} Height of the orthographic frustum in world units. */
+    get viewSize() {
+        return this.#viewSize;
+    }
+
     /**
      * Begins following a gladiator model.
      *
