@@ -1,0 +1,15 @@
+# One-shot database migration runner (see the `migrate` compose service).
+# Bakes dependencies at build time so `docker compose run` never depends on
+# the state of the long-lived `node_modules` volume.
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY runner/package.json runner/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY runner/helpers/ ./helpers/
+COPY runner/scripts/ ./scripts/
+COPY runner/migrations/ ./migrations/
+
+CMD ["npm", "run", "db:migrate"]
