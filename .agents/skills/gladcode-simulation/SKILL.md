@@ -26,6 +26,7 @@ For specialized component specifications, consult these reference guides:
 - 📜 **[C & Python Gladiator API Reference](references/c_api_reference.md)**: Documentation of `gladCodeAPI.c` and `gladCodeAPI.py` functions, arguments, return values, and TCP socket messaging protocols.
 - ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: Deep dive into `back_simulation.php`, Runner API, container VM isolation, `socket_compile.sh`, `simlog` format, and Phaser.js visualization.
 - 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: Complete guide to `public_html/dev-tools/`, `tournament.sh`, and `dump_restore.sh`.
+- ⚖️ **[Balance Patch Workflow](references/balance_patch.md)**: End-to-end procedure for rebalances — tuning payload values, verifying the server compile, syncing `manual.php` + function JSONs + regenerated bundle, bumping `version`, and publishing the news post.
 
 ---
 
@@ -120,6 +121,22 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
 # Reset production tournament #42
 docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh reset-real 42"
 ```
+
+### Workflow 5: Shipping a Balance Patch
+
+Rebalances follow a fixed five-step flow — full procedure, commands, and
+pre-commit checklist in [Balance Patch Workflow](references/balance_patch.md):
+
+1. Tune values in `payload/gladCodeGlobals.c` (`abilitycost`) and
+   `payload/gladCodeServerAPI.c` (watch two-spot values like teleport range).
+2. Prove the server compiles and runs (`gcc` line from `socket_compile.sh`
+   plus an end-to-end sim with `while(1)` bots). No image rebuild needed.
+3. Sync `public_html/manual.php`, `public_html/script/functions/*.json`,
+   regenerate `script/functions.json` via `compress_functions.php`, bump
+   `public_html/version`.
+4. Add the patch-notes `INSERT` under `public_html/dev-tools/` and apply it
+   to the production `news` table.
+5. Check off TODO.MD and commit (simulation, docs, news/skill slices).
 
 ---
 
