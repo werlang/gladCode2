@@ -53,5 +53,19 @@
             }
             return normalized;
         },
+        /**
+         * Demotes the renderer for this page load only, keeping the stored
+         * preference intact so transient failures retry on the next visit.
+         *
+         * @param {string} renderer Renderer name.
+         * @returns {string} The applied renderer.
+         */
+        setTransient(renderer) {
+            const normalized = normalize(renderer) ?? CLASSIC;
+            current = normalized;
+            window.battleRendererVersion = normalized;
+            applyClass(normalized);
+            return normalized;
+        },
     });
 })();
