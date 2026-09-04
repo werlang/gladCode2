@@ -13,3 +13,12 @@ public_html/runs/*
 .DS_Store
 backup/gcloud_config.json
 *.sql
+.playwright-mcp
+TODO.md
+public_html/assets/synty*
+public_html/assets/ancient-empire/
+public_html/assets/base-locomotion/
+public_html/assets/bow-crossbow/
+public_html/assets/dungeon-pack/
+public_html/assets/sword-combat/
+probe-anim*.png
