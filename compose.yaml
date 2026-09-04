@@ -25,6 +25,12 @@ services:
             - runs:/runs
         ports:
             - 127.0.0.1:3000:3000
+        environment:
+            - MYSQL_HOST=mysql
+            - MYSQL_PORT=${MYSQL_PORT}
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
         command: npm run dev
         # command: tail -f /dev/null #idle container
 

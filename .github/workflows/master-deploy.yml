@@ -35,6 +35,10 @@ jobs:
             docker compose build
             echo "[Deploy] Restarting services..."
             docker compose up -d --force-recreate
+            echo "[Deploy] Installing runner dependencies..."
+            docker compose exec -T runner npm install --omit=dev --no-audit --no-fund
+            echo "[Deploy] Running database migrations..."
+            docker compose exec -T runner npm run db:migrate
             echo "[Deploy] Services restarted successfully."
       - name: Notify success
         if: success()
