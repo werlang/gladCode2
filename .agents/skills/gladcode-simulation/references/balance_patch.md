@@ -72,6 +72,10 @@ Also bump `public_html/version` (plain `x.y.z`, no trailing newline):
 `back_glad.php` stamps it onto saved gladiators, `back_simulation.php`
 cancels duels whose gladiators predate it and stamps it on battle logs.
 
+For non-breaking bumps, ship a carry-forward migration
+`runner/migrations/NNN_bump_gladiators_to_X_Y_Z.sql` updating only rows on
+the replaced version (see Database Migrations); omit it for BREAKING bumps.
+
 ## 4. Publish the patch-notes news post
 
 `back_news.php` reads the `news` table (`id, title, time, post`); there is no
@@ -100,7 +104,7 @@ commit.
 - [ ] `abilitycost` index matches the `ABILITY_*` define, not position guesswork
 - [ ] `manual.php` cost/description cells for every touched ability
 - [ ] Source ability JSONs edited AND `functions.json` regenerated via the script
-- [ ] `version` bumped
+- [ ] `version` bumped (+ carry-forward migration unless the bump is BREAKING)
 - [ ] News SQL added under `public_html/dev-tools/`
 - [ ] TODO.MD balance items checked off
 - [ ] Full `tests/render2/` suite still green (unrelated but cheap)

@@ -45,10 +45,47 @@ named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 
 ## Running
 
-```bash
-# Inside the compose network (creds come from the runner environment)
-docker compose exec runner npm run db:migrate
+Migrations run in a dedicated one-shot container, never inside the
+long-lived `runner` service:
 
-# Deploy runs install (the node_modules volume shadows build-time deps)
-# then migrate automatically — see .github/workflows/master-deploy.yml
+```bash
+# Deploy (also in .github/workflows/master-deploy.yml)
+docker compose --profile tools build
+docker compose up -d --force-recreate
+docker compose --profile tools run --rm migrate
 ```
+
+The `migrate` service (`Dockerfile-migrate`, `profiles: ["tools"]`) bakes
+dependencies at build time, so it never depends on the `node_modules`
+volume state, waits for a healthy `mysql` via `depends_on`, and exits when
+done. Plain `docker compose up` never starts it. Local one-off runs use the
+same command; `npm run db:migrate` from `runner/` only works when that
+checkout has dependencies installed.
+
+## Adopting a pre-existing database
+
+A database created before this flow (e.g. production) must NOT run the
+`001` baseline — it drops and recreates every table. Stamp it instead, then
+migrate forward normally:
+
+```bash
+docker compose --profile tools run --rm migrate npm run db:migrate -- --baseline=1
+```
+
+`--baseline=N` records every migration with version <= N as applied WITHOUT
+executing it, then applies newer files normally. It is idempotent and safe
+to re-run.
+
+## Version-bump data migrations
+
+Non-breaking `version` bumps ship a gladiator carry-forward migration,
+`NNN_bump_gladiators_to_X_Y_Z.sql`:
+
+```sql
+UPDATE `gladiators` SET `version` = '<new>' WHERE `version` = '<old>';
+```
+
+Only rows already on the replaced version move; older rows stay stale behind
+the existing guards (old-version badge, duel cancel, matchmaking filter).
+Omit the migration when the bump is BREAKING — stale owners must review
+their code instead.
