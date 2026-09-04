@@ -105,6 +105,7 @@ function findColor(tokens, palette, fallback) {
  *   accentColor: string,
  *   armor: 'cloth'|'leather'|'metal'|'gold',
  *   armorColor: string,
+ *   families: { bow: boolean, spear: boolean, staff: boolean, magic: boolean, melee: boolean },
  *   gender: 'female'|'male',
  *   hairColor: string,
  *   hasCape: boolean,
@@ -134,13 +135,28 @@ export function getGladiatorAppearance(gladiator) {
     }
 
     let weapon = 'sword';
-    if (tokens.some((token) => /bow|arcoreal|ranged/.test(token))) {
+    // LPC "empty slot" markers such as `ranged_none`, `melee_none` or
+    // `shield_none` describe absence, not a weapon: nearly every character
+    // carries `ranged_none`, so they must never satisfy the ranged match.
+    const weaponTokens = tokens.filter((token) => !/_none$/.test(token) && token !== 'arrows');
+    const families = {
+        bow: weaponTokens.some((token) => /bow|arco|sling/.test(token)),
+        spear: weaponTokens.some((token) => /spear|trident|lance/.test(token)),
+        staff: weaponTokens.some((token) => /staff|cajado|wand|varinha/.test(token)),
+        magic: weaponTokens.some((token) => /wizard-hat|hood|robe/.test(token)),
+        melee: weaponTokens.some((token) => /sword|rapier|longsword|warhammer|hammer|axe|mace|club|dagger|scimitar|gauntlet/.test(token)),
+    };
+    if (families.bow) {
         weapon = 'bow';
     }
-    else if (tokens.some((token) => /spear|trident/.test(token))) {
+    else if (families.spear) {
         weapon = 'spear';
     }
-    else if (tokens.some((token) => /staff|wand/.test(token))) {
+    else if (families.staff) {
+        weapon = 'staff';
+    }
+    else if (families.magic) {
+        // Robed/hatted fighters with no explicit weapon are casters.
         weapon = 'staff';
     }
 
@@ -148,10 +164,11 @@ export function getGladiatorAppearance(gladiator) {
         accentColor,
         armor,
         armorColor,
+        families,
         gender: tokens.some((token) => token === 'female' || token.startsWith('female-')) ? 'female' : 'male',
         hairColor: findColor(tokens, HAIR_COLORS, '#4b3028'),
         hasCape: tokens.some((token) => token.startsWith('cape_') && !token.includes('none')),
-        hasHelmet: tokens.some((token) => /helmet|helm|hood|hat|cap/.test(token) && token !== 'head_none'),
+        hasHelmet: tokens.some((token) => /helmet|helm|hood|hat|(^|_)cap(?!e)/.test(token) && token !== 'head_none'),
         skinColor: findColor(tokens, SKIN_COLORS, '#d9a67f'),
         weapon,
     };

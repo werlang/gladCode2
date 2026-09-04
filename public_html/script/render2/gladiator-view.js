@@ -1,23 +1,64 @@
-import { ACTIONS, headingToRadians, isOutsideSafeZone, toArenaPosition } from './battle-state.js';
+import { ACTIONS, headingToRadians, isOutsideSafeZone, lerp, lerpAngle, toArenaPosition } from './battle-state.js';
 import { getGladiatorAppearance } from './gladiator-appearance.js';
-import { blendHeroPoses, getHeroActionDuration, sampleHeroPose } from './synty-hero-animation.js';
+import { hashIdentity } from './synty-hero-config.js';
+import { applyHitReaction, blendHeroPoses, getHeroActionDuration, sampleHeroPose } from './synty-hero-animation.js';
 
-/** Three.js representation of one engine-controlled gladiator. */
+/** Seconds an attack-recoil overlay stays visible when no clip library exists. */
+const HIT_REACTION_SECONDS = 0.34;
+/** Damage above which a hit reaction upgrades to the heavier stagger clip. */
+const STAGGER_DAMAGE_THRESHOLD = 22;
+/** World units per second treated as the reference locomotion cadence. */
+const REFERENCE_SPEED = 3;
+/** Looping guard idles that give each fighter a persistent silhouette. */
+const IDLE_CLIPS = ['idle', 'idleMenacing', 'idleEnergetic', 'idleFlourish'];
+
+/** Clip keys that play once instead of looping. */
+const ONE_SHOT_CLIPS = new Set([
+    'hitF', 'hitB', 'hitL', 'hitR',
+    'staggerF', 'staggerB', 'staggerL', 'staggerR',
+    'deathF', 'deathB', 'deathL', 'deathR',
+]);
+
+/**
+ * Three.js representation of one engine-controlled gladiator.
+ *
+ * Fighters play real Synty skeletal clips through an AnimationMixer whenever a
+ * clip exists for their state, and fall back to the hand-authored procedural
+ * pose system for actions the packs do not cover (casting, teleporting,
+ * drinking, archery). Engine positions stay authoritative: rendering bridges
+ * the two latest replay frames on the shared replay clock.
+ */
 export class GladiatorView {
     #THREE;
     #accentMaterial;
     #activeAction = null;
     #actionStartTime = 0;
+    #animationLibrary = null;
     #appearance;
     #armorMaterial;
     #baseArmorColor;
     #baseOpacities = new Map();
     #body;
+    #buffEmissive;
+    #buffIntensity = 0;
+    #clipActions = new Map();
+    #currentClipKey = null;
     #currentPose = null;
+    #deathClipKey = null;
     #deathStartedAt = null;
+    #displayedAlpha = 1;
+    #flashColor = null;
+    #fromPlacement = null;
     #heroController = null;
+    #hitClipKey = null;
+    #hitReactionStart = null;
+    #hitUntil = 0;
+    #idleClipKey = 'idle';
+    #arsenal = null;
     #index;
+    #lastGroundSpeed = 1;
     #materials = [];
+    #mixer = null;
     #model;
     #observedAction = null;
     #root;
@@ -25,23 +66,29 @@ export class GladiatorView {
     #state;
     #statusRing;
     #stunStars;
+    #toPlacement = null;
     #tracker;
     #transitionFromPose = null;
     #usesSyntyHero = false;
     #weaponPivot;
 
     /**
-     * @param {{ THREE: typeof import('three'), tracker: import('./resource-tracker.js').ResourceTracker, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null, gladiator: Record<string, unknown>, index: number }} options View dependencies.
+     * @param {{ THREE: typeof import('three'), tracker: import('./resource-tracker.js').ResourceTracker, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null, animationLibrary?: import('./animation-library.js').SyntyAnimationLibrary|null, gladiator: Record<string, unknown>, index: number }} options View dependencies.
      */
-    constructor({ THREE, tracker, heroAssets = null, gladiator, index }) {
+    constructor({ THREE, tracker, heroAssets = null, animationLibrary = null, gladiator, index }) {
         this.#THREE = THREE;
         this.#tracker = tracker;
         this.#index = index;
+        this.#animationLibrary = animationLibrary;
         this.#appearance = getGladiatorAppearance(gladiator);
         this.#root = tracker.track(new THREE.Group());
         this.#root.name = `gladiator-${gladiator.id ?? index}`;
         this.#model = tracker.track(new THREE.Group());
         this.#root.add(this.#model);
+        // A persistent per-fighter guard idle keeps the crowd varied without
+        // extra state: hash the stable identity over the available idles.
+        const idleHash = hashIdentity(`${gladiator.user ?? ''}:${gladiator.name ?? ''}`);
+        this.#idleClipKey = IDLE_CLIPS[idleHash % IDLE_CLIPS.length];
         this.#buildModel(heroAssets, gladiator);
         this.setState(gladiator, 17.68, 0);
     }
@@ -54,6 +101,18 @@ export class GladiatorView {
     /** @returns {Record<string, unknown>} Latest complete gladiator state. */
     get state() {
         return this.#state;
+    }
+
+    /**
+     * @returns {{ x: number, z: number, heading: number }} Placement the fighter
+     *          settles on once the current replay frame finishes interpolating.
+     */
+    get settledPlacement() {
+        return {
+            x: this.#toPlacement?.x ?? this.#root.position.x,
+            z: this.#toPlacement?.z ?? this.#root.position.z,
+            heading: this.#toPlacement?.heading ?? this.#root.rotation.y,
+        };
     }
 
     /** Registers a material for opacity and teardown handling. */
@@ -98,15 +157,32 @@ export class GladiatorView {
         shadow.castShadow = false;
         shadow.receiveShadow = false;
 
-        this.#statusRing = this.#mesh(new THREE.TorusGeometry(0.52, 0.055, 8, 32), this.#accentMaterial, this.#root);
+        this.#statusRing = this.#mesh(new THREE.TorusGeometry(0.52, 0.05, 8, 40), this.#accentMaterial, this.#root);
         this.#statusRing.rotation.x = Math.PI / 2;
         this.#statusRing.position.y = 0.06;
         this.#statusRing.castShadow = false;
 
-        const facing = this.#mesh(new THREE.ConeGeometry(0.12, 0.5, 6), this.#accentMaterial, this.#root);
-        facing.rotation.x = -Math.PI / 2;
-        facing.position.set(0, 0.1, -0.7);
-        facing.castShadow = false;
+        // Flat ground chevron pointing along the fighter's heading.
+        const chevronShape = new THREE.Shape();
+        chevronShape.moveTo(0, 0.17);
+        chevronShape.lineTo(0.12, -0.09);
+        chevronShape.lineTo(0, -0.035);
+        chevronShape.lineTo(-0.12, -0.09);
+        chevronShape.closePath();
+        const chevron = this.#mesh(
+            new THREE.ShapeGeometry(chevronShape),
+            new THREE.MeshBasicMaterial({
+                color: this.#appearance.accentColor,
+                transparent: true,
+                opacity: 0.62,
+                depthWrite: false,
+            }),
+            this.#root,
+        );
+        chevron.rotation.x = -Math.PI / 2;
+        chevron.position.set(0, 0.03, -0.82);
+        chevron.castShadow = false;
+        chevron.receiveShadow = false;
 
         let builtFromPack = false;
         if (heroAssets) {
@@ -153,6 +229,7 @@ export class GladiatorView {
     #buildSyntyHero(heroAssets, gladiator) {
         const hero = heroAssets.createHero(gladiator, this.#appearance);
         this.#heroController = hero;
+        this.#arsenal = hero.weapons ?? null;
         this.#usesSyntyHero = true;
         this.#tracker.track(hero.object);
         this.#model.add(hero.object);
@@ -160,7 +237,11 @@ export class GladiatorView {
         this.#armorMaterial = this.#registerMaterial(hero.material);
         this.#baseArmorColor = new this.#THREE.Color(0xffffff);
 
-        if (!hero.weapon) {
+        if (this.#animationLibrary && this.#animationLibrary.size > 0) {
+            this.#mixer = new this.#THREE.AnimationMixer(hero.object);
+        }
+
+        if (!this.#arsenal?.melee) {
             this.#weaponPivot = this.#tracker.track(new this.#THREE.Group());
             const darkMaterial = new this.#THREE.MeshStandardMaterial({ color: 0x392b22, roughness: 0.82 });
             this.#buildWeapon(darkMaterial);
@@ -169,6 +250,28 @@ export class GladiatorView {
                 rotation: [0, -Math.PI / 2, 0],
             });
         }
+    }
+
+    /**
+     * Shows the weapon the current action calls for: bow while shooting,
+     * blade while swinging, bare hands while casting, and the fighter's
+     * primary weapon the rest of the time.
+     *
+     * @param {number} action Engine action id.
+     */
+    #syncWeaponVisibility(action) {
+        const arsenal = this.#arsenal;
+        if (!arsenal) return;
+
+        let active = arsenal.primary;
+        if (action === ACTIONS.ranged && arsenal.ranged) active = 'ranged';
+        else if ((action === ACTIONS.melee || action === ACTIONS.assassinate) && arsenal.melee) active = 'melee';
+        else if (action === ACTIONS.fireball) active = 'none';
+
+        if (arsenal.melee) arsenal.melee.visible = active === 'melee';
+        if (arsenal.ranged) arsenal.ranged.visible = active === 'ranged';
+        if (arsenal.staff) arsenal.staff.visible = active === 'staff';
+        if (arsenal.shield) arsenal.shield.visible = active === 'melee';
     }
 
     /** Retains the prior geometry as a graceful fallback for missing assets. */
@@ -267,14 +370,38 @@ export class GladiatorView {
         this.#weaponPivot.rotation.z = -0.34;
     }
 
-    /** Applies a complete simlog state directly to the model transform. */
+    /**
+     * Applies a complete simlog state as the next interpolation target.
+     *
+     * @param {Record<string, unknown>} gladiator Complete gladiator frame.
+     * @param {number} safeRadius Current poison boundary radius.
+     * @param {number} simulationTime Replay timestamp of the frame.
+     */
     setState(gladiator, safeRadius, simulationTime = 0) {
         const wasAlive = !this.#state || Number(this.#state.hp) > 0;
+        const previous = this.#state;
         this.#state = gladiator;
+
         const position = toArenaPosition({ x: gladiator.x, y: gladiator.y });
-        this.#root.position.set(position.x, position.y, position.z);
-        this.#root.rotation.y = headingToRadians(gladiator.head);
-        this.#root.visible = true;
+        const target = { x: position.x, z: position.z, heading: headingToRadians(gladiator.head), simtime: Number(simulationTime) || 0 };
+
+        if (this.#toPlacement) {
+            const deltaTime = Math.max(target.simtime - this.#toPlacement.simtime, 0.001);
+            const distance = Math.hypot(target.x - this.#toPlacement.x, target.z - this.#toPlacement.z);
+            const instantSpeed = Math.min(Math.max(distance / deltaTime / REFERENCE_SPEED, 0.45), 2.1);
+            // Quantized replay positions make the instant estimate jitter; a
+            // short exponential average keeps the walk/run cadence steady.
+            this.#lastGroundSpeed = this.#lastGroundSpeed === 1
+                ? instantSpeed
+                : lerp(this.#lastGroundSpeed, instantSpeed, 0.35);
+        }
+
+        const jumped = !this.#toPlacement
+            || Math.abs(target.simtime - this.#toPlacement.simtime) > 0.45
+            || target.simtime <= this.#toPlacement.simtime;
+        this.#fromPlacement = jumped ? target : this.#currentVisualPlacement();
+        this.#toPlacement = target;
+        if (jumped) this.#applyPlacement(1);
 
         const buffs = gladiator.buffs ?? {};
         const isAlive = Number(gladiator.hp) > 0;
@@ -285,11 +412,17 @@ export class GladiatorView {
 
         if (isAlive) {
             this.#deathStartedAt = null;
-            this.#model.rotation.z = 0;
-            this.#model.position.y = 0;
+            this.#deathClipKey = null;
+            this.#model.rotation.set(0, 0, 0);
+            this.#model.position.set(this.#model.position.x, 0, this.#model.position.z);
+            this.#accentMaterial.opacity = this.#baseOpacities.get(this.#accentMaterial) ?? 1;
+            this.#accentMaterial.transparent = (this.#baseOpacities.get(this.#accentMaterial) ?? 1) < 1;
         }
         else if (wasAlive) {
             this.#deathStartedAt = Number(simulationTime) || 0;
+            // Deterministic collapse direction per fighter.
+            const directions = ['F', 'B', 'L', 'R'];
+            this.#deathClipKey = `death${directions[this.#index % directions.length]}`;
         }
         this.#shield.visible = isAlive && isResistant;
         this.#stunStars.visible = isAlive && Number(buffs.stun?.timeleft) > 0.1;
@@ -301,28 +434,200 @@ export class GladiatorView {
             material.opacity = isInvisible ? baseOpacity * 0.32 : baseOpacity;
         });
 
-        this.#armorMaterial.color.copy(this.#baseArmorColor);
-        this.#armorMaterial.emissive.setHex(0x000000);
-        this.#armorMaterial.emissiveIntensity = 0;
+        this.#buffEmissive = new this.#THREE.Color(0x000000);
+        this.#buffIntensity = 0;
         if (isBurning) {
-            this.#armorMaterial.emissive.setHex(0xff6b35);
-            this.#armorMaterial.emissiveIntensity = 0.72;
+            this.#buffEmissive.setHex(0xff6b35);
+            this.#buffIntensity = 0.72;
         }
         else if (isPoisoned) {
-            this.#armorMaterial.emissive.setHex(0x48d85d);
-            this.#armorMaterial.emissiveIntensity = 0.55;
+            this.#buffEmissive.setHex(0x48d85d);
+            this.#buffIntensity = 0.55;
         }
         else if (isResistant) {
-            this.#armorMaterial.emissive.setHex(0xffd84f);
-            this.#armorMaterial.emissiveIntensity = 0.48;
+            this.#buffEmissive.setHex(0xffd84f);
+            this.#buffIntensity = 0.48;
+        }
+        this.#armorMaterial.emissive.copy(this.#buffEmissive);
+        this.#armorMaterial.emissiveIntensity = this.#buffIntensity;
+
+        if (previous && Number(previous.action) !== Number(gladiator.action)
+            && Number(gladiator.hp) > 0
+            && [ACTIONS.melee, ACTIONS.assassinate].includes(Number(gladiator.action))) {
+            this.#startAction(Number(gladiator.action), Number(simulationTime) || 0);
         }
     }
 
-    /** Advances rig motion and action poses without changing engine positions. */
-    animate(simulationTime, reducedMotion = false) {
-        if (!this.#state) return;
-        if (Number(this.#state.hp) <= 0) {
-            this.#animateDeath(simulationTime, reducedMotion);
+    /**
+     * Starts a short recoil overlay after the fighter takes damage.
+     *
+     * @param {number} _simulationTime Current replay timestamp.
+     * @param {number} [damageAmount] HP lost by this hit; large hits stagger.
+     */
+    playHitReaction(_simulationTime = 0, damageAmount = 0) {
+        if (Number(this.#state?.hp) <= 0) return;
+        const directions = ['F', 'B', 'L', 'R'];
+        const direction = directions[this.#index % directions.length];
+        const key = Number(damageAmount) >= STAGGER_DAMAGE_THRESHOLD
+            ? `stagger${direction}`
+            : `hit${direction}`;
+        const fallbackKey = Number(damageAmount) >= STAGGER_DAMAGE_THRESHOLD ? `hit${direction}` : null;
+        const clip = this.#animationLibrary?.get(key) ?? (fallbackKey ? this.#animationLibrary?.get(fallbackKey) : null);
+        if (clip) {
+            const usedKey = this.#animationLibrary.has(key) ? key : fallbackKey;
+            this.#hitClipKey = usedKey;
+            this.#hitUntil = performance.now() + clip.duration * 1000 / 1.25 + 40;
+            this.#currentClipKey = null; // force the mixer to switch immediately
+            return;
+        }
+        // Procedural fallback overlay.
+        this.#hitReactionStart = Number(_simulationTime) || 0;
+    }
+
+    /**
+     * Blends the two most recent targets into the rendered placement.
+     *
+     * @param {number} alpha Progress from the previous target to the current one.
+     */
+    #applyPlacement(alpha) {
+        const from = this.#fromPlacement;
+        const to = this.#toPlacement;
+        this.#root.position.set(
+            lerp(from.x, to.x, alpha),
+            this.#root.position.y,
+            lerp(from.z, to.z, alpha),
+        );
+        this.#root.rotation.y = lerpAngle(from.heading, to.heading, alpha);
+    }
+
+    /** @returns {{ x: number, z: number, heading: number, simtime: number }} Placement currently displayed. */
+    #currentVisualPlacement() {
+        const from = this.#fromPlacement ?? this.#toPlacement;
+        const to = this.#toPlacement;
+        return {
+            x: lerp(from.x, to.x, this.#displayedAlpha),
+            z: lerp(from.z, to.z, this.#displayedAlpha),
+            heading: lerpAngle(from.heading, to.heading, this.#displayedAlpha),
+            simtime: to.simtime,
+        };
+    }
+
+    /**
+     * Picks the clip that represents the fighter's current state.
+     *
+     * Clips cover the states where packaged animation reads well (guard
+     * idles, block, hits, stuns, deaths). Locomotion and attacks are handled
+     * by the procedural pose system, which stays speed-true and readable
+     * from the top-down camera.
+     *
+     * @param {boolean} isAlive Whether the fighter still stands.
+     * @param {boolean} stunned Whether the stun buff is active.
+     * @returns {string|null} Clip key, or null to fall back to procedural posing.
+     */
+    #resolveClipKey(isAlive, stunned) {
+        const library = this.#animationLibrary;
+        if (!library) return null;
+        if (!isAlive) return library.has(this.#deathClipKey) ? this.#deathClipKey : null;
+        if (stunned && library.has('stun')) return 'stun';
+
+        const now = performance.now();
+        if (now < this.#hitUntil && this.#hitClipKey && library.has(this.#hitClipKey)) return this.#hitClipKey;
+
+        const action = Number(this.#state?.action);
+        if (action === ACTIONS.block && library.has('block')) return 'block';
+        if (action === ACTIONS.waiting || action === ACTIONS.none) {
+            if (library.has(this.#idleClipKey)) return this.#idleClipKey;
+            return library.has('idle') ? 'idle' : null;
+        }
+        return null;
+    }
+
+    /**
+     * Playback rate for a clip key.
+     *
+     * @param {string} key Clip key.
+     * @param {import('three').AnimationClip} clip The referenced clip.
+     * @returns {number} Mixer time scale.
+     */
+    #clipTimeScale(key, clip) {
+        if (key.startsWith('hit') || key.startsWith('stagger')) return 1.25;
+        return 1;
+    }
+
+    /**
+     * Drives the AnimationMixer toward the resolved clip.
+     *
+     * @param {number} deltaSeconds Wall-clock seconds since the previous frame.
+     * @param {boolean} isAlive Whether the fighter still stands.
+     * @param {boolean} stunned Whether the stun buff is active.
+     * @param {boolean} reducedMotion Whether ambient motion is reduced.
+     * @returns {boolean} True when a clip owns the bones this frame.
+     */
+    #syncMixer(deltaSeconds, isAlive, stunned, reducedMotion) {
+        if (!this.#mixer) return false;
+        const key = reducedMotion ? (isAlive ? null : this.#deathClipKey && this.#animationLibrary.has(this.#deathClipKey) ? this.#deathClipKey : null) : this.#resolveClipKey(isAlive, stunned);
+
+        if (!key) {
+            if (this.#currentClipKey) {
+                this.#clipActions.forEach((action) => action.fadeOut(0.12));
+                this.#currentClipKey = null;
+            }
+            this.#mixer.update(deltaSeconds);
+            return false;
+        }
+
+        const clip = this.#animationLibrary.get(key);
+        let action = this.#clipActions.get(key);
+        if (!action) {
+            action = this.#mixer.clipAction(clip);
+            this.#clipActions.set(key, action);
+        }
+
+        if (this.#currentClipKey !== key) {
+            const previous = this.#currentClipKey ? this.#clipActions.get(this.#currentClipKey) : null;
+            action.reset();
+            action.setLoop(ONE_SHOT_CLIPS.has(key) ? this.#THREE.LoopOnce : this.#THREE.LoopRepeat, 1);
+            action.clampWhenFinished = key.startsWith('death');
+            action.timeScale = this.#clipTimeScale(key, clip);
+            action.enabled = true;
+            action.fadeIn(previous ? 0.16 : 0.04);
+            previous?.fadeOut(0.16);
+            action.play();
+            this.#currentClipKey = key;
+        }
+        else {
+            action.timeScale = this.#clipTimeScale(key, clip);
+        }
+
+        this.#mixer.update(deltaSeconds);
+        return true;
+    }
+
+    /** Advances rig motion, interpolation, and status props without touching engine truth. */
+    animate(simulationTime, reducedMotion = false, frameProgress = 1, deltaSeconds = 1 / 60) {
+        if (!this.#state || !this.#fromPlacement || !this.#toPlacement) return;
+
+        this.#displayedAlpha = reducedMotion ? 1 : Math.min(Math.max(frameProgress, 0), 1);
+        this.#applyPlacement(this.#displayedAlpha);
+
+        const isAlive = Number(this.#state.hp) > 0;
+        const stunned = isAlive && Number(this.#state.buffs?.stun?.timeleft) > 0.1;
+        if (isAlive) this.#syncWeaponVisibility(Number(this.#state.action));
+        const clipOwned = this.#syncMixer(deltaSeconds, isAlive, stunned, reducedMotion);
+
+        if (!isAlive) {
+            this.#animateDeath(simulationTime, reducedMotion, clipOwned);
+            return;
+        }
+
+        if (clipOwned) {
+            // Clips own the bones; only the status props animate procedurally.
+            const ambientTime = reducedMotion ? 0 : simulationTime;
+            this.#statusRing.scale.setScalar(1 + Math.sin(ambientTime * 5.2 + this.#index) * 0.045);
+            this.#shield.rotation.z = ambientTime * 0.55;
+            this.#stunStars.rotation.y = ambientTime * 2.8;
+            this.#model.position.x = 0;
+            this.#model.position.z = 0;
             return;
         }
 
@@ -349,33 +654,58 @@ export class GladiatorView {
         const targetPose = sampleHeroPose(this.#activeAction, actionTime, {
             weapon: this.#appearance.weapon,
             seed: this.#index * 0.173,
+            speed: this.#lastGroundSpeed,
         });
         const transitionAmount = reducedMotion
             ? 1
             : Math.min(Math.abs(simulationTime - this.#actionStartTime) / 0.12, 1);
-        this.#currentPose = this.#transitionFromPose
+        let pose = this.#transitionFromPose
             ? blendHeroPoses(this.#transitionFromPose, targetPose, transitionAmount)
             : targetPose;
         if (transitionAmount >= 1) this.#transitionFromPose = null;
 
-        this.#heroController?.rig.applyPose(this.#currentPose);
+        const reactionProgress = this.#hitReactionStart === null
+            ? 1
+            : (simulationTime - this.#hitReactionStart) / HIT_REACTION_SECONDS;
+        if (reactionProgress >= 0 && reactionProgress < 1) {
+            pose = reducedMotion ? pose : applyHitReaction(pose, reactionProgress);
+            const flash = (1 - reactionProgress) * 0.85;
+            this.#armorMaterial.emissive.copy(this.#buffEmissive).lerp(this.#hitFlashColor, Math.min(flash * 1.4, 1));
+            this.#armorMaterial.emissiveIntensity = this.#buffIntensity + flash;
+        }
+        else if (this.#hitReactionStart !== null) {
+            this.#hitReactionStart = null;
+            this.#armorMaterial.emissive.copy(this.#buffEmissive);
+            this.#armorMaterial.emissiveIntensity = this.#buffIntensity;
+        }
+
+        this.#currentPose = pose;
+        this.#heroController?.rig.applyPose(pose);
         if (this.#usesSyntyHero) {
-            this.#body.position.y = this.#currentPose.body.y;
-            this.#body.rotation.x = this.#currentPose.body.z;
-            this.#body.rotation.z = this.#currentPose.body.x;
+            this.#body.position.y = pose.body.y;
+            this.#body.rotation.x = pose.body.z;
+            this.#body.rotation.z = pose.body.x;
         }
         else {
-            this.#model.position.y = this.#currentPose.body.y;
-            this.#body.rotation.x = this.#currentPose.body.x;
+            this.#model.position.y = pose.body.y;
+            this.#body.rotation.x = pose.body.x;
             if (this.#weaponPivot) {
-                this.#weaponPivot.rotation.z = -0.34 + this.#currentPose.weapon.emphasis * 0.8;
+                this.#weaponPivot.rotation.z = -0.34 + pose.weapon.emphasis * 0.8;
             }
         }
+        this.#model.position.x = pose.lunge.side;
+        this.#model.position.z = -pose.lunge.forward;
 
         const ambientTime = reducedMotion ? 0 : simulationTime;
         this.#statusRing.scale.setScalar(1 + Math.sin(ambientTime * 5.2 + this.#index) * 0.045);
         this.#shield.rotation.z = ambientTime * 0.55;
         this.#stunStars.rotation.y = ambientTime * 2.8;
+    }
+
+    /** Warm tint used while the damage flash decays. */
+    get #hitFlashColor() {
+        if (!this.#flashColor) this.#flashColor = new this.#THREE.Color(0xff3b30);
+        return this.#flashColor;
     }
 
     /** Starts one action without discarding the outgoing blended pose. */
@@ -385,15 +715,36 @@ export class GladiatorView {
         this.#actionStartTime = Number(simulationTime) || 0;
     }
 
-    /** Animates a readable fall while allowing replay seeks to restore life. */
-    #animateDeath(simulationTime, reducedMotion) {
+    /**
+     * Animates the collapse. Clip-driven deaths freeze in the authored pose;
+     * the procedural fallback tips the model over.
+     *
+     * @param {number} simulationTime Replay timestamp.
+     * @param {boolean} reducedMotion Whether ambient motion is reduced.
+     * @param {boolean} clipOwned Whether a death clip owns the bones.
+     */
+    #animateDeath(simulationTime, reducedMotion, clipOwned) {
+        this.#model.position.x = 0;
+        this.#model.position.z = 0;
+        if (clipOwned) {
+            this.#accentMaterial.opacity = 0.45;
+            this.#accentMaterial.transparent = true;
+            return;
+        }
         if (this.#deathStartedAt === null) this.#deathStartedAt = simulationTime;
         const linear = reducedMotion
             ? 1
-            : Math.min(Math.abs(simulationTime - this.#deathStartedAt) / 0.68, 1);
+            : Math.min(Math.abs(simulationTime - this.#deathStartedAt) / 0.72, 1);
         const eased = 1 - (1 - linear) ** 3;
-        this.#model.rotation.z = -Math.PI / 2 * eased;
-        this.#model.position.y = 0.28 * eased;
+        const settleBounce = linear < 1
+            ? Math.sin(linear * Math.PI) * 0.06 * (1 - linear)
+            : 0;
+        this.#model.rotation.x = Math.PI / 2 * eased;
+        this.#model.position.y = 0.22 * eased + settleBounce;
+        const fade = 1 - eased * 0.55;
+        this.#statusRing.scale.setScalar(1 + eased * 0.35);
+        this.#accentMaterial.opacity = fade;
+        this.#accentMaterial.transparent = fade < 1;
     }
 
     /** @returns {import('three').Vector3} World-space label anchor. */
@@ -403,6 +754,7 @@ export class GladiatorView {
 
     /** Releases per-fighter resources before shared asset teardown. */
     destroy() {
+        this.#mixer?.stopAllAction();
         this.#heroController?.dispose();
     }
 }
