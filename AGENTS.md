@@ -44,7 +44,7 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 - **`back_tournament.php` / `back_train.php`**: Handlers for tournaments and practice sessions.
 - **`playback.php` / `script/playback.js`**: Shared replay entrypoint, controls, preferences, and incremental simlog expansion used by both battle renderers.
 - **`script/render.js`**: Classic Phaser.js 2D battle renderer.
-- **`script/render2.js` / `script/render2/`**: Selectable Three.js top-down 3D renderer and its state, arena, gladiator, effects, audio, camera, and DOM-overlay modules.
+- **`script/render2.js` / `script/render2/`**: Selectable Three.js top-down 3D renderer and its state, arena, gladiator, effects, audio, camera, and DOM-overlay modules. Synty pack integration lives in `synty-hero-assets.js` / `synty-hero-config.js` (modular bodies plus the registered weapon pools from the hero, bow-crossbow, dungeon-pack, and ancient-empire FBXs), `weapon-library.js` (shared FBX cache and stale-texture URL remapping), `animation-library.js` (sword-combat and base-locomotion clips), and `synty-prop-packs.js` (arena dressing). Every consumed asset path is asserted by `tests/render2/asset-packs.test.mjs`.
 - **`banned_functions.json`**: Security policy listing forbidden C function names (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
 - **`dev-tools/`**: Complete suite for database backup/restore (`dump_restore.sh`) and tournament resetting (`tournament.sh`, `index.html`).
 
