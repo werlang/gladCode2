@@ -45,22 +45,25 @@ named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 
 ## Running
 
-Migrations run in a dedicated one-shot container, never inside the
-long-lived `runner` service:
+Migrations run via `./runner/migrate.sh`, which builds the migrate image
+and runs it with plain `docker run` on the MySQL container's network. It
+deliberately does NOT use `docker compose run` and does NOT depend on the
+long-lived `runner` service (or its `node_modules` volume): dependencies
+are baked into the image at build time, and the script waits for MySQL to
+accept connections before launching. Extra arguments are forwarded to
+`npm run db:migrate`.
 
 ```bash
 # Deploy (also in .github/workflows/master-deploy.yml)
-docker compose --profile tools build
+docker compose build
 docker compose up -d --force-recreate
-docker compose --profile tools run --rm migrate
+./runner/migrate.sh
 ```
 
-The `migrate` service (`Dockerfile-migrate`, `profiles: ["tools"]`) bakes
-dependencies at build time, so it never depends on the `node_modules`
-volume state, waits for a healthy `mysql` via `depends_on`, and exits when
-done. Plain `docker compose up` never starts it. Local one-off runs use the
-same command; `npm run db:migrate` from `runner/` only works when that
-checkout has dependencies installed.
+DB connection comes from the environment, falling back to `.env`, then to
+compose defaults (`mysql:3306`, `root`, `gladcode`). `npm run db:migrate`
+from `runner/` directly only works when that checkout has dependencies
+installed.
 
 ## Adopting a pre-existing database
 
@@ -69,7 +72,7 @@ A database created before this flow (e.g. production) must NOT run the
 migrate forward normally:
 
 ```bash
-docker compose --profile tools run --rm migrate npm run db:migrate -- --baseline=1
+./runner/migrate.sh --baseline=1
 ```
 
 `--baseline=N` records every migration with version <= N as applied WITHOUT
