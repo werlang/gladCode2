@@ -1,7 +1,15 @@
 import { ACTIONS, headingToRadians, isOutsideSafeZone, lerp, lerpAngle, toArenaPosition } from './battle-state.js';
 import { getGladiatorAppearance } from './gladiator-appearance.js';
 import { hashIdentity } from './synty-hero-config.js';
-import { applyHitReaction, blendHeroPoses, getHeroActionDuration, sampleHeroPose } from './synty-hero-animation.js';
+import {
+    STRIDE_SECONDS,
+    applyHitReaction,
+    blendHeroPoses,
+    blendHeroPosesEased,
+    getHeroActionDuration,
+    sampleHeroPose,
+    sampleMovementPhase,
+} from './synty-hero-animation.js';
 
 /** Seconds an attack-recoil overlay stays visible when no clip library exists. */
 const HIT_REACTION_SECONDS = 0.34;
@@ -11,6 +19,11 @@ const STAGGER_DAMAGE_THRESHOLD = 22;
 const REFERENCE_SPEED = 3;
 /** Looping guard idles that give each fighter a persistent silhouette. */
 const IDLE_CLIPS = ['idle', 'idleMenacing', 'idleEnergetic', 'idleFlourish'];
+
+/** Blend out of a finished swing into the next pose (seconds of replay time). */
+const BLEND_SECONDS_ATTACK = 0.16;
+/** Blend into a swing or between locomotion and idle (seconds of replay time). */
+const BLEND_SECONDS_SMOOTH = 0.22;
 
 /** Clip keys that play once instead of looping. */
 const ONE_SHOT_CLIPS = new Set([
@@ -25,8 +38,14 @@ const ONE_SHOT_CLIPS = new Set([
  * Fighters play real Synty skeletal clips through an AnimationMixer whenever a
  * clip exists for their state, and fall back to the hand-authored procedural
  * pose system for actions the packs do not cover (casting, teleporting,
- * drinking, archery). Engine positions stay authoritative: rendering bridges
- * the two latest replay frames on the shared replay clock.
+ * drinking, archery, locomotion, attacks). Engine positions stay authoritative:
+ * rendering bridges the two latest replay frames on the shared replay clock.
+ *
+ * Weapon contract: fighters carry their last-used weapon. Ranged attacks swap
+ * to the bow instantly at the moment of the shot, melee/assassinate swaps to
+ * the blade instantly at the moment of the swing, and every other action keeps
+ * whatever is already equipped — so shooting and slashing never cut frames by
+ * hiding the weapon mid-swing.
  */
 export class GladiatorView {
     #THREE;
@@ -55,8 +74,14 @@ export class GladiatorView {
     #hitUntil = 0;
     #idleClipKey = 'idle';
     #arsenal = null;
+    #equippedSlot = null;
+    #primarySlot = 'melee';
+    #fallbackWeapons = new Map();
+    #proceduralArsenal = new Map();
     #index;
     #lastGroundSpeed = 1;
+    #stridePhase = 0;
+    #lastStrideSimTime = null;
     #materials = [];
     #mixer = null;
     #model;
@@ -69,8 +94,10 @@ export class GladiatorView {
     #toPlacement = null;
     #tracker;
     #transitionFromPose = null;
+    #transitionDuration = BLEND_SECONDS_SMOOTH;
     #usesSyntyHero = false;
     #weaponPivot;
+    #weaponPivotBaseRotation = -0.34;
 
     /**
      * @param {{ THREE: typeof import('three'), tracker: import('./resource-tracker.js').ResourceTracker, heroAssets?: import('./synty-hero-assets.js').SyntyHeroAssets|null, animationLibrary?: import('./animation-library.js').SyntyAnimationLibrary|null, gladiator: Record<string, unknown>, index: number }} options View dependencies.
@@ -89,8 +116,13 @@ export class GladiatorView {
         // extra state: hash the stable identity over the available idles.
         const idleHash = hashIdentity(`${gladiator.user ?? ''}:${gladiator.name ?? ''}`);
         this.#idleClipKey = IDLE_CLIPS[idleHash % IDLE_CLIPS.length];
+        // Phase-offset locomotion so same-seed fighters never march in sync.
+        this.#stridePhase = (idleHash % 100) / 100 * Math.PI * 2;
         this.#buildModel(heroAssets, gladiator);
         this.setState(gladiator, 17.68, 0);
+        // Visual layer starts equipped with the primary weapon.
+        if (!this.#equippedSlot) this.#equippedSlot = this.#primarySlot;
+        this.#applyWeaponVisibility();
     }
 
     /** @returns {import('three').Group} Root object placed on the arena plane. */
@@ -101,6 +133,11 @@ export class GladiatorView {
     /** @returns {Record<string, unknown>} Latest complete gladiator state. */
     get state() {
         return this.#state;
+    }
+
+    /** @returns {string} Currently equipped weapon slot (for probes). */
+    get equippedSlot() {
+        return this.#equippedSlot ?? this.#primarySlot;
     }
 
     /**
@@ -230,6 +267,8 @@ export class GladiatorView {
         const hero = heroAssets.createHero(gladiator, this.#appearance);
         this.#heroController = hero;
         this.#arsenal = hero.weapons ?? null;
+        this.#primarySlot = hero.weapons?.primary ?? this.#primaryFromAppearance();
+        this.#equippedSlot = this.#primarySlot;
         this.#usesSyntyHero = true;
         this.#tracker.track(hero.object);
         this.#model.add(hero.object);
@@ -241,37 +280,219 @@ export class GladiatorView {
             this.#mixer = new this.#THREE.AnimationMixer(hero.object);
         }
 
-        if (!this.#arsenal?.melee) {
-            this.#weaponPivot = this.#tracker.track(new this.#THREE.Group());
-            const darkMaterial = new this.#THREE.MeshStandardMaterial({ color: 0x392b22, roughness: 0.82 });
-            this.#buildWeapon(darkMaterial);
-            hero.rig.attachEquipment(this.#THREE, this.#weaponPivot, hero.contentScale, {
-                handName: 'Hand_L',
-                rotation: [0, -Math.PI / 2, 0],
+        this.#ensureFallbackArsenal(hero);
+        this.#applyWeaponVisibility();
+    }
+
+    /** Derives the idle weapon slot from the skin contract. */
+    #primaryFromAppearance() {
+        const families = this.#appearance.families ?? {};
+        if (families.melee || families.spear) return 'melee';
+        if (families.bow) return 'ranged';
+        if (families.staff || families.magic) return 'staff';
+        return 'melee';
+    }
+
+    /**
+     * Guarantees every needed slot renders even when Synty FBXs are absent.
+     * Missing packs resolve to a same-family procedural weapon mounted on the
+     * correct hand, so fighters never fight empty-handed and visibility swaps
+     * never cut to nothing mid-swing.
+     */
+    #ensureFallbackArsenal(hero) {
+        const families = this.#appearance.families ?? {};
+        const needsMelee = true;
+        const needsRanged = Boolean(families.bow);
+        const needsStaff = Boolean(families.staff || families.magic) || this.#primarySlot === 'staff';
+        const needsShield = this.#primarySlot === 'melee' && !families.spear;
+
+        if (needsMelee && !this.#arsenal?.melee) {
+            const family = families.spear ? 'spear' : 'sword';
+            const fallback = this.#createFallbackWeapon(family);
+            if (fallback) {
+                this.#fallbackWeapons.set('melee', fallback);
+                hero.rig.attachEquipment(this.#THREE, fallback, hero.contentScale, {
+                    handName: 'Hand_R',
+                    rotation: families.spear ? [0.32, 0, -Math.PI / 2] : [0.32, 0, Math.PI / 2],
+                });
+                fallback.position.y = families.spear ? 0.3 : 0.26;
+                if (this.#arsenal) this.#arsenal.melee = fallback;
+                else this.#arsenal = { melee: fallback, ranged: null, staff: null, shield: null, primary: this.#primarySlot };
+            }
+        }
+        if (needsRanged && !this.#arsenal?.ranged) {
+            const fallback = this.#createFallbackWeapon('bow');
+            if (fallback) {
+                this.#fallbackWeapons.set('ranged', fallback);
+                hero.rig.attachEquipment(this.#THREE, fallback, hero.contentScale, {
+                    handName: 'Hand_L',
+                    rotation: [-0.18, 0, 0],
+                });
+                fallback.position.y = 0.24;
+                if (this.#arsenal) this.#arsenal.ranged = fallback;
+            }
+        }
+        if (needsStaff && !this.#arsenal?.staff) {
+            const fallback = this.#createFallbackWeapon('staff');
+            if (fallback) {
+                this.#fallbackWeapons.set('staff', fallback);
+                hero.rig.attachEquipment(this.#THREE, fallback, hero.contentScale, {
+                    handName: 'Hand_R',
+                    rotation: [0.32, 0, -Math.PI / 2],
+                });
+                fallback.position.y = 0.3;
+                if (this.#arsenal) this.#arsenal.staff = fallback;
+            }
+        }
+        if (needsShield && !this.#arsenal?.shield) {
+            const fallback = this.#createFallbackWeapon('shield');
+            if (fallback) {
+                this.#fallbackWeapons.set('shield', fallback);
+                hero.rig.attachEquipment(this.#THREE, fallback, hero.contentScale, {
+                    handName: 'Hand_L',
+                    rotation: [0, Math.PI / 2, 0],
+                });
+                fallback.position.set(0, 0.05, 0.14);
+                if (this.#arsenal) this.#arsenal.shield = fallback;
+            }
+        }
+        // Keep every weapon (FBX or fallback) from frustum-popping when the
+        // hand briefly leaves the top-down frame.
+        [this.#arsenal?.melee, this.#arsenal?.ranged, this.#arsenal?.staff, this.#arsenal?.shield]
+            .filter(Boolean)
+            .forEach((weapon) => weapon.traverse((object) => {
+                if (object.isMesh) object.frustumCulled = false;
+            }));
+    }
+
+    /**
+     * Builds a readable procedural weapon for missing-pack slots.
+     * Proportions match the normalized FBX registry lengths so FBX and
+     * procedural silhouettes swap without a size pop.
+     *
+     * @param {'sword'|'bow'|'spear'|'staff'|'shield'} family Weapon family.
+     * @returns {import('three').Group|null} Mount-ready weapon group.
+     */
+    #createFallbackWeapon(family) {
+        const THREE = this.#THREE;
+        const group = this.#tracker.track(new THREE.Group());
+        group.name = `fallback-${family}`;
+        const dark = new THREE.MeshStandardMaterial({ color: 0x4a3423, roughness: 0.78, metalness: 0.08 });
+        const steel = new THREE.MeshStandardMaterial({ color: 0xc7d0d5, roughness: 0.32, metalness: 0.72 });
+        const accent = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(this.#appearance.accentColor),
+            roughness: 0.6,
+            metalness: 0.25,
+        });
+        this.#registerMaterial(dark);
+        this.#registerMaterial(steel);
+        this.#registerMaterial(accent);
+        const add = (geometry, material, x = 0, y = 0, z = 0) => {
+            this.#tracker.track(geometry);
+            const mesh = this.#tracker.track(new THREE.Mesh(geometry, material));
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.frustumCulled = false;
+            group.add(mesh);
+            return mesh;
+        };
+
+        if (family === 'bow') {
+            const limbs = add(new THREE.TorusGeometry(0.36, 0.032, 6, 20, Math.PI), dark);
+            limbs.rotation.z = Math.PI / 2;
+            limbs.rotation.y = Math.PI / 2;
+            add(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 6), dark, 0, 0, 0);
+            const string = add(new THREE.CylinderGeometry(0.006, 0.006, 0.68, 4), steel, 0, 0, 0.02);
+            string.rotation.x = 0.06;
+            const arrow = add(new THREE.CylinderGeometry(0.014, 0.014, 0.62, 5), steel, 0, 0.02, -0.12);
+            arrow.rotation.x = Math.PI / 2;
+            add(new THREE.ConeGeometry(0.03, 0.09, 6), steel, 0, 0.02, -0.45).rotation.x = -Math.PI / 2;
+        }
+        else if (family === 'spear') {
+            add(new THREE.CylinderGeometry(0.032, 0.038, 1.62, 7), dark, 0, -0.1, 0);
+            add(new THREE.ConeGeometry(0.085, 0.3, 7), steel, 0, 0.86, 0);
+            add(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 7), accent, 0, 0.68, 0);
+        }
+        else if (family === 'staff') {
+            add(new THREE.CylinderGeometry(0.035, 0.042, 1.45, 7), accent, 0, 0, 0);
+            const gem = add(
+                new THREE.OctahedronGeometry(0.11, 0),
+                new THREE.MeshStandardMaterial({
+                    color: 0x9fe8ff, emissive: 0x62d8ff, emissiveIntensity: 0.9, roughness: 0.3,
+                }),
+                0, 0.82, 0,
+            );
+            this.#registerMaterial(gem.material);
+            add(new THREE.SphereGeometry(0.05, 8, 6), dark, 0, -0.75, 0);
+        }
+        else if (family === 'shield') {
+            const plate = add(new THREE.CylinderGeometry(0.34, 0.34, 0.06, 18), steel);
+            plate.rotation.x = Math.PI / 2;
+            const boss = add(new THREE.SphereGeometry(0.1, 10, 8), accent, 0, 0, -0.06);
+            boss.scale.z = 0.6;
+            const rim = add(new THREE.TorusGeometry(0.34, 0.025, 6, 24), accent);
+            rim.position.z = 0;
+        }
+        else {
+            // Sword default: guard + blade + pommel along +Y.
+            add(new THREE.CylinderGeometry(0.042, 0.048, 0.3, 7), dark, 0, -0.22, 0);
+            const guard = add(new THREE.BoxGeometry(0.24, 0.05, 0.07), accent, 0, -0.05, 0);
+            guard.castShadow = true;
+            add(new THREE.BoxGeometry(0.085, 0.78, 0.032), steel, 0, 0.38, 0);
+            add(new THREE.ConeGeometry(0.06, 0.14, 6), steel, 0, 0.84, 0);
+            add(new THREE.SphereGeometry(0.055, 8, 6), accent, 0, -0.4, 0);
+        }
+        return group;
+    }
+
+    /**
+     * Applies persistent weapon visibility.
+     * Only ranged/melee attacks swap the equipped slot — instantly, at the
+     * moment of the swing/shot — while every other action keeps carrying the
+     * last-used weapon so nothing vanishes mid-animation.
+     */
+    #applyWeaponVisibility() {
+        const arsenal = this.#arsenal;
+        if (arsenal?.melee || arsenal?.ranged || arsenal?.staff) {
+            const equipped = this.#equippedSlot ?? this.#primarySlot;
+            if (arsenal.melee) arsenal.melee.visible = equipped === 'melee';
+            if (arsenal.ranged) arsenal.ranged.visible = equipped === 'ranged';
+            if (arsenal.staff) arsenal.staff.visible = equipped === 'staff';
+            if (arsenal.shield) arsenal.shield.visible = equipped === 'melee';
+        }
+        if (this.#proceduralArsenal.size) {
+            const equipped = this.#equippedSlot ?? this.#primarySlot;
+            this.#proceduralArsenal.forEach((group, slot) => {
+                group.visible = equipped === slot;
             });
         }
     }
 
     /**
-     * Shows the weapon the current action calls for: bow while shooting,
-     * blade while swinging, bare hands while casting, and the fighter's
-     * primary weapon the rest of the time.
+     * Switches the carried weapon for the visual action.
+     * Instant on attack frames, persistent otherwise.
      *
-     * @param {number} action Engine action id.
+     * @param {number} visualAction Currently rendered action id.
      */
-    #syncWeaponVisibility(action) {
+    #syncWeaponVisibility(visualAction) {
         const arsenal = this.#arsenal;
-        if (!arsenal) return;
+        const hasMelee = Boolean(arsenal?.melee) || this.#proceduralArsenal.has('melee');
+        const hasRanged = Boolean(arsenal?.ranged) || this.#proceduralArsenal.has('ranged');
+        if (!hasMelee && !hasRanged && !arsenal?.staff) return;
 
-        let active = arsenal.primary;
-        if (action === ACTIONS.ranged && arsenal.ranged) active = 'ranged';
-        else if ((action === ACTIONS.melee || action === ACTIONS.assassinate) && arsenal.melee) active = 'melee';
-        else if (action === ACTIONS.fireball) active = 'none';
+        let desired = this.#equippedSlot ?? this.#primarySlot;
+        if (visualAction === ACTIONS.ranged && hasRanged) desired = 'ranged';
+        else if ((visualAction === ACTIONS.melee || visualAction === ACTIONS.assassinate) && hasMelee) desired = 'melee';
 
-        if (arsenal.melee) arsenal.melee.visible = active === 'melee';
-        if (arsenal.ranged) arsenal.ranged.visible = active === 'ranged';
-        if (arsenal.staff) arsenal.staff.visible = active === 'staff';
-        if (arsenal.shield) arsenal.shield.visible = active === 'melee';
+        if (desired !== this.#equippedSlot) {
+            this.#equippedSlot = desired;
+            this.#applyWeaponVisibility();
+        }
+        else {
+            // Re-assert in case an asset finished late.
+            this.#applyWeaponVisibility();
+        }
     }
 
     /** Retains the prior geometry as a graceful fallback for missing assets. */
@@ -312,10 +533,43 @@ export class GladiatorView {
             hair.position.y = 1.86;
         }
 
-        this.#weaponPivot = this.#tracker.track(new THREE.Group());
-        this.#weaponPivot.position.set(0.47, 1.34, -0.02);
-        this.#model.add(this.#weaponPivot);
-        this.#buildWeapon(darkMaterial);
+        // Procedural arsenal: one pivot per family so melee/ranged swaps read
+        // instantly without rebuilding geometry mid-fight.
+        this.#primarySlot = this.#primaryFromAppearance();
+        this.#equippedSlot = this.#primarySlot;
+        const families = [
+            ['melee', this.#appearance.families?.spear ? 'spear' : 'sword'],
+            ['ranged', 'bow'],
+            ['staff', 'staff'],
+        ];
+        families.forEach(([slot, family]) => {
+            const pivot = this.#tracker.track(new THREE.Group());
+            pivot.position.set(slot === 'ranged' ? -0.47 : 0.47, 1.34, -0.02);
+            this.#model.add(pivot);
+            const group = this.#createFallbackWeapon(family);
+            // Re-parent fallback meshes into the procedural pivot.
+            while (group.children.length) pivot.add(group.children[0]);
+            pivot.visible = slot === this.#equippedSlot
+                || (slot === 'melee' && this.#equippedSlot === 'melee')
+                || (slot === 'ranged' && this.#equippedSlot === 'ranged')
+                || (slot === 'staff' && this.#equippedSlot === 'staff');
+            // Only the families this skin justifies stay in the arena; the
+            // rest are disposed immediately to keep draw calls minimal.
+            const justified = slot === 'melee'
+                || (slot === 'ranged' && this.#appearance.families?.bow)
+                || (slot === 'staff' && (this.#appearance.families?.staff || this.#appearance.families?.magic));
+            if (!justified && slot !== this.#primarySlot) {
+                pivot.visible = false;
+                pivot.removeFromParent();
+                return;
+            }
+            this.#proceduralArsenal.set(slot, pivot);
+            if (slot === 'melee') {
+                this.#weaponPivot = pivot;
+                this.#weaponPivotBaseRotation = -0.34;
+            }
+        });
+        this.#applyWeaponVisibility();
 
         if (this.#appearance.hasCape) {
             const capeMaterial = new THREE.MeshStandardMaterial({
@@ -360,6 +614,7 @@ export class GladiatorView {
                 tip.position.y = 0.72;
             }
             this.#weaponPivot.rotation.z = -0.42;
+            this.#weaponPivotBaseRotation = -0.42;
             return;
         }
 
@@ -368,6 +623,7 @@ export class GladiatorView {
         const blade = this.#mesh(new THREE.BoxGeometry(0.09, 0.78, 0.035), metal, this.#weaponPivot);
         blade.position.y = 0.39;
         this.#weaponPivot.rotation.z = -0.34;
+        this.#weaponPivotBaseRotation = -0.34;
     }
 
     /**
@@ -401,7 +657,10 @@ export class GladiatorView {
             || target.simtime <= this.#toPlacement.simtime;
         this.#fromPlacement = jumped ? target : this.#currentVisualPlacement();
         this.#toPlacement = target;
-        if (jumped) this.#applyPlacement(1);
+        if (jumped) {
+            this.#applyPlacement(1);
+            this.#lastStrideSimTime = target.simtime;
+        }
 
         const buffs = gladiator.buffs ?? {};
         const isAlive = Number(gladiator.hp) > 0;
@@ -451,10 +710,14 @@ export class GladiatorView {
         this.#armorMaterial.emissive.copy(this.#buffEmissive);
         this.#armorMaterial.emissiveIntensity = this.#buffIntensity;
 
+        // Retrigger every transient action — including repeats of the same
+        // swing — so rapid combos restart from the current blended pose
+        // instead of dropping the second hit. Locomotion and idles are left
+        // to the duration-hold logic in animate() to avoid cutting swings.
         if (previous && Number(previous.action) !== Number(gladiator.action)
             && Number(gladiator.hp) > 0
-            && [ACTIONS.melee, ACTIONS.assassinate].includes(Number(gladiator.action))) {
-            this.#startAction(Number(gladiator.action), Number(simulationTime) || 0);
+            && getHeroActionDuration(Number(gladiator.action)) !== null) {
+            this.#startAction(Number(gladiator.action), Number(simulationTime) || 0, true);
         }
     }
 
@@ -492,12 +755,15 @@ export class GladiatorView {
     #applyPlacement(alpha) {
         const from = this.#fromPlacement;
         const to = this.#toPlacement;
+        // Smootherstep placement: quantized 100 ms engine steps glide instead
+        // of lerping with a corner at every frame boundary.
+        const eased = alpha * alpha * alpha * (alpha * (alpha * 6 - 15) + 10);
         this.#root.position.set(
-            lerp(from.x, to.x, alpha),
+            lerp(from.x, to.x, eased),
             this.#root.position.y,
-            lerp(from.z, to.z, alpha),
+            lerp(from.z, to.z, eased),
         );
-        this.#root.rotation.y = lerpAngle(from.heading, to.heading, alpha);
+        this.#root.rotation.y = lerpAngle(from.heading, to.heading, eased);
     }
 
     /** @returns {{ x: number, z: number, heading: number, simtime: number }} Placement currently displayed. */
@@ -569,7 +835,7 @@ export class GladiatorView {
 
         if (!key) {
             if (this.#currentClipKey) {
-                this.#clipActions.forEach((action) => action.fadeOut(0.12));
+                this.#clipActions.forEach((action) => action.fadeOut(0.18));
                 this.#currentClipKey = null;
             }
             this.#mixer.update(deltaSeconds);
@@ -590,8 +856,10 @@ export class GladiatorView {
             action.clampWhenFinished = key.startsWith('death');
             action.timeScale = this.#clipTimeScale(key, clip);
             action.enabled = true;
-            action.fadeIn(previous ? 0.16 : 0.04);
-            previous?.fadeOut(0.16);
+            // Longer cross-fades (0.22 s) keep guard-idle variety from popping
+            // when fighters settle between exchanges.
+            action.fadeIn(previous ? 0.22 : 0.08);
+            previous?.fadeOut(0.22);
             action.play();
             this.#currentClipKey = key;
         }
@@ -612,7 +880,28 @@ export class GladiatorView {
 
         const isAlive = Number(this.#state.hp) > 0;
         const stunned = isAlive && Number(this.#state.buffs?.stun?.timeleft) > 0.1;
-        if (isAlive) this.#syncWeaponVisibility(Number(this.#state.action));
+
+        const observedAction = Number(this.#state.action);
+        const observedChanged = this.#observedAction !== observedAction;
+        if (observedChanged && getHeroActionDuration(observedAction) !== null) {
+            this.#startAction(observedAction, simulationTime);
+        }
+        this.#observedAction = observedAction;
+
+        if (this.#activeAction === null) this.#startAction(observedAction, simulationTime);
+        const activeDuration = getHeroActionDuration(this.#activeAction);
+        const activeTime = Math.abs(simulationTime - this.#actionStartTime);
+        if (activeDuration && activeTime >= activeDuration && observedAction !== this.#activeAction) {
+            this.#startAction(observedAction, simulationTime);
+        }
+        else if (!activeDuration && observedAction !== this.#activeAction) {
+            this.#startAction(observedAction, simulationTime);
+        }
+
+        // Weapons follow the *visual* action (which persists for the full
+        // swing) instead of the 1-frame engine blip, so the blade stays out
+        // through contact and the bow stays up through release.
+        if (isAlive) this.#syncWeaponVisibility(this.#activeAction ?? observedAction);
         const clipOwned = this.#syncMixer(deltaSeconds, isAlive, stunned, reducedMotion);
 
         if (!isAlive) {
@@ -628,39 +917,69 @@ export class GladiatorView {
             this.#stunStars.rotation.y = ambientTime * 2.8;
             this.#model.position.x = 0;
             this.#model.position.z = 0;
+            // Keep the stride integrator in sync while a clip owns the bones
+            // so the legs resume mid-cycle instead of snapping to zero.
+            this.#lastStrideSimTime = simulationTime;
             return;
         }
 
-        const observedAction = Number(this.#state.action);
-        const observedChanged = this.#observedAction !== observedAction;
-        if (observedChanged && getHeroActionDuration(observedAction)) {
-            this.#startAction(observedAction, simulationTime);
+        const seed = this.#index * 0.173;
+        let targetPose;
+        const isLocomotion = this.#activeAction === ACTIONS.movement || this.#activeAction === ACTIONS.charge;
+        if (isLocomotion && !reducedMotion) {
+            // Phase-continuous gait: integrate replay time by cadence so speed
+            // changes hurry the stride without snapping the legs.
+            if (this.#lastStrideSimTime === null) this.#lastStrideSimTime = this.#actionStartTime;
+            const simDelta = Math.min(Math.max(simulationTime - this.#lastStrideSimTime, 0), 0.25);
+            const cadence = Math.min(Math.max(this.#lastGroundSpeed, 0.45), 2.1)
+                * (this.#activeAction === ACTIONS.charge ? 1.35 : 1);
+            this.#stridePhase += simDelta / STRIDE_SECONDS * cadence * Math.PI * 2;
+            if (this.#stridePhase > 1e4) this.#stridePhase %= Math.PI * 2;
+            this.#lastStrideSimTime = simulationTime;
+            targetPose = sampleMovementPhase(this.#stridePhase, {
+                seed,
+                charging: this.#activeAction === ACTIONS.charge,
+                speed: this.#lastGroundSpeed,
+            });
         }
-        this.#observedAction = observedAction;
-
-        if (this.#activeAction === null) this.#startAction(observedAction, simulationTime);
-        const activeDuration = getHeroActionDuration(this.#activeAction);
-        const activeTime = Math.abs(simulationTime - this.#actionStartTime);
-        if (activeDuration && activeTime >= activeDuration && observedAction !== this.#activeAction) {
-            this.#startAction(observedAction, simulationTime);
+        else {
+            if (isLocomotion && reducedMotion) {
+                this.#lastStrideSimTime = simulationTime;
+                targetPose = sampleHeroPose(this.#activeAction, 0.38, {
+                    weapon: this.#appearance.weapon,
+                    seed,
+                    speed: this.#lastGroundSpeed,
+                });
+            }
+            else {
+                // Continuous guards breathe on the shared replay clock so
+                // re-entering idle never restarts the breath — a classic pop.
+                // One-shots run on action age so anticipation always plays.
+                const continuous = this.#activeAction === ACTIONS.waiting
+                    || this.#activeAction === ACTIONS.none
+                    || this.#activeAction === ACTIONS.block
+                    || this.#activeAction === ACTIONS.ambush;
+                const sampleTime = reducedMotion
+                    ? (this.#activeAction === ACTIONS.waiting || this.#activeAction === ACTIONS.none ? 0 : 0.38)
+                    : continuous
+                        ? simulationTime
+                        : Math.abs(simulationTime - this.#actionStartTime);
+                // Locomotion sampled through the legacy path (tests, reduced
+                // motion) still needs a sane phase: seed the stride from the
+                // action clock when the integrator is bypassed.
+                if (!isLocomotion) this.#lastStrideSimTime = simulationTime;
+                targetPose = sampleHeroPose(this.#activeAction, sampleTime, {
+                    weapon: this.#appearance.weapon,
+                    seed,
+                    speed: this.#lastGroundSpeed,
+                });
+            }
         }
-        else if (!activeDuration && observedAction !== this.#activeAction) {
-            this.#startAction(observedAction, simulationTime);
-        }
-
-        const actionTime = reducedMotion
-            ? (this.#activeAction === ACTIONS.waiting || this.#activeAction === ACTIONS.none ? 0 : 0.38)
-            : Math.abs(simulationTime - this.#actionStartTime);
-        const targetPose = sampleHeroPose(this.#activeAction, actionTime, {
-            weapon: this.#appearance.weapon,
-            seed: this.#index * 0.173,
-            speed: this.#lastGroundSpeed,
-        });
         const transitionAmount = reducedMotion
             ? 1
-            : Math.min(Math.abs(simulationTime - this.#actionStartTime) / 0.12, 1);
+            : Math.min(Math.abs(simulationTime - this.#actionStartTime) / this.#transitionDuration, 1);
         let pose = this.#transitionFromPose
-            ? blendHeroPoses(this.#transitionFromPose, targetPose, transitionAmount)
+            ? blendHeroPosesEased(this.#transitionFromPose, targetPose, transitionAmount)
             : targetPose;
         if (transitionAmount >= 1) this.#transitionFromPose = null;
 
@@ -683,15 +1002,21 @@ export class GladiatorView {
         this.#heroController?.rig.applyPose(pose);
         if (this.#usesSyntyHero) {
             this.#body.position.y = pose.body.y;
-            this.#body.rotation.x = pose.body.z;
-            this.#body.rotation.z = pose.body.x;
+            // World-space pitch/roll: the outer hero group is unrotated, so it
+            // shares the procedural mapping (x=pitch, z=roll).
+            this.#body.rotation.x = pose.body.x;
+            this.#body.rotation.z = pose.body.z;
         }
         else {
             this.#model.position.y = pose.body.y;
             this.#body.rotation.x = pose.body.x;
             if (this.#weaponPivot) {
-                this.#weaponPivot.rotation.z = -0.34 + pose.weapon.emphasis * 0.8;
+                this.#weaponPivot.rotation.z = this.#weaponPivotBaseRotation + pose.weapon.emphasis * 0.8;
             }
+            this.#proceduralArsenal.forEach((pivot, slot) => {
+                if (slot === 'melee' && pivot !== this.#weaponPivot) return;
+                if (slot !== 'melee' && pivot) pivot.rotation.z = pose.weapon.emphasis * 0.25;
+            });
         }
         this.#model.position.x = pose.lunge.side;
         this.#model.position.z = -pose.lunge.forward;
@@ -708,11 +1033,22 @@ export class GladiatorView {
         return this.#flashColor;
     }
 
-    /** Starts one action without discarding the outgoing blended pose. */
-    #startAction(action, simulationTime) {
+    /**
+     * Starts one action without discarding the outgoing blended pose.
+     * Chained swings blend over a shorter window so combos feel connected;
+     * locomotion↔attack transitions use the full smooth window.
+     */
+    #startAction(action, simulationTime, fromEngine = false) {
+        const previousDuration = getHeroActionDuration(this.#activeAction);
+        const nextDuration = getHeroActionDuration(action);
+        const chainingAttacks = previousDuration !== null && nextDuration !== null;
+        this.#transitionDuration = chainingAttacks ? BLEND_SECONDS_ATTACK : BLEND_SECONDS_SMOOTH;
+        // Retriggers of the same swing (rapid combos) restart the timeline
+        // from the current blended pose — never a snap to guard.
         this.#transitionFromPose = this.#currentPose;
         this.#activeAction = action;
         this.#actionStartTime = Number(simulationTime) || 0;
+        if (fromEngine) this.#observedAction = action;
     }
 
     /**
