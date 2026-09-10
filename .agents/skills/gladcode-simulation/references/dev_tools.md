@@ -26,7 +26,7 @@ public_html/dev-tools/
 
 ## 🗄️ Database Backup & Restore (`dump_restore.sh`)
 
-The `dump_restore.sh` script automatically extracts database credentials from `public_html/config.json` or `.env`.
+The `dump_restore.sh` script reads database credentials from `.env`.
 
 > [!IMPORTANT]
 > Always execute scripts from inside the `apache` Docker container.

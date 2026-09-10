@@ -50,11 +50,17 @@ Copy environment template files:
 
 ```bash
 cp .env.example .env
-cp public_html/config.json.example public_html/config.json
+cp config/config.json.example config/config.json
 cp node/config.json.example node/config.json
 ```
 
-Ensure MySQL credentials in `.env`, `public_html/config.json`, and `node/config.json` match:
+> `config/config.json` lives **outside** the web root and is mounted into
+> Apache at `/var/www/private/config.json` (see `compose.yaml`). Never put
+> secrets in `public_html/` — `public_html/config.json` is deprecated, still
+> read as a last-resort fallback, and blocked by `.htaccess`. If you have one,
+> move it: `mv public_html/config.json config/config.json`.
+
+Ensure MySQL credentials in `.env`, `config/config.json`, and `node/config.json` match:
 
 ```json
 {

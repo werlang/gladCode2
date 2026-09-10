@@ -11,13 +11,14 @@
 	*/
 
 	//amazon
-	$host = 'email-smtp.us-east-1.amazonaws.com';
-	$port = 587;
-	$senderuser = json_decode(file_get_contents('config.json'), true)['mailer']['user'];
-	$senderpassword = json_decode(file_get_contents('config.json'), true)['mailer']['password'];
+	include_once "connection.php";
+	$mailerConfig = gladcode_mailer_config();
+	$host = $mailerConfig['host'];
+	$port = (int) $mailerConfig['port'];
+	$senderuser = $mailerConfig['user'];
+	$senderpassword = $mailerConfig['password'];
 	$action = $_POST['action'];
 
-	include_once "connection.php";
 	$cancelSend = false;
 	if (isset($_GET['teste'])){
 		$receivername = "Pablo";

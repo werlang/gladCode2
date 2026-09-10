@@ -145,4 +145,4 @@ pre-commit checklist in [Balance Patch Workflow](references/balance_patch.md):
 
 - **Sanitization**: When storing or retrieving gladiator source code, ensure string escaping (`htmlspecialchars`) is handled properly.
 - **Session Protection**: All PHP endpoints modifying database state must check `$_SESSION['user']`.
-- **Config Synchronization**: Ensure `public_html/config.json` and `node/config.json` remain identical in credentials and host settings.
+- **Config Synchronization**: Ensure `config/config.json` (canonical, outside web root) and `node/config.json` remain identical in credentials and host settings. Env vars (`MYSQL_*`) override both. Never put secrets in `public_html/`.

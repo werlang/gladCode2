@@ -55,7 +55,7 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore
 docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore.sh restore"
 ```
 
-Credentials are read automatically from `config.json` / `.env`.
+Credentials are read automatically from `config/config.json` (outside web root, mounted at `/var/www/private/config.json`) / env (`MYSQL_*` in `.env`).
 
 ### 3. Tournament Testing Suite (`public_html/dev-tools/`)
 

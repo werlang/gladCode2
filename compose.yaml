@@ -7,6 +7,17 @@ services:
         volumes:
             - ./public_html:/var/www/html
             - ./Payload:/app/payload
+            - ./config:/var/www/private:ro
+        environment:
+            - MYSQL_HOST=mysql
+            - MYSQL_PORT=${MYSQL_PORT:-3306}
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MAILER_HOST=${MAILER_HOST:-email-smtp.us-east-1.amazonaws.com}
+            - MAILER_PORT=${MAILER_PORT:-587}
+            - MAILER_USER=${MAILER_USER:-}
+            - MAILER_PASSWORD=${MAILER_PASSWORD:-}
         ports:
             - 80:80
         logging:

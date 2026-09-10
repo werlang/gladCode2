@@ -39,7 +39,7 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 ## 📂 Subsystem Breakdown & Key Files
 
 ### 1. PHP Frontend (`public_html/`)
-- **`connection.php`**: Database singleton loading credentials from `config.json`. Exposes `runQuery($sql, $data = null)`. Uses PDO with strict error mode.
+- **`connection.php`**: Database singleton loading credentials from env (`MYSQL_*`) with fallback to `config/config.json` outside the web root (mounted at `/var/www/private/config.json`). Exposes `runQuery($sql, $data = null)`. Uses PDO with strict error mode.
 - **`back_simulation.php`**: Main simulation orchestrator (750+ lines). Handles setup of temporary run folders (`public_html/runs/{hash}/`), security function checks, file copying, invoking the Runner API, and returning JSON responses.
 - **`back_tournament.php` / `back_train.php`**: Handlers for tournaments and practice sessions.
 - **`banned_functions.json`**: Security policy listing forbidden C function names (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
@@ -63,7 +63,7 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 ## 🗄️ Database & Configuration Standards
 
 ### Config Alignment
-`public_html/config.json` and `node/config.json` **MUST** remain in sync so PHP and Node share session states and database access:
+`config/config.json` (mounted read-only at `/var/www/private/config.json`, outside the web DocumentRoot) is the canonical PHP secret store; `node/config.json` is the legacy Node fallback. They **MUST** remain in sync so PHP and Node share session states and database access. Environment variables (`MYSQL_*`, `MAILER_*` from `.env` / `compose.yaml`) take precedence over both files. Never create `public_html/config.json` — it is web-accessible; if one exists, move it with `mv public_html/config.json config/config.json` (a deprecated fallback read + `.htaccess` deny remain only for migration):
 
 ```json
 {
@@ -153,7 +153,7 @@ cat simlog
 | :--- | :--- | :--- |
 | **"CLIENT TIMEOUT"** | Gladiator code stuck in infinite loop without calling API functions or socket stalled | Verify gladiator code contains valid loop calling `gladCodeAPI` actions |
 | **Empty `simlog`** | GCC compilation failed for gladiator code or C server | Inspect `errorc.txt` in the temporary run directory under `public_html/runs/{hash}/` |
-| **"AUTH_REQUIRED"** | Missing or expired PHP session | Log in via `index.php` or ensure `config.json` session database credentials are valid |
+| **"AUTH_REQUIRED"** | Missing or expired PHP session | Log in via `index.php` or ensure `config/config.json` / env session database credentials are valid |
 | **Container Timeout** | Simulation took longer than 30s | Runner kills container via `docker kill {dirname}`. Check for blocking calls or high turn counts |
 
 ---
