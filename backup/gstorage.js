@@ -5,10 +5,10 @@ export default class CloudStorage {
     constructor({ projectId, keyFilename }) {
         this.storage = new Storage({ projectId, keyFilename });
     }
-    
     async upload({ srcFilePath, bucket, storageDir, fileName}) {
         try {
-            const gcs = this.storage.bucket(`gs://${bucket}`);
+            const bucketName = bucket.replace(/^gs:\/\//, '');
+            const gcs = this.storage.bucket(bucketName);
             const storagepath = `${storageDir}/${fileName}`;
     
             const result = await gcs.upload(srcFilePath, {

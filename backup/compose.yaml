@@ -14,5 +14,5 @@ volumes:
     node_modules:
 networks:
     gladcode:
-        name: gladcode_default
+        name: ${DOCKER_NETWORK:-gladcode2_default}
         external: true
