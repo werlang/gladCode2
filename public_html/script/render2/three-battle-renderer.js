@@ -164,6 +164,7 @@ export class ThreeBattleRenderer {
                 THREE: this.#THREE,
                 tracker: this.#tracker,
                 heroAssets: this.#heroAssets,
+                animationLibrary: this.#animationLibrary,
                 gladiator,
                 index,
             });
