@@ -25,9 +25,12 @@ services:
             - runs:/runs
         ports:
             - 127.0.0.1:3000:3000
-        # Runtime install: ./runner bind-mount shadows build-time
-        # node_modules and the named volume starts empty on fresh checkouts.
-        command: sh -c "[ -x node_modules/.bin/nodemon ] || npm install --no-audit --no-fund; exec npm run dev"
+        # Deterministic install at startup: ./runner bind-mount shadows
+        # build-time node_modules and the named volume starts empty (or
+        # half-written after a crashed install) on fresh checkouts.
+        # Always `npm ci` — a shortcut `[ -x ... ]` check can perpetually
+        # preserve a corrupt tree combined with the restart loop.
+        command: sh -c "npm ci --no-audit --no-fund && exec npm run dev"
         # command: tail -f /dev/null #idle container
 
     mysql:
