@@ -227,6 +227,7 @@ export class BattleEffectsLayer {
     #audio;
     #damageTotals = new Map();
     #onShake;
+    #pendingStrikes = [];
     #projectiles = new Map();
     #scene;
     #slashArcGeometry;
@@ -470,6 +471,8 @@ export class BattleEffectsLayer {
 
     /**
      * Adds a directional melee slash arc that sweeps through the swing.
+     * The arc eases out (fast cut, soft landing) and breathes once so the
+     * swing never snaps on or off — the previous source of cut frames.
      *
      * @param {import('./gladiator-view.js').GladiatorView} view Attacking fighter.
      * @param {boolean} heavy Assassinate-grade swing.
@@ -487,12 +490,46 @@ export class BattleEffectsLayer {
         const arcCenterOffset = Math.PI * 0.425;
         const startAngle = headingToRadians(view.state.head) + Math.PI / 2 - arcCenterOffset;
         const sweep = Math.PI * 1.05;
+        const duration = heavy ? 0.36 : 0.3;
         this.#addTransient(mesh, null, material, (progress) => {
-            mesh.rotation.z = startAngle - sweep * (1 - (1 - progress) ** 2);
-            const pulse = 1 + Math.sin(progress * Math.PI) * 0.2;
+            // Ease-out cubic sweep: the blade snaps then glides, matching the
+            // procedural contact easing in synty-hero-animation.js.
+            const eased = 1 - (1 - progress) ** 3;
+            mesh.rotation.z = startAngle - sweep * eased;
+            const pulse = 1 + Math.sin(progress * Math.PI) * 0.14;
             mesh.scale.setScalar(scale * pulse);
-            material.opacity = (1 - progress) * 0.78;
-        }, heavy ? 0.3 : 0.24);
+            material.opacity = (1 - progress) ** 1.35 * 0.85;
+        }, duration);
+    }
+
+    /**
+     * Schedules a slash to land on the procedural contact frame instead of
+     * the engine event frame. Engine attacks last one 100 ms step while the
+     * visual coil needs ~0.26–0.30 s to reach full extension; firing the arc
+     * immediately used to flash before the arm arrived.
+     *
+     * @param {import('./gladiator-view.js').GladiatorView} view Attacking fighter.
+     * @param {boolean} heavy Assassinate-grade swing.
+     * @param {number} nowElapsed Wall-clock seconds (rAF timestamp basis).
+     */
+    #scheduleSlashArc(view, heavy, nowElapsed) {
+        const delay = heavy ? 0.22 : 0.26;
+        this.#pendingStrikes.push({ view, heavy, triggerAt: nowElapsed + delay });
+    }
+
+    /** Emits a bow-string snap exactly on the visual release frame. */
+    #emitBowSnap(view) {
+        const base = view.root.position;
+        this.#sparkPool.emit({ x: base.x, y: 1.25, z: base.z }, {
+            count: 6,
+            speed: 1.6,
+            size: 0.09,
+            life: 0.28,
+            upward: 0.25,
+            gravity: 1.2,
+            drag: 2.2,
+            colors: [0xfff6da, 0xe8d7ad],
+        });
     }
 
     /**
@@ -578,8 +615,9 @@ export class BattleEffectsLayer {
      * @param {import('./dom-overlay.js').BattleDomOverlay} overlay DOM overlay.
      * @param {{ text?: boolean, sound?: { sfx?: number }, reducedMotion?: boolean }} preferences User preferences.
      * @param {number} simulationTime Current replay timestamp.
+     * @param {number} [nowElapsed] Wall-clock seconds for strike scheduling.
      */
-    handleEvents(events, viewsById, overlay, preferences, simulationTime = 0) {
+    handleEvents(events, viewsById, overlay, preferences, simulationTime = 0, nowElapsed = performance.now() / 1000) {
         const volume = Number(preferences.sound?.sfx) || 0;
 
         events.forEach((event) => {
@@ -638,7 +676,7 @@ export class BattleEffectsLayer {
                 this.#addRing(view.root.position, 0x9ff3ff, 2.6, 0.7);
             }
             else if (event.type === 'action' && view) {
-                this.#handleAction(event, view, overlay, preferences, volume);
+                this.#handleAction(event, view, overlay, preferences, volume, nowElapsed);
             }
             else if (event.type === 'projectile-spawn' && Number(event.projectile?.type) === 1) {
                 this.#audio.playEffect('fireball', volume);
@@ -653,26 +691,29 @@ export class BattleEffectsLayer {
 
     /**
      * Handles action-specific audio and geometric accents.
+     * Slashes are scheduled onto the procedural contact frame; bow snaps and
+     * ranged audio fire on the release frame so shooting never cuts ahead of
+     * the draw.
      *
      * @param {Record<string, unknown>} event Action event.
      * @param {import('./gladiator-view.js').GladiatorView} view Acting gladiator.
      * @param {import('./dom-overlay.js').BattleDomOverlay} overlay DOM overlay.
      * @param {{ text?: boolean }} preferences User preferences.
      * @param {number} volume SFX volume.
+     * @param {number} nowElapsed Wall-clock seconds for strike scheduling.
      */
-    #handleAction(event, view, overlay, preferences, volume) {
+    #handleAction(event, view, overlay, preferences, volume, nowElapsed = performance.now() / 1000) {
         const action = Number(event.action);
         const appearance = getGladiatorAppearance(view.state);
-        const audioName = {
+        // Melee/ranged swing audio belongs to contact/release, not to the
+        // 1-frame engine blip — schedule it with the visual strike.
+        const instantAudioName = {
             [ACTIONS.teleport]: 'teleport',
             [ACTIONS.block]: 'block',
-            [ACTIONS.assassinate]: 'assassinate',
             [ACTIONS.ambush]: 'ambush',
-            [ACTIONS.melee]: 'melee',
-            [ACTIONS.ranged]: 'ranged',
             [ACTIONS.charge]: appearance.gender === 'female' ? 'charge_female' : 'charge_male',
         }[action];
-        if (audioName) this.#audio.playEffect(audioName, volume);
+        if (instantAudioName) this.#audio.playEffect(instantAudioName, volume);
 
         if (action === ACTIONS.teleport) {
             this.#addRing(view.root.position, 0x62d8ff, 2.9, 0.72);
@@ -689,11 +730,16 @@ export class BattleEffectsLayer {
             this.#addRing(view.root.position, 0xffdf62, 2.1, 0.5);
         }
         else if (action === ACTIONS.melee) {
-            this.#addSlashArc(view, false);
+            this.#pendingStrikes.push({ view, heavy: false, kind: 'slash', triggerAt: nowElapsed + 0.26, volume });
         }
         else if (action === ACTIONS.assassinate) {
-            this.#addSlashArc(view, true);
+            this.#pendingStrikes.push({ view, heavy: true, kind: 'slash', triggerAt: nowElapsed + 0.22, volume });
             this.#addRing(view.root.position, 0xd44bff, 2.6, 0.55);
+        }
+        else if (action === ACTIONS.ranged) {
+            // Bow release lands at 0.52 of the 0.9 s draw; the snap fires
+            // there so the arrow the engine already spawned meets the string.
+            this.#pendingStrikes.push({ view, heavy: false, kind: 'bow', triggerAt: nowElapsed + 0.4, volume });
         }
         else if (action === ACTIONS.ambush) {
             this.#addRing(view.root.position, 0xd44bff, 2.5, 0.55);
@@ -770,6 +816,22 @@ export class BattleEffectsLayer {
     animate(elapsedSeconds, _simulationTime = 0, deltaSeconds = 1 / 60, frameProgress = 1) {
         const reducedDelta = Math.min(deltaSeconds, 0.1);
         const alpha = Math.min(Math.max(frameProgress, 0), 1);
+
+        // Fire scheduled strikes on the visual contact/release frame.
+        if (this.#pendingStrikes.length) {
+            const due = this.#pendingStrikes.filter((strike) => elapsedSeconds >= strike.triggerAt);
+            this.#pendingStrikes = this.#pendingStrikes.filter((strike) => elapsedSeconds < strike.triggerAt);
+            due.forEach((strike) => {
+                if (strike.kind === 'bow') {
+                    this.#emitBowSnap(strike.view);
+                    this.#audio.playEffect('ranged', strike.volume ?? 0);
+                }
+                else {
+                    this.#addSlashArc(strike.view, strike.heavy);
+                    this.#audio.playEffect(strike.heavy ? 'assassinate' : 'melee', strike.volume ?? 0);
+                }
+            });
+        }
 
         this.#projectiles.forEach((item) => {
             const x = lerp(item.from.x, item.to.x, alpha);
@@ -889,6 +951,7 @@ export class BattleEffectsLayer {
 
     /** Releases every remaining projectile, transient and pooled resource. */
     destroy() {
+        this.#pendingStrikes = [];
         this.#projectiles.forEach(({ object, resources, trail }) => {
             if (trail) trail.removeFromParent();
             object.removeFromParent();
