@@ -33,7 +33,7 @@ fi
 MYSQL_HOST="${MYSQL_HOST:-mysql}"
 MYSQL_PORT="${MYSQL_PORT:-3306}"
 MYSQL_USER="${MYSQL_USER:-root}"
-MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
+MYSQL_PASSWORD="${MYSQL_PASSWORD:-${MYSQL_ROOT_PASSWORD:-}}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-gladcode}"
 
 echo "[migrate] Building gladcode2-migrate image..."
@@ -66,6 +66,7 @@ while true; do
     esac
     tries=$((tries + 1))
     if [ "$tries" -ge 30 ]; then
+        echo "[migrate] last ping response: $ping_ok" >&2
         echo "[migrate] error: MySQL did not become ready in time." >&2
         exit 1
     fi
