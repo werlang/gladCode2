@@ -326,12 +326,15 @@ export class SyntyHeroAssets {
         object.add(content);
 
         // Arsenal: every weapon the skin justifies, attached once and toggled
-        // per action — bow while shooting, blade while swinging, nothing while
-        // casting. The primary rides the hand outside of combat.
+        // per visual action — bow while shooting, blade while swinging, and
+        // the last-used weapon the rest of the time. The primary rides the
+        // hand outside of combat. Missing FBXs fall back to a same-family
+        // available asset before returning null so fighters never vanish
+        // mid-swap; GladiatorView builds procedural stand-ins past that.
         const polearmMelee = Boolean(appearance.families?.spear);
-        const melee = this.#createWeapon(config.arsenal.melee, material);
-        const ranged = this.#createWeapon(config.arsenal.ranged, material);
-        const staff = this.#createWeapon(config.arsenal.staff, material);
+        const melee = this.#createWeapon(config.arsenal.melee, material, polearmMelee ? 'spear' : 'sword');
+        const ranged = this.#createWeapon(config.arsenal.ranged, material, 'bow');
+        const staff = this.#createWeapon(config.arsenal.staff, material, 'staff');
 
         if (melee) {
             const polearm = polearmMelee;
@@ -356,7 +359,7 @@ export class SyntyHeroAssets {
             });
         }
 
-        const shield = this.#createWeapon(config.shieldAsset, material);
+        const shield = this.#createWeapon(config.shieldAsset, material, 'shield');
         if (shield) {
             shield.position.set(0, 0.05, 0.14);
             rig.attachEquipment(THREE, shield, scale, {
@@ -434,18 +437,28 @@ export class SyntyHeroAssets {
 
     /**
      * Builds a normalized rigid weapon from the shared registry sources.
+     * When the requested FBX is absent (packs not dropped in), falls back to
+     * a same-family available asset so the silhouette stays correct instead
+     * of vanishing mid-fight.
      *
      * @param {string|null} assetKey Registry key such as `dungeon:Spear_01`.
      * @param {import('three').MeshStandardMaterial} paletteMaterial Hero body palette, used by `hero:` pack entries.
+     * @param {'sword'|'spear'|'bow'|'staff'} [family] Family for fallback search.
      * @returns {import('three').Group|null} Normalized weapon group.
      */
-    #createWeapon(assetKey, paletteMaterial) {
-        if (!assetKey || !this.#weaponLibrary) return null;
-        const entry = WEAPON_ASSET_REGISTRY[assetKey];
-        if (!entry || !this.#weaponLibrary.has(entry.file)) return null;
+    #createWeapon(assetKey, paletteMaterial, family = 'sword') {
+        if (!this.#weaponLibrary) return null;
+        let key = assetKey;
+        let entry = key ? WEAPON_ASSET_REGISTRY[key] : null;
+        if (!entry || !this.#weaponLibrary.has(entry.file)) {
+            key = this.#findFallbackWeapon(family);
+            entry = key ? WEAPON_ASSET_REGISTRY[key] : null;
+            if (!entry || !this.#weaponLibrary.has(entry.file)) return null;
+        }
 
         const THREE = this.#THREE;
         const weapon = this.#weaponLibrary.clone(entry.file);
+        if (!weapon) return null;
         const material = entry.pack === 'hero'
             ? paletteMaterial
             : this.#packMaterial(entry.pack) ?? paletteMaterial;
@@ -454,6 +467,9 @@ export class SyntyHeroAssets {
             object.material = material;
             object.castShadow = true;
             object.receiveShadow = true;
+            // Hands leave the top-down frustum for a frame during wide
+            // swings; culled weapons would blink — a classic cut frame.
+            object.frustumCulled = false;
         });
         weapon.updateMatrixWorld(true);
         const bounds = new THREE.Box3().setFromObject(weapon);
@@ -466,6 +482,37 @@ export class SyntyHeroAssets {
         normalized.scale.setScalar(entry.length / longestSide);
         normalized.add(weapon);
         return normalized;
+    }
+
+    /**
+     * Finds an available registry weapon of the same family.
+     * Prefers the hero-pack pieces known to ship with the checkout.
+     *
+     * @param {'sword'|'spear'|'bow'|'staff'|'shield'} family Weapon family.
+     * @returns {string|null} Available registry key or null.
+     */
+    #findFallbackWeapon(family) {
+        const candidates = family === 'spear'
+            ? ['hero:Joust_01', 'hero:Joust_02', 'hero:Joust_03']
+            : family === 'bow'
+                ? ['bow:Bow_01']
+                : family === 'staff'
+                    ? ['hero:Staff_01', 'hero:Staff_02']
+                    : family === 'shield'
+                        ? ['hero:Shield_01', 'hero:Shield_05', 'hero:Shield_12']
+                        : ['hero:Sword_01', 'hero:Sword_Small_01', 'hero:Sword_Large_01'];
+        for (const key of candidates) {
+            const entry = WEAPON_ASSET_REGISTRY[key];
+            if (entry && this.#weaponLibrary?.has(entry.file)) return key;
+        }
+        // Last resort for blades only: any loaded weapon keeps the fighter
+        // armed. Shields/bows/staves must never resolve to a wrong silhouette.
+        if (family === 'sword' || family === 'spear') {
+            for (const [key, candidate] of Object.entries(WEAPON_ASSET_REGISTRY)) {
+                if (this.#weaponLibrary?.has(candidate.file)) return key;
+            }
+        }
+        return null;
     }
 
     /** Releases source-pack GPU resources after every fighter has been removed. */
