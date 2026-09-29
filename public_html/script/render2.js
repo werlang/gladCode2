@@ -1,7 +1,4 @@
-import { ThreeBattleRenderer } from './render2/three-battle-renderer.js';
-import { SyntyHeroAssets } from './render2/synty-hero-assets.js';
-import { SyntyAnimationLibrary } from './render2/animation-library.js';
-import { SyntyPropAssets } from './render2/synty-prop-packs.js';
+import { BattleRenderer } from './render2/renderer.js';
 
 const classicLoadRenderer = window.load_phaser;
 const classicUpdateRenderer = window.phaser_update;
@@ -11,7 +8,7 @@ let rendererWasLoaded = false;
 /**
  * Installs the Three.js renderer behind the legacy playback adapter boundary.
  *
- * @returns {Promise<ThreeBattleRenderer|null>} Active renderer or null after fallback.
+ * @returns {Promise<BattleRenderer|null>} Active renderer or null after fallback.
  */
 async function installThreeRenderer() {
     if (window.BattleRendererPreference?.get() !== window.BattleRendererPreference?.THREE) {
@@ -22,61 +19,13 @@ async function installThreeRenderer() {
     if (status) status.textContent = 'Carregando arena 3D';
 
     try {
-        const [THREE, { FBXLoader }, SkeletonUtils, { RoomEnvironment }] = await Promise.all([
-            import('three'),
-            import('three/addons/loaders/FBXLoader.js'),
-            import('three/addons/utils/SkeletonUtils.js'),
-            import('three/addons/environments/RoomEnvironment.js').catch(() => ({ RoomEnvironment: null })),
-        ]);
+        const THREE = await import('three');
         const container = document.querySelector('#canvas-div');
         if (!(container instanceof HTMLElement)) {
             throw new Error('Battle canvas container was not found.');
         }
 
-        let heroAssets = null;
-        let animationLibrary = null;
-        let propAssets = null;
-        const loadHeroAssets = (async () => {
-            try {
-                if (status) status.textContent = 'Preparando heróis modulares';
-                heroAssets = new SyntyHeroAssets({ THREE, FBXLoader, SkeletonUtils });
-                await heroAssets.load((ratio) => {
-                    if (status) status.textContent = `Preparando heróis modulares ${Math.round(ratio * 100)}%`;
-                });
-            }
-            catch (error) {
-                heroAssets?.dispose();
-                heroAssets = null;
-                console.warn('Modelos Synty indisponíveis; usando gladiadores geométricos.', error);
-            }
-        })();
-        const loadAnimations = (async () => {
-            try {
-                animationLibrary = new SyntyAnimationLibrary({ FBXLoader });
-                await animationLibrary.load((ratio) => {
-                    if (status) status.textContent = `Preparando animações ${Math.round(ratio * 100)}%`;
-                });
-            }
-            catch (error) {
-                animationLibrary = null;
-                console.warn('Clipes de animação indisponíveis; usando animação procedural.', error);
-            }
-        })();
-        const loadPropAssets = (async () => {
-            try {
-                propAssets = new SyntyPropAssets({ THREE, FBXLoader, SkeletonUtils });
-                await propAssets.load();
-            }
-            catch (error) {
-                propAssets?.dispose();
-                propAssets = null;
-                console.warn('Cenário esculpido indisponível; usando arena procedural.', error);
-            }
-        })();
-        await Promise.all([loadHeroAssets, loadAnimations, loadPropAssets]);
-        if (!heroAssets && status) status.textContent = 'Carregando modelos alternativos';
-
-        renderer = new ThreeBattleRenderer({ THREE, container, heroAssets, animationLibrary, propAssets, RoomEnvironment });
+        renderer = new BattleRenderer({ THREE, container });
         window.threeBattleRenderer = renderer;
         window.game = renderer.createLegacyFacade();
         window.music = renderer.music;

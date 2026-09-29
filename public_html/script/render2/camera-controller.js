@@ -1,22 +1,30 @@
 import { BaseComponent } from './base-component.js';
 
-const CAMERA_OFFSET = Object.freeze({ x: 0, y: 30, z: 23 });
+const CAMERA_DISTANCE = 36;
+const DEFAULT_PITCH = 0.85;
+const MIN_PITCH = 0.25;
+const MAX_PITCH = 1.5;
+const ROTATE_PER_PIXEL = 0.007;
+const MAX_ZOOM = 7;
 const CAMERA_TARGET_LIMIT = 10;
 
 /**
- * Pointer, keyboard and follow controls for the orthographic battle camera.
+ * Pointer, keyboard and follow controls for the perspective battle camera.
  */
 export class BattleCameraController extends BaseComponent {
     #THREE;
     #camera;
     #canvas;
     #dragOrigin = null;
+    #dragMode = 'pan';
+    #yaw = 0;
+    #pitch = DEFAULT_PITCH;
     #followTarget = null;
     #target;
     #viewSize = 33;
 
     /**
-     * @param {{ THREE: typeof import('three'), camera: import('three').OrthographicCamera, canvas: HTMLCanvasElement }} options Controller dependencies.
+     * @param {{ THREE: typeof import('three'), camera: import('three').PerspectiveCamera, canvas: HTMLCanvasElement }} options Controller dependencies.
      */
     constructor({ THREE, camera, canvas }) {
         super();
@@ -29,6 +37,7 @@ export class BattleCameraController extends BaseComponent {
         this.on(canvas, 'pointerdown', this.#handlePointerDown);
         this.on(window, 'pointermove', this.#handlePointerMove);
         this.on(window, 'pointerup', this.#handlePointerUp);
+        this.on(canvas, 'contextmenu', (event) => event.preventDefault());
         this.on(canvas, 'wheel', this.#handleWheel, { passive: false });
         this.on(window, 'keydown', this.#handleKeyDown);
         this.update();
@@ -39,7 +48,7 @@ export class BattleCameraController extends BaseComponent {
         return this.#followTarget;
     }
 
-    /** @returns {number} Height of the orthographic frustum in world units. */
+    /** @returns {number} World-space height framed at the camera target. */
     get viewSize() {
         return this.#viewSize;
     }
@@ -66,10 +75,7 @@ export class BattleCameraController extends BaseComponent {
      */
     resize(width, height) {
         const aspect = Math.max(0.1, width / Math.max(1, height));
-        this.#camera.left = -this.#viewSize * aspect / 2;
-        this.#camera.right = this.#viewSize * aspect / 2;
-        this.#camera.top = this.#viewSize / 2;
-        this.#camera.bottom = -this.#viewSize / 2;
+        this.#camera.aspect = aspect;
         this.#camera.updateProjectionMatrix();
     }
 
@@ -82,10 +88,11 @@ export class BattleCameraController extends BaseComponent {
 
         this.#target.x = Math.min(CAMERA_TARGET_LIMIT, Math.max(-CAMERA_TARGET_LIMIT, this.#target.x));
         this.#target.z = Math.min(CAMERA_TARGET_LIMIT, Math.max(-CAMERA_TARGET_LIMIT, this.#target.z));
+        const ground = Math.cos(this.#pitch) * CAMERA_DISTANCE;
         this.#camera.position.set(
-            this.#target.x + CAMERA_OFFSET.x,
-            CAMERA_OFFSET.y,
-            this.#target.z + CAMERA_OFFSET.z,
+            this.#target.x + Math.sin(this.#yaw) * ground,
+            Math.sin(this.#pitch) * CAMERA_DISTANCE,
+            this.#target.z + Math.cos(this.#yaw) * ground,
         );
         this.#camera.lookAt(this.#target);
         this.#camera.updateMatrixWorld();
@@ -93,7 +100,8 @@ export class BattleCameraController extends BaseComponent {
 
     /** @param {PointerEvent} event Pointer start event. */
     #handlePointerDown = (event) => {
-        if (event.button !== 0) return;
+        if (event.button > 2) return;
+        this.#dragMode = event.button === 0 && !event.shiftKey ? 'pan' : 'rotate';
         this.#dragOrigin = { x: event.clientX, y: event.clientY };
         this.#canvas.setPointerCapture?.(event.pointerId);
         this.#canvas.classList.add('is-dragging');
@@ -102,14 +110,26 @@ export class BattleCameraController extends BaseComponent {
     /** @param {PointerEvent} event Pointer movement event. */
     #handlePointerMove = (event) => {
         if (!this.#dragOrigin) return;
-        const worldPerPixel = this.#viewSize / (Math.max(1, this.#canvas.clientHeight) * this.#camera.zoom);
+        const worldPerPixel = this.#viewSize * 0.9 / (Math.max(1, this.#canvas.clientHeight) * this.#camera.zoom);
         const deltaX = event.clientX - this.#dragOrigin.x;
         const deltaY = event.clientY - this.#dragOrigin.y;
         this.#dragOrigin = { x: event.clientX, y: event.clientY };
+        if (this.#dragMode === 'rotate') {
+            this.#yaw -= deltaX * ROTATE_PER_PIXEL;
+            this.#pitch = Math.min(MAX_PITCH, Math.max(MIN_PITCH, this.#pitch + deltaY * ROTATE_PER_PIXEL));
+            return;
+        }
         this.unfollow();
-        this.#target.x -= deltaX * worldPerPixel;
-        this.#target.z -= deltaY * worldPerPixel * 1.35;
+        this.#pan(-deltaX * worldPerPixel, -deltaY * worldPerPixel * 1.35);
     };
+
+    /** Moves the target along the ground in screen-aligned axes (right, forward-down). */
+    #pan(right, down) {
+        const cos = Math.cos(this.#yaw);
+        const sin = Math.sin(this.#yaw);
+        this.#target.x += right * cos + down * sin;
+        this.#target.z += -right * sin + down * cos;
+    }
 
     /** Ends pointer dragging. */
     #handlePointerUp = () => {
@@ -121,7 +141,7 @@ export class BattleCameraController extends BaseComponent {
     #handleWheel = (event) => {
         event.preventDefault();
         const factor = event.deltaY > 0 ? 0.9 : 1.1;
-        this.#camera.zoom = Math.min(2.4, Math.max(0.72, this.#camera.zoom * factor));
+        this.#camera.zoom = Math.min(MAX_ZOOM, Math.max(0.72, this.#camera.zoom * factor));
         this.#camera.updateProjectionMatrix();
     };
 
@@ -132,12 +152,14 @@ export class BattleCameraController extends BaseComponent {
 
         const pan = 0.65 / this.#camera.zoom;
         const actions = {
-            ArrowLeft: () => { this.#target.x -= pan; },
-            ArrowRight: () => { this.#target.x += pan; },
-            ArrowUp: () => { this.#target.z -= pan; },
-            ArrowDown: () => { this.#target.z += pan; },
-            '+': () => { this.#camera.zoom = Math.min(2.4, this.#camera.zoom * 1.08); },
-            '=': () => { this.#camera.zoom = Math.min(2.4, this.#camera.zoom * 1.08); },
+            ArrowLeft: () => this.#pan(-pan, 0),
+            ArrowRight: () => this.#pan(pan, 0),
+            ArrowUp: () => this.#pan(0, -pan),
+            ArrowDown: () => this.#pan(0, pan),
+            q: () => { this.#yaw += 0.15; },
+            e: () => { this.#yaw -= 0.15; },
+            '+': () => { this.#camera.zoom = Math.min(MAX_ZOOM, this.#camera.zoom * 1.08); },
+            '=': () => { this.#camera.zoom = Math.min(MAX_ZOOM, this.#camera.zoom * 1.08); },
             '-': () => { this.#camera.zoom = Math.max(0.72, this.#camera.zoom / 1.08); },
         };
 

@@ -711,6 +711,12 @@ function start_timer(steps){
 //the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
 uiVars = [];
 async function create_ui(nglad){
+    if (document.documentElement.classList.contains('renderer-three')){
+        //the three renderer draws its HUD on canvas and reports selection through followedGladIndex
+        uiVars = Array.from({length: nglad}, () => ({}));
+        uiVars.showtext = true;
+        return;
+    }
     $('#ui-container').html("");
     uiVars = [];
     const templateLoads = [];
@@ -748,6 +754,7 @@ async function startBattle(simulation){
     await (window.battleRendererReady || Promise.resolve());
     if (load_phaser()){
         await create_ui(simulation[0].glads.length);
+        await window.threeBattleRenderer?.prepare?.(simulation[0].glads);
         $( "#time" ).slider("option", "max", simulation.length);
         for (i=0 ; i<simulation[0].glads.length ; i++){
             newindex[i] = i;
@@ -782,8 +789,12 @@ function changeCrowd (value) {
     }
 }
 
+function followedGladIndex(){
+    return window.followedGlad ?? $('.ui-glad').index($('.follow'));
+}
+
 function createDetailedWindow(){
-    var index = $('.ui-glad').index($('.follow'));
+    var index = followedGladIndex();
     var glad = json.glads[index];
 
     $('#details').remove();
@@ -864,7 +875,7 @@ function createDetailedWindow(){
 }
 
 async function updateDetailedWindow(){
-    var index = $('.ui-glad').index($('.follow'));
+    var index = followedGladIndex();
     var glad = json.glads[index];
 
     var info = [
