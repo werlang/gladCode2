@@ -1,3 +1,5 @@
+> **Note:** the Three.js battle renderer (`script/render2/`) is now fully procedural and no longer loads any pack below. The files remain only as source material; the module names referenced in this document no longer exist.
+
 # Synty runtime assets
 
 The Three.js battle replay (`script/render2/`) consumes selected files from the
