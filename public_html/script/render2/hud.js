@@ -1,31 +1,70 @@
-const PANEL_WIDTH = 282;
-const PANEL_HEIGHT = 98;
-const PANEL_GAP = 6;
+const PANEL_WIDTH = 300;
+const PANEL_HEIGHT = 96;
+const PANEL_GAP = 4;
 const PANEL_MARGIN = 8;
-const CARD_WIDTH = 136;
-const CARD_HEIGHT = 32;
-const BUBBLE_MAX_WIDTH = 170;
+const CARD_WIDTH = 128;
+const CARD_HEIGHT = 44;
+const BUBBLE_MAX_WIDTH = 180;
 const BUBBLE_LINE_HEIGHT = 14;
-const BUBBLE_PADDING = 7;
+const BUBBLE_PADDING = 10;
 const FLOAT_SECONDS = 0.9;
 const FLOAT_RISE = 38;
 const FLOAT_POOL = 14;
 const LABEL_CACHE_LIMIT = 48;
 const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
+/** Display face for names, levels and combat text (loaded by playback.php), and the face for numbers. */
+const TITLE_FONT = `Cinzel, Georgia, ${FONT}`;
+const NUMBER_FONT = `Acme, ${FONT}`;
+const INK = 'rgba(12, 8, 5, 0.92)';
+const PARCHMENT = '#f1dfb8';
 const FLOAT_COLORS = Object.freeze({
-    damage: '#ff6b5a', heal: '#6dff8a', potion: '#6dff8a', level: '#ffe66d', mana: '#6ab0ff',
+    damage: ['#ffb199', '#e8382b'], heal: ['#c8ffc0', '#3fcf5a'], potion: ['#c8ffc0', '#3fcf5a'], level: ['#fff3b0', '#f0a91c'], mana: ['#cfe6ff', '#4b8dff'],
 });
 
-/** Rounded-rectangle path helper (Path2D-free so it works on every canvas). */
-const ICON_URLS = Object.freeze({
-    str: 'res/str_icon.png', agi: 'sprite/images/sprint.png', int: 'res/int_icon.png',
-    poison: 'res/buff-poison.png', burn: 'res/buff-burn.png', movement: 'res/buff-speed.png',
-    resist: 'res/buff-protection.png', invisible: 'res/buff-invisible.png', stun: 'res/buff-stun.png',
+const SPRITES = '/assets/synty/fantasy-warrior-hud/Sprites/';
+const kit = (name) => `${SPRITES}FantasyWarrior/SPR_FantasyWarrior_${name}.png`;
+const hud = (name) => `${SPRITES}HUD/SPR_HUD_FantasyWarrior_${name}.png`;
+const fx = (name) => `${SPRITES}FX/SPR_FX_FantasyWarrior_${name}.png`;
+const status = (name, layer = 'Clean') => `${SPRITES}Icons_Status/ICON_FantasyWarrior_Status_${name}_${layer}.png`;
+const stat = (name, layer = 'Clean') => `${SPRITES}Icons_Stats/ICON_FantasyWarrior_Stat_${name}_${layer}.png`;
+
+/**
+ * Synty Fantasy Warrior HUD pieces. Frames, rings and gems ship coloured; the rest is white art
+ * meant to be tinted (`flat` paints the silhouette, `shade` multiplies so bevels keep their light).
+ * `slice` is the source inset of a 9-slice frame or the end-cap width of a 3-slice bar.
+ */
+const ART = Object.freeze({
+    frame: { url: kit('Frame_Box_Medium01_Variant01'), slice: 118 },
+    back: { url: kit('Box_Background_Shadowed') },
+    glow: { url: fx('Glow_Box01_Smooth') },
+    ring: { url: kit('Ring_Small01_Variant01') },
+    gem: { url: kit('Gem01_Container01') },
+    gemBack: { url: kit('Gem01_Background01') },
+    barFrame: { url: kit('Bar_Horizontal12_Variant01'), slice: 120 },
+    barFill: { url: kit('Bar_Horizontal05'), slice: 40 },
+    barGold: { url: kit('Bar_Horizontal04'), slice: 40 },
+    skull: { url: hud('Symbol_Skull01') },
+    marker: { url: hud('Triangle_Small01_Clean') },
+    markerUnder: { url: hud('Triangle_Small01_Underlay') },
+    parchment: { url: hud('Box_Small_Parchment02'), slice: 30 },
+    divider: { url: kit('Tracery_Horizontal01') },
+    buffRing: { url: kit('Ring_Small03_Variant01') },
+    str: { url: stat('Strength01'), under: stat('Strength01', 'Underlay'), color: '#ff8a70' },
+    agi: { url: stat('Speed01'), under: stat('Speed01', 'Underlay'), color: '#9be870' },
+    int: { url: stat('Mind01'), under: stat('Mind01', 'Underlay'), color: '#86c2ff' },
+    poison: { url: status('Poisoned01'), under: status('Poisoned01', 'Underlay'), color: '#8fe85f' },
+    burn: { url: status('Burninating01'), under: status('Burninating01', 'Underlay'), color: '#ffa040' },
+    movement: { url: status('SpeedUp01'), under: status('SpeedUp01', 'Underlay'), color: '#86e0ff' },
+    resist: { url: status('Defense01'), under: status('Defense01', 'Underlay'), color: '#ecd27e' },
+    invisible: { url: status('Charmed01'), under: status('Charmed01', 'Underlay'), color: '#cda6ff' },
+    stun: { url: status('Shocked01'), under: status('Shocked01', 'Underlay'), color: '#ffe76d' },
 });
-/** Buffs shown on every roster panel, in the same order as the original UI. */
+/** Buffs a roster panel can show, in the same order as the original UI. */
 const BUFF_ICONS = Object.freeze([['poison', 'Envenenado'], ['burn', 'Queimando'], ['movement', 'Velocidade'], ['resist', 'Proteção'], ['invisible', 'Invisível'], ['stun', 'Atordoado']]);
 
 const hex = (color) => `#${Number(color).toString(16).padStart(6, '0')}`;
+const rgba = (color, alpha) => `rgba(${(color >> 16) & 255}, ${(color >> 8) & 255}, ${color & 255}, ${alpha})`;
+const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
 /** Round face portrait drawn from the gladiator's skin traits (skin, hair, eyes, beard, headgear). */
 function drawPortrait(ctx, cx, cy, radius, look, alive) {
@@ -82,11 +121,6 @@ function drawPortrait(ctx, cx, cy, radius, look, alive) {
         }
     }
     ctx.restore();
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.stroke();
 }
 
 function roundRect(ctx, x, y, width, height, radius) {
@@ -97,6 +131,43 @@ function roundRect(ctx, x, y, width, height, radius) {
     ctx.arcTo(x, y + height, x, y, radius);
     ctx.arcTo(x, y, x + width, y, radius);
     ctx.closePath();
+}
+
+/** Draws a frame stretched to any size while its corners keep their shape (`inset` source px become `border` px). */
+function nineSlice(ctx, image, x, y, width, height, inset, border) {
+    const sx = [0, inset, image.width - inset, image.width];
+    const sy = [0, inset, image.height - inset, image.height];
+    const dx = [x, x + border, x + width - border, x + width];
+    const dy = [y, y + border, y + height - border, y + height];
+    for (let row = 0; row < 3; row += 1) {
+        for (let column = 0; column < 3; column += 1) {
+            const w = dx[column + 1] - dx[column];
+            const h = dy[row + 1] - dy[row];
+            if (w > 0 && h > 0) ctx.drawImage(image, sx[column], sy[row], sx[column + 1] - sx[column], sy[row + 1] - sy[row], dx[column], dy[row], w, h);
+        }
+    }
+}
+
+/** Draws a horizontal bar piece at any length: the pointed end caps keep their aspect, the middle stretches. */
+function threeSlice(ctx, image, x, y, width, height, cap) {
+    const scale = height / image.height;
+    const end = Math.min(cap * scale, width / 2);
+    ctx.drawImage(image, 0, 0, cap, image.height, x, y, end, height);
+    ctx.drawImage(image, cap, 0, image.width - cap * 2, image.height, x + end, y, width - end * 2, height);
+    ctx.drawImage(image, image.width - cap, 0, cap, image.height, x + width - end, y, end, height);
+}
+
+/** Text with a dark outline so it reads over any part of the arena. */
+function outlined(ctx, text, x, y, { font, color, outline = INK, width = 3, align = 'left', maxWidth } = {}) {
+    ctx.font = font;
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = width;
+    ctx.strokeStyle = outline;
+    ctx.strokeText(text, x, y, maxWidth);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y, maxWidth);
 }
 
 /** Greedy word wrap that also splits words longer than the line. */
@@ -128,10 +199,11 @@ function wrapText(ctx, text, maxWidth, maxLines) {
 }
 
 /**
- * Battle HUD drawn inside the WebGL canvas: name/vitals cards, speech and breakpoint
- * bubbles, and floating combat text. Everything is a screen-space sprite in a second,
+ * Battle HUD drawn inside the WebGL canvas: roster panels, name/vitals cards, speech and
+ * breakpoint bubbles, and floating combat text. Everything is a screen-space sprite in a second,
  * pixel-aligned scene rendered after the arena, so there is no DOM layout or restyling.
- * Card textures are redrawn only when the text or a bar value actually changes.
+ * The pieces are the Synty Fantasy Warrior HUD sprites composed on canvas (plain shapes stand in
+ * while they load or when the pack is missing); textures are redrawn only when what they show changes.
  */
 export class BattleHud {
     #THREE;
@@ -148,8 +220,10 @@ export class BattleHud {
     #onSelect;
     #isFollowed;
     #isPoisoned;
-    #icons = {};
-    #iconsLoaded = 0;
+    #art = {};
+    #tints = new Map();
+    /** Bumped whenever a sprite or the display font finishes loading, so cached textures redraw. */
+    #artVersion = 0;
 
     /**
      * @param {{ THREE: typeof import('three'), canvas: HTMLCanvasElement, camera: import('three').Camera, onSelect?: (index: number) => void, isFollowed?: (view: import('./fighter.js').Fighter) => boolean, isPoisoned?: (view: import('./fighter.js').Fighter) => boolean }} options HUD dependencies.
@@ -171,6 +245,7 @@ export class BattleHud {
             sprite.userData.age = Infinity;
             this.#floats.push(sprite);
         }
+        this.#loadArt();
         this.resize();
     }
 
@@ -180,6 +255,113 @@ export class BattleHud {
         sprite.center.set(0.5, 0);
         this.#scene.add(sprite);
         return sprite;
+    }
+
+    /** Starts loading every HUD sprite and the display fonts; each arrival invalidates the drawn textures. */
+    #loadArt() {
+        const arrived = () => {
+            this.#artVersion += 1;
+            this.#labelCache.forEach((entry) => entry.texture.dispose());
+            this.#labelCache.clear();
+            this.#cards.forEach((card) => { card.keys = {}; });
+        };
+        for (const [name, { url, under }] of Object.entries(ART)) {
+            for (const [key, src] of [[name, url], [`${name}:under`, under]]) {
+                if (!src) continue;
+                const image = new Image();
+                image.addEventListener('load', () => {
+                    this.#art[key] = image;
+                    arrived();
+                });
+                image.src = src;
+            }
+        }
+        document.fonts?.load(`700 14px ${TITLE_FONT}`).then(arrived, () => {});
+        document.fonts?.load(`16px ${NUMBER_FONT}`).then(arrived, () => {});
+    }
+
+    /**
+     * A loaded sprite, optionally tinted (cached per colour).
+     *
+     * @param {string} name Key in ART (`name:under` for an icon's underlay).
+     * @param {string} [color] CSS colour to tint white art with.
+     * @param {'flat'|'shade'} [mode] Flat silhouette, or multiplied so shading survives.
+     * @returns {HTMLImageElement|HTMLCanvasElement|null} Drawable, or null while loading.
+     */
+    #sprite(name, color, mode = 'flat') {
+        const image = this.#art[name];
+        if (!image || !color) return image ?? null;
+        const key = `${name}|${color}|${mode}`;
+        let tinted = this.#tints.get(key);
+        if (!tinted) {
+            tinted = document.createElement('canvas');
+            tinted.width = image.naturalWidth;
+            tinted.height = image.naturalHeight;
+            const ctx = tinted.getContext('2d');
+            ctx.drawImage(image, 0, 0);
+            ctx.globalCompositeOperation = mode === 'flat' ? 'source-in' : 'multiply';
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, tinted.width, tinted.height);
+            if (mode !== 'flat') {
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.drawImage(image, 0, 0);
+            }
+            this.#tints.set(key, tinted);
+        }
+        return tinted;
+    }
+
+    /** Draws an icon on its dark underlay so it reads on any background. */
+    #drawIcon(ctx, name, x, y, size) {
+        const under = this.#sprite(`${name}:under`, INK);
+        if (under) ctx.drawImage(under, x - size * 0.08, y - size * 0.08, size * 1.16, size * 1.16);
+        const icon = this.#sprite(name, ART[name].color);
+        if (icon) ctx.drawImage(icon, x, y, size, size);
+    }
+
+    /**
+     * Crystal bar: dark trough, tinted fill cut at `ratio`, gold bevel frame, optional centred text.
+     * `framed` false draws a slim frameless gauge.
+     */
+    #drawBar(ctx, x, y, width, height, ratio, color, { framed = true, text = '', fill = 'barFill' } = {}) {
+        const frame = this.#art.barFrame;
+        const crystal = this.#sprite(fill, fill === 'barFill' ? color : null, 'shade');
+        const trough = this.#sprite('barFill', '#1a1310', 'shade');
+        // The frame's opening sits inside its bevel; the crystal fills the opening and hides under the bevel.
+        const scale = height / 256;
+        const inner = framed ? { x: x + 26 * scale, y: y + 36 * scale, w: width - 52 * scale, h: height - 80 * scale } : { x, y, w: width, h: height };
+        if (crystal && trough && (!framed || frame)) {
+            const cap = ART.barFill.slice;
+            ctx.globalAlpha *= 0.9;
+            threeSlice(ctx, trough, inner.x, inner.y, inner.w, inner.h, cap);
+            ctx.globalAlpha /= 0.9;
+            if (ratio > 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(inner.x, inner.y - 2, inner.w * ratio, inner.h + 4);
+                ctx.clip();
+                threeSlice(ctx, crystal, inner.x, inner.y, inner.w, inner.h, cap);
+                ctx.restore();
+            }
+            if (framed) threeSlice(ctx, frame, x, y, width, height, ART.barFrame.slice);
+        }
+        else {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            roundRect(ctx, inner.x, inner.y, inner.w, inner.h, inner.h / 3);
+            ctx.fill();
+            if (ratio > 0) {
+                ctx.fillStyle = color;
+                roundRect(ctx, inner.x, inner.y, Math.max(inner.h, inner.w * ratio), inner.h, inner.h / 3);
+                ctx.fill();
+            }
+            if (framed) {
+                ctx.strokeStyle = '#c8913a';
+                ctx.lineWidth = 1.2;
+                roundRect(ctx, inner.x, inner.y, inner.w, inner.h, inner.h / 3);
+                ctx.stroke();
+            }
+        }
+        if (text) outlined(ctx, text, x + width / 2, inner.y + inner.h / 2 + 0.5, { font: `${Math.round(inner.h * 0.82)}px ${NUMBER_FONT}`, color: '#fffaf0', align: 'center', width: 2.5 });
     }
 
     /** Re-reads the canvas size; the HUD camera maps one unit to one CSS pixel. */
@@ -214,114 +396,138 @@ export class BattleHud {
         return Math.min(1, this.#size.height / Math.max(1, needed));
     }
 
-    /** Lazily loads the original UI icons; loaded state is part of the panel redraw key. */
-    #icon(name) {
-        let icon = this.#icons[name];
-        if (!icon) {
-            icon = new Image();
-            icon.addEventListener('load', () => { this.#iconsLoaded += 1; });
-            icon.src = ICON_URLS[name];
-            this.#icons[name] = icon;
-        }
-        return icon.complete && icon.naturalWidth ? icon : null;
-    }
-
+    /**
+     * One roster entry: gold-framed plaque with the team pennant behind an octagonal portrait ring,
+     * a gem level badge, crystal HP/AP gauges, a gold XP thread, attributes and the active buffs.
+     */
     #drawPanel(panel, glad, view, followed, poisoned) {
         const canvas = panel.material.map.image;
         const ctx = canvas.getContext('2d');
         const alive = Number(glad.hp) > 0;
         const look = view.appearance;
-        const left = 78;
-        const width = PANEL_WIDTH - left - 10;
+        const W = PANEL_WIDTH;
+        const H = PANEL_HEIGHT;
         ctx.setTransform(this.#ratio, 0, 0, this.#ratio, 0, 0);
-        ctx.clearRect(0, 0, PANEL_WIDTH, PANEL_HEIGHT);
-        ctx.globalAlpha = alive ? 1 : 0.5;
-        ctx.fillStyle = 'rgba(14, 18, 26, 0.88)';
-        roundRect(ctx, 0.5, 0.5, PANEL_WIDTH - 1, PANEL_HEIGHT - 1, 9);
-        ctx.fill();
-        ctx.strokeStyle = followed ? '#ffd45e' : 'rgba(255, 255, 255, 0.16)';
-        ctx.lineWidth = followed ? 2 : 1;
-        ctx.stroke();
-        ctx.fillStyle = hex(look.team);
-        roundRect(ctx, 5, 10, 4, PANEL_HEIGHT - 20, 2);
-        ctx.fill();
+        ctx.clearRect(0, 0, W, H);
+        ctx.filter = alive ? 'none' : 'grayscale(0.9) brightness(0.8)';
+        ctx.globalAlpha = alive ? 1 : 0.78;
 
-        const cx = 41;
-        const cy = 46;
-        const xpRatio = Math.max(0, Math.min(1, Number(glad.xp) / Math.max(1, Number(glad.tonext))));
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
-        ctx.beginPath();
-        ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.strokeStyle = '#f2d13d';
-        ctx.beginPath();
-        ctx.arc(cx, cy, 32, Math.PI / 2, Math.PI / 2 - Math.PI * 2 * xpRatio, true);
-        ctx.stroke();
-        drawPortrait(ctx, cx, cy, 27, look, alive);
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(cx + 24, cy + 30, 12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        ctx.fillStyle = '#1b1f27';
-        ctx.font = `800 13px ${FONT}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(String(Math.round(Number(glad.lvl) || 1)), cx + 24, cy + 31, 20);
+        // Plaque: shadowed backing, a wash of the team colour from the left, glow when followed, gold frame.
+        const back = this.#sprite('back');
+        if (back) ctx.drawImage(back, 6, 6, W - 12, H - 12);
+        else {
+            ctx.fillStyle = 'rgba(16, 12, 10, 0.9)';
+            ctx.fillRect(6, 6, W - 12, H - 12);
+        }
+        const wash = ctx.createLinearGradient(6, 0, W * 0.6, 0);
+        wash.addColorStop(0, rgba(look.team, 0.42));
+        wash.addColorStop(1, rgba(look.team, 0));
+        ctx.fillStyle = wash;
+        ctx.fillRect(6, 6, W - 12, H - 12);
+        if (followed) {
+            const glow = this.#sprite('glow', '#ffcf5a');
+            ctx.globalAlpha *= 0.55;
+            if (glow) ctx.drawImage(glow, 0, 0, W, H);
+            ctx.globalAlpha /= 0.55;
+        }
+        const frame = this.#sprite('frame');
+        if (frame) nineSlice(ctx, frame, 0, 0, W, H, ART.frame.slice, 17);
+        else {
+            ctx.strokeStyle = '#c8913a';
+            ctx.lineWidth = 2;
+            roundRect(ctx, 3, 3, W - 6, H - 6, 6);
+            ctx.stroke();
+        }
+        if (followed) {
+            ctx.strokeStyle = 'rgba(255, 228, 140, 0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(9.5, 9.5, W - 19, H - 19);
+        }
 
-        ctx.fillStyle = '#f2f4f7';
-        ctx.font = `700 13px ${FONT}`;
-        ctx.textAlign = 'left';
-        const name = String(glad.name ?? '');
-        ctx.fillText(name.length > 26 ? `${name.slice(0, 25)}…` : name, left, 13, width);
-        const bar = (y, value, max, color) => {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
-            roundRect(ctx, left, y, width, 14, 4);
+        // Portrait: 3D head shot (or drawn face) on the team colour, inside the gold octagon ring.
+        const cx = 52;
+        const cy = H / 2;
+        const radius = 30;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.clip();
+        const halo = ctx.createRadialGradient(cx, cy - 10, 3, cx, cy, radius + 2);
+        halo.addColorStop(0, rgba(look.team, 1));
+        halo.addColorStop(0.35, rgba(look.team, 0.75));
+        halo.addColorStop(1, '#120d09');
+        ctx.fillStyle = halo;
+        ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+        if (view.portrait) ctx.drawImage(view.portrait, cx - 36, cy - 38, 72, 72);
+        else drawPortrait(ctx, cx, cy, radius, look, alive);
+        ctx.restore();
+        const ring = this.#sprite('ring');
+        if (ring) ctx.drawImage(ring, cx - 42, cy - 42, 84, 84);
+        else {
+            ctx.strokeStyle = '#c8913a';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        if (!alive) {
+            const skull = this.#sprite('skull', '#e8e2d4');
+            if (skull) ctx.drawImage(skull, cx - 34, cy - 17, 68, 34);
+        }
+        const gemX = cx + 27;
+        const gemY = cy + 27;
+        const gemBack = this.#sprite('gemBack');
+        const gem = this.#sprite('gem');
+        if (gemBack) ctx.drawImage(gemBack, gemX - 14, gemY - 14, 28, 28);
+        if (gem) ctx.drawImage(gem, gemX - 14, gemY - 14, 28, 28);
+        else {
+            ctx.fillStyle = '#4a2d14';
+            ctx.beginPath();
+            ctx.arc(gemX, gemY, 11, 0, Math.PI * 2);
             ctx.fill();
-            const ratio = Math.max(0, Math.min(1, Number(value) / Math.max(1, Number(max))));
-            if (ratio > 0) {
-                ctx.fillStyle = color;
-                roundRect(ctx, left, y, Math.max(6, width * ratio), 14, 4);
-                ctx.fill();
-            }
-            ctx.fillStyle = '#fff';
-            ctx.font = `600 10px ${FONT}`;
-            ctx.textAlign = 'center';
-            ctx.fillText(`${Math.round(Number(value))} / ${Math.round(Number(max))}`, left + width / 2, y + 7.5);
-        };
-        bar(26, glad.hp, glad.maxhp, '#d8413b');
-        bar(44, glad.ap, glad.maxap, '#3f7fe8');
+        }
+        outlined(ctx, String(Math.round(Number(glad.lvl) || 1)), gemX, gemY + 1, { font: `700 13px ${TITLE_FONT}`, color: '#fff0c2', align: 'center' });
 
-        ctx.font = `700 11px ${FONT}`;
-        ctx.textAlign = 'left';
+        // Name and gauges.
+        const left = 100;
+        const right = W - 14;
+        const width = right - left;
+        const name = String(glad.name ?? '');
+        outlined(ctx, name, left + 2, 19, { font: `700 14px ${TITLE_FONT}`, color: '#f7e7c2', maxWidth: width - 4 });
+        this.#drawBar(ctx, left - 4, 25, width + 8, 24, clamp01(Number(glad.hp) / Math.max(1, Number(glad.maxhp))), '#ff4b3e',
+            { text: `${Math.round(Number(glad.hp))} / ${Math.round(Number(glad.maxhp))}` });
+        this.#drawBar(ctx, left - 4, 46, width + 8, 19, clamp01(Number(glad.ap) / Math.max(1, Number(glad.maxap))), '#4f8dff',
+            { text: `${Math.round(Number(glad.ap))} / ${Math.round(Number(glad.maxap))}` });
+        const xp = clamp01(Number(glad.xp) / Math.max(1, Number(glad.tonext)));
+        this.#drawBar(ctx, left + 2, 64, width - 4, 4, xp, '#f2c94c', { framed: false, fill: 'barGold' });
+
+        // Attributes, then the buffs that are active.
         [['str', glad.STR], ['agi', glad.AGI], ['int', glad.INT]].forEach(([key, value], index) => {
-            const x = left + index * 46;
-            const icon = this.#icon(key);
-            if (icon) ctx.drawImage(icon, x, 63, 14, 14);
-            ctx.fillStyle = '#c9cfd8';
-            ctx.fillText(String(value ?? '-'), x + 17, 71);
+            const x = left + index * 36;
+            this.#drawIcon(ctx, key, x, 71, 15);
+            outlined(ctx, String(value ?? '-'), x + 18, 79, { font: `13px ${NUMBER_FONT}`, color: '#efe4cc' });
         });
-        ctx.fillStyle = '#f2d13d';
-        ctx.textAlign = 'right';
-        ctx.fillText(`XP ${Math.round(Number(glad.xp) || 0)}/${Math.round(Number(glad.tonext) || 0)}`, PANEL_WIDTH - 10, 71);
-
         const buffs = glad.buffs ?? {};
-        BUFF_ICONS.forEach(([key], index) => {
-            const timeleft = key === 'poison' ? (poisoned ? 1 : 0) : Number(buffs[key]?.timeleft) || 0;
-            const x = left + index * 31;
-            ctx.globalAlpha = (alive ? 1 : 0.5) * (timeleft > 0 ? 1 : 0.18);
-            const icon = this.#icon(key);
-            if (icon) ctx.drawImage(icon, x, 82, 13, 13);
-            if (timeleft > 0 && key !== 'poison') {
-                ctx.fillStyle = '#fff';
-                ctx.font = `600 9px ${FONT}`;
-                ctx.textAlign = 'left';
-                ctx.fillText(`${timeleft.toFixed(0)}s`, x + 14, 89);
-            }
-        });
+        let slot = 0;
+        for (const [key] of BUFF_ICONS) {
+            const timeleft = key === 'poison' ? (poisoned ? Infinity : 0) : Number(buffs[key]?.timeleft) || 0;
+            if (timeleft <= 0) continue;
+            const x = right - 18 - slot * 23;
+            const ringArt = this.#sprite('buffRing');
+            ctx.fillStyle = INK;
+            ctx.beginPath();
+            ctx.arc(x + 9, 79, 9.5, 0, Math.PI * 2);
+            ctx.fill();
+            this.#drawIcon(ctx, key, x + 2.5, 72.5, 13);
+            if (ringArt) ctx.drawImage(ringArt, x - 2, 68, 22, 22);
+            if (Number.isFinite(timeleft)) outlined(ctx, timeleft.toFixed(0), x + 17, 87, { font: `10px ${NUMBER_FONT}`, color: '#fff', align: 'center', width: 2.5 });
+            slot += 1;
+        }
+        if (!slot) {
+            outlined(ctx, `XP ${Math.round(Number(glad.xp) || 0)}/${Math.round(Number(glad.tonext) || 0)}`, right - 2, 79,
+                { font: `12px ${NUMBER_FONT}`, color: '#f2cf6a', align: 'right' });
+        }
+        ctx.filter = 'none';
         ctx.globalAlpha = 1;
         panel.material.map.needsUpdate = true;
     }
@@ -342,7 +548,7 @@ export class BattleHud {
             const poisoned = this.#isPoisoned(view);
             const buffs = glad.buffs ?? {};
             const key = [glad.name, glad.lvl, glad.xp, glad.tonext, Math.round(glad.hp), Math.round(glad.ap), glad.maxhp, glad.maxap, glad.STR, glad.AGI, glad.INT,
-                followed, poisoned, this.#iconsLoaded,
+                followed, poisoned, this.#artVersion,
                 ...['burn', 'movement', 'resist', 'invisible', 'stun'].map((name) => Math.ceil(Number(buffs[name]?.timeleft) || 0))].join('|');
             if (panel.userData.key !== key) {
                 panel.userData.key = key;
@@ -403,62 +609,54 @@ export class BattleHud {
         return sprite.material.map.image;
     }
 
+    /** Overhead card: outlined name, framed crystal HP gauge, slim AP gauge and a team-coloured pointer. */
     #drawVitals(card, name, hp, ap, team) {
         const canvas = card.vitals.material.map.image;
         const ctx = canvas.getContext('2d');
         ctx.setTransform(this.#ratio, 0, 0, this.#ratio, 0, 0);
         ctx.clearRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-        ctx.fillStyle = 'rgba(12, 16, 22, 0.82)';
-        roundRect(ctx, 0.5, 0.5, CARD_WIDTH - 1, CARD_HEIGHT - 1, 5);
-        ctx.fill();
-        ctx.strokeStyle = team;
-        ctx.globalAlpha = 0.7;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#f2f4f7';
-        ctx.font = `700 11px ${FONT}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(name.length > 20 ? `${name.slice(0, 19)}…` : name, CARD_WIDTH / 2, 4, CARD_WIDTH - 10);
-        const bar = (y, height, fraction, color) => {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
-            ctx.fillRect(6, y, CARD_WIDTH - 12, height);
-            ctx.fillStyle = color;
-            ctx.fillRect(6, y, (CARD_WIDTH - 12) * fraction, height);
-        };
-        bar(18, 6, hp, '#e0463f');
-        bar(25, 3, ap, '#4a8dff');
+        outlined(ctx, name, CARD_WIDTH / 2, 8, { font: `700 11px ${TITLE_FONT}`, color: '#f7e7c2', align: 'center', maxWidth: CARD_WIDTH - 6 });
+        this.#drawBar(ctx, 4, 14, CARD_WIDTH - 8, 18, hp, '#ff4b3e');
+        this.#drawBar(ctx, 24, 31, CARD_WIDTH - 48, 4, ap, '#4f8dff', { framed: false });
+        const under = this.#sprite('markerUnder', INK);
+        const marker = this.#sprite('marker', team);
+        if (under) ctx.drawImage(under, CARD_WIDTH / 2 - 7, 35, 14, 9);
+        if (marker) ctx.drawImage(marker, CARD_WIDTH / 2 - 5.5, 36, 11, 7);
         card.vitals.material.map.needsUpdate = true;
     }
 
+    /** Speech or breakpoint bubble on a tinted Synty parchment, with a pointer towards the fighter. */
     #drawBubble(card, kind, text, style) {
         const sprite = card[kind];
         const probe = document.createElement('canvas').getContext('2d');
         probe.font = style.font;
         const lines = wrapText(probe, text, BUBBLE_MAX_WIDTH - BUBBLE_PADDING * 2, style.maxLines);
         const textWidth = Math.max(...lines.map((line) => probe.measureText(line).width));
-        const width = Math.ceil(textWidth + BUBBLE_PADDING * 2);
-        const bodyHeight = lines.length * BUBBLE_LINE_HEIGHT + BUBBLE_PADDING * 2 - 2;
-        const height = bodyHeight + 6;
+        const width = Math.ceil(Math.max(36, textWidth + BUBBLE_PADDING * 2));
+        const bodyHeight = lines.length * BUBBLE_LINE_HEIGHT + BUBBLE_PADDING * 2 - 4;
+        const height = bodyHeight + 7;
         const canvas = this.#resizeTexture(sprite, width, height);
         const ctx = canvas.getContext('2d');
         ctx.setTransform(this.#ratio, 0, 0, this.#ratio, 0, 0);
         ctx.clearRect(0, 0, width, height);
         ctx.fillStyle = style.background;
-        roundRect(ctx, 0.5, 0.5, width - 1, bodyHeight, 6);
-        ctx.fill();
         ctx.beginPath();
-        ctx.moveTo(width / 2 - 5, bodyHeight);
+        ctx.moveTo(width / 2 - 6, bodyHeight - 3);
         ctx.lineTo(width / 2, height - 0.5);
-        ctx.lineTo(width / 2 + 5, bodyHeight);
+        ctx.lineTo(width / 2 + 6, bodyHeight - 3);
         ctx.fill();
+        const parchment = this.#sprite('parchment', style.background, 'shade');
+        if (parchment) nineSlice(ctx, parchment, 0, 0, width, bodyHeight, ART.parchment.slice, 9);
+        else {
+            roundRect(ctx, 0.5, 0.5, width - 1, bodyHeight, 6);
+            ctx.fill();
+        }
         ctx.fillStyle = style.color;
         ctx.font = style.font;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         lines.forEach((line, index) => {
-            ctx.fillText(line, BUBBLE_PADDING, BUBBLE_PADDING - 1 + BUBBLE_LINE_HEIGHT * (index + 0.5));
+            ctx.fillText(line, BUBBLE_PADDING, BUBBLE_PADDING - 2 + BUBBLE_LINE_HEIGHT * (index + 0.5));
         });
         sprite.material.map.needsUpdate = true;
         sprite.userData.height = height;
@@ -495,7 +693,8 @@ export class BattleHud {
         if (!projected.visible || !alive) return;
 
         const x = Math.round(projected.x);
-        const y = Math.round(projected.y);
+        card.base = { x, y: Math.round(projected.y) };
+        const y = Math.round(card.base.y + (card.lift ?? 0));
         const name = String(glad.name ?? `Gladiador ${id}`);
         const fraction = (value, max) => Math.round(Math.max(0, Math.min(1, Number(value) / Math.max(1, Number(max)))) * 200) / 200;
         const hp = fraction(glad.hp, glad.maxhp);
@@ -516,7 +715,7 @@ export class BattleHud {
             if (keys.speech !== message) {
                 keys.speech = message;
                 this.#drawBubble(card, 'speech', message, {
-                    font: `500 11px ${FONT}`, color: '#1b1f27', background: 'rgba(250, 250, 244, 0.95)', maxLines: 4,
+                    font: `600 11px ${FONT}`, color: '#3a2614', background: PARCHMENT, maxLines: 4,
                 });
             }
             card.speech.position.set(x, top, 0);
@@ -528,7 +727,7 @@ export class BattleHud {
             if (keys.breakpoint !== breakpoint) {
                 keys.breakpoint = breakpoint;
                 this.#drawBubble(card, 'breakpoint', breakpoint, {
-                    font: `500 10px ui-monospace, Menlo, Consolas, monospace`, color: '#f3ecff', background: 'rgba(76, 44, 130, 0.94)', maxLines: 6,
+                    font: `500 10px ui-monospace, Menlo, Consolas, monospace`, color: '#f3ecff', background: '#5a3a9a', maxLines: 6,
                 });
             }
             card.breakpoint.position.set(x, top, 0);
@@ -540,28 +739,45 @@ export class BattleHud {
         card.breakpoint.renderOrder = order;
     }
 
+    /**
+     * Lifts overhead cards that would cover each other: from the lowest on screen up, a card that
+     * overlaps one already placed moves above it, easing there so crossing fighters do not flicker.
+     */
+    #separateCards(realDt) {
+        const step = CARD_HEIGHT - 8;
+        const shown = [...this.#cards.values()].filter((card) => card.vitals.visible && card.base).sort((a, b) => a.base.y - b.base.y);
+        const placed = [];
+        for (const card of shown) {
+            let y = card.base.y;
+            for (const other of placed) {
+                if (Math.abs(other.x - card.base.x) < CARD_WIDTH - 10 && Math.abs(y - other.y) < step) y = other.y + step;
+            }
+            placed.push({ x: card.base.x, y });
+            const target = y - card.base.y;
+            card.lift = (card.lift ?? 0) + (target - (card.lift ?? 0)) * Math.min(1, realDt * 12);
+        }
+        this.#cards.forEach((card) => { if (!card.vitals.visible) card.lift = 0; });
+    }
+
     // ------------------------------------------------------------------ floating text
 
     #labelTexture(text, tone) {
         const key = `${tone}|${text}`;
         const cached = this.#labelCache.get(key);
         if (cached) return cached;
+        const font = `900 ${tone === 'level' ? 17 : 20}px ${TITLE_FONT}`;
         const probe = document.createElement('canvas').getContext('2d');
-        probe.font = `800 17px ${FONT}`;
-        const width = Math.ceil(probe.measureText(text).width) + 10;
-        const height = 26;
+        probe.font = font;
+        const width = Math.ceil(probe.measureText(text).width) + 12;
+        const height = 30;
         const texture = this.#createTexture(width, height);
         const ctx = texture.image.getContext('2d');
         ctx.setTransform(this.#ratio, 0, 0, this.#ratio, 0, 0);
-        ctx.font = `800 17px ${FONT}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = 'rgba(10, 12, 16, 0.9)';
-        ctx.strokeText(text, width / 2, height / 2 + 1);
-        ctx.fillStyle = FLOAT_COLORS[tone] ?? '#ffffff';
-        ctx.fillText(text, width / 2, height / 2 + 1);
+        const [light, dark] = FLOAT_COLORS[tone] ?? ['#ffffff', '#bbbbbb'];
+        const fill = ctx.createLinearGradient(0, 6, 0, height - 6);
+        fill.addColorStop(0, light);
+        fill.addColorStop(1, dark);
+        outlined(ctx, text, width / 2, height / 2 + 1, { font, color: fill, align: 'center', width: 5 });
         const entry = { texture, width, height };
         this.#labelCache.set(key, entry);
         if (this.#labelCache.size > LABEL_CACHE_LIMIT) {
@@ -603,6 +819,7 @@ export class BattleHud {
     update(views, preferences, realDt) {
         this.#updatePanels(views);
         views.forEach((view) => this.updateFighter(view, preferences));
+        this.#separateCards(realDt);
         for (const sprite of this.#floats) {
             if (!sprite.visible) continue;
             const data = sprite.userData;

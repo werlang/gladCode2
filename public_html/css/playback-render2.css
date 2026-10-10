@@ -16,6 +16,9 @@
     --battle-shadow: 0 18px 50px rgb(0 0 0 / 0.42);
     --battle-radius: 12px;
     --battle-motion-fast: 160ms;
+    /* Synty Fantasy Warrior HUD pieces (gitignored pack; plain borders stand in when missing). */
+    --battle-frame: url('/assets/synty/fantasy-warrior-hud/Sprites/FantasyWarrior/SPR_FantasyWarrior_Frame_Box_Medium01_Variant01.png');
+    --battle-gem: url('/assets/synty/fantasy-warrior-hud/Sprites/FantasyWarrior/SPR_FantasyWarrior_Gem01.png');
 }
 
 .renderer-three {
@@ -76,19 +79,32 @@
         left: 10px;
         width: auto;
         margin: 0;
-        padding: 8px;
-        gap: 7px;
+        padding: 0 4px;
+        gap: 4px;
         flex-direction: column;
-        border: 1px solid var(--battle-border);
-        border-radius: var(--battle-radius);
-        background: var(--battle-panel);
-        box-shadow: var(--battle-shadow);
-        opacity: 0.9;
-        backdrop-filter: blur(14px) saturate(1.25);
+        isolation: isolate;
+        /* Same gold Synty frame as the canvas HUD; the backing sits under the frame's bevel. */
+        border: 14px solid var(--battle-bronze);
+        border-image: var(--battle-frame) 118 / 14px / 0 stretch;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+        opacity: 0.94;
+        filter: drop-shadow(0 10px 22px rgb(0 0 0 / 0.5));
+
+        &::before {
+            position: absolute;
+            z-index: -1;
+            inset: -9px;
+            content: '';
+            background:
+                linear-gradient(180deg, rgb(255 214 140 / 0.07), transparent 40%),
+                rgb(17 12 9 / 0.9);
+            backdrop-filter: blur(10px);
+        }
 
         &:hover,
         &:focus-within {
-            background: rgb(18 25 29 / 0.94);
             opacity: 1;
         }
 
@@ -113,13 +129,13 @@
                 transform var(--battle-motion-fast);
 
             &:hover {
-                border-color: var(--battle-border);
-                background-color: rgb(49 167 199 / 0.2);
+                border-color: rgb(240 196 83 / 0.6);
+                background-color: rgb(240 196 83 / 0.14);
                 transform: translateY(-1px);
             }
 
             &:focus-visible {
-                outline: 2px solid var(--battle-blue-bright);
+                outline: 2px solid var(--battle-warning);
                 outline-offset: 2px;
             }
 
@@ -150,32 +166,41 @@
     }
 
     #time-container {
-        height: 14px;
+        height: 18px;
 
         #time {
-            height: 5px;
-            border: 0;
-            background: rgb(255 255 255 / 0.14);
+            height: 6px;
+            border: 1px solid rgb(200 145 58 / 0.75);
+            border-radius: 3px;
+            background: rgb(0 0 0 / 0.55);
 
             .ui-slider-range {
-                height: 5px;
+                height: 4px;
                 margin: 0;
-                background: linear-gradient(90deg, var(--battle-bronze), var(--battle-blue-bright));
+                border-radius: 2px;
+                background: linear-gradient(180deg, #ffe7a0, #d9962c);
             }
 
+            /* Synty sapphire gem as the scrub handle. */
             .ui-slider-handle {
-                top: -4px;
-                width: 13px;
-                height: 13px;
-                border: 2px solid var(--battle-text);
-                background: var(--battle-blue-bright);
+                top: -9px;
+                width: 22px;
+                height: 22px;
+                margin-left: -11px;
+                border: 0;
+                background: var(--battle-gem) center / contain no-repeat, radial-gradient(circle, var(--battle-warning) 0 5px, transparent 6px);
+                filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.7));
                 opacity: 1;
+                cursor: grab;
             }
 
             .ui-slider-time {
-                top: -31px;
-                color: var(--battle-text);
-                background: var(--battle-panel);
+                top: -34px;
+                border: 1px solid rgb(200 145 58 / 0.75);
+                color: #f7e7c2;
+                background: rgb(17 12 9 / 0.92);
+                font-family: Cinzel, Georgia, serif;
+                font-weight: 700;
             }
         }
     }
@@ -188,16 +213,19 @@
         width: min(340px, calc(100vw - 16px));
         max-height: calc(100dvh - 104px);
         overflow: auto;
-        border: 1px solid var(--battle-border);
-        border-radius: 8px;
+        border: 12px solid var(--battle-bronze);
+        border-image: var(--battle-frame) 118 / 12px / 0 stretch;
+        border-radius: 0;
         color: var(--battle-text);
-        background: rgb(18 25 29 / 0.96);
+        background: rgb(17 12 9 / 0.95);
         box-shadow: var(--battle-shadow);
 
         #title {
-            border-bottom-color: var(--battle-border);
-            color: var(--battle-text);
-            background: #18333f;
+            border-bottom-color: rgb(200 145 58 / 0.55);
+            color: #f7e7c2;
+            background: linear-gradient(180deg, #3a2a18, #20160d);
+            font-family: Cinzel, Georgia, serif;
+            font-weight: 700;
         }
 
         input,
