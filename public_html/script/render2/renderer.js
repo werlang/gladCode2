@@ -1,14 +1,20 @@
-import { ARENA_SIZE, deriveStepEvents, headingToRadians, isOutsideSafeZone } from './battle-state.js';
+import { ACTIONS, ARENA_SIZE, deriveStepEvents, headingToRadians, isOutsideSafeZone } from './battle-state.js';
 import { Arena } from './arena.js';
 import { BattleAudioManager } from './audio-manager.js';
 import { BattleCameraController } from './camera-controller.js';
 import { BattleHud } from './hud.js';
 import { BattleEffects } from './effects.js';
-import { Fighter } from './fighter.js';
-import { sampleSkinColors } from './palette.js';
+import { Fighter, TELEPORT_DISTANCE } from './fighter.js';
+import { ACTION_BY_ID, ACTION_SPECS, ENGINE_RATE, actionDuration, engineTiming } from './motion.js';
+import { loadModelFactory } from './models.js';
+import { renderPortrait } from './portrait.js';
+import { getAppearance, sampleSkinColors } from './palette.js';
 import { ResourceTracker } from './resource-tracker.js';
 
 const SEEK_SECONDS = 0.45;
+/** Seconds between two simlog steps, and how many steps a seek looks back to find where an action began. */
+const STEP_SECONDS = 0.1;
+const SEEK_BACK_STEPS = 20;
 const DEFAULT_SEGMENT_MS = 100;
 const MIN_SEGMENT_MS = 16;
 const MAX_SEGMENT_MS = 400;
@@ -68,12 +74,15 @@ export class BattleRenderer {
     #resizeObserver;
     #reducedMotion;
     #fighters = [];
+    #modelFactory;
     #skinColors = new Map();
     #fightersById = new Map();
     #applied = null;
     #lastArrival = 0;
     #segmentMs = DEFAULT_SEGMENT_MS;
     #segmentStart = 0;
+    #wasPaused = false;
+    #pausedProgress = null;
     #lastTimestamp = null;
     #lastSize = { width: 0, height: 0 };
     #shakeTrauma = 0;
@@ -172,6 +181,17 @@ export class BattleRenderer {
      */
     async prepare(gladiators) {
         this.#skinColors = await sampleSkinColors(gladiators.map((gladiator) => gladiator.skin));
+        this.#modelFactory = await loadModelFactory(this.#THREE, gladiators.map((gladiator, index) => getAppearance(gladiator.skin, index, this.#skinColors)));
+        if (this.#modelFactory.kind !== 'synty') return;
+        try {
+            const { loadSyntyArena } = await import('./synty-arena.js');
+            this.#arena.applySynty(await loadSyntyArena(this.#THREE));
+            const crowd = Number(window.prefs?.crowd);
+            this.#arena.setCrowdDensity(Number.isFinite(crowd) ? crowd : 1);
+        }
+        catch (error) {
+            console.warn('Synty arena props unavailable, keeping the procedural enclosure.', error);
+        }
     }
 
     get fighters() {
@@ -205,7 +225,8 @@ export class BattleRenderer {
 
     #createFighters(gladiators) {
         gladiators.forEach((gladiator, index) => {
-            const fighter = new Fighter({ THREE: this.#THREE, gladiator, index, shadowTexture: this.#shadowTexture, colors: this.#skinColors });
+            const fighter = new Fighter({ THREE: this.#THREE, gladiator, index, shadowTexture: this.#shadowTexture, colors: this.#skinColors, createModel: this.#modelFactory.createModel });
+            if (this.#modelFactory.kind === 'synty') fighter.portrait = renderPortrait(this.#THREE, this.#renderer, this.#modelFactory.createModel({ THREE: this.#THREE, look: fighter.appearance, index }));
             this.#scene.add(fighter.root);
             this.#fighters.push(fighter);
             this.#fightersById.set(String(gladiator.id ?? index), fighter);
@@ -235,8 +256,9 @@ export class BattleRenderer {
         else {
             const gap = simulationTime - Number(this.#applied.simtime);
             if (gap === 0) return;
-            const continuous = Math.abs(gap) <= SEEK_SECONDS && !window.pausesim;
-            this.#applyFrame(state, continuous ? this.#applied : null, !continuous);
+            const continuous = Math.abs(gap) <= SEEK_SECONDS;
+            const snap = !continuous || Boolean(window.pausesim);
+            this.#applyFrame(state, continuous ? this.#applied : null, snap);
         }
         this.#showBattleWhenReady();
     }
@@ -258,20 +280,26 @@ export class BattleRenderer {
         }
         this.#lastArrival = now;
         this.#segmentStart = now;
+        if (snap && window.pausesim) {
+            this.#pausedProgress = 1;
+        }
 
         this.#pauseAtNewBreakpoints(previous, state);
         window.update_ui?.(state);
+        if (window.followedGlad != null && document.querySelector('#details')) window.updateDetailedWindow?.();
         this.#updateLegacyTimeSlider(state);
         this.#arena.updateSafeZone(safeRadius);
 
         const forward = previous && Number(state.simtime) > Number(previous.simtime);
-        if (forward) {
+        if (forward && !snap) {
             gladiators.forEach((gladiator, index) => {
                 if (Number(gladiator.action) !== Number(previous.glads[index]?.action)) this.#fighters[index]?.startAction(Number(gladiator.action));
             });
-            this.#effects.handleEvents(deriveStepEvents(previous, state), this.#fightersById, this.#overlay, window.prefs ?? {}, state);
+            const events = deriveStepEvents(previous, state);
+            this.#effects.handleEvents(events, this.#fightersById, this.#overlay, window.prefs ?? {}, state);
+            this.#rouseCrowd(events);
         }
-        else {
+        else if (!previous) {
             this.#effects.clear();
             this.#fighters.forEach((fighter) => fighter.reset());
         }
@@ -285,7 +313,9 @@ export class BattleRenderer {
                 headingToYaw(gladiator.head),
                 snap,
             );
-            fighter.setAlive(Number(gladiator.hp) > 0);
+            const teleport = fighter.takeTeleport();
+            if (teleport) this.#effects.teleport(teleport.from, teleport.to, window.prefs ?? {});
+            fighter.setAlive(Number(gladiator.hp) > 0, snap);
             const compatibility = window.gladArray[index] ?? {};
             compatibility.alive = Number(gladiator.hp) > 0;
             compatibility.hp = Number(gladiator.hp);
@@ -293,8 +323,84 @@ export class BattleRenderer {
             compatibility.poison = isOutsideSafeZone(gladiator, safeRadius);
             window.gladArray[index] = compatibility;
         });
+        if (snap) this.#seekPoses(gladiators);
         this.#effects.setProjectiles(Array.isArray(state.projectiles) ? state.projectiles : [], snap);
         this.#applied = state;
+    }
+
+    /**
+     * After a seek, puts every fighter back where its animation was at the shared timeline position
+     * (which may fall between two steps): the action in progress at its age, and the walking pose.
+     */
+    #seekPoses(gladiators) {
+        const steps = window.steps;
+        const at = Number(window.timestep);
+        const low = Math.floor(at);
+        if (!Array.isArray(steps) || !steps[low]) return;
+        const before = Math.max(0, low - 1);
+        const after = Math.min(steps.length - 1, low + 1);
+        gladiators.forEach((gladiator, index) => {
+            const fighter = this.#fighters[index];
+            if (!fighter || Number(gladiator.hp) <= 0) return;
+
+            let activeAction = null;
+            for (let s = low; s >= 0 && low - s <= SEEK_BACK_STEPS; s -= 1) {
+                const actionId = Number(steps[s]?.glads?.[index]?.action);
+                // Moving or idle means the last action is over; "waiting" is still inside it.
+                if (actionId === ACTIONS.movement || actionId === ACTIONS.none) break;
+                const name = ACTION_BY_ID[actionId];
+                if (!name) continue;
+                const spec = ACTION_SPECS[name];
+                if (!spec) continue;
+                const timing = engineTiming(spec, Number(gladiator[ENGINE_RATE[name]]));
+                const duration = timing ? (spec.hold ? timing.cycle : timing.windup + (spec.duration - spec.contact) / timing.follow) : actionDuration(spec);
+                const age = (at - s) * STEP_SECONDS;
+                if (age >= 0 && age < duration) {
+                    activeAction = { id: actionId, name, spec, age };
+                    break;
+                }
+            }
+
+            if (activeAction) {
+                fighter.startAction(activeAction.id);
+                fighter.seekAction(activeAction.age);
+            }
+            else {
+                fighter.releaseAction();
+            }
+
+            let travelled = 0;
+            for (let s = 1; s <= low; s += 1) {
+                const p0 = steps[s - 1]?.glads?.[index];
+                const p1 = steps[s]?.glads?.[index];
+                if (p0 && p1) {
+                    const d = Math.hypot(Number(p1.x) - Number(p0.x), Number(p1.y) - Number(p0.y));
+                    if (d < TELEPORT_DISTANCE) travelled += d;
+                }
+            }
+            const frac = at - low;
+            if (frac > 0) {
+                const p0 = steps[low]?.glads?.[index];
+                const p1 = steps[low + 1]?.glads?.[index];
+                if (p0 && p1) {
+                    const d = Math.hypot(Number(p1.x) - Number(p0.x), Number(p1.y) - Number(p0.y));
+                    if (d < TELEPORT_DISTANCE) travelled += d * frac;
+                }
+            }
+
+            const from = steps[before]?.glads?.[index];
+            const to = steps[after]?.glads?.[index];
+            const distance = from && to ? Math.hypot(Number(to.x) - Number(from.x), Number(to.y) - Number(from.y)) : 0;
+            if (distance <= TELEPORT_DISTANCE) {
+                const seconds = Math.max(1, after - before) * STEP_SECONDS;
+                fighter.seekMotion({
+                    dx: Number(to.x) - Number(from.x),
+                    dz: Number(to.y) - Number(from.y),
+                    seconds,
+                    travelled,
+                });
+            }
+        });
     }
 
     /** Pauses playback when a newly emitted breakpoint reaches the renderer. */
@@ -343,9 +449,23 @@ export class BattleRenderer {
         const realDt = this.#lastTimestamp === null ? 1 / 60 : Math.min((timestamp - this.#lastTimestamp) / 1000, MAX_FRAME_DELTA);
         this.#lastTimestamp = timestamp;
         const elapsed = timestamp / 1000;
-        const rate = window.pausesim ? 0 : Math.abs(Number(window.stepIncrement) || 1);
+        const isPaused = Boolean(window.pausesim);
+        if (isPaused !== this.#wasPaused) {
+            this.#wasPaused = isPaused;
+            if (isPaused) {
+                this.#pausedProgress = Math.min(1, Math.max(0, (performance.now() - this.#segmentStart) / this.#segmentMs));
+            } else {
+                const prog = this.#pausedProgress ?? 0;
+                this.#segmentStart = performance.now() - prog * this.#segmentMs;
+                this.#lastArrival = performance.now();
+                this.#pausedProgress = null;
+            }
+        }
+        const rate = isPaused ? 0 : Math.abs(Number(window.stepIncrement) || 1);
         const gameDt = realDt * rate;
-        const progress = Math.min(1, (performance.now() - this.#segmentStart) / this.#segmentMs);
+        const progress = isPaused && this.#pausedProgress !== null
+            ? this.#pausedProgress
+            : Math.min(1, Math.max(0, (performance.now() - this.#segmentStart) / this.#segmentMs));
 
         this.#controls.update();
         if (this.#shakeTrauma > 0) {
@@ -436,8 +556,25 @@ export class BattleRenderer {
         this.#overlay?.resize();
     }
 
-    /** The crowd slider is kept for the shared settings UI; this renderer has no crowd. */
-    setCrowdDensity() {}
+    /** @param {number} density Share of the stands filled, from the shared settings crowd slider (0 to 1). */
+    setCrowdDensity(density) {
+        this.#arena.setCrowdDensity(density);
+    }
+
+    /** The crowd rises to deaths, heavy blows and level-ups. */
+    #rouseCrowd(events) {
+        let intensity = 0;
+        for (const event of events) {
+            if (event.type === 'death') intensity = Math.max(intensity, 1);
+            else if (event.type === 'level-up') intensity = Math.max(intensity, 0.3);
+            else if (event.type === 'damage') {
+                const victim = this.#fightersById.get(String(event.gladId));
+                const share = Number(event.amount) / Math.max(1, Number(victim?.state?.maxhp) || 100);
+                if (share > 0.08) intensity = Math.max(intensity, Math.min(0.6, share * 3));
+            }
+        }
+        if (intensity > 0) this.#arena.reactCrowd(intensity);
+    }
 
     /**
      * Returns the subset of Phaser's API still used by the shared playback UI.
