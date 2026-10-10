@@ -2,7 +2,8 @@ import { BaseComponent } from './base-component.js';
 
 const CAMERA_DISTANCE = 36;
 const DEFAULT_PITCH = 0.85;
-const MIN_PITCH = 0.25;
+// Low enough for a stadium view, high enough that the camera stays above the stands.
+const MIN_PITCH = 0.4;
 const MAX_PITCH = 1.5;
 const ROTATE_PER_PIXEL = 0.007;
 const MAX_ZOOM = 7;

@@ -1,8 +1,14 @@
 import { ARENA_SIZE } from './battle-state.js';
 import { Enclosure } from './enclosure.js';
 import { clamp01, createRandom, fbm, mix, smooth, valueNoise } from './noise.js';
+import { PODIUM, SyntyColiseum } from './synty-coliseum.js';
+import { FireSystem } from './fire.js';
 
 const HALF = ARENA_SIZE / 2;
+/** The sand runs past the combat square up to the coliseum podium wall. */
+const FLOOR_SIZE = Math.ceil(PODIUM * 2 + 1);
+/** Gas plane over the combat square and its curb (the procedural walls stand right behind it). */
+const GAS_SIZE = ARENA_SIZE + 2;
 /** Distance from the arena center to a corner: the safe radius before poison starts. */
 export const CORNER_RADIUS = Math.hypot(HALF, HALF);
 
@@ -40,7 +46,7 @@ const DIRT = Object.freeze({
 });
 
 /** World coordinates of a texture pixel (canvas y grows toward +z). */
-const toWorld = (pixel, size) => (pixel / size) * ARENA_SIZE - HALF;
+const toWorld = (pixel, size) => (pixel / size) * FLOOR_SIZE - FLOOR_SIZE / 2;
 
 /** Packed-earth albedo written per pixel from layered noise: loam, clay and sand patches, mud where wet, fine grain. */
 function paintSoil(ctx, size) {
@@ -191,7 +197,7 @@ function createRelief(THREE) {
 
 /** Procedural packed-earth floor: soil, mud, debris and its bump/gloss maps, all derived from one seed. */
 function createFloorTexture(THREE) {
-    const size = 1536;
+    const size = 2048;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -214,6 +220,17 @@ export class Arena {
     #poisonUniform;
     #gasTime;
     #enclosure;
+    #enclosureGroup;
+    #scene;
+    #own;
+    /** Fires of the Synty coliseum: braziers and gate torches (see `fire.js`). */
+    #fires = null;
+    /** Sand floor mesh; its procedural material gives way to the Meadow Forest terrain when the Synty set loads. */
+    #floor;
+    #crowd = null;
+    #crowdDensity = 1;
+    #lastElapsed = null;
+    #destroyed = false;
     #disposables = [];
 
     /**
@@ -232,7 +249,7 @@ export class Arena {
 
         const ground = add(new THREE.Mesh(
             own(new THREE.PlaneGeometry(160, 160).rotateX(-Math.PI / 2)),
-            own(new THREE.MeshLambertMaterial({ color: 0x2f2a24 })),
+            own(new THREE.MeshLambertMaterial({ color: 0x5e4e3a })),
         ));
         ground.position.y = -0.3;
 
@@ -240,16 +257,19 @@ export class Arena {
         own(texture);
         own(wetMap);
         own(bumpMap);
-        const floorGeometry = own(new THREE.PlaneGeometry(ARENA_SIZE, ARENA_SIZE, 100, 100).rotateX(-Math.PI / 2));
+        const floorGeometry = own(new THREE.PlaneGeometry(FLOOR_SIZE, FLOOR_SIZE, 130, 130).rotateX(-Math.PI / 2));
         const vertices = floorGeometry.attributes.position;
         for (let i = 0; i < vertices.count; i += 1) vertices.setY(i, terrainHeight(vertices.getX(i), vertices.getZ(i)));
         floorGeometry.computeVertexNormals();
-        add(new THREE.Mesh(
+        this.#floor = add(new THREE.Mesh(
             floorGeometry,
             own(new THREE.MeshPhongMaterial({ map: texture, bumpMap, bumpScale: 1.2, specularMap: wetMap, specular: 0xa9bccb, shininess: 55 })),
         ));
 
-        this.#enclosure = new Enclosure({ THREE, add, own });
+        this.#scene = scene;
+        this.#own = own;
+        this.#enclosureGroup = add(new THREE.Group());
+        this.#enclosure = new Enclosure({ THREE, add: (mesh) => this.#enclosureGroup.add(mesh) && mesh, own });
         this.#buildPoison(add, own);
     }
 
@@ -258,7 +278,7 @@ export class Arena {
         const THREE = this.#THREE;
         this.#poisonUniform = { value: CORNER_RADIUS };
         this.#gasTime = { value: 0 };
-        const geometry = own(new THREE.PlaneGeometry(ARENA_SIZE + 2, ARENA_SIZE + 2).rotateX(-Math.PI / 2));
+        const geometry = own(new THREE.PlaneGeometry(GAS_SIZE, GAS_SIZE).rotateX(-Math.PI / 2));
         const fragmentShader = `
             uniform float radius; uniform float time; uniform float layer; varying vec2 vPos;
             float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -269,14 +289,17 @@ export class Arena {
             float fbm(vec2 p) { float v = 0.0; float a = 0.5; for (int i = 0; i < 3; i++) { v += a * noise(p); p = p * 2.03 + 11.7; a *= 0.5; } return v; }
             void main() {
                 float depth = length(vPos) - radius;
-                if (depth < -0.6) discard;
+                // radius is the engine safe radius: poisoned exactly where length(pos) >= radius.
+                if (depth < 0.0) discard;
                 vec2 drift = vec2(cos(layer * 2.1), sin(layer * 2.1)) * time * (0.35 + layer * 0.12);
                 float cloud = fbm(vPos * (0.16 + layer * 0.05) + drift);
                 float swirl = noise(vPos * 0.4 - drift * 1.6 + cloud * 2.0);
                 float density = smoothstep(0.3, 0.8, cloud * 0.65 + swirl * 0.5);
-                float edge = smoothstep(-0.6, 1.6, depth);
-                float alpha = (0.14 + density * 0.5) * edge * (0.85 - layer * 0.12);
-                vec3 color = mix(vec3(0.13, 0.42, 0.09), vec3(0.62, 0.95, 0.3), density * 0.85);
+                // Full density right at the boundary, with a bright rim marking it.
+                float edge = 0.55 + 0.45 * smoothstep(0.0, 1.2, depth);
+                float rim = 1.0 - smoothstep(0.0, 0.12, depth);
+                float alpha = (0.14 + density * 0.5) * edge * (0.85 - layer * 0.12) + rim * (1.0 - layer) * 0.55;
+                vec3 color = mix(mix(vec3(0.13, 0.42, 0.09), vec3(0.62, 0.95, 0.3), density * 0.85), vec3(0.75, 1.0, 0.45), rim * (1.0 - layer));
                 gl_FragColor = vec4(color, alpha);
             }`;
         this.#poison = new THREE.Group();
@@ -285,7 +308,7 @@ export class Arena {
                 transparent: true,
                 depthWrite: false,
                 uniforms: { radius: this.#poisonUniform, time: this.#gasTime, layer: { value: layer } },
-                vertexShader: 'varying vec2 vPos; void main() { vPos = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+                vertexShader: 'varying vec2 vPos; void main() { vPos = (modelMatrix * vec4(position, 1.0)).xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
                 fragmentShader,
             })));
             mesh.position.y = 0.05 + layer * 0.45;
@@ -298,19 +321,95 @@ export class Arena {
 
     /** @param {number} radius Current safe radius in world units. */
     updateSafeZone(radius) {
-        const safe = Math.max(0.5, Number(radius) || 0);
+        // The engine sends the radius once poison starts (and 0 once it covers everything).
+        const value = Number(radius);
+        const safe = Number.isFinite(value) ? Math.max(0, value) : CORNER_RADIUS;
         const visible = safe < CORNER_RADIUS - 0.01;
         this.#poison.visible = visible;
         this.#poisonUniform.value = safe;
     }
 
+    /**
+     * Replaces the whole procedural enclosure with the Synty coliseum (see `SyntyColiseum`):
+     * stands, podium, gates, statues and braziers. Only the brazier flames are billboards,
+     * textured with the Synty particle pack.
+     *
+     * @param {import('./synty-arena.js').SyntyArenaKit} kit Loaded Ancient Empire pieces.
+     */
+    applySynty(kit) {
+        const THREE = this.#THREE;
+        const own = this.#own;
+        this.#disposables.push(kit);
+        const coliseum = new SyntyColiseum(THREE, kit);
+        this.#enclosureGroup.visible = false;
+        this.#scene.add(coliseum.group);
+        // The sand runs on to the podium wall here, and so does the gas (the wall hides the edge of the plane).
+        this.#poison.scale.set(FLOOR_SIZE / GAS_SIZE, 1, FLOOR_SIZE / GAS_SIZE);
+        this.#loadCrowd(coliseum.plan, coliseum.posts, coliseum.throne);
+        this.#loadFloor();
+        this.#disposables.push({ dispose: () => coliseum.group.removeFromParent() });
+        // Particle fires in the brazier bowls and the gate torches (`size` < 1).
+        this.#fires = own(new FireSystem(THREE));
+        coliseum.flames.forEach((at) => this.#fires.add(at));
+        this.#scene.add(this.#fires.group);
+    }
+
     /** @param {number} elapsed Animation seconds; flames flicker with it. */
     animate(elapsed) {
         this.#gasTime.value = elapsed;
+        const dt = this.#lastElapsed === null ? 0 : Math.max(0, Math.min(0.1, elapsed - this.#lastElapsed));
+        this.#lastElapsed = elapsed;
+        this.#crowd?.update(elapsed, dt);
         this.#enclosure.animate(elapsed);
+        this.#fires?.update(elapsed, dt);
+    }
+
+    /** Re-dresses the sand with the Meadow Forest terrain textures and rocks (see `synty-floor.js`); the procedural soil stays if the pack is missing. */
+    #loadFloor() {
+        import('./synty-floor.js')
+            .then(({ loadSyntyFloor }) => loadSyntyFloor(this.#THREE, { wetness, terrainHeight, size: FLOOR_SIZE, wall: PODIUM }))
+            .then((floor) => {
+                if (this.#destroyed) {
+                    floor.dispose();
+                    return;
+                }
+                this.#floor.material = floor.material;
+                this.#scene.add(floor.props);
+                this.#disposables.push(floor);
+            })
+            .catch((error) => console.warn('Synty floor unavailable; keeping the procedural soil.', error));
+    }
+
+    /** Fills the stands once the crowd is baked (a few seconds after the arena shows); the arena works without it. */
+    #loadCrowd(plan, posts, throne) {
+        import('./synty-crowd.js')
+            .then(({ loadSyntyCrowd }) => loadSyntyCrowd(this.#THREE, plan, posts, throne))
+            .then((crowd) => {
+                if (this.#destroyed) {
+                    crowd.dispose();
+                    return;
+                }
+                this.#crowd = crowd;
+                crowd.setDensity(this.#crowdDensity);
+                this.#scene.add(crowd.group);
+                this.#disposables.push(crowd);
+            })
+            .catch((error) => console.warn('Synty crowd unavailable; the stands stay empty.', error));
+    }
+
+    /** @param {number} density Share of the spectators shown, 0 to 1 (the settings crowd slider). */
+    setCrowdDensity(density) {
+        this.#crowdDensity = Math.max(0, Math.min(1, Number(density) || 0));
+        this.#crowd?.setDensity(this.#crowdDensity);
+    }
+
+    /** @param {number} intensity How much the crowd rises to a moment of the fight, 0 to 1. */
+    reactCrowd(intensity) {
+        this.#crowd?.react(intensity);
     }
 
     destroy() {
+        this.#destroyed = true;
         this.#disposables.forEach((resource) => resource.dispose());
         this.#disposables = [];
     }

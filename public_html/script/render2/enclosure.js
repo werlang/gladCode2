@@ -86,7 +86,8 @@ const SKIN = [0xf0c8a0, 0xd9a577, 0xb07850, 0x82563a, 0x5c3b28];
 const BANNER = [0x8e1f1f, 0x1f3f7a, 0xb8891a, 0x2e6a3c];
 
 /**
- * Walls, corner braziers, banners and spectator stands. All static, shared-material meshes
+ * Procedural walls, corner braziers, banners and spectator stands: the fallback enclosure when
+ * the Synty coliseum (`synty-coliseum.js`) is not used. All static, shared-material meshes
  * (crowd and battlements are instanced), so the enclosure costs a handful of draw calls.
  */
 export class Enclosure {
