@@ -157,20 +157,24 @@ $(document).ready( function() {
     }
     $('#log').remove();
     
-    var stepprogi = 4, stepprog = [-10,-5,-2,-1,1,2,5,10];
+    var stepprog = [-10,-5,-2,-1,-0.5,0.5,1,2,5,10], stepprogi = stepprog.indexOf(1);
     $('#back-step').click( function(){
         if (pausesim){
             stepIncrement = -1;
-            timestep += Math.round(stepIncrement);
+            timestep = Math.max(0, (timestep % 1 !== 0 ? Math.ceil(timestep) : timestep) - 1);
             $('#fowd-step .speed').html("");
-            $('#back-step .speed').html(Math.round(stepIncrement));
+            $('#back-step .speed').html("-1");
+            var frame = frameAt(timestep);
+            if (frame) phaser_update(frame);
+            if (window.jQuery?.fn?.slider) $('#time').slider('value', timestep);
+            return;
         }
         else{
             if (stepprogi > 0)
                 stepprogi--;
             stepIncrement = stepprog[stepprogi];
             
-            if (stepprogi <= 3){
+            if (stepprog[stepprogi] < 0){
                 $('#fowd-step .speed').html("");
                 $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
             }
@@ -185,16 +189,20 @@ $(document).ready( function() {
     $('#fowd-step').click( function(){
         if (pausesim){
             stepIncrement = 1;
-            timestep += Math.round(stepIncrement);
+            timestep = Math.min(steps.length - 1, (timestep % 1 !== 0 ? Math.floor(timestep) : timestep) + 1);
             $('#back-step .speed').html("");
-            $('#fowd-step .speed').html("+"+ Math.round(stepIncrement));
+            $('#fowd-step .speed').html("+1");
+            var frame = frameAt(timestep);
+            if (frame) phaser_update(frame);
+            if (window.jQuery?.fn?.slider) $('#time').slider('value', timestep);
+            return;
         }
         else{
             if (stepprogi < stepprog.length - 1)
                 stepprogi++;
             stepIncrement = stepprog[stepprogi];
             
-            if (stepprogi <= 3){
+            if (stepprog[stepprogi] < 0){
                 $('#fowd-step .speed').html("");
                 $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
             }
@@ -206,27 +214,42 @@ $(document).ready( function() {
         clearInterval(istep);
         start_timer(steps);
     });
+    // Pause resets the speed, so resume always continues at 1x
+    var resumeIncrement = 1, resumeIndex = stepprog.indexOf(1);
     $('#pause').click( function(){
-        stepIncrement = 1;
-        stepprogi = 4;
         if (pausesim){
             pausesim = false;
+            stepIncrement = resumeIncrement;
+            stepprogi = resumeIndex;
             $('#pause #img-play').hide();
             $('#pause #img-pause').show();
-            $('#back-step .speed').html('-1x');
-            $('#fowd-step .speed').html('1x');
+            if (stepprog[stepprogi] === 1){
+                $('#back-step .speed').html('-1x');
+                $('#fowd-step .speed').html('1x');
+            }
+            else{
+                $('#back-step .speed').html(stepprog[stepprogi] < 0 ? stepprog[stepprogi] +'x' : '');
+                $('#fowd-step .speed').html(stepprog[stepprogi] < 0 ? '' : stepprog[stepprogi] +'x');
+            }
+            if (timestep % 1 !== 0){
+                timestep = stepIncrement > 0 ? Math.floor(timestep) + 1 : Math.floor(timestep);
+            }
+            clearInterval(istep);
+            start_timer(steps);
         }
         else{
+            // Pausing resets the speed so resume always plays back at 1x
+            resumeIncrement = 1;
+            resumeIndex = stepprog.indexOf(1);
+            stepprogi = resumeIndex;
             pausesim = true;
             $('#pause #img-pause').hide();
             $('#pause #img-play').show();
             stepIncrement = 1;
-            stepprogi = 4;
             $('#back-step .speed').html('-1');
             $('#fowd-step .speed').html('+1');
+            clearInterval(istep);
         }
-        clearInterval(istep);
-        start_timer(steps);
     });
     $('#fullscreen').click( function(){
         setFullScreen(!isFullScreen());
@@ -491,10 +514,13 @@ $(document).ready( function() {
             $('#sound').find('img').prop('src','icon/mute.png');
     }
     
+    var wasPlaying = false;
     $( "#time" ).slider({
         range: "min",
         min: 0,
         max: 0,
+        // Fractions of a simlog step (0.01 s) so playback can stop between two steps
+        step: 0.1,
         value: timestep,
         create: function( event, ui ) {
             $(this).append("<div class='ui-slider-time'></div>");
@@ -508,16 +534,25 @@ $(document).ready( function() {
             $(this).find('.ui-slider-time').html(time);
             $(this).find('.ui-slider-time').css('left', $(this).find('.ui-slider-handle').css('left'));
         },
+        start: function() {
+            // Scrub with playback held, then continue from the new position at 1x speed
+            wasPlaying = !pausesim;
+            if (wasPlaying) $('#pause').click();
+        },
         slide: function( event, ui ) {
             timestep = ui.value;
+            var frame = frameAt(timestep);
+            if (frame) phaser_update(frame);
+        },
+        stop: function() {
+            if (wasPlaying && pausesim) $('#pause').click();
         }
     });
 
     $([window, document]).focusin(function(){
         //console.log("entrou");
     }).focusout(function(){
-        pausesim = false; //coloca false na var
-        $('#pause').click(); //clica no botao e pause fica true
+        if (!pausesim) $('#pause').click();
     });	
 
 });
@@ -622,10 +657,40 @@ function resize() {
     }
 }
 
+/**
+ * Frame at a fractional step index: positions and headings blend between the two neighbouring
+ * simlog steps, everything else comes from the earlier one.
+ */
+function frameAt(index){
+    var low = Math.floor(index), fraction = index - low;
+    var a = steps[low], b = steps[Math.min(low + 1, steps.length - 1)];
+    if (!a || !fraction || a === b || !Array.isArray(a.glads))
+        return a;
+    var mix = function(from, to){ return Number(from) + (Number(to) - Number(from)) * fraction; };
+    return Object.assign({}, a, {
+        simtime: mix(a.simtime, b.simtime),
+        glads: a.glads.map(function(g, k){
+            if (!g) return g;
+            var next = b && Array.isArray(b.glads) ? b.glads[k] : null;
+            // a teleport jumps; do not slide across the arena
+            if (!next || Math.hypot(Number(next.x) - Number(g.x), Number(next.y) - Number(g.y)) > 3)
+                return g;
+            var turn = ((Number(next.head) - Number(g.head) + 540) % 360) - 180;
+            return Object.assign({}, g, { x: mix(g.x, next.x), y: mix(g.y, next.y), head: Number(g.head) + turn * fraction });
+        })
+    });
+}
+
 var show_final_score = true;
 function start_timer(steps){
     istep = setInterval( function(){
         //console.log(steps[timestep]);
+        if (pausesim){
+            // Held: the replay starts paused until the renderer shows its first frame, so keep feeding the current one
+            var frame = frameAt(timestep);
+            if (frame) phaser_update(frame);
+            return;
+        }
         if (timestep < 0)
             timestep = 0;
         if (timestep > steps.length - 1){
@@ -701,10 +766,12 @@ function start_timer(steps){
             show_final_score = true;
             music.resume();
         }
-        phaser_update(steps[timestep]);
-        if (!pausesim){
-            timestep += stepIncrement / Math.abs(stepIncrement);
+        if (timestep % 1 !== 0){
+            timestep = stepIncrement > 0 ? Math.floor(timestep) + 1 : Math.floor(timestep);
         }
+        if (steps[timestep])
+            phaser_update(steps[timestep]);
+        timestep += stepIncrement / Math.abs(stepIncrement);
     }, 100 / Math.abs(stepIncrement));	
 }
 

@@ -214,7 +214,7 @@ export function isOutsideSafeZone(position, safeRadius) {
  * @returns {number} Milliseconds between replay frames.
  */
 export function getPlaybackIntervalMs(speed) {
-    return STEP_DURATION_MS / Math.max(1, Math.abs(Number(speed) || 1));
+    return STEP_DURATION_MS / Math.abs(Number(speed) || 1);
 }
 
 /**
