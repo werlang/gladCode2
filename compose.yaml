@@ -8,7 +8,7 @@ services:
             - ./public_html:/var/www/html
             - ./Payload:/app/payload
         ports:
-            - 80:80
+            - ${APACHE_PORT}:80
         logging:
             options:
                 max-size: "10m"
@@ -24,7 +24,7 @@ services:
             - ./public_html/runs:/phppayload
             - runs:/runs
         ports:
-            - 127.0.0.1:3000:3000
+            - 127.0.0.1:${RUNNER_PORT}:3000
         # Deterministic install at startup: ./runner bind-mount shadows
         # build-time node_modules and the named volume starts empty (or
         # half-written after a crashed install) on fresh checkouts.
