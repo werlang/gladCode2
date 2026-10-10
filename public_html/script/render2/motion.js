@@ -9,6 +9,12 @@
  *  - Torso twist (Y rotation) is positive toward the character's left.
  */
 
+/** Scale of the whole figure inside the arena; every model builds in the same unscaled figure space. */
+export const FIGURE_SCALE = 0.6;
+/** Direction the blade extends from the fist, in the forearm's local frame. */
+export const BLADE_DIRECTION = Object.freeze([0, -0.85, 0.5]);
+// Polearms run along the forearm so they point up-forward in guard and straight ahead when thrusting.
+export const POLEARM_DIRECTION = Object.freeze([0, -0.98, -0.1]);
 export const LEG_SEGMENT = 0.28;
 export const FOOT_HEIGHT = 0.05;
 
@@ -253,11 +259,12 @@ export const ACTION_SPECS = Object.freeze({
         ],
     },
     fireball: {
-        duration: 0.75, blendIn: 0.12, blendOut: 0.22, contact: 0.46, holdAt: 0.42, weapon: 'orb',
+        duration: 0.9, blendIn: 0.1, blendOut: 0.25, contact: 0.6, holdAt: 0.55, weapon: 'orb',
         keys: [
-            [0.2, pose({ lean: -0.12, lsh: -1.75, lel: -0.9, lsz: 0.15, rsh: -1.75, rel: -0.9, rsz: -0.15, lhip: -0.15, rhip: 0.2, hx: -0.15 })],
-            [0.42, pose({ lean: -0.18, lsh: -2.0, lel: -0.7, lsz: 0.2, rsh: -2.0, rel: -0.7, rsz: -0.2, lhip: -0.15, rhip: 0.2, hx: -0.2 })],
-            [0.52, pose({ lean: 0.3, lsh: -1.4, lel: -0.05, lsz: 0.08, rsh: -1.4, rel: -0.05, rsz: -0.08, z: 0.18, lhip: -0.4, lknee: 0.3, rhip: 0.35 })],
+            [0.14, pose({ lean: 0.1, twist: 0.5, lsh: -0.3, lel: -0.4, lsz: 1.3, rsh: -0.3, rel: -0.4, rsz: -1.3, lhip: -0.15, rhip: 0.2, lknee: 0.2, rknee: 0.2, hx: -0.25 })],
+            [0.34, pose({ lean: -0.3, twist: -0.4, lsh: -1.5, lel: -1.2, lsz: 0.5, rsh: -1.5, rel: -1.2, rsz: -0.5, lhip: -0.2, rhip: 0.25, lknee: 0.3, rknee: 0.3, hx: -0.35 })],
+            [0.55, pose({ lean: -0.22, twist: 0, lsh: -2.05, lel: -0.7, lsz: 0.18, rsh: -2.05, rel: -0.7, rsz: -0.18, lhip: -0.15, rhip: 0.2, hx: -0.25 })],
+            [0.68, pose({ lean: 0.4, lsh: -1.4, lel: -0.05, lsz: 0.08, rsh: -1.4, rel: -0.05, rsz: -0.08, z: 0.22, lhip: -0.5, lknee: 0.35, rhip: 0.4 })],
         ],
     },
     potion: {
@@ -299,6 +306,64 @@ export const ACTION_BY_ID = Object.freeze({
     0: 'fireball', 1: 'teleport', 2: 'charge', 3: 'block', 4: 'assassinate',
     5: 'ambush', 6: 'melee', 7: 'ranged', 11: 'potion',
 });
+
+/**
+ * Engine stat that paces each action: attacks run on attack speed (`as`), abilities on cast speed (`cs`).
+ * The engine locks the gladiator for half a cycle (`0.5 / rate`), resolves the action (damage, projectile,
+ * buff, jump), then locks it for the other half; the action id is reported only on the cycle's first step.
+ */
+export const ENGINE_RATE = Object.freeze({
+    melee: 'as', ranged: 'as',
+    fireball: 'cs', teleport: 'cs', block: 'cs', assassinate: 'cs', ambush: 'cs',
+});
+/** Seconds between two engine steps. */
+const ENGINE_STEP = 0.1;
+/** How much faster or slower than authored an action may play before the wind-up waits or is shortened. */
+const MIN_RATE = 0.7;
+const MAX_RATE = 3;
+
+/**
+ * Time warp that fits an authored action to the engine's cycle, so its `contact` lands on the step where the
+ * engine resolves it and its follow-through ends before the next cycle can start. A slow attacker holds its
+ * guard before winding up (`delay`), a very fast one skips the start of the wind-up (`offset`).
+ *
+ * @param {object} spec Action spec from ACTION_SPECS.
+ * @param {number} rate Engine `as` or `cs` of the gladiator.
+ * @returns {{ windup: number, cycle: number, delay: number, offset: number, lead: number, follow: number }|null} Warp in game seconds, or null without a rate.
+ */
+export function engineTiming(spec, rate) {
+    if (!(rate > 0)) return null;
+    // The engine counts the half-cycle lock down one step at a time.
+    const windup = Math.max(ENGINE_STEP, Math.ceil(0.5 / rate / ENGINE_STEP - 1e-6) * ENGINE_STEP);
+    const cycle = windup * 2;
+    if (spec.hold) return { windup, cycle, delay: 0, offset: 0, lead: 1, follow: 1 };
+    const contact = spec.contact ?? 0;
+    const lead = Math.min(MAX_RATE, Math.max(MIN_RATE, contact / windup));
+    return {
+        windup,
+        cycle,
+        delay: Math.max(0, windup - contact / lead),
+        offset: Math.max(0, contact - windup * lead),
+        lead,
+        follow: Math.min(MAX_RATE, Math.max(1, (spec.duration - contact) / windup)),
+    };
+}
+
+/**
+ * Authored action time at `elapsed` game seconds into a warped action: guard during `delay`, wind-up until
+ * `release` (the engine's resolve step, or a late projectile report), follow-through after it.
+ *
+ * @param {object} spec Action spec.
+ * @param {ReturnType<typeof engineTiming>} timing Warp from {@link engineTiming}.
+ * @param {number} elapsed Game seconds since the action started.
+ * @param {number} [release] Game seconds at which the blow or shot leaves; defaults to the wind-up end.
+ * @returns {number} Seconds on the spec's own clock.
+ */
+export function warpedTime(spec, timing, elapsed, release = timing.windup) {
+    const contact = spec.contact ?? 0;
+    if (elapsed >= release) return contact + (elapsed - release) * timing.follow;
+    return Math.min(contact, timing.offset + Math.max(0, elapsed - timing.delay) * timing.lead);
+}
 
 /** Time of the last authored key of a timed action, plus its recovery. */
 export function actionDuration(spec) {

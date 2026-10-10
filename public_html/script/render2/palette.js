@@ -60,11 +60,14 @@ const SLOT_FALLBACK = Object.freeze([
     ['melee', /(sword|saber|rapier|dagger|spear|trident|mace|hammer|staff|wand|oversize)/],
 ]);
 
-/** Melee families in match order; numbered `oversize_N` blades come from the weapon pack. */
+/**
+ * Melee families in match order. Numbered `oversize_N` blades come from the weapon pack: 1 is a dark short
+ * sword, 6/7 energy blades, and 8-27 five materials in four sizes each (dagger, short, sword, great).
+ */
 const MELEE_KINDS = Object.freeze([
     ['wand', /wand/], ['staff', /staff/], ['trident', /trident/], ['spear', /spear/], ['warhammer', /hammer/],
-    ['mace', /mace/], ['dagger', /(dagger|oversize_1$)/], ['rapier', /rapier/], ['saber', /(saber|oversize_5$)/],
-    ['axe', /oversize_3$/], ['lightblade', /oversize_[67]$/], ['longsword', /(longsword|oversize_(2|4|11|15)$)/],
+    ['mace', /mace/], ['dagger', /(dagger|oversize_(8|12|16|20|24)$)/], ['rapier', /rapier/], ['saber', /saber/],
+    ['lightblade', /oversize_[67]$/], ['longsword', /(longsword|oversize_(11|15|19|23|27)$)/],
 ]);
 
 /** Bow families of the editor (`weapons/shoot`). */
@@ -194,7 +197,7 @@ export function averageColor(data) {
  * @param {unknown} skin Persisted skin JSON string or token array.
  * @param {number} [index] Roster index, used for the team ring color.
  * @param {Map<string, number>} [colors] Sampled sprite colors from {@link sampleSkinColors}.
- * @returns {Record<string, any>} Traits: colors plus `hairStyle`, `facial`, `headgear`, `skirt`, `weapon`, `shield`, `elfEars`.
+ * @returns {Record<string, any>} Traits: colors, slot `tokens`, `shape`, plus `hairStyle`, `facial`, `headgear`, `skirt`, `weapon`, `shield`, `elfEars`.
  */
 export function getAppearance(skin, index = 0, colors = new Map(), catalog = pageCatalog()) {
     const tokens = parseSkin(skin);
@@ -220,12 +223,17 @@ export function getAppearance(skin, index = 0, colors = new Map(), catalog = pag
 
     return {
         female,
+        /** Slot to skin token, for model sets that pick meshes per item (`synty-outfit.js`). */
+        tokens: slots,
+        shape,
+        skeleton: shape === 'skeleton',
         skin: skinColor,
         elfEars: /^(big|elven)ears/.test(slots.ears ?? ''),
         eyes: tint('eyes', 0x2a2a30) ?? 0x14161a,
         hair: hairColor,
         hairStyle: slots.style ? styleOf(slots.style, catalog) : null,
         facial: slots.facial ? { kind: styleOf(slots.facial, catalog), color: tint('facial', 0x5a3a22) } : null,
+        shirt,
         tunic: shirt ?? armorColor ?? 0x8a6a4a,
         pants: tint('legs', 0x555b66) ?? 0x4a4f5a,
         skirt: /skirt/.test(legsToken) || /(dress|robe)/.test(slots.shirt ?? '') ? (tint('legs', 0x555b66) ?? shirt) : null,
