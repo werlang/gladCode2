@@ -19,7 +19,7 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Visualizar batalha</title>
     <script src="script/battle-renderer-preference.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Acme|Source+Code+Pro&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Acme|Cinzel:700,900|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
@@ -35,15 +35,21 @@
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
     <script src="script/render.js"></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
-            }
-        }
-    </script>
-    <script type="module" src="script/render2.js"></script>
+<?php
+    // Every 3D renderer module is versioned by its modification time, so a browser never mixes a cached
+    // module with a newer one (the server sends no cache headers for scripts).
+    $render2Imports = [
+        "three" => "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js",
+        "three/addons/" => "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
+    ];
+    foreach (glob(__DIR__ . "/script/render2/*.js") as $render2File) {
+        $render2Url = "/script/render2/" . basename($render2File);
+        $render2Imports[$render2Url] = $render2Url . "?v=" . filemtime($render2File);
+    }
+    $render2Version = filemtime(__DIR__ . "/script/render2.js");
+?>
+    <script type="importmap"><?= json_encode(["imports" => $render2Imports], JSON_UNESCAPED_SLASHES) ?></script>
+    <script type="module" src="script/render2.js?v=<?= $render2Version ?>"></script>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/dropzone.js"></script>
