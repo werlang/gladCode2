@@ -12,6 +12,10 @@ import { loadSynty } from './synty-model.js';
 import { renderPortrait } from './portrait.js';
 import { getAppearance, sampleSkinColors } from './palette.js';
 import { ResourceTracker } from './resource-tracker.js';
+import { HAZE, SKY_RADIUS, createSky } from './sky.js';
+import { FrameProfiler } from './frame-profiler.js';
+import { disposeSharedTextures } from './textures.js';
+import { QUALITY_TIERS, chooseQuality, describeDevice, storedQuality } from './quality.js';
 
 const SEEK_SECONDS = 0.45;
 /** Seconds between two simlog steps, and how many steps a seek looks back to find where an action began. */
@@ -26,31 +30,27 @@ const QUALITY_WINDOW_MS = 700;
 const SLOW_FRAME_MS = 21;
 const FAST_FRAME_MS = 17.6;
 const MIN_PIXEL_RATIO = 0.7;
+/** A slow frame whose own main-thread work fills this share of it is CPU-bound (lowering resolution won't help). */
+const CPU_BOUND_SHARE = 0.4;
+/** Slow measuring windows in a row before detail is shed, the step taken each time, and how far it goes. */
+const SHED_AFTER_WINDOWS = 2;
+const LOAD_STEP = 0.25;
+const MIN_LOAD_SCALE = 0.35;
+/** A frame this long (ms) is a loading hitch, not the steady rate; detail is not shed in the first SETTLE_MS either. */
+const HITCH_MS = 120;
+const SETTLE_MS = 12000;
+/** Longest wait for the crowd, floor and countryside before the battle shows anyway (slow devices, slow networks). */
+const WARM_UP_TIMEOUT_MS = 25000;
 const PIXEL_RATIO_STEP = 0.15;
 const RAISE_AFTER_WINDOWS = 6;
 const SHAKE_DECAY_PER_SECOND = 1.9;
 const SHAKE_MAX_OFFSET = 0.3;
+/** Fog: the arena and the near countryside stay clear; the hills fade into the haze toward the horizon. */
+const FOG_NEAR = 110;
+const FOG_FAR = 560;
 
 /** Engine heading (degrees, 0 = north, clockwise) to the rig's yaw; the rig faces +Z. */
 const headingToYaw = (heading) => Math.PI + headingToRadians(heading);
-
-/** Dusk gradient behind the stands, fading into the fog colour at the horizon. */
-function createSkyTexture(THREE) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 2;
-    canvas.height = 256;
-    const ctx = canvas.getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-    gradient.addColorStop(0, '#3f5a7a');
-    gradient.addColorStop(0.55, '#7d8a94');
-    gradient.addColorStop(0.8, '#a5927a');
-    gradient.addColorStop(1, '#1d242b');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 2, 256);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-}
 
 /**
  * Three.js top-down battle renderer.
@@ -68,6 +68,28 @@ export class BattleRenderer {
     #scene;
     #camera;
     #controls;
+    /** Camera pose pinned by `setDebugView`, or null. */
+    #debugView = null;
+    /** Draw calls and triangles of the last scene render (diagnostics). */
+    #sceneStats = { calls: 0, triangles: 0 };
+    /** Pixel ratio pinned by `setDebugPixelRatio` (the adaptive resolution stands aside), or null. */
+    #pinnedRatio = null;
+    /** Graphics tier (see quality.js) and its name. */
+    #quality;
+    #qualityName;
+    /** Crowd setting from the player, and the share of it kept after the adaptive loop shed load. */
+    #crowdSetting = 1;
+    #loadScale = 1;
+    #slowWindows = 0;
+    #sceneryShed = false;
+    /** The pre-battle warm-up is running (see `#warmUp`). */
+    #warming = false;
+    #lastAdaptAt = null;
+    #longestFrame = 0;
+    #adaptStartedAt = null;
+    #centre = { x: 0, z: 0 };
+    /** Per-section frame timings for diagnostics (see `frame-profiler.js`). */
+    #profiler;
     #overlay;
     #arena;
     #effects;
@@ -111,10 +133,14 @@ export class BattleRenderer {
         this.#audio = new BattleAudioManager();
         this.#reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+        // Graphics tier for this device (see quality.js): resolution cap, anti-aliasing, crowd and scenery.
+        this.#qualityName = chooseQuality(storedQuality(), describeDevice());
+        this.#quality = QUALITY_TIERS[this.#qualityName];
         // MSAA on a dense display costs a lot of fill rate for little visible gain
         const density = window.devicePixelRatio || 1;
-        this.#renderer = new THREE.WebGLRenderer({ antialias: density < 1.5, powerPreference: 'high-performance' });
-        this.#maxPixelRatio = Math.min(density, 2);
+        this.#renderer = new THREE.WebGLRenderer({ antialias: density < 1.5 && this.#quality.msaa, powerPreference: 'high-performance' });
+        this.#profiler = new FrameProfiler(this.#renderer.getContext());
+        this.#maxPixelRatio = Math.min(density, this.#quality.pixelRatio);
         this.#pixelRatio = this.#maxPixelRatio;
         this.#renderer.setPixelRatio(this.#pixelRatio);
         this.#renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -124,11 +150,12 @@ export class BattleRenderer {
         container.appendChild(this.#renderer.domElement);
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = this.#tracker.track(createSkyTexture(THREE));
-        this.#scene.fog = new THREE.Fog(0x1d242b, 45, 85);
+        this.#scene.background = new THREE.Color(HAZE);
+        // Aerial perspective: the countryside fades into the horizon haze; the arena itself stays clear.
+        this.#scene.fog = new THREE.Fog(HAZE, FOG_NEAR, FOG_FAR);
         this.#buildLights();
-        this.#camera = new THREE.PerspectiveCamera(45, 1, 1, 160);
-        this.#arena = new Arena({ THREE, scene: this.#scene });
+        this.#camera = new THREE.PerspectiveCamera(45, 1, 1, SKY_RADIUS * 1.2);
+        this.#arena = new Arena({ THREE, scene: this.#scene, renderer: this.#renderer, quality: this.#quality });
         this.#effects = new BattleEffects({ THREE, scene: this.#scene, audio: this.#audio, onShake: (trauma) => this.addShake(trauma) });
         this.#controls = new BattleCameraController({ THREE, camera: this.#camera, canvas: this.#renderer.domElement });
         this.#overlay = new BattleHud({
@@ -191,7 +218,7 @@ export class BattleRenderer {
             const { loadSyntyArena } = await import('./synty-arena.js');
             this.#arena.applySynty(await loadSyntyArena(this.#THREE));
             const crowd = Number(window.prefs?.crowd);
-            this.#arena.setCrowdDensity(Number.isFinite(crowd) ? crowd : 1);
+            this.setCrowdDensity(Number.isFinite(crowd) ? crowd : 1);
         }
         catch (error) {
             console.warn('Synty arena props unavailable.', error);
@@ -208,6 +235,11 @@ export class BattleRenderer {
         const sun = this.#tracker.track(new THREE.DirectionalLight(0xfff0d8, 1.9));
         sun.position.set(-10, 22, 12);
         this.#scene.add(sun);
+        // The sky's sun hangs where this light comes from.
+        const sky = createSky(THREE, sun.position);
+        this.#tracker.track(sky.geometry);
+        this.#tracker.track(sky.material);
+        this.#scene.add(sky);
         const fill = this.#tracker.track(new THREE.DirectionalLight(0x9cc8ff, 0.45));
         fill.position.set(12, 8, -10);
         this.#scene.add(fill);
@@ -430,8 +462,46 @@ export class BattleRenderer {
         window.jQuery('#time').slider('value', simtime * 10);
     }
 
-    /** Removes the loader and starts the shared replay state once WebGL is ready. */
+    /**
+     * Holds the loading screen until the arena is complete and warmed up, then reveals the battle (see `#warmUp`).
+     * The render loop keeps drawing behind the loading screen in the meantime.
+     */
     #showBattleWhenReady() {
+        if (this.#ready || this.#warming) return;
+        this.#warming = true;
+        this.#warmUp().finally(() => this.#reveal());
+    }
+
+    /**
+     * Does the one-time GPU work before the battle shows instead of during its first seconds: waits for the crowd,
+     * the floor bake and the countryside (at most `WARM_UP_TIMEOUT_MS`), compiles every shader in parallel
+     * (pooled effects included) and draws a frame so every texture is uploaded.
+     */
+    async #warmUp() {
+        const status = document.querySelector('#loadbar #status');
+        const say = (text) => {
+            if (status) status.textContent = text;
+        };
+        say('Montando o coliseu');
+        await Promise.race([this.#arena.ready, new Promise((resolve) => window.setTimeout(resolve, WARM_UP_TIMEOUT_MS))]);
+        say('Preparando os gráficos');
+        this.#effects.setPoolsVisible(true);
+        try {
+            await this.#renderer.compileAsync(this.#scene, this.#camera);
+            this.#renderer.render(this.#scene, this.#camera);
+        }
+        catch (error) {
+            console.warn('Warm-up incomplete; the battle starts anyway.', error);
+        }
+        finally {
+            this.#effects.setPoolsVisible(false);
+        }
+        // One more frame through the normal loop, so the reveal does not land on a frame still finishing uploads.
+        await new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+    }
+
+    /** Removes the loader and starts the shared replay state once WebGL is ready. */
+    #reveal() {
         if (this.#ready) return;
         this.#ready = true;
         document.querySelector('#fog')?.remove();
@@ -455,6 +525,7 @@ export class BattleRenderer {
     }
 
     #animate = (timestamp) => {
+        this.#profiler.begin();
         const realDt = this.#lastTimestamp === null ? 1 / 60 : Math.min((timestamp - this.#lastTimestamp) / 1000, MAX_FRAME_DELTA);
         this.#lastTimestamp = timestamp;
         const elapsed = timestamp / 1000;
@@ -476,7 +547,11 @@ export class BattleRenderer {
             ? this.#pausedProgress
             : Math.min(1, Math.max(0, (performance.now() - this.#segmentStart) / this.#segmentMs));
 
-        this.#controls.update();
+        if (this.#debugView) {
+            this.#camera.position.set(...this.#debugView.position);
+            this.#camera.lookAt(...this.#debugView.target);
+        }
+        else this.#controls.update();
         if (this.#shakeTrauma > 0) {
             this.#shakeTrauma = Math.max(0, this.#shakeTrauma - SHAKE_DECAY_PER_SECOND * realDt);
             const magnitude = this.#shakeTrauma ** 2 * SHAKE_MAX_OFFSET;
@@ -484,14 +559,28 @@ export class BattleRenderer {
             this.#camera.position.z += Math.cos(elapsed * 27.3) * magnitude;
         }
 
+        const profiler = this.#profiler;
+        profiler.lap('camera');
         this.#arena.animate(this.#reducedMotion ? 0 : elapsed);
+        profiler.lap('arena');
         const frame = { realDt, gameDt, progress, elapsed, reducedMotion: this.#reducedMotion };
         for (const fighter of this.#fighters) fighter.update(frame);
-        this.#effects.update(frame);
+        profiler.lap('fighters');
+        this.#arena.setCrowdFocus(this.#fightCentre());
+        this.#effects.update(frame, this.#fighters);
+        profiler.lap('effects');
         this.#updateSound(realDt, isPaused);
+        profiler.lap('sound');
+        const gpu = profiler.gpuBegin();
         this.#renderer.render(this.#scene, this.#camera);
+        profiler.gpuEnd(gpu);
+        profiler.lap('render');
+        // The HUD pass resets the counters, so the scene's are kept for `getDebugSnapshot`.
+        this.#sceneStats.calls = this.#renderer.info.render.calls;
+        this.#sceneStats.triangles = this.#renderer.info.render.triangles;
         this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt);
         this.#overlay.render(this.#renderer);
+        profiler.lap('hud');
         this.#updateFps(timestamp);
         this.#adaptResolution(timestamp);
     };
@@ -501,6 +590,7 @@ export class BattleRenderer {
      * cautiously raises it again after a stretch of fast frames.
      */
     #adaptResolution(timestamp) {
+        if (this.#pinnedRatio !== null) return;
         if (document.hidden) {
             this.#qualityStartedAt = 0;
             return;
@@ -511,23 +601,80 @@ export class BattleRenderer {
             return;
         }
         this.#qualityFrames += 1;
+        const gap = this.#lastAdaptAt === null ? 0 : timestamp - this.#lastAdaptAt;
+        this.#lastAdaptAt = timestamp;
+        this.#longestFrame = Math.max(this.#longestFrame, gap);
+        this.#adaptStartedAt ??= timestamp;
         const elapsed = timestamp - this.#qualityStartedAt;
         if (elapsed < QUALITY_WINDOW_MS) return;
         const frameMs = elapsed / this.#qualityFrames;
+        const hitch = this.#longestFrame > HITCH_MS;
         this.#qualityStartedAt = timestamp;
         this.#qualityFrames = 0;
-        if (frameMs > SLOW_FRAME_MS && this.#pixelRatio > MIN_PIXEL_RATIO) {
+        this.#longestFrame = 0;
+        // Loading (crowd baking, the countryside, shader compiles) makes long one-off frames: a window holding one
+        // says nothing about the steady frame rate, and detail is never shed during the first seconds.
+        const settled = timestamp - this.#adaptStartedAt > SETTLE_MS;
+        if (hitch) {
+            this.#slowWindows = 0;
+            return;
+        }
+        // Resolution only helps when the GPU is the bottleneck; when the frame's own main-thread work (measured
+        // exactly by the profiler) fills a large share of it, the CPU is (a throttled laptop, a phone) and detail
+        // has to go instead, or the picture just turns blurry at the same frame rate. The GPU timer is not used:
+        // on macOS it is emulated and unreliable.
+        const cpuBound = this.#profiler.snapshot.cpuTotal >= frameMs * CPU_BOUND_SHARE;
+        const sharpFloor = Math.min(this.#maxPixelRatio, 1);
+        if (frameMs > SLOW_FRAME_MS && !settled) {
+            if (!cpuBound && this.#pixelRatio > sharpFloor + 1e-3) this.#applyPixelRatio(this.#pixelRatio - PIXEL_RATIO_STEP);
+            return;
+        }
+        if (frameMs > SLOW_FRAME_MS) {
             this.#fastWindows = 0;
-            this.#raiseBackoff = Math.min(this.#raiseBackoff * 2, 48);
-            this.#applyPixelRatio(this.#pixelRatio - PIXEL_RATIO_STEP);
+            this.#slowWindows += 1;
+            // Order: resolution down to 1x (GPU-bound only), then shed detail, then resolution below 1x as a last resort.
+            if (!cpuBound && this.#pixelRatio > sharpFloor + 1e-3) {
+                this.#raiseBackoff = Math.min(this.#raiseBackoff * 2, 48);
+                this.#applyPixelRatio(this.#pixelRatio - PIXEL_RATIO_STEP);
+            }
+            else if (this.#slowWindows >= SHED_AFTER_WINDOWS && this.#canShed()) {
+                this.#slowWindows = 0;
+                this.#shedLoad();
+            }
+            else if (!cpuBound && this.#pixelRatio > MIN_PIXEL_RATIO) {
+                this.#raiseBackoff = Math.min(this.#raiseBackoff * 2, 48);
+                this.#applyPixelRatio(this.#pixelRatio - PIXEL_RATIO_STEP);
+            }
         } else if (frameMs < FAST_FRAME_MS && this.#pixelRatio < this.#maxPixelRatio) {
+            this.#slowWindows = 0;
             this.#fastWindows += 1;
             if (this.#fastWindows < this.#raiseBackoff) return;
             this.#fastWindows = 0;
             this.#applyPixelRatio(this.#pixelRatio + PIXEL_RATIO_STEP);
         } else {
             this.#fastWindows = 0;
+            this.#slowWindows = 0;
         }
+    }
+
+    /**
+     * Sheds detail when frames stay long and resolution cannot help: first the crowd thins (down to a third of the
+     * setting), then the scenery beyond the walls goes. Never restored during the battle, so detail does not flicker.
+     */
+    #shedLoad() {
+        if (this.#loadScale > MIN_LOAD_SCALE + 1e-3) {
+            this.#loadScale = Math.max(MIN_LOAD_SCALE, this.#loadScale - LOAD_STEP);
+            this.setCrowdDensity(this.#crowdSetting);
+        }
+        else {
+            this.#arena.setScenery(false);
+            this.#sceneryShed = true;
+        }
+    }
+
+    /** @returns {boolean} Whether any detail is left to shed. */
+    #canShed() {
+        return this.#loadScale > MIN_LOAD_SCALE + 1e-3 || !this.#sceneryShed;
     }
 
     #applyPixelRatio(ratio) {
@@ -568,7 +715,9 @@ export class BattleRenderer {
 
     /** @param {number} density Share of the stands filled, from the shared settings crowd slider (0 to 1). */
     setCrowdDensity(density) {
-        this.#arena.setCrowdDensity(density);
+        this.#crowdSetting = density;
+        // The setting, scaled by the graphics tier and by any load the adaptive loop has shed.
+        this.#arena.setCrowdDensity(density * this.#quality.crowd * this.#loadScale);
     }
 
     /** Mix, listener, music fades and the living ambience (fires once the coliseum is up, burning fighters). */
@@ -586,6 +735,23 @@ export class BattleRenderer {
             this.#soundscape.setBurning(String(fighter.index), burning ? fighter.position : null);
         }
         this.#soundscape.update(realDt);
+    }
+
+    /** @returns {{ x: number, z: number }|null} Middle of the living fighters (where the crowd looks), reused. */
+    #fightCentre() {
+        let x = 0;
+        let z = 0;
+        let count = 0;
+        for (const fighter of this.#fighters) {
+            if (!(Number(fighter.state?.hp) > 0)) continue;
+            x += fighter.position.x;
+            z += fighter.position.z;
+            count += 1;
+        }
+        if (!count) return null;
+        this.#centre.x = x / count;
+        this.#centre.z = z / count;
+        return this.#centre;
     }
 
     /**
@@ -672,7 +838,48 @@ export class BattleRenderer {
             })),
             projectiles: this.#effects.getDebugSnapshot(),
             audio: { ...this.#audio.status, mood: this.music.mood },
+            render: { ...this.#sceneStats },
+            timings: { ...this.#profiler.snapshot, pixelRatio: this.#pixelRatio, quality: this.#qualityName, loadScale: this.#loadScale, sceneryShed: this.#sceneryShed },
         };
+    }
+
+    /**
+     * Diagnostics for automated checks: pins the camera at `position` looking at `target` (world metres) to inspect
+     * any corner of the scene, such as a spectator's view from the stands; null hands it back to the controller.
+     *
+     * @param {{ position: [number, number, number], target: [number, number, number] }|null} view Camera pose.
+     */
+    setDebugView(view) {
+        this.#debugView = view;
+    }
+
+    /**
+     * Diagnostics for automated checks: pins the render resolution (CSS pixels × `ratio`, any value, so a test can
+     * mimic a Retina screen) and stops the adaptive resolution; null hands it back.
+     *
+     * @param {number|null} ratio Pixel ratio.
+     */
+    setDebugPixelRatio(ratio) {
+        this.#pinnedRatio = ratio;
+        if (ratio === null) return;
+        this.#pixelRatio = ratio;
+        this.#renderer.setPixelRatio(ratio);
+        this.#renderer.setSize(this.#lastSize.width, this.#lastSize.height, false);
+    }
+
+    /**
+     * Diagnostics for automated checks: shows or hides a named part of the scene (`synty-crowd`, `synty-landscape`,
+     * `synty-coliseum`, `fires`, `sky`, ...) to measure what it costs.
+     *
+     * @param {string} name Object name in the scene.
+     * @param {boolean} visible Whether it is drawn.
+     * @returns {boolean} Whether such an object exists.
+     */
+    setDebugVisible(name, visible) {
+        const found = [];
+        this.#scene.traverse((node) => node.name === name && found.push(node));
+        found.forEach((node) => { node.visible = visible; });
+        return found.length > 0;
     }
 
     /**
@@ -698,6 +905,7 @@ export class BattleRenderer {
         this.#audio.destroy();
         this.#fighters.forEach((fighter) => fighter.destroy());
         this.#tracker.dispose();
+        disposeSharedTextures();
         this.#renderer.dispose();
         this.#renderer.domElement.remove();
         document.querySelector('#fps')?.remove();
