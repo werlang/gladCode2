@@ -1,4 +1,5 @@
 import { ARENA_SIZE } from './battle-state.js';
+import { loadTexture } from './textures.js';
 
 const ROOT = '/assets/synty/ancient-empire/';
 const TEXTURES = `${ROOT}Textures/`;
@@ -7,6 +8,9 @@ const IMAGE_URL = /\.(png|jpe?g|tga|tif|psd)(\?|$)/i;
 /** Dungeon pack pieces (gate arch, portcullis, tunnel, torches): authored in metres on one atlas. */
 const DUNGEON = '/assets/synty/dungeon-pack/';
 const DUNGEON_PREFIX = 'dungeon:';
+/** POLYGON Mini Fantasy pieces (houses, church, castle, background mountains): centimetres, one atlas. */
+const MINI = '/assets/synty/fantasy-pack/';
+const MINI_PREFIX = 'mini:';
 /** Pieces seen only in shadow (the gate tunnels), drawn darker than the sunlit stone. */
 const SHADOWED = new Set(['tunnel', 'tunnelEnd']);
 /** FBX files are authored in centimetres. */
@@ -203,7 +207,7 @@ export class SyntyArenaKit {
      * Draws many copies of a piece, one instanced mesh per sub-mesh.
      *
      * @param {string} name Piece name from PIECES.
-     * @param {Array<{ x: number, y?: number, z: number, ry?: number, sx?: number, sy?: number, sz?: number }>} placements Copies to draw.
+     * @param {Array<{ x: number, y?: number, z: number, ry?: number, sx?: number, sy?: number, sz?: number, color?: number }>} placements Copies to draw.
      * @param {{ center?: boolean }} [options] `center` moves the pivot to the bottom centre of the bounds first.
      * @returns {import('three').Group} Group to add to the scene.
      */
@@ -220,6 +224,9 @@ export class SyntyArenaKit {
         const matrix = new THREE.Matrix4();
         const rotation = new THREE.Quaternion();
         const up = new THREE.Vector3(0, 1, 0);
+        // Placements may tint their copy (`color`, multiplied into the texture), e.g. the stucco of each house.
+        const tinted = placements.some((p) => p.color !== undefined);
+        const tint = new THREE.Color();
         for (const part of piece.parts) {
             const materials = part.materials.map((material) => this.#materials[material] ?? this.#materials.atlas);
             const mesh = new THREE.InstancedMesh(part.geometry, materials.length === 1 ? materials[0] : materials, placements.length);
@@ -230,8 +237,10 @@ export class SyntyArenaKit {
                     new THREE.Vector3(p.sx ?? 1, p.sy ?? 1, p.sz ?? 1),
                 ).multiply(offset);
                 mesh.setMatrixAt(index, matrix);
+                if (tinted) mesh.setColorAt(index, tint.setHex(p.color ?? 0xffffff));
             });
             mesh.instanceMatrix.needsUpdate = true;
+            if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
             mesh.computeBoundingSphere();
             group.add(mesh);
         }
@@ -240,7 +249,8 @@ export class SyntyArenaKit {
 
     dispose() {
         Object.values(this.#materials).forEach((material) => material.dispose());
-        Object.values(this.#textures).forEach((texture) => texture.dispose());
+        // Shared textures belong to the cache (textures.js) and outlive this kit.
+        Object.values(this.#textures).forEach((texture) => texture.userData.shared || texture.dispose());
         this.#pieces.forEach((piece) => piece.parts.forEach((part) => part.geometry.dispose()));
     }
 }
@@ -252,30 +262,42 @@ export class SyntyArenaKit {
  * @returns {Promise<SyntyArenaKit>} Kit; rejects when the pack is missing.
  */
 export async function loadSyntyArena(THREE) {
+    return loadSyntyKit(THREE, PIECES);
+}
+
+/**
+ * Loads any set of Ancient Empire (or `dungeon:` / `mini:` Mini Fantasy) pieces into a kit, skinned like the coliseum.
+ *
+ * @param {typeof import('three')} THREE Three namespace.
+ * @param {Record<string, string>} pieces FBX path (under `FBX/`, without extension) by short name.
+ * @param {Record<string, string>} [extraTextures] More textures by FBX material name (under `Textures/`) for this kit's pieces.
+ * @returns {Promise<SyntyArenaKit>} Kit; rejects when the pack is missing.
+ */
+export async function loadSyntyKit(THREE, pieces, extraTextures = {}) {
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
     const manager = new THREE.LoadingManager();
     // The texture paths baked into the FBX files are stale; materials are rebuilt by name below.
     manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
     const fbx = new FBXLoader(manager);
-    const textureLoader = new THREE.TextureLoader();
-    const textures = Object.fromEntries(await Promise.all(Object.entries(MATERIAL_TEXTURES).map(async ([name, file]) => {
-        const texture = await textureLoader.loadAsync(`${TEXTURES}${file}`);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.anisotropy = 4;
-        return [name, texture];
-    })));
-    const dungeonAtlas = await textureLoader.loadAsync(`${DUNGEON}Textures/Dungeons_Texture_01.png`);
-    dungeonAtlas.colorSpace = THREE.SRGBColorSpace;
+    // Shared: the coliseum and the countryside skin their pieces from the same atlases and building textures.
+    const textures = Object.fromEntries(await Promise.all(Object.entries({ ...MATERIAL_TEXTURES, ...extraTextures }).map(async ([name, file]) => (
+        [name, await loadTexture(THREE, `${TEXTURES}${file}`, { repeat: true, anisotropy: 4, share: true })]
+    ))));
+    const dungeonAtlas = await loadTexture(THREE, `${DUNGEON}Textures/Dungeons_Texture_01.png`, { share: true });
     textures.dungeon = dungeonAtlas;
     textures.dungeonDark = dungeonAtlas;
-    const pieces = new Map(await Promise.all(Object.entries(PIECES).map(async ([name, file]) => {
+    if (Object.values(pieces).some((file) => file.startsWith(MINI_PREFIX))) {
+        textures.mini = await loadTexture(THREE, `${MINI}Textures/PolygonMinis_Texture_01.png`, { share: true });
+    }
+    const loaded = new Map(await Promise.all(Object.entries(pieces).map(async ([name, file]) => {
+        if (file.startsWith(MINI_PREFIX)) {
+            return [name, new Piece(THREE, await fbx.loadAsync(`${MINI}FBX/${file.slice(MINI_PREFIX.length)}.fbx`), { material: 'mini' })];
+        }
         if (file.startsWith(DUNGEON_PREFIX)) {
             const root = await fbx.loadAsync(`${DUNGEON}FBX/${file.slice(DUNGEON_PREFIX.length)}.fbx`);
             return [name, new Piece(THREE, root, { unit: 1, material: SHADOWED.has(name) ? 'dungeonDark' : 'dungeon' })];
         }
         return [name, new Piece(THREE, await fbx.loadAsync(`${ROOT}FBX/${file}.fbx`))];
     })));
-    return new SyntyArenaKit(THREE, pieces, textures);
+    return new SyntyArenaKit(THREE, loaded, textures);
 }

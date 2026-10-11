@@ -31,6 +31,14 @@ export const HONOUR_SIDE = 0;
  * it spans (front and back row, counted like `STAND_PROFILE` treads). Spectators keep out of it.
  */
 export const HONOUR_BOX = Object.freeze({ half: 2.7, rows: [2, 8] });
+/**
+ * Sand braziers: height, angles along each corner arc (0 = north, 90 = east) and how far in front of the curved
+ * podium wall they stand. Their fire is `BRAZIER_FIRE` times their scale (1.8 for the 0.8 scale they were tuned at).
+ */
+const BRAZIER_HEIGHT = 1.25;
+const BRAZIER_ANGLES = [16, 74];
+const BRAZIER_CLEARANCE = 1.05;
+const BRAZIER_FIRE = 2.25;
 /** Share of the gate arch's height (`SM_Env_Wall_Archway_01`) that is open under its crown. */
 const ARCH_OPENING = 0.7;
 
@@ -159,16 +167,26 @@ export class SyntyColiseum {
         }
         this.#put('wall', walls);
         this.#put('wallCap', caps);
-        // A golden brazier burns on the cap at the middle of each corner, clear of the stands and the sand.
-        const capTop = WALL_HEIGHT + (capBox.max.y - capBox.min.y) * 0.6;
-        const brazierScale = 0.8;
-        const bowl = onArc(45 * DEG, (radius - 0.12) * Math.cos((step / 2) * DEG));
-        this.#put('brazier', [{ ...bowl, y: capTop, sx: brazierScale, sy: brazierScale, sz: brazierScale }]);
-        const brazierTop = capTop + (this.kit.box('brazier').max.y - this.kit.box('brazier').min.y) * brazierScale;
+        this.#braziers(radius * Math.cos((step / 2) * DEG));
+    }
+
+    /**
+     * Golden braziers stand on the sand in each corner bend, two per corner: low enough that the front rows see
+     * over them, clear of the podium wall behind and of the combat square in front.
+     *
+     * @param {number} wall Distance from a corner pivot to the face of the curved podium wall.
+     */
+    #braziers(wall) {
+        const box = this.kit.box('brazier');
+        const scale = BRAZIER_HEIGHT / (box.max.y - box.min.y);
+        const bowls = BRAZIER_ANGLES.map((angle) => onArc(angle * DEG, wall - BRAZIER_CLEARANCE));
+        this.#put('brazier', bowls.map((bowl) => ({ ...bowl, sx: scale, sy: scale, sz: scale })));
         for (let side = 0; side < 4; side += 1) {
-            const { x, z } = turn(side, bowl);
-            // A fire as wide as the bowl, rising from just below its rim.
-            this.flames.push({ x, y: brazierTop - 0.08, z, size: 1.8 });
+            for (const bowl of bowls) {
+                const { x, z } = turn(side, bowl);
+                // A fire as wide as the bowl, rising from just below its rim.
+                this.flames.push({ x, y: BRAZIER_HEIGHT - 0.04, z, size: BRAZIER_FIRE * scale });
+            }
         }
     }
 
@@ -208,6 +226,12 @@ export class SyntyColiseum {
         this.#put('tunnel', [{ x: 0, z: back + 0.02 - length / 2, sx: span / tunnel.x, sy: opening / tunnel.y, sz: length / tunnel.z }], { sides });
         const end = size('tunnelEnd');
         this.#put('tunnelEnd', [{ x: 0, z: back - length, sx: (span + 0.4) / end.x, sy: opening / end.y }], { sides });
+        // Outside, where the roads arrive, the same arch frames the passage under the stands in the outer wall,
+        // stretches of wall close the rest of the opening and the dark passage runs in behind it.
+        const outer = -(STANDS + STAND_PROFILE.walkway[1]) - 0.05;
+        this.#put('gateArch', [{ x: 0, z: outer, ry: Math.PI, sx: archScale, sy: archScale, sz: archScale }], { sides });
+        this.#put('wall', [-1, 1].map((sign) => ({ x: sign * (span / 2 + filler / 2), z: outer + 0.12, sx: filler / wall.x, sy: LIFT / wall.y })), { sides });
+        this.#put('tunnelEnd', [{ x: 0, z: outer + 1.6, ry: Math.PI, sx: (span + 0.4) / end.x, sy: opening / end.y }], { sides });
         const torchY = WALL_HEIGHT * 0.55;
         // Sconces on the wall face either side of the arch: the back plate against the stone, the cup reaching out.
         const sconce = size('torch');

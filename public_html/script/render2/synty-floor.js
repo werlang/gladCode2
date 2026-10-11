@@ -1,5 +1,6 @@
 import { ARENA_SIZE } from './battle-state.js';
 import { clamp01, createRandom, fbm, smooth } from './noise.js';
+import { loadTexture } from './textures.js';
 
 const ROOT = '/assets/synty/meadow-forest/';
 const TERRAIN = `${ROOT}Textures/Terrain/`;
@@ -122,6 +123,86 @@ diffuseColor.rgb *= floorAlbedo * vec3(1.08, 1.0, 0.84);`)
     return material;
 }
 
+/** Sides of the baked floor textures: albedo on GPUs that take large textures, a smaller one elsewhere; normals. */
+const BAKE_ALBEDO = 4096;
+const BAKE_ALBEDO_SMALL = 2048;
+const BAKE_NORMAL = 2048;
+
+/**
+ * Bakes the splat once: the same layer blend as `splatMaterial`, drawn over the floor's UV square into an albedo
+ * texture (sRGB) and a tangent-space normal map. The floor then costs two texture reads a pixel instead of twenty
+ * (the live splat was most of the GPU time on high-density screens). Nothing in the blend changes during a battle.
+ *
+ * @param {typeof import('three')} THREE Three namespace.
+ * @param {import('three').WebGLRenderer} renderer Renderer to draw the bake with.
+ * @returns {{ material: import('three').Material, textures: import('three').Texture[] }} Floor material and its maps.
+ */
+function bakedMaterial(THREE, renderer, layers, mask, size, { small = false } = {}) {
+    const uniforms = { floorMask: { value: mask }, floorSize: { value: size } };
+    layers.forEach((layer, i) => {
+        uniforms[`albedo${i}`] = { value: layer.albedo };
+        uniforms[`normal${i}`] = { value: layer.normal };
+    });
+    const samplers = layers.map((_, i) => `uniform sampler2D albedo${i}; uniform sampler2D normal${i};`).join('\n');
+    const blend = layers.slice(1).map((_, k) => {
+        const i = k + 1;
+        return `albedo = mix(albedo, floorSample(albedo${i}, floorUv).rgb, floorW[${i}]);
+normal = mix(normal, floorSample(normal${i}, floorUv).xyz * 2.0 - 1.0, floorW[${i}]);`;
+    }).join('\n');
+    const pass = (output) => new THREE.ShaderMaterial({
+        uniforms,
+        depthTest: false,
+        depthWrite: false,
+        vertexShader: 'varying vec2 vUv;\nvoid main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+        fragmentShader: `
+varying vec2 vUv;
+uniform sampler2D floorMask;
+uniform float floorSize;
+${samplers}
+const mat2 FLOOR_TURN = mat2(0.8, -0.6, 0.6, 0.8);
+vec4 floorSample(sampler2D map, vec2 uv) { return mix(texture2D(map, uv), texture2D(map, FLOOR_TURN * uv * 0.37 + 0.31), 0.35); }
+void main() {
+    // Texel (u, v) of the floor is world (x, -z) = (uv - 0.5) * size, as the floor mesh's own UVs.
+    vec2 floorUv = (vUv - 0.5) * floorSize / ${TILE.toFixed(2)};
+    vec4 floorWeights = texture2D(floorMask, vUv);
+    float floorW[5];
+    floorW[0] = 1.0;
+    floorW[1] = floorWeights.r; floorW[2] = floorWeights.g; floorW[3] = floorWeights.b; floorW[4] = floorWeights.a;
+    vec3 albedo = floorSample(albedo0, floorUv).rgb;
+    vec3 normal = floorSample(normal0, floorUv).xyz * 2.0 - 1.0;
+    ${blend}
+    ${output === 'albedo'
+        // Warmed toward the sun-baked sand of an arena; written linear, stored sRGB by the target.
+        ? 'gl_FragColor = vec4(albedo * vec3(1.08, 1.0, 0.84), 1.0);'
+        : 'gl_FragColor = vec4(normalize(vec3(normal.xy, max(normal.z, 0.2))) * 0.5 + 0.5, 1.0);'}
+}`,
+    });
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+    const scene = new THREE.Scene();
+    scene.add(quad);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    const bake = (side, output, colorSpace) => {
+        const target = new THREE.WebGLRenderTarget(side, side, {
+            generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, colorSpace, depthBuffer: false,
+        });
+        target.texture.anisotropy = anisotropy;
+        quad.material = pass(output);
+        const previous = renderer.getRenderTarget();
+        renderer.setRenderTarget(target);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(previous);
+        quad.material.dispose();
+        return target;
+    };
+    const large = !small && renderer.capabilities.maxTextureSize >= 8192;
+    const albedo = bake(large ? BAKE_ALBEDO : BAKE_ALBEDO_SMALL, 'albedo', THREE.SRGBColorSpace);
+    const normal = bake(BAKE_NORMAL, 'normal', THREE.NoColorSpace);
+    quad.geometry.dispose();
+    const material = new THREE.MeshLambertMaterial({ map: albedo.texture, normalMap: normal.texture });
+    return { material, textures: [albedo, normal] };
+}
+
 /**
  * The arena floor dressed with the Meadow Forest terrain: textured splat material and rock props.
  */
@@ -132,10 +213,20 @@ export class SyntyFloor {
     props;
     #disposables = [];
 
-    constructor(THREE, layers, rocks, atlas, { wetness, terrainHeight, size, wall }) {
+    constructor(THREE, layers, rocks, atlas, { wetness, terrainHeight, size, wall, renderer = null, small = false }) {
         const mask = paintMask(THREE, wetness, size, wall);
-        this.material = splatMaterial(THREE, layers, mask, size);
-        this.#disposables.push(mask, this.material, atlas, ...layers.flatMap((layer) => [layer.albedo, layer.normal]));
+        const sources = [mask, ...layers.flatMap((layer) => [layer.albedo, layer.normal])];
+        if (renderer) {
+            // Baked once; the layer textures and the mask are no longer needed afterwards.
+            const baked = bakedMaterial(THREE, renderer, layers, mask, size, { small });
+            this.material = baked.material;
+            sources.forEach((texture) => texture.dispose());
+            this.#disposables.push(this.material, atlas, ...baked.textures);
+        }
+        else {
+            this.material = splatMaterial(THREE, layers, mask, size);
+            this.#disposables.push(this.material, atlas, ...sources);
+        }
         this.props = new THREE.Group();
         this.props.name = 'synty-floor-props';
         const random = createRandom(FLOOR_SEED + 77);
@@ -177,19 +268,12 @@ export class SyntyFloor {
  * Loads the Meadow Forest terrain textures and rock props.
  *
  * @param {typeof import('three')} THREE Three namespace.
- * @param {{ wetness: Function, terrainHeight: Function, size: number, wall: number }} field Arena relief and extent.
+ * @param {{ wetness: Function, terrainHeight: Function, size: number, wall: number, renderer?: import('three').WebGLRenderer, small?: boolean }} field
+ *   Arena relief and extent; with a renderer the blend is baked into two textures (`small` keeps them at 2048).
  * @returns {Promise<SyntyFloor>} Floor dressing; rejects when the pack is missing.
  */
 export async function loadSyntyFloor(THREE, field) {
-    const loader = new THREE.TextureLoader();
-    const load = async (url, srgb) => {
-        const texture = await loader.loadAsync(url);
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.anisotropy = 8;
-        if (srgb) texture.colorSpace = THREE.SRGBColorSpace;
-        return texture;
-    };
+    const load = (url, srgb) => loadTexture(THREE, url, { srgb, repeat: true, anisotropy: 8 });
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
     const manager = new THREE.LoadingManager();
     manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));

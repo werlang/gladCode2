@@ -1,4 +1,4 @@
-/** Seeded noise and random helpers shared by the procedural arena textures. */
+/** Seeded noise and random helpers shared by the arena relief and the Synty floor mask. */
 
 export const clamp01 = (value) => Math.min(1, Math.max(0, value));
 export const mix = (a, b, t) => a + (b - a) * t;
