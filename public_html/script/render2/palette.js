@@ -53,7 +53,7 @@ const SLOT_FALLBACK = Object.freeze([
     ['shape', /^(fe)?male-|^skeleton$/], ['eyes', /^eyes_/], ['ears', /ears/],
     ['facial', /^(beard|bigstache|fiveoclock|frenchstache|mustache|facial)/],
     ['style', /^(bangs|bunches|bedhead|ponytail|long|short|mohawk|afro|bob|curly|messy|braid|plain|parted|page|pixie|princess|swoop|unkempt|loose|jewfro|xlong)/],
-    ['cape', /^cape_/], ['shield', /shield/], ['head', /(helmet|hat|hood|bandana|tiara|cap$)/],
+    ['cape', /^(tatter)?cape_(?!.*_behind$)/], ['shield', /shield/], ['head', /(helmet|hat|hood|bandana|tiara|cap$)/],
     ['shoulder', /shoulder/], ['hands', /(gauntlet|glove|bracer)/], ['belt', /belt/],
     ['armor', /(chest|chain|plate)/], ['shirt', /(longsleeve|shirt|robe|tunic|dress|corset|sleeveless|pirate)/],
     ['legs', /(pants|legs|skirt)/], ['feet', /(shoes|boots|feet)/], ['ranged', /(bow|arcoreal)/],

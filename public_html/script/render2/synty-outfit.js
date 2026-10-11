@@ -20,7 +20,7 @@ export const HAIR_STYLES = Object.freeze({
     jewfro: 'prop:afro', long: 35, longhawk: 'prop:mohawk', longknot: 19, loose: 24, messy1: 7, messy2: 13,
     mohawk: 17, page: 27, page2: 32, parted: 10, pixie: 11, plain: 4, ponytail: 2, ponytail2: 38,
     princess: 29, shorthawk: 15, shortknot: 1, shoulderl: 26, shoulderr: 34, swoop: 5, unkempt: 'prop:wild',
-    xlong: 25, xlongknot: 30,
+    xlong: 'prop:longFlat', xlongknot: 30,
 });
 
 /** Hero `Chr_FacialHair_Male_NN` per LPC facial hair style. */
@@ -35,6 +35,7 @@ export const PROPS = Object.freeze({
     afro: { file: 'dungeon-realms/FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Afro_01.fbx', tint: 'hair', scale: 0.9 },
     mohawk: { file: 'dungeon-realms/FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Mohawk_01.fbx', tint: 'hair' },
     wild: { file: 'dungeon-realms/FBX/Characters/Attachments/SM_Chr_Attach_Hair_Wild_01.fbx', tint: 'hair' },
+    longFlat: { file: 'dungeon-realms/FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Long_Flat_01.fbx', tint: 'hair' },
     bandana: { file: 'dungeon-realms/FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Bandana_01.fbx', tint: 'head' },
 });
 
@@ -266,7 +267,8 @@ export function syntyOutfit(look) {
     else if (!skeleton) add('Leg', 0, {}, true);
 
     const cape = /^(tatter)?cape_/.exec(tokens.cape ?? '');
-    if (cape) addShared('BackAttachment', cape[1] ? 14 : 13, cloth(look.cape ?? 0xc23a34, { P: 1, MD: 0.55 }));
+    // Back attachments 01-12 are capes (03 a long one, 02 tattered); 13 is a leaf mantle and 14-15 are packs.
+    if (cape) addShared('BackAttachment', cape[1] ? 2 : 3, cloth(look.cape ?? 0xc23a34, { P: 1, MD: 0.55 }));
 
     // ---------------------------------------------------------------- head
     const head = id('head');
