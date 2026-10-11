@@ -1,6 +1,8 @@
 import { ACTION_BY_ID, ACTION_SPECS, smoothstep } from './motion.js';
 import { ARENA_SIZE } from './battle-state.js';
+import { terrainHeight } from './arena.js';
 import { BlastSystem } from './blast.js';
+import { FireSystem } from './fire.js';
 import { potionSound } from './audio-manager.js';
 
 const PARTICLE_POOL = 220;
@@ -30,11 +32,34 @@ const ARROW_STUCK_SECONDS = 1.8;
 const ARROW_GROUND_SECONDS = 0.5;
 const ARROW_FADE_SECONDS = 0.6;
 const ARROW_GRAVITY = 9;
-/** How deep the tip sinks past the body surface, and the body radius used when the line misses the mesh. */
-const ARROW_SINK = 0.05;
+/** Length of the arrowhead (the `arrowHead` cone), in model units. */
+const ARROW_HEAD_LENGTH = 0.09;
+/**
+ * How deep the tip sinks past the body surface: the whole head and a little shaft, so no metal shows.
+ * `ARROW_BODY_RADIUS` stands in for the body when the arrow's line misses the mesh.
+ */
+const ARROW_SINK = ARROW_HEAD_LENGTH * ARROW_SCALE + 0.035;
 const ARROW_BODY_RADIUS = 0.12;
+/**
+ * Close shots: at point-blank range the engine spawns and resolves an arrow within one step, so no frame ever holds
+ * it. A hit on a gladiator that an archer within this reach is aiming at (facing it within this angle, with the
+ * bow still drawn) is that arrow, and one is loosed from the bow into the body.
+ */
+const CLOSE_SHOT_REACH = 9;
+const CLOSE_SHOT_FACING = 0.75;
+/** A missed arrow stays planted in the sand this long (the last ARROW_FADE_SECONDS fading), at a slant in this range. */
+const ARROW_PLANT_SECONDS = 3;
+const ARROW_PLANT_PITCH = [0.35, 0.75];
+/** How deep the tip goes into the sand, and how long the shaft quivers after it lands. */
+const ARROW_PLANT_DEPTH = 0.09;
+const ARROW_QUIVER_SECONDS = 0.4;
 const FIREBALL_HEIGHT = 0.7;
 const DECAL_POOL = 12;
+/** Fires on a burning fighter: bone and size of each (a brazier is 1), so the whole torso and the shoulders blaze. */
+const BODY_FLAMES = Object.freeze([['Hips', 0.2], ['Spine_02', 0.28], ['Shoulder_L', 0.18], ['Shoulder_R', 0.18], ['Head', 0.12]]);
+/** Seconds for the flames to catch, and to die down once the burn ends. */
+const IGNITE_SECONDS = 0.25;
+const DOUSE_SECONDS = 0.8;
 const FX_URL = '/assets/synty/special-effects/Textures/PolygonParticles_';
 /** Synty particle textures; each has a canvas stand-in so effects still read when the assets are not installed. */
 const FX_TEXTURES = Object.freeze({
@@ -91,6 +116,8 @@ export class BattleEffects {
     /** Arrows lodged in a fighter after hitting them (see `#stickArrow`). */
     #stuck = [];
     #stuckScratch = null;
+    /** Close shots loosed so far (keys their arrows). */
+    #closeShots = 0;
     #projectiles = new Map();
     #damageTotals = new Map();
     #geometries = {};
@@ -102,6 +129,11 @@ export class BattleEffects {
     #nextRing = 0;
     #nextSlash = 0;
     #root;
+    /** Flames on burning fighters (see `#updateBurning`), drawn by their own fire system. */
+    #bodyFires;
+    /** @type {Map<import('./fighter.js').Fighter, { strength: number, fires: Array<{ bone: string, size: number, fire: object }> }>} */
+    #burning = new Map();
+    #boneScratch = null;
 
     /**
      * @param {{ THREE: typeof import('three'), scene: import('three').Scene, audio: import('./audio-manager.js').BattleAudioManager, onShake: (trauma: number) => void }} options Dependencies.
@@ -115,6 +147,8 @@ export class BattleEffects {
         scene.add(this.#root);
         this.#blasts = new BlastSystem(THREE);
         this.#root.add(this.#blasts.group);
+        this.#bodyFires = new FireSystem(THREE, { seeThrough: 0 });
+        this.#root.add(this.#bodyFires.group);
         const loader = new THREE.TextureLoader();
         for (const [key, [file, fallback]] of Object.entries(FX_TEXTURES)) {
             const texture = new THREE.CanvasTexture(drawFallback(fallback));
@@ -130,7 +164,7 @@ export class BattleEffects {
             ring: new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2),
             slash: new THREE.RingGeometry(0.7, 1.15, 20, 1, -Math.PI / 2 - 1.0, 2.0).rotateX(-Math.PI / 2),
             arrowShaft: new THREE.CylinderGeometry(0.01, 0.01, 0.5, 4).rotateX(Math.PI / 2),
-            arrowHead: new THREE.ConeGeometry(0.03, 0.09, 4).rotateX(Math.PI / 2),
+            arrowHead: new THREE.ConeGeometry(0.03, ARROW_HEAD_LENGTH, 4).rotateX(Math.PI / 2),
             pillar: new THREE.CylinderGeometry(1, 1, 1, 14, 1, true).translate(0, 0.5, 0),
             ball: new THREE.SphereGeometry(1, 12, 8),
         };
@@ -188,8 +222,21 @@ export class BattleEffects {
     }
 
     /** Drops queued work and live projectiles after a seek so nothing fires out of order. */
+    /**
+     * Shows every pooled sprite, ring and decal (true) so the renderer can compile their shaders and upload their
+     * textures behind the loading screen, or hides them again (false). Only for the warm-up before the battle.
+     *
+     * @param {boolean} visible Whether the pools are drawn.
+     */
+    setPoolsVisible(visible) {
+        for (const item of [...this.#particles, ...this.#rings, ...this.#decals, ...this.#slashes, ...this.#pillars]) {
+            item.visible = visible || item.userData.life > 0;
+        }
+    }
+
     clear() {
         this.#timeline = [];
+        this.#douseAll();
         this.#damageTotals.clear();
         this.#projectiles.forEach((entry) => entry.mesh.removeFromParent());
         this.#projectiles.clear();
@@ -224,12 +271,13 @@ export class BattleEffects {
         }
     }
 
-    addRing(position, color, radius = 2, life = 0.6) {
+    /** Expanding flat ring at `position`, just over the sand unless a `height` is given (a shockwave round the head). */
+    addRing(position, color, radius = 2, life = 0.6, height = 0.12) {
         const ring = this.#rings[this.#nextRing];
         this.#nextRing = (this.#nextRing + 1) % RING_POOL;
         ring.userData.life = ring.userData.maxLife = life;
         ring.userData.radius = radius;
-        ring.position.set(position.x, 0.12, position.z);
+        ring.position.set(position.x, height, position.z);
         ring.material.color.setHex(color);
         ring.scale.setScalar(0.1);
         ring.visible = true;
@@ -337,7 +385,8 @@ export class BattleEffects {
                     break;
                 }
                 case 'projectile-impact': this.#onImpact(event.projectile, prefs, fighters); break;
-                case 'stun': if (fighter) this.#sfx('stun', fighter.position); break;
+                case 'stun': if (fighter) this.#onStun(fighter, overlay, prefs); break;
+                case 'cough': if (fighter) this.#onCough(fighter); break;
                 default: break;
             }
         }
@@ -361,7 +410,6 @@ export class BattleEffects {
                 // A blood sigil under the assassin, red embers drawn into the bow, a red flash as the arrow leaves.
                 this.addDecal(at, 'ritual', 0xb0101c, 1.4, contact + 0.5);
                 this.addRing(at, 0xd01a28, 1.5, 0.45);
-                this.later(0.06, () => this.#sfx('creak', fighter.position, { rate: 1.05 }));
                 for (let i = 0; i < 5; i += 1) {
                     this.later(0.08 + i * 0.07, () => {
                         const bow = { x: fighter.position.x, y: 0.75, z: fighter.position.z };
@@ -377,8 +425,7 @@ export class BattleEffects {
                 break;
             }
             case 'ranged':
-                // The bow creaks as the string comes back, then twangs on release.
-                this.later(0.06, () => this.#sfx('creak', fighter.position, { rate: 1.15 }));
+                // The draw is silent; the string twangs on release.
                 this.later(contact, () => this.#sfx('ranged', fighter.position));
                 break;
             case 'fireball': {
@@ -422,6 +469,33 @@ export class BattleEffects {
     }
 
     /**
+     * The blow that dazes: a white flash at the head, a golden shockwave round it and a spray of sparks, with the
+     * classic stun sound and a floating label (the stars that follow are the fighter's own, see `Fighter`).
+     */
+    #onStun(fighter, overlay, prefs) {
+        this.#sfx('stun', fighter.position);
+        const head = fighter.bonePosition('Head', new this.#THREE.Vector3());
+        head.y += 0.1;
+        this.emitSparks(head, { count: 1, speed: 0, size: 0.7, life: 0.25, up: 0, gravity: 0, colors: [0xfffbe0], texture: 'sparkle' });
+        this.emitSparks(head, { count: 16, speed: 2, size: 0.07, life: 0.45, up: 0.6, gravity: 2, colors: [0xffe066, 0xfff6c0, 0xffffff] });
+        this.addRing(head, 0xffd84a, 0.9, 0.4, head.y);
+        if (prefs.text) overlay.showFloatingLabel(fighter, 'ATORDOADO', 'stun');
+    }
+
+    /** A gladiator choking in the poison gas: a coughing fit and a few green puffs breathed out of the mouth. */
+    #onCough(fighter) {
+        // The recordings are men's voices; a woman's cough is the same breath pitched up.
+        this.#sfx('cough', fighter.position, { rate: fighter.appearance.female ? 1.22 : 1 });
+        for (const delay of [0.02, 0.3]) {
+            this.later(delay, () => {
+                const yaw = fighter.debug.yaw;
+                const mouth = { x: fighter.position.x + Math.sin(yaw) * 0.18, y: 0.9, z: fighter.position.z + Math.cos(yaw) * 0.18 };
+                this.emitSparks(mouth, { count: 4, speed: 0.35, size: 0.1, life: 0.8, up: 0.3, gravity: -0.3, colors: [0x7da84a, 0xa8c878], smoke: true });
+            });
+        }
+    }
+
+    /**
      * A hit lands when the swing connects. The engine resolves melee damage half an attack cycle after the
      * swing starts and the swing is paced to connect on that step, so the visual waits only for whatever is
      * left of the attacker's wind-up (frame timing jitter).
@@ -452,6 +526,13 @@ export class BattleEffects {
             struck = true;
             blade = attacker;
         }
+        if (!struck) {
+            const archer = this.#closeShooter(victim, fighters);
+            if (archer) {
+                this.#closeShot(archer, victim);
+                struck = true;
+            }
+        }
         // Only attacks and projectiles flinch; burn and poison ticks are damage over time and just show their number.
         this.later(delay, () => {
             if (struck) {
@@ -476,6 +557,75 @@ export class BattleEffects {
                 this.#damageTotals.set(key, total);
             }
         });
+    }
+
+    /**
+     * The archer whose point-blank arrow this hit is (see `CLOSE_SHOT_REACH`): standing within reach of the victim,
+     * bow drawn and not yet loosed, facing it. Null when nobody is.
+     */
+    #closeShooter(victim, fighters) {
+        let best = null;
+        let bestDistance = CLOSE_SHOT_REACH;
+        for (const archer of fighters.values()) {
+            const action = archer.activeAction;
+            if (archer === victim || !archer.shotPending || !['ranged', 'assassinate'].includes(action?.name)) continue;
+            const dx = victim.position.x - archer.position.x;
+            const dz = victim.position.z - archer.position.z;
+            const distance = Math.hypot(dx, dz);
+            if (distance >= bestDistance) continue;
+            const off = Math.abs(((Math.atan2(dx, dz) - archer.debug.yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+            if (off > CLOSE_SHOT_FACING) continue;
+            best = archer;
+            bestDistance = distance;
+        }
+        return best;
+    }
+
+    /**
+     * Looses the arrow the engine resolved within a step: from the nocked arrow's pose straight into the victim's
+     * body, where it sticks like any other (`#stickArrow`), with the hit's sounds and, for an assassination, its blood.
+     */
+    #closeShot(archer, victim) {
+        const launch = archer.nockedArrow;
+        const bleeding = archer.activeAction?.name === 'assassinate';
+        archer.fire();
+        const mesh = this.#createProjectile({ type: 0 }, bleeding ? 'assassinate' : null);
+        if (launch) mesh.position.copy(launch.position);
+        else mesh.position.set(archer.position.x, ARROW_HEIGHT, archer.position.z);
+        const yaw = Math.atan2(victim.position.x - mesh.position.x, victim.position.z - mesh.position.z);
+        const key = `close:${this.#closeShots += 1}`;
+        this.#projectiles.set(key, { mesh, yaw });
+        this.#stickArrow(key, victim);
+        const at = { x: victim.position.x, y: ARROW_HEIGHT, z: victim.position.z };
+        this.#sfx('arrow_hit', at);
+        if (Number(victim.state?.buffs?.resist?.timeleft) > 0) this.#sfx('clang', at, { gain: 0.6, rate: 1.2 });
+        else this.#sfx('flesh', at, { gain: bleeding ? 0.9 : 0.6, rate: 1.15 });
+        if (bleeding) {
+            this.emitSparks(at, { count: 22, speed: 2.6, size: 0.1, life: 0.7, up: 1.2, gravity: 6, colors: [0x6a000c, 0xa8101e, 0xe0202e] });
+            this.addDecal(at, 'dark', 0x5a0008, 1.1, 5, { spin: 0, additive: false });
+        }
+    }
+
+    /**
+     * A missed arrow ends stuck in the sand where the engine dropped it: tip down at a slant along its flight, a
+     * short quiver, then it stands until it fades (see `#updateStuckArrows`).
+     */
+    #plantArrow(key, at) {
+        const entry = this.#projectiles.get(key);
+        if (!entry) return;
+        this.#projectiles.delete(key);
+        const { mesh } = entry;
+        const yaw = entry.yaw ?? mesh.rotation.y;
+        const pitch = ARROW_PLANT_PITCH[0] + Math.random() * (ARROW_PLANT_PITCH[1] - ARROW_PLANT_PITCH[0]);
+        const tip = new this.#THREE.Vector3(at.x, terrainHeight(at.x, at.z), at.z);
+        const direction = new this.#THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
+        tip.addScaledVector(direction, ARROW_PLANT_DEPTH);
+        mesh.traverse((node) => {
+            if (!node.material) return;
+            node.material.transparent = true;
+            node.material.needsUpdate = true;
+        });
+        this.#stuck.push({ mesh, victim: null, phase: 'planted', age: 0, tip, direction, yaw, pitch });
     }
 
     /** Dense grey cloud that billows around the caster, hides it, then thins out. */
@@ -554,6 +704,7 @@ export class BattleEffects {
             else this.#sfx('flesh', position, { gain: bleeding ? 0.9 : 0.6, rate: 1.15 });
         }
         else {
+            this.#plantArrow(key, position);
             this.#sfx('sand', position);
         }
     }
@@ -598,7 +749,7 @@ export class BattleEffects {
             if (hit) break;
             hit = victim.bodyHit(new THREE.Vector3(victim.position.x, height, victim.position.z).addScaledVector(forward, -1), forward, 2);
         }
-        const tip = hit ? hit.point.clone().addScaledVector(forward, ARROW_SINK) : centre.clone().addScaledVector(forward, -ARROW_BODY_RADIUS);
+        const tip = hit ? hit.point.clone().addScaledVector(forward, ARROW_SINK) : centre.clone().addScaledVector(forward, ARROW_SINK - ARROW_BODY_RADIUS);
         // Kept in the bone's frame so the glide ends exactly where the body has moved to.
         const bone = hit?.bone ?? victim.root;
         const localTip = bone.worldToLocal(tip.clone());
@@ -607,11 +758,27 @@ export class BattleEffects {
 
     #updateStuckArrows(dt) {
         const THREE = this.#THREE;
-        const scratch = this.#stuckScratch ??= { tip: new THREE.Vector3(), flat: new THREE.Quaternion(), up: new THREE.Vector3(0, 1, 0) };
+        const scratch = this.#stuckScratch ??= { tip: new THREE.Vector3(), axis: new THREE.Vector3(), flat: new THREE.Quaternion(), up: new THREE.Vector3(0, 1, 0) };
         for (const arrow of this.#stuck) {
             arrow.age += dt;
             const { mesh, victim, forward } = arrow;
-            const standing = Number(victim.state?.hp) > 0;
+            if (arrow.phase === 'planted') {
+                // Pivots on the buried tip: a fading quiver, then still until it fades out.
+                const quiver = arrow.age < ARROW_QUIVER_SECONDS ? Math.sin(arrow.age * 70) * 0.08 * (1 - arrow.age / ARROW_QUIVER_SECONDS) : 0;
+                mesh.rotation.set(arrow.pitch + quiver, arrow.yaw, 0, 'YXZ');
+                scratch.axis.set(0, 0, 1).applyQuaternion(mesh.quaternion);
+                mesh.position.copy(arrow.tip).addScaledVector(scratch.axis, -ARROW_TIP_OFFSET * ARROW_SCALE);
+                const opacity = Math.min(1, (ARROW_PLANT_SECONDS - arrow.age) / ARROW_FADE_SECONDS);
+                mesh.traverse((node) => {
+                    if (node.material) node.material.opacity = Math.max(0, opacity);
+                });
+                if (opacity <= 0) {
+                    mesh.removeFromParent();
+                    arrow.done = true;
+                }
+                continue;
+            }
+            const standing = Number(victim?.state?.hp) > 0;
             if (arrow.phase === 'glide') {
                 arrow.bone.updateWorldMatrix(true, false);
                 const tip = arrow.bone.localToWorld(scratch.tip.copy(arrow.localTip));
@@ -619,9 +786,13 @@ export class BattleEffects {
                 const t = Math.min(1, arrow.age / ARROW_GLIDE_SECONDS);
                 mesh.position.lerpVectors(arrow.from, target, t);
                 if (t >= 1) {
-                    // A slight wobble off the line, then bound to the body: it now follows the animation.
+                    // A slight wobble off the line, pivoting on the buried tip so the head stays in the wound, then bound
+                    // to the body: it now follows the animation.
                     mesh.rotateX(0.08 + Math.random() * 0.12);
                     mesh.rotateY((Math.random() - 0.5) * 0.2);
+                    const tip = arrow.bone.localToWorld(scratch.tip.copy(arrow.localTip));
+                    const axis = scratch.axis.set(0, 0, 1).applyQuaternion(mesh.quaternion);
+                    mesh.position.copy(tip).addScaledVector(axis, -ARROW_TIP_OFFSET * ARROW_SCALE);
                     arrow.bone.attach(mesh);
                     arrow.phase = 'lodged';
                     arrow.age = 0;
@@ -763,8 +934,9 @@ export class BattleEffects {
 
     /**
      * @param {{ realDt: number, gameDt: number, progress: number, elapsed: number }} frame Frame timing.
+     * @param {Iterable<import('./fighter.js').Fighter>} [fighters] Fighters, for the flames on the burning ones.
      */
-    update({ realDt, gameDt, progress, elapsed }) {
+    update({ realDt, gameDt, progress, elapsed }, fighters = []) {
         this.#clock += gameDt;
         if (this.#timeline.length) {
             const due = this.#timeline.filter((item) => item.at <= this.#clock);
@@ -831,6 +1003,8 @@ export class BattleEffects {
             pillar.material.opacity = (data.mode === 'out' ? 1 - t : Math.min(1, t * 3) * (1 - t * 0.6)) * 0.55;
         }
         this.#blasts.update(realDt);
+        // Flames flicker in real time but hold still while paused, like the rest of the fight.
+        this.#updateBurning(fighters, gameDt > 0 ? realDt : 0, elapsed);
         this.#updateStuckArrows(gameDt);
         for (const slash of this.#slashes) {
             const data = slash.userData;
@@ -848,8 +1022,51 @@ export class BattleEffects {
         return [...this.#projectiles.entries()].map(([key, entry]) => ({ key, x: entry.mesh.position.x, z: entry.mesh.position.z }));
     }
 
+    /**
+     * Sets burning fighters ablaze: a small fire on each of `BODY_FLAMES`' bones, following the posed body. The flames
+     * catch quickly when the burn starts and die down slowly when it ends (or the fighter falls).
+     */
+    #updateBurning(fighters, dt, elapsed) {
+        this.#boneScratch ??= new this.#THREE.Vector3();
+        const at = this.#boneScratch;
+        for (const fighter of fighters) {
+            // An invisible fighter's flames vanish with it.
+            const burning = fighter.burning && !(Number(fighter.state?.buffs?.invisible?.timeleft) > 0);
+            let entry = this.#burning.get(fighter);
+            if (!entry) {
+                if (!burning) continue;
+                entry = { strength: 0, fires: BODY_FLAMES.map(([bone, size]) => ({ bone, size, fire: this.#bodyFires.add({ x: 0, y: 0, z: 0, size: 0 }) })) };
+                this.#burning.set(fighter, entry);
+            }
+            entry.strength = burning
+                ? Math.min(1, entry.strength + dt / IGNITE_SECONDS)
+                : Math.max(0, entry.strength - dt / DOUSE_SECONDS);
+            if (!burning && entry.strength <= 0) {
+                entry.fires.forEach(({ fire }) => this.#bodyFires.remove(fire));
+                this.#burning.delete(fighter);
+                continue;
+            }
+            for (const { bone, size, fire } of entry.fires) {
+                fighter.bonePosition(bone, at);
+                // The flames' base sits a little under the bone so they lick up over it.
+                fire.x = at.x;
+                fire.y = at.y - size * 0.3;
+                fire.z = at.z;
+                fire.size = size * entry.strength;
+            }
+        }
+        this.#bodyFires.update(elapsed, dt);
+    }
+
+    /** Puts out every burning fighter at once (a seek). */
+    #douseAll() {
+        this.#burning.forEach((entry) => entry.fires.forEach(({ fire }) => this.#bodyFires.remove(fire)));
+        this.#burning.clear();
+    }
+
     destroy() {
         this.clear();
+        this.#bodyFires.dispose();
         this.#blasts.dispose();
         Object.values(this.#geometries).forEach((geometry) => geometry.dispose());
         this.#materials.forEach((material) => material.dispose());

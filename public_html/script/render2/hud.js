@@ -19,6 +19,7 @@ const INK = 'rgba(12, 8, 5, 0.92)';
 const PARCHMENT = '#f1dfb8';
 const FLOAT_COLORS = Object.freeze({
     damage: ['#ffb199', '#e8382b'], heal: ['#c8ffc0', '#3fcf5a'], potion: ['#c8ffc0', '#3fcf5a'], level: ['#fff3b0', '#f0a91c'], mana: ['#cfe6ff', '#4b8dff'],
+    stun: ['#fffbe0', '#d9a520'],
 });
 
 const SPRITES = '/assets/synty/fantasy-warrior-hud/Sprites/';
@@ -765,7 +766,7 @@ export class BattleHud {
         const key = `${tone}|${text}`;
         const cached = this.#labelCache.get(key);
         if (cached) return cached;
-        const font = `900 ${tone === 'level' ? 17 : 20}px ${TITLE_FONT}`;
+        const font = `900 ${tone === 'level' || tone === 'stun' ? 17 : 20}px ${TITLE_FONT}`;
         const probe = document.createElement('canvas').getContext('2d');
         probe.font = font;
         const width = Math.ceil(probe.measureText(text).width) + 12;
@@ -794,7 +795,7 @@ export class BattleHud {
      *
      * @param {import('./fighter.js').Fighter} view Target fighter.
      * @param {string} text Label.
-     * @param {'damage'|'heal'|'level'|'mana'|'potion'} tone Semantic tone.
+     * @param {'damage'|'heal'|'level'|'mana'|'potion'|'stun'} tone Semantic tone.
      */
     showFloatingLabel(view, text, tone) {
         const projected = this.#project(view);

@@ -27,8 +27,12 @@ export class FireSystem {
     #color;
     #disposables = [];
 
-    /** @param {typeof import('three')} THREE Three namespace. */
-    constructor(THREE) {
+    /**
+     * @param {typeof import('three')} THREE Three namespace.
+     * @param {{ seeThrough?: number }} [options] Radius beyond which fires fade when they stand between the camera and
+     *   the combat square (the wall fires); 0 never fades them (fires on the fighters).
+     */
+    constructor(THREE, { seeThrough = ARENA_SIZE / 2 + 1.5 } = {}) {
         this.#THREE = THREE;
         this.group = new THREE.Group();
         this.group.name = 'fires';
@@ -37,7 +41,7 @@ export class FireSystem {
         const soft = loader.load(SOFT);
         this.#disposables.push(shape, soft);
         // Fires on the wall fade like the stone when they stand between the camera and the combat square.
-        const view = { seeThrough: ARENA_SIZE / 2 + 1.5 };
+        const view = { seeThrough };
         this.#layers = {
             smoke: new ParticleLayer(THREE, shape, 64 * SMOKE, false, view),
             glow: new ParticleLayer(THREE, soft, 64 * (1 + EMBERS), true, view),
@@ -52,13 +56,22 @@ export class FireSystem {
     }
 
     /**
-     * Lights a fire.
+     * Lights a fire. Its `x`, `y`, `z` and `size` may change every frame (a fire carried by a fighter; size 0 hides it).
      *
      * @param {{ x: number, y: number, z: number, size?: number }} at Base of the flames (the bowl's rim) and scale.
+     * @returns {{ x: number, y: number, z: number, size: number }} The fire, to move or `remove`.
      */
     add({ x, y, z, size = 1 }) {
         const seeded = (n) => Array.from({ length: n }, () => ({ age: Math.random(), life: 1, seed: Math.random() }));
-        this.#fires.push({ x, y, z, size, flames: seeded(FLAMES), smoke: seeded(SMOKE), embers: seeded(EMBERS), phase: Math.random() * 10 });
+        const fire = { x, y, z, size, flames: seeded(FLAMES), smoke: seeded(SMOKE), embers: seeded(EMBERS), phase: Math.random() * 10 };
+        this.#fires.push(fire);
+        return fire;
+    }
+
+    /** @param {object} fire A fire returned by `add`, put out at once. */
+    remove(fire) {
+        const index = this.#fires.indexOf(fire);
+        if (index >= 0) this.#fires.splice(index, 1);
     }
 
     #ramped(t) {
@@ -87,6 +100,7 @@ export class FireSystem {
             p.seed = Math.random();
         };
         for (const fire of this.#fires) {
+            if (fire.size <= 0) continue;
             const s = fire.size;
             const t = elapsed + fire.phase;
             // A gust leans the whole fire for a moment.
