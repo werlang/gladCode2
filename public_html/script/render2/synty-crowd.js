@@ -1,4 +1,5 @@
 import { MAX_SPECTATORS, STANDING_MOTIONS, planCrowd, weighted } from './crowd-layout.js';
+import { loadTexture } from './textures.js';
 
 const ROOT = '/assets/synty/';
 const CHARACTERS = `${ROOT}ancient-empire/FBX/Characters/Individual/`;
@@ -63,6 +64,10 @@ const GUARD_MOTIONS = ['guard', 'walk'];
 const NOTABLE_MOTIONS = ['sit', 'sitWave'];
 /** Seconds over which a spectator or guard blends into a new motion. */
 const CROSSFADE_SECONDS = 0.45;
+/** How far (radians) a spectator turns off its bench facing to follow the fight. */
+const LOOK_LIMIT = 0.6;
+/** Seconds between updates of where the spectators look. */
+const FOLLOW_INTERVAL = 0.1;
 /** Walk speed in metres per second that matches the walk clip's stride at crowd scale. */
 const WALK_SPEED = (150 / 1.0667) * CROWD_SCALE;
 
@@ -482,7 +487,8 @@ class CrowdBatch {
     }
 
     place(member) {
-        this.matrix.compose(this.position.set(member.x, member.y, member.z), this.rotation.setFromAxisAngle(this.up, member.yaw), this.scale);
+        const size = CROWD_SCALE * (member.size ?? 1);
+        this.matrix.compose(this.position.set(member.x, member.y, member.z), this.rotation.setFromAxisAngle(this.up, member.yaw), this.scale.set(size, size, size));
         this.mesh.setMatrixAt(member.slot, this.matrix);
         this.mesh.instanceMatrix.needsUpdate = true;
     }
@@ -527,6 +533,9 @@ export class SyntyCrowd {
     #excitement = 0;
     #elapsed = 0;
     #nextShuffle = 0;
+    /** Where the fight is (world x, z), which the spectators turn to follow; null keeps them facing ahead. */
+    #focus = null;
+    #sinceFollow = 0;
     #disposables = [];
 
     /**
@@ -557,6 +566,11 @@ export class SyntyCrowd {
         for (const spectator of layout.spectators) {
             const member = { ...spectator, motion: spectator.upright ? spectator.standing : spectator.seated, standUntil: 0 };
             member.yaw += member.jitter;
+            // Each follows the fight from its own bench facing, with its own eye and its own pace.
+            member.ahead = member.yaw;
+            member.look = 0;
+            member.lookBias = (Math.random() - 0.5) * 0.16;
+            member.lookRate = 1.2 + Math.random() * 2;
             batch('spectators', pick(baked.spectators, spectator.type), pick(atlases, spectator.variant), MAX_SPECTATORS).add(member);
             this.#spectators.push(member);
         }
@@ -594,7 +608,8 @@ export class SyntyCrowd {
      */
     react(intensity) {
         this.#excitement = Math.min(1, this.#excitement + intensity);
-        const share = 0.15 + 0.55 * intensity;
+        // A death brings most of the crowd to its feet; a solid blow only the keenest few.
+        const share = 0.05 + 0.65 * intensity * intensity;
         for (const member of this.#spectators) {
             if (member.upright || Math.random() > share) continue;
             member.standUntil = this.#elapsed + 2 + Math.random() * 3 * (0.5 + intensity);
@@ -628,6 +643,43 @@ export class SyntyCrowd {
             }
         }
         for (const patrol of this.#patrols) this.#patrol(patrol, dt);
+        // Heads turn slowly: following the fight 10 times a second looks the same and re-uploads the instance
+        // matrices a sixth as often.
+        this.#sinceFollow += dt;
+        if (this.#sinceFollow >= FOLLOW_INTERVAL) {
+            this.#follow(this.#sinceFollow);
+            this.#sinceFollow = 0;
+        }
+    }
+
+    /**
+     * Where the action is: the spectators turn toward it as far as their seat allows.
+     *
+     * @param {{ x: number, z: number }|null} at World position of the fight (null: face ahead).
+     */
+    setFocus(at) {
+        this.#focus = at ? { x: at.x, z: at.z } : null;
+    }
+
+    /**
+     * Turns every spectator toward the fight, at most `LOOK_LIMIT` off its bench facing, each at its own pace and
+     * aiming a little off, so the stands sway with the action instead of snapping to it.
+     */
+    #follow(dt) {
+        if (dt <= 0) return;
+        for (const member of this.#spectators) {
+            let goal = 0;
+            if (this.#focus) {
+                const toward = Math.atan2(this.#focus.x - member.x, this.#focus.z - member.z);
+                const off = ((toward - member.ahead + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+                goal = Math.max(-LOOK_LIMIT, Math.min(LOOK_LIMIT, off + member.lookBias));
+            }
+            const next = member.look + (goal - member.look) * (1 - Math.exp(-dt * member.lookRate));
+            if (Math.abs(next - member.look) < 0.002) continue;
+            member.look = next;
+            member.yaw = member.ahead + next;
+            member.batch.place(member);
+        }
     }
 
     /** Walks a patrol to the end of its beat, has it stand a moment, turn round and walk back. */
@@ -682,7 +734,6 @@ export async function loadSyntyCrowd(THREE, plan, posts = [], throne = null) {
     const manager = new THREE.LoadingManager();
     manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
     const loader = new FBXLoader(manager);
-    const textures = new THREE.TextureLoader();
     const genders = ['Masc', 'Femn'];
     const clipEntries = Object.entries(CLIPS).flatMap(([name, url]) => genders.map((g) => [`${name}:${g}`, url(g)]));
     const female = (name) => /Female/.test(name);
@@ -692,11 +743,7 @@ export async function loadSyntyCrowd(THREE, plan, posts = [], throne = null) {
         Promise.all(SPECTATOR_TYPES.map((name) => loadFbx(loader, `${CHARACTERS}SM_Chr_${name}.fbx`))),
         Promise.all(GUARD_TYPES.map((name) => loadFbx(loader, `${CHARACTERS}SM_Chr_${name}.fbx`))),
         loadFbx(loader, `${CHARACTERS}SM_Chr_${NOTABLE_TYPE}.fbx`),
-        Promise.all(ATLASES.map(async (url) => {
-            const texture = await textures.loadAsync(url);
-            texture.colorSpace = THREE.SRGBColorSpace;
-            return texture;
-        })),
+        Promise.all(ATLASES.map((url) => loadTexture(THREE, url))),
     ]);
     const clips = new Map(clipSources.map(([key, source]) => {
         const clip = source.animations[0];

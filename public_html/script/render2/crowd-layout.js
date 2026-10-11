@@ -6,7 +6,7 @@ export const SEAT_SPACING = 0.42;
 /** Lowest tread a spectator uses: the first ones sit behind the podium wall and its cap. */
 const FIRST_ROW = 2;
 /** Most spectators at full density. */
-export const MAX_SPECTATORS = 340;
+export const MAX_SPECTATORS = 800;
 /** Spectators a seed of a cluster of friends brings along the bench. */
 const CLUSTER = [2, 7];
 
@@ -15,7 +15,7 @@ const CLUSTER = [2, 7];
  * front edge of their tread with their feet on the one below; standing ones stand on it.
  */
 export const SEATED_MOTIONS = Object.freeze([['sit', 5], ['sitClap', 3], ['sitFist', 1.5], ['sitWave', 1.5]]);
-export const STANDING_MOTIONS = Object.freeze([['stand', 2], ['standCheer', 2], ['standPump', 1.5], ['jumpCheer', 1]]);
+export const STANDING_MOTIONS = Object.freeze([['stand', 3.5], ['standCheer', 2], ['standPump', 1.5], ['jumpCheer', 0.6]]);
 
 /** Picks an entry of `[value, weight]` pairs. */
 export function weighted(entries, random) {
@@ -101,7 +101,8 @@ export function planCrowd(plan, random = Math.random, posts = [], throne = null)
     const notable = throne ?? free.reduce((best, seat) => (!best || Math.hypot(seat.x - box.x, seat.z - box.z) < Math.hypot(best.x - box.x, best.z - box.z) ? seat : best), null);
 
     const spectators = [];
-    const appeal = (seat) => (1 - 0.55 * (seat.row / rows)) * (seat.side === HONOUR_SIDE ? 1.25 : 1);
+    // The best seats are by the sand: the front rows fill up first, the top ones keep a thin scatter.
+    const appeal = (seat) => (0.22 + 0.78 * Math.exp(-seat.row / 4.5)) * (seat.side === HONOUR_SIDE ? 1.2 : 1);
     let guard = 0;
     while (spectators.length < MAX_SPECTATORS && guard < MAX_SPECTATORS * 40) {
         guard += 1;
@@ -117,6 +118,8 @@ export function planCrowd(plan, random = Math.random, posts = [], throne = null)
             spectators.push({
                 ...seat,
                 jitter: (random() - 0.5) * 0.08,
+                // Heights vary a little from one spectator to the next, as in any crowd.
+                size: 0.93 + random() * 0.14,
                 seated: weighted(SEATED_MOTIONS, random),
                 standing: weighted(STANDING_MOTIONS, random),
                 // Some never sit down: the rowdy ones.
