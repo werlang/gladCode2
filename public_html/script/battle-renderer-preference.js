@@ -3,6 +3,12 @@
     const CLASSIC = 'classic';
     const THREE = 'three';
 
+    // Feature gate set by playback.php from env ENABLE_RENDER2. When the gate
+    // is off, the 3D option is hidden and any stored/?renderer=three value is
+    // ignored so the page always runs the classic renderer. Defaults to
+    // enabled when the flag is absent (e.g. direct script use outside playback).
+    const ENABLED = window.__RENDER2_ENABLED__ !== false;
+
     /**
      * Normalizes URL and storage aliases into the supported renderer names.
      *
@@ -30,28 +36,30 @@
     catch {
         // Storage can be unavailable in privacy modes; the classic default remains safe.
     }
-    let current = queryRenderer ?? storedRenderer ?? CLASSIC;
+    let current = ENABLED ? (queryRenderer ?? storedRenderer ?? CLASSIC) : CLASSIC;
     applyClass(current);
 
     window.battleRendererVersion = current;
     window.BattleRendererPreference = Object.freeze({
         CLASSIC,
         THREE,
+        ENABLED,
         get() {
             return current;
         },
         set(renderer) {
             const normalized = normalize(renderer) ?? CLASSIC;
-            current = normalized;
-            window.battleRendererVersion = normalized;
-            applyClass(normalized);
+            const applied = ENABLED ? normalized : CLASSIC;
+            current = applied;
+            window.battleRendererVersion = applied;
+            applyClass(applied);
             try {
-                window.localStorage.setItem(STORAGE_KEY, normalized);
+                window.localStorage.setItem(STORAGE_KEY, applied);
             }
             catch {
                 // The current page still switches even if persistence is unavailable.
             }
-            return normalized;
+            return applied;
         },
         /**
          * Demotes the renderer for this page load only, keeping the stored
@@ -62,10 +70,11 @@
          */
         setTransient(renderer) {
             const normalized = normalize(renderer) ?? CLASSIC;
-            current = normalized;
-            window.battleRendererVersion = normalized;
-            applyClass(normalized);
-            return normalized;
+            const applied = ENABLED ? normalized : CLASSIC;
+            current = applied;
+            window.battleRendererVersion = applied;
+            applyClass(applied);
+            return applied;
         },
     });
 })();

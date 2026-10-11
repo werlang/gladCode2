@@ -406,6 +406,8 @@ $(document).ready( function() {
             $('#pref-text input').prop('checked', true);
         if (prefs.speech)
             $('#pref-speech input').prop('checked', true);
+        if (window.BattleRendererPreference.ENABLED === false)
+            $('#renderer-choice').remove();
         $(`#renderer-choice input[value='${window.BattleRendererPreference.get()}']`).prop('checked', true);
 
         $('.checkslider').each( function(){

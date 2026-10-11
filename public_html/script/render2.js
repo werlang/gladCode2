@@ -11,6 +11,9 @@ let rendererWasLoaded = false;
  * @returns {Promise<BattleRenderer|null>} Active renderer or null after fallback.
  */
 async function installThreeRenderer() {
+    if (window.__RENDER2_ENABLED__ === false) {
+        return null;
+    }
     if (window.BattleRendererPreference?.get() !== window.BattleRendererPreference?.THREE) {
         return null;
     }

@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
     $log = "";
     $tnm = "";
@@ -10,7 +9,13 @@
     if (strpos($_SERVER['REQUEST_URI'], "playback.php?log=") !== false){
         header("Location: play/". $loghash);
     }
+
+    // Feature gate for the Three.js Coliseu 3D renderer (env ENABLE_RENDER2).
+    // When off, the classic 2D renderer is the only option: no 3D CSS, import
+    // map, or module is sent, and the frontend preference is forced to classic.
+    $render2Enabled = in_array(strtolower(trim(getenv('ENABLE_RENDER2') ?: '0')), ['1', 'true', 'on', 'yes'], true);
 ?>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8' />
@@ -18,6 +23,7 @@
     <BASE href="../">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Visualizar batalha</title>
+    <script>window.__RENDER2_ENABLED__ = <?= $render2Enabled ? 'true' : 'false' ?>;</script>
     <script src="script/battle-renderer-preference.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Acme|Cinzel:700,900|Source+Code+Pro&display=swap" rel="stylesheet">
     <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
@@ -26,7 +32,9 @@
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/playback.css"/>
+<?php if ($render2Enabled): ?>
     <link rel='stylesheet' href="css/playback-render2.css"/>
+<?php endif; ?>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
     <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
@@ -35,6 +43,7 @@
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
     <script src="script/render.js"></script>
+<?php if ($render2Enabled): ?>
 <?php
     // Every 3D renderer module is versioned by its modification time, so a browser never mixes a cached
     // module with a newer one (the server sends no cache headers for scripts).
@@ -50,6 +59,7 @@
 ?>
     <script type="importmap"><?= json_encode(["imports" => $render2Imports], JSON_UNESCAPED_SLASHES) ?></script>
     <script type="module" src="script/render2.js?v=<?= $render2Version ?>"></script>
+<?php endif; ?>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/dropzone.js"></script>

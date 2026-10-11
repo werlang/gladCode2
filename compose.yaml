@@ -18,6 +18,7 @@ services:
             - MAILER_PORT=${MAILER_PORT:-587}
             - MAILER_USER=${MAILER_USER:-}
             - MAILER_PASSWORD=${MAILER_PASSWORD:-}
+            - ENABLE_RENDER2=${ENABLE_RENDER2:-0}
         ports:
             - "${APACHE_PORT:-80}:80"
         logging:
