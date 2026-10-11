@@ -23,6 +23,11 @@
 
     $args = json_decode($_POST['args'], true);
 
+    // editor/test runs only: the engine enables setHp, setPosition, setAp, lvlUp and "-1" (any item) slots
+    // in sandbox mode, so every run that counts (ranked, duel, tournament, training) must stay out of it
+    $sandbox = !isset($_SESSION['match']) && !isset($args['ranked']) && !isset($args['duel'])
+        && !isset($args['tournament']) && !isset($args['training']);
+
     $glads = array();
     if (isset($args['glads']))
         $glads = $args["glads"];
@@ -172,6 +177,8 @@
             foreach ($breakpoints as $ln){
                 $line = $ln - 1 + $setup;
                 $hint = preg_replace('/\s*(.*?)[{};]*\n/', "$1", $code[$line]);
+                // the hint is the source line itself: escape it so quotes do not end the string literal
+                $hint = addcslashes($hint, "\"\\");
                 $code[$line] = "breakpoint(\"". $hint ."\");". PHP_EOL . $code[$line];
                 $code = preg_replace($pattern, $replacement, $code);
                     
@@ -192,6 +199,7 @@
                 $line = $ln - 2 + $setup;
                 $hint = preg_replace('/(\s*)(.*)/', "$2", $code[$line]);
                 $tab = preg_replace('/(\s*)(.*)/', "$1", $code[$line]);
+                $hint = addcslashes($hint, "\"\\");
                 $code[$line] = $tab ."breakpoint(\"". $hint ."\")". PHP_EOL . $code[$line];
                     
             }
@@ -271,6 +279,7 @@
         curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'sandbox' => $sandbox,
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

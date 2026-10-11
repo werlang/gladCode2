@@ -3,12 +3,14 @@ import path from 'path';
 import { exec } from 'child_process';
 
 class Runner {
-    constructor({ dirname, nglads, codes }) {
+    constructor({ dirname, nglads, codes, sandbox }) {
         this.dirname = dirname;
         this.tmpDirPHP = path.join('/phppayload', this.dirname);
         this.tmpDir = path.join('/runs', this.dirname);
         this.nglads = nglads;
         this.codes = JSON.parse(codes || '[]');
+        // editor runs only: enables the engine sandbox commands (setHp, setPosition, setAp, lvlUp, -1 slots)
+        this.sandbox = sandbox === true;
     }
 
     async run() {
@@ -23,7 +25,7 @@ class Runner {
     }
 
     async runSimulation() {
-        const command = `docker run --rm --name ${this.dirname} -v gladcode_tmp_run:/usercode -w /usercode/${this.dirname} --cpu-period=100000 --cpu-quota=50000 gladcode2-vm sh socket_compile.sh`;
+        const command = `docker run --rm --name ${this.dirname} -v gladcode_tmp_run:/usercode -w /usercode/${this.dirname} --cpu-period=100000 --cpu-quota=50000 gladcode2-vm sh socket_compile.sh${this.sandbox ? ' sandbox' : ''}`;
         let finished = false;
         let timeoutId;
 
