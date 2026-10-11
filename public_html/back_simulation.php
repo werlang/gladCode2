@@ -1,7 +1,6 @@
 <?php
     include_once "connection.php";
     session_start();
-    include("back_node_message.php");
     date_default_timezone_set('America/Sao_Paulo');
 
     $user = null;
@@ -365,9 +364,6 @@
                 $result = runQuery($sql);
                 $row = $result->fetch();
 
-                send_node_message(array( 'profile notification' => array(
-                    'user' => array($row['user1'], $row['user2'])
-                )));
             }
             if (isset($args['tournament']) && $groupid != null){
                 $sql = "SELECT l.id FROM logs l WHERE l.hash = '$hash'";
@@ -386,7 +382,6 @@
                     $result = runQuery($sql);
                     $row = $result->fetch();
 
-                    send_node_message(['tournament refresh' => [ 'hash' => $row["hash"] ]]);
                 }
             }
 			if (isset($args['training']) && $groupid != null){
@@ -402,9 +397,6 @@
 					$sql = "UPDATE training_groups SET log = '$logid' WHERE id = '$groupid'";
                     $result = runQuery($sql);
                     
-                    send_node_message(array('training refresh' => array(
-                        'hash' => $row['hash']
-                    )));
 				}
 			}
 
@@ -594,9 +586,6 @@
         $sql = "UPDATE usuarios SET lvl = '$lvl', xp = '$xp', silver = silver + $silver WHERE id = '$user'";
         $result = runQuery($sql);
 
-        send_node_message(array(
-            'profile notification' => array('user' => array($user))
-        ));
 
         return $glad_rewards;
     }
@@ -739,9 +728,6 @@
 
         }
 
-        send_node_message(array(
-            'profile notification' => array('user' => $masters)
-        ));
     }
 
     function getLanguage($code){

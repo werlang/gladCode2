@@ -2,7 +2,6 @@
     session_start();
     date_default_timezone_set('America/Sao_Paulo');
     include_once "connection.php";
-    include("back_node_message.php");
 
     $user = $_SESSION['user'];
     $action = $_POST['action'];
@@ -30,7 +29,6 @@
             $sql = "INSERT INTO training (manager, name, description, creation, maxtime, players, weight, hash, hash_valid) VALUES ('$user', '$name', '$desc', now(3), $maxtime, $players, $weight, '$hash', now(3) + INTERVAL 1 HOUR);";
             $result = runQuery($sql);
             
-            send_node_message(array('training list' => array()));
     
             $output['hash'] = $hash;
             $output['status'] = "SUCCESS";
@@ -170,10 +168,6 @@
                         $output['id'] = $trainid; 
                         $output['name'] = $trainname;
                         $output['status'] = "SUCCESS";    
-                        send_node_message(array('training list' => array()));
-                        send_node_message(array('training room' => array(
-                            'id' => $trainid
-                        )));
 
                         // check if I want to redirect to another page
                         $redirect = $_POST['redirect'];
@@ -291,10 +285,6 @@
                     $result = runQuery($sql);
 
                     $output['status'] = "SUCCESS";
-                    send_node_message(array('training list' => array()));
-                    send_node_message(array('training room' => array(
-                        'id' => $trainid
-                    )));
                 }
             }
         }
@@ -320,9 +310,6 @@
                 $output['status'] = "SUCCESS";
                 $output['hash'] = $hash;
 
-                send_node_message(array('training room' => array(
-                    'id' => $trainid
-                )));
             }
         }
     }
@@ -364,10 +351,6 @@
                     $sql = "DELETE FROM gladiator_training WHERE id = $id";
                     $result = runQuery($sql);
                     $output['status'] = "SUCCESS";
-                    send_node_message(array('training list' => array()));
-                    send_node_message(array('training room' => array(
-                        'id' => $trainid
-                    )));
                 }
                 
             }
@@ -394,10 +377,6 @@
                 $result = runQuery($sql);
                 $output['status'] = "SUCCESS";
 
-                send_node_message(array('training list' => array()));
-                send_node_message(array('training room' => array(
-                    'id' => $trainid
-                )));
             }
         }
     }
@@ -428,9 +407,6 @@
                     $result = runQuery($sql);
 
                     $output['status'] = "SUCCESS";    
-                    send_node_message(array('training room' => array(
-                        'id' => $trainid
-                    )));
 
                 }
                 else
@@ -501,9 +477,6 @@
                     $sql = "UPDATE training SET deadline = now(3) + INTERVAL $maxtime MINUTE WHERE id = $trainid";
                     $result = runQuery($sql);
 
-                    send_node_message(array('training room' => array(
-                        'id' => $trainid
-                    )));
     
                     $output['hash'] = $hash;
                     $output['status'] = "SUCCESS";
@@ -540,10 +513,6 @@
             $sql = "DELETE FROM training WHERE id = $trainid";
             $result = runQuery($sql);
 
-            send_node_message(array('training list' => array()));
-            send_node_message(array('training room' => array(
-                'id' => $trainid
-            )));
             
             $output['status'] = "SUCCESS";
         }

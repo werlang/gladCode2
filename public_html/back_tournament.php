@@ -2,7 +2,6 @@
     session_start();
     date_default_timezone_set('America/Sao_Paulo');
     include_once "connection.php";
-    include("back_node_message.php");
 
     $user = $_SESSION['user'];
     $action = $_POST['action'];
@@ -42,7 +41,6 @@
             $sql = "INSERT INTO tournament (manager, name, password, description, creation, hash, maxteams, flex, maxtime) VALUES ('$user', '$name', '$pass', '$desc', now(), '', '$maxteams', '$flex', GREATEST(TIME('00:03'), TIME('$maxtime')));";
             $result = runQuery($sql);
 
-            send_node_message(array('tournament list' => array()));
         }
         else
             echo "EXISTS";
@@ -302,12 +300,6 @@
                             $result = runQuery($sql);
                         }
 
-                        send_node_message(array('tournament list' => array()));
-                        send_node_message(array('tournament teams' => array(
-                            'id' => $tourn,
-                            'name' => $tname,
-                            'pass' => $tpass
-                        )));
                     }
                     else
                         echo "EXISTS";
@@ -415,27 +407,15 @@
                     $result = runQuery($sql);
                     $output['status'] = "REMOVED";
 
-                    send_node_message(array('tournament list' => array()));
 
-                    send_node_message(array('tournament glads' => array(
-                        'team' => $teamid,
-                        'remove' => true,
-                        'user' => $user
-                    )));
                 }
                 else{
                     $sql = "UPDATE teams SET modified = now() WHERE id = '$teamid'";
                     $result = runQuery($sql);
                     $output['status'] = "LEFT";
 
-                    send_node_message(array('tournament glads' => array( 'team' => $teamid )));
                 }
 
-                send_node_message(array('tournament teams' => array(
-                    'id' => $tournid,
-                    'name' => $tname,
-                    'pass' => $tpass
-                )));
 
             }
 
@@ -494,13 +474,7 @@
             
                         $output['status'] = "SUCCESS";
 
-                        send_node_message(array('tournament teams' => array(
-                            'id' => $tourn,
-                            'name' => $tname,
-                            'pass' => $tpass
-                        )));
 
-                        send_node_message(array('tournament glads' => array( 'team' => $team )));
                     }
                     else
                         $output['status'] = "FAIL";
@@ -564,13 +538,7 @@
                         $result = runQuery($sql);
                         $output['status'] = "DONE";
 
-                        send_node_message(array('tournament teams' => array(
-                            'id' => $tourn,
-                            'name' => $tname,
-                            'pass' => $tpass
-                        )));
 
-                        send_node_message(array('tournament glads' => array( 'team' => $team )));
 
                     }
                 }
@@ -609,12 +577,7 @@
                 $result = runQuery($sql);
                 $output['status'] = "DELETED";
 
-                send_node_message(array('tournament list' => array()));
 
-                send_node_message(array('tournament teams' => array(
-                    'id' => $tournid,
-                    'remove' => true
-                )));
 
             }
             else {
@@ -664,27 +627,15 @@
                     $result = runQuery($sql);
                     $output['status'] = "DONE";
 
-                    send_node_message(array('tournament glads' => array( 'team' => $team )));
                 }
                 else{
                     $sql = "DELETE FROM teams WHERE id = '$team'";
                     $result = runQuery($sql);
                     $output['status'] = "REMOVED";
 
-                    send_node_message(array('tournament list' => array()));
 
-                    send_node_message(array('tournament glads' => array(
-                        'team' => $team,
-                        'remove' => true,
-                        'user' => $user
-                    )));
                 }
 
-                send_node_message(array('tournament teams' => array(
-                    'id' => $tourn,
-                    'name' => $tname,
-                    'pass' => $tpass
-                )));
 
             }
         }
@@ -718,19 +669,8 @@
             
             $output['status'] = "DONE";
 
-            send_node_message(array('tournament list' => array()));
 
-            send_node_message(array('tournament teams' => array(
-                'id' => $tourn,
-                'name' => $tname,
-                'pass' => $tpass
-            )));
 
-            send_node_message(array('tournament glads' => array(
-                'team' => $team,
-                'remove' => true,
-                'user' => $user
-            )));
         }
 
         echo json_encode($output);
@@ -777,12 +717,7 @@
 
                     create_chat($conn, $tournid);
 
-                    send_node_message(array('tournament list' => array()));
                     
-                    send_node_message(array('tournament teams' => array(
-                        'id' => $tournid,
-                        'start' => true 
-                    )));
 
                     $ngroups = ceil($nteams / 5);
                     $groups = array();
@@ -863,10 +798,6 @@
         $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
         $result = runQuery($sql);
 
-        send_node_message(array(
-            'chat notification' => array(
-                'room' => $room
-            )
-        ));      
+      
     }
 ?>

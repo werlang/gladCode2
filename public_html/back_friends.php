@@ -1,7 +1,6 @@
 <?php
 	session_start();
 	include_once "connection.php";
-	include("back_node_message.php");
 
 	if (isset($_POST['action']) && isset($_SESSION['user'])){
 		$action = $_POST['action'];
@@ -51,9 +50,6 @@
 			$result = runQuery($sql);
 			echo "OK";
 
-			send_node_message(array(
-				'profile notification' => array('user' => array($user))
-			));
 		}
 		elseif ($action == "SEARCH"){
 			$text = $_POST['text'];
@@ -85,9 +81,6 @@
 				$result = runQuery($sql);
 				echo "OK";
 
-				send_node_message(array(
-					'profile notification' => array('user' => array($friend))
-				));
 			}
 			else
 				echo "EXISTS";

@@ -2,7 +2,6 @@
     session_start();
     date_default_timezone_set('America/Sao_Paulo');
     include_once "connection.php";
-    include("back_node_message.php");
 
     $user = $_SESSION['user'];
     $action = $_POST['action'];
@@ -120,9 +119,6 @@
 
                 $output['status'] = "SUCCESS";
 
-                send_node_message(array('training end' => array(
-                    'hash' => $hash
-                )));
             }
             else{
                 $trainid = $row['id'];
@@ -145,9 +141,6 @@
                 $output['deadline'] = $row['deadline'];
                 $output['status'] = "SUCCESS";
 
-                send_node_message(array('training refresh' => array(
-                    'hash' => $hash
-                )));
 
             }
         }
@@ -382,9 +375,6 @@
 
                 $output['status'] = "SUCCESS";
 
-                send_node_message(array('training refresh' => array(
-                    'hash' => $hash
-                )));
 
             }
         }

@@ -6,7 +6,6 @@
     $action = $_POST['action'];
     $output = array();
     date_default_timezone_set('America/Sao_Paulo');
-    include("back_node_message.php");
 
     if ($action == "ROOMS"){
         $sql = "SELECT cr.id, cr.name, cu.visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room INNER JOIN chat_messages cm ON cm.room = cr.id WHERE cu.user = '$user' ORDER BY cm.time DESC";
@@ -147,11 +146,6 @@
                 }
             }
 
-            send_node_message(array(
-                'chat notification' => array(
-                    'room' => $room
-                )
-            ));
         }
 
     }
@@ -570,13 +564,6 @@
                                     $output['status'] = "UNBAN";
                                 }
 
-                                send_node_message(array(
-                                    'chat personal' => array(
-                                        'user' => $tuser,
-                                        'status' => $output['status'],
-                                        'room_name' => $room_name 
-                                    )
-                                ));
 
                                 $result = runQuery($sql);
 

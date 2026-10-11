@@ -1,7 +1,6 @@
 <?php
 	session_start();
     include_once "connection.php";
-    include("back_node_message.php");
 
     if (isset($_SESSION['user']))
         $user = $_SESSION['user'];
@@ -209,9 +208,6 @@
 
                 $output['status'] = "SUCCESS";
 
-                send_node_message(array('tournament refresh' => array(
-                    'hash' => $hash
-                )));
             }
         }
         else
@@ -368,8 +364,6 @@
                     $sql = "UPDATE `groups` SET log = NULL, locked = NULL WHERE log = $logid";
                     if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-                    send_node_message(['tournament refresh' => [ 'hash' => $hash ]]);
-        
                     break;
                 }
 
@@ -505,9 +499,6 @@
                 $output['status'] = "END";
             }
 
-            send_node_message(array('tournament refresh' => array(
-                'hash' => $hash
-            )));    
         }
     }
     elseif ($action == "END TURN"){
@@ -532,9 +523,6 @@
                 $sql = "UPDATE `groups` SET deadline = now(3) WHERE id = $groupid";
                 if(!$result2 = $conn->query($sql)){ die('There was an error running the query [' . $conn->error . ']. SQL: ['. $sql .']'); }
 
-                send_node_message(array('tournament refresh' => array(
-                    'hash' => $hash
-                )));
             }
 
             $output['status'] = "SUCCESS";

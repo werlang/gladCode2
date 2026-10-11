@@ -1,7 +1,6 @@
 <?php
 	session_start();
     include_once "connection.php";
-    include("back_node_message.php");
     $user = $_SESSION['user'];
     $action = $_POST['action'];
     $output = array();
@@ -46,9 +45,6 @@
                     $result = runQuery($sql);
                     $output['status'] = "OK";
                     
-                    send_node_message(array(
-                        'profile notification' => array('user' => array($friend))
-                    ));
 
                 }
 
@@ -63,9 +59,6 @@
         $result = runQuery($sql);
         $row = $result->fetch();
         
-        send_node_message(array(
-            'profile notification' => array('user' => array($row['user1'], $row['user2']))
-        ));
 
         $sql = "DELETE FROM duels WHERE id = '$id' AND (user1 = '$user' OR user2 = '$user')";
         $result = runQuery($sql);
@@ -119,9 +112,6 @@
         $sql = "UPDATE duels SET isread = '1' WHERE user1 = '$user' AND log IS NOT NULL";
         $result = runQuery($sql);
         
-        send_node_message(array(
-            'profile notification' => array('user' => array($user))
-        ));
 
     }
 

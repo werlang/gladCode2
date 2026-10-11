@@ -1,7 +1,6 @@
 <?php
     include_once "connection.php";
     session_start();
-    include("back_node_message.php");
     $user = $_SESSION['user'];
     $action = $_POST['action'];
     $output = array();
@@ -74,9 +73,6 @@
                 $sql = "UPDATE reports SET isread = '1' WHERE id IN ($ids)";
                 $result = runQuery($sql);
 
-                send_node_message(array(
-                    'profile notification' => array('user' => array($user))
-                ));
             }
         }
     }

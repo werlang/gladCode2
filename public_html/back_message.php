@@ -1,7 +1,6 @@
 <?php
 	session_start();
 	include_once "connection.php";
-	include("back_node_message.php");
 	$action = $_POST['action'];
 
 	if ($action == "GET"){
@@ -61,9 +60,6 @@
 		echo $sql;
 		$result = runQuery($sql);
 
-		send_node_message(array(
-			'profile notification' => array('user' => array($receiver))
-		));
 	}
 	elseif ($action == "READ"){
 		$user = $_SESSION['user'];
@@ -72,9 +68,6 @@
 		$sql = "UPDATE messages SET isread = '$val' WHERE cod = '$id' AND receiver = '$user'";
 		$result = runQuery($sql);
 
-		send_node_message(array(
-			'profile notification' => array('user' => array($user))
-		));
 	}
 	elseif ($action == "DELETE"){
 		$user = $_SESSION['user'];
@@ -98,9 +91,6 @@
 		$sql = "INSERT INTO messages (time, sender, receiver, message) VALUES (now(), '$sender', '$receiver', '$message')";
 		$result = runQuery($sql);
 
-		send_node_message(array(
-			'profile notification' => array('user' => array($receiver))
-		));
 	}
 
 ?>

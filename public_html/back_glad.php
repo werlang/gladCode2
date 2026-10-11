@@ -2,7 +2,6 @@
     $version = file_get_contents("version");
     include_once "connection.php";
     session_start();
-    include("back_node_message.php");
 
     if ($_POST['action'] == "FILE"){
         if (isset($_POST['filename']))
@@ -70,18 +69,12 @@
             }
             echo json_encode($info);
 
-            send_node_message(array(
-                'profile notification' => array('user' => array($user))
-            ));
         }
         elseif ($_POST['action'] == "DELETE"){
             $id = $_POST['id'];
             $sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
             $result = runQuery($sql);
 
-            send_node_message(array(
-                'profile notification' => array('user' => array($user))
-            ));
         }
         else{
             if (isset($_POST['id']))
@@ -127,9 +120,6 @@
                             $result = runQuery($sql, $data);
                             echo "{\"ID\":". $conn->lastInsertId() ."}";
 
-                            send_node_message(array(
-                                'profile notification' => array('user' => array($user))
-                            ));
                         }
                     }
                     elseif ($_POST['action'] == "UPDATE"){
