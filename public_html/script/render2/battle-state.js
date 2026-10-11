@@ -21,6 +21,8 @@ export const ARENA_SIZE = 25;
 
 /** The engine writes one replay patch every tenth of a second. */
 export const STEP_DURATION_MS = 100;
+/** Seconds of simulation between coughing fits while a gladiator stays in the poison gas. */
+export const COUGH_INTERVAL = 3.5;
 
 /**
  * Creates a plain deep copy without sharing mutable arrays or objects.
@@ -231,8 +233,8 @@ function projectileKey(projectile) {
  * Derives one-shot visual/audio events from two complete replay frames.
  *
  * Continuous state such as position, heading, buffs and bars is intentionally
- * absent (only a stun's onset is an event); renderers read those values directly
- * from the current frame.
+ * absent (only a stun's onset and coughing in the gas are events); renderers read those values
+ * directly from the current frame.
  *
  * @param {Record<string, unknown>|null} previous Previous complete frame.
  * @param {Record<string, unknown>} current Current complete frame.
@@ -277,6 +279,16 @@ export function deriveStepEvents(previous, current) {
         // A fresh stun (the buff's sound and stars start once, as in the classic renderer).
         if (Number(glad.hp) > 0 && Number(glad.buffs?.stun?.timeleft) > 0.1 && !(Number(prior.buffs?.stun?.timeleft) > 0.1)) {
             events.push({ type: 'stun', gladId });
+        }
+
+        // Coughing in the poison gas: a fit on stepping in, then one every `COUGH_INTERVAL` seconds while it stays,
+        // each gladiator on its own beat so they never cough in unison.
+        if (Number(glad.hp) > 0 && isOutsideSafeZone(glad, current.poison)) {
+            const entered = !isOutsideSafeZone(prior, previous.poison);
+            const beat = (frame) => Math.floor((Number(frame.simtime) + index * 1.3) / COUGH_INTERVAL);
+            if (entered || beat(current) > beat(previous)) {
+                events.push({ type: 'cough', gladId });
+            }
         }
     });
 

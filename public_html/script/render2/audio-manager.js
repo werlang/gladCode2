@@ -1,3 +1,5 @@
+import { glide } from './audio-param.js';
+
 const AUDIO_PATHS = Object.freeze({
     ambush: 'res/audio/ambush.mp3',
     arrow_hit: 'res/audio/arrow_hit.mp3',
@@ -41,11 +43,10 @@ export const SOUNDS = Object.freeze({
     melee: { files: [AUDIO_PATHS.melee], level: -4, spread: 1.4 },
     flesh: { files: variants('flesh', 5), level: -1, spread: 1.6 },
     flesh_heavy: { files: variants('flesh_heavy', 5), level: 1.5, spread: 1.2 },
-    clang: { files: variants('clang', 5), level: -2, spread: 1.4 },
+    clang: { files: variants('clang', 6), level: 0, spread: 0.8 },
     thud: { files: variants('thud', 5), level: -4, spread: 1 },
     sand: { files: variants('sand', 5), level: -10, spread: 2, minor: true },
     clatter: { files: variants('clatter', 5), level: -15, spread: 2, minor: true },
-    creak: { files: variants('creak', 3), level: -12, spread: 1.5, minor: true },
     arrow_hit: { files: [AUDIO_PATHS.arrow_hit], level: -4, spread: 1.5 },
     ranged: { files: [AUDIO_PATHS.ranged], level: -4, spread: 1.2 },
     assassinate: { files: [AUDIO_PATHS.assassinate], level: -1, spread: 0.6 },
@@ -64,6 +65,7 @@ export const SOUNDS = Object.freeze({
     lvlup: { files: [AUDIO_PATHS.lvlup], level: -2, spread: 0, voices: 2 },
     stun: { files: [AUDIO_PATHS.stun], level: -4, spread: 0.6, voices: 2 },
     teleport: { files: [AUDIO_PATHS.teleport], level: -3, spread: 0.8 },
+    cough: { files: variants('cough', 5), level: -8, spread: 0.6, voices: 3, minor: true },
 });
 
 /** Short-term loudness every one-shot is normalised to before its `level` applies (dBFS RMS over `LOUDNESS_WINDOW`). */
@@ -81,6 +83,8 @@ const LISTENER_HEIGHT_SHARE = 0.3;
 const PANNER = { panningModel: 'equalpower', distanceModel: 'inverse', refDistance: 10, rolloffFactor: 1, maxDistance: 80 };
 /** Ambience bus level against the effects volume slider (crowd, fires, gas, wind share it). */
 const AMBIENCE_LEVEL = 0.55;
+/** Seconds between listener updates (the camera moves smoothly; 20 Hz is plenty for panning). */
+const LISTENER_INTERVAL = 0.05;
 
 const dbToGain = (db) => 10 ** (db / 20);
 
@@ -246,6 +250,7 @@ export class BattleAudioManager {
     #meters = new Map();
     #unlocked = new Set();
     #taps = null;
+    #listenerPlacedAt = -Infinity;
 
     constructor() {
         const Context = window.AudioContext ?? window.webkitAudioContext;
@@ -395,9 +400,10 @@ export class BattleAudioManager {
         const y = at.y ?? 0.8;
         if (panner.positionX) {
             const now = this.#context.currentTime;
-            panner.positionX.setTargetAtTime(at.x, now, 0.02);
-            panner.positionY.setTargetAtTime(y, now, 0.02);
-            panner.positionZ.setTargetAtTime(at.z, now, 0.02);
+            // Within 5 cm the panner stays put: static sources cost nothing per frame.
+            glide(panner.positionX, at.x, now, 0.02, 0.05);
+            glide(panner.positionY, y, now, 0.02, 0.05);
+            glide(panner.positionZ, at.z, now, 0.02, 0.05);
         }
         else {
             panner.setPosition(at.x, y, at.z);
@@ -502,8 +508,8 @@ export class BattleAudioManager {
         const { sfx, ambience, sfxGate, ambienceGate, muffle } = this.#buses;
         this.#speed = Math.max(0.1, Number(speed) || 1);
         const level = Math.max(0, Math.min(1, Number(volume) || 0));
-        sfx.gain.setTargetAtTime(level, now, 0.05);
-        ambience.gain.setTargetAtTime(level * AMBIENCE_LEVEL, now, 0.05);
+        glide(sfx.gain, level, now, 0.05);
+        glide(ambience.gain, level * AMBIENCE_LEVEL, now, 0.05);
         if (paused !== this.#paused) {
             this.#paused = paused;
             // Pausing silences the blows in flight and muffles the arena around them, as if the world held its breath.
@@ -512,7 +518,11 @@ export class BattleAudioManager {
             muffle.frequency.setTargetAtTime(paused ? 700 : 20000, now, 0.25);
             if (paused) [...this.#voices].forEach((voice) => this.#release(voice, 0.2));
         }
-        if (camera) this.#placeListener(camera);
+        // The listener follows the camera at up to 20 Hz; its 30 ms glide covers the gaps.
+        if (camera && now - this.#listenerPlacedAt >= LISTENER_INTERVAL) {
+            this.#listenerPlacedAt = now;
+            this.#placeListener(camera);
+        }
     }
 
     /**
@@ -547,15 +557,15 @@ export class BattleAudioManager {
         const listener = this.#context.listener;
         const now = this.#context.currentTime;
         if (listener.positionX) {
-            listener.positionX.setTargetAtTime(x, now, 0.03);
-            listener.positionY.setTargetAtTime(y, now, 0.03);
-            listener.positionZ.setTargetAtTime(z, now, 0.03);
-            listener.forwardX.setTargetAtTime(hx / norm, now, 0.03);
-            listener.forwardY.setTargetAtTime(0, now, 0.03);
-            listener.forwardZ.setTargetAtTime(hz / norm, now, 0.03);
-            listener.upX.setTargetAtTime(0, now, 0.03);
-            listener.upY.setTargetAtTime(1, now, 0.03);
-            listener.upZ.setTargetAtTime(0, now, 0.03);
+            glide(listener.positionX, x, now, 0.03, 0.05);
+            glide(listener.positionY, y, now, 0.03, 0.05);
+            glide(listener.positionZ, z, now, 0.03, 0.05);
+            glide(listener.forwardX, hx / norm, now, 0.03, 0.01);
+            glide(listener.forwardY, 0, now, 0.03, 0.01);
+            glide(listener.forwardZ, hz / norm, now, 0.03, 0.01);
+            glide(listener.upX, 0, now, 0.03, 0.01);
+            glide(listener.upY, 1, now, 0.03, 0.01);
+            glide(listener.upZ, 0, now, 0.03, 0.01);
         }
         else {
             listener.setPosition(x, y, z);

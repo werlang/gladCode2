@@ -4,7 +4,7 @@ import test from 'node:test';
 
 import { SOUNDS, measureSound, potionSound } from '../../public_html/script/render2/audio-manager.js';
 import { crackleSamples, seededRandom } from '../../public_html/script/render2/soundscape.js';
-import { deriveStepEvents } from '../../public_html/script/render2/battle-state.js';
+import { COUGH_INTERVAL, deriveStepEvents } from '../../public_html/script/render2/battle-state.js';
 
 const RATE = 8000;
 
@@ -84,4 +84,15 @@ test('a stun is an event only when it begins', () => {
     assert.deepEqual(deriveStepEvents(frame(0), frame(1.5)).filter((event) => event.type === 'stun'), [{ type: 'stun', gladId: 0 }]);
     assert.equal(deriveStepEvents(frame(1.5), frame(1.4)).filter((event) => event.type === 'stun').length, 0);
     assert.equal(deriveStepEvents(frame(0, 0), frame(1.5, 0)).filter((event) => event.type === 'stun').length, 0);
+});
+
+test('a gladiator in the gas coughs on stepping in, then on its own beat while it stays', () => {
+    // Arena centre is (12.5, 12.5); a safe radius of 5 leaves x = 20 in the gas and x = 12.5 safe.
+    const frame = (simtime, x, hp = 100) => ({ simtime, poison: 5, glads: [{ id: 0, hp, lvl: 1, action: 0, x, y: 12.5 }], projectiles: [] });
+    const coughs = (previous, current) => deriveStepEvents(previous, current).filter((event) => event.type === 'cough');
+    assert.deepEqual(coughs(frame(1, 12.5), frame(1.1, 20)), [{ type: 'cough', gladId: 0 }]);
+    assert.equal(coughs(frame(1.1, 20), frame(1.2, 20)).length, 0);
+    assert.equal(coughs(frame(COUGH_INTERVAL - 0.1, 20), frame(COUGH_INTERVAL, 20)).length, 1);
+    assert.equal(coughs(frame(1, 20), frame(1.1, 12.5)).length, 0);
+    assert.equal(coughs(frame(1, 12.5), frame(1.1, 20, 0)).length, 0);
 });

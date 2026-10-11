@@ -1,3 +1,5 @@
+import { glide } from './audio-param.js';
+
 const CROWD = 'res/audio/arena/';
 const CROWD_FILES = Object.freeze({
     bed: `${CROWD}crowd_ambience.mp3`,
@@ -16,6 +18,8 @@ const GAS_FULL_RADIUS = 17.7;
 /** Synthesised loop lengths in seconds. */
 const CRACKLE_SECONDS = 6;
 const NOISE_SECONDS = 4;
+/** Seconds between updates of the slowly drifting ambience levels (crowd, chatter, gas, wind). */
+const LEVEL_INTERVAL = 0.1;
 
 /**
  * Seeded pseudo-random numbers (mulberry32), so the synthesised loops are the same on every load.
@@ -123,6 +127,7 @@ export class Soundscape {
     #swell = null;
     #flames = [];
     #burning = new Map();
+    #sinceLevels = Infinity;
     #gas = null;
     #gasLevel = 0;
     #wind = null;
@@ -323,24 +328,28 @@ export class Soundscape {
     update(dt) {
         const context = this.#context;
         if (!context) return;
-        const now = context.currentTime;
         this.#time += dt;
         this.#excitement *= 0.5 ** (dt / EXCITEMENT_HALF_LIFE);
-        const crowd = this.#density > 0 ? 0.35 + 0.65 * this.#density : 0;
-        this.#crowdGain.gain.setTargetAtTime(crowd, now, 0.3);
-        this.#chatterGain.gain.setTargetAtTime(0.15 + 0.85 * this.#excitement, now, 0.4);
         this.#bed?.update();
         this.#chatter?.update();
+        // The levels below drift over seconds and glide over 0.3 s or more: re-aimed 10 times a second, not every frame.
+        this.#sinceLevels += dt;
+        if (this.#sinceLevels < LEVEL_INTERVAL) return;
+        this.#sinceLevels = 0;
+        const now = context.currentTime;
+        const crowd = this.#density > 0 ? 0.35 + 0.65 * this.#density : 0;
+        glide(this.#crowdGain.gain, crowd, now, 0.3);
+        glide(this.#chatterGain.gain, 0.15 + 0.85 * this.#excitement, now, 0.4, 0.01);
 
         const t = this.#time;
         const gas = this.#gasLevel * (0.85 + 0.15 * Math.sin(t * 0.7) * Math.sin(t * 0.23 + 1));
-        this.#gas.hiss.gain.gain.setTargetAtTime(gas * LEVELS.hiss, now, 0.3);
-        this.#gas.rumble.gain.gain.setTargetAtTime(gas * LEVELS.rumble, now, 0.3);
-        this.#gas.hiss.filter.frequency.setTargetAtTime(2200 + 700 * Math.sin(t * 0.31), now, 0.3);
+        glide(this.#gas.hiss.gain.gain, gas * LEVELS.hiss, now, 0.3);
+        glide(this.#gas.rumble.gain.gain, gas * LEVELS.rumble, now, 0.3);
+        glide(this.#gas.hiss.filter.frequency, 2200 + 700 * Math.sin(t * 0.31), now, 0.3, 10);
         // Gusts: the band and the level wander on incommensurate sines.
         const gust = 0.5 + 0.3 * Math.sin(t * 0.13) + 0.2 * Math.sin(t * 0.37 + 2);
-        this.#wind.gain.gain.setTargetAtTime(LEVELS.wind * (0.4 + gust), now, 0.5);
-        this.#wind.filter.frequency.setTargetAtTime(300 + 350 * gust, now, 0.5);
+        glide(this.#wind.gain.gain, LEVELS.wind * (0.4 + gust), now, 0.5);
+        glide(this.#wind.filter.frequency, 300 + 350 * gust, now, 0.5, 5);
     }
 
     destroy() {
