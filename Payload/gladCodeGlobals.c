@@ -14,6 +14,9 @@ globais do ambiente, herdado do gladCode1
 #define VIS_RANGE 9
 #define VIS_RAD 120
 #define N_SLOTS 4
+#define N_ITEMS 22 //quantidade de itens em itemList (ids validos: 0..N_ITEMS-1)
+#define MAX_RESIST 0.95 //teto do buff de resistencia, acima de 1 o dano curaria
+#define CHARGE_MAX_STEPS 100 //limite de passos do charge, evita loop infinito se o caminho estiver bloqueado
 
 #define PROJECTILE_TYPE_ATTACK 0
 #define PROJECTILE_TYPE_FIREBALL 1
@@ -127,6 +130,9 @@ float timeLimit = 200; //tempo limite da para o evento de fim da simula��o
 //int rounds, estado;
 //int winners[3];
 int readytostart = 0;
+int sandbox = 0; //1 quando a simulacao roda no editor (habilita setHp, setPosition, setAp, lvlUp e slots -1)
+int simlogclosed = 0; //evita fclose duplo do simlog, protegido por lock
+int finalrecorded = 0; //garante que o passo final seja gravado uma unica vez, protegido por lock
 pthread_mutex_t lock;
 pthread_cond_t cond;
 

@@ -45,3 +45,9 @@ struct stringFunc *decodeFuncArg(char *client_message){
 	func->nargs = i;
 	return func;
 }
+
+//libera o que decodeFuncArg alocou, chamado a cada mensagem processada
+void freeFunc(struct stringFunc *func){
+	free(func->arg);
+	free(func);
+}

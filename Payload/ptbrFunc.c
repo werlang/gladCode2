@@ -23,11 +23,11 @@ int pegaFOR(){
 }
 
 int pegaAGI(){
-    return getSTR();
+    return getAGI();
 }
 
 int pegaINT(){
-    return getSTR();
+    return getINT();
 }
 
 char* pegaNome(){

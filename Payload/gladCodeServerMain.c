@@ -12,6 +12,8 @@ codigo inicial do servidor.
 #include<math.h>
 #include<sys/socket.h>
 #include <sys/time.h>
+#include <time.h>
+#include <poll.h>
 #include<arpa/inet.h> //inet_addr
 #include<unistd.h>    //write
 #include<pthread.h> //for threading , link with lpthread
@@ -48,9 +50,11 @@ void *connection_handler(void *p){
         
         if(read_size > 0){
             struct stringFunc *func = decodeFuncArg(client_message);
-            
-            if ((g+gladid)->hp <= 0 && (g+gladid)->time > timeInterval)
+
+            if ((g+gladid)->hp <= 0 && (g+gladid)->time > timeInterval){
+                freeFunc(func);
                 break;
+            }
             
             //Send the message back to client
             if (strcmp(func->call,"getPort")==0){
@@ -177,7 +181,9 @@ void *connection_handler(void *p){
                 sprintf(reply, "%.1f", getSimTime(gladid));
             }
             else if (strcmp(func->call,"getSimCounters")==0){
-                sprintf(reply, "%s", getSimCounters());
+                char *counters = getSimCounters();
+                sprintf(reply, "%s", counters);
+                free(counters);
             }
             else if (strcmp(func->call,"startSimulation")==0){
                 sprintf(reply, "%i", startSimulation(gladid));
@@ -341,6 +347,12 @@ void *connection_handler(void *p){
                 breakpoint(gladid, m);
                 sprintf(reply, "done");
             }
+            //comandos de sandbox (setPosition, setHp, setAp, lvlUp) so valem no editor.
+            //em batalhas valendo o codigo do usuario poderia chama-los via sendMessage
+            else if (!sandbox && (strcmp(func->call,"setPosition")==0 || strcmp(func->call,"setHp")==0 ||
+                    strcmp(func->call,"setAp")==0 || strcmp(func->call,"lvlUp")==0)){
+                sprintf(reply, "SANDBOX ONLY");
+            }
             else if (strcmp(func->call,"setPosition")==0){
                 float x = func->arg[0].toFloat;
                 float y = func->arg[1].toFloat;
@@ -382,6 +394,7 @@ void *connection_handler(void *p){
             else{
                 sprintf(reply, "%s", "UNKNOWN COMMAND");
             }
+            freeFunc(func);
             memset(client_message, 0, sizeof(client_message));
             write(sock , reply , strlen(reply));
         }
@@ -408,6 +421,8 @@ int main(int argc , char *argv[]){
 
     int i;
     nglad = atoi(argv[1]);
+    //o modo sandbox vem do runner (argumento da linha de comando), o codigo do usuario nao tem como liga-lo
+    sandbox = argc > 2 && strcmp(argv[2], "sandbox") == 0;
     g = NULL;
     p = NULL;
     
@@ -453,7 +468,7 @@ int main(int argc , char *argv[]){
     //Accept and incoming connection
     c = sizeof(struct sockaddr_in);
     pthread_t socket_thread[nglad];
-    int new_socket;
+    int new_socket = -1;
     struct thread_param p[nglad];
 
     for( i=0 ; i<nglad ; i++){
@@ -496,6 +511,13 @@ int main(int argc , char *argv[]){
             }
         }
 
+        //um cliente que morre antes de conectar deixava o accept bloqueado ate o kill do container
+        struct pollfd pfd = { socket_desc, POLLIN, 0 };
+        if (poll(&pfd, 1, 10000) <= 0){
+            endsim = 1;
+            printf("CLIENT TIMEOUT");
+            break;
+        }
         new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c);
                 
         p[i].socket_desc = new_socket;
@@ -524,8 +546,15 @@ int main(int argc , char *argv[]){
     //cJSON *jsonArray = cJSON_Parse(outString);
     //char *str = cJSON_Print(jsonArray);
     
-    pthread_mutex_destroy(&lock);
-    pthread_cond_destroy(&cond);
+    //espera quem estiver gravando o passo final e fecha o simlog antes de sair; retornar direto deixava o exit()
+    //fechar o arquivo no meio de um fprintf de outra thread. lock e cond nao sao destruidos porque as threads
+    //dos clientes ainda podem usa-los ate o processo terminar
+    pthread_mutex_lock(&lock);
+    if (!simlogclosed && outArq){
+        fclose(outArq);
+        simlogclosed = 1;
+    }
+    pthread_mutex_unlock(&lock);
      
     gettimeofday(&tv,NULL);
     long unsigned int secf = tv.tv_sec;

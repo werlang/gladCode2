@@ -57,13 +57,14 @@ void setName(int gladid, char *v){
         char user[50] = "";
         for (i=0 ; i<strlen(v) ; i++){
             if (v[i] == '@'){
-                strcpy(user, v+i+1);
+                snprintf(user, sizeof(user), "%s", v+i+1);
                 v[i] = '\0';
             }
         }
-        strcpy((g+gladid)->name, v);
+        //nome e usuario vem do codigo do usuario, limitados ao tamanho dos campos
+        snprintf((g+gladid)->name, sizeof((g+gladid)->name), "%s", v);
         if (strcmp(user,"") != 0)
-            strcpy((g+gladid)->user, user);
+            snprintf((g+gladid)->user, sizeof((g+gladid)->user), "%s", user);
     }
 }
 
@@ -82,8 +83,14 @@ void setSlots(int gladid, char *str){
             char n[100];
             strncpy(n, s, e-s);
             n[e-s] = '\0';
-            (g+gladid)->items[i] = atoi(n);
-            e++;
+            int id = atoi(n);
+            //-1 (qualquer item) so existe no editor; ids fora da lista leriam fora de itemList
+            if (id < 0 || id >= N_ITEMS)
+                id = (id == -1 && sandbox) ? -1 : 0;
+            (g+gladid)->items[i] = id;
+            //com menos de N_SLOTS itens na string, nao passa do fim dela
+            if (*e != '\0')
+                e++;
             s = e;
         }
     }
@@ -154,7 +161,13 @@ int isSimRunning(int gladid){
     
     checkAlive();
     if (endsim){
-        fclose(outArq);
+        //todas as threads chegam aqui no fim, o arquivo so pode ser fechado uma vez
+        pthread_mutex_lock(&lock);
+        if (!simlogclosed && outArq){
+            fclose(outArq);
+            simlogclosed = 1;
+        }
+        pthread_mutex_unlock(&lock);
         return 0;
     }
     
@@ -180,10 +193,28 @@ int startSimulation(int gladid){
     }while(i < nglad && timeout > 0);
     if (timeout <= 0)
         return 0;
+
+    //barreira: espera todos os gladiadores chegarem. o contador era incrementado sem lock e
+    //podia perder incrementos, deixando todos girando para sempre
+    struct timespec deadline;
+    clock_gettime(CLOCK_REALTIME, &deadline);
+    deadline.tv_sec += 10;
+    int started = 1;
+    pthread_mutex_lock(&lock);
     readytostart++;
-    while(readytostart < nglad);
-    
-    return 1;
+    pthread_cond_broadcast(&cond);
+    while (readytostart < nglad && !endsim){
+        if (pthread_cond_timedwait(&cond, &lock, &deadline) != 0 && readytostart < nglad){
+            //algum gladiador nunca ficou pronto (setup invalido ou travado): encerra em vez de travar ate o kill do container
+            endsim = 1;
+            pthread_cond_broadcast(&cond);
+        }
+    }
+    if (readytostart < nglad)
+        started = 0;
+    pthread_mutex_unlock(&lock);
+
+    return started;
 }
 
 //move para frente
@@ -298,19 +329,25 @@ void moveForward(int gladid, float p){
         return;
     if ((g+gladid)->hp > 0){
         float t = 0;
-        while(t < p){
-            t += moveForwardUnsafe(gladid);
+        while(t < p && !endsim && (g+gladid)->hp > 0){
+            float d = moveForwardUnsafe(gladid);
+            t += d;
             if (t > p){
+                //desfaz o excesso no sentido contrario ao passo (moveForwardUnsafe faz x += dx, y -= dy)
                 float dx, dy;
                 float a = (g+gladid)->head;
                 calcSidesFromAngleDist(&dx, &dy, t-p, a);
                 (g+gladid)->x -= dx;
-                (g+gladid)->y -= dy;
+                (g+gladid)->y += dy;
             }
-            
+
             (g+gladid)->action = ACTION_MOVEMENT;
             (g+gladid)->lockedfor = timeInterval;
             waitForLockedStatus(gladid);
+
+            //preso numa parede ou em outro gladiador: sem progresso o loop nunca terminaria
+            if (d < 0.0001)
+                break;
         }
     }
 }
@@ -547,8 +584,8 @@ int howManyEnemies(int gladid){
 
 //tranca no inimigo mais próximo dentro do campo de visão
 int getCloseEnemy(int gladid){
-    float ang2, dist2;
-    int i, closeri=-1, lowerdist;
+    float ang2, dist2, lowerdist;
+    int i, closeri=-1;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
             float dist = getDistUnsafe(gladid, (g+i)->x, (g+i)->y);
@@ -574,7 +611,8 @@ int getCloseEnemy(int gladid){
 
 //tranca no inimigo mais longe dentro do campo de visão
 int getFarEnemy(int gladid){
-    int i, fari=-1, higherdist;
+    int i, fari=-1;
+    float higherdist;
     for (i=0 ; i<nglad ; i++){
         if (i != gladid && (g+i)->hp > 0 && (g+i)->buffs[BUFF_INVISIBLE].timeleft <= 0){
             float dist = getDistUnsafe(gladid, (g+i)->x, (g+i)->y);
@@ -960,7 +998,7 @@ int teleport(int gladid, float x, float y){
                 calcSidesFromMaxDist(gladid, x, y, (g+gladid)->sdmg * 0.8 + 5, &rx, &ry);
                 (g+gladid)->x += rx;
                 (g+gladid)->y += ry;
-                preventCollision(gladid, x, y);
+                preventCollision(gladid, rx, ry);
             }
             preventLeaving(gladid);
             (g+gladid)->ap -= abilitycost[ABILITY_TELEPORT];
@@ -996,7 +1034,9 @@ int charge(int gladid){
 
             //bonus damage = 1...5
             float bonusdmg = getDistUnsafe(gladid, destx, desty) / VIS_RANGE * 2.5;
-            while(getDistUnsafe(gladid, destx, desty) > 1){
+            //limite de passos: com o caminho bloqueado por outro gladiador o charge nunca chegaria
+            int steps = 0;
+            while(getDistUnsafe(gladid, destx, desty) > 1 && steps++ < CHARGE_MAX_STEPS && !endsim){
                 if ((g+gladid)->buffs[BUFF_MOVEMENT].timeleft <= timeInterval){
                     addBuff(gladid, BUFF_MOVEMENT, timeInterval*2, 4);
                 }
@@ -1214,7 +1254,8 @@ int useItem(int gladid, char *item){
         int i, r = 0;
         for (i=0 ; i<N_SLOTS ; i++){
             int id = (g+gladid)->items[i];
-            if (id == -1 || (id != 0 && strcmp(item, itemList[id]) == 0)){
+            //-1 vale por qualquer item, somente no editor
+            if ((id == -1 && sandbox) || (id > 0 && id < N_ITEMS && strcmp(item, itemList[id]) == 0)){
                 (g+gladid)->items[i] = 0;
                 (g+gladid)->action = ACTION_ITEM;
                 (g+gladid)->lockedfor = timeInterval;
@@ -1224,7 +1265,7 @@ int useItem(int gladid, char *item){
         }
 
         if (r){
-            appendCode(gladid, "useItem(\\\"%s\\\")", item);
+            appendCode(gladid, "useItem(\"%s\")", item); //escapado para JSON em recordSteps
             waitForLockedStatus(gladid);
         }
 
@@ -1241,7 +1282,7 @@ int isItemReady(int gladid, char *item){
         int i;
         for (i=0 ; i<N_SLOTS ; i++){
             int id = (g+gladid)->items[i];
-            if (id == -1 || (id != 0 && strcmp(item, itemList[id]) == 0)){
+            if ((id == -1 && sandbox) || (id > 0 && id < N_ITEMS && strcmp(item, itemList[id]) == 0)){
                 return 1;
             }
         }

@@ -173,7 +173,8 @@ void addBuff(int id, int code, float timeleft, float value){
         (g+id)->buffs[code].value = value;
     }
     else if (code == BUFF_RESIST){
-        (g+id)->buffs[code].value = value;
+        //acima de 1 a resistencia transformaria dano em cura
+        (g+id)->buffs[code].value = value > MAX_RESIST ? MAX_RESIST : value;
     }
     (g+id)->buffs[code].timeleft = timeleft;
 }
@@ -186,7 +187,11 @@ void dealDamage(int gladid, int id, float value){
     
     //caso a vitima tenha o buff de resistencia e esteja virado para o atacante, leva menos dano
     if ((g+id)->buffs[BUFF_RESIST].timeleft > 0){
-        if ((g+id)->head >= (g+id)->lasthitangle - (g+id)->vrad/2 && (g+id)->head <= (g+id)->lasthitangle + (g+id)->vrad/2){
+        //diferenca circular entre a direcao do glad e a origem do golpe, para funcionar na virada 0/360
+        float diff = getNormalAngle((g+id)->head - (g+id)->lasthitangle);
+        if (diff > 180)
+            diff = 360 - diff;
+        if (diff <= (g+id)->vrad/2){
             value *= (1 - (g+id)->buffs[BUFF_RESIST].value);
         }
         else{
@@ -242,6 +247,8 @@ void launchProjectile(int gladid, float x, float y, float dmg, float spdx, float
     t->next = NULL;
     t->owner = gladid;
 
+    //a lista e percorrida e liberada por updateProjectiles em outra thread
+    pthread_mutex_lock(&lock);
     if (p == NULL)
         p = t;
     else{
@@ -250,6 +257,7 @@ void launchProjectile(int gladid, float x, float y, float dmg, float spdx, float
             a = a->next;
         a->next = t;
     }
+    pthread_mutex_unlock(&lock);
 }
 
 void removeProjectile(struct projectile *a){
@@ -333,20 +341,80 @@ void updateProjectiles(){
     }
 }
 
+//copia s para out escapando aspas, barras e caracteres de controle para JSON, e descartando bytes UTF-8 invalidos
+//(uma string cortada no meio de um caractere invalidaria o simlog inteiro no json_decode)
+void jsonEscape(const char *s, char *out, int outsize){
+    const unsigned char *c = (const unsigned char*)s;
+    int o = 0;
+    while (*c != '\0' && o < outsize - 7){
+        int len, k, valid = 1;
+        if (*c < 0x80)
+            len = 1;
+        else if (*c >= 0xC2 && *c <= 0xDF)
+            len = 2;
+        else if ((*c & 0xF0) == 0xE0)
+            len = 3;
+        else if (*c >= 0xF0 && *c <= 0xF4)
+            len = 4;
+        else{
+            c++;
+            continue;
+        }
+        for (k=1 ; k<len && valid ; k++){
+            if ((c[k] & 0xC0) != 0x80)
+                valid = 0;
+        }
+        //sequencias longas demais e surrogates
+        if (valid && len == 3 && ((c[0] == 0xE0 && c[1] < 0xA0) || (c[0] == 0xED && c[1] >= 0xA0)))
+            valid = 0;
+        if (valid && len == 4 && ((c[0] == 0xF0 && c[1] < 0x90) || (c[0] == 0xF4 && c[1] >= 0x90)))
+            valid = 0;
+        if (!valid){
+            c++;
+            continue;
+        }
+
+        if (len > 1){
+            for (k=0 ; k<len ; k++)
+                out[o++] = c[k];
+        }
+        else if (*c == '"' || *c == '\\'){
+            out[o++] = '\\';
+            out[o++] = *c;
+        }
+        else if (*c < 0x20)
+            o += sprintf(out+o, "\\u%04x", *c);
+        else
+            out[o++] = *c;
+        c += len;
+    }
+    out[o] = '\0';
+}
+
 //grava no arquivo de saida o json da diff da etapa anterior pra atual
+//quem chama deve segurar lock
 void recordSteps(){
     char resp[6000*nglad];
 
     int i,j;
     char buffer[10000], buffs[300];
-    float simtime;
+    char ename[301], euser[301], emessage[1537], ecode[1537];
+    float simtime = g->time;
+
+    if (simlogclosed)
+        return;
+
     for (i=0 ; i<nglad ; i++){
         if ((g+i)->hp > 0){
             simtime = (g+i)->time;
             break;
         }
     }
-    if (simtime == timeInterval){
+    //o primeiro registro e completo e sem virgula. decidir pelo simtime gravava dois "primeiros" quando a
+    //simulacao acabava ja no primeiro passo (passo + registro final), gerando JSON invalido
+    static int firstwritten = 0;
+    if (!firstwritten){
+        firstwritten = 1;
         sprintf(resp, "{\"simtime\":%.1f,\"glads\":[",simtime);
         for (i=0 ; i<nglad ; i++){
             sprintf(buffs,"\"buffs\":{\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}}",
@@ -356,9 +424,13 @@ void recordSteps(){
                 (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
                 (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
             );
+            jsonEscape((g+i)->name, ename, sizeof(ename));
+            jsonEscape((g+i)->user, euser, sizeof(euser));
+            jsonEscape((g+i)->message, emessage, sizeof(emessage));
+            jsonEscape((g+i)->code_exec, ecode, sizeof(ecode));
             sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"tonext\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",%s}",
-                (g+i)->name,
-                (g+i)->user,
+                ename,
+                euser,
                 i, //thread num
                 (g+i)->lvl, //lvl
                 getXpToNextLvl(i),
@@ -382,8 +454,8 @@ void recordSteps(){
                 (g+i)->items[2],
                 (g+i)->items[3],
                 (g+i)->action,
-                (g+i)->message,
-                (g+i)->code_exec,
+                emessage,
+                ecode,
                 buffs
             );
             if (i!=0)
@@ -474,14 +546,16 @@ void recordSteps(){
                 sprintf(buffer, "%s\"action\":%i,", buffer, (g+i)->action);
 
             if ( strcmp((g+i)->message, (go+i)->message) != 0){
+                jsonEscape((g+i)->message, emessage, sizeof(emessage));
                 if ((g+i)->msgtype == MSG_SPEAK)
-                    sprintf(buffer, "%s\"message\":\"%s\",", buffer, (g+i)->message);
+                    sprintf(buffer, "%s\"message\":\"%s\",", buffer, emessage);
                 else if ((g+i)->msgtype == MSG_BREAKPOINT)
-                    sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, (g+i)->message);
+                    sprintf(buffer, "%s\"breakpoint\":\"%s\",", buffer, emessage);
             }
 
             if ( strcmp((g+i)->code_exec, (go+i)->code_exec) != 0){
-                sprintf(buffer, "%s\"code\":\"%s\",", buffer, (g+i)->code_exec);
+                jsonEscape((g+i)->code_exec, ecode, sizeof(ecode));
+                sprintf(buffer, "%s\"code\":\"%s\",", buffer, ecode);
             }
 
             sprintf(buffs, "\"buffs\":{");
@@ -552,6 +626,7 @@ void recordSteps(){
 
 int checkAlive(){
     int i, nalive=0;
+    pthread_mutex_lock(&lock);
     for (i=0 ; i<nglad ; i++){
         if ( (g+i)->hp > 0 )
             nalive++;
@@ -560,8 +635,13 @@ int checkAlive(){
     }
     if (nalive <= 1){
         endsim = 1;
-        recordSteps();
+        //varias threads passam por aqui, o passo final so pode ser gravado uma vez
+        if (!finalrecorded){
+            finalrecorded = 1;
+            recordSteps();
+        }
     }
+    pthread_mutex_unlock(&lock);
     return nalive;
 }
 
@@ -621,24 +701,31 @@ int updateSimulation(int gladid){
                 }
             }
         }
+        //sem nenhum vivo loweri fica -1
+        if (loweri == -1)
+            break;
         timeout[loweri]--;
     }while(!endsim && loweri != gladid && timeout[loweri] > 0);
-    
-    if (timeout[loweri] == 0){
+
+    if (loweri != -1 && timeout[loweri] == 0){
         (g+loweri)->hp = 0;
         printf("Gladiator %s timed out\n",(g+loweri)->name);
         //endsim = 1;
     }
 
+    //o avanco do tempo e a checagem de sincronia ficam na mesma regiao critica,
+    //senao duas threads podem ver o sync juntas e gravar o mesmo passo duas vezes
+    pthread_mutex_lock(&lock);
     if ((g+gladid)->hp > 0){
         (g+gladid)->time += timeInterval;
         //printf("%i %f\n",gladid, (g+gladid)->time);
     }
-        
-    if (checkSync()){
+
+    if (!endsim && checkSync()){
         updateProjectiles();
         recordSteps();
     }
+    pthread_mutex_unlock(&lock);
     
     if ((g+gladid)->hp <= 0){
         (g+gladid)->hp = 0;
@@ -856,8 +943,12 @@ int createGladiator(int port){
     if (g == NULL){
         g = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
         go = (struct gladiador*)malloc(sizeof(struct gladiador) * nglad);
-        for (i=0 ; i<nglad ; i++)
+        //time e lido por startSimulation antes de todos os slots serem registrados; lixo da memoria
+        //fazia gladiadores desistirem no inicio
+        for (i=0 ; i<nglad ; i++){
             (g+i)->port = 0;
+            (g+i)->time = 0;
+        }
     }
     //pthread_mutex_unlock(&lock);	
     
@@ -876,22 +967,24 @@ int createGladiator(int port){
 }
 
 //calcula o custo do ponto de atributo
+//iterativo e com teto: valores negativos ou enormes recursavam ate estourar a pilha
 int calcCost(int val){
-    if (val == 0)
-        return 0;
-    return ceil((float)val/6) + calcCost(val-1);
+    int i, sum = 0;
+    for (i=1 ; i<=val && sum <= 1000 ; i++)
+        sum += ceil((float)i/6);
+    return sum;
 }
 
 //verifica se distribuiu os 50 pontos corretamente
 int checkSetup(int gladid){
-    int sum = calcCost((g+gladid)->STR) + calcCost((g+gladid)->AGI) + calcCost((g+gladid)->INT);
-    if (sum != 50)
-        return 0;
     if ((g+gladid)->STR < 0)
         return 0;
     if ((g+gladid)->AGI < 0)
         return 0;
     if ((g+gladid)->INT < 0)
+        return 0;
+    int sum = calcCost((g+gladid)->STR) + calcCost((g+gladid)->AGI) + calcCost((g+gladid)->INT);
+    if (sum != 50)
         return 0;
 
     (g+gladid)->lvl = 1; //lvl inicial
@@ -1025,19 +1118,48 @@ void increaseLowAttr(int *m[3], int v){
     }
 }
 
-void explodeItemName(char *item, char *name, int *lvl){
+//separa "pot-<nome>-<nivel>" em nome e nivel. retorna 0 se o formato for invalido
+int explodeItemName(char *item, char *name, int namesize, int *lvl){
     char *dash = strstr(item, "-");
-    strcpy(name, dash+1);
-    dash = strstr(name, "-");
-    *lvl = atoi(dash+1);
-    *dash = '\0';
+    if (dash == NULL)
+        return 0;
+    char *dash2 = strstr(dash+1, "-");
+    if (dash2 == NULL || dash2 - (dash+1) >= namesize)
+        return 0;
+    strncpy(name, dash+1, dash2 - (dash+1));
+    name[dash2 - (dash+1)] = '\0';
+    *lvl = atoi(dash2+1);
+    return 1;
+}
+
+//atualiza os status derivados de atributos que subiram desde old {STR, AGI, INT},
+//com os mesmos ganhos por ponto de upgradeSTR/AGI/INT
+void applyAttrDerived(int gladid, int old[3]){
+    int dstr = (g+gladid)->STR - old[0];
+    int dagi = (g+gladid)->AGI - old[1];
+    int dint = (g+gladid)->INT - old[2];
+
+    (g+gladid)->hp += 10 * dstr;
+    (g+gladid)->maxhp += 10 * dstr;
+    (g+gladid)->mdmg += 0.75 * dstr;
+
+    (g+gladid)->spd += 0.05 * dagi;
+    (g+gladid)->as += 0.05 * dagi;
+    (g+gladid)->ts += 9 * dagi;
+    (g+gladid)->rdmg += 0.4 * dagi;
+
+    (g+gladid)->ap += 10 * dint;
+    (g+gladid)->maxap += 10 * dint;
+    (g+gladid)->cs += 0.05 * dint;
+    (g+gladid)->sdmg += 0.5 * dint;
 }
 
 int itemEffect(int gladid, char *item){
     char name[20];
     int lvl;
 
-    explodeItemName(item, name, &lvl);
+    if (!explodeItemName(item, name, sizeof(name), &lvl))
+        return 0;
 
     if (lvl > 0){
         if (strcmp(name, "hp") == 0 && lvl <= 5){
@@ -1052,13 +1174,17 @@ int itemEffect(int gladid, char *item){
             int highArray[4] = {10, 5, 3, 2};
             int points = lvl + ceil((g+gladid)->lvl / highArray[lvl-1]);
             int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+            int old[3] = { *m[0], *m[1], *m[2] };
             increaseHighAttr(m, points);
+            applyAttrDerived(gladid, old);
         }
         else if (strcmp(name, "low") == 0 && lvl <= 4){
             int lowArray[4] = {10, 5, 3, 2};
             int points = 1+lvl + ceil((g+gladid)->lvl / lowArray[lvl-1]);
             int *m[3] = { &((g+gladid)->STR), &((g+gladid)->AGI), &((g+gladid)->INT) };
+            int old[3] = { *m[0], *m[1], *m[2] };
             increaseLowAttr(m, points);
+            applyAttrDerived(gladid, old);
         }
         else if (strcmp(name, "xp") == 0 && lvl <= 3){
             (g+gladid)->xp += (getXpToNextLvl(gladid) - (g+gladid)->xp) * 0.25 * lvl;
@@ -1107,6 +1233,6 @@ void appendCode(int gladid, char *format, ...){
     va_end(arg);
     message[999] = '\0';
 
-    sprintf((g+gladid)->code_exec, "%s", message);
+    snprintf((g+gladid)->code_exec, sizeof((g+gladid)->code_exec), "%s", message);
     
 }

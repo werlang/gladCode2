@@ -14,4 +14,10 @@ while [ -f code$i.* ]; do
 	i=$((i + 1))
 done
 
-gcc -o gladCodeServerMain gladCodeServerMain.c -lm -lpthread && ./gladCodeServerMain $i
+# "sandbox" (passado pelo runner so em execucoes do editor) libera setHp, setPosition, setAp, lvlUp e slots -1
+mode=""
+if [ "$1" = "sandbox" ]; then
+	mode="sandbox"
+fi
+
+gcc -o gladCodeServerMain gladCodeServerMain.c -lm -lpthread && ./gladCodeServerMain $i $mode
