@@ -231,7 +231,8 @@ function projectileKey(projectile) {
  * Derives one-shot visual/audio events from two complete replay frames.
  *
  * Continuous state such as position, heading, buffs and bars is intentionally
- * absent; renderers read those values directly from the current frame.
+ * absent (only a stun's onset is an event); renderers read those values directly
+ * from the current frame.
  *
  * @param {Record<string, unknown>|null} previous Previous complete frame.
  * @param {Record<string, unknown>} current Current complete frame.
@@ -271,6 +272,11 @@ export function deriveStepEvents(previous, current) {
 
         if (Number(glad.action) !== Number(prior.action)) {
             events.push({ type: 'action', gladId, action: Number(glad.action), code: glad.code ?? '' });
+        }
+
+        // A fresh stun (the buff's sound and stars start once, as in the classic renderer).
+        if (Number(glad.hp) > 0 && Number(glad.buffs?.stun?.timeleft) > 0.1 && !(Number(prior.buffs?.stun?.timeleft) > 0.1)) {
+            events.push({ type: 'stun', gladId });
         }
     });
 
