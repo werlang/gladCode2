@@ -18,8 +18,10 @@ services:
             - MAILER_PORT=${MAILER_PORT:-587}
             - MAILER_USER=${MAILER_USER:-}
             - MAILER_PASSWORD=${MAILER_PASSWORD:-}
+            - RUNNER_HOST=runner
+            - RUNNER_PORT=${RUNNER_PORT:-3000}
         ports:
-            - 80:80
+            - "${APACHE_PORT:-80}:80"
         logging:
             options:
                 max-size: "10m"
@@ -35,8 +37,9 @@ services:
             - ./public_html/runs:/phppayload
             - runs:/runs
         ports:
-            - 127.0.0.1:3000:3000
+            - 127.0.0.1:${RUNNER_PORT:-3000}:${RUNNER_PORT:-3000}
         environment:
+            - RUNNER_PORT=${RUNNER_PORT:-3000}
             - MYSQL_HOST=mysql
             - MYSQL_PORT=${MYSQL_PORT}
             - MYSQL_USER=root

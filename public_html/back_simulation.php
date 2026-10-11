@@ -269,7 +269,9 @@
         // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
+        $runnerHost = getenv('RUNNER_HOST') ?: 'runner';
+        $runnerPort = getenv('RUNNER_PORT') ?: '3000';
+        curl_setopt($ch, CURLOPT_URL, "http://$runnerHost:$runnerPort/$foldername");
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
         ]));

@@ -1,7 +1,7 @@
 import express from 'express';
 import Runner from './runner.js';
 
-const port = 3000;
+const port = Number(process.env.RUNNER_PORT || process.env.PORT || 3000);
 const host = '0.0.0.0';
 const app = express();
 
