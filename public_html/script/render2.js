@@ -1,4 +1,5 @@
 import { BattleRenderer } from './render2/renderer.js';
+import { storeQuality, storedQuality } from './render2/quality.js';
 
 const classicLoadRenderer = window.load_phaser;
 const classicUpdateRenderer = window.phaser_update;
@@ -47,6 +48,8 @@ async function installThreeRenderer() {
             renderer.update(step);
         };
         window.changeCrowd = (density) => renderer.setCrowdDensity(density);
+        // The settings window reads and stores the graphics quality of this device (see quality.js).
+        window.Render2Quality = { get: storedQuality, set: storeQuality, active: () => renderer.getDebugSnapshot().timings.quality };
         return renderer;
     }
     catch (error) {

@@ -344,6 +344,16 @@ $(document).ready( function() {
                     <h3>Número de espectadores</h3>
                     <div id='n-crowd'></div>
                 </div>
+                <div id='quality-container'>
+                    <h3>Qualidade gráfica (Coliseu 3D)</h3>
+                    <select id='render-quality'>
+                        <option value='auto'>Automática</option>
+                        <option value='high'>Alta</option>
+                        <option value='medium'>Média</option>
+                        <option value='low'>Baixa (aparelhos fracos)</option>
+                    </select>
+                    <p>Vale para este aparelho; a batalha será recarregada ao trocar.</p>
+                </div>
             </div>
             <div id='button-container'><button class='button' id='ok'>OK</button></div></div>
         </div>`);
@@ -408,6 +418,11 @@ $(document).ready( function() {
             $('#pref-speech input').prop('checked', true);
         if (window.BattleRendererPreference.ENABLED === false)
             $('#renderer-choice').remove();
+        // Graphics quality only applies to the 3D renderer, and only once it is running.
+        if (window.Render2Quality)
+            $('#render-quality').val(window.Render2Quality.get());
+        else
+            $('#quality-container').remove();
         $(`#renderer-choice input[value='${window.BattleRendererPreference.get()}']`).prop('checked', true);
 
         $('.checkslider').each( function(){
@@ -416,8 +431,14 @@ $(document).ready( function() {
     
         $('#settings-window #ok').click( function(){
             const selectedRenderer = $('#renderer-choice input:checked').val() || window.BattleRendererPreference.CLASSIC;
-            const rendererChanged = selectedRenderer !== window.BattleRendererPreference.get();
+            let rendererChanged = selectedRenderer !== window.BattleRendererPreference.get();
             window.BattleRendererPreference.set(selectedRenderer);
+            // A new graphics quality takes a reload (anti-aliasing and the floor bake are set when the arena starts).
+            const selectedQuality = $('#render-quality').val();
+            if (window.Render2Quality && selectedQuality && selectedQuality !== window.Render2Quality.get()) {
+                window.Render2Quality.set(selectedQuality);
+                rendererChanged = true;
+            }
 
             $.post("back_play.php", {
                 action: "SET_PREF",
