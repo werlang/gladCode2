@@ -1,6 +1,6 @@
 * Git clone
 * Install docker
-* Copy .env and config.json
+* Copy .env (.env.example) and config/config.json (config/config.json.example, outside web root)
 * Docker compose up
 * Build Dockerfile as `gladcode2-vm`
 * From apache service shell, run `chown -R www-data:www-data /var/www/html`

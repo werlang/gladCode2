@@ -1,5 +1,14 @@
 php_value date.timezone America/Sao_Paulo
 
+# Secrets live outside DocumentRoot (see /config/). Deny direct web access
+# to any leftover sensitive files as defense-in-depth.
+<FilesMatch "^(config\.json|\.env|\.git.*)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(sql|log|env|bak|swp|dist)$">
+    Require all denied
+</FilesMatch>
+
 RewriteEngine On
 
 RewriteRule    ^play\/([a-f0-9]+)/?$    playback.php?log=$1    [NC,L]

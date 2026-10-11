@@ -203,13 +203,13 @@
                         </tr>
                         <tr>
                             <td><a href='function/fireball'>Fireball</a></td>
-                            <td>50</td>
+                            <td>40</td>
                             <td>Arremessa um projétil que causa 60% do poder mágico de dano num ponto central de impacto. Todos gladiadores num raio de impacto 2p sofrem 350% do dano fixo como dano de queimadura ao longo de 4s. Alvos mais distantes do centro do impacto sofrem menos dano de queimadura</td>
                         </tr>
                         <tr>
                             <td><a href='function/teleport'>Teleport</a></td>
                             <td>70</td>
-                            <td>O gladiador imediatamente se transporta para outra localização. A distância máxima percorrida é limitada em 5p + 1p por ponto de poder mágico.</td>
+                            <td>O gladiador imediatamente se transporta para outra localização. A distância máxima percorrida é limitada em 5p + 0.8p por ponto de poder mágico.</td>
                         </tr>
                         <tr>
                             <td><a href='function/charge'>Charge</a></td>
@@ -219,12 +219,12 @@
                         <tr>
                             <td><a href='function/block'>Block</a></td>
                             <td>50</td>
-                            <td>Reduz todo dano levado em 10% * (0.1 + STR/(STR+16)) por 7s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
+                            <td>Reduz todo dano levado em 10% * (0.1 + STR/(STR+16)) por 5s. Caso o atacante não esteja no raio de visão do gladiador, o efeito da habilidade é reduzido pela metade</td>
                         </tr>
                         <tr>
                             <td><a href='function/assassinate'>Assassinate</a></td>
                             <td>30</td>
-                            <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 225% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 450% da Precisão.</td>
+                            <td>Realiza um ataque à distância contra o alvo. Ao acertar, caso o alvo não esteja lhe enxergando OU atordoado causa dano de 250% da Precisão. Caso o alvo não esteja lhe enxergando E esteja atordoado a habilidade causa dano 600% da Precisão.</td>
                         </tr>
                         <tr>
                             <td><a href='function/ambush'>Ambush</a></td>

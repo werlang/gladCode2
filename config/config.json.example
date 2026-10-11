@@ -1,0 +1,15 @@
+{
+    "mysql": {
+        "host": "mysql",
+        "port": 3306,
+        "user": "root",
+        "password": "root_password",
+        "database": "gladcode"
+    },
+    "mailer": {
+        "host": "email-smtp.us-east-1.amazonaws.com",
+        "port": 587,
+        "user": "<AWS_ACCESS_KEY>",
+        "password": "<AWS_SECRET_KEY>"
+    }
+}

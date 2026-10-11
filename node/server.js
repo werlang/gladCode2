@@ -23,8 +23,28 @@ var tournament_run = {};
 
 //var exec = require('child_process');
 
-//mysql
-var mysql_options = require('./config.json').mysql;
+//mysql: env first (compose/.env), then private file outside web root, then legacy local file
+function loadMysqlConfig() {
+    const envPassword = process.env.MYSQL_PASSWORD || process.env.MYSQL_ROOT_PASSWORD;
+    if (process.env.MYSQL_HOST || envPassword || process.env.MYSQL_DATABASE) {
+        return {
+            host: process.env.MYSQL_HOST || 'mysql',
+            port: Number(process.env.MYSQL_PORT || 3306),
+            user: process.env.MYSQL_USER || 'root',
+            password: envPassword || '',
+            database: process.env.MYSQL_DATABASE || 'gladcode',
+        };
+    }
+    const candidates = ['../config/config.json', '/var/www/private/config.json'];
+    for (const rel of candidates) {
+        try {
+            const cfg = require(rel).mysql;
+            if (cfg && cfg.host) return cfg;
+        } catch (e) { /* try next */ }
+    }
+    return require('./config.json').mysql;
+}
+var mysql_options = loadMysqlConfig();
 var connection = mysql.createConnection(mysql_options);
 var sessionStore = new MySQLStore({}, connection);
 connection.connect(function(err){

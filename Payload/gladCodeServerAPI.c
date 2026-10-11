@@ -947,7 +947,7 @@ int teleport(int gladid, float x, float y){
             float newhead = getAngleUnsafe(gladid, x, y);
             (g+gladid)->head = newhead;
                 
-            if (getDistUnsafe(gladid, x, y) <= (g+gladid)->sdmg + 5){
+            if (getDistUnsafe(gladid, x, y) <= (g+gladid)->sdmg * 0.8 + 5){
                 float dx = x - (g+gladid)->x;
                 float dy = y - (g+gladid)->y;
                 (g+gladid)->x = x;
@@ -957,7 +957,7 @@ int teleport(int gladid, float x, float y){
             }
             else{
                 float rx, ry;
-                calcSidesFromMaxDist(gladid, x, y, (g+gladid)->sdmg + 5, &rx, &ry);
+                calcSidesFromMaxDist(gladid, x, y, (g+gladid)->sdmg * 0.8 + 5, &rx, &ry);
                 (g+gladid)->x += rx;
                 (g+gladid)->y += ry;
                 preventCollision(gladid, x, y);
@@ -1048,7 +1048,7 @@ int block(int gladid){
             (g+gladid)->lockedfor = 1/(g+gladid)->cs/2;
             waitForLockedStatus(gladid);
 
-            addBuff(gladid, BUFF_RESIST, 7, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 16));
+            addBuff(gladid, BUFF_RESIST, 5, 0.1 + (float)(g+gladid)->STR / ((g+gladid)->STR + 16));
 
             (g+gladid)->ap -= abilitycost[ABILITY_BLOCK];
             r = 1;
@@ -1091,9 +1091,9 @@ int assassinate(int gladid, float x, float y){
                 bonus++;
 
             if (bonus == 2)
-                damage = (g+gladid)->rdmg * 4.5;
+                damage = (g+gladid)->rdmg * 6.0;
             else if (bonus == 1)
-                damage = (g+gladid)->rdmg * 2.25;
+                damage = (g+gladid)->rdmg * 2.5;
             else
                 damage = (g+gladid)->rdmg;
             /*
