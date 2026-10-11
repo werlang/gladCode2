@@ -1,6 +1,8 @@
 import { ACTIONS, ARENA_SIZE, deriveStepEvents, headingToRadians, isOutsideSafeZone } from './battle-state.js';
 import { Arena } from './arena.js';
 import { BattleAudioManager } from './audio-manager.js';
+import { MusicDirector } from './music.js';
+import { Soundscape } from './soundscape.js';
 import { BattleCameraController } from './camera-controller.js';
 import { BattleHud } from './hud.js';
 import { BattleEffects } from './effects.js';
@@ -70,6 +72,8 @@ export class BattleRenderer {
     #arena;
     #effects;
     #audio;
+    #soundscape;
+    #flamesHeard = false;
     #tracker;
     #resizeObserver;
     #reducedMotion;
@@ -137,7 +141,8 @@ export class BattleRenderer {
         });
         this.#shadowTexture = this.#createShadowTexture();
 
-        this.music = this.#audio.create('music', { loop: true, volume: Number(window.prefs?.sound?.music) || 0 });
+        this.music = new MusicDirector(this.#audio, Number(window.prefs?.sound?.music) || 0);
+        this.#soundscape = new Soundscape(this.#audio);
         this.ending = this.#audio.create('ending');
         this.victory = this.#audio.create('victory');
 
@@ -147,7 +152,7 @@ export class BattleRenderer {
         this.#renderer.setAnimationLoop(this.#animate);
     }
 
-    /** @type {import('./audio-manager.js').AudioTrack} */
+    /** @type {MusicDirector} Adaptive battle music with the legacy track API. */
     music;
 
     /** @type {import('./audio-manager.js').AudioTrack} */
@@ -288,6 +293,8 @@ export class BattleRenderer {
         if (window.followedGlad != null && document.querySelector('#details')) window.updateDetailedWindow?.();
         this.#updateLegacyTimeSlider(state);
         this.#arena.updateSafeZone(safeRadius);
+        this.#soundscape.setGas(safeRadius);
+        this.#setMusicMood(gladiators, safeRadius, snap);
 
         const forward = previous && Number(state.simtime) > Number(previous.simtime);
         if (forward && !snap) {
@@ -296,10 +303,12 @@ export class BattleRenderer {
             });
             const events = deriveStepEvents(previous, state);
             this.#effects.handleEvents(events, this.#fightersById, this.#overlay, window.prefs ?? {}, state);
-            this.#rouseCrowd(events);
+            this.#rouseCrowd(events, gladiators);
         }
         else if (!previous) {
             this.#effects.clear();
+            this.#audio.stopVoices();
+            this.#soundscape.calm();
             this.#fighters.forEach((fighter) => fighter.reset());
         }
 
@@ -320,6 +329,7 @@ export class BattleRenderer {
             compatibility.hp = Number(gladiator.hp);
             compatibility.level = Number(gladiator.lvl);
             compatibility.poison = isOutsideSafeZone(gladiator, safeRadius);
+            fighter.poisoned = compatibility.poison && compatibility.alive;
             window.gladArray[index] = compatibility;
         });
         if (snap) this.#seekPoses(gladiators);
@@ -478,6 +488,7 @@ export class BattleRenderer {
         const frame = { realDt, gameDt, progress, elapsed, reducedMotion: this.#reducedMotion };
         for (const fighter of this.#fighters) fighter.update(frame);
         this.#effects.update(frame);
+        this.#updateSound(realDt, isPaused);
         this.#renderer.render(this.#scene, this.#camera);
         this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt);
         this.#overlay.render(this.#renderer);
@@ -560,8 +571,37 @@ export class BattleRenderer {
         this.#arena.setCrowdDensity(density);
     }
 
-    /** The crowd rises to deaths, heavy blows and level-ups. */
-    #rouseCrowd(events) {
+    /** Mix, listener, music fades and the living ambience (fires once the coliseum is up, burning fighters). */
+    #updateSound(realDt, isPaused) {
+        const prefs = window.prefs ?? {};
+        this.#audio.update({ camera: this.#camera, paused: isPaused, speed: Math.abs(Number(window.stepIncrement) || 1), volume: Number(prefs.sound?.sfx) || 0 });
+        this.music.update(realDt);
+        if (!this.#flamesHeard && this.#arena.flames.length) {
+            this.#flamesHeard = true;
+            this.#soundscape.setFlames(this.#arena.flames);
+        }
+        this.#soundscape.setCrowd(prefs.crowd ?? 1);
+        for (const fighter of this.#fighters) {
+            const burning = Number(fighter.state?.buffs?.burn?.timeleft) > 0 && Number(fighter.state?.hp) > 0;
+            this.#soundscape.setBurning(String(fighter.index), burning ? fighter.position : null);
+        }
+        this.#soundscape.update(realDt);
+    }
+
+    /**
+     * The music turns tense for the climax: a duel with someone below 40% HP, or the gas closing in. Playing on only
+     * ever escalates; a seek re-evaluates from scratch.
+     */
+    #setMusicMood(gladiators, safeRadius, snap) {
+        const alive = gladiators.filter((gladiator) => Number(gladiator.hp) > 0);
+        const lowest = Math.min(...alive.map((gladiator) => Number(gladiator.hp) / Math.max(1, Number(gladiator.maxhp) || 100)));
+        const climax = (alive.length <= 2 && lowest < 0.4) || safeRadius < 6;
+        if (climax) this.music.setMood('climax');
+        else if (snap) this.music.setMood('battle');
+    }
+
+    /** The crowd rises to deaths, heavy blows and level-ups, and chants for the last one standing. */
+    #rouseCrowd(events, gladiators) {
         let intensity = 0;
         for (const event of events) {
             if (event.type === 'death') intensity = Math.max(intensity, 1);
@@ -572,7 +612,12 @@ export class BattleRenderer {
                 if (share > 0.08) intensity = Math.max(intensity, Math.min(0.6, share * 3));
             }
         }
-        if (intensity > 0) this.#arena.reactCrowd(intensity);
+        if (intensity > 0) {
+            this.#arena.reactCrowd(intensity);
+            this.#soundscape.react(intensity);
+        }
+        const standing = gladiators.filter((gladiator) => Number(gladiator.hp) > 0).length;
+        if (events.some((event) => event.type === 'death') && standing <= 1) this.#soundscape.victory();
     }
 
     /**
@@ -626,7 +671,18 @@ export class BattleRenderer {
                 ...fighter.debug,
             })),
             projectiles: this.#effects.getDebugSnapshot(),
+            audio: { ...this.#audio.status, mood: this.music.mood },
         };
+    }
+
+    /**
+     * Diagnostics for automated checks: the current level on an audio bus.
+     *
+     * @param {'master'|'music'|'sfx'|'ambience'} bus Bus to read.
+     * @returns {{ peak: number, rms: number }|null} Peak and RMS in dBFS.
+     */
+    meterAudio(bus) {
+        return this.#audio.meter(bus);
     }
 
     /** Stops animation and releases DOM, audio, scene and GPU resources. */
@@ -637,6 +693,8 @@ export class BattleRenderer {
         this.#overlay.destroy();
         this.#effects.destroy();
         this.#arena.destroy();
+        this.#soundscape.destroy();
+        this.music.destroy();
         this.#audio.destroy();
         this.#fighters.forEach((fighter) => fighter.destroy());
         this.#tracker.dispose();
