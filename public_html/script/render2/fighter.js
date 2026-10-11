@@ -7,6 +7,8 @@ import {
 
 const ANCHOR_HEIGHT = 1.05;
 const SHIELD_TEXTURE = '/assets/synty/special-effects/Textures/PolygonParticles_Hexagon.png';
+/** Radius of the block barrier around a fighter, in metres. */
+const SHIELD_RADIUS = 0.62;
 let shieldTexture = null;
 const SPEED_SMOOTHING_SECONDS = 0.3;
 const COMBAT_SECONDS = 4;
@@ -20,6 +22,47 @@ export const TELEPORT_DISTANCE = 4;
 const TELEPORT_ACTION_DISTANCE = 1;
 const HIT_HEAT_DECAY = 2;
 const MIN_HIT_SCALE = 0.5;
+/** Cuts and bruises from melee blows (see `Fighter#wound`). */
+const WOUND_POOL = 4;
+const WOUND_SECONDS = 2.2;
+const WOUND_HEIGHT = 0.58;
+const WOUND_SIZE = 0.13;
+let woundTexture = null;
+
+/** A cut over a bruise, painted once: two red gashes with dark edges on a purple-brown blotch. */
+function drawWoundTexture(THREE) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const bruise = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+    bruise.addColorStop(0, 'rgba(92, 34, 58, 0.75)');
+    bruise.addColorStop(0.6, 'rgba(70, 30, 48, 0.4)');
+    bruise.addColorStop(1, 'rgba(60, 30, 40, 0)');
+    ctx.fillStyle = bruise;
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.lineCap = 'round';
+    for (const [x0, y0, x1, y1] of [[14, 20, 50, 40], [18, 34, 44, 50]]) {
+        ctx.strokeStyle = 'rgba(60, 0, 6, 0.9)';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(210, 20, 30, 1)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x0 + 1, y0);
+        ctx.lineTo(x1 - 1, y1);
+        ctx.stroke();
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+}
+
+/** Attack speed the end-of-charge swing is paced at: a fast blow, carried by the rush. */
+const CHARGE_STRIKE_RATE = 2.5;
 const TELEPORT_DELAY = 0.5;
 const FLINCH_SECONDS = 0.28;
 const MAX_HOLD_SECONDS = 1;
@@ -63,6 +106,10 @@ export class Fighter {
     /** Motion forced by a seek (the replay is paused between steps), until playback moves again. */
     #hold = null;
     #flinch = 0;
+    #wounds = [];
+    #nextWound = 0;
+    /** Whether the fighter stands in the poison gas (set by the renderer each frame from the safe radius). */
+    poisoned = false;
     #turning = 0;
     #jumpDelay = 0;
     #teleport = null;
@@ -151,27 +198,78 @@ export class Fighter {
         return orb;
     }
 
-    /** Front-only energy shield: a Synty hexagon plate with a counter-rotating inner glow, held ahead of the torso. */
+    /**
+     * Block barrier: an energy dome around the fighter. The shell is bright at its rim and nearly clear face-on
+     * (fresnel), carries a hexagon lattice (the Synty particle hexagon, tiled over the dome) that drifts upward and
+     * shimmers, and ripples out from the front when a blow lands on it; a glowing ring marks where it meets the ground.
+     */
     #buildShield() {
         const THREE = this.#THREE;
         if (!shieldTexture) {
             shieldTexture = new THREE.TextureLoader().load(SHIELD_TEXTURE);
-            shieldTexture.colorSpace = THREE.SRGBColorSpace;
+            shieldTexture.wrapS = THREE.RepeatWrapping;
+            shieldTexture.wrapT = THREE.RepeatWrapping;
         }
-        const material = (color, opacity) => this.#effectMaterial(new THREE.MeshBasicMaterial({
-            map: shieldTexture, color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending,
-        }));
-        const plate = material(0x62c8ff, 0.85);
-        const glow = material(0xbfeaff, 0.5);
-        const geometry = this.#effectGeometry(() => new THREE.PlaneGeometry(1, 1));
-        const outer = new THREE.Mesh(geometry, plate);
-        outer.scale.setScalar(1.25);
-        const inner = new THREE.Mesh(geometry, glow);
-        inner.scale.setScalar(0.85);
-        inner.position.z = 0.02;
+        const uniforms = {
+            hexes: { value: shieldTexture },
+            time: { value: 0 },
+            strength: { value: 1 },
+            impact: { value: 0 },
+            tint: { value: new THREE.Color(0x2fa8ff) },
+        };
+        const dome = new THREE.Mesh(
+            this.#effectGeometry(() => new THREE.SphereGeometry(SHIELD_RADIUS, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.56)),
+            this.#effectMaterial(new THREE.ShaderMaterial({
+                uniforms,
+                vertexShader: `
+                    varying vec3 vNormalView; varying vec3 vViewDir; varying vec2 vUv; varying vec3 vLocal;
+                    void main() {
+                        vec4 view = modelViewMatrix * vec4(position, 1.0);
+                        vNormalView = normalize(normalMatrix * normal);
+                        vViewDir = normalize(-view.xyz);
+                        vUv = uv; vLocal = position;
+                        gl_Position = projectionMatrix * view;
+                    }`,
+                fragmentShader: `
+                    uniform sampler2D hexes; uniform float time; uniform float strength; uniform float impact; uniform vec3 tint;
+                    varying vec3 vNormalView; varying vec3 vViewDir; varying vec2 vUv; varying vec3 vLocal;
+                    void main() {
+                        float facing = abs(dot(normalize(vNormalView), normalize(vViewDir)));
+                        float rim = pow(1.0 - facing, 2.2);
+                        vec2 tile = vec2(vUv.x * 10.0, vUv.y * 4.0 - time * 0.25);
+                        vec4 hex = texture2D(hexes, tile);
+                        float cell = hex.r * hex.a;
+                        float shimmer = 0.5 + 0.5 * sin(time * 3.0 + vUv.x * 40.0 + vUv.y * 17.0);
+                        // A ripple running back from the front (+z) after a blow.
+                        float fromFront = acos(clamp(normalize(vLocal).z, -1.0, 1.0));
+                        float ripple = impact * smoothstep(0.35, 0.0, abs(fromFront - (1.0 - impact) * 3.0));
+                        // Fades in toward the ground so the dome reads as resting on it.
+                        float base = smoothstep(0.0, 0.12, vLocal.y + 0.02);
+                        // Strongest straight ahead of the fighter (+z), fading round to a faint minimum at the back.
+                        float ahead = smoothstep(-0.7, 0.9, normalize(vLocal).z);
+                        float facingWeight = mix(0.14, 1.35, ahead * ahead);
+                        float alpha = (0.02 + rim * 0.5 + cell * (0.18 + 0.22 * shimmer) * (0.5 + rim) + ripple * 0.8 + impact * 0.12) * strength * base * facingWeight;
+                        vec3 color = mix(tint, vec3(0.85, 0.96, 1.0), clamp(rim * 0.3 + ripple, 0.0, 1.0));
+                        gl_FragColor = vec4(color, alpha);
+                    }`,
+                transparent: true,
+                depthWrite: false,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending,
+            })),
+        );
+        // Taller than wide, so the dome clears the fighter's head.
+        dome.scale.y = 1.7;
+        dome.renderOrder = 15;
+        // The ground ring is an arc round the front only (after the rotation, ring angle 1.5π points ahead, +z).
+        const ground = new THREE.Mesh(
+            this.#effectGeometry(() => new THREE.RingGeometry(SHIELD_RADIUS * 0.82, SHIELD_RADIUS * 1.08, 40, 1, Math.PI * 0.9, Math.PI * 1.2).rotateX(-Math.PI / 2)),
+            this.#effectMaterial(new THREE.MeshBasicMaterial({ color: 0x3aa8ff, transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending })),
+        );
+        ground.position.y = 0.03;
         const shield = new THREE.Group();
-        shield.add(outer, inner);
-        Object.assign(shield.userData, { fill: plate, inner });
+        shield.add(dome, ground);
+        Object.assign(shield.userData, { uniforms, ground, impact: 0 });
         return shield;
     }
 
@@ -200,9 +298,9 @@ export class Fighter {
         const orb = this.#buildOrb();
         orb.position.set(0, 0.62, 0.5);
         mounts.torso.add(orb);
+        // The barrier stands on the ground around the fighter, not on the swaying torso.
         const shield = this.#buildShield();
-        shield.position.set(0, 0.36, 0.5);
-        mounts.torso.add(shield);
+        this.root.add(shield);
 
         const stars = new THREE.Group();
         const starMaterial = this.#effectMaterial(new THREE.MeshBasicMaterial({ color: 0xffe066 }));
@@ -260,6 +358,7 @@ export class Fighter {
 
     /** Clears transient animation state after a seek. */
     reset() {
+        this.#wounds.forEach((mark) => { mark.visible = false; });
         this.#action = null;
         this.#flinch = 0;
         this.#hitHeat = 0;
@@ -330,11 +429,28 @@ export class Fighter {
             spec = ACTION_SPECS[style];
             this.#swings += 1;
         }
-        if (name === 'melee' || name === 'assassinate') this.#weapon = 'melee';
-        else if (name === 'ranged') this.#weapon = 'bow';
+        if (name === 'melee') this.#weapon = 'melee';
+        else if (spec.weapon === 'bow') this.#weapon = 'bow';
         if (COMBAT_ACTIONS.has(name)) this.#combat = COMBAT_SECONDS;
         const rate = ENGINE_RATE[name] ? Number(this.state?.[ENGINE_RATE[name]]) : NaN;
         this.#action = { name, style, spec, start: this.#clock, releasedAt: null, firedAt: null, timing: engineTiming(spec, rate) };
+    }
+
+    /**
+     * The blow that ends a charge: the engine moves the charger to its target and deals melee damage on arrival,
+     * reporting no attack of its own, so the rush turns into a quick swing that connects right away.
+     *
+     * @returns {number} Game seconds until the swing connects.
+     */
+    chargeStrike() {
+        const styles = MELEE_STYLES[this.#appearance.weapon] ?? MELEE_STYLES.sword;
+        const style = styles[this.#swings % styles.length];
+        this.#swings += 1;
+        const spec = ACTION_SPECS[style];
+        this.#weapon = 'melee';
+        this.#combat = COMBAT_SECONDS;
+        this.#action = { name: 'melee', style, spec, start: this.#clock, releasedAt: null, firedAt: null, timing: engineTiming(spec, CHARGE_STRIKE_RATE) };
+        return this.#untilContact(this.#action);
     }
 
     /** Releases a drawn bow or a charged spell when the engine reports the projectile. */
@@ -398,8 +514,76 @@ export class Fighter {
         return teleport;
     }
 
+    /**
+     * Marks a melee blow on the body: a fresh cut over a bruise where the blow meets the body (found by casting from
+     * the attacker's side onto the posed mesh), bound to the nearest bone so it follows the animation. It shows at
+     * once, darkens and fades over a couple of seconds. A few marks per fighter are recycled.
+     *
+     * @param {{ x: number, z: number }} from World position of the attacker.
+     */
+    wound(from) {
+        if (!this.#alive) return;
+        const THREE = this.#THREE;
+        if (!this.#wounds.length) {
+            woundTexture ??= drawWoundTexture(THREE);
+            const geometry = this.#effectGeometry(() => new THREE.PlaneGeometry(WOUND_SIZE, WOUND_SIZE));
+            for (let i = 0; i < WOUND_POOL; i += 1) {
+                const material = this.#effectMaterial(new THREE.MeshBasicMaterial({
+                    map: woundTexture, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4,
+                }));
+                const mark = new THREE.Mesh(geometry, material);
+                mark.visible = false;
+                mark.userData.life = 0;
+                this.root.add(mark);
+                this.#wounds.push(mark);
+            }
+        }
+        const centre = new THREE.Vector3(this.root.position.x, WOUND_HEIGHT + (Math.random() - 0.5) * 0.16, this.root.position.z);
+        const toward = new THREE.Vector3(from.x - centre.x, 0, from.z - centre.z);
+        if (toward.lengthSq() < 1e-6) toward.set(Math.sin(this.#yaw), 0, Math.cos(this.#yaw));
+        // A little scatter round the side facing the attacker.
+        toward.normalize().applyAxisAngle(new THREE.Vector3(0, 1, 0), (Math.random() - 0.5) * 0.8);
+        const hit = this.#model.bodyHit?.(centre.clone().addScaledVector(toward, 1), toward.clone().negate(), 1.2);
+        if (!hit) return;
+        const mark = this.#wounds[this.#nextWound];
+        this.#nextWound = (this.#nextWound + 1) % this.#wounds.length;
+        // Placed in world space facing out of the surface, then handed to the bone.
+        const outward = hit.normal && hit.normal.dot(toward) > 0 ? hit.normal : toward;
+        mark.removeFromParent();
+        mark.position.copy(hit.point).addScaledVector(outward, 0.004);
+        mark.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), outward)
+            .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.random() * Math.PI * 2));
+        mark.scale.setScalar(0.8 + Math.random() * 0.5);
+        mark.updateMatrix();
+        hit.bone.attach(mark);
+        mark.userData.life = WOUND_SECONDS;
+        mark.visible = true;
+    }
+
+    #animateWounds(dt) {
+        for (const mark of this.#wounds) {
+            if (!mark.visible) continue;
+            mark.userData.life -= dt;
+            const left = mark.userData.life / WOUND_SECONDS;
+            if (left <= 0 || !this.#alive) {
+                mark.visible = false;
+                continue;
+            }
+            // Bright and wet at first, then darker as it fades away.
+            mark.material.opacity = Math.min(1, left * 2.5);
+            mark.material.color.setScalar(0.65 + 0.35 * left);
+        }
+    }
+
+    /** @see SyntyModel#bodyHit: where a world-space ray meets this fighter's posed body, and the bone there. */
+    bodyHit(origin, direction, far) {
+        return this.#alive ? this.#model.bodyHit?.(origin, direction, far) ?? null : null;
+    }
+
     /** Triggers the recoil and red flash of a landed hit. */
     hit() {
+        // A blow on a raised barrier ripples across it.
+        if (this.#parts.shield?.visible) this.#parts.shield.userData.impact = 1;
         // A fresh hit must not restart a flinch that is still playing (burn ticks, multi-hits).
         if (this.#flinch > 0.4) return;
         // Repeated hits in a short span are dampened so the fighter is not locked in the recoil, but every
@@ -520,6 +704,7 @@ export class Fighter {
         this.#animateOrb();
         this.#animateShield(poseElapsed);
         this.#animateStatus(poseElapsed, isPaused ? 0 : gameDt);
+        this.#animateWounds(isPaused ? 0 : gameDt);
     }
 
     #composePose(gait, elapsed, gameDt) {
@@ -570,7 +755,7 @@ export class Fighter {
             armRecoil: recoil * (1 - this.#actionBlend),
             bodyRecoil: recoil * (1 - 0.6 * this.#actionBlend),
             stunned: Number(this.state.buffs?.stun?.timeleft) > 0 && this.#alive,
-            aim: this.#activeSpec === ACTION_SPECS.ranged ? this.#actionBlend : 0,
+            aim: this.#activeSpec?.shot ? this.#actionBlend : 0,
             elapsed,
             speed: this.#speed,
             reducedMotion,
@@ -617,9 +802,16 @@ export class Fighter {
         const blocking = this.#activeSpec?.weapon === 'shield';
         const time = this.#frozen ? this.#frozen.time : (blocking && this.#action ? this.#actionTime(this.#action) : 1);
         const fade = blocking || !left ? 1 : Math.min(1, left / 0.5);
-        shield.scale.setScalar(Math.max(0.01, smoothstep(0, 0.16, time) * fade * (1 + Math.sin(elapsed * 8) * 0.03)));
-        shield.userData.fill.opacity = 0.75 + Math.sin(elapsed * 6) * 0.15;
-        shield.userData.inner.rotation.z = elapsed * 0.8;
+        // Springs up with a slight overshoot, breathes while it lasts, and is brighter while actively blocking.
+        const rise = smoothstep(0, 0.22, time);
+        const pop = rise * (1 + Math.sin(Math.min(1, time / 0.3) * Math.PI) * 0.12);
+        shield.scale.set(pop, Math.max(0.01, pop), pop);
+        const { uniforms, ground } = shield.userData;
+        shield.userData.impact = Math.max(0, shield.userData.impact - 1 / 30);
+        uniforms.time.value = elapsed;
+        uniforms.impact.value = shield.userData.impact;
+        uniforms.strength.value = fade * (blocking ? 1 : 0.6) * (0.9 + Math.sin(elapsed * 4) * 0.1);
+        ground.material.opacity = 0.3 * fade * rise;
     }
 
     /** Grows the fireball between the hands until the cast is released. */
@@ -650,7 +842,9 @@ export class Fighter {
         const ambushing = this.#action?.name === 'ambush' || this.#frozen?.name === 'ambush';
         const opacity = invisible || ambushing ? 0.06 : 1;
         const burn = burning ? 0.35 + Math.sin(elapsed * 14) * 0.15 : 0;
-        this.#model.setLook({ opacity, flash: this.#flinch * this.#flinch, burn });
+        // Standing in the gas: a sickly green glow that throbs slower than the burn.
+        const poison = this.poisoned && this.#alive ? 0.13 + Math.sin(elapsed * 5) * 0.06 : 0;
+        this.#model.setLook({ opacity, flash: this.#flinch * this.#flinch, burn, poison });
     }
 
     /** @returns {import('three').Vector3} World-space anchor above the head, reused between calls. */

@@ -83,7 +83,7 @@ export class BlastSystem {
         const blast = {
             x: at.x, y: at.y, z: at.z, radius, age: 0,
             fire: particles(FIRE, () => ({ dir: direction(), speed: (2.2 + Math.random() * 3.2) * radius, life: 0.45 + Math.random() * 0.5, size: 0.5 + Math.random() * 0.7, spin: Math.random() * 6 })),
-            smoke: particles(SMOKE, () => ({ dir: direction(), speed: (0.8 + Math.random() * 1.2) * radius, delay: 0.12 + Math.random() * 0.25, life: 1.6 + Math.random() * 1.2, size: 0.7 + Math.random() * 0.6, spin: Math.random() * 6, shade: 0.12 + Math.random() * 0.1 })),
+            smoke: particles(SMOKE, () => ({ dir: direction(), speed: (1.2 + Math.random() * 1.6) * radius, delay: 0.12 + Math.random() * 0.25, life: 1.6 + Math.random() * 1.2, size: 0.7 + Math.random() * 0.6, spin: Math.random() * 6, shade: 0.025 + Math.random() * 0.035 })),
             sparks: particles(SPARKS, () => ({ dir: direction(), speed: (4.5 + Math.random() * 5) * radius, life: 0.5 + Math.random() * 0.6 })),
             debris: particles(DEBRIS, () => ({ dir: direction(), speed: (3 + Math.random() * 3) * radius, life: 0.8 + Math.random() * 0.5, size: 0.06 + Math.random() * 0.08, spin: Math.random() * 6, shade: 0.18 + Math.random() * 0.15 })),
         };
@@ -133,7 +133,7 @@ export class BlastSystem {
                 const travel = p.speed * (1 - Math.exp(-t * 2)) / 2;
                 const rise = radius * (0.6 * t + 0.35 * t * t);
                 const shade = p.shade * (1 - 0.5 * Math.max(0, 1 - t * 4));
-                smoke.push(x + p.dir.x * travel, y + p.dir.y * travel * 0.5 + rise, z + p.dir.z * travel, radius * p.size * (0.6 + 1.6 * u), p.spin + u, shade * 1.1, shade, shade * 0.9, 0.75 * Math.sin(Math.PI * Math.min(1, u * 1.4 + 0.05)) * (1 - u));
+                smoke.push(x + p.dir.x * travel, y + p.dir.y * travel * 0.5 + rise, z + p.dir.z * travel, radius * p.size * (0.7 + 2.2 * u), p.spin + u, shade * 1.1, shade, shade * 0.9, 0.75 * Math.sin(Math.PI * Math.min(1, u * 1.4 + 0.05)) * (1 - u));
             }
             for (const p of blast.sparks) {
                 const u = age / p.life;

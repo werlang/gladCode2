@@ -236,18 +236,19 @@ export const ACTION_SPECS = Object.freeze({
             [0.28, pose({ lean: 0.5, twist: 0.1, rsh: -1.55, rel: -0.05, rsz: -0.1, lsh: 0.7, lel: -0.4, lsz: 0.9, z: 0.5, lhip: -1.0, lknee: 0.5, rhip: 0.6, rknee: 0.2 })],
         ],
     },
+    // The engine fires assassinate as a projectile (a bleeding arrow): it is the bow shot, aimed a beat longer.
     assassinate: {
-        duration: 0.6, blendIn: 0.08, blendOut: 0.2, contact: 0.22, weapon: 'melee',
+        duration: 0.9, blendIn: 0.14, blendOut: 0.25, contact: 0.55, holdAt: 0.5, weapon: 'bow', shot: true,
         keys: [
-            [0.1, pose({ lean: 0.35, twist: -0.5, rsh: -0.5, rel: -2.1, rsz: -0.2, lsh: -0.5, lel: -0.9, lhip: -0.5, lknee: 0.8, rhip: 0.4, rknee: 0.9, y: 0 })],
-            [0.22, pose({ lean: 0.6, twist: 0.35, rsh: -1.5, rel: -0.03, lsh: 0.5, lel: -0.4, z: 0.6, lhip: -1.0, lknee: 0.5, rhip: 0.7, rknee: 0.1 })],
-            [0.4, pose({ lean: 0.6, twist: 0.35, rsh: -1.5, rel: -0.03, lsh: 0.5, lel: -0.4, z: 0.6, lhip: -1.0, lknee: 0.5, rhip: 0.7, rknee: 0.1 })],
+            [0.16, pose({ lean: 0.02, twist: -1.5, hy: 0.6, lsh: 0, lel: 0, lsz: 1.5, rsh: -1.5, rsz: 0.8, rel: -0.3, draw: 0.3, lhip: -0.1, rhip: 0.12, lknee: 0.1, rknee: 0.1 })],
+            [0.5, pose({ lean: 0.02, twist: -1.5, hy: 0.6, lsh: 0, lel: 0, lsz: 1.5, rsh: -2.05, rsz: 1.15, rel: -0.05, draw: 1, lhip: -0.1, rhip: 0.12, lknee: 0.1, rknee: 0.1 })],
+            [0.6, pose({ lean: 0.0, twist: -1.45, hy: 0.58, lsh: 0, lel: 0, lsz: 1.5, rsh: -1.2, rsz: 0.5, rel: -0.6, draw: 0, lhip: -0.1, rhip: 0.12, lknee: 0.1, rknee: 0.1 })],
         ],
     },
     // Side-on archery stance: the chest turns a quarter so the bow arm points down the
     // heading, the head looks along it and the draw hand is pulled to the anchor near the chin.
     ranged: {
-        duration: 0.8, blendIn: 0.14, blendOut: 0.25, contact: 0.5, holdAt: 0.46, weapon: 'bow',
+        duration: 0.8, blendIn: 0.14, blendOut: 0.25, contact: 0.5, holdAt: 0.46, weapon: 'bow', shot: true,
         keys: [
             [0.16, pose({ lean: 0.02, twist: -1.5, hy: 0.6, lsh: 0, lel: 0, lsz: 1.5, rsh: -1.5, rsz: 0.8, rel: -0.3, draw: 0.3, lhip: -0.1, rhip: 0.12, lknee: 0.1, rknee: 0.1 })],
             [0.46, pose({ lean: 0.02, twist: -1.5, hy: 0.6, lsh: 0, lel: 0, lsz: 1.5, rsh: -2.05, rsz: 1.15, rel: -0.05, draw: 1, lhip: -0.1, rhip: 0.12, lknee: 0.1, rknee: 0.1 })],

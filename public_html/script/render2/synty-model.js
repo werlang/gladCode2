@@ -82,7 +82,6 @@ const ATTACK_CLIPS = {
     thrust: { file: 'Attack/HeavyStab01/A_Attack_HeavyStab01_Sword', start: 0.4, contact: 0.93, end: 1.4 },
     smash: { file: 'Attack/HeavyCombo01/A_Attack_HeavyCombo01A_Sword', start: 0.55, contact: 1.15, end: 1.7 },
     stab: { file: 'Attack/LightFencing01/A_Attack_LightFencing01_Sword', start: 0, contact: 0.55, end: 1 },
-    assassinate: { file: 'Attack/LightLeaping01/A_Attack_LightLeaping01_Sword', start: 0.5, contact: 1.12, end: 1.6 },
 };
 const STATE_CLIPS = {
     idleCombat: 'Idle/Base/A_Idle_Base_Sword',
@@ -96,13 +95,17 @@ const BLOCK_BEGIN_SECONDS = 0.5;
 const HIT_CLIP_SECONDS = 0.6;
 const DEATH_CLIP_SECONDS = 1.47;
 /** Actions without a Synty clip: the base locomotion stays and the upper body follows the `motion.js` pose. */
-const POSE_ACTIONS = new Set(['ranged', 'fireball', 'teleport', 'potion']);
+const POSE_ACTIONS = new Set(['ranged', 'assassinate', 'fireball', 'teleport', 'potion']);
+/** Bow shots: the archery IK, nocked arrow and string pull. */
+const SHOT_STYLES = new Set(['ranged', 'assassinate']);
 /** How far the torso turns side-on while drawing a bow (radians). */
 const ARCHERY_TWIST = 1.3;
 /** Forward tip of the top limb of a bow carried at the side. */
 const BOW_CARRY_TILT = 0.45;
 /** Length of the arrow shaft in world units (matches the flying arrow in effects.js). */
 const ARROW_LENGTH = 0.5;
+/** Arrows are modelled 0.5 m long and drawn at this scale (matches `effects.js`). */
+const ARROW_SCALE = 0.72;
 const IK_VECTORS = ['up', 'aim', 'side', 'from', 'to', 'at', 's', 'e', 'h', 'dir', 'bend', 'joint', 'goal', 'anchor', 'bowHand', 'drawHand', 'pole', 'neck', 'left', 'right', 'x', 'y', 'z'];
 
 const FINGER = /^(Thumb|IndexFinger|Finger)_/;
@@ -249,7 +252,10 @@ class SyntyAssets {
             node.skeleton.bones.forEach((bone, i) => {
                 if (this.#bindWorld.has(keys[i])) return;
                 this.#bindWorld.set(keys[i], node.skeleton.boneInverses[i].clone().invert());
-                this.#parents.set(keys[i], bone.parent?.isBone ? boneKey(bone.parent) : null);
+                // Attachment bones (cape chain) sit under a same-named twin in the FBX; the real parent is above it.
+                let parent = bone.parent;
+                while (parent?.isBone && boneKey(parent) === keys[i]) parent = parent.parent;
+                this.#parents.set(keys[i], parent?.isBone ? boneKey(parent) : null);
             });
         });
     }
@@ -517,12 +523,17 @@ export class SyntyModel {
     #clock = 0;
     #stride = 0;
     #stun = 0;
+    #dizzyScratch = null;
+    /** Skinned meshes of the body (not the carried props), for `bodyHit`. */
+    #bodyMeshes = [];
+    #raycaster = null;
     #ik = null;
     #bowGrip;
     #bowBasis;
     #string = null;
     #pull = 0;
     #arrowGeometries = [];
+    #arrowMaterials = null;
     #arrowWorld = null;
 
     /** Fighter hands the death over to the clip instead of tipping the figure over. */
@@ -577,6 +588,7 @@ export class SyntyModel {
             const mesh = new THREE.SkinnedMesh(geometry, partMaterial);
             mesh.frustumCulled = false;
             content.add(mesh);
+            this.#bodyMeshes.push(mesh);
             mesh.bind(new THREE.Skeleton(bones, inverses), new THREE.Matrix4());
         };
         for (const body of assets.bodies.get(outfit.body) ?? []) {
@@ -724,6 +736,7 @@ export class SyntyModel {
         arrow.visible = false;
         this.figure.add(arrow);
         this.#arrowGeometries = [shaft.geometry, head.geometry];
+        this.#arrowMaterials = { shaft: shaft.material, head: head.material };
         this.#parts = { melee, bow, flask, arrow, shield: this.#buildShield(outfit.shield, tint, scale) };
     }
 
@@ -1026,7 +1039,7 @@ export class SyntyModel {
         const THREE = this.#THREE;
         this.#ik ??= Object.fromEntries(IK_VECTORS.map((key) => [key, new THREE.Vector3()]));
         const ik = this.#ik;
-        const spec = ACTION_SPECS.ranged;
+        const spec = ACTION_SPECS[action.style] ?? ACTION_SPECS.ranged;
         const time = action.time;
         ik.up.set(0, 1, 0);
         this.figure.updateWorldMatrix(true, true);
@@ -1108,7 +1121,7 @@ export class SyntyModel {
         this.#bones.Hand_L.getWorldPosition(world.dir).sub(world.nock);
         if (world.dir.lengthSq() < 1e-6) world.dir.copy(this.#ik.aim);
         world.dir.normalize();
-        world.position.copy(world.nock).addScaledVector(world.dir, ARROW_LENGTH / 2);
+        world.position.copy(world.nock).addScaledVector(world.dir, (ARROW_LENGTH * ARROW_SCALE) / 2);
         world.quaternion.setFromUnitVectors(world.forward, world.dir);
         const { q } = this.#scratch;
         this.figure.updateWorldMatrix(true, false);
@@ -1116,7 +1129,7 @@ export class SyntyModel {
         arrow.position.copy(this.figure.worldToLocal(this.#ik.goal.copy(world.position)));
         arrow.quaternion.copy(q.invert().multiply(world.quaternion));
         this.figure.getWorldScale(world.scale);
-        arrow.scale.set(1 / world.scale.x, 1 / world.scale.y, 1 / world.scale.z);
+        arrow.scale.set(ARROW_SCALE / world.scale.x, ARROW_SCALE / world.scale.y, ARROW_SCALE / world.scale.z);
     }
 
     /**  {{ position: import('three').Vector3, quaternion: import('three').Quaternion }|null} World pose of the arrow on the string, if one is drawn. */
@@ -1138,12 +1151,36 @@ export class SyntyModel {
         string.bone.position.copy(string.bone.parent.worldToLocal(at.lerp(goal, amount)));
     }
 
+    /**
+     * Dizzy wobble over the stun clip: the torso, neck and head circle about tilting axes on staggered phases and
+     * the hips sway side to side, as if the fighter is about to lose balance (the stars spin overhead).
+     */
+    #dizzy(weight) {
+        const THREE = this.#THREE;
+        const t = this.#clock;
+        this.#dizzyScratch ??= { axis: new THREE.Vector3(), turn: new THREE.Quaternion(), world: new THREE.Quaternion() };
+        const { axis, turn, world } = this.#dizzyScratch;
+        this.figure.updateWorldMatrix(true, true);
+        const sway = Math.sin(t * 1.7);
+        this.#bones.Hips.position.x += sway * 4 * weight;
+        this.#bones.Hips.updateMatrixWorld(true);
+        for (const [name, amount, lag] of [['Spine_01', 0.14, 0], ['Neck', 0.18, 0.7], ['Head', 0.16, 1.3]]) {
+            const phase = t * 2.4 - lag;
+            axis.set(Math.cos(phase), 0, Math.sin(phase));
+            turn.setFromAxisAngle(axis, amount * weight * (0.8 + 0.2 * Math.sin(t * 0.9)));
+            const bone = this.#bones[name];
+            bone.getWorldQuaternion(world);
+            this.#setWorld(bone, turn.multiply(world), 1);
+        }
+    }
+
     /** Applies pose math and blends locomotion, combat, and upper-body IK overrides. */
     applyPose(p, o) {
         const m = o.motion;
         this.#play(m);
+        if (this.#stun > 0.01 && !(m.dead > 0)) this.#dizzy(this.#stun);
         const pose = POSE_ACTIONS.has(m.action?.style) && m.dead <= 0 ? m.action.blend : 0;
-        const shooting = pose > 0.001 && m.action.style === 'ranged';
+        const shooting = pose > 0.001 && SHOT_STYLES.has(m.action.style);
         if (shooting) this.#aimBow(m.action, pose);
         else if (pose > 0.001) this.#overridePose(p, o, pose);
         if (!this.#parts.bow.visible) {
@@ -1153,6 +1190,12 @@ export class SyntyModel {
         if (m.dead > 0) this.#parts.bow.quaternion.copy(this.#bowGrip);
         else this.#standBow(shooting ? pose : 0);
         this.#pullString(shooting && m.dead <= 0 ? pose * this.#pull : 0);
+        if (shooting) {
+            // The assassin's bleeding arrow is red, like the flying arrow that takes over from it.
+            const bleeding = m.action.style === 'assassinate';
+            this.#arrowMaterials.shaft.color.setHex(bleeding ? 0x8a1420 : 0xe6d2a1);
+            this.#arrowMaterials.head.color.setHex(bleeding ? 0xd01020 : 0xc8ced6);
+        }
         this.#nock(shooting && m.dead <= 0 && this.#pull > 0.05 && pose > 0.3);
     }
 
@@ -1162,6 +1205,41 @@ export class SyntyModel {
      * @param {import('three').Vector3} target Receives the position.
      * @returns {import('three').Vector3} `target`.
      */
+    /**
+     * Where a ray meets the body as it is posed now, and the bone nearest that point (so something stuck there can
+     * follow the animation). Weapons and props are ignored.
+     *
+     * @param {import('three').Vector3} origin Ray start, in world space.
+     * @param {import('three').Vector3} direction Unit ray direction.
+     * @param {number} far Longest distance to look.
+     * @returns {{ point: import('three').Vector3, normal: import('three').Vector3|null, bone: import('three').Bone }|null} Hit, or null on a miss.
+     */
+    bodyHit(origin, direction, far) {
+        const THREE = this.#THREE;
+        this.#raycaster ??= new THREE.Raycaster();
+        this.#raycaster.set(origin, direction);
+        this.#raycaster.far = far;
+        this.figure.updateMatrixWorld(true);
+        // Skinned bounds are computed once in whatever pose the mesh had; refresh them so the ray tests this pose.
+        for (const mesh of this.#bodyMeshes) mesh.computeBoundingSphere();
+        const hit = this.#raycaster.intersectObjects(this.#bodyMeshes, false)[0];
+        if (!hit) return null;
+        // The bone that drives the struck triangle most (its first corner's strongest skin weight).
+        const { skinIndex, skinWeight } = hit.object.geometry.attributes;
+        let bone = this.#bones.Spine_03;
+        if (hit.face && skinIndex && skinWeight) {
+            let best = 0;
+            for (let k = 0; k < 4; k += 1) {
+                const weight = skinWeight.getComponent(hit.face.a, k);
+                if (weight > best) {
+                    best = weight;
+                    bone = hit.object.skeleton.bones[skinIndex.getComponent(hit.face.a, k)] ?? bone;
+                }
+            }
+        }
+        return { point: hit.point.clone(), normal: hit.face ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld) : null, bone };
+    }
+
     headPosition(target) {
         this.figure.updateMatrixWorld(true);
         return this.#bones.Neck.getWorldPosition(target);
@@ -1179,8 +1257,8 @@ export class SyntyModel {
     }
 
     /** Sets visual status effects such as opacity, flinch flashes, and burn intensity. */
-    setLook({ opacity, flash, burn }) {
-        const key = `${opacity}|${flash.toFixed(2)}|${burn.toFixed(2)}`;
+    setLook({ opacity, flash, burn, poison = 0 }) {
+        const key = `${opacity}|${flash.toFixed(2)}|${burn.toFixed(2)}|${poison.toFixed(2)}`;
         if (key === this.#emissiveKey) return;
         this.#emissiveKey = key;
         for (const material of this.#materials) {
@@ -1188,6 +1266,7 @@ export class SyntyModel {
             material.emissive.setHex(material.userData.baseEmissive);
             if (flash > 0.01) material.emissive.r += flash * 0.75;
             if (burn > 0) material.emissive.setRGB(material.emissive.r + burn, material.emissive.g + burn * 0.35, material.emissive.b);
+            if (poison > 0) material.emissive.setRGB(material.emissive.r + poison * 0.15, material.emissive.g + poison * 0.85, material.emissive.b);
             const alpha = material.userData.baseOpacity * opacity;
             const transparent = alpha < 0.999 || material.userData.baseOpacity < 1;
             // three compiles an OPAQUE shader variant, so flipping the flag needs a recompile

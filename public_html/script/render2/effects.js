@@ -1,6 +1,7 @@
 import { ACTION_BY_ID, ACTION_SPECS, smoothstep } from './motion.js';
 import { ARENA_SIZE } from './battle-state.js';
 import { BlastSystem } from './blast.js';
+import { potionSound } from './audio-manager.js';
 
 const PARTICLE_POOL = 220;
 const PILLAR_POOL = 6;
@@ -11,9 +12,27 @@ const MELEE_REACH = 3;
 const HIT_WINDOW = 0.3;
 /** Game seconds before a swing's contact at which reported damage is still taken as that swing (frame jitter). */
 const CONTACT_TOLERANCE = 0.15;
+/** Share of the victim's max HP from which a blow sounds heavy. */
+const HEAVY_BLOW = 0.08;
 const ARROW_HEIGHT = 0.65;
 /** Game seconds over which a loosed arrow moves from the bow onto its engine path. */
 const LAUNCH_SECONDS = 0.18;
+/** An arrow vanishing this close to a gladiator hit them. */
+const ARROW_HIT_REACH = 1.9;
+/** Arrows are modelled 0.5 m long and drawn at this scale (matches the nocked arrow in `synty-model.js`). */
+const ARROW_SCALE = 0.72;
+/** Distance from the arrow's centre to its tip, in model units. */
+const ARROW_TIP_OFFSET = 0.335;
+/** The struck arrow flies on into the body over this long, then stays lodged for ARROW_STUCK_SECONDS. */
+const ARROW_GLIDE_SECONDS = 0.08;
+const ARROW_STUCK_SECONDS = 1.8;
+/** Then it drops, lies on the sand this long and fades over ARROW_FADE_SECONDS. */
+const ARROW_GROUND_SECONDS = 0.5;
+const ARROW_FADE_SECONDS = 0.6;
+const ARROW_GRAVITY = 9;
+/** How deep the tip sinks past the body surface, and the body radius used when the line misses the mesh. */
+const ARROW_SINK = 0.05;
+const ARROW_BODY_RADIUS = 0.12;
 const FIREBALL_HEIGHT = 0.7;
 const DECAL_POOL = 12;
 const FX_URL = '/assets/synty/special-effects/Textures/PolygonParticles_';
@@ -69,6 +88,9 @@ export class BattleEffects {
     /** Arrows drawn on a bow when the engine spawned them: the flying arrow starts there. */
     #launches = new Map();
     #launchScratch = null;
+    /** Arrows lodged in a fighter after hitting them (see `#stickArrow`). */
+    #stuck = [];
+    #stuckScratch = null;
     #projectiles = new Map();
     #damageTotals = new Map();
     #geometries = {};
@@ -172,6 +194,8 @@ export class BattleEffects {
         this.#projectiles.forEach((entry) => entry.mesh.removeFromParent());
         this.#projectiles.clear();
         this.#launches.clear();
+        this.#stuck.forEach((arrow) => arrow.mesh.removeFromParent());
+        this.#stuck = [];
         this.#variants.clear();
         this.#blasts.clear();
         [...this.#particles, ...this.#rings, ...this.#decals, ...this.#slashes, ...this.#pillars].forEach((item) => { item.visible = false; item.userData.life = 0; });
@@ -253,8 +277,15 @@ export class BattleEffects {
         slash.visible = true;
     }
 
-    #sfx(name, prefs) {
-        this.#audio.playEffect(name, Number(prefs.sound?.sfx) || 0);
+    /**
+     * Plays a sound where it happens (see `BattleAudioManager#play`); the effects slider sets the bus volume.
+     *
+     * @param {string} name Sound name.
+     * @param {{ x: number, z: number }|null} [at] World position (unpositioned when omitted).
+     * @param {{ gain?: number, rate?: number }} [options] Extra gain and pitch.
+     */
+    #sfx(name, at = null, options = {}) {
+        this.#audio.play(name, { at: at ? { x: at.x, y: 0.8, z: at.z } : null, ...options });
     }
 
     // -------------------------------------------------------------------- events
@@ -283,11 +314,15 @@ export class BattleEffects {
                     overlay.showFloatingLabel(fighter, `NÍVEL ${event.level}`, 'level');
                     this.addRing(fighter.position, 0xffe66d, 2.6, 0.9);
                     this.emitSparks(fighter.position, { count: 18, speed: 1.6, life: 0.9, up: 3.2, gravity: 3, colors: [0xffe66d, 0xfff3b0] });
-                    this.#sfx('lvlup', prefs);
+                    this.#sfx('lvlup', fighter.position);
+                    this.#audio.duck(0.6, 1.5);
                     break;
                 case 'death':
                     if (!fighter) break;
-                    this.#sfx(fighter.appearance.female ? 'death_female' : 'death_male', prefs);
+                    this.#sfx(fighter.appearance.female ? 'death_female' : 'death_male', fighter.position);
+                    // The body hits the sand as the death clip folds it.
+                    this.later(0.6, () => this.#sfx('thud', fighter.position, { gain: 1.2, rate: 0.85 }));
+                    this.#audio.duck(0.5, 1);
                     this.emitSparks(fighter.position, { count: 12, speed: 1.4, size: 0.18, life: 0.9, up: 1.2, gravity: 1.2, colors: [0x8a7f6d, 0xa39682] });
                     this.#onShake(0.3);
                     break;
@@ -298,10 +333,11 @@ export class BattleEffects {
                     if (launch) this.#launches.set(`${event.projectile.type}:${event.projectile.id}`, launch);
                     owner?.fire();
                     if (owner?.activeAction?.name === 'assassinate') this.#variants.set(`${event.projectile.type}:${event.projectile.id}`, 'assassinate');
-                    if (Number(event.projectile?.type) === 1) this.#sfx('fireball', prefs);
+                    if (Number(event.projectile?.type) === 1) this.#sfx('fireball', owner?.position ?? null);
                     break;
                 }
-                case 'projectile-impact': this.#onImpact(event.projectile, prefs); break;
+                case 'projectile-impact': this.#onImpact(event.projectile, prefs, fighters); break;
+                case 'stun': if (fighter) this.#sfx('stun', fighter.position); break;
                 default: break;
             }
         }
@@ -316,13 +352,35 @@ export class BattleEffects {
         const contact = fighter.activeAction?.untilContact ?? spec.contact ?? 0;
         switch (name) {
             case 'melee':
-            case 'assassinate':
                 this.later(contact, () => {
-                    this.addSlash(fighter, name === 'assassinate' ? 0xff6a7a : 0xfff2c8);
-                    this.#sfx(name === 'assassinate' ? 'assassinate' : 'melee', prefs);
+                    this.addSlash(fighter, 0xfff2c8);
+                    this.#sfx('melee', fighter.position);
                 });
                 break;
-            case 'ranged': this.later(contact, () => this.#sfx('ranged', prefs)); break;
+            case 'assassinate': {
+                // A blood sigil under the assassin, red embers drawn into the bow, a red flash as the arrow leaves.
+                this.addDecal(at, 'ritual', 0xb0101c, 1.4, contact + 0.5);
+                this.addRing(at, 0xd01a28, 1.5, 0.45);
+                this.later(0.06, () => this.#sfx('creak', fighter.position, { rate: 1.05 }));
+                for (let i = 0; i < 5; i += 1) {
+                    this.later(0.08 + i * 0.07, () => {
+                        const bow = { x: fighter.position.x, y: 0.75, z: fighter.position.z };
+                        this.emitSparks(bow, { count: 5, speed: 1.2, size: 0.09, life: 0.45, up: 0.4, gravity: -1.5, colors: [0x7a0010, 0xd01a28, 0xff5060] });
+                    });
+                }
+                this.later(contact, () => {
+                    const bow = { x: fighter.position.x + Math.sin(fighter.debug.yaw) * 0.45, y: 0.75, z: fighter.position.z + Math.cos(fighter.debug.yaw) * 0.45 };
+                    this.emitSparks(bow, { count: 1, speed: 0, size: 0.55, life: 0.25, up: 0, gravity: 0, colors: [0xff3a4a], texture: 'sparkle' });
+                    this.emitSparks(bow, { count: 12, speed: 2.2, size: 0.08, life: 0.4, up: 0.3, gravity: 0, colors: [0xd01a28, 0xff6070] });
+                    this.#sfx('assassinate', fighter.position);
+                });
+                break;
+            }
+            case 'ranged':
+                // The bow creaks as the string comes back, then twangs on release.
+                this.later(0.06, () => this.#sfx('creak', fighter.position, { rate: 1.15 }));
+                this.later(contact, () => this.#sfx('ranged', fighter.position));
+                break;
             case 'fireball': {
                 this.addRing(at, 0xff7a2a, 1.3, 0.5);
                 this.addDecal(at, 'ritual', 0xff8a3a, 1.2, contact + 0.4);
@@ -346,17 +404,17 @@ export class BattleEffects {
                 const front = { x: at.x + Math.sin(fighter.debug.yaw) * 0.5, y: 0.8, z: at.z + Math.cos(fighter.debug.yaw) * 0.5 };
                 this.emitSparks(front, { count: 1, speed: 0, size: 0.8, life: 0.4, up: 0, gravity: 0, colors: [0xbfeaff], texture: 'sparkle' });
                 this.emitSparks(front, { count: 14, speed: 1.6, size: 0.07, life: 0.6, up: 0.8, gravity: 0, colors: [0x62c8ff, 0xbfeaff] });
-                this.#sfx('block', prefs);
+                this.#sfx('block', at);
                 break;
             }
-            case 'ambush': this.#smokeScreen(at); this.#sfx('ambush', prefs); break;
-            case 'charge': this.#sfx(fighter.appearance.female ? 'charge_female' : 'charge_male', prefs); break;
+            case 'ambush': this.#smokeScreen(at); this.#sfx('ambush', at); break;
+            case 'charge': this.#sfx(fighter.appearance.female ? 'charge_female' : 'charge_male', at); break;
             case 'potion':
                 this.later(contact, () => {
                     this.addRing(fighter.position, 0x62ef70, 1.6, 0.6);
                     this.emitSparks({ x: fighter.position.x, y: 0.2, z: fighter.position.z }, { count: 10, speed: 0.6, size: 0.1, life: 1, up: 1.4, gravity: -0.5, colors: [0x8affa0, 0xd8ffe0], texture: 'bubble' });
                     this.emitSparks({ x: fighter.position.x, y: 0.9, z: fighter.position.z }, { count: 1, speed: 0, size: 0.6, life: 0.5, up: 0, gravity: 0, colors: [0xb8ffc8], texture: 'sparkle' });
-                    this.#sfx('elixir', prefs);
+                    this.#sfx(potionSound(event.code), fighter.position);
                 });
                 break;
             default: break;
@@ -370,23 +428,41 @@ export class BattleEffects {
      */
     #onDamage(event, victim, fighters, overlay, prefs, events) {
         let delay = 0;
+        // The melee attacker whose blow this is, if any (it leaves a wound facing them).
+        let blade = null;
         let struck = events.some((other) => other.type === 'projectile-impact');
         for (const attacker of fighters.values()) {
             const action = attacker.activeAction;
             const spec = action?.spec ?? null;
-            if (!spec || attacker === victim || !['melee', 'assassinate', 'charge'].includes(action.name)) continue;
+            if (!spec || attacker === victim || !['melee', 'charge'].includes(action.name)) continue;
             const distance = Math.hypot(attacker.position.x - victim.position.x, attacker.position.z - victim.position.z);
             if (distance > MELEE_REACH) continue;
-            // A charge strikes on arrival; a swing strikes at its contact, give or take a frame of timing jitter.
-            // Damage reported earlier in the wind-up or long after is something else (burn, poison).
-            if (action.name !== 'charge' && (action.untilContact > CONTACT_TOLERANCE || action.age > spec.contact + HIT_WINDOW)) continue;
-            delay = Math.max(delay, action.untilContact);
+            if (action.name === 'charge') {
+                // The charge lands on arrival: the rush ends in a quick swing and the blow is shown at its contact.
+                // Small ticks next to a charger (burn, poison) are not the blow.
+                if (Number(event.amount) < Math.max(1, Number(victim.state.maxhp) * 0.02)) continue;
+                delay = Math.max(delay, attacker.chargeStrike());
+            }
+            else {
+                // A swing strikes at its contact, give or take a frame of timing jitter. Damage reported earlier in
+                // the wind-up or long after is something else (burn, poison).
+                if (action.untilContact > CONTACT_TOLERANCE || action.age > spec.contact + HIT_WINDOW) continue;
+                delay = Math.max(delay, action.untilContact);
+            }
             struck = true;
+            blade = attacker;
         }
         // Only attacks and projectiles flinch; burn and poison ticks are damage over time and just show their number.
         this.later(delay, () => {
             if (struck) {
                 victim.hit();
+                if (blade) {
+                    victim.wound(blade.position);
+                    // Steel on a raised guard rings; a blow on the body lands with a weight that follows the damage.
+                    const share = Number(event.amount) / Math.max(1, Number(victim.state.maxhp) || 100);
+                    if (Number(victim.state.buffs?.resist?.timeleft) > 0) this.#sfx('clang', victim.position);
+                    else this.#sfx(share >= HEAVY_BLOW ? 'flesh_heavy' : 'flesh', victim.position, { gain: Math.min(1.3, 0.75 + share * 4) });
+                }
                 this.emitSparks({ x: victim.position.x, y: 0.6, z: victim.position.z }, { count: 7, speed: 2.2, colors: [0xfff2c8, 0xff8a6a] });
                 this.emitSparks({ x: victim.position.x, y: 0.7, z: victim.position.z }, { count: 1, speed: 0, size: 0.35, life: 0.22, up: 0, gravity: 0, colors: [0xfff2c8], texture: 'sparkle' });
             }
@@ -416,7 +492,7 @@ export class BattleEffects {
         this.#teleportBurst(from, 'in');
         this.#teleportBurst(to, 'out');
         this.#portalLink(from, to);
-        this.#sfx('teleport', prefs);
+        this.#sfx('teleport', { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 });
     }
 
     /** A trail of sparks bridging the two portals. */
@@ -437,18 +513,162 @@ export class BattleEffects {
         this.emitSparks({ x: position.x, y: 0.3, z: position.z }, { count: 18, gravity: 0, life: 0.7, size: 0.08, colors: [0xc890ff, 0xf0e0ff, 0x8a5aff], ...points });
     }
 
-    #onImpact(projectile, prefs) {
+    #onImpact(projectile, prefs, fighters = new Map()) {
         if (!projectile) return;
+        const key = `${projectile.type}:${projectile.id}`;
+        const bleeding = this.#variants.get(key) === 'assassinate';
+        this.#variants.delete(key);
         const isFireball = Number(projectile.type) === 1;
-        const position = { x: Number(projectile.x) - ARENA_SIZE / 2, y: isFireball ? FIREBALL_HEIGHT : ARROW_HEIGHT, z: Number(projectile.y) - ARENA_SIZE / 2 };
+        let position = { x: Number(projectile.x) - ARENA_SIZE / 2, y: isFireball ? FIREBALL_HEIGHT : ARROW_HEIGHT, z: Number(projectile.y) - ARENA_SIZE / 2 };
+        let victim = null;
+        if (!isFireball) {
+            // The engine drops an arrow the step it hits; the arrow flies on into the body it hit and sticks there.
+            victim = this.#arrowVictim(projectile, position, fighters);
+            if (victim) {
+                this.#stickArrow(key, victim);
+                position = { x: victim.position.x, y: ARROW_HEIGHT, z: victim.position.z };
+            }
+        }
         if (isFireball) {
             this.addExplosion(position, 1.05);
             this.#onShake(0.28);
         }
+        else if (bleeding) {
+            // The bleeding arrow: a spray of blood and a dark splatter left on the sand.
+            this.emitSparks(position, { count: 22, speed: 2.6, size: 0.1, life: 0.7, up: 1.2, gravity: 6, colors: [0x6a000c, 0xa8101e, 0xe0202e] });
+            this.emitSparks(position, { count: 1, speed: 0, size: 0.6, life: 0.22, up: 0, gravity: 0, colors: [0xff3040], texture: 'sparkle' });
+            this.addRing(position, 0xc0101e, 1.3, 0.35);
+            this.addDecal(position, 'dark', 0x5a0008, 1.1, 5, { spin: 0, additive: false });
+        }
         else {
             this.emitSparks(position, { count: 6, speed: 1.6, colors: [0xe8d7ad] });
         }
-        this.#sfx(isFireball ? 'explosion' : 'arrow_hit', prefs);
+        if (isFireball) {
+            this.#sfx('explosion', position);
+            this.#audio.duck(0.45, 0.6);
+        }
+        else if (victim) {
+            // A thunk into the body (or a clang off a raised guard) under the arrow's own hit.
+            this.#sfx('arrow_hit', position);
+            if (Number(victim.state?.buffs?.resist?.timeleft) > 0) this.#sfx('clang', position, { gain: 0.6, rate: 1.2 });
+            else this.#sfx('flesh', position, { gain: bleeding ? 0.9 : 0.6, rate: 1.15 });
+        }
+        else {
+            this.#sfx('sand', position);
+        }
+    }
+
+    /** The gladiator an arrow struck: the nearest standing one, other than the archer, close to where it vanished. */
+    #arrowVictim(projectile, at, fighters) {
+        let best = null;
+        let bestDistance = ARROW_HIT_REACH;
+        for (const [id, fighter] of fighters) {
+            if (id === String(projectile.owner) || !(Number(fighter.state?.hp) > 0)) continue;
+            const distance = Math.hypot(fighter.position.x - at.x, fighter.position.z - at.z);
+            if (distance < bestDistance) {
+                best = fighter;
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Takes a flying arrow out of the projectile list before the frame drops it and drives it into the victim: it
+     * glides on along its heading to where that line meets the posed body (or the chest, if the line misses), sinks
+     * its tip in, and is bound to the bone there so it moves with the body. When its time is up it drops off,
+     * tumbles onto the sand and fades (see `#updateStuckArrows`).
+     */
+    #stickArrow(key, victim) {
+        const entry = this.#projectiles.get(key);
+        if (!entry) return;
+        const THREE = this.#THREE;
+        this.#projectiles.delete(key);
+        const { mesh } = entry;
+        mesh.rotation.set(0, entry.yaw, 0);
+        mesh.updateMatrixWorld();
+        const forward = new THREE.Vector3(Math.sin(entry.yaw), 0, Math.cos(entry.yaw));
+        // The arrow's line, started a metre short of the victim.
+        const centre = new THREE.Vector3(victim.position.x, mesh.position.y, victim.position.z);
+        const along = centre.clone().sub(mesh.position).dot(forward);
+        const start = mesh.position.clone().addScaledVector(forward, along - 1);
+        // Along its own line first; if that grazes past the pose, through the body at a few heights.
+        let hit = victim.bodyHit(start, forward, 2);
+        for (const height of [0.6, 0.5, 0.7, 0.4]) {
+            if (hit) break;
+            hit = victim.bodyHit(new THREE.Vector3(victim.position.x, height, victim.position.z).addScaledVector(forward, -1), forward, 2);
+        }
+        const tip = hit ? hit.point.clone().addScaledVector(forward, ARROW_SINK) : centre.clone().addScaledVector(forward, -ARROW_BODY_RADIUS);
+        // Kept in the bone's frame so the glide ends exactly where the body has moved to.
+        const bone = hit?.bone ?? victim.root;
+        const localTip = bone.worldToLocal(tip.clone());
+        this.#stuck.push({ mesh, victim, bone, localTip, forward, from: mesh.position.clone(), age: 0, phase: 'glide' });
+    }
+
+    #updateStuckArrows(dt) {
+        const THREE = this.#THREE;
+        const scratch = this.#stuckScratch ??= { tip: new THREE.Vector3(), flat: new THREE.Quaternion(), up: new THREE.Vector3(0, 1, 0) };
+        for (const arrow of this.#stuck) {
+            arrow.age += dt;
+            const { mesh, victim, forward } = arrow;
+            const standing = Number(victim.state?.hp) > 0;
+            if (arrow.phase === 'glide') {
+                arrow.bone.updateWorldMatrix(true, false);
+                const tip = arrow.bone.localToWorld(scratch.tip.copy(arrow.localTip));
+                const target = tip.addScaledVector(forward, -ARROW_TIP_OFFSET * ARROW_SCALE);
+                const t = Math.min(1, arrow.age / ARROW_GLIDE_SECONDS);
+                mesh.position.lerpVectors(arrow.from, target, t);
+                if (t >= 1) {
+                    // A slight wobble off the line, then bound to the body: it now follows the animation.
+                    mesh.rotateX(0.08 + Math.random() * 0.12);
+                    mesh.rotateY((Math.random() - 0.5) * 0.2);
+                    arrow.bone.attach(mesh);
+                    arrow.phase = 'lodged';
+                    arrow.age = 0;
+                }
+                continue;
+            }
+            if (arrow.phase === 'lodged') {
+                if (arrow.age < ARROW_STUCK_SECONDS && standing) continue;
+                // Falls out of the wound: back into the scene, keeping where it was.
+                this.#root.attach(mesh);
+                arrow.phase = 'falling';
+                arrow.age = 0;
+                arrow.velocity = new THREE.Vector3((Math.random() - 0.5) * 0.6, 0.4, (Math.random() - 0.5) * 0.6).addScaledVector(forward, -0.4);
+                // Lands lying flat on the sand, pointing any way.
+                arrow.rest = scratch.flat.clone().setFromAxisAngle(scratch.up, Math.random() * Math.PI * 2);
+                arrow.spin = mesh.quaternion.clone();
+                mesh.traverse((node) => {
+                    if (node.material) node.material.transparent = true;
+                });
+                continue;
+            }
+            if (arrow.phase === 'falling') {
+                arrow.velocity.y -= ARROW_GRAVITY * dt;
+                mesh.position.addScaledVector(arrow.velocity, dt);
+                const ground = 0.02;
+                const drop = Math.min(1, arrow.age / 0.45);
+                mesh.quaternion.slerpQuaternions(arrow.spin, arrow.rest, drop);
+                if (mesh.position.y <= ground) {
+                    mesh.position.y = ground;
+                    mesh.quaternion.copy(arrow.rest);
+                    this.#audio.play('clatter', { at: mesh.position });
+                    arrow.phase = 'ground';
+                    arrow.age = 0;
+                }
+                continue;
+            }
+            // On the sand: lies a moment, then fades away.
+            const opacity = 1 - Math.max(0, arrow.age - ARROW_GROUND_SECONDS) / ARROW_FADE_SECONDS;
+            mesh.traverse((node) => {
+                if (node.material) node.material.opacity = Math.max(0, opacity);
+            });
+            if (opacity <= 0) {
+                mesh.removeFromParent();
+                arrow.done = true;
+            }
+        }
+        if (this.#stuck.some((arrow) => arrow.done)) this.#stuck = this.#stuck.filter((arrow) => !arrow.done);
     }
 
     // --------------------------------------------------------------- projectiles
@@ -478,6 +698,7 @@ export class BattleEffects {
             const head = new THREE.Mesh(this.#geometries.arrowHead, tip);
             head.position.z = 0.29;
             group.add(body, head);
+            group.scale.setScalar(ARROW_SCALE);
         }
         this.#root.add(group);
         return group;
@@ -610,6 +831,7 @@ export class BattleEffects {
             pillar.material.opacity = (data.mode === 'out' ? 1 - t : Math.min(1, t * 3) * (1 - t * 0.6)) * 0.55;
         }
         this.#blasts.update(realDt);
+        this.#updateStuckArrows(gameDt);
         for (const slash of this.#slashes) {
             const data = slash.userData;
             if (data.life <= 0) continue;
