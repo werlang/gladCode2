@@ -2,6 +2,7 @@ import { ARENA_SIZE } from './battle-state.js';
 import { clamp01, createRandom, fbm, mix, smooth, valueNoise } from './noise.js';
 import { PODIUM, SyntyColiseum } from './synty-coliseum.js';
 import { FireSystem } from './fire.js';
+import { GasClouds } from './gas.js';
 
 const HALF = ARENA_SIZE / 2;
 /** The sand runs past the combat square up to the coliseum podium wall. */
@@ -222,6 +223,10 @@ export class Arena {
     #own;
     /** Fires of the Synty coliseum: braziers and gate torches (see `fire.js`). */
     #fires = null;
+    /** @type {Array<{ x: number, y: number, z: number, size: number }>} Flame positions, once the coliseum is up. */
+    #flames = [];
+    /** Billowing poison clouds over the poisoned ground (see `gas.js`). */
+    #clouds = null;
     /** Sand floor mesh; its procedural material gives way to the Meadow Forest terrain when the Synty set loads. */
     #floor;
     #crowd = null;
@@ -297,6 +302,9 @@ export class Arena {
                 vec3 color = mix(mix(vec3(0.13, 0.42, 0.09), vec3(0.62, 0.95, 0.3), density * 0.85), vec3(0.75, 1.0, 0.45), rim * (1.0 - layer));
                 gl_FragColor = vec4(color, alpha);
             }`;
+        this.#clouds = new GasClouds(THREE, GAS_SIZE / 2);
+        own(this.#clouds);
+        add(this.#clouds.group);
         this.#poison = new THREE.Group();
         [0, 1].forEach((layer) => {
             const mesh = new THREE.Mesh(geometry, own(new THREE.ShaderMaterial({
@@ -312,6 +320,7 @@ export class Arena {
         });
         // The sand runs on to the podium wall, and so does the gas (the wall hides the edge of the plane).
         this.#poison.scale.set(FLOOR_SIZE / GAS_SIZE, 1, FLOOR_SIZE / GAS_SIZE);
+        this.#clouds.setExtent(FLOOR_SIZE / 2);
         add(this.#poison);
         this.updateSafeZone(CORNER_RADIUS);
     }
@@ -323,6 +332,7 @@ export class Arena {
         const safe = Number.isFinite(value) ? Math.max(0, value) : CORNER_RADIUS;
         const visible = safe < CORNER_RADIUS - 0.01;
         this.#poison.visible = visible;
+        this.#clouds?.setRadius(visible ? safe : Infinity);
         this.#poisonUniform.value = safe;
     }
 
@@ -344,7 +354,13 @@ export class Arena {
         // Particle fires in the brazier bowls and the gate torches (`size` < 1).
         this.#fires = own(new FireSystem(THREE));
         coliseum.flames.forEach((at) => this.#fires.add(at));
+        this.#flames = coliseum.flames;
         this.#scene.add(this.#fires.group);
+    }
+
+    /** @returns {Array<{ x: number, y: number, z: number, size: number }>} Brazier, torch and incense flames (empty until the coliseum loads). */
+    get flames() {
+        return this.#flames;
     }
 
     /** @param {number} elapsed Animation seconds; flames flicker with it. */
@@ -353,6 +369,7 @@ export class Arena {
         const dt = this.#lastElapsed === null ? 0 : Math.max(0, Math.min(0.1, elapsed - this.#lastElapsed));
         this.#lastElapsed = elapsed;
         this.#crowd?.update(elapsed, dt);
+        this.#clouds?.update(elapsed, dt);
         this.#fires?.update(elapsed, dt);
     }
 
