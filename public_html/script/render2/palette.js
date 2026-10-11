@@ -45,7 +45,7 @@ export function parseSkin(skin) {
 const isNone = (token) => token.endsWith('_none') || token === 'none';
 
 const SPRITE_ROOT = 'sprite/Universal-LPC-spritesheet/';
-/** Slots whose sprite sheet color is sampled; weapons keep their own procedural look. */
+/** Slots whose sprite sheet color is sampled. */
 const SAMPLED_SLOTS = Object.freeze(['shape', 'eyes', 'ears', 'facial', 'style', 'shirt', 'armor', 'legs', 'head', 'hands', 'shoulder', 'feet', 'belt', 'cape', 'shield', 'melee', 'ranged']);
 
 /** Fallback slot detection used when the editor catalog (`window.images`) is unavailable. */

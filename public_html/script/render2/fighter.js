@@ -61,6 +61,47 @@ function drawWoundTexture(THREE) {
     return texture;
 }
 
+/** Stun stars: how many, their orbit radius and size, how high over the head bone, spin rate and burst on recovery. */
+const STAR_COUNT = 5;
+const STAR_ORBIT = 0.2;
+const STAR_SIZE = 0.09;
+const STAR_LIFT = 0.2;
+const STAR_SPIN = 4.5;
+const STAR_BURST_SECONDS = 0.45;
+/** Five-pointed star sprite, white-hot at the heart, gold at the points, with a soft glow; shared by all fighters. */
+let starTexture = null;
+
+function drawStarTexture(THREE) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const glow = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    glow.addColorStop(0, 'rgba(255, 236, 150, 0.55)');
+    glow.addColorStop(1, 'rgba(255, 200, 60, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.beginPath();
+    for (let i = 0; i < 10; i += 1) {
+        const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+        const radius = i % 2 ? 9 : 22;
+        ctx.lineTo(32 + Math.cos(angle) * radius, 32 + Math.sin(angle) * radius);
+    }
+    ctx.closePath();
+    const fill = ctx.createRadialGradient(32, 32, 0, 32, 32, 22);
+    fill.addColorStop(0, '#ffffff');
+    fill.addColorStop(0.45, '#fff2a0');
+    fill.addColorStop(1, '#f2b318');
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(170, 100, 0, 0.8)';
+    ctx.stroke();
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+}
+
 /** Attack speed the end-of-charge swing is paced at: a fast blow, carried by the rush. */
 const CHARGE_STRIKE_RATE = 2.5;
 const TELEPORT_DELAY = 0.5;
@@ -123,6 +164,10 @@ export class Fighter {
     #dead = 0;
     #alive = true;
     #frozen = null;
+    /** Stun stars: shown 0..1, burst progress 0..1 after the stun ends, and a scratch vector for the head. */
+    #starLevel = 0;
+    #starBurst = 0;
+    #starAt = null;
     #basePose = { ...REST };
     #locoPose = { ...REST };
     #finalPose = { ...REST };
@@ -302,16 +347,22 @@ export class Fighter {
         const shield = this.#buildShield();
         this.root.add(shield);
 
+        // Stun stars ride a faint golden ring over the head (placed on the head bone each frame, see `#animateStars`).
         const stars = new THREE.Group();
-        const starMaterial = this.#effectMaterial(new THREE.MeshBasicMaterial({ color: 0xffe066 }));
-        for (let i = 0; i < 3; i += 1) {
-            const star = this.#ball(0.06, starMaterial);
-            star.userData.angle = (i / 3) * TWO_PI;
+        starTexture ??= drawStarTexture(THREE);
+        for (let i = 0; i < STAR_COUNT; i += 1) {
+            const star = new THREE.Sprite(this.#effectMaterial(new THREE.SpriteMaterial({ map: starTexture, transparent: true, depthWrite: false })));
+            star.userData.angle = (i / STAR_COUNT) * TWO_PI;
             stars.add(star);
         }
-        stars.position.y = 0.62;
+        const trail = new THREE.Mesh(
+            this.#effectGeometry(() => new THREE.RingGeometry(STAR_ORBIT - 0.012, STAR_ORBIT + 0.012, 40).rotateX(-Math.PI / 2)),
+            this.#effectMaterial(new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })),
+        );
+        stars.userData.trail = trail;
+        stars.add(trail);
         stars.visible = false;
-        mounts.head.add(stars);
+        this.root.add(stars);
         this.#parts = { shadow, ring, orb, shield, stars };
         this.#syncWeapons(null);
     }
@@ -451,6 +502,12 @@ export class Fighter {
         this.#combat = COMBAT_SECONDS;
         this.#action = { name: 'melee', style, spec, start: this.#clock, releasedAt: null, firedAt: null, timing: engineTiming(spec, CHARGE_STRIKE_RATE) };
         return this.#untilContact(this.#action);
+    }
+
+    /** @returns {boolean} Whether a drawn bow or charged spell is waiting for its projectile (not released yet). */
+    get shotPending() {
+        const action = this.#action;
+        return Boolean(action && action.spec.holdAt !== undefined && action.firedAt === null);
     }
 
     /** Releases a drawn bow or a charged spell when the engine reports the projectile. */
@@ -831,13 +888,7 @@ export class Fighter {
         const stunned = Number(buffs.stun?.timeleft) > 0 && this.#alive;
         const burning = Number(buffs.burn?.timeleft) > 0 && this.#alive;
 
-        this.#parts.stars.visible = stunned;
-        if (stunned) {
-            this.#parts.stars.children.forEach((star) => {
-                const angle = star.userData.angle + elapsed * 5;
-                star.position.set(Math.cos(angle) * 0.3, Math.sin(angle * 2) * 0.03, Math.sin(angle) * 0.3);
-            });
-        }
+        this.#animateStars(stunned, elapsed, realDt);
 
         const ambushing = this.#action?.name === 'ambush' || this.#frozen?.name === 'ambush';
         const opacity = invisible || ambushing ? 0.06 : 1;
@@ -845,6 +896,58 @@ export class Fighter {
         // Standing in the gas: a sickly green glow that throbs slower than the burn.
         const poison = this.poisoned && this.#alive ? 0.13 + Math.sin(elapsed * 5) * 0.06 : 0;
         this.#model.setLook({ opacity, flash: this.#flinch * this.#flinch, burn, poison });
+    }
+
+    /**
+     * Stun stars: they pop in over the head while stunned, circling on a tilted, wobbling ring that follows the dizzy
+     * head; when the stun ends they burst outward and fade as the fighter shakes it off.
+     */
+    #animateStars(stunned, elapsed, realDt) {
+        const stars = this.#parts.stars;
+        if (stunned) {
+            this.#starLevel = Math.min(1, this.#starLevel + realDt / 0.15);
+            this.#starBurst = 0;
+        }
+        else if (this.#starLevel > 0) {
+            this.#starBurst += realDt / STAR_BURST_SECONDS;
+            if (this.#starBurst >= 1) this.#starLevel = this.#starBurst = 0;
+        }
+        stars.visible = this.#starLevel > 0;
+        if (!stars.visible) return;
+        this.#starAt ??= new this.#THREE.Vector3();
+        const head = this.#model.bonePosition('Head', this.#starAt);
+        head.y += STAR_LIFT;
+        stars.position.copy(this.root.worldToLocal(head));
+        stars.rotation.set(0.35 * Math.sin(elapsed * 1.3), 0, 0.3 * Math.cos(elapsed * 1.1));
+        const burst = this.#starBurst;
+        const spread = 1 + 1.8 * Math.sqrt(burst);
+        const fade = this.#starLevel * (1 - burst);
+        for (const star of stars.children) {
+            if (star === stars.userData.trail) continue;
+            const base = star.userData.angle;
+            const angle = base + elapsed * STAR_SPIN;
+            star.position.set(Math.cos(angle) * STAR_ORBIT * spread, Math.sin(angle * 2) * 0.02 + burst * 0.15, Math.sin(angle) * STAR_ORBIT * spread);
+            const twinkle = 0.85 + 0.25 * Math.sin(elapsed * 9 + base * 3);
+            star.scale.setScalar(STAR_SIZE * twinkle * Math.min(1, this.#starLevel * 1.2) * (1 + 0.5 * burst));
+            star.material.opacity = fade;
+            star.material.rotation = elapsed * 3 + base;
+        }
+        stars.userData.trail.material.opacity = 0.3 * fade * (1 - burst);
+        stars.userData.trail.scale.setScalar(spread);
+    }
+
+    /** @returns {boolean} Whether the fighter is alive and on fire (the engine's `burn` buff). */
+    get burning() {
+        return Number(this.state?.buffs?.burn?.timeleft) > 0 && this.#alive;
+    }
+
+    /**
+     * @param {string} name Bone name (see `SyntyModel#bonePosition`).
+     * @param {import('three').Vector3} target Receives the bone's world position.
+     * @returns {import('three').Vector3} `target`.
+     */
+    bonePosition(name, target) {
+        return this.#model.bonePosition(name, target);
     }
 
     /** @returns {import('three').Vector3} World-space anchor above the head, reused between calls. */

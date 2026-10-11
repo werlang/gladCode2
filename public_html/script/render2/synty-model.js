@@ -4,6 +4,7 @@ import {
 import {
     ATLASES, BODIES, PROPS, SHIELD_MODELS, WEAPON_MODELS, syntyOutfit,
 } from './synty-outfit.js';
+import { loadTexture as loadImageTexture } from './textures.js';
 
 const ROOT = '/assets/synty/';
 const HEROES = `${ROOT}synty-modular-heroes/`;
@@ -112,6 +113,13 @@ const FINGER = /^(Thumb|IndexFinger|Finger)_/;
 const SIDES = ['L', 'R'];
 const HAND_OFFSET_CM = 8;
 const HIP_JOINT_HEIGHT = 2 * LEG_SEGMENT + FOOT_HEIGHT;
+/** Bones of the cape chain (Synty back attachment 03), top to bottom. */
+const CAPE_BONES = ['Capes_01', 'back_02', 'back_03', 'back_04', 'back_05'];
+/** How far (radians per bone, roughly) a running fighter's cape streams out behind, and how it grows with speed. */
+const CAPE_MAX_LIFT = 0.55;
+const CAPE_LIFT_PER_SPEED = 0.22;
+/** Length of the quick head shake when a stun wears off. */
+const SHAKE_OFF_SECONDS = 0.55;
 
 /**
  * Name of a part bone inside the animation skeleton. The part meshes share finger names between hands,
@@ -140,14 +148,9 @@ export async function loadSynty(THREE, looks = []) {
     // Skip the stale texture references inside the FBX files; materials are replaced with the shared atlases.
     manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
     const fbx = new FBXLoader(manager);
-    const textures = new THREE.TextureLoader();
     const loadFbx = (url) => new Promise((resolve, reject) => fbx.load(url, resolve, undefined, reject));
     // FBX UVs put v = 0 at the bottom of the image, which is three's default texture orientation (flipY).
-    const loadTexture = async (url) => {
-        const texture = await textures.loadAsync(url);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        return texture;
-    };
+    const loadTexture = (url) => loadImageTexture(THREE, url);
 
     // Only the gear and props these fighters wear are fetched; the default sword and bow always are, as fallbacks.
     const outfits = looks.map((look) => syntyOutfit(look));
@@ -524,6 +527,14 @@ export class SyntyModel {
     #stride = 0;
     #stun = 0;
     #dizzyScratch = null;
+    /** Seconds left of the head shake that throws off a stun, and whether the last frame was stunned. */
+    #shake = 0;
+    #wasStunned = false;
+    #shakeScratch = null;
+    /** Cape chain bones with their rest rotations (empty when the outfit has none), its current lift and scratch. */
+    #cape = [];
+    #capeLift = 0;
+    #capeScratch = null;
     /** Skinned meshes of the body (not the carried props), for `bodyHit`. */
     #bodyMeshes = [];
     #raycaster = null;
@@ -612,7 +623,9 @@ export class SyntyModel {
             this.#rest.set(name, { local: bone.quaternion.clone(), world, inverse: world.clone().invert() });
         }
 
-        // Arms are modelled in a T-pose; the upper-body pose override swings them down like the procedural rig.
+        this.#cape = CAPE_BONES.map((name) => byKey.get(name)).filter(Boolean).map((bone) => ({ bone, rest: bone.quaternion.clone() }));
+
+        // Arms are modelled in a T-pose; the upper-body pose override swings them down to the sides.
         for (const [side, sign] of [['L', -1], ['R', 1]]) {
             const down = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), sign * (Math.PI / 2 - 0.08));
             this.#hang[side] = { down, up: down.clone().invert() };
@@ -830,6 +843,9 @@ export class SyntyModel {
             }
             else if (this.#turnBlend < 0.01) this.#turnTotal = this.#turnTime = 0;
             this.#stun += ((m.stunned ? 1 : 0) - this.#stun) * (1 - Math.exp(-m.dt * 10));
+            if (this.#wasStunned && !m.stunned && !(m.dead > 0)) this.#shake = SHAKE_OFF_SECONDS;
+            this.#wasStunned = Boolean(m.stunned);
+            this.#shake = Math.max(0, this.#shake - m.dt);
         }
         const loop = (name) => this.#clock % this.#entry(name).duration;
         const still = (1 - m.moveWeight) * (1 - this.#turnBlend);
@@ -1174,11 +1190,36 @@ export class SyntyModel {
         }
     }
 
+    /**
+     * Shaking off a stun: three quick turns of the head from side to side that die away, the neck following, with a
+     * small nod as it clears.
+     *
+     * @param {number} u Progress through the shake, 0 to 1.
+     */
+    #shakeOff(u) {
+        const THREE = this.#THREE;
+        this.#shakeScratch ??= { up: new THREE.Vector3(0, 1, 0), side: new THREE.Vector3(), turn: new THREE.Quaternion(), nodding: new THREE.Quaternion(), world: new THREE.Quaternion() };
+        const { up, side, turn, nodding, world } = this.#shakeScratch;
+        this.figure.updateWorldMatrix(true, true);
+        // The nod tips about the fighter's own left-right axis, whichever way it faces.
+        side.set(1, 0, 0).applyQuaternion(this.figure.getWorldQuaternion(world));
+        const envelope = Math.sin(Math.PI * u) * (1 - u * 0.4);
+        const swing = Math.sin(u * Math.PI * 6) * 0.5 * envelope;
+        const nod = Math.sin(u * Math.PI * 2) * 0.12 * envelope;
+        for (const [name, share] of [['Neck', 0.4], ['Head', 0.6]]) {
+            const bone = this.#bones[name];
+            bone.getWorldQuaternion(world);
+            turn.setFromAxisAngle(up, swing * share).multiply(nodding.setFromAxisAngle(side, nod * share));
+            this.#setWorld(bone, turn.multiply(world), 1);
+        }
+    }
+
     /** Applies pose math and blends locomotion, combat, and upper-body IK overrides. */
     applyPose(p, o) {
         const m = o.motion;
         this.#play(m);
         if (this.#stun > 0.01 && !(m.dead > 0)) this.#dizzy(this.#stun);
+        if (this.#shake > 0 && !(m.dead > 0)) this.#shakeOff(1 - this.#shake / SHAKE_OFF_SECONDS);
         const pose = POSE_ACTIONS.has(m.action?.style) && m.dead <= 0 ? m.action.blend : 0;
         const shooting = pose > 0.001 && SHOT_STYLES.has(m.action.style);
         if (shooting) this.#aimBow(m.action, pose);
@@ -1197,6 +1238,33 @@ export class SyntyModel {
             this.#arrowMaterials.head.color.setHex(bleeding ? 0xd01020 : 0xc8ced6);
         }
         this.#nock(shooting && m.dead <= 0 && this.#pull > 0.05 && pose > 0.3);
+        this.#capeSway(m);
+    }
+
+    /**
+     * Lets a cape move: each bone of its chain bends a little behind the fighter, more the faster it moves (the cape
+     * streams out when running) and with a soft flutter travelling down the cloth. Five bone rotations on the CPU, reset
+     * to rest every frame; nothing extra for the GPU. Capes without the chain (the tattered one) stay rigid.
+     */
+    #capeSway(m) {
+        if (!this.#cape.length) return;
+        const THREE = this.#THREE;
+        this.#capeScratch ??= { side: new THREE.Vector3(), turn: new THREE.Quaternion(), world: new THREE.Quaternion() };
+        const { side, turn, world } = this.#capeScratch;
+        for (const { bone, rest } of this.#cape) bone.quaternion.copy(rest);
+        this.#cape[0].bone.parent.updateWorldMatrix(true, false);
+        side.set(1, 0, 0).applyQuaternion(this.figure.getWorldQuaternion(world));
+        // The lift follows speed with some lag, as cloth does; a fallen fighter's cape just lies.
+        const target = m.dead > 0 ? 0 : Math.min(CAPE_MAX_LIFT, (m.speed ?? 0) * CAPE_LIFT_PER_SPEED);
+        this.#capeLift += (target - this.#capeLift) * (1 - Math.exp(-(m.dt ?? 0) * 3));
+        const t = this.#clock;
+        this.#cape.forEach(({ bone }, i) => {
+            const flutter = Math.sin(t * 2.6 - i * 0.9) * (0.035 + 0.06 * this.#capeLift);
+            const bend = this.#capeLift * (0.3 + 0.12 * i) + flutter;
+            bone.getWorldQuaternion(world);
+            turn.setFromAxisAngle(side, bend);
+            this.#setWorld(bone, turn.multiply(world), 1);
+        });
     }
 
     /**
@@ -1238,6 +1306,15 @@ export class SyntyModel {
             }
         }
         return { point: hit.point.clone(), normal: hit.face ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld) : null, bone };
+    }
+
+    /**
+     * @param {string} name A posed bone (`Hips`, `Spine_01..03`, `Neck`, `Head`, `Shoulder_L/R`, `Elbow_L/R`, `Hand_L/R`).
+     * @param {import('three').Vector3} target Receives the bone's world position.
+     * @returns {import('three').Vector3} `target`.
+     */
+    bonePosition(name, target) {
+        return this.#bones[name].getWorldPosition(target);
     }
 
     headPosition(target) {
