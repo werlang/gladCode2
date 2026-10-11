@@ -1,0 +1,1496 @@
+path	category	size_x_m	size_y_m	size_z_m	min_x_m	min_y_m	min_z_m	tris	meshes	bones	clips	fbx_materials	materiallist_slots
+FBX/ModularCharactersFixedScale.fbx	FBX	2.05	2.14	1.16	-1.02	-0.01	-0.68	207725	720	52	Take 001:2.67s	lambert2	
+FBX/SK_Chr_ArmLowerLeft_Female_00.fbx	FBX	0.29	0.11	0.09	0.51	1.30	-0.09	54	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_01.fbx	FBX	0.29	0.14	0.10	0.51	1.29	-0.09	204	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_02.fbx	FBX	0.29	0.12	0.12	0.51	1.29	-0.11	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_03.fbx	FBX	0.29	0.14	0.10	0.51	1.28	-0.10	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_04.fbx	FBX	0.29	0.15	0.10	0.51	1.29	-0.09	150	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_05.fbx	FBX	0.30	0.15	0.10	0.51	1.28	-0.09	108	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_06.fbx	FBX	0.39	0.18	0.13	0.50	1.27	-0.12	296	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_07.fbx	FBX	0.29	0.16	0.10	0.51	1.27	-0.09	94	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_08.fbx	FBX	0.29	0.14	0.11	0.51	1.29	-0.09	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_09.fbx	FBX	0.29	0.13	0.09	0.51	1.29	-0.09	174	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_10.fbx	FBX	0.29	0.14	0.11	0.51	1.29	-0.10	264	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_11.fbx	FBX	0.37	0.19	0.15	0.51	1.28	-0.11	286	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_12.fbx	FBX	0.34	0.12	0.09	0.51	1.30	-0.09	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_13.fbx	FBX	0.29	0.11	0.09	0.51	1.30	-0.09	262	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_14.fbx	FBX	0.29	0.12	0.10	0.51	1.29	-0.09	222	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_15.fbx	FBX	0.30	0.17	0.12	0.50	1.27	-0.11	256	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_16.fbx	FBX	0.29	0.12	0.09	0.51	1.29	-0.09	184	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_17.fbx	FBX	0.30	0.12	0.12	0.51	1.29	-0.09	106	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Female_18.fbx	FBX	0.29	0.17	0.14	0.51	1.26	-0.11	166	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_00.fbx	FBX	0.29	0.11	0.14	0.51	1.30	-0.11	54	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_01.fbx	FBX	0.29	0.14	0.15	0.51	1.29	-0.11	204	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_02.fbx	FBX	0.29	0.12	0.17	0.51	1.30	-0.14	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_03.fbx	FBX	0.29	0.14	0.16	0.51	1.28	-0.12	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_04.fbx	FBX	0.29	0.15	0.14	0.51	1.29	-0.11	150	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_05.fbx	FBX	0.28	0.15	0.13	0.51	1.28	-0.10	108	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_06.fbx	FBX	0.39	0.18	0.18	0.50	1.27	-0.15	296	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_07.fbx	FBX	0.29	0.16	0.15	0.51	1.28	-0.11	94	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_08.fbx	FBX	0.29	0.14	0.16	0.51	1.29	-0.12	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_09.fbx	FBX	0.29	0.13	0.15	0.51	1.29	-0.11	174	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_10.fbx	FBX	0.29	0.14	0.15	0.51	1.29	-0.12	264	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_11.fbx	FBX	0.37	0.19	0.19	0.51	1.28	-0.13	286	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_12.fbx	FBX	0.34	0.12	0.14	0.51	1.30	-0.11	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_13.fbx	FBX	0.29	0.11	0.14	0.51	1.30	-0.11	262	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_14.fbx	FBX	0.29	0.12	0.14	0.51	1.30	-0.11	222	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_15.fbx	FBX	0.30	0.17	0.20	0.50	1.27	-0.15	256	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_16.fbx	FBX	0.29	0.12	0.14	0.51	1.30	-0.11	184	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_17.fbx	FBX	0.30	0.12	0.16	0.51	1.29	-0.13	106	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerLeft_Male_18.fbx	FBX	0.29	0.17	0.17	0.51	1.27	-0.13	166	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_00.fbx	FBX	0.29	0.11	0.09	-0.80	1.30	-0.09	54	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_01.fbx	FBX	0.29	0.14	0.10	-0.80	1.29	-0.09	204	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_02.fbx	FBX	0.29	0.12	0.12	-0.80	1.29	-0.11	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_03.fbx	FBX	0.29	0.14	0.10	-0.80	1.28	-0.10	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_04.fbx	FBX	0.29	0.15	0.10	-0.80	1.29	-0.09	150	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_05.fbx	FBX	0.30	0.15	0.10	-0.81	1.28	-0.09	108	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_06.fbx	FBX	0.39	0.18	0.13	-0.89	1.27	-0.12	296	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_07.fbx	FBX	0.29	0.16	0.10	-0.80	1.27	-0.09	94	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_08.fbx	FBX	0.29	0.14	0.11	-0.80	1.29	-0.09	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_09.fbx	FBX	0.29	0.13	0.09	-0.80	1.29	-0.09	174	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_10.fbx	FBX	0.29	0.14	0.11	-0.80	1.29	-0.10	264	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_11.fbx	FBX	0.37	0.19	0.15	-0.88	1.28	-0.11	286	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_12.fbx	FBX	0.34	0.12	0.09	-0.85	1.30	-0.09	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_13.fbx	FBX	0.29	0.11	0.09	-0.80	1.30	-0.09	262	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_14.fbx	FBX	0.29	0.12	0.10	-0.80	1.29	-0.09	222	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_15.fbx	FBX	0.30	0.17	0.12	-0.80	1.27	-0.11	256	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_16.fbx	FBX	0.29	0.12	0.09	-0.80	1.29	-0.09	184	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_17.fbx	FBX	0.30	0.12	0.12	-0.81	1.29	-0.09	106	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Female_18.fbx	FBX	0.29	0.17	0.14	-0.80	1.26	-0.11	166	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_00.fbx	FBX	0.29	0.11	0.14	-0.80	1.30	-0.11	54	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_01.fbx	FBX	0.29	0.14	0.15	-0.80	1.29	-0.11	204	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_02.fbx	FBX	0.29	0.12	0.17	-0.80	1.30	-0.14	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_03.fbx	FBX	0.29	0.14	0.16	-0.80	1.28	-0.12	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_04.fbx	FBX	0.29	0.15	0.14	-0.80	1.29	-0.11	150	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_05.fbx	FBX	0.28	0.15	0.13	-0.80	1.28	-0.10	108	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_06.fbx	FBX	0.39	0.18	0.18	-0.89	1.27	-0.15	296	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_07.fbx	FBX	0.29	0.16	0.15	-0.80	1.28	-0.11	94	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_08.fbx	FBX	0.29	0.14	0.16	-0.80	1.29	-0.12	290	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_09.fbx	FBX	0.29	0.13	0.15	-0.80	1.29	-0.11	174	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_10.fbx	FBX	0.29	0.14	0.15	-0.80	1.29	-0.12	264	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_11.fbx	FBX	0.37	0.19	0.19	-0.88	1.28	-0.13	286	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_12.fbx	FBX	0.34	0.12	0.14	-0.85	1.30	-0.11	146	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_13.fbx	FBX	0.29	0.11	0.14	-0.80	1.30	-0.11	262	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_14.fbx	FBX	0.29	0.12	0.14	-0.80	1.30	-0.11	222	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_15.fbx	FBX	0.30	0.17	0.20	-0.80	1.27	-0.15	256	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_16.fbx	FBX	0.29	0.12	0.14	-0.80	1.30	-0.11	184	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_17.fbx	FBX	0.30	0.12	0.16	-0.81	1.29	-0.13	106	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmLowerRight_Male_18.fbx	FBX	0.29	0.17	0.17	-0.80	1.27	-0.13	166	1	8	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_00.fbx	FBX	0.35	0.11	0.11	0.18	1.31	-0.10	46	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_01.fbx	FBX	0.35	0.16	0.15	0.18	1.28	-0.13	196	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_02.fbx	FBX	0.35	0.17	0.17	0.18	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_03.fbx	FBX	0.35	0.15	0.17	0.18	1.28	-0.14	226	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_04.fbx	FBX	0.35	0.18	0.15	0.18	1.28	-0.13	298	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_05.fbx	FBX	0.35	0.15	0.14	0.18	1.29	-0.12	92	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_06.fbx	FBX	0.35	0.17	0.17	0.18	1.29	-0.14	134	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_07.fbx	FBX	0.35	0.16	0.15	0.18	1.29	-0.13	176	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_08.fbx	FBX	0.35	0.18	0.14	0.18	1.28	-0.12	108	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_09.fbx	FBX	0.35	0.16	0.14	0.18	1.29	-0.12	276	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_10.fbx	FBX	0.36	0.15	0.14	0.18	1.28	-0.12	128	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_11.fbx	FBX	0.35	0.14	0.14	0.18	1.30	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_12.fbx	FBX	0.35	0.20	0.16	0.18	1.28	-0.12	244	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_13.fbx	FBX	0.35	0.16	0.14	0.18	1.28	-0.12	236	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_14.fbx	FBX	0.35	0.17	0.15	0.18	1.28	-0.12	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_15.fbx	FBX	0.35	0.16	0.14	0.18	1.28	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_16.fbx	FBX	0.35	0.15	0.15	0.18	1.29	-0.12	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_17.fbx	FBX	0.35	0.17	0.18	0.18	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_18.fbx	FBX	0.35	0.15	0.14	0.18	1.29	-0.12	104	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_19.fbx	FBX	0.35	0.14	0.14	0.18	1.30	-0.12	68	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Female_20.fbx	FBX	0.35	0.17	0.18	0.18	1.28	-0.14	120	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_00.fbx	FBX	0.33	0.12	0.14	0.19	1.31	-0.11	46	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_01.fbx	FBX	0.32	0.17	0.17	0.20	1.27	-0.13	196	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_02.fbx	FBX	0.32	0.16	0.19	0.20	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_03.fbx	FBX	0.33	0.14	0.20	0.19	1.29	-0.15	226	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_04.fbx	FBX	0.32	0.17	0.19	0.20	1.28	-0.14	298	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_05.fbx	FBX	0.33	0.16	0.17	0.20	1.28	-0.13	92	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_06.fbx	FBX	0.33	0.17	0.17	0.20	1.28	-0.13	108	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_07.fbx	FBX	0.33	0.17	0.18	0.20	1.28	-0.14	176	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_08.fbx	FBX	0.32	0.17	0.19	0.20	1.28	-0.14	134	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_09.fbx	FBX	0.33	0.16	0.17	0.20	1.28	-0.13	276	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_10.fbx	FBX	0.33	0.16	0.17	0.20	1.28	-0.13	128	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_11.fbx	FBX	0.33	0.14	0.15	0.19	1.29	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_12.fbx	FBX	0.33	0.19	0.18	0.20	1.27	-0.13	244	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_13.fbx	FBX	0.33	0.17	0.14	0.19	1.27	-0.11	236	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_14.fbx	FBX	0.33	0.16	0.17	0.20	1.28	-0.13	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_15.fbx	FBX	0.33	0.16	0.17	0.20	1.28	-0.13	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_16.fbx	FBX	0.33	0.15	0.18	0.19	1.28	-0.13	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_17.fbx	FBX	0.33	0.19	0.22	0.20	1.26	-0.16	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_18.fbx	FBX	0.33	0.15	0.17	0.20	1.29	-0.13	104	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_19.fbx	FBX	0.33	0.15	0.17	0.20	1.29	-0.13	68	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperLeft_Male_20.fbx	FBX	0.32	0.17	0.20	0.20	1.28	-0.15	120	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_00.fbx	FBX	0.35	0.11	0.11	-0.53	1.31	-0.10	46	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_01.fbx	FBX	0.35	0.16	0.15	-0.53	1.28	-0.13	196	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_02.fbx	FBX	0.35	0.17	0.17	-0.53	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_03.fbx	FBX	0.35	0.15	0.17	-0.53	1.28	-0.14	226	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_04.fbx	FBX	0.35	0.18	0.15	-0.53	1.28	-0.13	298	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_05.fbx	FBX	0.35	0.15	0.14	-0.53	1.29	-0.12	92	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_06.fbx	FBX	0.35	0.17	0.17	-0.53	1.29	-0.14	134	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_07.fbx	FBX	0.35	0.16	0.15	-0.53	1.29	-0.13	176	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_08.fbx	FBX	0.35	0.18	0.14	-0.53	1.28	-0.12	108	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_09.fbx	FBX	0.35	0.16	0.14	-0.53	1.29	-0.12	276	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_10.fbx	FBX	0.36	0.15	0.14	-0.54	1.28	-0.12	128	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_11.fbx	FBX	0.35	0.14	0.14	-0.53	1.30	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_12.fbx	FBX	0.35	0.20	0.16	-0.53	1.28	-0.12	244	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_13.fbx	FBX	0.35	0.16	0.14	-0.53	1.28	-0.12	236	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_14.fbx	FBX	0.35	0.17	0.15	-0.53	1.28	-0.12	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_15.fbx	FBX	0.35	0.16	0.14	-0.53	1.28	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_16.fbx	FBX	0.35	0.15	0.15	-0.53	1.29	-0.12	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_17.fbx	FBX	0.35	0.17	0.18	-0.53	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_18.fbx	FBX	0.35	0.15	0.14	-0.53	1.29	-0.12	104	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_19.fbx	FBX	0.35	0.14	0.14	-0.53	1.30	-0.12	68	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Female_20.fbx	FBX	0.35	0.17	0.18	-0.53	1.28	-0.14	120	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_00.fbx	FBX	0.33	0.12	0.14	-0.53	1.31	-0.11	46	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_01.fbx	FBX	0.32	0.17	0.17	-0.53	1.27	-0.13	196	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_02.fbx	FBX	0.32	0.16	0.19	-0.53	1.28	-0.14	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_03.fbx	FBX	0.33	0.14	0.20	-0.53	1.29	-0.15	226	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_04.fbx	FBX	0.32	0.17	0.19	-0.53	1.28	-0.14	298	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_05.fbx	FBX	0.33	0.16	0.17	-0.53	1.28	-0.13	92	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_06.fbx	FBX	0.32	0.17	0.19	-0.53	1.28	-0.14	134	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_07.fbx	FBX	0.33	0.17	0.18	-0.53	1.28	-0.14	176	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_08.fbx	FBX	0.33	0.17	0.17	-0.53	1.28	-0.13	108	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_09.fbx	FBX	0.33	0.16	0.17	-0.53	1.28	-0.13	276	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_10.fbx	FBX	0.33	0.16	0.17	-0.53	1.28	-0.13	128	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_11.fbx	FBX	0.33	0.14	0.15	-0.53	1.29	-0.12	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_12.fbx	FBX	0.33	0.19	0.18	-0.53	1.27	-0.13	244	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_13.fbx	FBX	0.33	0.17	0.14	-0.53	1.27	-0.11	236	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_14.fbx	FBX	0.33	0.16	0.17	-0.53	1.28	-0.13	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_15.fbx	FBX	0.33	0.16	0.17	-0.53	1.28	-0.13	110	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_16.fbx	FBX	0.33	0.15	0.18	-0.53	1.28	-0.13	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_17.fbx	FBX	0.33	0.19	0.22	-0.53	1.26	-0.16	116	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_18.fbx	FBX	0.33	0.15	0.17	-0.53	1.29	-0.13	104	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_19.fbx	FBX	0.33	0.15	0.17	-0.53	1.29	-0.13	68	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ArmUpperRight_Male_20.fbx	FBX	0.32	0.17	0.20	-0.53	1.28	-0.15	120	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_BackAttachment_01.fbx	FBX	0.43	0.54	0.24	-0.22	1.01	-0.34	844	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_BackAttachment_02.fbx	FBX	0.29	0.29	0.13	-0.15	1.16	-0.27	372	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_BackAttachment_03.fbx	FBX	0.55	1.28	0.28	-0.27	0.26	-0.36	386	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_04.fbx	FBX	0.51	1.06	0.22	-0.25	0.48	-0.30	288	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_05.fbx	FBX	0.78	1.42	0.30	-0.39	0.11	-0.38	376	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_06.fbx	FBX	0.73	1.39	0.30	-0.37	0.15	-0.38	310	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_07.fbx	FBX	0.43	1.37	0.30	-0.22	0.17	-0.38	194	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_08.fbx	FBX	0.43	1.35	0.30	-0.22	0.18	-0.38	202	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_09.fbx	FBX	0.55	0.96	0.23	-0.27	0.58	-0.31	186	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_10.fbx	FBX	0.66	1.27	0.30	-0.33	0.26	-0.38	272	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_11.fbx	FBX	0.66	1.27	0.30	-0.33	0.26	-0.38	210	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_12.fbx	FBX	0.62	0.75	0.22	-0.31	0.79	-0.30	194	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_13.fbx	FBX	0.73	1.37	0.30	-0.37	0.17	-0.38	242	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_14.fbx	FBX	0.70	1.21	0.25	-0.35	0.33	-0.32	298	1	7		lambert2	
+FBX/SK_Chr_BackAttachment_15.fbx	FBX	0.73	1.37	0.30	-0.37	0.17	-0.38	242	1	7		lambert2	
+FBX/SK_Chr_Ear_Ear_01.fbx	FBX	0.30	0.11	0.10	-0.15	1.60	-0.08	40	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Ear_Ear_02.fbx	FBX	0.30	0.14	0.13	-0.15	1.60	-0.11	40	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Ear_Ear_03.fbx	FBX	0.40	0.13	0.13	-0.20	1.60	-0.11	40	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_ElbowAttachLeft_01.fbx	FBX	0.18	0.12	0.13	0.44	1.29	-0.17	170	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachLeft_02.fbx	FBX	0.13	0.11	0.07	0.48	1.30	-0.15	98	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachLeft_03.fbx	FBX	0.22	0.13	0.07	0.42	1.29	-0.16	92	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachLeft_04.fbx	FBX	0.19	0.15	0.09	0.43	1.28	-0.17	128	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachLeft_05.fbx	FBX	0.24	0.19	0.14	0.40	1.27	-0.16	244	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachLeft_06.fbx	FBX	0.15	0.14	0.11	0.45	1.28	-0.15	118	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_01.fbx	FBX	0.18	0.12	0.13	-0.63	1.29	-0.17	170	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_02.fbx	FBX	0.13	0.11	0.07	-0.60	1.30	-0.15	98	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_03.fbx	FBX	0.22	0.13	0.07	-0.63	1.29	-0.16	92	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_04.fbx	FBX	0.19	0.15	0.09	-0.62	1.28	-0.17	128	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_05.fbx	FBX	0.24	0.19	0.14	-0.64	1.27	-0.16	244	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ElbowAttachRight_06.fbx	FBX	0.15	0.14	0.11	-0.60	1.28	-0.15	118	1	7	Take 001:2.67s	lambert1	
+FBX/SK_Chr_Eyebrow_Female_01.fbx	FBX	0.17	0.03	0.02	-0.09	1.68	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_02.fbx	FBX	0.17	0.03	0.02	-0.09	1.68	0.10	64	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_03.fbx	FBX	0.17	0.03	0.02	-0.09	1.68	0.10	59	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_04.fbx	FBX	0.17	0.03	0.02	-0.09	1.68	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_05.fbx	FBX	0.17	0.02	0.02	-0.09	1.68	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_06.fbx	FBX	0.17	0.03	0.02	-0.09	1.67	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Female_07.fbx	FBX	0.17	0.04	0.02	-0.09	1.66	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_01.fbx	FBX	0.22	0.05	0.03	-0.11	1.66	0.10	24	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_02.fbx	FBX	0.20	0.05	0.03	-0.10	1.66	0.10	40	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_03.fbx	FBX	0.22	0.05	0.03	-0.10	1.66	0.10	28	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_04.fbx	FBX	0.17	0.05	0.03	-0.09	1.66	0.10	44	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_05.fbx	FBX	0.18	0.04	0.03	-0.08	1.66	0.10	44	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_06.fbx	FBX	0.18	0.05	0.03	-0.09	1.66	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_07.fbx	FBX	0.18	0.04	0.03	-0.09	1.66	0.10	44	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_08.fbx	FBX	0.18	0.04	0.03	-0.09	1.66	0.10	52	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_09.fbx	FBX	0.18	0.04	0.03	-0.08	1.66	0.10	48	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Eyebrow_Male_10.fbx	FBX	0.22	0.05	0.03	-0.11	1.66	0.10	40	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_01.fbx	FBX	0.25	0.24	0.14	-0.12	1.44	0.01	212	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_02.fbx	FBX	0.23	0.28	0.16	-0.12	1.38	0	250	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_03.fbx	FBX	0.21	0.16	0.07	-0.10	1.47	0.07	148	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_04.fbx	FBX	0.25	0.18	0.14	-0.12	1.52	0	132	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_05.fbx	FBX	0.22	0.13	0.13	-0.11	1.48	0.02	206	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_06.fbx	FBX	0.12	0.13	0.05	-0.06	1.48	0.10	86	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_07.fbx	FBX	0.09	0.07	0.04	-0.04	1.47	0.10	54	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_08.fbx	FBX	0.13	0.07	0.03	-0.06	1.53	0.11	64	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_09.fbx	FBX	0.26	0.22	0.15	-0.13	1.46	0	136	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_10.fbx	FBX	0.23	0.22	0.13	-0.11	1.47	0.01	128	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_11.fbx	FBX	0.20	0.05	0.07	-0.10	1.57	0.06	76	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_12.fbx	FBX	0.26	0.22	0.15	-0.13	1.44	0.02	244	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_13.fbx	FBX	0.23	0.19	0.13	-0.12	1.47	0.02	204	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_14.fbx	FBX	0.29	0.23	0.16	-0.15	1.45	0.01	196	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_15.fbx	FBX	0.23	0.19	0.12	-0.12	1.49	0.01	92	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_16.fbx	FBX	0.16	0.07	0.03	-0.08	1.55	0.11	56	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_17.fbx	FBX	0.29	0.20	0.12	-0.15	1.47	0.01	100	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_FacialHair_Male_18.fbx	FBX	0.23	0.20	0.14	-0.12	1.46	0.02	228	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_01.fbx	FBX	0.21	0.27	0.42	-0.10	1.60	-0.30	340	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_02.fbx	FBX	0.29	0.31	0.29	-0.15	1.49	-0.17	272	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_03.fbx	FBX	0.25	0.23	0.25	-0.12	1.56	-0.13	154	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_04.fbx	FBX	0.25	0.14	0.30	-0.12	1.68	-0.15	124	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_05.fbx	FBX	0.31	0.24	0.32	-0.15	1.60	-0.14	160	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_06.fbx	FBX	0.22	0.14	0.34	-0.11	1.69	-0.19	204	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_07.fbx	FBX	0.28	0.27	0.28	-0.12	1.53	-0.13	250	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_08.fbx	FBX	0.21	0.23	0.25	-0.10	1.61	-0.13	108	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_09.fbx	FBX	0.29	0.23	0.30	-0.14	1.56	-0.14	270	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_10.fbx	FBX	0.25	0.25	0.30	-0.13	1.54	-0.15	248	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_11.fbx	FBX	0.25	0.25	0.28	-0.12	1.56	-0.13	186	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_12.fbx	FBX	0.25	0.23	0.25	-0.12	1.56	-0.13	184	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_13.fbx	FBX	0.28	0.28	0.28	-0.14	1.55	-0.15	195	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_14.fbx	FBX	0.34	0.24	0.31	-0.17	1.60	-0.14	290	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_15.fbx	FBX	0.09	0.20	0.23	-0.04	1.61	-0.15	70	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_16.fbx	FBX	0.25	0.27	0.27	-0.12	1.55	-0.13	184	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_17.fbx	FBX	0.09	0.23	0.29	-0.04	1.59	-0.15	84	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_18.fbx	FBX	0.25	0.24	0.27	-0.12	1.56	-0.13	162	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_19.fbx	FBX	0.25	0.29	0.34	-0.13	1.54	-0.21	266	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_20.fbx	FBX	0.28	0.33	0.28	-0.14	1.48	-0.15	298	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_21.fbx	FBX	0.28	0.35	0.26	-0.14	1.45	-0.13	270	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_22.fbx	FBX	0.26	0.28	0.31	-0.13	1.54	-0.16	262	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_23.fbx	FBX	0.31	0.30	0.35	-0.16	1.52	-0.16	218	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_24.fbx	FBX	0.28	0.33	0.26	-0.14	1.48	-0.14	450	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_25.fbx	FBX	0.29	0.38	0.33	-0.13	1.47	-0.20	366	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_26.fbx	FBX	0.26	0.35	0.34	-0.13	1.45	-0.17	382	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_27.fbx	FBX	0.33	0.24	0.32	-0.16	1.57	-0.14	484	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_28.fbx	FBX	0.30	0.33	0.32	-0.15	1.48	-0.14	396	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_29.fbx	FBX	0.29	0.34	0.32	-0.15	1.46	-0.17	638	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_30.fbx	FBX	0.26	0.36	0.35	-0.13	1.49	-0.22	296	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_31.fbx	FBX	0.26	0.32	0.29	-0.13	1.48	-0.14	218	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_32.fbx	FBX	0.28	0.32	0.37	-0.15	1.48	-0.22	330	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_33.fbx	FBX	0.28	0.26	0.30	-0.15	1.56	-0.17	305	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_34.fbx	FBX	0.29	0.36	0.27	-0.15	1.45	-0.14	257	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_35.fbx	FBX	0.26	0.35	0.27	-0.13	1.46	-0.14	242	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_36.fbx	FBX	0.26	0.32	0.27	-0.13	1.48	-0.14	206	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_37.fbx	FBX	0.27	0.29	0.28	-0.14	1.54	-0.15	280	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hair_38.fbx	FBX	0.29	0.38	0.40	-0.14	1.45	-0.28	542	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_00.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_01.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_02.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	216	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_03.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_04.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	186	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_05.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_06.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	166	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_07.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_08.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	156	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_09.fbx	FBX	0.25	0.11	0.19	0.78	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_10.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	172	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_11.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	176	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_12.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	252	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_13.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_14.fbx	FBX	0.24	0.11	0.19	0.79	1.29	-0.11	290	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_15.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	182	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_16.fbx	FBX	0.23	0.11	0.19	0.79	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Female_17.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_00.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_01.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_02.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	216	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_03.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_04.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	186	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_05.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_06.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	166	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_07.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_08.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	156	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_09.fbx	FBX	0.25	0.11	0.19	0.78	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_10.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	172	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_11.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	176	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_12.fbx	FBX	0.24	0.12	0.19	0.79	1.29	-0.11	252	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_13.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_14.fbx	FBX	0.24	0.11	0.19	0.79	1.29	-0.11	290	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_15.fbx	FBX	0.23	0.10	0.19	0.79	1.29	-0.11	182	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_16.fbx	FBX	0.23	0.11	0.19	0.79	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandLeft_Male_17.fbx	FBX	0.24	0.10	0.19	0.79	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_00.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_01.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_02.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	216	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_03.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_04.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	186	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_05.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_06.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	166	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_07.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_08.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	156	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_09.fbx	FBX	0.25	0.11	0.19	-1.02	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_10.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	172	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_11.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	176	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_12.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	252	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_13.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_14.fbx	FBX	0.24	0.11	0.19	-1.02	1.29	-0.11	290	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_15.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	182	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_16.fbx	FBX	0.23	0.11	0.19	-1.02	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Female_17.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_00.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_01.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_02.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	216	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_03.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_04.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	186	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_05.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_06.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	166	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_07.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_08.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	156	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_09.fbx	FBX	0.25	0.11	0.19	-1.02	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_10.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	172	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_11.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	176	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_12.fbx	FBX	0.24	0.12	0.19	-1.02	1.29	-0.11	252	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_13.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	144	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_14.fbx	FBX	0.24	0.11	0.19	-1.02	1.29	-0.11	290	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_15.fbx	FBX	0.23	0.10	0.19	-1.02	1.29	-0.11	182	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_16.fbx	FBX	0.23	0.11	0.19	-1.02	1.29	-0.11	162	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HandRight_Male_17.fbx	FBX	0.24	0.10	0.19	-1.02	1.29	-0.11	180	1	19	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_01.fbx	FBX	0.42	0.31	0.36	-0.21	1.50	-0.20	364	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_02.fbx	FBX	0.55	0.31	0.58	-0.27	1.61	-0.30	180	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_03.fbx	FBX	0.46	0.44	0.44	-0.20	1.67	-0.21	516	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_04.fbx	FBX	0.29	0.14	0.31	-0.14	1.70	-0.15	412	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_05.fbx	FBX	0.38	0.49	0.87	-0.15	1.65	-0.53	570	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_06.fbx	FBX	0.38	0.35	0.52	-0.19	1.66	-0.24	328	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_07.fbx	FBX	0.54	0.33	0.93	-0.27	1.65	-0.45	606	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_08.fbx	FBX	0.42	0.32	0.78	-0.21	1.64	-0.53	238	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_09.fbx	FBX	0.54	0.30	0.45	-0.27	1.68	-0.23	258	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_10.fbx	FBX	0.42	0.32	0.99	-0.21	1.64	-0.53	238	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_Base_Hair_11.fbx	FBX	0.54	0.33	0.93	-0.27	1.65	-0.45	606	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_FacialHair_01.fbx	FBX	0.25	0.32	0.11	-0.13	1.46	0.03	292	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_FacialHair_02.fbx	FBX	0.25	0.32	0.11	-0.13	1.46	0.03	292	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_FacialHair_03.fbx	FBX	0.26	0.27	0.30	-0.13	1.38	-0.15	162	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_FacialHair_04.fbx	FBX	0.27	0.29	0.27	-0.13	1.36	-0.12	108	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_01.fbx	FBX	0.30	0.47	0.31	-0.15	1.36	-0.17	324	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_02.fbx	FBX	0.32	0.50	0.33	-0.16	1.36	-0.16	255	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_03.fbx	FBX	0.49	0.45	0.53	-0.25	1.36	-0.25	244	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_04.fbx	FBX	0.27	0.39	0.35	-0.14	1.46	-0.17	222	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_05.fbx	FBX	0.28	0.45	0.38	-0.14	1.36	-0.17	192	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_06.fbx	FBX	0.31	0.43	0.35	-0.16	1.36	-0.17	192	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_07.fbx	FBX	0.28	0.45	0.38	-0.14	1.36	-0.17	184	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_08.fbx	FBX	0.28	0.47	0.47	-0.14	1.36	-0.24	232	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_09.fbx	FBX	0.54	0.53	0.57	-0.27	1.36	-0.27	716	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_10.fbx	FBX	0.38	0.49	0.54	-0.19	1.41	-0.23	720	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_11.fbx	FBX	0.28	0.45	0.40	-0.14	1.45	-0.19	430	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_12.fbx	FBX	0.32	0.44	0.28	-0.16	1.36	-0.15	194	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HeadCoverings_No_Hair_13.fbx	FBX	0.28	0.43	0.36	-0.14	1.40	-0.19	200	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_00.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	174	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_01.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	184	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_02.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	200	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_03.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	178	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_04.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	214	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_05.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	228	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_06.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	190	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_07.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	222	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_08.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	190	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_09.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	254	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_10.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	194	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_11.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	235	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_12.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	242	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_13.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	266	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_14.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	226	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_15.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	206	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_16.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_17.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	186	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_18.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	220	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_19.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	266	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_20.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	224	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_21.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	258	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Female_22.fbx	FBX	0.27	0.37	0.25	-0.13	1.42	-0.12	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_00.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	160	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_01.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	170	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_02.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	184	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_03.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	172	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_04.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	212	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_05.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	224	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_06.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	176	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_07.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	216	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_08.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	178	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_09.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	236	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_10.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	178	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_11.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	208	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_12.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	220	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_13.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	248	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_14.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	208	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_15.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	192	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_16.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	202	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_17.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	172	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_18.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	206	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_19.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	252	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_20.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	206	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_21.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	228	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_Male_22.fbx	FBX	0.27	0.35	0.26	-0.13	1.44	-0.12	198	1	7	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_01.fbx	FBX	0.27	0.37	0.46	-0.13	1.42	-0.12	586	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_02.fbx	FBX	0.25	0.41	0.35	-0.13	1.42	-0.15	394	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_03.fbx	FBX	0.25	0.38	0.31	-0.13	1.42	-0.12	456	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_04.fbx	FBX	0.28	0.43	0.40	-0.14	1.42	-0.19	450	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_05.fbx	FBX	0.26	0.41	0.35	-0.13	1.42	-0.15	390	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_06.fbx	FBX	0.26	0.38	0.33	-0.13	1.42	-0.13	744	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_07.fbx	FBX	0.27	0.40	0.33	-0.13	1.42	-0.14	798	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_08.fbx	FBX	0.28	0.39	0.35	-0.14	1.42	-0.16	608	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_09.fbx	FBX	0.25	0.38	0.29	-0.12	1.42	-0.13	622	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_10.fbx	FBX	0.29	0.38	0.43	-0.15	1.41	-0.14	534	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_11.fbx	FBX	0.25	0.39	0.33	-0.12	1.42	-0.14	864	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_12.fbx	FBX	0.28	0.42	0.35	-0.14	1.42	-0.16	442	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Female_13.fbx	FBX	0.25	0.40	0.35	-0.13	1.42	-0.14	916	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_01.fbx	FBX	0.27	0.35	0.46	-0.13	1.44	-0.12	600	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_02.fbx	FBX	0.25	0.39	0.35	-0.13	1.44	-0.15	394	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_03.fbx	FBX	0.25	0.36	0.31	-0.13	1.44	-0.12	456	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_04.fbx	FBX	0.28	0.41	0.40	-0.14	1.44	-0.19	450	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_05.fbx	FBX	0.26	0.39	0.35	-0.13	1.44	-0.15	390	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_06.fbx	FBX	0.26	0.37	0.33	-0.13	1.44	-0.13	744	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_07.fbx	FBX	0.27	0.38	0.33	-0.13	1.44	-0.14	798	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_08.fbx	FBX	0.28	0.39	0.35	-0.14	1.42	-0.16	608	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_09.fbx	FBX	0.25	0.37	0.29	-0.12	1.44	-0.13	622	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_10.fbx	FBX	0.29	0.38	0.43	-0.15	1.41	-0.14	534	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_11.fbx	FBX	0.25	0.37	0.33	-0.12	1.44	-0.14	864	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_12.fbx	FBX	0.28	0.41	0.35	-0.14	1.43	-0.16	442	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Head_No_Elements_Male_13.fbx	FBX	0.25	0.38	0.35	-0.13	1.44	-0.14	916	1	6	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_01.fbx	FBX	0.17	0.38	0.45	-0.09	1.53	-0.48	166	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_02.fbx	FBX	0.12	0.39	0.47	-0.07	1.52	-0.50	166	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_03.fbx	FBX	0.34	0.33	0.20	-0.17	1.58	-0.12	508	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_04.fbx	FBX	0.60	0.34	0.13	-0.31	1.65	-0.09	192	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_05.fbx	FBX	0.53	0.39	0.65	-0.25	1.60	-0.68	522	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_06.fbx	FBX	0.07	0.31	0.38	-0.03	1.64	-0.21	156	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_07.fbx	FBX	0.30	0.22	0.26	-0.15	1.73	-0.20	140	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_08.fbx	FBX	0.28	0.16	0.23	-0.14	1.68	-0.06	220	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_09.fbx	FBX	0.13	0.24	0.12	-0.06	1.71	0.06	160	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_10.fbx	FBX	0.26	0.41	0.64	-0.15	1.64	-0.66	234	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_11.fbx	FBX	0.17	0.24	0.14	-0.08	1.68	0.05	232	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_12.fbx	FBX	0.18	0.38	0.58	-0.25	1.64	-0.51	432	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HelmetAttachment_13.fbx	FBX	0.20	0.38	0.60	0.06	1.64	-0.53	432	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_HipsAttachment_01.fbx	FBX	0.13	0.20	0.13	-0.28	0.75	-0.02	144	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_02.fbx	FBX	0.12	0.20	0.11	-0.28	0.78	0	332	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_03.fbx	FBX	0.11	0.16	0.20	-0.27	0.79	-0.10	236	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_04.fbx	FBX	0.07	0.35	0.22	-0.24	0.59	-0.11	322	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_05.fbx	FBX	0.09	0.24	0.22	-0.24	0.77	-0.11	198	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_06.fbx	FBX	0.10	0.15	0.22	-0.26	0.78	-0.11	280	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_07.fbx	FBX	0.16	0.45	0.26	0.16	0.53	-0.20	194	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_08.fbx	FBX	0.15	0.27	0.39	0.12	0.76	-0.21	152	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_09.fbx	FBX	0.16	0.33	0.13	0.16	0.64	-0.13	224	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_10.fbx	FBX	0.10	0.25	0.22	0.16	0.67	-0.14	196	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_11.fbx	FBX	0.15	0.12	0.17	0.10	0.77	-0.04	64	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_HipsAttachment_12.fbx	FBX	0.08	0.31	0.22	0.16	0.59	-0.12	244	1	1	Take 001:0.03s	lambert1	
+FBX/SK_Chr_Hips_Female_00.fbx	FBX	0.38	0.58	0.30	-0.19	0.37	-0.18	248	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_01.fbx	FBX	0.46	0.58	0.30	-0.23	0.37	-0.18	656	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_02.fbx	FBX	0.46	0.58	0.27	-0.23	0.37	-0.17	480	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_03.fbx	FBX	0.42	0.58	0.28	-0.21	0.37	-0.18	318	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_04.fbx	FBX	0.41	0.58	0.28	-0.20	0.37	-0.17	388	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_05.fbx	FBX	0.49	0.58	0.30	-0.24	0.37	-0.18	310	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_06.fbx	FBX	0.45	0.58	0.28	-0.22	0.37	-0.18	496	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_07.fbx	FBX	0.41	0.58	0.28	-0.20	0.37	-0.17	298	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_08.fbx	FBX	0.43	0.58	0.28	-0.23	0.37	-0.18	248	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_09.fbx	FBX	0.49	0.58	0.30	-0.24	0.37	-0.18	382	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_10.fbx	FBX	0.45	0.58	0.30	-0.21	0.38	-0.18	380	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_11.fbx	FBX	0.45	0.58	0.28	-0.23	0.37	-0.18	412	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_12.fbx	FBX	0.50	0.58	0.33	-0.25	0.37	-0.18	346	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_13.fbx	FBX	0.40	0.58	0.30	-0.20	0.37	-0.20	499	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_14.fbx	FBX	0.44	0.58	0.27	-0.22	0.37	-0.17	232	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_15.fbx	FBX	0.45	0.58	0.29	-0.22	0.37	-0.19	806	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_16.fbx	FBX	0.44	0.58	0.27	-0.22	0.37	-0.17	668	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_17.fbx	FBX	0.41	0.58	0.28	-0.20	0.37	-0.18	266	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_18.fbx	FBX	0.47	0.58	0.32	-0.23	0.37	-0.18	490	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_19.fbx	FBX	0.43	0.58	0.28	-0.21	0.37	-0.18	434	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_20.fbx	FBX	0.50	0.58	0.30	-0.25	0.37	-0.19	650	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_21.fbx	FBX	0.45	0.58	0.28	-0.22	0.37	-0.17	348	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_22.fbx	FBX	0.42	0.58	0.28	-0.21	0.37	-0.18	590	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_23.fbx	FBX	0.42	0.58	0.28	-0.21	0.37	-0.18	434	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_24.fbx	FBX	0.53	0.58	0.29	-0.26	0.37	-0.18	326	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_25.fbx	FBX	0.47	0.58	0.36	-0.23	0.37	-0.19	626	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_26.fbx	FBX	0.48	0.58	0.32	-0.24	0.37	-0.19	638	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_27.fbx	FBX	0.50	0.58	0.29	-0.25	0.37	-0.18	344	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Female_28.fbx	FBX	0.50	0.58	0.32	-0.25	0.37	-0.18	464	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_00.fbx	FBX	0.36	0.55	0.28	-0.18	0.38	-0.15	276	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_01.fbx	FBX	0.43	0.55	0.30	-0.21	0.38	-0.16	656	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_02.fbx	FBX	0.45	0.55	0.28	-0.23	0.38	-0.15	480	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_03.fbx	FBX	0.41	0.55	0.30	-0.20	0.38	-0.18	318	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_04.fbx	FBX	0.40	0.55	0.30	-0.20	0.38	-0.18	386	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_05.fbx	FBX	0.48	0.55	0.30	-0.24	0.38	-0.17	310	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_06.fbx	FBX	0.44	0.55	0.31	-0.22	0.38	-0.18	492	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_07.fbx	FBX	0.40	0.55	0.29	-0.20	0.38	-0.17	298	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_08.fbx	FBX	0.41	0.55	0.29	-0.21	0.38	-0.17	248	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_09.fbx	FBX	0.48	0.55	0.31	-0.24	0.38	-0.17	380	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_10.fbx	FBX	0.45	0.55	0.31	-0.20	0.38	-0.17	380	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_11.fbx	FBX	0.44	0.55	0.29	-0.22	0.38	-0.17	412	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_12.fbx	FBX	0.49	0.55	0.34	-0.25	0.38	-0.19	346	1	48	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_13.fbx	FBX	0.37	0.55	0.30	-0.19	0.38	-0.18	500	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_14.fbx	FBX	0.44	0.55	0.28	-0.22	0.38	-0.15	232	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_15.fbx	FBX	0.42	0.55	0.33	-0.21	0.38	-0.19	806	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_16.fbx	FBX	0.44	0.55	0.28	-0.22	0.38	-0.16	668	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_17.fbx	FBX	0.38	0.56	0.30	-0.19	0.38	-0.17	266	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_18.fbx	FBX	0.44	0.57	0.33	-0.22	0.37	-0.17	490	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_19.fbx	FBX	0.39	0.55	0.30	-0.19	0.38	-0.18	434	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_20.fbx	FBX	0.47	0.55	0.32	-0.23	0.38	-0.20	650	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_21.fbx	FBX	0.45	0.55	0.28	-0.22	0.38	-0.15	348	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_22.fbx	FBX	0.42	0.55	0.32	-0.21	0.38	-0.18	590	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_23.fbx	FBX	0.42	0.55	0.30	-0.21	0.38	-0.18	434	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_24.fbx	FBX	0.50	0.56	0.31	-0.25	0.38	-0.17	326	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_25.fbx	FBX	0.48	0.55	0.36	-0.24	0.38	-0.19	626	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_26.fbx	FBX	0.47	0.55	0.32	-0.24	0.38	-0.18	638	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_27.fbx	FBX	0.49	0.55	0.32	-0.25	0.38	-0.19	344	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Hips_Male_28.fbx	FBX	0.49	0.55	0.34	-0.25	0.38	-0.19	464	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_KneeAttachLeft_01.fbx	FBX	0.16	0.17	0.08	0.04	0.34	0.01	146	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_02.fbx	FBX	0.18	0.18	0.11	0.03	0.32	-0.01	118	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_03.fbx	FBX	0.18	0.17	0.15	0.02	0.33	-0.07	132	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_04.fbx	FBX	0.16	0.17	0.13	0.03	0.34	-0.06	228	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_05.fbx	FBX	0.15	0.19	0.15	0.04	0.35	-0.04	170	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_06.fbx	FBX	0.16	0.23	0.09	0.04	0.30	0.03	92	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_07.fbx	FBX	0.22	0.23	0.19	0.01	0.32	-0.11	168	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_08.fbx	FBX	0.17	0.22	0.09	0.03	0.33	0.01	116	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_09.fbx	FBX	0.21	0.22	0.16	0.01	0.29	-0.07	228	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_10.fbx	FBX	0.15	0.16	0.11	0.04	0.36	-0.04	118	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachLeft_11.fbx	FBX	0.11	0.13	0.07	0.06	0.35	0	98	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_01.fbx	FBX	0.16	0.17	0.08	-0.19	0.34	0.01	146	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_02.fbx	FBX	0.18	0.18	0.11	-0.20	0.32	-0.01	118	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_03.fbx	FBX	0.18	0.17	0.15	-0.20	0.33	-0.07	132	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_04.fbx	FBX	0.16	0.17	0.13	-0.20	0.34	-0.06	228	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_05.fbx	FBX	0.15	0.19	0.15	-0.18	0.35	-0.04	170	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_06.fbx	FBX	0.16	0.23	0.09	-0.20	0.30	0.03	92	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_07.fbx	FBX	0.22	0.23	0.19	-0.23	0.32	-0.11	168	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_08.fbx	FBX	0.17	0.22	0.09	-0.19	0.33	0.01	116	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_09.fbx	FBX	0.21	0.22	0.16	-0.22	0.29	-0.07	228	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_10.fbx	FBX	0.15	0.16	0.11	-0.19	0.36	-0.04	118	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_KneeAttachRight_11.fbx	FBX	0.11	0.13	0.07	-0.17	0.35	0	98	1	3	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Female_00.fbx	FBX	0.11	0.40	0.23	0.06	0	-0.11	52	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_01.fbx	FBX	0.14	0.40	0.25	0.04	0	-0.12	236	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_02.fbx	FBX	0.17	0.40	0.29	0.03	0	-0.13	193	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_03.fbx	FBX	0.14	0.40	0.24	0.04	-0.01	-0.11	192	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_04.fbx	FBX	0.18	0.40	0.27	0.04	0	-0.14	308	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_05.fbx	FBX	0.17	0.42	0.24	0.03	0	-0.11	398	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_06.fbx	FBX	0.18	0.40	0.24	0.03	0	-0.11	296	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_07.fbx	FBX	0.18	0.41	0.29	0.02	0	-0.12	264	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_08.fbx	FBX	0.18	0.43	0.24	0.02	0	-0.12	250	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_09.fbx	FBX	0.19	0.40	0.28	0.02	0	-0.15	432	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_10.fbx	FBX	0.14	0.45	0.28	0.04	0	-0.14	316	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_11.fbx	FBX	0.16	0.40	0.26	0.05	0	-0.12	254	1	5		ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_12.fbx	FBX	0.14	0.40	0.23	0.05	0	-0.11	198	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_13.fbx	FBX	0.16	0.48	0.29	0.04	-0.01	-0.16	276	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_14.fbx	FBX	0.16	0.50	0.31	0.03	-0.01	-0.13	206	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_15.fbx	FBX	0.14	0.40	0.24	0.04	0	-0.11	198	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_16.fbx	FBX	0.16	0.40	0.29	0.03	0	-0.15	346	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_17.fbx	FBX	0.14	0.40	0.26	0.05	0	-0.13	300	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_18.fbx	FBX	0.16	0.41	0.25	0.03	0	-0.12	178	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Female_19.fbx	FBX	0.16	0.40	0.28	0.03	0	-0.14	152	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegLeft_Male_00.fbx	FBX	0.11	0.40	0.24	0.06	0	-0.11	52	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_01.fbx	FBX	0.14	0.40	0.26	0.04	0	-0.12	236	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_02.fbx	FBX	0.17	0.40	0.31	0.03	0	-0.13	193	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_03.fbx	FBX	0.14	0.41	0.25	0.04	-0.01	-0.11	192	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_04.fbx	FBX	0.18	0.40	0.27	0.04	0	-0.14	308	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_05.fbx	FBX	0.19	0.42	0.25	0.02	0	-0.11	398	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_06.fbx	FBX	0.19	0.40	0.25	0.02	0	-0.11	296	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_07.fbx	FBX	0.18	0.41	0.31	0.02	0	-0.12	264	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_08.fbx	FBX	0.17	0.43	0.25	0.03	0	-0.12	250	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_09.fbx	FBX	0.20	0.40	0.29	0.02	0	-0.15	432	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_10.fbx	FBX	0.13	0.45	0.30	0.05	0	-0.14	316	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_11.fbx	FBX	0.16	0.40	0.27	0.05	0	-0.12	254	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_12.fbx	FBX	0.13	0.40	0.24	0.05	0	-0.11	198	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_13.fbx	FBX	0.16	0.48	0.31	0.04	-0.01	-0.16	276	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_14.fbx	FBX	0.16	0.50	0.33	0.03	-0.01	-0.13	206	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_15.fbx	FBX	0.15	0.40	0.25	0.04	0	-0.11	198	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_16.fbx	FBX	0.16	0.40	0.30	0.03	0	-0.15	346	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_17.fbx	FBX	0.14	0.40	0.26	0.05	0	-0.13	300	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_18.fbx	FBX	0.16	0.41	0.26	0.03	0	-0.12	178	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegLeft_Male_19.fbx	FBX	0.16	0.40	0.29	0.03	0	-0.15	152	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Female_00.fbx	FBX	0.11	0.40	0.23	-0.17	0	-0.11	52	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_01.fbx	FBX	0.14	0.40	0.25	-0.18	0	-0.12	236	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_02.fbx	FBX	0.17	0.40	0.29	-0.20	0	-0.13	193	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_03.fbx	FBX	0.14	0.40	0.24	-0.18	-0.01	-0.11	192	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_04.fbx	FBX	0.18	0.40	0.27	-0.23	0	-0.14	308	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_05.fbx	FBX	0.17	0.42	0.24	-0.20	0	-0.11	398	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_06.fbx	FBX	0.18	0.40	0.24	-0.21	0	-0.11	296	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_07.fbx	FBX	0.18	0.41	0.29	-0.21	0	-0.12	264	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_08.fbx	FBX	0.18	0.43	0.24	-0.20	0	-0.12	250	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_09.fbx	FBX	0.19	0.40	0.28	-0.21	0	-0.15	432	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_10.fbx	FBX	0.14	0.45	0.28	-0.18	0	-0.14	316	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_11.fbx	FBX	0.16	0.40	0.26	-0.21	0	-0.12	254	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_12.fbx	FBX	0.14	0.40	0.23	-0.18	0	-0.11	198	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_13.fbx	FBX	0.16	0.48	0.29	-0.20	-0.01	-0.16	276	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_14.fbx	FBX	0.16	0.50	0.31	-0.19	-0.01	-0.13	206	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_15.fbx	FBX	0.14	0.40	0.24	-0.18	0	-0.11	198	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_16.fbx	FBX	0.16	0.40	0.29	-0.19	0	-0.15	346	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_17.fbx	FBX	0.14	0.40	0.26	-0.18	0	-0.13	300	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_18.fbx	FBX	0.16	0.41	0.25	-0.19	0	-0.12	178	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Female_19.fbx	FBX	0.16	0.40	0.28	-0.19	0	-0.14	152	1	5	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_LegRight_Male_00.fbx	FBX	0.11	0.40	0.24	-0.17	0	-0.11	52	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_01.fbx	FBX	0.14	0.40	0.26	-0.18	0	-0.12	236	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_02.fbx	FBX	0.17	0.40	0.31	-0.20	0	-0.13	193	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_03.fbx	FBX	0.14	0.41	0.25	-0.18	-0.01	-0.11	192	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_04.fbx	FBX	0.18	0.40	0.27	-0.23	0	-0.14	308	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_05.fbx	FBX	0.19	0.42	0.25	-0.21	0	-0.11	398	1	6	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_06.fbx	FBX	0.19	0.40	0.25	-0.21	0	-0.11	296	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_07.fbx	FBX	0.18	0.41	0.31	-0.21	0	-0.12	264	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_08.fbx	FBX	0.17	0.43	0.25	-0.20	0	-0.12	250	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_09.fbx	FBX	0.20	0.40	0.29	-0.21	0	-0.15	432	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_10.fbx	FBX	0.13	0.45	0.30	-0.18	0	-0.14	316	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_11.fbx	FBX	0.16	0.40	0.27	-0.21	0	-0.12	254	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_12.fbx	FBX	0.13	0.40	0.24	-0.18	0	-0.11	198	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_13.fbx	FBX	0.16	0.48	0.31	-0.20	-0.01	-0.16	276	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_14.fbx	FBX	0.16	0.50	0.33	-0.19	-0.01	-0.13	206	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_15.fbx	FBX	0.15	0.40	0.25	-0.19	0	-0.11	198	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_16.fbx	FBX	0.16	0.40	0.30	-0.19	0	-0.15	346	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_17.fbx	FBX	0.14	0.40	0.26	-0.18	0	-0.13	300	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_18.fbx	FBX	0.16	0.41	0.26	-0.19	0	-0.12	178	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_LegRight_Male_19.fbx	FBX	0.16	0.40	0.29	-0.19	0	-0.15	152	1	5	Take 001:2.67s	lambert1	
+FBX/SK_Chr_ShoulderAttachLeft_01.fbx	FBX	0.23	0.18	0.34	0.11	1.35	-0.22	170	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_02.fbx	FBX	0.25	0.18	0.33	0.10	1.35	-0.22	72	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_03.fbx	FBX	0.22	0.20	0.33	0.07	1.35	-0.21	182	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_04.fbx	FBX	0.21	0.13	0.22	0.17	1.39	-0.16	118	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_05.fbx	FBX	0.22	0.19	0.28	0.08	1.36	-0.18	158	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_06.fbx	FBX	0.32	0.19	0.29	0.05	1.37	-0.20	472	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_07.fbx	FBX	0.37	0.34	0.43	0	1.33	-0.24	180	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_08.fbx	FBX	0.32	0.26	0.29	0.10	1.34	-0.21	148	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_09.fbx	FBX	0.30	0.24	0.27	0.12	1.36	-0.19	520	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_10.fbx	FBX	0.26	0.28	0.33	0.16	1.33	-0.21	220	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_11.fbx	FBX	0.26	0.28	0.35	0.16	1.33	-0.21	176	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_12.fbx	FBX	0.20	0.26	0.29	0.13	1.34	-0.20	140	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_13.fbx	FBX	0.29	0.19	0.25	0.15	1.38	-0.20	92	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_14.fbx	FBX	0.26	0.18	0.28	0.12	1.37	-0.18	152	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_15.fbx	FBX	0.27	0.18	0.28	0.10	1.35	-0.19	128	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_16.fbx	FBX	0.18	0.12	0.24	0.14	1.38	-0.16	138	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_17.fbx	FBX	0.24	0.12	0.21	0.14	1.41	-0.16	52	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_18.fbx	FBX	0.28	0.30	0.32	0.10	1.36	-0.20	830	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_19.fbx	FBX	0.30	0.27	0.35	0.12	1.35	-0.21	204	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_20.fbx	FBX	0.28	0.26	0.41	0.13	1.38	-0.25	472	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachLeft_21.fbx	FBX	0.21	0.22	0.38	0.14	1.34	-0.23	316	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_01.fbx	FBX	0.23	0.18	0.34	-0.34	1.35	-0.22	170	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_02.fbx	FBX	0.25	0.18	0.33	-0.34	1.35	-0.22	72	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_03.fbx	FBX	0.22	0.20	0.33	-0.29	1.35	-0.21	182	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_04.fbx	FBX	0.21	0.13	0.22	-0.38	1.39	-0.16	118	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_05.fbx	FBX	0.22	0.19	0.28	-0.31	1.36	-0.18	158	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_06.fbx	FBX	0.32	0.19	0.29	-0.37	1.37	-0.20	472	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_07.fbx	FBX	0.37	0.34	0.43	-0.38	1.33	-0.24	180	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_08.fbx	FBX	0.32	0.26	0.29	-0.42	1.34	-0.21	148	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_09.fbx	FBX	0.30	0.24	0.27	-0.41	1.36	-0.19	520	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_10.fbx	FBX	0.26	0.28	0.33	-0.42	1.33	-0.21	220	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_11.fbx	FBX	0.26	0.28	0.35	-0.42	1.33	-0.21	176	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_12.fbx	FBX	0.20	0.26	0.29	-0.33	1.34	-0.20	140	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_13.fbx	FBX	0.29	0.19	0.25	-0.44	1.38	-0.20	92	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_14.fbx	FBX	0.26	0.18	0.28	-0.38	1.37	-0.18	152	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_15.fbx	FBX	0.27	0.18	0.28	-0.37	1.35	-0.19	128	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_16.fbx	FBX	0.18	0.12	0.24	-0.32	1.38	-0.16	138	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_17.fbx	FBX	0.24	0.12	0.21	-0.38	1.41	-0.16	52	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_18.fbx	FBX	0.28	0.30	0.32	-0.38	1.36	-0.20	830	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_19.fbx	FBX	0.30	0.27	0.35	-0.42	1.35	-0.21	204	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_20.fbx	FBX	0.28	0.26	0.41	-0.40	1.38	-0.25	472	1	6		lambert2	
+FBX/SK_Chr_ShoulderAttachRight_21.fbx	FBX	0.21	0.22	0.38	-0.35	1.34	-0.23	316	1	6		lambert2	
+FBX/SK_Chr_Torso_Female_00.fbx	FBX	0.50	0.64	0.30	-0.25	0.86	-0.15	346	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_01.fbx	FBX	0.50	0.64	0.33	-0.25	0.86	-0.17	918	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_02.fbx	FBX	0.52	0.70	0.41	-0.26	0.83	-0.22	1426	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_03.fbx	FBX	0.52	0.69	0.33	-0.26	0.85	-0.17	944	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_04.fbx	FBX	0.52	0.70	0.33	-0.26	0.86	-0.17	846	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_05.fbx	FBX	0.50	0.76	0.40	-0.25	0.80	-0.23	808	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_06.fbx	FBX	0.52	0.72	0.33	-0.26	0.85	-0.17	638	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_07.fbx	FBX	0.52	0.70	0.36	-0.26	0.86	-0.20	902	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_08.fbx	FBX	0.52	0.67	0.40	-0.26	0.86	-0.21	718	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_09.fbx	FBX	0.56	0.75	0.34	-0.27	0.86	-0.19	980	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_10.fbx	FBX	0.52	0.68	0.36	-0.26	0.86	-0.18	938	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_11.fbx	FBX	0.52	0.65	0.32	-0.26	0.85	-0.16	522	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_12.fbx	FBX	0.52	0.66	0.36	-0.26	0.85	-0.19	1130	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_13.fbx	FBX	0.52	0.70	0.33	-0.26	0.86	-0.17	1003	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_14.fbx	FBX	0.52	0.67	0.35	-0.26	0.86	-0.18	986	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_15.fbx	FBX	0.52	0.68	0.35	-0.26	0.85	-0.18	852	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_16.fbx	FBX	0.52	0.64	0.36	-0.26	0.86	-0.18	756	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_17.fbx	FBX	0.52	0.67	0.35	-0.26	0.86	-0.18	1114	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_18.fbx	FBX	0.52	0.66	0.38	-0.26	0.86	-0.21	606	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_19.fbx	FBX	0.52	0.71	0.36	-0.26	0.86	-0.17	690	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_20.fbx	FBX	0.52	0.69	0.36	-0.26	0.86	-0.18	836	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_21.fbx	FBX	0.52	0.67	0.38	-0.26	0.86	-0.20	524	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_22.fbx	FBX	0.52	0.67	0.41	-0.26	0.85	-0.21	1012	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_23.fbx	FBX	0.52	0.69	0.37	-0.26	0.85	-0.17	1052	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_24.fbx	FBX	0.52	0.67	0.41	-0.26	0.86	-0.21	556	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_25.fbx	FBX	0.52	0.72	0.45	-0.26	0.84	-0.20	740	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_26.fbx	FBX	0.52	0.68	0.35	-0.26	0.86	-0.18	916	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_27.fbx	FBX	0.52	0.73	0.35	-0.26	0.86	-0.19	822	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Female_28.fbx	FBX	0.52	0.69	0.33	-0.26	0.85	-0.18	681	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_00.fbx	FBX	0.49	0.68	0.32	-0.25	0.83	-0.16	274	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_01.fbx	FBX	0.49	0.65	0.34	-0.25	0.86	-0.19	782	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_02.fbx	FBX	0.49	0.69	0.41	-0.25	0.83	-0.22	1328	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_03.fbx	FBX	0.50	0.68	0.31	-0.25	0.85	-0.17	946	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_04.fbx	FBX	0.50	0.68	0.32	-0.25	0.86	-0.18	832	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_05.fbx	FBX	0.49	0.74	0.42	-0.25	0.80	-0.24	800	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_06.fbx	FBX	0.50	0.70	0.32	-0.25	0.85	-0.17	611	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_07.fbx	FBX	0.50	0.68	0.35	-0.25	0.86	-0.20	900	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_08.fbx	FBX	0.50	0.66	0.39	-0.25	0.86	-0.22	688	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_09.fbx	FBX	0.60	0.73	0.34	-0.28	0.86	-0.19	944	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_10.fbx	FBX	0.50	0.67	0.35	-0.25	0.86	-0.19	930	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_11.fbx	FBX	0.50	0.66	0.31	-0.25	0.85	-0.16	490	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_12.fbx	FBX	0.55	0.67	0.35	-0.27	0.85	-0.19	1142	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_13.fbx	FBX	0.50	0.68	0.32	-0.25	0.85	-0.17	953	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_14.fbx	FBX	0.50	0.66	0.35	-0.25	0.86	-0.19	956	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_15.fbx	FBX	0.49	0.67	0.34	-0.25	0.85	-0.18	820	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_16.fbx	FBX	0.52	0.66	0.34	-0.26	0.86	-0.19	726	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_17.fbx	FBX	0.50	0.65	0.35	-0.25	0.86	-0.18	1078	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_18.fbx	FBX	0.50	0.66	0.39	-0.25	0.86	-0.21	540	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_19.fbx	FBX	0.54	0.69	0.34	-0.27	0.86	-0.19	646	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_20.fbx	FBX	0.50	0.69	0.36	-0.25	0.86	-0.19	782	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_21.fbx	FBX	0.50	0.66	0.37	-0.25	0.86	-0.21	486	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_22.fbx	FBX	0.50	0.66	0.40	-0.25	0.85	-0.21	994	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_23.fbx	FBX	0.50	0.68	0.37	-0.25	0.84	-0.17	1052	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_24.fbx	FBX	0.50	0.66	0.41	-0.25	0.86	-0.22	548	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_25.fbx	FBX	0.50	0.71	0.45	-0.25	0.84	-0.22	740	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_26.fbx	FBX	0.50	0.67	0.34	-0.25	0.86	-0.18	918	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_27.fbx	FBX	0.50	0.70	0.35	-0.25	0.86	-0.19	807	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/SK_Chr_Torso_Male_28.fbx	FBX	0.50	0.67	0.32	-0.25	0.85	-0.18	635	1	9	Take 001:2.67s	ModularFantasyHeroCharacters	
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_00_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.09	-0.15	-0.05	-0.04	54	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_01_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.10	-0.15	-0.07	-0.05	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_02_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.12	-0.15	-0.06	-0.06	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_03_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.10	-0.15	-0.07	-0.05	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_04_Static.fbx	Characters_ModularParts_Static	0.29	0.15	0.10	-0.15	-0.07	-0.05	150	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_05_Static.fbx	Characters_ModularParts_Static	0.30	0.15	0.10	-0.15	-0.08	-0.05	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_06_Static.fbx	Characters_ModularParts_Static	0.39	0.18	0.13	-0.20	-0.09	-0.07	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_07_Static.fbx	Characters_ModularParts_Static	0.29	0.16	0.10	-0.15	-0.08	-0.05	94	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_08_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.11	-0.15	-0.07	-0.05	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_09_Static.fbx	Characters_ModularParts_Static	0.29	0.13	0.09	-0.15	-0.06	-0.05	174	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_10_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.11	-0.15	-0.07	-0.06	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_11_Static.fbx	Characters_ModularParts_Static	0.37	0.19	0.15	-0.18	-0.09	-0.08	286	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_12_Static.fbx	Characters_ModularParts_Static	0.34	0.12	0.09	-0.17	-0.06	-0.05	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_13_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.09	-0.15	-0.05	-0.05	262	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_14_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.10	-0.15	-0.06	-0.05	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_15_Static.fbx	Characters_ModularParts_Static	0.30	0.17	0.12	-0.15	-0.08	-0.06	256	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_16_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.09	-0.15	-0.06	-0.04	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_17_Static.fbx	Characters_ModularParts_Static	0.30	0.12	0.12	-0.15	-0.06	-0.06	106	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Female_18_Static.fbx	Characters_ModularParts_Static	0.29	0.17	0.14	-0.15	-0.08	-0.07	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_00_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.14	-0.14	-0.05	-0.07	54	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_01_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.15	-0.14	-0.07	-0.07	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_02_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.17	-0.14	-0.06	-0.09	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_03_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.16	-0.15	-0.07	-0.08	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_04_Static.fbx	Characters_ModularParts_Static	0.29	0.15	0.14	-0.15	-0.07	-0.07	150	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_05_Static.fbx	Characters_ModularParts_Static	0.28	0.15	0.13	-0.14	-0.08	-0.07	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_06_Static.fbx	Characters_ModularParts_Static	0.39	0.18	0.18	-0.20	-0.09	-0.09	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_07_Static.fbx	Characters_ModularParts_Static	0.29	0.16	0.15	-0.14	-0.08	-0.07	94	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_08_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.16	-0.15	-0.07	-0.08	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_09_Static.fbx	Characters_ModularParts_Static	0.29	0.13	0.15	-0.14	-0.06	-0.07	174	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_10_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.15	-0.15	-0.07	-0.08	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_11_Static.fbx	Characters_ModularParts_Static	0.37	0.19	0.19	-0.18	-0.09	-0.09	286	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_12_Static.fbx	Characters_ModularParts_Static	0.34	0.12	0.14	-0.17	-0.06	-0.07	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_13_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.14	-0.14	-0.05	-0.07	262	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_14_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.14	-0.14	-0.06	-0.07	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_15_Static.fbx	Characters_ModularParts_Static	0.30	0.17	0.20	-0.15	-0.08	-0.10	256	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_16_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.14	-0.14	-0.06	-0.07	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_17_Static.fbx	Characters_ModularParts_Static	0.30	0.12	0.16	-0.15	-0.06	-0.08	106	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerLeft_Male_18_Static.fbx	Characters_ModularParts_Static	0.29	0.17	0.17	-0.15	-0.08	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_00_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.09	-0.15	-0.05	-0.04	54	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_01_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.10	-0.15	-0.07	-0.05	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_02_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.12	-0.15	-0.06	-0.06	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_03_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.10	-0.15	-0.07	-0.05	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_04_Static.fbx	Characters_ModularParts_Static	0.29	0.15	0.10	-0.15	-0.07	-0.05	150	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_05_Static.fbx	Characters_ModularParts_Static	0.30	0.15	0.10	-0.15	-0.08	-0.05	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_06_Static.fbx	Characters_ModularParts_Static	0.39	0.18	0.13	-0.20	-0.09	-0.07	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_07_Static.fbx	Characters_ModularParts_Static	0.29	0.16	0.10	-0.15	-0.08	-0.05	94	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_08_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.11	-0.15	-0.07	-0.05	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_09_Static.fbx	Characters_ModularParts_Static	0.29	0.13	0.09	-0.15	-0.06	-0.05	174	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_10_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.11	-0.15	-0.07	-0.06	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_11_Static.fbx	Characters_ModularParts_Static	0.37	0.19	0.15	-0.18	-0.09	-0.08	286	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_12_Static.fbx	Characters_ModularParts_Static	0.34	0.12	0.09	-0.17	-0.06	-0.05	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_13_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.09	-0.15	-0.05	-0.05	262	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_14_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.10	-0.15	-0.06	-0.05	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_15_Static.fbx	Characters_ModularParts_Static	0.30	0.17	0.12	-0.15	-0.08	-0.06	256	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_16_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.09	-0.15	-0.06	-0.04	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_17_Static.fbx	Characters_ModularParts_Static	0.30	0.12	0.12	-0.15	-0.06	-0.06	106	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Female_18_Static.fbx	Characters_ModularParts_Static	0.29	0.17	0.14	-0.15	-0.08	-0.07	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_00_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.14	-0.14	-0.05	-0.07	54	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_01_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.15	-0.14	-0.07	-0.07	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_02_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.17	-0.14	-0.06	-0.09	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_03_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.16	-0.15	-0.07	-0.08	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_04_Static.fbx	Characters_ModularParts_Static	0.29	0.15	0.14	-0.15	-0.07	-0.07	150	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_05_Static.fbx	Characters_ModularParts_Static	0.28	0.15	0.13	-0.14	-0.08	-0.07	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_06_Static.fbx	Characters_ModularParts_Static	0.39	0.18	0.18	-0.20	-0.09	-0.09	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_07_Static.fbx	Characters_ModularParts_Static	0.29	0.16	0.15	-0.14	-0.08	-0.07	94	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_08_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.16	-0.15	-0.07	-0.08	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_09_Static.fbx	Characters_ModularParts_Static	0.29	0.13	0.15	-0.14	-0.06	-0.07	174	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_10_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.15	-0.15	-0.07	-0.08	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_11_Static.fbx	Characters_ModularParts_Static	0.37	0.19	0.19	-0.18	-0.09	-0.09	286	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_12_Static.fbx	Characters_ModularParts_Static	0.34	0.12	0.14	-0.17	-0.06	-0.07	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_13_Static.fbx	Characters_ModularParts_Static	0.29	0.11	0.14	-0.14	-0.05	-0.07	262	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_14_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.14	-0.14	-0.06	-0.07	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_15_Static.fbx	Characters_ModularParts_Static	0.30	0.17	0.20	-0.15	-0.08	-0.10	256	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_16_Static.fbx	Characters_ModularParts_Static	0.29	0.12	0.14	-0.14	-0.06	-0.07	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_17_Static.fbx	Characters_ModularParts_Static	0.30	0.12	0.16	-0.15	-0.06	-0.08	106	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmLowerRight_Male_18_Static.fbx	Characters_ModularParts_Static	0.29	0.17	0.17	-0.15	-0.08	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_00_Static.fbx	Characters_ModularParts_Static	0.35	0.11	0.11	-0.18	-0.06	-0.05	46	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_01_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.15	-0.18	-0.08	-0.08	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_02_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.17	-0.18	-0.08	-0.08	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_03_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.17	-0.18	-0.08	-0.09	226	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_04_Static.fbx	Characters_ModularParts_Static	0.35	0.18	0.15	-0.18	-0.09	-0.08	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_05_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.14	-0.18	-0.07	-0.07	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_06_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.17	-0.18	-0.08	-0.08	134	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_07_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.15	-0.18	-0.08	-0.08	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_08_Static.fbx	Characters_ModularParts_Static	0.35	0.18	0.14	-0.18	-0.09	-0.07	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_09_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_10_Static.fbx	Characters_ModularParts_Static	0.36	0.15	0.14	-0.18	-0.08	-0.07	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_11_Static.fbx	Characters_ModularParts_Static	0.35	0.14	0.14	-0.18	-0.07	-0.07	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_12_Static.fbx	Characters_ModularParts_Static	0.35	0.20	0.16	-0.18	-0.10	-0.08	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_13_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_14_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.15	-0.18	-0.08	-0.07	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_15_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_16_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.15	-0.18	-0.07	-0.07	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_17_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.18	-0.18	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_18_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.14	-0.18	-0.07	-0.07	104	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_19_Static.fbx	Characters_ModularParts_Static	0.35	0.14	0.14	-0.18	-0.07	-0.07	68	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Female_20_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.18	-0.18	-0.08	-0.09	120	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_00_Static.fbx	Characters_ModularParts_Static	0.33	0.12	0.14	-0.17	-0.06	-0.07	46	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_01_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.17	-0.16	-0.09	-0.09	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_02_Static.fbx	Characters_ModularParts_Static	0.32	0.16	0.19	-0.16	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_03_Static.fbx	Characters_ModularParts_Static	0.33	0.14	0.20	-0.17	-0.07	-0.10	226	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_04_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.19	-0.16	-0.09	-0.09	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_05_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_06_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.17	-0.17	-0.09	-0.09	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_07_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.18	-0.17	-0.08	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_08_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.19	-0.16	-0.08	-0.10	134	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_09_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_10_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.17	-0.08	-0.09	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_11_Static.fbx	Characters_ModularParts_Static	0.33	0.14	0.15	-0.17	-0.07	-0.08	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_12_Static.fbx	Characters_ModularParts_Static	0.33	0.19	0.18	-0.16	-0.10	-0.09	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_13_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.14	-0.17	-0.08	-0.07	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_14_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_15_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_16_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.18	-0.17	-0.07	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_17_Static.fbx	Characters_ModularParts_Static	0.33	0.19	0.22	-0.16	-0.10	-0.11	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_18_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.17	-0.16	-0.08	-0.09	104	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_19_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.17	-0.16	-0.07	-0.09	68	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperLeft_Male_20_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.20	-0.16	-0.08	-0.10	120	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_00_Static.fbx	Characters_ModularParts_Static	0.35	0.11	0.11	-0.18	-0.06	-0.05	46	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_01_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.15	-0.18	-0.08	-0.08	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_02_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.17	-0.18	-0.08	-0.08	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_03_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.17	-0.18	-0.08	-0.09	226	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_04_Static.fbx	Characters_ModularParts_Static	0.35	0.18	0.15	-0.18	-0.09	-0.08	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_05_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.14	-0.18	-0.07	-0.07	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_06_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.17	-0.18	-0.08	-0.08	134	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_07_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.15	-0.18	-0.08	-0.08	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_08_Static.fbx	Characters_ModularParts_Static	0.35	0.18	0.14	-0.18	-0.09	-0.07	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_09_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_10_Static.fbx	Characters_ModularParts_Static	0.36	0.15	0.14	-0.18	-0.08	-0.07	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_11_Static.fbx	Characters_ModularParts_Static	0.35	0.14	0.14	-0.18	-0.07	-0.07	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_12_Static.fbx	Characters_ModularParts_Static	0.35	0.20	0.16	-0.18	-0.10	-0.08	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_13_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_14_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.15	-0.18	-0.08	-0.07	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_15_Static.fbx	Characters_ModularParts_Static	0.35	0.16	0.14	-0.18	-0.08	-0.07	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_16_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.15	-0.18	-0.07	-0.07	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_17_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.18	-0.18	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_18_Static.fbx	Characters_ModularParts_Static	0.35	0.15	0.14	-0.18	-0.07	-0.07	104	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_19_Static.fbx	Characters_ModularParts_Static	0.35	0.14	0.14	-0.18	-0.07	-0.07	68	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Female_20_Static.fbx	Characters_ModularParts_Static	0.35	0.17	0.18	-0.18	-0.08	-0.09	120	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_00_Static.fbx	Characters_ModularParts_Static	0.33	0.12	0.14	-0.17	-0.06	-0.07	46	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_01_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.17	-0.16	-0.09	-0.09	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_02_Static.fbx	Characters_ModularParts_Static	0.32	0.16	0.19	-0.16	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_03_Static.fbx	Characters_ModularParts_Static	0.33	0.14	0.20	-0.17	-0.07	-0.10	226	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_04_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.19	-0.16	-0.09	-0.09	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_05_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_06_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.19	-0.16	-0.08	-0.10	134	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_07_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.18	-0.17	-0.08	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_08_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.17	-0.17	-0.09	-0.09	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_09_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_10_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.17	-0.08	-0.09	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_11_Static.fbx	Characters_ModularParts_Static	0.33	0.14	0.15	-0.17	-0.07	-0.08	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_12_Static.fbx	Characters_ModularParts_Static	0.33	0.19	0.18	-0.16	-0.10	-0.09	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_13_Static.fbx	Characters_ModularParts_Static	0.33	0.17	0.14	-0.17	-0.08	-0.07	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_14_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_15_Static.fbx	Characters_ModularParts_Static	0.33	0.16	0.17	-0.16	-0.08	-0.09	110	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_16_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.18	-0.17	-0.07	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_17_Static.fbx	Characters_ModularParts_Static	0.33	0.19	0.22	-0.16	-0.10	-0.11	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_18_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.17	-0.16	-0.08	-0.09	104	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_19_Static.fbx	Characters_ModularParts_Static	0.33	0.15	0.17	-0.16	-0.07	-0.09	68	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ArmUpperRight_Male_20_Static.fbx	Characters_ModularParts_Static	0.32	0.17	0.20	-0.16	-0.08	-0.10	120	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_01_Static.fbx	Characters_ModularParts_Static	0.43	0.54	0.24	-0.22	-0.27	-0.12	844	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_02_Static.fbx	Characters_ModularParts_Static	0.29	0.29	0.13	-0.15	-0.15	-0.06	372	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_03_Static.fbx	Characters_ModularParts_Static	0.55	1.28	0.28	-0.27	-0.64	-0.14	386	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_04_Static.fbx	Characters_ModularParts_Static	0.51	1.06	0.22	-0.25	-0.53	-0.11	288	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_05_Static.fbx	Characters_ModularParts_Static	0.78	1.42	0.30	-0.39	-0.71	-0.15	376	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_06_Static.fbx	Characters_ModularParts_Static	0.73	1.39	0.30	-0.37	-0.69	-0.15	310	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_07_Static.fbx	Characters_ModularParts_Static	0.43	1.37	0.30	-0.22	-0.69	-0.15	194	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_08_Static.fbx	Characters_ModularParts_Static	0.43	1.35	0.30	-0.22	-0.68	-0.15	202	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_09_Static.fbx	Characters_ModularParts_Static	0.55	0.96	0.23	-0.27	-0.48	-0.12	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_10_Static.fbx	Characters_ModularParts_Static	0.66	1.27	0.30	-0.33	-0.64	-0.15	272	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_11_Static.fbx	Characters_ModularParts_Static	0.66	1.27	0.30	-0.33	-0.64	-0.15	210	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_12_Static.fbx	Characters_ModularParts_Static	0.62	0.75	0.22	-0.31	-0.38	-0.11	194	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_13_Static.fbx	Characters_ModularParts_Static	0.73	1.37	0.30	-0.37	-0.69	-0.15	242	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_14_Static.fbx	Characters_ModularParts_Static	0.70	1.21	0.25	-0.35	-0.60	-0.12	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_BackAttachment_15_Static.fbx	Characters_ModularParts_Static	0.73	1.37	0.30	-0.37	-0.69	-0.15	242	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Ear_Ear_01_Static.fbx	Characters_ModularParts_Static	0.30	0.11	0.10	-0.15	-0.06	-0.05	40	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Ear_Ear_02_Static.fbx	Characters_ModularParts_Static	0.30	0.14	0.13	-0.15	-0.07	-0.06	40	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Ear_Ear_03_Static.fbx	Characters_ModularParts_Static	0.40	0.13	0.13	-0.20	-0.06	-0.06	40	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_01_Static.fbx	Characters_ModularParts_Static	0.18	0.12	0.13	-0.09	-0.06	-0.07	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_02_Static.fbx	Characters_ModularParts_Static	0.13	0.11	0.07	-0.06	-0.05	-0.03	98	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_03_Static.fbx	Characters_ModularParts_Static	0.22	0.13	0.07	-0.11	-0.06	-0.03	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_04_Static.fbx	Characters_ModularParts_Static	0.19	0.15	0.09	-0.09	-0.07	-0.04	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_05_Static.fbx	Characters_ModularParts_Static	0.24	0.19	0.14	-0.12	-0.09	-0.07	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachLeft_06_Static.fbx	Characters_ModularParts_Static	0.15	0.14	0.11	-0.08	-0.07	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_01_Static.fbx	Characters_ModularParts_Static	0.18	0.12	0.13	-0.09	-0.06	-0.07	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_02_Static.fbx	Characters_ModularParts_Static	0.13	0.11	0.07	-0.06	-0.05	-0.03	98	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_03_Static.fbx	Characters_ModularParts_Static	0.22	0.13	0.07	-0.11	-0.06	-0.03	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_04_Static.fbx	Characters_ModularParts_Static	0.19	0.15	0.09	-0.09	-0.07	-0.04	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_05_Static.fbx	Characters_ModularParts_Static	0.24	0.19	0.14	-0.12	-0.09	-0.07	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ElbowAttachRight_06_Static.fbx	Characters_ModularParts_Static	0.15	0.14	0.11	-0.08	-0.07	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_01_Static.fbx	Characters_ModularParts_Static	0.17	0.03	0.02	-0.09	-0.01	-0.01	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_02_Static.fbx	Characters_ModularParts_Static	0.17	0.03	0.02	-0.09	-0.01	-0.01	64	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_03_Static.fbx	Characters_ModularParts_Static	0.17	0.03	0.02	-0.09	-0.01	-0.01	59	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_04_Static.fbx	Characters_ModularParts_Static	0.17	0.03	0.02	-0.09	-0.02	-0.01	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_05_Static.fbx	Characters_ModularParts_Static	0.17	0.02	0.02	-0.09	-0.01	-0.01	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_06_Static.fbx	Characters_ModularParts_Static	0.17	0.03	0.02	-0.09	-0.01	-0.01	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Female_07_Static.fbx	Characters_ModularParts_Static	0.17	0.04	0.02	-0.09	-0.02	-0.01	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_01_Static.fbx	Characters_ModularParts_Static	0.22	0.05	0.03	-0.11	-0.02	-0.02	24	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_02_Static.fbx	Characters_ModularParts_Static	0.20	0.05	0.03	-0.10	-0.03	-0.02	40	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_03_Static.fbx	Characters_ModularParts_Static	0.22	0.05	0.03	-0.11	-0.02	-0.02	28	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_04_Static.fbx	Characters_ModularParts_Static	0.17	0.05	0.03	-0.09	-0.02	-0.02	44	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_05_Static.fbx	Characters_ModularParts_Static	0.18	0.04	0.03	-0.09	-0.02	-0.02	44	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_06_Static.fbx	Characters_ModularParts_Static	0.18	0.05	0.03	-0.09	-0.03	-0.02	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_07_Static.fbx	Characters_ModularParts_Static	0.18	0.04	0.03	-0.09	-0.02	-0.02	44	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_08_Static.fbx	Characters_ModularParts_Static	0.18	0.04	0.03	-0.09	-0.02	-0.02	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_09_Static.fbx	Characters_ModularParts_Static	0.18	0.04	0.03	-0.09	-0.02	-0.02	48	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Eyebrow_Male_10_Static.fbx	Characters_ModularParts_Static	0.22	0.05	0.03	-0.11	-0.02	-0.02	40	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_01_Static.fbx	Characters_ModularParts_Static	0.25	0.24	0.14	-0.12	-0.12	-0.07	212	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_02_Static.fbx	Characters_ModularParts_Static	0.23	0.28	0.16	-0.12	-0.14	-0.08	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_03_Static.fbx	Characters_ModularParts_Static	0.21	0.16	0.07	-0.10	-0.08	-0.04	148	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_04_Static.fbx	Characters_ModularParts_Static	0.25	0.18	0.14	-0.12	-0.09	-0.07	132	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_05_Static.fbx	Characters_ModularParts_Static	0.22	0.13	0.13	-0.11	-0.07	-0.06	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_06_Static.fbx	Characters_ModularParts_Static	0.12	0.13	0.05	-0.06	-0.07	-0.03	86	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_07_Static.fbx	Characters_ModularParts_Static	0.09	0.07	0.04	-0.04	-0.04	-0.02	54	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_08_Static.fbx	Characters_ModularParts_Static	0.13	0.07	0.03	-0.06	-0.04	-0.01	64	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_09_Static.fbx	Characters_ModularParts_Static	0.26	0.22	0.15	-0.13	-0.11	-0.08	136	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_10_Static.fbx	Characters_ModularParts_Static	0.23	0.22	0.13	-0.11	-0.11	-0.07	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_11_Static.fbx	Characters_ModularParts_Static	0.20	0.05	0.07	-0.10	-0.02	-0.04	76	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_12_Static.fbx	Characters_ModularParts_Static	0.26	0.22	0.15	-0.13	-0.11	-0.08	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_13_Static.fbx	Characters_ModularParts_Static	0.23	0.19	0.13	-0.12	-0.09	-0.07	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_14_Static.fbx	Characters_ModularParts_Static	0.29	0.23	0.16	-0.15	-0.12	-0.08	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_15_Static.fbx	Characters_ModularParts_Static	0.23	0.19	0.12	-0.12	-0.10	-0.06	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_16_Static.fbx	Characters_ModularParts_Static	0.16	0.07	0.03	-0.08	-0.03	-0.02	56	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_17_Static.fbx	Characters_ModularParts_Static	0.29	0.20	0.12	-0.15	-0.10	-0.06	100	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_FacialHair_Male_18_Static.fbx	Characters_ModularParts_Static	0.23	0.20	0.14	-0.12	-0.10	-0.07	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_01_Static.fbx	Characters_ModularParts_Static	0.21	0.27	0.42	-0.10	-0.13	-0.21	340	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_02_Static.fbx	Characters_ModularParts_Static	0.29	0.31	0.29	-0.15	-0.15	-0.14	272	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_03_Static.fbx	Characters_ModularParts_Static	0.25	0.23	0.25	-0.12	-0.12	-0.13	154	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_04_Static.fbx	Characters_ModularParts_Static	0.25	0.14	0.30	-0.12	-0.07	-0.15	124	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_05_Static.fbx	Characters_ModularParts_Static	0.31	0.24	0.32	-0.16	-0.12	-0.16	160	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_06_Static.fbx	Characters_ModularParts_Static	0.22	0.14	0.34	-0.11	-0.07	-0.17	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_07_Static.fbx	Characters_ModularParts_Static	0.28	0.27	0.28	-0.14	-0.13	-0.14	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_08_Static.fbx	Characters_ModularParts_Static	0.21	0.23	0.25	-0.10	-0.11	-0.13	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_09_Static.fbx	Characters_ModularParts_Static	0.29	0.23	0.30	-0.14	-0.12	-0.15	270	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_10_Static.fbx	Characters_ModularParts_Static	0.25	0.25	0.30	-0.13	-0.13	-0.15	248	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_11_Static.fbx	Characters_ModularParts_Static	0.25	0.25	0.28	-0.12	-0.13	-0.14	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_12_Static.fbx	Characters_ModularParts_Static	0.25	0.23	0.25	-0.12	-0.12	-0.12	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_13_Static.fbx	Characters_ModularParts_Static	0.28	0.28	0.28	-0.14	-0.14	-0.14	195	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_14_Static.fbx	Characters_ModularParts_Static	0.34	0.24	0.31	-0.17	-0.12	-0.16	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_15_Static.fbx	Characters_ModularParts_Static	0.09	0.20	0.23	-0.05	-0.10	-0.11	70	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_16_Static.fbx	Characters_ModularParts_Static	0.25	0.27	0.27	-0.12	-0.14	-0.13	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_17_Static.fbx	Characters_ModularParts_Static	0.09	0.23	0.29	-0.05	-0.12	-0.15	84	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_18_Static.fbx	Characters_ModularParts_Static	0.25	0.24	0.27	-0.12	-0.12	-0.13	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_19_Static.fbx	Characters_ModularParts_Static	0.25	0.29	0.34	-0.13	-0.15	-0.17	266	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_20_Static.fbx	Characters_ModularParts_Static	0.28	0.33	0.28	-0.14	-0.16	-0.14	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_21_Static.fbx	Characters_ModularParts_Static	0.28	0.35	0.26	-0.14	-0.17	-0.13	270	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_22_Static.fbx	Characters_ModularParts_Static	0.26	0.28	0.31	-0.13	-0.14	-0.15	262	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_23_Static.fbx	Characters_ModularParts_Static	0.31	0.30	0.35	-0.16	-0.15	-0.17	218	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_24_Static.fbx	Characters_ModularParts_Static	0.28	0.33	0.26	-0.14	-0.16	-0.13	450	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_25_Static.fbx	Characters_ModularParts_Static	0.29	0.38	0.33	-0.14	-0.19	-0.17	366	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_26_Static.fbx	Characters_ModularParts_Static	0.26	0.35	0.34	-0.13	-0.17	-0.17	382	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_27_Static.fbx	Characters_ModularParts_Static	0.33	0.24	0.32	-0.16	-0.12	-0.16	484	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_28_Static.fbx	Characters_ModularParts_Static	0.30	0.33	0.32	-0.15	-0.17	-0.16	396	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_29_Static.fbx	Characters_ModularParts_Static	0.29	0.34	0.32	-0.15	-0.17	-0.16	638	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_30_Static.fbx	Characters_ModularParts_Static	0.26	0.36	0.35	-0.13	-0.18	-0.17	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_31_Static.fbx	Characters_ModularParts_Static	0.26	0.32	0.29	-0.13	-0.16	-0.14	218	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_32_Static.fbx	Characters_ModularParts_Static	0.28	0.32	0.37	-0.14	-0.16	-0.18	330	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_33_Static.fbx	Characters_ModularParts_Static	0.28	0.26	0.30	-0.14	-0.13	-0.15	305	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_34_Static.fbx	Characters_ModularParts_Static	0.29	0.36	0.27	-0.15	-0.18	-0.13	257	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_35_Static.fbx	Characters_ModularParts_Static	0.26	0.35	0.27	-0.13	-0.17	-0.14	242	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_36_Static.fbx	Characters_ModularParts_Static	0.26	0.32	0.27	-0.13	-0.16	-0.14	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_37_Static.fbx	Characters_ModularParts_Static	0.27	0.29	0.28	-0.14	-0.15	-0.14	280	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hair_38_Static.fbx	Characters_ModularParts_Static	0.29	0.38	0.40	-0.14	-0.19	-0.20	542	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_00_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_01_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_02_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_03_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_04_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_05_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_06_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_07_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_08_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	156	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_09_Static.fbx	Characters_ModularParts_Static	0.25	0.11	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_10_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_11_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_12_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	252	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_13_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_14_Static.fbx	Characters_ModularParts_Static	0.24	0.11	0.19	-0.12	-0.06	-0.10	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_15_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_16_Static.fbx	Characters_ModularParts_Static	0.23	0.11	0.19	-0.12	-0.05	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Female_17_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_00_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_01_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_02_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_03_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_04_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_05_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_06_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_07_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_08_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	156	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_09_Static.fbx	Characters_ModularParts_Static	0.25	0.11	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_10_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_11_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_12_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	252	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_13_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_14_Static.fbx	Characters_ModularParts_Static	0.24	0.11	0.19	-0.12	-0.06	-0.10	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_15_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_16_Static.fbx	Characters_ModularParts_Static	0.23	0.11	0.19	-0.12	-0.05	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandLeft_Male_17_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_00_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_01_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_02_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_03_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_04_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_05_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_06_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_07_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_08_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	156	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_09_Static.fbx	Characters_ModularParts_Static	0.25	0.11	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_10_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_11_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_12_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	252	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_13_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_14_Static.fbx	Characters_ModularParts_Static	0.24	0.11	0.19	-0.12	-0.06	-0.10	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_15_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_16_Static.fbx	Characters_ModularParts_Static	0.23	0.11	0.19	-0.12	-0.05	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Female_17_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_00_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_01_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_02_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_03_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_04_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_05_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_06_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_07_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_08_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	156	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_09_Static.fbx	Characters_ModularParts_Static	0.25	0.11	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_10_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_11_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_12_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.19	-0.12	-0.06	-0.09	252	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_13_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_14_Static.fbx	Characters_ModularParts_Static	0.24	0.11	0.19	-0.12	-0.06	-0.10	290	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_15_Static.fbx	Characters_ModularParts_Static	0.23	0.10	0.19	-0.12	-0.05	-0.09	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_16_Static.fbx	Characters_ModularParts_Static	0.23	0.11	0.19	-0.12	-0.05	-0.09	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HandRight_Male_17_Static.fbx	Characters_ModularParts_Static	0.24	0.10	0.19	-0.12	-0.05	-0.09	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_01_Static.fbx	Characters_ModularParts_Static	0.42	0.31	0.36	-0.21	-0.15	-0.18	364	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_02_Static.fbx	Characters_ModularParts_Static	0.55	0.31	0.58	-0.27	-0.15	-0.29	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_03_Static.fbx	Characters_ModularParts_Static	0.46	0.44	0.44	-0.23	-0.22	-0.22	516	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_04_Static.fbx	Characters_ModularParts_Static	0.29	0.14	0.31	-0.14	-0.07	-0.16	412	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_05_Static.fbx	Characters_ModularParts_Static	0.38	0.49	0.87	-0.19	-0.24	-0.43	570	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_06_Static.fbx	Characters_ModularParts_Static	0.38	0.35	0.52	-0.19	-0.18	-0.26	328	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_07_Static.fbx	Characters_ModularParts_Static	0.54	0.33	0.93	-0.27	-0.16	-0.47	606	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_08_Static.fbx	Characters_ModularParts_Static	0.42	0.32	0.78	-0.21	-0.16	-0.39	238	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_09_Static.fbx	Characters_ModularParts_Static	0.54	0.30	0.45	-0.27	-0.15	-0.22	258	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_10_Static.fbx	Characters_ModularParts_Static	0.42	0.32	0.99	-0.21	-0.16	-0.50	238	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_Base_Hair_11_Static.fbx	Characters_ModularParts_Static	0.54	0.33	0.93	-0.27	-0.16	-0.47	606	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_FacialHair_01_Static.fbx	Characters_ModularParts_Static	0.25	0.32	0.11	-0.13	-0.16	-0.06	292	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_FacialHair_02_Static.fbx	Characters_ModularParts_Static	0.25	0.32	0.11	-0.13	-0.16	-0.06	292	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_FacialHair_03_Static.fbx	Characters_ModularParts_Static	0.26	0.27	0.30	-0.13	-0.14	-0.15	162	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_FacialHair_04_Static.fbx	Characters_ModularParts_Static	0.27	0.29	0.27	-0.13	-0.15	-0.14	108	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_01_Static.fbx	Characters_ModularParts_Static	0.30	0.47	0.31	-0.15	-0.24	-0.15	324	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_02_Static.fbx	Characters_ModularParts_Static	0.32	0.50	0.33	-0.16	-0.25	-0.16	255	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_03_Static.fbx	Characters_ModularParts_Static	0.49	0.45	0.53	-0.25	-0.22	-0.26	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_04_Static.fbx	Characters_ModularParts_Static	0.27	0.39	0.35	-0.14	-0.19	-0.17	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_05_Static.fbx	Characters_ModularParts_Static	0.28	0.45	0.38	-0.14	-0.22	-0.19	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_06_Static.fbx	Characters_ModularParts_Static	0.31	0.43	0.35	-0.16	-0.22	-0.18	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_07_Static.fbx	Characters_ModularParts_Static	0.28	0.45	0.38	-0.14	-0.22	-0.19	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_08_Static.fbx	Characters_ModularParts_Static	0.28	0.47	0.47	-0.14	-0.23	-0.24	232	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_09_Static.fbx	Characters_ModularParts_Static	0.54	0.53	0.57	-0.27	-0.26	-0.28	716	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_10_Static.fbx	Characters_ModularParts_Static	0.38	0.49	0.54	-0.19	-0.24	-0.27	720	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_11_Static.fbx	Characters_ModularParts_Static	0.28	0.45	0.40	-0.14	-0.23	-0.20	430	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_12_Static.fbx	Characters_ModularParts_Static	0.32	0.44	0.28	-0.16	-0.22	-0.14	194	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HeadCoverings_No_Hair_13_Static.fbx	Characters_ModularParts_Static	0.28	0.43	0.36	-0.14	-0.21	-0.18	200	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_00_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	174	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_01_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_02_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	200	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_03_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_04_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	214	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_05_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_06_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	190	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_07_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	190	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_08_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	222	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_09_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	186	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_10_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_11_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	258	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_12_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	266	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_13_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	220	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_14_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_15_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	226	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_16_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	266	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_17_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	242	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_18_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	235	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_19_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	254	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_20_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_21_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	194	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Female_22_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.25	-0.13	-0.18	-0.13	224	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_00_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	160	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_01_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_02_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	184	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_03_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_04_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	212	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_05_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	224	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_06_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_07_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	216	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_08_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_09_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_10_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_11_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	208	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_12_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	220	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_13_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	248	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_14_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	208	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_15_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_16_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	202	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_17_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	172	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_18_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_19_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	252	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_20_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_21_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_Male_22_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.26	-0.13	-0.18	-0.13	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_01_Static.fbx	Characters_ModularParts_Static	0.27	0.37	0.46	-0.13	-0.18	-0.23	586	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_02_Static.fbx	Characters_ModularParts_Static	0.25	0.41	0.35	-0.13	-0.20	-0.18	394	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_03_Static.fbx	Characters_ModularParts_Static	0.25	0.38	0.31	-0.13	-0.19	-0.15	456	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_04_Static.fbx	Characters_ModularParts_Static	0.28	0.43	0.40	-0.14	-0.21	-0.20	450	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_05_Static.fbx	Characters_ModularParts_Static	0.26	0.41	0.35	-0.13	-0.21	-0.18	390	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_06_Static.fbx	Characters_ModularParts_Static	0.26	0.38	0.33	-0.13	-0.19	-0.16	744	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_07_Static.fbx	Characters_ModularParts_Static	0.27	0.40	0.33	-0.13	-0.20	-0.16	798	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_08_Static.fbx	Characters_ModularParts_Static	0.28	0.39	0.35	-0.14	-0.20	-0.18	608	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_09_Static.fbx	Characters_ModularParts_Static	0.25	0.38	0.29	-0.12	-0.19	-0.15	622	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_10_Static.fbx	Characters_ModularParts_Static	0.29	0.38	0.43	-0.15	-0.19	-0.22	534	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_11_Static.fbx	Characters_ModularParts_Static	0.25	0.39	0.33	-0.12	-0.19	-0.17	864	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_12_Static.fbx	Characters_ModularParts_Static	0.28	0.42	0.35	-0.14	-0.21	-0.18	442	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Female_13_Static.fbx	Characters_ModularParts_Static	0.25	0.40	0.35	-0.13	-0.20	-0.18	916	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_01_Static.fbx	Characters_ModularParts_Static	0.27	0.35	0.46	-0.13	-0.18	-0.23	600	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_02_Static.fbx	Characters_ModularParts_Static	0.25	0.39	0.35	-0.13	-0.20	-0.18	394	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_03_Static.fbx	Characters_ModularParts_Static	0.25	0.36	0.31	-0.13	-0.18	-0.15	456	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_04_Static.fbx	Characters_ModularParts_Static	0.28	0.41	0.40	-0.14	-0.20	-0.20	450	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_05_Static.fbx	Characters_ModularParts_Static	0.26	0.39	0.35	-0.13	-0.20	-0.18	390	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_06_Static.fbx	Characters_ModularParts_Static	0.26	0.37	0.33	-0.13	-0.18	-0.16	744	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_07_Static.fbx	Characters_ModularParts_Static	0.27	0.38	0.33	-0.13	-0.19	-0.16	798	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_08_Static.fbx	Characters_ModularParts_Static	0.28	0.39	0.35	-0.14	-0.20	-0.18	608	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_09_Static.fbx	Characters_ModularParts_Static	0.25	0.37	0.29	-0.12	-0.18	-0.15	622	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_10_Static.fbx	Characters_ModularParts_Static	0.29	0.38	0.43	-0.15	-0.19	-0.22	534	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_11_Static.fbx	Characters_ModularParts_Static	0.25	0.37	0.33	-0.12	-0.19	-0.17	864	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_12_Static.fbx	Characters_ModularParts_Static	0.28	0.41	0.35	-0.14	-0.20	-0.18	442	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Head_No_Elements_Male_13_Static.fbx	Characters_ModularParts_Static	0.25	0.38	0.35	-0.13	-0.19	-0.18	916	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_01_Static.fbx	Characters_ModularParts_Static	0.17	0.38	0.45	-0.08	-0.19	-0.23	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_02_Static.fbx	Characters_ModularParts_Static	0.12	0.39	0.47	-0.06	-0.20	-0.23	166	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_03_Static.fbx	Characters_ModularParts_Static	0.34	0.33	0.20	-0.17	-0.17	-0.10	508	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_04_Static.fbx	Characters_ModularParts_Static	0.60	0.34	0.13	-0.30	-0.17	-0.06	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_05_Static.fbx	Characters_ModularParts_Static	0.53	0.39	0.65	-0.26	-0.20	-0.33	522	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_06_Static.fbx	Characters_ModularParts_Static	0.07	0.31	0.38	-0.03	-0.16	-0.19	156	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_07_Static.fbx	Characters_ModularParts_Static	0.30	0.22	0.26	-0.15	-0.11	-0.13	140	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_08_Static.fbx	Characters_ModularParts_Static	0.28	0.16	0.23	-0.14	-0.08	-0.11	220	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_09_Static.fbx	Characters_ModularParts_Static	0.13	0.24	0.12	-0.06	-0.12	-0.06	160	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_10_Static.fbx	Characters_ModularParts_Static	0.26	0.41	0.64	-0.13	-0.20	-0.32	234	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_11_Static.fbx	Characters_ModularParts_Static	0.17	0.24	0.14	-0.08	-0.12	-0.07	232	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_12_Static.fbx	Characters_ModularParts_Static	0.18	0.38	0.58	-0.09	-0.19	-0.29	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HelmetAttachment_13_Static.fbx	Characters_ModularParts_Static	0.20	0.38	0.60	-0.10	-0.19	-0.30	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_01_Static.fbx	Characters_ModularParts_Static	0.13	0.20	0.13	-0.07	-0.10	-0.07	144	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_02_Static.fbx	Characters_ModularParts_Static	0.12	0.20	0.11	-0.06	-0.10	-0.06	332	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_03_Static.fbx	Characters_ModularParts_Static	0.11	0.16	0.20	-0.05	-0.08	-0.10	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_04_Static.fbx	Characters_ModularParts_Static	0.07	0.35	0.22	-0.03	-0.17	-0.11	322	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_05_Static.fbx	Characters_ModularParts_Static	0.09	0.24	0.22	-0.04	-0.12	-0.11	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_06_Static.fbx	Characters_ModularParts_Static	0.10	0.15	0.22	-0.05	-0.08	-0.11	280	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_07_Static.fbx	Characters_ModularParts_Static	0.16	0.45	0.26	-0.08	-0.22	-0.13	194	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_08_Static.fbx	Characters_ModularParts_Static	0.15	0.27	0.39	-0.08	-0.13	-0.19	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_09_Static.fbx	Characters_ModularParts_Static	0.16	0.33	0.13	-0.08	-0.17	-0.07	224	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_10_Static.fbx	Characters_ModularParts_Static	0.10	0.25	0.22	-0.05	-0.12	-0.11	196	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_11_Static.fbx	Characters_ModularParts_Static	0.15	0.12	0.17	-0.08	-0.06	-0.09	64	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_HipsAttachment_12_Static.fbx	Characters_ModularParts_Static	0.08	0.31	0.22	-0.04	-0.15	-0.11	244	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_00_Static.fbx	Characters_ModularParts_Static	0.38	0.58	0.30	-0.19	-0.29	-0.15	248	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_01_Static.fbx	Characters_ModularParts_Static	0.46	0.58	0.30	-0.23	-0.29	-0.15	656	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_02_Static.fbx	Characters_ModularParts_Static	0.46	0.58	0.27	-0.23	-0.29	-0.14	480	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_03_Static.fbx	Characters_ModularParts_Static	0.42	0.58	0.28	-0.21	-0.29	-0.14	318	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_04_Static.fbx	Characters_ModularParts_Static	0.41	0.58	0.28	-0.21	-0.29	-0.14	388	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_05_Static.fbx	Characters_ModularParts_Static	0.49	0.58	0.30	-0.24	-0.29	-0.15	310	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_06_Static.fbx	Characters_ModularParts_Static	0.45	0.58	0.28	-0.22	-0.29	-0.14	496	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_07_Static.fbx	Characters_ModularParts_Static	0.41	0.58	0.28	-0.20	-0.29	-0.14	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_08_Static.fbx	Characters_ModularParts_Static	0.43	0.58	0.28	-0.22	-0.29	-0.14	248	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_09_Static.fbx	Characters_ModularParts_Static	0.49	0.58	0.30	-0.24	-0.29	-0.15	382	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_10_Static.fbx	Characters_ModularParts_Static	0.45	0.58	0.30	-0.22	-0.29	-0.15	380	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_11_Static.fbx	Characters_ModularParts_Static	0.45	0.58	0.28	-0.23	-0.29	-0.14	412	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_12_Static.fbx	Characters_ModularParts_Static	0.50	0.58	0.33	-0.25	-0.29	-0.16	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_13_Static.fbx	Characters_ModularParts_Static	0.40	0.58	0.30	-0.20	-0.29	-0.15	499	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_14_Static.fbx	Characters_ModularParts_Static	0.44	0.58	0.27	-0.22	-0.29	-0.14	232	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_15_Static.fbx	Characters_ModularParts_Static	0.45	0.58	0.29	-0.22	-0.29	-0.15	806	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_16_Static.fbx	Characters_ModularParts_Static	0.44	0.58	0.27	-0.22	-0.29	-0.14	668	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_17_Static.fbx	Characters_ModularParts_Static	0.41	0.58	0.28	-0.20	-0.29	-0.14	266	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_18_Static.fbx	Characters_ModularParts_Static	0.47	0.58	0.32	-0.23	-0.29	-0.16	490	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_19_Static.fbx	Characters_ModularParts_Static	0.43	0.58	0.28	-0.21	-0.29	-0.14	434	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_20_Static.fbx	Characters_ModularParts_Static	0.50	0.58	0.30	-0.25	-0.29	-0.15	650	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_21_Static.fbx	Characters_ModularParts_Static	0.45	0.58	0.28	-0.23	-0.29	-0.14	348	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_22_Static.fbx	Characters_ModularParts_Static	0.42	0.58	0.28	-0.21	-0.29	-0.14	590	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_23_Static.fbx	Characters_ModularParts_Static	0.42	0.58	0.28	-0.21	-0.29	-0.14	434	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_24_Static.fbx	Characters_ModularParts_Static	0.53	0.58	0.29	-0.26	-0.29	-0.14	326	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_25_Static.fbx	Characters_ModularParts_Static	0.47	0.58	0.36	-0.23	-0.29	-0.18	626	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_26_Static.fbx	Characters_ModularParts_Static	0.48	0.58	0.32	-0.24	-0.29	-0.16	638	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_27_Static.fbx	Characters_ModularParts_Static	0.50	0.58	0.29	-0.25	-0.29	-0.14	344	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Female_28_Static.fbx	Characters_ModularParts_Static	0.50	0.58	0.32	-0.25	-0.29	-0.16	464	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_00_Static.fbx	Characters_ModularParts_Static	0.36	0.55	0.28	-0.18	-0.28	-0.14	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_01_Static.fbx	Characters_ModularParts_Static	0.43	0.55	0.30	-0.21	-0.28	-0.15	656	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_02_Static.fbx	Characters_ModularParts_Static	0.45	0.55	0.28	-0.23	-0.28	-0.14	480	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_03_Static.fbx	Characters_ModularParts_Static	0.41	0.55	0.30	-0.20	-0.28	-0.15	318	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_04_Static.fbx	Characters_ModularParts_Static	0.40	0.55	0.30	-0.20	-0.28	-0.15	386	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_05_Static.fbx	Characters_ModularParts_Static	0.48	0.55	0.30	-0.24	-0.28	-0.15	310	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_06_Static.fbx	Characters_ModularParts_Static	0.44	0.55	0.31	-0.22	-0.28	-0.15	492	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_07_Static.fbx	Characters_ModularParts_Static	0.40	0.55	0.29	-0.20	-0.28	-0.15	298	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_08_Static.fbx	Characters_ModularParts_Static	0.41	0.55	0.29	-0.20	-0.28	-0.15	248	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_09_Static.fbx	Characters_ModularParts_Static	0.48	0.55	0.31	-0.24	-0.28	-0.15	380	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_10_Static.fbx	Characters_ModularParts_Static	0.45	0.55	0.31	-0.22	-0.28	-0.15	380	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_11_Static.fbx	Characters_ModularParts_Static	0.44	0.55	0.29	-0.22	-0.28	-0.14	412	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_12_Static.fbx	Characters_ModularParts_Static	0.49	0.55	0.34	-0.25	-0.28	-0.17	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_13_Static.fbx	Characters_ModularParts_Static	0.37	0.55	0.30	-0.19	-0.28	-0.15	500	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_14_Static.fbx	Characters_ModularParts_Static	0.44	0.55	0.28	-0.22	-0.28	-0.14	232	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_15_Static.fbx	Characters_ModularParts_Static	0.42	0.55	0.33	-0.21	-0.28	-0.16	806	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_16_Static.fbx	Characters_ModularParts_Static	0.44	0.55	0.28	-0.22	-0.28	-0.14	668	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_17_Static.fbx	Characters_ModularParts_Static	0.38	0.56	0.30	-0.19	-0.28	-0.15	266	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_18_Static.fbx	Characters_ModularParts_Static	0.44	0.57	0.33	-0.22	-0.28	-0.16	490	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_19_Static.fbx	Characters_ModularParts_Static	0.39	0.55	0.30	-0.19	-0.28	-0.15	434	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_20_Static.fbx	Characters_ModularParts_Static	0.47	0.55	0.32	-0.23	-0.28	-0.16	650	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_21_Static.fbx	Characters_ModularParts_Static	0.45	0.55	0.28	-0.22	-0.28	-0.14	348	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_22_Static.fbx	Characters_ModularParts_Static	0.42	0.55	0.32	-0.21	-0.28	-0.16	590	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_23_Static.fbx	Characters_ModularParts_Static	0.42	0.55	0.30	-0.21	-0.28	-0.15	434	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_24_Static.fbx	Characters_ModularParts_Static	0.50	0.56	0.31	-0.25	-0.28	-0.15	326	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_25_Static.fbx	Characters_ModularParts_Static	0.48	0.55	0.36	-0.24	-0.28	-0.18	626	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_26_Static.fbx	Characters_ModularParts_Static	0.47	0.55	0.32	-0.24	-0.28	-0.16	638	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_27_Static.fbx	Characters_ModularParts_Static	0.49	0.55	0.32	-0.25	-0.28	-0.16	344	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Hips_Male_28_Static.fbx	Characters_ModularParts_Static	0.49	0.55	0.34	-0.24	-0.28	-0.17	464	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_01_Static.fbx	Characters_ModularParts_Static	0.16	0.17	0.08	-0.08	-0.09	-0.04	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_02_Static.fbx	Characters_ModularParts_Static	0.18	0.18	0.11	-0.09	-0.09	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_03_Static.fbx	Characters_ModularParts_Static	0.18	0.17	0.15	-0.09	-0.09	-0.08	132	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_04_Static.fbx	Characters_ModularParts_Static	0.16	0.17	0.13	-0.08	-0.09	-0.06	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_05_Static.fbx	Characters_ModularParts_Static	0.15	0.19	0.15	-0.07	-0.09	-0.08	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_06_Static.fbx	Characters_ModularParts_Static	0.16	0.23	0.09	-0.08	-0.12	-0.04	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_07_Static.fbx	Characters_ModularParts_Static	0.22	0.23	0.19	-0.11	-0.11	-0.10	168	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_08_Static.fbx	Characters_ModularParts_Static	0.17	0.22	0.09	-0.08	-0.11	-0.05	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_09_Static.fbx	Characters_ModularParts_Static	0.21	0.22	0.16	-0.11	-0.11	-0.08	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_10_Static.fbx	Characters_ModularParts_Static	0.15	0.16	0.11	-0.08	-0.08	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachLeft_11_Static.fbx	Characters_ModularParts_Static	0.11	0.13	0.07	-0.05	-0.06	-0.03	98	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_01_Static.fbx	Characters_ModularParts_Static	0.16	0.17	0.08	-0.08	-0.09	-0.04	146	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_02_Static.fbx	Characters_ModularParts_Static	0.18	0.18	0.11	-0.09	-0.09	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_03_Static.fbx	Characters_ModularParts_Static	0.18	0.17	0.15	-0.09	-0.09	-0.08	132	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_04_Static.fbx	Characters_ModularParts_Static	0.16	0.17	0.13	-0.08	-0.09	-0.06	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_05_Static.fbx	Characters_ModularParts_Static	0.15	0.19	0.15	-0.07	-0.09	-0.08	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_06_Static.fbx	Characters_ModularParts_Static	0.16	0.23	0.09	-0.08	-0.12	-0.04	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_07_Static.fbx	Characters_ModularParts_Static	0.22	0.23	0.19	-0.11	-0.11	-0.10	168	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_08_Static.fbx	Characters_ModularParts_Static	0.17	0.22	0.09	-0.08	-0.11	-0.05	116	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_09_Static.fbx	Characters_ModularParts_Static	0.21	0.22	0.16	-0.11	-0.11	-0.08	228	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_10_Static.fbx	Characters_ModularParts_Static	0.15	0.16	0.11	-0.08	-0.08	-0.05	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_KneeAttachRight_11_Static.fbx	Characters_ModularParts_Static	0.11	0.13	0.07	-0.05	-0.06	-0.03	98	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_00_Static.fbx	Characters_ModularParts_Static	0.11	0.40	0.23	-0.05	-0.20	-0.11	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_01_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.25	-0.07	-0.20	-0.12	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_02_Static.fbx	Characters_ModularParts_Static	0.17	0.40	0.29	-0.08	-0.20	-0.15	193	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_03_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.24	-0.07	-0.20	-0.12	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_04_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.27	-0.09	-0.20	-0.13	308	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_05_Static.fbx	Characters_ModularParts_Static	0.17	0.42	0.24	-0.08	-0.21	-0.12	398	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_06_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.24	-0.09	-0.20	-0.12	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_07_Static.fbx	Characters_ModularParts_Static	0.18	0.41	0.29	-0.09	-0.20	-0.15	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_08_Static.fbx	Characters_ModularParts_Static	0.18	0.43	0.24	-0.09	-0.22	-0.12	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_09_Static.fbx	Characters_ModularParts_Static	0.19	0.40	0.28	-0.10	-0.20	-0.14	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_10_Static.fbx	Characters_ModularParts_Static	0.14	0.45	0.28	-0.07	-0.23	-0.14	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_11_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.26	-0.08	-0.20	-0.13	254	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_12_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.23	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_13_Static.fbx	Characters_ModularParts_Static	0.16	0.48	0.29	-0.08	-0.24	-0.15	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_14_Static.fbx	Characters_ModularParts_Static	0.16	0.50	0.31	-0.08	-0.25	-0.16	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_15_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.24	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_16_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.29	-0.08	-0.20	-0.14	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_17_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	300	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_18_Static.fbx	Characters_ModularParts_Static	0.16	0.41	0.25	-0.08	-0.20	-0.12	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Female_19_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.28	-0.08	-0.20	-0.14	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_00_Static.fbx	Characters_ModularParts_Static	0.11	0.40	0.24	-0.05	-0.20	-0.12	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_01_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_02_Static.fbx	Characters_ModularParts_Static	0.17	0.40	0.31	-0.08	-0.20	-0.15	193	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_03_Static.fbx	Characters_ModularParts_Static	0.14	0.41	0.25	-0.07	-0.20	-0.12	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_04_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.27	-0.09	-0.20	-0.14	308	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_05_Static.fbx	Characters_ModularParts_Static	0.19	0.42	0.25	-0.09	-0.21	-0.12	398	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_06_Static.fbx	Characters_ModularParts_Static	0.19	0.40	0.25	-0.10	-0.20	-0.12	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_07_Static.fbx	Characters_ModularParts_Static	0.18	0.41	0.31	-0.09	-0.20	-0.15	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_08_Static.fbx	Characters_ModularParts_Static	0.17	0.43	0.25	-0.09	-0.22	-0.13	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_09_Static.fbx	Characters_ModularParts_Static	0.20	0.40	0.29	-0.10	-0.20	-0.14	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_10_Static.fbx	Characters_ModularParts_Static	0.13	0.45	0.30	-0.07	-0.23	-0.15	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_11_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.27	-0.08	-0.20	-0.14	254	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_12_Static.fbx	Characters_ModularParts_Static	0.13	0.40	0.24	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_13_Static.fbx	Characters_ModularParts_Static	0.16	0.48	0.31	-0.08	-0.24	-0.15	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_14_Static.fbx	Characters_ModularParts_Static	0.16	0.50	0.33	-0.08	-0.25	-0.16	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_15_Static.fbx	Characters_ModularParts_Static	0.15	0.40	0.25	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_16_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.30	-0.08	-0.20	-0.15	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_17_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	300	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_18_Static.fbx	Characters_ModularParts_Static	0.16	0.41	0.26	-0.08	-0.20	-0.13	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegLeft_Male_19_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.29	-0.08	-0.20	-0.15	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_00_Static.fbx	Characters_ModularParts_Static	0.11	0.40	0.23	-0.05	-0.20	-0.11	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_01_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.25	-0.07	-0.20	-0.12	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_02_Static.fbx	Characters_ModularParts_Static	0.17	0.40	0.29	-0.08	-0.20	-0.15	193	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_03_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.24	-0.07	-0.20	-0.12	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_04_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.27	-0.09	-0.20	-0.13	308	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_05_Static.fbx	Characters_ModularParts_Static	0.17	0.42	0.24	-0.08	-0.21	-0.12	398	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_06_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.24	-0.09	-0.20	-0.12	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_07_Static.fbx	Characters_ModularParts_Static	0.18	0.41	0.29	-0.09	-0.20	-0.15	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_08_Static.fbx	Characters_ModularParts_Static	0.18	0.43	0.24	-0.09	-0.22	-0.12	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_09_Static.fbx	Characters_ModularParts_Static	0.19	0.40	0.28	-0.10	-0.20	-0.14	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_10_Static.fbx	Characters_ModularParts_Static	0.14	0.45	0.28	-0.07	-0.23	-0.14	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_11_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.26	-0.08	-0.20	-0.13	254	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_12_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.23	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_13_Static.fbx	Characters_ModularParts_Static	0.16	0.48	0.29	-0.08	-0.24	-0.15	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_14_Static.fbx	Characters_ModularParts_Static	0.16	0.50	0.31	-0.08	-0.25	-0.16	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_15_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.24	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_16_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.29	-0.08	-0.20	-0.14	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_17_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	300	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_18_Static.fbx	Characters_ModularParts_Static	0.16	0.41	0.25	-0.08	-0.20	-0.12	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Female_19_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.28	-0.08	-0.20	-0.14	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_00_Static.fbx	Characters_ModularParts_Static	0.11	0.40	0.24	-0.05	-0.20	-0.12	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_01_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	236	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_02_Static.fbx	Characters_ModularParts_Static	0.17	0.40	0.31	-0.08	-0.20	-0.15	193	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_03_Static.fbx	Characters_ModularParts_Static	0.14	0.41	0.25	-0.07	-0.20	-0.12	192	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_04_Static.fbx	Characters_ModularParts_Static	0.18	0.40	0.27	-0.09	-0.20	-0.14	308	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_05_Static.fbx	Characters_ModularParts_Static	0.19	0.42	0.25	-0.09	-0.21	-0.12	398	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_06_Static.fbx	Characters_ModularParts_Static	0.19	0.40	0.25	-0.10	-0.20	-0.12	296	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_07_Static.fbx	Characters_ModularParts_Static	0.18	0.41	0.31	-0.09	-0.20	-0.15	264	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_08_Static.fbx	Characters_ModularParts_Static	0.17	0.43	0.25	-0.09	-0.22	-0.13	250	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_09_Static.fbx	Characters_ModularParts_Static	0.20	0.40	0.29	-0.10	-0.20	-0.14	432	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_10_Static.fbx	Characters_ModularParts_Static	0.13	0.45	0.30	-0.07	-0.23	-0.15	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_11_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.27	-0.08	-0.20	-0.14	254	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_12_Static.fbx	Characters_ModularParts_Static	0.13	0.40	0.24	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_13_Static.fbx	Characters_ModularParts_Static	0.16	0.48	0.31	-0.08	-0.24	-0.15	276	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_14_Static.fbx	Characters_ModularParts_Static	0.16	0.50	0.33	-0.08	-0.25	-0.16	206	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_15_Static.fbx	Characters_ModularParts_Static	0.15	0.40	0.25	-0.07	-0.20	-0.12	198	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_16_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.30	-0.08	-0.20	-0.15	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_17_Static.fbx	Characters_ModularParts_Static	0.14	0.40	0.26	-0.07	-0.20	-0.13	300	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_18_Static.fbx	Characters_ModularParts_Static	0.16	0.41	0.26	-0.08	-0.20	-0.13	178	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_LegRight_Male_19_Static.fbx	Characters_ModularParts_Static	0.16	0.40	0.29	-0.08	-0.20	-0.15	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_01_Static.fbx	Characters_ModularParts_Static	0.23	0.18	0.34	-0.12	-0.09	-0.17	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_02_Static.fbx	Characters_ModularParts_Static	0.25	0.18	0.33	-0.12	-0.09	-0.17	72	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_03_Static.fbx	Characters_ModularParts_Static	0.22	0.20	0.33	-0.11	-0.10	-0.16	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_04_Static.fbx	Characters_ModularParts_Static	0.21	0.13	0.22	-0.11	-0.06	-0.11	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_05_Static.fbx	Characters_ModularParts_Static	0.22	0.19	0.28	-0.11	-0.10	-0.14	158	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_06_Static.fbx	Characters_ModularParts_Static	0.32	0.19	0.29	-0.16	-0.09	-0.15	472	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_07_Static.fbx	Characters_ModularParts_Static	0.37	0.34	0.43	-0.19	-0.17	-0.21	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_08_Static.fbx	Characters_ModularParts_Static	0.32	0.26	0.29	-0.16	-0.13	-0.15	148	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_09_Static.fbx	Characters_ModularParts_Static	0.30	0.24	0.27	-0.15	-0.12	-0.13	520	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_10_Static.fbx	Characters_ModularParts_Static	0.26	0.28	0.33	-0.13	-0.14	-0.16	220	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_11_Static.fbx	Characters_ModularParts_Static	0.26	0.28	0.35	-0.13	-0.14	-0.17	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_12_Static.fbx	Characters_ModularParts_Static	0.20	0.26	0.29	-0.10	-0.13	-0.15	140	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_13_Static.fbx	Characters_ModularParts_Static	0.29	0.19	0.25	-0.15	-0.10	-0.12	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_14_Static.fbx	Characters_ModularParts_Static	0.26	0.18	0.28	-0.13	-0.09	-0.14	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_15_Static.fbx	Characters_ModularParts_Static	0.27	0.18	0.28	-0.14	-0.09	-0.14	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_16_Static.fbx	Characters_ModularParts_Static	0.18	0.12	0.24	-0.09	-0.06	-0.12	138	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_17_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.21	-0.12	-0.06	-0.10	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_18_Static.fbx	Characters_ModularParts_Static	0.28	0.30	0.32	-0.14	-0.15	-0.16	830	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_19_Static.fbx	Characters_ModularParts_Static	0.30	0.27	0.35	-0.15	-0.13	-0.18	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_20_Static.fbx	Characters_ModularParts_Static	0.28	0.26	0.41	-0.14	-0.13	-0.21	472	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachLeft_21_Static.fbx	Characters_ModularParts_Static	0.21	0.22	0.38	-0.10	-0.11	-0.19	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_01_Static.fbx	Characters_ModularParts_Static	0.23	0.18	0.34	-0.12	-0.09	-0.17	170	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_02_Static.fbx	Characters_ModularParts_Static	0.25	0.18	0.33	-0.12	-0.09	-0.17	72	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_03_Static.fbx	Characters_ModularParts_Static	0.22	0.20	0.33	-0.11	-0.10	-0.16	182	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_04_Static.fbx	Characters_ModularParts_Static	0.21	0.13	0.22	-0.11	-0.06	-0.11	118	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_05_Static.fbx	Characters_ModularParts_Static	0.22	0.19	0.28	-0.11	-0.10	-0.14	158	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_06_Static.fbx	Characters_ModularParts_Static	0.32	0.19	0.29	-0.16	-0.09	-0.15	472	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_07_Static.fbx	Characters_ModularParts_Static	0.37	0.34	0.43	-0.19	-0.17	-0.21	180	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_08_Static.fbx	Characters_ModularParts_Static	0.32	0.26	0.29	-0.16	-0.13	-0.15	148	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_09_Static.fbx	Characters_ModularParts_Static	0.30	0.24	0.27	-0.15	-0.12	-0.13	520	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_10_Static.fbx	Characters_ModularParts_Static	0.26	0.28	0.33	-0.13	-0.14	-0.16	220	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_11_Static.fbx	Characters_ModularParts_Static	0.26	0.28	0.35	-0.13	-0.14	-0.17	176	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_12_Static.fbx	Characters_ModularParts_Static	0.20	0.26	0.29	-0.10	-0.13	-0.15	140	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_13_Static.fbx	Characters_ModularParts_Static	0.29	0.19	0.25	-0.15	-0.10	-0.12	92	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_14_Static.fbx	Characters_ModularParts_Static	0.26	0.18	0.28	-0.13	-0.09	-0.14	152	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_15_Static.fbx	Characters_ModularParts_Static	0.27	0.18	0.28	-0.14	-0.09	-0.14	128	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_16_Static.fbx	Characters_ModularParts_Static	0.18	0.12	0.24	-0.09	-0.06	-0.12	138	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_17_Static.fbx	Characters_ModularParts_Static	0.24	0.12	0.21	-0.12	-0.06	-0.10	52	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_18_Static.fbx	Characters_ModularParts_Static	0.28	0.30	0.32	-0.14	-0.15	-0.16	830	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_19_Static.fbx	Characters_ModularParts_Static	0.30	0.27	0.35	-0.15	-0.13	-0.18	204	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_20_Static.fbx	Characters_ModularParts_Static	0.28	0.26	0.41	-0.14	-0.13	-0.21	472	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_ShoulderAttachRight_21_Static.fbx	Characters_ModularParts_Static	0.21	0.22	0.38	-0.10	-0.11	-0.19	316	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_00_Static.fbx	Characters_ModularParts_Static	0.50	0.64	0.30	-0.25	-0.32	-0.15	346	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_01_Static.fbx	Characters_ModularParts_Static	0.50	0.64	0.33	-0.25	-0.32	-0.16	918	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_02_Static.fbx	Characters_ModularParts_Static	0.52	0.70	0.41	-0.26	-0.35	-0.21	1426	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_03_Static.fbx	Characters_ModularParts_Static	0.52	0.69	0.33	-0.26	-0.35	-0.17	944	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_04_Static.fbx	Characters_ModularParts_Static	0.52	0.70	0.33	-0.26	-0.35	-0.17	846	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_05_Static.fbx	Characters_ModularParts_Static	0.50	0.76	0.40	-0.25	-0.38	-0.20	808	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_06_Static.fbx	Characters_ModularParts_Static	0.52	0.72	0.33	-0.26	-0.36	-0.16	638	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_07_Static.fbx	Characters_ModularParts_Static	0.52	0.70	0.36	-0.26	-0.35	-0.18	902	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_08_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.40	-0.26	-0.34	-0.20	718	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_09_Static.fbx	Characters_ModularParts_Static	0.56	0.75	0.34	-0.28	-0.38	-0.17	980	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_10_Static.fbx	Characters_ModularParts_Static	0.52	0.68	0.36	-0.26	-0.34	-0.18	938	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_11_Static.fbx	Characters_ModularParts_Static	0.52	0.65	0.32	-0.26	-0.33	-0.16	522	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_12_Static.fbx	Characters_ModularParts_Static	0.52	0.66	0.36	-0.26	-0.33	-0.18	1130	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_13_Static.fbx	Characters_ModularParts_Static	0.52	0.70	0.33	-0.26	-0.35	-0.16	1003	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_14_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.35	-0.26	-0.34	-0.17	986	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_15_Static.fbx	Characters_ModularParts_Static	0.52	0.68	0.35	-0.26	-0.34	-0.17	852	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_16_Static.fbx	Characters_ModularParts_Static	0.52	0.64	0.36	-0.26	-0.32	-0.18	756	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_17_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.35	-0.26	-0.34	-0.18	1114	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_18_Static.fbx	Characters_ModularParts_Static	0.52	0.66	0.38	-0.26	-0.33	-0.19	606	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_19_Static.fbx	Characters_ModularParts_Static	0.52	0.71	0.36	-0.26	-0.36	-0.18	690	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_20_Static.fbx	Characters_ModularParts_Static	0.52	0.69	0.36	-0.26	-0.35	-0.18	836	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_21_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.38	-0.26	-0.34	-0.19	524	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_22_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.41	-0.26	-0.34	-0.20	1012	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_23_Static.fbx	Characters_ModularParts_Static	0.52	0.69	0.37	-0.26	-0.34	-0.19	1052	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_24_Static.fbx	Characters_ModularParts_Static	0.52	0.67	0.41	-0.26	-0.33	-0.21	556	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_25_Static.fbx	Characters_ModularParts_Static	0.52	0.72	0.45	-0.26	-0.36	-0.22	740	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_26_Static.fbx	Characters_ModularParts_Static	0.52	0.68	0.35	-0.26	-0.34	-0.17	916	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_27_Static.fbx	Characters_ModularParts_Static	0.52	0.73	0.35	-0.26	-0.37	-0.18	822	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Female_28_Static.fbx	Characters_ModularParts_Static	0.52	0.69	0.33	-0.26	-0.34	-0.17	681	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_00_Static.fbx	Characters_ModularParts_Static	0.49	0.68	0.32	-0.25	-0.34	-0.16	274	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_01_Static.fbx	Characters_ModularParts_Static	0.49	0.65	0.34	-0.25	-0.32	-0.17	782	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_02_Static.fbx	Characters_ModularParts_Static	0.49	0.69	0.41	-0.25	-0.35	-0.20	1328	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_03_Static.fbx	Characters_ModularParts_Static	0.50	0.68	0.31	-0.25	-0.34	-0.16	946	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_04_Static.fbx	Characters_ModularParts_Static	0.50	0.68	0.32	-0.25	-0.34	-0.16	832	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_05_Static.fbx	Characters_ModularParts_Static	0.49	0.74	0.42	-0.25	-0.37	-0.21	800	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_06_Static.fbx	Characters_ModularParts_Static	0.50	0.70	0.32	-0.25	-0.35	-0.16	611	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_07_Static.fbx	Characters_ModularParts_Static	0.50	0.68	0.35	-0.25	-0.34	-0.18	900	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_08_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.39	-0.25	-0.33	-0.20	688	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_09_Static.fbx	Characters_ModularParts_Static	0.60	0.73	0.34	-0.30	-0.37	-0.17	944	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_10_Static.fbx	Characters_ModularParts_Static	0.50	0.67	0.35	-0.25	-0.33	-0.17	930	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_11_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.31	-0.25	-0.33	-0.16	490	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_12_Static.fbx	Characters_ModularParts_Static	0.55	0.67	0.35	-0.27	-0.34	-0.17	1142	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_13_Static.fbx	Characters_ModularParts_Static	0.50	0.68	0.32	-0.25	-0.34	-0.16	953	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_14_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.35	-0.25	-0.33	-0.18	956	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_15_Static.fbx	Characters_ModularParts_Static	0.49	0.67	0.34	-0.25	-0.33	-0.17	820	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_16_Static.fbx	Characters_ModularParts_Static	0.52	0.66	0.34	-0.26	-0.33	-0.17	726	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_17_Static.fbx	Characters_ModularParts_Static	0.50	0.65	0.35	-0.25	-0.33	-0.17	1078	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_18_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.39	-0.25	-0.33	-0.20	540	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_19_Static.fbx	Characters_ModularParts_Static	0.54	0.69	0.34	-0.27	-0.35	-0.17	646	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_20_Static.fbx	Characters_ModularParts_Static	0.50	0.69	0.36	-0.25	-0.34	-0.18	782	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_21_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.37	-0.25	-0.33	-0.18	486	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_22_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.40	-0.25	-0.33	-0.20	994	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_23_Static.fbx	Characters_ModularParts_Static	0.50	0.68	0.37	-0.25	-0.34	-0.19	1052	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_24_Static.fbx	Characters_ModularParts_Static	0.50	0.66	0.41	-0.25	-0.33	-0.21	548	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_25_Static.fbx	Characters_ModularParts_Static	0.50	0.71	0.45	-0.25	-0.35	-0.23	740	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_26_Static.fbx	Characters_ModularParts_Static	0.50	0.67	0.34	-0.25	-0.34	-0.17	918	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_27_Static.fbx	Characters_ModularParts_Static	0.50	0.70	0.35	-0.25	-0.35	-0.18	807	1	0		lambert1	FantasyHero
+FBX/StaticMeshes/Chr_Torso_Male_28_Static.fbx	Characters_ModularParts_Static	0.50	0.67	0.32	-0.25	-0.34	-0.16	635	1	0		lambert1	FantasyHero
+FBX/Weapons/SK_Wep_Axe_01.fbx	Weapons	0.09	1.44	0.48	-0.04	-0.22	-0.07	484	1	0		Weapons	
+FBX/Weapons/SK_Wep_Dagger_01.fbx	Weapons	0.04	0.56	0.15	-0.02	-0.14	-0.09	124	1	0		Weapons	
+FBX/Weapons/SK_Wep_Joust_01.fbx	Weapons	0.25	2.99	0.25	-0.13	-0.64	-0.13	304	1	0		Weapons	
+FBX/Weapons/SK_Wep_Joust_02.fbx	Weapons	0.25	2.99	0.25	-0.13	-0.64	-0.13	196	1	0		Weapons	
+FBX/Weapons/SK_Wep_Joust_03.fbx	Weapons	0.25	1.45	0.25	-0.13	-0.64	-0.13	312	1	0		Weapons	
+FBX/Weapons/SK_Wep_Mace_01.fbx	Weapons	0.15	0.78	0.15	-0.07	-0.13	-0.07	426	1	0		Weapons	
+FBX/Weapons/SK_Wep_Mace_02.fbx	Weapons	0.31	1.12	0.28	-0.17	-0.30	-0.14	408	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_01.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	844	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_02.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	852	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_03.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	850	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_04.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	860	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_05.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	850	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_06.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	876	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_07.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	874	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_08.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	852	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_09.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	892	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_10.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	852	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_11.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	932	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_12.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	852	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_13.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	932	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_14.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	932	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_15.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	924	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_16.fbx	Weapons	0.67	0.98	0.61	-0.33	-0.58	-0.10	1774	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_17.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	850	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_18.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	852	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_19.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	850	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_20.fbx	Weapons	0.67	0.98	0.20	-0.33	-0.58	-0.10	860	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Buckler_01.fbx	Weapons	0.61	0.58	0.14	-0.31	-0.29	-0.07	580	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_01.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	796	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_02.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	804	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_03.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	800	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_04.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	796	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_05.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	796	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_06.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	794	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_07.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	804	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_08.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	768	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_09.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	800	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_10.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	768	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_11.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	834	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_12.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	768	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_13.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	834	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_14.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	834	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_15.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	816	1	0		Weapons	
+FBX/Weapons/SK_Wep_Shield_Long_16.fbx	Weapons	0.63	1.31	0.16	-0.32	-0.93	-0.08	810	1	0		Weapons	
+FBX/Weapons/SK_Wep_Staff_01.fbx	Weapons	0.17	1.77	0.16	-0.09	-1.05	-0.08	648	1	0		Weapons	
+FBX/Weapons/SK_Wep_Staff_02.fbx	Weapons	0.17	1.98	0.16	-0.09	-1.02	-0.08	638	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_01.fbx	Weapons	0.06	1.24	0.22	-0.03	-0.20	-0.11	290	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Cover_01.fbx	Weapons	0.12	0.98	0.16	-0.08	0.10	-0.07	272	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Large_01.fbx	Weapons	0.06	1.66	0.19	-0.03	-0.24	-0.08	376	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Rapier_01.fbx	Weapons	0.04	1.21	0.24	-0.02	-0.09	-0.12	296	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Rapier_Cover_01.fbx	Weapons	0.09	1.13	0.11	-0.06	0.11	-0.05	272	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Small_01.fbx	Weapons	0.05	0.74	0.23	-0.02	-0.15	-0.12	254	1	0		Weapons	
+FBX/Weapons/SK_Wep_Sword_Small_Cover_01.fbx	Weapons	0.10	0.51	0.12	-0.06	0.08	-0.06	272	1	0		Weapons	
+FBX/Weapons/SK_Wep_ThowingKnife_01.fbx	Weapons	0.02	0.48	0.08	-0.01	-0.12	-0.04	134	1	0		Weapons	

@@ -1,0 +1,91 @@
+<!doctype html>
+<!--
+  Synty piece viewer (dev tool): loads FBX pieces from a pack under /assets/synty/ and renders them once, so an agent
+  (or a person) can screenshot how pieces look, which way they face and how they fit together before using them in
+  the 3D renderer. See docs/synty-assets/README.md.
+
+  Query parameters:
+    pack   Pack folder under /assets/synty/ (default ancient-empire).
+    p      Comma-separated pieces: path under the pack's FBX/ folder without .fbx, optionally @x@z@ryDegrees@y
+           (native metres). Without a position, pieces are laid out on a grid `s` metres apart.
+    atlas  Texture under the pack's Textures/ folder for unmapped materials (default: the pack's usual atlas).
+    map    JSON of extra { fbxMaterialName: "path under Textures/" } mappings.
+    cam, t Camera position and target, "x,y,z" (native metres).
+  Sets window.done = true once rendered.
+-->
+<html><head><meta charset="utf-8"><title>Synty viewer</title><style>body{margin:0;background:#bcd}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}</script>
+</head><body><script type="module">
+import * as THREE from 'three';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
+const q = new URLSearchParams(location.search);
+const pack = q.get('pack') || 'ancient-empire';
+const ROOT = `/assets/synty/${pack}/`;
+/** Usual colour atlas per pack, for materials without a mapping. */
+const ATLASES = {
+    'ancient-empire': 'Alts/PolygonAncientWorlds_Texture_01_A.png',
+    'dungeon-pack': 'Dungeons_Texture_01.png',
+    'fantasy-pack': 'PolygonMinis_Texture_01.png',
+    'meadow-forest': 'PolygonNatureBiomes_Meadow_Texture_01.png',
+};
+/** Ancient Empire building materials by the names inside the FBX files (see docs/synty-assets/README.md). */
+const AE = {
+    Roof: 'BuildingAlts/Roof_Tile_01.png', Roof1: 'BuildingAlts/Roof_Tile_01.png', Stucco: 'BuildingAlts/Stucco_White_01.png',
+    lambert1131: 'BuildingAlts/Stucco_White_01.png', lambert1132: 'BuildingAlts/Stucco_White_01.png', HalfBrick: 'BuildingAlts/Building_Half_Brick_01.png',
+    GlassSHD: 'BuildingAlts/Window_01.png', lambert2: 'BuildingAlts/Building_Large_Brick_01.png', A_Wall1: 'BuildingAlts/Building_Large_Brick_01.png',
+    MarbleSHD: 'BuildingAlts/Building_Marble_02.png', lambert6: 'BuildingAlts/Building_Marble_02.png', lambert9: 'BuildingAlts/Building_Marble_02.png',
+};
+const MAP = { ...(pack === 'ancient-empire' ? AE : {}), ...JSON.parse(q.get('map') || '{}') };
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xbcd0e0);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x777766, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(-10, 20, 12);
+scene.add(sun);
+scene.add(new THREE.GridHelper(80, 32, 0x444444, 0x999999));
+// Red +X, green +Y, blue +Z.
+scene.add(new THREE.AxesHelper(3));
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+const [cx, cy, cz] = (q.get('cam') || '0,12,22').split(',').map(Number);
+const [tx, ty, tz] = (q.get('t') || '0,0,0').split(',').map(Number);
+camera.position.set(cx, cy, cz);
+camera.lookAt(tx, ty, tz);
+
+const textures = new THREE.TextureLoader();
+const load = async (path) => {
+    const texture = await textures.loadAsync(`${ROOT}Textures/${path}`);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    return new THREE.MeshLambertMaterial({ map: texture, side: THREE.DoubleSide });
+};
+const fallback = await load(q.get('atlas') || ATLASES[pack] || ATLASES['ancient-empire']).catch(() => new THREE.MeshLambertMaterial({ color: 0xcccccc, side: THREE.DoubleSide }));
+const cache = {};
+const materialFor = async (name) => (MAP[name] ? (cache[name] ??= await load(MAP[name])) : fallback);
+
+const manager = new THREE.LoadingManager();
+// Texture paths inside the FBX files are stale; materials are rebuilt by name above.
+manager.setURLModifier((url) => (/\.(png|jpe?g|tga|psd)/i.test(url) ? 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=' : url));
+const loader = new FBXLoader(manager);
+const spacing = Number(q.get('s') || 10);
+const names = (q.get('p') || '').split(',').filter(Boolean);
+for (const [i, entry] of names.entries()) {
+    const [file, px, pz, ry, py] = entry.split('@');
+    const root = await loader.loadAsync(`${ROOT}FBX/${file}.fbx`);
+    // Most packs are authored in centimetres; the dungeon pack in metres.
+    root.scale.setScalar(pack === 'dungeon-pack' ? 1 : 0.01);
+    const meshes = [];
+    root.traverse((node) => node.isMesh && meshes.push(node));
+    for (const mesh of meshes) mesh.material = Array.isArray(mesh.material) ? await Promise.all(mesh.material.map((m) => materialFor(m.name))) : await materialFor(mesh.material.name);
+    root.position.set(px !== undefined ? Number(px) : (i % 4) * spacing - 1.5 * spacing, Number(py || 0), pz !== undefined ? Number(pz) : Math.floor(i / 4) * -spacing);
+    if (ry) root.rotation.y = (Number(ry) * Math.PI) / 180;
+    scene.add(root);
+}
+renderer.render(scene, camera);
+window.done = true;
+</script></body></html>

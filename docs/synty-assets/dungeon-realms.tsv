@@ -1,0 +1,1222 @@
+path	category	size_x_m	size_y_m	size_z_m	min_x_m	min_y_m	min_z_m	tris	meshes	bones	clips	fbx_materials	materiallist_slots
+FBX/Characters/Attachments/SM_Chr_Attach_Bone_Shoulder_01.fbx	Attachments	0.22	0.17	0.24	-0.11	-0.07	-0.12	166	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Bandana_01.fbx	BR	0.47	0.27	0.40	-0.20	0.01	-0.17	204	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_01.fbx	BR	0.51	0.65	0.38	-0.26	-0.55	-0.01	1256	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_02.fbx	BR	0.52	0.52	0.33	-0.26	-0.41	0.02	560	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_03.fbx	BR	0.59	0.55	0.31	-0.29	-0.42	0.03	1186	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_04.fbx	BR	0.41	0.48	0.28	-0.20	-0.35	0.03	434	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_05.fbx	BR	0.39	0.13	0.10	-0.19	-0.07	0.16	114	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_06.fbx	BR	0.36	0.15	0.14	-0.18	-0.11	0.12	134	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_07.fbx	BR	0.44	0.35	0.21	-0.22	-0.22	0.05	220	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_08.fbx	BR	0.51	0.46	0.30	-0.26	-0.36	-0.01	838	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_Attach_01.fbx	BR	0.17	0.50	0.22	-0.09	-0.55	0.15	326	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Beard_Attach_02.fbx	BR	0.15	0.37	0.19	-0.08	-0.29	0.05	306	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_FacePlate_01.fbx	BR	0.39	0.10	0.41	-0.19	0.10	-0.17	44	1	0		ChrAttach	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_GasBag_01.fbx	BR	0.39	0.47	0.50	-0.19	-0.19	-0.16	341	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Gasmask_01.fbx	BR	0.37	0.46	0.49	-0.18	-0.22	-0.18	598	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Afro_01.fbx	BR	0.48	0.43	0.48	-0.24	-0.07	-0.22	318	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Balding_01.fbx	BR	0.48	0.33	0.36	-0.24	-0.07	-0.23	242	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Fancy_01.fbx	BR	0.53	0.55	0.52	-0.26	-0.16	-0.29	1760	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Long_01.fbx	BR	0.69	0.61	0.52	-0.35	-0.27	-0.25	1590	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Long_Flat_01.fbx	BR	0.47	0.52	0.42	-0.23	-0.22	-0.21	400	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Mohawk_01.fbx	BR	0.20	0.42	0.51	-0.10	0.03	-0.21	150	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Pigtails_01.fbx	BR	0.61	0.68	0.57	-0.31	-0.34	-0.24	1192	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Ponytail_01.fbx	BR	0.30	0.42	0.64	-0.15	0	-0.44	340	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Ponytail_02.fbx	BR	0.41	0.39	0.80	-0.21	-0.07	-0.58	450	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Hair_Rows_01.fbx	BR	0.37	0.40	0.45	-0.19	-0.09	-0.20	262	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Fancy_01.fbx	BR	0.67	0.76	0.52	-0.33	-0.16	-0.23	824	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Horns_01.fbx	BR	0.79	0.56	0.56	-0.40	-0.02	-0.27	536	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_King_01.fbx	BR	0.55	0.46	0.43	-0.27	-0.02	-0.17	394	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Leather_01.fbx	BR	0.55	0.52	0.45	-0.27	-0.19	-0.20	436	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Light_01.fbx	BR	0.57	0.42	0.58	-0.28	-0.03	-0.27	652	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Light_02.fbx	BR	0.57	0.50	0.66	-0.28	-0.03	-0.27	615	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Light_03.fbx	BR	0.56	0.60	0.56	-0.28	0.01	-0.28	843	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Helmet_Soldier_01.fbx	BR	0.54	0.50	0.56	-0.27	-0.10	-0.27	622	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_Fancy_L_01.fbx	BR	0.40	0.28	0.40	0.05	-0.04	-0.23	328	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_Fancy_R_01.fbx	BR	0.40	0.28	0.40	-0.46	-0.04	-0.23	328	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_King_L_01.fbx	BR	0.40	0.36	0.60	-0.01	-0.08	-0.33	140	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_King_R_01.fbx	BR	0.40	0.36	0.60	-0.40	-0.08	-0.33	140	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_Soldier_L_01.fbx	BR	0.54	0.36	0.47	0.05	-0.10	-0.26	240	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Dwarf_Shoulder_Soldier_R_01.fbx	BR	0.54	0.36	0.47	-0.59	-0.10	-0.26	240	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Ear_01.fbx	Attachments	0.41	0.19	0.15	-0.21	0.01	-0.12	50	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_FacePlate_Flip_01.fbx	Attachments	0.42	0.35	0.25	-0.21	-0.08	0.09	276	1	0		ChrAttach	
+FBX/Characters/Attachments/SM_Chr_Attach_Feather_01.fbx	Attachments	0.19	0.18	0.17	-0.03	-0.03	-0.16	232	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Feather_Shoulder_01.fbx	Attachments	0.35	0.22	0.25	-0.33	-0.04	-0.13	394	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hair_Hero_Female_01.fbx	Attachments	0.28	0.35	0.34	-0.14	-0.13	-0.17	574	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hair_Hero_Male_01.fbx	Attachments	0.30	0.36	0.32	-0.14	-0.11	-0.14	686	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hair_Wild_01.fbx	Attachments	0.33	0.29	0.39	-0.18	0.01	-0.25	466	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hair_Wild_02.fbx	Attachments	0.14	0.27	0.36	-0.10	0.03	-0.22	101	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hat_Round_01.fbx	Attachments	0.66	0.22	0.66	-0.33	0.07	-0.33	148	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hat_Round_02.fbx	Attachments	0.80	0.19	0.80	-0.40	0.12	-0.40	132	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Headwrap_01.fbx	Attachments	0.30	0.47	0.31	-0.15	-0.21	-0.16	324	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Headwrap_02.fbx	Attachments	0.29	0.42	0.30	-0.15	-0.19	-0.15	206	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Headwrap_03.fbx	Attachments	0.30	0.43	0.32	-0.13	-0.20	-0.15	230	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hero_Shoulder_01.fbx	Attachments	0.25	0.17	0.28	-0.09	-0.02	-0.14	138	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hood_01.fbx	Attachments	0.31	0.49	0.39	-0.15	-0.25	-0.19	210	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hood_02.fbx	Attachments	0.28	0.47	0.43	-0.14	-0.22	-0.24	228	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Hood_03.fbx	Attachments	0.28	0.46	0.36	-0.14	-0.23	-0.18	210	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Horns_01.fbx	Attachments	0.50	0.28	0.29	-0.25	0.02	-0.20	340	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Mask_01.fbx	Attachments	0.41	0.65	0.10	-0.21	-0.22	0.12	491	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Mask_02.fbx	Attachments	0.30	0.29	0.06	-0.15	-0.08	0.14	301	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Mask_03.fbx	Attachments	0.25	0.31	0.08	-0.13	-0.09	0.12	308	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Mask_04.fbx	Attachments	0.31	0.47	0.08	-0.15	-0.11	0.10	282	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Neckwrap_01.fbx	Attachments	0.48	0.32	0.38	-0.24	-0.08	-0.16	218	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Neckwrap_02.fbx	Attachments	0.45	0.31	0.35	-0.21	-0.09	-0.16	222	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Shoulder_01.fbx	Attachments	0.22	0.15	0.20	-0.13	-0.02	-0.12	224	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Turban_01.fbx	Attachments	0.31	0.56	0.38	-0.15	-0.05	-0.18	686	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Undead_Knight_AnimalSkull_01.fbx	Attachments	0.53	0.65	0.32	-0.27	-0.13	-0.08	630	1	0		ChrAttach	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Undead_Knight_Crown_01.fbx	Attachments	0.22	0.25	0.22	-0.11	0.08	-0.10	290	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Undead_Knight_Head_01.fbx	Attachments	0.24	0.27	0.22	-0.12	-0.10	-0.10	164	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Undead_Knight_Helmet_01.fbx	Attachments	0.41	0.59	0.30	-0.21	-0.13	-0.12	794	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Attachments/SM_Chr_Attach_Undead_Knight_Skull_01.fbx	Attachments	0.18	0.19	0.21	-0.09	-0.08	-0.09	262	1	0		ChrAttach	PolygonDungeonRealms_01_A
+FBX/Characters/Character_BR.fbx	Characters	2.96	2.07	0.76	-1.48	-0.01	-0.34	20800	8	38	Take 001:3.33s	lambert22,lambert23	
+FBX/Characters/Characters.fbx	Characters	2.05	1.84	0.56	-1.02	-0.01	-0.34	34997	11	39	Take 001:3.90s	lambert294,_DungeonSHD15,lambert295,lambert296,lambert1538,lambert298,lambert299,lambert300,lambert301,lambert302,lambert1539	
+FBX/Characters/Chr_Demon_01.fbx	Characters	2.96	2.07	0.71	-1.48	-0.01	-0.29	5830	1	38		lambert22	
+FBX/Characters/Chr_Dwarf_Casual_Female_01.fbx	Characters	2.89	1.87	0.65	-1.44	0	-0.33	1682	1	38		lambert22,lambert23	
+FBX/Characters/Chr_Dwarf_Casual_Male_01.fbx	Characters	2.89	1.87	0.64	-1.44	0	-0.32	1682	1	38		lambert22,lambert23	
+FBX/Characters/Chr_Dwarf_King_01.fbx	Characters	2.89	1.87	0.61	-1.44	0	-0.30	2246	1	38		lambert23,lambert22	
+FBX/Characters/Chr_Dwarf_Miner_01.fbx	Characters	2.89	1.87	0.61	-1.44	0	-0.30	2196	1	38		lambert22,lambert23	
+FBX/Characters/Chr_Dwarf_Soldier_Female_01.fbx	Characters	2.89	1.87	0.69	-1.44	0	-0.34	2414	1	38		lambert23,lambert22	
+FBX/Characters/Chr_Dwarf_Soldier_Male_01.fbx	Characters	2.89	1.87	0.65	-1.44	0	-0.33	2440	1	38		lambert22,lambert23	
+FBX/Characters/Chr_Dwarf_Worker_01.fbx	Characters	2.89	1.87	0.62	-1.44	0	-0.32	2310	1	38		lambert23,lambert22	
+FBX/Characters/Chr_Hero_Female_01.fbx	Characters	2.04	1.78	0.50	-1.02	0	-0.34	2632	1	39	Take 001:3.90s	lambert294	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Hero_Male_01.fbx	Characters	2.05	1.79	0.35	-1.02	0	-0.20	3004	1	39	Take 001:3.90s	_DungeonSHD15	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Nomad_Female_01.fbx	Characters	2.04	1.79	0.34	-1.02	-0.01	-0.18	2499	1	39	Take 001:3.90s	lambert295	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Nomad_Female_02.fbx	Characters	2.04	1.79	0.31	-1.02	0	-0.16	2454	1	39	Take 001:3.90s	lambert296	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Nomad_Male_01.fbx	Characters	2.05	1.79	0.35	-1.02	0	-0.18	2706	1	39	Take 001:3.90s	lambert1538	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Nomad_Male_02.fbx	Characters	2.05	1.79	0.34	-1.02	0	-0.18	2755	1	39	Take 001:3.90s	lambert298	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Nomad_Male_03.fbx	Characters	2.05	1.79	0.36	-1.02	0	-0.21	2274	1	39	Take 001:3.90s	lambert299	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Skeleton_01.fbx	Characters	2.04	1.84	0.38	-1.02	0	-0.17	4410	1	39	Take 001:3.90s	lambert300	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Skeleton_02.fbx	Characters	2.04	1.83	0.36	-1.02	0	-0.17	4077	1	39	Take 001:3.90s	lambert301	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Skeleton_03.fbx	Characters	2.04	1.83	0.32	-1.02	0	-0.17	4410	1	39	Take 001:3.90s	lambert302	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/Chr_Undead_Knight_01.fbx	Characters	2.05	1.63	0.41	-1.02	-0.01	-0.20	3776	1	39	Take 001:3.90s	lambert1539	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/Characters/SM_Chr_Demon_Wings_Left_01.fbx	Characters	1.10	1.76	0.90	-0.09	-1.07	-0.56	780	1	0		lambert22	
+FBX/Characters/SM_Chr_Demon_Wings_Right_01.fbx	Characters	1.10	1.76	0.90	-1.00	-1.07	-0.56	780	1	0		lambert22	
+FBX/FX_Bubble_Half_01.fbx	FBX	0.76	0.38	0.76	-0.38	0	-0.38	56	1	0		lambert2	
+FBX/FX_Cart_Filled_Mesh_01.fbx	FBX	2.79	3.13	2.10	-1.40	-3.12	-1.19	1852	1	0		Dungeon2SHD	
+FBX/FX_Cart_Filled_Mesh_02.fbx	FBX	2.08	5.19	2.50	-1.07	-5.18	-1.25	1782	1	0		Dungeon2SHD1	
+FBX/FX_Cart_Mesh_01.fbx	FBX	2.79	3.13	2.10	-1.40	-3.12	-1.19	755	1	0		lambert3	
+FBX/FX_Cart_Mesh_02.fbx	FBX	2.08	5.19	2.50	-1.07	-5.18	-1.25	1772	1	0		lambert4	
+FBX/FX_Chandelier_Mesh_01.fbx	FBX	5.44	0.94	5.49	-2.72	0.85	-2.75	22	1	0		lambert5	
+FBX/FX_Moth_Mesh_01.fbx	FBX	2.59	0.31	2.56	-1.30	-0.15	-1.26	160	1	0		MothWing	
+FBX/FX_Moth_Mesh_02.fbx	FBX	7.25	0.31	7.25	-3.62	-0.14	-3.62	320	1	0		MothWing1	
+FBX/FX_Portal_Sphere.fbx	FBX	0.93	0.93	0.91	-0.47	-0.47	-0.45	364	1	0		lambert1	
+FBX/FX_Portal_Sphere_Reverse.fbx	FBX	1.03	1.03	1.00	-0.51	-0.51	-0.50	364	1	0		lambert1	
+FBX/FX_Sphere_Simple_01.fbx	FBX	1.16	0.93	1.15	-0.58	-0.45	-0.58	28	1	0		lambert1472	
+FBX/FX_SunShafts.fbx	FBX	0.01	0.04	0.01	-0.01	-0.02	-0.01	4	1	0		lambert1934	
+FBX/SM_Bld_Camp_Tent_01.fbx	Buildings	21.22	14.14	10.54	-10.06	-2.70	-5.62	6616	1	0		lambert1473	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_02.fbx	Buildings	8.29	8.17	5.80	-4.28	-2.58	-2.90	1564	1	0		lambert1474	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_03.fbx	Buildings	11.77	11.79	8.06	-5.98	-2.23	-4.03	3452	1	0		lambert1475	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_04.fbx	Buildings	8.84	8.81	17.95	-4.48	-3.02	-8.97	4403	1	0		lambert6	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_05.fbx	Buildings	18.71	11.20	9.55	-9.77	-3.14	-5.39	2590	1	0		lambert7	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_06.fbx	Buildings	8.58	8.54	7.68	-4.13	-2.51	-3.16	2712	1	0		lambert8	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cloth_01.fbx	FBX	17.30	8.17	9.64	-9.16	2.07	-5.43	1232	1	0		lambert1476	
+FBX/SM_Bld_Camp_Tent_Cloth_02.fbx	FBX	7.42	2.97	5.08	-3.79	2.28	-2.48	604	1	0		lambert1477	
+FBX/SM_Bld_Camp_Tent_Cloth_03.fbx	FBX	9.45	5.67	4.85	-3.44	2.68	-0.93	340	1	0		lambert1478	
+FBX/SM_Bld_Camp_Tent_Cloth_04.fbx	FBX	7.00	3.12	15.19	-3.57	1.37	-8.65	608	1	0		lambert1479	
+FBX/SM_Bld_Camp_Tent_Cloth_05.fbx	FBX	15.72	5.81	5.53	-6.72	1.40	-4.39	568	1	0		lambert1480	
+FBX/SM_Bld_Camp_Tent_Cloth_06.fbx	FBX	8.39	3.60	7.07	-3.89	1.93	-2.87	592	1	0		lambert1481	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_01.fbx	Buildings	6.65	12.75	7.09	-3.32	-6.37	-3.55	866	1	0		lambert1462	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Rough_02.fbx	Buildings	3.27	12.87	8.11	-1.63	-6.43	-4.02	216	1	0		lambert1463	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Rough_03.fbx	Buildings	9.41	8.05	6.58	-5.64	-2.69	-3.74	250	1	0		lambert1464	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Rough_04.fbx	Buildings	11.69	9.30	5.24	-4.52	-3.00	-2.49	162	1	0		lambert1465	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Rough_05.fbx	Buildings	8.96	8.98	5.31	-5.78	-2.64	-0.96	194	1	0		lambert1466	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Cloth_01.fbx	FBX	3.86	4.88	4.16	-3.22	0.27	-3.32	104	1	0		lambert1467	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Cloth_02.fbx	FBX	3.17	1.85	8.04	-1.64	1.62	-4.08	156	1	0		lambert1468	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Cloth_03.fbx	FBX	8.24	2.01	6.14	-4.12	-1.03	-3.07	188	1	0		lambert1469	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Cloth_04.fbx	FBX	10.65	1.65	4.86	-3.81	3.18	-2.28	232	1	0		lambert1470	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Cloth_05.fbx	FBX	8.53	1.50	4.71	-5.55	2.80	-0.86	184	1	0		lambert1471	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Static_01.fbx	FBX	6.65	12.75	7.09	-3.32	-6.37	-3.55	970	1	0		lambert1482	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Static_02.fbx	FBX	3.27	12.87	8.17	-1.64	-6.43	-4.08	372	1	0		lambert9	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Static_03.fbx	FBX	9.41	8.05	6.58	-5.64	-2.69	-3.74	438	1	0		lambert10	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Static_04.fbx	FBX	11.69	9.30	5.24	-4.52	-3.00	-2.49	394	1	0		lambert11	
+FBX/SM_Bld_Camp_Tent_Cover_Rough_Static_05.fbx	FBX	8.96	8.98	5.31	-5.78	-2.64	-0.96	378	1	0		lambert12	
+FBX/SM_Bld_Camp_Tent_Cover_Side_01.fbx	Buildings	2.55	7.42	3.49	-1.26	-2.63	-0.52	288	1	0		lambert1483	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Side_02.fbx	Buildings	7.03	7.97	4.35	-3.51	-2.80	-2.16	454	1	0		lambert1484	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Side_03.fbx	Buildings	4.58	7.42	4.48	-2.30	-2.63	-2.24	288	1	0		lambert886	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Side_04.fbx	Buildings	7.82	8.30	5.29	-3.91	-2.93	-2.75	454	1	0		lambert887	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Side_05.fbx	Buildings	5.93	8.05	5.83	-3.17	-2.67	-3.29	342	1	0		lambert888	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Side_Cloth_01.fbx	FBX	2.76	3.19	2.83	-1.35	1.01	0.11	292	1	0		lambert1485	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Cloth_02.fbx	FBX	5.92	3.92	3.40	-3.05	0.48	-2.05	292	1	0		lambert1486	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Cloth_03.fbx	FBX	4.70	4.07	3.89	-2.35	0.24	-1.66	292	1	0		lambert1487	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Cloth_04.fbx	FBX	6.86	3.94	3.95	-3.54	0.85	-2.23	232	1	0		lambert1488	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Cloth_05.fbx	FBX	4.97	3.81	4.46	-2.58	0.80	-2.74	162	1	0		lambert1489	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Static_01.fbx	FBX	2.76	7.42	3.49	-1.35	-2.63	-0.52	580	1	0		lambert13	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Static_02.fbx	FBX	7.03	7.97	4.35	-3.51	-2.80	-2.16	746	1	0		lambert14	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Static_03.fbx	FBX	4.70	7.42	4.48	-2.35	-2.63	-2.24	580	1	0		lambert1490	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Static_04.fbx	FBX	7.82	8.30	5.29	-3.91	-2.93	-2.75	686	1	0		lambert1491	
+FBX/SM_Bld_Camp_Tent_Cover_Side_Static_05.fbx	FBX	5.93	8.05	5.83	-3.17	-2.67	-3.29	504	1	0		lambert1492	
+FBX/SM_Bld_Camp_Tent_Cover_Top_01.fbx	Buildings	2.56	7.88	3.26	-1.26	-2.58	-1.32	432	1	0		lambert889	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_02.fbx	Buildings	4.35	8.15	3.70	-2.59	-2.62	-1.82	432	1	0		lambert890	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_03.fbx	Buildings	3.14	8.11	4.35	-1.54	-2.58	-1.76	424	1	0		lambert891	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_04.fbx	Buildings	5.78	7.85	4.79	-2.96	-2.65	-2.34	432	1	0		lambert892	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_05.fbx	Buildings	4.22	8.26	4.17	-2.07	-2.74	-1.69	432	1	0		lambert893	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_06.fbx	Buildings	5.86	8.61	4.29	-3.04	-2.53	-2.02	432	1	0		lambert895	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_07.fbx	Buildings	6.95	7.67	5.84	-3.48	-2.51	-2.92	532	1	0		lambert896	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_01.fbx	FBX	2.69	0.97	3.38	-1.31	3.67	-1.37	292	1	0		lambert1493	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_02.fbx	FBX	4.53	1.01	3.89	-2.69	3.79	-1.90	292	1	0		lambert1494	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_03.fbx	FBX	3.31	0.98	4.53	-1.61	3.81	-1.84	292	1	0		lambert1495	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_04.fbx	FBX	5.69	1.09	5.10	-2.72	3.37	-2.55	292	1	0		lambert1496	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_05.fbx	FBX	4.44	1.00	4.36	-2.16	3.80	-1.77	292	1	0		lambert1497	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_06.fbx	FBX	6.21	2.43	4.57	-3.11	3.11	-2.31	232	1	0		lambert1498	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Cloth_07.fbx	FBX	5.99	2.07	4.63	-2.97	2.13	-2.37	292	1	0		lambert1499	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_01.fbx	FBX	2.69	7.88	3.38	-1.31	-2.58	-1.37	724	1	0		lambert1500	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_02.fbx	FBX	4.53	8.15	3.89	-2.69	-2.62	-1.90	724	1	0		lambert1501	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_03.fbx	FBX	3.31	8.11	4.53	-1.61	-2.58	-1.84	716	1	0		lambert1502	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_04.fbx	FBX	5.92	7.85	5.10	-2.96	-2.65	-2.55	724	1	0		lambert1503	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_05.fbx	FBX	4.44	8.26	4.36	-2.16	-2.74	-1.77	724	1	0		lambert1504	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_06.fbx	FBX	6.21	8.61	4.57	-3.11	-2.53	-2.31	664	1	0		lambert894	
+FBX/SM_Bld_Camp_Tent_Cover_Top_Static_07.fbx	FBX	6.95	7.67	5.84	-3.48	-2.51	-2.92	824	1	0		lambert1505	
+FBX/SM_Bld_Camp_Tent_Round_01.fbx	Buildings	5.68	9.32	8.43	-2.73	-2.91	-2.73	1113	1	0		lambert1506	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Round_02.fbx	Buildings	7.74	7.28	7.75	-3.98	-2.09	-3.68	752	1	0		lambert1507	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Camp_Tent_Static_01.fbx	FBX	21.22	14.14	10.54	-10.06	-2.70	-5.62	7848	1	0		lambert1508	
+FBX/SM_Bld_Camp_Tent_Static_02.fbx	FBX	8.29	8.17	5.80	-4.28	-2.58	-2.90	2168	1	0		lambert1509	
+FBX/SM_Bld_Camp_Tent_Static_03.fbx	FBX	11.99	11.79	8.06	-5.98	-2.23	-4.03	3792	1	0		lambert1510	
+FBX/SM_Bld_Camp_Tent_Static_04.fbx	FBX	8.84	8.81	17.95	-4.48	-3.02	-8.97	5011	1	0		lambert1511	
+FBX/SM_Bld_Camp_Tent_Static_05.fbx	FBX	18.77	11.20	9.55	-9.77	-3.14	-5.39	3158	1	0		lambert1512	
+FBX/SM_Bld_Camp_Tent_Static_06.fbx	FBX	8.63	8.54	7.68	-4.13	-2.51	-3.16	3304	1	0		lambert1513	
+FBX/SM_Bld_Dwarf_Building_01.fbx	Buildings	25.74	12.33	15.74	-12.87	0	-7.87	6021	1	0		DungeonSHD78	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Dwarf_Building_02.fbx	Buildings	8.84	6.29	7.39	-4.42	-2.00	-3.69	1330	1	0		DungeonSHD	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Dwarf_Building_03.fbx	Buildings	8.46	3.87	8.03	-4.23	-0.30	-3.92	1421	1	0		DungeonSHD79	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Bld_Dwarf_Building_Door_01.fbx	FBX	1.41	3.25	0.39	-0.05	0	-0.21	1113	1	0		DungeonSHD78	
+FBX/SM_Bld_Dwarf_Building_Door_02.fbx	FBX	1.33	2.20	0.36	-0.05	0	-0.19	913	1	0		DungeonSHD	
+FBX/SM_Bld_Dwarf_Building_Door_03.fbx	FBX	1.53	2.17	0.30	-0.03	-0.01	-0.15	2248	1	0		DungeonSHD79	
+FBX/SM_Bld_Ruin_Arch_01.fbx	Buildings	8.09	4.02	1.50	-4.04	0	-0.75	1178	1	0		lambert1514	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Arch_Broken_01.fbx	Buildings	5.29	4.02	1.50	-4.05	0	-0.75	526	1	0		lambert1515	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_01.fbx	Buildings	4.73	1.70	5.00	-2.37	-0.78	0	978	1	0		lambert1516	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_02.fbx	Buildings	4.73	1.70	5.00	-2.37	-0.77	0	932	1	0		lambert1517	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_03.fbx	Buildings	4.73	1.70	5.03	-2.37	-0.77	0	950	1	0		lambert1518	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_04.fbx	Buildings	4.73	1.70	5.02	-2.37	-0.84	0	996	1	0		lambert1519	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_Pillar_Large_01.fbx	Buildings	1.94	8.18	3.97	-0.98	-4.05	-1.98	436	1	0		lambert1520	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_Pillar_Large_02.fbx	Buildings	1.93	8.01	3.97	-0.96	-4.03	-1.98	526	1	0		lambert1521	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Bridge_Pillar_Large_Base_01.fbx	Buildings	2.31	4.79	2.31	-1.16	-0.30	-1.15	126	1	0		lambert1522	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_01.fbx	Buildings	0.81	3.28	0.81	-0.41	0	-0.41	266	1	0		lambert1523	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Arch_01.fbx	Buildings	4.30	0.69	0.70	-4.11	-0.23	-0.35	204	1	0		lambert1525	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Arch_Broken_01.fbx	Buildings	1.91	0.66	0.70	-1.71	-0.23	-0.35	108	1	0		lambert1526	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Arches_Round_01.fbx	Buildings	4.17	2.89	4.17	-2.09	0	-2.08	1281	1	0		lambert1524	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Broken_01.fbx	Buildings	0.77	2.06	0.77	-0.38	0	-0.38	158	1	0		lambert1527	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Broken_02.fbx	Buildings	0.77	0.97	0.77	-0.38	0	-0.38	86	1	0		lambert1528	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Broken_03.fbx	Buildings	0.77	0.40	0.77	-0.38	0	-0.38	36	1	0		lambert1529	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Pillar_Round_01.fbx	Buildings	3.30	10.33	3.32	-1.64	-0.51	-1.66	1396	1	0		lambert1530	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Stairs_Straight_01.fbx	Buildings	5.00	4.28	8.32	-2.50	0	0	557	1	0		lambert1531	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tiles_01.fbx	Buildings	5.00	1.88	5.00	-2.50	-0.94	-2.50	1162	1	0		lambert1532	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tiles_02.fbx	Buildings	5.01	2.05	4.73	-2.51	-1.02	-2.37	1140	1	0		lambert1533	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tiles_03.fbx	Buildings	4.24	2.06	4.27	-1.63	-1.02	-1.65	1608	1	0		lambert1534	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tiles_04.fbx	Buildings	4.15	0.63	4.16	-1.60	-0.33	-1.62	743	1	0		lambert1535	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_01.fbx	Buildings	5.97	10.34	5.97	-2.98	0	-2.98	3510	1	0		lambert1536	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Broken_01.fbx	Buildings	5.97	10.33	5.65	-2.98	0	-2.98	2940	1	0		lambert1537	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Round_01.fbx	Buildings	3.16	7.63	3.16	-1.58	-0.16	-1.58	948	1	0		lambert1538	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Round_Broken_01.fbx	Buildings	5.64	4.44	5.62	-2.82	0	-2.82	832	1	0		lambert1539	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Round_Short_01.fbx	Buildings	5.64	4.44	5.64	-2.82	-0.17	-2.82	890	1	0		lambert1540	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Round_Stairs_01.fbx	Buildings	6.46	4.28	4.90	-3.23	0	-1.69	788	1	0		lambert1541	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Round_Tall_01.fbx	Buildings	2.11	9.39	1.83	-1.05	0	-0.91	1322	1	0		lambert1542	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Tower_Small_01.fbx	Buildings	3.57	10.46	3.57	-1.79	0	-1.79	2152	1	0		lambert1543	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Wall_01.fbx	Buildings	5.04	5.00	0.61	-2.52	0	-0.31	986	1	0		lambert1544	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Wall_Broken_01.fbx	Buildings	5.02	5.00	0.60	-2.52	0	-0.30	718	1	0		lambert1545	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Wall_Cap_01.fbx	Buildings	5.00	1.30	1.77	-2.50	0	-0.89	188	1	0		lambert1546	PolygonDungeonRealms_01_A
+FBX/SM_Bld_Ruin_Wall_Cap_Broken_01.fbx	Buildings	3.47	1.30	1.77	-2.50	0	-0.89	174	1	0		lambert1547	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_01.fbx	Environments	22.74	24.29	4.23	-1.83	-2.92	-2.20	156	1	0		lambert1548	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_02.fbx	Environments	19.86	20.71	3.72	-1.61	-2.21	-1.82	126	1	0		lambert1549	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_03.fbx	Environments	19.65	20.29	5.04	-1.49	-1.88	-2.49	578	1	0		lambert1550	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_04.fbx	Environments	20.72	24.07	4.82	-1.13	-2.54	-2.34	690	1	0		lambert1551	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_05.fbx	Environments	11.82	13.65	2.91	-1.30	-2.38	-1.45	327	1	0		lambert1552	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bone_Rib_06.fbx	Environments	12.50	17.95	3.16	-1.08	-2.31	-1.58	429	1	0		lambert1553	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bramble_01.fbx	Environments	1.82	2.72	1.57	-0.84	-0.42	-0.72	398	1	0		lambert1554	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bramble_02.fbx	Environments	1.24	2.56	1.34	-0.51	-0.40	-0.93	384	1	0		lambert1555	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bramble_03.fbx	Environments	1.73	3.24	2.05	-0.81	-0.41	-0.81	480	1	0		lambert1556	PolygonDungeonRealms_01_A
+FBX/SM_Env_Bush_01.fbx	Generic	2.45	1.28	1.85	-1.26	-0.34	-0.90	132	1	0		lambert1557	PolygonDungeonRealms_01_A
+FBX/SM_Env_Camp_Well_01.fbx	Environments	5.49	4.56	5.91	-2.59	-2.44	-3.03	1242	1	0		_DungeonSHD2	PolygonDungeonRealms_01_A
+FBX/SM_Env_Crystals_Cluster_Large_01.fbx	Environments	5.65	7.49	3.86	-2.73	-1.28	-1.84	212	1	0		Dungeon2SHD15	PolygonDungeonRealms_Crystal_01
+FBX/SM_Env_Crystals_Cluster_Large_02.fbx	Environments	4.72	7.03	4.06	-1.71	-2.11	-1.94	246	1	0		Dungeon2SHD16	PolygonDungeonRealms_Crystal_01
+FBX/SM_Env_Crystals_Cluster_Large_03.fbx	Environments	3.68	5.36	3.34	-1.68	-1.29	-1.39	246	1	0		Dungeon2SHD17	PolygonDungeonRealms_Crystal_01
+FBX/SM_Env_Crystals_Cluster_Large_04.fbx	Environments	2.52	3.03	2.03	-1.17	-1.02	-0.92	124	1	0		Dungeon2SHD18	PolygonDungeonRealms_Crystal_01
+FBX/SM_Env_Dust_01.fbx	Environments	4.96	0.44	4.92	-2.57	0	-2.45	95	1	0		lambert1558	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dust_02.fbx	Environments	5.16	0.50	5.18	-2.52	0	-2.42	120	1	0		lambert1559	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dust_03.fbx	Environments	7.72	0.39	5.45	-3.88	0	-2.83	95	1	0		lambert1560	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dust_04.fbx	Environments	9.33	0.51	9.41	-4.69	0	-4.87	95	1	0		lambert1561	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dust_05.fbx	Environments	10.28	0.24	10.19	-5.14	0	-5.10	95	1	0		lambert1562	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_01.fbx	Environments	2.50	0.87	0.29	-2.50	0	-0.14	64	1	0		DungeonSHD80	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_01_Broken_01.fbx	Environments	2.15	0.87	0.29	-2.15	0	-0.14	62	1	0		DungeonSHD5	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_01_Broken_02.fbx	Environments	1.10	0.87	0.28	-1.10	0	-0.14	56	1	0		DungeonSHD81	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_02.fbx	Environments	2.50	0.87	0.27	-2.50	0	-0.14	494	1	0		DungeonSHD82	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_02_Broken_01.fbx	Environments	2.10	0.87	0.27	-2.09	0	-0.14	344	1	0		DungeonSHD6	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_02_Broken_02.fbx	Environments	1.30	0.87	0.27	-1.30	0	-0.14	200	1	0		DungeonSHD83	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_03.fbx	Environments	2.50	0.87	0.27	-2.50	0	-0.14	486	1	0		DungeonSHD84	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_03_Broken_01.fbx	Environments	2.23	0.87	0.27	-2.23	0	-0.14	420	1	0		DungeonSHD4	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_03_Broken_02.fbx	Environments	0.90	0.87	0.27	-0.90	0	-0.14	208	1	0		DungeonSHD85	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_Stairs_01.fbx	Environments	0.27	2.12	2.50	-0.14	0	-2.50	52	1	0		DungeonSHD95	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_Stairs_02.fbx	Environments	0.27	2.12	2.50	-0.14	0	-2.50	526	1	0		DungeonSHD96	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_Stairs_03.fbx	Environments	0.27	2.12	2.50	-0.14	0	-2.50	512	1	0		DungeonSHD97	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Balustrade_Stairs_04.fbx	Environments	0.17	1.52	2.50	-0.09	0	-2.50	20	1	0		DungeonSHD9	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Beam_01.fbx	Environments	5.00	2.19	0.61	0	0	-0.31	153	1	0		DungeonSHD31	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Beam_02.fbx	Environments	5.00	1.70	0.78	0	0	-0.39	156	1	0		DungeonSHD32	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Beam_03.fbx	Environments	5.00	2.24	0.82	0	0	-0.40	534	1	0		_DungeonSHD3	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Beam_04.fbx	Environments	5.00	0.40	0.50	-2.50	-0.20	-0.25	168	1	0		Dungeon2SHD19	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_01.fbx	Environments	6.29	10.00	10.00	-0.65	-10.00	0	500	1	0		lambert242	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_02.fbx	Environments	6.29	10.00	5.00	-0.65	-10.00	0	286	1	0		lambert244	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_03.fbx	Environments	6.29	10.00	5.00	-0.65	-10.00	0	308	1	0		lambert1563	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_Broken_01.fbx	Environments	6.29	10.00	5.86	-0.65	-10.00	0	398	1	0		lambert1564	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_Broken_02.fbx	Environments	6.29	10.00	2.65	-0.65	-10.00	0	384	1	0		lambert1565	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Bridge_Extension_01.fbx	Environments	6.93	10.42	5.73	-0.96	-10.00	-2.86	276	1	0		lambert1566	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_01.fbx	Environments	5.00	0.25	5.00	0	-0.23	0	1004	1	0		_DungeonSHD14	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_02.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD15	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_03.fbx	Environments	5.00	0.30	5.00	0	-0.23	0	600	1	0		_DungeonSHD16	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_04.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD17	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_05.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	682	1	0		_DungeonSHD18	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_06.fbx	Environments	5.00	0.25	5.00	0	-0.23	0	702	1	0		_DungeonSHD19	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_07.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	700	1	0		_DungeonSHD20	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_08.fbx	Environments	5.00	0.27	5.01	0	-0.23	0	1000	1	0		_DungeonSHD21	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_09.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	947	1	0		_DungeonSHD22	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_10.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	650	1	0		_DungeonSHD23	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_11.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	500	1	0		_DungeonSHD24	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_12.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	500	1	0		_DungeonSHD25	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_13.fbx	Environments	5.00	0.25	5.00	0	-0.23	0	500	1	0		_DungeonSHD26	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_14.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	500	1	0		_DungeonSHD27	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_15.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD28	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_16.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD29	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_17.fbx	Environments	5.00	0.25	5.00	0	-0.23	0	600	1	0		_DungeonSHD30	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_18.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	600	1	0		_DungeonSHD31	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_19.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	600	1	0		_DungeonSHD32	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_20.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD33	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_21.fbx	Environments	5.00	0.26	5.00	0	-0.23	0	500	1	0		_DungeonSHD34	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_22.fbx	Environments	5.02	0.26	5.00	-0.02	-0.23	0	500	1	0		_DungeonSHD35	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_23.fbx	Environments	5.00	0.24	5.00	0	-0.23	0	500	1	0		_DungeonSHD36	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_24.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	500	1	0		_DungeonSHD37	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_25.fbx	Environments	5.00	0.24	5.00	0	-0.23	0	600	1	0		_DungeonSHD38	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_26.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	500	1	0		_DungeonSHD39	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_27.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	800	1	0		_DungeonSHD40	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_28.fbx	Environments	5.00	0.23	5.00	0	-0.23	0	500	1	0		_DungeonSHD41	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_29.fbx	Environments	5.00	0.17	5.00	0	-0.13	0	800	1	0		_DungeonSHD42	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Corner_01.fbx	Environments	5.00	0.27	5.00	0	-0.23	0	258	1	0		lambert1567	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Crack_01.fbx	Environments	6.73	1.41	6.34	-3.36	-0.35	-3.17	709	1	0		_DungeonSHD43	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Gate_01.fbx	Environments	7.50	0.34	3.25	-3.75	-0.34	-0.72	242	1	0		_DungeonSHD84	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Half_01.fbx	Environments	2.50	0.28	2.50	0	-0.24	0	126	1	0		lambert242	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Half_02.fbx	Environments	2.50	0.26	2.50	0	-0.23	0	98	1	0		lambert1569	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Floor_Round_01.fbx	Environments	5.47	0.39	5.47	-2.74	-0.36	-2.74	1200	1	0		lambert1570	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_01.fbx	Environments	4.24	2.45	2.95	-2.12	0	-1.30	608	1	0		DungeonSHD33	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_01_Pillar.fbx	FBX	2.99	8.95	1.46	-1.49	0	-2.20	264	1	0		DungeonSHD33	
+FBX/SM_Env_Dwarf_Forge_Beam_01.fbx	Environments	10.00	1.13	1.23	0	-0.56	-0.56	299	1	0		_lambert22	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Beam_Corner_01.fbx	Environments	1.56	1.56	1.54	-0.78	-0.78	-0.77	122	1	0		_lambert23	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Gutter_Corner_01.fbx	Environments	1.27	0.50	1.27	-0.64	-0.36	-0.64	180	1	0		_DungeonSHD68	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Gutter_Straight_01.fbx	Environments	0.81	0.47	5.00	-0.41	-0.36	0	138	1	0		_DungeonSHD70	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Gutter_Straight_02.fbx	Environments	0.81	0.47	5.00	-0.41	-0.36	0	68	1	0		_DungeonSHD85	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Gutter_Straight_Half_01.fbx	FBX	0.81	0.47	2.50	-0.41	-0.36	0	116	1	0		_DungeonSHD86	
+FBX/SM_Env_Dwarf_Forge_Smelter_01.fbx	Environments	16.65	20.66	16.65	-8.33	-0.19	-8.33	6284	1	0		DungeonSHD98	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Smelter_02.fbx	Environments	5.11	2.18	6.90	-2.56	-0.18	-2.56	1839	1	0		_DungeonSHD	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Forge_Smelter_02_Crank.fbx	FBX	1.34	1.01	1.01	-0.95	-0.50	-0.50	390	1	0		_DungeonSHD	
+FBX/SM_Env_Dwarf_Forge_Smelter_02_Crucible.fbx	FBX	4.12	1.34	2.95	-2.12	-0.85	-1.32	534	1	0		_DungeonSHD	
+FBX/SM_Env_Dwarf_Gate_01.fbx	Environments	42.01	64.94	8.04	-21.00	-0.16	-4.54	4484	1	0		DungeonSHD188	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Gate_01_Bar.fbx	Environments	6.11	0.56	0.23	-3.06	-0.28	-0.12	186	1	0		Dungeon2SHD20	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Gate_01_Door_L.fbx	FBX	3.33	8.94	1.13	-0.17	0	-0.95	1994	1	0		DungeonSHD7	
+FBX/SM_Env_Dwarf_Gate_01_Door_R.fbx	FBX	3.33	8.94	1.13	-3.16	0	-0.95	1838	1	0		DungeonSHD7	
+FBX/SM_Env_Dwarf_Grate_Floor_01.fbx	Environments	2.81	0.60	2.38	-1.40	-0.32	-1.34	486	1	0		lambert1571	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Grate_Wall_01.fbx	Environments	2.81	2.12	1.27	-1.40	-0.97	-0.64	334	1	0		lambert1572	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_01.fbx	Environments	10.00	10.83	3.46	0	0	-1.73	623	1	0		DungeonSHD1	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_01_End_01.fbx	Environments	5.38	10.03	3.29	0	0	-1.65	302	1	0		DungeonSHD2	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_01_End_02.fbx	Environments	5.38	3.72	2.80	0	6.28	-1.40	188	1	0		DungeonSHD3	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_01_End_03.fbx	Environments	5.00	3.72	2.80	0	6.28	-1.40	186	1	0		DungeonSHD99	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_Pillar_01.fbx	Environments	5.71	13.69	5.71	-2.85	0	-2.85	496	1	0		DungeonSHD39	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Duct_Pillar_02.fbx	Environments	4.61	13.69	5.71	-2.31	0	-2.85	406	1	0		DungeonSHD40	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Wheel_01.fbx	Environments	4.59	7.18	7.18	-2.30	-3.59	-3.59	1906	1	0		DungeonSHD41	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Lava_Wheel_Bracket_01.fbx	Environments	0.58	4.71	5.93	1.47	-4.26	-2.96	482	1	0		DungeonSHD42	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_01.fbx	Environments	2.80	5.94	2.80	-1.40	-0.10	-1.40	242	1	0		DungeonSHD100	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_01_Broken_01.fbx	Environments	2.80	2.30	2.80	-1.40	0	-1.40	188	1	0		DungeonSHD101	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_01_Broken_02.fbx	Environments	3.76	0.97	2.40	-1.88	-0.03	-1.18	208	1	0		DungeonSHD102	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_02.fbx	Environments	2.80	4.25	2.80	-1.40	-0.10	-1.40	458	1	0		DungeonSHD103	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_02_Broken_01.fbx	Environments	2.80	1.45	2.80	-1.40	-0.10	-1.40	158	1	0		DungeonSHD104	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Obelisk_02_Broken_02.fbx	Environments	2.64	1.46	3.73	-1.32	0	-1.86	516	1	0		DungeonSHD105	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_01.fbx	Environments	1.24	5.00	1.24	-0.62	0	-0.62	298	1	0		pasted__DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_02.fbx	Environments	1.24	5.00	1.24	-0.62	0	-0.62	192	1	0		pasted__DungeonSHD1	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_03.fbx	Environments	1.24	5.00	1.24	-0.62	0	-0.62	230	1	0		pasted__DungeonSHD2	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_04.fbx	Environments	1.07	5.00	1.07	-0.54	0	-0.54	332	1	0		pasted__DungeonSHD3	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_05.fbx	Environments	1.50	5.00	1.50	-0.75	0	-0.75	360	1	0		pasted__DungeonSHD4	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_06.fbx	Environments	1.76	5.00	1.76	-0.88	0	-0.88	356	1	0		pasted__DungeonSHD5	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_07.fbx	Environments	1.11	5.00	1.11	-0.56	0	-0.56	84	1	0		pasted__DungeonSHD6	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_08.fbx	Environments	1.11	5.00	1.11	-0.56	0	-0.56	128	1	0		pasted__DungeonSHD7	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Base_01.fbx	Environments	2.96	0.50	2.96	-1.48	0	-1.48	142	1	0		pasted__DungeonSHD8	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Base_02.fbx	Environments	2.00	0.50	2.00	-1.00	0	-1.00	60	1	0		pasted__DungeonSHD9	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Base_03.fbx	Environments	2.50	0.50	2.50	-1.25	0	-1.25	108	1	0		pasted__DungeonSHD10	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Base_04.fbx	Environments	2.42	0.52	2.42	-1.21	-0.02	-1.21	108	1	0		pasted__DungeonSHD11	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Base_05.fbx	Environments	2.00	0.50	2.00	-1.00	0	-1.00	96	1	0		pasted__DungeonSHD12	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Cap_01.fbx	Environments	1.50	1.01	1.50	-0.75	0	-0.75	82	1	0		pasted__DungeonSHD13	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Cap_02.fbx	Environments	1.24	1.01	1.24	-0.62	0	-0.62	124	1	0		pasted__DungeonSHD14	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Half_01.fbx	Environments	1.24	2.50	1.24	-0.62	0	-0.62	286	1	0		pasted__DungeonSHD15	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Half_02.fbx	Environments	1.24	2.50	1.24	-0.62	0	-0.62	154	1	0		pasted__DungeonSHD16	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Half_03.fbx	Environments	1.24	2.50	1.24	-0.62	0	-0.62	222	1	0		pasted__DungeonSHD17	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Half_04.fbx	Environments	1.07	2.50	1.07	-0.54	0	-0.54	322	1	0		pasted__DungeonSHD18	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Half_05.fbx	Environments	1.76	2.50	1.76	-0.88	0	-0.88	352	1	0		pasted__DungeonSHD19	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Top_01.fbx	Environments	2.44	3.20	0.50	-1.22	0	-0.25	80	1	0		pasted__DungeonSHD20	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Top_02.fbx	Environments	5.54	2.00	5.54	-2.77	0	-2.77	470	1	0		pasted__DungeonSHD21	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Top_02_Extension.fbx	Environments	5.54	2.00	5.54	-2.77	0	-2.77	360	1	0		pasted__DungeonSHD22	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Pillar_Top_03.fbx	Environments	1.24	2.00	5.54	-0.62	0	-2.77	295	1	0		pasted__DungeonSHD23	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_01.fbx	Environments	5.00	2.73	5.00	0	-0.23	-5.00	254	1	0		DungeonSHD106	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Half_01.fbx	Environments	5.00	1.48	2.50	0	-0.23	-2.50	120	1	0		DungeonSHD107	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Half_Wall_01.fbx	Environments	0.45	1.25	2.50	-0.31	0	-2.50	10	1	0		DungeonSHD23	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Pillar_01.fbx	Environments	0.62	1.35	0.62	-0.31	0	-0.31	252	1	0		pasted__DungeonSHD24	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Pillar_02.fbx	Environments	0.62	1.25	0.62	-0.31	0	-0.31	157	1	0		pasted__DungeonSHD25	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Pillar_03.fbx	Environments	0.62	2.50	0.62	-0.31	0	-0.31	230	1	0		pasted__DungeonSHD26	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Pillar_04.fbx	Environments	0.42	1.05	0.42	-0.21	0	-0.21	128	1	0		pasted__DungeonSHD27	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_01.fbx	Environments	5.00	0.50	1.25	0	0	0	60	1	0		_DungeonSHD87	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_01.fbx	Environments	5.00	0.50	5.00	0	0	0	144	1	0		_DungeonSHD1	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_01_Alt.fbx	Environments	5.00	0.50	5.00	0	0	0	170	1	0		_DungeonSHD88	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_02.fbx	Environments	6.25	0.50	6.25	-1.25	0	0	144	1	0		_DungeonSHD89	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_02_Alt.fbx	Environments	6.25	0.50	6.25	-1.25	0	0	188	1	0		_DungeonSHD4	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_03.fbx	Environments	0.88	0.50	1.25	0	0	0	56	1	0		_DungeonSHD216	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_04.fbx	Environments	1.25	0.50	1.25	0	0	0	64	1	0		_DungeonSHD217	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Small_Corner_05.fbx	Environments	1.25	0.50	1.25	0	0	0	60	1	0		_DungeonSHD218	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Stairs_Wall_01.fbx	Environments	0.45	2.50	5.00	-0.31	0	-5.00	26	1	0		DungeonSHD108	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_01.fbx	Environments	5.00	5.00	0.56	0	0	-0.14	213	1	0		DungeonSHD17	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_02.fbx	Environments	5.00	5.00	0.56	0	0	-0.14	203	1	0		DungeonSHD109	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_03.fbx	Environments	5.00	5.00	0.45	0	0	-0.14	187	1	0		DungeonSHD110	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_04.fbx	Environments	5.00	5.00	0.46	0	0	-0.14	89	1	0		DungeonSHD111	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_05.fbx	Environments	5.00	5.00	0.56	0	0	-0.14	206	1	0		DungeonSHD112	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_06.fbx	Environments	5.00	5.00	0.56	0	0	-0.14	94	1	0		DungeonSHD113	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Alcove_Angular_01.fbx	Environments	5.00	5.00	1.56	0	0	-1.31	158	1	0		_DungeonSHD62	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Alcove_Angular_02.fbx	Environments	5.00	5.00	2.50	0	0	-2.14	162	1	0		_DungeonSHD63	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Alcove_Small_01.fbx	Environments	5.00	5.00	2.01	0	0	-1.61	156	1	0		_DungeonSHD64	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Alcove_Small_02.fbx	Environments	5.00	5.00	1.92	0	0	-1.61	110	1	0		_DungeonSHD65	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Angled_01.fbx	Environments	5.00	5.00	5.45	0	0	-0.14	108	1	0		DungeonSHD114	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Angled_02.fbx	Environments	5.00	5.00	5.45	0	0	-0.14	85	1	0		DungeonSHD115	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Angled_Pillar_01.fbx	Environments	0.58	5.00	5.59	-0.29	0	-0.05	20	1	0		pasted__DungeonSHD28	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Angled_Pillar_02.fbx	Environments	0.84	5.00	5.66	-0.42	0	-0.05	52	1	0		pasted__DungeonSHD29	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_01.fbx	Environments	5.00	5.00	0.78	0	0	-0.39	208	1	0		_DungeonSHD66	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_02.fbx	Environments	5.00	5.00	0.61	0	0	-0.31	302	1	0		_DungeonSHD67	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_03.fbx	Environments	5.00	5.00	0.78	0	0	-0.39	224	1	0		_DungeonSHD92	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_04.fbx	Environments	5.00	5.00	0.62	0	0	-0.31	88	1	0		_DungeonSHD69	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_01.fbx	Environments	5.00	2.50	0.61	0	2.50	-0.31	280	1	0		_DungeonSHD93	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_02.fbx	Environments	5.00	2.50	0.61	0	2.50	-0.31	116	1	0		_DungeonSHD71	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_03.fbx	Environments	5.00	2.50	0.61	0	2.50	-0.31	124	1	0		_DungeonSHD72	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_04.fbx	Environments	5.00	2.50	0.61	0	2.50	-0.31	108	1	0		_DungeonSHD73	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_05.fbx	Environments	5.00	2.50	0.61	0	2.50	-0.31	170	1	0		_DungeonSHD74	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Archway_Top_06.fbx	Environments	5.00	2.50	0.78	0	2.50	-0.39	164	1	0		_DungeonSHD75	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Angular_01.fbx	Environments	5.39	5.00	4.67	-1.35	0	0	568	1	0		DungeonSHD76	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Angular_02.fbx	Environments	6.33	5.80	6.33	-3.17	0	-3.17	848	1	0		DungeonSHD77	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_01.fbx	Environments	5.00	5.00	5.00	0	0	0	448	1	0		DungeonSHD116	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_02.fbx	Environments	5.00	5.00	5.00	0	0	0	416	1	0		DungeonSHD117	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_03.fbx	Environments	10.44	5.01	10.44	-5.22	0	-5.22	1126	1	0		DungeonSHD118	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_04.fbx	Environments	10.80	5.00	10.80	-5.40	0	-5.40	2018	1	0		DungeonSHD119	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_Half_01.fbx	Environments	2.50	5.00	2.50	0	0	0	374	1	0		_DungeonSHD82	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Block_Cube_Half_02.fbx	Environments	2.44	5.00	2.44	0	0	0	160	1	0		_DungeonSHD83	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_01.fbx	Environments	5.00	5.00	0.84	0	0	-0.42	379	1	0		DungeonSHD120	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_02.fbx	Environments	5.00	5.00	0.84	0	0	-0.42	321	1	0		DungeonSHD121	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_03.fbx	Environments	5.00	5.00	0.62	0	0	-0.31	354	1	0		DungeonSHD8	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_04.fbx	Environments	5.00	5.00	0.62	0	0	-0.31	140	1	0		DungeonSHD122	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_05.fbx	Environments	5.00	5.00	0.84	0	0	-0.42	371	1	0		DungeonSHD10	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Broken_06.fbx	Environments	5.00	5.00	0.84	0	0	-0.42	250	1	0		DungeonSHD11	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Double_01.fbx	Environments	5.00	5.00	0.66	0	0	-0.33	330	1	0		_DungeonSHD94	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Double_01_Door_01.fbx	FBX	1.36	2.93	0.40	-0.09	0	-0.20	1024	1	0		_DungeonSHD94	
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Double_02.fbx	Environments	5.00	5.00	0.78	0	0	-0.39	248	1	0		_DungeonSHD95	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Double_02_Door_02.fbx	FBX	1.41	3.26	0.39	0	0	-0.20	1113	1	0		_DungeonSHD95	
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Single_01.fbx	Environments	5.00	5.00	0.66	0	0	-0.33	274	1	0		_DungeonSHD96	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Single_01_Door.fbx	FBX	1.82	2.46	0.33	-0.06	0	-0.17	2064	1	0		_DungeonSHD96	
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Single_02.fbx	Environments	5.00	5.00	0.66	0	0	-0.33	314	1	0		_DungeonSHD97	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Single_02_Door.fbx	FBX	1.86	2.43	0.40	-0.06	0.01	-0.20	973	1	0		_DungeonSHD97	
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Slider_01.fbx	Environments	5.00	5.00	0.84	0	0	-0.42	508	1	0		DungeonSHD123	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_DoorFrame_Slider_01_Door.fbx	FBX	4.27	4.92	0.38	0.36	0.08	-0.19	244	1	0		DungeonSHD123	
+FBX/SM_Env_Dwarf_Wall_Dressing_01.fbx	Environments	5.00	5.02	0.59	0	-0.02	0	1248	1	0		Dungeon2SHD21	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Dressing_02.fbx	Environments	5.00	2.68	0.59	0	-0.01	0	501	1	0		Dungeon2SHD22	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Fireplace_01.fbx	Environments	5.57	5.00	2.12	-0.28	0	-0.95	1632	1	0		Dungeon2SHD23	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Fireplace_Extension_01.fbx	Environments	5.00	5.00	0.70	0	0	-0.14	88	1	0		Dungeon2SHD24	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_01.fbx	Environments	2.50	5.00	0.45	0	0	-0.14	119	1	0		DungeonSHD12	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_02.fbx	Environments	2.50	5.00	0.56	0	0	-0.14	130	1	0		DungeonSHD13	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_03.fbx	Environments	2.50	5.00	0.45	0	0	-0.14	122	1	0		DungeonSHD124	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_04.fbx	Environments	2.50	5.00	0.56	0	0	-0.14	168	1	0		DungeonSHD125	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_05.fbx	Environments	2.50	5.00	0.45	0	0	-0.14	96	1	0		DungeonSHD126	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Half_06.fbx	Environments	2.50	5.00	0.56	0	0	-0.14	86	1	0		DungeonSHD127	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Short_01.fbx	Environments	5.00	2.50	0.56	0	0	-0.14	147	1	0		DungeonSHD14	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Short_02.fbx	Environments	5.00	2.50	0.56	0	0	-0.14	138	1	0		DungeonSHD15	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Short_03.fbx	Environments	5.00	2.50	0.45	0	0	-0.14	86	1	0		DungeonSHD16	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_01.fbx	Environments	5.00	0.81	0.36	0	-0.41	0	60	1	0		_DungeonSHD98	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_02.fbx	Environments	5.00	0.81	0.36	0	-0.41	0	28	1	0		_DungeonSHD99	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_03.fbx	Environments	5.00	0.81	0.41	0	-0.41	0	153	1	0		_DungeonSHD100	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_04.fbx	Environments	5.00	0.81	0.42	0	-0.41	0	107	1	0		_DungeonSHD101	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_05.fbx	Environments	5.00	0.81	0.36	0	-0.41	0	156	1	0		_DungeonSHD102	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_Cap_01.fbx	Environments	0.86	1.36	0.52	-0.43	-0.68	0	44	1	0		DungeonSHD29	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Trim_Cap_02.fbx	Environments	0.63	1.28	0.49	-0.32	-0.64	0	32	1	0		DungeonSHD28	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Tunnel_01.fbx	Environments	5.00	5.00	1.64	0	0	-0.14	170	1	0		DungeonSHD86	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Tunnel_Archway_01.fbx	Environments	2.50	5.00	0.78	0	0	-0.39	164	1	0		DungeonSHD87	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Window_01.fbx	Environments	5.00	5.00	0.68	0	0	-0.34	212	1	0		_DungeonSHD103	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Window_02.fbx	Environments	5.00	5.00	0.68	0	0	-0.34	330	1	0		_DungeonSHD104	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Window_03.fbx	Environments	5.00	5.00	0.83	0	0	-0.41	246	1	0		_DungeonSHD105	PolygonDungeonRealms_01_A
+FBX/SM_Env_Dwarf_Wall_Window_04.fbx	Environments	5.00	5.00	0.83	0	0	-0.41	412	1	0		_DungeonSHD106	PolygonDungeonRealms_01_A
+FBX/SM_Env_Entrance_Stairs_Ruin_01.fbx	Environments	8.16	9.23	8.16	-4.08	-4.31	-4.08	1740	1	0		lambert1573	PolygonDungeonRealms_01_A
+FBX/SM_Env_Entrance_Stairs_Sand_01.fbx	Environments	25.01	1.09	22.88	-12.18	-0.32	-10.84	324	1	0		lambert1574	PolygonDungeonRealms_01_A
+FBX/SM_Env_Floor_Grate_01.fbx	Environments	5.24	0.56	5.16	-2.62	-0.15	-2.58	535	1	0		lambert1575	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Arm_L_01.fbx	FBX	30.16	20.97	45.72	3.18	-6.72	-26.42	1550	1	0		lambert16	
+FBX/SM_Env_GiantGolem_Arm_L_Lower_01.fbx	Environments	17.83	19.27	25.86	-7.99	-11.32	0	1030	1	0		lambert877	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Arm_L_Upper_01.fbx	Environments	20.38	18.47	22.27	-4.71	-10.31	-1.74	520	1	0		lambert1576	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Arm_R_01.fbx	FBX	27.23	19.36	47.85	-38.80	-13.54	-24.26	1550	1	0		lambert15	
+FBX/SM_Env_GiantGolem_Arm_R_Lower_01.fbx	Environments	16.65	16.26	30.18	-9.82	-8.64	0	1030	1	0		lambert1577	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Arm_R_Upper_01.fbx	Environments	21.83	18.30	21.41	-17.62	-9.52	-2.06	520	1	0		lambert1578	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Chest_01.fbx	Environments	27.56	25.25	38.35	-13.78	-12.62	-19.18	1485	1	0		lambert1579	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Head_01.fbx	Environments	13.58	12.85	15.77	-6.00	-6.09	-14.97	832	1	0		lambert1580	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Leg_L_01.fbx	FBX	23.06	16.82	40.28	-0.21	-9.47	0.80	800	1	0		lambert1581	
+FBX/SM_Env_GiantGolem_Leg_L_Lower_01.fbx	Environments	16.58	13.32	25.95	-3.79	-6.66	-1.22	362	1	0		lambert1582	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Leg_L_Upper_01.fbx	Environments	15.57	16.82	16.79	-4.70	-9.05	-0.75	438	1	0		lambert1583	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Leg_R_01.fbx	FBX	21.03	18.12	40.78	-17.94	-8.52	2.33	800	1	0		lambert1584	
+FBX/SM_Env_GiantGolem_Leg_R_Lower_01.fbx	Environments	16.87	16.14	20.76	-11.99	-8.07	-0.63	362	1	0		lambert1585	PolygonDungeonRealms_01_A
+FBX/SM_Env_GiantGolem_Leg_R_Upper_01.fbx	Environments	16.97	16.86	16.40	-9.86	-8.97	0	438	1	0		lambert1586	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Thin_01.fbx	Environments	3.08	1.08	2.67	-1.54	-0.27	-1.34	830	1	0		lambert1587	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Thin_02.fbx	Environments	1.95	1.08	2.42	-0.83	-0.27	-1.21	346	1	0		lambert1588	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Thin_03.fbx	Environments	1.11	1.34	1.00	-0.55	-0.27	-0.50	193	1	0		lambert1589	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Thin_04.fbx	Environments	0.63	1.08	0.58	-0.31	-0.27	-0.29	57	1	0		lambert1590	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Tuft_01.fbx	Generic	0.31	0.75	0.31	-0.26	-0.05	-0.14	88	1	0		pasted__lambert2	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Tuft_02.fbx	Generic	0.25	0.37	0.33	-0.15	-0.02	-0.17	66	1	0		pasted__lambert3	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Tuft_03.fbx	Generic	0.25	0.44	0.58	-0.09	-0.02	-0.33	66	1	0		pasted__lambert4	PolygonDungeonRealms_01_A
+FBX/SM_Env_Grass_Tuft_04.fbx	Generic	2.89	0.75	2.96	-1.44	-0.05	-1.48	902	1	0		pasted__lambert5	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Bone_Hand_L_01.fbx	Environments	6.90	6.85	13.60	-4.92	-1.39	-3.88	1466	1	0		lambert1591	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Bone_Hand_R_01.fbx	Environments	9.62	6.96	7.08	-0.86	-1.40	-1.07	1466	1	0		lambert1592	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Bone_Skull_01.fbx	Environments	17.92	6.97	7.02	-8.96	-3.49	-3.51	2165	1	0		lambert1593	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Bone_Skull_Jaw_01.fbx	FBX	4.57	3.18	3.75	-2.28	-2.42	-0.81	870	1	0		lambert1593	
+FBX/SM_Env_Hell_Chains_01.fbx	Environments	3.55	53.80	3.52	-1.94	-0.67	-1.89	2076	1	0		lambert1594	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Chains_02.fbx	Environments	3.55	31.37	3.52	-2.31	-0.76	-1.50	1176	1	0		lambert1595	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Chains_03.fbx	Environments	24.09	42.45	9.79	-22.61	-0.72	-8.73	2076	1	0		lambert1596	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Chains_04.fbx	Environments	9.96	22.32	6.51	-8.68	0	-5.61	936	1	0		lambert1597	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Chains_05.fbx	Environments	15.83	41.26	11.47	-12.29	-0.79	-10.51	2076	1	0		lambert1598	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Chains_06.fbx	Environments	6.00	18.58	11.47	-2.46	-0.79	-10.51	876	1	0		lambert1599	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Circle_01.fbx	Environments	15.23	2.35	15.23	-7.62	-1.43	-7.62	7430	1	0		lambert1600	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Floating_Rock_Chain_01.fbx	Environments	18.33	43.98	13.37	-15.28	-0.57	-9.11	2252	1	0		lambert1601	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Floating_Rock_Chain_02.fbx	Environments	24.45	54.87	30.02	-0.77	-0.45	-28.25	2831	1	0		lambert1602	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Floating_Rock_Chain_03.fbx	Environments	15.16	65.40	10.51	-9.15	-0.67	-4.70	2288	1	0		lambert1603	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Floating_Rock_Chain_04.fbx	Environments	26.94	58.83	18.73	-25.63	-1.28	-18.25	2876	1	0		lambert1604	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_01.fbx	Environments	27.95	3.67	22.25	-14.14	-0.48	-8.98	1621	1	0		lambert1605	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_02.fbx	Environments	20.47	2.89	16.42	-10.07	-1.56	-6.28	1662	1	0		lambert1606	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_03.fbx	Environments	20.91	3.24	19.73	-10.74	-1.91	-9.73	1714	1	0		lambert1607	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_Extended_01.fbx	Environments	27.95	17.39	22.25	-13.98	-13.90	-11.12	1602	1	0		lambert1608	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_Extended_02.fbx	Environments	20.26	17.03	16.42	-10.23	-13.66	-8.21	1652	1	0		lambert1609	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ground_Extended_03.fbx	Environments	20.91	16.68	19.72	-10.45	-13.62	-9.85	1632	1	0		lambert1610	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Obelisk_01.fbx	Environments	4.26	13.99	4.13	-1.85	-1.26	-1.72	162	1	0		lambert1611	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Obelisk_02.fbx	Environments	5.36	12.30	8.45	-2.35	-1.33	-1.92	164	1	0		lambert1612	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Obelisk_03.fbx	Environments	4.22	17.11	8.34	-2.37	-0.87	-2.34	190	1	0		lambert1613	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Obelisk_04.fbx	Environments	4.48	25.81	8.33	-2.63	-9.57	-2.33	268	1	0		lambert1614	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Obelisk_05.fbx	Environments	4.48	22.50	7.27	-1.85	-9.57	-2.00	202	1	0		lambert1615	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Pillar_01.fbx	Environments	2.47	28.23	4.66	-1.24	-12.22	-3.12	620	1	0		lambert1616	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Pillar_02.fbx	Environments	3.13	28.46	14.29	-1.56	-12.22	-7.08	1262	1	0		pasted__DungeonSHD30	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Pillar_03.fbx	Environments	6.69	29.29	5.98	-3.35	-12.22	-2.99	596	1	0		lambert1617	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Pillar_04.fbx	Environments	3.13	31.45	8.56	-1.56	-12.22	-7.07	752	1	0		lambert1618	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ring_01.fbx	Environments	25.47	2.44	25.47	-12.73	-1.22	-12.73	232	1	0		lambert1619	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ring_02.fbx	Environments	25.49	2.44	25.49	-12.75	-1.72	-12.75	192	1	0		lambert1620	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ring_Chains_01.fbx	Environments	36.69	29.06	42.59	-18.34	-28.02	-21.29	4636	1	0		lambert1621	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Ring_Chains_02.fbx	Environments	36.46	31.55	42.53	-18.23	-30.71	-21.27	5040	1	0		lambert1622	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_01.fbx	Environments	1.09	2.14	1.13	-0.55	-1.07	-0.56	42	1	0		lambert1623	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_02.fbx	Environments	1.69	2.88	1.73	-0.84	-1.44	-0.86	42	1	0		lambert1624	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_03.fbx	Environments	1.74	3.48	1.96	-0.87	-1.74	-0.98	54	1	0		lambert1625	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_04.fbx	Environments	1.98	4.16	1.76	-0.99	-2.08	-0.88	60	1	0		lambert1626	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_05.fbx	Environments	1.71	3.62	1.65	-0.85	-1.81	-0.83	70	1	0		lambert1627	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_06.fbx	Environments	2.73	6.35	2.59	-1.36	-3.18	-1.30	96	1	0		lambert1628	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_07.fbx	Environments	3.21	8.82	3.46	-1.61	-4.41	-1.73	86	1	0		lambert1629	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Rock_08.fbx	Environments	5.07	13.20	3.16	-2.53	-6.60	-1.58	198	1	0		lambert1630	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_01.fbx	Environments	16.22	9.33	14.44	-8.11	-1.44	-7.22	1621	1	0		lambert1631	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_02.fbx	Environments	2.65	7.32	2.78	-1.37	-0.97	-1.43	264	1	0		lambert1632	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_03.fbx	Environments	2.89	6.27	2.94	-1.46	-0.81	-1.43	260	1	0		lambert1633	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_04.fbx	Environments	2.33	5.51	2.79	-1.27	-0.72	-1.45	190	1	0		lambert1634	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_05.fbx	Environments	2.74	5.29	2.39	-1.34	-0.99	-1.20	188	1	0		lambert1635	PolygonDungeonRealms_01_A
+FBX/SM_Env_Hell_Spikes_06.fbx	Environments	23.35	16.01	17.80	-12.36	0	-11.33	1621	1	0		lambert1636	PolygonDungeonRealms_01_A
+FBX/SM_Env_Lava_Cube_01.fbx	Environments	20.00	19.90	20.00	-10.00	-19.90	-10.00	320	1	0		_DungeonSHD107	PolygonDungeonRealms_01_A
+FBX/SM_Env_Lava_Flow_01.fbx	Environments	1.70	5.41	2.06	-0.85	-5.36	0	112	1	0		_DungeonSHD108	PolygonDungeonRealms_01_A
+FBX/SM_Env_Lava_Line_01.fbx	Environments	1.09	6.38	1.09	-0.55	-3.19	-0.55	112	1	0		_DungeonSHD109	PolygonDungeonRealms_01_A
+FBX/SM_Env_Lava_Plane_01.fbx	Environments	5.00	0	5.00	-2.50	0	-2.50	2	1	0		lambert1637	PolygonDungeonRealms_01_A
+FBX/SM_Env_Mountain_Background_01.fbx	Environments	817.34	322.49	210.88	-404.66	0	-83.97	651	1	0		_DungeonSHD110	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_01.fbx	Environments	4.54	9.41	4.56	-2.29	0	-2.27	1452	1	0		lambert1638	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_02.fbx	Environments	3.83	4.66	3.83	-1.91	-0.51	-1.91	1128	1	0		lambert1639	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_03.fbx	Environments	2.78	9.58	2.78	-1.39	-1.53	-1.39	1763	1	0		lambert1640	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_04.fbx	Environments	1.26	5.76	1.26	-0.63	0	-0.63	122	1	0		lambert1641	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_Glow_01.fbx	Environments	4.54	9.41	4.56	-2.29	0	-2.27	1452	1	0		lambert1642	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_Glow_02.fbx	Environments	3.83	4.66	3.83	-1.91	-0.51	-1.91	1128	1	0		lambert1643	PolygonDungeonRealms_01_A
+FBX/SM_Env_Obelisk_Glow_03.fbx	Environments	2.78	9.58	2.78	-1.39	-1.53	-1.39	1763	1	0		lambert1644	PolygonDungeonRealms_01_A
+FBX/SM_Env_Ore_Pile_01.fbx	Environments	5.37	0.92	5.31	-2.72	-0.07	-2.66	1399	1	0		DungeonSHD128	PolygonDungeonRealms_01_A
+FBX/SM_Env_Ore_Pile_02.fbx	Environments	5.29	0.87	5.34	-2.60	-0.09	-2.67	1320	1	0		DungeonSHD129	PolygonDungeonRealms_01_A
+FBX/SM_Env_Plant_01.fbx	Environments	1.10	1.14	1.38	-0.49	-0.07	-0.70	176	1	0		lambert1645	PolygonDungeonRealms_01_A
+FBX/SM_Env_Plant_02.fbx	Environments	2.11	1.05	2.04	-1.05	-0.09	-1.02	198	1	0		lambert1646	PolygonDungeonRealms_01_A
+FBX/SM_Env_Plant_Spikey_01.fbx	Environments	2.90	1.33	2.87	-1.36	-0.27	-1.54	532	1	0		lambert1647	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Angle_01.fbx	Environments	3.27	4.80	5.73	-1.55	-2.46	-2.84	252	1	0		lambert1648	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_01.fbx	Environments	17.38	29.57	14.04	-8.43	-2.66	-7.00	426	1	0		lambert1649	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_02.fbx	Environments	15.71	22.53	22.15	-7.95	-2.78	-11.38	410	1	0		lambert1650	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_03.fbx	Environments	18.54	26.37	12.76	-10.00	1.63	-7.35	298	1	0		lambert1651	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_Arch_01.fbx	Environments	15.47	14.16	7.98	-13.65	0.30	-4.05	398	1	0		lambert1461	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_Arch_02.fbx	Environments	13.30	8.90	7.16	-11.40	-1.40	-3.63	408	1	0		lambert1652	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_Arch_PIllar_01.fbx	Environments	5.50	17.31	5.90	-2.72	0	-2.95	298	1	0		lambert1653	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Cliff_Cut_01.fbx	Environments	17.38	29.57	14.04	-8.43	-2.66	-7.00	530	1	0		lambert1654	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Flat_01.fbx	Environments	8.59	2.18	6.10	-4.29	-1.38	-3.05	248	1	0		lambert1655	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Flat_02.fbx	Environments	8.67	4.69	8.25	-4.35	-2.35	-4.12	262	1	0		lambert1656	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_01.fbx	Environments	1.35	1.35	1.44	-0.67	-0.14	-0.72	94	1	0		lambert1657	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_02.fbx	Environments	1.09	0.89	1.20	-0.54	-0.08	-0.60	76	1	0		lambert1658	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_03.fbx	Environments	0.74	0.84	0.80	-0.37	-0.17	-0.40	48	1	0		lambert1659	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_04.fbx	Environments	0.83	1.30	1.52	-0.42	-0.10	-0.76	134	1	0		lambert1660	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_05.fbx	Environments	1.03	1.19	1.36	-0.52	-0.13	-0.66	134	1	0		lambert1661	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_06.fbx	Environments	1.61	1.83	1.61	-0.80	-0.20	-0.81	134	1	0		lambert1662	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Medium_07.fbx	Environments	3.31	2.35	2.08	-1.66	-0.21	-1.04	198	1	0		lambert1663	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Obelisk_01.fbx	Environments	2.00	3.28	1.73	-1.00	-0.41	-0.87	132	1	0		lambert1664	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Peak_01.fbx	Environments	3.00	6.89	7.31	-1.50	-3.71	-5.89	244	1	0		lambert1665	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Peak_02.fbx	Environments	4.53	7.75	12.68	-2.26	-6.66	-7.95	260	1	0		lambert1666	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_01.fbx	Environments	6.35	3.95	4.64	-3.24	-0.82	-2.18	418	1	0		lambert1667	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_02.fbx	Environments	6.89	3.49	6.75	-3.69	-1.08	-3.37	366	1	0		lambert1668	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_03.fbx	Environments	9.32	4.09	3.95	-3.52	-0.97	-2.14	448	1	0		lambert1669	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_04.fbx	Environments	6.94	2.23	4.58	-3.25	-0.85	-2.21	402	1	0		lambert1670	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_05.fbx	Environments	6.38	1.93	3.24	-3.27	-0.73	-1.75	402	1	0		lambert1671	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_06.fbx	Environments	8.04	2.04	5.64	-3.42	-0.74	-3.58	366	1	0		lambert1672	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Round_07.fbx	Environments	7.06	2.40	6.55	-4.47	-0.79	-3.45	370	1	0		lambert1673	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Small_01.fbx	Environments	0.27	0.26	0.29	-0.12	-0.13	-0.27	24	1	0		lambert1674	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Small_02.fbx	Environments	0.38	0.30	0.39	-0.20	-0.15	-0.32	34	1	0		lambert1675	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Small_03.fbx	Environments	0.60	0.35	0.68	-0.30	-0.06	-0.32	46	1	0		lambert1676	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Small_04.fbx	Environments	0.58	0.31	0.60	-0.29	-0.06	-0.31	34	1	0		lambert1677	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Small_05.fbx	Environments	0.81	0.33	0.61	-0.40	-0.06	-0.31	52	1	0		lambert1678	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Stairs_01.fbx	Environments	3.17	2.62	4.50	-1.59	0.96	-2.25	98	1	0		lambert1679	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Stairs_02.fbx	Environments	3.16	2.59	4.40	-1.55	0.81	-2.20	150	1	0		lambert1680	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Stairs_03.fbx	Environments	3.55	6.25	4.50	-1.77	-2.67	-2.25	176	1	0		lambert1681	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rock_Stairs_04.fbx	Environments	3.28	6.25	4.40	-1.64	-2.84	-2.20	190	1	0		lambert1682	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Pillar_01.fbx	Environments	4.12	2.09	3.71	-2.06	-1.05	-1.86	733	1	0		lambert1683	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Pillar_02.fbx	Environments	2.80	3.74	3.32	-1.24	-1.88	-1.50	772	1	0		lambert1684	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Rocks_01.fbx	Environments	2.49	0.28	2.09	-1.25	-0.10	-1.05	232	1	0		lambert1685	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Rocks_02.fbx	Environments	1.67	0.28	1.07	-0.99	-0.10	-0.31	154	1	0		lambert1686	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Rocks_03.fbx	Environments	1.78	0.28	1.03	-0.80	-0.10	-0.40	196	1	0		lambert1687	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Slab_01.fbx	Environments	3.76	0.57	3.93	-1.88	-0.06	-1.97	94	1	0		lambert1688	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Slab_02.fbx	Environments	1.93	0.57	2.59	-0.97	-0.06	-1.30	76	1	0		lambert1689	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Slab_03.fbx	Environments	1.81	0.57	2.02	-0.91	-0.06	-1.01	52	1	0		lambert1690	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Slab_04.fbx	Environments	0.85	0.39	0.96	-0.42	-0.06	-0.48	40	1	0		lambert1691	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Slab_05.fbx	Environments	0.67	0.24	0.62	-0.33	-0.06	-0.31	28	1	0		lambert1692	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Tile_01.fbx	Environments	2.04	0.26	2.52	-0.78	0	-1.26	122	1	0		_DungeonSHD111	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Tile_02.fbx	Environments	1.40	0.26	1.32	-1.27	0	-0.07	84	1	0		_DungeonSHD112	PolygonDungeonRealms_01_A
+FBX/SM_Env_Rubble_Tile_03.fbx	Environments	1.92	0.26	2.53	-0.65	0	-1.25	128	1	0		_DungeonSHD113	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_01.fbx	Environments	21.09	1.70	20.05	-10.30	-0.12	-10.77	401	1	0		lambert1693	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_02.fbx	Environments	16.76	2.21	19.78	-8.38	0	-9.73	280	1	0		lambert1694	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_03.fbx	Environments	19.28	2.09	23.27	-9.64	0	-11.63	346	1	0		lambert1695	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_04.fbx	Environments	18.62	1.90	18.30	-9.31	0.06	-9.16	458	1	0		lambert1696	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_05.fbx	Environments	10.41	0.73	11.42	-4.72	-0.01	-5.74	80	1	0		lambert1697	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Rocks_01.fbx	Environments	19.68	0.67	19.50	-9.84	0	-9.75	401	1	0		lambert1698	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Rocks_02.fbx	Environments	19.68	0.79	19.50	-9.84	0	-9.75	463	1	0		lambert1699	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Waterfall_01.fbx	Environments	1.49	9.45	1.49	-0.74	-9.42	-0.74	46	1	0		lambert1700	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Waterfall_02.fbx	Environments	1.43	9.42	0.55	-0.69	-9.42	-0.27	44	1	0		lambert1701	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Waterfall_03.fbx	Environments	1.43	9.45	5.48	-0.69	-9.42	-5.20	58	1	0		lambert1702	PolygonDungeonRealms_01_A
+FBX/SM_Env_Sand_Waterfall_Ground_01.fbx	Environments	6.81	3.07	6.93	-3.38	-0.10	-3.47	74	1	0		lambert1703	PolygonDungeonRealms_01_A
+FBX/SM_Env_Shrine_01.fbx	Environments	7.84	9.83	7.89	-3.92	-1.17	-3.95	1508	1	0		lambert1704	PolygonDungeonRealms_01_A
+FBX/SM_Env_Skull_Huge_01.fbx	Environments	4.90	6.24	7.02	-2.43	-2.44	-4.92	1408	1	0		lambert1705	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Env_Skull_Huge_Horns_01.fbx	FBX	18.08	5.41	3.47	-9.02	-0.94	-3.61	672	1	0		lambert1705	
+FBX/SM_Env_Skull_Huge_Jaw_01.fbx	FBX	4.57	3.18	3.75	-2.30	-2.34	-0.82	870	1	0		lambert1705	
+FBX/SM_Env_Skull_Huge_Spikes_01.fbx	FBX	0.63	1.76	4.15	-0.32	2.77	-4.20	110	1	0		lambert1705	
+FBX/SM_Env_SpiderWeb_01.fbx	Environments	4.83	5.16	4.23	0.12	-0.12	-0.08	40	1	0		lambert1706	Spider_Web_01
+FBX/SM_Env_SpiderWeb_02.fbx	Environments	4.65	3.55	3.18	0.18	0	-1.45	42	1	0		lambert1707	Spider_Web_01
+FBX/SM_Env_SpiderWeb_03.fbx	Environments	2.54	4.68	4.25	0.18	0	-2.54	44	1	0		lambert1708	Spider_Web_01
+FBX/SM_Env_SpiderWeb_04.fbx	Environments	5.70	1.00	1.69	0	0.15	-0.90	24	1	0		lambert1709	Spider_Web_01
+FBX/SM_Env_SpiderWeb_05.fbx	Environments	6.29	2.13	0	-3.15	0.16	0	20	1	0		lambert1710	Spider_Web_01
+FBX/SM_Env_SpiderWeb_06.fbx	Environments	6.70	2.05	5.75	-4.00	0	-3.07	134	1	0		lambert1711	Spider_Web_01
+FBX/SM_Env_Statue_01.fbx	Environments	1.90	2.18	1.26	-0.95	0	-0.37	6948	1	0		DungeonSHD30	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_02.fbx	Environments	1.90	1.96	1.23	-0.94	-0.01	-0.33	5776	1	0		DungeonSHD130	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_03.fbx	Environments	1.50	1.66	1.62	-0.76	-0.08	-0.59	5045	1	0		DungeonSHD131	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_04.fbx	Environments	1.13	1.60	1.60	-0.66	-0.06	-0.57	4946	1	0		DungeonSHD132	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_05.fbx	Environments	1.28	1.97	0.86	-0.64	0	-0.32	5219	1	0		DungeonSHD133	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_05_Alt_01.fbx	Environments	1.28	1.97	0.86	-0.64	0	-0.32	5295	1	0		DungeonSHD134	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_06.fbx	Environments	1.05	2.17	0.87	-0.53	-0.01	-0.33	4580	1	0		DungeonSHD135	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_01.fbx	Environments	1.38	1.63	1.23	-0.43	0	-0.34	2899	1	0		DungeonSHD136	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_01_Head.fbx	Environments	0.91	0.54	0.89	-0.46	-0.01	-0.54	2014	1	0		DungeonSHD137	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_02.fbx	Environments	1.55	1.96	1.14	-0.90	-0.01	-0.33	3705	1	0		DungeonSHD138	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_03.fbx	Environments	1.12	1.66	1.23	-0.56	-0.08	-0.73	3179	1	0		DungeonSHD139	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_04.fbx	Environments	1.19	1.41	1.15	-0.59	-0.06	-0.57	3837	1	0		DungeonSHD140	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_05.fbx	Environments	1.20	1.66	0.86	-0.55	0	-0.32	3678	1	0		DungeonSHD141	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Broken_06.fbx	Environments	0.80	0.94	0.68	-0.40	-0.01	-0.33	1142	1	0		DungeonSHD142	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Female_01.fbx	Environments	1.47	1.88	0.79	-0.73	-0.01	-0.33	2414	1	0		lambert1712	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Female_02.fbx	Environments	1.08	1.59	1.17	-0.61	-0.11	-0.54	2413	1	0		lambert1713	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Female_03.fbx	Environments	1.05	1.87	0.87	-0.53	-0.01	-0.33	2414	1	0		lambert1714	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Male_01.fbx	Environments	1.11	1.87	0.86	-0.56	0	-0.32	2439	1	0		lambert1715	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Male_02.fbx	Environments	1.13	1.62	1.19	-0.65	-0.14	-0.55	2439	1	0		lambert1716	PolygonDungeonRealms_01_A
+FBX/SM_Env_Statue_Male_03.fbx	Environments	1.46	1.88	0.83	-0.72	0	-0.37	2440	1	0		lambert1717	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_01.fbx	Environments	2.00	0.35	1.63	-1.03	-0.16	-0.95	87	1	0		lambert885	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_02.fbx	Environments	1.57	0.30	2.01	-0.79	-0.15	-1.00	72	1	0		lambert1718	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_03.fbx	Environments	1.02	0.33	1.64	-0.50	-0.16	-0.81	34	1	0		lambert1719	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_04.fbx	Environments	1.61	0.29	1.56	-0.80	-0.17	-0.78	77	1	0		lambert1720	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_05.fbx	Environments	1.08	0.34	1.28	-0.55	-0.20	-0.65	36	1	0		lambert1721	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tiles_Loose_06.fbx	Environments	0.59	0.26	0.98	-0.30	-0.18	-0.49	18	1	0		lambert1722	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Big_01.fbx	Environments	14.51	11.38	9.47	-6.74	-1.40	-6.27	2710	1	0		lambert1723	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Big_02.fbx	Environments	8.47	14.57	8.25	-4.67	-0.70	-4.20	3100	1	0		lambert1724	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Dead_01.fbx	Environments	8.24	11.34	6.46	-4.12	0	-3.23	1158	1	0		lambert1725	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Dead_02.fbx	Environments	5.57	13.72	6.46	-3.36	-0.90	-3.23	1488	1	0		lambert1726	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Dead_Windswept_01.fbx	Environments	7.95	9.53	9.13	-3.73	-1.11	-8.32	1065	1	0		lambert1727	PolygonDungeonRealms_01_A
+FBX/SM_Env_Tree_Dead_Windswept_02.fbx	Environments	6.98	9.53	9.18	-1.89	-1.17	-7.96	1489	1	0		lambert1728	PolygonDungeonRealms_01_A
+FBX/SM_Generic_CloudRing_01.fbx	Generic	2650.41	248.95	2478.10	-1389.12	188.68	-1273.56	14456	1	0		lambert1729	Cloud_01
+FBX/SM_Generic_Cloud_01.fbx	Generic	6.72	1.28	1.95	-3.34	0	-1.37	280	1	0		lambert1730	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Cloud_02.fbx	Generic	7.34	1.33	2.85	-3.70	0	-1.94	252	1	0		lambert1731	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Cloud_03.fbx	Generic	7.18	1.54	3.34	-3.58	0	-2.77	490	1	0		lambert1732	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Cloud_04.fbx	Generic	5.04	1.12	1.66	-2.52	-0.25	-1.58	200	1	0		lambert1733	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Grass_Patch_01.fbx	Generic	2.81	0.92	2.16	-1.40	0	-1.08	602	1	0		lambert1734	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Grass_Patch_02.fbx	Generic	1.11	1.16	1.29	-0.56	0	-0.65	238	1	0		lambert1735	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Grass_Patch_03.fbx	Generic	3.27	0.93	2.72	-1.44	-0.16	-1.39	602	1	0		lambert1736	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Ground_01.fbx	Generic	5.53	0.28	5.68	-2.76	0	-2.84	200	1	0		lambert1737	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Ground_02.fbx	Generic	5.00	0.13	5.00	0	0	0	200	1	0		lambert1738	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Ground_03.fbx	Generic	15.22	5.52	15.64	-7.61	0	-7.82	200	1	0		lambert1739	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Small_Rocks_01.fbx	Generic	1.31	0.09	1.63	-0.48	-0.03	-0.81	180	1	0		lambert1740	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Small_Rocks_02.fbx	Generic	0.36	0.10	0.74	-0.18	0	-0.37	56	1	0		lambert1741	PolygonDungeonRealms_01_A
+FBX/SM_Generic_TreeDead_01.fbx	Generic	2.03	5.24	3.00	-0.56	-0.09	-1.29	306	1	0		lambert1742	PolygonDungeonRealms_01_A
+FBX/SM_Generic_TreeStump_01.fbx	Generic	0.78	0.50	0.82	-0.39	0	-0.41	228	1	0		lambert1743	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Tree_01.fbx	Generic	1.81	3.30	1.70	-0.97	-0.13	-0.80	598	1	0		lambert1744	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Tree_02.fbx	Generic	1.39	3.51	1.47	-0.70	-0.13	-0.73	288	1	0		lambert1745	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Tree_03.fbx	Generic	1.73	3.49	1.54	-0.87	-0.16	-0.77	266	1	0		lambert1746	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Tree_04.fbx	Generic	1.82	3.22	1.54	-0.62	-0.13	-0.77	316	1	0		lambert1747	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Water_Plane_01.fbx	Generic	5.00	0.17	5.00	0	-0.08	0	128	1	0		lambert1748	PolygonDungeonRealms_01_A
+FBX/SM_Generic_Water_Plane_02.fbx	Generic	5.00	0.17	5.00	0	-0.08	0	128	1	0		lambert1749	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Anvil_01.fbx	Props	1.79	1.02	0.65	-0.89	0	-0.33	1153	1	0		All_runs:_pasted__lambert14SG1	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_01.fbx	Props	1.93	10.23	0.24	-0.96	-10.13	-0.12	256	1	0		lambert1750	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_02.fbx	Props	1.93	5.55	0.24	-0.96	-5.45	-0.12	256	1	0		lambert1751	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_03.fbx	Props	1.93	10.06	0.24	-0.96	-9.96	-0.12	188	1	0		lambert1752	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_04.fbx	Props	1.93	5.65	0.24	-0.96	-5.54	-0.12	188	1	0		lambert1753	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_05.fbx	Props	1.11	4.86	0.24	-0.55	-4.76	-0.12	200	1	0		lambert1754	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_06.fbx	Props	1.11	2.59	0.24	-0.55	-2.49	-0.12	192	1	0		lambert1755	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_Damaged_01.fbx	Props	1.93	7.67	0.24	-0.96	-7.57	-0.12	304	1	0		lambert1756	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_Damaged_02.fbx	Props	1.93	6.07	0.24	-0.96	-5.97	-0.12	284	1	0		lambert1757	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_Damaged_03.fbx	Props	1.93	4.04	0.24	-0.96	-3.94	-0.12	252	1	0		lambert1758	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_Damaged_04.fbx	Props	1.93	2.45	0.24	-0.96	-2.35	-0.12	248	1	0		lambert1759	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Banner_Damaged_05.fbx	Props	1.11	1.94	0.24	-0.55	-1.84	-0.12	208	1	0		lambert1760	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_01.fbx	Props	0.72	0.91	0.72	-0.37	0	-0.36	440	1	0		lambert259	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_02.fbx	Props	0.71	0.88	0.71	-0.35	0	-0.35	632	1	0		lambert1761	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_03.fbx	Props	0.88	1.12	1.16	-0.44	0	-0.58	940	1	0		lambert1762	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Broken_01.fbx	Props	0.78	0.96	0.84	-0.38	-0.02	-0.43	558	1	0		lambert246	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Broken_02.fbx	Props	0.77	0.88	0.71	-0.40	0	-0.35	690	1	0		lambert1763	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Broken_03.fbx	Props	0.83	1.07	1.14	-0.40	-0.10	-0.66	1308	1	0		lambert1764	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Plug_01.fbx	Props	0.13	0.11	0.17	-0.07	-0.06	-0.03	84	1	0		lambert1765	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Plug_02.fbx	Props	0.13	0.14	0.11	-0.07	-0.03	-0.06	48	1	0		lambert1766	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Large_01.fbx	Props	2.03	2.78	0.84	-1.02	0	-0.42	2306	1	0		lambert1767	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Large_02.fbx	Props	2.03	2.21	0.80	-1.02	0	-0.40	410	1	0		lambert1768	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Large_Broken_02.fbx	Props	2.23	2.22	1.01	-1.00	-0.01	-0.41	491	1	0		lambert1769	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Small_01.fbx	Props	2.03	2.43	0.89	-1.02	0	-0.43	1886	1	0		lambert1770	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Small_02.fbx	Props	2.03	1.63	0.80	-1.02	0	-0.40	290	1	0		lambert1771	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Small_Broken_01.fbx	Props	2.06	1.64	1.55	-1.03	-0.01	-0.49	2502	1	0		lambert1772	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Shelf_Small_Broken_02.fbx	Props	2.06	1.63	0.82	-1.02	0	-0.41	357	1	0		lambert243	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Small_01.fbx	Props	0.51	0.64	0.51	-0.25	0	-0.25	440	1	0		lambert1773	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Barrel_Stack_01.fbx	Props	3.32	2.55	0.79	-1.66	0	-0.40	3366	1	0		lambert1774	PolygonDungeonRealms_01_A
+FBX/SM_Prop_BigHorn_01.fbx	Props	1.44	2.55	3.61	-0.72	0	-1.37	1634	1	0		lambert1775	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Caliper_01.fbx	Props	0.20	0.33	0.03	-0.10	-0.16	-0.01	136	1	0		lambert1776	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Basket_01.fbx	Props	1.07	0.94	1.00	-0.54	0	-0.50	364	1	0		lambert1777	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Bead_01.fbx	Props	0.28	1.54	0.24	-0.14	-1.51	-0.12	352	1	0		lambert1778	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Chest_01.fbx	Props	1.43	0.61	0.95	-0.71	0	-0.46	704	1	0		lambert1779	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Chest_02.fbx	Props	1.37	0.82	0.98	-0.69	0	-0.49	640	1	0		lambert1780	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Chest_Lid_01.fbx	FBX	1.27	0.09	0.91	-0.63	-0.01	-0.02	300	1	0		lambert1779	
+FBX/SM_Prop_Camp_FlagLine_01.fbx	Props	28.65	0.16	2.60	-0.02	-0.08	0	972	1	0		lambert903	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_02.fbx	Props	17.10	0.15	1.85	-0.01	-0.08	-0.13	512	1	0		lambert898	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_03.fbx	Props	26.94	0.12	10.81	-0.04	-0.07	-0.04	972	1	0		lambert899	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_04.fbx	Props	26.94	0.15	10.54	0.07	-0.08	0.01	968	1	0		lambert900	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_05.fbx	Props	14.11	0.13	7.15	0.07	-0.07	0.01	476	1	0		lambert901	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_06.fbx	Props	14.16	0.14	6.94	-0.04	-0.07	-0.04	440	1	0		lambert902	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_Pole_01.fbx	Props	14.41	0.26	11.20	-14.41	-0.14	-0.06	546	1	0		lambert904,lambert1459	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_FlagLine_Pole_02.fbx	Props	14.38	0.42	10.32	-14.37	-0.19	-0.07	510	1	0		lambert1460,lambert1781	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Hammock_01.fbx	Props	5.73	4.34	0.76	-2.87	-0.22	-0.38	372	1	0		lambert1782	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Hammock_02.fbx	Props	5.73	4.34	0.80	-2.87	-0.22	-0.40	586	1	0		lambert1783	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_HangingBag_01.fbx	Props	0.72	1.80	0.67	-0.36	-1.57	-0.33	254	1	0		lambert1784	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_HangingBag_02.fbx	Props	0.52	1.62	0.54	-0.26	-1.51	-0.27	276	1	0		lambert1785	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_HangingBag_03.fbx	Props	0.70	1.54	0.40	-0.35	-1.33	-0.20	198	1	0		lambert1786	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Lantern_01.fbx	Props	0.40	1.19	0.40	-0.20	-1.17	-0.20	434	1	0		lambert1787	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Plank_01.fbx	Props	1.67	0.10	0.26	-0.84	-0.05	-0.13	40	1	0		lambert1788	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Platform_01.fbx	Props	2.66	4.07	4.98	-1.32	-3.05	-2.11	760	1	0		lambert1789	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Platform_02.fbx	Props	0.87	4.01	4.62	-0.44	-3.05	-1.74	320	1	0		lambert1790	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_01.fbx	Props	0.51	0.60	0.51	-0.25	0.05	-0.25	192	1	0		lambert1791	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_02.fbx	Props	0.63	0.93	0.63	-0.31	0.07	-0.31	320	1	0		lambert1792	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_03.fbx	Props	0.39	0.54	0.39	-0.20	0.04	-0.20	304	1	0		lambert1793	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_04.fbx	Props	0.48	0.40	0.48	-0.24	0	-0.24	200	1	0		lambert1794	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_05.fbx	Props	0.69	1.23	0.51	-0.36	0	-0.26	586	1	0		lambert1795	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_06.fbx	Props	0.63	0.93	0.63	-0.31	0.07	-0.31	208	1	0		lambert1796	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Pot_07.fbx	Props	0.67	0.78	0.67	-0.34	0.25	-0.34	414	1	0		lambert1797	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Roll_01.fbx	Props	2.61	1.06	0.44	-1.31	-0.19	-0.22	764	1	0		lambert1798	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Roll_02.fbx	Props	2.69	0.40	0.44	-1.34	-0.20	-0.22	708	1	0		lambert1799	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Roll_03.fbx	Props	5.22	0.84	0.47	-2.59	-1.09	-0.23	708	1	0		lambert1800	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_01.fbx	Props	1.57	0.02	2.15	-0.79	-0.01	-1.07	32	1	0		lambert1802	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_02.fbx	Props	1.72	0.02	2.09	-0.86	-0.01	-1.05	32	1	0		lambert1803	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_03.fbx	Props	1.41	0.02	2.88	-0.71	-0.01	-1.40	440	1	0		lambert1804	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_04.fbx	Props	1.34	0.02	2.15	-0.67	-0.01	-1.07	32	1	0		lambert1805	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_05.fbx	Props	1.04	0.02	2.09	-0.52	-0.01	-1.05	32	1	0		lambert1806	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rug_06.fbx	Props	0.67	0.02	2.29	-0.38	-0.01	-1.12	232	1	0		lambert1807	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Rugs_01.fbx	Props	3.21	0.07	3.49	-1.61	-0.04	-1.74	128	1	0		lambert1801	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Stick_01.fbx	Props	0.09	2.32	0.05	-0.05	-1.16	-0.03	22	1	0		lambert1808	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Stick_02.fbx	Props	0.07	1.95	0.07	-0.04	-0.98	-0.03	22	1	0		lambert1809	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Sticks_01.fbx	Props	3.36	3.84	0.93	-1.59	-0.71	-0.53	672	1	0		_DungeonSHD114	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Sticks_02.fbx	Props	1.77	3.39	1.27	-0.88	-0.77	-0.66	432	1	0		_DungeonSHD115	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_String_01.fbx	Props	2.34	0.15	0.04	-0.01	-0.13	-0.02	50	1	0		lambert1810	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_01.fbx	Props	2.39	0.58	1.24	-1.20	-0.04	-0.62	280	1	0		lambert1811	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_Rug_01.fbx	Props	2.39	0.58	1.24	-1.20	0.26	-0.62	336	1	0		lambert1812	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_Rug_02.fbx	Props	2.39	0.58	1.24	-1.20	-0.03	-0.62	336	1	0		lambert1813	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_Rug_03.fbx	Props	2.35	0.65	1.34	-1.18	-0.04	-0.67	288	1	0		lambert1814	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_Rug_04.fbx	Props	2.35	0.65	1.34	-1.18	-0.04	-0.67	288	1	0		lambert1815	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Table_Small_01.fbx	Props	0.69	0.38	1.43	-0.24	-0.03	-0.72	240	1	0		lambert1816	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Fence_01.fbx	Props	1.81	4.41	0.25	-0.95	-2.56	-0.14	224	1	0		lambert1817	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Fence_02.fbx	Props	1.91	4.37	0.24	-1.00	-2.57	-0.11	224	1	0		lambert1818	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_01.fbx	Props	6.96	0.25	5.24	-3.42	-0.01	-2.53	760	1	0		lambert1819	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_02.fbx	Props	5.69	0.32	5.39	-2.96	-0.05	-2.89	480	1	0		lambert1820	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_03.fbx	Props	5.46	0.31	5.44	-2.75	0.13	-2.74	560	1	0		lambert1821	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_04.fbx	Props	2.37	0.26	2.00	-1.20	-0.12	-0.97	280	1	0		lambert1822	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_05.fbx	Props	2.70	0.27	2.02	-1.35	0.18	-1.01	240	1	0		lambert1823	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_06.fbx	Props	2.31	0.24	1.96	-1.17	0.23	-0.97	240	1	0		lambert1824	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_07.fbx	Props	1.38	0.13	1.48	-0.67	0.20	-0.68	240	1	0		lambert1825	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_08.fbx	Props	1.49	0.13	5.09	-0.75	0.17	-2.52	240	1	0		lambert1826	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_09.fbx	Props	3.41	0.28	1.19	-1.74	-0.08	-0.59	200	1	0		lambert1827	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Floor_10.fbx	Props	3.41	3.11	1.44	-1.70	-2.44	-0.72	488	1	0		lambert1828	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Pole_01.fbx	Props	0.17	5.36	0.15	-0.09	-2.68	-0.08	72	1	0		lambert1829	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Pole_02.fbx	Props	0.30	4.51	0.19	-0.15	-2.25	-0.09	72	1	0		lambert1830	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Stairs_01.fbx	Props	1.37	0.85	1.27	-0.68	-0.08	-1.05	240	1	0		lambert1831	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Stairs_02.fbx	Props	1.01	1.79	2.55	-0.51	-0.07	-2.36	400	1	0		lambert1832	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Table_01.fbx	Props	2.39	0.58	1.24	-1.20	-0.09	-0.62	280	1	0		lambert1833	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Camp_Wood_Table_02.fbx	Props	0.69	0.53	1.43	-0.24	-0.03	-0.72	240	1	0		lambert1834	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Candle_Flame_01.fbx	FBX	0	0	0	0	0	0	16	1	0		blinn4	
+FBX/SM_Prop_Chair_01.fbx	Props	0.58	1.02	0.56	-0.29	0	-0.28	592	1	0		Dungeon2SHD25	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Chair_Broken_01.fbx	Props	0.75	0.87	0.85	-0.40	-0.01	-0.42	526	1	0		Dungeon2SHD7	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_01.fbx	Props	0.18	0.51	0.12	-0.09	-0.46	0	68	1	0		lambert1835	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_02.fbx	Props	0.18	0.51	0.10	-0.10	-0.47	0	68	1	0		lambert1836	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_03.fbx	Props	0.18	0.52	0.14	-0.08	-0.47	0	76	1	0		lambert1837	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_Hanging_01.fbx	Props	0.18	0.74	0.18	-0.09	-0.74	-0.03	50	1	0		lambert1838	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_Hanging_02.fbx	Props	0.18	0.72	0.14	-0.08	-0.72	-0.03	50	1	0		lambert1839	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Charm_Hanging_03.fbx	Props	0.18	0.74	0.19	-0.09	-0.74	-0.03	58	1	0		lambert1840	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Compass_01.fbx	Props	0.24	0.30	0.28	-0.12	0	-0.16	380	1	0		lambert1841	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crate_01.fbx	Props	1.10	1.10	1.10	-0.55	0	-0.55	900	1	0		DungeonSHD143	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crate_Broken_01.fbx	Props	1.10	1.10	1.10	-0.55	0	-0.55	816	1	0		DungeonSHD144	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crate_Stack_01.fbx	Props	2.24	2.18	2.22	-1.66	0	-0.58	3600	1	0		DungeonSHD145	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_01.fbx	Props	0.11	0.20	0.11	-0.05	-0.10	-0.05	44	1	0		Dungeon2SHD26	PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_02.fbx	Props	0.10	0.27	0.11	-0.05	-0.13	-0.05	56	1	0		Dungeon2SHD27	PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_03.fbx	Props	0.19	0.42	0.19	-0.09	-0.21	-0.09	88	1	0		Dungeon2SHD28	PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_04.fbx	Props	0.10	0.32	0.09	-0.05	-0.16	-0.04	58	1	0		Dungeon2SHD29	PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_05.fbx	Props	0.10	0.23	0.09	-0.05	-0.12	-0.04	56	1	0		Dungeon2SHD30	PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_A_01.fbx	Props	0.73	1.15	0.88	-0.31	0.09	-0.42	348	1	0		Tomb:SM_Rune_Symbol_44SG3,Dungeon2SHD31	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_A_02.fbx	Props	0.73	0.84	0.88	-0.31	0.09	-0.42	230	1	0		Tomb:SM_Rune_Symbol_44SG4,Dungeon2SHD32	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_A_03.fbx	Props	0.73	0.62	0.76	-0.31	0.09	-0.42	210	1	0		Tomb:SM_Rune_Symbol_44SG5,Dungeon2SHD33	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_B_01.fbx	Props	0.67	1.18	0.73	-0.28	0.09	-0.37	322	1	0		Tomb:SM_Rune_Symbol_44SG6,Dungeon2SHD34	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_B_02.fbx	Props	0.67	0.91	0.73	-0.28	0.09	-0.37	228	1	0		Tomb:SM_Rune_Symbol_44SG7,Dungeon2SHD35	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_B_03.fbx	Props	0.67	0.75	0.73	-0.28	0.09	-0.37	188	1	0		Tomb:SM_Rune_Symbol_44SG8,Dungeon2SHD36	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_C_01.fbx	Props	0.65	0.83	0.69	-0.27	0.09	-0.34	204	1	0		Tomb:SM_Rune_Symbol_44SG9,Dungeon2SHD37	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_C_02.fbx	Props	0.65	0.69	0.65	-0.27	0.09	-0.29	158	1	0		Tomb:SM_Rune_Symbol_44SG10,Dungeon2SHD38	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_C_03.fbx	Props	0.65	0.55	0.58	-0.27	0.09	-0.29	114	1	0		Tomb:SM_Rune_Symbol_44SG11,Dungeon2SHD39	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_D_01.fbx	Props	0.52	0.78	0.56	-0.20	0.09	-0.29	165	1	0		Tomb:SM_Rune_Symbol_44SG12,Dungeon2SHD40	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_D_02.fbx	Props	0.52	0.70	0.56	-0.20	0.09	-0.29	149	1	0		Tomb:SM_Rune_Symbol_44SG13,Dungeon2SHD41	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_D_03.fbx	Props	0.52	0.48	0.56	-0.20	0.09	-0.29	70	1	0		Tomb:SM_Rune_Symbol_44SG14,Dungeon2SHD42	PolygonDungeonRealms_01_A | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_E_01.fbx	Props	0.62	0.97	0.69	-0.25	0.09	-0.35	212	1	0		Dungeon2SHD43,Tomb:SM_Rune_Symbol_44SG15	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_Crystal_01
+FBX/SM_Prop_Crystal_Rock_E_02.fbx	Props	0.62	0.87	0.69	-0.25	0.09	-0.35	168	1	0		Dungeon2SHD44,Tomb:SM_Rune_Symbol_44SG16	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_E_03.fbx	Props	0.57	0.49	0.64	-0.20	0.09	-0.31	116	1	0		Dungeon2SHD45,Tomb:SM_Rune_Symbol_44SG17	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_F_01.fbx	Props	0.59	0.96	0.71	-0.25	0.06	-0.36	248	1	0		Dungeon2SHD46,Tomb:SM_Rune_Symbol_44SG18	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_F_02.fbx	Props	0.54	0.88	0.71	-0.25	0.06	-0.36	176	1	0		Dungeon2SHD47,Tomb:SM_Rune_Symbol_44SG19	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_F_03.fbx	Props	0.54	0.51	0.71	-0.25	0.06	-0.36	122	1	0		Dungeon2SHD48,Tomb:SM_Rune_Symbol_44SG20	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_G_01.fbx	Props	0.71	0.83	0.73	-0.32	0.09	-0.37	295	1	0		Dungeon2SHD49,Tomb:SM_Rune_Symbol_44SG21	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_G_02.fbx	Props	0.60	0.66	0.73	-0.21	0.09	-0.37	190	1	0		Dungeon2SHD50,Tomb:SM_Rune_Symbol_44SG22	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Crystal_Rock_G_03.fbx	Props	0.53	0.53	0.73	-0.21	0.09	-0.37	134	1	0		Dungeon2SHD51,Tomb:SM_Rune_Symbol_44SG23	PolygonDungeonRealms_Crystal_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Dwarf_01.fbx	Props	1.35	1.45	1.34	-0.39	-0.06	-0.64	3169	1	0		lambert1842	PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Dwarf_02.fbx	Props	2.41	0.66	1.46	-1.44	-0.15	-0.76	3153	1	0		lambert1843	PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Dwarf_03.fbx	Props	2.16	0.73	1.34	-1.24	-0.16	-0.69	3166	1	0		lambert897	PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Dwarf_04.fbx	Props	2.41	1.02	2.46	-1.20	-0.15	-1.23	6316	1	0		lambert1844	PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_KingDwarf_01.fbx	Props	1.33	1.71	0.94	-0.67	-0.02	-0.47	3602	1	0		lambert1845,lambert1846,lambert1847,lambert1848,lambert1849	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Nomad_01.fbx	Props	1.74	0.36	1.46	-1.03	-0.05	-0.66	2709	1	0		lambert1850,lambert300,lambert299	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Nomad_02.fbx	Props	1.27	0.36	1.72	-0.55	-0.08	-0.76	3232	1	0		lambert1851,lambert302,lambert298	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_DeadBody_Nomad_03.fbx	Props	1.32	0.38	1.75	-0.74	-0.09	-0.83	2920	1	0		lambert1852	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Bed_01.fbx	Props	1.37	0.72	2.55	-0.69	0	-1.28	1046	1	0		Dungeon2SHD52	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Bed_02.fbx	Props	2.16	0.71	2.55	-1.08	0	-1.28	1149	1	0		Dungeon2SHD53	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Brazier_01.fbx	Props	2.17	1.62	2.17	-1.09	0	-1.09	783	1	0		_DungeonSHD116	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cannon_01.fbx	Props	1.29	0.94	1.86	-0.65	0	-1.20	2016	1	0		_DungeonSHD117	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cannon_Barrel_01.fbx	FBX	0.54	0.54	1.79	-0.27	-0.27	-1.00	1168	1	0		_DungeonSHD117	
+FBX/SM_Prop_Dwarf_Cannon_Wheel_L.fbx	FBX	0.28	1.02	1.02	-0.14	-0.51	-0.51	1088	1	0		_DungeonSHD117	
+FBX/SM_Prop_Dwarf_Cannon_Wheel_R.fbx	FBX	0.28	1.02	1.02	-0.14	-0.51	-0.51	1088	1	0		_DungeonSHD117	
+FBX/SM_Prop_Dwarf_Capstar_01.fbx	Props	1.09	1.24	1.09	-0.55	-0.04	-0.55	406	1	0		DungeonSHD146,DungeonSHD147	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Capstar_01_1.fbx	FBX	3.76	0.25	3.76	-1.88	0.71	-1.88	1856	1	0		DungeonSHD147,Dungeon2SHD54	
+FBX/SM_Prop_Dwarf_Cart_01.fbx	Props	0.64	3.08	1.07	-0.32	-3.06	-1.00	93	1	0		DungeonSHD148	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cart_01_Bin.fbx	FBX	2.79	1.42	2.10	-1.40	-0.37	-0.24	662	1	0		DungeonSHD149,DungeonSHD148	
+FBX/SM_Prop_Dwarf_Cart_02.fbx	Props	0.48	3.01	2.45	-0.24	-3.00	-1.22	206	1	0		DungeonSHD93	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cart_02_Bin.fbx	FBX	2.78	2.36	3.13	-1.43	-1.45	-1.57	830	1	0		DungeonSHD93	
+FBX/SM_Prop_Dwarf_Cart_02_Bracket.fbx	FBX	0.81	2.25	3.34	-0.32	-2.12	-1.67	736	1	0		DungeonSHD93	
+FBX/SM_Prop_Dwarf_Cart_03.fbx	Props	0.99	0.74	2.14	-0.50	0.13	-1.07	758	1	0		Dungeon2SHD55	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cart_03_Ore.fbx	FBX	0.76	0.19	1.60	-0.38	0.62	-0.80	762	1	0		Dungeon2SHD55	
+FBX/SM_Prop_Dwarf_Cart_03_Wheel_1.fbx	FBX	1.08	0.45	0.43	-0.54	-0.22	-0.21	492	1	0		Dungeon2SHD55	
+FBX/SM_Prop_Dwarf_Cart_03_Wheel_2.fbx	FBX	1.08	0.45	0.44	-0.54	-0.22	-0.22	492	1	0		Dungeon2SHD55	
+FBX/SM_Prop_Dwarf_Cart_Head_01.fbx	Props	4.83	13.73	4.64	-2.41	-9.82	-3.42	300	1	0		lambert1853	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cart_Rail_01.fbx	Props	10.00	0.56	0.60	-5.00	-0.14	-0.30	74	1	0		DungeonSHD94	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chain_01.fbx	Props	0.11	3.69	0.11	-0.05	-0.06	-0.05	1032	1	0		DungeonSHD150	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chain_02.fbx	Props	0.11	3.64	0.11	-0.05	-0.06	-0.05	408	1	0		_Dwarf1SG1	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chain_Clasp_01.fbx	Props	0.36	0.34	0.36	-0.18	-0.09	-0.18	112	1	0		_Dwarf1SG2	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chair_Bench_01.fbx	Props	1.58	0.42	0.44	-0.79	0	-0.22	202	1	0		Dungeon2SHD56	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chair_Bench_Broken_01.fbx	Props	1.63	0.56	1.02	-0.68	-0.02	-0.50	566	1	0		Dungeon2SHD57	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chair_Stool_01.fbx	Props	0.44	0.46	0.44	-0.22	0	-0.22	210	1	0		Dungeon2SHD58	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chair_Stool_Broken_01.fbx	Props	0.41	0.46	0.44	-0.20	0	-0.22	240	1	0		Dungeon2SHD5	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_01.fbx	Props	5.85	3.63	5.92	-2.92	0	-2.96	5668	1	0		Dungeon2SHD59	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_02.fbx	Props	0.32	0.51	0.29	-0.16	0	-0.14	338	1	0		DungeonSHD151	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_03.fbx	Props	0.38	0.73	0.38	-0.19	0	-0.19	328	1	0		DungeonSHD152	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_04.fbx	Props	0.62	0.94	0.60	-0.31	0	-0.30	608	1	0		DungeonSHD153	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_05.fbx	Props	0.45	0.98	0.45	-0.23	0	-0.23	324	1	0		DungeonSHD154	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Chandelier_06.fbx	Props	2.82	3.00	3.20	-1.41	0	-1.60	1958	1	0		Dungeon2SHD60,pasted__DungeonSHD31	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Box_01.fbx	Props	2.40	1.31	2.31	-1.20	-0.84	-1.16	210	1	0		DungeonSHD155	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Box_01_1.fbx	FBX	1.63	1.64	1.64	-0.82	-0.82	-0.82	1016	1	0		DungeonSHD155	
+FBX/SM_Prop_Dwarf_Cog_Box_01_2.fbx	FBX	0.12	0.98	0.98	-0.06	-0.49	-0.49	192	1	0		DungeonSHD155	
+FBX/SM_Prop_Dwarf_Cog_Box_01_3.fbx	FBX	0.12	1.02	1.02	-0.06	-0.51	-0.51	192	1	0		DungeonSHD155	
+FBX/SM_Prop_Dwarf_Cog_Box_02.fbx	Props	2.94	1.73	3.03	-1.47	-0.86	-1.51	394	1	0		DungeonSHD156	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Box_02_1.fbx	FBX	0.29	1.83	1.83	-0.19	-0.92	-0.92	384	1	0		DungeonSHD156	
+FBX/SM_Prop_Dwarf_Cog_Box_02_2.fbx	FBX	1.84	4.64	1.84	-0.92	-0.57	-0.92	784	1	0		DungeonSHD156	
+FBX/SM_Prop_Dwarf_Cog_Large_01.fbx	Props	1.83	0.20	1.83	-0.92	-0.10	-0.92	424	1	0		DungeonSHD157	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Large_02.fbx	Props	1.84	0.13	1.84	-0.92	-0.07	-0.92	732	1	0		DungeonSHD158	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Large_03.fbx	Props	1.84	0.17	1.83	-0.92	-0.09	-0.91	508	1	0		DungeonSHD159	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Large_04.fbx	Props	1.83	0.22	1.83	-0.92	-0.11	-0.92	608	1	0		DungeonSHD160	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Large_05.fbx	Props	1.83	0.40	1.83	-0.92	-0.20	-0.92	722	1	0		DungeonSHD161	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Pile_01.fbx	Props	1.54	0.27	1.19	-0.77	-0.01	-0.61	484	1	0		DungeonSHD162	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Pile_02.fbx	Props	2.28	0.27	2.50	-0.96	-0.01	-1.20	1124	1	0		DungeonSHD163	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Pile_03.fbx	Props	2.77	0.31	2.11	-1.31	-0.02	-1.03	1376	1	0		DungeonSHD164	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Pile_04.fbx	Props	2.01	0.45	1.94	-0.98	0	-0.92	1664	1	0		DungeonSHD165	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Pile_05.fbx	Props	2.86	0.59	2.78	-1.41	-0.01	-1.36	1834	1	0		DungeonSHD166	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Shaft_01.fbx	Props	1.61	4.73	1.61	-0.81	3.52	-0.81	424	1	0		DungeonSHD167	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Shaft_01_1.fbx	FBX	1.99	1.70	1.92	-1.00	0	-0.96	212	1	0		DungeonSHD167	
+FBX/SM_Prop_Dwarf_Cog_Shaft_01_2.fbx	FBX	2.06	2.97	2.04	-1.03	1.63	-1.02	668	1	0		DungeonSHD167	
+FBX/SM_Prop_Dwarf_Cog_Small_01.fbx	Props	0.98	0.12	0.98	-0.49	-0.06	-0.49	232	1	0		DungeonSHD168	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Cog_Small_02.fbx	Props	0.98	0.12	0.98	-0.49	-0.06	-0.49	252	1	0		DungeonSHD169	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Crane_01.fbx	Props	6.44	6.32	15.82	-3.22	0	-11.29	11470	1	0		DungeonSHD170	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Crane_01_Base_01.fbx	Props	8.42	1.00	8.42	-4.21	-1.00	-4.21	548	1	0		DungeonSHD171	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Crane_01_Cog.fbx	FBX	2.76	1.84	1.84	-1.38	-0.92	-0.92	1860	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Crank.fbx	FBX	3.10	1.13	1.26	-1.55	-0.57	-0.63	1196	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Preset.fbx	FBX	7.22	8.43	15.88	-3.61	-2.10	-11.33	16210	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Pulley_1.fbx	FBX	0.48	1.20	1.14	-0.24	-0.60	-0.57	180	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Pulley_2.fbx	FBX	0.43	0.68	0.64	-0.21	-0.34	-0.32	180	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Pulley_3.fbx	FBX	0.58	1.00	0.95	-0.29	-0.50	-0.48	180	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Rope.fbx	FBX	0.09	7.03	0.09	-0.05	-7.03	-0.05	16	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Crane_01_Wheel_1.fbx	FBX	0.76	0.73	0.52	-0.38	-0.36	-0.27	282	1	0		DungeonSHD170	
+FBX/SM_Prop_Dwarf_Fire_Pit_01.fbx	Props	1.97	0.38	4.16	-0.99	-0.13	-2.08	1778	1	0		Dungeon2SHD61	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Forge_Golem_Arm_01.fbx	Props	8.46	4.21	3.94	-4.19	-1.26	-1.97	750	1	0		_Dwarf1SG3	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Forge_Golem_Arm_02.fbx	Props	14.10	4.02	3.97	-6.31	-1.71	-1.91	946	1	0		_DungeonSHD118	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Forge_Golem_Chest_01.fbx	Props	15.07	10.16	6.79	-7.54	-5.15	-3.40	2726	1	0		_DungeonSHD119	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Forge_Golem_Head_01.fbx	Props	2.91	3.85	3.54	-1.45	-1.91	-1.77	340	1	0		_DungeonSHD120	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Lever_01.fbx	Props	0.72	0.55	0.98	-0.36	-0.21	-0.49	142	1	0		DungeonSHD172	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Lever_01_Handle.fbx	FBX	0.24	1.13	0.63	-0.12	-0.32	-0.32	314	1	0		DungeonSHD172	
+FBX/SM_Prop_Dwarf_Lever_02.fbx	Props	0.41	0.36	0.51	-0.20	-0.08	-0.25	116	1	0		DungeonSHD173	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Lever_02_Handle.fbx	FBX	0.13	0.82	0.37	-0.07	-0.18	-0.19	266	1	0		DungeonSHD173	
+FBX/SM_Prop_Dwarf_Lever_03.fbx	Props	0.43	0.55	0.51	-0.22	0	-0.26	144	1	0		DungeonSHD174	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Lever_03_Handle.fbx	FBX	0.06	0.46	0.17	-0.03	-0.01	-0.02	64	1	0		DungeonSHD174	
+FBX/SM_Prop_Dwarf_Shelf_01.fbx	Props	1.56	0.16	0.31	-0.78	-0.08	0	50	1	0		Dungeon2SHD62	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Shelf_02.fbx	Props	0.76	0.16	0.31	-0.38	-0.08	0	52	1	0		Dungeon2SHD63	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Smelter_Mould_01.fbx	Props	3.69	0.45	7.77	-1.85	-0.11	-3.89	166	1	0		DungeonSHD175	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Smelter_Mould_01_Metal.fbx	FBX	2.86	0.08	7.01	-1.44	0.22	-3.50	102	1	0		DungeonSHD175	
+FBX/SM_Prop_Dwarf_Smelting_Pot_01.fbx	Props	3.34	2.25	0.81	-1.67	-2.12	-0.49	728	1	0		DungeonSHD176	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Smelting_Pot_02.fbx	FBX	3.13	2.36	2.78	-1.57	-1.45	-1.35	830	1	0		DungeonSHD176	
+FBX/SM_Prop_Dwarf_Table_01.fbx	Props	2.02	0.56	1.37	-1.01	0	-0.68	296	1	0		Dungeon2SHD64	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_02.fbx	Props	2.02	0.91	1.37	-1.01	0	-0.68	992	1	0		Dungeon2SHD2	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_03.fbx	Props	3.32	0.91	1.37	-1.67	0	-0.68	518	1	0		Dungeon2SHD3	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_Broken_01.fbx	Props	2.46	0.73	1.85	-1.30	-0.01	-0.99	961	1	0		Dungeon2SHD65	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_Broken_02.fbx	Props	2.75	0.90	1.63	-1.37	-0.01	-0.81	1466	1	0		Dungeon2SHD66	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_Small_01.fbx	Props	0.79	0.91	0.80	-0.39	0	-0.40	250	1	0		Dungeon2SHD4	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_Small_02.fbx	Props	1.51	0.91	0.53	-0.76	0	0	176	1	0		Dungeon2SHD67	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Table_Small_Broken_01.fbx	Props	1.10	0.91	1.26	-0.39	0	-0.66	432	1	0		Dungeon2SHD68	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Throne_01.fbx	Props	3.15	6.64	1.78	-1.58	-0.10	-0.93	1616	1	0		DungeonSHD177	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Throne_02.fbx	Props	5.53	6.68	5.26	-2.72	0	-2.89	1672	1	0		DungeonSHD178,Gold	PolygonDungeonRealms_01_A | Gold_01
+FBX/SM_Prop_Dwarf_Torch_01.fbx	Props	0.25	0.78	0.57	-0.12	-0.26	-0.03	248	1	0		DungeonSHD179	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_02.fbx	Props	0.32	0.35	0.15	-0.16	-0.18	0	164	1	0		DungeonSHD180	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_03.fbx	Props	0.38	0.25	0.19	-0.19	-0.23	0	104	1	0		DungeonSHD181	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_04.fbx	Props	0.62	0.28	0.30	-0.31	0	0	266	1	0		DungeonSHD182	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_05.fbx	Props	0.45	0.29	0.23	-0.23	-0.19	0	114	1	0		DungeonSHD183	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_06.fbx	Props	0.61	0.55	0.58	-0.30	0	-0.29	184	1	0		DungeonSHD184	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Torch_07.fbx	Props	0.71	1.26	0.71	-0.36	0	-0.36	366	1	0		DungeonSHD185	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Totem_01.fbx	Props	1.67	2.71	1.44	-0.83	0	-0.72	1204	1	0		lambert1854	PolygonDungeonRealms_01_A | Gold_01
+FBX/SM_Prop_Dwarf_Totem_Gold_01.fbx	FBX	0.49	1.43	0.62	-0.25	0.85	-0.31	1354	1	0		_DungeonSHD121	
+FBX/SM_Prop_Dwarf_Trap_Gap_01.fbx	Props	1.16	3.78	0.59	-0.58	-2.84	-0.29	246	1	0		lambert1855	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Trap_Head_01.fbx	Props	1.39	1.81	0.55	-0.69	-0.91	0.27	296	1	0		lambert1856	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Trap_Head_02.fbx	Props	1.16	1.88	0.59	-0.58	-0.94	-0.29	246	1	0		lambert1857	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Trap_Head_Mouth_01.fbx	FBX	0.64	0.47	0.32	-0.32	-0.23	-0.16	20	1	0		lambert1856	
+FBX/SM_Prop_Dwarf_Trap_Head_Mouth_02.fbx	FBX	0.60	0.92	0.25	-0.30	-0.46	-0.13	18	1	0		lambert1857	
+FBX/SM_Prop_Dwarf_Trap_Saw_01.fbx	Props	0.51	0.11	2.37	-0.25	-0.05	-1.19	152	1	0		lambert1858	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Trap_Saw_Spin_01.fbx	FBX	0.36	2.25	2.22	-0.18	-1.13	-1.11	786	1	0		lambert1858	
+FBX/SM_Prop_Dwarf_TreasureChest_01.fbx	Props	3.83	1.01	1.87	-1.92	-0.01	-0.94	3656	1	0		lambert1859	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_TreasureChest_Lid_01.fbx	FBX	3.14	0.54	1.60	-1.57	-0.11	-0.12	1765	1	0		lambert1859	
+FBX/SM_Prop_Dwarf_Weapon_Barrel_01.fbx	Props	0.71	0.88	0.71	-0.35	0	-0.35	650	1	0		Dungeon2SHD69	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Weapon_Barrel_02.fbx	Props	1.01	2.00	0.71	-0.55	0	-0.35	1901	1	0		Dungeon2SHD70	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Weapon_Rack_01.fbx	Props	0.10	0.18	0.16	-0.05	-0.11	-0.05	70	1	0		Dungeon2SHD71	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Weapon_Rack_02.fbx	Props	0.66	0.22	0.22	-0.33	-0.11	-0.03	172	1	0		Dungeon2SHD72	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Weapon_Rack_03.fbx	Props	0.76	0.67	1.92	-0.38	0	-0.96	798	1	0		Dungeon2SHD73	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Dwarf_Weapon_Rack_04.fbx	Props	0.76	1.33	1.92	-0.38	0	-0.96	6140	1	0		Dungeon2SHD74	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Hammer_01.fbx	Props	0.21	0.75	0.39	-0.11	-0.18	-0.20	838	1	0		Dungeon2SHD75	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Hammer_02.fbx	Props	0.14	0.68	0.56	-0.07	-0.18	-0.39	568	1	0		Dungeon2SHD76	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Pickaxe_01.fbx	Props	0.09	0.60	0.51	-0.04	-0.17	-0.24	160	1	0		DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Pickaxe_02.fbx	Props	0.10	1.14	0.60	-0.05	-0.63	-0.28	152	1	0		DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Pickaxe_03.fbx	Props	0.11	0.84	0.97	-0.05	-0.18	-0.49	786	1	0		DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Spade_01.fbx	Props	0.09	1.24	0.35	-0.05	-0.20	-0.17	166	1	0		DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Spade_02.fbx	Props	0.12	1.60	0.45	-0.07	-0.57	-0.23	222	1	0		DungeonSHD	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Tongs_01.fbx	Props	0.18	1.12	0.09	-0.04	-0.27	-0.05	402	1	0		Dungeon2SHD77	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Forge_Tongs_Handle_01.fbx	FBX	0.18	1.12	0.09	-0.09	-0.86	-0.05	390	1	0		Dungeon2SHD77	
+FBX/SM_Prop_Gem_01.fbx	Props	0.09	0.06	0.09	-0.05	-0.05	-0.05	78	1	0		Dungeon2SHD78	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_02.fbx	Props	0.10	0.07	0.10	-0.05	-0.05	-0.05	30	1	0		Dungeon2SHD79	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_03.fbx	Props	0.10	0.07	0.10	-0.05	-0.05	-0.05	14	1	0		Dungeon2SHD80	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_04.fbx	Props	0.09	0.04	0.15	-0.05	-0.02	-0.10	96	1	0		Dungeon2SHD81	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_05.fbx	Props	0.09	0.07	0.10	-0.04	-0.05	-0.05	24	1	0		Dungeon2SHD82	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_06.fbx	Props	0.10	0.07	0.10	-0.05	-0.05	-0.05	30	1	0		Dungeon2SHD83	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_07.fbx	Props	0.10	0.04	0.15	-0.05	-0.02	-0.08	44	1	0		Dungeon2SHD84	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Cluster_01.fbx	Props	0.38	0.05	0.39	-0.19	0	-0.19	304	1	0		Dungeon2SHD_Shiny,Dungeon2SHD85	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Cluster_02.fbx	Props	0.38	0.06	0.38	-0.19	0	-0.19	106	1	0		Dungeon2SHD_Shiny1,Dungeon2SHD86	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Cluster_03.fbx	Props	0.38	0.05	0.39	-0.19	0	-0.19	128	1	0		Dungeon2SHD_Shiny2,Dungeon2SHD87	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Socket_01.fbx	Props	0.18	0.03	0.18	-0.09	0	-0.09	124	1	0		Dungeon2SHD_Shiny3,Dungeon2SHD88	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Socket_02.fbx	Props	0.18	0.03	0.19	-0.09	0	-0.10	88	1	0		Dungeon2SHD_Shiny4,Dungeon2SHD89	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Socket_03.fbx	Props	0.18	0.03	0.18	-0.09	0	-0.09	60	1	0		Dungeon2SHD_Shiny5,Dungeon2SHD90	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Socket_04.fbx	Props	0.17	0.03	0.24	-0.08	0	-0.15	166	1	0		Dungeon2SHD_Shiny6,Dungeon2SHD91	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gem_Socket_05.fbx	Props	0.16	0.04	0.19	-0.08	0	-0.09	76	1	0		Dungeon2SHD_Shiny7,Dungeon2SHD92	Gold_01 | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Goblet_01.fbx	Props	0.12	0.24	0.12	-0.06	0	-0.06	300	1	0		Dungeon2SHD93	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Goblet_02.fbx	Props	0.31	0.50	0.32	-0.16	0	-0.16	406	1	0		lambert1860	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Gold_Coins_01.fbx	Props	0.82	0.07	0.71	-0.41	0	-0.35	244	1	0		_Gold1	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_02.fbx	Props	0.85	0.04	0.40	-0.42	0	-0.20	160	1	0		_Gold2	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_03.fbx	Props	0.55	0.07	0.47	-0.27	0	-0.23	176	1	0		_Gold3	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_04.fbx	Props	0.64	0.02	0.57	-0.32	0	-0.29	96	1	0		_Gold4	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_05.fbx	Props	1.57	0.04	2.01	-0.78	0	-1.01	448	1	0		_Gold5	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_06.fbx	Props	0.52	0.43	0.39	-0.26	0	-0.20	280	1	0		_Gold6	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_07.fbx	Props	0.29	0.43	0.32	-0.15	0	-0.16	168	1	0		_Gold7	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_08.fbx	Props	0.15	0.33	0.13	-0.08	0	-0.07	56	1	0		_Gold8	Gold_Coins_01
+FBX/SM_Prop_Gold_Coins_09.fbx	Props	0.12	0.02	0.12	-0.06	-0.01	-0.06	20	1	0		_Gold9	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_01.fbx	Props	4.27	0.74	4.53	-2.07	-0.01	-2.26	1772	1	0		_Gold	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_02.fbx	Props	2.70	0.41	3.26	-1.16	-0.01	-1.42	1100	1	0		_Gold10	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_03.fbx	Props	1.72	0.39	1.51	-0.86	-0.01	-0.76	322	1	0		_Gold11	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_Large_01.fbx	Props	8.54	1.21	9.00	-4.27	0	-4.50	406	1	0		_Gold12	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_Large_02.fbx	Props	7.54	0.88	7.08	-3.77	0	-3.54	301	1	0		_Gold13	Gold_Coins_01
+FBX/SM_Prop_Gold_Pile_Large_03.fbx	Props	19.91	4.37	18.70	-6.99	0	-7.20	576	1	0		_Gold14	Gold_Coins_01
+FBX/SM_Prop_Hanging_Platform_01.fbx	Props	4.00	6.04	3.99	-2.00	-0.30	-2.00	1590	1	0		DungeonSHD186	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hanging_Weapon_01.fbx	Props	0.94	0.82	0.14	-0.46	-0.34	-0.02	2424	1	0		Dungeon2SHD94	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hanging_Weapon_02.fbx	Props	0.99	0.92	0.15	-0.49	-0.43	-0.02	2033	1	0		Dungeon2SHD95	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hanging_Weapon_03.fbx	Props	0.76	0.67	0.26	-0.37	-0.29	-0.11	1942	1	0		Dungeon2SHD96,_DungeonSHD122	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Brazier_01.fbx	Props	2.73	1.96	3.02	-1.36	-0.21	-1.51	516	1	0		lambert1861	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Brazier_02.fbx	Props	4.11	2.04	4.13	-2.07	-0.21	-2.07	540	1	0		lambert1862	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Circle_01.fbx	Props	3.55	1.50	3.55	-1.77	-0.16	-1.77	372	1	0		lambert1863	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Circle_02.fbx	Props	6.42	3.60	6.42	-3.19	-1.34	-3.20	1668	1	0		lambert1864	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fence_01.fbx	Props	0.79	2.40	0.13	-0.40	-1.78	-0.07	114	1	0		lambert1865	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fence_02.fbx	Props	1.35	2.45	0.14	-0.61	-1.49	-0.07	228	1	0		lambert1866	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fence_03.fbx	Props	0.55	2.78	0.15	-0.12	-2.11	-0.07	76	1	0		lambert1867	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fence_04.fbx	Props	0.75	3.07	0.95	-0.38	-0.93	-0.48	306	1	0		lambert1868	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fence_05.fbx	Props	5.96	2.89	0.74	-2.98	-0.74	-0.37	372	1	0		lambert1869	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Fountain_01.fbx	Props	3.58	3.14	3.58	-1.80	-0.51	-1.79	1122	1	0		lambert1870	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Pillar_01.fbx	Props	2.34	9.30	2.34	-1.17	0	-1.17	314	1	0		lambert1871	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Pillar_02.fbx	Props	2.34	8.65	2.34	-1.17	0	-1.17	366	1	0		lambert1872	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Pillar_03.fbx	Props	2.34	8.65	2.34	-1.17	0	-1.17	140	1	0		lambert1873	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Skull_01.fbx	Props	0.23	0.24	0.26	-0.11	0.02	-0.14	188	1	0		lambert1874	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Skull_02.fbx	Props	0.46	0.57	0.56	-0.23	-0.30	-0.25	652	1	0		lambert1875	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spike_01.fbx	Props	0.10	3.21	0.06	-0.06	-1.36	-0.03	28	1	0		lambert1878	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spike_Skull_01.fbx	Props	0.24	3.39	0.25	-0.11	-2.62	-0.12	226	1	0		lambert1879	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spike_Skull_02.fbx	Props	0.34	3.56	0.31	-0.16	-2.64	-0.14	780	1	0		lambert1880	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spike_Skull_03.fbx	Props	0.32	3.55	0.30	-0.16	-2.48	-0.15	602	1	0		lambert1881	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spikes_01.fbx	Props	0.83	2.34	0.55	-0.71	-1.38	-0.17	168	1	0		lambert1876	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Spikes_02.fbx	Props	1.26	2.23	1.17	-0.58	-1.34	-0.56	336	1	0		lambert1877	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_01.fbx	Props	3.00	2.92	0.13	-1.50	-1.46	-0.07	440	1	0		lambert1882	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_02.fbx	Props	3.54	3.43	0.25	-1.77	-1.86	-0.13	460	1	0		lambert1883	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_03.fbx	Props	2.28	3.31	0.28	-1.14	-1.65	-0.14	142	1	0		lambert1884	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_04.fbx	Props	2.48	3.34	0.22	-1.24	-1.98	-0.11	186	1	0		lambert1885	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_05.fbx	Props	2.35	3.01	0.19	-1.17	-1.51	-0.09	136	1	0		lambert1886	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Hell_Symbol_Frame_01.fbx	Props	7.76	5.40	0.35	-3.88	-2.70	-0.18	908	1	0		lambert1887	PolygonDungeonRealms_01_A
+FBX/SM_Prop_HornSmall_01.fbx	Props	0.39	0.67	0.97	-0.20	-0.11	-0.24	410	1	0		lambert1888	PolygonDungeonRealms_01_A
+FBX/SM_Prop_HornSmall_02.fbx	Props	0.31	0.56	0.81	-0.16	-0.05	-0.15	298	1	0		lambert1889	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Map_01.fbx	Props	1.15	0.13	0.97	-0.58	-0.01	-0.49	372	1	0		lambert1890	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Mug_01.fbx	Props	0.38	0.30	0.29	-0.13	0	-0.15	358	1	0		lambert1891	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Ore_Insert_Large_01.fbx	Props	2.49	0.22	1.49	-1.22	-0.01	-0.73	1097	1	0		Dungeon2SHD97	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Ore_Insert_Small_01.fbx	Props	1.60	0.18	0.76	-0.80	-0.03	-0.38	602	1	0		Dungeon2SHD98	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rock_Small_01.fbx	Props	0.62	0.28	0.63	-0.35	-0.14	-0.32	26	1	0		lambert1892	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rock_Small_02.fbx	Props	0.47	0.21	0.52	-0.26	-0.09	-0.22	26	1	0		lambert1893	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rock_Small_03.fbx	Props	0.82	0.28	1.00	-0.46	-0.14	-0.53	56	1	0		lambert1894	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rock_Small_04.fbx	Props	1.39	0.37	1.21	-0.69	-0.19	-0.59	66	1	0		lambert1895	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_01.fbx	Props	3.43	0.19	7.96	-1.70	0	-3.96	116	1	0		lambert1896	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_02.fbx	Props	3.46	0.31	7.36	-1.66	0	-3.42	104	1	0		lambert1897	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_03.fbx	Props	3.55	0.11	7.84	-1.83	0	-3.72	220	1	0		lambert1898	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_04.fbx	Props	3.43	0.21	8.28	-1.72	0	-4.22	84	1	0		lambert1899	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_05.fbx	Props	3.43	0.21	6.92	-1.72	0	-3.53	84	1	0		lambert1900	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_06.fbx	Props	3.37	0.22	5.94	-1.72	0	-3.07	64	1	0		lambert1901	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_07.fbx	Props	2.64	0.29	4.18	-1.30	0	-2.11	56	1	0		lambert1902	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_08.fbx	Props	2.96	0.18	4.02	-1.51	0	-2.05	56	1	0		lambert1903	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_09.fbx	Props	2.69	0.11	3.25	-1.30	0	-1.63	52	1	0		lambert1904	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_Stairs_01.fbx	Props	1.95	2.09	4.32	0.30	0.31	-4.67	332	1	0		lambert1905	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_Stairs_02.fbx	Props	1.95	2.09	4.32	0.30	0.31	-4.67	332	1	0		lambert1906	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Rug_Stairs_03.fbx	Props	1.76	1.02	2.15	0.36	0.13	-2.18	164	1	0		lambert1907	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Sarcophagus_01.fbx	Props	1.66	1.11	2.46	-0.83	0	-1.23	2886	1	0		_DungeonSHD123,Dungeon2SHD99	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Sarcophagus_01_Lid.fbx	FBX	1.26	0.35	2.06	-0.63	0	-1.03	441	1	0		Dungeon2SHD99,_DungeonSHD123	
+FBX/SM_Prop_Scroll_01.fbx	Props	0.28	0.14	0.70	-0.14	0	-0.35	918	1	0		lambert1908	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Scroll_Open_01.fbx	Props	0.79	0.14	0.70	-0.40	0	-0.35	884	1	0		lambert1909	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Scroll_Open_02.fbx	Props	1.08	0.12	0.76	-0.53	-0.03	-0.38	244	1	0		lambert1910	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Beam_01.fbx	Props	5.00	0.40	0.30	0	0	-0.15	134	1	0		Dungeon2SHD100	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Beam_Connector_01.fbx	Props	0.51	0.45	0.51	-0.26	-0.02	-0.26	164	1	0		Dungeon2SHD101	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Beam_Curve_01.fbx	Props	5.00	5.00	0.30	0	0	-0.15	140	1	0		Dungeon2SHD102	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Beam_Curve_02.fbx	Props	1.92	1.92	0.23	0	0	-0.11	116	1	0		Dungeon2SHD103	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Pulley_01.fbx	Props	0.94	4.26	5.12	-0.47	-0.47	-0.12	556	1	0		DungeonSHD187	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Prop_Steel_Pulley_01_Pulley.fbx	FBX	0.39	6.49	0.73	-0.19	-2.69	4.30	880	1	0		DungeonSHD187	
+FBX/SM_Prop_Tankard_01.fbx	Props	0.16	0.21	0.24	-0.08	0	-0.12	328	1	0		Dungeon2SHD104	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Coil_Short_01.fbx	Props	1.03	3.31	1.03	-0.52	0	-0.52	1186	1	0		lambert1911	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Coil_Tall_01.fbx	Props	1.27	6.31	1.27	-0.64	0	-0.64	1346	1	0		lambert1912	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_01.fbx	Props	0.60	0.82	0.60	-0.30	0	-0.30	244	1	0		lambert1913	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_02.fbx	Props	1.27	2.17	0.80	-0.63	0	-0.40	544	1	0		lambert1914	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_03.fbx	Props	0.71	1.48	0.71	-0.36	0	-0.36	508	1	0		lambert1915	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_Broken_01.fbx	Props	0.77	0.49	0.56	-0.40	-0.01	-0.28	312	1	0		lambert1916	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_Pile_01.fbx	Props	1.59	0.83	1.27	-0.80	-0.01	-0.56	976	1	0		lambert1917	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Container_Pile_02.fbx	Props	1.53	1.50	1.18	-0.75	-0.03	-0.59	1240	1	0		lambert1918	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Furnace_01.fbx	Props	1.57	3.55	1.52	-0.79	0	-0.76	1108	1	0		lambert1919	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Furnace_02.fbx	Props	1.08	2.73	1.15	-0.54	0	-0.58	1088	1	0		lambert1920	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Liquid_01.fbx	Props	0.70	0.05	0.75	-0.35	-0.02	-0.38	22	1	0		lambert1921	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Liquid_02.fbx	Props	1.55	0.05	1.55	-0.72	-0.02	-0.71	62	1	0		lambert1922	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Liquid_03.fbx	Props	2.11	0.05	2.68	-1.05	-0.02	-1.34	126	1	0		lambert1923	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Pipe_Corner_01.fbx	Props	0.60	0.17	0.60	-0.10	-0.08	0	122	1	0		lambert1924	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Pipe_Long_01.fbx	Props	0.19	0.17	5.00	-0.10	-0.08	0	288	1	0		lambert1925	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Pipe_Straight_01.fbx	Props	0.19	0.17	1.00	-0.10	-0.08	0	100	1	0		lambert1926	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Pipe_Up_01.fbx	Props	0.19	0.58	0.58	-0.10	-0.08	0	126	1	0		lambert1927	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Shelf_01.fbx	Props	2.06	2.34	0.95	-1.03	0	-0.48	3052	1	0		lambert1928	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Shelf_Empty_01.fbx	Props	2.06	2.34	0.71	-1.03	0	-0.48	856	1	0		lambert1929	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Tech_Tower_01.fbx	Props	1.90	3.50	1.87	-0.95	0	-0.94	1734	1	0		lambert1930	PolygonDungeonRealms_01_A
+FBX/SM_Prop_Toolstrap_01.fbx	Props	0.81	0.05	0.56	-0.40	0	-0.28	826	1	0		lambert1931	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_01.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	74	1	0		_DungeonSHD124	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_02.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	91	1	0		_DungeonSHD125	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_03.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	69	1	0		_DungeonSHD126	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_04.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	87	1	0		_DungeonSHD127	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_05.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	76	1	0		_DungeonSHD128	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_06.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	84	1	0		_DungeonSHD129	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_07.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	82	1	0		_DungeonSHD130	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_08.fbx	Runes	0.58	0.58	0.15	-0.29	-0.29	-0.07	56	1	0		_DungeonSHD131	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Letter_09.fbx	Runes	0.57	0.58	0.15	-0.29	-0.29	-0.07	73	1	0		_DungeonSHD132	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_01.fbx	Runes	0.81	0.54	0.15	-0.40	-0.27	-0.07	72	1	0		_DungeonSHD133	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_02.fbx	Runes	1.22	1.11	0.15	-0.61	-0.55	-0.07	194	1	0		_DungeonSHD134	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_03.fbx	Runes	1.08	1.08	0.15	-0.54	-0.54	-0.07	146	1	0		_DungeonSHD135	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_04.fbx	Runes	1.29	1.12	0.15	-0.64	-0.56	-0.07	248	1	0		_DungeonSHD136	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_05.fbx	Runes	1.29	0.53	0.15	-0.64	-0.26	-0.07	158	1	0		_DungeonSHD137	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_06.fbx	Runes	0.85	0.53	0.15	-0.42	-0.26	-0.07	86	1	0		_DungeonSHD138	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_07.fbx	Runes	1.33	0.53	0.15	-0.67	-0.26	-0.07	148	1	0		_DungeonSHD139	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_08.fbx	Runes	1.74	0.53	0.15	-0.87	-0.26	-0.07	220	1	0		_DungeonSHD140	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_09.fbx	Runes	1.29	0.73	0.15	-0.64	-0.36	-0.07	186	1	0		_DungeonSHD141	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_10.fbx	Runes	0.83	0.53	0.15	-0.41	-0.26	-0.07	90	1	0		_DungeonSHD142	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_11.fbx	Runes	1.30	1.15	0.15	-0.65	-0.58	-0.07	224	1	0		_DungeonSHD143	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_12.fbx	Runes	1.30	0.73	0.15	-0.65	-0.36	-0.07	154	1	0		_DungeonSHD144	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_13.fbx	Runes	1.82	0.53	0.15	-0.91	-0.26	-0.07	218	1	0		_DungeonSHD145	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_14.fbx	Runes	0.86	0.95	0.15	-0.43	-0.48	-0.07	106	1	0		_DungeonSHD146	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_15.fbx	Runes	2.43	0.31	0.15	-1.22	-0.15	-0.07	146	1	0		_DungeonSHD147	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_16.fbx	Runes	3.29	0.52	0.15	-1.64	-0.26	-0.07	212	1	0		_DungeonSHD148	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_17.fbx	Runes	4.14	0.95	0.15	-2.07	-0.48	-0.07	460	1	0		_DungeonSHD149	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_18.fbx	Runes	0.61	0.61	0.15	-0.31	-0.31	-0.07	34	1	0		_DungeonSHD150	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_19.fbx	Runes	0.61	0.31	0.15	-0.31	-0.15	-0.07	28	1	0		_DungeonSHD151	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_20.fbx	Runes	1.72	0.38	0.15	-0.86	-0.19	-0.07	198	1	0		_DungeonSHD152	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_21.fbx	Runes	0.69	0.52	0.15	-0.35	-0.26	-0.07	58	1	0		_DungeonSHD153	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_22.fbx	Runes	2.43	0.61	0.15	-1.22	-0.31	-0.07	154	1	0		_DungeonSHD154	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_23.fbx	Runes	1.22	0.95	0.15	-0.61	-0.47	-0.07	158	1	0		_DungeonSHD155	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_24.fbx	Runes	1.22	0.38	0.15	-0.61	-0.19	-0.07	102	1	0		_DungeonSHD156	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_25.fbx	Runes	2.58	0.38	0.15	-1.29	-0.19	-0.07	226	1	0		_DungeonSHD157	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_26.fbx	Runes	0.67	0.40	0.15	-0.34	-0.20	-0.07	62	1	0		_DungeonSHD158	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_27.fbx	Runes	0.94	0.94	0.15	-0.47	-0.47	-0.07	234	1	0		_DungeonSHD159	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_28.fbx	Runes	0.67	0.59	0.15	-0.34	-0.30	-0.07	89	1	0		_DungeonSHD160	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_29.fbx	Runes	0.94	0.94	0.15	-0.47	-0.47	-0.07	145	1	0		_DungeonSHD161	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_30.fbx	Runes	1.21	0.94	0.15	-0.61	-0.47	-0.07	209	1	0		_DungeonSHD162	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_31.fbx	Runes	1.48	0.94	0.15	-0.74	-0.47	-0.07	309	1	0		_DungeonSHD163	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_32.fbx	Runes	0.67	0.67	0.15	-0.34	-0.34	-0.07	136	1	0		_DungeonSHD164	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_33.fbx	Runes	2.02	0.40	0.15	-1.01	-0.20	-0.07	216	1	0		_DungeonSHD165	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_34.fbx	Runes	0.67	0.40	0.15	-0.34	-0.20	-0.07	90	1	0		_DungeonSHD166	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_35.fbx	Runes	1.08	0.40	0.15	-0.54	-0.20	-0.07	134	1	0		_DungeonSHD167	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_36.fbx	Runes	0.94	0.94	0.15	-0.47	-0.47	-0.07	155	1	0		_DungeonSHD168	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_37.fbx	Runes	0.54	0.40	0.15	-0.27	-0.20	-0.07	78	1	0		_DungeonSHD169	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_38.fbx	Runes	1.48	0.94	0.15	-0.74	-0.47	-0.07	336	1	0		_DungeonSHD170	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_39.fbx	Runes	0.85	0.85	0.15	-0.43	-0.43	-0.07	136	1	0		_DungeonSHD171	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_40.fbx	Runes	1.21	0.94	0.15	-0.61	-0.47	-0.07	252	1	0		_DungeonSHD172	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_41.fbx	Runes	1.48	1.48	0.15	-0.74	-0.74	-0.07	203	1	0		_DungeonSHD173	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_42.fbx	Runes	1.05	1.05	0.15	-0.52	-0.52	-0.07	218	1	0		_DungeonSHD174	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_43.fbx	Runes	0.89	0.89	0.15	-0.44	-0.44	-0.07	197	1	0		_DungeonSHD175	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_44.fbx	Runes	1.96	0.67	0.15	-0.98	-0.34	-0.07	218	1	0		_DungeonSHD176	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_45.fbx	Runes	1.48	1.08	0.15	-0.74	-0.54	-0.07	208	1	0		_DungeonSHD177	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_46.fbx	Runes	1.21	0.94	0.15	-0.61	-0.47	-0.07	226	1	0		_DungeonSHD178	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_47.fbx	Runes	0.94	0.40	0.15	-0.47	-0.20	-0.07	82	1	0		_DungeonSHD179	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_48.fbx	Runes	0.67	0.67	0.15	-0.34	-0.34	-0.07	118	1	0		_DungeonSHD180	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_49.fbx	Runes	2.02	0.40	0.15	-1.01	-0.20	-0.07	194	1	0		_DungeonSHD181	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_50.fbx	Runes	2.02	0.67	0.15	-1.01	-0.34	-0.07	376	1	0		_DungeonSHD182	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_51.fbx	Runes	0.94	0.67	0.15	-0.47	-0.34	-0.07	164	1	0		_DungeonSHD183	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_52.fbx	Runes	0.86	0.86	0.15	-0.43	-0.43	-0.07	182	1	0		_DungeonSHD184	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_53.fbx	Runes	1.80	1.80	0.16	-0.90	-0.90	-0.08	262	1	0		_DungeonSHD185	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_54.fbx	Runes	0.44	0.81	0.15	-0.22	-0.40	-0.07	90	1	0		_DungeonSHD186	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_55.fbx	Runes	1.21	0.67	0.15	-0.61	-0.34	-0.07	106	1	0		_DungeonSHD187	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_56.fbx	Runes	0.67	0.46	0.15	-0.34	-0.23	-0.07	102	1	0		_DungeonSHD188	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_57.fbx	Runes	1.48	0.74	0.15	-0.74	-0.37	-0.08	140	1	0		_DungeonSHD189	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_58.fbx	Runes	0.48	1.05	0.15	-0.24	-0.52	-0.07	100	1	0		_DungeonSHD190	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_59.fbx	Runes	0.86	0.29	0.15	-0.43	-0.14	-0.07	72	1	0		_DungeonSHD191	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_60.fbx	Runes	0.40	0.40	0.15	-0.20	-0.20	-0.07	24	1	0		_DungeonSHD192	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_61.fbx	Runes	0.17	0.17	0.15	-0.08	-0.08	-0.07	10	1	0		_DungeonSHD193	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_62.fbx	Runes	0.94	0.67	0.15	-0.47	-0.34	-0.07	130	1	0		_DungeonSHD194	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_63.fbx	Runes	0.85	0.85	0.15	-0.43	-0.43	-0.07	160	1	0		_DungeonSHD195	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_64.fbx	Runes	1.21	1.21	0.15	-0.61	-0.61	-0.07	195	1	0		_DungeonSHD196	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_65.fbx	Runes	0.67	1.44	0.15	-0.34	-0.72	-0.07	146	1	0		_DungeonSHD197	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_66.fbx	Runes	0.94	0.94	0.15	-0.47	-0.47	-0.07	150	1	0		_DungeonSHD198	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_67.fbx	Runes	0.77	0.79	0.15	-0.38	-0.39	-0.07	68	1	0		_DungeonSHD199	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_68.fbx	Runes	0.67	0.84	0.15	-0.34	-0.42	-0.07	122	1	0		_DungeonSHD200	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_69.fbx	Runes	0.50	1.16	0.15	-0.25	-0.58	-0.07	110	1	0		_DungeonSHD201	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_70.fbx	Runes	0.67	0.67	0.15	-0.34	-0.34	-0.07	100	1	0		_DungeonSHD202	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_71.fbx	Runes	1.11	1.95	0.15	-0.55	-0.98	-0.07	159	1	0		_DungeonSHD203	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_72.fbx	Runes	1.20	0.61	0.15	-0.60	-0.30	-0.07	100	1	0		_DungeonSHD204	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_73.fbx	Runes	1.21	1.21	0.15	-0.61	-0.61	-0.07	180	1	0		_DungeonSHD205	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_74.fbx	Runes	0.78	0.69	0.15	-0.39	-0.35	-0.07	86	1	0		_DungeonSHD206	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_75.fbx	Runes	0.78	0.95	0.15	-0.39	-0.48	-0.07	95	1	0		_DungeonSHD207	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_76.fbx	Runes	0.44	0.44	0.15	-0.22	-0.22	-0.07	68	1	0		_DungeonSHD208	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_77.fbx	Runes	1.01	0.48	0.15	-0.50	-0.24	-0.07	110	1	0		_DungeonSHD209	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_78.fbx	Runes	0.67	0.67	0.15	-0.34	-0.34	-0.07	103	1	0		_DungeonSHD210	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Symbol_79.fbx	Runes	0.94	0.67	0.15	-0.47	-0.34	-0.07	114	1	0		_DungeonSHD211	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Synty_01.fbx	Runes	0.43	0.49	0.15	-0.21	-0.25	-0.07	62	1	0		_DungeonSHD212	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Synty_02.fbx	Runes	0.43	0.77	0.15	-0.21	-0.38	-0.07	114	1	0		_DungeonSHD213	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Synty_03.fbx	Runes	0.43	2.38	0.15	-0.22	-1.19	-0.07	398	1	0		_DungeonSHD214	PolygonDungeonRealms_01_A
+FBX/SM_Rune_Synty_04.fbx	Runes	2.36	0.56	0.15	-1.18	-0.28	-0.07	429	1	0		_DungeonSHD215	PolygonDungeonRealms_01_A
+FBX/SM_Veh_SandBoat_01.fbx	Vehicles	3.03	2.04	10.47	-1.52	0	-5.23	1194	1	0		lambert1932	PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A | PolygonDungeonRealms_01_A
+FBX/SM_Veh_SandBoat_Bags_01.fbx	FBX	1.99	1.05	0.90	-0.99	-0.53	-0.45	164	1	0		lambert1932	
+FBX/SM_Veh_SandBoat_Sail_01.fbx	FBX	0.89	9.46	11.24	-0.35	0	-7.63	1686	1	0		lambert1932	
+FBX/SM_Veh_SandBoat_Sail_02.fbx	FBX	0.79	9.46	11.41	-0.40	0	-7.63	1790	1	0		lambert1933	
+FBX/SM_Wep_Axe_Large_01.fbx	Weapons	0.12	1.11	0.51	-0.06	-0.22	-0.25	862	1	0		Dungeon2SHD105	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_02.fbx	Weapons	0.09	1.07	0.47	-0.04	-0.24	-0.23	942	1	0		Dungeon2SHD106	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_03.fbx	Weapons	0.11	1.10	0.53	-0.05	-0.23	-0.27	802	1	0		Dungeon2SHD107	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_04.fbx	Weapons	0.14	1.10	0.46	-0.07	-0.22	-0.23	938	1	0		Dungeon2SHD108	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_05.fbx	Weapons	0.07	0.87	0.54	-0.04	-0.21	-0.27	1106	1	0		Dungeon2SHD109	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_06.fbx	Weapons	0.10	1.01	0.50	-0.05	-0.21	-0.25	1230	1	0		Dungeon2SHD110	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Large_07.fbx	Weapons	0.10	0.86	0.40	-0.05	-0.18	-0.15	878	1	0		Dungeon2SHD111	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_01.fbx	Weapons	0.10	0.65	0.40	-0.05	-0.14	-0.20	814	1	0		Dungeon2SHD112	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_02.fbx	Weapons	0.09	0.87	0.50	-0.05	-0.17	-0.25	846	1	0		Dungeon2SHD113	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_03.fbx	Weapons	0.12	0.85	0.50	-0.06	-0.23	-0.25	658	1	0		Dungeon2SHD114	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_04.fbx	Weapons	0.14	0.86	0.46	-0.07	-0.20	-0.23	794	1	0		Dungeon2SHD115	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_05.fbx	Weapons	0.09	0.69	0.23	-0.05	-0.21	-0.18	670	1	0		Dungeon2SHD116	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Axe_Small_06.fbx	Weapons	0.11	0.82	0.40	-0.06	-0.23	-0.21	716	1	0		Dungeon2SHD117	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Knife_Large_01.fbx	Weapons	0.07	0.54	0.22	-0.04	-0.11	-0.11	431	1	0		Dungeon2SHD118	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Knife_Large_02.fbx	Weapons	0.06	0.63	0.19	-0.03	-0.06	-0.10	242	1	0		Dungeon2SHD119	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Knife_Medium_01.fbx	Weapons	0.07	0.47	0.18	-0.04	-0.09	-0.09	348	1	0		Dungeon2SHD120	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Knife_Small_01.fbx	Weapons	0.06	0.38	0.13	-0.03	-0.07	-0.06	266	1	0		Dungeon2SHD121	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Knife_Small_02.fbx	Weapons	0.04	0.48	0.06	-0.02	-0.07	-0.03	183	1	0		Dungeon2SHD122	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Large_01.fbx	Weapons	0.28	1.12	0.28	-0.14	-0.26	-0.14	736	1	0		Dungeon2SHD123	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Large_02.fbx	Weapons	0.27	1.18	0.28	-0.13	-0.36	-0.14	1004	1	0		Dungeon2SHD124	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Large_03.fbx	Weapons	0.44	1.16	0.51	-0.22	-0.21	-0.26	1474	1	0		Dungeon2SHD125	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Large_05.fbx	Weapons	0.30	1.19	0.32	-0.15	-0.26	-0.16	868	1	0		Dungeon2SHD126	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Medium_01.fbx	Weapons	0.23	0.84	0.23	-0.12	-0.11	-0.12	592	1	0		Dungeon2SHD127	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Medium_02.fbx	Weapons	0.23	0.90	0.24	-0.11	-0.23	-0.12	994	1	0		Dungeon2SHD128	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Mace_Medium_03.fbx	Weapons	0.44	0.90	0.51	-0.22	-0.14	-0.25	1426	1	0		Dungeon2SHD129	PolygonDungeonRealms_01_A
+FBX/SM_Wep_PickAxe_Large_01.fbx	Weapons	0.18	0.78	0.57	-0.09	-0.22	-0.29	918	1	0		Dungeon2SHD130	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_01.fbx	Weapons	0.70	0.70	0.19	-0.35	-0.35	-0.09	992	1	0		Dungeon2SHD131	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_02.fbx	Weapons	0.69	0.69	0.21	-0.35	-0.35	-0.10	1067	1	0		Dungeon2SHD132	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_03.fbx	Weapons	0.70	0.73	0.18	-0.35	-0.36	-0.09	960	1	0		Dungeon2SHD133	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_04.fbx	Weapons	0.70	0.91	0.22	-0.35	-0.45	-0.12	1308	1	0		Dungeon2SHD134	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_05.fbx	Weapons	0.68	0.80	0.17	-0.34	-0.40	-0.09	954	1	0		Dungeon2SHD135	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_06.fbx	Weapons	0.91	0.91	0.17	-0.45	-0.45	-0.09	1422	1	0		Dungeon2SHD136	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_07.fbx	Weapons	1.07	1.26	0.47	-0.53	-0.63	-0.23	1278	1	0		Dungeon2SHD137	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Shield_08.fbx	Weapons	0.76	0.76	0.16	-0.38	-0.38	-0.08	1064	1	0		Dungeon2SHD138	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_01.fbx	Weapons	0.07	1.63	0.17	-0.03	-0.65	-0.09	442	1	0		Dungeon2SHD139	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_02.fbx	Weapons	0.08	1.54	0.11	-0.04	-0.55	-0.06	540	1	0		Dungeon2SHD140	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_03.fbx	Weapons	0.10	1.56	0.17	-0.05	-0.57	-0.08	690	1	0		Dungeon2SHD141	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_04.fbx	Weapons	0.09	2.09	0.18	-0.04	-0.88	-0.09	776	1	0		Dungeon2SHD142	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_05.fbx	Weapons	0.10	1.97	0.29	-0.05	-0.70	-0.24	438	1	0		Dungeon2SHD143	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_06.fbx	Weapons	0.07	1.93	0.07	-0.03	-0.73	-0.04	242	1	0		Dungeon2SHD144	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_07.fbx	Weapons	0.08	1.77	0.29	-0.04	-0.49	-0.14	556	1	0		Dungeon2SHD145	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Spear_08.fbx	Weapons	0.09	1.96	0.18	-0.04	-0.81	-0.09	719	1	0		Dungeon2SHD146	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_01.fbx	Weapons	0.26	1.55	0.11	-0.13	-0.77	-0.06	865	1	0		All_runs:_pasted__lambert14SG2	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_02.fbx	Weapons	0.28	1.68	0.28	-0.15	-0.84	-0.14	727	1	0		All_runs:_pasted__lambert14SG3	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_03.fbx	Weapons	0.80	2.55	0.12	-0.40	-1.28	-0.06	1118	1	0		All_runs:_pasted__lambert14SG4	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_04.fbx	Weapons	0.46	2.46	0.17	-0.23	-1.23	-0.08	838	1	0		All_runs:_pasted__lambert14SG5	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_05.fbx	Weapons	0.31	2.03	0.34	-0.15	-1.01	-0.16	840	1	0		All_runs:_pasted__lambert14SG6	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Staff_06.fbx	Weapons	0.62	2.97	0.52	-0.31	-1.58	-0.31	2252	1	0		All_runs:_pasted__lambert14SG7	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_01.fbx	Weapons	0.06	1.02	0.28	-0.03	-0.12	-0.06	467	1	0		Dungeon2SHD147	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_02.fbx	Weapons	0.07	1.28	0.31	-0.03	-0.24	-0.15	790	1	0		Dungeon2SHD148	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_03.fbx	Weapons	0.07	1.25	0.18	-0.03	-0.22	-0.09	770	1	0		Dungeon2SHD149	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_04.fbx	Weapons	0.07	1.43	0.23	-0.03	-0.23	-0.11	712	1	0		Dungeon2SHD150	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_05.fbx	Weapons	0.10	1.26	0.21	-0.05	-0.18	-0.04	756	1	0		Dungeon2SHD151	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_06.fbx	Weapons	0.07	1.14	0.39	-0.03	-0.17	-0.19	576	1	0		Dungeon2SHD152	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_07.fbx	Weapons	0.10	1.27	0.31	-0.05	-0.21	-0.28	416	1	0		Dungeon2SHD153	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_08.fbx	Weapons	0.12	1.29	0.25	-0.06	-0.24	-0.12	354	1	0		Dungeon2SHD154	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_09.fbx	Weapons	0.05	1.03	0.28	-0.03	-0.13	-0.08	554	1	0		Dungeon2SHD155	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_10.fbx	Weapons	0.08	1.02	0.28	-0.04	-0.17	-0.14	536	1	0		Dungeon2SHD156	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_11.fbx	Weapons	0.10	1.79	0.59	-0.05	-0.37	-0.30	908	1	0		Dungeon2SHD157	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Large_12.fbx	Weapons	0.11	1.43	0.54	-0.06	-0.22	-0.22	728	1	0		Dungeon2SHD158	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_01.fbx	Weapons	0.05	0.94	0.18	-0.03	-0.17	-0.09	622	1	0		Dungeon2SHD159	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_02.fbx	Weapons	0.06	0.85	0.21	-0.03	-0.13	-0.10	384	1	0		Dungeon2SHD160	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_03.fbx	Weapons	0.07	1.04	0.27	-0.04	-0.15	-0.14	460	1	0		Dungeon2SHD161	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_04.fbx	Weapons	0.08	1.08	0.26	-0.04	-0.14	-0.13	328	1	0		Dungeon2SHD162	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_05.fbx	Weapons	0.09	0.80	0.31	-0.05	-0.15	-0.08	394	1	0		Dungeon2SHD163	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_06.fbx	Weapons	0.08	0.82	0.27	-0.04	-0.11	-0.05	450	1	0		Dungeon2SHD164	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_07.fbx	Weapons	0.10	0.82	0.37	-0.05	-0.13	-0.15	396	1	0		Dungeon2SHD165	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_08.fbx	Weapons	0.11	1.51	0.32	-0.06	-0.22	-0.16	692	1	0		Dungeon2SHD166	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Medium_09.fbx	Weapons	0.09	1.41	0.42	-0.05	-0.23	-0.21	1300	1	0		Dungeon2SHD167	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_01.fbx	Weapons	0.06	0.60	0.15	-0.03	-0.10	-0.11	292	1	0		Dungeon2SHD168	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_02.fbx	Weapons	0.17	0.75	0.28	-0.04	-0.11	-0.14	442	1	0		Dungeon2SHD169	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_03.fbx	Weapons	0.05	0.73	0.22	-0.03	-0.13	-0.11	224	1	0		Dungeon2SHD170	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_04.fbx	Weapons	0.05	0.65	0.21	-0.03	-0.11	-0.06	360	1	0		Dungeon2SHD171	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_05.fbx	Weapons	0.17	0.87	0.20	-0.08	-0.12	-0.10	532	1	0		Dungeon2SHD172	PolygonDungeonRealms_01_A
+FBX/SM_Wep_Sword_Small_06.fbx	Weapons	0.08	0.74	0.19	-0.04	-0.11	-0.09	364	1	0		Dungeon2SHD173	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Large_01.fbx	Weapons	0.19	0.90	0.44	-0.10	-0.20	-0.22	982	1	0		Dungeon2SHD174	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Large_02.fbx	Weapons	0.20	0.94	0.42	-0.10	-0.20	-0.17	848	1	0		Dungeon2SHD175	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Large_03.fbx	Weapons	0.18	0.85	0.46	-0.09	-0.23	-0.23	1072	1	0		Dungeon2SHD176	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Large_04.fbx	Weapons	0.24	1.00	0.61	-0.12	-0.27	-0.30	932	1	0		Dungeon2SHD177	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Small_01.fbx	Weapons	0.20	0.72	0.39	-0.10	-0.18	-0.20	886	1	0		Dungeon2SHD178	PolygonDungeonRealms_01_A
+FBX/SM_Wep_WarHammer_Small_02.fbx	Weapons	0.20	0.76	0.42	-0.10	-0.17	-0.17	744	1	0		Dungeon2SHD179	PolygonDungeonRealms_01_A
+FBX/Skydome.fbx	FBX	65.88	26.13	65.88	-32.94	0	-32.94	160	1	0		blinn1	

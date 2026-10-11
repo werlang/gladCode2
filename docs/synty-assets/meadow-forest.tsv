@@ -1,0 +1,186 @@
+path	category	size_x_m	size_y_m	size_z_m	min_x_m	min_y_m	min_z_m	tris	meshes	bones	clips	fbx_materials	materiallist_slots
+FBX/Env_CloudRing_Larger_01_Smooth_03.fbx	FBX	307.81	54.12	290.61	-157.81	0.43	-150.95	18556	1	0		NatureSHD	
+FBX/Env_CloudRing_Larger_02.fbx	FBX	310.27	54.42	295.39	-159.29	0.38	-153.59	18556	1	0		NatureSHD	
+FBX/FX_Models/FX_Butterfly_Mesh_01.fbx	FX_Models	0.82	0.83	0.70	-0.41	-0.36	-0.40	44	1	0		Butterfly	
+FBX/FX_Models/FX_Leaf_Meadows_01.fbx	FX_Models	0.10	0.02	0.10	-0.05	-0.02	-0.05	4	1	0		lambert1683	
+FBX/FX_Models/FX_Sphere_Meadows_01.fbx	FX_Models	0.52	0.49	0.55	-0.26	-0.24	-0.27	46	1	0		Nature	
+FBX/FX_Models/FX_SunShafts_Meadow_01.fbx	FX_Models	1.00	3.59	1.00	-0.50	-1.80	-0.50	4	1	0		lambert2	
+FBX/SM_Bld_Stone_Cabin_01.fbx	Props	5.99	4.04	8.11	-3.00	0	-4.06	10310	1	0		Explorer_MAT	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Bld_Warpgate_01.fbx	Props	8.31	8.27	6.83	-4.15	-1.19	-3.40	6260	3	0		Explorer_MAT1	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Bld_Windmill_01.fbx	Props	9.48	12.95	7.79	-4.75	-1.98	-4.70	8919	2	0		Explorer_MAT2	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Bld_Windmill_02.fbx	Props	9.61	13.03	8.26	-4.80	-1.98	-4.70	9519	2	0		Explorer_MAT3	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Env_Background_Hill_01.fbx	FBX	17.27	1.93	9.34	-8.63	0	-4.67	128	1	0		CastleSHD297	
+FBX/SM_Env_Bush_01.fbx	Prefabs	2.68	2.88	2.44	-1.44	-0.04	-1.30	3642	2	0		lambert2	Tree_Mat_01 | Tree_Mat_01
+FBX/SM_Env_Bush_02.fbx	Prefabs	5.02	2.57	4.87	-2.41	-0.62	-2.67	3814	3	0		tomTreeGeneric_04:Base_Tree_Branches,lambert3	Branches_01 | Tree_Mat_01 | Tree_Mat_01_Small
+FBX/SM_Env_Bush_03.fbx	Prefabs	5.92	3.43	4.11	-3.01	-0.34	-2.19	10264	4	0		lambert4,tomTreeGeneric_04:Base_Tree_Branches1	Branches_01 | Tree_Mat_03 | Tree_Mat_03 | Tree_Mat_03
+FBX/SM_Env_Cloud_Ring_01.fbx	Prefabs	277.46	26.06	259.42	-145.42	19.75	-133.32	14456	1	0		NatureSHD	Cloud_Mat_01
+FBX/SM_Env_Cloud_Ring_02.fbx	Prefabs	310.27	54.42	295.39	-159.29	0.38	-153.59	18556	1	0		NatureSHD	Cloud_Mat_01
+FBX/SM_Env_CropField_Clump_01.fbx	Prefabs	2.19	1.35	2.39	-1.17	-0.12	-1.08	336	2	0		pasted__lambert1997	CropField_01 | CropField_01
+FBX/SM_Env_CropField_Clump_02.fbx	Prefabs	5.12	1.38	5.09	-2.46	-0.15	-2.56	2264	2	0		pasted__lambert1998	CropField_01 | CropField_01
+FBX/SM_Env_Flowers_Flat_01.fbx	Prefabs	2.07	0.14	2.02	-1.03	0	-1.00	18	1	0		flowerSHD	Flowers_Flat_Mat_01
+FBX/SM_Env_Flowers_Flat_02.fbx	Prefabs	2.16	0.15	2.07	-1.08	0	-1.01	18	1	0		flowerSHD1	Flowers_Flat_Mat_01
+FBX/SM_Env_Flowers_Flat_03.fbx	Prefabs	2.25	0.18	2.01	-1.03	0	-1.00	8	1	0		flowerSHD2	Flowers_Flat_Mat_01
+FBX/SM_Env_Fog_Ring_01.fbx	Prefabs	70.17	3.94	70.17	-35.09	0	-35.09	48	1	0		lambert1	Fog_01
+FBX/SM_Env_Grass_Bush_01.fbx	Prefabs	2.28	1.21	2.31	-1.10	-0.23	-1.18	110	3	0		grassSHD10,grassSHD8	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Large_01.fbx	Prefabs	33.95	3.99	34.49	-17.14	-2.91	-17.67	36612	3	0		grassSHD	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Large_02.fbx	Prefabs	33.20	3.46	34.59	-16.39	-0.40	-17.07	35200	3	0		grassSHD11	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Large_03.fbx	Prefabs	34.68	4.15	34.77	-17.44	-3.04	-17.90	37260	3	0		grassSHD1	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Large_04.fbx	Prefabs	34.01	3.42	34.24	-16.99	-0.71	-17.62	37422	3	0		grassSHD12	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Med_Clump_01.fbx	Prefabs	1.00	0.50	1.00	-0.50	-0.03	-0.43	10	2	0		grassSHD5	Grass_Med_Mat_01 | Grass_Med_Mat_01
+FBX/SM_Env_Grass_Med_Clump_02.fbx	Prefabs	1.79	0.53	1.46	-0.93	-0.03	-0.68	18	2	0		grassSHD4	Grass_Med_Mat_01 | Grass_Med_Mat_01
+FBX/SM_Env_Grass_Med_Clump_03.fbx	Prefabs	1.89	0.53	1.90	-0.95	-0.06	-0.95	50	3	0		pasted__grassSHD1,grassSHD6	Grass_Med_Mat_01 | Grass_Med_Mat_01 | Grass_Med_Mat_01
+FBX/SM_Env_Grass_Med_Plane_01.fbx	Prefabs	1.00	0.50	0	-0.50	-0.03	0	2	1	0		grassSHD13	Grass_Med_Mat_01
+FBX/SM_Env_Grass_Short_Clump_01.fbx	Prefabs	1.00	0.25	1.00	-0.50	-0.03	-0.43	10	2	0		grassSHD3	Grass_Short_Mat_01 | Grass_Short_Mat_01
+FBX/SM_Env_Grass_Short_Clump_02.fbx	Prefabs	1.79	0.27	1.46	-0.93	-0.03	-0.68	18	2	0		grassSHD2	Grass_Short_Mat_01 | Grass_Short_Mat_01
+FBX/SM_Env_Grass_Short_Clump_03.fbx	Prefabs	1.89	0.28	1.90	-0.95	-0.06	-0.95	50	3	0		pasted__grassSHD2,grassSHD14	Grass_Short_Mat_01 | Grass_Short_Mat_01 | Grass_Short_Mat_01
+FBX/SM_Env_Grass_Short_Plane_01.fbx	Prefabs	1.00	0.25	0	-0.50	-0.03	0	2	1	0		grassSHD15	Grass_Short_Mat_01
+FBX/SM_Env_Grass_Tall_Clump_01.fbx	Prefabs	1.00	1.00	1.00	-0.50	-0.03	-0.43	10	2	0		grassSHD7	Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Tall_Clump_02.fbx	Prefabs	1.79	1.07	1.46	-0.93	-0.03	-0.68	18	2	0		grassSHD9	Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Tall_Clump_03.fbx	Prefabs	1.91	1.03	1.93	-0.95	-0.06	-0.95	54	3	0		grassSHD16	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Tall_Clump_04.fbx	Prefabs	4.28	1.03	4.68	-2.16	-0.06	-2.32	378	3	0		grassSHD17	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Tall_Clump_05.fbx	Prefabs	7.45	1.50	7.05	-3.60	-0.42	-3.59	1026	3	0		grassSHD18	Grass_Tall_Mat_01 | Grass_Tall_Mat_01 | Grass_Tall_Mat_01
+FBX/SM_Env_Grass_Tall_Plane_01.fbx	Prefabs	1.00	1.00	0	-0.50	-0.03	0	2	1	0		grassSHD19	Grass_Tall_Mat_01
+FBX/SM_Env_Ground_Cliff_Large_01.fbx	Prefabs	39.64	7.87	40.78	-21.22	-7.75	-21.07	3129	1	0		Nature	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Ground_Cliff_Large_02.fbx	Prefabs	41.47	6.68	42.67	-22.14	-3.86	-22.02	3139	1	0		Nature1	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Ground_Cover_01.fbx	Prefabs	2.89	1.59	1.64	-1.55	-0.10	-0.75	70	2	0		pasted__groundCoverSHD	Ground_Cover_Mat_01 | Ground_Cover_Mat_01
+FBX/SM_Env_Ground_Cover_02.fbx	Prefabs	1.91	0.57	1.91	-0.88	-0.04	-0.94	92	3	0		pasted__groundCoverSHD1	Ground_Cover_Mat_01 | Ground_Cover_Mat_01 | Ground_Cover_Mat_01
+FBX/SM_Env_Ground_Cover_03.fbx	Prefabs	2.14	1.60	1.61	-1.01	-0.11	-0.80	100	3	0		pasted__groundCoverSHD2	Ground_Cover_Mat_01 | Ground_Cover_Mat_01 | Ground_Cover_Mat_01
+FBX/SM_Env_Ground_Mound_Large_01.fbx	Prefabs	36.64	3.21	37.30	-18.23	-3.09	-19.18	256	1	0		lambert5	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Ground_Mound_Large_02.fbx	Prefabs	39.41	2.62	39.23	-19.52	-0.51	-19.62	324	1	0		lambert6	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Ground_Mound_Large_03.fbx	Prefabs	36.64	3.15	37.30	-18.23	-3.09	-19.18	244	1	0		lambert7	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Ground_Mound_Large_04.fbx	Prefabs	37.28	3.37	37.96	-18.54	-1.44	-19.51	244	1	0		lambert8	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Lillies_01.fbx	Prefabs	3.42	0.20	2.89	-1.29	0	-1.27	2108	2	0		lambert2045,Nature2	NoWind_Mat_01 | Mat_Lillies_01
+FBX/SM_Env_Lillies_02.fbx	Prefabs	3.24	0.18	1.78	-1.14	0	-1.09	1194	2	0		lambert2046,Nature3	NoWind_Mat_01 | Mat_Lillies_01
+FBX/SM_Env_Lillies_03.fbx	Prefabs	2.05	0.20	4.35	-1.40	0	-2.48	1651	2	0		lambert2047,Nature4	NoWind_Mat_01 | Mat_Lillies_01
+FBX/SM_Env_Rapeseed_Clump_01.fbx	FBX	2.19	1.35	2.39	-1.17	-0.12	-1.08	336	2	0		pasted__lambert1999	
+FBX/SM_Env_Rapeseed_Clump_02.fbx	FBX	5.12	1.38	5.09	-2.46	-0.15	-2.56	2264	2	0		pasted__lambert2000	
+FBX/SM_Env_Rock_01.fbx	Prefabs	2.26	1.04	1.73	-1.18	-0.06	-0.91	196	1	0		Nature5	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_02.fbx	Prefabs	2.44	1.49	2.00	-1.26	-0.13	-1.05	214	1	0		Nature6	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_03.fbx	Prefabs	2.86	2.18	2.38	-1.46	-0.09	-1.23	162	1	0		Nature7	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_04.fbx	Prefabs	3.29	3.27	3.48	-1.48	-0.69	-1.41	538	1	0		Nature8	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_05.fbx	Prefabs	3.55	2.53	3.73	-1.83	-0.08	-1.90	572	1	0		Nature9	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_06.fbx	Prefabs	3.24	4.78	3.19	-1.61	-0.46	-1.54	616	1	0		Nature10	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Cliff_01.fbx	Prefabs	5.00	8.12	5.07	-2.61	-0.98	-2.48	460	1	0		Nature11	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Cliff_02.fbx	Prefabs	11.85	8.18	7.99	-5.97	-1.14	-4.04	1262	1	0		Nature12	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Cliff_03.fbx	Prefabs	22.27	10.23	9.14	-11.18	-1.53	-4.62	3196	1	0		Nature13	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Ground_01.fbx	Prefabs	21.21	4.02	20.35	-10.16	-2.86	-10.96	2219	1	0		Nature14	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Ground_02.fbx	Prefabs	12.02	1.78	6.27	-6.15	-0.63	-3.29	392	1	0		Nature15	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_01.fbx	Prefabs	13.38	3.34	10.33	-6.74	-1.13	-5.21	2204	1	0		Nature16	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_02.fbx	Prefabs	8.78	2.60	7.42	-4.44	-0.11	-3.75	968	1	0		Nature17	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_03.fbx	Prefabs	6.70	2.47	5.71	-3.40	-0.38	-2.90	932	1	0		Nature18	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_04.fbx	Prefabs	6.15	1.80	4.63	-3.12	-0.37	-2.36	638	1	0		Nature19	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_05.fbx	Prefabs	4.80	2.93	3.64	-2.45	-0.36	-1.86	622	1	0		Nature20	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_06.fbx	Prefabs	7.92	3.64	4.62	-4.01	-1.32	-2.36	1118	1	0		Nature21	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Pile_07.fbx	Prefabs	9.92	7.36	5.89	-5.01	-0.70	-2.99	1792	1	0		Nature22	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Round_01.fbx	Prefabs	2.87	2.30	3.14	-1.47	-0.35	-1.92	182	1	0		Nature23	Rock_Grass_Triplanar_Meadow_01
+FBX/SM_Env_Rock_Small_01.fbx	Prefabs	0.33	0.26	0.34	-0.17	-0.04	-0.20	28	1	0		lambert2048	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Env_Rock_Small_Pile_01.fbx	Prefabs	0.90	0.19	1.10	-0.40	-0.05	-0.50	168	1	0		lambert2049	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Env_Rock_Small_Pile_02.fbx	Prefabs	0.75	0.21	0.61	-0.38	-0.05	-0.33	168	1	0		lambert2050	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Env_Skydome_01.fbx	Prefabs	65.88	26.13	65.88	-32.94	0	-32.94	160	1	0		blinn1	Skybox_Mat_01
+FBX/SM_Env_Sunflower_01.fbx	Prefabs	0.79	1.65	0.80	-0.40	-0.06	-0.40	2802	3	0		pasted__lambert18,pasted__sunflowerSHD	Sunflowers_Mat_01 | Sunflowers_Mat_01 | Card_Sunflower_01
+FBX/SM_Env_Tree_Birch_01.fbx	Prefabs	5.07	10.56	5.23	-2.60	-1.07	-2.66	19776	7	0		lambert2051	Branches_02 | Branches_02 | Branches_02 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Card_Tree_Birch_01
+FBX/SM_Env_Tree_Birch_02.fbx	Prefabs	5.50	9.86	5.10	-2.46	-1.20	-2.45	20237	6	0		lambert2052	Branches_02 | Branches_02 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Card_Tree_Birch_02
+FBX/SM_Env_Tree_Birch_03.fbx	Prefabs	3.05	5.23	2.37	-1.62	-0.51	-1.21	5049	6	0		lambert2053	Branches_02 | Branches_02 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Tree_Birch_Mat_01 | Card_Tree_Birch_03
+FBX/SM_Env_Tree_Fruit_01.fbx	Prefabs	5.31	6.15	5.27	-2.64	-0.76	-2.80	11576	3	0		lambert2054	Tree_Mat_01 | Tree_Mat_01 | Card_Tree_Fruit_01
+FBX/SM_Env_Tree_Fruit_01_Fruit_01.fbx	FBX	4.56	2.52	4.49	-2.24	1.68	-2.46	870	1	0		lambert2055	
+FBX/SM_Env_Tree_Fruit_02.fbx	Prefabs	4.65	5.76	4.70	-2.11	-1.04	-2.31	9808	3	0		lambert2056	Tree_Mat_01 | Tree_Mat_01 | Card_Tree_Fruit_02
+FBX/SM_Env_Tree_Fruit_03.fbx	Prefabs	3.96	4.66	4.30	-1.75	-0.74	-2.27	9447	3	0		lambert2057	Tree_Mat_01 | Tree_Mat_01 | Card_Tree_Fruit_03
+FBX/SM_Env_Tree_Meadow_01.fbx	Prefabs	17.20	15.18	17.87	-8.87	-2.20	-9.52	44552	7	0		lambert2058	Branches_01 | Branches_01 | Branches_01 | Tree_Mat_03 | Tree_Mat_03 | Tree_Mat_03 | Card_Tree_Meadow_01
+FBX/SM_Env_Tree_Meadow_02.fbx	Prefabs	8.99	8.94	10.14	-4.62	-1.10	-5.17	21848	7	0		lambert2059	Branches_01 | Branches_01 | Branches_01 | Tree_Mat_03 | Tree_Mat_03 | Tree_Mat_03 | Card_Tree_Meadow_02
+FBX/SM_Env_Water_Plane_01.fbx	Prefabs	5.00	0.10	10.00	-2.50	0	-5.00	400	1	0		lambert2060	Water_Stream
+FBX/SM_Env_Wildflowers_01.fbx	Prefabs	0.74	0.70	0.69	-0.37	-0.07	-0.29	2738	3	0		pasted__lambert17,pasted__grassSHD	BASEMat_02_Saturated | BASEMat_02_Saturated | WildFlowers_01
+FBX/SM_Env_Wildflowers_02.fbx	Prefabs	0.79	0.70	0.72	-0.36	-0.07	-0.34	3231	3	0		pasted__lambert2001,pasted__grassSHD3	BASEMat_02_Saturated | BASEMat_02_Saturated | WildFlowers_02
+FBX/SM_Env_Wildflowers_03.fbx	Prefabs	0.79	0.70	0.74	-0.43	-0.07	-0.32	4382	3	0		lambert2017,lambert2061	Flowers_Field_Variation | Flowers_Field_Variation | WildFlowers_03
+FBX/SM_Env_Wildflowers_Patch_01.fbx	Prefabs	17.80	0.70	18.52	-9.03	-0.07	-9.25	135100	2	0		pasted__lambert2002,pasted__grassSHD4	Flowers_Field_Variation | WildFlowers_01
+FBX/SM_Env_Wildflowers_Patch_02.fbx	Prefabs	17.81	0.70	18.73	-8.73	-0.07	-9.41	178374	2	0		pasted__lambert2003,pasted__grassSHD5	BASEMat_02_Saturated | WildFlowers_02
+FBX/SM_Env_Wildflowers_Patch_03.fbx	Prefabs	18.39	0.70	18.60	-9.09	-0.07	-9.35	211338	2	0		lambert2062,lambert2063	Flowers_Field_Variation | WildFlowers_03
+FBX/SM_Prop_Birdhouse_01.fbx	Props	0.62	0.86	0.62	-0.31	-0.81	-0.31	615	1	0		Explorer_MAT4	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Birdhouse_02.fbx	Props	0.53	1.33	0.73	-0.26	-1.33	-0.27	522	1	0		Explorer_MAT5	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Bridge_01.fbx	Props	3.11	6.56	10.00	-1.56	-4.85	-5.00	1904	1	0		Explorer_MAT6	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Bucket_01.fbx	Props	0.53	0.20	0.54	-0.27	0	-0.27	158	1	0		Nature_Base_Mat	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Bucket_02.fbx	Props	0.29	0.20	0.29	-0.14	0	-0.15	140	1	0		Nature_Base_Mat1	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Can_01.fbx	Props	0.16	0.20	0.16	-0.08	0	-0.08	146	1	0		Nature_Base_Mat2	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Can_02.fbx	Props	0.25	0.24	0.16	-0.17	0	-0.08	184	1	0		Nature_Base_Mat3	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Crate_01.fbx	Props	0.55	0.54	0.80	-0.27	0	-0.40	568	1	0		Nature_Base_Mat4	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Fire_Tripod_01.fbx	Props	1.09	1.67	1.00	-0.62	-0.04	-0.58	540	1	0		Nature_Base_Mat5	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Fireplace_01.fbx	Props	0.84	0.38	0.80	-0.40	-0.03	-0.41	326	1	0		Nature_Base_Mat6	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Fireplace_02.fbx	Props	0.84	0.38	0.80	-0.40	-0.03	-0.42	326	1	0		Nature_Base_Mat7	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Fireplace_Stones_01.fbx	Props	1.19	0.22	1.17	-0.59	-0.06	-0.56	336	1	0		Nature_Base_Mat8	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Pouch_01.fbx	Props	0.22	0.27	0.23	-0.11	0	-0.12	100	1	0		Nature_Base_Mat9	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Tanning_Rack_01.fbx	Props	1.99	1.93	1.07	-0.99	0	-0.54	1158	1	0		Nature_Base_Mat10	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Camp_Tent_01.fbx	Props	2.00	1.52	2.68	-1.00	-0.07	-1.34	722	1	0		Nature_Base_Mat11	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Gate_Small_01.fbx	Props	1.52	1.30	0.20	-0.09	0	-0.08	528	2	0		Nature24	NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_HandCart_01.fbx	Props	1.88	1.51	2.75	-0.94	0	-0.72	2670	3	0		Explorer_MAT7	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_HorseHitch_01.fbx	Props	2.53	1.20	0.23	-1.26	-0.06	-0.11	590	1	0		Explorer_MAT8	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Kite_01.fbx	Props	0.82	15.43	0.12	-0.41	0	-0.03	194	1	0		NatureSHD1	Kite_Mat_01
+FBX/SM_Prop_Kite_02.fbx	Props	1.45	16.42	0.95	-0.64	0	-0.47	829	1	0		NatureSHD2	Kite_Mat_01
+FBX/SM_Prop_Kite_03.fbx	Props	2.47	15.24	1.12	-1.23	0	-0.73	754	1	0		NatureSHD3	Kite_Mat_01
+FBX/SM_Prop_Leaves_Branch_01.fbx	Prefabs	0.40	0.19	1.43	-0.25	-0.05	-0.76	204	1	0		lambert2064	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Leaves_Pile_01.fbx	Prefabs	1.94	0.12	2.77	-1.15	0.02	-1.65	355	1	0		lambert2065	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Leaves_Pile_02.fbx	Prefabs	1.51	0.10	1.24	-0.80	0.02	-0.67	285	1	0		lambert2066	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_01.fbx	Props	2.59	1.57	0.19	-2.50	-0.12	-0.09	238	1	0		Nature_Base_Mat12	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_02.fbx	Props	1.36	1.52	0.20	-1.25	-0.15	-0.10	202	1	0		Nature_Base_Mat13	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_03.fbx	Props	2.68	1.52	0.21	-2.60	-0.15	-0.10	308	1	0		Nature_Base_Mat14	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_04.fbx	Props	1.46	1.52	0.21	-1.35	-0.15	-0.11	276	1	0		Nature_Base_Mat15	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_05.fbx	Props	2.52	1.51	0.40	-2.44	-0.15	-0.32	244	1	0		Nature_Base_Mat16	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_06.fbx	Props	2.54	1.54	0.46	-2.43	-0.15	-0.37	242	1	0		Nature_Base_Mat17	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_07.fbx	Props	2.66	1.51	0.92	-2.58	-0.15	-0.82	312	1	0		Nature_Base_Mat18	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Gate_01.fbx	Props	2.27	1.28	0.16	-2.28	-0.63	-0.06	590	1	0		Nature_Base_Mat19	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Gate_02.fbx	Props	1.01	1.21	0.16	-1.00	-0.64	-0.08	329	1	0		Nature_Base_Mat20	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Gate_Set_01.fbx	Props	2.69	1.54	0.24	-2.59	-0.15	-0.12	888	3	0		Nature_Base_Mat21	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Gate_Set_02.fbx	Props	1.44	1.54	0.24	-1.34	-0.15	-0.12	627	3	0		Nature_Base_Mat22	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Post_01.fbx	Props	0.21	1.51	0.20	-0.10	-0.15	-0.09	74	1	0		Nature_Base_Mat23	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Post_02.fbx	Props	0.23	1.51	0.19	-0.14	-0.15	-0.09	132	1	0		Nature_Base_Mat24	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Post_03.fbx	Props	0.34	1.54	0.24	-0.09	-0.15	-0.11	166	2	0		Nature_Base_Mat25	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Meadow_Fence_Railing_01.fbx	Props	2.38	0.14	0.12	-2.37	-0.06	-0.06	46	1	0		Nature_Base_Mat26	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_MushroomHouse_01.fbx	Props	0.38	0.59	0.39	-0.19	-0.04	-0.19	1081	1	0		Explorer_MAT24	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_MushroomHouse_02.fbx	Props	0.43	0.48	0.40	-0.22	-0.03	-0.20	977	1	0		Explorer_MAT25	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_01.fbx	Props	0.07	0.27	0.06	-0.03	-0.02	-0.03	70	1	0		Explorer_MAT9	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_02.fbx	Props	0.17	0.21	0.14	-0.08	-0.04	-0.07	54	1	0		Explorer_MAT10	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_03.fbx	Props	0.11	0.21	0.09	-0.05	-0.03	-0.05	60	1	0		Explorer_MAT11	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_04.fbx	Props	0.09	0.15	0.08	-0.05	-0.02	-0.04	70	1	0		Explorer_MAT12	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_05.fbx	Props	0.20	0.20	0.20	-0.10	-0.03	-0.10	316	1	0		Explorer_MAT13	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_06.fbx	Props	0.13	0.20	0.13	-0.06	-0.03	-0.07	236	1	0		Explorer_MAT14	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Group_02.fbx	Props	0.23	0.21	0.23	-0.11	-0.04	-0.11	270	1	0		Explorer_MAT15	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Group_03.fbx	Props	0.22	0.21	0.21	-0.11	-0.03	-0.11	234	1	0		Explorer_MAT16	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Group_04.fbx	Props	0.26	0.25	0.31	-0.13	-0.06	-0.15	290	1	0		Explorer_MAT17	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Group_05.fbx	Props	0.36	0.22	0.32	-0.17	-0.04	-0.20	1046	1	0		Explorer_MAT18	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Sparse_01.fbx	Props	1.19	0.26	1.10	-0.61	-0.03	-0.51	992	1	0		Explorer_MAT19	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Sparse_02.fbx	Props	1.45	0.25	1.42	-0.70	-0.08	-0.74	1080	1	0		Explorer_MAT20	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Sparse_03.fbx	Props	1.15	0.21	0.90	-0.54	-0.03	-0.45	705	1	0		Explorer_MAT21	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Sparse_04.fbx	Props	1.68	0.25	1.18	-0.86	-0.06	-0.57	870	1	0		Explorer_MAT22	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Mushroom_Sparse_05.fbx	Props	1.73	0.22	1.32	-0.96	-0.04	-0.67	4838	1	0		Explorer_MAT23	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_ScareCrow_01.fbx	Props	2.95	3.84	0.80	-1.40	0	-0.28	3401	1	0		Explorer_MAT26	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_SciFiCable_01.fbx	Props	5.36	0.33	2.06	-2.68	0	-1.03	1296	1	0		Explorer_MAT27	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_SciFiCable_02.fbx	Props	2.43	0.50	2.26	-1.21	0	-1.13	1024	1	0		Explorer_MAT28	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_SciFiCrate_01.fbx	Props	0.80	0.77	0.80	-0.40	0	-0.40	812	1	0		Explorer_MAT29	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_SciFiCrate_02.fbx	Props	1.42	0.85	0.98	-0.71	-0.05	-0.49	332	1	0		Explorer_MAT30	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Sign_01.fbx	Props	1.06	2.96	0.96	-0.49	-0.08	-0.37	702	1	0		Explorer_MAT31	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Sign_02.fbx	Props	0.99	2.96	1.10	-0.42	-0.08	-0.49	558	1	0		Explorer_MAT32	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Sign_03.fbx	Props	0.98	2.96	0.69	-0.50	-0.08	-0.34	430	1	0		Explorer_MAT33	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneArch_01.fbx	Props	5.55	4.02	2.60	-2.77	0	-1.30	424	1	0		Explorer_MAT35	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StonePile_01.fbx	Props	0.88	1.48	0.73	-0.44	0	-0.38	1144	1	0		Explorer_MAT36	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StonePile_02.fbx	Props	0.56	0.88	0.62	-0.28	0	-0.31	232	1	0		Explorer_MAT37	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StonePile_03.fbx	Props	0.96	1.53	0.92	-0.48	0	-0.46	1788	1	0		Explorer_MAT38	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneRunes_01.fbx	Props	1.33	3.33	0.57	-0.67	-0.26	-0.29	404	1	0		Explorer_MAT39	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneRunes_02.fbx	Props	1.38	3.09	0.99	-0.69	-0.14	-0.50	416	1	0		Explorer_MAT40	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneRunes_03.fbx	Props	1.56	3.49	1.01	-0.78	-0.34	-0.50	508	1	0		Explorer_MAT41	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneStack_01.fbx	Props	5.81	4.91	5.38	-2.91	0	-2.69	612	1	0		Explorer_MAT42	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneStack_02.fbx	Props	4.49	5.73	5.93	-2.17	-0.20	-2.95	412	1	0		Explorer_MAT43	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_StoneWall_01.fbx	FBX	2.74	0.95	0.70	-2.56	-0.06	-0.35	2598	3	0		Nature25	
+FBX/SM_Prop_StoneWall_02.fbx	FBX	2.74	0.93	0.65	-2.62	-0.02	-0.33	2126	3	0		Nature26	
+FBX/SM_Prop_Stone_Hole_01.fbx	Props	1.33	3.09	1.09	-0.66	-0.39	-0.55	276	1	0		Explorer_MAT34	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Stonewall_End_01.fbx	Prefabs	4.28	1.26	0.76	-4.14	-0.06	-0.39	2870	3	0		Nature27	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Stonewall_Long_01.fbx	Prefabs	5.37	1.24	0.72	-5.21	-0.07	-0.36	5188	3	0		Nature28	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Stonewall_Pillar_01.fbx	Prefabs	0.82	1.38	1.00	-0.41	0	-0.50	574	3	0		Nature29	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Stonewall_Pillar_02.fbx	Prefabs	0.91	1.42	1.05	-0.45	-0.06	-0.53	746	3	0		Nature30	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Stonewall_Small_01.fbx	Prefabs	2.85	1.31	0.76	-2.66	-0.08	-0.38	2598	3	0		Nature31	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Stonewall_Small_02.fbx	Prefabs	2.85	1.20	0.71	-2.72	-0.03	-0.36	2126	3	0		Nature32	NoWind_Mat_01 | NoWind_Mat_01 | NoWind_Mat_01
+FBX/SM_Prop_Sword_01.fbx	FBX	0.47	2.20	0.10	-0.23	-1.92	-0.05	754	1	0		Explorer_MAT44	
+FBX/SM_Prop_Sword_Stone_01.fbx	Props	1.83	1.45	2.00	-1.10	0	-1.16	510	1	0		Explorer_MAT45	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Wagon_Broken_01.fbx	Props	3.40	2.39	5.32	-1.51	-0.14	-2.28	3914	1	0		Explorer_MAT46	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_WaterWheel_01.fbx	Props	3.02	3.60	3.61	-2.38	-0.11	-1.80	4381	3	0		Explorer_MAT47	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_Well_01.fbx	Props	1.91	2.97	1.95	-1.07	-0.13	-0.98	1809	1	0		Explorer_MAT48	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_WindChime_01.fbx	Props	0.30	1.45	0.31	-0.16	-1.44	-0.16	851	1	0		Explorer_MAT49	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Prop_WindChime_02.fbx	Props	0.48	1.64	0.45	-0.24	-1.64	-0.23	951	1	0		Explorer_MAT50	PolygonNatureBiomesMeadow_Mat_01
+FBX/SM_Veh_Steam_Car_01.fbx	Prefabs	2.36	2.90	4.14	-1.18	-0.01	-2.44	13340	8	0		Nature_Base_Mat27	PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01 | PolygonNatureBiomesMeadow_Mat_01

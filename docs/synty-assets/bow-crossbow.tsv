@@ -1,0 +1,7 @@
+path	category	size_x_m	size_y_m	size_z_m	min_x_m	min_y_m	min_z_m	tris	meshes	bones	clips	fbx_materials	materiallist_slots
+Rigged_Bow_NativeAmerican_Testing.fbx	Prefabs	0.21	1.42	0.23	-0.11	-0.71	-0.19	1252	1	8	Take 001:1.67s	Bow	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
+Rigged_Bow_Testing.fbx	Prefabs	0.08	1.46	0.21	-0.04	-0.73	-0.17	544	1	8	Take 001:1.67s	lambert2	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
+Rigged_CrossBow_Testing.fbx	Prefabs	0.89	0.15	1.12	-0.44	-0.09	-1.03	702	1	8	Take 001:1.67s	crossBow,Default_Material	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01) | Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
+SM_Arrow_01.fbx	Prefabs	0.05	0.06	0.93	-0.02	-0.03	-0.46	214	1	0		lambert2	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
+SM_Prop_Arrow_NativeAmerican_01.fbx	Prefabs	0.06	0.08	1.01	-0.03	-0.04	-0.43	200	1	0		Bow	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
+SM_Wep_Crossbow_Bolt_01.fbx	Prefabs	0.03	0.03	0.46	-0.02	-0.01	-0.23	90	1	0		crossBow	Polygon_BowCrossbow_Mat_01 (Polygon_BoxCrossbow_Texture_01)
