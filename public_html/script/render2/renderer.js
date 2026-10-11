@@ -6,7 +6,7 @@ import { BattleHud } from './hud.js';
 import { BattleEffects } from './effects.js';
 import { Fighter, TELEPORT_DISTANCE } from './fighter.js';
 import { ACTION_BY_ID, ACTION_SPECS, ENGINE_RATE, actionDuration, engineTiming } from './motion.js';
-import { loadModelFactory } from './models.js';
+import { loadSynty } from './synty-model.js';
 import { renderPortrait } from './portrait.js';
 import { getAppearance, sampleSkinColors } from './palette.js';
 import { ResourceTracker } from './resource-tracker.js';
@@ -74,7 +74,7 @@ export class BattleRenderer {
     #resizeObserver;
     #reducedMotion;
     #fighters = [];
-    #modelFactory;
+    #createModel;
     #skinColors = new Map();
     #fightersById = new Map();
     #applied = null;
@@ -181,8 +181,7 @@ export class BattleRenderer {
      */
     async prepare(gladiators) {
         this.#skinColors = await sampleSkinColors(gladiators.map((gladiator) => gladiator.skin));
-        this.#modelFactory = await loadModelFactory(this.#THREE, gladiators.map((gladiator, index) => getAppearance(gladiator.skin, index, this.#skinColors)));
-        if (this.#modelFactory.kind !== 'synty') return;
+        this.#createModel = await loadSynty(this.#THREE, gladiators.map((gladiator, index) => getAppearance(gladiator.skin, index, this.#skinColors)));
         try {
             const { loadSyntyArena } = await import('./synty-arena.js');
             this.#arena.applySynty(await loadSyntyArena(this.#THREE));
@@ -190,7 +189,7 @@ export class BattleRenderer {
             this.#arena.setCrowdDensity(Number.isFinite(crowd) ? crowd : 1);
         }
         catch (error) {
-            console.warn('Synty arena props unavailable, keeping the procedural enclosure.', error);
+            console.warn('Synty arena props unavailable.', error);
         }
     }
 
@@ -225,8 +224,8 @@ export class BattleRenderer {
 
     #createFighters(gladiators) {
         gladiators.forEach((gladiator, index) => {
-            const fighter = new Fighter({ THREE: this.#THREE, gladiator, index, shadowTexture: this.#shadowTexture, colors: this.#skinColors, createModel: this.#modelFactory.createModel });
-            if (this.#modelFactory.kind === 'synty') fighter.portrait = renderPortrait(this.#THREE, this.#renderer, this.#modelFactory.createModel({ THREE: this.#THREE, look: fighter.appearance, index }));
+            const fighter = new Fighter({ THREE: this.#THREE, gladiator, index, shadowTexture: this.#shadowTexture, colors: this.#skinColors, createModel: this.#createModel });
+            fighter.portrait = renderPortrait(this.#THREE, this.#renderer, this.#createModel({ THREE: this.#THREE, look: fighter.appearance, index }));
             this.#scene.add(fighter.root);
             this.#fighters.push(fighter);
             this.#fightersById.set(String(gladiator.id ?? index), fighter);

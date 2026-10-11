@@ -483,7 +483,7 @@ const GAIT_CM_PER_SECOND = {
 /**
  * Body made of the Synty modular hero parts, skinned to the animation skeleton. Locomotion, sword attacks,
  * block, hit, stun and death play the Synty clips; spells and archery keep the `motion.js` upper-body pose
- * layered over the locomotion legs (see `ProceduralModel` for the shared contract).
+ * layered over the locomotion legs.
  */
 export class SyntyModel {
     #THREE;
@@ -1138,7 +1138,7 @@ export class SyntyModel {
         string.bone.position.copy(string.bone.parent.worldToLocal(at.lerp(goal, amount)));
     }
 
-    /** @see ProceduralModel#applyPose */
+    /** Applies pose math and blends locomotion, combat, and upper-body IK overrides. */
     applyPose(p, o) {
         const m = o.motion;
         this.#play(m);
@@ -1167,7 +1167,7 @@ export class SyntyModel {
         return this.#bones.Neck.getWorldPosition(target);
     }
 
-    /** @see ProceduralModel#setWeapons */
+    /** Updates equipped hand props based on current combat action. */
     setWeapons(held, extra) {
         const { melee, bow, flask, shield } = this.#parts;
         const casting = extra === 'orb';
@@ -1178,7 +1178,7 @@ export class SyntyModel {
         flask.visible = extra === 'flask';
     }
 
-    /** @see ProceduralModel#setLook */
+    /** Sets visual status effects such as opacity, flinch flashes, and burn intensity. */
     setLook({ opacity, flash, burn }) {
         const key = `${opacity}|${flash.toFixed(2)}|${burn.toFixed(2)}`;
         if (key === this.#emissiveKey) return;

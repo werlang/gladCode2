@@ -1,6 +1,6 @@
 /**
  * Turns the persisted skin token list (e.g. `male_longsleeve_black`, `cape_red`)
- * into the handful of colors the procedural gladiator uses.
+ * into the colors and appearance traits used by gladiator models.
  */
 
 const COLOR_WORDS = Object.freeze([

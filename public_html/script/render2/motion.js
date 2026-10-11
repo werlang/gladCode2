@@ -1,5 +1,5 @@
 /**
- * Pure pose math for the procedural gladiator rig. Nothing here touches Three.js,
+ * Pure pose and timing math for the gladiator combat rig. Nothing here touches Three.js,
  * so every curve can be unit-tested.
  *
  * Angle conventions (character faces +Z, +Y is up, +X is the character's left):
@@ -11,10 +11,6 @@
 
 /** Scale of the whole figure inside the arena; every model builds in the same unscaled figure space. */
 export const FIGURE_SCALE = 0.6;
-/** Direction the blade extends from the fist, in the forearm's local frame. */
-export const BLADE_DIRECTION = Object.freeze([0, -0.85, 0.5]);
-// Polearms run along the forearm so they point up-forward in guard and straight ahead when thrusting.
-export const POLEARM_DIRECTION = Object.freeze([0, -0.98, -0.1]);
 export const LEG_SEGMENT = 0.28;
 export const FOOT_HEIGHT = 0.05;
 

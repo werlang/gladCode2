@@ -1,5 +1,4 @@
 import { ARENA_SIZE } from './battle-state.js';
-import { Enclosure } from './enclosure.js';
 import { clamp01, createRandom, fbm, mix, smooth, valueNoise } from './noise.js';
 import { PODIUM, SyntyColiseum } from './synty-coliseum.js';
 import { FireSystem } from './fire.js';
@@ -211,7 +210,7 @@ function createFloorTexture(THREE) {
 }
 
 /**
- * Coliseum floor, the stone enclosure (see `Enclosure`) and the shrinking poison zone.
+ * Coliseum floor, ancient empire coliseum (see `SyntyColiseum`) and the shrinking poison zone.
  * Everything is a handful of static meshes, so it costs almost nothing per frame.
  */
 export class Arena {
@@ -219,8 +218,6 @@ export class Arena {
     #poison;
     #poisonUniform;
     #gasTime;
-    #enclosure;
-    #enclosureGroup;
     #scene;
     #own;
     /** Fires of the Synty coliseum: braziers and gate torches (see `fire.js`). */
@@ -268,8 +265,6 @@ export class Arena {
 
         this.#scene = scene;
         this.#own = own;
-        this.#enclosureGroup = add(new THREE.Group());
-        this.#enclosure = new Enclosure({ THREE, add: (mesh) => this.#enclosureGroup.add(mesh) && mesh, own });
         this.#buildPoison(add, own);
     }
 
@@ -315,6 +310,8 @@ export class Arena {
             mesh.renderOrder = 1 + layer;
             this.#poison.add(mesh);
         });
+        // The sand runs on to the podium wall, and so does the gas (the wall hides the edge of the plane).
+        this.#poison.scale.set(FLOOR_SIZE / GAS_SIZE, 1, FLOOR_SIZE / GAS_SIZE);
         add(this.#poison);
         this.updateSafeZone(CORNER_RADIUS);
     }
@@ -330,9 +327,8 @@ export class Arena {
     }
 
     /**
-     * Replaces the whole procedural enclosure with the Synty coliseum (see `SyntyColiseum`):
-     * stands, podium, gates, statues and braziers. Only the brazier flames are billboards,
-     * textured with the Synty particle pack.
+     * Installs the Synty coliseum (see `SyntyColiseum`): stands, podium, gates, statues and braziers.
+     * Only the brazier flames are billboards, textured with the Synty particle pack.
      *
      * @param {import('./synty-arena.js').SyntyArenaKit} kit Loaded Ancient Empire pieces.
      */
@@ -341,10 +337,7 @@ export class Arena {
         const own = this.#own;
         this.#disposables.push(kit);
         const coliseum = new SyntyColiseum(THREE, kit);
-        this.#enclosureGroup.visible = false;
         this.#scene.add(coliseum.group);
-        // The sand runs on to the podium wall here, and so does the gas (the wall hides the edge of the plane).
-        this.#poison.scale.set(FLOOR_SIZE / GAS_SIZE, 1, FLOOR_SIZE / GAS_SIZE);
         this.#loadCrowd(coliseum.plan, coliseum.posts, coliseum.throne);
         this.#loadFloor();
         this.#disposables.push({ dispose: () => coliseum.group.removeFromParent() });
@@ -360,7 +353,6 @@ export class Arena {
         const dt = this.#lastElapsed === null ? 0 : Math.max(0, Math.min(0.1, elapsed - this.#lastElapsed));
         this.#lastElapsed = elapsed;
         this.#crowd?.update(elapsed, dt);
-        this.#enclosure.animate(elapsed);
         this.#fires?.update(elapsed, dt);
     }
 

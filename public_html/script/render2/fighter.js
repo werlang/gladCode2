@@ -35,8 +35,8 @@ function angleDelta(from, to) {
 
 /**
  * One gladiator. It owns interpolation between replay frames, distance-driven gait, timed combat
- * actions, flinch, death and status visuals, and drives a swappable body model (`ProceduralModel`
- * or `SyntyModel`, see models.js) with the poses computed in motion.js.
+ * actions, flinch, death and status visuals, and drives the body model (`SyntyModel`)
+ * with the poses computed in motion.js.
  */
 export class Fighter {
     #THREE;
@@ -603,10 +603,6 @@ export class Fighter {
         const target = this.#alive ? 0 : 1;
         this.#dead += Math.sign(target - this.#dead) * Math.min(Math.abs(target - this.#dead), realDt / (this.#model.deathSeconds ?? DEATH_SECONDS));
         const eased = smoothstep(0, 1, this.#dead);
-        if (!this.#model.animatesDeath) {
-            this.#model.figure.rotation.x = -eased * (Math.PI / 2);
-            this.#model.figure.position.y = eased * 0.2;
-        }
         this.#parts.shadow.scale.setScalar(1 + eased * 0.3);
         this.#parts.ring.visible = this.#dead < 0.9;
     }
