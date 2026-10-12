@@ -377,7 +377,8 @@ export class BattleEffects {
                 case 'revive': if (fighter) this.addRing(fighter.position, 0x9ff3ff, 2.4, 0.7); break;
                 case 'projectile-spawn': {
                     const owner = fighters.get(String(event.projectile?.owner));
-                    const launch = owner?.nockedArrow;
+                    // The flying fireball starts from the orb grown between the caster's hands, an arrow from the bow.
+                    const launch = Number(event.projectile?.type) === 1 ? owner?.castOrb : owner?.nockedArrow;
                     if (launch) this.#launches.set(`${event.projectile.type}:${event.projectile.id}`, launch);
                     owner?.fire();
                     if (owner?.activeAction?.name === 'assassinate') this.#variants.set(`${event.projectile.type}:${event.projectile.id}`, 'assassinate');

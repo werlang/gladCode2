@@ -553,6 +553,14 @@ export class Fighter {
         else if (action && !action.spec.hold) this.#action = null;
     }
 
+    /** @returns {{ position: import('three').Vector3, quaternion: import('three').Quaternion }|null} World pose of the fireball grown between the hands, for the flying fireball to start from. */
+    get castOrb() {
+        const orb = this.#parts.orb;
+        if (!orb?.visible || orb.scale.x < 0.05) return null;
+        orb.updateWorldMatrix(true, false);
+        return { position: orb.getWorldPosition(new this.#THREE.Vector3()), quaternion: new this.#THREE.Quaternion() };
+    }
+
     /** @returns {{ position: import('three').Vector3, quaternion: import('three').Quaternion }|null} World pose of the arrow on the string, for the flying arrow to start from. */
     get nockedArrow() {
         return this.#model.nockedArrow?.() ?? null;
@@ -878,7 +886,8 @@ export class Fighter {
         const spec = this.#activeSpec;
         const time = this.#frozen ? this.#frozen.time : (this.#action ? this.#actionTime(this.#action) : 0);
         const release = spec?.contact ?? 0.5;
-        const charge = smoothstep(0.05, 0.4, time) * (1 - smoothstep(release, release + 0.06, time));
+        // The orb leaves the hands the moment the engine launches the fireball (`fire()`), which flies on from there.
+        const charge = this.#action?.firedAt != null && !this.#frozen ? 0 : smoothstep(0.05, 0.4, time) * (1 - smoothstep(release, release + 0.06, time));
         orb.scale.setScalar(Math.max(0.001, charge));
     }
 
