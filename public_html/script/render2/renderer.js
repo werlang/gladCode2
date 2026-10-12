@@ -23,7 +23,14 @@ const STEP_SECONDS = 0.1;
 const SEEK_BACK_STEPS = 20;
 const DEFAULT_SEGMENT_MS = 100;
 const MIN_SEGMENT_MS = 16;
-const MAX_SEGMENT_MS = 400;
+/** Long enough for the slowest replay speed (0.1×: a step every second). */
+const MAX_SEGMENT_MS = 1100;
+/** The arena's ambience (crowd, fires, gas, clouds) follows the replay: still while paused, slowed in slow motion, at most this fast. */
+const AMBIENCE_MAX_RATE = 2;
+/** Paused, the arena fades to a moderate grey: how much colour goes, how much it dims, and how fast (per second). */
+const PAUSE_GREY = 0.55;
+const PAUSE_DIM = 0.08;
+const PAUSE_FADE_RATE = 7;
 const MAX_FRAME_DELTA = 0.1;
 /** Adaptive resolution: sampled over `QUALITY_WINDOW_MS`, stepping the pixel ratio within these bounds. */
 const QUALITY_WINDOW_MS = 700;
@@ -108,6 +115,11 @@ export class BattleRenderer {
     #segmentMs = DEFAULT_SEGMENT_MS;
     #segmentStart = 0;
     #wasPaused = false;
+    /** Seconds of arena ambience (see `AMBIENCE_MAX_RATE`). */
+    #worldTime = 0;
+    /** Pause greying: its level (0 to 1) and the off-screen pass it needs while above zero. */
+    #greyLevel = 0;
+    #grey = null;
     #pausedProgress = null;
     #lastTimestamp = null;
     #lastSize = { width: 0, height: 0 };
@@ -564,7 +576,8 @@ export class BattleRenderer {
 
         const profiler = this.#profiler;
         profiler.lap('camera');
-        this.#arena.animate(this.#reducedMotion ? 0 : elapsed);
+        this.#worldTime += realDt * Math.min(rate, AMBIENCE_MAX_RATE);
+        this.#arena.animate(this.#reducedMotion ? 0 : this.#worldTime);
         profiler.lap('arena');
         const frame = { realDt, gameDt, progress, elapsed, reducedMotion: this.#reducedMotion };
         for (const fighter of this.#fighters) fighter.update(frame);
@@ -575,13 +588,18 @@ export class BattleRenderer {
         this.#updateSound(realDt, isPaused);
         profiler.lap('sound');
         const gpu = profiler.gpuBegin();
-        this.#renderer.render(this.#scene, this.#camera);
+        this.#greyLevel += ((isPaused ? 1 : 0) - this.#greyLevel) * (1 - Math.exp(-realDt * PAUSE_FADE_RATE));
+        if (!isPaused && this.#greyLevel < 0.003) this.#greyLevel = 0;
+        if (this.#greyLevel > 0) this.#renderGrey();
+        else this.#renderer.render(this.#scene, this.#camera);
+        // The HUD pass resets the counters, so the scene's are kept for `getDebugSnapshot`.
+        if (!this.#greyLevel) {
+            this.#sceneStats.calls = this.#renderer.info.render.calls;
+            this.#sceneStats.triangles = this.#renderer.info.render.triangles;
+        }
         profiler.gpuEnd(gpu);
         profiler.lap('render');
-        // The HUD pass resets the counters, so the scene's are kept for `getDebugSnapshot`.
-        this.#sceneStats.calls = this.#renderer.info.render.calls;
-        this.#sceneStats.triangles = this.#renderer.info.render.triangles;
-        this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt);
+        this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt, gameDt);
         this.#overlay.render(this.#renderer);
         profiler.lap('hud');
         this.#updateFps(timestamp);
@@ -895,9 +913,61 @@ export class BattleRenderer {
         return this.#audio.meter(bus);
     }
 
+    /**
+     * Renders the scene off screen, then onto the canvas through a full-screen pass that takes its colour away by
+     * `#greyLevel` (the HUD is drawn after, in full colour). Only while paused or fading, so playing costs nothing.
+     */
+    #renderGrey() {
+        const THREE = this.#THREE;
+        const renderer = this.#renderer;
+        if (!this.#grey) {
+            const material = new THREE.ShaderMaterial({
+                uniforms: { map: { value: null }, grey: { value: 0 }, dim: { value: 0 } },
+                vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+                fragmentShader: `
+                    uniform sampler2D map;
+                    uniform float grey;
+                    uniform float dim;
+                    varying vec2 vUv;
+                    void main() {
+                        vec3 colour = texture2D(map, vUv).rgb;
+                        float luma = dot(colour, vec3(0.2126, 0.7152, 0.0722));
+                        gl_FragColor = vec4(mix(colour, vec3(luma), grey) * (1.0 - dim), 1.0);
+                        #include <colorspace_fragment>
+                    }`,
+                depthTest: false,
+                depthWrite: false,
+            });
+            const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+            quad.frustumCulled = false;
+            const scene = new THREE.Scene();
+            scene.add(quad);
+            const samples = renderer.getContext().getContextAttributes()?.antialias ? 4 : 0;
+            const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples });
+            this.#grey = { target, scene, quad, material, camera: new THREE.OrthographicCamera(), size: new THREE.Vector2() };
+        }
+        const grey = this.#grey;
+        renderer.getDrawingBufferSize(grey.size);
+        if (grey.target.width !== grey.size.x || grey.target.height !== grey.size.y) grey.target.setSize(grey.size.x, grey.size.y);
+        renderer.setRenderTarget(grey.target);
+        renderer.render(this.#scene, this.#camera);
+        this.#sceneStats.calls = renderer.info.render.calls;
+        this.#sceneStats.triangles = renderer.info.render.triangles;
+        renderer.setRenderTarget(null);
+        grey.material.uniforms.map.value = grey.target.texture;
+        grey.material.uniforms.grey.value = PAUSE_GREY * this.#greyLevel;
+        grey.material.uniforms.dim.value = PAUSE_DIM * this.#greyLevel;
+        renderer.render(grey.scene, grey.camera);
+    }
+
     /** Stops animation and releases DOM, audio, scene and GPU resources. */
     destroy() {
         this.#renderer.setAnimationLoop(null);
+        if (this.#grey) {
+            this.#grey.target.dispose();
+            this.#grey.material.dispose();
+            this.#grey.quad.geometry.dispose();
+        }
         this.#resizeObserver.disconnect();
         this.#controls.destroy();
         this.#overlay.destroy();

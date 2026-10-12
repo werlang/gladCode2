@@ -161,7 +161,7 @@ export class Fighter {
     #actionBlend = 0;
     #actionStyle = null;
     #moved = 0;
-    #realDt = 0;
+    #gameDt = 0;
     #weapon = 'melee';
     #dead = 0;
     #alive = true;
@@ -731,7 +731,7 @@ export class Fighter {
         }
         this.root.rotation.y = this.#yaw;
 
-        this.#realDt = realDt;
+        this.#gameDt = gameDt;
         if (!isPaused) {
             const moved = this.#alive ? Math.hypot(position.x - previousX, position.z - previousZ) : 0;
             const instantSpeed = gameDt > 0 ? moved / gameDt : 0;
@@ -835,8 +835,8 @@ export class Fighter {
             speed: this.#speed,
             reducedMotion,
             motion: {
-                dt: isPaused ? 0 : this.#realDt,
-                travel: isPaused ? 0 : this.#speed * this.#realDt,
+                dt: isPaused ? 0 : this.#gameDt,
+                travel: isPaused ? 0 : this.#speed * this.#gameDt,
                 phase: this.#phase,
                 speed: this.#speed,
                 forward: this.#forward,

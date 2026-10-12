@@ -953,10 +953,12 @@ export class BattleEffects {
     // ------------------------------------------------------------------- update
 
     /**
+     * Every effect runs on the fight's clock (`gameDt`: the replay speed, frozen while paused), like the fighters.
+     *
      * @param {{ realDt: number, gameDt: number, progress: number, elapsed: number }} frame Frame timing.
      * @param {Iterable<import('./fighter.js').Fighter>} [fighters] Fighters, for the flames on the burning ones.
      */
-    update({ realDt, gameDt, progress, elapsed }, fighters = []) {
+    update({ gameDt, progress }, fighters = []) {
         this.#clock += gameDt;
         if (this.#timeline.length) {
             const due = this.#timeline.filter((item) => item.at <= this.#clock);
@@ -974,7 +976,7 @@ export class BattleEffects {
             const trail = entry.type === 1
                 ? { rate: 70, size: 0.2, life: 0.6, colors: [0xff5b2e, 0xff8a2a, 0xffd27a] }
                 : entry.variant === 'assassinate' ? { rate: 90, size: 0.07, life: 0.7, colors: [0x7a0010, 0xb0121f, 0xe01a2c] } : null;
-            if (entry.type === 1) entry.mesh.scale.setScalar(1 + Math.sin(elapsed * 30) * 0.08);
+            if (entry.type === 1) entry.mesh.scale.setScalar(1 + Math.sin(this.#clock * 30) * 0.08);
             if (trail && gameDt > 0) {
                 entry.trail += gameDt * trail.rate;
                 const count = Math.min(6, Math.floor(entry.trail));
@@ -986,17 +988,17 @@ export class BattleEffects {
         for (const spark of this.#particles) {
             const data = spark.userData;
             if (data.life <= 0) continue;
-            data.life -= realDt;
+            data.life -= gameDt;
             if (data.life <= 0) { spark.visible = false; continue; }
-            data.velocity.y -= data.gravity * realDt;
-            spark.position.addScaledVector(data.velocity, realDt);
+            data.velocity.y -= data.gravity * gameDt;
+            spark.position.addScaledVector(data.velocity, gameDt);
             spark.scale.setScalar(data.size * (0.4 + 0.6 * (data.life / data.maxLife)));
             spark.material.opacity = Math.min(1, (data.life / data.maxLife) * 1.5);
         }
         for (const ring of this.#rings) {
             const data = ring.userData;
             if (data.life <= 0) continue;
-            data.life -= realDt;
+            data.life -= gameDt;
             if (data.life <= 0) { ring.visible = false; continue; }
             const t = 1 - data.life / data.maxLife;
             ring.scale.setScalar(data.radius * (1 - (1 - t) ** 2));
@@ -1005,31 +1007,31 @@ export class BattleEffects {
         for (const decal of this.#decals) {
             const data = decal.userData;
             if (data.life <= 0) continue;
-            data.life -= realDt;
+            data.life -= gameDt;
             if (data.life <= 0) { decal.visible = false; continue; }
             const t = 1 - data.life / data.maxLife;
-            decal.rotation.y += data.spin * realDt;
+            decal.rotation.y += data.spin * gameDt;
             decal.scale.setScalar(data.radius * (0.6 + 0.4 * Math.min(1, t * 3)));
             decal.material.opacity = Math.min(1, t * 8) * (1 - t) * 0.9;
         }
         for (const pillar of this.#pillars) {
             const data = pillar.userData;
             if (data.life <= 0) continue;
-            data.life -= realDt;
+            data.life -= gameDt;
             if (data.life <= 0) { pillar.visible = false; continue; }
             const t = 1 - data.life / data.maxLife;
             const wide = data.mode === 'out' ? 0.25 + t * 0.55 : 0.8 * (1 - t) + 0.1;
             pillar.scale.set(wide, data.height * (data.mode === 'out' ? 1 - t * 0.3 : 0.6 + 0.4 * (1 - t)), wide);
             pillar.material.opacity = (data.mode === 'out' ? 1 - t : Math.min(1, t * 3) * (1 - t * 0.6)) * 0.55;
         }
-        this.#blasts.update(realDt);
-        // Flames flicker in real time but hold still while paused, like the rest of the fight.
-        this.#updateBurning(fighters, gameDt > 0 ? realDt : 0, elapsed);
+        this.#blasts.update(gameDt);
+        // Flames burn on the fight's clock: faster when the replay is sped up, still while paused.
+        this.#updateBurning(fighters, gameDt, this.#clock);
         this.#updateStuckArrows(gameDt);
         for (const slash of this.#slashes) {
             const data = slash.userData;
             if (data.life <= 0) continue;
-            data.life -= realDt;
+            data.life -= gameDt;
             if (data.life <= 0) { slash.visible = false; continue; }
             const t = 1 - data.life / data.maxLife;
             slash.scale.setScalar(0.85 + t * 0.4);
@@ -1051,7 +1053,7 @@ export class BattleEffects {
         const at = this.#boneScratch;
         for (const fighter of fighters) {
             // An invisible fighter's flames vanish with it.
-            const burning = fighter.burning && !(Number(fighter.state?.buffs?.invisible?.timeleft) > 0);
+            const burning = fighter.burning && !(Number(fighter.buffs.invisible?.timeleft) > 0);
             let entry = this.#burning.get(fighter);
             if (!entry) {
                 if (!burning) continue;

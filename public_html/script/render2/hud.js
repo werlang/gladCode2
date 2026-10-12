@@ -816,15 +816,16 @@ export class BattleHud {
      * @param {import('./fighter.js').Fighter[]} views Fighters.
      * @param {{ bars?: boolean, speech?: boolean }} preferences Display preferences.
      * @param {number} realDt Real seconds since the previous frame.
+     * @param {number} [floatDt] Seconds to age the floating labels by (the fight's clock), `realDt` by default.
      */
-    update(views, preferences, realDt) {
+    update(views, preferences, realDt, floatDt = realDt) {
         this.#updatePanels(views);
         views.forEach((view) => this.updateFighter(view, preferences));
         this.#separateCards(realDt);
         for (const sprite of this.#floats) {
             if (!sprite.visible) continue;
             const data = sprite.userData;
-            data.age += realDt;
+            data.age += floatDt;
             if (data.age >= FLOAT_SECONDS) {
                 sprite.visible = false;
                 data.age = Infinity;
