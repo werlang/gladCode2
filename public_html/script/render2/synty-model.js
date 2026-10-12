@@ -1318,6 +1318,8 @@ export class SyntyModel {
         const shooting = pose > 0.001 && SHOT_STYLES.has(m.action.style);
         if (shooting) this.#aimBow(m.action, pose);
         else if (pose > 0.001) this.#overridePose(p, o, pose);
+        // Capes sway whatever the fighter carries (this ran only for archers, after the bow check).
+        this.#capeSway(m);
         if (!this.#parts.bow.visible) {
             this.#parts.arrow.visible = false;
             return;
@@ -1332,7 +1334,6 @@ export class SyntyModel {
             this.#arrowMaterials.head.color.setHex(bleeding ? 0xd01020 : 0xc8ced6);
         }
         this.#nock(shooting && m.dead <= 0 && this.#pull > 0.05 && pose > 0.3);
-        this.#capeSway(m);
     }
 
     /**
