@@ -10,7 +10,7 @@ const CROWD_FILES = Object.freeze({
 });
 
 /** Linear levels on the ambience bus (the crowd files are already mixed loud; impacts must stay on top). */
-const LEVELS = Object.freeze({ bed: 0.32, chatter: 0.3, soft: 0.3, strong: 0.45, chant: 0.5, brazier: 0.55, torch: 0.2, burning: 0.9, hiss: 0.16, rumble: 0.22, wind: 0.05 });
+const LEVELS = Object.freeze({ bed: 0.32, chatter: 0.3, soft: 0.3, strong: 0.45, chant: 0.5, brazier: 0.55, torch: 0.2, burning: 0.9, hiss: 0.09, rumble: 0.14, wind: 0.05 });
 /** Seconds the crowd's excitement takes to halve after a moment. */
 const EXCITEMENT_HALF_LIFE = 5;
 /** The poison gas is loudest when it covers the whole floor: the safe circle has shrunk to nothing. */
