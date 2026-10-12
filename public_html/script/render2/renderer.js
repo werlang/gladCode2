@@ -1,4 +1,4 @@
-import { ACTIONS, ARENA_SIZE, deriveStepEvents, headingToRadians, isOutsideSafeZone } from './battle-state.js';
+import { ACTIONS, ARENA_SIZE, deriveStepEvents, headingToRadians, isOutsideSafeZone, isSameMoment } from './battle-state.js';
 import { Arena } from './arena.js';
 import { BattleAudioManager } from './audio-manager.js';
 import { MusicDirector } from './music.js';
@@ -291,7 +291,6 @@ export class BattleRenderer {
         }
         else {
             const gap = simulationTime - Number(this.#applied.simtime);
-            if (gap === 0) return;
             const continuous = Math.abs(gap) <= SEEK_SECONDS;
             const snap = !continuous || Boolean(window.pausesim);
             this.#applyFrame(state, continuous ? this.#applied : null, snap);
@@ -328,7 +327,8 @@ export class BattleRenderer {
         this.#soundscape.setGas(safeRadius);
         this.#setMusicMood(gladiators, safeRadius, snap);
 
-        const forward = previous && Number(state.simtime) > Number(previous.simtime);
+        const forward = previous && (Number(state.simtime) > Number(previous.simtime)
+            || (Number(state.simtime) === Number(previous.simtime) && (Number(window.stepIncrement) || 1) > 0));
         if (forward && !snap) {
             gladiators.forEach((gladiator, index) => {
                 if (Number(gladiator.action) !== Number(previous.glads[index]?.action)) this.#fighters[index]?.startAction(Number(gladiator.action));
@@ -336,6 +336,9 @@ export class BattleRenderer {
             const events = deriveStepEvents(previous, state);
             this.#effects.handleEvents(events, this.#fightersById, this.#overlay, window.prefs ?? {}, state);
             this.#rouseCrowd(events, gladiators);
+            // Frames repeat while paused or at the end; the engine's last frames share one simtime and may still
+            // carry the killing blow, so only a frame that changes nothing is skipped.
+            if (isSameMoment(this.#applied, state)) return;
         }
         else if (!previous) {
             this.#effects.clear();

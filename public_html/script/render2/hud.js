@@ -377,7 +377,7 @@ export class BattleHud {
 
     /** Routes clicks on a roster panel to `onSelect` and keeps them away from the camera drag. */
     #handlePointer = (event) => {
-        if (event.button !== 0) return;
+        if (event.button !== 0 || !this.#panels[0]?.visible) return;
         const rect = this.#canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;

@@ -230,6 +230,23 @@ function projectileKey(projectile) {
 }
 
 /**
+ * Whether two frames show the same moment. The engine can write several frames at one simtime (its last steps), and
+ * a later one may carry the final blow, so a frame at the same time is only the same moment when every gladiator's
+ * hp, action and level match.
+ *
+ * @param {Record<string, unknown>|null} a One frame.
+ * @param {Record<string, unknown>|null} b The other frame.
+ * @returns {boolean} True when nothing a renderer shows differs between them.
+ */
+export function isSameMoment(a, b) {
+    if (!a || !b || Number(a.simtime) !== Number(b.simtime)) return false;
+    const before = Array.isArray(a.glads) ? a.glads : [];
+    const after = Array.isArray(b.glads) ? b.glads : [];
+    if (before.length !== after.length) return false;
+    return after.every((glad, index) => ['hp', 'action', 'lvl'].every((key) => Number(glad?.[key]) === Number(before[index]?.[key])));
+}
+
+/**
  * Derives one-shot visual/audio events from two complete replay frames.
  *
  * Continuous state such as position, heading, buffs and bars is intentionally

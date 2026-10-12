@@ -9,6 +9,7 @@ import {
     getPlaybackIntervalMs,
     headingToRadians,
     isOutsideSafeZone,
+    isSameMoment,
     lerp,
     lerpAngle,
     toArenaPosition,
@@ -195,4 +196,16 @@ test('blends angles through their shortest signed arc', () => {
     // 0° → 342° takes the short 18° path backwards instead of spinning forward.
     const longWay = lerpAngle(0, Math.PI * 1.9, 0.5);
     assert.ok(Math.abs(longWay + Math.PI * 0.05) < 1e-9);
+});
+
+test('a frame at the same simtime is new when it carries a death', () => {
+    const glad = (hp, action = 9) => ({ hp, action, lvl: 3 });
+    const last = { simtime: 98.7, glads: [glad(0), glad(2.4), glad(180, 10)] };
+    const repeat = { simtime: 98.7, glads: [glad(0), glad(2.4), glad(180, 10)] };
+    const finalBlow = { simtime: 98.7, glads: [glad(0), glad(0), glad(180, 10)] };
+
+    assert.equal(isSameMoment(last, repeat), true);
+    assert.equal(isSameMoment(last, finalBlow), false);
+    assert.equal(isSameMoment(last, { ...repeat, simtime: 98.8 }), false);
+    assert.equal(isSameMoment(null, repeat), false);
 });
