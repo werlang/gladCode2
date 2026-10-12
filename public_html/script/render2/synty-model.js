@@ -116,6 +116,12 @@ const BOW_CARRY_TILT = 0.45;
 const ARROW_LENGTH = 0.5;
 /** Arrows are modelled 0.5 m long and drawn at this scale (matches `effects.js`). */
 const ARROW_SCALE = 0.72;
+/** Pole weapons thrust two-handed (no Synty clip holds a spear): the stab clip lunges the body, IK puts both hands on the shaft. */
+const POLE_WEAPONS = new Set(['spear', 'longspear', 'dragonspear', 'trident', 'staff']);
+/** Spear thrust, in arm lengths: how far the rear hand draws back on the wind-up and drives out at contact, and the shaft's downward tilt. */
+const POLE_DRAW = 0.3;
+const POLE_LUNGE = 0.6;
+const POLE_TILT = 0.1;
 const IK_VECTORS = ['up', 'aim', 'side', 'from', 'to', 'at', 's', 'e', 'h', 'dir', 'bend', 'joint', 'goal', 'anchor', 'bowHand', 'drawHand', 'pole', 'neck', 'left', 'right', 'x', 'y', 'z'];
 
 const FINGER = /^(Thumb|IndexFinger|Finger)_/;
@@ -510,6 +516,8 @@ export class SyntyModel {
     #bones = {};
     #rest = new Map();
     #parts = {};
+    /** A pole weapon's grip, its rest rotation on the hand and the tip direction in the grip's frame (see `#thrustPole`). */
+    #pole = null;
     #emissiveKey = '';
     #scratch;
     #hang = {};
@@ -760,6 +768,7 @@ export class SyntyModel {
         this.#arrowGeometries = [shaft.geometry, head.geometry];
         this.#arrowMaterials = { shaft: shaft.material, head: head.material };
         this.#parts = { melee, bow, flask, arrow, shield: this.#buildShield(outfit.shield, tint, scale) };
+        this.#pole = POLE_WEAPONS.has(kind) ? this.#poleAxis(melee) : null;
     }
 
     /**
@@ -1229,10 +1238,80 @@ export class SyntyModel {
         }
     }
 
+    /** Finds where a pole weapon's tip points in its hand grip: the longest side of its bounds, toward the far end. */
+    #poleAxis(melee) {
+        const THREE = this.#THREE;
+        const grip = melee.parent;
+        grip.updateWorldMatrix(true, true);
+        const inverse = new THREE.Matrix4().copy(grip.matrixWorld).invert();
+        const box = new THREE.Box3();
+        const part = new THREE.Box3();
+        melee.traverse((node) => {
+            if (!node.isMesh) return;
+            node.geometry.computeBoundingBox();
+            box.union(part.copy(node.geometry.boundingBox).applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse, node.matrixWorld)));
+        });
+        if (box.isEmpty()) return null;
+        const size = box.getSize(new THREE.Vector3());
+        const key = size.x >= size.y && size.x >= size.z ? 'x' : size.y >= size.z ? 'y' : 'z';
+        const axis = new THREE.Vector3();
+        // The hand holds the shaft nearer the butt, so the tip is the end farther from the grip.
+        axis[key] = Math.abs(box.max[key]) >= Math.abs(box.min[key]) ? 1 : -1;
+        return { grip, rest: grip.quaternion.clone(), axis, tip: new THREE.Vector3(), want: new THREE.Quaternion() };
+    }
+
+    /**
+     * A two-handed spear thrust: the shaft level along the fighter's facing on its right side, the rear hand at the
+     * hip drawing back on the wind-up and driving out at contact, the front hand further along the shaft, and the
+     * weapon turned to lie along that line. The stab clip underneath still carries the body's lunge.
+     */
+    #thrustPole(action, weight) {
+        const THREE = this.#THREE;
+        const ik = this.#ik ??= Object.fromEntries(IK_VECTORS.map((key) => [key, new THREE.Vector3()]));
+        const spec = ACTION_SPECS[action.style] ?? ACTION_SPECS.thrust;
+        const time = action.time;
+        const contact = spec.contact ?? 0.22;
+        this.figure.updateWorldMatrix(true, true);
+        this.figure.getWorldDirection(ik.aim);
+        ik.aim.y = 0;
+        ik.aim.normalize();
+        ik.up.set(0, 1, 0);
+        ik.side.crossVectors(ik.aim, ik.up);
+        // `dir` is #reach's own scratch, so the shaft line lives in `anchor`.
+        const { left, right, anchor: dir, pole, bowHand: rear, drawHand: front } = ik;
+        this.#bones.Shoulder_L.getWorldPosition(left);
+        this.#bones.Shoulder_R.getWorldPosition(right);
+        const width = left.distanceTo(right);
+        const arm = this.#bones.Shoulder_R.getWorldPosition(ik.s).distanceTo(this.#bones.Elbow_R.getWorldPosition(ik.e))
+            + ik.e.distanceTo(this.#bones.Hand_R.getWorldPosition(ik.h));
+        const draw = smoothstep(0.02, contact * 0.7, time) * (1 - smoothstep(contact * 0.7, contact, time));
+        const lunge = smoothstep(contact * 0.6, contact, time) * (1 - smoothstep(contact + 0.1, spec.duration, time));
+        dir.copy(ik.aim).multiplyScalar(Math.cos(POLE_TILT)).addScaledVector(ik.up, -Math.sin(POLE_TILT));
+        rear.copy(right).addScaledVector(ik.up, -arm * 0.42).addScaledVector(ik.aim, arm * (0.12 - POLE_DRAW * draw + POLE_LUNGE * lunge));
+        front.copy(rear).addScaledVector(dir, width * 1.5);
+        // Elbows down: the rear one out to the side, the front one under the shaft.
+        this.#reach('R', rear, pole.copy(ik.side).addScaledVector(ik.up, -0.6).addScaledVector(ik.aim, -0.4), weight);
+        this.#reach('L', front, pole.copy(ik.up).multiplyScalar(-1).addScaledVector(ik.side, -0.3), weight);
+
+        // Lay the weapon along the shaft line.
+        const shaft = this.#pole;
+        const { q, t } = this.#scratch;
+        shaft.grip.updateWorldMatrix(true, false);
+        shaft.grip.getWorldQuaternion(q);
+        shaft.tip.copy(shaft.axis).applyQuaternion(q);
+        shaft.want.setFromUnitVectors(shaft.tip, dir).multiply(q);
+        shaft.grip.parent.getWorldQuaternion(t);
+        shaft.want.premultiply(t.invert());
+        shaft.grip.quaternion.copy(shaft.rest).slerp(shaft.want, weight);
+        shaft.grip.updateWorldMatrix(true, false);
+    }
+
     /** Applies pose math and blends locomotion, combat, and upper-body IK overrides. */
     applyPose(p, o) {
         const m = o.motion;
         this.#play(m);
+        if (this.#pole) this.#pole.grip.quaternion.copy(this.#pole.rest);
+        if (this.#pole && m.action?.style === 'thrust' && m.action.blend > 0.001 && !(m.dead > 0)) this.#thrustPole(m.action, m.action.blend);
         if (this.#stun > 0.01 && !(m.dead > 0)) this.#dizzy(this.#stun);
         if (this.#shake > 0 && !(m.dead > 0)) this.#shakeOff(1 - this.#shake / SHAKE_OFF_SECONDS);
         const pose = POSE_ACTIONS.has(m.action?.style) && m.dead <= 0 ? m.action.blend : 0;
