@@ -24,6 +24,14 @@
 .renderer-three {
     color-scheme: dark;
 
+    /* The 3D renderer draws its controls, FPS counter and inspect window on the canvas (render2/hud-controls.js). */
+    #canvas-container #button-container,
+    #ui-container,
+    #fps,
+    #details {
+        display: none !important;
+    }
+
     body {
         color: var(--battle-text);
         background: var(--battle-ink);

@@ -42,7 +42,7 @@
 
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
-    <script src="script/render.js"></script>
+    <script src="script/render.js?v=<?= filemtime(__DIR__ . "/script/render.js") ?>"></script>
 <?php if ($render2Enabled): ?>
 <?php
     // Every 3D renderer module is versioned by its modification time, so a browser never mixes a cached
@@ -64,7 +64,7 @@
     <script src="script/dialog.js"></script>
     <script src="script/dropzone.js"></script>
     <script src="script/checkboxes.js"></script>
-    <script src="script/playback.js"></script>
+    <script src="script/playback.js?v=<?= filemtime(__DIR__ . "/script/playback.js") ?>"></script>
     
     
     </head>

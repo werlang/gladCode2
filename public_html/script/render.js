@@ -1145,6 +1145,9 @@ function debugTimer(){
 }
 
 $(window).keydown(function(event) {
+    // The 3D renderer has its own shortcuts (render2/hud-controls.js).
+    if (document.documentElement.classList.contains('renderer-three'))
+        return;
     if(event.keyCode == Phaser.Keyboard.S){
         $('#sound').click();
     }

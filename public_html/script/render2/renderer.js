@@ -5,6 +5,7 @@ import { MusicDirector } from './music.js';
 import { Soundscape } from './soundscape.js';
 import { BattleCameraController } from './camera-controller.js';
 import { BattleHud } from './hud.js';
+import { PlaybackControls } from './hud-controls.js';
 import { BattleEffects } from './effects.js';
 import { Fighter, TELEPORT_DISTANCE } from './fighter.js';
 import { ACTION_BY_ID, ACTION_SPECS, ENGINE_RATE, actionDuration, engineTiming } from './motion.js';
@@ -125,8 +126,8 @@ export class BattleRenderer {
     #lastSize = { width: 0, height: 0 };
     #shakeTrauma = 0;
     #ready = false;
-    #fpsFrames = 0;
-    #fpsStartedAt = performance.now();
+    /** Canvas replay controls and windows (hud-controls.js). */
+    #ui;
     #shadowTexture;
     #maxPixelRatio = 1;
     #pixelRatio = 1;
@@ -178,6 +179,25 @@ export class BattleRenderer {
             isFollowed: (fighter) => this.#controls.target === fighter.root,
             isPoisoned: (fighter) => Boolean(window.gladArray?.[fighter.index]?.poison) && fighter.state && Number(fighter.state.hp) > 0,
         });
+        this.#ui = new PlaybackControls({
+            hud: this.#overlay,
+            canvas: this.#renderer.domElement,
+            host: {
+                fighters: () => this.#fighters,
+                select: (index) => this.#selectFighter(index),
+                stopInspect: () => this.#stopInspect(),
+                camera: () => ({ mode: this.#controls.mode, inspectMode: this.#controls.inspectMode, ghost: this.#controls.ghost }),
+                exitGhost: () => { if (this.#controls.ghost) this.#controls.toggleGhost(); },
+                cycleCamera: () => {
+                    const mode = this.#controls.cycleInspectMode();
+                    // A camera left free by a drag goes back to the inspected gladiator.
+                    const inspected = this.#fighters[window.followedGlad];
+                    if (inspected && this.#controls.mode !== 'inspect') this.#controls.follow(inspected);
+                    return mode;
+                },
+                frame: () => this.#applied,
+            },
+        });
         this.#shadowTexture = this.#createShadowTexture();
 
         this.music = new MusicDirector(this.#audio, Number(window.prefs?.sound?.music) || 0);
@@ -208,15 +228,21 @@ export class BattleRenderer {
     #selectFighter(index) {
         const fighter = this.#fighters[index];
         if (!fighter) return;
-        if (window.followedGlad === index || this.#controls.target === fighter.root) {
-            window.followedGlad = null;
-            this.#controls.unfollow();
-            window.jQuery?.('#details').remove();
+        if (window.followedGlad === index && this.#controls.mode === 'inspect') {
+            this.#stopInspect();
             return;
         }
         window.followedGlad = index;
-        this.#controls.follow(fighter.root);
-        window.createDetailedWindow?.();
+        this.#controls.follow(fighter);
+        // The inspect window opens minimized.
+        this.#ui.inspect(index);
+    }
+
+    /** Ends the inspection: the camera is let go and the inspect window closes. */
+    #stopInspect() {
+        window.followedGlad = null;
+        this.#controls.unfollow();
+        this.#ui.inspect(null);
     }
 
     /**
@@ -333,8 +359,7 @@ export class BattleRenderer {
 
         this.#pauseAtNewBreakpoints(previous, state);
         window.update_ui?.(state);
-        if (window.followedGlad != null && document.querySelector('#details')) window.updateDetailedWindow?.();
-        this.#updateLegacyTimeSlider(state);
+        this.#ui.record(state);
         this.#arena.updateSafeZone(safeRadius);
         this.#soundscape.setGas(safeRadius);
         this.#setMusicMood(gladiators, safeRadius, snap);
@@ -466,15 +491,7 @@ export class BattleRenderer {
             const breakpoint = typeof gladiator.breakpoint === 'string' ? gladiator.breakpoint : '';
             return breakpoint && breakpoint !== previous.glads[index]?.breakpoint && Number(gladiator.hp) > 0;
         });
-        if (hasNew && !window.pausesim) document.querySelector('#pause')?.click();
-    }
-
-    /** Keeps the shared jQuery UI timeline in sync with the replay clock. */
-    #updateLegacyTimeSlider(state) {
-        const simtime = Number(state.simtime);
-        if (window.timeSlider === Math.floor(simtime) || !window.jQuery?.fn?.slider) return;
-        window.timeSlider = simtime;
-        window.jQuery('#time').slider('value', simtime * 10);
+        if (hasNew && !window.pausesim) window.Playback?.setPaused(true);
     }
 
     /**
@@ -566,7 +583,7 @@ export class BattleRenderer {
             this.#camera.position.set(...this.#debugView.position);
             this.#camera.lookAt(...this.#debugView.target);
         }
-        else this.#controls.update();
+        else this.#controls.update(realDt);
         if (this.#shakeTrauma > 0) {
             this.#shakeTrauma = Math.max(0, this.#shakeTrauma - SHAKE_DECAY_PER_SECOND * realDt);
             const magnitude = this.#shakeTrauma ** 2 * SHAKE_MAX_OFFSET;
@@ -600,9 +617,9 @@ export class BattleRenderer {
         profiler.gpuEnd(gpu);
         profiler.lap('render');
         this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt, gameDt);
+        this.#ui.update(realDt, window.prefs ?? {});
         this.#overlay.render(this.#renderer);
         profiler.lap('hud');
-        this.#updateFps(timestamp);
         this.#adaptResolution(timestamp);
     };
 
@@ -702,25 +719,6 @@ export class BattleRenderer {
         this.#pixelRatio = Math.min(this.#maxPixelRatio, Math.max(MIN_PIXEL_RATIO, ratio));
         this.#renderer.setPixelRatio(this.#pixelRatio);
         this.#renderer.setSize(this.#lastSize.width, this.#lastSize.height, false);
-    }
-
-    #updateFps(timestamp) {
-        const existing = document.querySelector('#fps');
-        if (!window.prefs?.fps) {
-            existing?.remove();
-            this.#fpsFrames = 0;
-            this.#fpsStartedAt = timestamp;
-            return;
-        }
-        this.#fpsFrames += 1;
-        const elapsed = timestamp - this.#fpsStartedAt;
-        if (elapsed < 1000) return;
-        const badge = existing ?? document.createElement('div');
-        badge.id = 'fps';
-        badge.textContent = `FPS: ${(this.#fpsFrames * 1000 / elapsed).toFixed(1)}`;
-        if (!existing) this.#container.closest('#canvas-container')?.appendChild(badge);
-        this.#fpsFrames = 0;
-        this.#fpsStartedAt = timestamp;
     }
 
     /** Resizes WebGL and the camera aspect to the displayed container. */
@@ -970,6 +968,7 @@ export class BattleRenderer {
         }
         this.#resizeObserver.disconnect();
         this.#controls.destroy();
+        this.#ui.destroy();
         this.#overlay.destroy();
         this.#effects.destroy();
         this.#arena.destroy();
@@ -981,6 +980,5 @@ export class BattleRenderer {
         disposeSharedTextures();
         this.#renderer.dispose();
         this.#renderer.domElement.remove();
-        document.querySelector('#fps')?.remove();
     }
 }

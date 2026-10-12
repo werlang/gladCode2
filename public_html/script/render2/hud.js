@@ -11,12 +11,14 @@ const FLOAT_SECONDS = 0.9;
 const FLOAT_RISE = 38;
 const FLOAT_POOL = 14;
 const LABEL_CACHE_LIMIT = 48;
-const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
+export const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
 /** Display face for names, levels and combat text (loaded by playback.php), and the face for numbers. */
-const TITLE_FONT = `Cinzel, Georgia, ${FONT}`;
-const NUMBER_FONT = `Acme, ${FONT}`;
-const INK = 'rgba(12, 8, 5, 0.92)';
-const PARCHMENT = '#f1dfb8';
+export const TITLE_FONT = `Cinzel, Georgia, ${FONT}`;
+export const NUMBER_FONT = `Acme, ${FONT}`;
+/** Font Awesome (solid) is on the page for the classic UI; the canvas controls draw its glyphs as icons. */
+export const ICON_FONT = '"Font Awesome 6 Free"';
+export const INK = 'rgba(12, 8, 5, 0.92)';
+export const PARCHMENT = '#f1dfb8';
 const FLOAT_COLORS = Object.freeze({
     damage: ['#ffb199', '#e8382b'], heal: ['#c8ffc0', '#3fcf5a'], potion: ['#c8ffc0', '#3fcf5a'], level: ['#fff3b0', '#f0a91c'], mana: ['#cfe6ff', '#4b8dff'],
     stun: ['#fffbe0', '#d9a520'],
@@ -34,7 +36,7 @@ const stat = (name, layer = 'Clean') => `${SPRITES}Icons_Stats/ICON_FantasyWarri
  * meant to be tinted (`flat` paints the silhouette, `shade` multiplies so bevels keep their light).
  * `slice` is the source inset of a 9-slice frame or the end-cap width of a 3-slice bar.
  */
-const ART = Object.freeze({
+export const ART = Object.freeze({
     frame: { url: kit('Frame_Box_Medium01_Variant01'), slice: 118 },
     back: { url: kit('Box_Background_Shadowed') },
     glow: { url: fx('Glow_Box01_Smooth') },
@@ -124,7 +126,7 @@ function drawPortrait(ctx, cx, cy, radius, look, alive) {
     ctx.restore();
 }
 
-function roundRect(ctx, x, y, width, height, radius) {
+export function roundRect(ctx, x, y, width, height, radius) {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
     ctx.arcTo(x + width, y, x + width, y + height, radius);
@@ -135,7 +137,7 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 /** Draws a frame stretched to any size while its corners keep their shape (`inset` source px become `border` px). */
-function nineSlice(ctx, image, x, y, width, height, inset, border) {
+export function nineSlice(ctx, image, x, y, width, height, inset, border) {
     const sx = [0, inset, image.width - inset, image.width];
     const sy = [0, inset, image.height - inset, image.height];
     const dx = [x, x + border, x + width - border, x + width];
@@ -150,7 +152,7 @@ function nineSlice(ctx, image, x, y, width, height, inset, border) {
 }
 
 /** Draws a horizontal bar piece at any length: the pointed end caps keep their aspect, the middle stretches. */
-function threeSlice(ctx, image, x, y, width, height, cap) {
+export function threeSlice(ctx, image, x, y, width, height, cap) {
     const scale = height / image.height;
     const end = Math.min(cap * scale, width / 2);
     ctx.drawImage(image, 0, 0, cap, image.height, x, y, end, height);
@@ -159,7 +161,7 @@ function threeSlice(ctx, image, x, y, width, height, cap) {
 }
 
 /** Text with a dark outline so it reads over any part of the arena. */
-function outlined(ctx, text, x, y, { font, color, outline = INK, width = 3, align = 'left', maxWidth } = {}) {
+export function outlined(ctx, text, x, y, { font, color, outline = INK, width = 3, align = 'left', maxWidth } = {}) {
     ctx.font = font;
     ctx.textAlign = align;
     ctx.textBaseline = 'middle';
@@ -172,7 +174,7 @@ function outlined(ctx, text, x, y, { font, color, outline = INK, width = 3, alig
 }
 
 /** Greedy word wrap that also splits words longer than the line. */
-function wrapText(ctx, text, maxWidth, maxLines) {
+export function wrapText(ctx, text, maxWidth, maxLines) {
     const lines = [];
     let line = '';
     for (const word of text.split(/\s+/)) {
@@ -279,6 +281,56 @@ export class BattleHud {
         }
         document.fonts?.load(`700 14px ${TITLE_FONT}`).then(arrived, () => {});
         document.fonts?.load(`16px ${NUMBER_FONT}`).then(arrived, () => {});
+        document.fonts?.load(`900 16px ${ICON_FONT}`).then(arrived, () => {});
+    }
+
+    // ------------------------------------------------------------------ shared with the canvas controls
+
+    /** @returns {import('three').Scene} The screen-space scene (one unit = one CSS pixel, origin bottom-left). */
+    get scene() {
+        return this.#scene;
+    }
+
+    /** @returns {number} Bumped whenever a sprite or font arrives: textures keyed on it redraw. */
+    get artVersion() {
+        return this.#artVersion;
+    }
+
+    /** @returns {number} Canvas pixels per CSS pixel of the HUD textures. */
+    get ratio() {
+        return this.#ratio;
+    }
+
+    /** @returns {{ width: number, height: number }} Canvas size in CSS pixels. */
+    get size() {
+        return this.#size;
+    }
+
+    /** @see #sprite */
+    art(name, color, mode) {
+        return this.#sprite(name, color, mode);
+    }
+
+    /** A screen-space sprite in the HUD scene, anchored at its top-left corner. */
+    addSprite() {
+        const sprite = this.#createSprite();
+        sprite.center.set(0, 1);
+        return sprite;
+    }
+
+    /** Gives a sprite a canvas texture of this size (CSS pixels), reusing it when the size is unchanged. */
+    sizeSprite(sprite, width, height) {
+        return this.#resizeTexture(sprite, width, height);
+    }
+
+    /** @see #drawBar */
+    drawBar(ctx, x, y, width, height, ratio, color, options) {
+        this.#drawBar(ctx, x, y, width, height, ratio, color, options);
+    }
+
+    /** @see #drawIcon */
+    drawIcon(ctx, name, x, y, size) {
+        this.#drawIcon(ctx, name, x, y, size);
     }
 
     /**
@@ -548,7 +600,7 @@ export class BattleHud {
             const followed = this.#isFollowed(view);
             const poisoned = this.#isPoisoned(view);
             const buffs = glad.buffs ?? {};
-            const key = [glad.name, glad.lvl, glad.xp, glad.tonext, Math.round(glad.hp), Math.round(glad.ap), glad.maxhp, glad.maxap, glad.STR, glad.AGI, glad.INT,
+            const key = [glad.name, glad.lvl, glad.xp, glad.tonext, Math.round(glad.hp), Number(glad.hp) > 0, Math.round(glad.ap), glad.maxhp, glad.maxap, glad.STR, glad.AGI, glad.INT,
                 followed, poisoned, this.#artVersion,
                 ...['burn', 'movement', 'resist', 'invisible', 'stun'].map((name) => Math.ceil(Number(buffs[name]?.timeleft) || 0))].join('|');
             if (panel.userData.key !== key) {
@@ -814,12 +866,15 @@ export class BattleHud {
      * Repositions every card and advances floating labels.
      *
      * @param {import('./fighter.js').Fighter[]} views Fighters.
-     * @param {{ bars?: boolean, speech?: boolean }} preferences Display preferences.
+     * @param {{ bars?: boolean, speech?: boolean, frames?: boolean }} preferences Display preferences.
      * @param {number} realDt Real seconds since the previous frame.
      * @param {number} [floatDt] Seconds to age the floating labels by (the fight's clock), `realDt` by default.
      */
     update(views, preferences, realDt, floatDt = realDt) {
-        this.#updatePanels(views);
+        // The roster plaques follow the "frames" preference (M).
+        const roster = preferences.frames !== false;
+        if (roster) this.#updatePanels(views);
+        this.#panels.forEach((panel) => { panel.visible = roster; });
         views.forEach((view) => this.updateFighter(view, preferences));
         this.#separateCards(realDt);
         for (const sprite of this.#floats) {

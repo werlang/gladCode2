@@ -501,33 +501,40 @@ $(document).ready( function() {
         });		
     });
 
-    $('#sound').click( function(){
-        if (music.volume > 0){
-            $(this).data('music', music.volume);
-            music.volume = 0;
-        }
-        else if (prefs.sound.sfx > 0){
-            $(this).data('sfx', prefs.sound.sfx);
-            prefs.sound.sfx = 0;
-        }
-        else{
-            music.volume = $(this).data('music');
-            if (music.volume == 0)
-                music.volume = 0.1;
-    
-            prefs.sound.sfx = $(this).data('sfx');
-            if (prefs.sound.sfx == 0)
-                prefs.sound.sfx = 1;
-        }
-        changeSoundIcon();
+    $('#sound').click(toggleSound);
+});
 
-        $.post("back_play.php",{
-            action: "SET_PREF",
-            music_volume: music.volume,
-            sfx_volume: prefs.sound.sfx
-        });
-    })
+/** Cycles the audio: music and effects, effects only, silence (the remembered levels come back). */
+function toggleSound(){
+    var button = $('#sound');
+    if (music.volume > 0){
+        button.data('music', music.volume);
+        music.volume = 0;
+    }
+    else if (prefs.sound.sfx > 0){
+        button.data('sfx', prefs.sound.sfx);
+        prefs.sound.sfx = 0;
+    }
+    else{
+        music.volume = button.data('music');
+        if (!(music.volume > 0))
+            music.volume = 0.1;
 
+        prefs.sound.sfx = button.data('sfx');
+        if (!(prefs.sound.sfx > 0))
+            prefs.sound.sfx = 1;
+    }
+    changeSoundIcon();
+
+    $.post("back_play.php",{
+        action: "SET_PREF",
+        music_volume: music.volume,
+        sfx_volume: prefs.sound.sfx
+    });
+}
+
+$(document).ready( function() {
+    window.changeSoundIcon = changeSoundIcon;
     function changeSoundIcon(){
         if ((!music && parseFloat($('#sound').data('music')) > 0) || (music && music.volume > 0))
             $('#sound').find('img').prop('src','icon/music.png');
@@ -572,11 +579,12 @@ $(document).ready( function() {
         }
     });
 
-    $([window, document]).focusin(function(){
-        //console.log("entrou");
-    }).focusout(function(){
-        if (!pausesim) $('#pause').click();
-    });	
+    // Leaving the window (another tab or application) pauses; clicks inside the page never do.
+    window.addEventListener('blur', function(){
+        if (pausesim) return;
+        if (window.Playback.threeD) window.Playback.setPaused(true);
+        else $('#pause').click();
+    });
 
 });
 
@@ -703,6 +711,69 @@ function frameAt(index){
         })
     });
 }
+
+/**
+ * Replay control for the 3D renderer's canvas controls (the classic renderer keeps its DOM buttons).
+ * Speeds are simlog steps per 0.1 s; stepping always pauses first.
+ */
+var PLAYBACK_SPEEDS = [0.1, 0.2, 0.5, 1, 2, 5, 10];
+var playbackSpeedIndex = PLAYBACK_SPEEDS.indexOf(1);
+window.Playback = {
+    get threeD(){ return window.battleRendererVersion === window.BattleRendererPreference?.THREE && Boolean(window.threeBattleRenderer); },
+    get paused(){ return pausesim; },
+    get speed(){ return PLAYBACK_SPEEDS[playbackSpeedIndex]; },
+    get speeds(){ return PLAYBACK_SPEEDS; },
+    get speedIndex(){ return playbackSpeedIndex; },
+    get position(){ return timestep; },
+    get length(){ return steps.length; },
+    get tournament(){ return tournHash || null; },
+    get link(){ return "gladcode.dev/play/"+ loghash; },
+    setPaused: function(paused){
+        if (paused === pausesim) return;
+        clearInterval(istep);
+        pausesim = paused;
+        if (!paused){
+            stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
+            if (timestep % 1 !== 0)
+                timestep = Math.floor(timestep) + 1;
+            start_timer(steps);
+        }
+    },
+    togglePause: function(){ this.setPaused(!pausesim); },
+    step: function(direction){
+        this.setPaused(true);
+        if (direction < 0)
+            timestep = Math.max(0, Math.ceil(timestep) - 1);
+        else
+            timestep = Math.min(steps.length - 1, Math.floor(timestep) + 1);
+        var frame = frameAt(timestep);
+        if (frame) phaser_update(frame);
+    },
+    setSpeed: function(index){
+        playbackSpeedIndex = Math.max(0, Math.min(PLAYBACK_SPEEDS.length - 1, index));
+        stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
+        if (!pausesim){
+            clearInterval(istep);
+            start_timer(steps);
+        }
+    },
+    faster: function(){ this.setSpeed(playbackSpeedIndex + 1); },
+    slower: function(){ this.setSpeed(playbackSpeedIndex - 1); },
+    seek: function(position){
+        timestep = Math.max(0, Math.min(steps.length - 1, position));
+        var frame = frameAt(timestep);
+        if (frame) phaser_update(frame);
+    },
+    toggleSound: function(){ toggleSound(); },
+    get soundState(){
+        if (window.music && music.volume > 0) return 'music';
+        return prefs.sound.sfx > 0 ? 'sfx' : 'mute';
+    },
+    savePrefs: function(fields){ $.post("back_play.php", Object.assign({ action: "SET_PREF" }, fields)); },
+    openSettings: function(){ $('#settings').click(); },
+    get fullscreen(){ return isFullScreen(); },
+    toggleFullscreen: function(){ setFullScreen(!isFullScreen()); },
+};
 
 var show_final_score = true;
 function start_timer(steps){
