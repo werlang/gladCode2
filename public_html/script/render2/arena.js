@@ -74,6 +74,7 @@ export class Arena {
     #fires = null;
     /** @type {Array<{ x: number, y: number, z: number, size: number }>} Flame positions, once the coliseum is up. */
     #flames = [];
+    #throne = null;
     /** Billowing poison clouds over the poisoned ground (see `gas.js`). */
     #clouds = null;
     /** Sand floor mesh; its plain sand material gives way to the Meadow Forest terrain when the Synty set loads. */
@@ -215,6 +216,7 @@ export class Arena {
         this.#fires = own(new FireSystem(THREE));
         coliseum.flames.forEach((at) => this.#fires.add(at));
         this.#flames = coliseum.flames;
+        this.#throne = coliseum.throne;
         this.#scene.add(this.#fires.group);
     }
 
@@ -226,6 +228,11 @@ export class Arena {
      */
     get ready() {
         return this.#ready;
+    }
+
+    /** @returns {{ x: number, y: number, z: number, yaw: number }|null} The imperial box's throne (null until the coliseum loads). */
+    get throne() {
+        return this.#throne;
     }
 
     /** @returns {Array<{ x: number, y: number, z: number, size: number }>} Brazier, torch and incense flames (empty until the coliseum loads). */
