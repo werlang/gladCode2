@@ -110,6 +110,14 @@ const MAX_HOLD_SECONDS = 1;
 /** Engine action id while a gladiator is still locked in the action it started (see battle-state.js ACTIONS). */
 const WAITING = 9;
 const DEATH_SECONDS = 0.55;
+/**
+ * The last one standing celebrates in a loop: `VICTORY_DELAY` game seconds after the final death (the fall reads
+ * first), then every `VICTORY_CYCLE` seconds it turns to salute a side of the stands (`VICTORY_SALUTES`, radians
+ * from the imperial box), twirls its sword and raises its arms (synty-model.js `#celebrate`).
+ */
+const VICTORY_DELAY = 1.4;
+export const VICTORY_CYCLE = 7.5;
+const VICTORY_SALUTES = [0, 1.9, -1.9];
 const TWO_PI = Math.PI * 2;
 
 /** Shortest signed angle from `from` to `to`. */
@@ -165,6 +173,8 @@ export class Fighter {
     #weapon = 'melee';
     #dead = 0;
     #alive = true;
+    /** The celebration of the last one standing: game seconds into it (negative while it waits) and where to face. */
+    #victory = null;
     #frozen = null;
     /** Stun stars: shown 0..1, burst progress 0..1 after the stun ends, and a scratch vector for the head. */
     #starLevel = 0;
@@ -198,7 +208,7 @@ export class Fighter {
         return this.#appearance;
     }
 
-    /** @returns {{ x: number, z: number, yaw: number, speed: number, phase: number, action: string|null }} Debug values. */
+    /** @returns {{ x: number, z: number, yaw: number, speed: number, phase: number, action: string|null, dead: number, victory: number|null }} Debug values. */
     get debug() {
         return {
             x: this.root.position.x,
@@ -208,6 +218,8 @@ export class Fighter {
             phase: this.#phase,
             action: this.#action?.name ?? null,
             weapon: this.#weapon,
+            dead: this.#dead,
+            victory: this.#victory?.time ?? null,
         };
     }
 
@@ -424,6 +436,7 @@ export class Fighter {
         this.#forward = 0;
         this.#lateral = 0;
         this.#hold = null;
+        this.#victory = null;
     }
 
     /**
@@ -464,6 +477,7 @@ export class Fighter {
      * @param {number} actionId Engine action id.
      */
     startAction(actionId) {
+        if (this.celebrating) return;
         const name = ACTION_BY_ID[actionId];
         if (!name) {
             // The engine reports an action on its first step only and "waiting" for the rest of the cycle:
@@ -669,6 +683,36 @@ export class Fighter {
             : 0;
     }
 
+    /**
+     * Crowns or uncrowns the last one standing (a rewind before the final death uncrowns it).
+     *
+     * @param {boolean} victor Whether this fighter has won.
+     * @param {{ x: number, z: number }|null} [face] Where its first salute faces (the imperial box).
+     */
+    setVictor(victor, face = null) {
+        if (!victor) this.#victory = null;
+        else this.#victory ??= { time: -VICTORY_DELAY, face };
+    }
+
+    /** @returns {boolean} Whether the fighter is celebrating its win now. */
+    get celebrating() {
+        return Boolean(this.#victory && this.#victory.time >= 0 && this.#alive);
+    }
+
+    /** @returns {number} The celebration round under way (one per `VICTORY_CYCLE`), or -1 when not celebrating. */
+    get celebrationRound() {
+        return this.celebrating ? Math.floor(this.#victory.time / VICTORY_CYCLE) : -1;
+    }
+
+    /** Heading the fighter turns to: the engine's, or the side of the stands a celebrating victor salutes. */
+    #facing() {
+        if (!this.celebrating) return this.#to.yaw;
+        const { face } = this.#victory;
+        const round = this.celebrationRound;
+        const toward = face ? Math.atan2(face.x - this.root.position.x, face.z - this.root.position.z) : this.#to.yaw;
+        return toward + VICTORY_SALUTES[round % VICTORY_SALUTES.length];
+    }
+
     /** @param {boolean} alive Whether the fighter is standing. */
     setAlive(alive, snap = false) {
         this.#alive = alive;
@@ -693,11 +737,17 @@ export class Fighter {
      *
      * @param {{ realDt: number, gameDt: number, progress: number, elapsed: number, reducedMotion: boolean }} frame Frame timing.
      */
-    update({ realDt, gameDt, progress, elapsed, reducedMotion }) {
+    update({ gameDt, progress, reducedMotion }) {
         const isPaused = gameDt === 0;
         if (!isPaused) {
             this.#clock += gameDt;
             this.#gameElapsed += gameDt;
+            if (this.#victory) this.#victory.time += gameDt;
+        }
+        if (this.celebrating) {
+            // The fight is over: no guard, no leftover action.
+            this.#action = null;
+            this.#combat = 0;
         }
         const position = this.root.position;
         const previousX = position.x;
@@ -719,7 +769,7 @@ export class Fighter {
             position.z = this.#from.z + (this.#to.z - this.#from.z) * progress;
         }
         position.y = terrainHeight(position.x, position.z);
-        const yawError = angleDelta(this.#yaw, this.#to.yaw);
+        const yawError = angleDelta(this.#yaw, this.#facing());
         const standing = this.#alive && this.#speed < TURN_MAX_SPEED;
         const abs = Math.abs(yawError);
         // Turning in place at a steady rate, so the model can play its turn clip; otherwise follow quickly.
@@ -829,7 +879,7 @@ export class Fighter {
         this.#model.applyPose(p, {
             armRecoil: recoil * (1 - this.#actionBlend),
             bodyRecoil: recoil * (1 - 0.6 * this.#actionBlend),
-            stunned: Number(this.state.buffs?.stun?.timeleft) > 0 && this.#alive,
+            stunned: Number(this.buffs.stun?.timeleft) > 0 && this.#alive,
             aim: this.#activeSpec?.shot ? this.#actionBlend : 0,
             elapsed,
             speed: this.#speed,
@@ -847,9 +897,10 @@ export class Fighter {
                 flinch: this.#flinch,
                 hitScale: this.#hitScale,
                 hitAngle: this.#hitAngle,
-                turn: this.#turning ? angleDelta(this.#yaw, this.#to.yaw) : 0,
-                stunned: Number(this.state.buffs?.stun?.timeleft) > 0 && this.#alive,
+                turn: this.#turning ? angleDelta(this.#yaw, this.#facing()) : 0,
+                stunned: Number(this.buffs.stun?.timeleft) > 0 && this.#alive,
                 dead: this.#dead,
+                victory: this.celebrating ? { time: this.#victory.time % VICTORY_CYCLE, flourish: this.#weapon !== 'bow' } : null,
             },
         });
     }
@@ -871,7 +922,7 @@ export class Fighter {
     /** Pops the shield in when a block starts and pulses it while held. */
     #animateShield(elapsed) {
         const shield = this.#parts.shield;
-        const left = Number(this.state.buffs?.resist?.timeleft) || 0;
+        const left = Number(this.buffs.resist?.timeleft) || 0;
         // The shield stays up while the resist buff lasts, not only during the block action.
         shield.visible = this.#alive && (left > 0 || this.#activeSpec?.weapon === 'shield');
         if (!shield.visible) return;
@@ -903,7 +954,7 @@ export class Fighter {
     }
 
     #animateStatus(elapsed, realDt) {
-        const buffs = this.state.buffs ?? {};
+        const buffs = this.buffs;
         const invisible = Number(buffs.invisible?.timeleft) > 0;
         const stunned = Number(buffs.stun?.timeleft) > 0 && this.#alive;
         const burning = Number(buffs.burn?.timeleft) > 0 && this.#alive;
@@ -956,9 +1007,14 @@ export class Fighter {
         stars.userData.trail.scale.setScalar(spread);
     }
 
+    /** @returns {Record<string, { timeleft?: number }>} Buffs to show: the engine's, or none once the victor celebrates (they wear off). */
+    get buffs() {
+        return this.celebrating ? {} : this.state?.buffs ?? {};
+    }
+
     /** @returns {boolean} Whether the fighter is alive and on fire (the engine's `burn` buff). */
     get burning() {
-        return Number(this.state?.buffs?.burn?.timeleft) > 0 && this.#alive;
+        return Number(this.buffs.burn?.timeleft) > 0 && this.#alive;
     }
 
     /**

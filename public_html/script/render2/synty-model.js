@@ -94,6 +94,7 @@ const STATE_CLIPS = {
     hitR: 'Hit/HitReact/A_Hit_R_React_Sword',
     stun: 'Hit/Stun/A_Stun_Loop_Sword',
     death: 'Death/A_Death_F_01_Sword',
+    flourish: 'Idle/Fidgets/A_Idle_Flourish01_Sword',
 };
 const BLOCK_BEGIN_SECONDS = 0.5;
 const HIT_CLIP_SECONDS = 0.6;
@@ -133,6 +134,13 @@ const CAPE_BONES = ['Capes_01', 'back_02', 'back_03', 'back_04', 'back_05'];
 /** How far (radians per bone, roughly) a running fighter's cape streams out behind, and how it grows with speed. */
 const CAPE_MAX_LIFT = 0.55;
 const CAPE_LIFT_PER_SPEED = 0.22;
+/**
+ * A victor's celebration round (seconds into each `VICTORY_CYCLE` of fighter.js): it turns to salute first, twirls
+ * its sword (the flourish clip; archers skip it), then raises its weapon high and pumps the other fist
+ * (`PUMPS_PER_SECOND`), chest out and looking up, and rests before the next round.
+ */
+const CHEER = { flourishStart: 1, flourishEnd: 2.8, armsStart: 1, armsAfterFlourish: 2.65, armsEnd: 6.7 };
+const PUMPS_PER_SECOND = 1.4;
 /** Length of the quick head shake when a stun wears off. */
 const SHAKE_OFF_SECONDS = 0.55;
 
@@ -552,6 +560,7 @@ export class SyntyModel {
     #cape = [];
     #capeLift = 0;
     #capeScratch = null;
+    #cheerScratch = null;
     /** Skinned meshes of the body (not the carried props), for `bodyHit`. */
     #bodyMeshes = [];
     #raycaster = null;
@@ -888,6 +897,13 @@ export class SyntyModel {
                 else this.#queue(overlays, 'blockLoop', a.blend, (a.time - BLOCK_BEGIN_SECONDS) % this.#entry('blockLoop').duration);
             }
             else if (a.style === 'ambush') this.#queue(overlays, 'crouch', a.blend, loop('crouch'));
+        }
+
+        // A victor's sword flourish.
+        const victory = m.victory;
+        if (victory?.flourish && !(m.dead > 0)) {
+            const weight = smoothstep(CHEER.flourishStart, CHEER.flourishStart + 0.25, victory.time) * (1 - smoothstep(CHEER.flourishEnd - 0.3, CHEER.flourishEnd, victory.time));
+            this.#queue(overlays, 'flourish', weight, Math.max(0, victory.time - CHEER.flourishStart));
         }
 
         this.#hit = m.flinch > 0 ? Math.max(0, Math.min(1, (1 - m.flinch) / 0.1, m.flinch / 0.4)) * m.hitScale : 0;
@@ -1238,6 +1254,65 @@ export class SyntyModel {
         }
     }
 
+    /**
+     * The victor's arms-up moment, layered on the idle: the chest swells and the head looks up at the stands, the
+     * weapon hand (the bow hand for archers) stretches high overhead and the other fist pumps the air. Solved in world
+     * space with the archery IK, in arm lengths, so it fits every body.
+     *
+     * @param {{ time: number, flourish: boolean }} victory Seconds into the celebration round, and whether it twirled.
+     */
+    #celebrate(victory) {
+        const t = victory.time;
+        const start = victory.flourish ? CHEER.armsAfterFlourish : CHEER.armsStart;
+        const lift = smoothstep(start, start + 0.45, t) * (1 - smoothstep(CHEER.armsEnd - 0.5, CHEER.armsEnd, t));
+        if (lift <= 0.001) return;
+        const THREE = this.#THREE;
+        this.#ik ??= Object.fromEntries(IK_VECTORS.map((key) => [key, new THREE.Vector3()]));
+        this.#cheerScratch ??= {
+            ...Object.fromEntries(['up', 'right', 'fwd', 'axis', 'left', 'rightShoulder', 'target', 'high', 'pole'].map((key) => [key, new THREE.Vector3()])),
+            turn: new THREE.Quaternion(),
+            world: new THREE.Quaternion(),
+        };
+        const s = this.#cheerScratch;
+        const { turn, world } = s;
+        this.figure.updateWorldMatrix(true, true);
+        s.up.set(0, 1, 0);
+        this.#bones.Shoulder_L.getWorldPosition(s.left);
+        this.#bones.Shoulder_R.getWorldPosition(s.rightShoulder);
+        s.right.copy(s.rightShoulder).sub(s.left).setY(0).normalize();
+        s.fwd.crossVectors(s.up, s.right);
+        // Turning about this axis tips the chest back and the face up.
+        s.axis.crossVectors(s.fwd, s.up);
+        const pump = 0.5 - 0.5 * Math.cos((t - start) * PUMPS_PER_SECOND * Math.PI * 2);
+        for (const [name, angle] of [['Spine_02', 0.07], ['Spine_03', 0.07 + 0.05 * pump], ['Head', 0.28]]) {
+            const bone = this.#bones[name];
+            if (!bone) continue;
+            bone.getWorldQuaternion(world);
+            turn.setFromAxisAngle(s.axis, angle * lift);
+            this.#setWorld(bone, turn.multiply(world), 1);
+        }
+        const held = victory.flourish ? 'R' : 'L';
+        for (const side of SIDES) {
+            const shoulder = this.#bones[`Shoulder_${side}`];
+            const elbow = this.#bones[`Elbow_${side}`];
+            const hand = this.#bones[`Hand_${side}`];
+            shoulder.getWorldPosition(s.left);
+            const arm = s.left.distanceTo(elbow.getWorldPosition(s.target)) + s.target.distanceTo(hand.getWorldPosition(s.high));
+            const out = side === 'R' ? 1 : -1;
+            // Straight up and a little out (past reach, so the arm locks), the weapon swaying.
+            s.high.copy(s.left).addScaledVector(s.up, arm * 1.2).addScaledVector(s.right, out * arm * 0.3)
+                .addScaledVector(s.fwd, arm * (0.12 + 0.06 * Math.sin(t * 3)));
+            if (side === held) s.target.copy(s.high);
+            else {
+                // The fist drops beside the head and punches up again.
+                s.target.copy(s.left).addScaledVector(s.up, arm * 0.45).addScaledVector(s.right, out * arm * 0.55)
+                    .addScaledVector(s.fwd, arm * 0.25).lerp(s.high, pump);
+            }
+            s.pole.copy(s.right).multiplyScalar(out).addScaledVector(s.up, -0.6).addScaledVector(s.fwd, -0.2);
+            this.#reach(side, s.target, s.pole, lift);
+        }
+    }
+
     /** Finds where a pole weapon's tip points in its hand grip: the longest side of its bounds, toward the far end. */
     #poleAxis(melee) {
         const THREE = this.#THREE;
@@ -1314,6 +1389,7 @@ export class SyntyModel {
         if (this.#pole && m.action?.style === 'thrust' && m.action.blend > 0.001 && !(m.dead > 0)) this.#thrustPole(m.action, m.action.blend);
         if (this.#stun > 0.01 && !(m.dead > 0)) this.#dizzy(this.#stun);
         if (this.#shake > 0 && !(m.dead > 0)) this.#shakeOff(1 - this.#shake / SHAKE_OFF_SECONDS);
+        if (m.victory && !(m.dead > 0)) this.#celebrate(m.victory);
         const pose = POSE_ACTIONS.has(m.action?.style) && m.dead <= 0 ? m.action.blend : 0;
         const shooting = pose > 0.001 && SHOT_STYLES.has(m.action.style);
         if (shooting) this.#aimBow(m.action, pose);

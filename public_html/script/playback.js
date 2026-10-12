@@ -776,7 +776,11 @@ window.Playback = {
 };
 
 var show_final_score = true;
-function start_timer(steps){
+var resultShown = false;
+// One timer at a time, reading the global `steps`: a timer left running from before the replay was expanded (Space
+// during loading) kept an empty copy and pinned the replay at its first frame.
+function start_timer(){
+    clearInterval(istep);
     istep = setInterval( function(){
         //console.log(steps[timestep]);
         if (pausesim){
@@ -787,7 +791,26 @@ function start_timer(steps){
         }
         if (timestep < 0)
             timestep = 0;
-        if (timestep > steps.length - 1){
+        if (window.Playback.threeD){
+            // The 3D renderer crowns the victor in the arena itself: nothing covers the battle or holds it.
+            if (timestep > steps.length - 1){
+                timestep = steps.length - 1;
+                if (!resultShown){
+                    resultShown = true;
+                    if (new URLSearchParams(location.search).get('loop') === 'true')
+                        location.reload();
+                    window.threeBattleRenderer.battleEnded();
+                    music.pause();
+                    victory.play('', 0, music.volume / 0.1);
+                }
+            }
+            else if (resultShown){
+                resultShown = false;
+                window.threeBattleRenderer.battleResumed();
+                music.resume();
+            }
+        }
+        else if (timestep > steps.length - 1){
             timestep = steps.length - 1;
             var name, team, id, hp;
             for (i in steps[timestep].glads){

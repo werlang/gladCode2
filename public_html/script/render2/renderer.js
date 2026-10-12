@@ -32,6 +32,9 @@ const AMBIENCE_MAX_RATE = 2;
 const PAUSE_GREY = 0.55;
 const PAUSE_DIM = 0.08;
 const PAUSE_FADE_RATE = 7;
+/** After the victory the gas clears outward: its radius grows by this much per second, and per second squared. */
+const GAS_CLEAR_SPEED = 3;
+const GAS_CLEAR_ACCELERATION = 3;
 const MAX_FRAME_DELTA = 0.1;
 /** Adaptive resolution: sampled over `QUALITY_WINDOW_MS`, stepping the pixel ratio within these bounds. */
 const QUALITY_WINDOW_MS = 700;
@@ -125,9 +128,14 @@ export class BattleRenderer {
     #lastTimestamp = null;
     #lastSize = { width: 0, height: 0 };
     #shakeTrauma = 0;
+    /** The victor's celebration round last cheered by the crowd (-1 while the battle is on). */
+    #victoryRound = -1;
     #ready = false;
     /** Canvas replay controls and windows (hud-controls.js). */
     #ui;
+    /** The engine's current safe radius, and seconds the gas has been clearing since the victory (null before). */
+    #safeRadius = Infinity;
+    #gasClear = null;
     #shadowTexture;
     #maxPixelRatio = 1;
     #pixelRatio = 1;
@@ -328,6 +336,9 @@ export class BattleRenderer {
             this.#applyFrame(state, null, true);
         }
         else {
+            // Frames repeat while paused or at the end; the engine's last frames share one simtime and may still
+            // carry the killing blow, so only a frame that changes nothing is skipped.
+            if (isSameMoment(this.#applied, state)) return;
             const gap = simulationTime - Number(this.#applied.simtime);
             const continuous = Math.abs(gap) <= SEEK_SECONDS;
             const snap = !continuous || Boolean(window.pausesim);
@@ -360,8 +371,11 @@ export class BattleRenderer {
         this.#pauseAtNewBreakpoints(previous, state);
         window.update_ui?.(state);
         this.#ui.record(state);
-        this.#arena.updateSafeZone(safeRadius);
-        this.#soundscape.setGas(safeRadius);
+        this.#safeRadius = safeRadius;
+        if (this.#gasClear === null) {
+            this.#arena.updateSafeZone(safeRadius);
+            this.#soundscape.setGas(safeRadius);
+        }
         this.#setMusicMood(gladiators, safeRadius, snap);
 
         const forward = previous && (Number(state.simtime) > Number(previous.simtime)
@@ -373,9 +387,6 @@ export class BattleRenderer {
             const events = deriveStepEvents(previous, state);
             this.#effects.handleEvents(events, this.#fightersById, this.#overlay, window.prefs ?? {}, state);
             this.#rouseCrowd(events, gladiators);
-            // Frames repeat while paused or at the end; the engine's last frames share one simtime and may still
-            // carry the killing blow, so only a frame that changes nothing is skipped.
-            if (isSameMoment(this.#applied, state)) return;
         }
         else if (!previous) {
             this.#effects.clear();
@@ -404,6 +415,10 @@ export class BattleRenderer {
             fighter.poisoned = compatibility.poison && compatibility.alive;
             window.gladArray[index] = compatibility;
         });
+        // The last one standing celebrates, saluting the imperial box first; a rewind past the final death uncrowns it.
+        const standing = gladiators.filter((gladiator) => Number(gladiator.hp) > 0);
+        const victor = gladiators.length > 1 && standing.length === 1 ? standing[0] : null;
+        gladiators.forEach((gladiator, index) => this.#fighters[index]?.setVictor(gladiator === victor, this.#arena.throne));
         if (snap) this.#seekPoses(gladiators);
         this.#effects.setProjectiles(Array.isArray(state.projectiles) ? state.projectiles : [], snap);
         this.#applied = state;
@@ -598,6 +613,8 @@ export class BattleRenderer {
         profiler.lap('arena');
         const frame = { realDt, gameDt, progress, elapsed, reducedMotion: this.#reducedMotion };
         for (const fighter of this.#fighters) fighter.update(frame);
+        this.#cheerVictor();
+        this.#clearGas(realDt);
         profiler.lap('fighters');
         this.#arena.setCrowdFocus(this.#fightCentre());
         this.#effects.update(frame, this.#fighters);
@@ -616,7 +633,9 @@ export class BattleRenderer {
         }
         profiler.gpuEnd(gpu);
         profiler.lap('render');
-        this.#overlay.update(this.#fighters, window.prefs ?? {}, realDt, gameDt);
+        const prefs = window.prefs ?? {};
+        // The overhead cards make way for the victor's laurels.
+        this.#overlay.update(this.#fighters, this.#ui.crowning ? { ...prefs, bars: false, speech: false } : prefs, realDt, gameDt);
         this.#ui.update(realDt, window.prefs ?? {});
         this.#overlay.render(this.#renderer);
         profiler.lap('hud');
@@ -750,7 +769,7 @@ export class BattleRenderer {
         }
         this.#soundscape.setCrowd(prefs.crowd ?? 1);
         for (const fighter of this.#fighters) {
-            const burning = Number(fighter.state?.buffs?.burn?.timeleft) > 0 && Number(fighter.state?.hp) > 0;
+            const burning = fighter.burning;
             this.#soundscape.setBurning(String(fighter.index), burning ? fighter.position : null);
         }
         this.#soundscape.update(realDt);
@@ -783,6 +802,68 @@ export class BattleRenderer {
         const climax = (alive.length <= 2 && lowest < 0.4) || safeRadius < 6;
         if (climax) this.music.setMood('climax');
         else if (snap) this.music.setMood('battle');
+    }
+
+    /**
+     * The crowd rises and cheers again at every round of the victor's celebration. When it begins, the camera films
+     * the victor in a slow circle and the laurels crown it; a rewind before the final death undoes both.
+     */
+    #cheerVictor() {
+        let round = -1;
+        let victor = null;
+        for (const fighter of this.#fighters) {
+            if (fighter.celebrationRound > round) {
+                round = fighter.celebrationRound;
+                victor = fighter;
+            }
+        }
+        if (round > this.#victoryRound) {
+            this.#arena.reactCrowd(0.7);
+            this.#soundscape.react(0.7);
+        }
+        if (this.#victoryRound < 0 && round === 0) {
+            this.#controls.cinematic(victor);
+            this.#ui.showVictory(victor);
+        }
+        else if (this.#victoryRound >= 0 && round < 0) {
+            if (this.#controls.mode === 'cinematic') this.#controls.cinematic(null);
+            this.#ui.hideVictory();
+        }
+        this.#victoryRound = round;
+    }
+
+    /** Once the victor celebrates, the gas clears outward from the safe circle until it is gone; a rewind restores it. */
+    #clearGas(realDt) {
+        if (this.#victoryRound < 0) {
+            if (this.#gasClear !== null) {
+                this.#gasClear = null;
+                this.#arena.updateSafeZone(this.#safeRadius);
+                this.#soundscape.setGas(this.#safeRadius);
+            }
+            return;
+        }
+        if (!Number.isFinite(this.#safeRadius)) return;
+        this.#gasClear = (this.#gasClear ?? 0) + realDt;
+        const t = this.#gasClear;
+        const radius = this.#safeRadius + GAS_CLEAR_SPEED * t + GAS_CLEAR_ACCELERATION * t * t;
+        for (const fighter of this.#fighters) {
+            fighter.poisoned = false;
+            if (window.gladArray?.[fighter.index]) window.gladArray[fighter.index].poison = false;
+        }
+        if (radius > 60) return;
+        this.#arena.updateSafeZone(radius);
+        this.#soundscape.setGas(radius);
+    }
+
+    /** The replay reached its last frame (playback.js): a battle without a victor ends in a draw. */
+    battleEnded() {
+        const standing = this.#fighters.filter((fighter) => Number(fighter.state?.hp) > 0).length;
+        if (standing === 0 && this.#fighters.length > 1) this.#ui.showVictory(null);
+    }
+
+    /** The replay moved back from its last frame. */
+    battleResumed() {
+        if (this.#victoryRound < 0) this.#ui.hideVictory();
     }
 
     /** The crowd rises to deaths, heavy blows and level-ups, and chants for the last one standing. */
