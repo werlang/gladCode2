@@ -156,6 +156,8 @@ export class Fighter {
     #teleport = null;
     #hitHeat = 0;
     #hitScale = 1;
+    /** Where the last blow came from, relative to the facing (0 ahead, +π/2 on the left). */
+    #hitAngle = 0;
     #actionBlend = 0;
     #actionStyle = null;
     #moved = 0;
@@ -645,8 +647,12 @@ export class Fighter {
         return this.#alive ? this.#model.bodyHit?.(origin, direction, far) ?? null : null;
     }
 
-    /** Triggers the recoil and red flash of a landed hit. */
-    hit() {
+    /**
+     * Triggers the recoil and red flash of a landed hit; the body reels away from where the blow came from.
+     *
+     * @param {{ x: number, z: number }|null} [from] World point the blow came from (attacker, or the projectile's path).
+     */
+    hit(from = null) {
         // A blow on a raised barrier ripples across it.
         if (this.#parts.shield?.visible) this.#parts.shield.userData.impact = 1;
         // A fresh hit must not restart a flinch that is still playing (burn ticks, multi-hits).
@@ -657,6 +663,10 @@ export class Fighter {
         this.#hitHeat += 1;
         this.#flinch = 1;
         this.#combat = COMBAT_SECONDS;
+        const at = this.root.position;
+        this.#hitAngle = from && Math.hypot(from.x - at.x, from.z - at.z) > 1e-3
+            ? angleDelta(this.#yaw, Math.atan2(from.x - at.x, from.z - at.z))
+            : 0;
     }
 
     /** @param {boolean} alive Whether the fighter is standing. */
@@ -836,6 +846,7 @@ export class Fighter {
                 action: this.#actionStyle,
                 flinch: this.#flinch,
                 hitScale: this.#hitScale,
+                hitAngle: this.#hitAngle,
                 turn: this.#turning ? angleDelta(this.#yaw, this.#to.yaw) : 0,
                 stunned: Number(this.state.buffs?.stun?.timeleft) > 0 && this.#alive,
                 dead: this.#dead,

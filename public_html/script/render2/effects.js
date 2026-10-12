@@ -1,5 +1,5 @@
 import { ACTION_BY_ID, ACTION_SPECS, smoothstep } from './motion.js';
-import { ARENA_SIZE } from './battle-state.js';
+import { ARENA_SIZE, headingToRadians } from './battle-state.js';
 import { terrainHeight } from './arena.js';
 import { BlastSystem } from './blast.js';
 import { FireSystem } from './fire.js';
@@ -505,7 +505,11 @@ export class BattleEffects {
         let delay = 0;
         // The melee attacker whose blow this is, if any (it leaves a wound facing them).
         let blade = null;
-        let struck = events.some((other) => other.type === 'projectile-impact');
+        // Where the blow came from, so the victim reels the right way.
+        let from = null;
+        const impact = events.find((other) => other.type === 'projectile-impact');
+        let struck = Boolean(impact);
+        if (impact) from = this.#projectileSource(impact.projectile, victim);
         for (const attacker of fighters.values()) {
             const action = attacker.activeAction;
             const spec = action?.spec ?? null;
@@ -526,18 +530,20 @@ export class BattleEffects {
             }
             struck = true;
             blade = attacker;
+            from = attacker.position;
         }
         if (!struck) {
             const archer = this.#closeShooter(victim, fighters);
             if (archer) {
                 this.#closeShot(archer, victim);
                 struck = true;
+                from = archer.position;
             }
         }
         // Only attacks and projectiles flinch; burn and poison ticks are damage over time and just show their number.
         this.later(delay, () => {
             if (struck) {
-                victim.hit();
+                victim.hit(from);
                 if (blade) {
                     victim.wound(blade.position);
                     // Steel on a raised guard rings; a blow on the body lands with a weight that follows the damage.
@@ -558,6 +564,19 @@ export class BattleEffects {
                 this.#damageTotals.set(key, total);
             }
         });
+    }
+
+    /**
+     * A point back along a projectile's flight from the victim: where its last frame had it, or, when that sits on the
+     * victim, one metre behind along its heading.
+     */
+    #projectileSource(projectile, victim) {
+        const x = Number(projectile.x) - ARENA_SIZE / 2;
+        const z = Number(projectile.y) - ARENA_SIZE / 2;
+        if (Math.hypot(x - victim.position.x, z - victim.position.z) > 0.2) return { x, z };
+        // The same heading-to-yaw turn as the fighters (renderer.js `headingToYaw`).
+        const yaw = Math.PI + headingToRadians(projectile.head);
+        return { x: victim.position.x - Math.sin(yaw), z: victim.position.z - Math.cos(yaw) };
     }
 
     /**

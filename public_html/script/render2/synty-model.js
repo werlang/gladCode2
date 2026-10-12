@@ -88,12 +88,21 @@ const STATE_CLIPS = {
     idleCombat: 'Idle/Base/A_Idle_Base_Sword',
     blockBegin: 'Block/A_Block_Begin_Sword',
     blockLoop: 'Block/A_Block_Loop_Sword',
-    hit: 'Hit/HitReact/A_Hit_F_React_Sword',
+    hitF: 'Hit/HitReact/A_Hit_F_React_Sword',
+    hitB: 'Hit/HitReact/A_Hit_B_React_Sword',
+    hitL: 'Hit/HitReact/A_Hit_L_React_Sword',
+    hitR: 'Hit/HitReact/A_Hit_R_React_Sword',
     stun: 'Hit/Stun/A_Stun_Loop_Sword',
     death: 'Death/A_Death_F_01_Sword',
 };
 const BLOCK_BEGIN_SECONDS = 0.5;
 const HIT_CLIP_SECONDS = 0.6;
+/**
+ * Directional hit reactions: clip and the side a blow comes from that it answers (x: left, z: ahead). The clips are
+ * named for where the body goes (measured: F folds forward, B arches back, L sways left, R right), so a blow from
+ * ahead plays B and one from the left plays R: the body is driven away from the blow.
+ */
+const HIT_SIDES = [['hitB', 0, 1], ['hitF', 0, -1], ['hitR', 1, 0], ['hitL', -1, 0]];
 const DEATH_CLIP_SECONDS = 1.47;
 /** Actions without a Synty clip: the base locomotion stays and the upper body follows the `motion.js` pose. */
 const POSE_ACTIONS = new Set(['ranged', 'assassinate', 'fireball', 'teleport', 'potion']);
@@ -917,10 +926,16 @@ export class SyntyModel {
         for (let i = 0; i < links.length; i += 1) if (this.#hitLayer[i]) saved[i].copy(links[i].bone.quaternion);
         const hips = this.#bones.Hips.position.clone();
         for (const entry of this.#actions.values()) entry.action.enabled = false;
-        const hit = this.#entry('hit');
-        hit.action.enabled = true;
-        hit.action.weight = 1;
-        hit.action.time = Math.min((1 - m.flinch) * HIT_CLIP_SECONDS, hit.duration - 1e-3);
+        // The reaction to the side the blow came from: the two nearest of the four directional clips, blended.
+        const angle = m.hitAngle ?? 0;
+        const shares = HIT_SIDES.map(([, x, z]) => Math.max(0, Math.cos(angle) * z + Math.sin(angle) * x));
+        const total = shares.reduce((sum, share) => sum + share, 0) || 1;
+        HIT_SIDES.forEach(([name], index) => {
+            const hit = this.#entry(name);
+            hit.action.enabled = shares[index] > 0.001;
+            hit.action.weight = shares[index] / total;
+            hit.action.time = Math.min((1 - m.flinch) * HIT_CLIP_SECONDS, hit.duration - 1e-3);
+        });
         this.#mixer.update(0);
         this.#retarget();
         this.#bones.Hips.position.copy(hips);
