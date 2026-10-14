@@ -131,6 +131,7 @@ float timeLimit = 200; //tempo limite da para o evento de fim da simula��o
 //int winners[3];
 int readytostart = 0;
 int sandbox = 0; //1 quando a simulacao roda no editor (habilita setHp, setPosition, setAp, lvlUp e slots -1)
+int noitems = 0; //1 em torneios: setSlots nao registra nenhum item, nenhum gladiador usa pocoes
 int simlogclosed = 0; //evita fclose duplo do simlog, protegido por lock
 int finalrecorded = 0; //garante que o passo final seja gravado uma unica vez, protegido por lock
 pthread_mutex_t lock;

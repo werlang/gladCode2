@@ -28,6 +28,9 @@
     $sandbox = !isset($_SESSION['match']) && !isset($args['ranked']) && !isset($args['duel'])
         && !isset($args['tournament']) && !isset($args['training']);
 
+    // tournament runs forbid consumable items: no slots are sent and the engine also ignores any setSlots
+    $noitems = isset($args['tournament']);
+
     $glads = array();
     if (isset($args['glads']))
         $glads = $args["glads"];
@@ -225,16 +228,14 @@
             $skins[$name .'@'. $nick] = $row['skin'];
             $uid = $row['userid'];
 
-            $potions = "";
-            $sql = "SELECT item FROM slots WHERE user = $uid AND expire > now() ORDER BY expire LIMIT 4";
-            $result2 = runQuery($sql);
-            $potions = array();
-            for ($i=0 ; $i<4 ; $i++){
-                if ($row = $result2->fetch()){
-                    array_push($potions, $row['item']);
-                }
-                else {
-                    array_push($potions, "0");
+            $potions = array("0", "0", "0", "0");
+            if (!$noitems){
+                $sql = "SELECT item FROM slots WHERE user = $uid AND expire > now() ORDER BY expire LIMIT 4";
+                $result2 = runQuery($sql);
+                for ($i=0 ; $i<4 ; $i++){
+                    if ($row = $result2->fetch()){
+                        $potions[$i] = $row['item'];
+                    }
                 }
             }
             $potions = implode(",", $potions);
@@ -280,6 +281,7 @@
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'sandbox' => $sandbox,
+            'noitems' => $noitems,
         ]));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

@@ -87,6 +87,9 @@ void setSlots(int gladid, char *str){
             //-1 (qualquer item) so existe no editor; ids fora da lista leriam fora de itemList
             if (id < 0 || id >= N_ITEMS)
                 id = (id == -1 && sandbox) ? -1 : 0;
+            //torneios nao permitem itens: o runner liga noitems, o codigo do usuario nao tem como desliga-lo
+            if (noitems)
+                id = 0;
             (g+gladid)->items[i] = id;
             //com menos de N_SLOTS itens na string, nao passa do fim dela
             if (*e != '\0')

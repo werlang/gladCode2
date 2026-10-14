@@ -422,7 +422,15 @@ int main(int argc , char *argv[]){
     int i;
     nglad = atoi(argv[1]);
     //o modo sandbox vem do runner (argumento da linha de comando), o codigo do usuario nao tem como liga-lo
-    sandbox = argc > 2 && strcmp(argv[2], "sandbox") == 0;
+    //(o mesmo vale para noitems, que desabilita os itens em torneios)
+    sandbox = 0;
+    noitems = 0;
+    for (i=2 ; i<argc ; i++){
+        if (strcmp(argv[i], "sandbox") == 0)
+            sandbox = 1;
+        else if (strcmp(argv[i], "noitems") == 0)
+            noitems = 1;
+    }
     g = NULL;
     p = NULL;
     

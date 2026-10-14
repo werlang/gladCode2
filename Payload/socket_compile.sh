@@ -15,9 +15,12 @@ while [ -f code$i.* ]; do
 done
 
 # "sandbox" (passado pelo runner so em execucoes do editor) libera setHp, setPosition, setAp, lvlUp e slots -1
+# "noitems" (passado pelo runner em torneios) desabilita o uso de itens consumiveis
 mode=""
-if [ "$1" = "sandbox" ]; then
-	mode="sandbox"
-fi
+for arg in "$@"; do
+	if [ "$arg" = "sandbox" ] || [ "$arg" = "noitems" ]; then
+		mode="$mode $arg"
+	fi
+done
 
 gcc -o gladCodeServerMain gladCodeServerMain.c -lm -lpthread && ./gladCodeServerMain $i $mode

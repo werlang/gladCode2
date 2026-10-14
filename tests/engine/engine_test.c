@@ -37,6 +37,7 @@ void resetArena(int n){
     p = NULL;
     nglad = n;
     sandbox = 0;
+    noitems = 0;
     for (i=0 ; i<n ; i++){
         int id = createGladiator(1000 + i);
         setSTR(id, 12);
@@ -129,6 +130,18 @@ void testSetSlots(){
 
     sandbox = 0;
     CHECK(isItemReady(0, "pot-hp-5") == 0, "-1 must not count as any item outside sandbox");
+
+    //torneios: noitems descarta qualquer slot, inclusive itens validos
+    noitems = 1;
+    (g+0)->lvl = 0;
+    strcpy(s, "1,2,3,4");
+    setSlots(0, s);
+    CHECK((g+0)->items[0] == 0 && (g+0)->items[1] == 0 && (g+0)->items[2] == 0 && (g+0)->items[3] == 0,
+        "noitems must drop every slot: %d %d %d %d", (g+0)->items[0], (g+0)->items[1], (g+0)->items[2], (g+0)->items[3]);
+    (g+0)->lvl = 1;
+    CHECK(isItemReady(0, itemList[1]) == 0, "no item may be ready with noitems");
+    CHECK(useItem(0, itemList[1]) == 0, "no item may be used with noitems");
+    noitems = 0;
 }
 
 void testJsonEscape(){

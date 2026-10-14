@@ -435,6 +435,8 @@ reward = ( rewardBase / mmr * avgmmr ) * ( 1 + ((0.001 * mmr - 1) * lowmmr) )</e
 
                 <p>Para usar um item durante o combate, seu gladiador precisa usar a função <a href='function/useitem'>useItem</a>. Como argumento você deve informar uma String com o <b>identificador</b> do item desejado. Cada item encomendado e ativo só poderá ser usado uma vez durante cada batalha.</p>
 
+                <p>Os itens <b>não podem ser usados em torneios</b>. Nessas batalhas todos os compartimentos são ignorados, e <a href='function/useitem'>useItem</a> sempre retorna falso.</p>
+
                 <pre><code class="language-c">// Linguagem C
 loop(){
     if (getHp() < 100){

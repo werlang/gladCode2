@@ -3,7 +3,7 @@ import path from 'path';
 import { exec } from 'child_process';
 
 class Runner {
-    constructor({ dirname, nglads, codes, sandbox }) {
+    constructor({ dirname, nglads, codes, sandbox, noitems }) {
         this.dirname = dirname;
         this.tmpDirPHP = path.join('/phppayload', this.dirname);
         this.tmpDir = path.join('/runs', this.dirname);
@@ -11,6 +11,8 @@ class Runner {
         this.codes = JSON.parse(codes || '[]');
         // editor runs only: enables the engine sandbox commands (setHp, setPosition, setAp, lvlUp, -1 slots)
         this.sandbox = sandbox === true;
+        // tournament runs only: the engine ignores every item slot, so no gladiator can use potions
+        this.noitems = noitems === true;
     }
 
     async run() {
@@ -25,7 +27,7 @@ class Runner {
     }
 
     async runSimulation() {
-        const command = `docker run --rm --name ${this.dirname} -v gladcode_tmp_run:/usercode -w /usercode/${this.dirname} --cpu-period=100000 --cpu-quota=50000 gladcode2-vm sh socket_compile.sh${this.sandbox ? ' sandbox' : ''}`;
+        const command = `docker run --rm --name ${this.dirname} -v gladcode_tmp_run:/usercode -w /usercode/${this.dirname} --cpu-period=100000 --cpu-quota=50000 gladcode2-vm sh socket_compile.sh${this.sandbox ? ' sandbox' : ''}${this.noitems ? ' noitems' : ''}`;
         let finished = false;
         let timeoutId;
 
