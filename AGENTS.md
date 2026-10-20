@@ -155,6 +155,10 @@ cat simlog
 | **Empty `simlog`** | GCC compilation failed for gladiator code or C server | Inspect `errorc.txt` in the temporary run directory under `public_html/runs/{hash}/` |
 | **"AUTH_REQUIRED"** | Missing or expired PHP session | Log in via `index.php` or ensure `config/config.json` / env session database credentials are valid |
 | **Container Timeout** | Simulation took longer than 30s | Runner kills container via `docker kill {dirname}`. Check for blocking calls or high turn counts |
+| **HTTP 500 in Ranked Battle** | `DivisionByZeroError` in `calcReward()` when all combatants have 0 MMR | Ensure `$avgmmr > 0 ? ($glad['mmr'] / $avgmmr) : 1` in `public_html/back_simulation.php` |
+| **"ERRO DE SINTAXE" in Matchmaking** | Opponent gladiator in MMR pool threw Python/C runtime error | Triage candidate pool via pairwise battle curl; fix gladiator code or downgrade version |
+
+For detailed guidance on programmatically invoking battles and triaging errors, see [Debugging & Programmatic Battles](.agents/skills/gladcode-simulation/references/debugging_and_programmatic_battles.md).
 
 ---
 
