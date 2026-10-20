@@ -647,9 +647,9 @@
         
         foreach($glads as $i => $glad){
             $rewardWeighted[$i] = $rewardRaw[$i] - $evenReward;
-            $rewardNorm = $rewardWeighted[$i] / $rewardWeighted[0] * $maxReward;
+            $rewardNorm = ($rewardWeighted[0] != 0) ? ($rewardWeighted[$i] / $rewardWeighted[0] * $maxReward) : 0;
 
-            $mmrDev = $glad['mmr'] / $avgmmr;
+            $mmrDev = ($avgmmr > 0) ? ($glad['mmr'] / $avgmmr) : 1;
             
             if ($rewardNorm > 0)
                 $rewardDev[$i] = $rewardNorm / max($mmrDev, 0.5);

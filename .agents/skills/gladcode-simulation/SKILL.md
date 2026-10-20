@@ -25,6 +25,7 @@ For specialized component specifications, consult these reference guides:
 
 - 📜 **[C & Python Gladiator API Reference](references/c_api_reference.md)**: Documentation of `gladCodeAPI.c` and `gladCodeAPI.py` functions, arguments, return values, and TCP socket messaging protocols.
 - ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: Deep dive into `back_simulation.php`, Runner API, container VM isolation, `socket_compile.sh`, `simlog` format, and Phaser.js visualization.
+- 🔬 **[Debugging & Programmatic Battles](references/debugging_and_programmatic_battles.md)**: Guide to navigating codebase architecture, calling ranked/custom battles via curl/APIs, and diagnostic procedures for battle bugs.
 - 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: Complete guide to `public_html/dev-tools/`, `tournament.sh`, and `dump_restore.sh`.
 - ⚖️ **[Balance Patch Workflow](references/balance_patch.md)**: End-to-end procedure for rebalances — tuning payload values, verifying the server compile, syncing `manual.php` + function JSONs + regenerated bundle, bumping `version`, and publishing the news post.
 - 🗃️ **[Database Migrations](references/database_migrations.md)**: Versioned MySQL flow (`migrations/`, `db:migrate`, deploy hook) ported from node-aec.
