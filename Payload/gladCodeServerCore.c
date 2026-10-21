@@ -333,20 +333,49 @@ void updateProjectiles(){
     }
 }
 
+//troca os caracteres que quebrariam o json do simlog (aspas, barra invertida e controles) por equivalentes seguros,
+//impedindo que o codigo do gladiador injete campos (ex. "crashed") no log via speak ou setName
+void jsonSafe(char *s){
+    for ( ; *s != '\0' ; s++){
+        if (*s == '"')
+            *s = '\'';
+        else if (*s == '\\')
+            *s = '/';
+        else if ((unsigned char)*s < 32)
+            *s = ' ';
+    }
+}
+
 //grava no arquivo de saida o json da diff da etapa anterior pra atual
 void recordSteps(){
+    static int firststep = 1; //a primeira etapa grava o estado completo, as demais so a diferenca
     char resp[6000*nglad];
 
     int i,j;
     char buffer[10000], buffs[300];
-    float simtime;
+
+    pthread_mutex_lock(&loglock);
+    if (outArq == NULL){ //simlog ja foi fechado pelo main
+        pthread_mutex_unlock(&loglock);
+        return;
+    }
+
+    float simtime = -1;
     for (i=0 ; i<nglad ; i++){
         if ((g+i)->hp > 0){
             simtime = (g+i)->time;
             break;
         }
     }
-    if (simtime == timeInterval){
+    //nenhum vivo (todos cairam ao mesmo tempo): usa o tempo mais avancado
+    if (i == nglad){
+        for (i=0 ; i<nglad ; i++){
+            if ((g+i)->time > simtime)
+                simtime = (g+i)->time;
+        }
+    }
+    if (firststep){
+        firststep = 0;
         sprintf(resp, "{\"simtime\":%.1f,\"glads\":[",simtime);
         for (i=0 ; i<nglad ; i++){
             sprintf(buffs,"\"buffs\":{\"burn\":{\"value\":%.2f,\"timeleft\":%.1f},\"movement\":{\"value\":%.2f,\"timeleft\":%.1f},\"resist\":{\"value\":%.2f,\"timeleft\":%.1f},\"invisible\":{\"value\":%.2f,\"timeleft\":%.1f},\"stun\":{\"value\":%.2f,\"timeleft\":%.1f}}",
@@ -552,6 +581,7 @@ void recordSteps(){
     
     //printf("%s\n",resp);
     fprintf(outArq, "%s",resp);
+    pthread_mutex_unlock(&loglock);
 }
 
 int checkAlive(){
@@ -563,8 +593,9 @@ int checkAlive(){
             (g+i)->hp = 0;
     }
     if (nalive <= 1){
-        endsim = 1;
+        //grava a ultima etapa antes de sinalizar o fim, pois o main fecha o simlog assim que ve endsim
         recordSteps();
+        endsim = 1;
     }
     return nalive;
 }

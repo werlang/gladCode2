@@ -53,6 +53,7 @@ int getINT(int gladid){
 
 void setName(int gladid, char *v){
     if ( (g+gladid)->lvl == 0){
+        jsonSafe(v);
         int i;
         char user[50] = "";
         for (i=0 ; i<strlen(v) ; i++){
@@ -154,7 +155,7 @@ int isSimRunning(int gladid){
     
     checkAlive();
     if (endsim){
-        fclose(outArq);
+        //o simlog e fechado uma unica vez pelo main (fechar em cada thread causava double fclose)
         return 0;
     }
     
@@ -1159,6 +1160,7 @@ void speak(int gladid, char *message){
         *newline = '\0';
 
     (g+gladid)->message[249] = '\0';
+    jsonSafe((g+gladid)->message);
     (g+gladid)->msgtime = 3;
     (g+gladid)->msgtype = MSG_SPEAK;
 }
@@ -1173,6 +1175,7 @@ void breakpoint(int gladid, char *message){
     strncpy((g+gladid)->message, message, 250);
 
     (g+gladid)->message[249] = '\0';
+    jsonSafe((g+gladid)->message);
     (g+gladid)->msgtime = timeInterval;
     (g+gladid)->msgtype = MSG_BREAKPOINT;
 }

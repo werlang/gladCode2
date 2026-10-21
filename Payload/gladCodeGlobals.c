@@ -129,6 +129,7 @@ float timeLimit = 200; //tempo limite da para o evento de fim da simula��o
 //int winners[3];
 int readytostart = 0;
 pthread_mutex_t lock;
+pthread_mutex_t loglock = PTHREAD_MUTEX_INITIALIZER; //serializa a gravacao do simlog com a marcacao de gladiadores que cairam
 pthread_cond_t cond;
 
 // associa os indices aos nomes dos itens

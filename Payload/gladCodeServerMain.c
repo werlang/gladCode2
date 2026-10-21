@@ -392,13 +392,23 @@ void *connection_handler(void *p){
                 printf("Error");
 
             // the client process died (runtime error) while its gladiator was still fighting:
-            // kill the gladiator right away so the others don't wait for its turn timeout
+            // kill the gladiator right away so the others don't wait for its turn timeout.
+            // loglock keeps recordSteps() from snapshotting the step halfway through this change,
+            // and the readytostart check skips gladiators whose hp is not initialised yet (before startSim)
+            int crashed = 0;
             pthread_mutex_lock(&lock);
-            if (!endsim && (g+gladid)->hp > 0){
+            pthread_mutex_lock(&loglock);
+            if (!endsim && readytostart >= nglad && (g+gladid)->hp > 0){
                 (g+gladid)->hp = 0;
                 (g+gladid)->crashed = 1;
+                crashed = 1;
             }
+            pthread_mutex_unlock(&loglock);
             pthread_mutex_unlock(&lock);
+
+            // ends the battle when this crash leaves one or no gladiator alive (no live thread would notice if all crashed)
+            if (crashed)
+                checkAlive();
             endcomm = 1;
         }
     }
@@ -529,6 +539,13 @@ int main(int argc , char *argv[]){
     
     while(!endsim)
         usleep(10000);
+
+    // closes the simlog exactly once; threads still finishing a step see outArq == NULL and skip it
+    pthread_mutex_lock(&loglock);
+    if (outArq)
+        fclose(outArq);
+    outArq = NULL;
+    pthread_mutex_unlock(&loglock);
 
     //cJSON *jsonArray = cJSON_Parse(outString);
     //char *str = cJSON_Print(jsonArray);
