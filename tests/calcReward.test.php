@@ -1,62 +1,10 @@
 <?php
 /**
- * Unit tests for calcReward() logic from back_simulation.php.
+ * Unit tests for calcReward() from battle_results.php.
  * Validates division by zero edge cases, MMR deviations, and reward weighting.
  */
 
-// Isolated pure function version of calcReward for unit testing
-function calcReward(array $glads): array {
-    $maxReward = 10;
-    $timeWeight = 1.5;
-    $winWeight = 1;
-    $nglad = count($glads);
-    
-    $rewardRaw = array();
-    $timeDiff = $glads[1]['time'] - $glads[$nglad - 1]['time'];
-    
-    $avgmmr = 0;
-    foreach ($glads as $i => $glad) {
-        $diff = $glad['time'] - $glads[$nglad - 1]['time'];
-        if ($timeDiff == 0) {
-            $timeNorm = 1;
-        } else {
-            $timeNorm = $diff / $timeDiff;
-        }
-
-        $win = 0;
-        if ($i == 0 || $glad['time'] == $glads[0]['time']) {
-            $win = 1;
-            $timeNorm = 1;
-        }
-        $rewardRaw[$i] = ($timeNorm * $nglad * $timeWeight) + ($win * $nglad * $winWeight);
-        $avgmmr += $glad['mmr'];
-    }
-    $avgmmr /= $nglad;
-    $evenReward = array_sum($rewardRaw) / $nglad;
-    $rewardWeighted = array();
-    $rewardDev = array();
-    
-    foreach ($glads as $i => $glad) {
-        $rewardWeighted[$i] = $rewardRaw[$i] - $evenReward;
-        $rewardNorm = ($rewardWeighted[0] != 0) ? ($rewardWeighted[$i] / $rewardWeighted[0] * $maxReward) : 0;
-
-        $mmrDev = ($avgmmr > 0) ? ($glad['mmr'] / $avgmmr) : 1;
-        
-        if ($rewardNorm > 0) {
-            $rewardDev[$i] = $rewardNorm / max($mmrDev, 0.5);
-        } else {
-            $rewardDev[$i] = $rewardNorm * min($mmrDev, 2);
-        }
-        
-        // faz perder menos quanto mais próximo de mmr 0
-        if ($rewardDev[$i] < 0 && $glad['mmr'] < 1000) { 
-            $bias = 0.001 * $glad['mmr'] - 1;
-            $rewardDev[$i] = $rewardDev[$i] + $rewardDev[$i] * $bias;
-        }
-    }		
-    
-    return $rewardDev;
-}
+require __DIR__ . '/../public_html/battle_results.php';
 
 // Test Runner
 $passed = 0;

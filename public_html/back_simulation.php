@@ -1,7 +1,7 @@
 <?php
     include_once "connection.php";
     session_start();
-    include_once "tournament_forfeit.php";
+    include_once "battle_results.php";
     date_default_timezone_set('America/Sao_Paulo');
 
     $user = null;
@@ -15,7 +15,6 @@
 
     $ids = array();
     $codes = array();
-    $code_ids = array(); // codes index => gladiator cod, for codes loaded from the database
     $skins = array();
 
     $args = json_decode($_POST['args'], true);
@@ -212,11 +211,10 @@
 
     if (count($ids) > 0){
         $ids = implode(",", $ids);
-        $sql = "SELECT u.id AS 'userid', g.cod, code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
+        $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
 
         while($row = $result->fetch()){
-            $cod = $row['cod'];
             $code = $row['code'];
             $nick = $row['apelido'];
             $name = $row['name'];
@@ -248,7 +246,6 @@
 
             $code = $setup . $code;
 
-            $code_ids[count($codes)] = $cod;
             array_push($codes, $code);
         }
     }
@@ -264,22 +261,7 @@
         $output['simulation'] = null;
     elseif (!$invalid_attr) {
         list($simlog, $error) = run_simulation($codes, $sandbox, $noitems);
-
-        // a broken gladiator would stall the tournament round: forfeit it and run the battle once more
-        if ($error != "" && isset($args['tournament']) && $groupid != null){
-            $failed_cods = array();
-            foreach (find_failed_glads($error, count($codes)) as $i){
-                if (isset($code_ids[$i])){
-                    $codes[$i] = forfeit_code($codes[$i], getLanguage($codes[$i]));
-                    array_push($failed_cods, $code_ids[$i]);
-                }
-            }
-
-            if (count($failed_cods) > 0){
-                forfeit_glads($failed_cods, $groupid);
-                list($simlog, $error) = run_simulation($codes, $sandbox, $noitems);
-            }
-        }
+        $error = battle_error(!$sandbox, $simlog, $error);
 
         // $spechar = array("\n", "\r", "\t", "\"");
         // $repchar = array("\\n", "\\r", "\\t", '\\"');
@@ -346,6 +328,7 @@
 
             if (isset($args['ranked'])){
                 $deaths = death_times($conn, $ids, $simulation);
+                flag_broken_glads(crashed_glads($simulation), $deaths);
                 $rewards = battle_rewards($conn, $deaths, $user);
                 send_reports($rewards, $hash);
             }
@@ -408,8 +391,6 @@
     }
 
     echo json_encode($output);
-
-    // system("rm -rf $path/$foldername");
 
     // writes the codes in a fresh run folder (the runner deletes it afterwards) and returns [simlog, error]
     // $sandbox/$noitems come from the caller: a function does not see the script's variables
@@ -640,57 +621,6 @@
         return $reward;
     }
     
-    function calcReward($glads){
-        $maxReward = 10;
-        $timeWeight = 1.5;
-        $winWeight = 1;
-        $nglad = count($glads);
-        
-        $rewardRaw = array();
-        $timeDiff = $glads[1]['time'] - $glads[$nglad-1]['time'];
-        
-        $avgmmr = 0;
-        foreach($glads as $i => $glad){
-            $diff = $glad['time'] - $glads[$nglad-1]['time'];
-            if ($timeDiff == 0)
-                $timeNorm = 1;
-            else
-                $timeNorm = $diff/$timeDiff;
-
-            $win = 0;
-            if ($i == 0 || $glad['time'] == $glads[0]['time']){
-                $win = 1;
-                $timeNorm = 1;
-            }
-            $rewardRaw[$i] = ($timeNorm * $nglad * $timeWeight) + ($win * $nglad * $winWeight);
-            $avgmmr += $glad['mmr'];
-        }
-        $avgmmr /= $nglad;
-        $evenReward = array_sum($rewardRaw) / $nglad;
-        $rewardWeighted = array();
-        $rewardDev = array();
-        
-        foreach($glads as $i => $glad){
-            $rewardWeighted[$i] = $rewardRaw[$i] - $evenReward;
-            $rewardNorm = ($rewardWeighted[0] != 0) ? ($rewardWeighted[$i] / $rewardWeighted[0] * $maxReward) : 0;
-
-            $mmrDev = ($avgmmr > 0) ? ($glad['mmr'] / $avgmmr) : 1;
-            
-            if ($rewardNorm > 0)
-                $rewardDev[$i] = $rewardNorm / max($mmrDev, 0.5);
-            else
-                $rewardDev[$i] = $rewardNorm * min($mmrDev, 2);
-            
-            //faz perder menos quanto mais próximo de mmr 0
-            if ($rewardDev[$i] < 0 && $glad['mmr'] < 1000){ 
-                $bias = 0.001 * $glad['mmr'] - 1;
-                $rewardDev[$i] = $rewardDev[$i] + $rewardDev[$i] * $bias;
-            }
-        }		
-        
-        return $rewardDev;
-    }	
-
     function death_times($conn, $ids, $log){
         $deaths = array();
 

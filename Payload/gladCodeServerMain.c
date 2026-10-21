@@ -403,6 +403,23 @@ void *connection_handler(void *p){
                 printf("Client disconnected");
             else if(read_size == -1)
                 printf("Error");
+
+            // the client process died (runtime error) while its gladiator was still fighting:
+            // kill the gladiator right away so the others don't wait for its turn timeout.
+            // lock keeps recordSteps() (which runs under it) from snapshotting the step halfway through this change,
+            // and the readytostart check skips gladiators whose hp is not initialised yet (before startSim)
+            int crashed = 0;
+            pthread_mutex_lock(&lock);
+            if (!endsim && readytostart >= nglad && (g+gladid)->hp > 0){
+                (g+gladid)->hp = 0;
+                (g+gladid)->crashed = 1;
+                crashed = 1;
+            }
+            pthread_mutex_unlock(&lock);
+
+            // ends the battle when this crash leaves one or no gladiator alive (no live thread would notice if all crashed)
+            if (crashed)
+                checkAlive();
             endcomm = 1;
         }
     }
