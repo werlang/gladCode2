@@ -12,11 +12,6 @@
     $outtext = ""; 
     $error = "";
     $cancel_run = false;
-    
-    $foldername = md5('folder'.microtime(true)*rand());
-    $path = "./runs";
-
-    system("mkdir $path/$foldername && cp /app/payload/* $path/$foldername");
 
     $ids = array();
     $codes = array();
@@ -251,42 +246,12 @@
         if (!validate_attr($code)){
             $invalid_attr = true;
         }
-
-        $language = getLanguage($code);
-        if ($language == "c"){
-            $code = "#include \"gladCodeCore.c\"\n". $code;
-            file_put_contents("$path/$foldername/code$i.c",$code);
-        }
-        else if ($language == "python"){
-            $code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
-            file_put_contents("$path/$foldername/code$i.py",$code);
-        }
     }
 
     if ($cancel_run)
         $output['simulation'] = null;
     elseif (!$invalid_attr) {
-        // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-        ]));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $raw_response = curl_exec($ch);
-        $curl_err = curl_error($ch);
-        curl_close($ch);
-
-        if ($raw_response === false) {
-            $error = "CURL Error: " . $curl_err;
-            $simlog = '';
-        } else {
-            $response = json_decode($raw_response, true);
-            $simlog = $response['simlog'] ?? '';
-            $error = $response['error'] ?? '';
-        }
+        list($simlog, $error) = run_simulation($codes);
 
         // $spechar = array("\n", "\r", "\t", "\"");
         // $repchar = array("\\n", "\\r", "\\t", '\\"');
@@ -424,7 +389,46 @@
     echo json_encode($output);
 
     // system("rm -rf $path/$foldername");
-    
+
+    // writes the codes in a fresh run folder (the runner deletes it afterwards) and returns [simlog, error]
+    function run_simulation($codes){
+        $foldername = md5('folder'.microtime(true)*rand());
+        $path = "./runs";
+
+        system("mkdir $path/$foldername && cp /app/payload/* $path/$foldername");
+
+        foreach($codes as $i => $code){
+            $language = getLanguage($code);
+            if ($language == "c"){
+                $code = "#include \"gladCodeCore.c\"\n". $code;
+                file_put_contents("$path/$foldername/code$i.c",$code);
+            }
+            else if ($language == "python"){
+                $code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
+                file_put_contents("$path/$foldername/code$i.py",$code);
+            }
+        }
+
+        // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        ]));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $raw_response = curl_exec($ch);
+        $curl_err = curl_error($ch);
+        curl_close($ch);
+
+        if ($raw_response === false)
+            return array('', "CURL Error: " . $curl_err);
+
+        $response = json_decode($raw_response, true);
+        return array($response['simlog'] ?? '', $response['error'] ?? '');
+    }
+
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
         $hash = codeMatch($subject, $pattern);
