@@ -2,6 +2,7 @@
     include_once "connection.php";
     session_start();
     include("back_node_message.php");
+    include_once "tournament_forfeit.php";
     date_default_timezone_set('America/Sao_Paulo');
 
     $user = null;
@@ -15,6 +16,7 @@
 
     $ids = array();
     $codes = array();
+    $code_ids = array(); // codes index => gladiator cod, for codes loaded from the database
     $skins = array();
 
     $args = json_decode($_POST['args'], true);
@@ -200,10 +202,11 @@
 
     if (count($ids) > 0){
         $ids = implode(",", $ids);
-        $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
+        $sql = "SELECT u.id AS 'userid', g.cod, code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
 
         while($row = $result->fetch()){
+            $cod = $row['cod'];
             $code = $row['code'];
             $nick = $row['apelido'];
             $name = $row['name'];
@@ -237,6 +240,7 @@
 
             $code = $setup . $code;
 
+            $code_ids[count($codes)] = $cod;
             array_push($codes, $code);
         }
     }
@@ -252,6 +256,22 @@
         $output['simulation'] = null;
     elseif (!$invalid_attr) {
         list($simlog, $error) = run_simulation($codes);
+
+        // a broken gladiator would stall the tournament round: forfeit it and run the battle once more
+        if ($error != "" && isset($args['tournament']) && $groupid != null){
+            $failed_cods = array();
+            foreach (find_failed_glads($error, count($codes)) as $i){
+                if (isset($code_ids[$i])){
+                    $codes[$i] = forfeit_code($codes[$i], getLanguage($codes[$i]));
+                    array_push($failed_cods, $code_ids[$i]);
+                }
+            }
+
+            if (count($failed_cods) > 0){
+                forfeit_glads($failed_cods, $groupid);
+                list($simlog, $error) = run_simulation($codes);
+            }
+        }
 
         // $spechar = array("\n", "\r", "\t", "\"");
         // $repchar = array("\\n", "\\r", "\\t", '\\"');
