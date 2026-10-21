@@ -1,6 +1,7 @@
 <?php
     include_once "connection.php";
     session_start();
+    include_once "tournament_forfeit.php";
     date_default_timezone_set('America/Sao_Paulo');
 
     $user = null;
@@ -11,14 +12,10 @@
     $outtext = ""; 
     $error = "";
     $cancel_run = false;
-    
-    $foldername = md5('folder'.microtime(true)*rand());
-    $path = "./runs";
-
-    system("mkdir $path/$foldername && cp /app/payload/* $path/$foldername");
 
     $ids = array();
     $codes = array();
+    $code_ids = array(); // codes index => gladiator cod, for codes loaded from the database
     $skins = array();
 
     $args = json_decode($_POST['args'], true);
@@ -215,10 +212,11 @@
 
     if (count($ids) > 0){
         $ids = implode(",", $ids);
-        $sql = "SELECT u.id AS 'userid', code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
+        $sql = "SELECT u.id AS 'userid', g.cod, code, apelido, vstr, vagi, vint, g.name, skin FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod IN ($ids)";
         $result = runQuery($sql);
 
         while($row = $result->fetch()){
+            $cod = $row['cod'];
             $code = $row['code'];
             $nick = $row['apelido'];
             $name = $row['name'];
@@ -250,6 +248,7 @@
 
             $code = $setup . $code;
 
+            $code_ids[count($codes)] = $cod;
             array_push($codes, $code);
         }
     }
@@ -259,43 +258,27 @@
         if (!validate_attr($code)){
             $invalid_attr = true;
         }
-
-        $language = getLanguage($code);
-        if ($language == "c"){
-            $code = "#include \"gladCodeCore.c\"\n". $code;
-            file_put_contents("$path/$foldername/code$i.c",$code);
-        }
-        else if ($language == "python"){
-            $code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
-            file_put_contents("$path/$foldername/code$i.py",$code);
-        }
     }
 
     if ($cancel_run)
         $output['simulation'] = null;
     elseif (!$invalid_attr) {
-        // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
+        list($simlog, $error) = run_simulation($codes, $sandbox, $noitems);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-            'sandbox' => $sandbox,
-            'noitems' => $noitems,
-        ]));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $raw_response = curl_exec($ch);
-        $curl_err = curl_error($ch);
-        curl_close($ch);
+        // a broken gladiator would stall the tournament round: forfeit it and run the battle once more
+        if ($error != "" && isset($args['tournament']) && $groupid != null){
+            $failed_cods = array();
+            foreach (find_failed_glads($error, count($codes)) as $i){
+                if (isset($code_ids[$i])){
+                    $codes[$i] = forfeit_code($codes[$i], getLanguage($codes[$i]));
+                    array_push($failed_cods, $code_ids[$i]);
+                }
+            }
 
-        if ($raw_response === false) {
-            $error = "CURL Error: " . $curl_err;
-            $simlog = '';
-        } else {
-            $response = json_decode($raw_response, true);
-            $simlog = $response['simlog'] ?? '';
-            $error = $response['error'] ?? '';
+            if (count($failed_cods) > 0){
+                forfeit_glads($failed_cods, $groupid);
+                list($simlog, $error) = run_simulation($codes, $sandbox, $noitems);
+            }
         }
 
         // $spechar = array("\n", "\r", "\t", "\"");
@@ -427,7 +410,49 @@
     echo json_encode($output);
 
     // system("rm -rf $path/$foldername");
-    
+
+    // writes the codes in a fresh run folder (the runner deletes it afterwards) and returns [simlog, error]
+    // $sandbox/$noitems come from the caller: a function does not see the script's variables
+    function run_simulation($codes, $sandbox = false, $noitems = false){
+        $foldername = md5('folder'.microtime(true)*rand());
+        $path = "./runs";
+
+        system("mkdir $path/$foldername && cp /app/payload/* $path/$foldername");
+
+        foreach($codes as $i => $code){
+            $language = getLanguage($code);
+            if ($language == "c"){
+                $code = "#include \"gladCodeCore.c\"\n". $code;
+                file_put_contents("$path/$foldername/code$i.c",$code);
+            }
+            else if ($language == "python"){
+                $code = "from gladCodeAPI import *\n\n". $code ."\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n";
+                file_put_contents("$path/$foldername/code$i.py",$code);
+            }
+        }
+
+        // system("$path/$foldername/call_socket.sh $foldername &>> $path/$foldername/error.txt");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://runner:3000/$foldername");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'sandbox' => $sandbox,
+            'noitems' => $noitems,
+        ]));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $raw_response = curl_exec($ch);
+        $curl_err = curl_error($ch);
+        curl_close($ch);
+
+        if ($raw_response === false)
+            return array('', "CURL Error: " . $curl_err);
+
+        $response = json_decode($raw_response, true);
+        return array($response['simlog'] ?? '', $response['error'] ?? '');
+    }
+
     function getSkin($subject) {
         $pattern = '/setSpritesheet\("([\d\w]*?)"\)[;]{0,1}/';
         $hash = codeMatch($subject, $pattern);
