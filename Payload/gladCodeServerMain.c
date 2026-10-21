@@ -390,6 +390,15 @@ void *connection_handler(void *p){
                 printf("Client disconnected");
             else if(read_size == -1)
                 printf("Error");
+
+            // the client process died (runtime error) while its gladiator was still fighting:
+            // kill the gladiator right away so the others don't wait for its turn timeout
+            pthread_mutex_lock(&lock);
+            if (!endsim && (g+gladid)->hp > 0){
+                (g+gladid)->hp = 0;
+                (g+gladid)->crashed = 1;
+            }
+            pthread_mutex_unlock(&lock);
             endcomm = 1;
         }
     }

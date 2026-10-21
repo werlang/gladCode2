@@ -112,6 +112,7 @@ struct gladiador{
     int msgtype;
 	float msgtime;
     int items[N_SLOTS];
+    int crashed; //cliente desconectou com o gladiador vivo (erro em tempo de execucao)
 };
 
 struct gladiador *g, *go;

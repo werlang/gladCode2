@@ -356,7 +356,7 @@ void recordSteps(){
                 (g+i)->buffs[BUFF_INVISIBLE].value,(g+i)->buffs[BUFF_INVISIBLE].timeleft,
                 (g+i)->buffs[BUFF_STUN].value,(g+i)->buffs[BUFF_STUN].timeleft
             );
-            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"tonext\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",%s}",
+            sprintf(buffer, "{\"name\":\"%s\",\"user\":\"%s\",\"id\":%i,\"lvl\":%i,\"tonext\":%i,\"xp\":%i,\"STR\":%i,\"AGI\":%i,\"INT\":%i,\"spd\":%.2f,\"as\":%.2f,\"cs\":%.2f,\"x\":%.2f,\"y\":%.2f,\"head\":%.1f,\"lockedfor\":%.2f,\"hp\":%.2f,\"maxhp\":%.2f,\"ap\":%.2f,\"maxap\":%.2f,\"items\":[%i,%i,%i,%i],\"action\":%i,\"message\":\"%s\",\"code\":\"%s\",\"crashed\":%i,%s}",
                 (g+i)->name,
                 (g+i)->user,
                 i, //thread num
@@ -384,6 +384,7 @@ void recordSteps(){
                 (g+i)->action,
                 (g+i)->message,
                 (g+i)->code_exec,
+                (g+i)->crashed, //cliente desconectou com o gladiador vivo
                 buffs
             );
             if (i!=0)
@@ -483,6 +484,9 @@ void recordSteps(){
             if ( strcmp((g+i)->code_exec, (go+i)->code_exec) != 0){
                 sprintf(buffer, "%s\"code\":\"%s\",", buffer, (g+i)->code_exec);
             }
+
+            if ( (g+i)->crashed != (go+i)->crashed )
+                sprintf(buffer, "%s\"crashed\":%i,", buffer, (g+i)->crashed);
 
             sprintf(buffs, "\"buffs\":{");
             
@@ -832,6 +836,7 @@ void registerGlad(int gladid){
     (g+gladid)->lasthitangle = 0; //angulo de onde veio o ultimo ataque
     (g+gladid)->lasthitnotification = 0; //sem notificacao de acerto
     (g+gladid)->lasthittime = -999;
+    (g+gladid)->crashed = 0;
     (g+gladid)->action = ACTION_NONE; //action inicial do gladiador
     strcpy((g+gladid)->message, "");
     strcpy((g+gladid)->code_exec, "");
