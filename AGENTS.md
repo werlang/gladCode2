@@ -42,7 +42,7 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 - **`connection.php`**: Database singleton loading credentials from env (`MYSQL_*`) with fallback to `config/config.json` outside the web root (mounted at `/var/www/private/config.json`). Exposes `runQuery($sql, $data = null)`. Uses PDO with strict error mode.
 - **`back_simulation.php`**: Main simulation orchestrator (750+ lines). Handles setup of temporary run folders (`public_html/runs/{hash}/`), security function checks, file copying, invoking the Runner API, and returning JSON responses.
 - **`back_tournament.php` / `back_train.php`**: Handlers for tournaments and practice sessions.
-- **`tournament_forfeit.php`**: Auto-forfeit for tournament battles. When a battle fails, gladiators blamed in `errorc.txt` are flagged `version = 'broken'`, marked dead in the round and replaced by an idle dummy, then the battle is re-run once.
+- **`battle_results.php`**: Battle result helpers with no top-level code (`calcReward()`, `crashed_glads()`, `flag_broken_glads()`), unit tested in `tests/`. Tournament, ranked, duel and training battles are judged by the engine simlog alone: a gladiator whose client crashes mid-battle is killed by the engine and marked `"crashed":1`, and ranked battles flag it `version = 'broken'`. Never blame gladiators from `errorc.txt` text, which every gladiator can write to.
 - **`banned_functions.json`**: Security policy listing forbidden C function names (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
 - **`dev-tools/`**: Complete suite for database backup/restore (`dump_restore.sh`) and tournament resetting (`tournament.sh`, `index.html`).
 
@@ -156,9 +156,9 @@ cat simlog
 | **Empty `simlog`** | GCC compilation failed for gladiator code or C server | Inspect `errorc.txt` in the temporary run directory under `public_html/runs/{hash}/` |
 | **"AUTH_REQUIRED"** | Missing or expired PHP session | Log in via `index.php` or ensure `config/config.json` / env session database credentials are valid |
 | **Container Timeout** | Simulation took longer than 30s | Runner kills container via `docker kill {dirname}`. Check for blocking calls or high turn counts |
-| **HTTP 500 in Ranked Battle** | `DivisionByZeroError` in `calcReward()` when all combatants have 0 MMR | Ensure `$avgmmr > 0 ? ($glad['mmr'] / $avgmmr) : 1` in `public_html/back_simulation.php` |
-| **Gladiator `version = 'broken'`, says "Desclassificado"** | Its code failed to compile/crashed in a tournament battle and was auto-forfeited (`tournament_forfeit.php`) | Owner fixes and saves the gladiator again to upgrade its version |
-| **"ERRO DE SINTAXE" in Matchmaking** | Opponent gladiator in MMR pool threw Python/C runtime error | Triage candidate pool via pairwise battle curl; fix gladiator code or downgrade version |
+| **HTTP 500 in Ranked Battle** | `DivisionByZeroError` in `calcReward()` when all combatants have 0 MMR | Ensure `$avgmmr > 0 ? ($glad['mmr'] / $avgmmr) : 1` in `public_html/battle_results.php` |
+| **Gladiator `version = 'broken'`, shown as outdated** | Its client crashed (runtime error) during a ranked battle: the engine marked it `"crashed":1` in the simlog and `flag_broken_glads()` removed it from matchmaking | Owner fixes the runtime error and saves the gladiator again to upgrade its version |
+| **"ERRO DE SINTAXE" / `NO_OUTPUT` in Matchmaking** | Opponent saved code no longer compiles (runtime crashes no longer fail ranked battles) | Triage candidate pool via pairwise battle curl; fix gladiator code or downgrade version |
 
 For detailed guidance on programmatically invoking battles and triaging errors, see [Debugging & Programmatic Battles](.agents/skills/gladcode-simulation/references/debugging_and_programmatic_battles.md).
 

@@ -106,8 +106,9 @@ To simulate battles directly between arbitrary gladiators without affecting MMR 
 # Battle between specific gladiator IDs (by database 'cod')
 curl -s -d 'args={"glads":[913, 864]}' http://localhost/back_simulation.php
 
-# Battle with custom raw code
-curl -s -d 'args={"glads":[{"name":"Glad1","user":"Alice","code":"...","skin":"[]","vstr":10,"vagi":14,"vint":9}, {"name":"Glad2","user":"Bob","code":"...","skin":"[]","vstr":14,"vagi":10,"vint":9}]}' http://localhost/back_simulation.php
+# Battle with custom raw code: each entry is the full source as a string (setup() with setName/setUser and
+# attributes, then loop()). Gladiator objects are not accepted (htmlspecialchars_decode() TypeError -> HTTP 500).
+curl -s --data-urlencode 'args={"glads":["setup(){\n    setName(\"Glad1\");\n    setUser(\"Alice\");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n}\n\nloop(){\n    stepForward();\n}\n", 864]}' http://localhost/back_simulation.php
 ```
 
 ---
@@ -152,10 +153,12 @@ cat simlog
 | Symptom / Response | Root Cause | Diagnosis Step | Solution |
 | :--- | :--- | :--- | :--- |
 | **HTTP 500 / Empty response** | PHP Fatal Exception (e.g. `DivisionByZeroError`) | Check `docker logs gladcode2-apache-1 --tail 50` | Guard against division by zero in `calcReward()` (`$avgmmr == 0` or `$rewardWeighted[0] == 0`) |
-| **`"error": "Traceback..."`** | Python runtime exception in gladiator code | Inspect `error` JSON field or `errorc.txt` in run directory | Fix gladiator script syntax/scope bug (e.g. uninitialized global variable like `volta`) |
+| **`"error": "Traceback..."`** (editor / sandbox runs only) | Python runtime exception in gladiator code | Inspect `error` JSON field or `errorc.txt` in run directory | Fix gladiator script syntax/scope bug (e.g. uninitialized global variable like `volta`) |
 | **`"error": "codeX.c:... error:"`** | GCC compilation error in gladiator code | Inspect `error` JSON field or `errorc.txt` | Fix C syntax error, missing semicolon, or invalid function signature |
 | **`"error": "INVALID_ATTR"`** | Attribute sum is not 50 points | Inspect `vstr`, `vagi`, `vint` in `gladiators` table | Ensure `calcAttrValue(STR) + calcAttrValue(AGI) + calcAttrValue(INT) == 50` |
-| **`"output": "CLIENT TIMEOUT"`** | Gladiator code stuck in loop without yielding | Run gladiator isolated; check for infinite while loop missing API action call | Ensure loop calls action functions (`stepForward`, `turn`, `attack`) |
+| **`"error": "NO_OUTPUT"` / empty `simlog`** | A C gladiator binary never appeared (compile failure, the server prints `CLIENT TIMEOUT` to its own stdout, not to the JSON response) or a Python gladiator wrote to stderr before connecting (`PYTHON ERROR`) | Run the battle via Flow C and read `errorc.txt` | Fix the compile error; saved gladiators already passed a clean editor run |
+| **Gladiator dies instantly, `"crashed":1` in `simlog`** | Its client process died mid-battle (Python exception, C segfault); the engine kills it as soon as the socket closes | Re-run it in the editor to see the traceback in `errorc.txt` | Fix the runtime error. Tournament, ranked, duel and training battles still keep the log; ranked battles also flag it `version = 'broken'` |
+| **Gladiator stuck in a loop without API calls** | The engine turn timeout sets its hp to 0 and prints `Gladiator X timed out` | Run gladiator isolated; check for infinite while loop missing API action call | Ensure loop calls action functions (`stepForward`, `turn`, `attack`) |
 | **30-second Runner Timeout** | Process hung or engine deadlock | Check `docker logs gladcode2-runner-1` | Runner executes `docker kill {hash}` after 30s. Check socket communication and gladiator loop |
 
 ---
@@ -184,10 +187,11 @@ When ranked matchmaking fails for a specific gladiator:
      echo "VS $opponent: $res"
    done
    ```
-   If a specific opponent triggers an error, that gladiator's code contains a compilation or runtime defect poisoning the pool.
+   If a specific opponent triggers an error, that gladiator's code contains a compilation or runtime defect. Ranked battles flag gladiators that crash at runtime as `version = 'broken'`, which removes them from this pool until their owner saves them again.
 
 3. **Verify Post-Battle Reward Computations**:
-   Ensure `calcReward()` executes without division by zero when all combatants have 0 MMR or when battle results tie:
+   `calcReward()` lives in `public_html/battle_results.php`; its tests (and the crash-flag tests) run against the real function. `tests/` is not mounted in the apache container, so run them in a throwaway PHP container from the repo root:
    ```bash
-   docker compose exec apache php tests/calcReward.test.php
+   docker run --rm -v "$PWD":/w -w /w php:8.2-cli php tests/calcReward.test.php
+   docker run --rm -v "$PWD":/w -w /w php:8.2-cli php tests/battleResults.test.php
    ```
