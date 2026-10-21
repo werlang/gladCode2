@@ -195,3 +195,9 @@ When ranked matchmaking fails for a specific gladiator:
    docker run --rm -v "$PWD":/w -w /w php:8.2-cli php tests/calcReward.test.php
    docker run --rm -v "$PWD":/w -w /w php:8.2-cli php tests/battleResults.test.php
    ```
+
+4. **Engine Crash Regression Battles**:
+   After changing `payload/` engine code, run real battles in `gladcode2-vm` (healthy, first-turn and mid-battle crashes in C and Python, forged stderr, `speak()` JSON injection). Each must produce a valid simlog flagging exactly the crashed gladiators:
+   ```bash
+   bash tests/engine/run.sh
+   ```

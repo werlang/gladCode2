@@ -40,7 +40,7 @@ gladCode 2 is structured into four primary components coordinated by Docker Comp
 
 ### 1. PHP Frontend (`public_html/`)
 - **`connection.php`**: Database singleton loading credentials from env (`MYSQL_*`) with fallback to `config/config.json` outside the web root (mounted at `/var/www/private/config.json`). Exposes `runQuery($sql, $data = null)`. Uses PDO with strict error mode.
-- **`back_simulation.php`**: Main simulation orchestrator (750+ lines). Handles setup of temporary run folders (`public_html/runs/{hash}/`), security function checks, file copying, invoking the Runner API, and returning JSON responses.
+- **`back_simulation.php`**: Main simulation orchestrator (700+ lines). Handles setup of temporary run folders (`public_html/runs/{hash}/`), security function checks, file copying, invoking the Runner API, and returning JSON responses.
 - **`back_tournament.php` / `back_train.php`**: Handlers for tournaments and practice sessions.
 - **`battle_results.php`**: Battle result helpers with no top-level code (`calcReward()`, `crashed_glads()`, `flag_broken_glads()`), unit tested in `tests/`. Tournament, ranked, duel and training battles are judged by the engine simlog alone: a gladiator whose client crashes mid-battle is killed by the engine and marked `"crashed":1`, and ranked battles flag it `version = 'broken'`. Never blame gladiators from `errorc.txt` text, which every gladiator can write to.
 - **`banned_functions.json`**: Security policy listing forbidden C function names (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
