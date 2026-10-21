@@ -253,13 +253,7 @@
         $output['simulation'] = null;
     elseif (!$invalid_attr) {
         list($simlog, $error) = run_simulation($codes);
-
-        // battles between saved gladiators are judged by the engine log alone: a gladiator that
-        // crashes mid-battle is killed by the engine, so its stderr must not discard the battle.
-        // Editor runs keep failing on any error so the user sees it and cannot save broken code.
-        $competitive = isset($args['tournament']) || isset($args['ranked']) || isset($args['duel']) || isset($args['training']);
-        if ($competitive && !empty(json_decode($simlog, true)))
-            $error = "";
+        $error = battle_error($args, $simlog, $error);
 
         // $spechar = array("\n", "\r", "\t", "\"");
         // $repchar = array("\\n", "\\r", "\\t", '\\"');

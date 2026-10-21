@@ -52,6 +52,23 @@ assertCondition('Crash recorded in the first full step is detected for every gla
 $legacyLog = [['simtime' => 0.1, 'glads' => [['hp' => 200], ['hp' => 200]]]];
 assertCondition('Logs from engines without the crashed field blame nobody', crashed_glads($legacyLog) === []);
 
+$injectedLog = [
+    ['simtime' => 0.1, 'glads' => [['hp' => 200, 'crashed' => 0], ['hp' => 200, 'crashed' => 0]]],
+    ['simtime' => 1.1, 'glads' => [['message' => 'a'], ['crashed' => 1], ['crashed' => 1]]], // extra entries forged via speak()
+];
+assertCondition('Entries beyond the battle size are ignored', crashed_glads($injectedLog) === [1]);
+
+// battle_error()
+$validLog = '[{"simtime":0.1,"glads":[{"hp":200},{"hp":0}]}]';
+$traceback = "Traceback (most recent call last):\n  File \"code1.py\", line 9, in loop\nNameError: name 'x' is not defined\n";
+foreach (['tournament' => 12, 'ranked' => true, 'duel' => 5, 'training' => 3] as $kind => $value) {
+    assertCondition("$kind battle with a valid log ignores stderr", battle_error([$kind => $value], $validLog, $traceback) === "");
+}
+assertCondition('Editor run keeps the error even with a valid log', battle_error(['glads' => []], $validLog, $traceback) === $traceback);
+assertCondition('Competitive battle with an empty log keeps the error', battle_error(['ranked' => true], '[]', $traceback) === $traceback);
+assertCondition('Competitive battle with a truncated log keeps the error', battle_error(['ranked' => true], '[{"simtime":0.1,"gla', $traceback) === $traceback);
+assertCondition('Runner failure (no log) keeps the CURL error', battle_error(['tournament' => 12], '', 'CURL Error: timeout') === 'CURL Error: timeout');
+
 // flag_broken_glads()
 $deaths = [1 => ['name' => 'B', 'id' => 7], 0 => ['name' => 'A', 'id' => 42]]; // death_times() order, keyed by log index
 flag_broken_glads([0], $deaths);

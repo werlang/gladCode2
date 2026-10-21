@@ -1,12 +1,24 @@
 <?php
     // Battle result helpers shared by back_simulation.php, kept free of top-level code so they can be unit tested.
 
-    // log indexes of the gladiators the engine flagged as crashed (client process died while the gladiator was alive)
+    // error to report for a finished run. Battles between saved gladiators are judged by the engine log alone:
+    // a gladiator that crashes mid-battle is killed by the engine, so stderr (which every gladiator can write to)
+    // must not discard a valid log. Editor runs keep any error so the user sees it and cannot save broken code.
+    function battle_error($args, $simlog, $error){
+        $competitive = isset($args['tournament']) || isset($args['ranked']) || isset($args['duel']) || isset($args['training']);
+        if ($competitive && !empty(json_decode($simlog, true)))
+            return "";
+        return $error;
+    }
+
+    // log indexes of the gladiators the engine flagged as crashed (client process died while the gladiator was alive).
+    // Indexes beyond the battle size are ignored, as defense in depth against entries injected into the log
     function crashed_glads($log){
+        $nglads = count($log[0]['glads']);
         $crashed = array();
         foreach ($log as $step){
             foreach ($step['glads'] as $i => $glad){
-                if (!empty($glad['crashed']))
+                if ($i < $nglads && !empty($glad['crashed']))
                     $crashed[$i] = true;
             }
         }
