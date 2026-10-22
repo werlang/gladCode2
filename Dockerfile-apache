@@ -1,7 +1,15 @@
-# Use Debian as the base image
-FROM pswerlang/php-apache
+# Official PHP + Apache (Debian) image. Pinned to a release patched against
+# PHP2Shell (CVE-2026-109618 / CVE-2026-109619); only bump, never go below 8.4.27.
+FROM php:8.4.27-apache
 
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+
+# PHP extensions and Apache modules the app relies on
+RUN apt-get update && \
+    apt-get install -y libpng-dev zlib1g-dev && \
+    docker-php-ext-install gd pdo_mysql exif && \
+    a2enmod rewrite && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install prerequisites
 RUN apt-get update && \

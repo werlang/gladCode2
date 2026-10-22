@@ -11,8 +11,8 @@
             
         $hash = getSpriteHash($code);
         
-        $sql = "SELECT skin FROM skins WHERE hash = '$hash'";
-        $result = runQuery($sql);
+        $sql = "SELECT skin FROM skins WHERE hash = :hash";
+        $result = runQuery($sql, [':hash' => $hash]);
 
         $info = array();
 
@@ -34,8 +34,8 @@
     elseif(isset($_SESSION['user'])) {
         $user = $_SESSION['user'];
         
-        $sql = "SELECT * FROM usuarios WHERE id = '$user'";
-        $result = runQuery($sql);
+        $sql = "SELECT * FROM usuarios WHERE id = :user";
+        $result = runQuery($sql, [':user' => $user]);
         $row = $result->fetch();
         $lvl = $row['lvl'];
         
@@ -46,8 +46,8 @@
         $nick = $row['apelido'];
         
         if ($_POST['action'] == "GET"){
-            $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-            $result = runQuery($sql);
+            $sql = "SELECT * FROM gladiators WHERE master = :user";
+            $result = runQuery($sql, [':user' => $user]);
 
             $i = 0;
             $info = array();
@@ -71,16 +71,18 @@
 
         }
         elseif ($_POST['action'] == "DELETE"){
-            $id = $_POST['id'];
-            $sql = "DELETE FROM gladiators WHERE cod = '$id' AND master = '$user'";
-            $result = runQuery($sql);
+            $id = filter_var($_POST['id'], FILTER_VALIDATE_INT);
+            if ($id) {
+                $sql = "DELETE FROM gladiators WHERE cod = :id AND master = :user";
+                $result = runQuery($sql, [':id' => $id, ':user' => $user]);
+            }
 
         }
         else{
             if (isset($_POST['id']))
-                $id = $_POST['id'];
+                $id = filter_var($_POST['id'], FILTER_VALIDATE_INT) ?: 0;
             else
-                $id = '';
+                $id = 0;
             $skin = $_POST['skin'];
             $name = $_POST['nome'];
             preg_match ( '/^[\w À-ú]+?$/' , $name , $name_match );
@@ -94,12 +96,12 @@
                 $blocks = $_POST['blocks'];
 
             if (validate_attr($vstr,$vagi,$vint) && count($name_match) == 1 && isset($_SESSION['code'])){
-                $sql = "SELECT cod FROM gladiators WHERE name = '$name' AND cod != '$id'";
-                $result = runQuery($sql);
+                $sql = "SELECT cod FROM gladiators WHERE name = :name AND cod != :id";
+                $result = runQuery($sql, [':name' => $name, ':id' => $id]);
                 if ($result->rowCount() == 0){
                     if ($_POST['action'] == "INSERT"){
-                        $sql = "SELECT * FROM gladiators WHERE master = '$user'";
-                        $result = runQuery($sql);
+                        $sql = "SELECT * FROM gladiators WHERE master = :user";
+                        $result = runQuery($sql, [':user' => $user]);
                         if ($result->rowCount() >= $limit)
                             echo "{\"LIMIT\":$limit}";
                         else{

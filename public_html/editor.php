@@ -74,15 +74,16 @@
         if(isset($_SESSION['user']) && isset($_GET['g'])) {
             $user = $_SESSION['user'];
             unset($_SESSION['code']);
-            $id = $_GET['g'];
-            if ($id == 0){
+            $id = filter_var($_GET['g'], FILTER_VALIDATE_INT);
+            if ($id === false || $id <= 0){
                 echo "<div id='newglad'></div>";
             }
             else{
-                $sql = "SELECT * FROM gladiators INNER JOIN usuarios ON id = master WHERE master = '$user' AND cod = $id";
-                $result = runQuery($sql);
+                $sql = "SELECT g.cod, g.name, g.vstr, g.vagi, g.vint, g.skin, g.code, g.blocks, u.apelido FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE g.master = :user AND g.cod = :id";
+                $result = runQuery($sql, [':user' => $user, ':id' => $id]);
                 if ($result->rowCount() > 0){
                     $row = $result->fetch();
+                    $id = (int)$row['cod'];
                     $name = $row['name'];
                     $vstr = $row['vstr'];
                     $vagi = $row['vagi'];
