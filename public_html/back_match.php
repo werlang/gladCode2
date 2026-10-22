@@ -8,20 +8,24 @@
             $user = $_SESSION['user'];
             $output = array();
 
-            $id = $_POST['id'];
+            $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+            if (!$id) {
+                echo json_encode(['status' => 'INVALID_ID']);
+                exit;
+            }
             $pool = 10;
             
-            $sql = "SELECT version FROM gladiators WHERE cod = $id";
-            $result = runQuery($sql);
-            $row = $result->fetch();
+            $sql = "SELECT version FROM gladiators WHERE cod = :id AND master = :user";
+            $result = runQuery($sql, [':id' => $id, ':user' => $user]);
+            $row = $result ? $result->fetch() : null;
 
-            if ($row['version'] == $version){
-                $mymmr = "SELECT mmr FROM gladiators WHERE cod = '$id' AND master = '$user'";
+            if ($row && $row['version'] == $version){
+                $mymmr = "SELECT mmr FROM gladiators WHERE cod = :id AND master = :user";
                 $mypos = "SELECT count(*) FROM gladiators WHERE mmr < ($mymmr)";
                 $pos = "SELECT count(*) FROM gladiators g2 WHERE g2.mmr < g.mmr";
-                $gladsclose = "SELECT g.cod FROM gladiators g WHERE g.master != '$user' AND g.version = '$version' ORDER BY ABS(($pos) - ($mypos)) LIMIT $pool";
+                $gladsclose = "SELECT g.cod FROM gladiators g WHERE g.master != :user AND g.version = :version ORDER BY ABS(($pos) - ($mypos)) LIMIT $pool";
                 $sql = "SELECT * FROM gladiators g INNER JOIN usuarios u ON g.master = u.id INNER JOIN ($gladsclose) s ON g.cod = s.cod ORDER BY rand() LIMIT 4";
-                $result = runQuery($sql);
+                $result = runQuery($sql, [':id' => $id, ':user' => $user, ':version' => $version]);
 
                 $i = 0;
                 $ids = array();

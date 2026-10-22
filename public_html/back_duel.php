@@ -25,52 +25,61 @@
         $output['status'] = "SUCCESS";
     }
     elseif ($action == "CHALLENGE"){
-        $friend = $_POST['friend'];
-        $glad = $_POST['glad'];
-        $sql = "SELECT cod FROM amizade WHERE (usuario1 = '$user' AND usuario2 = '$friend') OR (usuario2 = '$user' AND usuario1 = '$friend')";
-        $result = runQuery($sql);
-        if ($result->rowCount() == 0)
-            $output['status'] = "NOT_FRIEND";
-        else{
-            $sql = "SELECT cod FROM gladiators g INNER JOIN usuarios u ON g.master = u.id WHERE g.cod = '$glad' AND g.master = '$user'";
-            $result = runQuery($sql);
+        $friend = filter_var($_POST['friend'] ?? null, FILTER_VALIDATE_INT);
+        $glad = filter_var($_POST['glad'] ?? null, FILTER_VALIDATE_INT);
+        if (!$friend || !$glad) {
+            $output['status'] = "INVALID_PARAMS";
+        } else {
+            $sql = "SELECT cod FROM amizade WHERE (usuario1 = :user AND usuario2 = :friend) OR (usuario2 = :user AND usuario1 = :friend)";
+            $result = runQuery($sql, [':user' => $user, ':friend' => $friend]);
             if ($result->rowCount() == 0)
-                $output['status'] = "NOT_GLAD";
+                $output['status'] = "NOT_FRIEND";
             else{
-                $sql = "SELECT id FROM duels WHERE user2 = '$friend' AND gladiator1 = '$glad' AND log IS NULL";
-                $result = runQuery($sql);
-                if ($result->rowCount() > 0)
-                    $output['status'] = "EXISTS";
+                $sql = "SELECT cod FROM gladiators WHERE cod = :glad AND master = :user";
+                $result = runQuery($sql, [':glad' => $glad, ':user' => $user]);
+                if ($result->rowCount() == 0)
+                    $output['status'] = "NOT_GLAD";
                 else{
-                    $sql = "INSERT INTO duels (user1, gladiator1, user2, time) VALUES ('$user', '$glad', '$friend', now())";
-                    $result = runQuery($sql);
-                    $output['status'] = "OK";
-                    
-                    send_node_message(array(
-                        'profile notification' => array('user' => array($friend))
-                    ));
+                    $sql = "SELECT id FROM duels WHERE user2 = :friend AND gladiator1 = :glad AND log IS NULL";
+                    $result = runQuery($sql, [':friend' => $friend, ':glad' => $glad]);
+                    if ($result->rowCount() > 0)
+                        $output['status'] = "EXISTS";
+                    else{
+                        $sql = "INSERT INTO duels (user1, gladiator1, user2, time) VALUES (:user, :glad, :friend, now())";
+                        $result = runQuery($sql, [':user' => $user, ':glad' => $glad, ':friend' => $friend]);
+                        $output['status'] = "OK";
+                        
+                        send_node_message(array(
+                            'profile notification' => array('user' => array($friend))
+                        ));
+
+                    }
 
                 }
-
+                
             }
-            
         }
     }
     elseif ($action == "DELETE"){
-        $id = $_POST['id'];
+        $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+        if (!$id) {
+            $output['status'] = "INVALID_ID";
+        } else {
+            $sql = "SELECT user1, user2 FROM duels WHERE id = :id";
+            $result = runQuery($sql, [':id' => $id]);
+            $row = $result ? $result->fetch() : null;
+            
+            if ($row) {
+                send_node_message(array(
+                    'profile notification' => array('user' => array($row['user1'], $row['user2']))
+                ));
 
-        $sql = "SELECT user1, user2 FROM duels WHERE id = $id";
-        $result = runQuery($sql);
-        $row = $result->fetch();
-        
-        send_node_message(array(
-            'profile notification' => array('user' => array($row['user1'], $row['user2']))
-        ));
+                $sql = "DELETE FROM duels WHERE id = :id AND (user1 = :user OR user2 = :user)";
+                $result = runQuery($sql, [':id' => $id, ':user' => $user]);
+            }
 
-        $sql = "DELETE FROM duels WHERE id = '$id' AND (user1 = '$user' OR user2 = '$user')";
-        $result = runQuery($sql);
-
-        $output['status'] = "OK";
+            $output['status'] = "OK";
+        }
     }
     elseif ($action == "REPORT"){
         $offset = $_POST['offset'];
