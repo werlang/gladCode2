@@ -1,7 +1,7 @@
 # One-shot database migration runner (see migrate.sh).
 # Bakes dependencies at build time so `docker run` never depends on any
 # long-lived service or its node_modules volume.
-FROM node:20-alpine
+FROM node:24.22.1-alpine
 
 WORKDIR /app
 
