@@ -1,36 +1,100 @@
 import GoogleLogin from "./google-login.js";
 
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function showLogin(msg) {
+    showDialog(`${msg}<div id='google-login' style='display: flex; justify-content: center'></div>`, ["Cancelar"]);
+    GoogleLogin.init().then(() => {
+        GoogleLogin.renderButton($('#google-login')[0]);
+    });
+}
+
+// Steps the highlighted line through the visible code sample while the arena video plays
+function runCodeTrace() {
+    let timer = null;
+    let index = 0;
+
+    const tick = () => {
+        const lines = $('#hero .code:not([hidden]) .l');
+        lines.removeClass('run');
+        // skip blank and closing-brace lines, they never "run"
+        do {
+            index = (index + 1) % lines.length;
+        } while (/^\s*[{}]?\s*$/.test(lines.eq(index).text()));
+        lines.eq(index).addClass('run');
+    };
+
+    const start = () => { if (!timer) timer = setInterval(tick, 700); };
+    const stop = () => { clearInterval(timer); timer = null; };
+
+    const video = $('#hero video')[0];
+    if (reducedMotion) {
+        // show the first frame only
+        video.removeAttribute('autoplay');
+        return;
+    }
+
+    // play only while the hero is on screen
+    new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                video.play().catch(() => {});
+                start();
+            }
+            else {
+                video.pause();
+                stop();
+            }
+        });
+    }, { threshold: 0.2 }).observe($('#hero .hero-stage')[0]);
+}
+
 $(document).ready( function() {
     $('#header').addClass('big');
     $('#header-container').addClass('small');
-    
-    $('#section-2 .card').mouseenter( function() {
-        var name = $(this).find('.title img').attr('src').split('/')[1].split('.')[0];
-        $(this).find('.title img').attr('src','image/'+ name +'.gif');
-    }).mouseleave( function() {
-        var name = $(this).find('.title img').attr('src').split('/')[1].split('.')[0];
-        $(this).find('.title img').attr('src','image/'+ name +'.png');
-    });	
-    
+
+    $('#hero .tabs button').click( function() {
+        const lang = $(this).data('lang');
+        $('#hero .tabs button').attr('aria-selected', 'false');
+        $(this).attr('aria-selected', 'true');
+        $('#hero .code').attr('hidden', true);
+        $(`#hero .code[data-lang='${lang}']`).removeAttr('hidden');
+    });
+
+    runCodeTrace();
+
+    // animate the pixel sprites while hovering their step
+    $('#steps .step').on('mouseenter focusin', function() {
+        const img = $(this).find('.sprite');
+        img.attr('src', img.data('anim'));
+    }).on('mouseleave focusout', function() {
+        const img = $(this).find('.sprite');
+        img.attr('src', img.data('anim').replace('.gif', '.png'));
+    });
+
     $('#account').click( function(){
-        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
-        GoogleLogin.renderButton($('#google-login')[0]);
+        showLogin("Faça login no sistema");
     });
-    
-    $('#section-2 .card .video').click( function() {
-        var hash = $(this).find('.thumb').attr('src').split('/')[4];
-        
-        $('body').append("<div id='fog'><div id='video-container'><iframe width='100%' height='100%' src='https://www.youtube.com/embed/"+ hash +"' frameborder='0' allowfullscreen></iframe><div id='remove'></div></div></div>");
-        $('#fog').hide().fadeIn(1000);
-        $('#fog').click( function(){
+
+    $('#videos .video').click( function() {
+        const hash = $(this).data('video');
+
+        $('body').append(`<div id='fog'><div id='video-container' role='dialog' aria-label='Vídeo'><iframe src='https://www.youtube.com/embed/${hash}?autoplay=1' allow='autoplay; encrypted-media' allowfullscreen></iframe><button id='remove' aria-label='Fechar vídeo'></button></div></div>`);
+        $('#fog').hide().fadeIn(reducedMotion ? 0 : 400);
+        $('#fog #remove').focus();
+
+        const close = () => {
             $('#fog').remove();
-        });
+            $(document).off('keydown.video');
+            this.focus();
+        };
+        $('#fog').click(close);
+        $(document).on('keydown.video', e => { if (e.key == 'Escape') close(); });
     });
-    
+
     if ($('#loginhash').length){
         var tab = $('#loginhash').html();
-        // $('#loginhash').remove();
-        
+
         var loginMessage = {
             'messages': "Faça login para visualizar sua mensagem",
             'friends': "Faça login para ver seus pedidos de amizade",
@@ -41,10 +105,6 @@ $(document).ready( function() {
         if (!loginMessage[tab])
             msg = "Faça login para ir para o seu perfil"
 
-
-        showDialog(`${msg}<div id='google-login' style='display: flex; justify-content: center'></div>`, ["Cancelar"])
-        GoogleLogin.init().then(() => {
-            GoogleLogin.renderButton($('#google-login')[0]);
-        })
+        showLogin(msg);
     }
 });
