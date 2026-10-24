@@ -123,33 +123,91 @@ body.home #header #menu-button {
 	background-color: rgba(237, 241, 243, 0.08);
 }
 
-/* Hero */
+/* Hero: a real replay filmed in the 3D coliseum runs behind the copy and the code that drives it */
 #hero {
+	position: relative;
+	isolation: isolate;
+	background-color: var(--ink);
+}
+
+.hero-media {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	max-height: 62vh;
+	width: 100%;
+	overflow: hidden;
+	background: var(--ink) url('../image/home/arena-3d.jpg') center / cover no-repeat;
+}
+
+.hero-media video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+@media only screen and (max-width: 699px) {
+	.hero-media {
+		aspect-ratio: 4 / 3;
+	}
+}
+
+/* Fades the arena into the ink below it */
+.hero-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, transparent 55%, var(--ink) 100%);
+	pointer-events: none;
+}
+
+.hero-caption {
+	position: absolute;
+	z-index: 1;
+	left: var(--gutter);
+	top: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 6px 12px;
+	border-radius: 999px;
+	background-color: rgba(8, 21, 31, 0.7);
+	backdrop-filter: blur(6px);
+	color: var(--sand-light);
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+}
+
+.hero-caption .live {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: var(--blood);
+	box-shadow: 0 0 0 3px rgba(196, 65, 47, 0.3);
+	animation: home-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes home-pulse {
+	50% { opacity: .35; }
+}
+
+.hero-inner {
 	position: relative;
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 48px;
+	gap: 40px;
 	max-width: var(--max);
-	margin: 0 auto;
-	padding: 56px var(--gutter) 88px;
+	margin: -24px auto 0;
+	padding: 0 var(--gutter) 88px;
 	box-sizing: border-box;
-	align-items: center;
-}
-
-#hero::before {
-	content: '';
-	position: absolute;
-	inset: 0 -50vw;
-	z-index: -1;
-	background:
-		radial-gradient(60% 70% at 78% 45%, rgba(242, 180, 65, 0.14), transparent 70%),
-		linear-gradient(180deg, var(--brand) -40%, var(--ink) 38%, var(--ink) 100%);
 }
 
 #hero h1 {
 	font-size: clamp(2.2rem, 4vw, 3.25rem);
 	letter-spacing: -0.01em;
 	color: var(--text);
+	text-shadow: 0 2px 24px rgba(5, 13, 20, 0.6);
 }
 
 #hero h1 span {
@@ -160,7 +218,7 @@ body.home #header #menu-button {
 	max-width: 34em;
 	margin: 22px 0 32px;
 	font-size: 1.125rem;
-	color: #c7d4dd;
+	color: #d3dee5;
 }
 
 #hero .facts {
@@ -185,22 +243,68 @@ body.home #header #menu-button {
 	background-color: var(--gold);
 }
 
-/* Hero stage: the code panel drives the arena beside it */
-.hero-stage {
-	position: relative;
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 16px;
-}
+/* Wide screens: the arena fills the hero, the copy reads over its darkened left side */
+@media only screen and (min-width: 1100px) {
+	#hero {
+		min-height: min(calc(100vh - 80px), 860px);
+		display: flex;
+		align-items: center;
+	}
 
-.hero-stage figure {
-	margin: 0;
+	.hero-media {
+		position: absolute;
+		inset: 0;
+		max-height: none;
+		aspect-ratio: auto;
+	}
+
+	.hero-media::after {
+		background:
+			linear-gradient(90deg, rgba(11, 29, 43, 0.94) 0%, rgba(11, 29, 43, 0.72) 34%, rgba(11, 29, 43, 0) 60%),
+			linear-gradient(180deg, rgba(11, 29, 43, 0.35) 0%, transparent 22%, transparent 70%, var(--ink) 100%);
+	}
+
+	.hero-caption {
+		top: auto;
+		left: auto;
+		right: var(--gutter);
+		bottom: 28px;
+	}
+
+	.hero-inner {
+		width: 100%;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+		justify-content: space-between;
+		align-items: end;
+		margin-top: 0;
+		padding-top: 72px;
+		padding-bottom: 96px;
+	}
+
+	.hero-copy {
+		max-width: 560px;
+	}
+
+	.code-panel {
+		background-color: rgba(8, 21, 31, 0.78);
+		backdrop-filter: blur(10px);
+	}
+
+	.code-bar {
+		background-color: rgba(14, 34, 50, 0.85);
+	}
+
+	.code-panel .code {
+		font-size: 0.74rem;
+		padding: 10px 0;
+	}
 }
 
 .code-panel {
 	position: relative;
 	z-index: 1;
 	min-width: 0;
+	margin: 0;
 	background-color: #08151f;
 	border: 1px solid #23435c;
 	border-radius: var(--radius);
@@ -251,7 +355,7 @@ body.home #header #menu-button {
 	margin: 0;
 	padding: 14px 0;
 	font-family: var(--font-mono);
-	font-size: 0.8rem;
+	font-size: clamp(0.7rem, 2.6vw, 0.8rem);
 	line-height: 1.6;
 	color: #d5dee5;
 	overflow-x: auto;
@@ -285,85 +389,6 @@ body.home #header #menu-button {
 .code .f { color: #f2b441; }
 .code .a { color: #8fd6a8; }
 .code .n { color: #e79b7b; }
-
-.arena-panel {
-	position: relative;
-	order: -1;
-	justify-self: center;
-	width: min(100%, 420px);
-	border-radius: var(--radius);
-	overflow: hidden;
-	background-color: #000;
-	border: 1px solid #3b3220;
-	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(233, 214, 173, 0.06);
-}
-
-.arena-panel video {
-	display: block;
-	width: 100%;
-	aspect-ratio: 400 / 426;
-	image-rendering: pixelated;
-	object-fit: cover;
-}
-
-.arena-panel figcaption {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 9px 12px;
-	background-color: #120f09;
-	color: var(--sand);
-	font-family: var(--font-mono);
-	font-size: 0.75rem;
-}
-
-.arena-panel .live {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background-color: var(--blood);
-	box-shadow: 0 0 0 3px rgba(196, 65, 47, 0.25);
-	animation: home-pulse 1.6s ease-in-out infinite;
-}
-
-@keyframes home-pulse {
-	50% { opacity: .35; }
-}
-
-@media only screen and (min-width: 700px) {
-	.hero-stage {
-		grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-		align-items: center;
-	}
-
-	.arena-panel {
-		width: 100%;
-		order: 0;
-	}
-}
-
-@media only screen and (min-width: 1000px) {
-	#hero {
-		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-		gap: 48px;
-		padding-top: 80px;
-		padding-bottom: 112px;
-	}
-
-	.hero-stage {
-		grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-	}
-
-	/* The editor overlaps the arena, as if typed straight into it */
-	.code-panel {
-		margin-right: -48px;
-		margin-top: 72px;
-	}
-
-	.arena-panel {
-		margin-bottom: 56px;
-	}
-}
 
 /* Section headings */
 .home .section-head {
@@ -401,10 +426,10 @@ body.home #header #menu-button {
 .step-list {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 20px;
+	gap: 140px 20px;
 	max-width: var(--max);
 	margin: 0 auto;
-	padding: 0;
+	padding: 130px 0 0;
 	list-style: none;
 	counter-reset: step;
 }
@@ -433,12 +458,21 @@ body.home #header #menu-button {
 	color: #ecdcb7;
 }
 
-.step .sprite {
+/* The 3D fighters step out over the top edge of their card */
+.step .fighter {
 	align-self: flex-start;
-	height: 80px;
+	height: 180px;
 	width: auto;
-	margin: -4px 0 14px -8px;
-	image-rendering: pixelated;
+	max-width: 70%;
+	object-fit: contain;
+	object-position: left bottom;
+	margin: -130px 0 16px -6px;
+	filter: drop-shadow(0 10px 8px rgba(60, 40, 10, 0.25));
+	transition: transform .3s;
+}
+
+.step:hover .fighter {
+	transform: translateY(-4px);
 }
 
 .step h3 {
@@ -602,16 +636,28 @@ body.home #header #menu-button {
 		var(--ink-3);
 }
 
-.join-sprites {
+.join-fighters {
 	display: flex;
 	align-items: flex-end;
-	gap: 4px;
+	justify-content: center;
+	gap: 8px;
+	margin: -96px 0 0;
 }
 
-.join-sprites img {
-	height: 96px;
+.join-fighters img {
+	height: 190px;
 	width: auto;
-	image-rendering: pixelated;
+	filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+}
+
+@media only screen and (min-width: 900px) {
+	.join-fighters {
+		margin: -110px 0 -10px;
+	}
+
+	.join-fighters img {
+		height: 230px;
+	}
 }
 
 .join-copy h2 {

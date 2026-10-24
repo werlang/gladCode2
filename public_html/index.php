@@ -10,9 +10,9 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 
     <meta property="og:title" content="gladCode">
-    <meta property="og:image" content="https://www.gladcode.dev/icon/gladcode_icon.png">
-    <meta property="og:image:width" content="200">
-    <meta property="og:image:height" content="200">
+    <meta property="og:image" content="https://www.gladcode.dev/image/home/arena-3d.jpg">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
 
     <meta property="og:url" content="https://gladcode.dev">
     <meta property="og:description" content="Programe gladiadores em C, Python ou blocos e veja seu código lutar na arena.">
@@ -61,6 +61,13 @@
 <body class='home'>
 <main>
     <section id='hero'>
+        <div class='hero-media'>
+            <video poster='image/home/arena-3d.jpg' muted loop playsinline preload='metadata' aria-label='Replay de uma batalha no Coliseu 3D'>
+                <source src='image/home/arena-3d.mp4' type='video/mp4'>
+            </video>
+            <p class='hero-caption'><span class='live'></span>Replay real no Coliseu 3D</p>
+        </div>
+        <div class='hero-inner'>
         <div class='hero-copy'>
             <p class='eyebrow'>Programação &times; arena</p>
             <h1>Você escreve a estratégia.<br><span>Eles lutam.</span></h1>
@@ -75,9 +82,7 @@
                 <li>Partidas ranqueadas e torneios</li>
             </ul>
         </div>
-
-        <div class='hero-stage' aria-label='Exemplo de código e batalha'>
-            <figure class='code-panel'>
+            <figure class='code-panel' aria-label='Exemplo de código de um gladiador'>
                 <div class='code-bar'>
                     <div class='tabs' role='tablist' aria-label='Linguagem do exemplo'>
                         <button role='tab' aria-selected='true' data-lang='c'>gladiador.c</button>
@@ -119,10 +124,6 @@
 <span class='l'>    <span class='k'>else</span>:</span>
 <span class='l'>        <span class='a'>turn</span>(<span class='n'>5</span>)</span></code></pre>
             </figure>
-            <figure class='arena-panel'>
-                <video src='image/battle-movie.mp4' muted loop playsinline preload='auto' aria-label='Gravação de uma batalha na arena'></video>
-                <figcaption><span class='live'></span>Batalha simulada a partir do código</figcaption>
-            </figure>
         </div>
     </section>
 
@@ -133,19 +134,19 @@
         </header>
         <ol class='step-list'>
             <li class='step'>
-                <img class='sprite' src='image/huntress.png' data-anim='image/huntress.gif' alt='' width='64' height='64'>
+                <img class='fighter' src='image/home/arcaness.webp' width='252' height='492' alt='' loading='lazy'>
                 <h3>Programe a lógica</h3>
                 <p>Use toda a sintaxe básica da linguagem e funções para mover, virar, atacar, lançar magias e detectar inimigos. Não existe terminal: o gladiador só sabe o que o seu código perguntar.</p>
                 <a href='docs'>Ver as funções</a>
             </li>
             <li class='step'>
-                <img class='sprite' src='image/archer.png' data-anim='image/archer.gif' alt='' width='64' height='64'>
+                <img class='fighter' src='image/home/hound.webp' width='270' height='523' alt='' loading='lazy'>
                 <h3>Monte o gladiador</h3>
                 <p>Escolha a aparência e distribua pontos entre força, agilidade e inteligência. Guerreiro, ladino, mago ou qualquer mistura: cada combinação muda o que a sua estratégia consegue fazer.</p>
                 <a href='editor'>Abrir o editor</a>
             </li>
             <li class='step'>
-                <img class='sprite' src='image/mage.png' data-anim='image/mage.gif' alt='' width='64' height='64'>
+                <img class='fighter' src='image/home/magnus.webp' width='235' height='519' alt='' loading='lazy'>
                 <h3>Entre na arena</h3>
                 <p>Teste contra outros gladiadores, suba de nível durante a luta e dispute partidas ranqueadas, torneios e treinos com a comunidade. Só os fortes chegam ao topo.</p>
                 <a href='manual'>Conhecer a simulação</a>
@@ -184,9 +185,9 @@
 
     <section id='join' aria-labelledby='join-title'>
         <div class='join-card'>
-            <div class='join-sprites' aria-hidden='true'>
-                <img src='image/warrior.gif' alt='' width='64' height='64'>
-                <img src='image/orc.gif' alt='' width='64' height='64'>
+            <div class='join-fighters' aria-hidden='true'>
+                <img src='image/home/nimble.webp' width='208' height='387' alt='' loading='lazy'>
+                <img src='image/home/warmaker.webp' width='321' height='389' alt='' loading='lazy'>
             </div>
             <div class='join-copy'>
                 <h2 id='join-title'>Os portões estão abertos</h2>

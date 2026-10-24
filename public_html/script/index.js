@@ -28,11 +28,8 @@ function runCodeTrace() {
     const stop = () => { clearInterval(timer); timer = null; };
 
     const video = $('#hero video')[0];
-    if (reducedMotion) {
-        // show the first frame only
-        video.removeAttribute('autoplay');
-        return;
-    }
+    // reduced motion keeps the poster frame and a still code panel
+    if (reducedMotion) return;
 
     // play only while the hero is on screen
     new IntersectionObserver(entries => {
@@ -46,7 +43,7 @@ function runCodeTrace() {
                 stop();
             }
         });
-    }, { threshold: 0.2 }).observe($('#hero .hero-stage')[0]);
+    }, { threshold: 0.2 }).observe($('#hero')[0]);
 }
 
 $(document).ready( function() {
@@ -62,15 +59,6 @@ $(document).ready( function() {
     });
 
     runCodeTrace();
-
-    // animate the pixel sprites while hovering their step
-    $('#steps .step').on('mouseenter focusin', function() {
-        const img = $(this).find('.sprite');
-        img.attr('src', img.data('anim'));
-    }).on('mouseleave focusout', function() {
-        const img = $(this).find('.sprite');
-        img.attr('src', img.data('anim').replace('.gif', '.png'));
-    });
 
     $('#account').click( function(){
         showLogin("Faça login no sistema");

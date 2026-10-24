@@ -81,6 +81,8 @@ export class BattleRenderer {
     #controls;
     /** Camera pose pinned by `setDebugView`, or null. */
     #debugView = null;
+    /** False while `setDebugHud` hides the HUD and controls (clean captures of the scene). */
+    #debugHud = true;
     /** Draw calls and triangles of the last scene render (diagnostics). */
     #sceneStats = { calls: 0, triangles: 0 };
     /** Pixel ratio pinned by `setDebugPixelRatio` (the adaptive resolution stands aside), or null. */
@@ -637,7 +639,7 @@ export class BattleRenderer {
         // The overhead cards make way for the victor's laurels.
         this.#overlay.update(this.#fighters, this.#ui.crowning ? { ...prefs, bars: false, speech: false } : prefs, realDt, gameDt);
         this.#ui.update(realDt, window.prefs ?? {});
-        this.#overlay.render(this.#renderer);
+        if (this.#debugHud) this.#overlay.render(this.#renderer);
         profiler.lap('hud');
         this.#adaptResolution(timestamp);
     };
@@ -951,6 +953,16 @@ export class BattleRenderer {
      */
     setDebugView(view) {
         this.#debugView = view;
+    }
+
+    /**
+     * Diagnostics for automated checks and captures: hides or shows the HUD pass (roster, cards, controls), so the
+     * scene can be filmed clean, as for the front page clip.
+     *
+     * @param {boolean} visible Whether the HUD is drawn.
+     */
+    setDebugHud(visible) {
+        this.#debugHud = visible;
     }
 
     /**
