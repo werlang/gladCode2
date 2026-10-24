@@ -52,8 +52,7 @@
             <h2>Sistema</h2>
             
             <p>Sistema desenvolvido por <b>Pablo Werlang</b></p>
-            <p>email: <a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></p>
-            <p>facebook: <a href='https://www.facebook.com/pswerlang'>https://www.facebook.com/pswerlang</a></p>
+            <p>email: <a href='mailto:contato@gladcode.dev'>contato@gladcode.dev</a></p>
 
             <h2>Sprites</h2>
 
@@ -102,7 +101,7 @@
             <h2>Outros</h2>
 
             <p>Alguns dos itens utilizados não foi possível determinar a autoria. Caso eu esteja utilizando a sua arte, favor entrar em contato através do email:</p>
-            <p><a href='mailto:pswerlang@gmail.com'>pswerlang@gmail.com</a></p>
+            <p><a href='mailto:contato@gladcode.dev'>contato@gladcode.dev</a></p>
         </div>
     </div>
     <div id='footer'></div>

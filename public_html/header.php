@@ -28,14 +28,7 @@
             </div>
             <div class='item' id='learn'><a href='manual' title='Saiba como funciona a gladCode'><span>APRENDER</span></a></div>
             <div class='item' id='header-editor'><a href='editor' title='Crie e programe seus gladiadores'>EDITOR</a></div>
-            <div class='item drop-menu'>
-                <div class='title'><span>COMUNIDADE</span></div>
-                <div class='item-container'>
-                    <div class='item'><a href='https://www.reddit.com/r/gladcode/' target='_blank'><span>REDDIT</span></a></div>
-                    <div class='item'><a href='https://www.facebook.com/gladcode/' target='_blank'><span>FACEBOOK</span></a></div>
-                    <div class='item'><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank'><span>WHATSAPP</span></a></div>
-                </div>
-            </div>
+            <div class='item' id='header-contact'><a href='mailto:contato@gladcode.dev' title='Fale com a gladCode por email'><span>CONTATO</span></a></div>
             <div class='item drop-menu' id='about'>
                 <div class='title'><span>SOBRE</span></div>
                 <div class='item-container'>

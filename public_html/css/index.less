@@ -670,33 +670,28 @@ body.home #header #menu-button {
 	color: #c7d4dd;
 }
 
-.join-community {
+.join-contact {
 	padding-top: 24px;
 	border-top: 1px solid #2c4b63;
 }
 
-.join-community h3 {
+.join-contact h3 {
 	font-size: 1.1rem;
 }
 
-.join-community p {
+.join-contact p {
 	margin: 8px 0 14px;
 	font-size: 0.95rem;
 	color: var(--muted);
 }
 
-.join-community ul {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.join-community a {
+.join-contact .mail {
 	display: inline-block;
-	padding: 8px 14px;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 9px 16px;
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
 	border-radius: 999px;
 	border: 1px solid #3c5f7a;
 	color: var(--text);
@@ -705,7 +700,7 @@ body.home #header #menu-button {
 	transition: border-color .2s, background-color .2s;
 }
 
-.join-community a:hover {
+.join-contact .mail:hover {
 	border-color: var(--gold);
 	background-color: rgba(242, 180, 65, 0.1);
 }
@@ -717,7 +712,7 @@ body.home #header #menu-button {
 		gap: 40px;
 	}
 
-	.join-community {
+	.join-contact {
 		padding: 0 0 0 40px;
 		border-top: 0;
 		border-left: 1px solid #2c4b63;

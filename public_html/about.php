@@ -49,8 +49,7 @@
                 </div>
             </div>
             <div class='row' id='social'>
-                <a href='mailto:pswerlang@gmail.com'><img src='icon/gmail.png'><span>pswerlang@gmail.com</span></a>
-                <a href='https://facebook.com/pswerlang' target='_blank'><img src='icon/facebook_blue.png'><span>facebook.com/pswerlang</span></a>
+                <a href='mailto:contato@gladcode.dev'><img src='icon/gmail.png'><span>contato@gladcode.dev</span></a>
                 <a href='https://github.com/werlang' target='_blank'><img src='icon/github.png'><span>github.com/werlang</span></a>
             </div>
         </div>
@@ -78,12 +77,12 @@
                 <span class='time'>Out 2018</span>
             </div>
             <div class='row'>
-                <span class='text'>Lançamento da <a href='https://www.reddit.com/r/gladcode/comments/auttt3/atualiza%C3%A7%C3%A3o_gladcode_251beta/' target='_blank'>versão Beta</a>, que proporciona a criação e teste de gladiadores de maneira integrada através do editor, além de perfis de usuários, batalhas contra outros usuários e ranking.</span>
+                <span class='text'>Lançamento da versão Beta, que proporciona a criação e teste de gladiadores de maneira integrada através do editor, além de perfis de usuários, batalhas contra outros usuários e ranking.</span>
                 <img src='icon/swords.png'>
                 <span class='time'>Jan 2019</span>
             </div>
             <div class='row'>
-                <span class='text'>Inauguração do novo <a href='https://www.reddit.com/r/gladcode/comments/d5h8qv/atualiza%C3%A7%C3%A3o_gladcode_26beta/' target='_blank'>Modo torneio</a> na CharCode 2019, além de mudanças expressivas na aparência da arena.</span>
+                <span class='text'>Inauguração do novo Modo torneio na CharCode 2019, além de mudanças expressivas na aparência da arena.</span>
                 <img src='icon/swords.png'>
                 <span class='time'>Dez 2019</span>
             </div>
@@ -205,10 +204,7 @@
             <div class='title'>Entre em contato</div>
             <div class='subtitle'>Adoraríamos saber o que você pensa sobre o projeto</div>
             <div id='social'>
-                <a href='mailto:pswerlang@gmail.com' title='Enviar Email' target='_blank'><img src='icon/at-sign.png'></a>
-                <a href='https://facebook.com/gladcode' title='Página do Facebook' target='_blank'><img src='icon/facebook.png'></a>
-                <a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' title='Grupo do WhatsApp' target='_blank'><img src='icon/whatsapp_full.png'></a>
-                <a href='https://www.reddit.com/r/gladcode' title='Comunidade do Reddit' target='_blank'><img src='icon/reddit.png'></a>
+                <a href='mailto:contato@gladcode.dev' title='Enviar email para contato@gladcode.dev'><img src='icon/at-sign.png'></a>
             </div>
         </div>
         <div id='about-footer'>Copyright © 2018-<?php echo date('Y') ?> Pablo Werlang</div>

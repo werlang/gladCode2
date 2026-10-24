@@ -203,14 +203,10 @@
                 </div>
                 <?php endif; ?>
             </div>
-            <div class='join-community'>
-                <h3>Comunidade</h3>
-                <p>Mostre seus gladiadores, troque estratégias e tire dúvidas.</p>
-                <ul>
-                    <li><a href='https://forms.gle/BDbSmcLpPgwLe4Uc7' target='_blank' rel='noopener'>WhatsApp</a></li>
-                    <li><a href='https://www.reddit.com/r/gladcode/' target='_blank' rel='noopener'>Reddit</a></li>
-                    <li><a href='https://www.facebook.com/gladcode/' target='_blank' rel='noopener'>Facebook</a></li>
-                </ul>
+            <div class='join-contact'>
+                <h3>Fale com a gente</h3>
+                <p>Dúvidas, sugestões ou parcerias? Escreva para a equipe da gladCode.</p>
+                <a class='mail' href='mailto:contato@gladcode.dev'>contato@gladcode.dev</a>
             </div>
         </div>
     </section>
@@ -220,7 +216,7 @@
         <a href='about'>O projeto</a>
         <a href='creditos'>Créditos</a>
         <a href='stats'>Estatísticas</a>
-        <a href='mailto:pswerlang@gmail.com'>Contato</a>
+        <a href='mailto:contato@gladcode.dev'>contato@gladcode.dev</a>
     </nav>
     <span>Copyright © 2018-<?php echo date('Y') ?> Pablo Werlang</span>
 </footer>
