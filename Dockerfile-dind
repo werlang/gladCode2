@@ -1,5 +1,10 @@
 FROM docker:dind
-RUN apk update && apk add --no-cache nodejs npm
+# Node comes from the official image: Alpine's nodejs package lags behind security releases
+RUN apk add --no-cache libstdc++ libgcc
+COPY --from=node:24.22.1-alpine /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:24.22.1-alpine /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 WORKDIR /app
 COPY runner/package.json runner/package-lock.json ./
 RUN npm ci --no-audit --no-fund
