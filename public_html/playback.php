@@ -13,7 +13,7 @@
     // Feature gate for the Three.js Coliseu 3D renderer (env ENABLE_RENDER2).
     // When off, the classic 2D renderer is the only option: no 3D CSS, import
     // map, or module is sent, and the frontend preference is forced to classic.
-    $render2Enabled = in_array(strtolower(trim(getenv('ENABLE_RENDER2') ?: '0')), ['1', 'true', 'on', 'yes'], true);
+    $render2Enabled = in_array(strtolower(trim(getenv('ENABLE_RENDER2') ?: '1')), ['1', 'true', 'on', 'yes'], true);
 ?>
 <!DOCTYPE html>
 <html>
