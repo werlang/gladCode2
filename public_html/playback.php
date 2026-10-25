@@ -31,9 +31,9 @@
 
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/playback.css"/>
+    <link rel='stylesheet' href="css/playback.css?v=<?= filemtime(__DIR__ . "/css/playback.css") ?>"/>
 <?php if ($render2Enabled): ?>
-    <link rel='stylesheet' href="css/playback-render2.css"/>
+    <link rel='stylesheet' href="css/playback-render2.css?v=<?= filemtime(__DIR__ . "/css/playback-render2.css") ?>"/>
 <?php endif; ?>
     
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
