@@ -54,6 +54,7 @@
     foreach (glob(__DIR__ . "/script/render2/*.js") as $render2File) {
         $render2Url = "/script/render2/" . basename($render2File);
         $render2Imports[$render2Url] = $render2Url . "?v=" . filemtime($render2File);
+        $render2Imports["./render2/" . basename($render2File)] = $render2Url . "?v=" . filemtime($render2File);
     }
     $render2Version = filemtime(__DIR__ . "/script/render2.js");
 ?>

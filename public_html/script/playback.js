@@ -944,7 +944,7 @@ async function startBattle(simulation){
             newindex[i] = i;
         }
 
-        const { expandSimulation } = await import('./render2/battle-state.js');
+        const { expandSimulation } = await import('/script/render2/battle-state.js');
         steps = expandSimulation(simulation);
 
         start_timer(steps);
