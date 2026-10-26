@@ -6,6 +6,12 @@ import { profile } from './session.js';
 
 /** E-mail preferences, by the id suffix of their switches (`#pref-<name>`). */
 const PREFERENCES = ['friend', 'message', 'update', 'duel', 'tourn'];
+/** What to tell the user for each refused save, by API error code. */
+const SAVE_ERRORS = {
+    NICKNAME_TAKEN: 'Outro usuário já escolheu este nome',
+    INVALID_NICKNAME: 'O nome deve ter entre 2 e 30 caracteres',
+    INVALID_PICTURE: 'Não foi possível usar esta imagem. Escolha uma imagem PNG ou JPEG menor.',
+};
 
 /**
  * Reads an image file as a data URL.
@@ -28,7 +34,7 @@ function readImage(file) {
  */
 export class SettingsTab {
     #panel = document.querySelector('#profile-panel');
-    /** Picture to save: the current one, or a new crop as a data URL. */
+    /** A new crop to save, as a data URL; null keeps the current picture. */
     #picture = null;
 
     /** Binds the form. */
@@ -41,10 +47,10 @@ export class SettingsTab {
 
     /** Fills the form with the current settings. */
     show() {
-        this.#picture = profile.user.foto;
-        this.#panel.querySelector('#nickname .input').value = profile.user.apelido;
+        this.#picture = null;
+        this.#panel.querySelector('#nickname .input').value = profile.user.nickname;
         PREFERENCES.forEach(name => {
-            this.#switch(name).checked = profile.user.preferences[name] == '1';
+            this.#switch(name).checked = profile.user.preferences[name];
         });
     }
 
@@ -122,28 +128,32 @@ export class SettingsTab {
     async #save() {
         const button = this.#panel.querySelector('#save');
         button.disabled = true;
-        const preferences = Object.fromEntries(PREFERENCES.map(name => [name, this.#switch(name).checked ? '1' : '0']));
-        const nickname = this.#panel.querySelector('#nickname .input').value;
-
-        const data = await UserModel.update({
-            nickname,
-            picture: this.#picture ?? profile.user.foto,
-            preferences,
+        const field = this.#panel.querySelector('#nickname .input');
+        const changes = {
+            nickname: field.value,
+            preferences: Object.fromEntries(PREFERENCES.map(name => [name, this.#switch(name).checked])),
             language: this.#panel.querySelector('#language select').value,
-        });
-        button.disabled = false;
+        };
+        if (this.#picture) changes.picture = this.#picture;
 
-        if (data.status === 'SUCCESS') {
-            profile.user = await UserModel.current({ refresh: true });
-            document.querySelector('#profile-ui #nickname').textContent = profile.user.apelido;
-            document.querySelector('#profile-ui #picture img').src = profile.user.foto;
+        try {
+            profile.user = await UserModel.update(changes);
+            this.#picture = null;
+            document.querySelector('#profile-ui #nickname').textContent = profile.user.nickname;
+            document.querySelector('#profile-ui #picture img').src = profile.user.picture;
             showMessage('Informações atualizadas');
         }
-        else if (data.status === 'EXISTS') {
-            await showMessage('Outro usuário já escolheu este nome');
-            const field = this.#panel.querySelector('#nickname .input');
-            field.focus();
-            field.select();
+        catch (error) {
+            const problem = SAVE_ERRORS[error.code];
+            if (!problem) throw error;
+            await showMessage(problem);
+            if (error.code !== 'INVALID_PICTURE') {
+                field.focus();
+                field.select();
+            }
+        }
+        finally {
+            button.disabled = false;
         }
     }
 }

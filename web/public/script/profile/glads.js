@@ -85,7 +85,7 @@ export class GladsTab {
      */
     #drawFreePlaces(count) {
         this.#container.querySelectorAll('.glad-add').forEach(place => place.remove());
-        const limit = gladiatorLimit(profile.user.lvl);
+        const limit = gladiatorLimit(profile.user.level);
         for (let index = count; index < MAX_GLADS; index++) {
             const open = index < limit;
             const place = createElement(renderTemplate(gladAddTemplate, {

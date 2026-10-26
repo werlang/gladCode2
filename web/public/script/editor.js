@@ -110,20 +110,20 @@ class EditorPage {
     async #setUpUser(embedded) {
         const { user } = this;
         document.querySelectorAll('#login').forEach(login => {
-            login.textContent = user.nome;
+            login.textContent = user.firstName;
         });
         const picture = document.querySelector('#profile-icon img');
         picture.onerror = () => {
             picture.src = BLANK_IMAGE;
         };
-        picture.src = user.foto;
+        picture.src = user.picture;
 
-        if (user.tutor == '1') {
+        if (user.showTutorial) {
             tutorial.enabled = true;
             tutorial.show();
         }
         if (user.language === 'blocks' && !embedded?.blocks) this.blocks.toggle({ ask: false, active: true });
-        this.code.setAppearance(user.theme, user.font);
+        this.code.setAppearance(user.editorTheme, user.editorFont);
 
         if (document.querySelector('#newglad')) {
             document.querySelector('#newglad').remove();

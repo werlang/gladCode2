@@ -4,6 +4,8 @@ import { assertJwtSecretConfiguration } from './helpers/jwt.js';
 import { Mysql } from './helpers/mysql.js';
 import { corsMiddleware, csrfOriginMiddleware, requestLogMiddleware, securityHeadersMiddleware } from './helpers/platform.js';
 import { errorMiddleware } from './middleware/error.js';
+import { authRouter } from './route/auth.js';
+import { usersRouter } from './route/users.js';
 
 const port = 3000;
 const host = '0.0.0.0';
@@ -33,6 +35,9 @@ app.get('/ready', async (req, res, next) => {
         next(new CustomError(503, 'Service unavailable.', 'NOT_READY'));
     }
 });
+
+app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

@@ -34,15 +34,15 @@ const VIDEOS = [
  * @param {Record<string, any>|null} user Signed-in user (saves the choice).
  */
 export function openSettings(code, user) {
-    const current = user?.theme ?? DEFAULT_THEME;
+    const current = user?.editorTheme ?? DEFAULT_THEME;
     const themes = THEMES.map(name => renderTemplate(themeTemplate, { name, selected: name === current ? 'selected' : '' })).join('');
     const fog = createElement(renderTemplate(settingsTemplate, { themes }));
     document.body.append(fog);
 
     const sample = ace.edit('code-sample');
     if (user) {
-        sample.setTheme(`ace/theme/${user.theme}`);
-        sample.setFontSize(`${user.font}px`);
+        sample.setTheme(`ace/theme/${user.editorTheme}`);
+        sample.setFontSize(`${user.editorFont}px`);
     }
     sample.getSession().setMode('ace/mode/c_cpp');
     sample.setReadOnly(true);
@@ -55,7 +55,8 @@ export function openSettings(code, user) {
     }));
     fog.querySelectorAll('#font-size .button').forEach(button => button.addEventListener('click', () => {
         const font = parseInt(sample.getFontSize(), 10);
-        sample.setFontSize(button.classList.contains('font-small') ? font - 2 : font + 2);
+        // the profile keeps sizes from 8 to 40
+        sample.setFontSize(Math.min(40, Math.max(8, button.classList.contains('font-small') ? font - 2 : font + 2)));
         sample.resize();
     }));
     fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
@@ -66,8 +67,8 @@ export function openSettings(code, user) {
         fog.remove();
         if (!user) return;
         await UserModel.saveEditor({ theme, font });
-        user.theme = theme;
-        user.font = font;
+        user.editorTheme = theme;
+        user.editorFont = font;
     });
 }
 

@@ -41,8 +41,8 @@ async function start() {
         return;
     }
 
-    document.querySelector('#profile-ui #picture img').src = profile.user.foto;
-    document.querySelector('#profile-ui #nickname').textContent = profile.user.apelido;
+    document.querySelector('#profile-ui #picture img').src = profile.user.picture;
+    document.querySelector('#profile-ui #nickname').textContent = profile.user.nickname;
     // credits stay hidden until tutor accounts are on sale
     document.querySelector('#menu #currencies #money')?.remove();
     document.querySelector('#menu #currencies').classList.remove('hidden');

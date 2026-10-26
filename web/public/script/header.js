@@ -4,30 +4,25 @@ import { GoogleLogin } from './helpers/google-login.js';
 import { UserModel } from './models/user.js';
 
 /**
- * Signs in with Google: the one-tap prompt when no credential is stored,
- * then a server session from the credential and the news page.
+ * Shows the session in the header and signs in with Google: the one-tap prompt for visitors, then
+ * an API session from the credential and the news page.
  */
-async function startGoogleLogin() {
+async function start() {
+    Tooltip.install();
+    const user = await UserModel.current().catch(() => null);
+    const logged = UserModel.isLogged(user);
+    const headerElement = document.querySelector('#header');
+    if (headerElement) new Header(headerElement).showSignedIn(logged);
+
     GoogleLogin.onFail(() => GoogleLogin.removeCredential());
     GoogleLogin.onSignIn(async credential => {
         if (!credential) return;
         await UserModel.signIn(credential);
-        await UserModel.current({ refresh: true });
         location.href = '/news';
     });
 
     await GoogleLogin.init();
-    if (!GoogleLogin.getCredential()) {
-        GoogleLogin.prompt();
-    }
+    if (!logged) GoogleLogin.prompt();
 }
 
-UserModel.current();
-Tooltip.install();
-
-const headerElement = document.querySelector('#header');
-if (headerElement) {
-    new Header(headerElement).showSignedIn(Boolean(GoogleLogin.getCredential()));
-}
-
-startGoogleLogin();
+start();

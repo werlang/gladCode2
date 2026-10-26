@@ -1,30 +1,23 @@
 import { api } from '../helpers/request.js';
-import { LocalData } from '../helpers/local-data.js';
-
-const ENDPOINT = 'back_login.php';
-const CACHE_KEY = 'user';
 
 /** The signed-in user request, shared by every caller on the page. */
 let current = null;
 
 /**
- * The account behind the PHP session (`back_login.php`).
+ * The signed-in account (`/users/me`) and its session (`/auth`).
+ *
+ * A user is `{ id, email, nickname, firstName, lastName, picture, language, level, xp, silver,
+ * credits, premium, apothecary, showTutorial, editorTheme, editorFont, preferences, isAdmin }`.
  */
 export class UserModel {
     /**
      * Fetches the signed-in user once per page; later calls share the answer.
      *
      * @param {{ refresh?: boolean }} [options] `refresh` asks the server again.
-     * @returns {Promise<Record<string, any>>} The user, whose `status` is
-     *   `SUCCESS`, or `NOTLOGGED` / `NOTFOUND` without a session.
+     * @returns {Promise<Record<string, any>|null>} The user, or null for a visitor.
      */
     static current({ refresh = false } = {}) {
-        if (!current || refresh) {
-            current = api.post(ENDPOINT, { action: 'GET' }).then(user => {
-                new LocalData({ id: CACHE_KEY }).set({ data: user });
-                return user;
-            });
-        }
+        if (!current || refresh) current = api.get('users/me').then(answer => answer.user);
         return current;
     }
 
@@ -35,66 +28,65 @@ export class UserModel {
      * @returns {boolean}
      */
     static isLogged(user) {
-        return user?.status === 'SUCCESS';
+        return Boolean(user?.id);
     }
 
     /**
      * Opens a session from a Google credential.
      *
-     * @param {string} token Google ID token.
-     * @returns {Promise<Record<string, any>>}
+     * @param {string} credential Google ID token.
+     * @returns {Promise<Record<string, any>>} The user.
      */
-    static signIn(token) {
-        return api.post(ENDPOINT, { action: 'SET', token });
+    static async signIn(credential) {
+        const { user } = await api.post('auth/google', { credential });
+        current = Promise.resolve(user);
+        return user;
     }
 
     /**
-     * Closes the session and forgets the cached user.
+     * Closes the session and forgets the user.
      *
      * @returns {Promise<unknown>}
      */
     static signOut() {
         current = null;
-        new LocalData({ id: CACHE_KEY }).remove();
-        return api.post(ENDPOINT, { action: 'UNSET' });
+        return api.post('auth/logout');
     }
 
     /**
-     * Saves the profile settings.
+     * Saves profile changes; only the fields given change.
      *
-     * @param {{ nickname: string, language: string, picture: string, preferences: Record<string, unknown> }} fields
-     * @returns {Promise<unknown>}
+     * @param {{ nickname?: string, language?: string, picture?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean }} fields
+     *   `picture` is a new cropped image as a data URL.
+     * @returns {Promise<Record<string, any>>} The updated user.
+     * @throws {import('../helpers/request.js').RequestError} `NICKNAME_TAKEN` when the nickname is in use.
      */
-    static update({ nickname, language, picture, preferences }) {
-        return api.post(ENDPOINT, {
-            action: 'UPDATE',
-            nickname,
-            language,
-            picture,
-            preferences: JSON.stringify(preferences),
-        });
+    static async update(fields) {
+        const { user } = await api.put('users/me', fields);
+        current = Promise.resolve(user);
+        return user;
     }
 
-    /** @returns {Promise<unknown>} Marks the tutorial as finished. */
+    /** @returns {Promise<Record<string, any>>} Marks the tutorial as finished. */
     static endTutorial() {
-        return api.post(ENDPOINT, { action: 'TUTORIAL_END' });
+        return UserModel.update({ showTutorial: false });
     }
 
     /**
-     * @param {string} language Language the tutorial runs in.
-     * @returns {Promise<unknown>}
+     * @param {string} language Language the tutorial runs in, also the preferred one.
+     * @returns {Promise<Record<string, any>>}
      */
     static setTutorialLanguage(language) {
-        return api.post(ENDPOINT, { action: 'TUTORIAL_LANGUAGE', language });
+        return UserModel.update({ language });
     }
 
     /**
      * Saves the editor appearance.
      *
      * @param {{ theme: string, font: string|number }} settings
-     * @returns {Promise<unknown>}
+     * @returns {Promise<Record<string, any>>}
      */
     static saveEditor({ theme, font }) {
-        return api.post(ENDPOINT, { action: 'EDITOR', theme, font });
+        return UserModel.update({ editorTheme: theme, editorFont: Number(font) });
     }
 }

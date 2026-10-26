@@ -36,9 +36,9 @@ export class Header extends BaseComponent {
     }
 
     /**
-     * Shows the profile link when signed in to Google, the login link otherwise.
+     * Shows the profile link when signed in, the login link otherwise.
      *
-     * @param {boolean} logged Whether a Google credential is stored.
+     * @param {boolean} logged Whether the visitor has a session.
      */
     showSignedIn(logged) {
         this.element.querySelectorAll('#profile').forEach(link => link.classList.toggle('hidden', !logged));

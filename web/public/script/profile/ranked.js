@@ -124,7 +124,7 @@ async function showAfterBattle(hash, before) {
         find('#renown-total').textContent = Math.trunc(value);
     } });
 
-    profile.user.lvl = data.lvl;
+    profile.user.level = data.lvl;
     profile.user.xp = data.xp;
     loadGladCards(find('.glad-card-container'), { glads: [data.glad] });
     find('#code').addEventListener('click', () => window.open(`glad-${data.glad.id}`));
@@ -184,9 +184,9 @@ export class RankedBattle {
         if (!glad) return;
         const progress = new ProgressButton(this.#button, ['Executando batalha...', 'Aguardando resposta do servidor']);
         const before = {
-            lvl: profile.user.lvl,
+            lvl: profile.user.level,
             xp: parseFloat(profile.user.xp),
-            xpTotal: xpToNextLevel(profile.user.lvl),
+            xpTotal: xpToNextLevel(profile.user.level),
             silver: parseInt(profile.user.silver, 10),
             mmr: glad.mmr,
         };

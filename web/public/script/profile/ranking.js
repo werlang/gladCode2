@@ -219,7 +219,7 @@ export class RankingTab {
     #generalRow(row) {
         const change = parseInt(row.change24, 10) || 0;
         return renderTemplate(generalRowTemplate, {
-            mine: profile.user.apelido === row.master ? 'mine' : '',
+            mine: profile.user.nickname === row.master ? 'mine' : '',
             position: row.position,
             glad: row.glad,
             master: row.master,

@@ -12,7 +12,7 @@ export async function checkNotifications({ duelChallenges } = {}) {
     const data = await NotificationModel.counts();
     const menu = document.querySelector('#menu');
 
-    profile.user.lvl = data.user.lvl;
+    profile.user.level = data.user.lvl;
     profile.user.xp = data.user.xp;
     document.querySelector('#profile-ui #lvl span').textContent = data.user.lvl;
     const xp = parseInt(data.user.xp, 10);

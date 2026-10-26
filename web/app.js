@@ -25,6 +25,8 @@ if (['1', 'true', 'on', 'yes'].includes(String(process.env.MAINTENANCE || '').to
 }
 
 app.use(express.static(PUBLIC, { index: false, extensions: false }));
+// Profile pictures uploaded through the API (shared data volume).
+app.use('/profpics', express.static(process.env.PROFPICS_DIR || '/data/profpics', { index: false }));
 
 // The browser talks to the API directly; the web service only renders page shells and never
 // receives the session.
