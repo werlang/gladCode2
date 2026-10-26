@@ -41,7 +41,6 @@
             <!-- <div class='item drop-menu'>
                 <div class='title'><span>{{projects}}</span></div>
                 <div class='item-container'>
-                    <div class='item'><a href='code' title='{{header_tooltip_compiler}}'><span>{{header_projects_compiler}}</span></a></div>
                     <div class='item'><a href='https://github.com/werlang/gladcode' title='{{header_tooltip_github_gladcode}}' target='_blank'>GLADCODE V1</a></div>
                     <div class='item'><a href='https://github.com/werlang/automin' title='{{header_tooltip_automin}}' target='_blank'>AUTOMIN</a></div>
                 </div>
