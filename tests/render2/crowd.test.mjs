@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createRandom } from '../../public_html/script/render2/noise.js';
-import { MAX_SPECTATORS, planCrowd, seats } from '../../public_html/script/render2/crowd-layout.js';
-import { PODIUM, SyntyColiseum } from '../../public_html/script/render2/synty-coliseum.js';
+import { createRandom } from '../../web/public/script/render2/noise.js';
+import { MAX_SPECTATORS, planCrowd, seats } from '../../web/public/script/render2/crowd-layout.js';
+import { PODIUM, SyntyColiseum } from '../../web/public/script/render2/synty-coliseum.js';
 
 const THREE = { Group: class { add() {} } };
 const box = { min: { x: -0.5, y: 0, z: -0.5 }, max: { x: 0.5, y: 1, z: 0.5 } };

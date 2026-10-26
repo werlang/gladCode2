@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { formatTimeline, frameAt } from '../../public_html/script/helpers/replay.js';
-import { nextVersion } from '../../public_html/script/helpers/version.js';
+import { formatTimeline, frameAt } from '../../web/public/script/helpers/replay.js';
+import { nextVersion } from '../../web/public/script/helpers/version.js';
 
 const steps = [
     { simtime: 0, glads: [{ x: 0, y: 0, head: 350, hp: 10 }] },

@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { attributeCost, detectLanguage, gladiatorSource, validGladName } from '../../public_html/script/editor/attributes.js';
-import { insideFunction } from '../../public_html/script/editor/code-editor.js';
+import { attributeCost, detectLanguage, gladiatorSource, validGladName } from '../../web/public/script/editor/attributes.js';
+import { insideFunction } from '../../web/public/script/editor/code-editor.js';
 
 test('attribute costs grow by one point every six levels', () => {
     assert.equal(attributeCost(0), 0);

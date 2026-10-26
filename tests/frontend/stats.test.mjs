@@ -2,9 +2,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { battleStats, expandSteps } from '../../public_html/script/helpers/battle-stats.js';
-import { snapValue } from '../../public_html/script/components/slider.js';
-import { toBackendDate } from '../../public_html/script/models/stats.js';
+import { battleStats, expandSteps } from '../../web/public/script/helpers/battle-stats.js';
+import { snapValue } from '../../web/public/script/components/slider.js';
+import { toBackendDate } from '../../web/public/script/models/stats.js';
 
 /**
  * A gladiator's state in one step.

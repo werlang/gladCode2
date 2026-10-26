@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { TAP_MS, TAP_SLOP, TouchGestures } from '../../public_html/script/render2/touch-gestures.js';
+import { TAP_MS, TAP_SLOP, TouchGestures } from '../../web/public/script/render2/touch-gestures.js';
 
 test('one finger drags by its own motion', () => {
     const touches = new TouchGestures();

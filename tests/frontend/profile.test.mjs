@@ -2,11 +2,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { gladiatorLimit } from '../../public_html/script/profile/glads.js';
-import { formatRemaining } from '../../public_html/script/profile/potions.js';
-import { xpToNextLevel } from '../../public_html/script/profile/session.js';
-import { typeRoundTime, validRoundTime } from '../../public_html/script/profile/tournaments.js';
-import { battleSizes } from '../../public_html/script/profile/trainings.js';
+import { gladiatorLimit } from '../../web/public/script/profile/glads.js';
+import { formatRemaining } from '../../web/public/script/profile/potions.js';
+import { xpToNextLevel } from '../../web/public/script/profile/session.js';
+import { typeRoundTime, validRoundTime } from '../../web/public/script/profile/tournaments.js';
+import { battleSizes } from '../../web/public/script/profile/trainings.js';
 
 test('potion time left drops the hours and minutes that are zero', () => {
     assert.equal(formatRemaining(3725), '1h 2m 5s');

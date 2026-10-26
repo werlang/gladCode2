@@ -27,10 +27,10 @@ const rules = {
 export default [
     {
         // vendored libraries stay as shipped
-        ignores: ['public_html/script/phaser.js', 'public_html/script/croppie.js', 'api/node_modules/**'],
+        ignores: ['web/public/script/phaser.js', 'web/public/script/croppie.js', 'api/node_modules/**'],
     },
     {
-        files: ['public_html/script/**/*.js'],
+        files: ['web/public/script/**/*.js'],
         languageOptions: {
             ecmaVersion: 2024,
             sourceType: 'module',
@@ -39,8 +39,8 @@ export default [
         rules,
     },
     {
-        files: ['api/**/*.js'],
-        ignores: ['api/node_modules/**'],
+        files: ['api/**/*.js', 'web/*.js', 'web/middleware/**/*.js', 'web/helpers/**/*.js'],
+        ignores: ['api/node_modules/**', 'web/node_modules/**'],
         languageOptions: {
             ecmaVersion: 2024,
             sourceType: 'module',
@@ -51,7 +51,7 @@ export default [
     {
         // the classic Phaser renderer predates the modules: it shares page globals
         // and var-scoped state, so only the correctness rules apply until it is rewritten
-        files: ['public_html/script/render.js', 'public_html/script/floatingText.js'],
+        files: ['web/public/script/render.js', 'web/public/script/floatingText.js'],
         languageOptions: { sourceType: 'script' },
         rules: {
             'no-undef': 'off',

@@ -13,7 +13,7 @@ import {
     lerp,
     lerpAngle,
     toArenaPosition,
-} from '../../public_html/script/render2/battle-state.js';
+} from '../../web/public/script/render2/battle-state.js';
 
 const EMPTY_BUFFS = {
     burn: { value: 0, timeleft: 0 },

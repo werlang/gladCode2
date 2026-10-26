@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import {
     FOOTPRINT, LAND_RADIUS, PLAZA, ROAD_HALF, footprintDistance, housePieces, landHeight, planLandscape, roadDistance,
-} from '../../public_html/script/render2/landscape-layout.js';
+} from '../../web/public/script/render2/landscape-layout.js';
 
 const plan = planLandscape();
 const vegetation = [...plan.props].filter(([name]) => /^(cypress|tree|cluster|bush)/.test(name)).flatMap(([, placements]) => placements);

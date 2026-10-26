@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import test from 'node:test';
 
-import { SOUNDS, measureSound, potionSound } from '../../public_html/script/render2/audio-manager.js';
-import { crackleSamples, seededRandom } from '../../public_html/script/render2/soundscape.js';
-import { COUGH_INTERVAL, deriveStepEvents } from '../../public_html/script/render2/battle-state.js';
+import { SOUNDS, measureSound, potionSound } from '../../web/public/script/render2/audio-manager.js';
+import { crackleSamples, seededRandom } from '../../web/public/script/render2/soundscape.js';
+import { COUGH_INTERVAL, deriveStepEvents } from '../../web/public/script/render2/battle-state.js';
 
 const RATE = 8000;
 
@@ -51,7 +51,7 @@ test('potions play the classic renderer sound for their kind', () => {
 test('every sound has files on disk and a level within the mix range', () => {
     for (const [name, sound] of Object.entries(SOUNDS)) {
         assert.ok(sound.files.length > 0, name);
-        for (const path of sound.files) assert.ok(existsSync(new URL(`../../public_html/${path}`, import.meta.url)), path);
+        for (const path of sound.files) assert.ok(existsSync(new URL(`../../web/public/${path}`, import.meta.url)), path);
         assert.ok(Math.abs(sound.level) <= 18, name);
     }
 });

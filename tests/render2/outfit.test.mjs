@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getAppearance } from '../../public_html/script/render2/palette.js';
+import { getAppearance } from '../../web/public/script/render2/palette.js';
 import {
     FACIAL_STYLES, HAIR_STYLES, PROPS, SHIELD_MODELS, WEAPON_MODELS, bowModel, meleeModel, shieldModel, syntyOutfit,
-} from '../../public_html/script/render2/synty-outfit.js';
+} from '../../web/public/script/render2/synty-outfit.js';
 
 const outfitOf = (tokens) => syntyOutfit(getAppearance(JSON.stringify(tokens), 0, new Map(), []));
 const names = (outfit) => outfit.parts.map((part) => part.name);

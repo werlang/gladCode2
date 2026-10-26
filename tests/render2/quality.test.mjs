@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { QUALITY_TIERS, chooseQuality } from '../../public_html/script/render2/quality.js';
-import { glide } from '../../public_html/script/render2/audio-param.js';
+import { QUALITY_TIERS, chooseQuality } from '../../web/public/script/render2/quality.js';
+import { glide } from '../../web/public/script/render2/audio-param.js';
 
 test('the automatic tier follows the device, and a stored choice wins', () => {
     const desktop = { mobile: false, cores: 10, memory: 8 };

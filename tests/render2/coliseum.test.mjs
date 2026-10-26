@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { ARENA_SIZE } from '../../public_html/script/render2/battle-state.js';
-import { PODIUM, SyntyColiseum } from '../../public_html/script/render2/synty-coliseum.js';
+import { ARENA_SIZE } from '../../web/public/script/render2/battle-state.js';
+import { PODIUM, SyntyColiseum } from '../../web/public/script/render2/synty-coliseum.js';
 
 const HALF = ARENA_SIZE / 2;
 

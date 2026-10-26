@@ -2,30 +2,26 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { elapsedString, formatMessageTime, splitDuration } from '../../public_html/script/helpers/date-format.js';
-import { escapeHtml, renderTemplate } from '../../public_html/script/helpers/html.js';
-import { parseBody, toFormBody } from '../../public_html/script/helpers/request.js';
-import { nameGladiators, simulationProblem } from '../../public_html/script/helpers/simulation-report.js';
+import { elapsedString, formatMessageTime, splitDuration } from '../../web/public/script/helpers/date-format.js';
+import { escapeHtml, renderTemplate } from '../../web/public/script/helpers/html.js';
+import { RequestError, parseBody, toQuery } from '../../web/public/script/helpers/request.js';
+import { nameGladiators, simulationProblem } from '../../web/public/script/helpers/simulation-report.js';
 
-test('form bodies nest objects and arrays the way PHP reads $_POST', () => {
-    const body = toFormBody({
-        action: 'SET',
-        glads: [3, 7],
-        prefs: { sound: true, speed: 2 },
-        rows: [{ id: 1 }],
-        empty: null,
-        skipped: undefined,
-    });
-    assert.equal(
-        decodeURIComponent(body.toString()),
-        'action=SET&glads[]=3&glads[]=7&prefs[sound]=true&prefs[speed]=2&rows[0][id]=1&empty=',
-    );
+test('queries repeat array keys and leave empty values out', () => {
+    assert.equal(toQuery({ page: 2, glads: [3, 7], search: '', skipped: undefined, none: null }), 'page=2&glads=3&glads=7');
+    assert.equal(toQuery({ q: 'a b&c' }), 'q=a+b%26c');
 });
 
 test('bodies parse as JSON and fall back to their text', () => {
-    assert.deepEqual(parseBody('{"status":"SUCCESS"}'), { status: 'SUCCESS' });
-    assert.equal(parseBody('Warning: oops'), 'Warning: oops');
-    assert.equal(parseBody(''), '');
+    assert.deepEqual(parseBody('{"status":"alive"}'), { status: 'alive' });
+    assert.equal(parseBody('plain text'), 'plain text');
+    assert.equal(parseBody(''), null);
+});
+
+test('API errors expose their stable code', () => {
+    const error = new RequestError(409, 'Nickname taken.', { error: true, code: 'NICKNAME_TAKEN' });
+    assert.equal(error.code, 'NICKNAME_TAKEN');
+    assert.equal(new RequestError(500, 'x', 'text').code, undefined);
 });
 
 test('templates escape double braces and insert triple braces as is', () => {

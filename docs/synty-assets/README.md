@@ -1,7 +1,7 @@
 # Synty asset reference (for agents)
 
 **Read this before picking, loading or placing any 3D asset for the render2 battle renderer.** The packs live in
-`public_html/assets/synty/<pack>/` (gitignored, never commit them; served at `/assets/synty/<pack>/`). This folder
+`web/public/assets/synty/<pack>/` (gitignored, never commit them; served at `/assets/synty/<pack>/`). This folder
 indexes everything in them so you can find a model, know its real size, pivot, cost and textures, and load it the
 way the renderer already does, without opening FBX files by hand.
 

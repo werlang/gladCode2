@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ACTION_BY_ID, ACTION_SPECS, REST, actionDuration, actionWeight, composePose, engineTiming, warpedTime, gaitForSpeed, hipHeight, locomotionPose, pose } from '../../public_html/script/render2/motion.js';
-import { getAppearance, parseSkin } from '../../public_html/script/render2/palette.js';
+import { ACTION_BY_ID, ACTION_SPECS, REST, actionDuration, actionWeight, composePose, engineTiming, warpedTime, gaitForSpeed, hipHeight, locomotionPose, pose } from '../../web/public/script/render2/motion.js';
+import { getAppearance, parseSkin } from '../../web/public/script/render2/palette.js';
 
 test('the lowest foot is grounded at every gait phase', () => {
     const { amplitude, run } = gaitForSpeed(2);

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/gif" href="/icon/gladcode_icon.png" />
+    <title>gladCode - Página não encontrada</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+    <link rel='stylesheet' href="/css/header.css"/>
+    <link rel='stylesheet' href="/css/dialog.css"/>
+    <link rel='stylesheet' href="{{#asset}}css/notfound.css{{/asset}}"/>
+    {{{importMap}}}
+    <script type="module" src="{{#module}}header.js{{/module}}"></script>
+</head>
+<body>
+    {{{templateVars}}}
+    {{> header}}
+    <main id='notfound'>
+        <img src='/icon/logo.png' alt='gladCode'>
+        <h1>Página não encontrada</h1>
+        <p>O endereço que você abriu não existe ou foi movido.</p>
+        <a class='button' href='/'>Voltar para o início</a>
+    </main>
+</body>
+</html>
