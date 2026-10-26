@@ -1,4 +1,4 @@
-import { engineText } from '../helpers/battle-results.js';
+import { placingOrder, survival } from '../helpers/battle-results.js';
 import { expandSteps } from '../helpers/battle-stats.js';
 import { CustomError } from '../helpers/error.js';
 import { Mysql } from '../helpers/mysql.js';
@@ -9,54 +9,8 @@ import { GROUP_SIZE, createGroups } from './tournament.js';
 
 /** A group's battle holds its lock this long (the runner gives a battle 30 s). */
 const LOCK_SECONDS = 60;
-/** Survival time added to a group's winner, so it ranks above everyone who died. */
-const WINNER_BONUS = 1000;
 /** Tables of a tournament round, joined from a group to its tournament. */
 const GROUP_JOIN = '`groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament';
-
-/**
- * Places a group's teams: the winner first, then teams still alive, then by survival time and hp.
- *
- * @param {{ winner?: boolean, dead?: boolean, time: number, hp?: number }} a
- * @param {{ winner?: boolean, dead?: boolean, time: number, hp?: number }} b
- * @returns {number}
- */
-export function placingOrder(a, b) {
-    if (b.winner && !a.winner) return 1;
-    if (a.winner && !b.winner) return -1;
-    if (b.dead && !a.dead) return -1;
-    if (a.dead && !b.dead) return 1;
-    return (b.time - a.time) || ((b.hp ?? 0) - (a.hp ?? 0));
-}
-
-/**
- * Each gladiator's survival in a group battle: `time` is when it was last seen alive, or
- * 1000 + the end for the winner (alive at the end).
- *
- * @param {Array<{ simtime: number, glads: Array<Record<string, any>> }>} steps Expanded steps.
- * @returns {Array<{ name: string, user: string, time: number, hp: number, winner?: boolean }>}
- */
-export function survival(steps) {
-    const last = steps.at(-1);
-    const result = last.glads.map(glad => {
-        const entry = { name: engineText(glad.name), user: engineText(glad.user), time: 0, hp: 0 };
-        if (glad.hp > 0) {
-            entry.winner = true;
-            entry.time = WINNER_BONUS + Number(last.simtime);
-        }
-        return entry;
-    });
-    for (const step of [...steps].reverse()) {
-        step.glads.forEach((glad, index) => {
-            if (result[index].time === 0 && glad.hp > 0) {
-                result[index].time = Number(step.simtime);
-                result[index].hp = glad.hp;
-            }
-        });
-        if (result.every(entry => entry.time !== 0)) break;
-    }
-    return result;
-}
 
 /**
  * The rounds of a started tournament (by its public hash): groups of up to five teams, each

@@ -81,6 +81,53 @@ export function deathOrder(simulation) {
     });
 }
 
+/** Survival time added to a group battle's winners, so they rank above everyone who died. */
+export const WINNER_BONUS = 1000;
+
+/**
+ * Places a group's teams: the winner first, then teams still alive, then by survival time and hp.
+ *
+ * @param {{ winner?: boolean, dead?: boolean, time: number, hp?: number }} a
+ * @param {{ winner?: boolean, dead?: boolean, time: number, hp?: number }} b
+ * @returns {number}
+ */
+export function placingOrder(a, b) {
+    if (b.winner && !a.winner) return 1;
+    if (a.winner && !b.winner) return -1;
+    if (b.dead && !a.dead) return -1;
+    if (a.dead && !b.dead) return 1;
+    return (b.time - a.time) || ((b.hp ?? 0) - (a.hp ?? 0));
+}
+
+/**
+ * Each gladiator's survival in a group battle: `time` is when it was last seen alive, or
+ * 1000 + the end for the winner (alive at the end).
+ *
+ * @param {Array<{ simtime: number, glads: Array<Record<string, any>> }>} steps Expanded steps.
+ * @returns {Array<{ name: string, user: string, time: number, hp: number, winner?: boolean }>}
+ */
+export function survival(steps) {
+    const last = steps.at(-1);
+    const result = last.glads.map(glad => {
+        const entry = { name: engineText(glad.name), user: engineText(glad.user), time: 0, hp: 0 };
+        if (glad.hp > 0) {
+            entry.winner = true;
+            entry.time = WINNER_BONUS + Number(last.simtime);
+        }
+        return entry;
+    });
+    for (const step of [...steps].reverse()) {
+        step.glads.forEach((glad, index) => {
+            if (result[index].time === 0 && glad.hp > 0) {
+                result[index].time = Number(step.simtime);
+                result[index].hp = glad.hp;
+            }
+        });
+        if (result.every(entry => entry.time !== 0)) break;
+    }
+    return result;
+}
+
 /**
  * Renown change of each gladiator, in placing order: the winner (and anyone who lasted as long)
  * gets the most, the first to die loses the most, scaled by how strong each was against the
@@ -117,6 +164,25 @@ export function calcReward(glads) {
         if (reward < 0 && glad.mmr < 1000) reward += reward * (0.001 * glad.mmr - 1);
         return reward;
     });
+}
+
+/**
+ * Score of each gladiator of a training battle, in placing order: 10 for the winners, the others
+ * by how long they lasted between the first to die and the runner-up, as back_training_run.php did.
+ *
+ * @param {Array<{ time: number, winner?: boolean }>} placed From the winner down (see {@link survival}).
+ * @returns {number[]}
+ */
+export function trainingScores(placed) {
+    const times = placed.map(entry => (entry.winner ? entry.time - WINNER_BONUS : entry.time));
+    const last = times.at(-1);
+    // a battle of one has no runner-up
+    const timeDiff = (times[1] ?? 0) - last;
+    const raw = placed.map((entry, index) => {
+        const timeNorm = entry.winner || timeDiff === 0 ? 1 : (times[index] - last) / timeDiff;
+        return (timeNorm * TIME_WEIGHT) + (entry.winner ? WIN_WEIGHT : 0);
+    });
+    return raw.map(value => (raw[0] ? (value / raw[0]) * MAX_REWARD : 0));
 }
 
 /**

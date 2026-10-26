@@ -1,58 +1,66 @@
 import { api } from '../helpers/request.js';
 
-const TRAIN = 'back_train.php';
-const RUN = 'back_training_run.php';
-
 /**
- * Team trainings: their setup (`back_train.php`) and their rounds of battles
- * (`back_training_run.php`).
+ * Team trainings: their setup (`/trainings`) and their rounds of battles
+ * (`/training-rounds/:hash`). A training is joined by its invitation code, which
+ * names its round pages once it starts. Refusals come as `RequestError` codes such
+ * as `TRAINING_NOT_FOUND`, `INVITATION_EXPIRED`, `TRAINING_STARTED`.
  */
 export class TrainingModel {
     /**
-     * Joins a training by its invitation hash. Without `glad` it only checks
-     * the invitation (`ALLOWED` asks for a gladiator).
+     * The training an invitation code opens.
      *
-     * @param {string} hash Invitation hash.
-     * @param {{ glad?: number, redirect?: boolean }} [options] Gladiator to enter,
-     *   and whether the profile should open the training next.
-     * @returns {Promise<{ status: 'JOINED'|'NOTFOUND'|'COLLISION'|'EXPIRED'|'ALLOWED'|'STARTED'|'NOGLAD'|'SUCCESS', id?: number, name?: string }>}
+     * @param {string} hash Invitation code.
+     * @returns {Promise<{ id: number, name: string, status: 'open'|'joined'|'started' }>}
+     * @throws {import('../helpers/request.js').RequestError} `TRAINING_NOT_FOUND`, `INVITATION_EXPIRED`.
      */
-    static join(hash, { glad, redirect } = {}) {
-        return api.post(TRAIN, {
-            action: 'JOIN',
-            hash,
-            ...(glad === undefined ? {} : { glad, redirect: Boolean(redirect) }),
-        });
+    static async invitation(hash) {
+        const { training } = await api.get(`trainings/invitations/${encodeURIComponent(hash)}`);
+        return training;
+    }
+
+    /**
+     * Enters one of the master's gladiators in a training.
+     *
+     * @param {string} hash Invitation code.
+     * @param {number} gladiator
+     * @returns {Promise<{ id: number, name: string }>}
+     * @throws {import('../helpers/request.js').RequestError} `TRAINING_STARTED`, `ALREADY_JOINED`, `INVITATION_EXPIRED`.
+     */
+    static join(hash, gladiator) {
+        return api.post(`trainings/invitations/${encodeURIComponent(hash)}`, { gladiator });
     }
 
     /**
      * Creates a training (tutor accounts).
      *
-     * @param {{ name: string, desc: string, maxtime: number, players: number, weight: number }} training
-     * @returns {Promise<{ status: 'SUCCESS'|'NOPREMIUM'|'NOCREDITS'|string, hash?: string }>}
+     * @param {{ name: string, description: string, maxMinutes: number, players: number, weight: number }} training
+     * @returns {Promise<{ id: number, hash: string }>}
+     * @throws {import('../helpers/request.js').RequestError} `TUTOR_ONLY`, `NO_CREDITS`.
      */
     static create(training) {
-        return api.post(TRAIN, { action: 'CREATE', ...training });
+        return api.post('trainings', training);
     }
 
     /**
      * Pages of the trainings the user manages and takes part in.
      *
      * @param {{ manage: number, part: number }} offsets First row of each list.
-     * @returns {Promise<Record<string, any>>} `redirect` names a training to open (just joined from a link).
+     * @returns {Promise<{ manage: object[], part: object[], pages: Record<'manage'|'part', { offset: number, total: number }> }>}
      */
     static list({ manage, part }) {
-        return api.post(TRAIN, { action: 'LIST', moffset: manage, poffset: part });
+        return api.get('trainings', { manageOffset: manage, partOffset: part });
     }
 
     /**
      * A training waiting to start, as its manager or a participant sees it.
      *
      * @param {number} id Training id.
-     * @returns {Promise<Record<string, any>>} `status` is `MANAGE`, `PARTICIPATE`, `STARTED`, `NOTALLOWED` or `NOTFOUND`.
+     * @returns {Promise<Record<string, any>>} `status` is `manage`, `participate` or `started` (with `hash`).
+     * @throws {import('../helpers/request.js').RequestError} `TRAINING_NOT_FOUND`, `NOT_A_MEMBER`.
      */
     static room(id) {
-        return api.post(TRAIN, { action: 'ROOM', id });
+        return api.get(`trainings/${id}`);
     }
 
     /**
@@ -61,20 +69,21 @@ export class TrainingModel {
      * @param {number} id Training id.
      * @param {'name'|'description'} field Field.
      * @param {string} value New text.
-     * @returns {Promise<{ status: string, message?: string }>}
+     * @returns {Promise<unknown>}
+     * @throws {import('../helpers/request.js').RequestError} `INVALID_NAME`.
      */
     static edit(id, field, value) {
-        return api.post(TRAIN, { action: 'EDIT', id, field, value });
+        return api.put(`trainings/${id}`, { [field]: value });
     }
 
     /**
-     * Issues a new invitation hash (manager only).
+     * Issues a new invitation code (manager only).
      *
      * @param {number} id Training id.
-     * @returns {Promise<{ status: string, hash?: string }>}
+     * @returns {Promise<{ hash: string }>}
      */
     static renew(id) {
-        return api.post(TRAIN, { action: 'RENEW', id });
+        return api.post(`trainings/${id}/invitation`);
     }
 
     /**
@@ -82,40 +91,30 @@ export class TrainingModel {
      *
      * @param {number} id Training id.
      * @param {number} glad Participant's gladiator.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static kick(id, glad) {
-        return api.post(TRAIN, { action: 'KICK', id, glad });
+        return api.delete(`trainings/${id}/gladiators/${glad}`);
     }
 
     /**
      * Leaves a training.
      *
      * @param {number} id Training id.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static leave(id) {
-        return api.post(TRAIN, { action: 'KICK', id, myself: true });
+        return api.delete(`trainings/${id}/members/me`);
     }
 
     /**
-     * Deletes a training without participants (manager only).
+     * Deletes a training with its rounds and scores (manager only).
      *
      * @param {number} id Training id.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static remove(id) {
-        return api.post(TRAIN, { action: 'DELETE', id });
-    }
-
-    /**
-     * Deletes a training that already ran, with its results (manager only).
-     *
-     * @param {number} id Training id.
-     * @returns {Promise<{ status: string }>}
-     */
-    static purge(id) {
-        return api.post(TRAIN, { action: 'REMOVE', id });
+        return api.delete(`trainings/${id}`);
     }
 
     /**
@@ -123,85 +122,86 @@ export class TrainingModel {
      *
      * @param {number} id Training id.
      * @param {number} glad New gladiator.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static changeGladiator(id, glad) {
-        return api.post(TRAIN, { action: 'CHANGE', id, glad });
+        return api.put(`trainings/${id}/members/me`, { gladiator: glad });
     }
 
     /**
      * Starts a training (manager only).
      *
      * @param {number} id Training id.
-     * @returns {Promise<{ status: string, hash?: string }>}
+     * @returns {Promise<{ hash: string }>}
+     * @throws {import('../helpers/request.js').RequestError} `FEW_PLAYERS`.
      */
     static start(id) {
-        return api.post(TRAIN, { action: 'START', id });
+        return api.post(`trainings/${id}/start`);
     }
 
     /**
-     * A round of a training: its groups and teams, or the final ranking.
+     * A round of a training, the final ranking (round 0) or where to go.
      *
-     * @param {string} hash Training hash.
-     * @param {number|string} round Round number (0 for the final ranking).
-     * @returns {Promise<Record<string, any>>}
+     * @param {string} hash Training code.
+     * @param {number|string} round Round number.
+     * @returns {Promise<Record<string, any>>} `status`: `round`, `end` or `redirect`.
      */
     static round(hash, round) {
-        return api.post(RUN, { action: 'GET', hash, round });
+        return api.get(`training-rounds/${encodeURIComponent(hash)}/${round}`);
     }
 
     /**
-     * The round's progress: deadlines, finished groups and what to do next.
+     * The round's progress: deadlines, fought groups and what happens next.
      *
-     * @param {string} hash Training hash.
+     * @param {string} hash Training code.
      * @param {number|string} round Round number.
-     * @returns {Promise<Record<string, any>>}
+     * @returns {Promise<{ status: 'wait'|'open'|'run'|'busy'|'done'|'end', end: boolean, maxRound: number, now: string, deadline: string|null, trainDeadline: string|null, groups: object[] }>}
      */
     static refresh(hash, round) {
-        return api.post(RUN, { action: 'REFRESH', hash, round });
+        return api.get(`training-rounds/${encodeURIComponent(hash)}/${round}/status`);
+    }
+
+    /**
+     * Moves the training on: fights the next due group or opens the next round.
+     *
+     * @param {string} hash Training code.
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ status: string, group?: number, hash?: string|null, error?: string }>}
+     */
+    static advance(hash, { signal } = {}) {
+        return api.post(`training-rounds/${encodeURIComponent(hash)}/advance`, undefined, { signal });
     }
 
     /**
      * Sets when the round's battles start (manager only).
      *
-     * @param {string} hash Training hash.
+     * @param {string} hash Training code.
      * @param {number|string} round Round number.
-     * @param {number} minutes Minutes from now; 0 ends the round now.
-     * @returns {Promise<{ status: string, deadline?: string }>}
+     * @param {number} minutes Minutes from now; 0 starts them now.
+     * @returns {Promise<{ deadline: string }>}
      */
     static setRoundDeadline(hash, round, minutes) {
-        return api.post(RUN, { action: 'DEADLINE', hash, round, time: minutes });
+        return api.put(`training-rounds/${encodeURIComponent(hash)}/${round}/deadline`, { minutes: Number(minutes) });
     }
 
     /**
      * Ends the whole training now (manager only).
      *
-     * @param {string} hash Training hash.
-     * @returns {Promise<{ status: string }>}
+     * @param {string} hash Training code.
+     * @returns {Promise<unknown>}
      */
     static end(hash) {
-        return api.post(RUN, { action: 'DEADLINE', hash });
+        return api.post(`training-rounds/${encodeURIComponent(hash)}/end`);
     }
 
     /**
-     * Opens the next round once every group fought.
+     * Makes a group fight again (manager only).
      *
-     * @param {string} hash Training hash.
-     * @param {number|string} round Finished round.
-     * @returns {Promise<Record<string, any>>}
-     */
-    static newRound(hash, round) {
-        return api.post(RUN, { action: 'NEW ROUND', hash, round });
-    }
-
-    /**
-     * Runs a group's battle again (manager only).
-     *
-     * @param {string} hash Training hash.
+     * @param {string} hash Training code.
      * @param {number|string} group Group id.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static rerun(hash, group) {
-        return api.post(RUN, { action: 'RERUN', hash, group });
+        return api.post(`training-rounds/${encodeURIComponent(hash)}/groups/${group}/rerun`);
     }
 }

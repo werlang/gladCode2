@@ -20,6 +20,8 @@ import { statsRouter } from './route/stats.js';
 import { teamsRouter } from './route/teams.js';
 import { tournamentRoundsRouter } from './route/tournament-rounds.js';
 import { tournamentsRouter } from './route/tournaments.js';
+import { trainingRoundsRouter } from './route/training-rounds.js';
+import { trainingsRouter } from './route/trainings.js';
 import { usersRouter } from './route/users.js';
 
 const port = 3000;
@@ -68,6 +70,8 @@ app.use('/duels', duelsRouter);
 app.use('/tournaments', tournamentsRouter);
 app.use('/teams', teamsRouter);
 app.use('/tournament-rounds', tournamentRoundsRouter);
+app.use('/trainings', trainingsRouter);
+app.use('/training-rounds', trainingRoundsRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

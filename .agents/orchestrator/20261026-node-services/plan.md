@@ -79,8 +79,9 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
       battle runner; ranked, duel, tournament and training runs still go through it in their phases.
 - [x] Potions and replay preferences (3d78f9586), ranking and stats (5399815c0)
 - [x] Friends, messages, reports, notifications, mail (590e73a89); duels, ranked battles, server-side stats (5f5add820)
-- [x] Tournaments: setup, teams, rounds, group battles (lock per group), start and round emails sent by the API
-- [ ] Trainings
+- [x] Tournaments (1af24fef4): setup, teams, rounds, group battles (lock per group), start email sent by the API
+- [x] Trainings: setup, invitations, rounds; the API runs each due group's battle and opens the next
+      round when a viewer's page asks (`POST /training-rounds/:hash/advance`), scores match PHP
 - [ ] Release, thanks, admin dev-tools, cron, engine test, PHP tests
 - [ ] Retire public_html/Apache/node, compose for production, docs
 

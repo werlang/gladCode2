@@ -3,9 +3,8 @@ import { loadSelectableCards } from '../components/glad-card.js';
 import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
-import { MessageModel } from '../models/social.js';
 import { TrainingModel } from '../models/training.js';
 import { profile } from './session.js';
 import { showNoCredit } from './tutor.js';
@@ -27,12 +26,17 @@ import {
 
 const PAGE_SIZE = 10;
 const TRAIN_URL = 'https://gladcode.dev/train/';
-/** Who to tell about a hash collision. */
-const ADMIN_ID = 277;
 /** How often an open training window looks for new participants, in ms. */
 const ROOM_POLL_MS = 5000;
 /** Training weights the weight slider steps through. */
 const WEIGHTS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10];
+/** What to tell a master a training code does not work, by API error code. */
+const JOIN_ERRORS = {
+    TRAINING_NOT_FOUND: 'Treino não encontrado',
+    TRAINING_STARTED: 'Este treino já iniciou',
+    INVITATION_EXPIRED: 'O código para ingresso deste treino expirou',
+    ALREADY_JOINED: 'Você já está participando deste treino',
+};
 
 /**
  * The battle sizes a training's participants split into, as the room shows
@@ -182,14 +186,16 @@ function editInPlace(element, id, field) {
             return;
         }
         finish(value);
-        const data = await TrainingModel.edit(id, field, value);
-        if (data.status === 'ERROR') {
-            createToast(data.message, 'error');
+        try {
+            await TrainingModel.edit(id, field, value);
+        }
+        catch (error) {
             element.textContent = text;
+            if (error.code !== 'INVALID_NAME') throw error;
+            createToast('Nome precisa ter pelo menos 6 caracteres', 'error');
+            return;
         }
-        else if (data.status === 'SUCCESS') {
-            createToast('Campo alterado com sucesso', 'success');
-        }
+        createToast('Campo alterado com sucesso', 'success');
     };
 
     input.addEventListener('focusout', save);
@@ -222,16 +228,23 @@ class TrainingRoom {
 
     /** Opens the window (or the running training). */
     async show() {
-        const data = await TrainingModel.room(this.id);
-        if (data.status === 'STARTED') {
+        let data;
+        try {
+            data = await TrainingModel.room(this.id);
+        }
+        catch (error) {
+            if (error.code !== 'TRAINING_NOT_FOUND' && error.code !== 'NOT_A_MEMBER') throw error;
+            showMessage('Treino não encontrado');
+            return;
+        }
+        if (data.status === 'started') {
             window.open(`train/${data.hash}`);
             return;
         }
-        if (data.status !== 'MANAGE' && data.status !== 'PARTICIPATE') return;
 
-        this.manager = data.status === 'MANAGE';
-        this.players = parseInt(data.players, 10);
-        this.#fog = createElement(renderTemplate(roomWindowTemplate, data));
+        this.manager = data.status === 'manage';
+        this.players = data.players;
+        this.#fog = createElement(renderTemplate(roomWindowTemplate, { ...data, maxtime: data.maxMinutes }));
         document.body.append(this.#fog);
         const window_ = this.#window();
 
@@ -251,7 +264,7 @@ class TrainingRoom {
             leave.textContent = 'ABANDONAR TREINO';
             leave.hidden = false;
             leave.addEventListener('click', async () => {
-                if (await showDialog(`Abandonar o treino <b>${data.name}</b>?`, ['Sim', 'Não']) !== 'Sim') return;
+                if (await showDialog(`Abandonar o treino <b>${escapeHtml(data.name)}</b>?`, ['Sim', 'Não']) !== 'Sim') return;
                 this.#left = true;
                 await TrainingModel.leave(this.id);
                 this.refresh();
@@ -298,8 +311,8 @@ class TrainingRoom {
             renew.innerHTML = "<i class='fas fa-redo'></i>";
             renew.addEventListener('click', async () => {
                 renew.innerHTML = "<i class='fas fa-spinner fa-pulse'></i>";
-                const answer = await TrainingModel.renew(this.id);
-                if (answer.status === 'SUCCESS') this.#setHash(answer.hash);
+                const { hash } = await TrainingModel.renew(this.id);
+                this.#setHash(hash);
             });
             return;
         }
@@ -335,27 +348,31 @@ class TrainingRoom {
     /** Redraws the participants and the manager's controls. */
     async refresh() {
         if (!this.#fog) return;
-        const data = await TrainingModel.room(this.id);
-        if (!this.#fog) return;
-
-        if (data.status === 'NOTFOUND') {
-            this.close();
-            showMessage('O treino foi removido pelo gerenciador');
-            return;
+        let data;
+        try {
+            data = await TrainingModel.room(this.id);
         }
-        if (data.status === 'STARTED') {
-            this.close();
-            await showMessage('O treino foi iniciado. Clique para ir até ele');
-            window.open(`train/${data.hash}`);
-            return;
-        }
-        if (data.status === 'NOTALLOWED') {
+        catch (error) {
+            if (!this.#fog) return;
+            if (error.code === 'TRAINING_NOT_FOUND') {
+                this.close();
+                showMessage('O treino foi removido pelo gerenciador');
+                return;
+            }
+            if (error.code !== 'NOT_A_MEMBER') throw error;
             this.close();
             if (this.#left) createToast('Você saiu do treino', 'success');
             else showMessage('Você foi removido do treino');
             return;
         }
-        if (data.status !== 'MANAGE' && data.status !== 'PARTICIPATE') return;
+        if (!this.#fog) return;
+
+        if (data.status === 'started') {
+            this.close();
+            await showMessage('O treino foi iniciado. Clique para ir até ele');
+            window.open(`train/${data.hash}`);
+            return;
+        }
 
         const window_ = this.#window();
         const name = window_.querySelector('#train-name');
@@ -375,7 +392,7 @@ class TrainingRoom {
         const table = window_.querySelector('.table');
         const start = window_.querySelector('#start');
         const remove = window_.querySelector('#delete');
-        const count = data.glads.length;
+        const count = data.gladiators.length;
 
         if (count === 0) {
             table.innerHTML = "<div class='row'>Nenhum participante</div>";
@@ -393,7 +410,7 @@ class TrainingRoom {
         window_.querySelector('#player-container #players').textContent = sizes.players;
         window_.querySelector('#player-container #pl-second').textContent = sizes.second;
 
-        table.innerHTML = participantsHeadTemplate + data.glads.map(glad => renderTemplate(participantRowTemplate, {
+        table.innerHTML = participantsHeadTemplate + data.gladiators.map(glad => renderTemplate(participantRowTemplate, {
             signed: glad.mine ? 'signed' : '',
             master: glad.master,
             glad: glad.gladiator,
@@ -407,11 +424,9 @@ class TrainingRoom {
             start.disabled = count < this.players;
             start.onclick = () => this.#askStart();
             rows.forEach((row, index) => row.querySelector('.kick').addEventListener('click', async () => {
-                const answer = await TrainingModel.kick(this.id, data.glads[index].id);
-                if (answer.status === 'SUCCESS') {
-                    createToast('Participante removido', 'success');
-                    this.refresh();
-                }
+                await TrainingModel.kick(this.id, data.gladiators[index].id);
+                createToast('Participante removido', 'success');
+                this.refresh();
             }));
             return;
         }
@@ -420,35 +435,41 @@ class TrainingRoom {
         table.querySelector('.row.signed')?.addEventListener('click', async () => {
             const glad = await chooseGladiator();
             if (!glad) return;
-            const answer = await TrainingModel.changeGladiator(this.id, glad.id);
-            if (answer.status === 'SUCCESS') {
-                createToast('Gladiador alterado', 'success');
-                this.refresh();
+            try {
+                await TrainingModel.changeGladiator(this.id, glad.id);
             }
-            else {
-                createToast('ERRO', 'error');
+            catch (error) {
+                if (!error.code) throw error;
+                createToast('Não foi possível alterar o gladiador', 'error');
+                return;
             }
+            createToast('Gladiador alterado', 'success');
+            this.refresh();
         });
     }
 
     async #askStart() {
         if (await showDialog('Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados', ['Sim', 'Não']) !== 'Sim') return;
         this.close();
-        const data = await TrainingModel.start(this.id);
-        if (data.status === 'SUCCESS') {
-            createToast('Treino iniciado', 'success');
-            window.open(`train/${data.hash}`);
+        let hash;
+        try {
+            ({ hash } = await TrainingModel.start(this.id));
         }
+        catch (error) {
+            if (error.code !== 'FEW_PLAYERS') throw error;
+            showMessage('O treino precisa de mais participantes');
+            return;
+        }
+        createToast('Treino iniciado', 'success');
+        window.open(`train/${hash}`);
     }
 
     /** @param {string} name Training name. */
     async #askDelete(name) {
-        if (await showDialog(`Deseja excluir o treino ${name}?`, ['Sim', 'Não']) !== 'Sim') return;
-        const data = await TrainingModel.remove(this.id);
-        if (data.status === 'SUCCESS') {
-            this.close();
-            createToast('Treino removido', 'success');
-        }
+        if (await showDialog(`Deseja excluir o treino ${escapeHtml(name)}?`, ['Sim', 'Não']) !== 'Sim') return;
+        await TrainingModel.remove(this.id);
+        this.close();
+        createToast('Treino removido', 'success');
     }
 }
 
@@ -482,11 +503,16 @@ export class TrainingsTab {
         this.refresh();
     }
 
-    /** Draws both training lists, opening the one a join link pointed to. */
+    /** Draws both training lists, opening the one a join link pointed to (`?room=`). */
     async refresh() {
         const data = await TrainingModel.list(this.#offsets);
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
-        if (data.redirect) new TrainingRoom(data.redirect).show();
+
+        const room = Number(new URLSearchParams(location.search).get('room'));
+        if (room) {
+            history.replaceState(null, '', location.pathname);
+            new TrainingRoom(room).show();
+        }
     }
 
     /**
@@ -542,7 +568,7 @@ export class TrainingsTab {
      */
     #askPurge(training) {
         new Message({
-            message: `Deseja realmente excluir o treino <b>${training.name}</b>? Esta operação é irreversível`,
+            message: `Deseja realmente excluir o treino <b>${escapeHtml(training.name)}</b>? Esta operação é irreversível`,
             buttons: { yes: 'SIM', no: 'NÃO' },
         }).show().click('yes', () => {
             new Message({
@@ -554,11 +580,9 @@ export class TrainingsTab {
                     new Message({ message: 'O nome informado não confere' }).show();
                     return;
                 }
-                const data = await TrainingModel.purge(training.id);
-                if (data.status === 'SUCCESS') {
-                    new Message({ message: 'O treino foi removido com sucesso' }).show();
-                    this.refresh();
-                }
+                await TrainingModel.remove(training.id);
+                new Message({ message: 'O treino foi removido com sucesso' }).show();
+                this.refresh();
             });
         });
     }
@@ -610,26 +634,31 @@ export class TrainingsTab {
                 return;
             }
 
-            const data = await TrainingModel.create({
-                name: nameField.value,
-                desc: window_.querySelector('#desc').value,
-                maxtime: maxtime.value,
-                players: players.value,
-                weight: WEIGHTS[weight.value],
-            });
-            if (data.status === 'NOPREMIUM') {
-                createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
-                profile.user.premium = false;
+            let created;
+            try {
+                created = await TrainingModel.create({
+                    name: nameField.value,
+                    description: window_.querySelector('#desc').value,
+                    maxMinutes: Number(maxtime.value),
+                    players: Number(players.value),
+                    weight: WEIGHTS[weight.value],
+                });
             }
-            else if (data.status === 'NOCREDITS') {
-                createToast('Você não possui créditos para utilizar essa função', 'error');
-                profile.user.credits = 0;
+            catch (error) {
+                if (error.code === 'TUTOR_ONLY') {
+                    createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
+                    profile.user.premium = false;
+                }
+                else if (error.code === 'NO_CREDITS') {
+                    createToast('Você não possui créditos para utilizar essa função', 'error');
+                    profile.user.credits = 0;
+                }
+                else throw error;
+                return;
             }
-            else if (data.status === 'SUCCESS') {
-                fog.remove();
-                this.#showCreated(data.hash);
-                this.refresh();
-            }
+            fog.remove();
+            this.#showCreated(created.hash);
+            this.refresh();
         });
     }
 
@@ -650,39 +679,45 @@ export class TrainingsTab {
 
     /** Joins a training by its code. */
     async #join() {
-        const hash = await showInput('Informe o código fornecido para participar do treino', '');
-        if (hash === false) return;
+        const answer = await showInput('Informe o código fornecido para participar do treino', '');
+        if (answer === false) return;
+        const hash = answer.trim();
+        if (!/^[0-9A-Za-z]+$/.test(hash)) {
+            showMessage(JOIN_ERRORS.TRAINING_NOT_FOUND);
+            return;
+        }
 
-        const data = await TrainingModel.join(hash);
-        const messages = {
-            NOTFOUND: 'Treino não encontrado',
-            STARTED: 'Este treino já iniciou',
-            EXPIRED: 'O código para ingresso deste treino expirou',
-        };
-        if (messages[data.status]) {
-            showMessage(messages[data.status]);
+        let training;
+        try {
+            training = await TrainingModel.invitation(hash);
         }
-        else if (data.status === 'COLLISION') {
-            if (await showDialog('Colisão de hash. Informar o administrador?', ['OK', 'Cancelar']) === 'OK') {
-                MessageModel.send(ADMIN_ID, `Sistema - Colisão de hash: training#${hash}`);
-            }
+        catch (error) {
+            if (!JOIN_ERRORS[error.code]) throw error;
+            showMessage(JOIN_ERRORS[error.code]);
+            return;
         }
-        else if (data.status === 'JOINED') {
+
+        if (training.status === 'started') {
+            showMessage(JOIN_ERRORS.TRAINING_STARTED);
+        }
+        else if (training.status === 'joined') {
             createToast('Você já está participando deste treino', 'info');
-            new TrainingRoom(data.id).show();
+            new TrainingRoom(training.id).show();
         }
-        else if (data.status === 'ALLOWED') {
+        else {
             const glad = await chooseGladiator();
             if (!glad) return;
-            const answer = await TrainingModel.join(hash, { glad: glad.id });
-            if (answer.status === 'SUCCESS') {
-                createToast('Você ingressou no treino', 'success');
-                this.refresh();
-                new TrainingRoom(answer.id).show();
+            try {
+                await TrainingModel.join(hash, glad.id);
             }
-            else {
-                createToast('Erro ao ingressar, tente novamente', 'error');
+            catch (error) {
+                if (!error.code) throw error;
+                createToast(JOIN_ERRORS[error.code] ?? 'Erro ao ingressar, tente novamente', 'error');
+                return;
             }
+            createToast('Você ingressou no treino', 'success');
+            this.refresh();
+            new TrainingRoom(training.id).show();
         }
     }
 }

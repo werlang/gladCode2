@@ -30,7 +30,7 @@ vi.mock('../../../model/battle-log.js', () => ({
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { sendMail } = await import('../../../helpers/email.js');
 const { Tournament, createGroups, shuffle, teamWord } = await import('../../../model/tournament.js');
-const { TournamentRound, placingOrder, survival } = await import('../../../model/tournament-round.js');
+const { TournamentRound } = await import('../../../model/tournament-round.js');
 
 /** A step of a group battle: each gladiator's name, master and hp. */
 const step = (simtime, ...glads) => ({ simtime, glads: glads.map(([name, user, hp]) => ({ name, user, hp })) });
@@ -51,30 +51,6 @@ describe('tournament helpers', () => {
         Mysql.insert.mockResolvedValueOnce({ insertId: 8 }).mockResolvedValueOnce({ insertId: 9 });
         expect(await createGroups(2, 2, '00:05:00', { connection: 'tx' })).toEqual([8, 9]);
         expect(Mysql.insert.mock.calls[0][1].deadline.toSqlString()).toBe("ADDTIME(NOW(), '00:05:00')");
-    });
-
-    test('the winner places first, then the living, then the longest survivor', () => {
-        const teams = [
-            { team: 1, time: 50, hp: 0, dead: true },
-            { team: 2, time: 1080, winner: true },
-            { team: 3, time: 50, hp: 7 },
-            { team: 4, time: 70, hp: 2 },
-            { team: 5, time: 50, hp: 9 },
-        ];
-        expect(teams.sort(placingOrder).map(entry => entry.team)).toEqual([2, 4, 5, 3, 1]);
-    });
-
-    test('survival is when each gladiator was last alive, the winner after everyone', () => {
-        const steps = [
-            step(1, ['Zed', 'Ana', 30], ['Rex', 'Bo', 30], ['Max#II', 'Cy', 30]),
-            step(2, ['Zed', 'Ana', 20], ['Rex', 'Bo', 4], ['Max#II', 'Cy', 0]),
-            step(3, ['Zed', 'Ana', 15], ['Rex', 'Bo', 0], ['Max#II', 'Cy', 0]),
-        ];
-        expect(survival(steps)).toEqual([
-            { name: 'Zed', user: 'Ana', time: 1003, hp: 0, winner: true },
-            { name: 'Rex', user: 'Bo', time: 2, hp: 4 },
-            { name: 'Max II', user: 'Cy', time: 1, hp: 30 },
-        ]);
     });
 });
 

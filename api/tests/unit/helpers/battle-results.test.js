@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { calcReward, deathOrder, masterRewards, xpToNextLevel } from '../../../helpers/battle-results.js';
+import { calcReward, deathOrder, masterRewards, placingOrder, survival, trainingScores, xpToNextLevel } from '../../../helpers/battle-results.js';
 
 const glads = pairs => pairs.map(([mmr, time]) => ({ mmr, time }));
+/** A step of a group battle: each gladiator's name, master and hp. */
+const step = (simtime, ...entries) => ({ simtime, glads: entries.map(([name, user, hp]) => ({ name, user, hp })) });
 
 describe('battle results', () => {
     test('renown rewards match the PHP results on the same battles', () => {
@@ -45,5 +47,37 @@ describe('battle results', () => {
         expect(toNext).toBeCloseTo(2.9 * 130, 6);
         expect(masterRewards({ mmr: 1000, level: 1, xp: toNext - 50, won: true, battlesToday: 0, gladiators: 5 })).toMatchObject({ level: 2, xp: 200 });
         expect(masterRewards({ mmr: 1000, level: 60, xp: 500, won: true, battlesToday: 0, gladiators: 5 })).toMatchObject({ level: 60, xp: 0 });
+    });
+    test('the winner places first, then the living, then the longest survivor', () => {
+        const teams = [
+            { team: 1, time: 50, hp: 0, dead: true },
+            { team: 2, time: 1080, winner: true },
+            { team: 3, time: 50, hp: 7 },
+            { team: 4, time: 70, hp: 2 },
+            { team: 5, time: 50, hp: 9 },
+        ];
+        expect(teams.sort(placingOrder).map(entry => entry.team)).toEqual([2, 4, 5, 3, 1]);
+    });
+
+    test('survival is when each gladiator was last alive, the winner after everyone', () => {
+        const steps = [
+            step(1, ['Zed', 'Ana', 30], ['Rex', 'Bo', 30], ['Max#II', 'Cy', 30]),
+            step(2, ['Zed', 'Ana', 20], ['Rex', 'Bo', 4], ['Max#II', 'Cy', 0]),
+            step(3, ['Zed', 'Ana', 15], ['Rex', 'Bo', 0], ['Max#II', 'Cy', 0]),
+        ];
+        expect(survival(steps)).toEqual([
+            { name: 'Zed', user: 'Ana', time: 1003, hp: 0, winner: true },
+            { name: 'Rex', user: 'Bo', time: 2, hp: 4 },
+            { name: 'Max II', user: 'Cy', time: 1, hp: 30 },
+        ]);
+    });
+
+    test('a training battle scores 10 for the winner and the others by how long they lasted', () => {
+        const placed = [{ time: 1100, winner: true }, { time: 80 }, { time: 50 }, { time: 20 }];
+        expect(trainingScores(placed)).toEqual([10, 6, 3, 0]);
+        // a tie for the last place (or everyone dying together) scores everyone the most
+        expect(trainingScores([{ time: 141.7 }, { time: 141.6 }])).toEqual([10, 10]);
+        expect(trainingScores([{ time: 1030, winner: true }])).toEqual([10]);
+        expect(trainingScores([{ time: 1050, winner: true }, { time: 1050, winner: true }, { time: 10 }])).toEqual([10, 10, 0]);
     });
 });
