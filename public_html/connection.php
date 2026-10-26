@@ -109,7 +109,7 @@
     ];
 
     $conn = new PDO(
-        "mysql:host=$host:$port;dbname=$database",
+        "mysql:host=$host:$port;dbname=$database;charset=utf8mb4",
         $user,
         $password,
         $options
