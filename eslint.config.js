@@ -27,7 +27,7 @@ const rules = {
 export default [
     {
         // vendored libraries stay as shipped
-        ignores: ['public_html/script/phaser.js', 'public_html/script/croppie.js'],
+        ignores: ['public_html/script/phaser.js', 'public_html/script/croppie.js', 'api/node_modules/**'],
     },
     {
         files: ['public_html/script/**/*.js'],
@@ -35,6 +35,16 @@ export default [
             ecmaVersion: 2024,
             sourceType: 'module',
             globals: { ...globals.browser, ...pageLibraries },
+        },
+        rules,
+    },
+    {
+        files: ['api/**/*.js'],
+        ignores: ['api/node_modules/**'],
+        languageOptions: {
+            ecmaVersion: 2024,
+            sourceType: 'module',
+            globals: { ...globals.node },
         },
         rules,
     },

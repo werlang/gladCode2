@@ -1,0 +1,23 @@
+{
+    "name": "gladcode2-api",
+    "version": "1.0.0",
+    "description": "gladCode 2 Express API service",
+    "type": "module",
+    "scripts": {
+        "production": "node app.js",
+        "development": "node --watch app.js",
+        "test": "vitest run"
+    },
+    "author": "Pablo Werlang",
+    "dependencies": {
+        "cors": "2.8.5",
+        "express": "4.22.1",
+        "google-auth-library": "10.5.0",
+        "jose": "6.1.3",
+        "mysql2": "3.15.3"
+    },
+    "devDependencies": {
+        "supertest": "7.1.4",
+        "vitest": "4.0.15"
+    }
+}

@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Lint and unit-test tooling for public_html/script. Run through Docker, never on the host (see AGENTS.md).",
   "scripts": {
-    "lint": "eslint public_html/script",
+    "lint": "eslint public_html/script api",
     "test": "node --test tests/frontend/*.test.mjs tests/render2/*.test.mjs"
   },
   "devDependencies": {

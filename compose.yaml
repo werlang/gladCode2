@@ -51,6 +51,37 @@ services:
         command: sh -c "npm ci --no-audit --no-fund && exec npm run dev"
         # command: tail -f /dev/null #idle container
 
+    api:
+        build:
+            context: ./api
+            target: development
+        restart: unless-stopped
+        volumes:
+            - ./api:/app
+            - api_node_modules:/app/node_modules
+        environment:
+            - NODE_ENV=${NODE_ENV:-production}
+            - MYSQL_HOST=mysql
+            - MYSQL_PORT=3306
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - WEB_URL=${WEB_URL:-http://localhost}
+            - WEB_PORT=${WEB_PORT:-80}
+            - JWT_SECRET=${JWT_SECRET:-}
+            - SESSION_TTL_DAYS=${SESSION_TTL_DAYS:-30}
+            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+            - ADMIN_EMAILS=${ADMIN_EMAILS:-}
+            - TRUST_PROXY=${TRUST_PROXY:-false}
+        ports:
+            - "${API_PORT:-3001}:3000"
+        command: sh -c "npm ci --no-audit --no-fund && exec npm run development"
+        depends_on:
+            - mysql
+        logging:
+            options:
+                max-size: "10m"
+
     mysql:
         image: mysql:8.0
         restart: unless-stopped
@@ -65,6 +96,7 @@ services:
             - 127.0.0.1:${MYSQL_PORT}:3306
 volumes:
     node_modules:
+    api_node_modules:
     mysql:
     runs:
         name: gladcode_tmp_run
