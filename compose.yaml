@@ -29,12 +29,12 @@ services:
     web:
         build:
             context: ./web
-            target: development
+            target: production
         restart: unless-stopped
         volumes:
-            - ./web:/app
-            - web_node_modules:/app/node_modules
             - ./data/profpics:/data/profpics:ro
+            # Synty packs are licensed and gitignored: they stay on the host, never in the image
+            - ./web/public/assets/synty:/app/public/assets/synty:ro
         environment:
             - NODE_ENV=${NODE_ENV:-production}
             - PROFPICS_DIR=/data/profpics
@@ -44,9 +44,9 @@ services:
             - ENABLE_RENDER2=${ENABLE_RENDER2:-1}
             - MAINTENANCE=${MAINTENANCE:-}
             - TRUST_PROXY=${TRUST_PROXY:-false}
+        # WEB_PORT is the port in the public URL; WEB_PUBLISH is where the host listens (behind nginx)
         ports:
-            - "${WEB_PORT:-80}:3000"
-        command: sh -c "npm ci --no-audit --no-fund && exec npm run development"
+            - "${WEB_PUBLISH:-80}:3000"
         depends_on:
             - api
         logging:
@@ -56,11 +56,9 @@ services:
     api:
         build:
             context: ./api
-            target: development
+            target: production
         restart: unless-stopped
         volumes:
-            - ./api:/app
-            - api_node_modules:/app/node_modules
             - ./data/profpics:/data/profpics
             - ./data/logs:/data/logs
             - ./data/runs:/data/runs
@@ -88,9 +86,9 @@ services:
             - MAILER_PORT=${MAILER_PORT:-587}
             - MAILER_USER=${MAILER_USER:-}
             - MAILER_PASSWORD=${MAILER_PASSWORD:-}
+        # API_PORT is the port in the public URL; API_PUBLISH is where the host listens (behind nginx)
         ports:
-            - "${API_PORT:-3001}:3000"
-        command: sh -c "npm ci --no-audit --no-fund && exec npm run development"
+            - "${API_PUBLISH:-3001}:3000"
         depends_on:
             - mysql
         logging:
@@ -111,8 +109,6 @@ services:
             - 127.0.0.1:${MYSQL_PORT}:3306
 volumes:
     node_modules:
-    api_node_modules:
-    web_node_modules:
     mysql:
     runs:
         name: gladcode_tmp_run

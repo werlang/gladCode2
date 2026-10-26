@@ -97,7 +97,11 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] Retired `public_html/`, Apache (service and Dockerfile), `node/`, `config/`, PHPMailer; the
       runner reads the API's run folders at `/requests`. Untracked leftovers (old logs, runs, the
       dump, private configs) are gitignored for the maintainer to move or delete
-- [ ] Compose for production, docs
+- [x] Compose: `compose.yaml` builds the production images (no source mounts; Synty packs and data
+      mounted from the host), `compose.dev.yaml` adds live reload (`COMPOSE_FILE` in the local .env);
+      `WEB_PUBLISH`/`API_PUBLISH` are the host ports, `WEB_PORT`/`API_PORT` the public URL ports;
+      deploy removes orphaned services
+- [ ] Docs
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
 cookie for `localhost` (web on 8085, API on 8086, old Apache on 8087).

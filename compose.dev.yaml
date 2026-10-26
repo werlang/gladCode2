@@ -1,0 +1,23 @@
+# Local development on top of compose.yaml: the web and api services run from the source folders
+# with live reload instead of their production images. Select it in your .env:
+#   COMPOSE_FILE=compose.yaml:compose.dev.yaml
+services:
+    web:
+        build:
+            target: development
+        volumes:
+            - ./web:/app
+            - web_node_modules:/app/node_modules
+        command: sh -c "npm ci --no-audit --no-fund && exec npm run development"
+
+    api:
+        build:
+            target: development
+        volumes:
+            - ./api:/app
+            - api_node_modules:/app/node_modules
+        command: sh -c "npm ci --no-audit --no-fund && exec npm run development"
+
+volumes:
+    api_node_modules:
+    web_node_modules:

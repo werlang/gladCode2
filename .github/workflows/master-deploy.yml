@@ -31,10 +31,11 @@ jobs:
             git checkout main
             git reset --hard origin/main
             echo "[Deploy] Code synchronized with origin/main."
-            echo "[Deploy] Restarting services..."
+            echo "[Deploy] Building images..."
             docker compose build
             echo "[Deploy] Restarting services..."
-            docker compose up -d --force-recreate
+            # --remove-orphans drops services that left compose.yaml (the PHP stack's apache)
+            docker compose up -d --force-recreate --remove-orphans
             echo "[Deploy] Running database migrations in a one-shot container..."
             ./migrations/migrate.sh
             echo "[Deploy] Services restarted successfully."
