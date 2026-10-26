@@ -24,7 +24,6 @@
     <link rel='stylesheet' href="css/profile.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/croppie.css"/>
     <link rel='stylesheet' href="css/slider.css"/>
     <link rel='stylesheet' href="css/ui-slider.css"/>
@@ -45,7 +44,6 @@
     
     
     <script src="script/croppie.js"></script>
-    <!-- <script src="script/chat.js"></script> -->
     
     
     </head>
@@ -318,7 +316,6 @@
             </div>
         </div>
         <div id='right-panel'></div>
-        <div id='chat-panel'></div>
     </div>
 </body>
 </html>

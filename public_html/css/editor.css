@@ -572,10 +572,6 @@ body{
     background-color: #1e86d8;
 }
 
-#chat-panel {
-	z-index: 6;
-}
-
 body #fog {
 	z-index: 7;
 }

@@ -22,7 +22,7 @@ This guide provides instructions and architectural context for GitHub Copilot an
 gladCode is a web-based programming game where users code AI gladiators in C or Python that battle autonomously in an arena. The application uses a microservices architecture managed via **Docker Compose**:
 
 - **Apache/PHP 8 Frontend (`public_html/`)**: Web UI, user management, gladiator creation, tournament routing, and database operations.
-- **Node.js WebSocket Server (`node/`)**: Real-time notifications, live chat, and tournament updates via Socket.IO.
+- **Node.js WebSocket Server (`node/`)**: Real-time notifications and tournament updates via Socket.IO.
 - **Runner Service (`runner/`)**: Express API & Docker-in-Docker service executing user code in isolated containers (`gladcode2-vm`).
 - **C Simulation Engine (`payload/`)**: Multi-threaded server executing combat between gladiators via TCP sockets.
 

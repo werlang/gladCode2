@@ -18,7 +18,6 @@
     <link rel='stylesheet' href="css/slider.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
-    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/header.css"/>
     <link rel='stylesheet' href="css/editor.css"/>
     
@@ -47,7 +46,6 @@
     <script src="script/fallback/blockly-python.js"></script> -->
 
     
-    <!-- <script src="script/chat.js"></script> -->
     
     </head>
     <!-- Google tag (gtag.js) -->
@@ -178,6 +176,5 @@
             </div>
         </div>
     </div>
-    <div id='chat-panel'></div>
 </body>
 </html>

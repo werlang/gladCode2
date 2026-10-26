@@ -28,7 +28,6 @@
     <link rel='stylesheet' href="css/training.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/ui-slider.css"/>
-    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
 
     <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
     <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
@@ -58,7 +57,6 @@
             <div id='content-box'></div>
             <div id='footer'></div>
         </div>
-        <div id='chat-panel' class='tournament'></div>
     </div>
 </body>
 </html>

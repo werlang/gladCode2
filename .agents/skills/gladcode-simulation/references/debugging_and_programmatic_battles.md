@@ -31,7 +31,7 @@ gladcode2/
 │   ├── gladCodeAPI.c / .py  # Gladiator client SDKs (compiled into gladiator binaries)
 │   └── socket_compile.sh    # GCC and Python invocation script executed inside gladcode2-vm
 ├── migrations/              # Versioned MySQL migration scripts (001_..., 002_...)
-└── node/                    # Socket.IO notification and chat server
+└── node/                    # Socket.IO notification server
 ```
 
 ### Core Database Entities

@@ -715,10 +715,6 @@
                     $sql = "UPDATE tournament t SET t.hash = '$hash' WHERE t.id = '$tournid'";
                     $result = runQuery($sql);
 
-                    create_chat($conn, $tournid);
-
-                    
-
                     $ngroups = ceil($nteams / 5);
                     $groups = array();
                     for ($i=0 ; $i<$ngroups ; $i++){
@@ -758,46 +754,4 @@
             
     }
 
-    function create_chat($conn, $tourn){
-        //check if room exists
-        $sql = "SELECT cr.id, t.name, t.manager FROM chat_rooms cr RIGHT JOIN tournament t ON t.name = cr.name WHERE t.id = $tourn";
-        $result = runQuery($sql);
-
-        $row = $result->fetch();
-        $name = $row['name'];
-        $manager = $row['manager'];
-
-        if (!is_null($row['id']))
-            $name .= "_". substr(md5(rand()), 0,4);
-
-        //create chat room
-        $sql = "INSERT INTO chat_rooms(name, creation, description, public) VALUES ('$name', now(3), 'Sala de discussão do torneio $name', 0)";
-        $result = runQuery($sql);
-        $room = $conn->lastInsertId();
-
-        //get who is in the tournament
-        $sql = "SELECT DISTINCT g.master FROM teams te INNER JOIN gladiator_teams glt ON glt.team = te.id INNER JOIN gladiators g ON g.cod = glt.gladiator WHERE te.tournament = $tourn";
-        $result = runQuery($sql);
-
-        $masters = array();
-        while ($row = $result->fetch()){
-            array_push($masters, $row['master']);
-        }
-        if (!in_array($manager, $masters))
-            array_push($masters, $manager);
-
-        foreach ($masters as $master){
-            $privilege = 1;
-            if ($master == $manager)
-                $privilege = 0;
-            //insert every user from the tournament in the new chat room
-            $sql = "INSERT INTO chat_users (room, user, joined, visited, privilege) VALUES ($room, '$master', now(3), now(3), $privilege)";
-            $result = runQuery($sql);
-        }
-
-        $sql = "INSERT INTO chat_messages (room, time, sender, message, `system`) VALUES ($room, now(3), '$manager', 'Sala $name criada', 1)";
-        $result = runQuery($sql);
-
-      
-    }
 ?>

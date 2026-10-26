@@ -29,7 +29,6 @@
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
     <link rel='stylesheet' href="css/tournament.css"/>
-    <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/header.css"/>
     
     <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
@@ -43,7 +42,6 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
 
-    <!-- <script src="script/chat.js"></script> -->
     
     
     </head>
@@ -66,7 +64,6 @@
         <div id='content-wrapper'>
             <div id='content-box'></div>
         </div>
-        <div id='chat-panel' class='tournament'></div>
         <div id='footer'></div>
     </div>
 </body>

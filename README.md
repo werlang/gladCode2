@@ -32,7 +32,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- |
 | **Apache / PHP Frontend** | `public_html/` | PHP 8, Apache, native ES modules, Phaser.js, Three.js | Web UI, user auth, gladiator management, tournament routing, simulation invocation, and selectable battle replay rendering |
 | **Runner Service** | `runner/` | Node.js (ESM), Express, Docker CLI | Docker-in-Docker executor. Receives battle requests, runs containerized simulations |
-| **WebSocket Server** | `node/` | Node.js, Express, Socket.IO | Real-time chat, live notification delivery, tournament updates |
+| **WebSocket Server** | `node/` | Node.js, Express, Socket.IO | Live notification delivery, tournament updates |
 | **Simulation Engine** | `payload/` | C (GCC, pthreads, Sockets) | Multi-threaded arena server executing turn-by-turn combat between gladiator scripts |
 | **Database** | `database-2025.*.sql` | MySQL 8.0 | Stores user accounts, gladiators, tournament schedules, battle logs, and stats |
 

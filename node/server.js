@@ -158,15 +158,7 @@ app.post('/phpcallback', parser, function(req, res) {
     var content = req.body;
     //console.log(content);
     //emit notifications
-    if (content['chat notification']){
-        var msg = content['chat notification'];
-        io.to(`chat-room-${msg.room}`).emit('chat notification', msg);
-    }
-    else if (content['chat personal']){
-        var msg = content['chat personal'];
-        io.to(`user-${msg.user}`).emit('chat personal', msg);
-    }
-    else if (content['profile notification']){
+    if (content['profile notification']){
         var users = content['profile notification'].user;
         for (let i in users){
             //console.log(`send to: user-${users[i]}`);
@@ -223,29 +215,6 @@ io.on('connection', function(socket){
 
 
     socket.on('disconnect', function(){
-    });
-
-    //list rooms
-    socket.on('chat rooms', (fn) => {
-        if (session && session.user){
-            var user = session.user;
-            var output = {};
-            var sql = `SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, (SELECT UNIX_TIMESTAMP(visited) FROM chat_users WHERE room = cr.id AND user = ${user}) AS visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = "${user}" ORDER BY last_message DESC`;
-            connection.query(sql, function (error, results, fields){
-                if(error){ fn(error); return;}
-                
-                output.room = results;
-                output.status = "OK";
-                fn(output);
-
-                for (let i in results){
-                    socket.join(`chat-room-${results[i].id}`);
-                }
-            });
-        }
-        else
-            fn({status: "NOTLOGGED"});
-
     });
 
     socket.on('tournament run request', (args, fn) => {
