@@ -8,8 +8,9 @@
     date_default_timezone_set('America/Sao_Paulo');
 
     if ($action == "ROOMS"){
-        $sql = "SELECT cr.id, cr.name, cu.visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room INNER JOIN chat_messages cm ON cm.room = cr.id WHERE cu.user = '$user' ORDER BY cm.time DESC";
-        $result = runQuery($sql);
+        // every room the user is in, once, the most recently active first
+        $sql = "SELECT cr.id, cr.name, (SELECT max(time) FROM chat_messages WHERE room = cr.id) AS last_message, UNIX_TIMESTAMP(cu.visited) AS visited FROM chat_rooms cr INNER JOIN chat_users cu ON cr.id = cu.room WHERE cu.user = :user ORDER BY last_message DESC";
+        $result = runQuery($sql, [':user' => $user]);
         
         $output['room'] = array();
         while ($row = $result->fetch()){
