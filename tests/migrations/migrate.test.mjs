@@ -65,7 +65,7 @@ test('keeps dashes inside string literals and HTML bodies intact', () => {
 });
 
 test('acquires lock, bootstraps tracking table, skips applied versions, releases lock', async () => {
-    const db = makeFakeDb({ applied: [1, 2] });
+    const db = makeFakeDb({ applied: [1, 2, 3] });
     await migrate({ db });
 
     const poolCalls = db.calls.filter(call => call.scope === 'pool');
@@ -115,10 +115,14 @@ test('carries current-version gladiators forward once the baseline applied', asy
         .map(call => call.sql)
         .join('\n');
     assert.match(txSql, /UPDATE `gladiators` SET `version` = '2\.9\.3' WHERE `version` = '2\.9\.2'/);
+    assert.match(txSql, /UPDATE `gladiators` SET `version` = '2\.10\.0' WHERE `version` = '2\.9\.3'/);
     assert.ok(!txSql.includes('CREATE TABLE'));
 
-    const record = db.calls.find(call => call.sql.startsWith('INSERT INTO schema_migrations'));
-    assert.deepEqual(record.params, [2, '002_bump_gladiators_to_2_9_3.sql']);
+    const records = db.calls.filter(call => call.sql.startsWith('INSERT INTO schema_migrations'));
+    assert.deepEqual(records.map(r => r.params), [
+        [2, '002_bump_gladiators_to_2_9_3.sql'],
+        [3, '003_bump_gladiators_to_2_10_0.sql'],
+    ]);
 });
 
 test('baseline records old files without executing them, then migrates forward', async () => {
@@ -138,5 +142,6 @@ test('baseline records old files without executing them, then migrates forward',
     assert.deepEqual(records, [
         [1, '001_initial_schema.sql'],
         [2, '002_bump_gladiators_to_2_9_3.sql'],
+        [3, '003_bump_gladiators_to_2_10_0.sql'],
     ]);
 });
