@@ -111,6 +111,9 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
 - Lint and test through Docker: `docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
 - Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards).
 
+### Branches & Commits
+- Follow [CONTRIBUTING.md](../CONTRIBUTING.md): work branches from `dev` named `<type>/<slug>`, Conventional Commits `<type>(<scope>): <summary>` (imperative, at most 72 characters, scopes listed there), a body only when the reason is not obvious.
+
 ### Database Access Example
 ```php
 include_once "connection.php";

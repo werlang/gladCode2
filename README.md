@@ -136,6 +136,8 @@ docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint 
 
 Coding rules for `public_html/script/` are in [AGENTS.md](AGENTS.md#frontend-standards).
 
+Branches, commit messages and how work is merged are described in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 ## ⚔️ How Gladiator Battles Work
@@ -154,6 +156,7 @@ Coding rules for `public_html/script/` are in [AGENTS.md](AGENTS.md#frontend-sta
 ```
 gladcode2/
 ├── .github/                 # GitHub workflows & Copilot instructions
+├── CONTRIBUTING.md          # Branches, commit messages and merging
 ├── Dockerfile-apache        # PHP 8 + Apache + Docker CLI container definition
 ├── Dockerfile-dind          # Docker-in-Docker container definition for runner
 ├── compose.yaml             # Docker Compose microservices specification
