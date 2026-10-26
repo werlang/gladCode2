@@ -30,7 +30,7 @@ flowchart TD
 
 | Service | Location | Tech Stack | Role & Responsibilities |
 | :--- | :--- | :--- | :--- |
-| **Apache / PHP Frontend** | `public_html/` | PHP 8, Apache, jQuery, Phaser.js, Three.js | Web UI, user auth, gladiator management, tournament routing, simulation invocation, and selectable battle replay rendering |
+| **Apache / PHP Frontend** | `public_html/` | PHP 8, Apache, native ES modules, Phaser.js, Three.js | Web UI, user auth, gladiator management, tournament routing, simulation invocation, and selectable battle replay rendering |
 | **Runner Service** | `runner/` | Node.js (ESM), Express, Docker CLI | Docker-in-Docker executor. Receives battle requests, runs containerized simulations |
 | **WebSocket Server** | `node/` | Node.js, Express, Socket.IO | Real-time chat, live notification delivery, tournament updates |
 | **Simulation Engine** | `payload/` | C (GCC, pthreads, Sockets) | Multi-threaded arena server executing turn-by-turn combat between gladiator scripts |
@@ -156,7 +156,7 @@ gladcode2/
 │   ├── banned_functions.json# Security function filter
 │   ├── dev-tools/           # Tournament & DB management CLI/Web suite
 │   ├── runs/                # Temporary simulation workspace directory
-│   └── script/              # Playback UI plus Phaser and Three.js renderers
+│   └── script/              # ES module pages, components, models, templates; Phaser and Three.js renderers
 │       └── render2/         # Modular Three.js arena, entities, effects, audio, camera, and state helpers
 └── runner/                  # Express Docker execution service
 ```
