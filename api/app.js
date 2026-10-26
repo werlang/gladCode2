@@ -3,7 +3,9 @@ import { CustomError } from './helpers/error.js';
 import { assertJwtSecretConfiguration } from './helpers/jwt.js';
 import { Mysql } from './helpers/mysql.js';
 import { corsMiddleware, csrfOriginMiddleware, requestLogMiddleware, securityHeadersMiddleware } from './helpers/platform.js';
+import { auth } from './middleware/auth.js';
 import { errorMiddleware } from './middleware/error.js';
+import { adminRouter } from './route/admin.js';
 import { authRouter } from './route/auth.js';
 import { battlesRouter } from './route/battles.js';
 import { duelsRouter } from './route/duels.js';
@@ -36,6 +38,9 @@ app.use(requestLogMiddleware);
 app.use(securityHeadersMiddleware);
 app.use(corsMiddleware);
 app.use(csrfOriginMiddleware);
+// tournament imports carry their battle logs, so administrators may send large bodies there;
+// every other body stays small
+app.use('/admin/tournaments/import', auth({ admin: true }), express.json({ limit: '100mb' }));
 app.use(express.json({ limit: '2mb' }));
 
 /** Process liveness. */
@@ -74,6 +79,7 @@ app.use('/tournament-rounds', tournamentRoundsRouter);
 app.use('/trainings', trainingsRouter);
 app.use('/training-rounds', trainingRoundsRouter);
 app.use('/releases', releasesRouter);
+app.use('/admin', adminRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

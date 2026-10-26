@@ -694,41 +694,42 @@ small {
     gap: 10px;
 }
 
-/* Toast Notifications */
-.toast-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 2000;
-    pointer-events: none;
-}
-
-.toast {
-    pointer-events: auto;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+/* Lists and results */
+.empty-list {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: var(--bg-card);
     border-radius: var(--radius-md);
-    padding: 12px 18px;
-    color: var(--text-main);
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    max-width: 380px;
+    border: 1px dashed var(--border-subtle);
+    color: var(--text-muted);
 }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+.empty-list svg {
+    margin-bottom: 8px;
 }
 
-.toast.success { border-left: 3px solid var(--emerald); }
-.toast.error { border-left: 3px solid var(--rose); }
+.empty-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.result-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.result-box .meta-grid {
+    margin-bottom: 12px;
+}
+
+.meta-item.full {
+    grid-column: 1 / -1;
+}
+
+.summary {
+    padding-left: 18px;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
@@ -745,4 +746,8 @@ small {
     .migration-grid {
         grid-template-columns: 1fr;
     }
+}
+#fileNameDisplay.chosen {
+    color: var(--emerald);
+    font-weight: 600;
 }

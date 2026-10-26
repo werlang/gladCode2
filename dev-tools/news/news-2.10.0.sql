@@ -1,6 +1,6 @@
 -- gladCode 2.10.0 patch notes.
 -- Apply on the PRODUCTION database:
---   docker compose exec -T mysql mysql -u root -p --default-character-set=utf8mb4 gladcode < public_html/dev-tools/news-2.10.0.sql
+--   docker compose exec -T mysql mysql -u root -p --default-character-set=utf8mb4 gladcode < dev-tools/news/news-2.10.0.sql
 -- Verify:
 --   SELECT id, title, time FROM news ORDER BY time DESC LIMIT 1;
 

@@ -86,7 +86,10 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] Release (`/releases/current`, admins): the version stays the deployed `api/version` (bumped in a
       commit, as before), the page carries older gladiators forward and sends the announcement in the
       background; the dead donation redirect (`back_thanks.php`) and `back_sendmail.php` are gone
-- [ ] Admin dev-tools, cron, engine test, PHP tests
+- [x] Admin dev-tools: `/admin/tournaments` (test tournaments by the `[DEV-TEST]` marker, no token
+      files), `/dev-tools` page, `api/scripts/dev-tournament.js` behind `dev-tools/tournament.sh`;
+      repo-level `dev-tools/` keeps the dump script and news SQL; the Synty viewer is in `web/public/dev-tools/`
+- [ ] Cron, engine test, PHP tests
 - [ ] Retire public_html/Apache/node, compose for production, docs
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`

@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gladCode Dev Cockpit — Tournament Management</title>
-    <link rel="stylesheet" href="index.css">
-    <script type="module" src="index.js" defer></script>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dev Cockpit</title>
+    <link rel="icon" type="image/gif" href="icon/gladcode_icon.png">
+    <link rel="stylesheet" href="{{#asset}}css/dev-tools.css{{/asset}}">
+    <link rel="stylesheet" href="{{#asset}}css/dialog.css{{/asset}}">
+    {{{importMap}}}
+    <script type="module" src="{{#module}}dev-tools.js{{/module}}"></script>
 </head>
-<body class="bg-base text-main antialiased selection:bg-indigo-500 selection:text-white">
+<body>
+    {{{templateVars}}}
     <!-- Top Header -->
     <header class="app-header">
         <div class="header-container">
@@ -90,7 +95,7 @@
 
                     <div class="form-group">
                         <label for="manager">Manager Email</label>
-                        <input type="email" id="manager" name="manager" value="manager@example.com" placeholder="manager@domain.com" required>
+                        <input type="email" id="manager" name="manager" placeholder="You, when left empty">
                     </div>
                     
                     <div class="form-actions full-width">
@@ -186,7 +191,6 @@
                             <select id="exportType" name="exportType">
                                 <option value="id">Tournament ID</option>
                                 <option value="hash">Tournament Hash String</option>
-                                <option value="token">Cleanup Token (Test Instance)</option>
                             </select>
                         </div>
 
@@ -198,11 +202,6 @@
                         <div class="form-group" id="exportHashField" style="display: none;">
                             <label for="exportHash">Tournament Hash</label>
                             <input type="text" id="exportHash" name="exportHash" placeholder="e.g. a1b2c3d4e5f6...">
-                        </div>
-
-                        <div class="form-group" id="exportTokenField" style="display: none;">
-                            <label for="exportToken">Cleanup Token</label>
-                            <input type="text" id="exportToken" name="exportToken" placeholder="e.g. test_token_123">
                         </div>
                         
                         <button type="submit" class="btn btn-primary w-full">
@@ -266,9 +265,6 @@
             </div>
         </section>
     </main>
-
-    <!-- Toast Notifications Container -->
-    <div class="toast-container" id="toastContainer"></div>
 </body>
 </html>
 

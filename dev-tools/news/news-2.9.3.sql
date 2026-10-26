@@ -1,6 +1,6 @@
 -- gladCode 2.9.3 patch notes.
 -- Apply on the PRODUCTION database (there is no admin UI for news posts):
---   docker compose exec -T mysql mysql -u root -p gladcode < public_html/dev-tools/news-2.9.3.sql
+--   docker compose exec -T mysql mysql -u root -p gladcode < dev-tools/news/news-2.9.3.sql
 -- Run from the repo root. Verify afterwards:
 --   SELECT id, title, time FROM news ORDER BY time DESC LIMIT 1;
 

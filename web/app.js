@@ -24,7 +24,8 @@ if (['1', 'true', 'on', 'yes'].includes(String(process.env.MAINTENANCE || '').to
     });
 }
 
-app.use(express.static(PUBLIC, { index: false, extensions: false }));
+// no trailing-slash redirect: /dev-tools is a page next to the public/dev-tools/ folder
+app.use(express.static(PUBLIC, { index: false, extensions: false, redirect: false }));
 // Profile pictures uploaded through the API (shared data volume).
 app.use('/profpics', express.static(process.env.PROFPICS_DIR || '/data/profpics', { index: false }));
 
@@ -68,6 +69,9 @@ page('/manual', 'manual');
 page('/stats', 'stats');
 page('/thanks', 'thanks');
 page('/update', 'update');
+// administrators only: the API refuses everyone else and the page sends them home
+page('/dev-tools', 'dev-tools');
+app.get('/dev-tools/index.html', (req, res) => res.redirect(301, '/dev-tools'));
 page(['/function/:name', '/funcao/:name'], 'function', req => {
     const [name, language = ''] = req.params.name.split('.');
     return { functionName: name, codeLanguage: language, docLanguage: req.path.startsWith('/funcao/') ? 'pt' : '' };
