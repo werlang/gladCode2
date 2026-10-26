@@ -13,6 +13,7 @@ public_html/runs/*
 .DS_Store
 backup/gcloud_config.json
 *.sql
+*.sql.gz
 public_html/assets
 .playwright-mcp
 TODO.md
