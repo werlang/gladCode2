@@ -1,19 +1,20 @@
 #!/bin/bash
 # Engine regression battles: runs real battles in the gladcode2-vm image and checks the simlog
-# the way PHP reads it (valid JSON, crashed gladiators via crashed_glads() from battle_results.php).
+# the way the API reads it (valid JSON, crashed gladiators via crashedGladiators() from
+# api/helpers/battle-results.js).
 # Usage (repo root, Docker running, gladcode2-vm image built): bash tests/engine/run.sh
-# Run dirs go to public_html/runs/engine_test/ (gitignored, mountable by Docker Desktop) and are removed at the end.
+# Run dirs go to data/runs/engine_test/ (gitignored, mountable by Docker Desktop) and are removed at the end.
 
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 GLADS=$REPO/tests/engine/glads
-ROOT=$REPO/public_html/runs/engine_test
+ROOT=$REPO/data/runs/engine_test
 failed=0
 
-# battle <case> <glad files...>: builds the run dir like back_simulation.php run_simulation() and runs it (60s cap)
+# battle <case> <glad files...>: builds the run dir like the API's model/battle.js and runs it (60s cap)
 battle(){
     local case=$1; shift
     local dir=$ROOT/$case i=0 f
-    rm -rf "$dir"; mkdir -p "$dir"; cp "$REPO"/payload/* "$dir/"
+    rm -rf "$dir"; mkdir -p "$dir"; cp "$REPO"/Payload/* "$dir/"
     for f in "$@"; do
         if [[ $f == *.py ]]; then
             { printf 'from gladCodeAPI import *\n\n'
@@ -38,14 +39,14 @@ battle(){
 # expect <case> <crashed names, comma separated or empty>
 expect(){
     local got
-    got=$(docker run --rm -v "$REPO":/w -w /w php:8.2-cli php -r '
-        require "public_html/battle_results.php";
-        $log = json_decode("[" . @file_get_contents($argv[1]) . "]", true);
-        if (empty($log)) { echo "NO_VALID_LOG"; exit; }
-        $names = array_map(fn($g) => $g["name"], $log[0]["glads"]);
-        $crashed = array_map(fn($i) => $names[$i], crashed_glads($log));
-        sort($crashed);
-        echo implode(",", $crashed);' "public_html/runs/engine_test/$1/simlog")
+    got=$(docker run --rm -v "$REPO":/w -w /w node:22-alpine node --input-type=module -e '
+        import { readFileSync } from "node:fs";
+        import { crashedGladiators } from "./api/helpers/battle-results.js";
+        let log;
+        try { log = JSON.parse("[" + readFileSync(process.argv[1], "utf8") + "]"); } catch { log = []; }
+        if (!log.length) { process.stdout.write("NO_VALID_LOG"); process.exit(); }
+        const names = log[0].glads.map(glad => glad.name);
+        process.stdout.write(crashedGladiators(log).map(index => names[index]).sort().join(","));' "data/runs/engine_test/$1/simlog")
     if [ "$got" = "$2" ]; then
         echo "[PASS] $1: crashed=[$got]"
     else

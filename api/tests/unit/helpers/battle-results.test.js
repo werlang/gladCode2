@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { calcReward, deathOrder, masterRewards, placingOrder, survival, trainingScores, xpToNextLevel } from '../../../helpers/battle-results.js';
+import { calcReward, crashedGladiators, deathOrder, masterRewards, placingOrder, survival, trainingScores, xpToNextLevel } from '../../../helpers/battle-results.js';
 
 const glads = pairs => pairs.map(([mmr, time]) => ({ mmr, time }));
 /** A step of a group battle: each gladiator's name, master and hp. */
@@ -79,5 +81,30 @@ describe('battle results', () => {
         expect(trainingScores([{ time: 141.7 }, { time: 141.6 }])).toEqual([10, 10]);
         expect(trainingScores([{ time: 1030, winner: true }])).toEqual([10]);
         expect(trainingScores([{ time: 1050, winner: true }, { time: 1050, winner: true }, { time: 10 }])).toEqual([10, 10, 0]);
+    });
+
+    test('the engine flags crashed gladiators in its log', () => {
+        // a real gladcode2-vm log: G0 (Python) raises NameError after simtime 3
+        const log = JSON.parse(readFileSync(path.join(import.meta.dirname, '../../fixtures/simlog_python_crash.json'), 'utf8'));
+        expect(crashedGladiators(log)).toEqual([0]);
+
+        const killed = [
+            { simtime: 0.1, glads: [{ name: 'A', hp: 200, crashed: 0 }, { name: 'B', hp: 200, crashed: 0 }] },
+            { simtime: 0.2, glads: [{ hp: 150 }, {}] },
+            { simtime: 9, glads: [{ hp: 0 }, {}] },
+        ];
+        expect(crashedGladiators(killed)).toEqual([]);
+        const firstStep = [{ simtime: 0.1, glads: [{ hp: 200, crashed: 0 }, { hp: 0, crashed: 1 }, { hp: 200, crashed: 1 }] }, { simtime: 0.2, glads: [{}, {}, {}] }];
+        expect(crashedGladiators(firstStep)).toEqual([1, 2]);
+        // logs from engines without the flag blame nobody
+        expect(crashedGladiators([{ simtime: 0.1, glads: [{ hp: 200 }, { hp: 200 }] }])).toEqual([]);
+    });
+
+    test('entries beyond the battle size, forged through speak(), are ignored', () => {
+        const injected = [
+            { simtime: 0.1, glads: [{ hp: 200, crashed: 0 }, { hp: 200, crashed: 0 }] },
+            { simtime: 1.1, glads: [{ message: 'a' }, { crashed: 1 }, { crashed: 1 }] },
+        ];
+        expect(crashedGladiators(injected)).toEqual([1]);
     });
 });
