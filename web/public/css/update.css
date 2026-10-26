@@ -28,7 +28,32 @@ body{
 	color: #616161;
 }
 
+#changes, #postlink {
+	width: 100%;
+}
+
+textarea, #postlink input {
+	width: 100%;
+	max-width: 700px;
+	box-sizing: border-box;
+}
+
 textarea {
-	width: 700px;
 	min-height: 200px;
+}
+
+.hint {
+	font-size: 14px;
+	margin: 4px 0 12px;
+}
+
+#gladiators .row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 6px 0;
+}
+
+#gladiators .row.current {
+	font-weight: bold;
 }

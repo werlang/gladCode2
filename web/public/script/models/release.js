@@ -1,32 +1,36 @@
 import { api } from '../helpers/request.js';
 
 /**
- * Site releases (`back_update.php`, administrator only) and the e-mail that announces them.
+ * The running release (`/releases/current`, administrators only): the deployed version, carrying
+ * gladiators forward and the e-mail that announces it.
  */
 export class ReleaseModel {
-    /** @returns {Promise<string[]>} The current version, split in its numbers. */
+    /**
+     * @returns {Promise<{ version: string, announcing: boolean, gladiators: Array<{ version: string, count: number }> }>}
+     * @throws {import('../helpers/request.js').RequestError} `ADMIN_ONLY`.
+     */
     static current() {
-        return api.post('back_update.php', { action: 'GET' });
+        return api.get('releases/current');
     }
 
     /**
-     * Sets the site version.
+     * Moves the gladiators saved on an older version to the current one.
      *
-     * @param {{ version: string, keepup: boolean, pass: string }} release
-     *   `keepup` moves the gladiators of the current version to the new one.
-     * @returns {Promise<'OK'|'WRONGPASS'|unknown>}
+     * @param {string} from
+     * @returns {Promise<{ moved: number }>}
      */
-    static publish({ version, keepup, pass }) {
-        return api.post('back_update.php', { action: 'SET', version, keepup, pass });
+    static carryForward(from) {
+        return api.post('releases/current/gladiators', { from });
     }
 
     /**
-     * E-mails the users who asked for update news.
+     * E-mails the users who asked for update news (sent in the background).
      *
-     * @param {{ version: string, summary: string, postlink: string }} announcement
-     * @returns {Promise<unknown>}
+     * @param {{ changes: string, postLink: string }} announcement `changes` is HTML.
+     * @returns {Promise<{ recipients: number }>}
+     * @throws {import('../helpers/request.js').RequestError} `ANNOUNCEMENT_RUNNING`, `INVALID_POST_LINK`.
      */
-    static announce({ version, summary, postlink }) {
-        return api.post('back_sendmail.php', { action: 'UPDATE', version, summary, postlink });
+    static announce(announcement) {
+        return api.post('releases/current/announcement', announcement);
     }
 }

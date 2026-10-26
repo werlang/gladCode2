@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { formatTimeline, frameAt } from '../../web/public/script/helpers/replay.js';
-import { nextVersion } from '../../web/public/script/helpers/version.js';
 
 const steps = [
     { simtime: 0, glads: [{ x: 0, y: 0, head: 350, hp: 10 }] },
@@ -25,10 +24,4 @@ test('a teleport jumps instead of sliding', () => {
 test('the timeline reads minutes and seconds', () => {
     assert.equal(formatTimeline(0), '0:00');
     assert.equal(formatTimeline(1415), '2:21');
-});
-
-test('releases bump the major, minor or patch number', () => {
-    assert.equal(nextVersion(['2', '10', '0'], 0), '3.0');
-    assert.equal(nextVersion(['2', '10', '0'], 1), '2.11');
-    assert.equal(nextVersion(['2', '10'], 2), '2.10.1');
 });

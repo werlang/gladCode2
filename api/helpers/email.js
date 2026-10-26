@@ -50,11 +50,11 @@ function smtp() {
  * must not undo the action that caused it.
  *
  * @param {string} template Template name (`message`, `friend`, `duel`, `tournament`, `update`).
- * @param {{ subject: string, recipients: Array<{ email: string, name: string, vars?: Record<string, unknown> }>, vars?: Record<string, unknown>, raw?: string[] }} mail
- *   `vars` are shared; each recipient's `vars` are added to them.
+ * @param {{ subject: string, recipients: Array<{ email: string, name: string, vars?: Record<string, unknown> }>, vars?: Record<string, unknown>, raw?: string[], onSent?: (recipient: { email: string, name: string }) => Promise<void>|void }} mail
+ *   `vars` are shared; each recipient's `vars` are added to them. `onSent` runs after each email that went out.
  * @returns {Promise<{ sent: number, failed: number }>}
  */
-export async function sendMail(template, { subject, recipients, vars = {}, raw = [] }) {
+export async function sendMail(template, { subject, recipients, vars = {}, raw = [], onSent }) {
     if (!TEMPLATE_NAMES.has(template)) throw new Error(`Unknown mail template: ${template}`);
     const html = await readFile(path.join(TEMPLATES, `mail_${template}.html`), 'utf8');
     const transporter = smtp();
@@ -69,12 +69,14 @@ export async function sendMail(template, { subject, recipients, vars = {}, raw =
         }
         try {
             await transporter.sendMail({ from: SENDER, to: { name: recipient.name, address: recipient.email }, subject, html: body });
-            sent++;
         }
         catch (error) {
             failed++;
             console.error(`Mail "${template}" to ${recipient.email} failed:`, error.message);
+            continue;
         }
+        sent++;
+        await onSent?.(recipient);
     }
     return { sent, failed };
 }

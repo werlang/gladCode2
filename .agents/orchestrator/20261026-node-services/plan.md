@@ -82,7 +82,11 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] Tournaments (1af24fef4): setup, teams, rounds, group battles (lock per group), start email sent by the API
 - [x] Trainings: setup, invitations, rounds; the API runs each due group's battle and opens the next
       round when a viewer's page asks (`POST /training-rounds/:hash/advance`), scores match PHP
-- [ ] Release, thanks, admin dev-tools, cron, engine test, PHP tests
+- [x] Trainings commit 9ed971e47; replay potion names off back_slots.php (40533b97f)
+- [x] Release (`/releases/current`, admins): the version stays the deployed `api/version` (bumped in a
+      commit, as before), the page carries older gladiators forward and sends the announcement in the
+      background; the dead donation redirect (`back_thanks.php`) and `back_sendmail.php` are gone
+- [ ] Admin dev-tools, cron, engine test, PHP tests
 - [ ] Retire public_html/Apache/node, compose for production, docs
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`

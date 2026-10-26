@@ -2,7 +2,6 @@ import { Message } from './components/dialog.js';
 import { decorateRadios } from './components/form-controls.js';
 import { createElement, renderTemplate } from './helpers/html.js';
 import { fadeIn, fadeOut, hide, show, slideDown } from './helpers/animate.js';
-import { ThanksModel } from './models/thanks.js';
 import { walletTemplate } from './templates/about.js';
 
 /** Donation wallets; `groups` splits the address into readable chunks. */
@@ -118,10 +117,6 @@ function bindDonationForm() {
 
     support.querySelectorAll('.donate.small').forEach(button => {
         button.addEventListener('click', () => showWallet(button.id));
-    });
-
-    support.querySelectorAll('#paypal, #pagseguro').forEach(link => {
-        link.addEventListener('click', () => ThanksModel.trackDonation(location.pathname));
     });
 }
 

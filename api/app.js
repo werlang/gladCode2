@@ -15,6 +15,7 @@ import { newsRouter } from './route/news.js';
 import { notificationsRouter } from './route/notifications.js';
 import { potionsRouter } from './route/potions.js';
 import { rankingRouter } from './route/ranking.js';
+import { releasesRouter } from './route/releases.js';
 import { reportsRouter } from './route/reports.js';
 import { statsRouter } from './route/stats.js';
 import { teamsRouter } from './route/teams.js';
@@ -72,6 +73,7 @@ app.use('/teams', teamsRouter);
 app.use('/tournament-rounds', tournamentRoundsRouter);
 app.use('/trainings', trainingsRouter);
 app.use('/training-rounds', trainingRoundsRouter);
+app.use('/releases', releasesRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));
