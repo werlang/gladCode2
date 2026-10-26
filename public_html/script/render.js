@@ -1,3 +1,61 @@
+// The classic 2D battle renderer (Phaser). It shares the replay with
+// playback.js through page globals (steps, timestep, pausesim, json, prefs, ...).
+
+/* ----- DOM helpers of the gladiator frames and loading screen ----- */
+
+/** The index-th element matching a selector, or null. */
+function uiNth(selector, index){
+    return document.querySelectorAll(selector)[index] ?? null;
+}
+
+/** Sets the text of the index-th element matching a selector. */
+function uiTextAt(selector, index, text){
+    var element = uiNth(selector, index);
+    if (element) element.textContent = text;
+}
+
+/** Sets the text of the first element matching a selector. */
+function uiText(selector, text){
+    var element = document.querySelector(selector);
+    if (element) element.textContent = text;
+}
+
+/** Turns a class on or off on the index-th element matching a selector. */
+function uiClass(selector, index, name, on){
+    uiNth(selector, index)?.classList.toggle(name, on);
+}
+
+/** Sets a style property of the index-th element matching a selector (numbers are px). */
+function uiStyle(selector, index, property, value){
+    var element = uiNth(selector, index);
+    if (element) element.style[property] = typeof value === 'number' ? value +'px' : value;
+}
+
+/** Sets the width of the first element matching a selector (numbers are px). */
+function uiWidth(selector, value){
+    uiStyle(selector, 0, 'width', value);
+}
+
+/** Removes every element matching a selector. */
+function uiRemove(selector){
+    document.querySelectorAll(selector).forEach(element => element.remove());
+}
+
+/**
+ * Fades an element in (showing it with `display`) or out (hiding it).
+ * Resolves with the element when the fade ends.
+ */
+function uiFade(element, visible, display){
+    if (!element) return Promise.resolve(null);
+    if (visible) element.style.display = display || '';
+    var frames = visible ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }];
+    var done = element.animate ? element.animate(frames, 400).finished.catch(() => {}) : Promise.resolve();
+    return done.then(() => {
+        if (!visible) element.style.display = 'none';
+        return element;
+    });
+}
+
 var tileD = 32; //size of a single tile
 var screenW = tileD * 42; //how many tiles there is in the entire image
 var screenH = tileD * 49;
@@ -65,8 +123,8 @@ var game = null;
 function load_phaser(){
     if (!game){
         game = new Phaser.Game({
-            width: $(document).width(),
-            height: $(document).height(),
+            width: document.documentElement.scrollWidth,
+            height: document.documentElement.scrollHeight,
             renderer: Phaser.WEBGL_MULTI,
             parent: 'canvas-div',
             antialias: true,
@@ -126,15 +184,15 @@ function preload() {
     game.load.start();
     loadCache = true;
     resize();
-    $('#canvas-div canvas').focus();
+    document.querySelector('#canvas-div canvas')?.focus();
     if (game.camera)
         game.camera.focusOnXY(screenW * game.camera.scale.x / 2, screenH * game.camera.scale.y / 2);
 
 }
 
 function loadStart(){
-    $('#loadbar #status').html("Preparando recursos");
-    $('#loadbar #second .bar').width(0);
+    uiText('#loadbar #status', "Preparando recursos");
+    uiWidth('#loadbar #second .bar', 0);
 }
 
 
@@ -146,13 +204,13 @@ cacheKey = the asset object
 success = boolean saying if the assets was successfully loaded
 */
 function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles){
-    $('#loadbar #status').html("Carregando recursos");
-    $('#loadbar #second .bar').width(progress +"%");
-    $('#loadbar #main .bar').width(50 + progress/2 +"%");
+    uiText('#loadbar #status', "Carregando recursos");
+    uiWidth('#loadbar #second .bar', progress +"%");
+    uiWidth('#loadbar #main .bar', 50 + progress/2 +"%");
 }
 
 function loadComplete(){
-    $('#loadbar #status').html("Tudo pronto");
+    uiText('#loadbar #status', "Tudo pronto");
 }
 
 var layers = [];
@@ -198,7 +256,7 @@ function create() {
     victory = game.add.audio('victory');
 
     window.addEventListener("wheel", event => {
-        if (event.path && $(event.path[0]).parents('#canvas-div').length)
+        if (event.target instanceof Element && event.target.closest('#canvas-div'))
             zoomWheel({deltaY: event.deltaY});
     });
 
@@ -216,7 +274,7 @@ function create() {
 
     fillPeople();
     
-    $.each(npc, function(n,v){
+    Object.entries(npc).forEach( function([n,v]){
         let pos = getPosArena(v.x, v.y, true);
         v.sprite = {};
         
@@ -458,8 +516,8 @@ function update() {
     else if (sprite.length > 0){
         if (!startsim){
             startsim = true;
-            $('#fog').remove();
-            $('#canvas-container').css({'opacity':1});
+            uiRemove('#fog');
+            document.querySelector('#canvas-container').style.opacity = 1;
             resize();	
             pausesim = false;
         }
@@ -769,7 +827,7 @@ function update() {
 
                 if (timeSlider != Math.floor(json.simtime)){
                     timeSlider = json.simtime;
-                    $( "#time" ).slider("value", parseFloat(json.simtime) * 10);
+                    window.Playback?.syncTimeline(parseFloat(json.simtime) * 10);
                 }
             }
             
@@ -864,13 +922,13 @@ function update() {
 
     if (game.input.mouse.drag){
         if (game.camera.target){
-            $('.ui-glad').removeClass('follow');
+            document.querySelectorAll('.ui-glad').forEach(frame => frame.classList.remove('follow'));
             game.camera.unfollow();
-            $('#details').remove();
+            uiRemove('#details');
         }
         game.camera.view.y -= game.input.speed.y;
         game.camera.view.x -= game.input.speed.x;
-        $('.baloon').remove();
+        uiRemove('.baloon');
     }
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.NUMPAD_ADD) || game.input.keyboard.isDown(Phaser.Keyboard.EQUALS))
@@ -947,11 +1005,11 @@ function update_ui(json){
     if (prefs.frames){
         if (prefs.text && !uiVars.showtext){
             uiVars.showtext = true;
-            $('.ap-bar .text, .hp-bar .text').removeClass('hidden');
+            document.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(text => text.classList.remove('hidden'));
         }
         else if (!prefs.text && uiVars.showtext){
             uiVars.showtext = false;
-            $('.ap-bar .text, .hp-bar .text').addClass('hidden');
+            document.querySelectorAll('.ap-bar .text, .hp-bar .text').forEach(text => text.classList.add('hidden'));
         }
     
         var nglad = json.glads.length;
@@ -976,117 +1034,117 @@ function update_ui(json){
         
             if (!uiVars[i].name){
                 uiVars[i].name = name;
-                $('.glad-name span').eq(i).html(name);
-                $('.glad-portrait').eq(i).append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
+                uiTextAt('.glad-name span', i, name);
+                uiNth('.glad-portrait', i)?.append(getSpriteThumb(hashes[newindex[i]],'walk','down'));
             }
             
             if (uiVars[i].STR !== STR){
                 uiVars[i].STR = STR;
-                $('.glad-str span').eq(i).html(STR);
+                uiTextAt('.glad-str span', i, STR);
             }
 
             if (uiVars[i].AGI !== AGI){
                 uiVars[i].AGI = AGI;
-                $('.glad-agi span').eq(i).html(AGI);
+                uiTextAt('.glad-agi span', i, AGI);
             }
 
             if (uiVars[i].INT !== INT){
                 uiVars[i].INT = INT;
-                $('.glad-int span').eq(i).html(INT);
+                uiTextAt('.glad-int span', i, INT);
             }
 
             if (uiVars[i].lvl != lvl){
                 uiVars[i].lvl = lvl;
-                $('.lvl-value span').eq(i).html(lvl);
+                uiTextAt('.lvl-value span', i, lvl);
                 
-                $('.lvl-value').eq(i).addClass('up');
+                uiClass('.lvl-value', i, 'up', true);
                 let j = i;
                 setTimeout( function(){
-                    $('.lvl-value').eq(j).removeClass('up');
+                    uiClass('.lvl-value', j, 'up', false);
                 }, 500);
             }
             
             if (uiVars[i].xp != xp){
                 uiVars[i].xp = xp;
-                $('.xp-bar .filled').eq(i).height((xp / json.glads[i].tonext * 100) +'%');
+                uiStyle('.xp-bar .filled', i, 'height', (xp / json.glads[i].tonext * 100) +'%');
             }
             
             if (uiVars[i].hp != hp){
                 uiVars[i].hp = hp;
-                $('.hp-bar .filled').eq(i).width(hp/maxhp*100 +'%');
-                $('.hp-bar .text').eq(i).html(`${hp.toFixed(0)} / ${maxhp}`);
+                uiStyle('.hp-bar .filled', i, 'width', hp/maxhp*100 +'%');
+                uiTextAt('.hp-bar .text', i, `${hp.toFixed(0)} / ${maxhp}`);
             }
             
             if (hp <= 0){
                 uiVars[i].dead = true;
-                $('.ui-glad').eq(i).addClass('dead');
+                uiClass('.ui-glad', i, 'dead', true);
             }
             else if (uiVars[i].dead){
                 uiVars[i].dead = false;
-                $('.ui-glad').eq(i).removeClass('dead');
+                uiClass('.ui-glad', i, 'dead', false);
             }
             
             if (uiVars[i].ap != ap){
                 uiVars[i].ap = ap;
-                $('.ap-bar .filled').eq(i).width(ap/maxap*100 +'%');
-                $('.ap-bar .text').eq(i).html(`${ap.toFixed(0)} / ${maxap}`);
+                uiStyle('.ap-bar .filled', i, 'width', ap/maxap*100 +'%');
+                uiTextAt('.ap-bar .text', i, `${ap.toFixed(0)} / ${maxap}`);
             }
             
             if (burn){
                 uiVars[i].burn = true;
-                $('.buff-burn').eq(i).addClass('active');
+                uiClass('.buff-burn', i, 'active', true);
             }
             else if (uiVars[i].burn){
                 uiVars[i].burn = false;
-                $('.buff-burn').eq(i).removeClass('active');
+                uiClass('.buff-burn', i, 'active', false);
             }
             
             if (resist){
                 uiVars[i].resist = true;
-                $('.buff-resist').eq(i).addClass('active');
+                uiClass('.buff-resist', i, 'active', true);
             }
             else if (uiVars[i].resist){
                 uiVars[i].resist = false;
-                $('.buff-resist').eq(i).removeClass('active');
+                uiClass('.buff-resist', i, 'active', false);
             }
             
             if (stun){
                 uiVars[i].stun = true;
-                $('.buff-stun').eq(i).addClass('active');
+                uiClass('.buff-stun', i, 'active', true);
             }
             else if (uiVars[i].stun){
                 uiVars[i].stun = false;
-                $('.buff-stun').eq(i).removeClass('active');
+                uiClass('.buff-stun', i, 'active', false);
             }
 
             if (invisible){
                 uiVars[i].invisible = true;
-                $('.buff-invisible').eq(i).addClass('active');
+                uiClass('.buff-invisible', i, 'active', true);
             }
             else if (uiVars[i].invisible){
                 uiVars[i].invisible = false;
-                $('.buff-invisible').eq(i).removeClass('active');
+                uiClass('.buff-invisible', i, 'active', false);
             }
 
             if (speed){
                 uiVars[i].speed = true;
-                $('.buff-speed').eq(i).addClass('active');
+                uiClass('.buff-speed', i, 'active', true);
             }
             else if (uiVars[i].speed){
                 uiVars[i].speed = false;
-                $('.buff-speed').eq(i).removeClass('active');
+                uiClass('.buff-speed', i, 'active', false);
             }
 
             if (poison){
                 uiVars[i].poison = true;
-                $('.buff-poison').eq(i).addClass('active');
+                uiClass('.buff-poison', i, 'active', true);
             }
             else if (uiVars[i].poison){
                 uiVars[i].poison = false;
-                $('.buff-poison').eq(i).removeClass('active');
+                uiClass('.buff-poison', i, 'active', false);
             }
 
-            if ($('.ui-glad.follow').length && i == $('.ui-glad').index($('.follow'))){
+            if (uiNth('.ui-glad', i)?.classList.contains('follow')){
                 updateDetailedWindow()
             }
     
@@ -1107,8 +1165,8 @@ function debugTimer(){
             contFPS++;
             oldTime = newTime;
         }
-        if (!$('#fps').length){
-            $('#canvas-container').append("<div id='fps'></fps>");
+        if (!document.querySelector('#fps')){
+            document.querySelector('#canvas-container').insertAdjacentHTML('beforeend', "<div id='fps'></div>");
             intFPS();
         }
         function intFPS(){
@@ -1126,10 +1184,10 @@ function debugTimer(){
                         avgFPS += avgFPS5[i];
                     avgFPS /= avgFPS5.length;
 
-                    $('#fps').html("FPS: "+ parseFloat(avgFPS).toFixed(1));
+                    uiText('#fps', "FPS: "+ parseFloat(avgFPS).toFixed(1));
                 }
-                
-                if ($('#fps').length)
+
+                if (document.querySelector('#fps'))
                     intFPS();
                 else{
                     avgFPS5 = [];
@@ -1139,89 +1197,85 @@ function debugTimer(){
             }, 1000);
         }
     }
-    else if ($('#fps').length){
-        $('#fps').remove();
+    else if (document.querySelector('#fps')){
+        uiRemove('#fps');
     }
 }
 
-$(window).keydown(function(event) {
+window.addEventListener('keydown', function(event) {
     // The 3D renderer has its own shortcuts (render2/hud-controls.js).
     if (document.documentElement.classList.contains('renderer-three'))
         return;
+    // typing in a field is not a shortcut
+    if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]'))
+        return;
+    var click = selector => document.querySelector(selector)?.click();
+
     if(event.keyCode == Phaser.Keyboard.S){
-        $('#sound').click();
+        click('#sound');
     }
 
     if(event.keyCode == Phaser.Keyboard.F){
         prefs.fps = (prefs.fps + 1) % 2;
-    
-        $.post("back_play.php", {
-            action: "SET_PREF",
-            show_fps: (prefs.fps == 1)
-        });
+        window.Playback.savePrefs({ show_fps: (prefs.fps == 1) });
     }
 
     if(event.keyCode == Phaser.Keyboard.B){
         prefs.bars = (prefs.bars + 1) % 2;
-    
-        $.post("back_play.php", {
-            action: "SET_PREF",
-            show_bars: (prefs.bars == 1)
-        });
+        window.Playback.savePrefs({ show_bars: (prefs.bars == 1) });
     }
 
     if(event.keyCode == Phaser.Keyboard.M){
-        if (prefs.frames){
-            $('#ui-container').fadeOut();
-            prefs.frames = false;
-        }
-        else{
-            $('#ui-container').fadeIn();
-            prefs.frames = true;
-        }
-
-        $.post("back_play.php", {
-            action: "SET_PREF",
-            show_frames: prefs.frames
-        });
+        var frames = document.querySelector('#ui-container');
+        prefs.frames = !prefs.frames;
+        uiFade(frames, prefs.frames, 'flex');
+        window.Playback.savePrefs({ show_frames: prefs.frames });
     }
 
     if(event.keyCode == Phaser.Keyboard.T){
         prefs.text = (prefs.text + 1) % 2;
-
-        $.post("back_play.php", {
-            action: "SET_PREF",
-            show_text: (prefs.text == 1)
-        });
+        window.Playback.savePrefs({ show_text: (prefs.text == 1) });
     }
 
     if(event.keyCode == Phaser.Keyboard.SPACEBAR)
-        $('#pause').click();
+        click('#pause');
 
     if(event.keyCode == Phaser.Keyboard.A)
-        $('#back-step').click();
+        click('#back-step');
 
     if(event.keyCode == Phaser.Keyboard.D)
-        $('#fowd-step').click();
+        click('#fowd-step');
 
     if(event.keyCode >= Phaser.Keyboard.ONE && event.keyCode <= Phaser.Keyboard.FIVE){
-        var i = event.keyCode - Phaser.Keyboard.ONE;
-        $('.ui-glad').eq(i).click();
+        uiNth('.ui-glad', event.keyCode - Phaser.Keyboard.ONE)?.click();
     }
-
 });
 
 function getGladPositionOnCanvas(gladid){
     var ph = game.camera.scale.y * tileD;
     var pw = game.camera.scale.x * tileD;
-    
-    //var x = pw*(arenaX1/tileD) + pw * parseFloat(25);
+
     var x = pw * ((arenaX1/tileD) + parseFloat(json.glads[gladid].x)/25*26);
     var y = ph * ((arenaY1/tileD) + parseFloat(json.glads[gladid].y)/25*26);
-    //console.log(json.glads[gladid].y);
-    var ct = $('#canvas-div canvas').position().top - game.camera.view.y;
-    var cl = $('#canvas-div canvas').position().left - game.camera.view.x;
+    var canvas = document.querySelector('#canvas-div canvas');
+    var ct = canvas.offsetTop - game.camera.view.y;
+    var cl = canvas.offsetLeft - game.camera.view.x;
     return {x: x+cl, y: y+ct};
+}
+
+/**
+ * Places a speech or breakpoint balloon above a gladiator, flipping it to
+ * the left when it is narrow and tall.
+ */
+function placeBaloon(baloon, x, y){
+    baloon.style.top = y +'px';
+    baloon.style.left = x +'px';
+    if (baloon.offsetWidth < 200 && baloon.offsetHeight >= 50){
+        baloon.style.left = (x - 230) +'px';
+        baloon.classList.add('left');
+    }
+    else
+        baloon.classList.remove('left');
 }
 
 function showMessageBaloon(gladid){
@@ -1230,69 +1284,56 @@ function showMessageBaloon(gladid){
     if (prefs.speech && message != "" && json.glads[gladid].hp > 0){
         var gpos = getGladPositionOnCanvas(gladid);
 
-        if ($('.baloon.glad-'+ gladid).length)
-            $('.baloon.glad-'+ gladid).html(message);
-        else
-            $('#canvas-div').append("<div class='baloon glad-"+ gladid +"'>"+ message +"</div>");
-
-        var baloon = $('.baloon.glad-'+ gladid);
-        var x = gpos.x + 15 * game.camera.scale.x;
-        var y = gpos.y - 15 * game.camera.scale.y - baloon.outerHeight();
-        baloon.css({'top': y, 'left': x});
-        if (baloon.width() < 200 && baloon.height() >= 50){
-            baloon.css({'left': x-230});
-            baloon.addClass('left');
+        var baloon = document.querySelector('.baloon.glad-'+ gladid);
+        if (!baloon){
+            baloon = document.createElement('div');
+            baloon.className = 'baloon glad-'+ gladid;
+            document.querySelector('#canvas-div').append(baloon);
         }
-        else if (baloon.hasClass('left'))
-            baloon.removeClass('left');
-            
+        // the gladiator's own words: text, never markup
+        baloon.textContent = message;
+
+        var x = gpos.x + 15 * game.camera.scale.x;
+        var y = gpos.y - 15 * game.camera.scale.y - baloon.offsetHeight;
+        placeBaloon(baloon, x, y);
         gladArray[gladid].baloon = true;
     }
     else if (gladArray[gladid].baloon){
-        $('.baloon.glad-'+ gladid).fadeOut( function(){
-            $(this).remove();
-            gladArray[gladid].baloon = null;
+        gladArray[gladid].baloon = null;
+        uiFade(document.querySelector('.baloon.glad-'+ gladid), false).then( function(element){
+            element?.remove();
         });
     }
-    
 }
 
 function showBreakpoint(gladid){
     if (json.glads[gladid].breakpoint && json.glads[gladid].hp > 0){
         if (!pausesim)
-            $('#pause').click();
+            document.querySelector('#pause')?.click();
 
         var gpos = getGladPositionOnCanvas(gladid);
-        var bp = json.glads[gladid].breakpoint;
-
-        if ($(`.breakpoint.glad-${gladid}`).length)
-            $('.breakpoint.glad-'+ gladid).remove();
-        $('#canvas-div').append(`<div class='breakpoint glad-${gladid}' title='Expandir breakpoint'>${bp}</div>`);
-
-        var baloon = $('.breakpoint.glad-'+ gladid);
-        baloon.hide().fadeIn();
+        uiRemove('.breakpoint.glad-'+ gladid);
+        var baloon = document.createElement('div');
+        baloon.className = 'breakpoint glad-'+ gladid;
+        baloon.title = 'Expandir breakpoint';
+        baloon.textContent = json.glads[gladid].breakpoint;
+        document.querySelector('#canvas-div').append(baloon);
+        uiFade(baloon, true);
 
         var x = gpos.x - 7.5;
-        var y = gpos.y - 25 * game.camera.scale.y - baloon.outerHeight();
-        baloon.css({'top': y, 'left': x});
-        if (baloon.width() < 200 && baloon.height() >= 50){
-            baloon.css({'left': x-230});
-            baloon.addClass('left');
-        }
-        else if (baloon.hasClass('left'))
-            baloon.removeClass('left');
-            
+        var y = gpos.y - 25 * game.camera.scale.y - baloon.offsetHeight;
+        placeBaloon(baloon, x, y);
         gladArray[gladid].breakpoint = true;
-        
-        baloon.click( () => {
-            if (!baloon.hasClass('expanded'))
-                baloon.addClass('expanded').removeAttr('title');
+
+        baloon.addEventListener('click', function(){
+            baloon.classList.add('expanded');
+            baloon.removeAttribute('title');
         });
     }
     else if (gladArray[gladid].breakpoint && !pausesim){
         gladArray[gladid].breakpoint = false;
-        $('.breakpoint.glad-'+ gladid).fadeOut(function(){
-            $(this).remove();
+        uiFade(document.querySelector('.breakpoint.glad-'+ gladid), false).then( function(element){
+            element?.remove();
         });
     }
 }
@@ -1391,40 +1432,40 @@ function zoomWheel(wheel){
     }
 
     var bind = null;
-    if ($(window).width() > $(window).height()){
-        if (canvasH <= $(window).height())
+    if (window.innerWidth > window.innerHeight){
+        if (canvasH <= window.innerHeight)
             bind = "height";
         else
             bind = "none";
     }
     else{
-        if (canvasW <= $(window).width())
+        if (canvasW <= window.innerWidth)
             bind = "width";
         else
             bind = "none";
     }
 
     if (bind == "width"){
-        canvasW = $(window).width();
-        canvasH = $(window).width() * screenH/screenW;
-        game.camera.scale.x = $(window).width() / screenW;
-        game.camera.scale.y = $(window).width() / screenW;
+        canvasW = window.innerWidth;
+        canvasH = window.innerWidth * screenH/screenW;
+        game.camera.scale.x = window.innerWidth / screenW;
+        game.camera.scale.y = window.innerWidth / screenW;
     }
     else if (bind == "height"){
-        canvasH = $(window).height();
-        canvasW = $(window).height() * screenW/screenH;
-        game.camera.scale.x = $(window).height() / screenH;
-        game.camera.scale.y = $(window).height() / screenH;
+        canvasH = window.innerHeight;
+        canvasW = window.innerHeight * screenW/screenH;
+        game.camera.scale.x = window.innerHeight / screenH;
+        game.camera.scale.y = window.innerHeight / screenH;
     }
     else{
         game.camera.scale.x *= delta;
         game.camera.scale.y *= delta;
     }
 
-    if (canvasW > $(window).width())
-        canvasW = $(window).width();
-    if (canvasH > $(window).height())
-        canvasH = $(window).height();
+    if (canvasW > window.innerWidth)
+        canvasW = window.innerWidth;
+    if (canvasH > window.innerHeight)
+        canvasH = window.innerHeight;
 
     game.scale.setGameSize(canvasW, canvasH);
     game.camera.bounds.width = screenW;
@@ -1441,7 +1482,7 @@ function zoomWheel(wheel){
         game.camera.x = point.x * sx - mx;
         game.camera.y = point.y * sy - my;
     }
-    $('.baloon').remove();
+    uiRemove('.baloon');
 }
 
 function getPosArena(x, y, absolute=false){

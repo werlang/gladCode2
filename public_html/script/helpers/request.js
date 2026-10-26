@@ -48,6 +48,30 @@ export function parseBody(text) {
 }
 
 /**
+ * Reads a response body as text, reporting how much of it arrived.
+ *
+ * @param {Response} response Fetch response.
+ * @param {(ratio: number) => void} onProgress Called with 0 to 1 as chunks arrive (only when the size is known).
+ * @returns {Promise<string>}
+ */
+async function readWithProgress(response, onProgress) {
+    const total = Number(response.headers.get('content-length'));
+    if (!response.body || !total) return response.text();
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let received = 0;
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        onProgress(Math.min(1, received / total));
+    }
+    return new TextDecoder().decode(await new Blob(chunks).arrayBuffer());
+}
+
+/**
  * Error thrown when the server answers outside the 2xx range or cannot be reached.
  */
 export class RequestError extends Error {
@@ -92,7 +116,8 @@ export class Request {
     /**
      * @param {string} endpoint Path relative to the site root.
      * @param {Record<string, unknown>|FormData} [data] Body fields.
-     * @param {{ signal?: AbortSignal, timeout?: number }} [options] Abort signal and timeout.
+     * @param {{ signal?: AbortSignal, timeout?: number, onProgress?: (ratio: number) => void }} [options]
+     *   Abort signal, timeout and a download progress callback (0 to 1, when the size is known).
      * @returns {Promise<unknown>}
      */
     post(endpoint, data = {}, options = {}) {
@@ -106,11 +131,12 @@ export class Request {
      * @param {'GET'|'POST'} method HTTP method.
      * @param {string} endpoint Path relative to the site root.
      * @param {BodyInit} [body] Request body.
-     * @param {{ signal?: AbortSignal, timeout?: number }} [options] Abort signal and timeout.
+     * @param {{ signal?: AbortSignal, timeout?: number, onProgress?: (ratio: number) => void }} [options]
+     *   Abort signal, timeout and download progress callback.
      * @returns {Promise<unknown>}
      * @throws {RequestError} On a non-2xx answer, a timeout, an abort (status 0, `aborted`) or a network failure.
      */
-    async request(method, endpoint, body, { signal, timeout = this.timeout } = {}) {
+    async request(method, endpoint, body, { signal, timeout = this.timeout, onProgress } = {}) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeout);
         signal?.addEventListener('abort', () => controller.abort(), { once: true });
@@ -123,7 +149,7 @@ export class Request {
                 credentials: 'same-origin',
                 signal: controller.signal,
             });
-            const data = parseBody(await response.text());
+            const data = parseBody(onProgress ? await readWithProgress(response, onProgress) : await response.text());
             if (!response.ok) {
                 throw new RequestError(response.status, response.statusText || 'Request failed', data);
             }

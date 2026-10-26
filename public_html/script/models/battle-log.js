@@ -10,11 +10,12 @@ export class BattleLogModel {
      * Fetches a battle log.
      *
      * @param {string} hash Log hash.
+     * @param {{ onProgress?: (ratio: number) => void }} [options] Download progress, 0 to 1.
      * @returns {Promise<{ status: 'SUCCESS'|'EXPIRED'|'NOTFOUND'|'ERROR', log?: string }>}
      *   `log` is the JSON text of the simulation steps.
      */
-    static get(hash) {
-        return api.post(ENDPOINT, { action: 'GET', loghash: hash });
+    static get(hash, { onProgress } = {}) {
+        return api.post(ENDPOINT, { action: 'GET', loghash: hash }, { onProgress });
     }
 
     /**

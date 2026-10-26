@@ -44,6 +44,7 @@ export class Slider extends BaseComponent {
      *   `true` between two handles; defaults to `true` with `values`.
      * @param {(value: number) => string} [options.label] Text shown in each handle.
      * @param {string} [options.ariaLabel] Accessible name of the handles.
+     * @param {() => void} [options.onStart] Called when a pointer starts dragging.
      * @param {(value: number|number[]) => void} [options.onSlide] Called while a handle moves.
      * @param {(value: number|number[]) => void} [options.onChange] Called when a move ends.
      */
@@ -155,6 +156,7 @@ export class Slider extends BaseComponent {
             : this.#nearestHandle(value);
         this.element.setPointerCapture?.(event.pointerId);
         this.#handles[this.#dragging].focus();
+        this.#options.onStart?.();
         this.#move(this.#dragging, value);
     }
 

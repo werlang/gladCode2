@@ -5,13 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Obrigado</title>
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
 	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
-	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-	<script type="text/javascript" src="script/header.js"></script>
-	<script type="text/javascript" src="script/googlelogin.js"></script>
+	<?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+	<script type="module" src="<?= moduleSrc("header.js") ?>"></script>
 
 	<style>
 		body{
@@ -58,18 +55,16 @@
 			position: relative;
 		}
 	</style>
-	<script>
-		time();
-		function time() {
-			setTimeout(() => {
-				var val = parseInt($('#content-box span').html()) - 1;
-				$('#content-box span').html(val);
-				if (val == 0)
-					window.location.href = 'news';
-				else
-					time();
-			}, 1000);
-		}
+	<script type="module">
+		// counts down, then goes to the news
+		const counter = document.querySelector('#content-box span');
+		const timer = setInterval(() => {
+			counter.textContent = Number(counter.textContent) - 1;
+			if (Number(counter.textContent) <= 0) {
+				clearInterval(timer);
+				location.href = 'news';
+			}
+		}, 1000);
 	</script>
 </head>
 <body>

@@ -1,1073 +1,616 @@
-var code;
-var json = {};
-var hashes = [], newindex = new Array();
-var steps = new Array();
-var timestep = 0;
-var pausesim = true;
-var stepIncrement = 1;
-var istep;
-var tournHash, loghash;
-var fullscreen = false;
-var timeSlider = 0; 
-var potionList = {}
+import { showDialog, showMessage } from './components/dialog.js';
+import { decorateCheckSliders } from './components/form-controls.js';
+import { Slider } from './components/slider.js';
+import { fadeIn, fadeOut, hide, show } from './helpers/animate.js';
+import { copyText } from './helpers/clipboard.js';
+import { createElement, renderTemplate } from './helpers/html.js';
+import { formatTimeline, frameAt as frameIn } from './helpers/replay.js';
+import { getImage, images } from './helpers/sprite-catalog.js';
+import { fetchSpritesheet, getSpriteThumb } from './helpers/spritesheet.js';
+import { BattleLogModel } from './models/battle-log.js';
+import { PlaybackModel } from './models/playback.js';
+import { SlotsModel } from './models/slots.js';
+import { expandSimulation } from './render2/battle-state.js';
+import {
+    buffRowTemplate,
+    commandRowTemplate,
+    detailsTemplate,
+    endMessageTemplate,
+    helpTemplate,
+    itemRowTemplate,
+    loadErrorTemplate,
+    settingsTemplate,
+    shareTemplate,
+} from './templates/playback.js';
 
-$(document).ready( function() {
-    $('#loadbar #status').html("Página carregada");
+/*
+ * The replay page. The classic 2D renderer (render.js, a classic script) and
+ * the 3D renderer (render2/) read and change the replay through page globals,
+ * so the state they share is published on `window` by `exposeLegacyGlobals`:
+ * `steps`, `timestep`, `pausesim`, `stepIncrement`, `hashes`, `newindex`,
+ * `uiVars`, `timeSlider`, `fullscreen` and the functions they call. The 2D
+ * renderer owns `prefs`, `game`, `music`, `json` and friends, read here through
+ * `window`.
+ */
 
-    $('#footer-wrapper').addClass('white');
+/** Speeds of the classic DOM controls, in simlog steps per 0.1 s. */
+const STEP_SPEEDS = [-10, -5, -2, -1, -0.5, 0.5, 1, 2, 5, 10];
+/** Speeds of the 3D renderer's canvas controls. */
+const PLAYBACK_SPEEDS = [0.1, 0.2, 0.5, 1, 2, 5, 10];
+/** Longest log hash a URL may carry. */
+const MAX_HASH = 32;
 
-    if ($('#tourn').html().length){
-        tournHash = $('#tourn').html();
+/** Replay state shared with the renderers. */
+const state = {
+    steps: [],
+    timestep: 0,
+    pausesim: true,
+    stepIncrement: 1,
+    hashes: [],
+    newindex: [],
+    uiVars: [],
+    timeSlider: 0,
+    fullscreen: false,
+};
+
+let timer = null;
+let tournHash = null;
+let loghash = null;
+let stepSpeedIndex = STEP_SPEEDS.indexOf(1);
+let resumeIncrement = 1;
+let resumeIndex = STEP_SPEEDS.indexOf(1);
+let playbackSpeedIndex = PLAYBACK_SPEEDS.indexOf(1);
+let showFinalScore = true;
+let resultShown = false;
+/** Volumes the sound button brings back after muting. */
+let rememberedMusic = 0.1;
+let rememberedSfx = 1;
+/** Potion identifier by item id, for the details window. */
+let potionNames = null;
+/** @type {Slider|null} */
+let timeline = null;
+
+/** @returns {Record<string, any>} The display preferences owned by render.js. */
+function prefs() {
+    return window.prefs;
+}
+
+/**
+ * Shows a replay frame through whichever renderer is active.
+ *
+ * @param {object} frame Expanded simlog step.
+ */
+function showFrame(frame) {
+    if (frame) window.phaser_update(frame);
+}
+
+/**
+ * Frame at a fractional position of the replay.
+ *
+ * @param {number} index Step index, possibly fractional.
+ * @returns {object|undefined}
+ */
+function frameAt(index) {
+    return frameIn(state.steps, index);
+}
+
+/**
+ * Moves the timeline to a position without firing its callbacks.
+ *
+ * @param {number} value Position in simlog steps.
+ */
+function syncTimeline(value) {
+    if (!timeline) return;
+    timeline.value = value;
+    const label = document.querySelector('#time .ui-slider-time');
+    const handle = document.querySelector('#time .ui-slider-handle');
+    if (label) {
+        label.textContent = formatTimeline(timeline.value);
+        label.style.left = handle?.style.left ?? '0';
     }
-    $('#tourn').remove();
-    
-    if ($('#log').html().length){
-        var log;
-        
-        if ($('#log').html().length > 32)
-            showMessage('Erro na URL');
-        else{
-            loghash = $('#log').html();
-            queryLog();
+}
 
-            $.post("back_play.php", {
-                action: "GET_PREF"
-            }).done( function(data){
-                // console.log(data);
-                data = JSON.parse(data);
-                prefs.bars = (data.show_bars === true || data.show_bars == 'true');
-                prefs.fps = (data.show_fps === true || data.show_fps == 'true');
-                prefs.text = (data.show_text === true || data.show_text == 'true');
-                prefs.speech = (data.show_speech === true || data.show_speech == 'true');
-                
-                prefs.crowd = parseFloat(data.crowd);
+/** @returns {number} Index of the gladiator the camera follows, or -1. */
+function followedGladIndex() {
+    if (window.followedGlad !== undefined && window.followedGlad !== null) return window.followedGlad;
+    return [...document.querySelectorAll('.ui-glad')].findIndex(glad => glad.classList.contains('follow'));
+}
 
-                prefs.sound.music = parseFloat(data.music_volume);
-                $('#sound').data('music', parseFloat(data.music_volume));
-                prefs.sound.sfx = parseFloat(data.sfx_volume);
-                $('#sound').data('sfx', parseFloat(data.sfx_volume));
-                changeSoundIcon();
+/**
+ * Name of an engine action id (render.js holds the list).
+ *
+ * @param {number|string} action Action id.
+ * @returns {string|false}
+ */
+function getActionName(action) {
+    return (window.actionlist ?? []).find(item => item.value == action)?.name ?? false;
+}
 
-                if (data.show_frames === true || data.show_frames == 'true'){
-                    $('#ui-container').fadeIn();
-                    prefs.frames = true;
-                }
-                else{
-                    $('#ui-container').fadeOut();
-                    prefs.frames = false;
-                }
-            });
-        }
-        
-        function queryLog(){
-            $.ajax({
-                xhr: function() {
-                    var xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function(evt) {
-                        if (evt.lengthComputable) {
-                            var percentComplete = evt.loaded / evt.total;
-                            //Do something with upload progress here
-                        }
-                   }, false);
-            
-                   xhr.addEventListener("progress", function(evt) {
-                       if (evt.lengthComputable) {
-                           var percentComplete = (100 * evt.loaded / evt.total).toFixed(0);
-                           $('#loadbar #status').html("Fazendo download do log de batalha");
-                           $('#loadbar #second .bar').width(percentComplete +"%");
-                           $('#loadbar #main .bar').width(percentComplete/4 +"%");
-                       }
-                   }, false);
-            
-                   return xhr;
-                },
-                type: 'POST',
-                url: "back_log.php",
-                data: {
-                    action: "GET",
-                    loghash: loghash
-                },
-                success: function(data){
-                    // console.log(data);
-                    try{
-                        data = JSON.parse(data);
-                    }
-                    catch(error){
-                        console.log(error);
-                    }
+// ----- sound ------------------------------------------------------------------
 
-                    if (data.status == "EXPIRED"){
-                        $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha é muito antiga e não está mais acessível</span></div>`)
-                        clearInterval(istep)
-                    }
-                    else if (data.status != "SUCCESS"){
-                        if (tournHash)
-                            window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
-                        else{
-                            // window.location.href = "https://gladcode.dev";
-                            $('#loadbar').html(`<img src='icon/logo.png'><div><span>Esta batalha não consta nos registros</span></div>`)
-                        }
-                        clearInterval(istep)
-                    }
-                    else{
-                        let log = JSON.parse(data.log)
-                        // console.log(log)
-                        var glads = log[0].glads;
-                        stab = [];
-                        gender = [];
-                        
-                        // console.log(log);
-                        for (var i in glads){
-                            //console.log(glads[i].skin);
-                            var skin = glads[i].skin;
-                            keepOrder(i,hashes,skin);
-                            skin = JSON.parse(skin);
-                            
-                            stab[i] = "0";
-                            gender[i] = "male";
-                            for (var j in skin){
-                                var item = getImage(skin[j]);
-                                if (item.move == 'thrust')
-                                    stab[i] = "1";
-                                if (item.id == 'female')
-                                    gender[i] = "female";
-                            }
-                        }
-                        
-                        function keepOrder(i, hashes, skin){
-                            fetchSpritesheet(skin).then( function(data){
-                                hashes[i] = data;
-                                var pct = (100 * hashes.length / glads.length).toFixed(0);
-                                $('#loadbar #status').html("Montando gladiadores");
-                                $('#loadbar #second .bar').width(pct +"%");
-                                $('#loadbar #main .bar').width(25 + pct/4 +"%");
-
-                                if (hashes.length == glads.length){
-                                    setTimeout( function(){
-                                        startBattle(log);
-                                    }, 100);
-                                }
-                            });
-                        }
-
-                    }
-                }
-            });
-        }
-    }
-    $('#log').remove();
-    
-    var stepprog = [-10,-5,-2,-1,-0.5,0.5,1,2,5,10], stepprogi = stepprog.indexOf(1);
-    $('#back-step').click( function(){
-        if (pausesim){
-            stepIncrement = -1;
-            timestep = Math.max(0, (timestep % 1 !== 0 ? Math.ceil(timestep) : timestep) - 1);
-            $('#fowd-step .speed').html("");
-            $('#back-step .speed').html("-1");
-            var frame = frameAt(timestep);
-            if (frame) phaser_update(frame);
-            if (window.jQuery?.fn?.slider) $('#time').slider('value', timestep);
-            return;
-        }
-        else{
-            if (stepprogi > 0)
-                stepprogi--;
-            stepIncrement = stepprog[stepprogi];
-            
-            if (stepprog[stepprogi] < 0){
-                $('#fowd-step .speed').html("");
-                $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-            else{
-                $('#back-step .speed').html("");
-                $('#fowd-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-        }
-        clearInterval(istep);
-        start_timer(steps);
-    });
-    $('#fowd-step').click( function(){
-        if (pausesim){
-            stepIncrement = 1;
-            timestep = Math.min(steps.length - 1, (timestep % 1 !== 0 ? Math.floor(timestep) : timestep) + 1);
-            $('#back-step .speed').html("");
-            $('#fowd-step .speed').html("+1");
-            var frame = frameAt(timestep);
-            if (frame) phaser_update(frame);
-            if (window.jQuery?.fn?.slider) $('#time').slider('value', timestep);
-            return;
-        }
-        else{
-            if (stepprogi < stepprog.length - 1)
-                stepprogi++;
-            stepIncrement = stepprog[stepprogi];
-            
-            if (stepprog[stepprogi] < 0){
-                $('#fowd-step .speed').html("");
-                $('#back-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-            else{
-                $('#back-step .speed').html("");
-                $('#fowd-step .speed').html(stepprog[stepprogi]+ 'x');
-            }
-        }
-        clearInterval(istep);
-        start_timer(steps);
-    });
-    // Pause resets the speed, so resume always continues at 1x
-    var resumeIncrement = 1, resumeIndex = stepprog.indexOf(1);
-    $('#pause').click( function(){
-        if (pausesim){
-            pausesim = false;
-            stepIncrement = resumeIncrement;
-            stepprogi = resumeIndex;
-            $('#pause #img-play').hide();
-            $('#pause #img-pause').show();
-            if (stepprog[stepprogi] === 1){
-                $('#back-step .speed').html('-1x');
-                $('#fowd-step .speed').html('1x');
-            }
-            else{
-                $('#back-step .speed').html(stepprog[stepprogi] < 0 ? stepprog[stepprogi] +'x' : '');
-                $('#fowd-step .speed').html(stepprog[stepprogi] < 0 ? '' : stepprog[stepprogi] +'x');
-            }
-            if (timestep % 1 !== 0){
-                timestep = stepIncrement > 0 ? Math.floor(timestep) + 1 : Math.floor(timestep);
-            }
-            clearInterval(istep);
-            start_timer(steps);
-        }
-        else{
-            // Pausing resets the speed so resume always plays back at 1x
-            resumeIncrement = 1;
-            resumeIndex = stepprog.indexOf(1);
-            stepprogi = resumeIndex;
-            pausesim = true;
-            $('#pause #img-pause').hide();
-            $('#pause #img-play').show();
-            stepIncrement = 1;
-            $('#back-step .speed').html('-1');
-            $('#fowd-step .speed').html('+1');
-            clearInterval(istep);
-        }
-    });
-    $('#fullscreen').click( function(){
-        setFullScreen(!isFullScreen());
-    });
-
-    $('#help').click( function(){
-        $('body').append(`<div id='fog'>
-        <div id='help-window' class='blue-window'>
-            <div id='content'>
-                <h2>Controle da câmera</h2>
-                <div class='table'>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/mouse_drag.png'>/<img src='icon/arrows_keyboard.png'></div>
-                        <div class='cell'>Mover a câmera</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/mouse_scroll.png'>/<img src='icon/plmin_keyboard.png'></div>
-                        <div class='cell'>Zoom da arena</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><img src='icon/select_glad.png'>/<img src='icon/numbers_keyboard.png'></div>
-                        <div class='cell'>Acompanhar um gladiador</div>
-                    </div>
-                </div>
-                <h2>Teclas de atalho</h2>
-                <div class='table'>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>M</span></div><div class='cell'>Mostrar/ocultar molduras</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>B</span></div><div class='cell'>Mostrar/ocultar barras de hp e ap</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>F</span></div><div class='cell'>Mostrar/ocultar taxa de atualização</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>ESPAÇO</span></div><div class='cell'>Parar/Continuar simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>A</span></div>
-                        <div class='cell'>Retroceder simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>D</span></div>
-                        <div class='cell'>Avançar simulação</div>
-                    </div>
-                    <div class='row'>
-                        <div class='cell'><span class='key'>S</span></div>
-                        <div class='cell'>Liga/desliga Música e efeitos sonoros</div>
-                    </div>
-                </div>
-            </div>
-            <div id='button-container'><button class='button' id='ok'>OK</button></div>
-        </div>
-        </div>`);
-
-        $('#help-window #ok').click( function(){
-            $('#fog').remove();
-        });
-    });
-
-    $('#settings').click( function(){
-        $('body').append(`<div id='fog'>
-        <div id='settings-window' class='blue-window'>
-            <h2>Preferências</h2>
-            <div class='check-container'>
-                <fieldset id='renderer-choice' class='renderer-choice'>
-                    <legend>Visual da arena</legend>
-                    <label class='renderer-option'>
-                        <input type='radio' name='battle-renderer' value='classic'>
-                        <span><strong>Clássico 2D</strong><small>Sprites originais em Phaser</small></span>
-                    </label>
-                    <label class='renderer-option'>
-                        <input type='radio' name='battle-renderer' value='three'>
-                        <span><strong>Coliseu 3D</strong><small>Câmera top-down em Three.js</small></span>
-                    </label>
-                    <p>A batalha será recarregada ao trocar o visual.</p>
-                </fieldset>
-                <div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap (B)</label></div>
-                <div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores (M)</label></div>
-                <div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
-                <div id='pref-text'><label><input type='checkbox' class='checkslider'>Mostrar valores numéricos de hp, ap e dano (T)</label></div>
-                <div id='pref-speech'><label><input type='checkbox' class='checkslider'>Mostrar balões de fala</label></div>
-                <div id='volume-container'>
-                    <h3>Volume do áudio</h3>
-                    <p>Efeitos sonoros</p>
-                    <div id='sfx-volume'></div>
-                    <p>Música</p>
-                    <div id='music-volume'></div>
-                </div>
-                <div id='crowd-container'>
-                    <h3>Número de espectadores</h3>
-                    <div id='n-crowd'></div>
-                </div>
-                <div id='quality-container'>
-                    <h3>Qualidade gráfica (Coliseu 3D)</h3>
-                    <select id='render-quality'>
-                        <option value='auto'>Automática</option>
-                        <option value='high'>Alta</option>
-                        <option value='medium'>Média</option>
-                        <option value='low'>Baixa (aparelhos fracos)</option>
-                    </select>
-                    <p>Vale para este aparelho; a batalha será recarregada ao trocar.</p>
-                </div>
-            </div>
-            <div id='button-container'><button class='button' id='ok'>OK</button></div></div>
-        </div>`);
-
-        var soundtest = game.add.audio('lvlup');
-        $( "#sfx-volume" ).slider({
-            range: "min",
-            min: 0,
-            max: 1,
-            step: 0.01,
-            create: function( event, ui ) {
-                $(this).slider('value', prefs.sound.sfx);
-            },
-            slide: function( event, ui ) {
-                prefs.sound.sfx = ui.value;
-                soundtest.stop();
-                soundtest.play('', 0.5, prefs.sound.sfx);
-
-                changeSoundIcon();
-            },
-        });
-
-        $( "#music-volume" ).slider({
-            range: "min",
-            min: 0,
-            max: 0.1,
-            value: 0.1,
-            step: 0.001,
-            create: function( event, ui ) {
-                $(this).slider('value', music.volume);
-            },
-            slide: function( event, ui ) {
-                music.volume = ui.value;
-
-                changeSoundIcon();
-            },
-        });
-
-        $( "#n-crowd" ).slider({
-            range: "min",
-            min: 0,
-            max: 1,
-            value: prefs.crowd,
-            step: 0.1,
-            create: function( event, ui ) {
-            },
-            slide: ( event, ui ) => {
-                changeCrowd(ui.value);
-                prefs.crowd = ui.value;
-            }
-        });
-
-        if (prefs.bars)
-            $('#pref-bars input').prop('checked', true);
-        if ($('#ui-container').css('display') == 'flex')
-            $('#pref-frames input').prop('checked', true);
-        if (prefs.fps)
-            $('#pref-fps input').prop('checked', true);
-        if (prefs.text)
-            $('#pref-text input').prop('checked', true);
-        if (prefs.speech)
-            $('#pref-speech input').prop('checked', true);
-        if (window.BattleRendererPreference.ENABLED === false)
-            $('#renderer-choice').remove();
-        // Graphics quality only applies to the 3D renderer, and only once it is running.
-        if (window.Render2Quality)
-            $('#render-quality').val(window.Render2Quality.get());
-        else
-            $('#quality-container').remove();
-        $(`#renderer-choice input[value='${window.BattleRendererPreference.get()}']`).prop('checked', true);
-
-        $('.checkslider').each( function(){
-            create_checkbox($(this));
-        });
-    
-        $('#settings-window #ok').click( function(){
-            const selectedRenderer = $('#renderer-choice input:checked').val() || window.BattleRendererPreference.CLASSIC;
-            let rendererChanged = selectedRenderer !== window.BattleRendererPreference.get();
-            window.BattleRendererPreference.set(selectedRenderer);
-            // A new graphics quality takes a reload (anti-aliasing and the floor bake are set when the arena starts).
-            const selectedQuality = $('#render-quality').val();
-            if (window.Render2Quality && selectedQuality && selectedQuality !== window.Render2Quality.get()) {
-                window.Render2Quality.set(selectedQuality);
-                rendererChanged = true;
-            }
-
-            $.post("back_play.php", {
-                action: "SET_PREF",
-                show_bars: prefs.bars,
-                show_frames: $('#pref-frames input').prop('checked'),
-                show_fps: prefs.fps,
-                show_text: prefs.text,
-                show_speech: prefs.speech,
-                sfx_volume: prefs.sound.sfx,
-                music_volume: music.volume,
-                crowd: prefs.crowd
-            }).always( function(){
-                if (rendererChanged){
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete('renderer');
-                    window.location.assign(url);
-                    return;
-                }
-                $('#fog').remove();
-            });
-        });
-
-        $('#pref-bars input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.bars = true;
-            else
-                prefs.bars = false;
-        });
-
-        $('#pref-frames input').change( function(){
-            if ($(this).prop('checked')){
-                $('#ui-container').fadeIn();
-                prefs.frames = true;
-            }
-            else{
-                $('#ui-container').fadeOut();
-                prefs.frames = false;
-            }
-        });
-
-        $('#pref-fps input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.fps = true;
-            else
-                prefs.fps = false;
-        });		
-
-        $('#pref-text input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.text = true;
-            else
-                prefs.text = false;
-        });		
-
-        $('#pref-speech input').change( function(){
-            if ($(this).prop('checked'))
-                prefs.speech = true;
-            else
-                prefs.speech = false;
-        });		
-    });
-
-    $('#sound').click(toggleSound);
-});
+/** Shows music on, effects only or mute on the sound button. */
+function changeSoundIcon() {
+    const icon = document.querySelector('#sound img');
+    if (!icon) return;
+    const music = window.music;
+    if ((!music && rememberedMusic > 0) || (music && music.volume > 0)) icon.src = 'icon/music.png';
+    else if (prefs().sound.sfx > 0) icon.src = 'icon/music-off.png';
+    else icon.src = 'icon/mute.png';
+}
 
 /** Cycles the audio: music and effects, effects only, silence (the remembered levels come back). */
-function toggleSound(){
-    var button = $('#sound');
-    if (music.volume > 0){
-        button.data('music', music.volume);
+function toggleSound() {
+    const music = window.music;
+    const sound = prefs().sound;
+    if (music.volume > 0) {
+        rememberedMusic = music.volume;
         music.volume = 0;
     }
-    else if (prefs.sound.sfx > 0){
-        button.data('sfx', prefs.sound.sfx);
-        prefs.sound.sfx = 0;
+    else if (sound.sfx > 0) {
+        rememberedSfx = sound.sfx;
+        sound.sfx = 0;
     }
-    else{
-        music.volume = button.data('music');
-        if (!(music.volume > 0))
-            music.volume = 0.1;
-
-        prefs.sound.sfx = button.data('sfx');
-        if (!(prefs.sound.sfx > 0))
-            prefs.sound.sfx = 1;
+    else {
+        music.volume = rememberedMusic > 0 ? rememberedMusic : 0.1;
+        sound.sfx = rememberedSfx > 0 ? rememberedSfx : 1;
     }
     changeSoundIcon();
-
-    $.post("back_play.php",{
-        action: "SET_PREF",
-        music_volume: music.volume,
-        sfx_volume: prefs.sound.sfx
-    });
+    PlaybackModel.savePreferences({ music_volume: music.volume, sfx_volume: sound.sfx });
 }
 
-$(document).ready( function() {
-    window.changeSoundIcon = changeSoundIcon;
-    function changeSoundIcon(){
-        if ((!music && parseFloat($('#sound').data('music')) > 0) || (music && music.volume > 0))
-            $('#sound').find('img').prop('src','icon/music.png');
-        else if (prefs.sound.sfx > 0)
-            $('#sound').find('img').prop('src','icon/music-off.png');
-        else
-            $('#sound').find('img').prop('src','icon/mute.png');
-    }
-    
-    var wasPlaying = false;
-    $( "#time" ).slider({
-        range: "min",
-        min: 0,
-        max: 0,
-        // Fractions of a simlog step (0.01 s) so playback can stop between two steps
-        step: 0.1,
-        value: timestep,
-        create: function( event, ui ) {
-            $(this).append("<div class='ui-slider-time'></div>");
-        },
-        change: function( event, ui ) {
-            var h = Math.floor(ui.value/600);
-            var m = Math.floor(ui.value/10)%60;
-            if (m < 10)
-                m = "0"+ m;
-            var time = h +":"+ m;
-            $(this).find('.ui-slider-time').html(time);
-            $(this).find('.ui-slider-time').css('left', $(this).find('.ui-slider-handle').css('left'));
-        },
-        start: function() {
-            // Scrub with playback held, then continue from the new position at 1x speed
-            wasPlaying = !pausesim;
-            if (wasPlaying) $('#pause').click();
-        },
-        slide: function( event, ui ) {
-            timestep = ui.value;
-            var frame = frameAt(timestep);
-            if (frame) phaser_update(frame);
-        },
-        stop: function() {
-            if (wasPlaying && pausesim) $('#pause').click();
-        }
-    });
+// ----- fullscreen and layout -------------------------------------------------------
 
-    // Leaving the window (another tab or application) pauses; clicks inside the page never do.
-    // A phone switching apps or locking its screen hides the page without always blurring the window.
-    function pauseOnLeave(){
-        if (pausesim) return;
-        if (window.Playback.threeD) window.Playback.setPaused(true);
-        else $('#pause').click();
-    }
-    window.addEventListener('blur', pauseOnLeave);
-    document.addEventListener('visibilitychange', function(){
-        if (document.hidden) pauseOnLeave();
-    });
-
-});
-
-function isFullScreen(){
-    var isfs = (document.fullscreenElement && document.fullscreenElement !== null) ||
-        (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
-        (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
-        (document.msFullscreenElement && document.msFullscreenElement !== null);
-    if (isfs)
-        return true;
-    else
-        return false;
+/** @returns {boolean} Whether the page is in fullscreen. */
+function isFullScreen() {
+    return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
 }
 
-function setFullScreen(state){
-    if (state){
-        var elem = $("body")[0];
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        }
-        else if (elem.mozRequestFullScreen) { /* Firefox */
-            elem.mozRequestFullScreen();
-        }
-        else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-            elem.webkitRequestFullscreen();
-        }
-        else if (elem.msRequestFullscreen) { /* IE/Edge */
-            elem.msRequestFullscreen();
-        }
-        fullscreen = true;
-    }
-    else{
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-        else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
-        else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        }
-        else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-        fullscreen = false;
-    }
-    setTimeout( function(){
-        resize();
-    }, 100);
+/**
+ * Enters or leaves fullscreen.
+ *
+ * @param {boolean} enter Enter fullscreen.
+ */
+function setFullScreen(enter) {
+    const body = document.body;
+    if (enter) (body.requestFullscreen ?? body.webkitRequestFullscreen)?.call(body);
+    else if (isFullScreen()) (document.exitFullscreen ?? document.webkitExitFullscreen)?.call(document);
+    state.fullscreen = enter;
+    setTimeout(resize, 100);
 }
 
-$(window).resize( function() {
-    resize();
-});
-
+/**
+ * Fits the battle to the window: the 3D renderer resizes itself, the 2D one
+ * scales the camera to the arena and suggests portrait or fullscreen on phones.
+ */
 function resize() {
-    if (window.battleRendererVersion === window.BattleRendererPreference?.THREE){
+    if (window.battleRendererVersion === window.BattleRendererPreference?.THREE) {
         window.threeBattleRenderer?.resize();
         return;
     }
+    const { game, screenW, screenH, arenaD, arenaX1, arenaY1 } = window;
+    if (!game) return;
 
-    if (game){
-        var canvasH, canvasW;
-        if ($(window).width() > $(window).height()){
-            var usefulRatio = screenH / arenaD; //ration between entire and useful part of the background
-            canvasH = $(window).height();
-            canvasW = Math.min($(window).width(), screenW * game.camera.scale.x); //if the screen is smaller than deginated area for the canvas, use the small area
-            game.camera.scale.x = $(window).height() * usefulRatio / screenH;
-            game.camera.scale.y = $(window).height() * usefulRatio / screenH;
-            if ($(window).height() < 450 && $(window).height() < $(window).width() && $('#dialog-box').length == 0){
-                showMessage("Em dispositivos móveis, a visualização das lutas é melhor no modo retrato");
-            }
-
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const dialogOpen = Boolean(document.querySelector('#dialog-box'));
+    let canvasW;
+    let canvasH;
+    if (width > height) {
+        const usefulRatio = screenH / arenaD;
+        canvasH = height;
+        canvasW = Math.min(width, screenW * game.camera.scale.x);
+        game.camera.scale.x = (height * usefulRatio) / screenH;
+        game.camera.scale.y = (height * usefulRatio) / screenH;
+        if (height < 450 && !dialogOpen) {
+            showMessage('Em dispositivos móveis, a visualização das lutas é melhor no modo retrato');
         }
-        else{
-            if ($('#dialog-box').length){
-                $('#fog').remove();
-            }
-
-            var usefulRatio = screenW / arenaD;
-            canvasH = Math.min($(window).height(), screenH * game.camera.scale.y);
-            canvasW = $(window).width();
-            game.camera.scale.x = $(window).width() * usefulRatio / screenW;
-            game.camera.scale.y = $(window).width() * usefulRatio / screenW;
-            if ($(window).height() < 600 && !isFullScreen() && !fullscreen && $('#dialog-box').length == 0){
-                showDialog("Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?", ['Não','SIM']).then( function(data){
-                    if (data == "SIM")
-                        setFullScreen(true);
-                        $('#fog').remove();
-                        fullscreen = true;
-                });
-            }
-        }	
-        game.scale.setGameSize(canvasW, canvasH); //this is that it should be, dont mess
-        game.camera.bounds.width = screenW; //leave teh bounds alone, dont mess here
-        game.camera.bounds.height = screenH;
-        game.camera.y = (arenaY1 + arenaD/2) * game.camera.scale.y - game.height/2; //middle of the arena minus middle of the screen
-        game.camera.x = (arenaX1 + arenaD/2) * game.camera.scale.x - game.width/2;
-
-        $('#canvas-div canvas').click();
     }
+    else {
+        if (dialogOpen) document.querySelectorAll('#fog').forEach(fog => fog.remove());
+        const usefulRatio = screenW / arenaD;
+        canvasH = Math.min(height, screenH * game.camera.scale.y);
+        canvasW = width;
+        game.camera.scale.x = (width * usefulRatio) / screenW;
+        game.camera.scale.y = (width * usefulRatio) / screenW;
+        if (height < 600 && !isFullScreen() && !state.fullscreen && !document.querySelector('#dialog-box')) {
+            showDialog('Em dispositivos móveis, a visualização das lutas é melhor em tela cheia. Deseja trocar?', ['Não', 'SIM']).then(answer => {
+                if (answer === 'SIM') setFullScreen(true);
+                state.fullscreen = true;
+            });
+        }
+    }
+    game.scale.setGameSize(canvasW, canvasH);
+    game.camera.bounds.width = screenW;
+    game.camera.bounds.height = screenH;
+    game.camera.y = (arenaY1 + arenaD / 2) * game.camera.scale.y - game.height / 2;
+    game.camera.x = (arenaX1 + arenaD / 2) * game.camera.scale.x - game.width / 2;
+    document.querySelector('#canvas-div canvas')?.click();
 }
 
 /**
- * Frame at a fractional step index: positions and headings blend between the two neighbouring
- * simlog steps, everything else comes from the earlier one.
+ * Revives or hides spectators to match a density.
+ *
+ * @param {number} density Share of spectators shown, 0 to 1.
  */
-function frameAt(index){
-    var low = Math.floor(index), fraction = index - low;
-    var a = steps[low], b = steps[Math.min(low + 1, steps.length - 1)];
-    if (!a || !fraction || a === b || !Array.isArray(a.glads))
-        return a;
-    var mix = function(from, to){ return Number(from) + (Number(to) - Number(from)) * fraction; };
-    return Object.assign({}, a, {
-        simtime: mix(a.simtime, b.simtime),
-        glads: a.glads.map(function(g, k){
-            if (!g) return g;
-            var next = b && Array.isArray(b.glads) ? b.glads[k] : null;
-            // a teleport jumps; do not slide across the arena
-            if (!next || Math.hypot(Number(next.x) - Number(g.x), Number(next.y) - Number(g.y)) > 3)
-                return g;
-            var turn = ((Number(next.head) - Number(g.head) + 540) % 360) - 180;
-            return Object.assign({}, g, { x: mix(g.x, next.x), y: mix(g.y, next.y), head: Number(g.head) + turn * fraction });
-        })
+function changeCrowd(density) {
+    Object.values(window.npc ?? {}).forEach(spectator => {
+        const roll = Math.random();
+        const alive = spectator.sprite.body.alive;
+        if (roll < density && !alive) Object.values(spectator.sprite).forEach(part => part.revive());
+        else if (roll > density && alive) Object.values(spectator.sprite).forEach(part => part.kill());
     });
 }
 
-/**
- * Replay control for the 3D renderer's canvas controls (the classic renderer keeps its DOM buttons).
- * Speeds are simlog steps per 0.1 s; stepping always pauses first.
- */
-var PLAYBACK_SPEEDS = [0.1, 0.2, 0.5, 1, 2, 5, 10];
-var playbackSpeedIndex = PLAYBACK_SPEEDS.indexOf(1);
-window.Playback = {
-    get threeD(){ return window.battleRendererVersion === window.BattleRendererPreference?.THREE && Boolean(window.threeBattleRenderer); },
-    get paused(){ return pausesim; },
-    get speed(){ return PLAYBACK_SPEEDS[playbackSpeedIndex]; },
-    get speeds(){ return PLAYBACK_SPEEDS; },
-    get speedIndex(){ return playbackSpeedIndex; },
-    get position(){ return timestep; },
-    get length(){ return steps.length; },
-    get tournament(){ return tournHash || null; },
-    get link(){ return "gladcode.dev/play/"+ loghash; },
-    setPaused: function(paused){
-        if (paused === pausesim) return;
-        clearInterval(istep);
-        pausesim = paused;
-        if (!paused){
-            stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
-            if (timestep % 1 !== 0)
-                timestep = Math.floor(timestep) + 1;
-            start_timer(steps);
-        }
-    },
-    togglePause: function(){ this.setPaused(!pausesim); },
-    step: function(direction){
-        this.setPaused(true);
-        if (direction < 0)
-            timestep = Math.max(0, Math.ceil(timestep) - 1);
-        else
-            timestep = Math.min(steps.length - 1, Math.floor(timestep) + 1);
-        var frame = frameAt(timestep);
-        if (frame) phaser_update(frame);
-    },
-    setSpeed: function(index){
-        playbackSpeedIndex = Math.max(0, Math.min(PLAYBACK_SPEEDS.length - 1, index));
-        stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
-        if (!pausesim){
-            clearInterval(istep);
-            start_timer(steps);
-        }
-    },
-    faster: function(){ this.setSpeed(playbackSpeedIndex + 1); },
-    slower: function(){ this.setSpeed(playbackSpeedIndex - 1); },
-    seek: function(position){
-        timestep = Math.max(0, Math.min(steps.length - 1, position));
-        var frame = frameAt(timestep);
-        if (frame) phaser_update(frame);
-    },
-    toggleSound: function(){ toggleSound(); },
-    get soundState(){
-        if (window.music && music.volume > 0) return 'music';
-        return prefs.sound.sfx > 0 ? 'sfx' : 'mute';
-    },
-    savePrefs: function(fields){ $.post("back_play.php", Object.assign({ action: "SET_PREF" }, fields)); },
-    openSettings: function(){ $('#settings').click(); },
-    get fullscreen(){ return isFullScreen(); },
-    toggleFullscreen: function(){ setFullScreen(!isFullScreen()); },
-};
+// ----- playback loop -------------------------------------------------------------
 
-var show_final_score = true;
-var resultShown = false;
-// One timer at a time, reading the global `steps`: a timer left running from before the replay was expanded (Space
-// during loading) kept an empty copy and pinned the replay at its first frame.
-function start_timer(){
-    clearInterval(istep);
-    istep = setInterval( function(){
-        //console.log(steps[timestep]);
-        if (pausesim){
-            // Held: the replay starts paused until the renderer shows its first frame, so keep feeding the current one
-            var frame = frameAt(timestep);
-            if (frame) phaser_update(frame);
+/**
+ * Shows the classic end-of-battle message: the survivor with the most hp
+ * (or a draw), sharing and the way back to the tournament.
+ */
+function showEndMessage() {
+    const last = state.steps[state.timestep];
+    let winner = null;
+    last.glads.forEach((glad, index) => {
+        const card = document.querySelectorAll('.ui-glad')[index];
+        if (parseFloat(glad.hp) > 0 && !card?.classList.contains('dead') && (!winner || winner.hp < parseFloat(glad.hp))) {
+            winner = { index, name: glad.name, team: glad.user, hp: parseFloat(glad.hp) };
+        }
+    });
+
+    if (new URLSearchParams(location.search).get('loop') === 'true') location.reload();
+
+    const fog = createElement(renderTemplate(endMessageTemplate, { name: winner ? winner.name : 'Empate', team: winner ? winner.team : '' }));
+    document.body.append(fog);
+    const message = fog.querySelector('#end-message');
+    fog.querySelector('#retornar').addEventListener('click', () => {
+        showFinalScore = false;
+        fog.remove();
+        if (tournHash) location.href = `tourn/${tournHash}`;
+    });
+    fog.querySelector('#share').addEventListener('click', () => {
+        hide(message);
+        const link = `gladcode.dev/play/${loghash}`;
+        const share = createElement(renderTemplate(shareTemplate, { hash: loghash, link }));
+        fog.append(share);
+        share.querySelector('#getlink').addEventListener('click', async () => {
+            await copyText(link);
+            const hash = share.querySelector('#hash');
+            hash.textContent = 'Link copiado';
+            hash.classList.add('clicked');
+            setTimeout(() => {
+                hash.classList.remove('clicked');
+                hash.textContent = loghash;
+            }, 500);
+        });
+        share.querySelector('#close').addEventListener('click', () => {
+            share.remove();
+            show(message);
+        });
+    });
+
+    if (winner) fog.querySelector('#image').replaceChildren(getSpriteThumb(state.hashes[state.newindex[winner.index]], 'walk', 'down'));
+    message.style.display = 'none';
+    fadeIn(message, 1000);
+    window.music.pause();
+    window.victory.play('', 0, window.music.volume / 0.1);
+}
+
+/**
+ * Plays the replay: one simlog step every 0.1 s divided by the speed. One timer
+ * at a time, reading `state.steps` (a timer left running from before the replay
+ * was expanded kept an empty copy and pinned the replay at its first frame).
+ */
+function startTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+        const { steps } = state;
+        if (state.pausesim) {
+            // held: the replay starts paused until the renderer shows its first frame, so keep feeding the current one
+            showFrame(frameAt(state.timestep));
             return;
         }
-        if (timestep < 0)
-            timestep = 0;
-        if (window.Playback.threeD){
-            // The 3D renderer crowns the victor in the arena itself: nothing covers the battle or holds it.
-            if (timestep > steps.length - 1){
-                timestep = steps.length - 1;
-                if (!resultShown){
+        if (state.timestep < 0) state.timestep = 0;
+
+        if (window.Playback.threeD) {
+            // the 3D renderer crowns the victor in the arena itself: nothing covers the battle or holds it
+            if (state.timestep > steps.length - 1) {
+                state.timestep = steps.length - 1;
+                if (!resultShown) {
                     resultShown = true;
-                    if (new URLSearchParams(location.search).get('loop') === 'true')
-                        location.reload();
+                    if (new URLSearchParams(location.search).get('loop') === 'true') location.reload();
                     window.threeBattleRenderer.battleEnded();
-                    music.pause();
-                    victory.play('', 0, music.volume / 0.1);
+                    window.music.pause();
+                    window.victory.play('', 0, window.music.volume / 0.1);
                 }
             }
-            else if (resultShown){
+            else if (resultShown) {
                 resultShown = false;
                 window.threeBattleRenderer.battleResumed();
-                music.resume();
+                window.music.resume();
             }
         }
-        else if (timestep > steps.length - 1){
-            timestep = steps.length - 1;
-            var name, team, id, hp;
-            for (i in steps[timestep].glads){
-                //revive gladiator when running backwards
-                if (parseFloat(steps[timestep].glads[i].hp) > 0 && !$('.ui-glad').eq(i).hasClass('dead')){
-                    if (!id || hp < parseFloat(steps[timestep].glads[i].hp)){
-                        name = steps[timestep].glads[i].name;
-                        hp = parseFloat(steps[timestep].glads[i].hp);
-                        team = steps[timestep].glads[i].user;
-                        id = i;
-                    }
-                }
-            }
-            if (show_final_score && !$('#end-message').length){
-                if (new URLSearchParams(location.search).get('loop') === 'true') {
-                    location.reload();
-                }
-
-                if (!id){
-                    name = "Empate";
-                    team = "";
-                }
-                $('body').append(`<div id='fog'><div id='end-message'><div id='victory'>VITÓRIA</div><div id='image-container'><div id='image'></div><div id='name-team-container'><span id='name'>${name}</span><span id='team'>${team}</span></div></div><div id='button-container'><button class='button' id='retornar' title='Retornar para a batalha'>OK</button><button class='button small' id='share' title='Compartilhar'><i class="fas fa-share-alt"></i></button></div></div></div>`);
-                $('#end-message #retornar').click( function() {
-                    show_final_score = false;
-                    $('#fog').remove();
-                    if (tournHash)
-                        window.location.href = "https://gladcode.dev/tournment.php?t="+ tournHash;
-                });
-
-                $('#end-message #share').click( function() {
-                    $('#end-message').hide();
-
-                    var link = "gladcode.dev/play/"+ loghash;
-
-                    var twitter = `<a id='twitter' class='button' title='Compartilhar pelo Twitter' href='https://twitter.com/intent/tweet?text=Veja%20esta%20batalha:&url=https://${link}&hashtags=gladcode' target='_blank'><i class="fab fa-twitter"></i></a>`;
-
-                    var facebook = `<a id='facebook' class='button' title='Compartilhar pelo Facebook' href='https://www.facebook.com/sharer/sharer.php?u=${link}' target='_blank'><i class="fab fa-facebook-square"></i></a>`;
-
-                    var whatsapp = `<a id='whatsapp' class='button' title='Compartilhar pelo Whatsapp' href='https://api.whatsapp.com/send?text=Veja esta batalha:%0a${link}%0a%23gladcode' target='_blank'><i class="fab fa-whatsapp"></i></a>`;
-
-                    $('#fog').append(`<div id='url'><div id='link'><span id='title'>Compartilhar batalha</span><span id='site'>gladcode.dev/play/</span><span id='hash'>${loghash}</span></div><div id='social'><div id='getlink' class='button' title='Copiar link'><i class="fas fa-link"></i></div>${twitter + facebook + whatsapp}</div><button id='close' class='button'>OK</button></div>`);
-                    
-                    $('#url #social #getlink').click( function(){
-                        copyToClipboard(link);
-                        $('#url #hash').html('Link copiado');
-                        $('#url #hash').addClass('clicked');
-                        setTimeout(function(){
-                            $('#url #hash').removeClass('clicked');
-                            $('#url #hash').html(loghash);
-                        },500);
-                    });
-                    
-                    $('#url #close').click( function(){
-                        $('#url').remove();
-                        $('#end-message').show();
-                    });
-                });
-
-                if (id)
-                    $('#end-message #image').html(getSpriteThumb(hashes[newindex[id]],'walk','down'));
-                $('#end-message').hide();
-                $('#end-message').fadeIn(1000);
-                music.pause();
-                victory.play('', 0, music.volume / 0.1);
-            }
+        else if (state.timestep > steps.length - 1) {
+            state.timestep = steps.length - 1;
+            if (showFinalScore && !document.querySelector('#end-message')) showEndMessage();
         }
-        else if (!show_final_score){
-            $('#fog').remove();
-            show_final_score = true;
-            music.resume();
+        else if (!showFinalScore) {
+            document.querySelectorAll('#fog').forEach(fog => fog.remove());
+            showFinalScore = true;
+            window.music.resume();
         }
-        if (timestep % 1 !== 0){
-            timestep = stepIncrement > 0 ? Math.floor(timestep) + 1 : Math.floor(timestep);
+
+        if (state.timestep % 1 !== 0) {
+            state.timestep = state.stepIncrement > 0 ? Math.floor(state.timestep) + 1 : Math.floor(state.timestep);
         }
-        if (steps[timestep])
-            phaser_update(steps[timestep]);
-        timestep += stepIncrement / Math.abs(stepIncrement);
-    }, 100 / Math.abs(stepIncrement));	
+        showFrame(steps[state.timestep]);
+        state.timestep += state.stepIncrement / Math.abs(state.stepIncrement);
+    }, 100 / Math.abs(state.stepIncrement));
 }
 
-//the entire reason of adding a uiVars is to avoid verifying DOM on each cycle, which is very slow
-uiVars = [];
-async function create_ui(nglad){
-    if (document.documentElement.classList.contains('renderer-three')){
-        //the three renderer draws its HUD on canvas and reports selection through followedGladIndex
-        uiVars = Array.from({length: nglad}, () => ({}));
-        uiVars.showtext = true;
+// ----- classic controls ----------------------------------------------------------
+
+/**
+ * Writes the speed labels of the step buttons.
+ *
+ * @param {string} back Label of the back button.
+ * @param {string} forward Label of the forward button.
+ */
+function setSpeedLabels(back, forward) {
+    document.querySelector('#back-step .speed').textContent = back;
+    document.querySelector('#fowd-step .speed').textContent = forward;
+}
+
+/** Shows the speed of the classic controls on their step buttons. */
+function showSpeed() {
+    const speed = STEP_SPEEDS[stepSpeedIndex];
+    if (speed < 0) setSpeedLabels(`${speed}x`, '');
+    else setSpeedLabels('', `${speed}x`);
+}
+
+/**
+ * Paused: moves one step. Playing: changes the speed.
+ *
+ * @param {-1|1} direction Backwards or forwards.
+ */
+function stepButton(direction) {
+    if (state.pausesim) {
+        state.stepIncrement = direction;
+        state.timestep = direction < 0
+            ? Math.max(0, (state.timestep % 1 !== 0 ? Math.ceil(state.timestep) : state.timestep) - 1)
+            : Math.min(state.steps.length - 1, (state.timestep % 1 !== 0 ? Math.floor(state.timestep) : state.timestep) + 1);
+        setSpeedLabels(direction < 0 ? '-1' : '', direction < 0 ? '' : '+1');
+        showFrame(frameAt(state.timestep));
+        syncTimeline(state.timestep);
         return;
     }
-    $('#ui-container').html("");
-    uiVars = [];
-    const templateLoads = [];
-    for (let i=0 ; i<nglad ; i++){
-        const uiGlad = $("<div class='ui-glad'></div>");
-        $('#ui-container').append(uiGlad);
-        templateLoads.push(new Promise((resolve) => {
-            uiGlad.load("ui_template.html", function(){
-                $(this).click( function(){
-                    if ($(this).hasClass('follow') || $(this).hasClass('dead')){
-                        game.camera.unfollow();
-                        $('.ui-glad').removeClass('follow');
-                        $('#details').remove();
-                    }
-                    else{
-                        game.camera.follow(sprite[i]);
-                        $('.ui-glad').removeClass('follow');
-                        $(this).addClass('follow');
-                        createDetailedWindow();
-                    }
-                });
-                resolve();
-            });
-        }));
-        uiVars.push({});
-    }
-    await Promise.all(templateLoads);
-    uiVars.showtext = true;
+    stepSpeedIndex = Math.max(0, Math.min(STEP_SPEEDS.length - 1, stepSpeedIndex + direction));
+    state.stepIncrement = STEP_SPEEDS[stepSpeedIndex];
+    showSpeed();
+    startTimer();
 }
 
-async function startBattle(simulation){
-    json = {};
-                
-    $('#loadbar #status').html("Carregando render");
-    await (window.battleRendererReady || Promise.resolve());
-    if (load_phaser()){
-        await create_ui(simulation[0].glads.length);
-        await window.threeBattleRenderer?.prepare?.(simulation[0].glads);
-        $( "#time" ).slider("option", "max", simulation.length);
-        for (i=0 ; i<simulation[0].glads.length ; i++){
-            newindex[i] = i;
+/** Plays or pauses with the classic controls; pausing resets the speed so resume plays at 1x. */
+function togglePauseButton() {
+    const play = document.querySelector('#pause #img-play');
+    const pause = document.querySelector('#pause #img-pause');
+    if (state.pausesim) {
+        state.pausesim = false;
+        state.stepIncrement = resumeIncrement;
+        stepSpeedIndex = resumeIndex;
+        hide(play);
+        show(pause);
+        if (STEP_SPEEDS[stepSpeedIndex] === 1) setSpeedLabels('-1x', '1x');
+        else showSpeed();
+        if (state.timestep % 1 !== 0) {
+            state.timestep = state.stepIncrement > 0 ? Math.floor(state.timestep) + 1 : Math.floor(state.timestep);
         }
-
-        const { expandSimulation } = await import('/script/render2/battle-state.js');
-        steps = expandSimulation(simulation);
-
-        start_timer(steps);
+        startTimer();
+    }
+    else {
+        resumeIncrement = 1;
+        resumeIndex = STEP_SPEEDS.indexOf(1);
+        stepSpeedIndex = resumeIndex;
+        state.pausesim = true;
+        hide(pause);
+        show(play);
+        state.stepIncrement = 1;
+        setSpeedLabels('-1', '+1');
+        clearInterval(timer);
     }
 }
 
-function copyToClipboard(text) {
-    $('body').append("<input type='text' id='icopy' value='"+ text +"'>");
-    $('#icopy').select();
-    document.execCommand("copy");
-    $('#icopy').remove();
-}	
-
-function changeCrowd (value) {
-    for (let i in npc){
-        var r = Math.random();
-        var alive = npc[i].sprite.body.alive;
-        if (r < value && !alive){
-            for (let j in npc[i].sprite)
-                npc[i].sprite[j].revive();
-        }
-        else if (r > value && alive){
-            for (let j in npc[i].sprite)
-                npc[i].sprite[j].kill();
-        }
-    }
+function openHelp() {
+    const fog = createElement(helpTemplate);
+    document.body.append(fog);
+    fog.querySelector('#ok').addEventListener('click', () => fog.remove());
 }
 
-function followedGladIndex(){
-    return window.followedGlad ?? $('.ui-glad').index($('.follow'));
-}
+/** The preferences window: renderer, overlays, volumes, crowd and 3D quality. */
+function openSettings() {
+    const fog = createElement(settingsTemplate);
+    document.body.append(fog);
+    const find = selector => fog.querySelector(selector);
+    const options = prefs();
+    const frames = document.querySelector('#ui-container');
 
-function createDetailedWindow(){
-    var index = followedGladIndex();
-    var glad = json.glads[index];
-
-    $('#details').remove();
-    $('body').append(`<div id='details'>
-        <div id='title' class='span-col-2'>
-            <i class="fas fa-arrows-alt" title='Mover'></i>
-            <span>Detalhes do gladiador</span>
-            <i id='minimize' class="fas fa-window-minimize" title='Minimizar'></i>
-        </div>
-        <div id='content'>
-            <span>Name:</span><input class='col-3 left' value='${glad.name}' readonly>
-            <span>LVL:</span><input readonly>
-            <span>XP:</span><input readonly>
-            <span>X:</span><input readonly>
-            <span>HP:</span><input readonly>
-            <span>Y:</span><input readonly>
-            <span>AP:</span><input readonly>
-            <span>STR:</span><input readonly>
-            <span>Head:</span><div id='head'><input readonly><span>🡅</span></div>
-            <span>AGI:</span><input readonly>
-            <span>Action:</span><input readonly>
-            <span>INT:</span><input readonly>
-            <div id='buffs'>
-                <span>Buffs:</span>
-                <span>Valor</span>
-                <span>Tempo</span>
-                <div id='box'><div></div><div></div><div></div></div>
-            </div>
-            <span>AS:</span><input readonly>
-            <span>CS:</span><input readonly>
-            <span>Speed:</span><input readonly>
-            <span>Locked:</span><input readonly>
-            <div id='items'>
-                <span>Items:</span>
-                <div id='box'></div>
-            </div>
-            <div id='code'>
-                <span>Comandos:</span>
-                <span>Durac.</span>
-                <span>Tempo</span>
-                <div id='box'></div>
-            </div>
-        </div>
-    </div>`);
-
-    var box = "";
-    for (let i in glad.buffs){
-        box += `<span>${i}</span><span>0.0</span><span>0.0</span>`;
-    }
-    $('#details #buffs #box').html(box);
-
-    $('#details').hide().fadeIn().draggable({
-        handle: "#title"
+    const soundTest = window.game.add.audio('lvlup');
+    new Slider(find('#sfx-volume'), {
+        range: 'min', min: 0, max: 1, step: 0.01, value: options.sound.sfx, ariaLabel: 'Volume dos efeitos',
+        onSlide: value => {
+            options.sound.sfx = value;
+            soundTest.stop();
+            soundTest.play('', 0.5, value);
+            changeSoundIcon();
+        },
+    });
+    new Slider(find('#music-volume'), {
+        range: 'min', min: 0, max: 0.1, step: 0.001, value: window.music.volume, ariaLabel: 'Volume da música',
+        onSlide: value => {
+            window.music.volume = value;
+            changeSoundIcon();
+        },
+    });
+    new Slider(find('#n-crowd'), {
+        range: 'min', min: 0, max: 1, step: 0.1, value: options.crowd, ariaLabel: 'Número de espectadores',
+        onSlide: value => {
+            window.changeCrowd(value);
+            options.crowd = value;
+        },
     });
 
-    $('#details #minimize').click( function(){
-        $('#details').animate({
-            "top": $(window).height() - 33,
-            "left": $(window).width() - 350
+    const toggles = { bars: 'bars', fps: 'fps', text: 'text', speech: 'speech' };
+    Object.entries(toggles).forEach(([id, field]) => {
+        const input = find(`#pref-${id} input`);
+        input.checked = Boolean(options[field]);
+        input.addEventListener('change', () => {
+            options[field] = input.checked;
         });
-
+    });
+    const framesInput = find('#pref-frames input');
+    framesInput.checked = getComputedStyle(frames).display === 'flex';
+    framesInput.addEventListener('change', () => {
+        options.frames = framesInput.checked;
+        if (framesInput.checked) fadeIn(frames, undefined, 'flex');
+        else fadeOut(frames);
     });
 
-    if (Object.keys(potionList).length == 0){
-        potionList.ready = $.post("back_slots.php", {
-            action: "ITEMS"
-        }).then( data => {
-            let potions = JSON.parse(data).potions
-            // console.log(potions)
-            for (i in potions){
-                let p = potions[i]
-                potionList[p.id] = i
-            }
-            // console.log(potionList)
-        })
-    }
+    const preference = window.BattleRendererPreference;
+    if (preference.ENABLED === false) find('#renderer-choice').remove();
+    else find(`#renderer-choice input[value='${preference.get()}']`).checked = true;
+    // graphics quality only applies to the 3D renderer, and only once it is running
+    if (window.Render2Quality) find('#render-quality').value = window.Render2Quality.get();
+    else find('#quality-container').remove();
+    decorateCheckSliders(fog);
 
+    find('#ok').addEventListener('click', async () => {
+        const selectedRenderer = find('#renderer-choice input:checked')?.value ?? preference.CLASSIC;
+        let reload = selectedRenderer !== preference.get();
+        preference.set(selectedRenderer);
+        // a new graphics quality takes a reload (anti-aliasing and the floor bake are set when the arena starts)
+        const quality = find('#render-quality')?.value;
+        if (window.Render2Quality && quality && quality !== window.Render2Quality.get()) {
+            window.Render2Quality.set(quality);
+            reload = true;
+        }
+
+        await PlaybackModel.savePreferences({
+            show_bars: options.bars,
+            show_frames: framesInput.checked,
+            show_fps: options.fps,
+            show_text: options.text,
+            show_speech: options.speech,
+            sfx_volume: options.sound.sfx,
+            music_volume: window.music.volume,
+            crowd: options.crowd,
+        }).catch(() => {});
+        if (reload) {
+            const url = new URL(location.href);
+            url.searchParams.delete('renderer');
+            location.assign(url);
+            return;
+        }
+        fog.remove();
+    });
 }
 
-async function updateDetailedWindow(){
-    var index = followedGladIndex();
-    var glad = json.glads[index];
+// ----- gladiator frames and details (classic renderer) ------------------------------
 
-    var info = [
+/**
+ * Creates the gladiators' frames of the classic renderer (the 3D one draws
+ * its HUD on canvas and reports the followed gladiator through `followedGlad`).
+ *
+ * @param {number} count Gladiators.
+ */
+async function createUi(count) {
+    if (document.documentElement.classList.contains('renderer-three')) {
+        state.uiVars = Array.from({ length: count }, () => ({}));
+        state.uiVars.showtext = true;
+        return;
+    }
+
+    const container = document.querySelector('#ui-container');
+    container.replaceChildren();
+    const response = await fetch('ui_template.html');
+    const template = await response.text();
+    state.uiVars = [];
+    for (let index = 0; index < count; index++) {
+        const frame = document.createElement('div');
+        frame.className = 'ui-glad';
+        frame.innerHTML = template;
+        frame.addEventListener('click', () => {
+            const frames = document.querySelectorAll('.ui-glad');
+            if (frame.classList.contains('follow') || frame.classList.contains('dead')) {
+                window.game.camera.unfollow();
+                frames.forEach(other => other.classList.remove('follow'));
+                document.querySelector('#details')?.remove();
+            }
+            else {
+                window.game.camera.follow(window.sprite[index]);
+                frames.forEach(other => other.classList.remove('follow'));
+                frame.classList.add('follow');
+                createDetailedWindow();
+            }
+        });
+        container.append(frame);
+        state.uiVars.push({});
+    }
+    state.uiVars.showtext = true;
+}
+
+/**
+ * Lets a window be dragged by its title.
+ *
+ * @param {HTMLElement} element Window.
+ * @param {HTMLElement} handle Title bar.
+ */
+function makeDraggable(element, handle) {
+    handle.style.touchAction = 'none';
+    handle.addEventListener('pointerdown', event => {
+        const start = { x: event.clientX - element.offsetLeft, y: event.clientY - element.offsetTop };
+        handle.setPointerCapture(event.pointerId);
+        const move = moveEvent => {
+            element.style.left = `${moveEvent.clientX - start.x}px`;
+            element.style.top = `${moveEvent.clientY - start.y}px`;
+        };
+        const stop = () => {
+            handle.removeEventListener('pointermove', move);
+            handle.removeEventListener('pointerup', stop);
+        };
+        handle.addEventListener('pointermove', move);
+        handle.addEventListener('pointerup', stop);
+    });
+}
+
+/** Opens the details window of the followed gladiator (classic renderer). */
+function createDetailedWindow() {
+    const glad = window.json.glads[followedGladIndex()];
+    document.querySelector('#details')?.remove();
+    const buffs = Object.keys(glad.buffs).map(name => renderTemplate(buffRowTemplate, { name })).join('');
+    const details = createElement(renderTemplate(detailsTemplate, { name: glad.name, buffs }));
+    document.body.append(details);
+    fadeIn(details);
+    makeDraggable(details, details.querySelector('#title'));
+    details.querySelector('#minimize').addEventListener('click', () => {
+        details.style.transition = 'top 0.4s, left 0.4s';
+        details.style.top = `${window.innerHeight - 33}px`;
+        details.style.left = `${window.innerWidth - 350}px`;
+        setTimeout(() => {
+            details.style.transition = '';
+        }, 400);
+    });
+
+    potionNames ??= SlotsModel.items().then(({ potions }) => Object.fromEntries(
+        Object.entries(potions).map(([identifier, potion]) => [potion.id, identifier]),
+    ));
+}
+
+/** Refreshes the details window of the followed gladiator (called by render.js). */
+async function updateDetailedWindow() {
+    const details = document.querySelector('#details');
+    const glad = window.json?.glads?.[followedGladIndex()];
+    if (!details || !glad) return;
+
+    const values = [
         glad.name,
         glad.lvl,
         `${glad.xp} / ${glad.tonext}`,
@@ -1083,84 +626,323 @@ async function updateDetailedWindow(){
         glad.as.toFixed(1),
         glad.cs.toFixed(1),
         glad.spd.toFixed(1),
-        glad.lockedfor.toFixed(1)
+        glad.lockedfor.toFixed(1),
     ];
+    details.querySelectorAll('input').forEach((input, index) => {
+        input.value = values[index];
+    });
+    details.querySelector('#head span').style.transform = `rotate(${glad.head.toFixed(0)}deg)`;
 
-    $('#details input').each( function(i){
-        $(this).val(info[i]);
+    const cells = details.querySelectorAll('#buffs #box span');
+    Object.values(glad.buffs).forEach((buff, row) => {
+        const active = parseFloat(buff.timeleft) > 0;
+        for (let column = 0; column < 3; column++) cells[row * 3 + column]?.classList.toggle('active', active);
+        if (cells[row * 3 + 1]) cells[row * 3 + 1].textContent = buff.value.toFixed(1);
+        if (cells[row * 3 + 2]) cells[row * 3 + 2].textContent = buff.timeleft.toFixed(1);
     });
 
-    $('#details #head span').css({"transform": `rotate(${glad.head.toFixed(0)}deg)`});
-
-    var c = 0;
-    for (let i in glad.buffs){
-        if (parseFloat(glad.buffs[i].timeleft) > 0 && !$('#details #buffs #box span').eq(c*3).hasClass('active')){
-            for (let j=0 ; j<3 ; j++)
-                $('#details #buffs #box span').eq(j + c*3).addClass('active');
+    if (glad.code) {
+        const box = details.querySelector('#code #box');
+        const rows = box.querySelectorAll('.row');
+        const last = rows[rows.length - 1];
+        if (glad.code !== last?.querySelector('.name').textContent) {
+            box.insertAdjacentHTML('beforeend', renderTemplate(commandRowTemplate, { code: glad.code, time: window.json.simtime.toFixed(1) }));
+            if (box.querySelectorAll('.row').length > 5) box.querySelector('.row').remove();
         }
-        else if (parseFloat(glad.buffs[i].timeleft) == 0 && $('#details #buffs #box span').eq(c*3).hasClass('active')){
-            for (let j=0 ; j<3 ; j++)
-                $('#details #buffs #box span').eq(j + c*3).removeClass('active');
-        }
-
-        $('#details #buffs #box span').eq(1 + c*3).html(glad.buffs[i].value.toFixed(1));
-        $('#details #buffs #box span').eq(2 + c*3).html(glad.buffs[i].timeleft.toFixed(1));
-
-        c++;
-    }
-
-    if (glad.code){
-        if (glad.code != $('#details #code #box .name').last().text()){
-            $('#details #code #box').append(`<div class='row'>
-                <div class='name'>${glad.code}</div>
-                <div class='duration'>0.1</div>
-                <div class='time'>${json.simtime.toFixed(1)}</div>
-            </div>`)
-
-            if ($('#details #code #box .row').length > 5){
-                $('#details #code #box .row').first().remove()
-            }
-        }
-        else{
-            let time = parseFloat($('#details #code #box .row').last().find('.duration').text())
-            $('#details #code #box .row').last().find('.duration').text((time + 0.1).toFixed(1))
+        else {
+            const duration = last.querySelector('.duration');
+            duration.textContent = (parseFloat(duration.textContent) + 0.1).toFixed(1);
         }
     }
 
-    let allPotions = '😎'
-    await potionList.ready
-    for (let i in glad.items){
-        let item = $('#details #items #box .row').eq(i).find('span')
-        
-        if (item.length){
-            let text = item.text()
-            if (text == '-' || glad.items[i] == 0){
-                item.addClass('used')
-            }
-            else {
-                item.removeClass('used')
-            }
+    const names = await potionNames;
+    const items = details.querySelector('#items #box');
+    glad.items?.forEach((item, index) => {
+        const existing = items.querySelectorAll('.row span')[index];
+        if (existing) {
+            existing.classList.toggle('used', existing.textContent === '-' || item == 0);
+            return;
         }
-        else{
-            let potion
-            if (glad.items[i] > 0){
-                potion = potionList[glad.items[i]]
-            }
-            else if (glad.items[i] == 0){
-                potion = '-'
-            }
-            else if (glad.items[i] == -1){
-                potion = allPotions
-            }
-            $('#details #items #box').append(`<div class='row'><span>${potion}</span></div>`)
-        }
-    }
+        let potion = '-';
+        if (item > 0) potion = names?.[item] ?? item;
+        else if (item == -1) potion = '😎';
+        items.insertAdjacentHTML('beforeend', renderTemplate(itemRowTemplate, { potion }));
+    });
 }
 
-function getActionName(action){
-    for (let item of actionlist){
-        if (item.value == action)
-            return item.name;
-    }
-    return false;
+// ----- loading -------------------------------------------------------------------
+
+/**
+ * Shows loading progress.
+ *
+ * @param {string} status Status line.
+ * @param {number} second Progress of the current task, in %.
+ * @param {number} main Overall progress, in %.
+ */
+function setLoading(status, second, main) {
+    document.querySelector('#loadbar #status').textContent = status;
+    document.querySelector('#loadbar #second .bar').style.width = `${second}%`;
+    document.querySelector('#loadbar #main .bar').style.width = `${main}%`;
 }
+
+/**
+ * Replaces the loading bars with a message.
+ *
+ * @param {string} message Why the battle cannot be shown.
+ */
+function showLoadError(message) {
+    document.querySelector('#loadbar').innerHTML = renderTemplate(loadErrorTemplate, { message });
+    clearInterval(timer);
+}
+
+/**
+ * Starts the renderer and the replay once the gladiators' sheets are ready.
+ *
+ * @param {object[]} simulation Incremental simlog steps.
+ */
+async function startBattle(simulation) {
+    window.json = {};
+    document.querySelector('#loadbar #status').textContent = 'Carregando render';
+    await (window.battleRendererReady || Promise.resolve());
+    if (!window.load_phaser()) return;
+
+    const count = simulation[0].glads.length;
+    await createUi(count);
+    await window.threeBattleRenderer?.prepare?.(simulation[0].glads);
+    if (timeline) timeline.max = simulation.length;
+    state.newindex = Array.from({ length: count }, (_, index) => index);
+    state.steps = expandSimulation(simulation);
+    startTimer();
+}
+
+/** Downloads the battle log and builds every gladiator's spritesheet. */
+async function loadBattle() {
+    let data;
+    try {
+        data = await BattleLogModel.get(loghash, {
+            onProgress: ratio => setLoading('Fazendo download do log de batalha', Math.round(ratio * 100), (ratio * 100) / 4),
+        });
+    }
+    catch {
+        showLoadError('Esta batalha não consta nos registros');
+        return;
+    }
+    if (data.status === 'EXPIRED') {
+        showLoadError('Esta batalha é muito antiga e não está mais acessível');
+        return;
+    }
+    if (data.status !== 'SUCCESS') {
+        if (tournHash) location.href = `tourn/${tournHash}`;
+        else showLoadError('Esta batalha não consta nos registros');
+        return;
+    }
+
+    const log = JSON.parse(data.log);
+    const { glads } = log[0];
+    window.stab = [];
+    window.gender = [];
+    glads.forEach((glad, index) => {
+        window.stab[index] = '0';
+        window.gender[index] = 'male';
+        let skin = [];
+        try {
+            skin = JSON.parse(glad.skin);
+        }
+        catch {
+            skin = [];
+        }
+        skin.forEach(id => {
+            const item = getImage(id);
+            if (item?.move === 'thrust') window.stab[index] = '1';
+            if (item?.id === 'female') window.gender[index] = 'female';
+        });
+    });
+
+    let built = 0;
+    state.hashes = await Promise.all(glads.map(async glad => {
+        const sheet = await fetchSpritesheet(glad.skin);
+        built++;
+        const percent = Math.round((100 * built) / glads.length);
+        setLoading('Montando gladiadores', percent, 25 + percent / 4);
+        return sheet;
+    }));
+    setTimeout(() => startBattle(log), 100);
+}
+
+/** Applies the viewer's saved preferences. */
+async function loadPreferences() {
+    const data = await PlaybackModel.preferences();
+    const flag = value => value === true || value === 'true';
+    const options = prefs();
+    options.bars = flag(data.show_bars);
+    options.fps = flag(data.show_fps);
+    options.text = flag(data.show_text);
+    options.speech = flag(data.show_speech);
+    options.crowd = parseFloat(data.crowd);
+    options.sound.music = parseFloat(data.music_volume);
+    options.sound.sfx = parseFloat(data.sfx_volume);
+    rememberedMusic = options.sound.music;
+    rememberedSfx = options.sound.sfx;
+    changeSoundIcon();
+
+    const frames = document.querySelector('#ui-container');
+    options.frames = flag(data.show_frames);
+    if (options.frames) fadeIn(frames, undefined, 'flex');
+    else fadeOut(frames);
+}
+
+// ----- page API ---------------------------------------------------------------------
+
+/**
+ * Replay control for the 3D renderer's canvas controls (the classic renderer
+ * keeps its DOM buttons). Speeds are simlog steps per 0.1 s; stepping always pauses first.
+ */
+const Playback = {
+    get threeD() { return window.battleRendererVersion === window.BattleRendererPreference?.THREE && Boolean(window.threeBattleRenderer); },
+    get paused() { return state.pausesim; },
+    get speed() { return PLAYBACK_SPEEDS[playbackSpeedIndex]; },
+    get speeds() { return PLAYBACK_SPEEDS; },
+    get speedIndex() { return playbackSpeedIndex; },
+    get position() { return state.timestep; },
+    get length() { return state.steps.length; },
+    get tournament() { return tournHash || null; },
+    get link() { return `gladcode.dev/play/${loghash}`; },
+    setPaused(paused) {
+        if (paused === state.pausesim) return;
+        clearInterval(timer);
+        state.pausesim = paused;
+        if (!paused) {
+            state.stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
+            if (state.timestep % 1 !== 0) state.timestep = Math.floor(state.timestep) + 1;
+            startTimer();
+        }
+    },
+    togglePause() { this.setPaused(!state.pausesim); },
+    step(direction) {
+        this.setPaused(true);
+        state.timestep = direction < 0
+            ? Math.max(0, Math.ceil(state.timestep) - 1)
+            : Math.min(state.steps.length - 1, Math.floor(state.timestep) + 1);
+        showFrame(frameAt(state.timestep));
+    },
+    setSpeed(index) {
+        playbackSpeedIndex = Math.max(0, Math.min(PLAYBACK_SPEEDS.length - 1, index));
+        state.stepIncrement = PLAYBACK_SPEEDS[playbackSpeedIndex];
+        if (!state.pausesim) startTimer();
+    },
+    faster() { this.setSpeed(playbackSpeedIndex + 1); },
+    slower() { this.setSpeed(playbackSpeedIndex - 1); },
+    seek(position) {
+        state.timestep = Math.max(0, Math.min(state.steps.length - 1, position));
+        showFrame(frameAt(state.timestep));
+    },
+    toggleSound() { toggleSound(); },
+    get soundState() {
+        if (window.music && window.music.volume > 0) return 'music';
+        return prefs().sound.sfx > 0 ? 'sfx' : 'mute';
+    },
+    savePrefs(fields) { PlaybackModel.savePreferences(fields); },
+    openSettings() { openSettings(); },
+    get fullscreen() { return isFullScreen(); },
+    toggleFullscreen() { setFullScreen(!isFullScreen()); },
+    /** Moves the classic timeline to the replay position (render.js calls it every step). */
+    syncTimeline,
+};
+
+/** Publishes the replay state and functions the renderers use as page globals. */
+function exposeLegacyGlobals() {
+    Object.keys(state).forEach(name => {
+        Object.defineProperty(window, name, {
+            configurable: true,
+            get: () => state[name],
+            set: value => {
+                state[name] = value;
+            },
+        });
+    });
+    Object.assign(window, {
+        Playback,
+        resize,
+        changeCrowd,
+        changeSoundIcon,
+        getActionName,
+        updateDetailedWindow,
+        getSpriteThumb,
+        images,
+    });
+}
+
+/** Binds the classic controls, the timeline and the pause-on-leave behaviour. */
+function bindControls() {
+    document.querySelector('#back-step').addEventListener('click', () => stepButton(-1));
+    document.querySelector('#fowd-step').addEventListener('click', () => stepButton(1));
+    document.querySelector('#pause').addEventListener('click', togglePauseButton);
+    document.querySelector('#fullscreen').addEventListener('click', () => setFullScreen(!isFullScreen()));
+    document.querySelector('#help').addEventListener('click', openHelp);
+    document.querySelector('#settings').addEventListener('click', openSettings);
+    document.querySelector('#sound').addEventListener('click', toggleSound);
+
+    const time = document.querySelector('#time');
+    let wasPlaying = false;
+    timeline = new Slider(time, {
+        range: 'min',
+        min: 0,
+        max: 0,
+        // fractions of a simlog step so playback can stop between two steps
+        step: 0.1,
+        value: state.timestep,
+        ariaLabel: 'Momento da batalha',
+        // scrub with playback held, then continue from the new position at 1x speed
+        onStart: () => {
+            wasPlaying = !state.pausesim;
+            if (wasPlaying) togglePauseButton();
+        },
+        onSlide: value => {
+            state.timestep = value;
+            syncTimeline(value);
+            showFrame(frameAt(value));
+        },
+        onChange: () => {
+            if (wasPlaying && state.pausesim) togglePauseButton();
+        },
+    });
+    time.insertAdjacentHTML('beforeend', "<div class='ui-slider-time'></div>");
+
+    // leaving the window (another tab or application) pauses; clicks inside the page never do
+    const pauseOnLeave = () => {
+        if (state.pausesim) return;
+        if (Playback.threeD) Playback.setPaused(true);
+        else togglePauseButton();
+    };
+    window.addEventListener('blur', pauseOnLeave);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) pauseOnLeave();
+    });
+    window.addEventListener('resize', resize);
+}
+
+/** Reads the log and tournament the page was opened with, then loads the battle. */
+function start() {
+    exposeLegacyGlobals();
+    document.querySelector('#loadbar #status').textContent = 'Página carregada';
+    document.querySelector('#footer-wrapper')?.classList.add('white');
+    bindControls();
+
+    const tourn = document.querySelector('#tourn');
+    tournHash = tourn?.textContent || null;
+    tourn?.remove();
+    const log = document.querySelector('#log');
+    const hash = log?.textContent ?? '';
+    log?.remove();
+
+    if (!hash) return;
+    if (hash.length > MAX_HASH) {
+        showMessage('Erro na URL');
+        return;
+    }
+    loghash = hash;
+    loadBattle();
+    loadPreferences().catch(() => {});
+}
+
+start();

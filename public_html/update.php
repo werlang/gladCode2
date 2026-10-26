@@ -23,15 +23,10 @@
 	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
 	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
-	<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-	<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+	<?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+	<script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+	<script type="module" src="<?= moduleSrc("update.js") ?>"></script>
 	
-	<script type="text/javascript" src="script/update.js"></script>
-	<script type="text/javascript" src="script/googlelogin.js"></script>
-	<script type="text/javascript" src="script/dialog.js"></script>
-	<script type="text/javascript" src="script/socket.js"></script>
-	<script type="text/javascript" src="script/header.js"></script>
-	<script type="text/javascript" src="script/socket.js"></script>
 </head>
 <body>
 	<?php include("header.php"); ?>

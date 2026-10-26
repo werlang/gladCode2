@@ -36,8 +36,6 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
 
     <!-- <script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
-    <script src='script/fallback/jquery-3.4.1.min.js'></script>
-    <script src='script/fallback/jquery-ui.min.js'></script>
     <script src="script/fallback/cloudinary.js"></script>
     <script src="script/fallback/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="script/fallback/ace-ext-language_tools.js" type="text/javascript" charset="utf-8"></script>

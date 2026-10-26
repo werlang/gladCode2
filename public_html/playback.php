@@ -26,20 +26,16 @@
     <script>window.__RENDER2_ENABLED__ = <?= $render2Enabled ? 'true' : 'false' ?>;</script>
     <script src="script/battle-renderer-preference.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Acme|Cinzel:700,900|Source+Code+Pro&display=swap" rel="stylesheet">
-    <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
+    <link rel='stylesheet' href="css/ui-slider.css"/>
     <link rel='stylesheet' href="css/playback.css?v=<?= filemtime(__DIR__ . "/css/playback.css") ?>"/>
 <?php if ($render2Enabled): ?>
     <link rel='stylesheet' href="css/playback-render2.css?v=<?= filemtime(__DIR__ . "/css/playback-render2.css") ?>"/>
 <?php endif; ?>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    
-
     <script src="script/phaser.js"></script>
     <script src="script/floatingText.js"></script>
     <script src="script/render.js?v=<?= filemtime(__DIR__ . "/script/render.js") ?>"></script>
@@ -58,15 +54,12 @@
     }
     $render2Version = filemtime(__DIR__ . "/script/render2.js");
 ?>
-    <script type="importmap"><?= json_encode(["imports" => $render2Imports], JSON_UNESCAPED_SLASHES) ?></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap($render2Imports); ?>
     <script type="module" src="script/render2.js?v=<?= $render2Version ?>"></script>
+<?php else: ?>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
 <?php endif; ?>
-    <script src="script/assets.js"></script>
-    <script src="script/dialog.js"></script>
-    <script type="module" src="script/legacy.js"></script>
-    <script src="script/dropzone.js"></script>
-    <script src="script/checkboxes.js"></script>
-    <script src="script/playback.js?v=<?= filemtime(__DIR__ . "/script/playback.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("playback.js") ?>"></script>
     
     
     </head>
@@ -98,8 +91,8 @@
             </div>
         </div>
     </div>
-    <div id='log' hidden><?php echo $loghash; ?></div>
-    <div id='tourn' hidden><?php echo $tnm; ?></div>
+    <div id='log' hidden><?php echo htmlspecialchars($loghash ?? ""); ?></div>
+    <div id='tourn' hidden><?php echo htmlspecialchars($tnm); ?></div>
     <div id='frame'>
         <div id='canvas-container'>
             <div id='ui-container'></div>
