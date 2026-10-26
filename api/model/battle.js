@@ -1,3 +1,4 @@
+import { battleError, engineText } from '../helpers/battle-results.js';
 import { detectLanguage, hasValidSetup, insertBreakpoints, prepareEditorSource, setupBlock } from '../helpers/gladiator-code.js';
 import { Mysql } from '../helpers/mysql.js';
 import { runBattle } from '../helpers/runner.js';
@@ -5,49 +6,6 @@ import { BattleLog } from './battle-log.js';
 
 /** Hashes of `skins` rows are md5, 32 characters; anything else is the skin JSON itself. */
 const SKIN_HASH_LENGTH = 32;
-
-/**
- * Whether a run's error output fails it. Battles that count (not sandboxed) are judged by the
- * engine log alone: a gladiator that crashes mid-battle is killed by the engine, and stderr (which
- * every gladiator can write to) must not discard a valid log. Editor runs keep any error so the
- * player sees it and cannot save broken code.
- *
- * @param {boolean} counts The battle is not a sandboxed editor run.
- * @param {unknown[]|null} simulation Parsed engine log.
- * @param {string} error Engine error output.
- * @returns {string} The error to report, `''` when the battle stands.
- */
-export function battleError(counts, simulation, error) {
-    return counts && simulation?.length ? '' : error;
-}
-
-/**
- * Log indexes of the gladiators the engine flagged as crashed (client died while alive). Indexes
- * beyond the battle size are ignored, as defense in depth against entries injected into the log.
- *
- * @param {Array<{ glads: Array<Record<string, unknown>> }>} simulation
- * @returns {number[]}
- */
-export function crashedGladiators(simulation) {
-    const size = simulation[0]?.glads?.length ?? 0;
-    const crashed = new Set();
-    for (const step of simulation) {
-        step.glads?.forEach((glad, index) => {
-            if (index < size && glad?.crashed) crashed.add(index);
-        });
-    }
-    return [...crashed];
-}
-
-/**
- * The engine stores spaces in names as `#`.
- *
- * @param {string} text
- * @returns {string}
- */
-export function engineText(text) {
-    return String(text ?? '').replace(/#/g, ' ');
-}
 
 /**
  * One battle being set up and run: gladiators sent as source by the editor and saved gladiators,
@@ -59,6 +17,8 @@ export class Battle {
     /** Skin of each `name@nick` in the battle (JSON text, or a `skins` hash to look up). */
     #skins = new Map();
     #breakpoints = [];
+    /** Saved gladiators in the battle by `name@nick`: their key and master. */
+    #saved = new Map();
 
     /**
      * @param {{ origin: string, sandbox?: boolean, noitems?: boolean }} options `sandbox` for editor
@@ -117,6 +77,7 @@ export class Battle {
         for (const row of rows) {
             const slots = this.noitems ? '0,0,0,0' : await Battle.#slots(row.master, context);
             this.#skins.set(`${row.name}@${row.apelido}`, row.skin);
+            this.#saved.set(`${row.name}@${row.apelido}`, { id: row.cod, master: row.master });
             const setup = setupBlock(detectLanguage(row.code), {
                 name: row.name, nick: row.apelido, vstr: row.vstr, vagi: row.vagi, vint: row.vint, slots,
             });
@@ -146,6 +107,17 @@ export class Battle {
     setBreakpoints(lines) {
         this.#breakpoints = lines;
         return this;
+    }
+
+    /**
+     * The saved gladiator a log entry is.
+     *
+     * @param {string} name Name as the log has it (spaces as `#` are fine).
+     * @param {string} nick Master nick as the log has it.
+     * @returns {{ id: number, master: number }|undefined}
+     */
+    savedGladiator(name, nick) {
+        return this.#saved.get(`${engineText(name)}@${engineText(nick)}`);
     }
 
     /** @returns {number} Gladiators in the battle. */

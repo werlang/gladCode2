@@ -37,46 +37,56 @@ export class ReportModel {
 }
 
 /**
- * Duels between friends (`back_duel.php`).
+ * Duels between friends (`/duels`).
  */
 export class DuelModel {
-    /**
-     * Duel challenges waiting for the user's answer.
-     *
-     * @returns {Promise<{ status: string, duels?: object[] }>}
-     */
-    static challenges() {
-        return api.post('back_duel.php', { action: 'GET' });
+    /** @returns {Promise<object[]>} Challenges waiting for the signed-in master's answer. */
+    static async challenges() {
+        const { duels } = await api.get('duels');
+        return duels;
     }
 
     /**
-     * Challenges a friend with a gladiator.
+     * Challenges a friend with a gladiator; the friend is emailed unless they opted out.
      *
      * @param {{ glad: number, friend: number }} challenge
-     * @returns {Promise<{ status: 'OK'|'EXISTS'|string }>}
+     * @returns {Promise<unknown>}
+     * @throws {import('../helpers/request.js').RequestError} `DUEL_EXISTS`, `NOT_FRIENDS`.
      */
     static challenge({ glad, friend }) {
-        return api.post('back_duel.php', { action: 'CHALLENGE', glad, friend });
+        return api.post('duels', { friend, gladiator: glad });
     }
 
     /**
-     * Refuses or cancels a challenge.
+     * Refuses or withdraws a challenge.
      *
      * @param {number} id Duel id.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static remove(id) {
-        return api.post('back_duel.php', { action: 'DELETE', id });
+        return api.delete(`duels/${id}`);
     }
 
     /**
-     * A page of the user's duels.
+     * Answers a challenge with a gladiator; the battle runs on the server.
+     *
+     * @param {number} id Duel id.
+     * @param {number} gladiator The master's gladiator.
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ hash: string|null, error: string }>}
+     */
+    static fight(id, gladiator, { signal } = {}) {
+        return api.post(`duels/${id}/battle`, { gladiator }, { signal });
+    }
+
+    /**
+     * A page of the master's duels (`{ id, time, log, read, glad, enemy, user }` each).
      *
      * @param {{ offset: number }} query
-     * @returns {Promise<{ status: string, total: number, duels: object[] }>}
+     * @returns {Promise<{ total: number, duels: object[] }>}
      */
     static reports({ offset }) {
-        return api.post('back_duel.php', { action: 'REPORT', offset });
+        return api.get('duels/history', { offset });
     }
 }
 
@@ -201,25 +211,12 @@ export class NotificationModel {
     static counts() {
         return api.get('notifications');
     }
-
-    /**
-     * @param {string} hash Battle log hash.
-     * @returns {Promise<{ lvl: number, xp: number, silver: number, glad: object }>}
-     */
-    static summary(hash) {
-        return api.post('back_notification.php', { action: 'SUMMARY', hash });
-    }
 }
 
 /**
- * Email notices the browser still asks for (duels and tournaments, until their endpoints send them).
+ * Email notices the browser still asks for (tournaments, until their endpoints send them).
  */
 export class MailModel {
-    /** @param {number} friend Challenged user id. */
-    static duel(friend) {
-        return api.post('back_sendmail.php', { action: 'DUEL', friend });
-    }
-
     /** @param {string} hash Tournament hash whose new round started. */
     static tournament(hash) {
         return api.post('back_sendmail.php', { action: 'TOURNAMENT', hash });
@@ -227,16 +224,29 @@ export class MailModel {
 }
 
 /**
- * Ranked matchmaking (`back_match.php`).
+ * Ranked battles (`/battles/ranked`): matchmaking, then the battle with its rewards.
  */
-export class MatchModel {
+export class RankedModel {
     /**
-     * Picks the opponents of a ranked battle.
+     * Finds four opponents for one of the master's gladiators.
      *
-     * @param {number} id The user's gladiator.
-     * @returns {Promise<object[]>} The opponents.
+     * @param {number} gladiator
+     * @returns {Promise<{ opponents: Array<{ name: string, master: string, skin: string, vstr: number, vagi: number, vint: number, mmr: number }>, match: string }>}
+     *   `match` is the short-lived token {@link RankedModel.fight} needs.
+     * @throws {import('../helpers/request.js').RequestError} `GLADIATOR_OUTDATED`.
      */
-    static find(id) {
-        return api.post('back_match.php', { action: 'MATCH', id });
+    static match(gladiator) {
+        return api.post('battles/ranked/match', { gladiator });
+    }
+
+    /**
+     * Fights a match.
+     *
+     * @param {string} match
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ hash: string|null, error: string, summary?: { level: number, xp: number, silver: number, gladiator: object } }>}
+     */
+    static fight(match, { signal } = {}) {
+        return api.post('battles/ranked', { match }, { signal });
     }
 }

@@ -1,0 +1,49 @@
+import { describe, expect, test } from 'vitest';
+import { calcReward, deathOrder, masterRewards, xpToNextLevel } from '../../../helpers/battle-results.js';
+
+const glads = pairs => pairs.map(([mmr, time]) => ({ mmr, time }));
+
+describe('battle results', () => {
+    test('renown rewards match the PHP results on the same battles', () => {
+        // golden values computed by battle_results.php calcReward()
+        const cases = [
+            [[[1200, 120], [1100, 90], [1300, 70], [1050, 50], [1150, 30]], [9.666666666666666, 3.0129870129870127, -0.8004926108374383, -3.879310344827586, -7.789408866995074]],
+            [[[900, 200], [1500, 200], [700, 10], [300, 5]], [9.444444444444445, 5.666666666666667, -5.67533059735522, -1.0752393980848156]],
+            [[[0, 100], [0, 80], [0, 60], [0, 40], [0, 20]], [10, 2.8571428571428568, 0, 0, 0]],
+            [[[2000, 50.5], [400, 48.1]], [6, -1.3333333333333333]],
+        ];
+        for (const [battle, expected] of cases) {
+            calcReward(glads(battle)).forEach((reward, index) => expect(reward).toBeCloseTo(expected[index], 10));
+        }
+    });
+
+    test('a complete tie moves no renown', () => {
+        expect(calcReward(glads([[0, 0], [0, 0], [0, 0]]))).toEqual([0, 0, 0]);
+    });
+
+    test('survivors place first, then the latest to die', () => {
+        const order = deathOrder([
+            { simtime: 0, glads: [{ name: 'A', user: 'u#1', hp: 10 }, { name: 'B', user: 'u2', hp: 10 }, { name: 'C', user: 'u3', hp: 10 }] },
+            { simtime: 5, glads: [{ hp: 0 }, {}, { hp: 4 }] },
+            { simtime: 9, glads: [{}, { hp: 0 }, {}] },
+        ]);
+        expect(order.map(glad => [glad.name, glad.user, glad.time])).toEqual([['C', 'u3', 5], ['B', 'u2', 9], ['A', 'u 1', 5]]);
+    });
+
+    test('masters earn silver and experience, more for a win and less after twenty battles', () => {
+        const base = { mmr: 2215.87, level: 59, xp: 0, battlesToday: 0, gladiators: 5 };
+        const win = masterRewards({ ...base, won: true });
+        expect(win.silver).toBeCloseTo(373.1996, 4);
+        expect(win.xp).toBe(250);
+        expect(masterRewards({ ...base, won: true, battlesToday: 20 }).silver).toBeCloseTo(37.31996, 4);
+        expect(masterRewards({ ...base, won: false }).silver).toBeCloseTo(45.53327, 4);
+        expect(masterRewards({ ...base, mmr: 0, won: false }).silver).toBe(0);
+    });
+
+    test('a level is gained once the experience reaches the next level, never past 60', () => {
+        const toNext = xpToNextLevel(1, 5);
+        expect(toNext).toBeCloseTo(2.9 * 130, 6);
+        expect(masterRewards({ mmr: 1000, level: 1, xp: toNext - 50, won: true, battlesToday: 0, gladiators: 5 })).toMatchObject({ level: 2, xp: 200 });
+        expect(masterRewards({ mmr: 1000, level: 60, xp: 500, won: true, battlesToday: 0, gladiators: 5 })).toMatchObject({ level: 60, xp: 0 });
+    });
+});

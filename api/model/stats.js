@@ -1,3 +1,4 @@
+import { battleStats } from '../helpers/battle-stats.js';
 import { Mysql } from '../helpers/mysql.js';
 
 /** Abilities counted per battle (`stats` columns), and how the report names them. */
@@ -115,5 +116,34 @@ export class Stats {
             if (levels.count[kind]) summary.attributes[kind].lvl = levels.sum[kind] / levels.count[kind];
         }
         return summary;
+    }
+
+    /**
+     * Records a ranked battle's statistics (abilities used, what the winner did, levels, duration,
+     * potions) with the battle's average renown.
+     *
+     * @param {unknown[]} simulation The battle log.
+     * @param {number} logId The battle's `logs.id`.
+     * @param {number[]} gladiatorIds The battle's gladiators.
+     * @param {Parameters<typeof Mysql.insert>[2]} [context]
+     */
+    static async record(simulation, logId, gladiatorIds, context = {}) {
+        const stats = battleStats(simulation);
+        const [{ avgmmr }] = await Mysql.select(`SELECT AVG(mmr) AS avgmmr FROM gladiators WHERE cod IN (${gladiatorIds.map(() => '?').join(',')})`, gladiatorIds, context);
+        await Mysql.insert('stats', {
+            time: Mysql.raw('NOW()'),
+            log: logId,
+            ...stats.uses,
+            win: JSON.stringify(stats.win),
+            avglvl: stats.avglvl,
+            winnerlvl: stats.winnerlvl,
+            duration: stats.duration,
+            highSTR: stats.high.STR,
+            highAGI: stats.high.AGI,
+            highINT: stats.high.INT,
+            avgmmr,
+            potionuse: JSON.stringify(stats.potionuse),
+            potionwin: JSON.stringify(stats.potionwin),
+        }, context);
     }
 }

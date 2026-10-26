@@ -7,7 +7,8 @@ vi.mock('../../../model/battle-log.js', () => ({ BattleLog: { create: vi.fn(asyn
 const { runBattle } = await import('../../../helpers/runner.js');
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { BattleLog } = await import('../../../model/battle-log.js');
-const { Battle, battleError, crashedGladiators } = await import('../../../model/battle.js');
+const { Battle } = await import('../../../model/battle.js');
+const { battleError, crashedGladiators } = await import('../../../helpers/battle-results.js');
 
 const SOURCE = name => `setup(){\n    setName("${name}");\n    setSTR(10);\n    setAGI(18);\n    setINT(0);\n    setSkin("[1]");\n}\n\nloop(){}`;
 const LOG = [{ glads: [{ name: 'A', user: 'user0' }, { name: 'B#C', user: 'Ana' }] }, { glads: [{}, { crashed: 1 }] }];

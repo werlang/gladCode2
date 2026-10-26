@@ -3,9 +3,9 @@ import { loadGladCards } from '../components/glad-card.js';
 import { ProgressButton, Simulation } from '../components/simulation.js';
 import { animateValue, fadeIn } from '../helpers/animate.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { api } from '../helpers/request.js';
+import { site } from '../helpers/request.js';
 import { GladiatorModel } from '../models/gladiator.js';
-import { MatchModel, NotificationModel } from '../models/social.js';
+import { RankedModel } from '../models/social.js';
 import { BATTLE_TIPS } from './battle-tips.js';
 import { profile, setSilver, xpToNextLevel } from './session.js';
 import { afterBattleTemplate, mmrRowTemplate, preBattleExtraTemplate, preBattleTemplate } from '../templates/profile.js';
@@ -40,7 +40,7 @@ function showPreBattle(glads, button) {
     loadGladCards(show.querySelector('.glad-card-container'), { glads, master: false }).then(cards => {
         cards.forEach((card, index) => {
             card.querySelector('.info .glad').insertAdjacentHTML('afterend', renderTemplate(preBattleExtraTemplate, {
-                user: glads[index].user,
+                user: glads[index].master,
                 mmr: parseInt(glads[index].mmr, 10),
             }));
         });
@@ -70,30 +70,30 @@ function showPreBattle(glads, button) {
  * counting up, the gladiator's card and links to the replay and the editor.
  *
  * @param {string} hash Battle log hash.
- * @param {{ lvl: number, xp: number, xpTotal: number, silver: number, mmr: number }} before The user and gladiator before the battle.
+ * @param {{ level: number, xp: number, silver: number, gladiator: Record<string, any> }} data The master and gladiator after the battle.
+ * @param {{ lvl: number, xp: number, xpTotal: number, silver: number, mmr: number }} before The master and gladiator before it.
  */
-async function showAfterBattle(hash, before) {
+async function showAfterBattle(hash, data, before) {
     const fog = createElement(afterBattleTemplate);
     document.body.append(fog);
     const box = fog.querySelector('#after-battle');
     const find = selector => box.querySelector(selector);
 
     [['#renown-now .svg', 'icon/crown.svg'], ['#silver-now .svg', 'icon/coin.svg']].forEach(async ([selector, icon]) => {
-        const svg = await api.get(icon);
+        const svg = await site.get(icon);
         if (typeof svg === 'string') find(selector).innerHTML = svg;
     });
     find('#close').addEventListener('click', () => fog.remove());
     find('#watch').addEventListener('click', () => window.open(`play/${hash}`));
 
-    const data = await NotificationModel.summary(hash);
-    find('#lvl .value').textContent = data.lvl;
+    find('#lvl .value').textContent = data.level;
 
     let xpGain = data.xp - before.xp;
-    if (parseInt(before.lvl, 10) !== parseInt(data.lvl, 10)) {
+    if (before.lvl !== data.level) {
         find('#lvl #plusone').classList.remove('hidden');
         xpGain = Math.round(parseFloat(data.xp) + before.xpTotal - before.xp);
     }
-    const xpTotal = xpToNextLevel(data.lvl);
+    const xpTotal = xpToNextLevel(data.level);
     find('#xp-total').textContent = Math.trunc(xpTotal);
 
     animateValue({ from: 0, to: xpGain, duration: COUNT_MS, onStep: value => {
@@ -112,21 +112,21 @@ async function showAfterBattle(hash, before) {
         find('#silver-total').textContent = value.toFixed(0);
     } }).then(() => setSilver(data.silver));
 
-    const mmrGain = parseInt(data.glad.mmr, 10) - parseInt(before.mmr, 10);
+    const mmrGain = Math.trunc(data.gladiator.mmr) - Math.trunc(before.mmr);
     const renown = find('#renown-now .value');
     if (mmrGain > 0) renown.classList.add('green');
     else if (mmrGain < 0) renown.classList.add('red');
     animateValue({ from: 0, to: mmrGain, duration: COUNT_MS, onStep: value => {
         renown.textContent = mmrGain > 0 ? `+${Math.trunc(value)}` : Math.trunc(value);
     } });
-    animateValue({ from: before.mmr, to: data.glad.mmr, duration: COUNT_MS, onStep: value => {
+    animateValue({ from: before.mmr, to: data.gladiator.mmr, duration: COUNT_MS, onStep: value => {
         find('#renown-total').textContent = Math.trunc(value);
     } });
 
-    profile.user.level = data.lvl;
+    profile.user.level = data.level;
     profile.user.xp = data.xp;
-    loadGladCards(find('.glad-card-container'), { glads: [data.glad] });
-    find('#code').addEventListener('click', () => window.open(`glad-${data.glad.id}`));
+    loadGladCards(find('.glad-card-container'), { glads: [data.gladiator] });
+    find('#code').addEventListener('click', () => window.open(`glad-${data.gladiator.id}`));
 }
 
 /**
@@ -190,22 +190,33 @@ export class RankedBattle {
             mmr: glad.mmr,
         };
 
-        const opponents = await MatchModel.find(glad.id);
-        const stopPreBattle = showPreBattle([...(Array.isArray(opponents) ? opponents : []), glad], this.#button);
+        let match;
+        try {
+            match = await RankedModel.match(glad.id);
+        }
+        catch (error) {
+            progress.kill();
+            if (error.code !== 'GLADIATOR_OUTDATED') throw error;
+            const answer = await showDialog('Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
+            if (answer === 'Sim') window.open(`glad-${glad.id}`);
+            return;
+        }
+        const glads = [...match.opponents, glad];
+        const stopPreBattle = showPreBattle(glads, this.#button);
 
         let data;
         try {
-            data = await new Simulation({ ranked: true, origin: 'ranked', terminal: true }).run();
+            data = await new Simulation(signal => RankedModel.fight(match.match, { signal }), { terminal: true, names: glads.map(entry => entry.name) }).run();
         }
         catch {
             data = { error: true };
         }
         stopPreBattle();
         progress.kill();
-        if (data.error) return;
+        if (data.error || !data.hash) return;
 
         document.querySelectorAll('#fog').forEach(fog => fog.remove());
         this.onFought();
-        showAfterBattle(data.simulation, before);
+        showAfterBattle(data.hash, data.summary, before);
     }
 }

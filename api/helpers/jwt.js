@@ -27,16 +27,18 @@ function secretKey() {
 }
 
 /**
- * Signs a session payload (HS256) that expires with the session cookie.
+ * Signs a payload (HS256): a session by default, which expires with the session cookie, or a
+ * short-lived capability such as a ranked match.
  *
  * @param {Record<string, unknown>} payload
+ * @param {{ expiresInSeconds?: number }} [options]
  * @returns {Promise<string>}
  */
-export function signJwt(payload) {
+export function signJwt(payload, { expiresInSeconds = Cookies.ttlDays * 86400 } = {}) {
     return new SignJWT({ ...payload })
         .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
         .setIssuedAt()
-        .setExpirationTime(`${Cookies.ttlDays * 86400}s`)
+        .setExpirationTime(`${expiresInSeconds}s`)
         .sign(secretKey());
 }
 

@@ -232,7 +232,7 @@ export class ReportsTab {
             tail = cancelDuelTemplate;
         }
         return renderTemplate(duelRowTemplate, {
-            unread: row.isread == '0' || (!row.enemy && !row.log) ? 'unread' : '',
+            unread: !row.read || (!row.enemy && !row.log) ? 'unread' : '',
             mine: row.glad || 'Gladiador Esquecido',
             mineClass: row.glad ? '' : 'forgotten',
             enemy,

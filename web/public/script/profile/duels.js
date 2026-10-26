@@ -2,8 +2,8 @@ import { showMessage } from '../components/dialog.js';
 import { loadSelectableCards } from '../components/glad-card.js';
 import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
-import { DuelModel, MailModel } from '../models/social.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { DuelModel } from '../models/social.js';
 import { challengeRowTemplate, duelBoxTemplate } from '../templates/profile.js';
 
 /**
@@ -26,22 +26,25 @@ function openDuelBox(nick, action, onConfirm) {
 }
 
 /**
- * Challenges a friend to a duel and e-mails them.
+ * Challenges a friend to a duel (the API e-mails them).
  *
  * @param {string} nick Friend's nickname.
  * @param {number} friend Friend's user id.
  */
 export function challengeFriend(nick, friend) {
     openDuelBox(nick, 'DESAFIAR', async (glad, confirm, fog) => {
-        const data = await DuelModel.challenge({ glad: glad.id, friend });
+        const name = escapeHtml(nick);
+        try {
+            await DuelModel.challenge({ glad: glad.id, friend });
+        }
+        catch (error) {
+            fog.remove();
+            if (error.code !== 'DUEL_EXISTS') throw error;
+            showMessage(`Já existe um desafio de duelo contra <span class='highlight'>${name}</span> usando o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span>.`);
+            return;
+        }
         fog.remove();
-        if (data.status === 'EXISTS') {
-            showMessage(`Já existe um desafio de duelo contra <span class='highlight'>${nick}</span> usando o gladiador <span class='highlight'>${glad.name}</span>.`);
-        }
-        else if (data.status === 'OK') {
-            showMessage(`Desafio enviado para <span class='highlight'>${nick}</span>. Assim que uma resposta for dada você será notificado.`);
-            MailModel.duel(friend);
-        }
+        showMessage(`Desafio enviado para <span class='highlight'>${name}</span>. Assim que uma resposta for dada você será notificado.`);
     });
 }
 
@@ -65,15 +68,13 @@ export class ChallengeList {
 
     /** Draws the challenges. */
     async refresh() {
-        const data = await DuelModel.challenges();
-        if (data.status !== 'SUCCESS') return;
-
+        const duels = await DuelModel.challenges();
         const table = this.#panel.querySelector('.table');
-        this.#panel.classList.toggle('hidden', data.duels.length === 0);
+        this.#panel.classList.toggle('hidden', duels.length === 0);
         table.replaceChildren();
-        data.duels.forEach(duel => {
+        duels.forEach(duel => {
             const row = createElement(renderTemplate(challengeRowTemplate, {
-                level: duel.lvl,
+                level: duel.level,
                 picture: duel.picture,
                 nick: duel.nick,
                 date: formatMessageTime(duel.time),
@@ -90,8 +91,7 @@ export class ChallengeList {
      * @param {Record<string, any>} duel Challenge.
      */
     async #refuse(row, duel) {
-        const data = await DuelModel.remove(duel.id);
-        if (data.status !== 'OK') return;
+        await DuelModel.remove(duel.id);
         showMessage('Desafio recusado');
         row.remove();
         if (this.count === 0) this.#panel.classList.add('hidden');
@@ -101,7 +101,7 @@ export class ChallengeList {
     #accept(duel) {
         openDuelBox(duel.nick, 'DUELAR', async (glad, confirm, fog) => {
             const progress = new ProgressButton(confirm, ['Executando batalha...', 'Aguardando resposta do servidor']);
-            const log = await runSimulation({ duel: duel.id, glads: glad.id, origin: 'duel' });
+            const log = await runSimulation(signal => DuelModel.fight(duel.id, glad.id, { signal }), [glad.name, duel.nick]);
             progress.kill();
             fog.remove();
             this.onDuelFought();

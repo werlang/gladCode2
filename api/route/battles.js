@@ -5,6 +5,7 @@ import { auth } from '../middleware/auth.js';
 import { asyncRoute } from '../middleware/error.js';
 import { Battle } from '../model/battle.js';
 import { Gladiator } from '../model/gladiator.js';
+import { RankedBattle } from '../model/ranked-battle.js';
 import { SampleGladiator } from '../model/sample-gladiator.js';
 
 const router = Router();
@@ -41,6 +42,24 @@ router.post('/test', auth({ optional: true }), asyncRoute(async (req, res) => {
 
     const { log, error } = await battle.run();
     res.send({ hash: log?.hash ?? null, error });
+}));
+
+/**
+ * POST /battles/ranked/match
+ * Finds opponents for one of the master's gladiators: `{ gladiator }`. Answers `{ opponents, match }`;
+ * `match` is a short-lived token the battle needs.
+ */
+router.post('/ranked/match', auth(), asyncRoute(async (req, res) => {
+    res.send(await RankedBattle.match(req.user, Validate.integer(req.body?.gladiator, 'gladiator', { min: 1 })));
+}));
+
+/**
+ * POST /battles/ranked
+ * Fights a match: `{ match }`. Answers `{ hash, error, summary }` with the master's level, xp and
+ * silver and their gladiator after the battle.
+ */
+router.post('/ranked', auth(), asyncRoute(async (req, res) => {
+    res.send(await RankedBattle.fight(req.user, Validate.text(req.body?.match, 'match', { max: 2000 })));
 }));
 
 export { router as battlesRouter };
