@@ -183,7 +183,10 @@ export class TournamentRound {
             const state = { total: Number(row.total), remaining };
             if (remaining > 0 && !timeUp) state.status = 'wait';
             else {
-                if (timeUp && remaining > 0) await TournamentRound.#pickForLateTeams(row.id);
+                if (timeUp && remaining > 0) {
+                    await TournamentRound.#pickForLateTeams(row.id);
+                    state.remaining = await Mysql.count('group_teams', { groupid: row.id, gladiator: null });
+                }
                 const [group] = await Mysql.select(
                     'SELECT l.hash, (gr.locked > NOW(3) - INTERVAL ? SECOND) AS busy FROM `groups` gr LEFT JOIN logs l ON l.id = gr.log WHERE gr.id = ?',
                     [LOCK_SECONDS, row.id],
@@ -380,6 +383,7 @@ export class TournamentRound {
         await TournamentRound.#managed(hash, userId);
         const round = await TournamentRound.maxRound(hash);
         const groups = await Mysql.select(`SELECT DISTINCT gr.id FROM ${GROUP_JOIN} WHERE t.hash = ? AND gr.round = ?`, [hash, round]);
-        if (groups.length) await Mysql.update('groups', { deadline: Mysql.raw('NOW(3)') }, { id: groups.map(group => group.id) });
+        // the column keeps whole seconds and NOW(3) would round up, leaving the turn open a moment
+        if (groups.length) await Mysql.update('groups', { deadline: Mysql.raw('NOW()') }, { id: groups.map(group => group.id) });
     }
 }
