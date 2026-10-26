@@ -178,7 +178,7 @@ For detailed guidance on programmatically invoking battles and triaging errors, 
 3. **Session Guards**: All `back_*.php` endpoints must check `isset($_SESSION['user'])`.
 4. **Preserve Documentation**: Maintain existing comments, docstrings, and contracts when modifying PHP backends or C engine source.
 5. **Echoed Values**: PHP pages escape every value they print into HTML or a script with `htmlspecialchars()` (query parameters, names, nicks, skins).
-6. **Commit Messages**: Follow [`.github/COMMIT-v2.md`](.github/COMMIT-v2.md): `<type>(<scope>): <summary>`, scope always present, no body unless asked.
+6. **Branches & Commits**: Follow [`CONTRIBUTING.md`](CONTRIBUTING.md): work branches from `dev` named `<type>/<slug>`, Conventional Commits with the scopes listed there, merged into `dev` with `--no-ff`.
 
 ### Frontend Standards
 
