@@ -1,3 +1,8 @@
+<?php
+    // before any output: the page is larger than PHP's output buffer
+    if (session_status() == PHP_SESSION_NONE)
+        session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,10 +22,9 @@
     <link rel='stylesheet' href="css/header.css"/>
     <link rel='stylesheet' href="css/editor.css"/>
     
-    <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/>
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("editor.js") ?>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
@@ -44,17 +48,8 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
 
-    <script type="module" src="script/editor.js"></script>
-    <script src="script/assets.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/tutorial.js"></script>
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
     
-    <script src="script/emoji.js"></script>
     <!-- <script src="script/chat.js"></script> -->
-    <script type="module" src="script/blocks.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->
@@ -70,7 +65,6 @@
 <body>
     <?php
         include_once "connection.php";
-        session_start();
         
         if(isset($_SESSION['user']) && isset($_GET['g'])) {
             $user = $_SESSION['user'];
@@ -85,12 +79,12 @@
                 if ($result->rowCount() > 0){
                     $row = $result->fetch();
                     $id = (int)$row['cod'];
-                    $name = $row['name'];
+                    $name = htmlspecialchars($row['name']);
                     $vstr = $row['vstr'];
                     $vagi = $row['vagi'];
                     $vint = $row['vint'];
-                    $skin = $row['skin'];
-                    $nick = $row['apelido'];
+                    $skin = htmlspecialchars($row['skin']);
+                    $nick = htmlspecialchars($row['apelido']);
                     $code = htmlspecialchars($row['code']);
                     $blocks = htmlspecialchars($row['blocks']);
                     echo "<div id='glad-code' hidden>

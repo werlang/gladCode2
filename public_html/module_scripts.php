@@ -9,7 +9,7 @@
  */
 
 /** Folders under script/ whose modules are versioned (render2 has its own map in playback.php). */
-const MODULE_DIRS = ["", "components", "helpers", "models", "profile", "templates"];
+const MODULE_DIRS = ["", "components", "editor", "helpers", "models", "profile", "templates"];
 
 /**
  * Import map entries for every frontend module.

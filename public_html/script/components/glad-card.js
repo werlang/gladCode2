@@ -124,12 +124,13 @@ export async function loadGladCards(container, { glads, dead, code, master, remo
  *
  * @param {HTMLElement} container Where the cards go.
  * @param {HTMLButtonElement} button The confirm button.
- * @param {object} [options] {@link loadGladCards} options (`glads`, `dead`, `code`, `master`).
+ * @param {object} [options] {@link loadGladCards} options (`glads`, `dead`, `code`, `master`, `remove`),
+ *   plus `canPick(card)` to decide which cards can be picked.
  * @returns {Promise<() => Record<string, any>|null>} Reads the picked gladiator.
  */
-export async function loadSelectableCards(container, button, options = {}) {
+export async function loadSelectableCards(container, button, { canPick, ...options } = {}) {
     let selected = null;
-    const selectable = card => !card.classList.contains('old') && !card.classList.contains('dead');
+    const selectable = canPick ?? (card => !card.classList.contains('old') && !card.classList.contains('dead'));
 
     await loadGladCards(container, {
         ...options,

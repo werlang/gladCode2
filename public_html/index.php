@@ -1,3 +1,13 @@
+<?php
+    // before any output: the page is larger than PHP's output buffer
+    if (session_status() == PHP_SESSION_NONE)
+        session_start();
+    $logged = isset($_SESSION['user']);
+    if (isset($_GET['login']) && $logged){
+        header("Location: profile.php?t=". urlencode($_GET['login']));
+        exit;
+    }
+?>
 <!DOCTYPE html>
 
 <html lang="pt-BR">
@@ -42,15 +52,8 @@
     </script>
 <?php
     include("header.php");
-    if (isset($_GET['login'])){
-        if (isset($_SESSION['user'])){
-            $link = "profile.php?t=".$_GET['login'];
-            header("Location: $link");
-        }
-        else
-            echo "<div id='loginhash' hidden>".htmlspecialchars($_GET['login'])."</div>";
-    }
-    $logged = isset($_SESSION['user']);
+    if (isset($_GET['login']))
+        echo "<div id='loginhash' hidden>".htmlspecialchars($_GET['login'])."</div>";
 ?>
 
 <body class='home'>
