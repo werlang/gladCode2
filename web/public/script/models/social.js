@@ -1,39 +1,38 @@
 import { api } from '../helpers/request.js';
 
 /**
- * Battle reports of ranked battles (`back_report.php`).
+ * Ranked battle reports (`/reports`). A report is `{ id, time, gladiator, read, reward, favorite,
+ * comment, hash, expired }` (`hash` is null once the battle expired).
  */
 export class ReportModel {
     /**
-     * A page of battle reports, marked read.
+     * A page of the signed-in master's reports, marked as read.
      *
      * @param {{ offset: number, unreadOnly?: boolean }} query
-     * @returns {Promise<{ status: string, total: number, reports: object[] }>}
+     * @returns {Promise<{ total: number, reports: object[] }>}
      */
     static battles({ offset, unreadOnly = false }) {
-        return api.post('back_report.php', { action: 'GET', offset, read: true, unread_only: unreadOnly });
+        return api.get('reports', { offset, markRead: true, unreadOnly: unreadOnly || undefined });
     }
 
     /**
-     * A page of favourite battles.
+     * A page of the favorite reports.
      *
      * @param {{ offset: number }} query
-     * @returns {Promise<{ status: string, total: number, reports: object[] }>}
+     * @returns {Promise<{ total: number, reports: object[] }>}
      */
     static favorites({ offset }) {
-        return api.post('back_report.php', { action: 'GET', offset, favorites: true });
+        return api.get('reports', { offset, favorites: true });
     }
 
     /**
-     * Keeps a battle as a favourite with a comment, or stops keeping it.
-     *
      * @param {number} id Report id.
      * @param {boolean} favorite Keep it.
      * @param {string} [comment] Why it is kept.
-     * @returns {Promise<unknown>}
+     * @returns {Promise<{ favorite: boolean }>}
      */
     static setFavorite(id, favorite, comment = '') {
-        return api.post('back_report.php', { action: 'FAVORITE', favorite, id, comment });
+        return api.put(`reports/${id}/favorite`, { favorite, comment });
     }
 }
 
@@ -82,87 +81,86 @@ export class DuelModel {
 }
 
 /**
- * Friends and friend requests (`back_friends.php`).
+ * Friends and friend requests (`/friends`). A friend is `{ id, user, nick, level, picture,
+ * idleMinutes? }` where `id` is the friendship and `user` the master.
  */
 export class FriendModel {
-    /** @returns {Promise<{ pending: object[], confirmed: object[] }>} Requests and friends. */
+    /** @returns {Promise<{ pending: object[], confirmed: object[] }>} Requests to answer and friends. */
     static list() {
-        return api.post('back_friends.php', { action: 'GET' });
+        return api.get('friends');
     }
 
     /**
-     * Friends whose nickname contains a text.
-     *
-     * @param {string} text Filter.
-     * @returns {Promise<Array<{ user: number, nick: string, picture: string }>>}
+     * @param {string} text Part of a friend's nickname.
+     * @returns {Promise<object[]>} Matching friends.
      */
-    static filter(text) {
-        return api.post('back_friends.php', { action: 'FILTER', text });
+    static async filter(text) {
+        const { friends } = await api.get('friends', { filter: text });
+        return friends;
     }
 
     /**
-     * Users whose nickname contains a text.
-     *
-     * @param {string} text Search.
-     * @returns {Promise<Array<{ user: number, nick: string, email: string }>>}
+     * @param {string} text Part of a nickname.
+     * @returns {Promise<Array<{ user: number, nick: string }>>} Masters to befriend.
      */
-    static search(text) {
-        return api.post('back_friends.php', { action: 'SEARCH', text });
+    static async search(text) {
+        const { users } = await api.get('friends/search', { nick: text });
+        return users;
     }
 
     /**
-     * Answers a friend request.
-     *
      * @param {number} id Request id.
      * @param {boolean} accept Accept it.
      * @returns {Promise<unknown>}
      */
     static answer(id, accept) {
-        return api.post('back_friends.php', { action: 'REQUEST', answer: accept ? 'YES' : 'NO', id });
+        return api.put(`friends/requests/${id}`, { accept });
     }
 
     /**
-     * Sends a friend request.
+     * Asks a master for friendship; they are emailed unless they opted out.
      *
-     * @param {number} user User id.
-     * @returns {Promise<'EXISTS'|unknown>}
+     * @param {number} user Master id.
+     * @returns {Promise<unknown>}
+     * @throws {import('../helpers/request.js').RequestError} `FRIENDSHIP_EXISTS`.
      */
     static add(user) {
-        return api.post('back_friends.php', { action: 'ADD', user });
+        return api.post('friends', { user });
     }
 
     /**
-     * Ends a friendship.
-     *
-     * @param {number} user Friendship id.
+     * @param {number} id Friendship id.
      * @returns {Promise<unknown>}
      */
-    static remove(user) {
-        return api.post('back_friends.php', { action: 'DELETE', user });
+    static remove(id) {
+        return api.delete(`friends/${id}`);
     }
 }
 
 /**
- * Private messages (`back_message.php`).
+ * Private messages (`/messages`). A message is `{ id, sender, nick, picture, time, message, read }`;
+ * `message` is stored HTML (escaped text, a reply quoting its original in `<quote>`).
  */
 export class MessageModel {
     /**
-     * A page of received messages.
+     * A page of the signed-in master's inbox.
      *
      * @param {number} page Page from 1.
-     * @returns {Promise<{ meta: { total: number, start: number, end: number, page: number }, info: object[] }>}
+     * @returns {Promise<{ meta: { total: number, start: number, end: number, page: number }, messages: object[] }>}
      */
     static list(page) {
-        return api.post('back_message.php', { action: 'GET', page });
+        return api.get('messages', { page });
     }
 
     /**
-     * @param {number} receiver User id.
+     * Sends a message; the receiver is emailed unless they opted out.
+     *
+     * @param {number} receiver Master id.
      * @param {string} message Text.
      * @returns {Promise<unknown>}
      */
     static send(receiver, message) {
-        return api.post('back_message.php', { action: 'SEND', id: receiver, message });
+        return api.post('messages', { receiver, message });
     }
 
     /**
@@ -171,7 +169,7 @@ export class MessageModel {
      * @returns {Promise<unknown>}
      */
     static reply(id, message) {
-        return api.post('back_message.php', { action: 'REPLY', replyid: id, message });
+        return api.post(`messages/${id}/reply`, { message });
     }
 
     /**
@@ -180,7 +178,7 @@ export class MessageModel {
      * @returns {Promise<unknown>}
      */
     static markRead(id, read) {
-        return api.post('back_message.php', { action: 'READ', id, value: read ? 1 : 0 });
+        return api.put(`messages/${id}`, { read });
     }
 
     /**
@@ -188,22 +186,23 @@ export class MessageModel {
      * @returns {Promise<unknown>}
      */
     static remove(id) {
-        return api.post('back_message.php', { action: 'DELETE', id });
+        return api.delete(`messages/${id}`);
     }
 }
 
 /**
- * The profile's counters and the after-battle summary (`back_notification.php`).
+ * The profile's counters (`/notifications`).
  */
 export class NotificationModel {
-    /** @returns {Promise<Record<string, any>>} Level, xp, silver and unread counts. */
+    /**
+     * @returns {Promise<{ user: { level: number, xp: number, silver: number }, messages: number, friends: number,
+     *   gladiators: { remaining: number, outdated: number }, reports: { ranked: number, duel: number }, duels: number, news: number }>}
+     */
     static counts() {
-        return api.post('back_notification.php', { action: 'GET' });
+        return api.get('notifications');
     }
 
     /**
-     * What a ranked battle changed for the user and the gladiator.
-     *
      * @param {string} hash Battle log hash.
      * @returns {Promise<{ lvl: number, xp: number, silver: number, glad: object }>}
      */
@@ -213,29 +212,9 @@ export class NotificationModel {
 }
 
 /**
- * Email notices to other users (`back_sendmail.php`).
+ * Email notices the browser still asks for (duels and tournaments, until their endpoints send them).
  */
 export class MailModel {
-    /**
-     * Emails a user about a new message (or a reply).
-     *
-     * @param {{ receiver?: number, replyid?: number, message: string }} message
-     * @returns {Promise<unknown>}
-     */
-    static message({ receiver, replyid, message }) {
-        return api.post('back_sendmail.php', {
-            action: 'MESSAGE',
-            message,
-            ...(receiver === undefined ? {} : { receiver }),
-            ...(replyid === undefined ? {} : { replyid }),
-        });
-    }
-
-    /** @param {string} email Invited user's email. */
-    static friendRequest(email) {
-        return api.post('back_sendmail.php', { action: 'FRIEND', friend: email });
-    }
-
     /** @param {number} friend Challenged user id. */
     static duel(friend) {
         return api.post('back_sendmail.php', { action: 'DUEL', friend });

@@ -1,7 +1,7 @@
 import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
 import { elapsedString } from '../helpers/date-format.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
-import { FriendModel, MailModel, MessageModel } from '../models/social.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
 
@@ -9,17 +9,16 @@ import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../tem
 const MAX_MESSAGE = 2048;
 
 /**
- * Writes a private message to a user and e-mails them about it.
+ * Writes a private message to a user (the API e-mails them about it).
  *
  * @param {number} user User id.
  * @param {string} nick Nickname.
  */
 export async function writeMessage(user, nick) {
-    const message = await showTextArea(`Mensagem para <span class='highlight'>${nick}</span>:`, 'Olá...', MAX_MESSAGE);
+    const message = await showTextArea(`Mensagem para <span class='highlight'>${escapeHtml(nick)}</span>:`, 'Olá...', MAX_MESSAGE);
     if (!message) return;
     await MessageModel.send(user, message);
     showMessage('Mensagem enviada');
-    MailModel.message({ receiver: user, message });
 }
 
 /**
@@ -62,7 +61,7 @@ export class FriendsTab {
         requests.replaceChildren();
         data.pending.forEach(request => {
             const row = createElement(renderTemplate(requestRowTemplate, {
-                level: request.lvl,
+                level: request.level,
                 picture: request.picture,
                 nick: request.nick,
             }));
@@ -75,10 +74,10 @@ export class FriendsTab {
         friends.replaceChildren();
         data.confirmed.forEach(friend => {
             const row = createElement(renderTemplate(friendRowTemplate, {
-                level: friend.lvl,
+                level: friend.level,
                 picture: friend.picture,
                 nick: friend.nick,
-                active: elapsedString(friend.active),
+                active: elapsedString(friend.idleMinutes),
             }));
             row.querySelector('.button-open').addEventListener('click', event => {
                 event.stopPropagation();
@@ -125,7 +124,7 @@ export class FriendsTab {
     async #askUnfriend() {
         if (!this.#current) return;
         const { row, friend } = this.#current;
-        const answer = await showDialog(`Deseja remover <span class='highlight'>${friend.nick}</span> da sua lista de amigos?`, ['Sim', 'Não']);
+        const answer = await showDialog(`Deseja remover <span class='highlight'>${escapeHtml(friend.nick)}</span> da sua lista de amigos?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
         await FriendModel.remove(friend.id);
         row.remove();
@@ -144,14 +143,17 @@ export class FriendsTab {
         });
     }
 
-    /** @param {{ user: number, nick: string, email: string }} user User to invite. */
+    /** @param {{ user: number, nick: string }} user User to invite (the API e-mails them). */
     async #invite(user) {
-        const answer = await FriendModel.add(user.user);
-        if (answer === 'EXISTS') {
-            showMessage(`O usuário <span class='highlight'>${user.nick}</span> já esté em sua lista de amigos`);
+        const nick = escapeHtml(user.nick);
+        try {
+            await FriendModel.add(user.user);
+        }
+        catch (error) {
+            if (error.code !== 'FRIENDSHIP_EXISTS') throw error;
+            showMessage(`O usuário <span class='highlight'>${nick}</span> já está em sua lista de amigos`);
             return;
         }
-        showMessage(`Convite enviado para <span class='highlight'>${user.nick}</span>`);
-        MailModel.friendRequest(user.email);
+        showMessage(`Convite enviado para <span class='highlight'>${nick}</span>`);
     }
 }

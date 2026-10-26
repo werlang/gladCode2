@@ -6,11 +6,15 @@ import { corsMiddleware, csrfOriginMiddleware, requestLogMiddleware, securityHea
 import { errorMiddleware } from './middleware/error.js';
 import { authRouter } from './route/auth.js';
 import { battlesRouter } from './route/battles.js';
+import { friendsRouter } from './route/friends.js';
 import { gladiatorsRouter } from './route/gladiators.js';
 import { logsRouter } from './route/logs.js';
+import { messagesRouter } from './route/messages.js';
 import { newsRouter } from './route/news.js';
+import { notificationsRouter } from './route/notifications.js';
 import { potionsRouter } from './route/potions.js';
 import { rankingRouter } from './route/ranking.js';
+import { reportsRouter } from './route/reports.js';
 import { statsRouter } from './route/stats.js';
 import { usersRouter } from './route/users.js';
 
@@ -52,6 +56,10 @@ app.use('/logs', logsRouter);
 app.use('/potions', potionsRouter);
 app.use('/ranking', rankingRouter);
 app.use('/stats', statsRouter);
+app.use('/friends', friendsRouter);
+app.use('/messages', messagesRouter);
+app.use('/reports', reportsRouter);
+app.use('/notifications', notificationsRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

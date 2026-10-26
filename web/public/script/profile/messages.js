@@ -1,7 +1,7 @@
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
-import { MailModel, MessageModel } from '../models/social.js';
+import { MessageModel } from '../models/social.js';
 import { fullMessageTemplate, messageRowTemplate, replyTemplate } from '../templates/profile.js';
 
 /** Tallest the reply box grows, in px. */
@@ -33,7 +33,7 @@ export class MessagesTab {
         const table = this.#panel.querySelector('.table');
         show(table);
 
-        const { meta, info } = await MessageModel.list(this.#page);
+        const { meta, messages: info } = await MessageModel.list(this.#page);
         if (meta.total == 0) {
             table.textContent = 'Você ainda não possui mensagens';
             return;
@@ -49,7 +49,7 @@ export class MessagesTab {
         table.replaceChildren();
         info.forEach(message => {
             const row = createElement(renderTemplate(messageRowTemplate, {
-                unread: message.isread == '0' ? 'unread' : '',
+                unread: message.read ? '' : 'unread',
                 nick: message.nick,
                 message: message.message,
                 elapsed: formatMessageTime(message.time, { short: true }),
@@ -113,7 +113,6 @@ export class MessagesTab {
             const text = input.value;
             await MessageModel.reply(message.id, text);
             this.show();
-            MailModel.message({ replyid: message.id, message: text });
         });
         reply.querySelector('#cancel').addEventListener('click', () => {
             reply.remove();

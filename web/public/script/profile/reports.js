@@ -134,7 +134,7 @@ export class ReportsTab {
         });
 
         const data = await view.load({ offset, unread: this.#onlyUnread() });
-        if (request !== this.#request || data.status !== 'SUCCESS') return;
+        if (request !== this.#request) return;
 
         const total = parseInt(data.total, 10);
         this.#totals[id] = total;
@@ -197,7 +197,7 @@ export class ReportsTab {
     #battleRow(row) {
         const reward = parseFloat(row.reward);
         return renderTemplate(battleRowTemplate, {
-            unread: row.isread == '0' ? 'unread' : '',
+            unread: row.read ? '' : 'unread',
             starClass: row.favorite ? 'fas' : 'far',
             starTitle: row.favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos',
             glad: row.gladiator,

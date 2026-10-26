@@ -12,25 +12,25 @@ export async function checkNotifications({ duelChallenges } = {}) {
     const data = await NotificationModel.counts();
     const menu = document.querySelector('#menu');
 
-    profile.user.level = data.user.lvl;
+    profile.user.level = data.user.level;
     profile.user.xp = data.user.xp;
-    document.querySelector('#profile-ui #lvl span').textContent = data.user.lvl;
-    const xp = parseInt(data.user.xp, 10);
-    document.querySelector('#profile-ui #xp #filled').style.width = `${(xp / xpToNextLevel(data.user.lvl)) * 100}%`;
+    document.querySelector('#profile-ui #lvl span').textContent = data.user.level;
+    const xp = data.user.xp;
+    document.querySelector('#profile-ui #xp #filled').style.width = `${(xp / xpToNextLevel(data.user.level)) * 100}%`;
     setSilver(data.user.silver);
 
-    setBadge(menu.querySelector('#messages .notification'), parseInt(data.messages, 10));
-    setBadge(menu.querySelector('#news .notification'), parseInt(data.news, 10));
-    setBadge(menu.querySelector('#friends .notification'), parseInt(data.friends, 10));
-    setBadge(menu.querySelector('#glads .notification'), parseInt(data.glads.remaining, 10) + parseInt(data.glads.obsolete, 10));
+    setBadge(menu.querySelector('#messages .notification'), data.messages);
+    setBadge(menu.querySelector('#news .notification'), data.news);
+    setBadge(menu.querySelector('#friends .notification'), data.friends);
+    setBadge(menu.querySelector('#glads .notification'), data.gladiators.remaining + data.gladiators.outdated);
 
-    const duels = parseInt(data.duels, 10);
+    const { duels } = data;
     setBadge(menu.querySelector('#battle .notification'), duels);
     setBadge(document.querySelector('#battle-container #duel .notification'), duels);
     if (duelChallenges && duelChallenges.count !== duels) duelChallenges.refresh();
 
-    const ranked = parseInt(data.reports.ranked, 10);
-    const duel = parseInt(data.reports.duel, 10);
+    const { ranked } = data.reports;
+    const { duel } = data.reports;
     setBadge(menu.querySelector('#report .notification'), ranked + duel);
     const tabs = document.querySelector('#report-container');
     tabs.querySelector('#ranked.tab .notification')?.classList.toggle('empty', !(ranked > 0));
