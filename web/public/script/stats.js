@@ -40,9 +40,9 @@ function renderAbilities(data) {
     body.innerHTML = names.length
         ? names.map(name => renderTemplate(abilityRowTemplate, {
             name,
-            use: data.percuse[name].toFixed(1),
+            use: data.usage[name].toFixed(1),
             average: data.average[name].toFixed(1),
-            win: data.percwin[name].toFixed(1),
+            win: data.winRate[name].toFixed(1),
         })).join('')
         : emptyAbilitiesTemplate;
 }
@@ -68,8 +68,8 @@ function renderAttributes(data) {
             return attribute === 'lvl' ? value.toFixed(1) : `${value.toFixed(1)}%`;
         };
         row.insertAdjacentHTML('beforeend', renderTemplate(attributeCellsTemplate, {
-            average: format(data.highattr.avg[attribute]),
-            winner: format(data.highattr.winner[attribute]),
+            average: format(data.attributes.avg[attribute]),
+            winner: format(data.attributes.winner[attribute]),
         }));
     });
 }
@@ -118,10 +118,10 @@ function renderPotions(data, potions) {
  */
 function renderSummary(data, empty) {
     const lowBattles = document.querySelector('#single-stats #low-battles');
-    document.querySelector('#nbattles').textContent = empty ? '0' : data.nbattles.total;
+    document.querySelector('#nbattles').textContent = empty ? '0' : data.battles.total;
     document.querySelector('#avg-time').textContent = !empty && data.duration ? `${data.duration.toFixed(1)}s` : '-';
 
-    const partial = !empty && data.potions.battles < data.nbattles.total;
+    const partial = !empty && data.potions.battles < data.battles.total;
     lowBattles.classList.toggle('hidden', !partial);
     if (partial) {
         lowBattles.title = `Somente ${data.potions.battles} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`;

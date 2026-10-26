@@ -144,7 +144,7 @@ export class Mysql {
                     return `${column} != ?`;
                 }
                 if (Object.hasOwn(value, 'like')) {
-                    values.push(`%${String(value.like).replace(/[\\%_]/g, match => `\\${match}`)}%`);
+                    values.push(Mysql.contains(value.like));
                     return `${column} LIKE ?`;
                 }
                 if (Object.hasOwn(value, 'between')) {
@@ -328,6 +328,16 @@ export class Mysql {
         finally {
             connection.release();
         }
+    }
+
+    /**
+     * A `LIKE` value matching text anywhere, with the text's own `%`, `_` and `\` taken literally.
+     *
+     * @param {string} text
+     * @returns {string}
+     */
+    static contains(text) {
+        return `%${String(text).replace(/[\\%_]/g, match => `\\${match}`)}%`;
     }
 
     /**

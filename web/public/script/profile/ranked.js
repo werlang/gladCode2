@@ -6,7 +6,6 @@ import { createElement, renderTemplate } from '../helpers/html.js';
 import { api } from '../helpers/request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { MatchModel, NotificationModel } from '../models/social.js';
-import { StatsModel } from '../models/stats.js';
 import { BATTLE_TIPS } from './battle-tips.js';
 import { profile, setSilver, xpToNextLevel } from './session.js';
 import { afterBattleTemplate, mmrRowTemplate, preBattleExtraTemplate, preBattleTemplate } from '../templates/profile.js';
@@ -205,7 +204,6 @@ export class RankedBattle {
         progress.kill();
         if (data.error) return;
 
-        StatsModel.saveBattle(data.simulation);
         document.querySelectorAll('#fog').forEach(fog => fog.remove());
         this.onFought();
         showAfterBattle(data.simulation, before);

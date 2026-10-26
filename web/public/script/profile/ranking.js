@@ -40,7 +40,7 @@ export class RankingTab {
         this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
         this.#search.addEventListener('input', () => this.fetch({ offset: 0 }));
 
-        const { offset } = await RankModel.myBestOffset();
+        const offset = await RankModel.myBestOffset();
         this.#pages[GENERAL].offset = Math.floor(offset / PAGE_SIZE) * PAGE_SIZE;
     }
 
@@ -51,7 +51,7 @@ export class RankingTab {
     }
 
     async #drawTabs() {
-        const { tags = [] } = await RankModel.tabs();
+        const tags = await RankModel.tabs();
         this.#panel.querySelectorAll('#tab-container .tab.user').forEach(tab => tab.remove());
         const add = this.#panel.querySelector('#add-tab');
         if (!tags.includes(this.#selected) && this.#selected !== GENERAL) this.#selected = GENERAL;
@@ -96,8 +96,7 @@ export class RankingTab {
             message: `Deseja remover a aba <b>#${name}</b>`,
             buttons: { yes: 'SIM', no: 'NÃO' },
         }).show().click('yes', async () => {
-            const data = await RankModel.unwatch(name);
-            if (data.status !== 'SUCCESS') return;
+            await RankModel.unwatch(name);
             createToast(`Aba #${name} removida`, 'success');
             this.#selected = GENERAL;
             this.show();
@@ -147,17 +146,20 @@ export class RankingTab {
 
     /** @param {string} name Hashtag. */
     async #addHashtag(name) {
-        const data = await RankModel.watch(name);
-        if (data.status === 'SUCCESS') {
+        try {
+            await RankModel.watch(name);
             createToast(`Aba #${name} criada`, 'success');
         }
-        else if (data.status === 'NOPREMIUM') {
-            createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
-            profile.user.premium = false;
-        }
-        else if (data.status === 'NOCREDITS') {
-            createToast('Você não possui créditos para utilizar essa função', 'error');
-            profile.user.credits = 0;
+        catch (error) {
+            if (error.code === 'TUTOR_ONLY') {
+                createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
+                profile.user.premium = false;
+            }
+            else if (error.code === 'NO_CREDITS') {
+                createToast('Você não possui créditos para utilizar essa função', 'error');
+                profile.user.credits = 0;
+            }
+            else throw error;
         }
         this.#drawTabs();
     }
@@ -190,10 +192,10 @@ export class RankingTab {
         const search = this.#search.value;
         const data = general
             ? await RankModel.general({ offset, search })
-            : await RankModel.hashtag({ tab: id, search });
+            : { ranking: await RankModel.hashtag({ tab: id, search }) };
         if (request !== this.#request) return;
 
-        const total = general ? parseInt(data.total, 10) : data.ranking.length;
+        const total = general ? data.total : data.ranking.length;
         this.#pages[id].total = total;
         if (total < offset) {
             this.fetch({ offset: 0 });
@@ -217,23 +219,23 @@ export class RankingTab {
 
     /** @param {Record<string, any>} row General ranking row. */
     #generalRow(row) {
-        const change = parseInt(row.change24, 10) || 0;
+        const change = Math.trunc(row.change24h);
         return renderTemplate(generalRowTemplate, {
             mine: profile.user.nickname === row.master ? 'mine' : '',
             position: row.position,
-            glad: row.glad,
+            glad: row.gladiator,
             master: row.master,
             trend: change > 0 ? 'green' : change < 0 ? 'red' : '',
             arrow: change !== 0 ? "<img src='icon/arrow-up-green.png' alt=''>" : '',
             change: Math.abs(change),
-            mmr: parseInt(row.mmr, 10),
+            mmr: row.mmr,
         });
     }
 
     /** @param {Record<string, any>} row Hashtag ranking row. */
     #hashtagRow(row) {
         return renderTemplate(hashtagRowTemplate, {
-            mine: profile.user.id == row.id ? 'mine' : '',
+            mine: profile.user.id === row.id ? 'mine' : '',
             position: row.position,
             nick: row.nick,
             score: row.score,

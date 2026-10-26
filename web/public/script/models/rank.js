@@ -1,66 +1,60 @@
 import { api } from '../helpers/request.js';
 
-const ENDPOINT = 'back_rank.php';
-
 /**
- * The gladiator ranking and the tutors' hashtag rankings (`back_rank.php`).
+ * Rankings (`/ranking`): gladiators by renown, and masters by the trainings tagged with a hashtag.
  */
 export class RankModel {
     /**
-     * A page of the general ranking.
+     * A page of the gladiator ranking.
      *
-     * @param {{ offset: number, search?: string }} query First position and a gladiator or master filter.
-     * @returns {Promise<{ total: number, ranking: Array<{ position: number, glad: string, master: string, mmr: number, change24: number }> }>}
+     * @param {{ offset: number, search?: string }} query
+     * @returns {Promise<{ total: number, ranking: Array<{ gladiator: string, mmr: number, master: string, change24h: number, position: number }> }>}
      */
     static general({ offset, search = '' }) {
-        return api.post(ENDPOINT, { action: 'GET', offset, search });
+        return api.get('ranking', { offset, search });
+    }
+
+    /** @returns {Promise<number>} Gladiators ranked above the signed-in master's best one. */
+    static async myBestOffset() {
+        const { offset } = await api.get('ranking/me');
+        return offset;
+    }
+
+    /** @returns {Promise<string[]>} The signed-in master's hashtag tabs. */
+    static async tabs() {
+        const { tags } = await api.get('ranking/tabs');
+        return tags;
     }
 
     /**
-     * The position of the user's best gladiator, to open the ranking on its page.
-     *
-     * @returns {Promise<{ offset: number }>}
-     */
-    static myBestOffset() {
-        return api.post(ENDPOINT, { action: 'MAXMINE' });
-    }
-
-    /**
-     * The hashtags the tutor follows.
-     *
-     * @returns {Promise<{ tags: string[] }>}
-     */
-    static tabs() {
-        return api.post(ENDPOINT, { action: 'GET TABS' });
-    }
-
-    /**
-     * Follows a hashtag.
+     * Follows a hashtag (tutor accounts).
      *
      * @param {string} name Hashtag without `#`.
-     * @returns {Promise<{ status: 'SUCCESS'|'NOPREMIUM'|'NOCREDITS'|string }>}
+     * @returns {Promise<unknown>}
+     * @throws {import('../helpers/request.js').RequestError} `TUTOR_ONLY`, `NO_CREDITS`.
      */
     static watch(name) {
-        return api.post(ENDPOINT, { action: 'WATCH TAB', name, add: true });
+        return api.put(`ranking/tabs/${encodeURIComponent(name)}`, { watch: true });
     }
 
     /**
-     * Stops following a hashtag.
+     * Closes a hashtag tab.
      *
      * @param {string} name Hashtag without `#`.
-     * @returns {Promise<{ status: string }>}
+     * @returns {Promise<unknown>}
      */
     static unwatch(name) {
-        return api.post(ENDPOINT, { action: 'WATCH TAB', name, remove: true });
+        return api.put(`ranking/tabs/${encodeURIComponent(name)}`, { watch: false });
     }
 
     /**
-     * The ranking of the trainings tagged with a hashtag.
+     * The masters' ranking of a hashtag.
      *
-     * @param {{ tab: string, search?: string }} query Hashtag and a master filter.
-     * @returns {Promise<{ ranking: Array<{ position: number, id: number, nick: string, score: number, time: number }> }>}
+     * @param {{ tab: string, search?: string }} query
+     * @returns {Promise<Array<{ id: number, nick: string, score: number, time: number, position: number }>>}
      */
-    static hashtag({ tab, search = '' }) {
-        return api.post(ENDPOINT, { action: 'FETCH', tab, search });
+    static async hashtag({ tab, search = '' }) {
+        const { ranking } = await api.get(`ranking/tabs/${encodeURIComponent(tab)}`, { search });
+        return ranking;
     }
 }

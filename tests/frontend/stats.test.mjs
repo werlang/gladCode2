@@ -4,7 +4,6 @@ import test from 'node:test';
 
 import { battleStats, expandSteps } from '../../web/public/script/helpers/battle-stats.js';
 import { snapValue } from '../../web/public/script/components/slider.js';
-import { toBackendDate } from '../../web/public/script/models/stats.js';
 
 /**
  * A gladiator's state in one step.
@@ -51,9 +50,4 @@ test('slider values snap to steps inside the range', () => {
     assert.equal(snapValue(-50, range), 0);
     assert.equal(snapValue(9000, range), 4000);
     assert.equal(snapValue(0.30000000000000004, { min: 0, max: 1, step: 0.1 }), 0.3);
-});
-
-test('date inputs convert to the backend day-first format', () => {
-    assert.equal(toBackendDate('2025-01-31'), '31/01/2025');
-    assert.equal(toBackendDate(''), '');
 });
