@@ -272,11 +272,23 @@ export class SyntyFloor {
  *   Arena relief and extent; with a renderer the blend is baked into two textures (`small` keeps them at 2048).
  * @returns {Promise<SyntyFloor>} Floor dressing; rejects when the pack is missing.
  */
-export async function loadSyntyFloor(THREE, field) {
-    const load = (url, srgb) => loadTexture(THREE, url, { srgb, repeat: true, anisotropy: 8 });
+export async function loadSyntyFloor(THREE, field, manager = null) {
+    if (!manager) {
+        manager = new THREE.LoadingManager();
+        manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    }
+    const load = async (url, srgb) => {
+        manager.itemStart(url);
+        try {
+            const texture = await loadTexture(THREE, url, { srgb, repeat: true, anisotropy: 8 });
+            manager.itemEnd(url);
+            return texture;
+        } catch (error) {
+            manager.itemError(url);
+            throw error;
+        }
+    };
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
-    const manager = new THREE.LoadingManager();
-    manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
     const fbx = new FBXLoader(manager);
     const [layers, rocks, atlas] = await Promise.all([
         Promise.all(LAYERS.map(async ([name, albedo, normal]) => ({ name, albedo: await load(`${TERRAIN}${albedo}.png`, true), normal: await load(`${TERRAIN}${normal}.png`, false) }))),

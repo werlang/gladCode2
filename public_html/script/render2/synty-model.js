@@ -164,16 +164,28 @@ function boneKey(bone) {
  * @param {Array<Record<string, any>>} looks Appearances of the fighters, used to preload only the needed weapons.
  * @returns {Promise<(options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel>} Model factory.
  */
-export async function loadSynty(THREE, looks = []) {
+export async function loadSynty(THREE, looks = [], manager = null) {
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
     const { clone: cloneSkinned } = await import('three/addons/utils/SkeletonUtils.js');
-    const manager = new THREE.LoadingManager();
-    // Skip the stale texture references inside the FBX files; materials are replaced with the shared atlases.
-    manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    if (!manager) {
+        manager = new THREE.LoadingManager();
+        // Skip the stale texture references inside the FBX files; materials are replaced with the shared atlases.
+        manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    }
     const fbx = new FBXLoader(manager);
     const loadFbx = (url) => new Promise((resolve, reject) => fbx.load(url, resolve, undefined, reject));
     // FBX UVs put v = 0 at the bottom of the image, which is three's default texture orientation (flipY).
-    const loadTexture = (url) => loadImageTexture(THREE, url);
+    const loadTexture = async (url) => {
+        manager.itemStart(url);
+        try {
+            const texture = await loadImageTexture(THREE, url);
+            manager.itemEnd(url);
+            return texture;
+        } catch (error) {
+            manager.itemError(url);
+            throw error;
+        }
+    };
 
     // Only the gear and props these fighters wear are fetched; the default sword and bow always are, as fallbacks.
     const outfits = looks.map((look) => syntyOutfit(look));

@@ -202,15 +202,16 @@ export class Arena {
      * Only the brazier flames are billboards, textured with the Synty particle pack.
      *
      * @param {import('./synty-arena.js').SyntyArenaKit} kit Loaded Ancient Empire pieces.
+     * @param {import('three').LoadingManager} [manager] Shared loading manager for tracking progress.
      */
-    applySynty(kit) {
+    applySynty(kit, manager = null) {
         const THREE = this.#THREE;
         const own = this.#own;
         this.#disposables.push(kit);
         const coliseum = new SyntyColiseum(THREE, kit);
         this.#scene.add(freeze(coliseum.group));
         // The crowd, the floor bake and the countryside load in the background; `ready` settles when all three have.
-        this.#ready = Promise.all([this.#loadCrowd(coliseum.plan, coliseum.posts, coliseum.throne), this.#loadFloor(), this.#loadLandscape()]);
+        this.#ready = Promise.all([this.#loadCrowd(coliseum.plan, coliseum.posts, coliseum.throne, manager), this.#loadFloor(manager), this.#loadLandscape(manager)]);
         this.#disposables.push({ dispose: () => coliseum.group.removeFromParent() });
         // Particle fires in the brazier bowls and the gate torches (`size` < 1).
         this.#fires = own(new FireSystem(THREE));
@@ -252,9 +253,9 @@ export class Arena {
     }
 
     /** Re-dresses the sand with the Meadow Forest terrain textures and rocks (see `synty-floor.js`); the plain sand stays if the pack is missing. */
-    #loadFloor() {
+    #loadFloor(manager = null) {
         return import('./synty-floor.js')
-            .then(({ loadSyntyFloor }) => loadSyntyFloor(this.#THREE, { wetness, terrainHeight, size: FLOOR_SIZE, wall: PODIUM, renderer: this.#renderer, small: this.#quality.smallBake }))
+            .then(({ loadSyntyFloor }) => loadSyntyFloor(this.#THREE, { wetness, terrainHeight, size: FLOOR_SIZE, wall: PODIUM, renderer: this.#renderer, small: this.#quality.smallBake }, manager))
             .then((floor) => {
                 if (this.#destroyed) {
                     floor.dispose();
@@ -268,9 +269,9 @@ export class Arena {
     }
 
     /** Lays out the countryside beyond the walls (see `synty-landscape.js`); the open sky stays if the pack is missing. */
-    #loadLandscape() {
+    #loadLandscape(manager = null) {
         return import('./synty-landscape.js')
-            .then(({ loadSyntyLandscape }) => loadSyntyLandscape(this.#THREE))
+            .then(({ loadSyntyLandscape }) => loadSyntyLandscape(this.#THREE, manager))
             .then((landscape) => {
                 if (this.#destroyed) {
                     landscape.dispose();
@@ -285,9 +286,9 @@ export class Arena {
     }
 
     /** Fills the stands once the crowd is baked (a few seconds after the arena shows); the arena works without it. */
-    #loadCrowd(plan, posts, throne) {
+    #loadCrowd(plan, posts, throne, manager = null) {
         return import('./synty-crowd.js')
-            .then(({ loadSyntyCrowd }) => loadSyntyCrowd(this.#THREE, plan, posts, throne))
+            .then(({ loadSyntyCrowd }) => loadSyntyCrowd(this.#THREE, plan, posts, throne, manager))
             .then((crowd) => {
                 if (this.#destroyed) {
                     crowd.dispose();

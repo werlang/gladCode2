@@ -169,13 +169,17 @@ diffuseColor.rgb *= land * vec3(1.04, 0.97, 0.78);`);
 }
 
 /** Loads the ground textures, each falling back to a flat colour when the Meadow Forest pack is missing. */
-async function loadGroundTextures(THREE) {
+async function loadGroundTextures(THREE, manager = null) {
     const entries = await Promise.all(Object.entries(GROUND_TEXTURES).map(async ([name, [file, fallback]]) => {
         let texture;
+        const url = `${TERRAIN}${file}.png`;
+        if (manager) manager.itemStart(url);
         try {
-            texture = await loadTexture(THREE, `${TERRAIN}${file}.png`);
+            texture = await loadTexture(THREE, url);
+            if (manager) manager.itemEnd(url);
         }
         catch {
+            if (manager) manager.itemError(url);
             const color = new THREE.Color(fallback);
             texture = new THREE.DataTexture(new Uint8Array([color.r * 255, color.g * 255, color.b * 255, 255]), 1, 1);
             texture.needsUpdate = true;
@@ -269,7 +273,7 @@ export class SyntyLandscape {
  * @param {typeof import('three')} THREE Three namespace.
  * @returns {Promise<SyntyLandscape>} Landscape; rejects when the Ancient Empire pack is missing.
  */
-export async function loadSyntyLandscape(THREE) {
-    const [kit, textures] = await Promise.all([loadSyntyKit(THREE, PIECES, BUILDING_TEXTURES), loadGroundTextures(THREE)]);
+export async function loadSyntyLandscape(THREE, manager = null) {
+    const [kit, textures] = await Promise.all([loadSyntyKit(THREE, PIECES, BUILDING_TEXTURES, manager), loadGroundTextures(THREE, manager)]);
     return new SyntyLandscape(THREE, kit, textures);
 }

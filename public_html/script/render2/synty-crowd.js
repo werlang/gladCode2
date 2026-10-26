@@ -729,11 +729,24 @@ export class SyntyCrowd {
  * @param {Array<{ x: number, y: number, z: number }>} [posts] Lookout points on the structure (`SyntyColiseum#posts`).
  * @returns {Promise<SyntyCrowd>} Crowd; rejects when the packs are missing.
  */
-export async function loadSyntyCrowd(THREE, plan, posts = [], throne = null) {
+export async function loadSyntyCrowd(THREE, plan, posts = [], throne = null, manager = null) {
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
-    const manager = new THREE.LoadingManager();
-    manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    if (!manager) {
+        manager = new THREE.LoadingManager();
+        manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    }
     const loader = new FBXLoader(manager);
+    const loadTex = async (url) => {
+        manager.itemStart(url);
+        try {
+            const texture = await loadTexture(THREE, url);
+            manager.itemEnd(url);
+            return texture;
+        } catch (error) {
+            manager.itemError(url);
+            throw error;
+        }
+    };
     const genders = ['Masc', 'Femn'];
     const clipEntries = Object.entries(CLIPS).flatMap(([name, url]) => genders.map((g) => [`${name}:${g}`, url(g)]));
     const female = (name) => /Female/.test(name);
@@ -743,7 +756,7 @@ export async function loadSyntyCrowd(THREE, plan, posts = [], throne = null) {
         Promise.all(SPECTATOR_TYPES.map((name) => loadFbx(loader, `${CHARACTERS}SM_Chr_${name}.fbx`))),
         Promise.all(GUARD_TYPES.map((name) => loadFbx(loader, `${CHARACTERS}SM_Chr_${name}.fbx`))),
         loadFbx(loader, `${CHARACTERS}SM_Chr_${NOTABLE_TYPE}.fbx`),
-        Promise.all(ATLASES.map((url) => loadTexture(THREE, url))),
+        Promise.all(ATLASES.map((url) => loadTex(url))),
     ]);
     const clips = new Map(clipSources.map(([key, source]) => {
         const clip = source.animations[0];

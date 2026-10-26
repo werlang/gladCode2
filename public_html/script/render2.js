@@ -19,8 +19,13 @@ async function installThreeRenderer() {
         return null;
     }
 
-    const status = document.querySelector('#loadbar #status');
-    if (status) status.textContent = 'Carregando arena 3D';
+    const third = document.querySelector('#loadbar #third');
+    const statusArena = document.querySelector('#loadbar #status-arena');
+    if (third) third.style.display = 'block';
+    if (statusArena) {
+        statusArena.style.display = 'block';
+        statusArena.textContent = 'Carregando arena 3D';
+    }
 
     try {
         const THREE = await import('three');

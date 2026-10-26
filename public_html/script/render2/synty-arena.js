@@ -261,8 +261,8 @@ export class SyntyArenaKit {
  * @param {typeof import('three')} THREE Three namespace.
  * @returns {Promise<SyntyArenaKit>} Kit; rejects when the pack is missing.
  */
-export async function loadSyntyArena(THREE) {
-    return loadSyntyKit(THREE, PIECES);
+export async function loadSyntyArena(THREE, manager = null) {
+    return loadSyntyKit(THREE, PIECES, {}, manager);
 }
 
 /**
@@ -271,23 +271,37 @@ export async function loadSyntyArena(THREE) {
  * @param {typeof import('three')} THREE Three namespace.
  * @param {Record<string, string>} pieces FBX path (under `FBX/`, without extension) by short name.
  * @param {Record<string, string>} [extraTextures] More textures by FBX material name (under `Textures/`) for this kit's pieces.
+ * @param {import('three').LoadingManager} [manager] Shared loading manager for tracking progress.
  * @returns {Promise<SyntyArenaKit>} Kit; rejects when the pack is missing.
  */
-export async function loadSyntyKit(THREE, pieces, extraTextures = {}) {
+export async function loadSyntyKit(THREE, pieces, extraTextures = {}, manager = null) {
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
-    const manager = new THREE.LoadingManager();
-    // The texture paths baked into the FBX files are stale; materials are rebuilt by name below.
-    manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    if (!manager) {
+        manager = new THREE.LoadingManager();
+        // The texture paths baked into the FBX files are stale; materials are rebuilt by name below.
+        manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+    }
     const fbx = new FBXLoader(manager);
+    const loadTex = async (url, opts) => {
+        manager.itemStart(url);
+        try {
+            const texture = await loadTexture(THREE, url, opts);
+            manager.itemEnd(url);
+            return texture;
+        } catch (error) {
+            manager.itemError(url);
+            throw error;
+        }
+    };
     // Shared: the coliseum and the countryside skin their pieces from the same atlases and building textures.
     const textures = Object.fromEntries(await Promise.all(Object.entries({ ...MATERIAL_TEXTURES, ...extraTextures }).map(async ([name, file]) => (
-        [name, await loadTexture(THREE, `${TEXTURES}${file}`, { repeat: true, anisotropy: 4, share: true })]
+        [name, await loadTex(`${TEXTURES}${file}`, { repeat: true, anisotropy: 4, share: true })]
     ))));
-    const dungeonAtlas = await loadTexture(THREE, `${DUNGEON}Textures/Dungeons_Texture_01.png`, { share: true });
+    const dungeonAtlas = await loadTex(`${DUNGEON}Textures/Dungeons_Texture_01.png`, { share: true });
     textures.dungeon = dungeonAtlas;
     textures.dungeonDark = dungeonAtlas;
     if (Object.values(pieces).some((file) => file.startsWith(MINI_PREFIX))) {
-        textures.mini = await loadTexture(THREE, `${MINI}Textures/PolygonMinis_Texture_01.png`, { share: true });
+        textures.mini = await loadTex(`${MINI}Textures/PolygonMinis_Texture_01.png`, { share: true });
     }
     const loaded = new Map(await Promise.all(Object.entries(pieces).map(async ([name, file]) => {
         if (file.startsWith(MINI_PREFIX)) {

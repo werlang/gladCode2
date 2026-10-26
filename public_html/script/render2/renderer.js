@@ -260,11 +260,54 @@ export class BattleRenderer {
      * @param {Array<Record<string, unknown>>} gladiators First replay frame gladiators.
      */
     async prepare(gladiators) {
+        const thirdContainer = document.querySelector('#loadbar #third');
+        const statusArena = document.querySelector('#loadbar #status-arena');
+        const thirdBar = document.querySelector('#loadbar #third .bar');
+        const secondBar = document.querySelector('#loadbar #second .bar');
+        const mainBar = document.querySelector('#loadbar #main .bar');
+        const status = document.querySelector('#loadbar #status');
+
+        if (thirdContainer) thirdContainer.style.display = 'block';
+        if (statusArena) {
+            statusArena.style.display = 'block';
+            statusArena.textContent = 'Carregando arena 3D';
+        }
+        if (thirdBar) thirdBar.style.width = '0%';
+        if (status) status.textContent = 'Montando gladiadores 3D';
+        if (secondBar) secondBar.style.width = '0%';
+        if (mainBar) mainBar.style.width = '50%';
+
+        const EMPTY_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
+        const IMAGE_URL = /\.(png|jpe?g|tga|tif|psd)(\?|$)/i;
+
+        const gladiatorManager = new this.#THREE.LoadingManager();
+        gladiatorManager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+        gladiatorManager.onProgress = (_url, loaded, total) => {
+            const pct = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
+            if (secondBar) secondBar.style.width = `${pct}%`;
+            if (status) status.textContent = `Montando gladiadores 3D (${loaded}/${total})`;
+            if (mainBar) mainBar.style.width = `${50 + Math.round(pct * 0.2)}%`;
+        };
+
         this.#skinColors = await sampleSkinColors(gladiators.map((gladiator) => gladiator.skin));
-        this.#createModel = await loadSynty(this.#THREE, gladiators.map((gladiator, index) => getAppearance(gladiator.skin, index, this.#skinColors)));
+        this.#createModel = await loadSynty(this.#THREE, gladiators.map((gladiator, index) => getAppearance(gladiator.skin, index, this.#skinColors)), gladiatorManager);
+
+        if (secondBar) secondBar.style.width = '100%';
+        if (status) status.textContent = 'Gladiadores prontos';
+        if (mainBar) mainBar.style.width = '70%';
+
+        const arenaManager = new this.#THREE.LoadingManager();
+        arenaManager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+        arenaManager.onProgress = (_url, loaded, total) => {
+            const pct = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
+            if (thirdBar) thirdBar.style.width = `${pct}%`;
+            if (statusArena) statusArena.textContent = `Carregando arena 3D (${loaded}/${total})`;
+            if (mainBar) mainBar.style.width = `${70 + Math.round(pct * 0.25)}%`;
+        };
+
         try {
             const { loadSyntyArena } = await import('./synty-arena.js');
-            this.#arena.applySynty(await loadSyntyArena(this.#THREE));
+            this.#arena.applySynty(await loadSyntyArena(this.#THREE, arenaManager), arenaManager);
             const crowd = Number(window.prefs?.crowd);
             this.setCrowdDensity(Number.isFinite(crowd) ? crowd : 1);
         }
@@ -528,12 +571,18 @@ export class BattleRenderer {
      */
     async #warmUp() {
         const status = document.querySelector('#loadbar #status');
+        const statusArena = document.querySelector('#loadbar #status-arena');
+        const thirdBar = document.querySelector('#loadbar #third .bar');
+        const mainBar = document.querySelector('#loadbar #main .bar');
         const say = (text) => {
-            if (status) status.textContent = text;
+            if (statusArena) statusArena.textContent = text;
+            else if (status) status.textContent = text;
         };
         say('Montando o coliseu');
         await Promise.race([this.#arena.ready, new Promise((resolve) => window.setTimeout(resolve, WARM_UP_TIMEOUT_MS))]);
         say('Preparando os gráficos');
+        if (thirdBar) thirdBar.style.width = '100%';
+        if (mainBar) mainBar.style.width = '100%';
         this.#effects.setPoolsVisible(true);
         try {
             await this.#renderer.compileAsync(this.#scene, this.#camera);

@@ -91,6 +91,10 @@
             <div id='second' class='bar-container'>
                 <div class='bar'></div>
             </div>
+            <span id='status-arena' class='text' style='display: none;'></span>
+            <div id='third' class='bar-container' style='display: none;'>
+                <div class='bar'></div>
+            </div>
         </div>
     </div>
     <div id='log' hidden><?php echo $loghash; ?></div>
