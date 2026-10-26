@@ -6,15 +6,10 @@ const ICONS = Object.freeze({
     settings: '', expand: '', compress: '', back: '', forward: '', play: '', pause: '',
     slower: '', faster: '+', music: '', sfx: '', mute: '', help: '?', share: '',
     tournament: '', fixed: '', follow: '', first: '', cinematic: '', free: '',
-    close: '', up: '', down: '', mouse: '', keyboard: '',
+    close: '', up: '', down: '', mouse: '', keyboard: '', touch: '',
 });
-const BAR_WIDTH = 660;
-const BAR_HEIGHT = 96;
 const BAR_MARGIN = 10;
 const FRAME_BORDER = 14;
-const TRACK = { x: 30, y: 30, right: 112 };
-const ROW_Y = 66;
-const BUTTON_HEIGHT = 38;
 const GOLD = '#f7e7c2';
 const BRONZE = 'rgba(200, 145, 58, 0.6)';
 const PANEL_FILL = 'rgba(17, 12, 9, 0.92)';
@@ -23,18 +18,43 @@ const SPEED_COLORS = { slow: '#86c2ff', normal: GOLD, fast: '#ffa040' };
 const INSPECT_WIDTH = 310;
 const INSPECT_TITLE = 38;
 const INSPECT_HEIGHT = 440;
-const HELP_WIDTH = 680;
-const HELP_HEIGHT = 540;
 const COMMAND_HISTORY = 5;
 const TOAST_SECONDS = 1.6;
 /** The victor's laurels: fade in, hold, fade out (seconds). */
 const LAUREL_TIMES = [0.9, 5, 1.2];
 const LAUREL_SIZE = 560;
 
+/** A row of the control bar: [id, width] buttons and plain-number gaps. */
 const BUTTONS = [
     ['settings', 40], ['fullscreen', 40], 14, ['back', 40], ['play', 50], ['forward', 40], 14,
     ['slower', 34], ['speed', 96], ['faster', 34], 14, ['camera', 40], ['sound', 40], ['share', 40], ['help', 40],
 ];
+/**
+ * Control bar layouts in bar pixels (the bar is then scaled to the screen): `wide` is one row of buttons under the
+ * timeline; `compact` (a phone held upright, a narrow window) puts playback and speed on one row and the rest on
+ * another, with larger targets. `rows` are [centre y, buttons].
+ */
+const BAR_LAYOUTS = Object.freeze({
+    wide: { width: 660, height: 96, track: { x: 30, y: 30, right: 112 }, buttonHeight: 38, rows: [[66, BUTTONS]] },
+    compact: {
+        width: 372,
+        height: 160,
+        track: { x: 26, y: 30, right: 110 },
+        buttonHeight: 44,
+        rows: [
+            [76, [['back', 44], ['play', 56], ['forward', 44], 12, ['slower', 42], ['speed', 80], ['faster', 42]]],
+            [124, [['settings', 48], ['fullscreen', 48], ['camera', 48], ['sound', 48], ['share', 48], ['help', 48]]],
+        ],
+    },
+});
+/** The wide bar is kept while it fits at this scale or more; on a touch screen it may grow up to `TOUCH_BAR_SCALE`. */
+const WIDE_MIN_SCALE = 0.9;
+const TOUCH_BAR_SCALE = 1.15;
+/** Height of the timeline's grab area (bar pixels): a finger needs more than the mouse. */
+const TRACK_GRIP = { mouse: 20, touch: 38 };
+/** Touch: seconds without a touch before the playing replay's controls fade away (a tap on the arena brings them back), and the fade. */
+const CHROME_IDLE_SECONDS = 4;
+const CHROME_FADE_SECONDS = 0.3;
 const BUFF_NAMES = { burn: 'Queimando', movement: 'Velocidade', resist: 'Proteção', invisible: 'Invisível', stun: 'Atordoado' };
 
 /** The shortcuts window: [title, icon, rows of [keys, action]], in two columns. */
@@ -44,7 +64,7 @@ const SHORTCUTS = Object.freeze([
             ['Arrastar (esq.)', 'Mover a câmera'],
             ['Arrastar (dir.)', 'Girar / olhar em volta'],
             ['Roda', 'Zoom / distância'],
-            ['Clique no painel', 'Inspecionar gladiador'],
+            ['Clique', 'Inspecionar (painel ou arena)'],
         ]],
         ['Exibição', 'keyboard', [
             ['M', 'Painéis dos gladiadores'],
@@ -69,6 +89,22 @@ const SHORTCUTS = Object.freeze([
         ]],
     ],
 ]);
+/** The same window on a touch screen: the gestures, in one column. */
+const GESTURES = Object.freeze([
+    [
+        ['Gestos', 'touch', [
+            ['Arrastar 1 dedo', 'Girar / olhar em volta'],
+            ['Arrastar 2 dedos', 'Mover a câmera'],
+            ['Pinça', 'Zoom / distância'],
+            ['Torcer 2 dedos', 'Virar a arena'],
+            ['Tocar no gladiador', 'Inspecionar'],
+            ['Tocar no painel', 'Inspecionar'],
+            ['Tocar na arena', 'Mostrar / ocultar controles'],
+        ]],
+    ],
+]);
+/** Shortcuts window sizes: two columns for the keyboard, one for the gestures; `key` is the key-cap column. */
+const HELP_SPECS = Object.freeze({ keyboard: { width: 680, height: 540, key: 118 }, touch: { width: 400, height: 380, key: 140 } });
 
 const formatSpeed = (speed) => `${String(speed).replace('.', ',')}×`;
 const formatClock = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -81,7 +117,9 @@ const smooth = (t) => t * t * (3 - 2 * t);
  * (timeline, settings, fullscreen, step back/forward, play/pause, speed −/+ with its cue, inspect camera, sound,
  * share, shortcuts), the status badge and toasts, the FPS counter, the shortcuts window, the inspect window (opens
  * minimized) and the victor's laurels. Playback goes through `window.Playback` (playback.js); camera and selection
- * through the `host` callbacks. Every texture is redrawn only when what it shows changes.
+ * through the `host` callbacks. Every texture is redrawn only when what it shows changes. On a narrow screen the bar
+ * takes its two-row compact layout; on a touch screen the targets grow, hover tips give way to pressed buttons and the
+ * bar fades while the replay plays untouched (a tap on the arena brings it back).
  */
 export class PlaybackControls {
     #hud;
@@ -95,6 +133,12 @@ export class PlaybackControls {
     #scrub = null;
     #scale = 1;
     #bar = { x: 0, y: 0 };
+    /** The bar layout in use (`BAR_LAYOUTS`), picked each frame from the screen width. */
+    #layout = BAR_LAYOUTS.wide;
+    /** Touch: the bar's fade (alpha), whether it is faded away, and the seconds since the last touch. */
+    #chrome = { alpha: 1, hidden: false, idle: 0 };
+    /** Whether the browser can go fullscreen (an iPhone cannot: the button is left out). */
+    #canFullscreen = Boolean(document.fullscreenEnabled || document.webkitFullscreenEnabled);
     #help = false;
     #inspect = { index: null, open: false, history: [], lastTime: -Infinity };
     #potions = null;
@@ -128,6 +172,7 @@ export class PlaybackControls {
         window.addEventListener('pointerdown', this.#handleDown, true);
         window.addEventListener('pointermove', this.#handleMove);
         window.addEventListener('pointerup', this.#handleUp);
+        window.addEventListener('pointercancel', this.#handleUp);
         window.addEventListener('keydown', this.#handleKey);
     }
 
@@ -204,6 +249,23 @@ export class PlaybackControls {
     }
 
     /**
+     * A tap or click on the arena that the camera did not turn into a drag. On a touch screen a tap that picked
+     * no gladiator shows the faded controls, or hides them.
+     *
+     * @param {{ touch: boolean, picked: boolean }} tap Whether it was a finger, and whether it selected a gladiator.
+     */
+    tap({ touch, picked }) {
+        if (picked || !touch || this.#chrome.hidden) this.#wake();
+        else this.#chrome.hidden = true;
+    }
+
+    /** Shows the controls and restarts their idle timer. */
+    #wake() {
+        this.#chrome.hidden = false;
+        this.#chrome.idle = 0;
+    }
+
+    /**
      * Lays out and redraws what changed. Call once per frame before the HUD renders.
      *
      * @param {number} realDt Real seconds since the previous frame.
@@ -213,8 +275,17 @@ export class PlaybackControls {
         const playback = window.Playback;
         this.#regions = [];
         const { width, height } = this.#hud.size;
-        this.#scale = Math.min(1, (width - 16) / BAR_WIDTH);
-        this.#bar = { x: Math.round((width - BAR_WIDTH * this.#scale) / 2), y: Math.round(height - BAR_MARGIN - BAR_HEIGHT * this.#scale) };
+        const insets = this.#hud.insets;
+        const touch = this.#hud.touch;
+        // The one-row bar while it fits, the two-row one on a phone held upright; inside the safe area.
+        const room = width - 16 - insets.left - insets.right;
+        this.#layout = room / BAR_LAYOUTS.wide.width >= WIDE_MIN_SCALE ? BAR_LAYOUTS.wide : BAR_LAYOUTS.compact;
+        this.#scale = Math.min(touch ? TOUCH_BAR_SCALE : 1, room / this.#layout.width);
+        this.#bar = {
+            x: Math.round(insets.left + (width - insets.left - insets.right - this.#layout.width * this.#scale) / 2),
+            y: Math.round(height - BAR_MARGIN - insets.bottom - this.#layout.height * this.#scale),
+        };
+        this.#updateChrome(realDt, playback);
         if (playback) {
             this.#updateBar(playback);
             this.#updateBadge(playback, realDt);
@@ -233,6 +304,7 @@ export class PlaybackControls {
         window.removeEventListener('pointerdown', this.#handleDown, true);
         window.removeEventListener('pointermove', this.#handleMove);
         window.removeEventListener('pointerup', this.#handleUp);
+        window.removeEventListener('pointercancel', this.#handleUp);
         window.removeEventListener('keydown', this.#handleKey);
         Object.values(this.#sprites).forEach((sprite) => {
             sprite.material.map?.dispose();
@@ -305,20 +377,50 @@ export class PlaybackControls {
         return null;
     }
 
+    /**
+     * Top edge (CSS pixels) for something at the top of the screen spanning [x, x + width]: below the notch, and below
+     * the roster when the roster reaches across that span (the two-column phone roster).
+     */
+    #topY(x, width) {
+        const roster = this.#hud.rosterBounds;
+        const top = 10 + this.#hud.insets.top;
+        if (!roster.width || roster.x > x + width || roster.x + roster.width < x) return top;
+        return Math.max(top, Math.round(roster.y + roster.height + 8));
+    }
+
+    /** @returns {number} Where windows above the control bar sit on (the bar's top, or the bottom once it faded away). */
+    #barTop() {
+        return this.#chrome.alpha > 0 ? this.#bar.y : this.#hud.size.height - BAR_MARGIN - this.#hud.insets.bottom;
+    }
+
+    /** Touch: fades the bar out after a while of playing untouched; it always shows while paused, scrubbing or in a window. */
+    #updateChrome(realDt, playback) {
+        const chrome = this.#chrome;
+        const autoHide = this.#hud.touch && playback && !playback.paused && !this.#scrub && !this.#help;
+        if (!autoHide) this.#wake();
+        else if (!chrome.hidden && (chrome.idle += realDt) > CHROME_IDLE_SECONDS) chrome.hidden = true;
+        const step = realDt / CHROME_FADE_SECONDS;
+        chrome.alpha = chrome.hidden ? Math.max(0, chrome.alpha - step) : Math.min(1, chrome.alpha + step);
+    }
+
     // ------------------------------------------------------------------ control bar
 
     #layoutButtons() {
-        const total = BUTTONS.reduce((sum, item) => sum + (Array.isArray(item) ? item[1] + 4 : item), 0) - 4;
-        let x = (BAR_WIDTH - total) / 2;
+        const { width: barWidth, buttonHeight, rows } = this.#layout;
         const buttons = [];
-        for (const item of BUTTONS) {
-            if (!Array.isArray(item)) {
-                x += item;
-                continue;
+        for (const [rowY, row] of rows) {
+            const items = row.filter((item) => this.#canFullscreen || item[0] !== 'fullscreen');
+            const total = items.reduce((sum, item) => sum + (Array.isArray(item) ? item[1] + 4 : item), 0) - 4;
+            let x = (barWidth - total) / 2;
+            for (const item of items) {
+                if (!Array.isArray(item)) {
+                    x += item;
+                    continue;
+                }
+                const [id, width] = item;
+                buttons.push({ id, x, y: rowY - buttonHeight / 2, width, height: buttonHeight });
+                x += width + 4;
             }
-            const [id, width] = item;
-            buttons.push({ id, x, y: ROW_Y - BUTTON_HEIGHT / 2, width, height: BUTTON_HEIGHT });
-            x += width + 4;
         }
         return buttons;
     }
@@ -345,7 +447,8 @@ export class PlaybackControls {
     #updateBar(playback) {
         const camera = this.#host.camera();
         const steps = Math.max(1, playback.length - 1);
-        const trackWidth = BAR_WIDTH - TRACK.x - TRACK.right;
+        const { width: barWidth, height: barHeight, track } = this.#layout;
+        const trackWidth = barWidth - track.x - track.right;
         const progress = Math.max(0, Math.min(1, playback.position / steps));
         const frame = this.#host.frame();
         const now = Number(frame?.simtime) || playback.position / 10;
@@ -354,39 +457,50 @@ export class PlaybackControls {
         const tips = this.#tips(playback, camera);
         const inspecting = this.#inspect.index !== null;
         const key = [Math.round(progress * trackWidth), formatClock(now), formatClock(total), playback.paused, playback.speedIndex, playback.soundState,
-            playback.fullscreen, camera.mode, camera.inspectMode, inspecting, this.#hover, this.#help, this.#hud.artVersion, this.#copied > 0].join('|');
+            playback.fullscreen, camera.mode, camera.inspectMode, inspecting, this.#hover, this.#help, this.#hud.artVersion, this.#copied > 0,
+            this.#layout === BAR_LAYOUTS.wide, this.#hud.touch].join('|');
         const s = this.#scale;
         const { x: left, y: top } = this.#bar;
-        // Clickable areas, in screen pixels.
-        this.#region('bar', left, top, BAR_WIDTH * s, BAR_HEIGHT * s);
-        this.#region('track', left + (TRACK.x - 6) * s, top + (TRACK.y - 10) * s, (trackWidth + 12) * s, 20 * s);
-        for (const button of buttons) this.#region(button.id, left + button.x * s, top + button.y * s, button.width * s, button.height * s, tips[button.id]);
-        this.#place('bar', left, top, BAR_WIDTH, BAR_HEIGHT, s);
+        const sprite = this.#sprites.bar;
+        if (this.#chrome.alpha <= 0) {
+            sprite.visible = false;
+            return;
+        }
+        // Clickable areas, in screen pixels (none while fading away, so taps reach the arena).
+        if (!this.#chrome.hidden) {
+            const grip = TRACK_GRIP[this.#hud.touch ? 'touch' : 'mouse'];
+            this.#region('bar', left, top, barWidth * s, barHeight * s);
+            this.#region('track', left + (track.x - 6) * s, top + (track.y - grip / 2) * s, (trackWidth + 12) * s, grip * s);
+            for (const button of buttons) this.#region(button.id, left + button.x * s, top + button.y * s, button.width * s, button.height * s, tips[button.id]);
+        }
+        this.#place('bar', left, top, barWidth, barHeight, s);
+        sprite.material.opacity = smooth(this.#chrome.alpha);
         if (this.#keys.bar === key) return;
         this.#keys.bar = key;
 
-        const ctx = this.#canvasFor('bar', BAR_WIDTH, BAR_HEIGHT);
-        this.#panel(ctx, 0, 0, BAR_WIDTH, BAR_HEIGHT);
-        // Timeline: dark trough, gold progress, a sapphire handle; the clock on the right.
+        const ctx = this.#canvasFor('bar', barWidth, barHeight);
+        this.#panel(ctx, 0, 0, barWidth, barHeight);
+        // Timeline: dark trough, gold progress, a sapphire handle (larger for a finger); the clock on the right.
         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        roundRect(ctx, TRACK.x, TRACK.y - 3, trackWidth, 6, 3);
+        roundRect(ctx, track.x, track.y - 3, trackWidth, 6, 3);
         ctx.fill();
-        const fill = ctx.createLinearGradient(0, TRACK.y - 3, 0, TRACK.y + 3);
+        const fill = ctx.createLinearGradient(0, track.y - 3, 0, track.y + 3);
         fill.addColorStop(0, '#ffe7a0');
         fill.addColorStop(1, '#d9962c');
         ctx.fillStyle = fill;
-        roundRect(ctx, TRACK.x, TRACK.y - 2, Math.max(4, trackWidth * progress), 4, 2);
+        roundRect(ctx, track.x, track.y - 2, Math.max(4, trackWidth * progress), 4, 2);
         ctx.fill();
-        const handleX = TRACK.x + trackWidth * progress;
+        const handleX = track.x + trackWidth * progress;
+        const knob = (this.#hud.touch ? 11 : 8) + (this.#hover === 'track' || this.#scrub ? 1 : 0);
         ctx.beginPath();
-        ctx.arc(handleX, TRACK.y, this.#hover === 'track' || this.#scrub ? 9 : 8, 0, Math.PI * 2);
+        ctx.arc(handleX, track.y, knob, 0, Math.PI * 2);
         ctx.fillStyle = '#c8913a';
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(handleX, TRACK.y, 5, 0, Math.PI * 2);
+        ctx.arc(handleX, track.y, knob - 3, 0, Math.PI * 2);
         ctx.fillStyle = '#31a7c7';
         ctx.fill();
-        outlined(ctx, `${formatClock(now)} / ${formatClock(total)}`, BAR_WIDTH - TRACK.right + 14, TRACK.y + 1, { font: `700 13px ${TITLE_FONT}`, color: GOLD, width: 2 });
+        outlined(ctx, `${formatClock(now)} / ${formatClock(total)}`, barWidth - track.right + 14, track.y + 1, { font: `700 13px ${TITLE_FONT}`, color: GOLD, width: 2, maxWidth: track.right - 18 });
 
         for (const button of buttons) this.#drawButton(ctx, button, playback, camera, inspecting);
         this.#commit('bar');
@@ -490,7 +604,8 @@ export class PlaybackControls {
             this.#commit('badge');
         }
         const scale = 1 + 0.12 * smooth(this.#badgePulse);
-        this.#place('badge', (this.#hud.size.width - width * scale) / 2, 10, width, height, scale);
+        const x = (this.#hud.size.width - width) / 2;
+        this.#place('badge', (this.#hud.size.width - width * scale) / 2, this.#topY(x, width), width, height, scale);
     }
 
     #updateToast(realDt) {
@@ -512,7 +627,8 @@ export class PlaybackControls {
             outlined(ctx, toast.text, width / 2, height / 2 + 1, { font: `700 13px ${FONT}`, color: GOLD, align: 'center', width: 2 });
             this.#commit('toast');
         }
-        this.#place('toast', (this.#hud.size.width - width) / 2, 52, width, height);
+        const x = (this.#hud.size.width - width) / 2;
+        this.#place('toast', x, this.#topY(x, width) + 42, width, height);
         sprite.material.opacity = Math.min(1, (TOAST_SECONDS - toast.age) / 0.4);
     }
 
@@ -546,12 +662,16 @@ export class PlaybackControls {
             outlined(ctx, text, width / 2, height / 2 + 1, { font: `15px ${NUMBER_FONT}`, color: fps.value >= 50 ? '#9be870' : fps.value >= 30 ? '#f0c453' : '#ff8a70', align: 'center', width: 2 });
             this.#commit('fps');
         }
-        this.#place('fps', this.#hud.size.width - width - 10, 10, width, height);
+        const x = this.#hud.size.width - this.#hud.insets.right - width - 10;
+        const y = this.#topY(x, width);
+        // Under the roster on a phone, where the badge sits too: one line lower.
+        this.#place('fps', x, y > 10 + this.#hud.insets.top ? y + 42 : y, width, height);
     }
 
     #updateTooltip() {
         const sprite = this.#sprites.tooltip;
-        const region = this.#regions.find((candidate) => candidate.id === this.#hover && candidate.tip);
+        // No hover on a touch screen: a finger's press only lights its button.
+        const region = this.#hud.touch ? null : this.#regions.find((candidate) => candidate.id === this.#hover && candidate.tip);
         if (!region || this.#scrub) {
             sprite.visible = false;
             return;
@@ -594,22 +714,27 @@ export class PlaybackControls {
         backdrop.scale.set(screenWidth, screenHeight, 1);
         this.#region('backdrop', 0, 0, screenWidth, screenHeight);
 
-        const scale = Math.min(1, (screenWidth - 16) / HELP_WIDTH, (screenHeight - 16) / HELP_HEIGHT);
-        const x = (screenWidth - HELP_WIDTH * scale) / 2;
-        const y = (screenHeight - HELP_HEIGHT * scale) / 2;
-        this.#region('help-window', x, y, HELP_WIDTH * scale, HELP_HEIGHT * scale);
-        this.#region('help-close', x + (HELP_WIDTH - 46) * scale, y + 12 * scale, 32 * scale, 32 * scale, 'Fechar (Esc)');
-        this.#region('help-ok', x + (HELP_WIDTH / 2 - 50) * scale, y + (HELP_HEIGHT - 52) * scale, 100 * scale, 34 * scale);
-        this.#place('help', x, y, HELP_WIDTH, HELP_HEIGHT, scale);
-        const key = `${this.#hud.artVersion}|${this.#hover}`;
+        const touch = this.#hud.touch;
+        const { width: W, height: H, key: keyWidth } = HELP_SPECS[touch ? 'touch' : 'keyboard'];
+        const pages = touch ? GESTURES : SHORTCUTS;
+        const columnWidth = W / pages.length;
+        // A lone column keeps clear of the right frame as the two columns keep clear of each other.
+        const textRoom = (pages.length > 1 ? columnWidth : W - 26) - keyWidth - 44;
+        const scale = Math.min(1, (screenWidth - 16) / W, (screenHeight - 16) / H);
+        const x = (screenWidth - W * scale) / 2;
+        const y = (screenHeight - H * scale) / 2;
+        this.#region('help-window', x, y, W * scale, H * scale);
+        this.#region('help-close', x + (W - 46) * scale, y + 12 * scale, 32 * scale, 32 * scale, 'Fechar (Esc)');
+        this.#region('help-ok', x + (W / 2 - 50) * scale, y + (H - 52) * scale, 100 * scale, 34 * scale);
+        this.#place('help', x, y, W, H, scale);
+        const key = `${this.#hud.artVersion}|${this.#hover}|${touch}`;
         if (this.#keys.help === key) return;
         this.#keys.help = key;
 
-        const ctx = this.#canvasFor('help', HELP_WIDTH, HELP_HEIGHT);
-        this.#panel(ctx, 0, 0, HELP_WIDTH, HELP_HEIGHT, 18);
-        outlined(ctx, 'Atalhos', HELP_WIDTH / 2, 32, { font: `900 22px ${TITLE_FONT}`, color: GOLD, align: 'center', width: 3 });
-        this.#icon(ctx, ICONS.close, HELP_WIDTH - 30, 28, 16, this.#hover === 'help-close' ? '#fff3c4' : GOLD);
-        const keyWidth = 118;
+        const ctx = this.#canvasFor('help', W, H);
+        this.#panel(ctx, 0, 0, W, H, 18);
+        outlined(ctx, touch ? 'Controles' : 'Atalhos', W / 2, 32, { font: `900 22px ${TITLE_FONT}`, color: GOLD, align: 'center', width: 3 });
+        this.#icon(ctx, ICONS.close, W - 30, 28, 16, this.#hover === 'help-close' ? '#fff3c4' : GOLD);
         const section = (title, glyph, rows, left, top) => {
             this.#icon(ctx, ICONS[glyph], left + 9, top, 15, '#f0c453');
             outlined(ctx, title, left + 24, top + 1, { font: `700 15px ${TITLE_FONT}`, color: '#f0c453', width: 2 });
@@ -623,22 +748,22 @@ export class PlaybackControls {
                 ctx.strokeStyle = BRONZE;
                 ctx.lineWidth = 1;
                 ctx.stroke();
-                outlined(ctx, keys, left + capWidth / 2, rowY + 1, { font: `700 12px ${FONT}`, color: '#fff3c4', align: 'center', width: 0.01 });
-                outlined(ctx, text, left + keyWidth + 10, rowY + 1, { font: `13px ${FONT}`, color: '#e9dcc0', width: 0.01, maxWidth: HELP_WIDTH / 2 - keyWidth - 44 });
+                outlined(ctx, keys, left + capWidth / 2, rowY + 1, { font: `700 12px ${FONT}`, color: '#fff3c4', align: 'center', width: 0.01, maxWidth: capWidth - 10 });
+                outlined(ctx, text, left + keyWidth + 10, rowY + 1, { font: `13px ${FONT}`, color: '#e9dcc0', width: 0.01, maxWidth: textRoom });
             });
             return top + 30 + rows.length * 28 + 14;
         };
-        SHORTCUTS.forEach((sections, column) => {
+        pages.forEach((sections, column) => {
             let top = 78;
-            for (const [title, glyph, rows] of sections) top = section(title, glyph, rows, 30 + column * (HELP_WIDTH / 2 - 10), top);
+            for (const [title, glyph, rows] of sections) top = section(title, glyph, rows, 30 + column * (columnWidth - 10), top);
         });
         const hover = this.#hover === 'help-ok';
         ctx.fillStyle = hover ? 'rgba(255, 214, 140, 0.3)' : 'rgba(255, 214, 140, 0.16)';
-        roundRect(ctx, HELP_WIDTH / 2 - 50, HELP_HEIGHT - 52, 100, 34, 7);
+        roundRect(ctx, W / 2 - 50, H - 52, 100, 34, 7);
         ctx.fill();
         ctx.strokeStyle = '#e2b25a';
         ctx.stroke();
-        outlined(ctx, 'OK', HELP_WIDTH / 2, HELP_HEIGHT - 34, { font: `700 15px ${TITLE_FONT}`, color: GOLD, align: 'center', width: 2 });
+        outlined(ctx, 'OK', W / 2, H - 34, { font: `700 15px ${TITLE_FONT}`, color: GOLD, align: 'center', width: 2 });
         this.#commit('help');
     }
 
@@ -665,13 +790,20 @@ export class PlaybackControls {
         const glad = fighter.state;
         const camera = this.#host.camera();
         const height = open ? INSPECT_HEIGHT : INSPECT_TITLE;
-        const s = this.#scale;
-        const x = this.#hud.size.width - INSPECT_WIDTH * s - 8;
-        const y = this.#bar.y - height * s - 8;
+        // Bottom right above the control bar, inside the safe area and clear of a roster that reaches across.
+        const insets = this.#hud.insets;
+        const right = this.#hud.size.width - insets.right - 8;
+        const bottom = this.#barTop() - 8;
+        const roster = this.#hud.rosterBounds;
+        const ceiling = roster.width && roster.x + roster.width > right - INSPECT_WIDTH ? roster.y + roster.height + 8 : insets.top + 8;
+        const s = Math.max(0.5, Math.min(1, (right - insets.left - 8) / INSPECT_WIDTH, (bottom - ceiling) / height));
+        const x = right - INSPECT_WIDTH * s;
+        const y = bottom - height * s;
+        // The title's buttons take its full height, so a finger finds them.
         this.#region('inspect', x, y, INSPECT_WIDTH * s, height * s);
-        this.#region('inspect-toggle', x, y, (INSPECT_WIDTH - 118) * s, INSPECT_TITLE * s, open ? 'Minimizar' : 'Mostrar detalhes');
-        this.#region('inspect-camera', x + (INSPECT_WIDTH - 116) * s, y + 7 * s, 80 * s, 24 * s, 'Câmera da inspeção (C)');
-        this.#region('inspect-close', x + (INSPECT_WIDTH - 32) * s, y + 7 * s, 24 * s, 24 * s, 'Parar a inspeção (Esc)');
+        this.#region('inspect-toggle', x, y, (INSPECT_WIDTH - 120) * s, INSPECT_TITLE * s, open ? 'Minimizar' : 'Mostrar detalhes');
+        this.#region('inspect-camera', x + (INSPECT_WIDTH - 118) * s, y, 84 * s, INSPECT_TITLE * s, 'Câmera da inspeção (C)');
+        this.#region('inspect-close', x + (INSPECT_WIDTH - 34) * s, y, 34 * s, INSPECT_TITLE * s, 'Parar a inspeção (Esc)');
         this.#place('inspect', x, y, INSPECT_WIDTH, height, s);
 
         const viewLabel = camera.mode === 'cinematic' ? 'Cinema' : camera.mode === 'free' ? 'Livre' : INSPECT_LABELS[camera.inspectMode];
@@ -963,6 +1095,11 @@ export class PlaybackControls {
     #share() {
         const link = window.Playback?.link;
         if (!link) return;
+        // A phone offers its own share sheet (messages, apps); elsewhere the link is copied.
+        if (this.#hud.touch && navigator.share) {
+            navigator.share({ title: document.title, url: `https://${link}` }).catch(() => {});
+            return;
+        }
         navigator.clipboard?.writeText(`https://${link}`).catch(() => {});
         this.#copied = 2;
         this.toast('Link da batalha copiado');
@@ -978,19 +1115,26 @@ export class PlaybackControls {
 
     #scrubTo(x) {
         const playback = window.Playback;
-        const trackWidth = (BAR_WIDTH - TRACK.x - TRACK.right) * this.#scale;
-        const start = this.#bar.x + TRACK.x * this.#scale;
+        const { width, track } = this.#layout;
+        const trackWidth = (width - track.x - track.right) * this.#scale;
+        const start = this.#bar.x + track.x * this.#scale;
         const share = Math.max(0, Math.min(1, (x - start) / trackWidth));
         playback.seek(Math.round(share * (playback.length - 1) * 10) / 10);
     }
 
     #handleDown = (event) => {
         if (!this.#container?.contains(event.target)) return;
+        // The HUD follows the last kind of press: finger-sized and auto-hiding for touch, hover tips for the mouse.
+        this.#hud.touch = event.pointerType === 'touch';
+        if (this.#hud.touch) this.#chrome.idle = 0;
         const hit = this.#hit(event);
         if (!hit) return;
         // Everything under the controls stays away from the camera and the roster.
         event.stopPropagation();
         event.preventDefault();
+        this.#wake();
+        // A finger lights the button it presses (there is no hover to show it).
+        if (this.#hud.touch) this.#hover = hit.region.id;
         if (event.button === 0) this.#act(hit.region.id, hit);
     };
 
@@ -1000,6 +1144,7 @@ export class PlaybackControls {
             this.#scrubTo(event.clientX - rect.left);
             return;
         }
+        if (event.pointerType !== 'mouse') return;
         const hit = event.target instanceof Node && this.#container?.contains(event.target) ? this.#hit(event) : null;
         const id = hit?.region.id ?? null;
         if (id !== this.#hover) {
@@ -1008,7 +1153,8 @@ export class PlaybackControls {
         }
     };
 
-    #handleUp = () => {
+    #handleUp = (event) => {
+        if (event.pointerType !== 'mouse') this.#hover = null;
         if (!this.#scrub) return;
         if (this.#scrub.wasPlaying) window.Playback?.setPaused(false);
         this.#scrub = null;

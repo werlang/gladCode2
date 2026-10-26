@@ -1,6 +1,17 @@
 import { BaseComponent } from './base-component.js';
+import { TouchGestures } from './touch-gestures.js';
 
 const CAMERA_DISTANCE = 36;
+/** A tall (portrait) screen pulls the overview back so the combat square still fits across: (1 / aspect) ^ this, at most `PORTRAIT_FIT_MAX`. */
+const PORTRAIT_FIT_POWER = 0.8;
+const PORTRAIT_FIT_MAX = 2;
+/** Touch: radians a finger turns the camera per pixel (a little faster than the mouse), and how far two fingers must travel together before a pinch also pans while inspecting. */
+const TOUCH_ROTATE = 1.25;
+const TOUCH_PAN_SLOP = 28;
+/** Metres the ghost flies per unit of log zoom (a wheel notch is about 1.5 m). */
+const GHOST_ZOOM_FLIGHT = 15.7;
+/** A mouse press that moves less than this (CSS pixels) is a click. */
+const CLICK_SLOP = 5;
 const DEFAULT_PITCH = 0.85;
 // Low enough for a stadium view, high enough that the camera stays above the stands.
 const MIN_PITCH = 0.4;
@@ -49,7 +60,9 @@ const smooth = (t) => t * t * (3 - 2 * t);
 const wrap = (angle) => Math.atan2(Math.sin(angle), Math.cos(angle));
 
 /**
- * Mouse controls for the perspective battle camera: left drag pans, right (or Shift) drag rotates, the wheel zooms.
+ * Mouse and touch controls for the perspective battle camera: left drag pans, right (or Shift) drag rotates, the wheel
+ * zooms; on a touch screen one finger rotates (orbits, looks round), two fingers pan, pinch to zoom and twist to turn.
+ * A click or tap that does not drag goes to `onTap` (the renderer picks a fighter or shows the controls).
  * An inspected gladiator is framed in one of `INSPECT_MODES` (fixed: the overview follows it; follow: third person
  * behind it, the wheel setting the distance; first: through its eyes), and `cinematic` slowly circles a fighter (the
  * victor). Mode changes glide over `TRANSITION_SECONDS`; any drag in the cinematic hands the camera back.
@@ -85,15 +98,25 @@ export class BattleCameraController extends BaseComponent {
     #cFired = false;
     /** Ghost flying keys held down (`KeyboardEvent.code`). */
     #held = new Set();
+    /** Fingers on the canvas. */
+    #touches = new TouchGestures();
+    /** Where a mouse press began, to tell a click from a drag. */
+    #pressAt = null;
+    /** Overview distance factor for a portrait screen (1 when landscape). */
+    #fit = 1;
+    #onTap;
 
     /**
-     * @param {{ THREE: typeof import('three'), camera: import('three').PerspectiveCamera, canvas: HTMLCanvasElement }} options Controller dependencies.
+     * @param {{ THREE: typeof import('three'), camera: import('three').PerspectiveCamera, canvas: HTMLCanvasElement,
+     *   onTap?: (point: { x: number, y: number, touch: boolean }) => void }} options Controller dependencies; `onTap` gets
+     *   canvas-relative CSS pixels.
      */
-    constructor({ THREE, camera, canvas }) {
+    constructor({ THREE, camera, canvas, onTap = () => {} }) {
         super();
         this.#THREE = THREE;
         this.#camera = camera;
         this.#canvas = canvas;
+        this.#onTap = onTap;
         this.#target = new THREE.Vector3(0, 0, 0);
         this.#scratch = { position: new THREE.Vector3(), look: new THREE.Vector3(), from: new THREE.Vector3(), lookFrom: new THREE.Vector3(), head: new THREE.Vector3() };
         this.#lastLook = new THREE.Vector3();
@@ -102,6 +125,7 @@ export class BattleCameraController extends BaseComponent {
         this.on(canvas, 'pointerdown', this.#handlePointerDown);
         this.on(window, 'pointermove', this.#handlePointerMove);
         this.on(window, 'pointerup', this.#handlePointerUp);
+        this.on(window, 'pointercancel', this.#handlePointerUp);
         this.on(canvas, 'contextmenu', (event) => event.preventDefault());
         this.on(canvas, 'wheel', this.#handleWheel, { passive: false });
         this.on(window, 'keydown', this.#handleKeyDown);
@@ -109,6 +133,7 @@ export class BattleCameraController extends BaseComponent {
         this.on(window, 'blur', () => {
             this.#cDown = null;
             this.#held.clear();
+            this.#touches.clear();
         });
         this.update(0);
     }
@@ -228,6 +253,7 @@ export class BattleCameraController extends BaseComponent {
      */
     resize(width, height) {
         const aspect = Math.max(0.1, width / Math.max(1, height));
+        this.#fit = aspect < 1 ? Math.min(PORTRAIT_FIT_MAX, (1 / aspect) ** PORTRAIT_FIT_POWER) : 1;
         this.#camera.aspect = aspect;
         this.#camera.updateProjectionMatrix();
     }
@@ -306,10 +332,11 @@ export class BattleCameraController extends BaseComponent {
         }
         this.#target.x = Math.min(CAMERA_TARGET_LIMIT, Math.max(-CAMERA_TARGET_LIMIT, this.#target.x));
         this.#target.z = Math.min(CAMERA_TARGET_LIMIT, Math.max(-CAMERA_TARGET_LIMIT, this.#target.z));
-        const ground = Math.cos(this.#pitch) * CAMERA_DISTANCE;
+        const distance = CAMERA_DISTANCE * this.#fit;
+        const ground = Math.cos(this.#pitch) * distance;
         position.set(
             this.#target.x + Math.sin(this.#yaw) * ground,
-            Math.sin(this.#pitch) * CAMERA_DISTANCE,
+            Math.sin(this.#pitch) * distance,
             this.#target.z + Math.cos(this.#yaw) * ground,
         );
         look.copy(this.#target);
@@ -408,52 +435,105 @@ export class BattleCameraController extends BaseComponent {
 
     /** @param {PointerEvent} event Pointer start event. */
     #handlePointerDown = (event) => {
+        if (event.pointerType === 'touch') {
+            this.#touches.down(event.pointerId, event.clientX, event.clientY, event.timeStamp);
+            this.#canvas.setPointerCapture?.(event.pointerId);
+            this.#takeBack();
+            return;
+        }
         if (event.button > 2) return;
         this.#dragMode = event.button === 0 && !event.shiftKey ? 'pan' : 'rotate';
         this.#dragOrigin = { x: event.clientX, y: event.clientY };
+        this.#pressAt = event.button === 0 ? { x: event.clientX, y: event.clientY, moved: false } : null;
         this.#canvas.setPointerCapture?.(event.pointerId);
         this.#canvas.classList.add('is-dragging');
-        if (this.#ghost) return;
-        // Any drag takes the camera back from the cinematic.
-        if (this.#cinematic) {
-            this.#cinematic = null;
-            if (this.#subject && this.#inspectMode !== 'fixed') return;
-            this.#target.set(this.#lastLook.x, 0, this.#lastLook.z);
-            this.#glide();
-        }
+        this.#takeBack();
     };
+
+    /** Any drag takes the camera back from the cinematic (the ghost keeps flying). */
+    #takeBack() {
+        if (this.#ghost || !this.#cinematic) return;
+        this.#cinematic = null;
+        if (this.#subject && this.#inspectMode !== 'fixed') return;
+        this.#target.set(this.#lastLook.x, 0, this.#lastLook.z);
+        this.#glide();
+    }
 
     /** @param {PointerEvent} event Pointer movement event. */
     #handlePointerMove = (event) => {
+        if (this.#touches.has(event.pointerId)) {
+            this.#handleTouchMove(event);
+            return;
+        }
         if (!this.#dragOrigin) return;
-        const worldPerPixel = this.#viewSize * 0.9 / (Math.max(1, this.#canvas.clientHeight) * this.#camera.zoom);
         const deltaX = event.clientX - this.#dragOrigin.x;
         const deltaY = event.clientY - this.#dragOrigin.y;
         this.#dragOrigin = { x: event.clientX, y: event.clientY };
+        if (this.#pressAt && Math.hypot(event.clientX - this.#pressAt.x, event.clientY - this.#pressAt.y) > CLICK_SLOP) this.#pressAt.moved = true;
+        if (this.#ghost || this.#dragMode === 'rotate') this.#rotate(deltaX, deltaY);
+        else this.#drag(deltaX, deltaY);
+    };
+
+    /** One finger rotates like a right drag; two pan like a left drag, pinch like the wheel and twist turn the overview. */
+    #handleTouchMove(event) {
+        const gesture = this.#touches.move(event.pointerId, event.clientX, event.clientY);
+        if (!gesture) return;
+        if (gesture.kind === 'drag') {
+            this.#rotate(gesture.dx * TOUCH_ROTATE, gesture.dy * TOUCH_ROTATE);
+            return;
+        }
+        const applied = this.#zoomBy(gesture.scale);
+        if (!this.#ghost && !this.#subject && !this.#cinematic && applied !== 1) {
+            // The overview zooms toward the fingers: what lies under the pinch stays under it.
+            const rect = this.#canvas.getBoundingClientRect();
+            const offsetX = gesture.x - rect.left - rect.width / 2;
+            const offsetY = gesture.y - rect.top - rect.height / 2;
+            // (The camera still has the old magnification, so the shift is measured at it.)
+            this.#drag(-offsetX * (1 - 1 / applied), -offsetY * (1 - 1 / applied));
+        }
         if (this.#ghost) {
-            // Any button looks round, without limits but straight up or down.
+            const step = this.#worldPerPixel();
+            this.#fly(-gesture.dx * step, gesture.dy * step, 0);
+            return;
+        }
+        // While a gladiator is inspected, a pinch that barely drifts must not let it go.
+        if (!this.#subject || this.#touches.travel > TOUCH_PAN_SLOP) this.#drag(gesture.dx, gesture.dy);
+        if (!this.#subject && !this.#cinematic) this.#yaw += gesture.twist;
+    }
+
+    /** CSS pixels to metres on the ground at the overview's focus. */
+    #worldPerPixel() {
+        return this.#viewSize * 0.9 * this.#fit / (Math.max(1, this.#canvas.clientHeight) * this.#camera.zoom);
+    }
+
+    /** A rotate drag: looks round in the ghost and first person, orbits in third person, turns and tilts the overview. */
+    #rotate(deltaX, deltaY) {
+        if (this.#ghost) {
+            // Looks round without limits but straight up or down.
             this.#ghost.yaw -= deltaX * ROTATE_PER_PIXEL * 0.6;
             this.#ghost.pitch = Math.min(1.55, Math.max(-1.55, this.#ghost.pitch - deltaY * ROTATE_PER_PIXEL * 0.6));
-            return;
         }
-        if (this.#dragMode === 'rotate') {
-            if (this.#subject && this.#inspectMode === 'follow') {
-                this.#orbitOffset -= deltaX * ROTATE_PER_PIXEL;
-                this.#followPitch = Math.min(FOLLOW_PITCH_RANGE[1], Math.max(FOLLOW_PITCH_RANGE[0], this.#followPitch + deltaY * ROTATE_PER_PIXEL));
-            }
-            else if (this.#subject && this.#inspectMode === 'first') {
-                this.#lookYaw -= deltaX * ROTATE_PER_PIXEL;
-                this.#lookPitch = Math.min(1.2, Math.max(-1.2, this.#lookPitch - deltaY * ROTATE_PER_PIXEL));
-            }
-            else {
-                this.#yaw -= deltaX * ROTATE_PER_PIXEL;
-                this.#pitch = Math.min(MAX_PITCH, Math.max(MIN_PITCH, this.#pitch + deltaY * ROTATE_PER_PIXEL));
-            }
-            return;
+        else if (this.#subject && this.#inspectMode === 'follow') {
+            this.#orbitOffset -= deltaX * ROTATE_PER_PIXEL;
+            this.#followPitch = Math.min(FOLLOW_PITCH_RANGE[1], Math.max(FOLLOW_PITCH_RANGE[0], this.#followPitch + deltaY * ROTATE_PER_PIXEL));
         }
+        else if (this.#subject && this.#inspectMode === 'first') {
+            this.#lookYaw -= deltaX * ROTATE_PER_PIXEL;
+            this.#lookPitch = Math.min(1.2, Math.max(-1.2, this.#lookPitch - deltaY * ROTATE_PER_PIXEL));
+        }
+        else {
+            this.#yaw -= deltaX * ROTATE_PER_PIXEL;
+            this.#pitch = Math.min(MAX_PITCH, Math.max(MIN_PITCH, this.#pitch + deltaY * ROTATE_PER_PIXEL));
+        }
+    }
+
+    /** A pan drag: the ground follows the pointer; it lets an inspected gladiator go. */
+    #drag(deltaX, deltaY) {
+        if (!deltaX && !deltaY) return;
         if (this.#subject) this.unfollow();
+        const worldPerPixel = this.#worldPerPixel();
         this.#pan(-deltaX * worldPerPixel, -deltaY * worldPerPixel * 1.35);
-    };
+    }
 
     /** Moves the target along the ground in screen-aligned axes (right, forward-down). */
     #pan(right, down) {
@@ -463,24 +543,49 @@ export class BattleCameraController extends BaseComponent {
         this.#target.z += -right * sin + down * cos;
     }
 
-    /** Ends pointer dragging. */
-    #handlePointerUp = () => {
+    /** Ends pointer dragging; a press or touch that never dragged is a tap. */
+    #handlePointerUp = (event) => {
+        if (this.#touches.has(event.pointerId)) {
+            const tap = this.#touches.up(event.pointerId, event.timeStamp, event.type === 'pointercancel');
+            if (tap) this.#tap(tap.x, tap.y, true);
+            return;
+        }
+        const press = this.#pressAt;
+        this.#pressAt = null;
         this.#dragOrigin = null;
         this.#canvas.classList.remove('is-dragging');
+        if (press && !press.moved && event.type === 'pointerup' && event.button === 0) this.#tap(press.x, press.y, false);
     };
+
+    #tap(clientX, clientY, touch) {
+        const rect = this.#canvas.getBoundingClientRect();
+        this.#onTap({ x: clientX - rect.left, y: clientY - rect.top, touch });
+    }
 
     /** @param {WheelEvent} event Mouse-wheel zoom: magnifies the overview, or brings a close camera nearer. */
     #handleWheel = (event) => {
         event.preventDefault();
-        const factor = event.deltaY > 0 ? 0.9 : 1.1;
+        this.#zoomBy(event.deltaY > 0 ? 0.9 : 1.1);
+    };
+
+    /**
+     * Zooms by a factor (above 1 closer): the ghost flies along its view, close cameras come nearer, the overview magnifies.
+     *
+     * @param {number} factor Zoom ratio.
+     * @returns {number} The ratio the overview magnification actually changed by (1 for the other cameras or at a limit).
+     */
+    #zoomBy(factor) {
+        if (factor === 1 || !(factor > 0)) return 1;
         if (this.#ghost) {
-            this.#fly(0, 0, event.deltaY > 0 ? -1.5 : 1.5);
-            return;
+            this.#fly(0, 0, Math.log(factor) * GHOST_ZOOM_FLIGHT);
+            return 1;
         }
         if (this.#cinematic || (this.#subject && this.#inspectMode !== 'fixed')) {
             this.#followZoom = Math.min(4, Math.max(0.4, this.#followZoom * factor));
-            return;
+            return 1;
         }
-        this.#zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, this.#zoom * factor));
-    };
+        const zoom = this.#zoom;
+        this.#zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * factor));
+        return this.#zoom / zoom;
+    }
 }

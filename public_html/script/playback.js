@@ -580,10 +580,15 @@ $(document).ready( function() {
     });
 
     // Leaving the window (another tab or application) pauses; clicks inside the page never do.
-    window.addEventListener('blur', function(){
+    // A phone switching apps or locking its screen hides the page without always blurring the window.
+    function pauseOnLeave(){
         if (pausesim) return;
         if (window.Playback.threeD) window.Playback.setPaused(true);
         else $('#pause').click();
+    }
+    window.addEventListener('blur', pauseOnLeave);
+    document.addEventListener('visibilitychange', function(){
+        if (document.hidden) pauseOnLeave();
     });
 
 });

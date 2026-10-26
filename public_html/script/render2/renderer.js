@@ -60,8 +60,20 @@ const SHAKE_MAX_OFFSET = 0.3;
 const FOG_NEAR = 110;
 const FOG_FAR = 560;
 
+/** A click or tap inspects the gladiator whose body (feet to `TAP_BODY_HEIGHT` metres) passes within this many CSS pixels of it. */
+const TAP_REACH = { mouse: 24, touch: 40 };
+const TAP_BODY_HEIGHT = 1.8;
+
 /** Engine heading (degrees, 0 = north, clockwise) to the rig's yaw; the rig faces +Z. */
 const headingToYaw = (heading) => Math.PI + headingToRadians(heading);
+
+/** Screen distance from a point to the segment a → b. */
+function segmentDistance(x, y, a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const t = Math.max(0, Math.min(1, ((x - a.x) * dx + (y - a.y) * dy) / Math.max(1e-6, dx * dx + dy * dy)));
+    return Math.hypot(x - (a.x + dx * t), y - (a.y + dy * t));
+}
 
 /**
  * Three.js top-down battle renderer.
@@ -135,6 +147,8 @@ export class BattleRenderer {
     #ready = false;
     /** Canvas replay controls and windows (hud-controls.js). */
     #ui;
+    /** Scratch vector for projecting fighters when a tap picks one. */
+    #tapPoint = null;
     /** The engine's current safe radius, and seconds the gas has been clearing since the victory (null before). */
     #safeRadius = Infinity;
     #gasClear = null;
@@ -155,6 +169,9 @@ export class BattleRenderer {
         this.#tracker = new ResourceTracker(THREE);
         this.#audio = new BattleAudioManager();
         this.#reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // The arena fills the whole phone screen, round the notch and the home indicator; the HUD keeps to the safe area.
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport && !/viewport-fit/.test(viewport.content)) viewport.content = `${viewport.content}, viewport-fit=cover`;
 
         // Graphics tier for this device (see quality.js): resolution cap, anti-aliasing, crowd and scenery.
         this.#qualityName = chooseQuality(storedQuality(), describeDevice());
@@ -180,7 +197,7 @@ export class BattleRenderer {
         this.#camera = new THREE.PerspectiveCamera(45, 1, 1, SKY_RADIUS * 1.2);
         this.#arena = new Arena({ THREE, scene: this.#scene, renderer: this.#renderer, quality: this.#quality });
         this.#effects = new BattleEffects({ THREE, scene: this.#scene, audio: this.#audio, onShake: (trauma) => this.addShake(trauma) });
-        this.#controls = new BattleCameraController({ THREE, camera: this.#camera, canvas: this.#renderer.domElement });
+        this.#controls = new BattleCameraController({ THREE, camera: this.#camera, canvas: this.#renderer.domElement, onTap: (tap) => this.#handleTap(tap) });
         this.#overlay = new BattleHud({
             THREE,
             canvas: this.#renderer.domElement,
@@ -246,6 +263,39 @@ export class BattleRenderer {
         this.#controls.follow(fighter);
         // The inspect window opens minimized.
         this.#ui.inspect(index);
+    }
+
+    /**
+     * A click or tap on the arena: inspects the gladiator under it (the nearest whose body is within reach on
+     * screen, more forgiving for a finger); anything else goes to the controls (a tap shows or hides them).
+     *
+     * @param {{ x: number, y: number, touch: boolean }} tap Canvas-relative CSS pixels.
+     */
+    #handleTap({ x, y, touch }) {
+        const { width, height } = this.#lastSize;
+        const reach = touch ? TAP_REACH.touch : TAP_REACH.mouse;
+        const point = this.#tapPoint ??= new this.#THREE.Vector3();
+        let picked = null;
+        let best = Infinity;
+        this.#fighters.forEach((fighter, index) => {
+            if (!fighter.root.visible) return;
+            // The body from the feet to the head, as a short segment on screen.
+            const ends = [0.1, TAP_BODY_HEIGHT].map((lift) => {
+                point.copy(fighter.root.position);
+                point.y += lift;
+                point.project(this.#camera);
+                return { x: (point.x + 1) / 2 * width, y: (1 - point.y) / 2 * height, behind: point.z > 1 };
+            });
+            if (ends.some((end) => end.behind)) return;
+            const distance = segmentDistance(x, y, ends[0], ends[1]);
+            if (distance < reach && distance < best) {
+                best = distance;
+                picked = index;
+            }
+        });
+        // Picking the gladiator already followed keeps it (the roster's toggle would let it go).
+        if (picked !== null && !(window.followedGlad === picked && this.#controls.mode === 'inspect')) this.#selectFighter(picked);
+        this.#ui.tap({ touch, picked: picked !== null });
     }
 
     /** Ends the inspection: the camera is let go and the inspect window closes. */

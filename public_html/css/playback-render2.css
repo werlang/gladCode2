@@ -35,9 +35,13 @@
     body {
         color: var(--battle-text);
         background: var(--battle-ink);
+        /* A swipe on the arena never scrolls, bounces or reloads the page on a phone. */
+        overscroll-behavior: none;
     }
 
     #frame {
+        /* The visible height: on a phone 100vh reaches under the browser's toolbar and would hide the control bar. */
+        height: 100dvh;
         background:
             radial-gradient(circle at 50% 15%, rgb(0 99 141 / 0.34), transparent 42%),
             linear-gradient(145deg, #0c1216, var(--battle-ink));
@@ -60,6 +64,11 @@
         width: 100%;
         height: 100%;
         background: var(--battle-ink);
+        /* Touch gestures drive the camera (camera-controller.js): no text selection, long-press menu or tap flash. */
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
 
         #battle-render2-canvas {
             display: block;

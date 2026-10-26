@@ -2,6 +2,14 @@ const PANEL_WIDTH = 300;
 const PANEL_HEIGHT = 96;
 const PANEL_GAP = 4;
 const PANEL_MARGIN = 8;
+/** Phone plaque (portrait, name, HP and AP, active buffs), laid out in two columns on a narrow screen. */
+const MINI_WIDTH = 184;
+const MINI_HEIGHT = 60;
+/** Below this width or height the HUD switches to its compact (phone) layout. */
+export const COMPACT_WIDTH = 600;
+export const COMPACT_HEIGHT = 500;
+/** Share of a short landscape screen's height a one-column compact roster may take (the control bar sits under it). */
+const SHORT_ROSTER_SHARE = 0.68;
 const CARD_WIDTH = 128;
 const CARD_HEIGHT = 44;
 const BUBBLE_MAX_WIDTH = 180;
@@ -227,6 +235,12 @@ export class BattleHud {
     #tints = new Map();
     /** Bumped whenever a sprite or the display font finishes loading, so cached textures redraw. */
     #artVersion = 0;
+    /** Whether the player is on a touch screen (a coarse pointer, then whichever kind pressed last). */
+    #touch = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+    /** The screen's safe-area insets (notch, rounded corners, home indicator) in CSS pixels, read from a probe. */
+    #insets = { top: 0, right: 0, bottom: 0, left: 0 };
+    #insetProbe = null;
+    #rosterBounds = { x: 0, y: 0, width: 0, height: 0 };
 
     /**
      * @param {{ THREE: typeof import('three'), canvas: HTMLCanvasElement, camera: import('three').Camera, onSelect?: (index: number) => void, isFollowed?: (view: import('./fighter.js').Fighter) => boolean, isPoisoned?: (view: import('./fighter.js').Fighter) => boolean }} options HUD dependencies.
@@ -304,6 +318,31 @@ export class BattleHud {
     /** @returns {{ width: number, height: number }} Canvas size in CSS pixels. */
     get size() {
         return this.#size;
+    }
+
+    /** @returns {boolean} Whether the HUD uses its compact (phone) layout. */
+    get compact() {
+        return this.#size.width < COMPACT_WIDTH || this.#size.height < COMPACT_HEIGHT;
+    }
+
+    /** @returns {boolean} Whether the player is on a touch screen: larger targets, no hover tips, auto-hiding controls. */
+    get touch() {
+        return this.#touch;
+    }
+
+    /** @param {boolean} touch Whether the last press was a finger. */
+    set touch(touch) {
+        this.#touch = Boolean(touch);
+    }
+
+    /** @returns {{ top: number, right: number, bottom: number, left: number }} Safe-area insets in CSS pixels. */
+    get insets() {
+        return this.#insets;
+    }
+
+    /** @returns {{ x: number, y: number, width: number, height: number }} Where the roster is drawn (CSS pixels from the top-left; empty when hidden). */
+    get rosterBounds() {
+        return this.#rosterBounds;
     }
 
     /** @see #sprite */
@@ -425,28 +464,68 @@ export class BattleHud {
         this.#ratio = Math.min(window.devicePixelRatio || 1, 2);
         Object.assign(this.hudCamera, { right: width, top: height });
         this.hudCamera.updateProjectionMatrix();
+        this.#readInsets();
     }
 
-    /** Routes clicks on a roster panel to `onSelect` and keeps them away from the camera drag. */
+    /** Reads `env(safe-area-inset-*)` through an invisible element padded by them (the page sets `viewport-fit=cover`). */
+    #readInsets() {
+        const parent = this.#canvas.parentElement;
+        if (!parent) return;
+        if (!this.#insetProbe) {
+            this.#insetProbe = document.createElement('div');
+            this.#insetProbe.setAttribute('aria-hidden', 'true');
+            this.#insetProbe.style.cssText = 'position:fixed;inset:0;visibility:hidden;pointer-events:none;'
+                + 'padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+            parent.appendChild(this.#insetProbe);
+        }
+        const style = getComputedStyle(this.#insetProbe);
+        const read = (side) => Math.max(0, parseFloat(style[`padding${side}`]) || 0);
+        this.#insets = { top: read('Top'), right: read('Right'), bottom: read('Bottom'), left: read('Left') };
+    }
+
+    /** Routes clicks and taps on a roster panel to `onSelect` and keeps them away from the camera drag. */
     #handlePointer = (event) => {
         if (event.button !== 0 || !this.#panels[0]?.visible) return;
         const rect = this.#canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        const scale = this.#panelScale();
-        if (x < PANEL_MARGIN || x > PANEL_MARGIN + PANEL_WIDTH * scale) return;
-        const index = Math.floor((y - PANEL_MARGIN) / ((PANEL_HEIGHT + PANEL_GAP) * scale));
-        const within = (y - PANEL_MARGIN) - index * (PANEL_HEIGHT + PANEL_GAP) * scale <= PANEL_HEIGHT * scale;
-        if (index < 0 || index >= this.#panels.length || !within) return;
+        const { slots, width, height } = this.#rosterLayout(this.#panels.length);
+        const index = slots.findIndex((slot) => x >= slot.x && x <= slot.x + width && y >= slot.y && y <= slot.y + height);
+        if (index < 0) return;
         event.stopPropagation();
         event.preventDefault();
         this.#onSelect(index);
     };
 
-    /** Roster panel scale that keeps a long roster inside the window. */
-    #panelScale() {
-        const needed = this.#panels.length * (PANEL_HEIGHT + PANEL_GAP) + PANEL_MARGIN * 2;
-        return Math.min(1, this.#size.height / Math.max(1, needed));
+    /**
+     * Where the roster plaques go: one column of full plaques, or compact plaques (two columns on a narrow
+     * screen, one on a short one), scaled down to fit and kept inside the safe area.
+     *
+     * @param {number} count Plaques.
+     * @returns {{ compact: boolean, scale: number, width: number, height: number, slots: { x: number, y: number }[] }}
+     *   Plaque size on screen and each one's top-left corner, in CSS pixels from the top-left.
+     */
+    #rosterLayout(count) {
+        const { width: screenWidth, height: screenHeight } = this.#size;
+        const insets = this.#insets;
+        const left = PANEL_MARGIN + insets.left;
+        const top = PANEL_MARGIN + insets.top;
+        const room = { width: screenWidth - left - PANEL_MARGIN - insets.right, height: screenHeight - top - PANEL_MARGIN - insets.bottom };
+        const compact = this.compact;
+        const base = compact ? { width: MINI_WIDTH, height: MINI_HEIGHT } : { width: PANEL_WIDTH, height: PANEL_HEIGHT };
+        const columns = compact && screenWidth < COMPACT_WIDTH && count > 1 ? 2 : 1;
+        const rows = Math.max(1, Math.ceil(count / columns));
+        const tall = compact && columns === 1 ? room.height * SHORT_ROSTER_SHARE : room.height;
+        const scale = Math.min(1,
+            (room.width - (columns - 1) * PANEL_GAP) / (columns * base.width),
+            (tall - (rows - 1) * PANEL_GAP) / Math.max(1, rows * base.height));
+        const width = base.width * scale;
+        const height = base.height * scale;
+        const slots = Array.from({ length: count }, (_, index) => ({
+            x: left + (index % columns) * (width + PANEL_GAP),
+            y: top + Math.floor(index / columns) * (height + PANEL_GAP),
+        }));
+        return { compact, scale, width, height, slots };
     }
 
     /**
@@ -454,6 +533,10 @@ export class BattleHud {
      * a gem level badge, crystal HP/AP gauges, a gold XP thread, attributes and the active buffs.
      */
     #drawPanel(panel, glad, view, followed, poisoned) {
+        if (panel.userData.compact) {
+            this.#drawCompactPanel(panel, glad, view, followed, poisoned);
+            return;
+        }
         const canvas = panel.material.map.image;
         const ctx = canvas.getContext('2d');
         const alive = Number(glad.hp) > 0;
@@ -585,30 +668,152 @@ export class BattleHud {
         panel.material.map.needsUpdate = true;
     }
 
+    /** Phone plaque: the same frame, portrait ring and level gem, with only the name, HP, AP and the active buffs. */
+    #drawCompactPanel(panel, glad, view, followed, poisoned) {
+        const canvas = panel.material.map.image;
+        const ctx = canvas.getContext('2d');
+        const alive = Number(glad.hp) > 0;
+        const look = view.appearance;
+        const W = MINI_WIDTH;
+        const H = MINI_HEIGHT;
+        ctx.setTransform(this.#ratio, 0, 0, this.#ratio, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        ctx.filter = alive ? 'none' : 'grayscale(0.9) brightness(0.8)';
+        ctx.globalAlpha = alive ? 1 : 0.78;
+
+        const back = this.#sprite('back');
+        if (back) ctx.drawImage(back, 4, 4, W - 8, H - 8);
+        else {
+            ctx.fillStyle = 'rgba(16, 12, 10, 0.9)';
+            ctx.fillRect(4, 4, W - 8, H - 8);
+        }
+        const wash = ctx.createLinearGradient(4, 0, W * 0.6, 0);
+        wash.addColorStop(0, rgba(look.team, 0.42));
+        wash.addColorStop(1, rgba(look.team, 0));
+        ctx.fillStyle = wash;
+        ctx.fillRect(4, 4, W - 8, H - 8);
+        if (followed) {
+            const glow = this.#sprite('glow', '#ffcf5a');
+            ctx.globalAlpha *= 0.55;
+            if (glow) ctx.drawImage(glow, 0, 0, W, H);
+            ctx.globalAlpha /= 0.55;
+        }
+        const frame = this.#sprite('frame');
+        if (frame) nineSlice(ctx, frame, 0, 0, W, H, ART.frame.slice, 12);
+        else {
+            ctx.strokeStyle = '#c8913a';
+            ctx.lineWidth = 2;
+            roundRect(ctx, 2, 2, W - 4, H - 4, 5);
+            ctx.stroke();
+        }
+        if (followed) {
+            ctx.strokeStyle = 'rgba(255, 228, 140, 0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(7.5, 7.5, W - 15, H - 15);
+        }
+
+        const cx = 30;
+        const cy = H / 2;
+        const radius = 19;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.clip();
+        const halo = ctx.createRadialGradient(cx, cy - 6, 2, cx, cy, radius + 2);
+        halo.addColorStop(0, rgba(look.team, 1));
+        halo.addColorStop(0.35, rgba(look.team, 0.75));
+        halo.addColorStop(1, '#120d09');
+        ctx.fillStyle = halo;
+        ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+        if (view.portrait) ctx.drawImage(view.portrait, cx - 23, cy - 24, 46, 46);
+        else {
+            ctx.translate(cx, cy);
+            ctx.scale(radius / 30, radius / 30);
+            drawPortrait(ctx, 0, 0, 30, look, alive);
+        }
+        ctx.restore();
+        const ring = this.#sprite('ring');
+        if (ring) ctx.drawImage(ring, cx - 27, cy - 27, 54, 54);
+        else {
+            ctx.strokeStyle = '#c8913a';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 1.5, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        if (!alive) {
+            const skull = this.#sprite('skull', '#e8e2d4');
+            if (skull) ctx.drawImage(skull, cx - 22, cy - 11, 44, 22);
+        }
+        const gemX = cx + 17;
+        const gemY = cy + 17;
+        const gemBack = this.#sprite('gemBack');
+        const gem = this.#sprite('gem');
+        if (gemBack) ctx.drawImage(gemBack, gemX - 10, gemY - 10, 20, 20);
+        if (gem) ctx.drawImage(gem, gemX - 10, gemY - 10, 20, 20);
+        else {
+            ctx.fillStyle = '#4a2d14';
+            ctx.beginPath();
+            ctx.arc(gemX, gemY, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        outlined(ctx, String(Math.round(Number(glad.lvl) || 1)), gemX, gemY + 0.5, { font: `700 10px ${TITLE_FONT}`, color: '#fff0c2', align: 'center', width: 2.5 });
+
+        // Active buffs as small icons at the end of the name row; the name takes what is left.
+        const left = 56;
+        const right = W - 10;
+        const buffs = glad.buffs ?? {};
+        const active = BUFF_ICONS.filter(([key]) => (key === 'poison' ? poisoned : Number(buffs[key]?.timeleft) > 0)).slice(0, 4);
+        active.forEach(([key], slot) => this.#drawIcon(ctx, key, right - 12 - slot * 14, 7, 12));
+        outlined(ctx, String(glad.name ?? ''), left + 1, 14, { font: `700 12px ${TITLE_FONT}`, color: '#f7e7c2', maxWidth: right - left - 2 - active.length * 14 });
+        this.#drawBar(ctx, left - 4, 20, right - left + 8, 21, clamp01(Number(glad.hp) / Math.max(1, Number(glad.maxhp))), '#ff4b3e',
+            { text: `${Math.round(Number(glad.hp))} / ${Math.round(Number(glad.maxhp))}` });
+        this.#drawBar(ctx, left - 4, 37, right - left + 8, 16, clamp01(Number(glad.ap) / Math.max(1, Number(glad.maxap))), '#4f8dff',
+            { text: `${Math.round(Number(glad.ap))} / ${Math.round(Number(glad.maxap))}` });
+        ctx.filter = 'none';
+        ctx.globalAlpha = 1;
+        panel.material.map.needsUpdate = true;
+    }
+
     #updatePanels(views) {
-        const scale = this.#panelScale();
+        const layout = this.#rosterLayout(views.length);
+        const last = layout.slots[layout.slots.length - 1];
+        this.#rosterBounds = last ? {
+            x: layout.slots[0].x,
+            y: layout.slots[0].y,
+            width: Math.max(...layout.slots.map((slot) => slot.x)) + layout.width - layout.slots[0].x,
+            height: last.y + layout.height - layout.slots[0].y,
+        } : { x: 0, y: 0, width: 0, height: 0 };
         views.forEach((view, index) => {
             let panel = this.#panels[index];
             if (!panel) {
                 panel = this.#createSprite();
                 panel.center.set(0, 1);
-                panel.material.map = this.#createTexture(PANEL_WIDTH, PANEL_HEIGHT);
                 panel.userData.key = '';
                 this.#panels[index] = panel;
+            }
+            if (!panel.material.map || panel.userData.compact !== layout.compact) {
+                // The plaque design changed with the screen: a texture of the other size.
+                panel.material.map?.dispose();
+                panel.material.map = layout.compact ? this.#createTexture(MINI_WIDTH, MINI_HEIGHT) : this.#createTexture(PANEL_WIDTH, PANEL_HEIGHT);
+                panel.material.needsUpdate = true;
+                panel.userData.compact = layout.compact;
+                panel.userData.key = '';
             }
             const glad = view.state;
             const followed = this.#isFollowed(view);
             const poisoned = this.#isPoisoned(view);
             const buffs = glad.buffs ?? {};
-            const key = [glad.name, glad.lvl, glad.xp, glad.tonext, Math.round(glad.hp), Number(glad.hp) > 0, Math.round(glad.ap), glad.maxhp, glad.maxap, glad.STR, glad.AGI, glad.INT,
+            const key = [layout.compact, glad.name, glad.lvl, glad.xp, glad.tonext, Math.round(glad.hp), Number(glad.hp) > 0, Math.round(glad.ap), glad.maxhp, glad.maxap, glad.STR, glad.AGI, glad.INT,
                 followed, poisoned, this.#artVersion,
                 ...['burn', 'movement', 'resist', 'invisible', 'stun'].map((name) => Math.ceil(Number(buffs[name]?.timeleft) || 0))].join('|');
             if (panel.userData.key !== key) {
                 panel.userData.key = key;
                 this.#drawPanel(panel, glad, view, followed, poisoned);
             }
-            panel.scale.set(PANEL_WIDTH * scale, PANEL_HEIGHT * scale, 1);
-            panel.position.set(PANEL_MARGIN, this.#size.height - PANEL_MARGIN - index * (PANEL_HEIGHT + PANEL_GAP) * scale, 0);
+            const slot = layout.slots[index];
+            panel.scale.set(layout.width, layout.height, 1);
+            panel.position.set(slot.x, this.#size.height - slot.y, 0);
             panel.renderOrder = 3000;
         });
     }
@@ -874,6 +1079,7 @@ export class BattleHud {
         // The roster plaques follow the "frames" preference (M).
         const roster = preferences.frames !== false;
         if (roster) this.#updatePanels(views);
+        else this.#rosterBounds = { x: 0, y: 0, width: 0, height: 0 };
         this.#panels.forEach((panel) => { panel.visible = roster; });
         views.forEach((view) => this.updateFighter(view, preferences));
         this.#separateCards(realDt);
@@ -895,6 +1101,7 @@ export class BattleHud {
     /** Releases sprites, textures and materials. */
     destroy() {
         this.#canvas.parentElement?.removeEventListener('pointerdown', this.#handlePointer, true);
+        this.#insetProbe?.remove();
         const sprites = [...this.#panels, ...this.#floats, ...[...this.#cards.values()].flatMap((card) => [card.vitals, card.speech, card.breakpoint])];
         for (const sprite of sprites) {
             sprite.material.map?.dispose();
