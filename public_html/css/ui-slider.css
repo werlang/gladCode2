@@ -1,0 +1,47 @@
+/*
+ * Base rules of the Slider component (script/components/slider.js), taken from
+ * the jQuery UI 1.12 base theme it replaces; pages style it further through the
+ * same .ui-slider* class names.
+ */
+.ui-slider {
+	position: relative;
+	text-align: left;
+	height: .8em;
+	border: 1px solid #c5c5c5;
+	border-radius: 3px;
+	background: #fff;
+	touch-action: none;
+}
+
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	top: -.3em;
+	width: 1.2em;
+	height: 1.2em;
+	margin-left: -.6em;
+	border: 1px solid #c5c5c5;
+	border-radius: 3px;
+	background: #f6f6f6;
+	color: #454545;
+	cursor: pointer;
+	touch-action: none;
+	box-sizing: content-box;
+}
+
+.ui-slider .ui-slider-handle:focus-visible {
+	outline: 2px solid #1e86d8;
+	outline-offset: 2px;
+}
+
+.ui-slider .ui-slider-range {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	height: 100%;
+	display: block;
+	font-size: .7em;
+	border: 0;
+	border-radius: 3px;
+	background: #e9e9e9;
+}

@@ -1,178 +1,168 @@
-$(document).ready( function() {
-    menu_loaded().then( function(data){
-        var loc = window.location.href.split("/");
-        loc = loc[loc.length - 1];
-        $('#side-menu #'+loc).addClass('here');
-    });    
-    $('#about').addClass('here');
+import { SideMenu } from './components/side-menu.js';
+import { Slider } from './components/slider.js';
+import { renderTemplate } from './helpers/html.js';
+import { SlotsModel } from './models/slots.js';
+import { StatsModel } from './models/stats.js';
+import {
+    abilityRowTemplate,
+    attributeCellsTemplate,
+    emptyAbilitiesTemplate,
+    potionCellTemplate,
+    potionRowTemplate,
+} from './templates/stats.js';
 
-    $( "#mmr-slider" ).slider({
-        range: true,
-        min: 0,
-        max: 4000,
-        step: 100,
-        values: [500, 3500],
-        create: function( event, ui ) {
-            var val = $(this).slider('option','values');
-            $(this).find('.ui-slider-handle').eq(0).html(val[0]);
-            $(this).find('.ui-slider-handle').eq(1).append(val[1]);
-        },
-        slide: function( event, ui ) {
-            $(this).find('.ui-slider-handle').each( (index, obj) => {
-                $(obj).html(ui.values[index]);
-            });
-        },
-        stop: function( event, ui ) {
-            search();
+/** What each row of the gladiator table shows, in table order. */
+const ATTRIBUTE_ROWS = ['STR', 'AGI', 'INT', 'lvl'];
+/** Potion levels shown as columns. */
+const POTION_LEVELS = 5;
+
+const dateStart = document.querySelector('#date-str');
+const dateEnd = document.querySelector('#date-end');
+
+/**
+ * A percentage with one decimal, or none when it is a round 100.
+ *
+ * @param {number} value Percentage.
+ * @returns {string}
+ */
+function percent(value) {
+    return value === 100 ? value.toFixed(0) : value.toFixed(1);
+}
+
+/**
+ * Fills the ability table.
+ *
+ * @param {Record<string, any>} data Statistics.
+ */
+function renderAbilities(data) {
+    const body = document.querySelector('#t-hab tbody');
+    const names = Object.keys(data.average);
+    body.innerHTML = names.length
+        ? names.map(name => renderTemplate(abilityRowTemplate, {
+            name,
+            use: data.percuse[name].toFixed(1),
+            average: data.average[name].toFixed(1),
+            win: data.percwin[name].toFixed(1),
+        })).join('')
+        : emptyAbilitiesTemplate;
+}
+
+/**
+ * Fills the gladiator table: the share favouring each attribute (and the
+ * maximum level) among all gladiators and among winners.
+ *
+ * @param {Record<string, any>|null} data Statistics, or `null` without battles.
+ */
+function renderAttributes(data) {
+    const rows = document.querySelectorAll('#t-glad tbody tr');
+    rows.forEach((row, index) => {
+        row.querySelectorAll('td:not(.fixed)').forEach(cell => cell.remove());
+        if (!data) {
+            row.insertAdjacentHTML('beforeend', '<td colspan=2></td>');
+            return;
         }
-    });
-    
-    $( "#date-str, #date-end" ).datepicker({
-        showAnim: "slideDown",
-        dateFormat: "dd/mm/yy",
-        dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-        dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
-        dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
-        monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-        monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
-        nextText: 'Próximo',
-        prevText: 'Anterior'
-    });
-    
-    $( "#date-str, #date-end" ).change( function() {
-        search();
-    });
-    
-    search();
 
-    $('.table .info').click( function() {
-        //create_tooltip($(this).attr('title'), $(this));
+        const attribute = ATTRIBUTE_ROWS[index];
+        const format = value => {
+            if (!value) return '-';
+            return attribute === 'lvl' ? value.toFixed(1) : `${value.toFixed(1)}%`;
+        };
+        row.insertAdjacentHTML('beforeend', renderTemplate(attributeCellsTemplate, {
+            average: format(data.highattr.avg[attribute]),
+            winner: format(data.highattr.winner[attribute]),
+        }));
     });
+}
+
+/**
+ * Fills the potion table: per potion kind and level, how often it was used
+ * and how often its user won.
+ *
+ * @param {Record<string, any>} data Statistics.
+ * @param {Record<string, { name: string }>} potions Potion catalogue.
+ */
+function renderPotions(data, potions) {
+    const kinds = new Map();
+    Object.entries(potions).forEach(([id, potion]) => {
+        const [type, effect, level] = id.split('-');
+        const kind = `${type}-${effect}`;
+        if (!kinds.has(kind)) {
+            // the catalogue name ends with the level ("Poção de cura I")
+            kinds.set(kind, { name: potion.name.split(' ').slice(0, -1).join(' '), levels: [] });
+        }
+        kinds.get(kind).levels[parseInt(level, 10) - 1] = {
+            use: data.potions.use[id] ?? 0,
+            win: data.potions.win[id] ?? 0,
+        };
+    });
+
+    document.querySelector('#t-pot tbody').innerHTML = [...kinds.values()].map(({ name, levels }) => {
+        const cells = Array.from({ length: POTION_LEVELS }, (_, index) => {
+            const level = levels[index];
+            if (!level?.use) return '<td>-</td>';
+            return renderTemplate(potionCellTemplate, {
+                use: percent((level.use / data.potions.battles) * 100),
+                win: percent((level.win / level.use) * 100),
+            });
+        }).join('');
+        return renderTemplate(potionRowTemplate, { name, cells });
+    }).join('');
+}
+
+/**
+ * Fills the summary cards: battle count, average duration and a warning when
+ * part of the battles predate the newer statistics.
+ *
+ * @param {Record<string, any>} data Statistics.
+ * @param {boolean} empty Whether no battle was found.
+ */
+function renderSummary(data, empty) {
+    const lowBattles = document.querySelector('#single-stats #low-battles');
+    document.querySelector('#nbattles').textContent = empty ? '0' : data.nbattles.total;
+    document.querySelector('#avg-time').textContent = !empty && data.duration ? `${data.duration.toFixed(1)}s` : '-';
+
+    const partial = !empty && data.potions.battles < data.nbattles.total;
+    lowBattles.classList.toggle('hidden', !partial);
+    if (partial) {
+        lowBattles.title = `Somente ${data.potions.battles} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`;
+    }
+}
+
+/**
+ * Loads the statistics for the chosen period and renown range.
+ *
+ * @param {Slider} mmr Renown range slider.
+ */
+async function search(mmr) {
+    const [minMmr, maxMmr] = mmr.values;
+    const [data, { potions }] = await Promise.all([
+        StatsModel.load({ start: dateStart.value, end: dateEnd.value, minMmr, maxMmr }),
+        SlotsModel.items(),
+    ]);
+    const empty = Object.keys(data.average).length === 0;
+
+    renderAbilities(data);
+    renderAttributes(empty ? null : data);
+    renderSummary(data, empty);
+    renderPotions(data, potions);
+}
+
+const menu = new SideMenu(document.querySelector('#side-menu'));
+menu.ready.then(() => {
+    const entry = document.querySelector(`#side-menu #${CSS.escape(location.pathname.split('/').at(-1))}`);
+    entry?.classList.add('here');
+});
+document.querySelector('#about')?.classList.add('here');
+
+const mmr = new Slider(document.querySelector('#mmr-slider'), {
+    min: 0,
+    max: 4000,
+    step: 100,
+    values: [500, 3500],
+    label: String,
+    ariaLabel: 'Intervalo de renome',
+    onChange: () => search(mmr),
 });
 
-async function search(){
-    var mmr = $( "#mmr-slider" ).slider('option','values');
-    
-    let stats = load_stats({
-        date: {
-            start: $("#date-str").val(),
-            end: $("#date-end").val()
-        },
-        mmr: {
-            start: mmr[0],
-            end: mmr[1]
-        }
-    })
-    
-    let potions = post("back_slots.php", { action: "ITEMS" })
-
-    load_table(await stats, (await potions).potions)
-
-}
-
-function load_table(data, potions){
-    data = JSON.parse(data);
-    // console.log(data);
-    
-    $('#t-hab tbody').html("");
-    $('#t-glad tbody td').not('.fixed').remove();
-    if (data.average.length != 0){
-        for (let i in data.average){
-            $('#t-hab tbody').append(`<tr>
-                <td>${i}</td>
-                <td>${(data.percuse[i]).toFixed(1)}%</td>
-                <td>${(data.average[i]).toFixed(1)}</td>
-                <td>${(data.percwin[i]).toFixed(1)}%</td>
-            </tr>`);
-        }
-
-        for (let i=0 ; i < $('#t-glad tbody tr').length ; i++){
-            var a = $('#t-glad tbody tr').eq(i).data('info');
-
-            var avg = data.highattr.avg[a];
-            if (avg)
-                avg = avg.toFixed(1);
-            else
-                avg = '-';
-
-            var winner = data.highattr.winner[a];
-            if (winner)
-                winner = winner.toFixed(1);
-            else
-                winner = '-';
-    
-            if (a != 'lvl' && avg != '-')
-                avg += '%';
-            if (a != 'lvl' && winner != '-')
-                winner += '%';
-
-            $('#t-glad tbody tr').eq(i).append(`
-                <td>${avg}</td>
-                <td>${winner}</td>`);
-        }
-
-        $('#nbattles').html(data.nbattles.total);
-
-        if (data.duration)
-            $('#avg-time').html(data.duration.toFixed(1) +"s");
-        else
-            $('#avg-time').html('-');
-
-        if (data.potions.battles < data.nbattles.total){
-            $('#single-stats #low-battles').removeClass('hidden').attr('title', `Somente ${data.potions.battles} batalhas foram encontradas neste intervalo contendo as estatísticas recentemente adicionadas.`).tooltip();
-        }
-        else if (!$('#single-stats #low-battles').hasClass('hidden'))
-            $('#single-stats #low-battles').addClass('hidden');
-    }
-    else{
-        $('#t-hab tbody').html("<tr><td colspan=4>Nenhuma batalha encontrada</td></tr>");
-        $('#t-glad tbody tr').each( function(){
-            $(this).append(`<td colspan=2></td>`)
-        })
-        $('#avg-time').html("-");
-        $('#nbattles').html("0");
-        $('#single-stats #low-battles').addClass('hidden')
-    }
-    
-    let table = {}
-    for (let p in potions){
-        let potkind = p.split("-").splice(0,2).join("-")
-        if (!table[potkind]){
-            let name = potions[p].name.split(" ")
-            name = name.splice(0, name.length-1).join(" ") 
-            table[potkind] = {name: name, lvl: []}
-        }
-
-        let uses = data.potions.use[p]
-        let wins = data.potions.win[p]
-        let lvl = parseInt(p.split("-")[2])
-        if (!uses){
-            uses = 0
-        }
-        if (!wins){
-            wins = 0
-        }
-        table[potkind].lvl[lvl-1] = {use: uses, win: wins}
-    }
-
-    let str = []
-    for (let p in table){
-        row = []
-        for (let i=0 ; i<5 ; i++){
-            if (!table[p].lvl[i] || table[p].lvl[i].use == 0){
-                row.push(`<td>-</td>`)    
-            }
-            else{
-                let uses = table[p].lvl[i].use / data.potions.battles * 100
-                let wins = table[p].lvl[i].win / table[p].lvl[i].use * 100
-                row.push(`<td><div>
-                    <span class='up' title='Percentual de batalhas que a poção foi utilizada'>${uses == 100 ? uses.toFixed(0) : uses.toFixed(1)}%</span>/
-                    <span class='down' title='Percentual de batalhas que o gladiador que usou a poção venceu'>${wins == 100 ? wins.toFixed(0) : wins.toFixed(1)}%</span>
-                </div></td>`)
-            }
-        }
-        str.push(`<tr><td>${table[p].name}</td>${row.join("")}</tr>`)
-    }
-
-    $('#t-pot tbody').html(str.join(""))
-}
+[dateStart, dateEnd].forEach(input => input.addEventListener('change', () => search(mmr)));
+search(mmr);

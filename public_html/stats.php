@@ -5,27 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Estatísticas</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
     <link rel='stylesheet' href="css/side-menu.css"/>
     <link rel='stylesheet' href="css/table.css"/>
+    <link rel='stylesheet' href="css/ui-slider.css"/>
     <link rel='stylesheet' href="css/stats.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/header.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("stats.js") ?>"></script>
     
 
-    <script src="script/stats.js"></script>
-    <script src="script/stats_func.js"></script>
-    <script src="script/side-menu.js"></script>
-    <script src="script/dialog.js"></script>
     
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->
@@ -47,7 +42,7 @@
                 <h1>Estatísticas da gladCode</h1>
                 <div id='search-container'>
                     <div id='date-container'>
-                        <span>Pesquisar entre</span><input type='text' id='date-str' class='input' placeholder='último mês'><span>e</span><input type='text' id='date-end' class='input' placeholder='hoje'>
+                        <span>Pesquisar entre</span><input type='date' id='date-str' class='input' aria-label='Data inicial (vazio: último mês)' title='Vazio: último mês'><span>e</span><input type='date' id='date-end' class='input' aria-label='Data final (vazio: hoje)' title='Vazio: hoje'>
                     </div>
                     <div id='mmr-container'>
                         <span>Intervalo de renome</span><div id='mmr-slider'></div>
@@ -76,16 +71,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-info='STR'>
+                        <tr>
                             <td class='fixed'>Força predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a força como seu atributo predominante'></i></td>
                         </tr>
-                        <tr data-info='AGI'>
+                        <tr>
                             <td class='fixed'>Agilidade predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a agilidade como seu atributo predominante'></i></td>
                         </tr>
-                        <tr data-info='INT'>
+                        <tr>
                             <td class='fixed'>Inteligência predominante<i class='info fas fa-question-circle' title='Percentual de gladiadores que possuem a inteligência como seu atributo predominante'></i></td>
                         </tr>
-                        <tr data-info='lvl'>
+                        <tr>
                             <td class='fixed'>Nível máximo<i class='info fas fa-question-circle' title='Maior nível atingido pelo gladiadores vivos nos últimos 5 segundos da batalha'></i></td>
                         </tr>
                     </tbody>

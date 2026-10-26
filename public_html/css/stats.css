@@ -300,3 +300,9 @@ h2 {
     font-size: 0.8em;
     color: #616161;
 }
+
+#date-container .input[type='date'] {
+    width: auto;
+    min-width: 130px;
+    font-family: inherit;
+}

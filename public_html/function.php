@@ -7,7 +7,6 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
@@ -17,8 +16,9 @@
     <link rel='stylesheet' href="css/function.css"/>
     <link rel='stylesheet' href="css/header.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("function.js") ?>"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -31,12 +31,7 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
     
-    <script type="module" src="script/blocks.js"></script>
-    <script src="script/function.js"></script>
-    <script src="script/side-menu.js"></script>
     
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->
@@ -92,11 +87,11 @@
     <?php
         $func = "";
         if (isset($_GET['f']))
-            echo "<input type='hidden' id='vget' value='". $_GET['f'] ."'>";
+            echo "<input type='hidden' id='vget' value='". htmlspecialchars($_GET['f'], ENT_QUOTES) ."'>";
         if (isset($_GET['l']))
-            echo "<div id='dict' hidden>". $_GET['l'] ."</div>";
+            echo "<div id='dict' hidden>". htmlspecialchars($_GET['l']) ."</div>";
         if (isset($_GET['p']))
-            echo "<div id='get-lang' hidden>". $_GET['p'] ."</div>";
+            echo "<div id='get-lang' hidden>". htmlspecialchars($_GET['p']) ."</div>";
         
     ?>
 </body>

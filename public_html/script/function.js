@@ -1,280 +1,240 @@
 // ------------------------------------------------------------------------
 // WHEN MESSING WITH FUNCS, DONT FORGET TO RUN compress_functions.php AFTER
 // ------------------------------------------------------------------------
+import './blocks.js';
+import { SideMenu } from './components/side-menu.js';
+import { renderTemplate } from './helpers/html.js';
+import { FunctionDocsModel } from './models/function-docs.js';
+import { UserModel } from './models/user.js';
+import {
+    noVersionTemplate,
+    notFoundTemplate,
+    paramTemplate,
+    seeAlsoRowTemplate,
+    voidParamTemplate,
+} from './templates/function.js';
 
-var langDict = false
+/** URL extension of each language. */
+const EXTENSIONS = { c: 'c', python: 'py', blocks: 'blk' };
+/** Language of each URL extension. */
+const LANGUAGES = { c: 'c', py: 'python', blk: 'blocks' };
+/** Words that look like calls in a sample but are not API functions. */
+const RESERVED = ['loops', 'if', 'elif', 'while', 'for'];
 
-$(document).ready( function() {
-    $('#learn').addClass('here');
-    
-    var func = "";
-    if ($('#vget').length)
-        func = $('#vget').val();
+const content = document.querySelector('#content');
+const select = document.querySelector('#language select');
+const functionName = document.querySelector('#vget')?.value ?? '';
+/** `pt` on the Portuguese pages (`funcao/...`), where names are translated. */
+const dictionary = document.querySelector('#dict')?.textContent ?? '';
 
-    var lang_word = 'function';
-    if ($('#dict').length){
-        langDict = $('#dict').html()
-        if (langDict == 'pt')
-            lang_word = 'funcao';
+/**
+ * The language to show: the one in the URL, else the user's, else C.
+ *
+ * @param {Record<string, any>} user Signed-in user answer.
+ * @returns {'c'|'python'|'blocks'}
+ */
+function chooseLanguage(user) {
+    const requested = document.querySelector('#get-lang');
+    const language = requested && LANGUAGES[requested.textContent];
+    requested?.remove();
+    if (language) return language;
+    return UserModel.isLogged(user) && user.language ? user.language : 'c';
+}
+
+/**
+ * Shows Blockly XML in a read-only workspace that follows its container's size.
+ *
+ * @param {HTMLElement} replaced Element the workspace takes the place of.
+ * @param {string} id Workspace container id.
+ * @param {string} xml Blocks.
+ * @param {object} [options] Extra Blockly options.
+ */
+function showBlocks(replaced, id, xml, options = {}) {
+    const container = document.createElement('div');
+    container.id = id;
+    replaced.replaceWith(container);
+    const workspace = Blockly.inject(id, { readOnly: true, ...options });
+    Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), workspace);
+    new ResizeObserver(() => Blockly.svgResize(workspace)).observe(container);
+}
+
+/**
+ * Shows code highlighted by Prism.
+ *
+ * @param {HTMLElement} element `<code>` element.
+ * @param {string} code Source.
+ * @param {string} language Language.
+ */
+function showCode(element, code, language) {
+    element.innerHTML = code;
+    element.className = `language-${language}`;
+    Prism.highlightElement(element);
+}
+
+/**
+ * Fills the example: the code, the "see also" functions it calls and the
+ * explanation, whose `{function}` marks become the function's name (its
+ * block name on the blocks page).
+ *
+ * @param {Record<string, any>} item Function documentation.
+ * @param {Record<string, any>} reference Every function's documentation.
+ * @param {string} language Shown language.
+ */
+async function fillSample(item, reference, language) {
+    const sample = await FunctionDocsModel.sample(`${item.sample.explain.split('.')[0]}.json`);
+    const target = document.querySelector('#temp-sample');
+    if (language === 'blocks') {
+        showBlocks(target.parentElement, 'sample-ws', sample.blocks, { scrollbars: true });
+    }
+    else {
+        showCode(target, sample[language], language);
     }
 
-    if (func == "")
-        load_content("");
-    else{
-        $('#language select').selectmenu({
-            change: function( event, ui ) {
-                let ext = {
-                    c: "c",
-                    python: "py",
-                    blocks: "blk"
-                };
+    const calls = (sample.python ?? sample.c).match(/\w+\(/g) ?? [];
+    calls.map(call => call.slice(0, -1)).forEach(name => {
+        if (name !== item.name.default && !item.seealso.includes(name) && !RESERVED.includes(name)) {
+            item.seealso.push(name);
+        }
+    });
 
-                window.location.href = `${lang_word}/${func}.${ext[ui.item.value]}`;
-            }
-        });
-            
-        $.getJSON(`script/functions.json`, async data => {
-            await load_content(func, data);        
-            await menu_loaded();
-            
-            let loc = window.location.href.split("/")
-            let place = loc[loc.length - 2]
-            let funcName = loc[loc.length - 1].split(".")
-            let ext = ''
+    const marked = new Set((sample.explain.match(/\{[\w\W]+?\}/g) ?? []).map(mark => mark.match(/\w+/)[0]));
+    let explain = sample.explain;
+    marked.forEach(name => {
+        const shown = language === 'blocks' ? reference[name.toLowerCase()].name.block : name;
+        explain = explain.replace(new RegExp(`\\{${name}\\}`, 'g'), shown);
+    });
+    document.querySelector('#temp-explain').innerHTML = explain;
+}
 
-            let submenu
+/**
+ * Renames the functions in the page to their Portuguese names and points the
+ * links at the Portuguese pages.
+ *
+ * @param {Record<string, string>} names Portuguese name by English name.
+ */
+function translateNames(names) {
+    const template = content.querySelector('#template');
+    let html = template.innerHTML;
+    Object.entries(names).forEach(([name, translated]) => {
+        html = html.replace(new RegExp(`([^f=\\w])${name}([\\W])`, 'g'), `$1${translated}$2`);
+    });
+    template.innerHTML = html.replace(/href="function\/([\w]*?)"/g, "href='funcao/$1'");
+}
 
-            if (funcName[1] == 'blk'){
-                ext = '.'+ funcName[1]
-                submenu = $(`#docs-blocks`).next('ul')
-            }
-            else if (place == 'funcao'){
-                submenu = $(`#docs-ptbr`).next('ul')
-            }
-            else{
-                submenu = $(`#docs`).next('ul')
-            }
-
-            funcName = funcName[0]
-
-            submenu.find(`li a`).each( function(){
-                if ($(this).attr('href') == `${place}/${funcName}${ext}`){
-                    $(this).parent().addClass('here visible').siblings('li').addClass('visible');
-                    $(this).parents('ul').prev('li').addClass('here visible');
-                    $('li.here i').addClass('open');
-                }
-            });
-        }).fail( function(){
-            load_content("");
-        });
-    }
-
-});
-
-async function load_content(item, fileData){
-    if (!item || item == ""){
-        var func = $('#vget').val();
-        $('#content').html("<h1>Função <i>"+ func +"</i> não encontrada.</h1><p><a href='docs'>Voltar para documentação</a></p>")
+/**
+ * Renders a function's page.
+ *
+ * @param {Record<string, any>} reference Every function's documentation.
+ * @returns {Promise<boolean>} Whether the function was shown.
+ */
+async function showFunction(reference) {
+    const item = reference[functionName];
+    if (!item) {
+        content.innerHTML = renderTemplate(notFoundTemplate, { name: functionName });
         return false;
     }
 
-    item = fileData[item]
+    const user = await UserModel.current();
+    const language = chooseLanguage(user);
 
-    var user = await waitLogged();
-
-    var language;
-
-    // set language to c or python only, and only if set in GET
-    if ($('#get-lang').length){
-        var ext = $('#get-lang').html();
-
-        if (ext == 'c')
-            language = "c";
-        else if (ext == 'py')
-            language = "python";
-        else if (ext == 'blk')
-            language = 'blocks'
-
-        $('#get-lang').remove();
+    if (item.noversion?.includes(language)) {
+        content.innerHTML = renderTemplate(noVersionTemplate, { name: functionName });
+        return false;
     }
-    
-    // if language is not set in GET, or set wrong, set user language, else set c
-    if (!language){
-        if (user)
-            language = user.language
-        else
-            language = 'c';
+    item.noversion?.forEach(missing => select.querySelector(`option[value='${missing}']`)?.remove());
+    select.value = language;
+
+    if (!item.syntax[language]) {
+        location.href = `function/${item.name.default.toLowerCase()}.c`;
+        return false;
     }
 
-    // check if there is no version for this funcion, then remove the select option
-    if (item.noversion){
-        for (let l of item.noversion){
-            if (l == language){
-                let func = $('#vget').val();
-                $('#content').html(`<h1>A função <i>${func}</i> não existe para esta linguagem.</h1><p><a href='docs'>Voltar para documentação</a></p>`)
-                return false;
-            }
-            $('#language select option').each( function() {
-                if ($(this).val() == l){
-                    $(this).remove()
-                }
-            })
-        }
+    const name = language === 'blocks' ? item.name.block : item.name.default;
+    document.title = `gladCode - ${name}`;
+    document.querySelector('#temp-name').textContent = name;
+    const syntax = document.querySelector('#temp-syntax');
+    if (language === 'blocks') {
+        showBlocks(syntax.parentElement, 'syntax-ws', `<xml>${item.syntax.blocks}</xml>`);
     }
-
-    $('#language select').val(language).selectmenu('refresh');
-
-    if (!item.syntax[language])
-        window.location.href = `function/${item.name.default.toLowerCase()}.c`
-
-    if (language == 'blocks'){
-        $('title').html("gladCode - "+ item.name.block)
-        $('#temp-name').html(item.name.block)
-        $('#temp-syntax').parent().after(`<div id='syntax-ws'></div>`).remove()
-
-        let xml = `<xml>${item.syntax.blocks}</xml>`
-        let ws = Blockly.inject('syntax-ws', { readOnly: true });
-        xmlDom = Blockly.Xml.textToDom(xml);
-        Blockly.Xml.domToWorkspace(xmlDom, ws);
-
-        new ResizeObserver(() => {
-            Blockly.svgResize(ws);
-        }).observe($('#syntax-ws')[0])
+    else {
+        showCode(syntax, item.syntax[language], language);
     }
-    else{
-        $('title').html("gladCode - "+ item.name.default)
-        $('#temp-name').html(item.name.default)
+    document.querySelector('#temp-description').innerHTML = item.description.long;
 
-        $('#temp-syntax').html(item.syntax[language])
+    const params = item.param[language] || item.param.default;
+    document.querySelector('#temp-param').insertAdjacentHTML('beforeend', params.map(param => (
+        param.name === 'void'
+            ? renderTemplate(voidParamTemplate, { description: param.description })
+            : renderTemplate(paramTemplate, param)
+    )).join(''));
+    document.querySelector('#temp-return').innerHTML = item.treturn[language] || item.treturn.default;
 
-        $('#temp-syntax').attr('class', `language-${language}`)
-        Prism.highlightElement($('#temp-syntax')[0])
-    }
+    await fillSample(item, reference, language);
 
-    $('#temp-description').html(item.description.long)
+    const translations = { [item.name.default]: item.name[dictionary] };
+    const rows = item.seealso.map(other => reference[other.toLowerCase()]).filter(Boolean).map(other => {
+        translations[other.name.default] = other.name[dictionary];
+        const shown = language === 'blocks' ? other.name.block : other.name.default;
+        if (!shown) return '';
+        return renderTemplate(seeAlsoRowTemplate, {
+            link: other.name.default.toLowerCase(),
+            name: shown,
+            brief: other.description.brief,
+        });
+    });
+    document.querySelector('#temp-seealso').insertAdjacentHTML('beforeend', rows.join(''));
 
-    var param = item.param.default;
-    if (user && item.param[language])
-        param = item.param[language];
-
-    for (let i in param){
-        if (param[i].name == "void")
-            $('#temp-param').append("<p>"+ param[i].description +"</p>");
-        else
-            $('#temp-param').append("<p class='syntax'>"+ param[i].name +"</p><p>"+ param[i].description +"</p>");
-    }
-    
-    var treturn = item.treturn.default;
-    if (user && item.treturn[language])
-        treturn = item.treturn[language];
-
-    $('#temp-return').html(treturn);
-
-    let filename = item.sample.explain.split(".")[0] + '.json'
-    var loadSample = $.get(`script/functions/samples/${filename}`, async code => {
-        if (language == 'blocks'){
-            // load blocks into div, create workspace and observe resize
-            $('#temp-sample').parent().after(`<div id='sample-ws'></div>`).remove()
-
-            let ws = Blockly.inject('sample-ws', {
-                scrollbars: true,
-                readOnly: true
-            });
-    
-            xmlDom = Blockly.Xml.textToDom(code.blocks);
-            Blockly.Xml.domToWorkspace(xmlDom, ws);
-
-            new ResizeObserver(() => {
-                Blockly.svgResize(ws);
-            }).observe($('#sample-ws')[0])  
-        }
-        else{
-            // load code into div and use prism to highlight code
-            $('#temp-sample').html(code[language]).attr('class', `language-${language}`)
-            Prism.highlightElement($('#temp-sample')[0])
-        }
-
-        // put functions into seealso
-        let codesearch = code.python
-        if (!codesearch)
-            codesearch = code.c
-
-        let funcs = codesearch.match(/\w+\(/g)
-        funcs = funcs.map(e => { return e.split("(")[0]})
-
-        let reserved = ['loops', 'if', 'elif', 'while', 'for']
-        for (let e of funcs){
-            if (e != item.name.default && item.seealso.indexOf(e) == -1 && reserved.indexOf(e) == -1)
-                item.seealso.push(e)
-        }   
-
-        // translate functions in brackets {} in explian text
-        let matches = code.explain.match(/\{[\w\W]+?\}/g)
-        funcs = []
-        if (matches){
-            for (let match of matches){
-                let word = match.match(/\w+/)[0]
-                if (funcs.indexOf(word) == -1)
-                    funcs.push(word)
-            }
-            for (let func of funcs){
-                // translate explain text to reflect blocks names
-                if (language == 'blocks'){
-                    let data = fileData[func.toLowerCase()]
-                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), data.name.block)
-                }
-                else
-                    code.explain = code.explain.replace(new RegExp(`\\{${func}\\}`, 'g'), func)
-            }
-        }
-        $('#temp-explain').html(code.explain);
-    
-        return code
-    })
-
-    if (langDict){
-        var funcsDict = {};
-        funcsDict[item.name.default] = item.name[langDict];
-    }
-
-    await loadSample
-
-    for (let i in item.seealso){
-        let data = fileData[item.seealso[i].toLowerCase()]
-        if (data){
-            let link = data.name.default.toLowerCase()
-            let name = data.name.default
-
-            if (language == 'blocks')
-                name = data.name.block
-
-            if (name)
-                $('#temp-seealso').append(`<tr>
-                    <td><a href='function/${link}'>${name}</a></td>
-                    <td>${data.description.brief}</td></tr>`)
-
-            if (langDict)
-                funcsDict[data.name.default] = data.name[langDict]
-        }
-    }
-
-    if (langDict){
-        // await loadExplain
-        loadDict(funcsDict)
-    }
-
+    if (dictionary === 'pt') translateNames(translations);
     return true;
 }
 
-function loadDict(func){
-    if (langDict == 'pt'){
-        for (let name in func){
-            var pattern = new RegExp("([^f=\\w])"+ name +"([\\W])", 'g');
-            var replace = '$1'+ func[name] +'$2';
-            $('#content #template').html($('#content #template').html().replace(pattern, replace));
+/**
+ * Opens this function's entry in the side menu of the right documentation
+ * (C, Portuguese or blocks).
+ */
+function highlightMenuEntry() {
+    const [place, file] = location.pathname.split('/').slice(-2);
+    const [name, ext] = file.split('.');
+    const suffix = ext === 'blk' ? '.blk' : '';
+    const sectionId = ext === 'blk' ? '#docs-blocks' : place === 'funcao' ? '#docs-ptbr' : '#docs';
+    const submenu = document.querySelector(`#side-menu ${sectionId}`)?.nextElementSibling;
+    const href = `${place}/${name}${suffix}`;
+
+    submenu?.querySelectorAll('li a').forEach(link => {
+        if (link.getAttribute('href') !== href) return;
+        const entry = link.parentElement;
+        entry.classList.add('here', 'visible');
+        [...entry.parentElement.children].forEach(sibling => {
+            if (sibling !== entry && sibling.tagName === 'LI') sibling.classList.add('visible');
+        });
+        for (let list = entry.parentElement; list && list.id !== 'side-menu'; list = list.parentElement) {
+            if (list.tagName === 'UL' && list.previousElementSibling?.tagName === 'LI') {
+                list.previousElementSibling.classList.add('here', 'visible');
+            }
         }
-        var pattern = new RegExp("href=\"function/([\\w]*?)\"", 'g');
-        var replace = "href='funcao/$1'";
-        $('#content #template').html($('#content #template').html().replace(pattern, replace));
-    }
+        document.querySelectorAll('#side-menu li.here i').forEach(icon => icon.classList.add('open'));
+    });
+}
+
+document.querySelector('#learn')?.classList.add('here');
+const menu = new SideMenu(document.querySelector('#side-menu'));
+
+select.addEventListener('change', () => {
+    const word = dictionary === 'pt' ? 'funcao' : 'function';
+    location.href = `${word}/${functionName}.${EXTENSIONS[select.value]}`;
+});
+
+if (functionName) {
+    FunctionDocsModel.all()
+        .then(async reference => {
+            await showFunction(reference);
+            await menu.ready;
+            highlightMenuEntry();
+        })
+        .catch(() => {
+            content.innerHTML = renderTemplate(notFoundTemplate, { name: functionName });
+        });
+}
+else {
+    content.innerHTML = renderTemplate(notFoundTemplate, { name: '' });
 }
