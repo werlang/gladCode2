@@ -1,5 +1,6 @@
 import { FONT, ICON_FONT, NUMBER_FONT, TITLE_FONT, nineSlice, outlined, roundRect } from './hud.js';
 import { INSPECT_LABELS } from './camera-controller.js';
+import { PotionModel } from '../models/potion.js';
 
 /** Font Awesome 6 solid glyphs used as icons. */
 const ICONS = Object.freeze({
@@ -772,9 +773,8 @@ export class PlaybackControls {
     #loadPotions() {
         if (this.#potions) return;
         this.#potions = {};
-        const body = new URLSearchParams({ action: 'ITEMS' });
-        fetch('back_slots.php', { method: 'POST', body }).then((response) => response.json()).then((data) => {
-            for (const [name, potion] of Object.entries(data?.potions ?? {})) this.#potions[potion.id] = name;
+        PotionModel.catalog().then((potions) => {
+            for (const [name, potion] of Object.entries(potions ?? {})) this.#potions[potion.id] = name;
             this.#keys.inspect = null;
         }).catch(() => {});
     }

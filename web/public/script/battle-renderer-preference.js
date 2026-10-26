@@ -3,7 +3,7 @@
     const CLASSIC = 'classic';
     const THREE = 'three';
 
-    // Feature gate set by playback.php from env ENABLE_RENDER2. When the gate
+    // Feature gate set by the playback page (web/app.js) from env ENABLE_RENDER2. When the gate
     // is off, the 3D option is hidden and any stored/?renderer=three value is
     // ignored so the page always runs the classic renderer. Defaults to
     // enabled when the flag is absent (e.g. direct script use outside playback).

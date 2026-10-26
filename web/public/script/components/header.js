@@ -21,7 +21,7 @@ export async function showLoginDialog(message = 'Faça login no sistema') {
 }
 
 /**
- * Site header (`header.php`): drop-down menus, the mobile slide-out menu,
+ * Site header (`view/header.html`): drop-down menus, the mobile slide-out menu,
  * login and profile links and the footer.
  */
 export class Header extends BaseComponent {

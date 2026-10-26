@@ -20,7 +20,7 @@ const FLOAT_RISE = 38;
 const FLOAT_POOL = 14;
 const LABEL_CACHE_LIMIT = 48;
 export const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
-/** Display face for names, levels and combat text (loaded by playback.php), and the face for numbers. */
+/** Display face for names, levels and combat text (loaded by view/playback.html), and the face for numbers. */
 export const TITLE_FONT = `Cinzel, Georgia, ${FONT}`;
 export const NUMBER_FONT = `Acme, ${FONT}`;
 /** Font Awesome (solid) is on the page for the classic UI; the canvas controls draw its glyphs as icons. */
