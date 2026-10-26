@@ -1,0 +1,14 @@
+{
+  "name": "gladcode2-frontend-tools",
+  "private": true,
+  "type": "module",
+  "description": "Lint and unit-test tooling for public_html/script. Run through Docker, never on the host (see AGENTS.md).",
+  "scripts": {
+    "lint": "eslint public_html/script",
+    "test": "node --test tests/frontend/*.test.mjs tests/render2/*.test.mjs"
+  },
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "globals": "15.15.0"
+  }
+}
