@@ -72,6 +72,8 @@ export class RequestError extends Error {
         this.status = status;
         this.data = data;
         this.code = data && typeof data === 'object' && typeof data.code === 'string' ? data.code : undefined;
+        /** The API error's `data` payload (e.g. `{ limit }` for `GLADIATOR_LIMIT`). */
+        this.details = data && typeof data === 'object' ? data.data : undefined;
         this.aborted = aborted;
     }
 }

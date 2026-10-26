@@ -1,60 +1,58 @@
 import { api } from '../helpers/request.js';
 
-const ENDPOINT = 'back_glad.php';
-
 /**
- * The signed-in user's gladiators (`back_glad.php`).
+ * The signed-in master's gladiators (`/gladiators`). A gladiator is `{ id, name, vstr, vagi, vint,
+ * skin, code, blocks, mmr, master, outdated }`: `skin` is the skin JSON text, `code` and `blocks`
+ * are as written (escape them before putting them in HTML), `outdated` asks for a save on the
+ * current engine version.
  */
 export class GladiatorModel {
-    /**
-     * Every gladiator of the signed-in user. `code` and `blocks` arrive
-     * HTML-escaped; `oldversion` is set when the gladiator needs saving again.
-     *
-     * @returns {Promise<Array<{ id: number, name: string, vstr: number, vagi: number, vint: number,
-     *   code: string, blocks: string, skin: string, mmr: number, user: string, oldversion?: string }>>}
-     */
+    /** @returns {Promise<Array<Record<string, any>>>} Every gladiator of the signed-in master. */
     static async list() {
-        const glads = await api.post(ENDPOINT, { action: 'GET' });
-        return Array.isArray(glads) ? glads : [];
+        const { gladiators } = await api.get('gladiators');
+        return gladiators;
     }
 
     /**
-     * Deletes a gladiator.
-     *
+     * @param {number} id
+     * @returns {Promise<Record<string, any>>} One of the master's gladiators.
+     */
+    static async get(id) {
+        const { gladiator } = await api.get(`gladiators/${id}`);
+        return gladiator;
+    }
+
+    /**
      * @param {number} id Gladiator id.
-     * @returns {Promise<unknown>}
+     * @returns {Promise<{ deleted: true }>}
      */
     static remove(id) {
-        return api.post(ENDPOINT, { action: 'DELETE', id });
+        return api.delete(`gladiators/${id}`);
     }
 
     /**
-     * Creates a gladiator, or updates it when `id` is given, from the code
-     * last compiled in this session.
+     * Creates a gladiator, or saves it when `id` is given. The server first fights it against the
+     * strongest samples, so this takes a few seconds.
      *
-     * @param {{ id?: number, skin: string, name: string, vstr: number, vagi: number, vint: number, blocks?: string }} glad
-     * @returns {Promise<{ ID: number }|{ LIMIT: number }|'EXISTS'|'INVALID'|string>}
+     * @param {{ id?: number, name: string, vstr: number, vagi: number, vint: number, skin: string, code: string, blocks?: string }} glad
+     *   `code` is the user code without setup().
+     * @returns {Promise<Record<string, any>>} The saved gladiator.
+     * @throws {import('../helpers/request.js').RequestError} `NAME_TAKEN`, `GLADIATOR_LIMIT` (data.limit),
+     *   `BANNED_FUNCTIONS` (data.functions), `GLADIATOR_TEST_FAILED` (data.error), `INVALID_*`.
      */
-    static save({ id, skin, name, vstr, vagi, vint, blocks }) {
-        return api.post(ENDPOINT, {
-            action: id ? 'UPDATE' : 'INSERT',
-            ...(id ? { id } : {}),
-            skin,
-            nome: name,
-            vstr,
-            vagi,
-            vint,
-            ...(blocks === undefined ? {} : { blocks }),
-        });
+    static async save({ id, ...glad }) {
+        const { gladiator } = id ? await api.put(`gladiators/${id}`, glad) : await api.post('gladiators', glad);
+        return gladiator;
     }
 
     /**
-     * Reads a gladiator's name, attributes and skin from its source code.
+     * A sample opponent.
      *
-     * @param {{ code?: string, filename?: string }} source Code, or a sample file path.
-     * @returns {Promise<{ name: string|false, vstr: string|false, vagi: string|false, vint: string|false, skin: string[]|null, code: string }>}
+     * @param {string} name Sample name (`Archie`, `War Maker`, ...).
+     * @returns {Promise<{ name: string, vstr: number, vagi: number, vint: number, skin: string|null, code: string }>}
      */
-    static parse(source) {
-        return api.post(ENDPOINT, { action: 'FILE', ...source });
+    static async sample(name) {
+        const { sample } = await api.get(`gladiators/samples/${encodeURIComponent(name)}`);
+        return sample;
     }
 }

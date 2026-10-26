@@ -1,14 +1,16 @@
 import './blocks.js';
-import { Message, showDialog, showMessage } from './components/dialog.js';
+import { Message, showDialog, showMessage, showTerminal } from './components/dialog.js';
 import { showLoginDialog } from './components/header.js';
-import { createElement, decodeHtml, renderTemplate } from './helpers/html.js';
+import { ProgressButton } from './components/simulation.js';
+import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
+import { simulationProblem } from './helpers/simulation-report.js';
 import { fetchSpritesheet, getSpriteThumb } from './helpers/spritesheet.js';
-import { api } from './helpers/request.js';
+import { TemplateVar } from './helpers/template-var.js';
 import { BattleLogModel } from './models/battle-log.js';
 import { GladiatorModel } from './models/gladiator.js';
 import { UserModel } from './models/user.js';
 import { gladiatorSource } from './editor/attributes.js';
-import { BattleTest, SAVE_TEST_GLADS, loadSample, runTestBattle } from './editor/battle-test.js';
+import { BattleTest } from './editor/battle-test.js';
 import { BlocksEditor } from './editor/blocks-editor.js';
 import { CodeEditor } from './editor/code-editor.js';
 import { SkinCreator } from './editor/skin-creator.js';
@@ -22,32 +24,19 @@ const TEST_ATTRIBUTES = { vstr: 14, vagi: 14, vint: 2 };
 /** Lessons the tutorial checks when the test window opens, and after a test battle. */
 const BEFORE_TEST_LESSONS = ['checkStep', 'oponent', 'learnAttack', 'checkAttack', 'checkGetHit', 'checkReact', 'checkSafe', 'checkFireball', 'checkTeleport', 'checkUpgrade', 'checkBreakpoint'];
 const AFTER_TEST_LESSONS = ['watchCodeMove', 'moveBackForth', 'askMoveNext', 'detectEnemy', 'getHit', 'reactHit', 'safe', 'fireball', 'teleport', 'upgrade', 'breakpoint'];
+/** The samples the server fights a gladiator against before saving it, in battle order. */
+const SAVE_TEST_NAMES = ['Archie', 'War Maker', 'Magnus', 'Rouge'];
 /** A transparent pixel, for a profile picture that fails to load. */
 const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
-/**
- * Reads the gladiator editor.php embedded for editing (`glad-<id>`).
- *
- * @returns {Record<string, string>|null}
- */
-function takeEmbeddedGladiator() {
-    const element = document.querySelector('#glad-code');
-    if (!element) return null;
-    const field = id => element.querySelector(`#${id}`)?.textContent ?? '';
-    const glad = {
-        id: field('idglad'),
-        name: field('name'),
-        user: field('user'),
-        code: field('code'),
-        blocks: field('blocks'),
-        vstr: field('vstr'),
-        vagi: field('vagi'),
-        vint: field('vint'),
-        skin: field('skin'),
-    };
-    element.remove();
-    return glad;
-}
+/** What to tell the player for each refused save, by API error code. */
+const SAVE_ERRORS = {
+    NAME_TAKEN: name => `O nome <span class='highlight'>${name}</span> já está sendo usado por outro gladiador`,
+    GLADIATOR_LIMIT: (name, data) => `Você não pode possuir mais de <span class='highlight'>${data.limit}</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`,
+    BANNED_FUNCTIONS: (name, data) => `Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:${data.functions.map(fn => `<li><b>${fn}</b></li>`).join('')}</ul>`,
+    INVALID_NAME: () => 'O nome do gladiador só pode ter letras, números, espaços e _.',
+    INVALID_ATTRIBUTES: () => 'Os atributos do gladiador não correspondem às regras da gladCode.',
+};
 
 /**
  * The gladiator editor page: code or blocks, appearance and attributes,
@@ -56,19 +45,12 @@ function takeEmbeddedGladiator() {
 class EditorPage {
     user = null;
     saved = true;
-    tested = true;
     /** Id of the saved gladiator being edited. */
     gladId = null;
-    /** Owner nickname of the edited gladiator. */
-    nick = null;
     /** The gladiator as the creator last produced it (name, attributes, skin). */
     card = null;
 
-    /**
-     * @param {Record<string, string>|null} embedded The gladiator opened for editing.
-     */
-    constructor(embedded) {
-        this.embedded = embedded;
+    constructor() {
         this.code = new CodeEditor('code', { blocksActive: () => this.blocks.active });
         this.blocks = new BlocksEditor(this.code);
         this.creator = new SkinCreator(document.querySelector('#fog-skin'), glad => this.#useCreatedGladiator(glad));
@@ -82,8 +64,6 @@ class EditorPage {
             fog.style.display = 'none';
         });
 
-        const { embedded } = this;
-        this.nick = embedded?.user ?? null;
         this.#bindMenu();
         this.code.ace.on('change', () => this.#codeChanged());
         window.addEventListener('beforeunload', event => {
@@ -96,18 +76,24 @@ class EditorPage {
         this.user = UserModel.isLogged(user) ? user : null;
         attachTutorial({ editor: this.code.ace, user: user ?? {}, toggleBlocks: options => this.blocks.toggle(options) });
 
+        // `/glad-<id>` opens a saved gladiator, `/newglad` (id 0) the creator, `/editor` the list
+        const gladiatorId = TemplateVar.get('gladiatorId');
+        const embedded = this.user && gladiatorId ? await GladiatorModel.get(gladiatorId).catch(() => null) : null;
         if (embedded) await this.#loadGladiator(embedded);
         if (!this.user) {
             this.#showCreator();
         }
         else {
-            this.#setUpUser(embedded);
+            this.#setUpUser(embedded, gladiatorId === 0);
         }
         this.code.ace.focus();
     }
 
-    /** @param {Record<string, any>|null} embedded The gladiator opened for editing. */
-    async #setUpUser(embedded) {
+    /**
+     * @param {Record<string, any>|null} embedded The gladiator opened for editing.
+     * @param {boolean} creating The page was opened to create a gladiator.
+     */
+    async #setUpUser(embedded, creating) {
         const { user } = this;
         document.querySelectorAll('#login').forEach(login => {
             login.textContent = user.firstName;
@@ -125,8 +111,7 @@ class EditorPage {
         if (user.language === 'blocks' && !embedded?.blocks) this.blocks.toggle({ ask: false, active: true });
         this.code.setAppearance(user.editorTheme, user.editorFont);
 
-        if (document.querySelector('#newglad')) {
-            document.querySelector('#newglad').remove();
+        if (creating) {
             this.#showCreator();
         }
         else if (!embedded) {
@@ -139,15 +124,15 @@ class EditorPage {
     /**
      * Fills the editor with a saved gladiator.
      *
-     * @param {Record<string, string>} glad Embedded gladiator.
+     * @param {Record<string, any>} glad The saved gladiator.
      */
     async #loadGladiator(glad) {
         this.gladId = glad.id;
         this.creator.load(glad);
         if (glad.blocks) {
-            await this.blocks.toggle({ ask: false, active: true, xml: decodeHtml(glad.blocks) });
+            await this.blocks.toggle({ ask: false, active: true, xml: glad.blocks });
         }
-        this.code.value = decodeHtml(glad.code);
+        this.code.value = glad.code;
         this.code.ace.gotoLine(1, 0, true);
 
         let skin = null;
@@ -160,7 +145,6 @@ class EditorPage {
         const image = skin ? getSpriteThumb(await fetchSpritesheet(skin), 'walk', 'down') : null;
         this.#showCard({ ...this.creator.values(), image });
         this.saved = true;
-        this.tested = false;
     }
 
     #bindMenu() {
@@ -203,7 +187,6 @@ class EditorPage {
 
     #codeChanged() {
         this.saved = false;
-        this.tested = false;
         if (tutorial.enabled && this.user?.language === 'blocks') tutorial.show(['checkStep']);
     }
 
@@ -251,7 +234,6 @@ class EditorPage {
         this.creator.showAppearance();
         this.#showCard(glad);
         this.saved = false;
-        this.tested = false;
     }
 
     /**
@@ -272,7 +254,7 @@ class EditorPage {
     /**
      * The edited gladiator ready to fight: its code with the setup function, and its breakpoints.
      *
-     * @returns {{ source: string, breakpoints: string[]|false, glad: Record<string, any> }}
+     * @returns {{ source: string, name: string, breakpoints: string[]|false }}
      */
     #editedSource() {
         const values = this.creator.values();
@@ -283,10 +265,10 @@ class EditorPage {
             vagi: attributes.vagi,
             vint: attributes.vint,
             skin: JSON.stringify(values.skin),
-            user: this.nick || 'user',
+            user: this.user?.nickname || 'user',
         };
         const language = this.code.detectLanguage();
-        return { source: gladiatorSource(glad, this.code.value, language), breakpoints: this.code.breakpoints(), glad };
+        return { source: gladiatorSource(glad, this.code.value, language), name: glad.name, breakpoints: this.code.breakpoints() };
     }
 
     #openTest() {
@@ -296,89 +278,78 @@ class EditorPage {
 
     /** @param {string} hash Test battle log hash. */
     async #afterTest(hash) {
-        this.tested = true;
         if (await showDialog('Deseja visualizar a batalha?', ['Sim', 'Não']) === 'Sim') window.open(`play/${hash}`);
         else BattleLogModel.remove(hash);
         tutorial.show(AFTER_TEST_LESSONS);
     }
 
-    /** @returns {Promise<string[]>} The test-only functions the code uses. */
-    async #bannedFunctions() {
-        const { functions = [] } = await api.get('banned_functions.json');
-        return functions.filter(name => this.code.value.includes(name));
-    }
-
+    /**
+     * Saves the gladiator. The server fights it against the strongest samples first, so a
+     * window shows the progress meanwhile.
+     */
     async #save() {
         if (!this.user) {
             this.#askLogin('Você precisa fazer LOGIN no sistema para salvar seu gladiador');
             return;
         }
 
-        const banned = await this.#bannedFunctions();
-        if (banned.length) {
-            showMessage(`Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:${banned.map(name => `<li><b>${name}</b></li>`).join('')}</ul>`);
-            return;
-        }
-        // the server saves the code of this session's last test battle
-        if (!this.tested) {
-            this.#testBeforeSaving();
-            return;
-        }
-
         const card = this.card ?? this.creator.values();
-        const blocks = this.blocks.active ? this.blocks.save() : undefined;
-        const data = await GladiatorModel.save({
-            id: this.gladId,
-            name: card.name,
-            vstr: card.vstr,
-            vagi: card.vagi,
-            vint: card.vint,
-            skin: JSON.stringify(card.skin),
-            blocks,
-        });
-        document.querySelectorAll('#fog').forEach(fog => fog.remove());
+        const fog = createElement(renderTemplate(savingTemplate, { name: card.name }));
+        document.body.append(fog);
+        const progress = new ProgressButton(fog.querySelector('button'), ['Testando o gladiador...', 'Aguardando resposta do servidor']);
 
-        if (data?.LIMIT) {
-            showMessage(`Você não pode possuir mais de <span class='highlight'>${data.LIMIT}</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`);
+        let glad;
+        try {
+            glad = await GladiatorModel.save({
+                id: this.gladId,
+                name: card.name,
+                vstr: card.vstr,
+                vagi: card.vagi,
+                vint: card.vint,
+                skin: JSON.stringify(card.skin),
+                code: this.code.value,
+                blocks: this.blocks.active ? this.blocks.save() : '',
+            });
         }
-        else if (data === 'EXISTS') {
-            showMessage(`O nome <span class='highlight'>${card.name}</span> já está sendo usado por outro gladiador`);
+        catch (error) {
+            this.#saveFailed(error, card.name);
+            return;
         }
-        else if (data === 'INVALID') {
-            showMessage('CHEATER');
+        finally {
+            progress.kill();
+            fog.remove();
         }
-        else if (data?.ID) {
-            const created = !this.gladId;
-            this.gladId = data.ID;
-            this.saved = true;
-            if (!created) {
-                showMessage(`Gladiador <span class='highlight'>${card.name}</span> gravado`);
-            }
-            else if (await showDialog(`O gladiador <span class='highlight'>${card.name}</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`, ['Sim', 'Agora não']) === 'Sim') {
-                window.open('battle.ranked');
-            }
+
+        const created = !this.gladId;
+        this.gladId = glad.id;
+        this.saved = true;
+        if (!created) {
+            showMessage(`Gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> gravado`);
+        }
+        else if (await showDialog(`O gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> foi criado e gravado em seu perfil. Deseja inscrevê-lo para competir contra outros gladiadores?`, ['Sim', 'Agora não']) === 'Sim') {
+            window.open('battle.ranked');
         }
     }
 
-    /** Fights the strongest samples, so the server holds tested code, then saves. */
-    async #testBeforeSaving() {
-        const name = this.card?.name ?? this.creator.values().name;
-        const fog = createElement(renderTemplate(savingTemplate, { name }));
-        document.body.append(fog);
-        const opponents = await Promise.all(SAVE_TEST_GLADS.map(async sample => (await loadSample(sample)).code));
-        const hash = await runTestBattle(fog.querySelector('button'), opponents, this.#editedSource());
-        if (!hash) {
-            fog.remove();
+    /**
+     * Explains why a save was refused.
+     *
+     * @param {import('./helpers/request.js').RequestError} error
+     * @param {string} name The gladiator's name.
+     */
+    #saveFailed(error, name) {
+        if (error.code === 'GLADIATOR_TEST_FAILED') {
+            const problem = simulationProblem({ error: error.details?.error }, [...SAVE_TEST_NAMES, name]);
+            showTerminal(problem.title, problem.message);
             return;
         }
-        BattleLogModel.remove(hash);
-        this.tested = true;
-        this.#save();
+        const explain = SAVE_ERRORS[error.code];
+        if (!explain) throw error;
+        showMessage(explain(escapeHtml(name), error.details ?? {}));
     }
 }
 
-// the embedded gladiator holds an element with the editor's id, so it goes first
-new EditorPage(takeEmbeddedGladiator()).start().catch(error => {
+new EditorPage().start().catch(error => {
     console.error(error);
     new Message({ message: 'Não foi possível carregar o editor. Recarregue a página.' }).show();
 });

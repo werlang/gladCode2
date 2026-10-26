@@ -1,6 +1,6 @@
 import { showDialog } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
-import { createElement, decodeHtml, renderTemplate } from '../helpers/html.js';
+import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeOut } from '../helpers/animate.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { profile } from './session.js';
@@ -24,7 +24,7 @@ export function gladiatorLimit(level) {
 /**
  * Shows a gladiator's code (or blocks) with a button to open it in the editor.
  *
- * @param {Record<string, any>} glad Gladiator with HTML-escaped code.
+ * @param {Record<string, any>} glad Gladiator; the template escapes its code.
  */
 function showCode(glad) {
     const blocks = Boolean(glad.blocks);
@@ -36,7 +36,7 @@ function showCode(glad) {
 
     if (blocks) {
         const workspace = Blockly.inject('code-ws', { scrollbars: true, readOnly: true });
-        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(decodeHtml(glad.blocks)), workspace);
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(glad.blocks), workspace);
     }
     else {
         Prism.highlightElement(fog.querySelector('code'));
@@ -69,11 +69,11 @@ export class GladsTab {
             glads,
             code: true,
             remove: true,
-            onCode: glad => (glad.oldversion ? this.#askUpdate(glad) : showCode(glad)),
+            onCode: glad => (glad.outdated ? this.#askUpdate(glad) : showCode(glad)),
         });
         cards.forEach((card, index) => {
             const glad = glads[index];
-            if (glad.oldversion) card.querySelector('.code .button').textContent = "{'atualizar'}";
+            if (glad.outdated) card.querySelector('.code .button').textContent = 'Atualizar';
             card.querySelector('.delete').addEventListener('click', () => this.#askDelete(card, glad));
         });
 

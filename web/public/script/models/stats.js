@@ -44,8 +44,7 @@ export class StatsModel {
      * @returns {Promise<unknown>}
      */
     static async saveBattle(hash) {
-        const { log } = await BattleLogModel.get(hash);
-        const stats = battleStats(JSON.parse(log));
+        const stats = battleStats(await BattleLogModel.get(hash));
         return api.post(ENDPOINT, {
             action: 'SAVE',
             ...stats.uses,

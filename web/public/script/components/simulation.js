@@ -1,6 +1,5 @@
 import { showTerminal } from './dialog.js';
 import { simulationProblem } from '../helpers/simulation-report.js';
-import { SimulationModel } from '../models/simulation.js';
 
 /** The request of the last {@link runSimulation}, cancelled by the next one. */
 let pending = null;
@@ -15,12 +14,12 @@ function removeOverlays() {
 /**
  * Shows what went wrong with a battle, if anything did.
  *
- * @param {unknown} data back_simulation.php answer.
- * @param {Array<object|string|number>} [glads] The simulation's gladiators.
+ * @param {{ hash: string|null, error: string }} data The run's answer.
+ * @param {string[]} [names] Gladiator names in battle order, to name them in compiler output.
  * @returns {boolean} Whether a problem was shown.
  */
-function reportProblem(data, glads) {
-    const problem = simulationProblem(data, glads);
+function reportProblem(data, names) {
+    const problem = simulationProblem(data, names);
     if (!problem) return false;
     showTerminal(problem.title, problem.message);
     return true;
@@ -30,40 +29,37 @@ function reportProblem(data, glads) {
  * One battle run.
  *
  * @example
- * const result = await new Simulation({ glads, terminal: true }).run();
- * if (result.simulation) open(`play/${result.simulation}`);
+ * const run = new Simulation(signal => SimulationModel.test(battle, { signal }), { terminal: true });
+ * const { hash } = await run.run();
  */
 export class Simulation {
     #controller = null;
 
     /**
-     * @param {object} args Simulation arguments (see {@link SimulationModel.run});
-     *   `terminal: true` shows problems in a terminal window.
+     * @param {(signal: AbortSignal) => Promise<{ hash: string|null, error: string }>} request Starts the run
+     *   (a {@link import('../models/simulation.js').SimulationModel} call).
+     * @param {{ terminal?: boolean, names?: string[] }} [options] `terminal` shows problems in a terminal
+     *   window; `names` label the gladiators in compiler output.
      */
-    constructor({ terminal = false, ...args }) {
-        this.args = args;
+    constructor(request, { terminal = false, names = [] } = {}) {
+        this.request = request;
         this.terminal = terminal;
+        this.names = names;
         this.running = false;
-        this.hash = null;
     }
 
     /**
      * Runs the battle and removes the page's overlays when it answers.
      *
-     * @returns {Promise<Record<string, any>>} The backend answer.
-     * @throws {Error} With `error` set to the answer when it is not JSON.
+     * @returns {Promise<{ hash: string|null, error: string }>}
      */
     async run() {
         this.running = true;
         this.#controller = new AbortController();
         try {
-            const data = await SimulationModel.run(this.args, { signal: this.#controller.signal });
+            const data = await this.request(this.#controller.signal);
             removeOverlays();
-            if (this.terminal) reportProblem(data, this.args.glads);
-            if (!data || typeof data !== 'object') {
-                throw Object.assign(new Error('The simulation did not answer with JSON'), { error: data });
-            }
-            this.hash = data;
+            if (this.terminal) reportProblem(data, this.names);
             return data;
         }
         finally {
@@ -81,20 +77,20 @@ export class Simulation {
 /**
  * Runs a battle, cancelling the previous one still waiting, and shows any problem.
  *
- * @param {object} args Simulation arguments (see {@link SimulationModel.run}).
- * @returns {Promise<string|false>} The battle log hash, `'ERROR'` when a
- *   problem was shown, `false` without an answer.
+ * @param {(signal: AbortSignal) => Promise<{ hash: string|null, error: string }>} request Starts the run.
+ * @param {string[]} [names] Gladiator names in battle order.
+ * @returns {Promise<string|false>} The battle log hash, `'ERROR'` when a problem was shown,
+ *   `false` without an answer.
  */
-export async function runSimulation(args) {
+export async function runSimulation(request, names = []) {
     pending?.abort();
     const controller = new AbortController();
     pending = controller;
 
     try {
-        const data = await SimulationModel.run(args, { signal: controller.signal });
-        if (reportProblem(data, args.glads)) return 'ERROR';
-        if (data.output) console.log(`MENSAGEM: ${data.output}`);
-        return data.simulation || false;
+        const data = await request(controller.signal);
+        if (reportProblem(data, names)) return 'ERROR';
+        return data.hash || false;
     }
     catch (error) {
         if (error.aborted) return false;

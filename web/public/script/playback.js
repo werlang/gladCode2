@@ -718,27 +718,19 @@ async function startBattle(simulation) {
 
 /** Downloads the battle log and builds every gladiator's spritesheet. */
 async function loadBattle() {
-    let data;
+    let log;
     try {
-        data = await BattleLogModel.get(loghash, {
+        log = await BattleLogModel.get(loghash, {
             onProgress: ratio => setLoading('Fazendo download do log de batalha', Math.round(ratio * 100), (ratio * 100) / 4),
         });
     }
-    catch {
-        showLoadError('Esta batalha não consta nos registros');
-        return;
-    }
-    if (data.status === 'EXPIRED') {
-        showLoadError('Esta batalha é muito antiga e não está mais acessível');
-        return;
-    }
-    if (data.status !== 'SUCCESS') {
-        if (tournHash) location.href = `tourn/${tournHash}`;
+    catch (error) {
+        if (error.code === 'LOG_EXPIRED') showLoadError('Esta batalha é muito antiga e não está mais acessível');
+        else if (tournHash) location.href = `tourn/${tournHash}`;
         else showLoadError('Esta batalha não consta nos registros');
         return;
     }
 
-    const log = JSON.parse(data.log);
     const { glads } = log[0];
     window.stab = [];
     window.gender = [];

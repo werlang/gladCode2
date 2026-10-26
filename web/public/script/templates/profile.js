@@ -26,7 +26,7 @@ export const codeBoxTemplate = `
     </div>
 </div>`;
 
-export const codeBlockTemplate = `<pre class='line-numbers language-{{language}}'><code class='language-{{language}}'>{{{code}}}</code></pre>`;
+export const codeBlockTemplate = `<pre class='line-numbers language-{{language}}'><code class='language-{{language}}'>{{code}}</code></pre>`;
 
 export const mmrRowTemplate = `<div class='row mmr' title='Renome'><span>{{mmr}}</span><img src='icon/winner-icon.png' alt=''></div>`;
 

@@ -1,4 +1,4 @@
-import { createElement, decodeHtml, renderTemplate } from '../helpers/html.js';
+import { createElement, renderTemplate } from '../helpers/html.js';
 import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { codeBlocksModalTemplate, codeModalTemplate, gladCardTemplate } from '../templates/glad-card.js';
@@ -35,7 +35,7 @@ export async function setGladImage(container, index, skin, dead = false) {
  * Opens a window with a gladiator's code: its blocks, or C/Python
  * highlighted by Prism.
  *
- * @param {{ code: string, blocks?: string }} glad Gladiator with HTML-escaped code.
+ * @param {{ code: string, blocks?: string }} glad Gladiator; its code is escaped by the template.
  */
 function showCode({ code, blocks }) {
     let fog;
@@ -43,7 +43,7 @@ function showCode({ code, blocks }) {
         fog = createElement(codeBlocksModalTemplate);
         document.body.append(fog);
         const workspace = Blockly.inject('code-ws', { scrollbars: true, readOnly: true });
-        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(decodeHtml(blocks)), workspace);
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(blocks), workspace);
     }
     else {
         const language = code.includes('def loop():') ? 'python' : 'c';
@@ -78,7 +78,7 @@ export async function loadGladCards(container, { glads, dead, code, master, remo
             vstr: glad.vstr,
             vagi: glad.vagi,
             vint: glad.vint,
-            master: master ? glad.user : '',
+            master: master ? glad.master : '',
         }));
         cardGlads.set(card, glad);
         container.append(card);
@@ -104,7 +104,7 @@ export async function loadGladCards(container, { glads, dead, code, master, remo
             card.classList.add('dead');
             card.title = 'Este gladiador está morto';
         }
-        if (glad.oldversion) {
+        if (glad.outdated) {
             card.classList.add('old');
             card.title = 'Este gladiador precisa ser atualizado';
         }

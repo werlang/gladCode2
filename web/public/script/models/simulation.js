@@ -1,21 +1,19 @@
 import { api } from '../helpers/request.js';
 
 /**
- * Battle simulations (`back_simulation.php`).
+ * Battle runs (`/battles`). A run answers `{ hash, error }`: the battle log hash, or null with the
+ * compiler or engine output (`INVALID_ATTR` and `NO_OUTPUT` are fixed codes).
  */
 export class SimulationModel {
     /**
-     * Runs a battle.
+     * The editor's test battle (test-only commands allowed).
      *
-     * @param {object} args What to simulate: `glads` (objects with name, user,
-     *   code, skin, vstr, vagi, vint, or gladiator ids) or a `tournament` /
-     *   `training` group with its `origin`, plus flags such as `ranked`, `duel`
-     *   or `force`.
-     * @param {{ signal?: AbortSignal }} [options] Abort signal.
-     * @returns {Promise<{ simulation: string|null, error: string, output: string }|string>}
-     *   `simulation` is the battle log hash; text means the backend broke.
+     * @param {{ source: string, opponents: Array<{ sample: string }|{ id: number }>, breakpoints?: number[] }} battle
+     *   `source` is the edited gladiator's full code with setup().
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ hash: string|null, error: string }>}
      */
-    static run(args, { signal } = {}) {
-        return api.post('back_simulation.php', { args: JSON.stringify(args) }, { signal });
+    static test({ source, opponents, breakpoints = [] }, { signal } = {}) {
+        return api.post('battles/test', { gladiator: { source }, opponents, breakpoints }, { signal });
     }
 }

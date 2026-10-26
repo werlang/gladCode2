@@ -47,13 +47,13 @@ test('message times read as Portuguese dates', () => {
     assert.equal(formatMessageTime(Date.now() - 3 * 60000, { short: true }), '3 minutos');
 });
 
-test('compiler errors name the gladiators', () => {
-    const glads = [{ name: 'Alpha' }, 'setName("Beta");', 7];
-    assert.equal(nameGladiators('/usercode/code0.c:1 x\\ncode1.py:2', glads), '<span>Alpha</span>:1 x\n<span>Beta</span>:2');
-    assert.equal(simulationProblem({ error: 'INVALID_ATTR' }).title, 'ERRO DE VALIDAÇÃO');
-    assert.match(simulationProblem({ error: '', output: 'Gladiator Zed timed out' }).message, /Zed/);
-    assert.equal(simulationProblem({ error: '', output: '', simulation: 'abc' }), null);
-    assert.equal(simulationProblem('Fatal error').title, 'ERRO EM TEMPO DE EXECUÇÃO');
+test('compiler errors name the gladiators and stay text', () => {
+    assert.equal(nameGladiators('/usercode/code0.c:1 x\\ncode1.py:2', ['Alpha', 'Beta']), '<span>Alpha</span>:1 x\n<span>Beta</span>:2');
+    assert.equal(nameGladiators('code0.c: expected <b>', ['<i>A</i>']), '<span>&#60;i&#62;A&#60;/i&#62;</span>: expected &#60;b&#62;');
+    assert.equal(simulationProblem({ hash: null, error: 'INVALID_ATTR' }).title, 'ERRO DE VALIDAÇÃO');
+    assert.equal(simulationProblem({ hash: null, error: 'NO_OUTPUT' }).title, 'ERRO NA SIMULAÇÃO');
+    assert.equal(simulationProblem({ hash: 'abc', error: '' }), null);
+    assert.equal(simulationProblem({ hash: null, error: 'code0.c: oops' }, ['Zed']).message, '<span>Zed</span>: oops');
 });
 
 test('durations split into padded hours, minutes and seconds', () => {
