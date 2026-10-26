@@ -1,198 +1,45 @@
-import GoogleLogin from "./google-login.js";
-import LocalData from "./local-data.js";
+import { Header } from './components/header.js';
+import { Tooltip } from './components/tooltip.js';
+import { GoogleLogin } from './helpers/google-login.js';
+import { api } from './helpers/request.js';
+import { UserModel } from './models/user.js';
 
-var user;
-window.user = user;
+/**
+ * Fills the `#footer` placeholder with footer.php.
+ */
+async function loadFooter() {
+    const footer = document.querySelector('#footer');
+    if (!footer) return;
+    const markup = await api.get('footer.php');
+    if (typeof markup === 'string') footer.innerHTML = markup;
+}
 
-post("back_login.php", {
-    action: "GET"
-}).then( data => {
-    user = data;
-    window.user = data;
-    new LocalData({ id: 'user'}).set({ data: user });
-});
-
-$(document).ready( async function() {
-    $('#menu-button').click( function() {
-        $('body').append("<div id='fog'><div id='menu'></div></div>");
-        $('#fog #menu').html("<a href='index'><img src='icon/logo.png'></a>"+ $('#h-items').html());
-        
-        $('#fog').click( function() {
-            $('#fog #menu').toggle("slide", 300, function() {
-                $('#fog').remove();
-            });
-        });
-        $('#fog #menu').click( function(e) {
-            e.stopPropagation();
-        });
-        $('#fog #login').click( function(){
-            showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
-            GoogleLogin.renderButton($('#google-login')[0]);
-        });	
-        
-        $('#fog #menu').toggle("slide", 300); //precisa jquery ui
-    });
-    
-    $('.drop-menu').hover( function() {
-        menu_open($(this));
-    });
-    $('.drop-menu').mouseleave( function() {
-        menu_close();
-    });
-    $('.drop-menu').click( function() {
-        menu_close();
-        menu_open($(this));
-    });
-    function menu_open(element){
-        $('.item-container').hide();
-        if ($('.item-container.open').length == 0){
-            var container = element.find('.item-container');
-            container.slideDown().addClass('open');
-            
-            var left = element.position().left;
-            if (element.position().left + container.find('.item').width() > $(window).width())
-                left = element.position().left + element.width() - container.width();
-
-            container.css({
-                'left': left, 
-                'top': element.position().top + element.height()
-            });
-
-        }
-    }
-    function menu_close(){
-        $('.item-container').hide();
-        $('.item-container').removeClass('open');
-    }
-    
-    $('.mobile #login, .desktop #login').click( function(){
-        showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
-        GoogleLogin.renderButton($('#google-login')[0]);
-    });	
-
-    GoogleLogin.init().then(async () => {
-        let googleCredential = GoogleLogin.getCredential();
-        if (googleCredential) return;
-        GoogleLogin.prompt();
-    });
-    
-    GoogleLogin.onFail(() => {
-        GoogleLogin.removeCredential();
-    });
-    
-    GoogleLogin.onSignIn(async () => {
-        let googleCredential = GoogleLogin.getCredential();
-        // console.log(googleCredential);
-        if (!googleCredential) return;
-
-        const credentialData = {};
-        credentialData.googleid = googleCredential;
-
-        const response = await $.post( "back_login.php", {
-            action: "SET",
-            token: googleCredential
-        });
-
-        const user = await post("back_login.php", { action: "GET" });
-        console.log(user);
-        new LocalData({ id: 'user'}).set({ data: user });
+/**
+ * Signs in with Google: the one-tap prompt when no credential is stored,
+ * then a server session from the credential and the news page.
+ */
+async function startGoogleLogin() {
+    GoogleLogin.onFail(() => GoogleLogin.removeCredential());
+    GoogleLogin.onSignIn(async credential => {
+        if (!credential) return;
+        await UserModel.signIn(credential);
+        await UserModel.current({ refresh: true });
         location.href = '/news';
-
     });
 
-    $('.mobile #profile, .mobile #login, .desktop #login, .desktop #profile').removeClass('hidden');
-    if (GoogleLogin.getCredential()) {
-        $('.mobile #login, .desktop #login').addClass('hidden');
+    await GoogleLogin.init();
+    if (!GoogleLogin.getCredential()) {
+        GoogleLogin.prompt();
     }
-    else {
-        $('.mobile #profile, .desktop #profile').addClass('hidden');
-    }
-
-    if ($('#footer').length){
-        $('#footer').load("footer.php", async () => {
-            // await waitLogged()
-            // translator.translate($('#footer'))
-
-        });
-    }
-
-    // await translator.init()
-    // await translator.translate($('body'))
-});
-
-async function waitLogged(){
-    return await new Promise( (resolve, reject) => {
-        loginReady();
-        function loginReady(){
-            setTimeout( async function() {
-                const data = window.user || new LocalData({ id: 'user' }).get();
-                if (data) {
-                    window.user = data;
-                    resolve(data);
-                }
-                else
-                    loginReady();
-            }, 100);
-        }
-    });
 }
-window.waitLogged = waitLogged;
 
-async function post(path, args){
-    return $.post(path, args).then( data => {
-        try{
-            data = JSON.parse(data)
-        } catch(e) {
-            return {error: e, data: data}
-        }
-        return data
-    })
+UserModel.current();
+Tooltip.install();
+
+const headerElement = document.querySelector('#header');
+if (headerElement) {
+    new Header(headerElement).showSignedIn(Boolean(GoogleLogin.getCredential()));
 }
-window.post = post;
 
-var translator = {}
-
-// translator.init = function(){
-//     return $.getJSON(`script/translation.json`, data => {
-//         this.info = data
-//     })
-// }
-
-// translator.translate = async function(element){
-//     if (!this.info){
-//         return false
-//     }
-//     else {
-//         let info = this.info
-//         let lang = user && user.speak ? user.speak : 'pt'
-
-//         var fieldcheck = ['title', 'placeholder']
-
-//         // console.log(data)
-//         element.find(`*`).contents().each(function(){
-//             // replace contents
-//             if (this.nodeType == 3){
-//                 let v = this.textContent.replace(/\{\{(\w+)\}\}/, "$1")
-//                 if (v.length && info[v]){
-//                     this.textContent = this.textContent.replace(this.textContent, info[v][lang])
-//                 }
-//             }
-
-//             let fields = []
-//             for (let check of fieldcheck){
-//                 if (this[check] && this[check] != ""){
-//                     fields.push(check)
-//                 }
-//             }
-    
-//             for (let field of fields){
-//                 let replace = this[field].replace(/\{\{(\w+)\}\}/, "$1")
-//                 if (replace.length && info[replace]){
-//                     this[field] = this[field].replace(this[field], info[replace][lang])
-//                 }
-//             }
-//         })
-
-//         return this
-//     }
-// }
+loadFooter();
+startGoogleLogin();

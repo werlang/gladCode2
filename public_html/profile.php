@@ -62,9 +62,9 @@
     <script src="script/stats_func.js"></script>
     <script src="script/emoji.js"></script>
     
-    <script type="module" src="script/google-login.js"></script>
     <script type="module" src="script/header.js"></script>
-    <script src="script/blocks.js"></script>
+    <script type="module" src="script/legacy.js"></script>
+    <script type="module" src="script/blocks.js"></script>
     
     </head>
 

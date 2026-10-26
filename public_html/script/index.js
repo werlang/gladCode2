@@ -1,98 +1,111 @@
-import GoogleLogin from "./google-login.js";
+import { showLoginDialog } from './components/header.js';
+import { createElement, renderTemplate } from './helpers/html.js';
+import { fadeIn } from './helpers/animate.js';
+import { videoModalTemplate } from './templates/index.js';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function showLogin(msg) {
-    showDialog(`${msg}<div id='google-login' style='display: flex; justify-content: center'></div>`, ["Cancelar"]);
-    GoogleLogin.init().then(() => {
-        GoogleLogin.renderButton($('#google-login')[0]);
-    });
+/** Login prompts for the profile tabs that redirect here without a session. */
+const LOGIN_MESSAGES = {
+    messages: 'Faça login para visualizar sua mensagem',
+    friends: 'Faça login para ver seus pedidos de amizade',
+    battle: 'Faça login para visualizar suas batalhas e desafios',
+};
+
+/**
+ * Switches the hero code sample between languages.
+ */
+function bindCodeTabs() {
+    const tabs = document.querySelectorAll('#hero .tabs button');
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+        tabs.forEach(other => other.setAttribute('aria-selected', String(other === tab)));
+        document.querySelectorAll('#hero .code').forEach(code => {
+            code.hidden = code.dataset.lang !== tab.dataset.lang;
+        });
+    }));
 }
 
-// Steps the highlighted line through the visible code sample while the arena video plays
+/**
+ * Steps the highlighted line through the visible code sample while the arena
+ * video plays, only while the hero is on screen.
+ */
 function runCodeTrace() {
+    // reduced motion keeps the poster frame and a still code panel
+    if (reducedMotion) return;
+
+    const hero = document.querySelector('#hero');
+    const video = hero?.querySelector('video');
+    if (!video) return;
+
     let timer = null;
     let index = 0;
 
     const tick = () => {
-        const lines = $('#hero .code:not([hidden]) .l');
-        lines.removeClass('run');
+        const lines = [...hero.querySelectorAll('.code:not([hidden]) .l')];
+        if (!lines.length) return;
+        lines.forEach(line => line.classList.remove('run'));
         // skip blank and closing-brace lines, they never "run"
+        let tries = 0;
         do {
             index = (index + 1) % lines.length;
-        } while (/^\s*[{}]?\s*$/.test(lines.eq(index).text()));
-        lines.eq(index).addClass('run');
+            tries++;
+        } while (/^\s*[{}]?\s*$/.test(lines[index].textContent) && tries < lines.length);
+        lines[index].classList.add('run');
     };
 
-    const start = () => { if (!timer) timer = setInterval(tick, 700); };
-    const stop = () => { clearInterval(timer); timer = null; };
+    const start = () => {
+        timer ??= setInterval(tick, 700);
+    };
+    const stop = () => {
+        clearInterval(timer);
+        timer = null;
+    };
 
-    const video = $('#hero video')[0];
-    // reduced motion keeps the poster frame and a still code panel
-    if (reducedMotion) return;
-
-    // play only while the hero is on screen
-    new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                video.play().catch(() => {});
-                start();
-            }
-            else {
-                video.pause();
-                stop();
-            }
-        });
-    }, { threshold: 0.2 }).observe($('#hero')[0]);
+    new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            video.play().catch(() => {});
+            start();
+        }
+        else {
+            video.pause();
+            stop();
+        }
+    }), { threshold: 0.2 }).observe(hero);
 }
 
-$(document).ready( function() {
-    $('#header').addClass('big');
-    $('#header-container').addClass('small');
+/**
+ * Opens a YouTube video in a modal that Escape or a click closes.
+ *
+ * @param {HTMLElement} trigger The `.video` card, refocused on close.
+ */
+function openVideo(trigger) {
+    const fog = createElement(renderTemplate(videoModalTemplate, { hash: trigger.dataset.video }));
+    document.body.append(fog);
+    fadeIn(fog, reducedMotion ? 0 : 400, 'flex');
+    fog.querySelector('#remove').focus();
 
-    $('#hero .tabs button').click( function() {
-        const lang = $(this).data('lang');
-        $('#hero .tabs button').attr('aria-selected', 'false');
-        $(this).attr('aria-selected', 'true');
-        $('#hero .code').attr('hidden', true);
-        $(`#hero .code[data-lang='${lang}']`).removeAttr('hidden');
-    });
-
-    runCodeTrace();
-
-    $('#account').click( function(){
-        showLogin("Faça login no sistema");
-    });
-
-    $('#videos .video').click( function() {
-        const hash = $(this).data('video');
-
-        $('body').append(`<div id='fog'><div id='video-container' role='dialog' aria-label='Vídeo'><iframe src='https://www.youtube.com/embed/${hash}?autoplay=1' allow='autoplay; encrypted-media' allowfullscreen></iframe><button id='remove' aria-label='Fechar vídeo'></button></div></div>`);
-        $('#fog').hide().fadeIn(reducedMotion ? 0 : 400);
-        $('#fog #remove').focus();
-
-        const close = () => {
-            $('#fog').remove();
-            $(document).off('keydown.video');
-            this.focus();
-        };
-        $('#fog').click(close);
-        $(document).on('keydown.video', e => { if (e.key == 'Escape') close(); });
-    });
-
-    if ($('#loginhash').length){
-        var tab = $('#loginhash').html();
-
-        var loginMessage = {
-            'messages': "Faça login para visualizar sua mensagem",
-            'friends': "Faça login para ver seus pedidos de amizade",
-            'battle': "Faça login para visualizar suas batalhas e desafios"
-        };
-
-        let msg = loginMessage[tab]
-        if (!loginMessage[tab])
-            msg = "Faça login para ir para o seu perfil"
-
-        showLogin(msg);
+    function close() {
+        fog.remove();
+        document.removeEventListener('keydown', onKey);
+        trigger.focus();
     }
-});
+    function onKey(event) {
+        if (event.key === 'Escape') close();
+    }
+    fog.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+}
+
+document.querySelector('#header')?.classList.add('big');
+document.querySelector('#header-container')?.classList.add('small');
+
+bindCodeTabs();
+runCodeTrace();
+
+document.querySelector('#account')?.addEventListener('click', () => showLoginDialog('Faça login no sistema'));
+document.querySelectorAll('#videos .video').forEach(video => video.addEventListener('click', () => openVideo(video)));
+
+const loginHash = document.querySelector('#loginhash');
+if (loginHash) {
+    showLoginDialog(LOGIN_MESSAGES[loginHash.textContent] ?? 'Faça login para ir para o seu perfil');
+}

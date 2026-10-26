@@ -116,10 +116,6 @@ function create_toast(message, type) {
 
 }
 
-$(document).ready( function() {
-    $(document).tooltip()
-    $(document).tooltip("option", "show.delay", 700)
-});
 
 /*
 it works, but jquery UI provides a better alternative

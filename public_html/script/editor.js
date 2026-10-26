@@ -1,4 +1,4 @@
-import GoogleLogin from './google-login.js';
+import { GoogleLogin } from './helpers/google-login.js';
 
 var editor;
 var saved = true;

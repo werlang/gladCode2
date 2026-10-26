@@ -1,126 +1,133 @@
-$(document).ready( function(){
-    $('#support input').click( function(){
-        if ($('#support #one-time:checked').length)
-            $('#support #method').slideDown();
-        else{
-            $('#support #method').fadeOut();
-            $('#support #method input').prop('checked', false);
-        }
+import { Message } from './components/dialog.js';
+import { decorateRadios } from './components/form-controls.js';
+import { createElement, renderTemplate } from './helpers/html.js';
+import { fadeIn, fadeOut, hide, show, slideDown } from './helpers/animate.js';
+import { ThanksModel } from './models/thanks.js';
+import { walletTemplate } from './templates/about.js';
 
-        $('#support .donate').addClass('hidden');
-        $('#support #buttons').hide();
+/** Donation wallets; `groups` splits the address into readable chunks. */
+const WALLETS = {
+    bitcoin: {
+        name: 'Bitcoin',
+        address: '351JhGwhqGckt6P4F8cSsFCgsHKHCU8tjD',
+        icon: 'icon/bitcoin.png',
+        qrcode: 'image/qr_btc.png',
+        groups: [4, 4, 4, 5, 4, 4, 4, 5],
+    },
+    ethereum: {
+        name: 'Ethereum',
+        address: '0x50E9BBf49C6329FC97493d012fEBB4D04d5de37e',
+        icon: 'icon/ethereum.png',
+        qrcode: 'image/qr_eth.png',
+        groups: [4, 4, 4, 4, 5, 4, 4, 4, 4, 5],
+    },
+};
 
-        if ($('#support #crypto:checked').length)
-            $('#support #bitcoin, #support #ethereum').removeClass('hidden');
-        if ($('#support #boleto:checked').length + $('#support #card:checked').length)
-            $('#support #pagseguro').removeClass('hidden');
-        if ($('#support #monthly:checked').length + $('#support #card:checked').length)
-            $('#support #paypal').removeClass('hidden');
-
-        $('#support #buttons').slideDown('fast');
-    });
-
-    $('#support .donate.small').click( function(){
-        var id = $(this).attr('id');
-
-        if (id == 'ethereum')
-            showWallet("eth");
-        else if (id == 'bitcoin')
-            showWallet("btc");
-    });
-
-    $('.discontinued').click( () => {
-        create_tooltip("Este modo não existe mais na gladCode. Os torneio agora podem ser criados a partir do peril do usuário.", $('.discontinued'));
-    });
-
-    $('#paypal, #pagseguro').click( function(){
-        $.post("back_thanks.php",{
-            action: "SET",
-            url: window.location.pathname
-        }).done( function(data){
-            //console.log(data);
-        });
-    });
-    
-    $('#plans #premium').click( () => {
-        // new Message({
-        //     message: `
-        //         <h2 id='title'>Tornar-se tutor?</h2>
-        //         <p>Ao tornar-se tutor, sua conta receberá <b>R$ 30,00 de crédito</b> para usar nos treinos de equipes.</p>
-        //         <p>A partir do momento da adesão, a cada mês será descontado <b>R$ 0,99</b> de seus créditos por cada aluno que participou de algum de seus treinos do mês vigente.</p>
-        //         <p>Ao fim de seus créditos, você poderá recarregá-los através de pagamento com cartão de crédito, boleto ou criptomoedas.</p>`,
-        //     buttons: {no: 'Não, obrigado', yes: "SIM, EU QUERO"}
-        // }).show().click('yes', async () => {
-        //     let data = await post("back_login.php", { action: "PREMIUM" })
-        //     console.log(data)
-        //     if (data.status == "PREMIUM"){
-        //         new Message({ message: "Seu perfil já possui o status de tutor" }).show()
-        //     }
-        //     else if (data.status == "SUCCESS"){
-        //         new Message({ message: "Pronto! Seu perfil agora possui o status de tutor, e foram depositados <b>R$ 30,00</b> de créditos em sua conta" }).show()
-        //     }
-        // })
-        // $('#dialog-box').addClass('large')
-    })
-});
-
-function showWallet(curr){
-    var data = {
-        btc: {
-            name: "Bitcoin",
-            wallet: "351JhGwhqGckt6P4F8cSsFCgsHKHCU8tjD",
-            icon: "icon/bitcoin.png",
-            qrcode: "image/qr_btc.png"
-        },
-        eth: {
-            name: "Ethereum",
-            wallet: "0x50E9BBf49C6329FC97493d012fEBB4D04d5de37e",
-            icon: "icon/ethereum.png",
-            qrcode: "image/qr_eth.png"
-        }
-    };
-
-    if ($('#crypto-box').length == 0){
-        var wallet = data[curr].wallet;
-        var prettyArray = {
-            btc: [4,4,4,5,4,4,4,5],
-            eth: [4,4,4,4,5,4,4,4,4,5]
-        };
-        var walletpretty = "";
-        var start = 0;
-        for (var i in prettyArray[curr]){
-            walletpretty += wallet.substring(start, start + prettyArray[curr][i]);
-            start += prettyArray[curr][i];
-            if (i < prettyArray[curr].length-1)
-                walletpretty += " ";
-        }
-
-        //var wallet = walletpretty.split(" ").join("");
-        var qrcode = "<img src='"+ data[curr].qrcode +"'>";
-        var box = "<div id='fog'><div id='crypto-box' class='size-"+ prettyArray[curr].length +"'><div id='close'>X</div><div id='title'>Carteira "+ data[curr].name +":</div><div id='qrcode'>"+ qrcode +"</div><div id='wallet' title='Copiar para área de transferência'><img src='"+ data[curr].icon +"'><span>"+ walletpretty +"</span></div></div></div>";
-
-        $('body').append(box);
-        $('#crypto-box').hide().fadeIn();
-        $('#crypto-box #close').click(function(){
-            $('#fog').remove();
-        });
-
-        $('#crypto-box #wallet').click(function(){
-            var textObj = $('#crypto-box #wallet span');
-            copyToClipboard(wallet);
-            textObj.parent().addClass('copied');
-            textObj.html("Copiado").fadeOut(1200, function(){
-                textObj.parent().removeClass('copied');
-                textObj.html(walletpretty).show();
-            });
-        });
-
-    }
+/**
+ * Splits a wallet address into space-separated chunks.
+ *
+ * @param {string} address Wallet address.
+ * @param {number[]} groups Chunk lengths.
+ * @returns {string}
+ */
+function prettyAddress(address, groups) {
+    let start = 0;
+    return groups.map(length => {
+        const chunk = address.substring(start, start + length);
+        start += length;
+        return chunk;
+    }).join(' ');
 }
 
-function copyToClipboard(text) {
-    $('body').append("<input type='text' id='icopy' value='"+ text +"'>");
-    $('#icopy').select();
-    document.execCommand("copy");
-    $('#icopy').remove();
-}	
+/**
+ * Opens a wallet window with its QR code; clicking the address copies it.
+ *
+ * @param {keyof WALLETS} id Wallet id.
+ */
+function showWallet(id) {
+    if (document.querySelector('#crypto-box')) return;
+
+    const wallet = WALLETS[id];
+    const pretty = prettyAddress(wallet.address, wallet.groups);
+    const fog = createElement(renderTemplate(walletTemplate, {
+        size: wallet.groups.length,
+        name: wallet.name,
+        qrcode: wallet.qrcode,
+        icon: wallet.icon,
+        pretty,
+    }));
+    document.body.append(fog);
+    const box = fog.querySelector('#crypto-box');
+    fadeIn(box);
+
+    const close = fog.querySelector('#close');
+    close.addEventListener('click', () => fog.remove());
+    close.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') fog.remove();
+    });
+
+    const address = fog.querySelector('#wallet');
+    const copy = async () => {
+        const text = address.querySelector('span');
+        await navigator.clipboard?.writeText(wallet.address).catch(() => {});
+        address.classList.add('copied');
+        text.textContent = 'Copiado';
+        await fadeOut(text, 1200);
+        address.classList.remove('copied');
+        text.textContent = pretty;
+        show(text);
+    };
+    address.addEventListener('click', copy);
+    address.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') copy();
+    });
+}
+
+/**
+ * Shows the donation buttons matching the chosen frequency and method.
+ */
+function bindDonationForm() {
+    const support = document.querySelector('#support');
+    if (!support) return;
+
+    const method = support.querySelector('#method');
+    const buttons = support.querySelector('#buttons');
+    const checked = id => Boolean(support.querySelector(`#${id}:checked`));
+
+    support.querySelectorAll('input').forEach(input => input.addEventListener('click', () => {
+        if (checked('one-time')) {
+            slideDown(method);
+        }
+        else {
+            fadeOut(method);
+            method.querySelectorAll('input').forEach(option => {
+                option.checked = false;
+            });
+        }
+
+        support.querySelectorAll('.donate').forEach(button => button.classList.add('hidden'));
+        hide(buttons);
+
+        const reveal = (...ids) => ids.forEach(id => support.querySelector(`#${id}`).classList.remove('hidden'));
+        if (checked('crypto')) reveal('bitcoin', 'ethereum');
+        if (checked('boleto') || checked('card')) reveal('pagseguro');
+        if (checked('monthly') || checked('card')) reveal('paypal');
+
+        slideDown(buttons, 200);
+    }));
+
+    support.querySelectorAll('.donate.small').forEach(button => {
+        button.addEventListener('click', () => showWallet(button.id));
+    });
+
+    support.querySelectorAll('#paypal, #pagseguro').forEach(link => {
+        link.addEventListener('click', () => ThanksModel.trackDonation(location.pathname));
+    });
+}
+
+decorateRadios();
+bindDonationForm();
+
+document.querySelectorAll('.discontinued').forEach(mode => mode.addEventListener('click', () => {
+    new Message({ message: 'Este modo não existe mais na gladCode. Os torneios agora podem ser criados a partir do perfil do usuário.' }).show();
+}));

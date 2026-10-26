@@ -1,4 +1,4 @@
-import GoogleLogin from "./google-login.js";
+import { GoogleLogin } from "./helpers/google-login.js";
 
 $(document).ready(async function(){
     // got here from train link

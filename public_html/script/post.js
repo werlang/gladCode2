@@ -1,75 +1,36 @@
-$(document).ready( function() {
-    $.post("back_news.php",{
-        action: "POST",
-        hash: $('#hash').html()
-    }).done( function(data){
-        // console.log(data);
-        data = JSON.parse(data);
+import { formatMessageTime } from './helpers/date-format.js';
+import { renderTemplate } from './helpers/html.js';
+import { NewsModel } from './models/news.js';
+import { postTemplate } from './templates/post.js';
 
-        if (data.status == "EMPTY"){
-            window.location.href = "index";
-        }
-        else if (data.status == "SUCCESS"){
-            $('#post').html(`<div class='post'>
-                <div class='title'>${data.post.title}</div>
-                <div class='time'>Publicado em ${getMessageTime(data.post.time, { month_full: true })}</div>
-                <div class='body'>${data.post.body}</div>
-            </div>`);
+/**
+ * Shows the post named in `#hash` and links its neighbours; an unknown post
+ * sends the visitor to the front page.
+ */
+async function showPost() {
+    const hashElement = document.querySelector('#hash');
+    const hash = hashElement?.textContent ?? '';
+    hashElement?.remove();
 
-            if (data.prev){
-                $('#prev').removeClass('disabled').attr('href', `post/${data.prev}`);
-            }
-            if (data.next){
-                $('#next').removeClass('disabled').attr('href', `post/${data.next}`);
-            }
-        }
+    const data = await NewsModel.get(hash);
+    if (data.status === 'EMPTY') {
+        location.href = 'index';
+        return;
+    }
+    if (data.status !== 'SUCCESS') return;
+
+    document.querySelector('#post').innerHTML = renderTemplate(postTemplate, {
+        title: data.post.title,
+        time: formatMessageTime(data.post.time, { monthFull: true }),
+        body: data.post.body,
     });
 
-    $('#hash').remove();
-});
-
-function getMessageTime(msgTime, args){
-	var short = false;
-	var month_full = false;
-	if (args){
-		if (args.short)
-			short = true;
-		if (args.month_full)
-			month_full = true;
-	} 
-
-	if (short){
-		var now = new Date();
-		msgTime = new Date(msgTime);
-		
-		var secNow = Math.round(now.getTime() / 1000);
-		var secMsg = Math.round(msgTime.getTime() / 1000);
-		
-		var diff = (secNow - secMsg) / 60;
-		return last_active_string(diff);
-	}
-	else{
-		var months = [
-			"Janeiro",
-			"Fevereiro",
-			"Março",
-			"Abril",
-			"Maio",
-			"Junho",
-			"Julho",
-			"Agosto",
-			"Setembro",
-			"Outubro",
-			"Novembro",
-			"Dezembro"
-		];
-		if (!month_full){
-			for (let i in months)
-				months[i] = months[i].toLowerCase().slice(0,3);
-		}
-
-		t = new Date(msgTime);
-		var string = t.getDate() +' de '+ months[t.getMonth()] +' de '+ t.getFullYear() +' às '+ ('0'+t.getHours()).slice(-2) +':'+ ('0'+t.getMinutes()).slice(-2);
-		return string;
-	}
+    [['prev', data.prev], ['next', data.next]].forEach(([id, target]) => {
+        if (!target) return;
+        const link = document.querySelector(`#${id}`);
+        link.classList.remove('disabled');
+        link.href = `post/${target}`;
+    });
 }
+
+showPost();

@@ -1,48 +1,53 @@
-$(document).ready( async function(){
-    await menu_loaded()
+import './blocks.js';
+import { SideMenu } from './components/side-menu.js';
+import { renderTemplate } from './helpers/html.js';
+import { SlotsModel } from './models/slots.js';
+import { apothecaryRowTemplate, potionRowTemplate, silverTemplate } from './templates/manual.js';
 
-    var loc = window.location.href.split("/");
-    loc = loc[loc.length - 1];
-    $('#side-menu #'+loc).addClass('here');
-    $('#side-menu #'+loc).click();
-    
-    $('#learn').addClass('here');
+/**
+ * Turns each `.block-container` holding Blockly XML into a read-only workspace.
+ */
+function renderBlockSamples() {
+    document.querySelectorAll('.block-container').forEach((container, index) => {
+        const xml = container.innerHTML;
+        container.innerHTML = `<div id='code-ws-${index}' class='block'></div>`;
+        const workspace = Blockly.inject(`code-ws-${index}`, { scrollbars: true, readOnly: true });
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), workspace);
+    });
+}
 
-    if ($('.block-container').length){
-        $('.block-container').each( function(index, obj) {
-            let xml = $(obj).html()
-            $(obj).html(`<div id='code-ws-${index}' class='block'></div>`)
-    
-            // console.log(xml)
-            let ws = Blockly.inject(`code-ws-${index}`, {
-                scrollbars: true,
-                readOnly: true
-            })
-    
-            xmlDom = Blockly.Xml.textToDom(xml)
-            Blockly.Xml.domToWorkspace(xmlDom, ws)
-        })
-    }
+/**
+ * Fills the apothecary table: brewing time and upgrade price per level.
+ */
+async function fillApothecaryTable() {
+    const { prices, times } = await SlotsModel.upgradeCosts();
+    document.querySelector('#tapot tbody')?.insertAdjacentHTML('beforeend', prices.map((_, index) => renderTemplate(apothecaryRowTemplate, {
+        level: index + 1,
+        time: times[index],
+        price: index === 0 ? '-' : renderTemplate(silverTemplate, { price: prices[index - 1] }),
+    })).join(''));
+}
 
-    post("back_slots.php", {
-        action: "UPGRADE",
-        command: "COSTS"
-    }).then( data => {
-        // console.log(data)
-        for (let i in data.prices){
-            let price = i == 0 ? '-' : `${data.prices[i-1]} <i class='fas fa-coins silver'></i>`
-            let time = data.times[i]
-            $('#tapot tbody').append(`<tr><td>${parseInt(i)+1}</td><td>${time}h</td><td>${price}</td></tr>`)
-        }
-    })
+/**
+ * Fills the potion table from the catalogue.
+ */
+async function fillPotionTable() {
+    const { potions } = await SlotsModel.items();
+    document.querySelector('#tpotions tbody')?.insertAdjacentHTML('beforeend', Object.entries(potions).map(([id, potion]) => renderTemplate(potionRowTemplate, {
+        name: potion.name,
+        level: potion.lvl,
+        id,
+        description: potion.description,
+        price: renderTemplate(silverTemplate, { price: potion.price }),
+    })).join(''));
+}
 
-    post("back_slots.php", {
-        action: "ITEMS"
-    }).then( data => {
-        // console.log(data.potions)
-        for (let i in data.potions){
-            let pot = data.potions[i]
-            $('#tpotions tbody').append(`<tr><td>${pot.name}</td><td>${pot.lvl}</td><td>${i}</td><td>${pot.description}</td><td>${pot.price} <i class='fas fa-coins silver'></i></td></tr>`)
-        }
-    })
+const menu = new SideMenu(document.querySelector('#side-menu'));
+document.querySelector('#learn')?.classList.add('here');
+
+menu.ready.then(() => {
+    menu.selectCurrentPage();
+    renderBlockSamples();
 });
+fillApothecaryTable();
+fillPotionTable();

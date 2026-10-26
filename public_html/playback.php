@@ -63,6 +63,7 @@
 <?php endif; ?>
     <script src="script/assets.js"></script>
     <script src="script/dialog.js"></script>
+    <script type="module" src="script/legacy.js"></script>
     <script src="script/dropzone.js"></script>
     <script src="script/checkboxes.js"></script>
     <script src="script/playback.js?v=<?= filemtime(__DIR__ . "/script/playback.js") ?>"></script>

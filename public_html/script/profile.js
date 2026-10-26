@@ -1,5 +1,5 @@
-import GoogleLogin from "./google-login.js";
-import LocalData from "./local-data.js";
+import { GoogleLogin } from "./helpers/google-login.js";
+import { LocalData } from "./helpers/local-data.js";
 
 $(document).ready( function(){
     $('#header-container').addClass('small-profile');

@@ -24,8 +24,8 @@
     <script src="script/side-menu.js"></script>
     <script src="script/dialog.js"></script>
     
-    <script type="module" src="script/google-login.js"></script>
     <script type="module" src="script/header.js"></script>
+    <script type="module" src="script/legacy.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->

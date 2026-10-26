@@ -1,34 +1,38 @@
-$(document).ready( async function(){
-    await menu_loaded()
+import { SideMenu } from './components/side-menu.js';
+import { FunctionDocsModel } from './models/function-docs.js';
 
-    var loc = window.location.href.split("/");
-    loc = loc[loc.length - 1];
-    $('#side-menu #'+loc).addClass('here');
-    $('#side-menu #'+loc).click();
-    
-    $('#learn').addClass('here');
+/** Link prefix, name field and link suffix of each documentation flavour. */
+const FLAVOURS = {
+    'docs-blocks': { path: 'function', name: 'block', ext: '.blk' },
+    'docs-ptbr': { path: 'funcao', name: 'pt', ext: '' },
+    docs: { path: 'function', name: 'default', ext: '' },
+};
 
-    $.get(`script/functions.json`, async data => {
-        
-        let page = window.location.href.split("/").splice(-1,1)[0].split("#")[0]
-        // console.log(page)
-        $('.t-funcs a').map( (i,e) => {
-            let match = $(e).attr('href')
-            // console.log(match)
-            let fakePath = 'function'
-            let nameLang = 'default'
-            let ext = ''
-            if (page == 'docs-blocks'){
-                nameLang = 'block'
-                ext = '.blk'
-            }
-            else if (page == 'docs-ptbr'){
-                fakePath = 'funcao'
-                nameLang = 'pt'
-            }
+/**
+ * Fills the function tables: each link gets its flavour's name and URL, and
+ * the next cell the function's brief description.
+ */
+async function fillFunctionTables() {
+    const page = location.pathname.split('/').at(-1);
+    const flavour = FLAVOURS[page] ?? FLAVOURS.docs;
+    const functions = await FunctionDocsModel.all();
 
-            $(e).attr('href', `${fakePath}/${match}${ext}`).html(data[match].name[nameLang])
-            $(e).parent().siblings('td').html(data[match].description.brief)
-        })
-    })
-});
+    document.querySelectorAll('.t-funcs a').forEach(link => {
+        const key = link.getAttribute('href');
+        const doc = functions[key];
+        if (!doc) return;
+        link.href = `${flavour.path}/${key}${flavour.ext}`;
+        link.textContent = doc.name[flavour.name];
+        const cell = link.closest('td');
+        [...cell.parentElement.children]
+            .filter(sibling => sibling !== cell)
+            .forEach(sibling => {
+                sibling.innerHTML = doc.description.brief;
+            });
+    });
+}
+
+const menu = new SideMenu(document.querySelector('#side-menu'));
+document.querySelector('#learn')?.classList.add('here');
+menu.ready.then(() => menu.selectCurrentPage());
+fillFunctionTables();

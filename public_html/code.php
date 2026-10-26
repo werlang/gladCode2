@@ -22,7 +22,6 @@
     <script src="script/keybinds.js"></script>
     
     <script src="script/file_manager.js"></script>
-    <script type="module" src="script/google-login.js"></script>
     
     </head>
 <body>

@@ -36,13 +36,13 @@
     
 
     <script type="module" src="script/header.js"></script>
+    <script type="module" src="script/legacy.js"></script>
     <script src="script/dialog.js"></script>
     <script src="script/glad-card.js"></script>
     <script src="script/runSim.js"></script>
     <script src="script/assets.js"></script>
     <script src="script/emoji.js"></script>
     
-    <script type="module" src="script/google-login.js"></script>
     <script type="module" src="script/training.js"></script>
 
     </head>

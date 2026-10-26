@@ -1,4 +1,7 @@
-var funcList = {};
+import { FunctionDocsModel } from './models/function-docs.js';
+
+/** Tooltip promises by function name. */
+const funcList = {};
 
 Blockly.Blocks['loop'] = {
     init: function() {
@@ -13,18 +16,18 @@ Blockly.Blocks['loop'] = {
 };
 
 Blockly.Python['loop'] = function(block) {
-    var code = Blockly.Python.statementToCode(block, 'CONTENT');
-    var globals = [];
+    let code = Blockly.Python.statementToCode(block, 'CONTENT');
+    let globals = [];
 
     if (code == ""){
         code = Blockly.Python.INDENT + "pass\n";
         globals = '';
     }
     else{
-        var varName;
-        var workspace = block.workspace;
-        var variables = Blockly.Variables.allUsedVarModels(workspace) || [];
-        for (let variable of variables){
+        let varName;
+        const workspace = block.workspace;
+        const variables = Blockly.Variables.allUsedVarModels(workspace) || [];
+        for (const variable of variables){
             varName = variable.name;
             globals.push(Blockly.Python.variableDB_.getName(varName, Blockly.VARIABLE_CATEGORY_NAME));
         }
@@ -63,9 +66,9 @@ Blockly.Blocks['move'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
 
-        var hasposition = "false";
+        let hasposition = "false";
         if (this.getFieldValue('COMPLEMENT') == "TO")
             hasposition = "true";
         container.setAttribute('position', hasposition);
@@ -118,11 +121,11 @@ Blockly.Blocks['move'] = {
 };
 
 Blockly.Python['move'] = function(block) {
-    var dropdown_complement = block.getFieldValue('COMPLEMENT');
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const dropdown_complement = block.getFieldValue('COMPLEMENT');
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `moveToTarget()`;
+    let code = `moveToTarget()`;
     if (dropdown_complement == "TO")
         code = `moveTo(${value_x}, ${value_y})`;
 
@@ -151,7 +154,7 @@ Blockly.Blocks['step'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -167,15 +170,15 @@ Blockly.Blocks['step'] = {
 };
 
 Blockly.Python['step'] = function(block) {
-    var dropdown_complement = block.getFieldValue('COMPLEMENT');
-    var values = {
+    const dropdown_complement = block.getFieldValue('COMPLEMENT');
+    const values = {
         FORWARD: "Forward",
         BACK: "Back",
         LEFT: "Left",
         RIGHT: "Right"
     };
 
-    code = `step${values[dropdown_complement]}()`;
+    const code = `step${values[dropdown_complement]}()`;
     this.func = `step${values[dropdown_complement]}`;
     setBlockInfo(this);
     
@@ -204,8 +207,8 @@ Blockly.Blocks['moveforward'] = {
 };
 
 Blockly.Python['moveforward'] = function(block) {
-    var steps = (Blockly.Python.valueToCode(block, 'STEPS', Blockly.Python.ORDER_ATOMIC) || 0);
-    code = `moveForward(${steps})\n`;
+    const steps = (Blockly.Python.valueToCode(block, 'STEPS', Blockly.Python.ORDER_ATOMIC) || 0);
+    const code = `moveForward(${steps})\n`;
 
     return code;
 };
@@ -234,8 +237,8 @@ Blockly.Blocks['turn'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
-        var option = this.getFieldValue('COMPLEMENT');
+        const container = document.createElement('mutation');
+        const option = this.getFieldValue('COMPLEMENT');
         container.setAttribute('where', option);
 
         if (this.useReturn)
@@ -253,14 +256,14 @@ Blockly.Blocks['turn'] = {
     },
     reshape({useReturn, option}){
         if (["TO", "TARGET", "HIT", "LEFT", "RIGHT"].indexOf(option) != -1){
-            var input_now = [];
-            for (let i in this.inputList){
-                let name = this.inputList[i].name;
+            const input_now = [];
+            for (const i in this.inputList){
+                const name = this.inputList[i].name;
                 if (name != "")
                     input_now.push(name);
             }
 
-            var input_next = [];
+            const input_next = [];
             if (option == "TO"){
                 input_next.push("X", "Y");
             }
@@ -271,14 +274,14 @@ Blockly.Blocks['turn'] = {
             }
 
             // remove uneeded input
-            for (let i in input_now){
+            for (const i in input_now){
                 if (input_next.indexOf(input_now[i]) == -1){
                     this.removeInput(input_now[i]);
                 }
             }
 
             // include needed inputs
-            for (let i in input_next){
+            for (const i in input_next){
                 if (input_next[i] == "X" && !this.getInput("X")){
                     this.appendValueInput("X")
                         .setCheck("Number")
@@ -321,8 +324,8 @@ Blockly.Blocks['turn'] = {
 };
 
 Blockly.Python['turn'] = function(block) {
-    var dropdown_where = block.getFieldValue('COMPLEMENT');
-    var values = {
+    const dropdown_where = block.getFieldValue('COMPLEMENT');
+    const values = {
         TO: "To",
         LEFT: "Left",
         RIGHT: "Right",
@@ -330,17 +333,17 @@ Blockly.Python['turn'] = function(block) {
         HIT: "ToLastHit"
     };
 
-    var code = `turn${values[dropdown_where]}`;
+    let code = `turn${values[dropdown_where]}`;
     this.func = code;
     setBlockInfo(this);
 
     if (dropdown_where == "TO"){
-        var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-        var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
         code += `(${value_x}, ${value_y})`;
     }
     else if (dropdown_where == "LEFT" || dropdown_where == "RIGHT"){
-        var value_angle = (Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_angle = (Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_ATOMIC) || 0);
         code += `(${value_angle})`;
     }
     else{
@@ -370,13 +373,13 @@ Blockly.Blocks['turnangle'] = {
         this.useReturn = false;
     },
     customContextMenu: function(options) {
-        var option = this.getFieldValue('COMPLEMENT');
+        const option = this.getFieldValue('COMPLEMENT');
         if (option == "ANGLE")
             toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
-        var option = this.getFieldValue('COMPLEMENT');
+        const container = document.createElement('mutation');
+        const option = this.getFieldValue('COMPLEMENT');
         container.setAttribute('operation', option);
 
         if (this.useReturn)
@@ -405,10 +408,10 @@ Blockly.Blocks['turnangle'] = {
 };
 
 Blockly.Python['turnangle'] = function(block) {
-    var value_angle = (Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_ATOMIC) || 0);
-    var dropdown_op = block.getFieldValue('COMPLEMENT');
+    const value_angle = (Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_ATOMIC) || 0);
+    const dropdown_op = block.getFieldValue('COMPLEMENT');
 
-    var code = "turn";
+    let code = "turn";
 
     if (dropdown_op == "ANGLE")
         code += "ToAngle";
@@ -449,7 +452,7 @@ Blockly.Blocks['fireball'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -465,10 +468,10 @@ Blockly.Blocks['fireball'] = {
 };
 
 Blockly.Python['fireball'] = function(block) {
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `fireball(${value_x}, ${value_y})`;
+    const code = `fireball(${value_x}, ${value_y})`;
 
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
@@ -501,7 +504,7 @@ Blockly.Blocks['teleport'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -517,10 +520,10 @@ Blockly.Blocks['teleport'] = {
 };
 
 Blockly.Python['teleport'] = function(block) {
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `teleport(${value_x}, ${value_y})`;
+    const code = `teleport(${value_x}, ${value_y})`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -543,7 +546,7 @@ Blockly.Blocks['charge'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -559,7 +562,7 @@ Blockly.Blocks['charge'] = {
 };
 
 Blockly.Python['charge'] = function(block) {
-    var code = `charge()`;
+    const code = `charge()`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -582,7 +585,7 @@ Blockly.Blocks['block'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -598,7 +601,7 @@ Blockly.Blocks['block'] = {
 };
 
 Blockly.Python['block'] = function(block) {
-    var code = `block()`;
+    const code = `block()`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -630,7 +633,7 @@ Blockly.Blocks['assassinate'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -646,10 +649,10 @@ Blockly.Blocks['assassinate'] = {
 };
 
 Blockly.Python['assassinate'] = function(block) {
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `assassinate(${value_x}, ${value_y})`;
+    const code = `assassinate(${value_x}, ${value_y})`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -672,7 +675,7 @@ Blockly.Blocks['ambush'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -688,7 +691,7 @@ Blockly.Blocks['ambush'] = {
 };
 
 Blockly.Python['ambush'] = function(block) {
-    var code = `ambush()`;
+    const code = `ambush()`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -709,7 +712,7 @@ Blockly.Blocks['melee'] = {
 };
 
 Blockly.Python['melee'] = function(block) {
-    var code = `attackMelee()\n`;
+    const code = `attackMelee()\n`;
     return code;
 };
 
@@ -738,7 +741,7 @@ Blockly.Blocks['ranged'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -754,10 +757,10 @@ Blockly.Blocks['ranged'] = {
 };
 
 Blockly.Python['ranged'] = function(block) {
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `attackRanged(${value_x}, ${value_y})`;
+    const code = `attackRanged(${value_x}, ${value_y})`;
     if (this.useReturn)
         return [code, Blockly.Python.ORDER_NONE];
     else
@@ -776,8 +779,8 @@ Blockly.Blocks['get_info'] = {
 };
 
 Blockly.Python['get_info'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `get${info}()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `get${info}()`;
 
     this.func = `get${info}`;
     setBlockInfo(this);
@@ -797,7 +800,7 @@ Blockly.Blocks['gethit'] = {
 };
 
 Blockly.Python['gethit'] = function(block) {
-    var code = `getHit()`;
+    const code = `getHit()`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -813,8 +816,8 @@ Blockly.Blocks['get_time'] = {
 };
 
 Blockly.Python['get_time'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `get${info}TimeLeft()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `get${info}TimeLeft()`;
 
     this.func = `get${info}TimeLeft`;
     setBlockInfo(this);
@@ -834,8 +837,8 @@ Blockly.Blocks['get_lasthit'] = {
 };
 
 Blockly.Python['get_lasthit'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `getLastHit${info}()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `getLastHit${info}()`;
 
     this.func = `getLastHit${info}`;
     setBlockInfo(this);
@@ -863,7 +866,7 @@ Blockly.Blocks['upgrade'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -879,10 +882,10 @@ Blockly.Blocks['upgrade'] = {
 };
 
 Blockly.Python['upgrade'] = function(block) {
-    var attr = this.getFieldValue('COMPLEMENT');
-    var value = (Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || 0);
+    const attr = this.getFieldValue('COMPLEMENT');
+    const value = (Blockly.Python.valueToCode(block, 'VALUE', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `upgrade${attr}(${value})`;
+    const code = `upgrade${attr}(${value})`;
     this.func = `upgrade${attr}`;
     setBlockInfo(this);
 
@@ -908,8 +911,8 @@ Blockly.Blocks['speak'] = {
 };
 
 Blockly.Python['speak'] = function(block) {
-    var text = (Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "");
-    var code = `speak(${text})\n`;
+    const text = (Blockly.Python.valueToCode(block, 'TEXT', Blockly.Python.ORDER_ATOMIC) || "");
+    const code = `speak(${text})\n`;
     return code;
 };
 
@@ -924,15 +927,15 @@ Blockly.Blocks['getdist'] = {
         this.reshape(true);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
-        var hasposition = "false";
+        const container = document.createElement('mutation');
+        let hasposition = "false";
         if (this.getFieldValue('COMPLEMENT') == "POSITION")
             hasposition = "true";
         container.setAttribute('position', hasposition);
         return container;
     },
     domToMutation: function(xmlElement) {
-        var hasposition = (xmlElement.getAttribute('position') == "true");
+        const hasposition = (xmlElement.getAttribute('position') == "true");
         this.reshape(hasposition);
     },
     reshape(hasposition){
@@ -963,12 +966,12 @@ Blockly.Blocks['getdist'] = {
 };
 
 Blockly.Python['getdist'] = function(block) {
-    var dropdown_complement = block.getFieldValue('COMPLEMENT');
+    const dropdown_complement = block.getFieldValue('COMPLEMENT');
 
-    var code;
+    let code;
     if (dropdown_complement == "POSITION"){
-        var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-        var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
         code = `getDist(${value_x}, ${value_y})`;
         this.func = 'getDist';
     }
@@ -1003,10 +1006,10 @@ Blockly.Blocks['getangle'] = {
 };
 
 Blockly.Python['getangle'] = function(block) {
-    var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-    var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+    const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
 
-    var code = `getAngle(${value_x}, ${value_y})`;
+    const code = `getAngle(${value_x}, ${value_y})`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1023,8 +1026,8 @@ Blockly.Blocks['is_status'] = {
 };
 
 Blockly.Python['is_status'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `is${info}()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `is${info}()`;
     this.func = `is${info}`;
     setBlockInfo(this);
 
@@ -1045,7 +1048,7 @@ Blockly.Blocks['get_enemy'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -1061,8 +1064,8 @@ Blockly.Blocks['get_enemy'] = {
 };
 
 Blockly.Python['get_enemy'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `get${info}()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `get${info}()`;
     this.func = `get${info}`;
     setBlockInfo(this);
 
@@ -1085,8 +1088,8 @@ Blockly.Blocks['get_target'] = {
 };
 
 Blockly.Python['get_target'] = function(block) {
-    var info = this.getFieldValue('COMPLEMENT');
-    var code = `getTarget${info}()`;
+    const info = this.getFieldValue('COMPLEMENT');
+    const code = `getTarget${info}()`;
     this.func = `getTarget${info}`;
     setBlockInfo(this);
 
@@ -1105,8 +1108,8 @@ Blockly.Blocks['issafe'] = {
         this.reshape(false);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
-        var hasposition = "false";
+        const container = document.createElement('mutation');
+        let hasposition = "false";
         if (this.getFieldValue('COMPLEMENT') == "There")
             hasposition = "true";
         container.setAttribute('position', hasposition);
@@ -1114,7 +1117,7 @@ Blockly.Blocks['issafe'] = {
         return container;
     },
     domToMutation: function(xmlElement) {
-        var hasposition = (xmlElement.getAttribute('position') == "true");
+        const hasposition = (xmlElement.getAttribute('position') == "true");
         this.reshape(hasposition);
 
     },
@@ -1146,12 +1149,12 @@ Blockly.Blocks['issafe'] = {
 };
 
 Blockly.Python['issafe'] = function(block) {
-    var dropdown_complement = block.getFieldValue('COMPLEMENT');
+    const dropdown_complement = block.getFieldValue('COMPLEMENT');
 
-    var code;
+    let code;
     if (dropdown_complement == "There"){
-        var value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
-        var value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_x = (Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_ATOMIC) || 0);
+        const value_y = (Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_ATOMIC) || 0);
         code = `isSafe${dropdown_complement}(${value_x}, ${value_y})`;
     }
     else
@@ -1176,7 +1179,7 @@ Blockly.Blocks['getsaferadius'] = {
 };
 
 Blockly.Python['getsaferadius'] = function(block) {
-    var code = `getSafeRadius()`;
+    const code = `getSafeRadius()`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1193,7 +1196,7 @@ Blockly.Blocks['howmanyenemies'] = {
 };
 
 Blockly.Python['howmanyenemies'] = function(block) {
-    var code = `howManyEnemies()`;
+    const code = `howManyEnemies()`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1210,7 +1213,7 @@ Blockly.Blocks['doyouseeme'] = {
 };
 
 Blockly.Python['doyouseeme'] = function(block) {
-    var code = `doYouSeeMe()`;
+    const code = `doYouSeeMe()`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1227,7 +1230,7 @@ Blockly.Blocks['getsimtime'] = {
 };
 
 Blockly.Python['getsimtime'] = function(block) {
-    var code = `getSimTime()`;
+    const code = `getSimTime()`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1244,8 +1247,8 @@ Blockly.Blocks['pot_hp'] = {
 };
 
 Blockly.Python['pot_hp'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-hp-${lvl}`;
+    const lvl = this.getFieldValue('COMPLEMENT');
+    const code = `pot-hp-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1262,8 +1265,8 @@ Blockly.Blocks['pot_ap'] = {
 };
 
 Blockly.Python['pot_ap'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-ap-${lvl}`;
+    const lvl = this.getFieldValue('COMPLEMENT');
+    const code = `pot-ap-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1280,8 +1283,8 @@ Blockly.Blocks['pot_high'] = {
 };
 
 Blockly.Python['pot_high'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-high-${lvl}`;
+    const lvl = this.getFieldValue('COMPLEMENT');
+    const code = `pot-high-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1298,8 +1301,8 @@ Blockly.Blocks['pot_low'] = {
 };
 
 Blockly.Python['pot_low'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-low-${lvl}`;
+    const lvl = this.getFieldValue('COMPLEMENT');
+    const code = `pot-low-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1316,8 +1319,8 @@ Blockly.Blocks['pot_xp'] = {
 };
 
 Blockly.Python['pot_xp'] = function(block) {
-    let lvl = this.getFieldValue('COMPLEMENT');
-    let code = `pot-xp-${lvl}`;
+    const lvl = this.getFieldValue('COMPLEMENT');
+    const code = `pot-xp-${lvl}`;
     return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -1338,7 +1341,7 @@ Blockly.Blocks['useitem'] = {
         toggleUseReturn(this, options);
     },
     mutationToDom: function() {
-        var container = document.createElement('mutation');
+        const container = document.createElement('mutation');
         if (this.useReturn)
             container.setAttribute('use-return', 'true');
         else
@@ -1354,8 +1357,8 @@ Blockly.Blocks['useitem'] = {
 };
 
 Blockly.Python['useitem'] = function(block) {
-    let info = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
-    let code = `useItem("${info}")`;
+    const info = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
+    const code = `useItem("${info}")`;
     this.func = `useItem`;
     setBlockInfo(this);
 
@@ -1378,23 +1381,23 @@ Blockly.Blocks['itemready'] = {
 };
 
 Blockly.Python['itemready'] = function(block) {
-    let pot = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
-    var code = `isItemReady("${pot}")`;
+    const pot = (Blockly.Python.valueToCode(block, 'POTION', Blockly.Python.ORDER_NONE) || "")
+    const code = `isItemReady("${pot}")`;
     this.func = `isItemReady`;
     setBlockInfo(this);
 
     return [code, Blockly.Python.ORDER_NONE];
 };
 
-async function getTooltip(name){
-    if (funcList[name])
-        return funcList[name];
-
-    let json = await $.getJSON(`script/functions/${name.toLowerCase()}.json`, async data => {
-        funcList[name] = data.description.brief;
-    });
-
-    return json.description.brief;
+/**
+ * Brief description of an API function, for a block's tooltip (fetched once per function).
+ *
+ * @param {string} name Function name.
+ * @returns {Promise<string>}
+ */
+function getTooltip(name){
+    funcList[name] ??= FunctionDocsModel.get(name).then(data => data.description.brief);
+    return funcList[name];
 }
 
 function setBlockInfo(block){
@@ -1405,7 +1408,7 @@ function setBlockInfo(block){
 }
 
 function toggleUseReturn(block, options){
-    var option = {};
+    const option = {};
     option.enabled = true;
     if (!block.useReturn){
         option.text = 'Usar retorno';
@@ -1442,7 +1445,7 @@ function reshape_toggleUseReturn(block, useReturn, type){
 }
 
 function connectShadow(block, input){
-    let shadow = block.workspace.newBlock('math_number');
+    const shadow = block.workspace.newBlock('math_number');
     shadow.setShadow(true);
     shadow.initSvg();
     shadow.render();

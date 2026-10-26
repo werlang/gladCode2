@@ -5,21 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Sobre</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel='stylesheet' href="css/about.css"/>
     <link rel='stylesheet' href="css/radio.css"/>
     <link rel='stylesheet' href="css/dialog.css"/>
     <link rel='stylesheet' href="css/header.css"/>
     
     <link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>	
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("about.js") ?>"></script>
     	
-    <script src="script/about.js"></script>
-    <script src="script/radio.js"></script>
-    <script src="script/dialog.js"></script>
-    <script type="module" src="script/google-login.js"></script>
-    <script type="module" src="script/header.js"></script>
     
     </head>
 <body>

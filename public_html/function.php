@@ -31,12 +31,12 @@
     <script src="script/fallback/blockly-pt-br.js"></script>
     <script src="script/fallback/blockly-python.js"></script> -->
     
-    <script src="script/blocks.js"></script>
+    <script type="module" src="script/blocks.js"></script>
     <script src="script/function.js"></script>
     <script src="script/side-menu.js"></script>
-    <script type="module" src="script/google-login.js"></script>
     
     <script type="module" src="script/header.js"></script>
+    <script type="module" src="script/legacy.js"></script>
     
     </head>
     <!-- Google tag (gtag.js) -->

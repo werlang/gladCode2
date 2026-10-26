@@ -12,15 +12,12 @@
     <link rel='stylesheet' href="css/side-menu.css"/>
     <link rel='stylesheet' href="css/header.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("docs.js") ?>"></script>
     
 
-    <script src="script/docs.js"></script>
-    <script src="script/side-menu.js"></script>
-    <script type="module" src="script/google-login.js"></script>
     
-    <script type="module" src="script/header.js"></script>
     
     </head>
         <!-- Google tag (gtag.js) -->

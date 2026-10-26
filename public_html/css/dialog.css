@@ -214,3 +214,7 @@ body .ui-tooltip {
 	box-shadow: none;
 	z-index: 9999;
 }
+#dialog-box .google-login {
+	display: flex;
+	justify-content: center;
+}
