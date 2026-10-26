@@ -127,8 +127,6 @@
                         $pasta = md5($email);
                         $sql = "INSERT INTO usuarios (googleid,email,nome,apelido,sobrenome,pasta,ativo,foto) VALUES ('$googleid','$email','$nome','$apelido','$sobrenome','$pasta',now(), '$foto')";
                         $result = runQuery($sql);
-                        $path = "/home/gladcode/user";
-                        system("mkdir $path/$pasta");
                         $id = $conn->lastInsertId();
                     }
                     else{
