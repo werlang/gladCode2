@@ -71,3 +71,18 @@ Decisions taken with the user: Node Express API, REST redesign, API and web page
 
 Pages: index, about, creditos, docs, docs-ptbr, docs-blocks, manual, function, stats, post, editor,
 profile, playback, tournament, training, thanks, update (+ header, footer, module_scripts).
+
+## Progress
+
+- [x] API foundation (88375e749), web foundation (55780e2d8), auth and users (53f60ef06), news (645f31605)
+- [x] Gladiators, editor test battles, logs, battle core (c498d8e18): `model/battle.js` is the shared
+      battle runner; ranked, duel, tournament and training runs still go through it in their phases.
+- [ ] Potions and replay preferences
+- [ ] Ranking, stats
+- [ ] Reports, duels, friends, messages, notifications, mail, matchmaking + ranked battles
+- [ ] Tournaments, trainings
+- [ ] Release, thanks, admin dev-tools, cron, engine test, PHP tests
+- [ ] Retire public_html/Apache/node, compose for production, docs
+
+Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
+cookie for `localhost` (web on 8085, API on 8086, old Apache on 8087).

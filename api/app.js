@@ -9,6 +9,7 @@ import { battlesRouter } from './route/battles.js';
 import { gladiatorsRouter } from './route/gladiators.js';
 import { logsRouter } from './route/logs.js';
 import { newsRouter } from './route/news.js';
+import { potionsRouter } from './route/potions.js';
 import { usersRouter } from './route/users.js';
 
 const port = 3000;
@@ -46,6 +47,7 @@ app.use('/news', newsRouter);
 app.use('/gladiators', gladiatorsRouter);
 app.use('/battles', battlesRouter);
 app.use('/logs', logsRouter);
+app.use('/potions', potionsRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

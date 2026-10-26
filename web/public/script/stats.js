@@ -1,7 +1,7 @@
 import { SideMenu } from './components/side-menu.js';
 import { Slider } from './components/slider.js';
 import { renderTemplate } from './helpers/html.js';
-import { SlotsModel } from './models/slots.js';
+import { PotionModel } from './models/potion.js';
 import { StatsModel } from './models/stats.js';
 import {
     abilityRowTemplate,
@@ -135,9 +135,9 @@ function renderSummary(data, empty) {
  */
 async function search(mmr) {
     const [minMmr, maxMmr] = mmr.values;
-    const [data, { potions }] = await Promise.all([
+    const [data, potions] = await Promise.all([
         StatsModel.load({ start: dateStart.value, end: dateEnd.value, minMmr, maxMmr }),
-        SlotsModel.items(),
+        PotionModel.catalog(),
     ]);
     const empty = Object.keys(data.average).length === 0;
 

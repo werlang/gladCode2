@@ -6,11 +6,11 @@ import { copyText } from './helpers/clipboard.js';
 import { createElement, renderTemplate } from './helpers/html.js';
 import { formatTimeline, frameAt as frameIn } from './helpers/replay.js';
 import { getImage, images } from './helpers/sprite-catalog.js';
+import { ReplayPreferences } from './helpers/replay-preferences.js';
 import { fetchSpritesheet, getSpriteThumb } from './helpers/spritesheet.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { BattleLogModel } from './models/battle-log.js';
-import { PlaybackModel } from './models/playback.js';
-import { SlotsModel } from './models/slots.js';
+import { PotionModel } from './models/potion.js';
 import { expandSimulation } from './render2/battle-state.js';
 import {
     buffRowTemplate,
@@ -156,7 +156,7 @@ function toggleSound() {
         sound.sfx = rememberedSfx > 0 ? rememberedSfx : 1;
     }
     changeSoundIcon();
-    PlaybackModel.savePreferences({ music_volume: music.volume, sfx_volume: sound.sfx });
+    ReplayPreferences.save({ music_volume: music.volume, sfx_volume: sound.sfx });
 }
 
 // ----- fullscreen and layout -------------------------------------------------------
@@ -494,7 +494,7 @@ function openSettings() {
             reload = true;
         }
 
-        await PlaybackModel.savePreferences({
+        await ReplayPreferences.save({
             show_bars: options.bars,
             show_frames: framesInput.checked,
             show_fps: options.fps,
@@ -600,7 +600,7 @@ function createDetailedWindow() {
         }, 400);
     });
 
-    potionNames ??= SlotsModel.items().then(({ potions }) => Object.fromEntries(
+    potionNames ??= PotionModel.catalog().then(potions => Object.fromEntries(
         Object.entries(potions).map(([identifier, potion]) => [potion.id, identifier]),
     ));
 }
@@ -764,7 +764,7 @@ async function loadBattle() {
 
 /** Applies the viewer's saved preferences. */
 async function loadPreferences() {
-    const data = await PlaybackModel.preferences();
+    const data = ReplayPreferences.load();
     const flag = value => value === true || value === 'true';
     const options = prefs();
     options.bars = flag(data.show_bars);
@@ -834,7 +834,7 @@ const Playback = {
         if (window.music && window.music.volume > 0) return 'music';
         return prefs().sound.sfx > 0 ? 'sfx' : 'mute';
     },
-    savePrefs(fields) { PlaybackModel.savePreferences(fields); },
+    savePrefs(fields) { ReplayPreferences.save(fields); },
     openSettings() { openSettings(); },
     get fullscreen() { return isFullScreen(); },
     toggleFullscreen() { setFullScreen(!isFullScreen()); },

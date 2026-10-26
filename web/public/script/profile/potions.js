@@ -2,7 +2,7 @@ import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
-import { SlotsModel } from '../models/slots.js';
+import { PotionModel } from '../models/potion.js';
 import { profile, setSilver } from './session.js';
 import {
     emptySlotTemplate,
@@ -38,7 +38,7 @@ export class PotionsTab {
     #panel = document.querySelector('#apot-container');
     #potions = {};
     #prices = [];
-    #times = [];
+    #brewHours = [];
     #level = 0;
     /** Expiry time (ms) of each filled slot, by slot index. */
     #expiries = new Map();
@@ -47,11 +47,11 @@ export class PotionsTab {
 
     /** Loads the catalogue and the apothecary, then the slots. */
     async init() {
-        const [items, costs] = await Promise.all([SlotsModel.items(), SlotsModel.upgradeCosts()]);
-        this.#potions = items.potions;
-        this.#prices = costs.prices;
-        this.#times = costs.times;
-        this.#level = parseInt(profile.user.apothecary, 10);
+        const [potions, apothecary] = await Promise.all([PotionModel.catalog(), PotionModel.apothecary()]);
+        this.#potions = potions;
+        this.#prices = apothecary.prices;
+        this.#brewHours = apothecary.hours;
+        this.#level = profile.user.apothecary;
         this.#showApothecary();
 
         this.#panel.querySelector('#browse').addEventListener('click', event => {
@@ -68,7 +68,7 @@ export class PotionsTab {
 
     /** @param {number} [level] Apothecary level (the current one by default). */
     #hours(level = this.#level) {
-        return this.#times[level - 1];
+        return this.#brewHours[level - 1];
     }
 
     #showApothecary() {
@@ -95,7 +95,7 @@ export class PotionsTab {
 
     /** Redraws the slots from the server. */
     async refresh() {
-        const data = await SlotsModel.slots();
+        const data = await PotionModel.slots();
         const container = this.#panel.querySelector('#my-pots');
         container.replaceChildren();
         this.#expiries.clear();
@@ -104,12 +104,12 @@ export class PotionsTab {
         for (let index = 0; index < SLOTS; index++) {
             const item = data.slots[index];
             let slot;
-            if (parseInt(data.lvl, 10) < parseInt(data.slotlvl[index], 10)) {
-                slot = createElement(renderTemplate(lockedSlotTemplate, { level: data.slotlvl[index] }));
+            if (data.level < data.unlockLevels[index]) {
+                slot = createElement(renderTemplate(lockedSlotTemplate, { level: data.unlockLevels[index] }));
             }
             else if (item) {
                 slot = this.#filledSlot(item);
-                this.#expiries.set(index, Date.now() + parseInt(item.time, 10) * 1000);
+                this.#expiries.set(index, Date.now() + item.secondsLeft * 1000);
             }
             else {
                 slot = createElement(emptySlotTemplate);
@@ -134,7 +134,7 @@ export class PotionsTab {
         const slot = createElement(renderTemplate(filledSlotTemplate, { icon: item.icon, name: item.name }));
         slot.addEventListener('click', () => {
             new Message({
-                message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.id}")</b></code>`,
+                message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.potion}")</b></code>`,
                 buttons: { yes: 'Ajuda', no: 'OK' },
             }).show().click('yes', () => window.open('manual#nav-item'));
         });
@@ -144,8 +144,8 @@ export class PotionsTab {
                 message: 'Deseja cancelar esta encomenda?',
                 buttons: { yes: 'SIM', no: 'NÃO' },
             }).show().click('yes', async () => {
-                const data = await SlotsModel.expire(item.sid);
-                if (data.status === 'SUCCESS') this.refresh();
+                await PotionModel.cancel(item.id);
+                this.refresh();
             });
         });
         return slot;
@@ -173,7 +173,7 @@ export class PotionsTab {
             const potion = this.#potions[id];
             return renderTemplate(shopItemTemplate, {
                 icon: potion.icon,
-                level: potion.lvl,
+                level: potion.level,
                 price: potion.price,
                 name: potion.name,
             });
@@ -202,8 +202,8 @@ export class PotionsTab {
         const ids = Object.keys(this.#potions);
         this.#shop.querySelectorAll('#shop-container .slot').forEach((slot, index) => {
             const potion = this.#potions[ids[index]];
-            if (parseInt(profile.user.silver, 10) < parseInt(potion.price, 10)) slot.classList.add('dis-price', 'disabled');
-            if (this.#level < parseInt(potion.lvl, 10)) slot.classList.add('dis-lvl', 'disabled');
+            if (profile.user.silver < potion.price) slot.classList.add('dis-price', 'disabled');
+            if (this.#level < potion.level) slot.classList.add('dis-lvl', 'disabled');
         });
     }
 
@@ -214,7 +214,7 @@ export class PotionsTab {
             message: renderTemplate(potionInfoTemplate, {
                 name: potion.name,
                 description: potion.description,
-                level: potion.lvl,
+                level: potion.level,
                 price: potion.price,
             }),
             class: 'description',
@@ -235,11 +235,11 @@ export class PotionsTab {
             new Message({ message: 'Você não possui espaços disponíveis para adquirir este item' }).show();
             return;
         }
-        if (this.#level < parseInt(potion.lvl, 10)) {
-            new Message({ message: `Aprimore o apotecário para o nível <b>${potion.lvl}</b> para poder encomendar este item` }).show();
+        if (this.#level < potion.level) {
+            new Message({ message: `Aprimore o apotecário para o nível <b>${potion.level}</b> para poder encomendar este item` }).show();
             return;
         }
-        if (parseInt(profile.user.silver, 10) < parseInt(potion.price, 10)) {
+        if (profile.user.silver < potion.price) {
             new Message({ message: "Você não possui prata <i class='fas fa-coins silver'></i> suficiente para adquirir este item" }).show();
             return;
         }
@@ -249,10 +249,14 @@ export class PotionsTab {
             buttons: { yes: 'Sim', no: 'Não' },
         }).show().click('yes', async () => {
             closeShop();
-            setSilver(profile.user.silver - parseInt(potion.price, 10));
-            createToast(`Item ${potion.name} encomandado`, 'success');
-            const data = await SlotsModel.buy(id);
-            if (data.status !== 'SUCCESS') createToast('O item não pôde ser adquirido', 'error');
+            try {
+                const { silver } = await PotionModel.buy(id);
+                setSilver(silver);
+                createToast(`Item ${potion.name} encomendado`, 'success');
+            }
+            catch {
+                createToast('O item não pôde ser adquirido', 'error');
+            }
             this.refresh();
         });
     }
@@ -275,19 +279,20 @@ export class PotionsTab {
         if (!affordable) box.getButton('yes').remove();
 
         box.click('yes', async () => {
-            const data = await SlotsModel.upgradeApothecary();
-            if (data.status === 'NO MONEY') {
-                new Message({ message: 'Você não possui prata suficiente' }).show();
+            let data;
+            try {
+                data = await PotionModel.upgradeApothecary();
             }
-            else if (data.status === 'MAX LVL') {
-                new Message({ message: 'O apotecário já está no nível máximo' }).show();
+            catch (error) {
+                const problem = { NOT_ENOUGH_SILVER: 'Você não possui prata suficiente', APOTHECARY_MAX_LEVEL: 'O apotecário já está no nível máximo' }[error.code];
+                if (!problem) throw error;
+                new Message({ message: problem }).show();
+                return;
             }
-            else {
-                setSilver(data.silver);
-                profile.user.apothecary = data.apot;
-                this.#level = parseInt(data.apot, 10);
-                this.#showApothecary();
-            }
+            setSilver(data.silver);
+            profile.user.apothecary = data.apothecary;
+            this.#level = data.apothecary;
+            this.#showApothecary();
         });
     }
 }
