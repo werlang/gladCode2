@@ -23,7 +23,6 @@
     <title>gladCode - Torneio</title>
     <link href="https://fonts.googleapis.com/css?family=Orbitron|Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     
-    <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
@@ -33,9 +32,9 @@
     <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/header.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("tournament.js") ?>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
@@ -44,17 +43,8 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
 
-    <script src="script/assets.js"></script>
-    <script src="script/glad-card.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/tournament.js"></script>
     <!-- <script src="script/chat.js"></script> -->
-    <script src="script/emoji.js"></script>
     
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
-    <script type="module" src="script/blocks.js"></script>
     
     </head>
         <!-- Google tag (gtag.js) -->

@@ -1,410 +1,373 @@
-var hash, round, isManager;
+import './blocks.js';
+import { Countdown, countdownDigitsTemplate } from './components/countdown.js';
+import { showMessage } from './components/dialog.js';
+import { gladOfCard, loadGladCards } from './components/glad-card.js';
+import { runSimulation } from './components/simulation.js';
+import { createElement, renderTemplate } from './helpers/html.js';
+import { TournamentModel } from './models/tournament.js';
+import {
+    chooseGladTemplate,
+    finalRankingTemplate,
+    groupTemplate,
+    medalTemplate,
+    rankingRowTemplate,
+    reloadButtonTemplate,
+    roundTemplate,
+    teamTemplate,
+    winnerIconTemplate,
+} from './templates/tournament.js';
 
-$(document).ready( function() {
-    hash = $('#hash').html();
-    round = $('#round').html();
-    $('#hash, #round').remove();
+const MEDALS = ['gold', 'silver', 'bronze'];
+/** Class showing how many of the team's three gladiators are left. */
+const ALIVE_CLASSES = ['', 'one', 'two', 'three'];
+/** A survival time this long means the gladiator outlived everyone. */
+const WINNER_TIME = 1000;
 
-    // socket_ready().then( () => {
-    //     socket.emit('tournament run join', {
-    //         hash: hash
-    //     });
-    //     socket.on('tournament refresh', data =>{
-    //         refresh_round();
-    //     });
-    // });
+const content = document.querySelector('#content-box');
 
-    $.post("back_tournament_run.php", {
-        action: "GET",
-        hash: hash,
-        round: round
-    }).done( function(data){
-        // console.log(data);
-        data = JSON.parse(data);
+/**
+ * Reads and removes a value the page left in a hidden element.
+ *
+ * @param {string} id Element id.
+ * @returns {string}
+ */
+function takeHidden(id) {
+    const element = document.getElementById(id);
+    const value = element?.textContent ?? '';
+    element?.remove();
+    return value;
+}
 
-        if (data.status == "REDIRECT"){
-            window.location.href = 'tourn/'+ hash +'/'+ data.round;
+/**
+ * A tournament round page: groups of teams, the countdown to the battles,
+ * choosing the team's gladiator and, for the manager, running the battles.
+ */
+class TournamentRound {
+    /** Group id of each group element. */
+    #groupIds = new Map();
+    /** Team id of each team element. */
+    #teamIds = new Map();
+    /** Groups whose result the visitor opened, so their scores show. */
+    #revealed = new Set();
+    #manager = false;
+
+    /**
+     * @param {string} hash Tournament hash.
+     * @param {string} round Round number from the URL.
+     */
+    constructor(hash, round) {
+        this.hash = hash;
+        this.round = round;
+    }
+
+    /** Loads the round and renders it, the final ranking or a redirect. */
+    async show() {
+        const data = await TournamentModel.round(this.hash, this.round);
+        if (data.status === 'REDIRECT') {
+            location.href = `tourn/${this.hash}/${data.round}`;
         }
-        else if (data.status == "NOTFOUND"){
-            window.location.href = 'index';
+        else if (data.status === 'NOTFOUND') {
+            location.href = 'index';
         }
-        else if (data.status == "END"){
-            $('#content-box').html("<h1>Classificação final</h1><h3>O torneio <span id='tourn-name'>"+ data.tournament +"</span> chegou ao fim e esta foi a classificação obtida pelas equipes</h3><div id='ranking-container'></div><div id='button-container'><button id='back-round' class='button'>RODADA ANTERIOR</button></div>");
+        else if (data.status === 'END') {
+            this.#showRanking(data);
+        }
+        else {
+            this.#showRound(data);
+        }
+    }
 
-            for (let i in data.ranking){
-                var c = parseInt(i)+1;
-                $('#content-box #ranking-container').append("<div class='team'><div class='ordinal'>"+ c +"º</div><div class='name'>"+ data.ranking[i] +"</div></div>");
-
-                if (c == 1)
-                    $('#content-box #ranking-container .team').last().addClass('gold');
-                else if (c == 2)
-                    $('#content-box #ranking-container .team').last().addClass('silver');
-                else if (c == 3)
-                    $('#content-box #ranking-container .team').last().addClass('bronze');
-            }
-            $('#content-box #ranking-container .team.gold .ordinal').html("<img class='icon' src='icon/gold-medal.png'>");
-            $('#content-box #ranking-container .team.silver .ordinal').html("<img class='icon' src='icon/silver-medal.png'>");
-            $('#content-box #ranking-container .team.bronze .ordinal').html("<img class='icon' src='icon/bronze-medal.png'>");
-
-            $('#content-box #back-round').click( function(){
-                window.location.href = 'tourn/'+ hash +'/'+ data.maxround;
+    /**
+     * @param {Record<string, any>} data Final ranking answer.
+     */
+    #showRanking(data) {
+        const rows = data.ranking.map((name, index) => {
+            const medal = MEDALS[index] ?? '';
+            return renderTemplate(rankingRowTemplate, {
+                medal,
+                ordinal: medal ? renderTemplate(medalTemplate, { medal, place: index + 1 }) : `${index + 1}º`,
+                name,
             });
-        }
-        else{
-            $('#content-box').html("<h1>Torneio <span id='tourn-name'>"+ data.tournament.name +"</span></h1><h3 id='tourn-desc'>"+ data.tournament.description +"</h3><div id='group-container'></div>");
+        }).join('');
+        content.innerHTML = renderTemplate(finalRankingTemplate, { name: data.tournament, rows });
+        content.querySelector('#back-round').addEventListener('click', () => {
+            location.href = `tourn/${this.hash}/${data.maxround}`;
+        });
+    }
 
-            var hasteam = false;
-            var groupindex = 0;
-            var groups = {};
-            for (let i in data.teams){
-                var groupid = data.teams[i].group;
-
-                if (!(data.teams[i].group in groups)){
-                    groups[groupid] = groupindex;
-                    $('#content-box #group-container').append("<div class='group'><div class='head'><div class='title'>Grupo "+ parseInt(groupindex+1) +" - <span>Rodada "+ data.tournament.round +"</span></div><div class='icons'><div class='glad' title='Quantos gladiadores da equipe ainda restam'><img src='icon/gladcode_icon.png'></div><div class='time' title='Quantos segundos o gladiador da equipe sobreviveu'><img src='icon/clock-icon.png'></div></div></div><div class='teams-container'></div><div class='foot'><button class='button' disabled>Aguardando <span class='number'></span> mestre<span class='plural'>s</span></button></div></div>");
-                    $('#content-box #group-container .group').eq(groupindex).data('id', groupid);
-                    groupindex++;
-                }
-
-                var myteamclass = '';
-                var myteam;
-                if (data.teams[i].myteam == true){
-                    myteamclass = 'myteam';
-                    hasteam = true;
-                    myteam = data.teams[i].name;
-                }
-
-                $('#content-box #group-container .group .teams-container').eq(groups[groupid]).append(`<div class='team ${myteamclass}'>
-                    <div class='icon'><i class='far fa-hourglass'></i></div>
-                    <div class='name'>${data.teams[i].name}</div>
-                    <div class='info'>
-                        <div class='glad'>
-                            <div class='g-bar'></div>
-                            <div class='g-bar'></div>
-                            <div class='g-bar'></div>
-                        </div>
-                        <div class='time'>-</div>
-                    </div>
-                </div>`);
-                $('#content-box #group-container .group').eq(groups[groupid]).find('.team').last().data('id', data.teams[i].id);
-
+    /**
+     * @param {Record<string, any>} data Round answer.
+     */
+    #showRound(data) {
+        const { tournament } = data;
+        const groupOrder = [];
+        const teamsByGroup = new Map();
+        data.teams.forEach(team => {
+            if (!teamsByGroup.has(team.group)) {
+                teamsByGroup.set(team.group, []);
+                groupOrder.push(team.group);
             }
-
-            $('#content-box').append(`<div class='timeleft' title='Tempo máximo restante até o fim da rodada'>
-                <div id='time'>
-                    <div class='numbers'><span>0</span><span>0</span></div>:
-                    <div class='numbers'><span>0</span><span>0</span></div>:
-                    <div class='numbers'><span>0</span><span>0</span></div>
-                </div>
-                <div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div>
-            </div>
-            <div id='button-container'>
-                <button class='arrow' id='back-round' title='Rodada anterior' disabled>
-                    <i class='fas fa-chevron-left'></i>
-                </button>
-                <button id='prepare' class='button' disabled>PREPARAR-SE</button>
-                <button class='arrow' id='next-round' title='Próxima rodada' disabled>
-                    <i class='fas fa-chevron-right'></i>
-                </button>
-            </div>`);
-
-            refresh_round();
-
-            var round = data.tournament.round;
-            if (round > 1){
-                $('#content-box #back-round').removeAttr('disabled');
-                $('#content-box #back-round').click( function(){
-                    window.location.href = 'tourn/'+ hash +'/'+ parseInt(round - 1);
-                });
-            }
-
-            isManager = data.tournament.manager;
-            if (hasteam){
-                $('#content-box #prepare').html("PREPARAR-SE").removeAttr('disabled');
-
-                if (data.locked)
-                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
-
-                var round = data.tournament.round;
-                var nick = data.nick;
-
-                $('#content-box #prepare').off().click( function(){
-                    $.post("back_tournament_run.php", {
-                        action: "GLADS",
-                        hash: hash,
-                        round: round
-                    }).done( function(data){
-                        //console.log(data);
-                        data = JSON.parse(data);
-                       
-                        if (data.status == "LOCK"){
-                            showMessage("Tarde demais. Seu grupo já encerrou as inscrições");
-                            $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
-                        }
-                        else if (data.status == "NOTFOUND"){
-                            showMessage("Lista de gladiadores não encontrada");
-                        }
-                        else{
-                            $('body').append("<div id='fog'><div class='float-box'><div id='text'>Olá <span class='highlight'>"+ nick +"</span>, você precisa escolher um gladiador para representar a equipe <span class='highlight'>"+ myteam +"</span> na rodada <span class='highlight'>"+ round +"</span> do torneio</div><div class='glad-card-container'></div><div id='button-container'><button id='cancel' class='button'>AINDA NÃO</button><button id='choose' class='button' disabled>ESCOLHER</button></div></div></div>");
-
-                            $('.float-box #cancel').click( function(){
-                                $('#fog').remove();
-                            });
-            
-                            $('.float-box #choose').click( function(){
-                                var gladid = $('.float-box .glad-preview.selected').data('id');
-                                var gladname = $('.float-box .glad-preview.selected .info .glad span').html();
-                                $.post("back_tournament_run.php", {
-                                    action: "CHOOSE",
-                                    id: gladid,
-                                    hash: hash
-                                }).done( function(data){
-                                    //console.log(data);
-                                    data = JSON.parse(data);
-            
-                                    if (data.status == "DEAD")
-                                        showMessage("Este gladiador está gravemente ferido e não poderá mais participar deste torneio");
-                                    else if (data.status == "OLD")
-                                        showMessage("Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o");
-                                    else if (data.status == "SUCCESS"){
-                                        $('#fog').remove();
-                                        showMessage("Sua equipe escolheu o gladiador <span class='highlight'>"+ gladname +"</span> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.");
-                                    }
-                                });
-            
-                            });
-
-                            load_glad_cards($('.float-box .glad-card-container'), {
-                                customLoad: data.glads,
-                                code: true,
-                                master: true,
-                                dead: true,
-                                clickHandler: function(){
-                                    if (!$(this).hasClass('dead') && !$(this).hasClass('old')){
-                                        $('.float-box #choose').removeAttr('disabled');
-                                        $('.float-box .glad-preview').removeClass('selected');
-                                        $(this).addClass('selected');
-                                    }
-                                }, 
-                                dblClickHandler: function(){
-                                    if (!$(this).hasClass('dead') && !$(this).hasClass('old'))
-                                        $('.float-box #choose').click();
-                                }
-                            }).then( function(){
-                            });
-                        }
-                        
-                    });
-
-                });
-
-            }
-            else if (isManager){
-                $('#content-box #prepare').html("ENCERRAR RODADA").removeAttr('disabled');
-                $('#content-box #prepare').off().click( function(){
-                    $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
-                    $.post("back_tournament_run.php", {
-                        action: "END TURN",
-                        hash: hash
-                    }).done( function(data){
-                        data = JSON.parse(data);
-                        //console.log(data);
-                    });
-                });
-            }
-            else{
-                $('#content-box #prepare').remove();
-                $('#button-container .arrow').addClass('nobutton');
-            }
-
-            var deadline = new Date(data.tournament.deadline);
-            var timenow = new Date(data.tournament.timenow);
-            var serverleft = deadline - timenow;
-            var timestart = new Date();
-            countDown();
-            function countDown() {
-                setTimeout( function(){
-                    var timediff = serverleft - (new Date() - timestart);
-                    var timeleft = msToTime(timediff);
-                    
-                    $('.timeleft .numbers').each( function(index, obj){
-                        if (parseInt(timeleft[index]) != parseInt($(obj).text())){
-                            $(obj).find('span').eq(0).html(timeleft[index].toString()[0]);
-                            $(obj).find('span').eq(1).html(timeleft[index].toString()[1]);
-                        }
-                    });
-
-                    if ($('#group-container .team.myteam .icon.green').length == 1)
-                        $('.timeleft').addClass('green');
-                    else if (parseInt(timeleft[0]) == 0){
-                        if (parseInt(timeleft[1]) < 10)
-                            $('.timeleft').addClass('red');
-                        else
-                            $('.timeleft').addClass('yellow');
-                    }
-                    
-                    if ($('#group-container .team .icon.green').length == $('#group-container .team').length)
-                        $('.timeleft .numbers span').html('0');
-                    if ($('.timeleft #time').text() != '00:00:00')
-                        countDown();
-                }, 1000);
-            }
-
-        }
-        
-    });
-
-    // init_chat($('#chat-panel'), {
-    //     full: false,
-    //     defaultOpen: 900
-    // });
-});
-
-const teamShow = {};
-
-function refresh_round(){
-    $.post("back_tournament_run.php", {
-        action: "REFRESH",
-        hash: hash,
-        round: round,
-    }).done( async function(data){
-        data = JSON.parse(data);
-        console.log(data);
-        
-        $('#content-box #group-container .team').each( function(){
-            if (!$(this).parents('.group').hasClass('hide-info') && teamShow[$(this).parents('.group').data('id')] == true){
-                var i = $(this).data('id');
-                // var lasttime = '-';
-                var lasttime = data.teams[i].lasttime;
-                if (lasttime == null)
-                    lasttime = '-';
-                else if (parseFloat(lasttime) >= 1000){
-                    lasttime = "<img class='win' src='icon/winner-icon.png'>";
-                }
-                else
-                    lasttime = parseFloat(lasttime).toFixed(1);
-        
-                var alive = ['', 'one', 'two', 'three'];
-                alive = alive[data.teams[i].alive];
-        
-                var iconready = {class: 'far fa-hourglass', title: 'A equipe ainda não escolheu seu gladiador'};
-                if (data.teams[i].ready)
-                    iconready = {class: "fas fa-check green", title: 'A equipe está pronta para a batalha'};
-
-                $(this).find('.icon i').attr('class', iconready.class);
-                $(this).find('.icon i').attr('title', iconready.title);
-
-                $(this).find('.info .glad').attr('class', 'glad '+ alive);
-                $(this).find('.info .time').html(lasttime);
-            }
+            teamsByGroup.get(team.group).push(team);
         });
 
-        $('#content-box #group-container .group').each( function(){
-            var groupobj = $(this);
-            var i = $(this).data('id');
-            
-            if (data.groups[i].status == "DONE"){
-                $(this).find('.foot .button').removeAttr('disabled').html("VISUALIZAR BATALHA");
-                $(this).find('.foot .button').off('click').click( function(){
-                    window.open('play/'+ data.groups[i].hash);
-                    $(this).parents('.group').removeClass('hide-info');
-                    teamShow[i] = true;
-                    refresh_round();
-                });
+        const groups = groupOrder.map((groupId, index) => renderTemplate(groupTemplate, {
+            number: index + 1,
+            round: tournament.round,
+            teams: teamsByGroup.get(groupId).map(team => renderTemplate(teamTemplate, {
+                mine: team.myteam === true ? 'myteam' : '',
+                name: team.name,
+            })).join(''),
+        })).join('');
 
-                if (isManager) {
-                    $(this).find('.foot .button').html("<span>VISUALIZAR BATALHA</span><span class='reload' title='Executar batalha novamente'>🔄️</span>");
-                    $(this).find('.foot .button .reload').click( function(e){
-                        e.stopPropagation();
-                        groupobj.find('.foot .button').attr('disabled', true).html("Aguardando batalha...");
-                        runSimulation({
-                            tournament: i,
-                            origin: "tourn",
-                            force: true,
-                        }).then( function(data){
-                            // console.log(data);
-                            refresh_round();
-                        });
-                    });
-                }
-            }
-            else if (data.groups[i].status == "RUN"){
-                groupobj.addClass('hide-info');
-                groupobj.find('.foot .button').html("Grupo pronto. Aguardando batalha...");
-
-                if ((groupobj).find('.team.myteam').length > 0) {
-                    $('#content-box #prepare').attr('disabled', true).html("Aguarde a nova rodada");
-                }
-
-                if (isManager){
-                    groupobj.find('.foot .button').html("Executar Batalha").removeAttr('disabled').click( function(){
-                        groupobj.find('.foot .button').attr('disabled', true).html("Aguardando batalha...");
-                        runSimulation({
-                            tournament: i,
-                            origin: "tourn"
-                        }).then( function(data){
-                            console.log(data);
-                            refresh_round();
-                        });
-                    });
-
-
-                }
-            }
-            else if (data.groups[i].status == "WAIT"){
-                $(this).find('.foot .button .number').html(data.groups[i].value);
-                if (data.groups[i].value == 1)
-                    $(this).find('.foot .button').addClass('one');
-            }
+        content.innerHTML = renderTemplate(roundTemplate, {
+            name: tournament.name,
+            description: tournament.description,
+            groups,
+            digits: countdownDigitsTemplate,
         });
 
-        // all groups done and I'm the manager and there is no next round yet
-        if (Object.values(data.groups).filter(group => group.status == "DONE").length == Object.keys(data.groups).length && isManager && data.status == "SUCCESS"){
-            $('#content-box #prepare').removeAttr('disabled').html("Preparar próxima rodada").click(function () {
-                $.post("back_tournament_run.php", {
-                    action: "UPDATE",
-                    hash: hash
-                }).done(function (data) {
-                    // console.log(data);
-                    data = JSON.parse(data);
-                    refresh_round();
-                });
-            });;
-        }
+        content.querySelectorAll('#group-container .group').forEach((group, index) => {
+            const groupId = groupOrder[index];
+            this.#groupIds.set(group, groupId);
+            group.querySelectorAll('.team').forEach((team, teamIndex) => {
+                this.#teamIds.set(team, teamsByGroup.get(groupId)[teamIndex].id);
+            });
+        });
 
-        if (data.status == "NEXT" || data.status == "END"){
-            $('#content-box #next-round').removeAttr('disabled');
-            $('#content-box #prepare').remove();
-            $('#button-container .arrow').addClass('nobutton');
+        this.refresh();
 
-            $('#content-box #next-round').off().click( function(){
-                if (data.status == "END"){
-                    window.location.href = 'tourn/'+ hash +'/0';
-                }
-                else{
-                    var newround = parseInt(round) + 1;
-                    window.location.href = 'tourn/'+ hash +'/'+ newround;
-                }
+        const round = parseInt(tournament.round, 10);
+        if (round > 1) {
+            const back = content.querySelector('#back-round');
+            back.disabled = false;
+            back.addEventListener('click', () => {
+                location.href = `tourn/${this.hash}/${round - 1}`;
             });
         }
 
-    });
+        this.#manager = Boolean(tournament.manager);
+        const myTeam = data.teams.find(team => team.myteam === true);
+        const prepare = content.querySelector('#prepare');
+        if (myTeam) {
+            prepare.textContent = 'PREPARAR-SE';
+            prepare.disabled = false;
+            if (data.locked) this.#lockPrepare(prepare);
+            prepare.onclick = () => this.#prepare(tournament.round, data.nick, myTeam.name, prepare);
+        }
+        else if (this.#manager) {
+            prepare.textContent = 'ENCERRAR RODADA';
+            prepare.disabled = false;
+            prepare.onclick = () => {
+                prepare.textContent = 'AGUARDE...';
+                prepare.disabled = true;
+                TournamentModel.endTurn(this.hash);
+            };
+        }
+        else {
+            prepare.remove();
+            content.querySelectorAll('#button-container .arrow').forEach(arrow => arrow.classList.add('nobutton'));
+        }
 
+        this.#startCountdown(tournament.deadline, tournament.timenow);
+    }
+
+    /**
+     * @param {HTMLButtonElement|null} prepare The round button.
+     */
+    #lockPrepare(prepare) {
+        if (!prepare) return;
+        prepare.disabled = true;
+        prepare.textContent = 'Aguarde a nova rodada';
+    }
+
+    /**
+     * Counts down to the round's deadline: green once the user's team is
+     * ready, yellow in the last hour and red in the last ten minutes.
+     *
+     * @param {string} deadline Round deadline (server time).
+     * @param {string} now Server time.
+     */
+    #startCountdown(deadline, now) {
+        const box = content.querySelector('.timeleft');
+        const countdown = new Countdown(box, {
+            deadline,
+            now,
+            onTick: (left, [hours, minutes]) => {
+                if (content.querySelectorAll('#group-container .team.myteam .icon .green').length === 1) {
+                    box.classList.add('green');
+                }
+                else if (parseInt(hours, 10) === 0) {
+                    box.classList.add(parseInt(minutes, 10) < 10 ? 'red' : 'yellow');
+                }
+
+                const teams = content.querySelectorAll('#group-container .team');
+                const ready = content.querySelectorAll('#group-container .team .icon .green');
+                if (teams.length && ready.length === teams.length) {
+                    countdown.show(['00', '00', '00']);
+                    countdown.stop();
+                }
+            },
+        });
+        countdown.start();
+    }
+
+    /**
+     * Lets the user choose the gladiator that represents the team this round.
+     *
+     * @param {number|string} round Round number.
+     * @param {string} nick The user's nickname.
+     * @param {string} team The team's name.
+     * @param {HTMLButtonElement} prepare The round button.
+     */
+    async #prepare(round, nick, team, prepare) {
+        const data = await TournamentModel.teamGladiators(this.hash, round);
+        if (data.status === 'LOCK') {
+            showMessage('Tarde demais. Seu grupo já encerrou as inscrições');
+            this.#lockPrepare(prepare);
+            return;
+        }
+        if (data.status === 'NOTFOUND') {
+            showMessage('Lista de gladiadores não encontrada');
+            return;
+        }
+
+        const fog = createElement(renderTemplate(chooseGladTemplate, { nick, team, round }));
+        document.body.append(fog);
+        const choose = fog.querySelector('#choose');
+        let selected = null;
+
+        fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
+        choose.addEventListener('click', async () => {
+            const answer = await TournamentModel.choose(this.hash, selected.id);
+            if (answer.status === 'DEAD') {
+                showMessage('Este gladiador está gravemente ferido e não poderá mais participar deste torneio');
+            }
+            else if (answer.status === 'OLD') {
+                showMessage('Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o');
+            }
+            else if (answer.status === 'SUCCESS') {
+                fog.remove();
+                showMessage(`Sua equipe escolheu o gladiador <span class='highlight'>${selected.name}</span> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`);
+            }
+        });
+
+        const selectable = card => !card.classList.contains('dead') && !card.classList.contains('old');
+        await loadGladCards(fog.querySelector('.glad-card-container'), {
+            glads: data.glads,
+            code: true,
+            master: true,
+            dead: true,
+            onClick: event => {
+                const card = event.currentTarget;
+                if (!selectable(card)) return;
+                fog.querySelectorAll('.glad-preview').forEach(other => other.classList.remove('selected'));
+                card.classList.add('selected');
+                selected = gladOfCard(card);
+                choose.disabled = false;
+            },
+            onDoubleClick: event => {
+                if (selectable(event.currentTarget)) choose.click();
+            },
+        });
+    }
+
+    /**
+     * Runs a group's battle (manager only), then refreshes the round.
+     *
+     * @param {string} groupId Group id.
+     * @param {HTMLButtonElement} button The group's button.
+     * @param {boolean} [force] Run again a battle that already happened.
+     */
+    async #runGroup(groupId, button, force = false) {
+        button.disabled = true;
+        button.textContent = 'Aguardando batalha...';
+        await runSimulation({ tournament: groupId, origin: 'tourn', ...(force ? { force: true } : {}) });
+        this.refresh();
+    }
+
+    /** Updates the teams and groups from the server. */
+    async refresh() {
+        const data = await TournamentModel.refresh(this.hash, this.round);
+
+        content.querySelectorAll('#group-container .team').forEach(element => {
+            const group = element.closest('.group');
+            const groupId = this.#groupIds.get(group);
+            if (group.classList.contains('hide-info') || !this.#revealed.has(groupId)) return;
+
+            const team = data.teams[this.#teamIds.get(element)];
+            const icon = element.querySelector('.icon i');
+            icon.className = team.ready ? 'fas fa-check green' : 'far fa-hourglass';
+            icon.title = team.ready ? 'A equipe está pronta para a batalha' : 'A equipe ainda não escolheu seu gladiador';
+            element.querySelector('.info .glad').className = `glad ${ALIVE_CLASSES[team.alive] ?? ''}`;
+
+            const time = element.querySelector('.info .time');
+            if (team.lasttime == null) time.textContent = '-';
+            else if (parseFloat(team.lasttime) >= WINNER_TIME) time.innerHTML = winnerIconTemplate;
+            else time.textContent = parseFloat(team.lasttime).toFixed(1);
+        });
+
+        content.querySelectorAll('#group-container .group').forEach(group => {
+            const groupId = this.#groupIds.get(group);
+            const state = data.groups[groupId];
+            const button = group.querySelector('.foot .button');
+
+            if (state.status === 'DONE') {
+                button.disabled = false;
+                button.textContent = 'VISUALIZAR BATALHA';
+                button.onclick = () => {
+                    window.open(`play/${state.hash}`);
+                    group.classList.remove('hide-info');
+                    this.#revealed.add(groupId);
+                    this.refresh();
+                };
+                if (this.#manager) {
+                    button.innerHTML = reloadButtonTemplate;
+                    button.querySelector('.reload').addEventListener('click', event => {
+                        event.stopPropagation();
+                        this.#runGroup(groupId, button, true);
+                    });
+                }
+            }
+            else if (state.status === 'RUN') {
+                group.classList.add('hide-info');
+                button.textContent = 'Grupo pronto. Aguardando batalha...';
+                if (group.querySelector('.team.myteam')) this.#lockPrepare(content.querySelector('#prepare'));
+                if (this.#manager) {
+                    button.textContent = 'Executar Batalha';
+                    button.disabled = false;
+                    button.onclick = () => this.#runGroup(groupId, button);
+                }
+            }
+            else if (state.status === 'WAIT') {
+                const number = button.querySelector('.number');
+                if (number) number.textContent = state.value;
+                button.classList.toggle('one', state.value == 1);
+            }
+        });
+
+        const groups = Object.values(data.groups);
+        const prepare = content.querySelector('#prepare');
+        if (prepare && this.#manager && data.status === 'SUCCESS' && groups.every(group => group.status === 'DONE')) {
+            prepare.disabled = false;
+            prepare.textContent = 'Preparar próxima rodada';
+            prepare.onclick = async () => {
+                await TournamentModel.nextRound(this.hash);
+                this.refresh();
+            };
+        }
+
+        if (data.status === 'NEXT' || data.status === 'END') {
+            const next = content.querySelector('#next-round');
+            next.disabled = false;
+            prepare?.remove();
+            content.querySelectorAll('#button-container .arrow').forEach(arrow => arrow.classList.add('nobutton'));
+            next.onclick = () => {
+                location.href = data.status === 'END'
+                    ? `tourn/${this.hash}/0`
+                    : `tourn/${this.hash}/${parseInt(this.round, 10) + 1}`;
+            };
+        }
+    }
 }
 
-function msToTime(ms) {
-    var s = Math.floor(ms / 1000);
-    var m = Math.floor(s / 60);
-    s = s % 60;
-    var h = Math.floor(m / 60);
-    m = m % 60;
-
-    if (h < 10)
-        h = '0' + h;
-    if (m < 10)
-        m = '0' + m;
-    if (s < 10)
-        s = '0' + s;
-
-    return [h, m, s];
-}
+new TournamentRound(takeHidden('hash'), takeHidden('round')).show();
