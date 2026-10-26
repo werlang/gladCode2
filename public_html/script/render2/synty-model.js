@@ -127,7 +127,6 @@ const IK_VECTORS = ['up', 'aim', 'side', 'from', 'to', 'at', 's', 'e', 'h', 'dir
 
 const FINGER = /^(Thumb|IndexFinger|Finger)_/;
 const SIDES = ['L', 'R'];
-const HAND_OFFSET_CM = 8;
 const HIP_JOINT_HEIGHT = 2 * LEG_SEGMENT + FOOT_HEIGHT;
 /** Bones of the cape chain (Synty back attachment 03), top to bottom. */
 const CAPE_BONES = ['Capes_01', 'back_02', 'back_03', 'back_04', 'back_05'];
@@ -358,7 +357,6 @@ class SyntyAssets {
      * @returns {{ hero: import('three').Bone, anim: import('three').Bone, links: object[] }} Rig.
      */
     createRig() {
-        const THREE = this.#THREE;
         const hero = this.createSkeleton();
         const anim = this.#animationRoot.clone(true);
         const animByName = new Map();
@@ -395,7 +393,6 @@ class SyntyAssets {
      * @returns {{ position: import('three').Vector3, quaternion: import('three').Quaternion }} Mount transform in cm.
      */
     mountFrame(side) {
-        const THREE = this.#THREE;
         const socket = this.#animationRoot.getObjectByName(`Prop_${side}`);
         const hand = `Hand_${side}`;
         const heroInverse = this.#bindQuaternion(this.#bindWorld, hand).invert();

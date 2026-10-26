@@ -1,4 +1,4 @@
-import { FONT, ICON_FONT, INK, NUMBER_FONT, TITLE_FONT, nineSlice, outlined, roundRect } from './hud.js';
+import { FONT, ICON_FONT, NUMBER_FONT, TITLE_FONT, nineSlice, outlined, roundRect } from './hud.js';
 import { INSPECT_LABELS } from './camera-controller.js';
 
 /** Font Awesome 6 solid glyphs used as icons. */

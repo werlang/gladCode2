@@ -210,7 +210,6 @@ class CrowdBaker {
      * the head pivot as origin and the character's axes).
      */
     #attachments(roots, headPosition, indexed) {
-        const THREE = this.#THREE;
         const lists = { position: [], uv: [], normal: [], index: [] };
         let count = 0;
         for (const root of roots) {

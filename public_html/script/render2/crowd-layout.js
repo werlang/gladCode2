@@ -88,7 +88,6 @@ export function seats(plan) {
  */
 export function planCrowd(plan, random = Math.random, posts = [], throne = null) {
     const free = seats(plan);
-    const rows = STAND_PROFILE.treads - FIRST_ROW;
     const taken = new Set();
     const key = (seat) => `${seat.x.toFixed(2)}|${seat.z.toFixed(2)}`;
 
