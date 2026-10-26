@@ -2,14 +2,8 @@
 temp/*
 node_modules
 cwp_stats
-node/package.json
-node/package-lock.json
-config.json
 nginx/*
 .env
-public_html/logs/*
-public_html/profpics/*
-public_html/runs/*
 .DS_Store
 backup/gcloud_config.json
 *.sql
@@ -21,3 +15,8 @@ probe-anim*.png
 
 # Persistent data of the Node services (profile pictures, battle logs, run folders)
 data/
+
+# Left behind by the PHP stack (old logs, runs, dumps, private configs): move what you need to data/
+public_html/
+node/
+config/

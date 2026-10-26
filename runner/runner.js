@@ -5,7 +5,8 @@ import { exec } from 'child_process';
 class Runner {
     constructor({ dirname, nglads, codes, sandbox, noitems }) {
         this.dirname = dirname;
-        this.tmpDirPHP = path.join('/phppayload', this.dirname);
+        // the run folder the API prepared (data/runs on the host)
+        this.requestDir = path.join('/requests', this.dirname);
         this.tmpDir = path.join('/runs', this.dirname);
         this.nglads = nglads;
         this.codes = JSON.parse(codes || '[]');
@@ -17,11 +18,11 @@ class Runner {
 
     async run() {
         // write files
-        fs.cpSync(this.tmpDirPHP, this.tmpDir, { recursive: true });
+        fs.cpSync(this.requestDir, this.tmpDir, { recursive: true });
         const response = await this.runSimulation();
         // remove temporary files
         fs.rmSync(this.tmpDir, { recursive: true, force: true });
-        fs.rmSync(this.tmpDirPHP, { recursive: true, force: true });
+        fs.rmSync(this.requestDir, { recursive: true, force: true });
 
         return response;
     }
@@ -57,7 +58,7 @@ class Runner {
 
                     // remove dirs
                     fs.rmSync(this.tmpDir, { recursive: true, force: true });
-                    fs.rmSync(this.tmpDirPHP, { recursive: true, force: true });
+                    fs.rmSync(this.requestDir, { recursive: true, force: true });
                 });
             }
         }, 30000);

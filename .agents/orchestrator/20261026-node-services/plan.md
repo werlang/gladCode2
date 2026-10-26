@@ -93,7 +93,11 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] Cron: `api/scripts/remove-old-battles.js` (host crontab:
       `docker compose exec -T api node scripts/remove-old-battles.js`); back_simulation.php and
       battle_results.php removed (no callers)
-- [ ] Retire public_html/Apache/node, compose for production, docs
+- [x] compress_functions.php → `web/scripts/compress-functions.js`; old compiler samples removed
+- [x] Retired `public_html/`, Apache (service and Dockerfile), `node/`, `config/`, PHPMailer; the
+      runner reads the API's run folders at `/requests`. Untracked leftovers (old logs, runs, the
+      dump, private configs) are gitignored for the maintainer to move or delete
+- [ ] Compose for production, docs
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
 cookie for `localhost` (web on 8085, API on 8086, old Apache on 8087).
