@@ -89,7 +89,10 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] Admin dev-tools: `/admin/tournaments` (test tournaments by the `[DEV-TEST]` marker, no token
       files), `/dev-tools` page, `api/scripts/dev-tournament.js` behind `dev-tools/tournament.sh`;
       repo-level `dev-tools/` keeps the dump script and news SQL; the Synty viewer is in `web/public/dev-tools/`
-- [ ] Cron, engine test, PHP tests
+- [x] PHP tests to Vitest, engine regression checker on Node (e6ae1f3f3)
+- [x] Cron: `api/scripts/remove-old-battles.js` (host crontab:
+      `docker compose exec -T api node scripts/remove-old-battles.js`); back_simulation.php and
+      battle_results.php removed (no callers)
 - [ ] Retire public_html/Apache/node, compose for production, docs
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
