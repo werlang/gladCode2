@@ -214,16 +214,6 @@ export class NotificationModel {
 }
 
 /**
- * Email notices the browser still asks for (tournaments, until their endpoints send them).
- */
-export class MailModel {
-    /** @param {string} hash Tournament hash whose new round started. */
-    static tournament(hash) {
-        return api.post('back_sendmail.php', { action: 'TOURNAMENT', hash });
-    }
-}
-
-/**
  * Ranked battles (`/battles/ranked`): matchmaking, then the battle with its rewards.
  */
 export class RankedModel {

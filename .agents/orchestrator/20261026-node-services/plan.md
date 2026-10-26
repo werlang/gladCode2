@@ -77,10 +77,10 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
 - [x] API foundation (88375e749), web foundation (55780e2d8), auth and users (53f60ef06), news (645f31605)
 - [x] Gladiators, editor test battles, logs, battle core (c498d8e18): `model/battle.js` is the shared
       battle runner; ranked, duel, tournament and training runs still go through it in their phases.
-- [ ] Potions and replay preferences
-- [ ] Ranking, stats
-- [ ] Reports, duels, friends, messages, notifications, mail, matchmaking + ranked battles
-- [ ] Tournaments, trainings
+- [x] Potions and replay preferences (3d78f9586), ranking and stats (5399815c0)
+- [x] Friends, messages, reports, notifications, mail (590e73a89); duels, ranked battles, server-side stats (5f5add820)
+- [x] Tournaments: setup, teams, rounds, group battles (lock per group), start and round emails sent by the API
+- [ ] Trainings
 - [ ] Release, thanks, admin dev-tools, cron, engine test, PHP tests
 - [ ] Retire public_html/Apache/node, compose for production, docs
 

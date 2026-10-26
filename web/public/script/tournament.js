@@ -3,7 +3,7 @@ import { Countdown, countdownDigitsTemplate } from './components/countdown.js';
 import { showMessage } from './components/dialog.js';
 import { gladOfCard, loadGladCards } from './components/glad-card.js';
 import { runSimulation } from './components/simulation.js';
-import { createElement, renderTemplate } from './helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { TournamentModel } from './models/tournament.js';
 import {
@@ -50,14 +50,19 @@ class TournamentRound {
 
     /** Loads the round and renders it, the final ranking or a redirect. */
     async show() {
-        const data = await TournamentModel.round(this.hash, this.round);
-        if (data.status === 'REDIRECT') {
+        let data;
+        try {
+            data = await TournamentModel.round(this.hash, this.round);
+        }
+        catch (error) {
+            if (error.status !== 404) throw error;
+            location.href = '/';
+            return;
+        }
+        if (data.status === 'redirect') {
             location.href = `tourn/${this.hash}/${data.round}`;
         }
-        else if (data.status === 'NOTFOUND') {
-            location.href = 'index';
-        }
-        else if (data.status === 'END') {
+        else if (data.status === 'end') {
             this.#showRanking(data);
         }
         else {
@@ -79,7 +84,7 @@ class TournamentRound {
         }).join('');
         content.innerHTML = renderTemplate(finalRankingTemplate, { name: data.tournament, rows });
         content.querySelector('#back-round').addEventListener('click', () => {
-            location.href = `tourn/${this.hash}/${data.maxround}`;
+            location.href = `tourn/${this.hash}/${data.maxRound}`;
         });
     }
 
@@ -102,7 +107,7 @@ class TournamentRound {
             number: index + 1,
             round: tournament.round,
             teams: teamsByGroup.get(groupId).map(team => renderTemplate(teamTemplate, {
-                mine: team.myteam === true ? 'myteam' : '',
+                mine: team.mine ? 'myteam' : '',
                 name: team.name,
             })).join(''),
         })).join('');
@@ -134,7 +139,7 @@ class TournamentRound {
         }
 
         this.#manager = Boolean(tournament.manager);
-        const myTeam = data.teams.find(team => team.myteam === true);
+        const myTeam = data.teams.find(team => team.mine);
         const prepare = content.querySelector('#prepare');
         if (myTeam) {
             prepare.textContent = 'PREPARAR-SE';
@@ -156,7 +161,7 @@ class TournamentRound {
             content.querySelectorAll('#button-container .arrow').forEach(arrow => arrow.classList.add('nobutton'));
         }
 
-        this.#startCountdown(tournament.deadline, tournament.timenow);
+        this.#startCountdown(tournament.deadline, tournament.now);
     }
 
     /**
@@ -208,14 +213,16 @@ class TournamentRound {
      * @param {HTMLButtonElement} prepare The round button.
      */
     async #prepare(round, nick, team, prepare) {
-        const data = await TournamentModel.teamGladiators(this.hash, round);
-        if (data.status === 'LOCK') {
-            showMessage('Tarde demais. Seu grupo já encerrou as inscrições');
-            this.#lockPrepare(prepare);
-            return;
+        let glads;
+        try {
+            glads = await TournamentModel.teamGladiators(this.hash, round);
         }
-        if (data.status === 'NOTFOUND') {
-            showMessage('Lista de gladiadores não encontrada');
+        catch (error) {
+            if (error.code === 'GROUP_LOCKED') {
+                showMessage('Tarde demais. Seu grupo já encerrou as inscrições');
+                this.#lockPrepare(prepare);
+            }
+            else showMessage('Lista de gladiadores não encontrada');
             return;
         }
 
@@ -226,22 +233,25 @@ class TournamentRound {
 
         fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
         choose.addEventListener('click', async () => {
-            const answer = await TournamentModel.choose(this.hash, selected.id);
-            if (answer.status === 'DEAD') {
-                showMessage('Este gladiador está gravemente ferido e não poderá mais participar deste torneio');
+            try {
+                await TournamentModel.choose(this.hash, selected.id);
             }
-            else if (answer.status === 'OLD') {
-                showMessage('Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o');
+            catch (error) {
+                const problems = {
+                    GLADIATOR_DEAD: 'Este gladiador está gravemente ferido e não poderá mais participar deste torneio',
+                    GLADIATOR_OUTDATED: 'Este gladiador está desatualizado e não pode ser escolhido. Para atualizá-lo, altere ele no editor e salve-o',
+                    GROUP_DONE: 'A batalha do seu grupo já aconteceu nesta rodada',
+                };
+                showMessage(problems[error.code] ?? 'Não foi possível escolher este gladiador');
+                return;
             }
-            else if (answer.status === 'SUCCESS') {
-                fog.remove();
-                showMessage(`Sua equipe escolheu o gladiador <span class='highlight'>${selected.name}</span> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`);
-            }
+            fog.remove();
+            showMessage(`Sua equipe escolheu o gladiador <span class='highlight'>${escapeHtml(selected.name)}</span> para participar desta rodada. Assim que todas equipes escolherem seus representantes a batalha iniciará.`);
         });
 
         const selectable = card => !card.classList.contains('dead') && !card.classList.contains('old');
         await loadGladCards(fog.querySelector('.glad-card-container'), {
-            glads: data.glads,
+            glads,
             code: true,
             master: true,
             dead: true,
@@ -269,7 +279,7 @@ class TournamentRound {
     async #runGroup(groupId, button, force = false) {
         button.disabled = true;
         button.textContent = 'Aguardando batalha...';
-        await runSimulation({ tournament: groupId, origin: 'tourn', ...(force ? { force: true } : {}) });
+        await runSimulation(signal => TournamentModel.runGroup(this.hash, groupId, { force, signal }));
         this.refresh();
     }
 
@@ -299,7 +309,7 @@ class TournamentRound {
             const state = data.groups[groupId];
             const button = group.querySelector('.foot .button');
 
-            if (state.status === 'DONE') {
+            if (state.status === 'done') {
                 button.disabled = false;
                 button.textContent = 'VISUALIZAR BATALHA';
                 button.onclick = () => {
@@ -316,26 +326,26 @@ class TournamentRound {
                     });
                 }
             }
-            else if (state.status === 'RUN') {
+            else if (state.status === 'ready' || state.status === 'locked') {
                 group.classList.add('hide-info');
                 button.textContent = 'Grupo pronto. Aguardando batalha...';
                 if (group.querySelector('.team.myteam')) this.#lockPrepare(content.querySelector('#prepare'));
-                if (this.#manager) {
+                if (this.#manager && state.status === 'ready') {
                     button.textContent = 'Executar Batalha';
                     button.disabled = false;
                     button.onclick = () => this.#runGroup(groupId, button);
                 }
             }
-            else if (state.status === 'WAIT') {
+            else if (state.status === 'wait') {
                 const number = button.querySelector('.number');
-                if (number) number.textContent = state.value;
-                button.classList.toggle('one', state.value == 1);
+                if (number) number.textContent = state.remaining;
+                button.classList.toggle('one', state.remaining === 1);
             }
         });
 
         const groups = Object.values(data.groups);
         const prepare = content.querySelector('#prepare');
-        if (prepare && this.#manager && data.status === 'SUCCESS' && groups.every(group => group.status === 'DONE')) {
+        if (prepare && this.#manager && data.status === 'open' && groups.every(group => group.status === 'done')) {
             prepare.disabled = false;
             prepare.textContent = 'Preparar próxima rodada';
             prepare.onclick = async () => {
@@ -344,13 +354,13 @@ class TournamentRound {
             };
         }
 
-        if (data.status === 'NEXT' || data.status === 'END') {
+        if (data.status === 'next' || data.status === 'end') {
             const next = content.querySelector('#next-round');
             next.disabled = false;
             prepare?.remove();
             content.querySelectorAll('#button-container .arrow').forEach(arrow => arrow.classList.add('nobutton'));
             next.onclick = () => {
-                location.href = data.status === 'END'
+                location.href = data.status === 'end'
                     ? `tourn/${this.hash}/0`
                     : `tourn/${this.hash}/${parseInt(this.round, 10) + 1}`;
             };

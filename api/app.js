@@ -17,6 +17,9 @@ import { potionsRouter } from './route/potions.js';
 import { rankingRouter } from './route/ranking.js';
 import { reportsRouter } from './route/reports.js';
 import { statsRouter } from './route/stats.js';
+import { teamsRouter } from './route/teams.js';
+import { tournamentRoundsRouter } from './route/tournament-rounds.js';
+import { tournamentsRouter } from './route/tournaments.js';
 import { usersRouter } from './route/users.js';
 
 const port = 3000;
@@ -62,6 +65,9 @@ app.use('/messages', messagesRouter);
 app.use('/reports', reportsRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/duels', duelsRouter);
+app.use('/tournaments', tournamentsRouter);
+app.use('/teams', teamsRouter);
+app.use('/tournament-rounds', tournamentRoundsRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

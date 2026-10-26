@@ -1,9 +1,8 @@
 import { decorateCheckSliders } from '../components/form-controls.js';
 import { loadGladCards, loadSelectableCards } from '../components/glad-card.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
-import { MailModel } from '../models/social.js';
 import { TournamentModel } from '../models/tournament.js';
 import {
     addGladTemplate,
@@ -60,6 +59,28 @@ export function validRoundTime(value) {
 }
 
 /**
+ * Minutes in a round time field ("1h 30m" or "45m").
+ *
+ * @param {string} value Field value.
+ * @returns {number}
+ */
+export function roundMinutes(value) {
+    const text = value.includes('h ') ? value : `00h ${value}`;
+    const [hours, rest] = text.split('h ');
+    return parseInt(hours, 10) * 60 + parseInt(rest, 10);
+}
+
+/** What to tell the master when a team refuses them, by API error code. */
+const TEAM_ERRORS = {
+    WRONG_WORD: 'Senha incorreta',
+    TOURNAMENT_STARTED: 'Este torneio já iniciou',
+    ALREADY_IN_TOURNAMENT: 'Você já participa de uma equipe deste torneio',
+    TEAM_FULL: 'Esta equipe já está completa',
+    SAME_GLADIATOR: 'Este gladiador já faz parte da equipe',
+    ALREADY_ENLISTED: 'Neste torneio cada mestre inscreve um gladiador',
+};
+
+/**
  * Shows a validation tip above a field.
  *
  * @param {HTMLElement} field Invalid field.
@@ -108,9 +129,9 @@ function chooseGladiator() {
         choose.addEventListener('click', async () => {
             const glad = (await picked)();
             if (!glad) return;
-            const showcode = fog.querySelector('#show-code input').checked;
+            const showCode = fog.querySelector('#show-code input').checked;
             fog.remove();
-            resolve({ glad: glad.id, showcode });
+            resolve({ gladiator: glad.id, showCode });
         });
     });
 }
@@ -145,16 +166,16 @@ class TeamWindow {
     /** Draws the team's gladiators. */
     async refresh() {
         const data = await TournamentModel.team(this.team.id);
-        if (data.status !== 'DONE') return;
         const window_ = this.fog.querySelector('.tourn.window');
         this.word = data.word;
         if (data.word) window_.querySelector('#word span').textContent = data.word;
         else window_.querySelector('#word')?.remove();
 
-        const known = data.glads.every(glad => typeof glad === 'object');
-        const glads = data.glads.map(glad => (typeof glad === 'object'
-            ? { ...glad, id: glad.cod, user: glad.apelido }
-            : { name: '??????????', vstr: '??', vagi: '??', vint: '??', skin: '', user: glad }));
+        // members see the gladiators; others only who brought them
+        const known = data.member;
+        const glads = known
+            ? data.gladiators
+            : data.gladiators.map(glad => ({ name: '??????????', vstr: '??', vagi: '??', vint: '??', skin: '', master: glad.master }));
 
         const container = window_.querySelector('.glad-card-container');
         container.replaceChildren();
@@ -162,7 +183,7 @@ class TeamWindow {
         cards.forEach((card, index) => {
             const glad = glads[index];
             if (!known) card.classList.add('blurred');
-            if (glad.owner === true) {
+            if (glad.mine === true) {
                 card.classList.add('mine');
                 card.querySelector('.delete').addEventListener('click', () => this.#askRemove(glad));
             }
@@ -174,7 +195,7 @@ class TeamWindow {
         const button = window_.querySelector('#join-leave');
         for (let index = glads.length; index < TEAM_SIZE; index++) {
             const add = createElement(addGladTemplate);
-            if (!known || data.flex === '0') add.classList.add('disabled');
+            if (!known || !data.flex) add.classList.add('disabled');
             else add.addEventListener('click', () => this.#addGladiator());
             container.append(add);
         }
@@ -187,57 +208,65 @@ class TeamWindow {
 
     /** @param {Record<string, any>} glad The user's gladiator in the team. */
     async #askRemove(glad) {
-        const answer = await showDialog(`Deseja remover o gladiador <span class='highlight'>${glad.name}</span> da equipe?`, ['Sim', 'Não']);
+        const answer = await showDialog(`Deseja remover o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> da equipe?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
-        const data = await TournamentModel.removeGladiator(this.team.id, glad.id);
-        if (data.status === 'STARTED') {
+        let data;
+        try {
+            data = await TournamentModel.removeGladiator(this.team.id, glad.id);
+        }
+        catch (error) {
+            if (error.code !== 'TOURNAMENT_STARTED') throw error;
             this.fog.remove();
             showMessage('Este torneio já iniciou');
+            return;
         }
-        else if (data.status === 'REMOVED') {
+        if (data.teamRemoved) {
             this.fog.remove();
-            await showMessage(`A equipe <span class='highlight'>${this.team.name}</span> foi desmantelada`);
+            await showMessage(`A equipe <span class='highlight'>${escapeHtml(this.team.name)}</span> foi desmantelada`);
             this.close();
         }
-        else if (data.status === 'DONE') {
-            showMessage(`O gladiador <span class='highlight'>${glad.name}</span> foi removido da equipe`);
-            this.refresh();
-        }
         else {
-            showMessage(data.status);
+            showMessage(`O gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> foi removido da equipe`);
+            this.refresh();
         }
     }
 
     async #addGladiator() {
         const choice = await chooseGladiator();
         if (!choice) return;
-        const data = await TournamentModel.addGladiator({ team: this.team.id, pass: this.word, ...choice });
-        if (data.status === 'SAMEGLAD') {
-            showMessage('Este gladiador já faz parte da equipe');
+        try {
+            await TournamentModel.addGladiator(this.team.id, { word: this.word, ...choice });
         }
-        else if (data.status === 'STARTED') {
-            this.fog.remove();
-            showMessage('Este torneio já iniciou');
+        catch (error) {
+            if (error.code === 'TOURNAMENT_STARTED') {
+                this.fog.remove();
+                showMessage('Este torneio já iniciou');
+            }
+            else showMessage(TEAM_ERRORS[error.code] ?? 'Não foi possível adicionar o gladiador');
+            return;
         }
-        else if (data.status === 'DONE') {
-            this.refresh();
-        }
+        this.refresh();
     }
 
     async #joinOrLeave() {
         const button = this.fog.querySelector('#join-leave');
         if (button.textContent === 'ABANDONAR') {
-            const answer = await showDialog(`Tem certeza que deseja sair da equipe <span class='highlight'>${this.team.name}</span>?`, ['Não', 'SIM']);
+            const answer = await showDialog(`Tem certeza que deseja sair da equipe <span class='highlight'>${escapeHtml(this.team.name)}</span>?`, ['Não', 'SIM']);
             if (answer !== 'SIM') return;
-            const data = await TournamentModel.leaveTeam(this.team.id);
-            this.fog.remove();
-            if (data.status === 'STARTED') {
+            let data;
+            try {
+                data = await TournamentModel.leaveTeam(this.team.id);
+            }
+            catch (error) {
+                this.fog.remove();
+                if (error.code !== 'TOURNAMENT_STARTED') throw error;
                 showMessage('Este torneio já iniciou');
                 return;
             }
-            await showMessage(data.status === 'REMOVED'
-                ? `A equipe <span class='highlight'>${this.team.name}</span> foi desmantelada`
-                : `Você não faz mais parte da equipe <span class='highlight'>${this.team.name}</span>`);
+            this.fog.remove();
+            await showMessage(data.teamRemoved
+                ? `A equipe <span class='highlight'>${escapeHtml(this.team.name)}</span> foi desmantelada`
+                : `Você não faz mais parte da equipe <span class='highlight'>${escapeHtml(this.team.name)}</span>`);
             this.close();
             return;
         }
@@ -246,14 +275,15 @@ class TeamWindow {
         if (!choice) return;
         const pass = await showInput('Senha para ingressar na equipe');
         if (pass === false) return;
-        const data = await TournamentModel.joinTeam({ team: this.team.id, pass, ...choice });
-        if (data.status === 'FAIL') showMessage('Senha incorreta');
-        else if (data.status === 'STARTED') showMessage('Este torneio já iniciou');
-        else if (data.status === 'SIGNED') showMessage('Você já participa de uma equipe deste torneio');
-        else {
-            showMessage(`Você ingressou na equipe <span class='highlight'>${this.team.name}</span>`);
-            this.refresh();
+        try {
+            await TournamentModel.joinTeam(this.team.id, { word: pass, ...choice });
         }
+        catch (error) {
+            showMessage(TEAM_ERRORS[error.code] ?? 'Não foi possível ingressar na equipe');
+            return;
+        }
+        showMessage(`Você ingressou na equipe <span class='highlight'>${escapeHtml(this.team.name)}</span>`);
+        this.refresh();
     }
 }
 
@@ -264,15 +294,15 @@ class TeamWindow {
 class TournamentWindow {
     /**
      * @param {HTMLElement} fog The join window's overlay, reused.
-     * @param {{ name: string, pass: string }} credentials Name and password as typed (they address the tournament).
-     * @param {{ name: string, pass: string, description: string }} info The tournament as the server names it.
+     * @param {{ id: number, password: string }} credentials The tournament's id and password (they address it).
+     * @param {{ name: string, password: string, description: string }} info The tournament as the server names it.
      */
     constructor(fog, credentials, info) {
         this.fog = fog;
         this.tournament = credentials;
         this.window = fog.querySelector('.tourn.window');
-        this.window.innerHTML = renderTemplate(teamsWindowTemplate, { name: info.name, pass: info.pass, description: info.description });
-        if (!info.pass) hide(this.window.querySelector('#word'));
+        this.window.innerHTML = renderTemplate(teamsWindowTemplate, { name: info.name, pass: info.password, description: info.description });
+        if (!info.password) hide(this.window.querySelector('#word'));
 
         this.window.querySelector('#close').addEventListener('click', () => this.fog.remove());
         this.window.querySelector('#new').addEventListener('click', () => this.#newTeamField());
@@ -282,7 +312,7 @@ class TournamentWindow {
     /** Draws the teams and the manager's controls. */
     async refresh() {
         const data = await TournamentModel.teams(this.tournament);
-        if (data.status === 'STARTED') {
+        if (data.started) {
             this.fog.remove();
             const answer = await showDialog('Este torneio já iniciou. Deseja acompanhá-lo?', ['Sim', 'Não']);
             if (answer === 'Sim') window.open(`tourn/${data.hash}`);
@@ -291,6 +321,7 @@ class TournamentWindow {
 
         const { teams = [] } = data;
         const joined = data.joined ?? false;
+        data.maxteams = data.maxTeams;
         const table = this.window.querySelector('.table');
         const count = this.window.querySelector('h3 #count');
         if (!teams.length) {
@@ -299,22 +330,22 @@ class TournamentWindow {
         }
         else {
             table.innerHTML = teamsHeadTemplate + teams.map(team => renderTemplate(teamRowTemplate, {
-                state: joined === team.id ? 'signed' : team.glads == TEAM_SIZE ? 'full' : '',
+                state: joined === team.id ? 'signed' : team.gladiators === TEAM_SIZE ? 'full' : '',
                 name: team.name,
-                glads: team.glads,
+                glads: team.gladiators,
             })).join('');
             count.textContent = `(${teams.length}/${data.maxteams})`;
             table.querySelectorAll('.row:not(.head)').forEach((row, index) => {
                 row.addEventListener('click', () => new TeamWindow(this, teams[index]));
                 row.querySelector('.kick').addEventListener('click', event => {
                     event.stopPropagation();
-                    this.#askKick(teams[index].name);
+                    this.#askKick(teams[index]);
                 });
             });
         }
 
         this.#managerControls(data, teams);
-        this.window.querySelector('#new-container').style.display = joined !== false || teams.length >= data.maxteams ? 'none' : '';
+        this.window.querySelector('#new-container').style.display = joined || teams.length >= data.maxteams ? 'none' : '';
     }
 
     /**
@@ -350,38 +381,39 @@ class TournamentWindow {
         const answer = await showDialog('Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas', ['Sim', 'NÃO']);
         if (answer !== 'Sim') return;
         this.fog.remove();
-        const data = await TournamentModel.start(this.tournament);
-        if (data.status === 'DONE') {
-            window.open(`tourn/${data.hash}`);
-            MailModel.tournament(data.hash);
+        try {
+            const { hash } = await TournamentModel.start(this.tournament);
+            window.open(`tourn/${hash}`);
+        }
+        catch (error) {
+            const problems = { FEW_TEAMS: 'O torneio precisa de pelo menos duas equipes', FEW_GLADIATORS: 'Todas as equipes precisam de três gladiadores' };
+            if (!problems[error.code]) throw error;
+            showMessage(problems[error.code]);
         }
     }
 
     async #askDelete() {
         const answer = await showDialog('Deseja remover o torneio?', ['Sim', 'NÃO']);
         if (answer !== 'Sim') return;
-        const data = await TournamentModel.remove(this.tournament);
-        if (data.status === 'DELETED') {
-            showMessage('Torneio removido');
-            this.fog.remove();
+        try {
+            await TournamentModel.remove(this.tournament);
         }
-        else if (data.status === 'STARTED') {
-            showMessage('Este torneio já iniciou');
+        catch (error) {
+            showMessage(error.code === 'TOURNAMENT_STARTED' ? 'Este torneio já iniciou' : 'Um torneio só pode ser removido quando não possuir equipes');
+            return;
         }
-        else {
-            showMessage('Um torneio só pode ser removido quando não possuir equipes');
-        }
+        showMessage('Torneio removido');
+        this.fog.remove();
     }
 
-    /** @param {string} team Team name. */
+    /** @param {{ id: number, name: string }} team */
     async #askKick(team) {
-        const answer = await showDialog(`Deseja expulsar a equipe <span class='highlight'>${team}</span> do torneio?`, ['Sim', 'Não']);
+        const name = escapeHtml(team.name);
+        const answer = await showDialog(`Deseja expulsar a equipe <span class='highlight'>${name}</span> do torneio?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
-        const data = await TournamentModel.kick(this.tournament, team);
-        if (data.status === 'DONE') {
-            showMessage(`Equipe <span class='highlight'>${team}</span> removida do torneio`);
-            this.refresh();
-        }
+        await TournamentModel.kick(this.tournament, team.id);
+        showMessage(`Equipe <span class='highlight'>${name}</span> removida do torneio`);
+        this.refresh();
     }
 
     /** Shows the field that names a new team. */
@@ -429,23 +461,26 @@ class TournamentWindow {
 
         const choice = await chooseGladiator();
         if (!choice) return;
-        const data = await TournamentModel.createTeam({ name, tname: this.tournament.name, tpass: this.tournament.pass, ...choice });
-        const messages = {
-            NOTFOUND: 'Torneio não encontrado',
-            ALREADYIN: 'Já está em um time neste torneio',
-            FULL: 'Este torneio já esgotou o limite de inscrições',
-        };
-        if (data === 'STARTED') {
-            this.fog.remove();
-            showMessage('Este torneio já iniciou');
+        let data;
+        try {
+            data = await TournamentModel.createTeam(this.tournament, { name, ...choice });
         }
-        else if (data === 'EXISTS') {
-            tip('Esta equipe já está registrada');
+        catch (error) {
+            const messages = {
+                TOURNAMENT_NOT_FOUND: 'Torneio não encontrado',
+                ALREADY_IN_TOURNAMENT: 'Já está em um time neste torneio',
+                TOURNAMENT_FULL: 'Este torneio já esgotou o limite de inscrições',
+            };
+            if (error.code === 'TOURNAMENT_STARTED') {
+                this.fog.remove();
+                showMessage('Este torneio já iniciou');
+            }
+            else if (error.code === 'TEAM_EXISTS') tip('Esta equipe já está registrada');
+            else if (messages[error.code]) showMessage(messages[error.code]);
+            else throw error;
+            return;
         }
-        else if (messages[data]) {
-            showMessage(messages[data]);
-        }
-        else if (data && typeof data === 'object') {
+        {
             done();
             const box = createElement(renderTemplate(teamCreatedTemplate, { name, word: data.word }));
             document.body.append(box);
@@ -489,8 +524,7 @@ export class TournamentsTab {
     async refresh() {
         const data = await TournamentModel.list(this.#offsets);
         ['mine', 'open'].forEach(list => {
-            const offset = parseInt(data.pages[list].offset, 10);
-            const total = parseInt(data.pages[list].total, 10);
+            const { offset, total } = data.pages[list];
             const end = Math.min(total, offset + PAGE_SIZE);
             this.#offsets[list] = offset;
 
@@ -504,8 +538,8 @@ export class TournamentsTab {
 
         this.#drawList(this.#wrapper.querySelector('#table-open'), data.open);
         const mine = this.#wrapper.querySelector('#mytourn.title');
-        mine.style.display = data.mytourn.length ? '' : 'none';
-        if (data.mytourn.length) this.#drawList(this.#wrapper.querySelector('#table-mytourn'), data.mytourn);
+        mine.style.display = data.mine.length ? '' : 'none';
+        if (data.mine.length) this.#drawList(this.#wrapper.querySelector('#table-mytourn'), data.mine);
     }
 
     /**
@@ -517,13 +551,13 @@ export class TournamentsTab {
             name: tournament.name,
             description: tournament.description,
             teams: tournament.teams,
-            maxteams: tournament.maxteams,
-            flex: tournament.flex == '1' ? "<i class='fas fa-check flex'></i>" : '',
+            maxteams: tournament.maxTeams,
+            flex: tournament.flex ? "<i class='fas fa-check flex'></i>" : '',
         })).join('');
         table.querySelectorAll('.row:not(.head)').forEach((row, index) => {
             row.addEventListener('click', async () => {
-                const data = await TournamentModel.find(tournaments[index].name);
-                this.#openJoin({ name: data.name, pass: data.pass, submit: true });
+                const tournament = await TournamentModel.find(tournaments[index].name);
+                this.#openJoin({ name: tournament.name, pass: tournament.password, submit: true });
             });
         });
     }
@@ -579,15 +613,20 @@ export class TournamentsTab {
         if (/\D/.test(maxteams) || maxteams < 2 || maxteams > 50) return showTip(field('#maxteams input'), 'Informe um número entre 2 e 50');
         if (!validRoundTime(maxtime)) return showTip(field('#maxtime input'), 'Formato de hora inválida');
 
-        const data = await TournamentModel.create({
-            name,
-            pass,
-            desc: field('#desc').value,
-            maxteams,
-            maxtime,
-            flex: field('#flex-team input').checked,
-        });
-        if (data === 'EXISTS') return showTip(field('#name'), 'Um torneio com este identificador já existe');
+        try {
+            await TournamentModel.create({
+                name,
+                password: pass,
+                description: field('#desc').value,
+                maxTeams: Number(maxteams),
+                maxMinutes: roundMinutes(maxtime),
+                flex: field('#flex-team input').checked,
+            });
+        }
+        catch (error) {
+            if (error.code !== 'TOURNAMENT_EXISTS') throw error;
+            return showTip(field('#name'), 'Um torneio com este identificador já existe');
+        }
 
         fog.remove();
         const content = pass
@@ -631,19 +670,24 @@ export class TournamentsTab {
      * @param {string} pass Password.
      */
     async #join(fog, name, pass) {
-        const data = await TournamentModel.find(name, pass);
         const window_ = fog.querySelector('.tourn.window');
-        if (data.status === 'NOTFOUND') {
+        let tournament;
+        try {
+            tournament = await TournamentModel.find(name, pass);
+        }
+        catch (error) {
+            if (error.code !== 'TOURNAMENT_NOT_FOUND') throw error;
             clearTips(window_);
             ['#name', '#pass'].forEach(selector => window_.querySelector(selector).classList.add('error'));
             showTip(window_.querySelector('#name'), 'Torneio não encontrado');
+            return;
         }
-        else if (data.hash) {
+        if (tournament.hash) {
             fog.remove();
-            window.open(`tourn/${data.hash}`);
+            window.open(`tourn/${tournament.hash}`);
         }
         else {
-            new TournamentWindow(fog, { name, pass }, data);
+            new TournamentWindow(fog, { id: tournament.id, password: tournament.password }, tournament);
         }
     }
 }
