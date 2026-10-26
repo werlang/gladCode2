@@ -26,6 +26,120 @@ export class TrainingModel {
     }
 
     /**
+     * Creates a training (tutor accounts).
+     *
+     * @param {{ name: string, desc: string, maxtime: number, players: number, weight: number }} training
+     * @returns {Promise<{ status: 'SUCCESS'|'NOPREMIUM'|'NOCREDITS'|string, hash?: string }>}
+     */
+    static create(training) {
+        return api.post(TRAIN, { action: 'CREATE', ...training });
+    }
+
+    /**
+     * Pages of the trainings the user manages and takes part in.
+     *
+     * @param {{ manage: number, part: number }} offsets First row of each list.
+     * @returns {Promise<Record<string, any>>} `redirect` names a training to open (just joined from a link).
+     */
+    static list({ manage, part }) {
+        return api.post(TRAIN, { action: 'LIST', moffset: manage, poffset: part });
+    }
+
+    /**
+     * A training waiting to start, as its manager or a participant sees it.
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<Record<string, any>>} `status` is `MANAGE`, `PARTICIPATE`, `STARTED`, `NOTALLOWED` or `NOTFOUND`.
+     */
+    static room(id) {
+        return api.post(TRAIN, { action: 'ROOM', id });
+    }
+
+    /**
+     * Renames a training or changes its description (manager only).
+     *
+     * @param {number} id Training id.
+     * @param {'name'|'description'} field Field.
+     * @param {string} value New text.
+     * @returns {Promise<{ status: string, message?: string }>}
+     */
+    static edit(id, field, value) {
+        return api.post(TRAIN, { action: 'EDIT', id, field, value });
+    }
+
+    /**
+     * Issues a new invitation hash (manager only).
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<{ status: string, hash?: string }>}
+     */
+    static renew(id) {
+        return api.post(TRAIN, { action: 'RENEW', id });
+    }
+
+    /**
+     * Removes a participant (manager only).
+     *
+     * @param {number} id Training id.
+     * @param {number} glad Participant's gladiator.
+     * @returns {Promise<{ status: string }>}
+     */
+    static kick(id, glad) {
+        return api.post(TRAIN, { action: 'KICK', id, glad });
+    }
+
+    /**
+     * Leaves a training.
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<{ status: string }>}
+     */
+    static leave(id) {
+        return api.post(TRAIN, { action: 'KICK', id, myself: true });
+    }
+
+    /**
+     * Deletes a training without participants (manager only).
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<{ status: string }>}
+     */
+    static remove(id) {
+        return api.post(TRAIN, { action: 'DELETE', id });
+    }
+
+    /**
+     * Deletes a training that already ran, with its results (manager only).
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<{ status: string }>}
+     */
+    static purge(id) {
+        return api.post(TRAIN, { action: 'REMOVE', id });
+    }
+
+    /**
+     * Swaps the user's gladiator in a training.
+     *
+     * @param {number} id Training id.
+     * @param {number} glad New gladiator.
+     * @returns {Promise<{ status: string }>}
+     */
+    static changeGladiator(id, glad) {
+        return api.post(TRAIN, { action: 'CHANGE', id, glad });
+    }
+
+    /**
+     * Starts a training (manager only).
+     *
+     * @param {number} id Training id.
+     * @returns {Promise<{ status: string, hash?: string }>}
+     */
+    static start(id) {
+        return api.post(TRAIN, { action: 'START', id });
+    }
+
+    /**
      * A round of a training: its groups and teams, or the final ranking.
      *
      * @param {string} hash Training hash.

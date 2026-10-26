@@ -62,13 +62,14 @@ function showCode({ code, blocks }) {
  * @param {object[]} [options.glads] Gladiators to show; the signed-in user's when omitted.
  * @param {boolean} [options.dead] Show dead gladiators (`dead` set) in the death pose.
  * @param {boolean} [options.code] Add the button that shows the gladiator's code.
+ * @param {(glad: object) => void} [options.onCode] Replaces what the code button does.
  * @param {boolean} [options.master] Show the owner's nickname.
  * @param {boolean} [options.remove] Keep the delete button.
  * @param {(event: MouseEvent, glad: object, index: number) => void} [options.onClick] Card click.
  * @param {(event: MouseEvent, glad: object, index: number) => void} [options.onDoubleClick] Card double click.
  * @returns {Promise<HTMLElement[]>} The card elements.
  */
-export async function loadGladCards(container, { glads, dead, code, master, remove, onClick, onDoubleClick } = {}) {
+export async function loadGladCards(container, { glads, dead, code, master, remove, onClick, onDoubleClick, onCode } = {}) {
     const list = glads ?? await GladiatorModel.list();
 
     const cards = list.map((glad, index) => {
@@ -87,10 +88,10 @@ export async function loadGladCards(container, { glads, dead, code, master, remo
         if (!code) {
             codeButton.remove();
         }
-        else if (glad.code) {
+        else if (glad.code || onCode) {
             codeButton.addEventListener('click', event => {
                 event.stopPropagation();
-                showCode(glad);
+                (onCode ?? showCode)(glad);
             });
         }
         else {
@@ -114,4 +115,35 @@ export async function loadGladCards(container, { glads, dead, code, master, remo
     });
 
     return cards;
+}
+
+/**
+ * Renders cards the user picks one of: a click selects a card and enables
+ * `button`, a double click presses it. Old (and, with `dead`, dead)
+ * gladiators cannot be picked.
+ *
+ * @param {HTMLElement} container Where the cards go.
+ * @param {HTMLButtonElement} button The confirm button.
+ * @param {object} [options] {@link loadGladCards} options (`glads`, `dead`, `code`, `master`).
+ * @returns {Promise<() => Record<string, any>|null>} Reads the picked gladiator.
+ */
+export async function loadSelectableCards(container, button, options = {}) {
+    let selected = null;
+    const selectable = card => !card.classList.contains('old') && !card.classList.contains('dead');
+
+    await loadGladCards(container, {
+        ...options,
+        onClick: event => {
+            const card = event.currentTarget;
+            if (!selectable(card)) return;
+            container.querySelectorAll('.glad-preview').forEach(other => other.classList.remove('selected'));
+            card.classList.add('selected');
+            selected = gladOfCard(card);
+            button.disabled = false;
+        },
+        onDoubleClick: event => {
+            if (selectable(event.currentTarget) && selected) button.click();
+        },
+    });
+    return () => selected;
 }

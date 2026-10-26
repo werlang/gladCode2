@@ -149,3 +149,28 @@ export function toggle(element, visible = !isVisible(element)) {
 export function isVisible(element) {
     return Boolean(element && (element.offsetWidth || element.offsetHeight || element.getClientRects().length));
 }
+
+/**
+ * Animates a number from one value to another, easing out.
+ *
+ * @param {{ from: number, to: number, duration?: number, onStep: (value: number) => void }} options
+ * @returns {Promise<void>} Resolves at the end value.
+ */
+export function animateValue({ from, to, duration = 1500, onStep }) {
+    const start = Number(from) || 0;
+    const end = Number(to) || 0;
+    if (reducedMotion() || duration <= 0 || start === end) {
+        onStep(end);
+        return Promise.resolve();
+    }
+    return new Promise(resolve => {
+        const began = performance.now();
+        const frame = now => {
+            const progress = Math.min(1, (now - began) / duration);
+            onStep(start + (end - start) * (1 - (1 - progress) ** 3));
+            if (progress < 1) requestAnimationFrame(frame);
+            else resolve();
+        };
+        requestAnimationFrame(frame);
+    });
+}

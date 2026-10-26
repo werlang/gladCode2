@@ -18,7 +18,6 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Perfil</title>
     <link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
-    <link type='text/css' rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
@@ -28,14 +27,15 @@
     <!-- <link rel='stylesheet' href="css/chat.css"/> -->
     <link rel='stylesheet' href="css/croppie.css"/>
     <link rel='stylesheet' href="css/slider.css"/>
+    <link rel='stylesheet' href="css/ui-slider.css"/>
     <link rel='stylesheet' href="css/radio.css"/>
     <link rel='stylesheet' href="css/checkboxes.css"/>
     <link rel='stylesheet' href="css/table2.css"/>
     <link rel='stylesheet' href="css/header.css"/>
     
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("profile.js") ?>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
@@ -44,27 +44,9 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
     
-    <script src="script/assets.js"></script>
-    <script src="script/dropzone.js"></script>
     <script src="script/croppie.js"></script>
-    <script src="script/profile-tourn.js"></script>
-    <script src="script/profile-train.js"></script>
-    <script src="script/profile-report.js"></script>
-    <script src="script/profile-rank.js"></script>
-    <script src="script/profile-potions.js"></script>
     <!-- <script src="script/chat.js"></script> -->
-    <script src="script/glad-card.js"></script>
-    <script type="module" src="script/profile.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/radio.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/checkboxes.js"></script>
-    <script src="script/stats_func.js"></script>
-    <script src="script/emoji.js"></script>
     
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
-    <script type="module" src="script/blocks.js"></script>
     
     </head>
 
@@ -82,9 +64,9 @@
     <?php
         include("header.php");
         if(isset($_GET['t']))
-            echo "<div id='tab' hidden>". $_GET['t'] ."</div>";
+            echo "<div id='tab' hidden>". htmlspecialchars($_GET['t']) ."</div>";
         if(isset($_GET['s']))
-            echo "<div id='subtab' hidden>". $_GET['s'] ."</div>";
+            echo "<div id='subtab' hidden>". htmlspecialchars($_GET['s']) ."</div>";
     ?>
     <div id='frame'>
         <div id='menu'>
