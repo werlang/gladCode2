@@ -5,6 +5,7 @@ import { Mysql } from './helpers/mysql.js';
 import { corsMiddleware, csrfOriginMiddleware, requestLogMiddleware, securityHeadersMiddleware } from './helpers/platform.js';
 import { errorMiddleware } from './middleware/error.js';
 import { authRouter } from './route/auth.js';
+import { newsRouter } from './route/news.js';
 import { usersRouter } from './route/users.js';
 
 const port = 3000;
@@ -38,6 +39,7 @@ app.get('/ready', async (req, res, next) => {
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/news', newsRouter);
 
 app.use((req, res, next) => {
     next(new CustomError(404, 'Resource not found.', 'NOT_FOUND'));

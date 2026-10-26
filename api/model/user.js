@@ -83,6 +83,11 @@ export class User extends Model {
         return admins.includes(String(this.email || '').toLowerCase());
     }
 
+    /** Records that the user read the news feed, which clears the news counter. */
+    async markNewsRead() {
+        await Mysql.update('usuarios', { read_news: Mysql.raw('NOW(3)') }, { id: this.id });
+    }
+
     /** Records that the user was just active. */
     async touch() {
         await Mysql.update('usuarios', { ativo: Mysql.raw('NOW()') }, { id: this.id });

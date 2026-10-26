@@ -11,12 +11,14 @@ import { postTemplate } from './templates/post.js';
 async function showPost() {
     const hash = TemplateVar.get('postHash') ?? '';
 
-    const data = await NewsModel.get(hash);
-    if (data.status === 'EMPTY') {
-        location.href = 'index';
-        return;
+    let data;
+    try {
+        data = await NewsModel.get(hash);
     }
-    if (data.status !== 'SUCCESS') return;
+    catch (error) {
+        if (error.code === 'NEWS_NOT_FOUND' || error.code === 'INVALID_HASH') location.href = '/';
+        throw error;
+    }
 
     document.querySelector('#post').innerHTML = renderTemplate(postTemplate, {
         title: data.post.title,
@@ -24,7 +26,7 @@ async function showPost() {
         body: data.post.body,
     });
 
-    [['prev', data.prev], ['next', data.next]].forEach(([id, target]) => {
+    [['prev', data.previous], ['next', data.next]].forEach(([id, target]) => {
         if (!target) return;
         const link = document.querySelector(`#${id}`);
         link.classList.remove('disabled');

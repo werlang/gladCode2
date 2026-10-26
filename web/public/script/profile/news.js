@@ -9,10 +9,10 @@ import { newsPostTemplate, shareLinkTemplate } from '../templates/profile.js';
 /**
  * Opens the window with a post's public link.
  *
- * @param {string|number} id Post id.
+ * @param {string} hash Post hash.
  */
-function sharePost(id) {
-    const fog = createElement(renderTemplate(shareLinkTemplate, { link: `https://gladcode.dev/post/${id}` }));
+function sharePost(hash) {
+    const fog = createElement(renderTemplate(shareLinkTemplate, { link: `${location.origin}/post/${hash}` }));
     document.body.append(fog);
     fadeIn(fog, undefined, 'flex');
     fog.addEventListener('click', () => fog.remove());
@@ -32,15 +32,15 @@ export class NewsTab {
 
     /** Loads the first page of posts. */
     async show() {
-        const data = await NewsModel.list(0);
+        const posts = await NewsModel.list(0);
         this.#container.replaceChildren();
-        data.posts.forEach(post => {
+        posts.forEach(post => {
             const element = createElement(renderTemplate(newsPostTemplate, {
                 title: post.title,
                 time: formatMessageTime(post.time, { monthFull: true }),
-                body: post.post,
+                body: post.body,
             }));
-            element.querySelector('.share').addEventListener('click', () => sharePost(post.id));
+            element.querySelector('.share').addEventListener('click', () => sharePost(post.hash));
             this.#container.append(element);
         });
     }
