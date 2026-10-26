@@ -34,17 +34,6 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
 
-    <!-- <script src="script/fallback/font-awesome.js" crossorigin="anonymous"></script>
-    <script src="script/fallback/cloudinary.js"></script>
-    <script src="script/fallback/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="script/fallback/ace-ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-    <script src="script/fallback/prism.min.js"></script>
-    <script src="script/fallback/prism-autoloader.min.js"></script>
-    <script>Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/'</script>
-    <script src="script/fallback/blockly.min.js"></script>
-    <script src="script/fallback/blockly-pt-br.js"></script>
-    <script src="script/fallback/blockly-python.js"></script> -->
-
     
     
     </head>

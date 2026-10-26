@@ -26,10 +26,6 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/blockly.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/msg/pt-br.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
-
-    <!-- <script src="script/fallback/blockly.min.js"></script>
-    <script src="script/fallback/blockly-pt-br.js"></script>
-    <script src="script/fallback/blockly-python.js"></script> -->
     
     
     

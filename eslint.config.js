@@ -26,8 +26,8 @@ const rules = {
 
 export default [
     {
-        // vendored libraries and generated data stay as shipped
-        ignores: ['public_html/script/phaser.js', 'public_html/script/croppie.js', 'public_html/script/fallback/**'],
+        // vendored libraries stay as shipped
+        ignores: ['public_html/script/phaser.js', 'public_html/script/croppie.js'],
     },
     {
         files: ['public_html/script/**/*.js'],
