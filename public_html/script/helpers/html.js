@@ -57,3 +57,15 @@ export function createElement(markup) {
     template.innerHTML = markup.trim();
     return /** @type {HTMLElement} */ (template.content.firstElementChild);
 }
+
+/**
+ * Turns HTML entities back into text (`&lt;b&gt;` becomes `<b>`).
+ *
+ * @param {string} value Escaped text.
+ * @returns {string}
+ */
+export function decodeHtml(value) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+}

@@ -20,7 +20,6 @@
     <title>gladCode - Treino</title>
     
     <link href="https://fonts.googleapis.com/css?family=Orbitron|Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">    
-    <link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'/> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
     <link rel='stylesheet' href="css/header.css"/>
@@ -28,22 +27,15 @@
     <link rel='stylesheet' href="css/tournament.css"/>
     <link rel='stylesheet' href="css/training.css"/>
     <link rel='stylesheet' href="css/glad-card.css"/>
+    <link rel='stylesheet' href="css/ui-slider.css"/>
     <!-- <link rel='stylesheet' href="css/chat.css"/> -->
 
-    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-    <script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+    <?php include_once "module_scripts.php"; printModuleImportMap(); ?>
+    <script type="module" src="<?= moduleSrc("header.js") ?>"></script>
+    <script type="module" src="<?= moduleSrc("training.js") ?>"></script>
     
 
-    <script type="module" src="script/header.js"></script>
-    <script type="module" src="script/legacy.js"></script>
-    <script src="script/dialog.js"></script>
-    <script src="script/glad-card.js"></script>
-    <script src="script/runSim.js"></script>
-    <script src="script/assets.js"></script>
-    <script src="script/emoji.js"></script>
     
-    <script type="module" src="script/training.js"></script>
 
     </head>
         <!-- Google tag (gtag.js) -->
@@ -59,7 +51,7 @@
 <body>
     <?php
         include("header.php");
-        echo "<div id='hash' hidden>$hash</div><div id='round' hidden>$round</div>";
+        echo "<div id='hash' hidden>". htmlspecialchars($hash ?? "") ."</div><div id='round' hidden>". htmlspecialchars($round ?? "") ."</div>";
     ?>
     <div id='frame'>
         <div id='content-wrapper'>

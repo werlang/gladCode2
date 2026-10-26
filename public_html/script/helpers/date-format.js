@@ -44,3 +44,16 @@ export function formatMessageTime(time, { short = false, monthFull = false } = {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${date.getDate()} de ${month} de ${date.getFullYear()} às ${hours}:${minutes}`;
 }
+
+/**
+ * Splits a duration into zero-padded hours, minutes and seconds; a negative
+ * duration reads as zero.
+ *
+ * @param {number} ms Duration in milliseconds.
+ * @returns {[string, string, string]}
+ */
+export function splitDuration(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const pad = value => String(value).padStart(2, '0');
+    return [pad(Math.floor(total / 3600)), pad(Math.floor(total / 60) % 60), pad(total % 60)];
+}

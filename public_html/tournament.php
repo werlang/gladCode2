@@ -70,7 +70,7 @@
 <body>
     <?php
         include("header.php");
-        echo "<div id='hash' hidden>$hash</div><div id='round' hidden>$round</div>";
+        echo "<div id='hash' hidden>". htmlspecialchars($hash ?? "") ."</div><div id='round' hidden>". htmlspecialchars($round ?? "") ."</div>";
     ?>
     <div id='frame'>
         <div id='content-wrapper'>

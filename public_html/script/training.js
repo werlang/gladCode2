@@ -1,582 +1,449 @@
-import { GoogleLogin } from "./helpers/google-login.js";
+import { Countdown, countdownDigitsTemplate } from './components/countdown.js';
+import { Message, showMessage } from './components/dialog.js';
+import { loadGladCards, gladOfCard } from './components/glad-card.js';
+import { showLoginDialog } from './components/header.js';
+import { Simulation } from './components/simulation.js';
+import { Slider } from './components/slider.js';
+import { createElement, renderTemplate } from './helpers/html.js';
+import { TrainingModel } from './models/training.js';
+import { UserModel } from './models/user.js';
+import {
+    finalRankingTemplate,
+    gladBoxTemplate,
+    groupTemplate,
+    medalTemplate,
+    rankingRowTemplate,
+    roundTemplate,
+    roundTimeTemplate,
+    teamTemplate,
+    winnerIconTemplate,
+} from './templates/training.js';
 
-$(document).ready(async function(){
-    // got here from train link
-    let hash = $('#hash').html()
-    let round = $('#round').html()
-    $('#hash, #round').remove()
+const MEDALS = ['gold', 'silver', 'bronze'];
+/** A survival time this long means the gladiator outlived everyone. */
+const WINNER_TIME = 1000;
+/** Wait before asking for a group's battle again after it failed, in ms. */
+const RERUN_DELAY_MS = 5000;
 
-    if (hash){
-        await waitLogged()
-        if (user.status == "NOTLOGGED"){
-            let data = await showDialog("Você precisa realizar o login para ingressar em um treino", ["Login", "Não"])
-            if (data == "Não")
-                window.location.href = ''
-            else if (data == "Login"){
-                showDialog("<div>Faça login no sistema</div><div id='google-login'></div>", ["CANCELAR"]);
-                GoogleLogin.renderButton($('#google-login')[0]);
-            }
+const content = document.querySelector('#content-box');
+
+/**
+ * Reads and removes a value the page left in a hidden element.
+ *
+ * @param {string} id Element id.
+ * @returns {string}
+ */
+function takeHidden(id) {
+    const element = document.getElementById(id);
+    const value = element?.textContent ?? '';
+    element?.remove();
+    return value;
+}
+
+/**
+ * A score with one decimal, or none when it is the round maximum of 10.
+ *
+ * @param {number|string} score Score.
+ * @returns {string}
+ */
+function formatScore(score) {
+    const value = parseFloat(score);
+    return value === 10 ? String(value) : value.toFixed(1);
+}
+
+/**
+ * A training round page: its groups, countdowns and battles.
+ */
+class TrainingRound {
+    /** Group id of each group element. */
+    #groupIds = new Map();
+    /** Team id of each team element. */
+    #teamIds = new Map();
+    #countdowns = {};
+
+    /**
+     * @param {string} hash Training hash.
+     * @param {string} round Round number from the URL.
+     */
+    constructor(hash, round) {
+        this.hash = hash;
+        this.round = round;
+        this.groups = {};
+    }
+
+    /** Loads the round and renders it, or the final ranking. */
+    async show() {
+        const data = await TrainingModel.round(this.hash, this.round);
+        if (data.status === 'REDIRECT') {
+            location.href = `train/${this.hash}/${data.round}`;
+            return;
+        }
+        Object.assign(this, data);
+
+        if (data.status === 'END') this.#showRanking(data);
+        else this.#showRound();
+    }
+
+    /**
+     * @param {Record<string, any>} data Final ranking answer.
+     */
+    #showRanking(data) {
+        const rows = data.ranking.map((entry, index) => {
+            const medal = MEDALS[index] ?? '';
+            return renderTemplate(rankingRowTemplate, {
+                medal,
+                ordinal: medal ? renderTemplate(medalTemplate, { medal, place: index + 1 }) : `${index + 1}º`,
+                master: entry.apelido,
+                glad: entry.name,
+                score: entry.score % 1 ? parseFloat(entry.score).toFixed(1) : parseInt(entry.score, 10),
+                time: parseFloat(entry.time).toFixed(1),
+            });
+        }).join('');
+
+        content.innerHTML = renderTemplate(finalRankingTemplate, { name: this.name, rows });
+        content.querySelector('#back-round').addEventListener('click', () => {
+            location.href = `train/${this.hash}/${parseInt(this.maxround, 10) - 1}`;
+        });
+    }
+
+    #showRound() {
+        const groupIds = Object.keys(this.groups);
+        const groups = groupIds.map((groupId, index) => renderTemplate(groupTemplate, {
+            number: index + 1,
+            round: this.round,
+            teams: Object.values(this.groups[groupId]).map(team => renderTemplate(teamTemplate, {
+                mine: team.myteam === true ? 'myteam' : '',
+                score: parseInt(team.score, 10),
+                master: team.master,
+                glad: team.gladiator,
+            })).join(''),
+        })).join('');
+
+        content.innerHTML = renderTemplate(roundTemplate, {
+            name: this.name,
+            description: this.description,
+            groups,
+            roundDigits: countdownDigitsTemplate,
+            trainDigits: countdownDigitsTemplate,
+        });
+
+        content.querySelectorAll('#group-container .group').forEach((group, index) => {
+            const groupId = groupIds[index];
+            this.#groupIds.set(group, groupId);
+            const teamIds = Object.keys(this.groups[groupId]);
+            group.querySelectorAll('.team').forEach((team, teamIndex) => this.#teamIds.set(team, teamIds[teamIndex]));
+        });
+
+        const prepare = content.querySelector('#prepare');
+        if (this.manager) {
+            this.#bindManagerControls(prepare);
+        }
+        if (!this.manager || this.end) {
+            prepare.remove();
+            content.querySelectorAll('#button-container .arrow').forEach(arrow => arrow.classList.add('nobutton'));
+            content.querySelectorAll('#group-container .foot .rerun').forEach(rerun => rerun.remove());
         }
 
-        let data = await post("back_train.php", {
-            action: "JOIN",
-            hash: hash
-        })
-        // console.log(data)
-        
-        let message
-        let redirect = true
-        
-        if (data.status == "JOINED"){
-            window.location.href = 'battle.train'
-        }
-        else if (data.status == "NOTFOUND"){
-            message = "Treino não encontrado"
-        }
-        else if (data.status == "EXPIRED"){
-            message = "O código para ingresso deste treino expirou"
-        }
-        else if (data.status == "ALLOWED"){
-            redirect = false
-            selectedGlad.choose(hash)
-        }
-        else if (data.status == "STARTED"){
-            redirect = false
+        if (!this.end) this.#startCountdown('train');
+        this.refresh({ start: true });
+    }
 
-            training.round = round
-            training.hash = hash
-            await training.show()
-        }
+    /**
+     * The manager can close the round, rerun a group and set when the round's
+     * battles start.
+     *
+     * @param {HTMLButtonElement} prepare The round button.
+     */
+    #bindManagerControls(prepare) {
+        prepare.disabled = false;
+        prepare.onclick = () => {
+            prepare.textContent = 'AGUARDE...';
+            prepare.disabled = true;
+            TrainingModel.setRoundDeadline(this.hash, this.round, 0);
+        };
 
-        if (redirect){
-            let msgbox = showMessage(message)
-            $('#fog').addClass('black')
-            await msgbox
-            window.location.href = "battle.train"
+        content.querySelectorAll('#group-container .foot .rerun').forEach(rerun => {
+            const group = rerun.closest('.group');
+            const button = group.querySelector('.foot .button');
+            let tries = 0;
+            rerun.addEventListener('click', async () => {
+                const groupId = this.#groupIds.get(group);
+                const data = await TrainingModel.rerun(this.hash, groupId);
+                if (data.status !== 'SUCCESS') return;
+                tries++;
+                button.disabled = true;
+                button.textContent = `Grupo pronto. Organizando batalha... ${tries}`;
+                this.groups[groupId].log = false;
+            });
+        });
+
+        if (this.deadline === null) this.#askRoundTime();
+    }
+
+    /** Asks the manager how long until the round's battles start. */
+    async #askRoundTime() {
+        const box = new Message({
+            message: renderTemplate(roundTimeTemplate, { round: this.round }),
+            buttons: { ok: 'OK', cancel: 'Cancelar' },
+        }).show();
+        const slider = new Slider(box.element.querySelector('#slider'), {
+            range: 'min',
+            min: 0,
+            max: 15,
+            step: 1,
+            value: 5,
+            label: value => `${value}m`,
+            ariaLabel: 'Minutos até o início das batalhas',
+        });
+
+        const { button } = await box.wait();
+        if (button === 'ok') {
+            TrainingModel.setRoundDeadline(this.hash, this.round, slider.value);
         }
     }
-    else
-        window.location.href = ''
 
-    // socket_ready().then( () => {
-    //     socket.emit('training run join', {
-    //         hash: hash
-    //     });
-    //     socket.on('training refresh', () => {
-    //         if (!training.refreshCalls)
-    //             training.refreshCalls = 0
-            
-    //         if (training.refreshCalls == 0){
-    //             setTimeout(() => {
-    //                 training.refreshCalls = 0
-    //                 training.refresh()
-    //             }, 500)
-    //         }
-    //         training.refreshCalls++
-    //     });
-    //     socket.on('training end', () => {
-    //         window.location.href = `train/${training.hash}/0`
-    //     });
+    /**
+     * Counts down to the end of the round or of the training.
+     *
+     * @param {'round'|'train'} mode Which deadline.
+     */
+    #startCountdown(mode) {
+        const deadline = mode === 'train' ? this.train_deadline : this.deadline;
+        if (!deadline) return;
+        const box = content.querySelector(`.timeleft.${mode}`);
 
-    //     init_chat($('#chat-panel'), {
-    //         full: false,
-    //         defaultOpen: 900
-    //     });
-    // })
-
-})
-
-var selectedGlad = {
-    choose: async function(hash){
-        this.hash = hash
-        var box = `<div id='fog'>
-            <div class='glad-box'>
-                <div id='title'>Escolha o gladiador que participará do treino</div>
-                <div class='glad-card-container'></div>
-                <div id='button-container'>
-                    <button id='select' class='button' disabled>SELECIONAR</button>
-                </div>
-            </div>
-        </div>`;
-        $('body').append(box);
-
-        load_glad_cards($('#fog .glad-card-container'), {
-            clickHandler: function(){
-                if (!$(this).hasClass('old')){
-                    $('#fog #btn-glad-open').removeAttr('disabled');
-                    $('#fog .glad-preview').removeClass('selected');
-                    $(this).addClass('selected');
-                    $('.glad-box #select').removeAttr('disabled');
+        this.#countdowns[mode]?.stop();
+        this.#countdowns[mode] = new Countdown(box, {
+            deadline,
+            now: this.now,
+            onTick: (left, [hours, minutes]) => {
+                if (parseInt(hours, 10) > 0) {
+                    box.classList.add('green');
+                }
+                else if (parseInt(minutes, 10) < 10) {
+                    box.classList.replace('yellow', 'red') || box.classList.add('red');
+                }
+                else {
+                    box.classList.replace('green', 'yellow') || box.classList.add('yellow');
                 }
             },
-            dblClickHandler: function(){
-                if ($('#fog .glad-card-container .selected').length)
-                    $('#fog .glad-box #select').click();
-            }
-        })
-        $('#fog').addClass('black')
+            onEnd: () => this.refresh(),
+        }).start();
+    }
 
-        $('#fog .glad-box #select').click( async function(){
-            let glad = $('#fog .glad-preview.selected').data('id')
-            let data = JSON.parse(await $.post("back_train.php", {
-                action: "JOIN",
-                hash: hash,
-                glad: glad,
-                redirect: true
-            }))
-            // console.log(data)
-
-            if (data.status == "SUCCESS"){
-                $('.glad-box').hide()
-                await showMessage("Você ingressou no treino")
-                window.location.href = 'battle.train'
-                sendChatMessage({text: `/join ${data.name}_${hash}`})
-            }
+    /**
+     * Shows a group's scores and survival times.
+     *
+     * @param {HTMLElement} group Group element.
+     */
+    #revealInfo(group) {
+        const groupId = this.#groupIds.get(group);
+        group.querySelectorAll('.team').forEach(team => {
+            const { score, time } = this.groups[groupId][this.#teamIds.get(team)];
+            team.querySelector('.glad').textContent = formatScore(score);
+            const seconds = parseFloat(time);
+            team.querySelector('.time').innerHTML = seconds > WINNER_TIME ? winnerIconTemplate : `${seconds.toFixed(1)}s`;
         });
     }
-}
 
-var training = {}
+    /**
+     * Updates the round from the server and moves it on: counts down, runs the
+     * next battle, waits for the others or opens the next round.
+     *
+     * @param {{ start?: boolean }} [options] `start` reveals finished groups at once.
+     */
+    async refresh({ start = false } = {}) {
+        const data = await TrainingModel.refresh(this.hash, this.round);
+        const prepare = content.querySelector('#prepare');
+        this.now = data.now;
+        this.deadline = data.deadline;
 
-training.show = async function(){
-    let data = await post("back_training_run.php", {
-        action: "GET",
-        hash: this.hash,
-        round: this.round
-    })
-    // console.log(data)
-
-    if (data.status == "REDIRECT")
-        window.location.href = `train/${this.hash}/${data.round}`
-
-    for (let f in data)
-        this[f] = data[f]
-
-    if (data.status == "END"){
-        $('#content-box').html("<h1>Classificação final</h1><h3>O treino <span id='tourn-name'>"+ this.name +"</span> chegou ao fim e esta foi a classificação obtida pelos participantes</h3><div id='ranking-container'><div class='head'><div class='score' title='Pontuação obtida no treino'><i class='fas fa-star'></i></div><div class='time' title='Tempo médio sobrevivido'><i class='fas fa-clock'></i></div></div></div><div id='button-container'><button id='back-round' class='button'>RODADA ANTERIOR</button></div>");
-
-        for (let i in data.ranking){
-            let c = parseInt(i)+1
-            let score = data.ranking[i].score%1 ? parseFloat(data.ranking[i].score).toFixed(1) : parseInt(data.ranking[i].score)
-            let time = parseFloat(data.ranking[i].time).toFixed(1)
-            $('#content-box #ranking-container').append(`<div class='team'><div class='ordinal'>${c}º</div><div class='name'>${data.ranking[i].apelido} - ${data.ranking[i].name}</div><div class='score'>${score}</div><div class='score'>${time}</div></div>`);
-
-            if (c == 1)
-                $('#content-box #ranking-container .team').last().addClass('gold');
-            else if (c == 2)
-                $('#content-box #ranking-container .team').last().addClass('silver');
-            else if (c == 3)
-                $('#content-box #ranking-container .team').last().addClass('bronze');
-        }
-        $('#content-box #ranking-container .team.gold .ordinal').html("<img class='icon' src='icon/gold-medal.png'>");
-        $('#content-box #ranking-container .team.silver .ordinal').html("<img class='icon' src='icon/silver-medal.png'>");
-        $('#content-box #ranking-container .team.bronze .ordinal').html("<img class='icon' src='icon/bronze-medal.png'>");
-
-        $('#content-box #back-round').click( () => {
-            window.location.href = `train/${this.hash}/${parseInt(this.maxround)-1}`
-        });
-    }
-    else{
-        $('#content-box').html(`<h1>Treino <span id='tourn-name'>${this.name}</span></h1><h3 id='tourn-desc'>${this.description}</h3><div id='group-container'></div>`)
-
-        // build teams and groups table
-        let i = 0
-        for (let gid in this.groups){
-            $('#content-box #group-container').append(`<div class='group'>
-                <div class='head'>
-                    <div class='icons'>
-                        <div title='Pontuação total até o momento'><i class='fas fa-trophy'></i></div>
-                    </div>
-                    <div class='title'>Grupo ${i+1} - <span>Rodada ${this.round}</span></div>
-                    <div class='icons'>
-                        <div class='glad' title='Pontuação da última rodada'><i class='fas fa-star'></i></div>
-                        <div class='time' title='Quantos segundos o gladiador sobreviveu'><i class='fas fa-clock'></i></div>
-                    </div>
-                </div>
-                <div class='teams-container'></div>
-                <div class='foot'><button class='button' disabled></button><div class='rerun hidden' title='Executar simulação'><i class='fas fa-redo'></i></div></div>
-            </div>`);
-            $('#content-box #group-container .group').eq(i).data('id', gid);
-
-            for (let tid in this.groups[gid]){
-                let team = this.groups[gid][tid]
-                let myteamclass = '';
-                if (team.myteam == true){
-                    myteamclass = 'myteam';
-                }
-
-                $('#content-box #group-container .group .teams-container').eq(i).append(`<div class='team ${myteamclass}'>
-                    <div class='score'>${parseInt(team.score)}</div>
-                    <div class='name'>${team.master} - ${team.gladiator}</div>
-                    <div class='info'>
-                        <div class='glad'>0</div>
-                        <div class='time'>-</div>
-                    </div>
-                </div>`);
-                $('#content-box #group-container .group').eq(i).find('.team').last().data('id', tid);
+        if (data.end) {
+            this.end = data.end;
+            if (prepare) {
+                prepare.textContent = 'FIM DO TREINO';
+                prepare.onclick = () => {
+                    location.href = `train/${this.hash}/0`;
+                };
             }
-
-            i++
+            if (parseInt(this.round, 10) === parseInt(data.maxround, 10)) location.reload();
         }
 
-        // buld countdown and link to other rounds
-        $('#content-box').append(`
-            <div id='time-container'>
-                <div class='timeleft round' title='Tempo máximo restante até o fim da rodada'>
-                    <div class='title'>FIM DA RODADA</div>
-                    <div id='time'>
-                        <div class='numbers'><span>-</span><span>-</span></div>:
-                        <div class='numbers'><span>-</span><span>-</span></div>:
-                        <div class='numbers'><span>-</span><span>-</span></div>
-                    </div>
-                    <div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div>
-                </div>
-                <div class='timeleft train' title='Tempo máximo restante até o fim do treino'>
-                    <div class='title'>FIM DO TREINO</div>
-                    <div id='time'>
-                        <div class='numbers'><span>-</span><span>-</span></div>:
-                        <div class='numbers'><span>-</span><span>-</span></div>:
-                        <div class='numbers'><span>-</span><span>-</span></div>
-                    </div>
-                    <div id='text'><span>HRS</span><span>MIN</span><span>SEG</span></div>
-                </div>
-            </div>
-            <div id='button-container' class='train'>
-                <button class='arrow' id='back-round' title='Rodada anterior' disabled>
-                    <i class='fas fa-chevron-left'></i>
-                </button>
-                <button id='prepare' class='button' disabled>ENCERRAR RODADA</button>
-                <button class='arrow' id='next-round' title='Próxima rodada' disabled>
-                    <i class='fas fa-chevron-right'></i>
-                </button>
-            </div>
-        `);
-
-        if (this.manager){
-            $('#content-box #prepare').removeAttr('disabled');
-            $('#content-box #prepare').off().click( () => {
-                if (!$('#content-box #prepare').attr('disabled')){
-                    $('#content-box #prepare').html("AGUARDE...").attr('disabled', true);
-
-                    post("back_training_run.php", {
-                        action: "DEADLINE",
-                        hash: this.hash,
-                        time: 0,
-                        round: this.round
-                    }).then( data => {
-                        // console.log(data)
-                    })
-                }
-            })
-
-            $('#group-container .foot .rerun').off().click( e => {
-                let group = $(e.currentTarget).parents('.group')
-                let id = group.data('id')
-                post("back_training_run.php", {
-                    action: "RERUN",
-                    hash: this.hash,
-                    group: id
-                }).then( data => {
-                    // console.log(data)
-                    if (data.status == "SUCCESS"){
-                        let button = group.find('.foot .button')
-                        if (!button.data('try')){
-                            button.data('try', '1')
-                        }
-                        else{
-                            let btry = parseInt(button.data('try'))
-                            button.data('try', btry + 1)
-                        }
-                        button.attr('disabled', true).html(`Grupo pronto. Organizando batalha... ${button.data('try')}`);
-                        this.groups[id].log = false
-                    }
-                })
-            })
-
-            if (this.deadline === null){
-                let click = showDialog(`
-                    <span>Quanto tempo até o início das batalhas da rodada ${this.round}?</span>
-                    <div id='slider'></div>
-                `, ["OK", "Cancelar"])
-
-                var roundTime
-                $('#dialog-box #slider').slider({
-                    range: "min",
-                    min: 0,
-                    max: 15,
-                    step: 1,
-                    value: 5,
-                    create: function( event, ui ) {
-                        var val = $(this).slider('option','value');
-                        $(this).find('.ui-slider-handle').html(val + 'm');
-                        roundTime = val
-                    },
-                    slide: function( event, ui ) {
-                        $(this).find('.ui-slider-handle').each( (index, obj) => {
-                            $(obj).html(ui.value + 'm');
-                            roundTime = ui.value
-                        });
-                    }
-                })
-
-                if (await click == 'OK'){
-                    post("back_training_run.php", {
-                        action: "DEADLINE",
-                        hash: this.hash,
-                        time: roundTime,
-                        round: this.round
-                    }).then( data => {
-                        // console.log(data)
-                    })
-                }
+        Object.entries(this.groups).forEach(([groupId, group]) => {
+            const update = data.groups[groupId];
+            if (update.locked) {
+                group.locked = true;
+                content.querySelectorAll('.group .rerun').forEach(rerun => rerun.classList.remove('hidden'));
             }
-        }
-        else if (!this.manager || this.end){
-            $('#content-box #prepare').remove();
-            $('#button-container .arrow').addClass('nobutton');
-            $('#group-container .foot .rerun').remove();
-        }
-
-        this.counting = { train: 0, round: 0 }
-        if (!this.end)
-            this.countDown({mode: 'train'})
-        this.refresh({start: true})
-    }
-}
-
-training.countDown = function({timestart, mode}){
-    var startCountTime = new Date()
-
-    if (!mode)
-        mode = 'round'
-
-    let timers = {
-        train: this.train_deadline,
-        round: this.deadline
-    }
-
-    var serverleft = new Date(timers[mode]) - new Date(this.now)
-    if (!timestart)
-        timestart = new Date()
-
-    if (this.counting[mode] <= 1){
-        this.counting[mode]++
-
-        let timediff = serverleft - (new Date() - timestart)
-        let timeleft = msToTime(timediff)
-
-        $(`.timeleft.${mode} .numbers`).each( function(index, obj){
-            if (parseInt(timeleft[index]) != parseInt($(obj).text())){
-                $(obj).find('span').eq(0).html(timeleft[index].toString()[0])
-                $(obj).find('span').eq(1).html(timeleft[index].toString()[1])
+            if (update.log) {
+                group.log = update.log;
+                Object.entries(update).forEach(([teamId, team]) => {
+                    if (team && typeof team === 'object' && group[teamId]) {
+                        group[teamId].score = team.score;
+                        group[teamId].time = team.time;
+                    }
+                });
+            }
+            if (prepare && !prepare.disabled && group.locked) {
+                prepare.onclick = null;
+                prepare.textContent = 'AGUARDE...';
+                prepare.disabled = true;
             }
         });
 
-        if (parseInt(timeleft[0]) == 0){
-            if (parseInt(timeleft[1]) < 10)
-                $(`.timeleft.${mode}`).removeClass('yellow').addClass('red')
-            else
-                $(`.timeleft.${mode}`).removeClass('green').addClass('yellow')
-        }
-        else
-            $(`.timeleft.${mode}`).addClass('green')
-        
-        if ($('#group-container .team .icon.green').length == $('#group-container .team').length)
-            $(`.timeleft.${mode} .numbers span`).html('0')
-
-        if (timediff > 0){
-            let skipTime = 1000 - (new Date() - startCountTime)
-            setTimeout( () => {
-                this.counting[mode]--
-                this.countDown({timestart: timestart, mode: mode})
-            }, skipTime)
-        }
-        else{
-            this.refresh()
-        }
-    }
-
-    function msToTime(ms) {
-        var s = Math.floor(ms / 1000);
-        var m = Math.floor(s / 60);
-        s = s % 60;
-        var h = Math.floor(m / 60);
-        m = m % 60;
-      
-        if (h < 0)
-            h = '00'
-        else if (h < 10)
-            h = '0' + h;
-        
-        if (m < 0)
-            m = '00'
-        else if (m < 10)
-            m = '0' + m;
-    
-        if (s < 0)
-            s = '00'
-        else if (s < 10)
-            s = '0' + s;
-            
-        return [h,m,s];
-    }
-}
-
-training.refresh = async function(args){
-    let data = await post("back_training_run.php", {
-        action: "REFRESH",
-        hash: this.hash,
-        round: this.round
-    })
-    // console.log(data)
-
-    this.now = data.now
-    this.deadline = data.deadline
-
-    if (data.end){
-        this.end = data.end
-        $('#content-box #prepare').html("FIM DO TREINO").off().click( () => {
-            window.location.href = `train/${this.hash}/0`
-        })
-
-        if (this.round == data.maxround)
-            window.location.reload()
-    }
-    
-    for (let gid in this.groups){
-        let group = this.groups[gid]
-        if (data.groups[gid].locked){
-            group.locked = true
-            $('.group .rerun').removeClass('hidden')
-        }
-        if (data.groups[gid].log){
-            group.log = data.groups[gid].log
-            for (let ti in group){
-                group[ti].score = data.groups[gid][ti].score
-                group[ti].time = data.groups[gid][ti].time
+        let finished = 0;
+        content.querySelectorAll('#group-container .group').forEach(element => {
+            const group = this.groups[this.#groupIds.get(element)];
+            const button = element.querySelector('.foot .button');
+            if (group.log) {
+                finished++;
+                if (start) this.#revealInfo(element);
+                button.disabled = false;
+                button.textContent = 'VISUALIZAR BATALHA';
+                button.onclick = () => {
+                    window.open(`play/${group.log}`);
+                    setTimeout(() => this.#revealInfo(element), 1500);
+                };
             }
-        }
-
-        if (!$('#content-box #prepare').attr('disabled') && group.locked)
-            $('#content-box #prepare').off().html("AGUARDE...").attr('disabled', true)
-    }
-
-    this.finished = 0
-    $('#content-box #group-container .group').each( async (i, obj) => {
-        obj = $(obj)
-        const id = obj.data('id')
-
-        if (this.groups[id].log){
-            this.finished++
-            if (args && args.start)
-                revealInfo(obj)
-
-            obj.find('.foot .button').removeAttr('disabled').html("VISUALIZAR BATALHA");
-            obj.find('.foot .button').click( () => {
-                window.open('play/'+ this.groups[id].log);
-                setTimeout(() => {
-                    revealInfo(obj)
-                }, 1500)
-            });
-        }
-        else if (this.groups[id].locked){
-            obj.find('.foot .button').html("Grupo pronto. Organizando batalha...");
-        }
-    })
-
-    if (data.status == "SUCCESS" && !data.end){
-        this.countDown({})
-    }
-    else{
-        if (data.status == "RUN" && !data.end){
-            const gid = data.run
-            let sim = new Simulation({
-                training: gid,
-                origin: "train"
-            })
-            // await socket_ready()
-            socket.emit('tournament run request', {
-                hash: this.hash,
-                group: gid
-            }, async data => {
-                // console.log(data);
-                if (data.permission == 'granted'){
-                    let d = new Date().getTime()
-                    sim.run().then( data => {
-                        // console.log(data)
-                        $('#content-box #group-container .group').each( (_,obj) => {
-                            let id = $(obj).data('id')
-                            if (data.error.length && parseInt(id) == parseInt(gid)){
-                                // this 5s time is to avoid permission denied from node
-                                setTimeout( () => {
-                                    $(obj).find('.foot .rerun').click()
-                                }, 5000 - (new Date().getTime() - d))
-                            }
-                        })    
-                    })
-                }
-            })
-        }
-        else if (data.status == "LOCK"){
-            if (this.finished == Object.keys(this.groups).length)
-                setTimeout(() => this.refresh(), 2000)
-        }
-        else if (data.status == "DONE"){
-            $('#button-container #next-round').removeAttr('disabled').click( () => {
-                window.location.href = `train/${this.hash}/${parseInt(this.round)+1}`
-            })
-            $('#content-box #prepare').removeAttr('disabled').html("ENCERRAR TREINO").off().click( () => {
-                post("back_training_run.php", {
-                    action: "DEADLINE",
-                    hash: this.hash
-                }).then( data => {
-                    // console.log(data)
-                })
-            })
-
-            if (data.newround){
-                // await socket_ready()
-                socket.emit('tournament run request', {
-                    hash: this.hash,
-                    group: 'newround'
-                }, async data => {
-                    // console.log(data);
-                    if (data.permission == 'granted'){
-                        post("back_training_run.php", {
-                            action: "NEW ROUND",
-                            hash: this.hash,
-                            round: this.round
-                        }).then( data => {
-                            // console.log(data)
-                        })
-                    }
-                })
+            else if (group.locked) {
+                button.textContent = 'Grupo pronto. Organizando batalha...';
             }
+        });
+
+        if (data.status === 'SUCCESS' && !data.end) {
+            this.#startCountdown('round');
+        }
+        else if (data.status === 'RUN' && !data.end) {
+            this.#runGroup(data.run);
+        }
+        else if (data.status === 'LOCK') {
+            if (finished === Object.keys(this.groups).length) setTimeout(() => this.refresh(), 2000);
+        }
+        else if (data.status === 'DONE') {
+            this.#offerNextRound(data, prepare);
+        }
+
+        if (this.round > 1) {
+            const back = content.querySelector('#button-container #back-round');
+            back.disabled = false;
+            back.onclick = () => {
+                location.href = `train/${this.hash}/${parseInt(this.round, 10) - 1}`;
+            };
         }
     }
 
-    if (this.round > 1){
-        $('#button-container #back-round').removeAttr('disabled').click( () => {
-            window.location.href = `train/${this.hash}/${parseInt(this.round)-1}`
-        })
+    /**
+     * Runs a group's battle; a failed run is retried after a pause.
+     *
+     * @param {string} groupId Group id.
+     */
+    async #runGroup(groupId) {
+        const started = Date.now();
+        const result = await new Simulation({ training: groupId, origin: 'train' }).run();
+        if (!result.error?.length) return;
+
+        const group = [...this.#groupIds].find(([, id]) => parseInt(id, 10) === parseInt(groupId, 10))?.[0];
+        setTimeout(() => group?.querySelector('.foot .rerun')?.click(), RERUN_DELAY_MS - (Date.now() - started));
+    }
+
+    /**
+     * Every group fought: links the next round and lets the manager end the training.
+     *
+     * @param {Record<string, any>} data Refresh answer.
+     * @param {HTMLButtonElement|null} prepare The round button.
+     */
+    #offerNextRound(data, prepare) {
+        const next = content.querySelector('#button-container #next-round');
+        next.disabled = false;
+        next.onclick = () => {
+            location.href = `train/${this.hash}/${parseInt(this.round, 10) + 1}`;
+        };
+        if (prepare) {
+            prepare.disabled = false;
+            prepare.textContent = 'ENCERRAR TREINO';
+            prepare.onclick = () => TrainingModel.end(this.hash);
+        }
+        if (data.newround) TrainingModel.newRound(this.hash, this.round);
     }
 }
 
-function revealInfo(obj){
-    const id = obj.data('id')
-    obj.find('.team').each( (_,team) => {
-        const tid = $(team).data('id')
-        const score = parseFloat(training.groups[id][tid].score)
-        const time = parseFloat(training.groups[id][tid].time).toFixed(1)
+/**
+ * Lets the user pick the gladiator that enters the training.
+ *
+ * @param {string} hash Invitation hash.
+ */
+async function chooseGladiator(hash) {
+    const fog = createElement(gladBoxTemplate);
+    document.body.append(fog);
+    const select = fog.querySelector('#select');
+    let selected = null;
 
-        if (score == 10)
-            $(team).find('.glad').html(score)
-        else
-            $(team).find('.glad').html(score.toFixed(1))
+    await loadGladCards(fog.querySelector('.glad-card-container'), {
+        onClick: event => {
+            const card = event.currentTarget;
+            if (card.classList.contains('old')) return;
+            fog.querySelectorAll('.glad-preview').forEach(other => other.classList.remove('selected'));
+            card.classList.add('selected');
+            selected = gladOfCard(card);
+            select.disabled = false;
+        },
+        onDoubleClick: () => {
+            if (selected) select.click();
+        },
+    });
 
-        if (time > 1000)
-            $(team).find('.time').html(`<img class='win' src='icon/winner-icon.png'>`)
-        else
-            $(team).find('.time').html(time +'s')
-    })
+    select.addEventListener('click', async () => {
+        const data = await TrainingModel.join(hash, { glad: selected.id, redirect: true });
+        if (data.status !== 'SUCCESS') return;
+        fog.querySelector('.glad-box').style.display = 'none';
+        await showMessage('Você ingressou no treino');
+        location.href = 'battle.train';
+    });
 }
+
+/**
+ * Enters the training of the invitation link: asks for a login, joins, picks
+ * a gladiator or shows the running round.
+ *
+ * @param {string} hash Invitation or training hash.
+ * @param {string} round Round number from the URL.
+ */
+async function start(hash, round) {
+    const user = await UserModel.current();
+    if (!UserModel.isLogged(user)) {
+        const { button } = await new Message({
+            message: 'Você precisa realizar o login para ingressar em um treino',
+            buttons: { login: 'Login', no: 'Não' },
+        }).show().wait();
+        if (button === 'no') location.href = '';
+        else showLoginDialog();
+        return;
+    }
+
+    const data = await TrainingModel.join(hash);
+    const messages = {
+        NOTFOUND: 'Treino não encontrado',
+        EXPIRED: 'O código para ingresso deste treino expirou',
+    };
+
+    if (data.status === 'JOINED') {
+        location.href = 'battle.train';
+    }
+    else if (data.status === 'ALLOWED') {
+        chooseGladiator(hash);
+    }
+    else if (data.status === 'STARTED') {
+        new TrainingRound(hash, round).show();
+    }
+    else {
+        const box = showMessage(messages[data.status] ?? 'Não foi possível ingressar no treino');
+        document.querySelector('#fog')?.classList.add('black');
+        await box;
+        location.href = 'battle.train';
+    }
+}
+
+const hash = takeHidden('hash');
+const round = takeHidden('round');
+if (hash) start(hash, round);
+else location.href = '';

@@ -55,12 +55,14 @@ export class RequestError extends Error {
      * @param {number} status HTTP status, 0 when the network failed.
      * @param {string} message Description.
      * @param {unknown} [data] Parsed response body.
+     * @param {{ aborted?: boolean }} [options] `aborted` when the caller cancelled the request.
      */
-    constructor(status, message, data) {
+    constructor(status, message, data, { aborted = false } = {}) {
         super(message);
         this.name = 'RequestError';
         this.status = status;
         this.data = data;
+        this.aborted = aborted;
     }
 }
 
@@ -90,11 +92,12 @@ export class Request {
     /**
      * @param {string} endpoint Path relative to the site root.
      * @param {Record<string, unknown>|FormData} [data] Body fields.
+     * @param {{ signal?: AbortSignal, timeout?: number }} [options] Abort signal and timeout.
      * @returns {Promise<unknown>}
      */
-    post(endpoint, data = {}) {
+    post(endpoint, data = {}, options = {}) {
         const body = data instanceof FormData ? data : toFormBody(data);
-        return this.request('POST', endpoint, body);
+        return this.request('POST', endpoint, body, options);
     }
 
     /**
@@ -103,12 +106,14 @@ export class Request {
      * @param {'GET'|'POST'} method HTTP method.
      * @param {string} endpoint Path relative to the site root.
      * @param {BodyInit} [body] Request body.
+     * @param {{ signal?: AbortSignal, timeout?: number }} [options] Abort signal and timeout.
      * @returns {Promise<unknown>}
-     * @throws {RequestError} On a non-2xx answer, a timeout or a network failure.
+     * @throws {RequestError} On a non-2xx answer, a timeout, an abort (status 0, `aborted`) or a network failure.
      */
-    async request(method, endpoint, body) {
+    async request(method, endpoint, body, { signal, timeout = this.timeout } = {}) {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), this.timeout);
+        const timer = setTimeout(() => controller.abort(), timeout);
+        signal?.addEventListener('abort', () => controller.abort(), { once: true });
         const url = this.baseURL ? `${this.baseURL}/${endpoint}` : endpoint;
 
         try {
@@ -126,7 +131,10 @@ export class Request {
         }
         catch (error) {
             if (error instanceof RequestError) throw error;
-            if (error.name === 'AbortError') throw new RequestError(408, 'Request timeout');
+            if (error.name === 'AbortError') {
+                if (signal?.aborted) throw new RequestError(0, 'Request aborted', undefined, { aborted: true });
+                throw new RequestError(408, 'Request timeout');
+            }
             throw new RequestError(0, error.message || 'Network failure');
         }
         finally {
