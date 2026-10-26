@@ -18,7 +18,7 @@ gladcode2/
 │   ├── back_simulation.php  # Main simulation orchestrator (assembles payload, talks to runner)
 │   ├── back_glad.php        # Gladiator CRUD API
 │   ├── runs/                # Temporary workspaces created per battle run: {hash}/
-│   ├── script/              # Frontend Javascript (Phaser.js render.js, runSim.js, editor.js)
+│   ├── script/              # Frontend Javascript (ES modules: pages, components, helpers, models; Phaser render.js and Three.js render2/)
 │   ├── banned_functions.json# Blocked C functions policy
 │   ├── version              # Current production version file (e.g. 2.9.3)
 │   └── dev-tools/           # DB backup/restore (dump_restore.sh) and tournament reset CLI

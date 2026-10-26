@@ -126,6 +126,16 @@ cd public_html/dev-tools
 ./tournament.sh reset-real 45
 ```
 
+### Frontend Lint & Tests
+
+The frontend tooling (`package.json`, `eslint.config.js`) runs in Docker like everything else:
+
+```bash
+docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
+```
+
+Coding rules for `public_html/script/` are in [AGENTS.md](AGENTS.md#frontend-standards).
+
 ---
 
 ## ⚔️ How Gladiator Battles Work
@@ -148,6 +158,7 @@ gladcode2/
 ├── Dockerfile-dind          # Docker-in-Docker container definition for runner
 ├── compose.yaml             # Docker Compose microservices specification
 ├── database-2025.*.sql      # Database initialization SQL dumps
+├── eslint.config.js         # Frontend lint rules (run through Docker, see AGENTS.md)
 ├── node/                    # Node.js Socket.IO WebSocket server
 ├── payload/                 # C battle simulation engine & socket API source
 ├── public_html/             # Apache web root (PHP backends, JS, CSS, dev-tools)

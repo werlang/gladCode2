@@ -87,7 +87,7 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
    - Launches `gladCodeServerMain`, creating TCP sockets for each gladiator thread.
    - User gladiators communicate with game engine via `gladCodeAPI.c` / `gladCodeAPI.py`.
 5. Simulation produces a `simlog` JSON file containing turn-by-turn combat data.
-6. Frontend (`script/render.js`) parses `simlog` and replays 2D animated combat in Phaser.js.
+6. `script/playback.js` expands the `simlog` into frames and replays it with the renderer the user picked: classic 2D Phaser.js (`script/render.js`) or the Three.js coliseum (`script/render2/`).
 
 ### Socket IPC Architecture
 
@@ -102,6 +102,14 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
 - `connection.php` provides the PDO database connection singleton. Use `runQuery($sql, $params)` for queries.
 - Authentication must be checked on all endpoints via `$_SESSION['user']`.
 - Sessions are shared between PHP and Node.js via MySQL session store.
+
+### Frontend JavaScript (`public_html/script/`)
+- Native ES modules with named exports, loaded through the import map in `module_scripts.php` (`printModuleImportMap()`, `moduleSrc()`). No jQuery and no new `window` globals.
+- Page entries in `script/*.js`; DOM classes in `components/`; pure helpers in `helpers/`; markup strings in `templates/` (`{{key}}` escaped, `{{{key}}}` raw).
+- Only `models/` calls `back_*.php`, through `helpers/request.js`.
+- Never `alert`/`confirm`/`prompt` (use `components/dialog.js`), never unescaped text in `innerHTML`, never app data in `data-*` attributes.
+- Lint and test through Docker: `docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
+- Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards).
 
 ### Database Access Example
 ```php
@@ -136,5 +144,6 @@ If a simulation fails or returns an empty `simlog`:
 - **`payload/socket_compile.sh`**: Compilation script inside `gladcode2-vm`.
 - **`public_html/back_simulation.php`**: Primary battle orchestrator.
 - **`runner/runner.js`**: Docker container lifecycle manager.
-- **`public_html/script/render.js`**: Client-side Phaser.js visualization engine.
+- **`public_html/script/playback.js`**: Replay loader and controls shared by both renderers.
+- **`public_html/script/render.js`** / **`render2/`**: Classic Phaser.js 2D and Three.js 3D battle renderers.
 - **`public_html/dev-tools/`**: Web and CLI tools for database and tournament management.
