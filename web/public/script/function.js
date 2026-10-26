@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------
-// WHEN MESSING WITH FUNCS, DONT FORGET TO RUN compress_functions.php AFTER
+// After editing functions/ or functions/samples/, rebuild the bundles: web/scripts/compress-functions.js
 // ------------------------------------------------------------------------
 import './blocks.js';
 import { SideMenu } from './components/side-menu.js';

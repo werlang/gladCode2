@@ -39,7 +39,7 @@ export default [
         rules,
     },
     {
-        files: ['api/**/*.js', 'web/*.js', 'web/middleware/**/*.js', 'web/helpers/**/*.js'],
+        files: ['api/**/*.js', 'web/*.js', 'web/middleware/**/*.js', 'web/helpers/**/*.js', 'web/scripts/**/*.js'],
         ignores: ['api/node_modules/**', 'web/node_modules/**'],
         languageOptions: {
             ecmaVersion: 2024,
