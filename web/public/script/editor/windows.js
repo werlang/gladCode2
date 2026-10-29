@@ -1,6 +1,6 @@
-import { showDialog } from '../components/dialog.js';
+import { showDialog, showMessage } from '../components/dialog.js';
 import { loadSelectableCards } from '../components/glad-card.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn, fadeOut, slideDown } from '../helpers/animate.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { UserModel } from '../models/user.js';
@@ -140,10 +140,16 @@ export async function openGladiators(isSaved, markSaved) {
         card.querySelector('.delete')?.addEventListener('click', async event => {
             event.stopPropagation();
             const glad = glads[index];
-            if (await showDialog(`Deseja excluir o gladiador <span class='highlight'>${glad.name}</span>?`, ['Sim', 'Não']) !== 'Sim') return;
+            if (await showDialog(`Deseja excluir o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span>?`, ['Sim', 'Não']) !== 'Sim') return;
+            try {
+                await GladiatorModel.remove(glad.id);
+            }
+            catch {
+                showMessage('Não foi possível excluir o gladiador. Tente novamente');
+                return;
+            }
             await fadeOut(card);
             card.remove();
-            GladiatorModel.remove(glad.id);
         });
     });
 
@@ -154,7 +160,7 @@ export async function openGladiators(isSaved, markSaved) {
         const glad = picked();
         if (!glad) return;
         if (!isSaved()) {
-            const answer = await showDialog(`Deseja abrir o gladiador <span class='highlight'>${glad.name}</span> para edição? Todas alterações no gladiador atual serão perdidas`, ['Sim', 'Não']);
+            const answer = await showDialog(`Deseja abrir o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> para edição? Todas alterações no gladiador atual serão perdidas`, ['Sim', 'Não']);
             if (answer !== 'Sim') return;
             markSaved();
         }

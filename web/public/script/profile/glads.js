@@ -1,6 +1,6 @@
-import { showDialog } from '../components/dialog.js';
+import { showDialog, showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeOut } from '../helpers/animate.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { profile } from './session.js';
@@ -103,7 +103,7 @@ export class GladsTab {
 
     /** @param {Record<string, any>} glad Outdated gladiator. */
     async #askUpdate(glad) {
-        const answer = await showDialog(`A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>${glad.name}</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor`, ['Cancelar', 'OK']);
+        const answer = await showDialog(`A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor`, ['Cancelar', 'OK']);
         if (answer === 'OK') window.open(`glad-${glad.id}`);
     }
 
@@ -112,11 +112,17 @@ export class GladsTab {
      * @param {Record<string, any>} glad Gladiator.
      */
     async #askDelete(card, glad) {
-        const answer = await showDialog(`Deseja excluir o gladiador <span class='highlight'>${glad.name}</span>?`, ['Sim', 'Não']);
+        const answer = await showDialog(`Deseja excluir o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span>?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
+        try {
+            await GladiatorModel.remove(glad.id);
+        }
+        catch {
+            showMessage('Não foi possível excluir o gladiador. Tente novamente');
+            return;
+        }
         await fadeOut(card);
         card.remove();
-        await GladiatorModel.remove(glad.id);
         this.#drawFreePlaces(this.#container.querySelectorAll('.glad-preview').length);
     }
 }

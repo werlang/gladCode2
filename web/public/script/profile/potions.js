@@ -1,6 +1,6 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
 import { PotionModel } from '../models/potion.js';
 import { profile, setSilver } from './session.js';
@@ -252,7 +252,7 @@ export class PotionsTab {
             try {
                 const { silver } = await PotionModel.buy(id);
                 setSilver(silver);
-                createToast(`Item ${potion.name} encomendado`, 'success');
+                createToast(`Item ${escapeHtml(potion.name)} encomendado`, 'success');
             }
             catch {
                 createToast('O item não pôde ser adquirido', 'error');
