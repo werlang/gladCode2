@@ -135,8 +135,9 @@ export class DevTournament {
     }
 
     /**
-     * Deletes the battle log rows no group points at any more (an imported copy of a tournament
-     * shares its logs); their files go after the transaction commits ({@link DevTournament.#removeLogFiles}).
+     * Deletes the battle log rows no group or report points at any more (an imported copy of a
+     * tournament shares its logs); their files go after the transaction commits
+     * ({@link DevTournament.#removeLogFiles}).
      *
      * @param {number[]} logIds Logs of groups already deleted or cleared.
      * @param {{ connection: unknown }} context
@@ -145,8 +146,8 @@ export class DevTournament {
     static async #deleteLogs(logIds, context) {
         if (!logIds.length) return [];
         const kept = await Mysql.select(
-            'SELECT log FROM `groups` WHERE log IN (?) UNION SELECT log FROM training_groups WHERE log IN (?)',
-            [logIds, logIds],
+            'SELECT log FROM `groups` WHERE log IN (?) UNION SELECT log FROM training_groups WHERE log IN (?) UNION SELECT log FROM reports WHERE log IN (?)',
+            [logIds, logIds, logIds],
             context,
         );
         const used = new Set(kept.map(row => row.log));
@@ -334,7 +335,11 @@ export class DevTournament {
                     const tournament = await DevTournament.find(tournamentId, context);
                     const { logs, stats } = await DevTournament.#purge(tournament.id, context);
                     replaced.push(...logs);
-                    await Mysql.update('tournament', { ...fields, hash: source.hash ?? '' }, { id: tournament.id }, context);
+                    // the same guard as creating: never take a hash another tournament answers for
+                    const taken = source.hash && await Mysql.count('tournament', { hash: source.hash, id: { not: tournament.id } }, context);
+                    const hash = taken ? randomBytes(8).toString('hex') : source.hash ?? '';
+                    await Mysql.update('tournament', { ...fields, hash }, { id: tournament.id }, context);
+                    if (taken) summary.push(`The hash ${source.hash} belongs to another tournament: this one now uses ${hash}`);
                     summary.push(`Tournament ${id} updated: ${stats.teams} teams, ${stats.groups} groups and ${stats.logs} logs replaced`);
                 }
                 else {
@@ -370,12 +375,15 @@ export class DevTournament {
 
                 const logIds = new Map();
                 for (const log of list('logs')) {
-                    const [existing] = await Mysql.select('SELECT id FROM logs WHERE hash = ? LIMIT 1', [log.hash], context);
-                    if (existing) {
+                    const [existing] = await Mysql.select('SELECT id, origin FROM logs WHERE hash = ? LIMIT 1', [log.hash], context);
+                    // reuse only another tournament's log: never tie a group to a ranked or duel battle
+                    // that deleting this tournament could then remove
+                    if (existing?.origin === 'tourn') {
                         logIds.set(log.id, existing.id);
                         continue;
                     }
-                    const { insertId } = await Mysql.insert('logs', { hash: log.hash, time: log.time ?? null, version: log.version ?? null, origin: log.origin ?? null }, context);
+                    const hash = existing ? randomBytes(8).toString('hex') : log.hash;
+                    const { insertId } = await Mysql.insert('logs', { hash, time: log.time ?? null, version: log.version ?? null, origin: 'tourn' }, context);
                     logIds.set(log.id, insertId);
                     if (typeof log.file_content === 'string') {
                         await writeFile(path.join(logsDir(), String(insertId)), log.file_content);

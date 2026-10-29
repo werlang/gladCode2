@@ -107,4 +107,28 @@ describe('dev tools tournaments', () => {
         expect(writeFile.mock.calls[0][0]).toMatch(/70$/);
         expect(rm.mock.calls[0][0]).toMatch(/70$/);
     });
+
+    test('an import reuses only tournament logs, and a taken hash gets a new one', async () => {
+        Mysql.count.mockResolvedValueOnce(0);
+        Mysql.insert.mockResolvedValueOnce({ insertId: 50 }).mockResolvedValueOnce({ insertId: 71 });
+        Mysql.select.mockResolvedValueOnce([{ id: 5, origin: 'ranked' }]).mockResolvedValueOnce([{ id: 6, origin: 'tourn' }]);
+        const data = { tournaments: [{ name: 'Copa', hash: '' }], teams: [], logs: [{ id: 9, hash: 'abc', origin: 'ranked' }, { id: 10, hash: 'def' }] };
+
+        await DevTournament.import(data, { mode: 'create' });
+        const logInserts = Mysql.insert.mock.calls.filter(([table]) => table === 'logs');
+        expect(logInserts).toHaveLength(1);
+        expect(logInserts[0][1]).toMatchObject({ origin: 'tourn' });
+        expect(logInserts[0][1].hash).toMatch(/^[a-f0-9]{16}$/);
+        expect(logInserts[0][1].hash).not.toBe('abc');
+    });
+
+    test('importing over a tournament never takes another tournament\'s hash', async () => {
+        Mysql.select.mockResolvedValueOnce([{ id: 15, name: 'Copa', description: `${TEST_MARKER} x` }]).mockResolvedValue([]);
+        Mysql.count.mockResolvedValueOnce(1);
+        await DevTournament.import({ tournaments: [{ name: 'Copa', hash: 'h12' }], teams: [] }, { mode: 'update', tournamentId: 15 });
+        expect(Mysql.count).toHaveBeenCalledWith('tournament', { hash: 'h12', id: { not: 15 } }, tx);
+        const update = Mysql.update.mock.calls.find(([table]) => table === 'tournament');
+        expect(update[1].hash).toMatch(/^[a-f0-9]{16}$/);
+        Mysql.select.mockReset();
+    });
 });
