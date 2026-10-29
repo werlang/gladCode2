@@ -146,7 +146,7 @@ gladcode2/
 
 ## 🚀 Deploying
 
-`compose.yaml` builds and runs the production images; the GitHub workflow (`.github/workflows/master-deploy.yml`) pulls `main` on the server, stops when `JWT_SECRET`, `WEB_PUBLISH` or `API_PUBLISH` is missing from `.env`, moves the PHP stack's `public_html/logs` and `public_html/profpics` into `data/` (once, never overwriting), builds, restarts with `--remove-orphans` and runs the migrations. On the server:
+`compose.yaml` builds and runs the production images; the GitHub workflow (`.github/workflows/master-deploy.yml`) pulls `main` on the server, stops when `JWT_SECRET`, `WEB_PUBLISH` or `API_PUBLISH` is missing from `.env`, moves the PHP stack's `public_html/logs` and `public_html/profpics` into `data/` (once, never overwriting), builds, runs the migrations and then restarts with `--remove-orphans`, so new code never meets the old schema. On the server:
 
 - Set `NODE_ENV=production`, `WEB_URL=https://gladcode.dev`, `WEB_PORT=443`, `API_URL=https://api.gladcode.dev`, `API_PORT=443`, `WEB_PUBLISH`/`API_PUBLISH` (for example `127.0.0.1:8085` and `127.0.0.1:8086`), `TRUST_PROXY=true`, a random `JWT_SECRET` and `ADMIN_EMAILS`.
 - Route `gladcode.dev` to the web port and `api.gladcode.dev` to the API port in the host nginx (with TLS).

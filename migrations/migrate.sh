@@ -52,7 +52,7 @@ if [ -z "$NETWORK" ]; then
     exit 1
 fi
 
-# Wait for MySQL to accept connections (deploy restarts it right before us).
+# Wait for MySQL to accept connections (the deploy starts it right before us).
 echo "[migrate] Waiting for MySQL at $MYSQL_HOST:$MYSQL_PORT..."
 tries=0
 while true; do

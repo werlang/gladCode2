@@ -43,16 +43,23 @@ jobs:
             mkdir -p data/logs data/profpics data/runs
             for dir in logs profpics; do
                 if [ -d "public_html/$dir" ]; then
-                    find "public_html/$dir" -mindepth 1 -maxdepth 1 -exec mv -n -t "data/$dir" {} +
+                    # some coreutils versions exit 1 when -n skips a file: that must not stop the deploy
+                    find "public_html/$dir" -mindepth 1 -maxdepth 1 -exec mv -n -t "data/$dir" {} + || true
+                    left=$(find "public_html/$dir" -mindepth 1 -maxdepth 1 | wc -l)
+                    if [ "$left" -gt 0 ]; then
+                        echo "[Deploy] warning: $left entries of public_html/$dir already exist in data/$dir and were left in place."
+                    fi
                 fi
             done
             echo "[Deploy] Building images..."
             docker compose build
+            echo "[Deploy] Running database migrations in a one-shot container..."
+            # before the new code starts, so it never runs against the old schema
+            docker compose up -d mysql
+            ./migrations/migrate.sh
             echo "[Deploy] Restarting services..."
             # --remove-orphans drops services that left compose.yaml (the PHP stack's apache)
             docker compose up -d --force-recreate --remove-orphans
-            echo "[Deploy] Running database migrations in a one-shot container..."
-            ./migrations/migrate.sh
             echo "[Deploy] Services restarted successfully."
       - name: Notify success
         if: success()
