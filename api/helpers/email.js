@@ -76,7 +76,13 @@ export async function sendMail(template, { subject, recipients, vars = {}, raw =
             continue;
         }
         sent++;
-        await onSent?.(recipient);
+        try {
+            await onSent?.(recipient);
+        }
+        catch (error) {
+            // the email went out: a failed follow-up must not stop the rest of the recipients
+            console.error(`Mail "${template}" to ${recipient.email}: onSent failed:`, error.message);
+        }
     }
     return { sent, failed };
 }
