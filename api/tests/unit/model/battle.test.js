@@ -21,7 +21,9 @@ describe('Battle', () => {
 
     test('counted battles are judged by the log, editor runs keep any error', () => {
         expect(battleError(true, [{}], 'stderr')).toBe('');
-        expect(battleError(true, null, 'boom')).toBe('boom');
+        // the compiler output quotes every gladiator's code: a battle that counts never shows it
+        expect(battleError(true, null, 'code2.c:4: error: secret_move();')).toBe('NO_OUTPUT');
+        expect(battleError(false, null, 'code0.c:4: error')).toBe('code0.c:4: error');
         expect(battleError(false, [{}], 'warning')).toBe('warning');
     });
 

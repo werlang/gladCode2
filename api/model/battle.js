@@ -147,7 +147,11 @@ export class Battle {
         }
 
         const error = battleError(!this.sandbox, simulation, output);
-        if (error) return { log: null, simulation: null, error };
+        if (error) {
+            // the answer of a battle that counts hides the compiler output: keep it for the logs
+            if (error !== output) console.error(JSON.stringify({ event: 'battle_without_log', origin: this.origin, output }));
+            return { log: null, simulation: null, error };
+        }
         if (!simulation?.length) return { log: null, simulation: null, error: 'NO_OUTPUT' };
 
         if (!store) return { log: null, simulation, error: '' };

@@ -17,8 +17,9 @@ const MANAGED_BATTLES = 20;
 /**
  * Whether a run's error output fails it. Battles that count (not sandboxed) are judged by the
  * engine log alone: a gladiator that crashes mid-battle is killed by the engine, and stderr (which
- * every gladiator can write to) must not discard a valid log. Editor runs keep any error so the
- * player sees it and cannot save broken code.
+ * every gladiator can write to) must not discard a valid log, and without a log they report
+ * `NO_OUTPUT` only: the compiler output quotes the code of every gladiator, other masters' code
+ * included. Editor runs keep any error so the player sees it and cannot save broken code.
  *
  * @param {boolean} counts The battle is not a sandboxed editor run.
  * @param {unknown[]|null} simulation Parsed engine log.
@@ -26,7 +27,8 @@ const MANAGED_BATTLES = 20;
  * @returns {string} The error to report, `''` when the battle stands.
  */
 export function battleError(counts, simulation, error) {
-    return counts && simulation?.length ? '' : error;
+    if (!counts) return error;
+    return simulation?.length ? '' : 'NO_OUTPUT';
 }
 
 /**
