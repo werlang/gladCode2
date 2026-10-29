@@ -179,7 +179,14 @@ class TrainingRound {
             const button = element.querySelector('.foot .button');
             rerun.addEventListener('click', async () => {
                 const group = this.#groupOf.get(element);
-                await TrainingModel.rerun(this.hash, group.id);
+                try {
+                    await TrainingModel.rerun(this.hash, group.id);
+                }
+                catch (error) {
+                    if (error.code !== 'ROUND_OVER') throw error;
+                    showMessage('Esta rodada já terminou. Apenas os grupos da última rodada podem lutar novamente');
+                    return;
+                }
                 group.log = null;
                 button.disabled = true;
                 button.onclick = null;
@@ -345,7 +352,12 @@ class TrainingRound {
         if (this.#advancing) return;
         this.#advancing = true;
         try {
-            await TrainingModel.advance(this.hash);
+            const { status } = await TrainingModel.advance(this.hash);
+            // nothing was due after all: ask again later rather than at once
+            if (status === 'wait') {
+                this.#refreshLater(WAIT_POLL_MS);
+                return;
+            }
         }
         catch {
             // another viewer's page, or this one on its next ask, moves it on

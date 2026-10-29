@@ -335,19 +335,21 @@ export class TrainingRound {
     }
 
     /**
-     * Makes a group fight again now, its scores cleared (manager only).
+     * Makes a group of the latest round fight again now, its scores cleared (manager only). Only
+     * the latest round's groups fight, so an earlier one would stay unfought with no score.
      *
      * @param {string} hash
      * @param {number} groupId
      * @param {number} userId
-     * @throws {CustomError} 404 `GROUP_NOT_FOUND`.
+     * @throws {CustomError} 404 `GROUP_NOT_FOUND`, 409 `ROUND_OVER`.
      */
     static async rerun(hash, groupId, userId) {
         const training = await TrainingRound.#managed(hash, userId);
         await Mysql.withTransaction(async context => {
-            if (!await Mysql.count('gladiator_training', { training: training.id, groupid: groupId }, context)) {
-                throw new CustomError(404, 'Group not found.', 'GROUP_NOT_FOUND');
-            }
+            const [group] = await Mysql.select(`SELECT DISTINCT tg.round FROM ${ENTRY_JOIN} WHERE gt.training = ? AND tg.id = ?`, [training.id, groupId], context);
+            if (!group) throw new CustomError(404, 'Group not found.', 'GROUP_NOT_FOUND');
+            if (group.round !== await TrainingRound.#maxRound(training.id, context)) throw new CustomError(409, 'This round is over.', 'ROUND_OVER');
+
             await Mysql.update('training_groups', { deadline: Mysql.raw('NOW(3)'), locked: null, log: null }, { id: groupId }, context);
             await Mysql.update('gladiator_training', { score: 0, lasttime: 0 }, { groupid: groupId }, context);
         });

@@ -240,10 +240,18 @@ describe('training rounds', () => {
         expect(Mysql.update).not.toHaveBeenCalled();
         Mysql.select.mockReset();
 
-        Mysql.select.mockResolvedValueOnce([running]);
-        Mysql.count.mockResolvedValueOnce(1);
+        Mysql.select.mockResolvedValueOnce([running]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ round: 2 }]);
         await TrainingRound.rerun('AB12', 3, 7);
         expect(Mysql.update).toHaveBeenCalledWith('training_groups', expect.objectContaining({ locked: null, log: null }), { id: 3 }, tx);
         expect(Mysql.update).toHaveBeenCalledWith('gladiator_training', { score: 0, lasttime: 0 }, { groupid: 3 }, tx);
+    });
+
+    test('only the latest round\'s groups fight again', async () => {
+        // round 3 opened as soon as round 2's last group fought: round 2 would never fight again
+        Mysql.select.mockResolvedValueOnce([running]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ round: 3 }]);
+        await expect(TrainingRound.rerun('AB12', 3, 7)).rejects.toMatchObject({ status: 409, code: 'ROUND_OVER' });
+        Mysql.select.mockResolvedValueOnce([running]).mockResolvedValueOnce([]);
+        await expect(TrainingRound.rerun('AB12', 99, 7)).rejects.toMatchObject({ status: 404, code: 'GROUP_NOT_FOUND' });
+        expect(Mysql.update).not.toHaveBeenCalled();
     });
 });
