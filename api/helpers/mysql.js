@@ -28,6 +28,8 @@ export class Mysql {
             database: process.env.MYSQL_DATABASE || 'gladcode',
             charset: 'utf8mb4',
             dateStrings: true,
+            // an object passed as a value is compared as a string, never expanded into `key` = value
+            stringifyObjects: true,
             connectionLimit: 10,
         };
     }
@@ -73,31 +75,9 @@ export class Mysql {
     }
 
     /**
-     * Expands raw fragments (`Mysql.raw`) in place of their `?` and drops them from the values.
-     *
-     * @param {string} sql
-     * @param {unknown[]} values
-     * @returns {{ sql: string, values: unknown[] }}
-     */
-    static #expandRaw(sql, values) {
-        if (!values.some(value => typeof value?.toSqlString === 'function')) return { sql, values };
-
-        const pieces = sql.split('?');
-        let expanded = pieces.shift();
-        const kept = [];
-        values.forEach(value => {
-            if (typeof value?.toSqlString === 'function') expanded += value.toSqlString();
-            else {
-                expanded += '?';
-                kept.push(value);
-            }
-            expanded += pieces.shift() ?? '';
-        });
-        return { sql: expanded + pieces.join('?'), values: kept };
-    }
-
-    /**
-     * Runs one parameterised statement on the pool or on a transaction connection.
+     * Runs one parameterised statement on the pool or on a transaction connection. The driver
+     * fills the placeholders: `Mysql.raw` values are embedded as they are, every other value is
+     * escaped (objects as strings, see `stringifyObjects`).
      *
      * @param {string} sql
      * @param {unknown[]} [values]
@@ -106,13 +86,13 @@ export class Mysql {
      */
     static async #query(sql, values = [], { connection } = {}) {
         const executor = connection || Mysql.#connect();
-        const statement = Mysql.#expandRaw(sql.trim(), values);
+        const statement = sql.trim();
         try {
-            const [result] = await executor.query(statement.sql, statement.values);
+            const [result] = await executor.query(statement, values);
             return result;
         }
         catch (error) {
-            throw new CustomError(500, error.message, 'SQL_ERROR', { sql: statement.sql, code: error.code });
+            throw new CustomError(500, error.message, 'SQL_ERROR', { sql: statement, code: error.code });
         }
     }
 

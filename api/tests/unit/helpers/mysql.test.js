@@ -6,6 +6,7 @@ vi.mock('mysql2/promise', () => ({
     default: { createPool: () => ({ query, getConnection: async () => connection, pool: { on: vi.fn() }, end: vi.fn() }) },
 }));
 
+const { format } = await vi.importActual('mysql2');
 const { Mysql } = await import('../../../helpers/mysql.js');
 
 describe('Mysql helper', () => {
@@ -46,9 +47,17 @@ describe('Mysql helper', () => {
 
     test('raw fragments are embedded, values stay bound', async () => {
         query.mockResolvedValue([{ insertId: 5, affectedRows: 1 }]);
-        const result = await Mysql.insert('news', { title: 'x', time: Mysql.raw('NOW(3)') });
-        expect(query).toHaveBeenCalledWith('INSERT INTO `news` (`title`, `time`) VALUES (?, NOW(3))', ['x']);
+        const result = await Mysql.insert('news', { title: 'x?', time: Mysql.raw('NOW(3)') });
+        // rendered by the real driver, as the pool does with the helper's settings
+        const [sql, values] = query.mock.calls[0];
+        expect(format(sql, values, Mysql.config.stringifyObjects)).toBe("INSERT INTO `news` (`title`, `time`) VALUES ('x?', NOW(3))");
         expect(result).toEqual({ insertId: 5, affectedRows: 1 });
+    });
+
+    test('an object value is compared as a string, never expanded into a condition', async () => {
+        await Mysql.select('SELECT id FROM usuarios WHERE token = ?', [{ token: 1 }]);
+        const [sql, values] = query.mock.calls[0];
+        expect(format(sql, values, Mysql.config.stringifyObjects)).toBe("SELECT id FROM usuarios WHERE token = '[object Object]'");
     });
 
     test('update supports increments and refuses to run without a filter', async () => {
