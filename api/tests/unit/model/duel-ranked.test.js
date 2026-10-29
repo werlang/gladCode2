@@ -48,9 +48,20 @@ describe('duels', () => {
         Mysql.findOne.mockResolvedValueOnce({ id: 3, gladiator1: 11, user2: 7 });
         Mysql.count.mockResolvedValueOnce(0);
         run.mockResolvedValueOnce({ log: { hash: 'abc' }, error: '' });
+        Mysql.update.mockResolvedValueOnce(1);
         expect(await Duel.fight({ id: 7 }, 3, 4)).toEqual({ hash: 'abc', error: '' });
         expect(run.mock.calls[0][0]).toMatchObject({ ids: [4, 11], options: { origin: 'duel' } });
-        expect(Mysql.update).toHaveBeenCalledWith('duels', expect.objectContaining({ log: 'abc', gladiator2: 4 }), { id: 3, user2: 7 });
+        expect(Mysql.update).toHaveBeenCalledWith('duels', expect.objectContaining({ log: 'abc', gladiator2: 4 }), { id: 3, user2: 7, log: null });
+    });
+
+    test('a duel answered twice at once keeps the first battle only', async () => {
+        const remove = vi.fn();
+        Mysql.findOne.mockResolvedValueOnce({ id: 3, gladiator1: 11, user2: 7 });
+        Mysql.count.mockResolvedValueOnce(0);
+        run.mockResolvedValueOnce({ log: { hash: 'late', delete: remove }, error: '' });
+        Mysql.update.mockResolvedValueOnce(0);
+        await expect(Duel.fight({ id: 7 }, 3, 4)).rejects.toMatchObject({ status: 409, code: 'DUEL_ANSWERED' });
+        expect(remove).toHaveBeenCalledTimes(1);
     });
 
     test('a duel against an outdated gladiator does not run', async () => {

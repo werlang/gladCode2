@@ -101,7 +101,20 @@ export class ChallengeList {
     #accept(duel) {
         openDuelBox(duel.nick, 'DUELAR', async (glad, confirm, fog) => {
             const progress = new ProgressButton(confirm, ['Executando batalha...', 'Aguardando resposta do servidor']);
-            const log = await runSimulation(signal => DuelModel.fight(duel.id, glad.id, { signal }), [glad.name, duel.nick]);
+            let log;
+            try {
+                log = await runSimulation(signal => DuelModel.fight(duel.id, glad.id, { signal }), [glad.name, duel.nick]);
+            }
+            catch (error) {
+                const problems = {
+                    DUEL_ANSWERED: 'Este desafio já foi respondido',
+                    DUEL_NOT_FOUND: 'Este desafio não existe mais',
+                    DUEL_GLADIATOR_GONE: 'O gladiador do desafiante não existe mais',
+                    GLADIATOR_OUTDATED: 'Os dois gladiadores precisam estar atualizados para duelar',
+                };
+                showMessage(problems[error.code] ?? 'Não foi possível executar o duelo');
+                log = false;
+            }
             progress.kill();
             fog.remove();
             this.onDuelFought();

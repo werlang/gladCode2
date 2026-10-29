@@ -113,7 +113,7 @@ export class Duel {
      * @param {number} duelId
      * @param {number} gladiatorId
      * @returns {Promise<{ hash: string|null, error: string }>}
-     * @throws {CustomError} 404 `DUEL_NOT_FOUND`/`GLADIATOR_NOT_FOUND`, 409 `DUEL_GLADIATOR_GONE`/`GLADIATOR_OUTDATED`.
+     * @throws {CustomError} 404 `DUEL_NOT_FOUND`/`GLADIATOR_NOT_FOUND`, 409 `DUEL_GLADIATOR_GONE`/`GLADIATOR_OUTDATED`/`DUEL_ANSWERED`.
      */
     static async fight(user, duelId, gladiatorId) {
         const duel = await Mysql.findOne('duels', { filter: { id: duelId, user2: user.id, log: null } });
@@ -128,7 +128,12 @@ export class Duel {
         const { log, error } = await battle.run();
         if (!log) return { hash: null, error };
 
-        await Mysql.update('duels', { log: log.hash, gladiator2: gladiatorId, time: Mysql.raw('NOW()') }, { id: duelId, user2: user.id });
+        // two answers at once (a double click) both fight: only the first to finish is kept
+        const answered = await Mysql.update('duels', { log: log.hash, gladiator2: gladiatorId, time: Mysql.raw('NOW()') }, { id: duelId, user2: user.id, log: null });
+        if (!answered) {
+            await log.delete();
+            throw new CustomError(409, 'This duel was already answered.', 'DUEL_ANSWERED');
+        }
         return { hash: log.hash, error: '' };
     }
 }
