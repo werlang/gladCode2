@@ -30,13 +30,13 @@ const save = vi.fn(async function save(fields) { return Object.assign(this, fiel
 vi.mock('../../../model/gladiator.js', () => ({
     Gladiator: Object.assign(class {
         constructor(fields) { Object.assign(this, fields); }
-        save(fields) { return save.call(this, fields); }
+        saveChecked(fields) { return save.call(this, fields); }
         toJSON() { return { id: this.cod, name: this.name }; }
     }, {
         assertSavable: vi.fn(),
         findOwned: vi.fn(async (id, master) => {
             if (master !== 7) throw Object.assign(new Error('nope'), { status: 404, code: 'GLADIATOR_NOT_FOUND' });
-            return { cod: id, name: 'Old', save(fields) { return save.call(this, fields); }, delete: vi.fn(), toJSON() { return { id: this.cod, name: this.name }; } };
+            return { cod: id, name: 'Old', saveChecked(fields) { return save.call(this, fields); }, delete: vi.fn(), toJSON() { return { id: this.cod, name: this.name }; } };
         }),
         listByMaster: vi.fn(async () => []),
     }),

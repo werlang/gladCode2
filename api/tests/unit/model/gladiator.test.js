@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-vi.mock('../../../helpers/mysql.js', () => ({ Mysql: { findOne: vi.fn(), count: vi.fn() } }));
+vi.mock('../../../helpers/mysql.js', () => ({
+    Mysql: { findOne: vi.fn(), count: vi.fn(), select: vi.fn(), insert: vi.fn(), update: vi.fn(), withTransaction: vi.fn(operation => operation({ connection: 'tx' })) },
+}));
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { Gladiator, gladiatorLimit } = await import('../../../model/gladiator.js');
 const { VERSION } = await import('../../../helpers/version.js');
@@ -37,6 +39,27 @@ describe('Gladiator', () => {
         await expect(Gladiator.assertSavable(glad, master)).rejects.toMatchObject({ status: 403, code: 'GLADIATOR_LIMIT', data: { limit: 3 } });
         Mysql.count.mockResolvedValueOnce(3);
         await expect(Gladiator.assertSavable({ ...glad, id: 4 }, master)).resolves.toBeUndefined();
+    });
+
+    test('names fit the 49 bytes the engine keeps', async () => {
+        await expect(Gladiator.assertSavable({ ...glad, name: 'a'.repeat(49) }, master)).resolves.toBeUndefined();
+        await expect(Gladiator.assertSavable({ ...glad, name: 'a'.repeat(50) }, master)).rejects.toMatchObject({ code: 'INVALID_NAME' });
+        // accented letters take two bytes each
+        await expect(Gladiator.assertSavable({ ...glad, name: 'é'.repeat(25) }, master)).rejects.toMatchObject({ code: 'INVALID_NAME' });
+    });
+
+    test('saving checks again under the master\'s lock, so parallel saves cannot pass the limit', async () => {
+        Mysql.insert.mockResolvedValue({ insertId: 51 });
+        await new Gladiator({ master: 7 }).saveChecked({ ...glad, skin: '', blocks: '' }, master);
+        expect(Mysql.select).toHaveBeenCalledWith('SELECT id FROM usuarios WHERE id = ? FOR UPDATE', [7], { connection: 'tx' });
+        expect(Mysql.count).toHaveBeenCalledWith('gladiators', { master: 7 }, { connection: 'tx' });
+        expect(Mysql.insert).toHaveBeenCalledWith('gladiators', expect.objectContaining({ name: 'Zed', master: 7 }), { connection: 'tx' });
+
+        // the other request saved first: the limit is reached now and nothing is written
+        Mysql.insert.mockClear();
+        Mysql.count.mockResolvedValueOnce(3);
+        await expect(new Gladiator({ master: 7 }).saveChecked({ ...glad, skin: '', blocks: '' }, master)).rejects.toMatchObject({ code: 'GLADIATOR_LIMIT' });
+        expect(Mysql.insert).not.toHaveBeenCalled();
     });
 
     test('a master only finds their own gladiators', async () => {

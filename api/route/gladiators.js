@@ -79,7 +79,7 @@ router.post('/', auth(), asyncRoute(async (req, res) => {
     const glad = gladiatorBody(req.body);
     await Gladiator.assertSavable(glad, req.user);
     await testBeforeSaving(glad, req.user.apelido);
-    const saved = await new Gladiator({ master: req.user.id }).save(glad);
+    const saved = await new Gladiator({ master: req.user.id }).saveChecked(glad, req.user);
     res.status(201).send({ gladiator: saved.toJSON(req.user.apelido) });
 }));
 
@@ -93,7 +93,7 @@ router.put('/:id', auth(), asyncRoute(async (req, res) => {
     const glad = gladiatorBody(req.body);
     await Gladiator.assertSavable({ ...glad, id }, req.user);
     await testBeforeSaving(glad, req.user.apelido);
-    const saved = await existing.save(glad);
+    const saved = await existing.saveChecked(glad, req.user);
     res.send({ gladiator: saved.toJSON(req.user.apelido) });
 }));
 
