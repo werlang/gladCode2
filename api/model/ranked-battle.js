@@ -126,6 +126,12 @@ export class RankedBattle {
             .filter(entry => entry.saved);
 
         await Mysql.withTransaction(async context => {
+            // masters before gladiators, the order saving a gladiator takes them in, so the two never deadlock
+            const masters = [...new Set(placed.map(entry => entry.saved.master))].sort((a, b) => a - b);
+            if (masters.length) {
+                await Mysql.select(`SELECT id FROM usuarios WHERE id IN (${masters.map(() => '?').join(',')}) ORDER BY id FOR UPDATE`, masters, context);
+            }
+
             // a gladiator whose client crashed leaves matchmaking until its owner saves it again
             const crashed = crashedGladiators(simulation)
                 .map(index => battle.savedGladiator(logGlads[index].name, logGlads[index].user)?.id)

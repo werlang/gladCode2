@@ -10,7 +10,7 @@ vi.mock('../../../model/battle.js', () => ({
         constructor(options) { this.options = options; }
         async addGladiators(ids) { this.ids = ids; return this; }
         run() { return run(this); }
-        savedGladiator(name) { return { Zed: { id: 20 }, Max: { id: 4 } }[name]; }
+        savedGladiator(name) { return { Zed: { id: 20, master: 8 }, Max: { id: 4, master: 7 } }[name]; }
     },
 }));
 vi.mock('../../../model/stats.js', () => ({ Stats: { record: vi.fn() } }));
@@ -128,20 +128,22 @@ describe('ranked battles', () => {
 describe('ranked rewards', () => {
     beforeEach(() => vi.clearAllMocks());
 
-    test('rewards lock the gladiators and are written with the stats in one transaction', async () => {
+    test('rewards lock the masters, then the gladiators, and are written with the stats in one transaction', async () => {
         const simulation = [
             { simtime: 1, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }] },
             { simtime: 30, glads: [{ name: 'Zed', user: 'Bo', hp: 0 }, { name: 'Max', user: 'Ana', hp: 4 }] },
         ];
         Mysql.select
             .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20]' }])
+            .mockResolvedValueOnce([{ id: 7 }, { id: 8 }])
             .mockResolvedValueOnce([{ cod: 20, mmr: 1000, master: 8, lvl: 3, xp: 0 }, { cod: 4, mmr: 1000, master: 7, lvl: 3, xp: 0 }])
             .mockResolvedValueOnce([{ battles: 0 }])
             .mockResolvedValueOnce([{ lvl: 3, xp: 10, silver: 50, cod: 4, name: 'Max', skin: '', vstr: 1, vagi: 1, vint: 1, mmr: 1010 }]);
         run.mockResolvedValueOnce({ log: { id: 9, hash: 'abc' }, simulation, error: '' });
 
         expect((await RankedBattle.fight({ id: 7 }, 'd'.repeat(32))).hash).toBe('abc');
-        const [sql, ids, context] = Mysql.select.mock.calls[1];
+        expect(Mysql.select.mock.calls[1]).toEqual(['SELECT id FROM usuarios WHERE id IN (?,?) ORDER BY id FOR UPDATE', [7, 8], { connection: 'tx' }]);
+        const [sql, ids, context] = Mysql.select.mock.calls[2];
         expect(sql).toMatch(/WHERE g\.cod IN \(\?,\?\) FOR UPDATE$/);
         expect([ids, context]).toEqual([[4, 20], { connection: 'tx' }]);
         expect(Stats.record).toHaveBeenCalledWith(simulation, 9, [20, 4], { connection: 'tx' });
