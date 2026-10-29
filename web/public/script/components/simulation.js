@@ -106,8 +106,11 @@ export function abortSimulation() {
     pending?.abort();
 }
 
-/** How long a battle may take before the button gives up, in ms. */
-const PROGRESS_LIMIT_MS = 20000;
+/**
+ * How long a battle may take before the button gives up, in ms: past the API's own 60 s runner
+ * limit, so a battle the server still counts is never reported as failed here.
+ */
+const PROGRESS_LIMIT_MS = 65000;
 /** How long each waiting message stays, in ms. */
 const MESSAGE_MS = 2000;
 
