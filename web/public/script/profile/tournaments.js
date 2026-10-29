@@ -199,11 +199,20 @@ class TeamWindow {
             else add.addEventListener('click', () => this.#addGladiator());
             container.append(add);
         }
-        if (!known) button.textContent = 'INGRESSAR';
-        if ((data.joined || glads.length >= TEAM_SIZE) && button.textContent === 'INGRESSAR') {
+        if (!button) return;
+        // a refresh after joining turns the button into ABANDONAR again
+        button.textContent = known ? 'ABANDONAR' : 'INGRESSAR';
+        if (!known && (data.joined || glads.length >= TEAM_SIZE)) {
             button.remove();
             window_.querySelectorAll('#button-container .button').forEach(other => other.classList.add('single'));
         }
+    }
+
+    /** The tournament started meanwhile: closes both windows and says so. */
+    #tournamentStarted() {
+        this.fog.remove();
+        this.tournament.fog.remove();
+        showMessage('Este torneio já iniciou');
     }
 
     /** @param {Record<string, any>} glad The user's gladiator in the team. */
@@ -216,8 +225,7 @@ class TeamWindow {
         }
         catch (error) {
             if (error.code !== 'TOURNAMENT_STARTED') throw error;
-            this.fog.remove();
-            showMessage('Este torneio já iniciou');
+            this.#tournamentStarted();
             return;
         }
         if (data.teamRemoved) {
@@ -238,10 +246,7 @@ class TeamWindow {
             await TournamentModel.addGladiator(this.team.id, { word: this.word, ...choice });
         }
         catch (error) {
-            if (error.code === 'TOURNAMENT_STARTED') {
-                this.fog.remove();
-                showMessage('Este torneio já iniciou');
-            }
+            if (error.code === 'TOURNAMENT_STARTED') this.#tournamentStarted();
             else showMessage(TEAM_ERRORS[error.code] ?? 'Não foi possível adicionar o gladiador');
             return;
         }
@@ -258,9 +263,8 @@ class TeamWindow {
                 data = await TournamentModel.leaveTeam(this.team.id);
             }
             catch (error) {
-                this.fog.remove();
                 if (error.code !== 'TOURNAMENT_STARTED') throw error;
-                showMessage('Este torneio já iniciou');
+                this.#tournamentStarted();
                 return;
             }
             this.fog.remove();
