@@ -8,6 +8,9 @@ nginx/*
 backup/gcloud_config.json
 *.sql
 *.sql.gz
+# ...but schema migrations and release notes are code
+!migrations/*.sql
+!dev-tools/news/*.sql
 web/public/assets/synty
 .playwright-mcp
 TODO.md
