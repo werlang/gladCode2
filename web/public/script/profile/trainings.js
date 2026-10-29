@@ -274,8 +274,11 @@ class TrainingRoom {
         if (this.manager) this.#showInvitation(data);
         window_.querySelector('#close').addEventListener('click', () => this.close());
         await this.refresh();
+        // the first refresh may have closed the window (started, removed, not a member)
+        if (!this.#fog) return;
         this.#timer = setInterval(() => {
-            if (!document.hidden) this.refresh();
+            // a failed poll (a lost connection, say) is simply tried again on the next tick
+            if (!document.hidden) this.refresh().catch(() => {});
         }, ROOM_POLL_MS);
     }
 
