@@ -73,7 +73,7 @@ export const fullMessageTemplate = `
 
 export const replyTemplate = `
 <div class='row reply'>
-    <textarea class='input' aria-label='Resposta'></textarea>
+    <textarea class='input' aria-label='Resposta' maxlength='1000'></textarea>
     <div class='row buttons'>
         <button class='button' id='send'><img src='icon/reply.png' alt=''><span>Enviar</span></button>
         <button class='button' id='cancel'><img src='icon/delete2.png' alt=''><span>Descartar</span></button>

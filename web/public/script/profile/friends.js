@@ -5,8 +5,8 @@ import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
 
-/** Longest private message, in characters. */
-const MAX_MESSAGE = 2048;
+/** Longest private message, in characters (the API refuses longer ones). */
+const MAX_MESSAGE = 1000;
 
 /**
  * Writes a private message to a user (the API e-mails them about it).
@@ -17,7 +17,14 @@ const MAX_MESSAGE = 2048;
 export async function writeMessage(user, nick) {
     const message = await showTextArea(`Mensagem para <span class='highlight'>${escapeHtml(nick)}</span>:`, 'Olá...', MAX_MESSAGE);
     if (!message) return;
-    await MessageModel.send(user, message);
+    try {
+        await MessageModel.send(user, message);
+    }
+    catch (error) {
+        if (error.code !== 'MESSAGE_TOO_LONG') throw error;
+        showMessage('A mensagem é longa demais. Encurte o texto e tente novamente.');
+        return;
+    }
     showMessage('Mensagem enviada');
 }
 

@@ -11,7 +11,7 @@ vi.mock('../../../helpers/email.js', async original => ({ ...(await original()),
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { sendMail, fillTemplate } = await import('../../../helpers/email.js');
 const { Friendship } = await import('../../../model/friendship.js');
-const { Message } = await import('../../../model/message.js');
+const { Message, storedMessage } = await import('../../../model/message.js');
 const { Report } = await import('../../../model/report.js');
 const { Duel } = await import('../../../model/duel.js');
 
@@ -58,6 +58,20 @@ describe('social models', () => {
         const [, row] = Mysql.insert.mock.calls[0];
         expect(row).toMatchObject({ sender: 7, receiver: 9, message: '<quote>oi &amp; tchau</quote>&#60;b&#62;ok&#60;/b&#62;' });
         expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    test('a reply always keeps its own text, quoting only what still fits', () => {
+        // a long thread: the original already quotes an older message and fills the column
+        const original = `<quote>${'o'.repeat(500)}</quote>${'a'.repeat(1530)}&#60;b&#62;`;
+        const stored = storedMessage('NEW REPLY', original);
+        expect(stored.endsWith('NEW REPLY')).toBe(true);
+        expect(stored.length).toBeLessThanOrEqual(2048);
+        expect(stored).toBe(`<quote>${'a'.repeat(1530)}&#60;b&#62;</quote>NEW REPLY`);
+
+        const cut = storedMessage('x'.repeat(2026), `${'a'.repeat(5)}&#60;bb`);
+        expect(cut).toBe(`<quote>aaaaa</quote>${'x'.repeat(2026)}`);
+        expect(storedMessage('x'.repeat(2040), 'quoted')).toBe('x'.repeat(2040));
+        expect(() => storedMessage('x'.repeat(2049), null)).toThrow(expect.objectContaining({ code: 'MESSAGE_TOO_LONG' }));
     });
 
     test('a reply needs a message the master received', async () => {

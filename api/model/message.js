@@ -4,6 +4,29 @@ import { Mysql } from '../helpers/mysql.js';
 
 /** Messages per page. */
 export const MESSAGES_PAGE_SIZE = 10;
+/** Size of `messages.message`. */
+const MESSAGE_LENGTH = 2048;
+
+/**
+ * The stored form of a message: the escaped text, after the quoted message's own text when it
+ * answers one. The quote drops the older quotes nested in it and gives up its end when space runs
+ * out, so the new text is always kept whole.
+ *
+ * @param {string} escaped The new text, HTML-escaped.
+ * @param {string|null} quoted The stored message being answered.
+ * @returns {string}
+ * @throws {CustomError} 400 `MESSAGE_TOO_LONG` when the new text alone does not fit.
+ */
+export function storedMessage(escaped, quoted) {
+    if (escaped.length > MESSAGE_LENGTH) throw new CustomError(400, 'The message is too long.', 'MESSAGE_TOO_LONG');
+    if (quoted === null) return escaped;
+
+    const room = MESSAGE_LENGTH - escaped.length - '<quote></quote>'.length;
+    if (room <= 0) return escaped;
+    // never cut an entity such as &#60; in half
+    const quote = quoted.replace(/<quote>[\s\S]*<\/quote>/g, '').slice(0, room).replace(/&[^;]*$/, '');
+    return `<quote>${quote}</quote>${escaped}`;
+}
 
 /**
  * Private messages between masters (`messages`, key `cod`). Texts are stored HTML-escaped (the
@@ -48,15 +71,15 @@ export class Message {
      * @param {number} receiverId
      * @param {string} text Plain text.
      * @param {string} [quoted] Stored HTML of the message being answered.
-     * @throws {CustomError} 404 `USER_NOT_FOUND`.
+     * @throws {CustomError} 404 `USER_NOT_FOUND`, 400 `MESSAGE_TOO_LONG` when the escaped text
+     *   alone does not fit the column.
      */
     static async send(sender, receiverId, text, quoted = null) {
         const receiver = await Mysql.findOne('usuarios', { filter: { id: receiverId }, view: ['id', 'apelido', 'email', 'pref_message'] });
         if (!receiver) throw new CustomError(404, 'Master not found.', 'USER_NOT_FOUND');
 
-        const escaped = escapeMailText(text);
-        const stored = quoted === null ? escaped : `<quote>${quoted}</quote>${escaped}`;
-        await Mysql.insert('messages', { time: Mysql.raw('NOW()'), sender: sender.id, receiver: receiver.id, message: stored.slice(0, 2048) });
+        const message = storedMessage(escapeMailText(text), quoted);
+        await Mysql.insert('messages', { time: Mysql.raw('NOW()'), sender: sender.id, receiver: receiver.id, message });
 
         if (Number(receiver.pref_message)) {
             await sendMail('message', {

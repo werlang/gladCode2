@@ -1,3 +1,4 @@
+import { showMessage } from '../components/dialog.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
@@ -111,7 +112,14 @@ export class MessagesTab {
 
         reply.querySelector('#send').addEventListener('click', async () => {
             const text = input.value;
-            await MessageModel.reply(message.id, text);
+            try {
+                await MessageModel.reply(message.id, text);
+            }
+            catch (error) {
+                if (error.code !== 'MESSAGE_TOO_LONG') throw error;
+                showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
+                return;
+            }
             this.show();
         });
         reply.querySelector('#cancel').addEventListener('click', () => {
