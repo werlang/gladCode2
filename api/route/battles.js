@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { CustomError } from '../helpers/error.js';
+import { oneBattlePerClient } from '../helpers/runner.js';
 import { Validate } from '../helpers/validation.js';
 import { auth } from '../middleware/auth.js';
 import { asyncRoute } from '../middleware/error.js';
@@ -17,7 +18,8 @@ const MAX_OPPONENTS = 4;
  * The editor's test battle, in the sandbox (test-only commands allowed), open to visitors:
  * `{ gladiator: { source }, opponents: [{ sample } | { id }], breakpoints?: number[] }` where
  * `source` is the full code with setup() and `id` one of the signed-in master's gladiators.
- * Answers `{ hash, error }`: the log hash, or null with the compiler or engine error.
+ * Answers `{ hash, error }`: the log hash, or null with the compiler or engine error. One test at a
+ * time per master (or per address for visitors): 429 `BATTLE_RUNNING`.
  */
 router.post('/test', auth({ optional: true }), asyncRoute(async (req, res) => {
     const body = req.body ?? {};
@@ -40,7 +42,8 @@ router.post('/test', auth({ optional: true }), asyncRoute(async (req, res) => {
     battle.addSource(source, { edited: true }).setBreakpoints(breakpoints);
     await battle.addGladiators(ids);
 
-    const { log, error } = await battle.run();
+    const client = req.user ? `user:${req.user.id}` : `ip:${req.ip}`;
+    const { log, error } = await oneBattlePerClient(client, () => battle.run());
     res.send({ hash: log?.hash ?? null, error });
 }));
 

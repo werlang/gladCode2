@@ -82,6 +82,7 @@ services:
             - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
             - ADMIN_EMAILS=${ADMIN_EMAILS:-}
             - TRUST_PROXY=${TRUST_PROXY:-false}
+            - RUNNER_CONCURRENCY=${RUNNER_CONCURRENCY:-6}
             - MAILER_HOST=${MAILER_HOST:-email-smtp.us-east-1.amazonaws.com}
             - MAILER_PORT=${MAILER_PORT:-587}
             - MAILER_USER=${MAILER_USER:-}

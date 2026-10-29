@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { CustomError } from '../helpers/error.js';
+import { oneBattlePerClient } from '../helpers/runner.js';
 import { Validate } from '../helpers/validation.js';
 import { auth } from '../middleware/auth.js';
 import { asyncRoute } from '../middleware/error.js';
@@ -32,14 +33,15 @@ function gladiatorBody(body = {}) {
  * is not kept.
  *
  * @param {ReturnType<typeof gladiatorBody>} glad
- * @param {string} nick
- * @throws {CustomError} 422 `GLADIATOR_TEST_FAILED` (data: `{ error }`, the engine output).
+ * @param {{ id: number, apelido: string }} master
+ * @throws {CustomError} 422 `GLADIATOR_TEST_FAILED` (data: `{ error }`, the engine output), 429
+ *   `BATTLE_RUNNING` while another battle of the master runs.
  */
-async function testBeforeSaving(glad, nick) {
+async function testBeforeSaving(glad, master) {
     const battle = new Battle({ origin: 'editor', sandbox: true });
     for (const name of SAVE_TEST_SAMPLES) battle.addSource((await SampleGladiator.find(name)).code);
-    battle.addDraft({ ...glad, nick });
-    const { error } = await battle.run({ store: false });
+    battle.addDraft({ ...glad, nick: master.apelido });
+    const { error } = await oneBattlePerClient(`user:${master.id}`, () => battle.run({ store: false }));
     if (error) throw new CustomError(422, 'The gladiator failed its test battle.', 'GLADIATOR_TEST_FAILED', { error });
 }
 
@@ -78,7 +80,7 @@ router.get('/:id', auth(), asyncRoute(async (req, res) => {
 router.post('/', auth(), asyncRoute(async (req, res) => {
     const glad = gladiatorBody(req.body);
     await Gladiator.assertSavable(glad, req.user);
-    await testBeforeSaving(glad, req.user.apelido);
+    await testBeforeSaving(glad, req.user);
     const saved = await new Gladiator({ master: req.user.id }).saveChecked(glad, req.user);
     res.status(201).send({ gladiator: saved.toJSON(req.user.apelido) });
 }));
@@ -92,7 +94,7 @@ router.put('/:id', auth(), asyncRoute(async (req, res) => {
     const existing = await Gladiator.findOwned(id, req.user.id);
     const glad = gladiatorBody(req.body);
     await Gladiator.assertSavable({ ...glad, id }, req.user);
-    await testBeforeSaving(glad, req.user.apelido);
+    await testBeforeSaving(glad, req.user);
     const saved = await existing.saveChecked(glad, req.user);
     res.send({ gladiator: saved.toJSON(req.user.apelido) });
 }));
