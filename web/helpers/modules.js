@@ -46,6 +46,8 @@ export function moduleImports({ render2 = false } = {}) {
     for (const dir of MODULE_DIRS) {
         for (const file of scripts(dir)) imports[`/${file}`] = assetUrl(file);
     }
+    // the replay expands its log with the 3D renderer's state module, whichever renderer it uses
+    imports['/script/render2/battle-state.js'] = assetUrl('script/render2/battle-state.js');
     if (render2) {
         Object.assign(imports, THREE_IMPORTS);
         for (const file of scripts('render2')) {
