@@ -31,6 +31,21 @@ jobs:
             git checkout main
             git reset --hard origin/main
             echo "[Deploy] Code synchronized with origin/main."
+            echo "[Deploy] Checking the settings the services need..."
+            # without them the API refuses to start or the web service binds the host's port 80
+            for key in JWT_SECRET WEB_PUBLISH API_PUBLISH; do
+                if ! grep -q "^${key}=." .env; then
+                    echo "[Deploy] error: set ${key} in .env first (see .env.example)." >&2
+                    exit 1
+                fi
+            done
+            echo "[Deploy] Moving the PHP stack's battle logs and profile pictures into data/ (once, never overwriting)..."
+            mkdir -p data/logs data/profpics data/runs
+            for dir in logs profpics; do
+                if [ -d "public_html/$dir" ]; then
+                    find "public_html/$dir" -mindepth 1 -maxdepth 1 -exec mv -n -t "data/$dir" {} +
+                fi
+            done
             echo "[Deploy] Building images..."
             docker compose build
             echo "[Deploy] Restarting services..."
