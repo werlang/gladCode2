@@ -279,7 +279,16 @@ class TournamentRound {
     async #runGroup(groupId, button, force = false) {
         button.disabled = true;
         button.textContent = 'Aguardando batalha...';
-        await runSimulation(signal => TournamentModel.runGroup(this.hash, groupId, { force, signal }));
+        try {
+            await runSimulation(signal => TournamentModel.runGroup(this.hash, groupId, { force, signal }));
+        }
+        catch (error) {
+            const problems = {
+                GROUP_BUSY: 'Este grupo já está em batalha',
+                ROUND_OVER: 'Esta rodada já terminou e a seguinte foi montada com os seus resultados',
+            };
+            showMessage(problems[error.code] ?? 'Não foi possível executar a batalha');
+        }
         this.refresh();
     }
 
@@ -349,7 +358,13 @@ class TournamentRound {
             prepare.disabled = false;
             prepare.textContent = 'Preparar próxima rodada';
             prepare.onclick = async () => {
-                await TournamentModel.nextRound(this.hash);
+                try {
+                    await TournamentModel.nextRound(this.hash);
+                }
+                catch (error) {
+                    if (error.code !== 'GROUP_LOG_MISMATCH') throw error;
+                    showMessage('Não foi possível ler o resultado de um grupo. Execute a batalha desse grupo novamente');
+                }
                 this.refresh();
             };
         }

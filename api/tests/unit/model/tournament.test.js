@@ -141,20 +141,20 @@ describe('tournament rounds', () => {
     test('a running or fought group does not fight again unless forced', async () => {
         for (const group of [{ log: null, busy: 1 }, { log: 30, busy: 0 }]) {
             Mysql.findOne.mockResolvedValueOnce(manager);
-            Mysql.select.mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]).mockResolvedValueOnce([group]);
+            Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([group]);
             await expect(TournamentRound.fight('h', 2, 7)).rejects.toMatchObject({ code: 'GROUP_BUSY' });
         }
         expect(run).not.toHaveBeenCalled();
 
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]).mockResolvedValueOnce([{ log: 30, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: 30, busy: 0 }]);
         run.mockResolvedValueOnce({ log: { id: 31, hash: 'def' }, error: '' });
         expect(await TournamentRound.fight('h', 2, 7, true)).toEqual({ hash: 'def', error: '' });
     });
 
     test('a group fights without potions under a lock it always releases', async () => {
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
         run.mockResolvedValueOnce({ log: { id: 30, hash: 'abc' }, error: '' });
         expect(await TournamentRound.fight('h', 2, 7)).toEqual({ hash: 'abc', error: '' });
         // the group is claimed under a row lock, so two managers' clicks never both fight it
@@ -164,7 +164,7 @@ describe('tournament rounds', () => {
         expect(Mysql.update).toHaveBeenLastCalledWith('groups', { locked: null }, { id: 2 });
 
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
         run.mockRejectedValueOnce(new Error('runner down'));
         await expect(TournamentRound.fight('h', 2, 7)).rejects.toThrow('runner down');
         expect(Mysql.update).toHaveBeenLastCalledWith('groups', { locked: null }, { id: 2 });
@@ -219,5 +219,69 @@ describe('tournament rounds', () => {
         simulation.mockResolvedValueOnce([step(1, ['Zed', 'Ana', 9], ['Rex', 'Bo', 0])]);
         expect(await TournamentRound.advance('h', 7)).toEqual({ status: 'end' });
         expect(Mysql.insert).not.toHaveBeenCalled();
+    });
+
+    test('only the latest round\'s groups fight', async () => {
+        Mysql.findOne.mockResolvedValueOnce(manager);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 1 }, { gladiator: 5, round: 1 }]).mockResolvedValueOnce([{ round: 2 }]);
+        await expect(TournamentRound.fight('h', 2, 7, true)).rejects.toMatchObject({ status: 409, code: 'ROUND_OVER' });
+        expect(run).not.toHaveBeenCalled();
+    });
+
+    /** Advance with one fought group whose members are `members` and log is `steps`. */
+    const advanceOne = (members, steps) => {
+        Mysql.findOne.mockResolvedValueOnce(manager);
+        Mysql.select
+            .mockResolvedValueOnce([])
+            .mockResolvedValueOnce([{ round: 2 }])
+            .mockResolvedValueOnce([{ id: 3, log: 9 }])
+            .mockResolvedValueOnce(members)
+            .mockResolvedValueOnce([{ id: 100 }]);
+        simulation.mockResolvedValueOnce(steps);
+        return TournamentRound.advance('h', 7);
+    };
+
+    test('a gladiator renamed since its battle keeps its result, read in fight order', async () => {
+        const members = [{ grt: 31, glt: 41, name: 'Zed II', apelido: 'Ana', team: 100 }, { grt: 32, glt: 42, name: 'Rex', apelido: 'Bob', team: 200 }];
+        expect(await advanceOne(members, [step(1, ['Zed', 'Ana', 9], ['Rex', 'Bo', 0])])).toEqual({ status: 'end' });
+        expect(Mysql.select.mock.calls[3][0]).toMatch(/ORDER BY grt\.id$/);
+        expect(Mysql.update).toHaveBeenCalledWith('group_teams', { lasttime: 1001 }, { id: 31 }, { connection: 'tx' });
+        expect(Mysql.update).toHaveBeenCalledWith('gladiator_teams', { dead: 2 }, { id: 42 }, { connection: 'tx' });
+    });
+
+    test('a log that fits neither names nor the group stops the round instead of dropping a team', async () => {
+        const members = [{ grt: 31, glt: 41, name: 'Zed II', apelido: 'Ana', team: 100 }];
+        await expect(advanceOne(members, [step(1, ['Zed', 'Ana', 9], ['Rex', 'Bo', 0])])).rejects.toMatchObject({ code: 'GROUP_LOG_MISMATCH' });
+        expect(Mysql.insert).not.toHaveBeenCalled();
+        Mysql.select.mockReset(); // drop the answers the stopped round never read
+    });
+
+    test('recording a group again replaces its earlier deaths', async () => {
+        const members = [{ grt: 31, glt: 41, name: 'Zed', apelido: 'Ana', team: 100 }, { grt: 32, glt: 42, name: 'Rex', apelido: 'Bo', team: 200 }];
+        await advanceOne(members, [step(1, ['Zed', 'Ana', 9], ['Rex', 'Bo', 0])]);
+        const updates = Mysql.update.mock.calls.filter(([table]) => table === 'gladiator_teams');
+        expect(updates).toEqual([
+            ['gladiator_teams', { dead: 0 }, { id: [41, 42], dead: 2 }, { connection: 'tx' }],
+            ['gladiator_teams', { dead: 2 }, { id: 42 }, { connection: 'tx' }],
+        ]);
+    });
+
+    test('a choice waits for the group\'s lock and is refused while it fights', async () => {
+        Mysql.select
+            .mockResolvedValueOnce([{ dead: 0, version: 'current', team: 100 }])
+            .mockResolvedValueOnce([{ round: 2 }])
+            .mockResolvedValueOnce([{ id: 3 }])
+            .mockResolvedValueOnce([{ log: null, busy: 1 }]);
+        await expect(TournamentRound.choose('h', 7, 4)).rejects.toMatchObject({ status: 409, code: 'GROUP_DONE' });
+        expect(Mysql.select.mock.calls[3]).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), [60, 3], { connection: 'tx' }]);
+        expect(Mysql.update).not.toHaveBeenCalled();
+
+        Mysql.select
+            .mockResolvedValueOnce([{ dead: 0, version: 'current', team: 100 }])
+            .mockResolvedValueOnce([{ round: 2 }])
+            .mockResolvedValueOnce([{ id: 3 }])
+            .mockResolvedValueOnce([{ log: null, busy: 0 }]);
+        await TournamentRound.choose('h', 7, 4);
+        expect(Mysql.update).toHaveBeenCalledWith('group_teams', { gladiator: 4 }, { groupid: 3, team: 100 }, { connection: 'tx' });
     });
 });

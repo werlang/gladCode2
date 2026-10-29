@@ -19,10 +19,11 @@ const GROUP_JOIN = '`groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.i
 export class TournamentRound {
     /**
      * @param {string} hash
+     * @param {{ connection?: unknown }} [context]
      * @returns {Promise<number|null>} The latest round, or null for an unknown tournament.
      */
-    static async maxRound(hash) {
-        const [row] = await Mysql.select(`SELECT MAX(gr.round) AS round FROM ${GROUP_JOIN} WHERE t.hash = ?`, [hash]);
+    static async maxRound(hash, context = {}) {
+        const [row] = await Mysql.select(`SELECT MAX(gr.round) AS round FROM ${GROUP_JOIN} WHERE t.hash = ?`, [hash], context);
         return row?.round ?? null;
     }
 
@@ -132,7 +133,8 @@ export class TournamentRound {
      * @param {string} hash
      * @param {number} userId
      * @param {number} gladiatorId
-     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND`, 409 `GLADIATOR_DEAD`/`GLADIATOR_OUTDATED`/`GROUP_DONE`.
+     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND`, 409 `GLADIATOR_DEAD`/`GLADIATOR_OUTDATED`/`GROUP_DONE`
+     *   (also while the group is fighting).
      */
     static async choose(hash, userId, gladiatorId) {
         const [glad] = await Mysql.select(
@@ -147,12 +149,21 @@ export class TournamentRound {
         if (glad.version !== VERSION) throw new CustomError(409, 'Save the gladiator on the current version first.', 'GLADIATOR_OUTDATED');
 
         const [group] = await Mysql.select(
-            'SELECT gr.id, gr.log FROM `groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.id WHERE gr.round = ? AND grt.team = ?',
+            'SELECT gr.id FROM `groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.id WHERE gr.round = ? AND grt.team = ?',
             [round, glad.team],
         );
         if (!group) throw new CustomError(404, 'Your team is not in this round.', 'TEAM_NOT_FOUND');
-        if (group.log !== null) throw new CustomError(409, 'Your group already fought this round.', 'GROUP_DONE');
-        await Mysql.update('group_teams', { gladiator: gladiatorId }, { groupid: group.id, team: glad.team });
+
+        // the group row lock is the one fight() takes: a choice never changes a fighting group
+        await Mysql.withTransaction(async context => {
+            const [current] = await Mysql.select(
+                'SELECT log, (locked > NOW(3) - INTERVAL ? SECOND) AS busy FROM `groups` WHERE id = ? FOR UPDATE',
+                [LOCK_SECONDS, group.id],
+                context,
+            );
+            if (current.log !== null || Number(current.busy)) throw new CustomError(409, 'Your group already fought this round.', 'GROUP_DONE');
+            await Mysql.update('group_teams', { gladiator: gladiatorId }, { groupid: group.id, team: glad.team }, context);
+        });
     }
 
     /**
@@ -245,20 +256,24 @@ export class TournamentRound {
 
     /**
      * Runs a group's battle (manager only). Every team must have its gladiator; `force` runs a fought
-     * group again. The group is locked while it fights, so two requests cannot run it twice.
+     * group of the latest round again. The group is locked while it fights, so two requests cannot
+     * run it twice. The gladiators line up in `group_teams` order, which {@link TournamentRound.advance}
+     * falls back on to read the log.
      *
      * @param {string} hash
      * @param {number} groupId
      * @param {number} userId
      * @param {boolean} [force]
      * @returns {Promise<{ hash: string|null, error: string }>}
-     * @throws {CustomError} 403 `MANAGER_ONLY`, 404 `GROUP_NOT_FOUND`, 409 `GROUP_NOT_READY`/`GROUP_BUSY`.
+     * @throws {CustomError} 403 `MANAGER_ONLY`, 404 `GROUP_NOT_FOUND`, 409 `GROUP_NOT_READY`/`GROUP_BUSY`/`ROUND_OVER`.
      */
     static async fight(hash, groupId, userId, force = false) {
         await TournamentRound.#managed(hash, userId);
-        const members = await Mysql.select(`SELECT grt.gladiator FROM ${GROUP_JOIN} WHERE t.hash = ? AND gr.id = ?`, [hash, groupId]);
+        const members = await Mysql.select(`SELECT grt.gladiator, gr.round FROM ${GROUP_JOIN} WHERE t.hash = ? AND gr.id = ? ORDER BY grt.id`, [hash, groupId]);
         if (!members.length) throw new CustomError(404, 'Group not found.', 'GROUP_NOT_FOUND');
         if (members.some(member => member.gladiator === null)) throw new CustomError(409, 'Some teams have not chosen their gladiator.', 'GROUP_NOT_READY');
+        // a later round was built from this round's results: fighting again would change nothing
+        if (members[0].round !== await TournamentRound.maxRound(hash)) throw new CustomError(409, 'This round is over.', 'ROUND_OVER');
 
         await Mysql.withTransaction(async context => {
             const [group] = await Mysql.select(
@@ -296,7 +311,7 @@ export class TournamentRound {
         const tournament = await TournamentRound.#managed(hash, userId);
         return Mysql.withTransaction(async context => {
             await Mysql.select('SELECT id FROM tournament WHERE id = ? FOR UPDATE', [tournament.id], context);
-            const maxRound = await TournamentRound.maxRound(hash);
+            const maxRound = await TournamentRound.maxRound(hash, context);
             const groups = await Mysql.select(`SELECT DISTINCT gr.id, gr.log FROM ${GROUP_JOIN} WHERE t.hash = ? AND gr.round = ?`, [hash, maxRound], context);
 
             const placed = [];
@@ -342,7 +357,9 @@ export class TournamentRound {
     }
 
     /**
-     * Writes one group battle's survival times and deaths.
+     * Writes one group battle's survival times and deaths. The log names each gladiator as it was
+     * when it fought: when a gladiator or its master was renamed since, the log is read in the
+     * order {@link TournamentRound.fight} lined the group up instead.
      *
      * @param {string} hash
      * @param {number} groupId
@@ -350,22 +367,31 @@ export class TournamentRound {
      * @param {Array<Record<string, any>>} steps Expanded log.
      * @param {{ connection: unknown }} context
      * @returns {Promise<Array<{ team: number, time: number, hp: number, winner?: boolean }>>}
+     * @throws {CustomError} 409 `GROUP_LOG_MISMATCH` when the log fits neither, rather than leaving a
+     *   team out of the next round.
      */
     static async #recordGroup(hash, groupId, round, steps, context) {
         const members = await Mysql.select(
             `SELECT grt.id AS grt, glt.id AS glt, g.name, u.apelido, te.id AS team
             FROM group_teams grt INNER JOIN gladiators g ON g.cod = grt.gladiator INNER JOIN usuarios u ON u.id = g.master
             INNER JOIN gladiator_teams glt ON glt.gladiator = g.cod AND glt.team = grt.team INNER JOIN teams te ON te.id = grt.team
-            INNER JOIN tournament t ON t.id = te.tournament WHERE grt.groupid = ? AND t.hash = ?`,
+            INNER JOIN tournament t ON t.id = te.tournament WHERE grt.groupid = ? AND t.hash = ? ORDER BY grt.id`,
             [groupId, hash],
             context,
         );
+        const entries = survival(steps);
         const byName = new Map(members.map(member => [`${member.name}@${member.apelido}`, member]));
+        let fighters = entries.map(entry => byName.get(`${entry.name}@${entry.user}`));
+        if (fighters.some(member => !member)) {
+            if (entries.length !== members.length) throw new CustomError(409, 'The battle log does not match the group.', 'GROUP_LOG_MISMATCH');
+            fighters = members;
+        }
 
+        // a forced rerun replaces the group's earlier result, deaths included
+        await Mysql.update('gladiator_teams', { dead: 0 }, { id: members.map(member => member.glt), dead: round }, context);
         const results = [];
-        for (const entry of survival(steps)) {
-            const member = byName.get(`${entry.name}@${entry.user}`);
-            if (!member) continue;
+        for (const [index, entry] of entries.entries()) {
+            const member = fighters[index];
             await Mysql.update('group_teams', { lasttime: entry.time }, { id: member.grt }, context);
             if (!entry.winner) await Mysql.update('gladiator_teams', { dead: round }, { id: member.glt }, context);
             results.push({ team: member.team, time: entry.time, hp: entry.hp, winner: entry.winner });
