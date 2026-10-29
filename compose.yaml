@@ -46,7 +46,7 @@ services:
             - TRUST_PROXY=${TRUST_PROXY:-false}
         # WEB_PORT is the port in the public URL; WEB_PUBLISH is where the host listens (behind nginx)
         ports:
-            - "${WEB_PUBLISH:-80}:3000"
+            - "${WEB_PUBLISH:-127.0.0.1:80}:3000"
         depends_on:
             - api
         logging:
@@ -89,7 +89,7 @@ services:
             - MAILER_PASSWORD=${MAILER_PASSWORD:-}
         # API_PORT is the port in the public URL; API_PUBLISH is where the host listens (behind nginx)
         ports:
-            - "${API_PUBLISH:-3001}:3000"
+            - "${API_PUBLISH:-127.0.0.1:3001}:3000"
         depends_on:
             - mysql
         logging:
