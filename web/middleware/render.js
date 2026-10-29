@@ -17,11 +17,29 @@ const VIEW_PATH = path.join(import.meta.dirname, '../view');
  *   `helpers/template-var.js`. The server never sees sessions, so nothing private goes there.
  *
  * @param {Record<string, unknown>} fixedVars Variables for every page and the browser (e.g. `apiUrl`).
- * @param {{ cache?: boolean }} [options] Cache view files (production).
+ * @param {{ cache?: boolean }} [options] Cache view files and import maps (production, where the
+ *   files never change while the service runs).
  * @returns {import('express').RequestHandler}
  */
 export function renderMiddleware(fixedVars = {}, { cache = false } = {}) {
     const templates = new Map();
+    const importMaps = new Map();
+    const assets = new Map();
+    let viewNames = null;
+
+    /** @param {string} file Path under `public/`. @returns {string} Its versioned URL. */
+    const versioned = file => {
+        if (!cache) return assetUrl(file);
+        if (!assets.has(file)) assets.set(file, assetUrl(file));
+        return assets.get(file);
+    };
+
+    /** @param {boolean} render2 @returns {string} */
+    const importMap = render2 => {
+        if (!cache) return importMapTag({ render2 });
+        if (!importMaps.has(render2)) importMaps.set(render2, importMapTag({ render2 }));
+        return importMaps.get(render2);
+    };
 
     /** @param {string} name */
     const read = async name => {
@@ -33,7 +51,8 @@ export function renderMiddleware(fixedVars = {}, { cache = false } = {}) {
 
     /** @returns {Promise<Record<string, string>>} Every view as a partial. */
     const partials = async () => {
-        const names = (await fs.readdir(VIEW_PATH)).filter(file => file.endsWith('.html')).map(file => file.slice(0, -5));
+        const names = viewNames ?? (await fs.readdir(VIEW_PATH)).filter(file => file.endsWith('.html')).map(file => file.slice(0, -5));
+        if (cache) viewNames = names;
         return Object.fromEntries(await Promise.all(names.map(async name => [name, await read(name)])));
     };
 
@@ -49,9 +68,9 @@ export function renderMiddleware(fixedVars = {}, { cache = false } = {}) {
                 ...clientVars,
                 ...vars,
                 year: new Date().getFullYear(),
-                asset: () => text => assetUrl(text.trim()),
-                module: () => text => assetUrl(`script/${text.trim()}`),
-                importMap: importMapTag({ render2: Boolean(vars.render2) }),
+                asset: () => text => versioned(text.trim()),
+                module: () => text => versioned(`script/${text.trim()}`),
+                importMap: importMap(Boolean(vars.render2)),
                 templateVars: `<script id="template-vars" type="application/json">${safeJson({ ...fixedVars, ...clientVars })}</script>`,
             };
             res.send(Mustache.render(await read(view), context, await partials()));
