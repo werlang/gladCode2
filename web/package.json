@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "production": "node app.js",
-        "development": "node --watch-path=app.js --watch-path=view --watch-path=middleware --watch-path=helpers app.js"
+        "development": "node --watch-path=app.js --watch-path=view --watch-path=middleware --watch-path=helpers app.js",
+        "test": "node --test tests/*.test.js"
     },
     "author": "Pablo Werlang",
     "dependencies": {
