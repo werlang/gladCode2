@@ -1,6 +1,6 @@
+import { randomBytes } from 'node:crypto';
 import { calcReward, crashedGladiators, deathOrder, masterRewards } from '../helpers/battle-results.js';
 import { CustomError } from '../helpers/error.js';
-import { signJwt, verifyJwt } from '../helpers/jwt.js';
 import { Mysql } from '../helpers/mysql.js';
 import { VERSION } from '../helpers/version.js';
 import { Battle } from './battle.js';
@@ -12,7 +12,6 @@ const MATCH_POOL = 10;
 const OPPONENTS = 4;
 /** How long a match may wait for its battle. */
 const MATCH_SECONDS = 600;
-const MATCH_KIND = 'ranked-match';
 
 /**
  * Ranked battles: matchmaking against the closest gladiators in rank, the battle, and its renown,
@@ -21,12 +20,14 @@ const MATCH_KIND = 'ranked-match';
 export class RankedBattle {
     /**
      * Picks four opponents among the ten gladiators of other masters closest in rank to the master's
-     * gladiator. The answer carries a signed, short-lived match the battle needs.
+     * gladiator. The match is kept on the server (`ranked_matches`) and its id is what the battle
+     * needs: each match is fought once, within {@link MATCH_SECONDS}.
      *
      * @param {{ id: number }} user
      * @param {number} gladiatorId
      * @returns {Promise<{ opponents: object[], match: string }>}
-     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND`, 409 `GLADIATOR_OUTDATED` (save it on the current version first).
+     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND`, 409 `GLADIATOR_OUTDATED` (save it on the current
+     *   version first), 409 `NO_OPPONENTS` when no other master has a gladiator on the current version.
      */
     static async match(user, gladiatorId) {
         const glad = await Gladiator.findOwned(gladiatorId, user.id);
@@ -43,10 +44,17 @@ export class RankedBattle {
             ORDER BY RAND() LIMIT ?`,
             [user.id, VERSION, glad.mmr, MATCH_POOL, OPPONENTS],
         );
-        const match = await signJwt(
-            { kind: MATCH_KIND, user: user.id, gladiator: glad.cod, opponents: rows.map(row => row.cod) },
-            { expiresInSeconds: MATCH_SECONDS },
-        );
+        if (!rows.length) throw new CustomError(409, 'No opponents on the current version yet.', 'NO_OPPONENTS');
+
+        const match = randomBytes(16).toString('hex');
+        await Mysql.delete('ranked_matches', { expires: { '<': Mysql.raw('NOW()') } });
+        await Mysql.insert('ranked_matches', {
+            id: match,
+            user: user.id,
+            gladiator: glad.cod,
+            opponents: JSON.stringify(rows.map(row => row.cod)),
+            expires: Mysql.raw(`NOW() + INTERVAL ${MATCH_SECONDS} SECOND`),
+        });
         return {
             opponents: rows.map(row => ({ name: row.name, master: row.apelido, skin: row.skin, vstr: row.vstr, vagi: row.vagi, vint: row.vint, mmr: Math.trunc(row.mmr) })),
             match,
@@ -57,36 +65,59 @@ export class RankedBattle {
      * Runs a matched battle and applies its results.
      *
      * @param {{ id: number }} user
-     * @param {string} match The token from {@link RankedBattle.match}.
+     * @param {string} match The id from {@link RankedBattle.match}.
      * @returns {Promise<{ hash: string|null, error: string, summary?: object }>} `summary`: the master's
      *   level, xp and silver and their gladiator after the battle.
-     * @throws {CustomError} 400 `MATCH_INVALID` for a missing, expired or someone else's match.
+     * @throws {CustomError} 400 `MATCH_INVALID` for a missing, expired, already fought or someone
+     *   else's match; 404 `GLADIATOR_NOT_FOUND` and 409 `GLADIATOR_OUTDATED` when the master's gladiator
+     *   changed since.
      */
     static async fight(user, match) {
-        const payload = await verifyJwt(match);
-        if (payload?.kind !== MATCH_KIND || payload.user !== user.id || !Array.isArray(payload.opponents)) {
-            throw new CustomError(400, 'Find opponents again.', 'MATCH_INVALID');
-        }
+        const claimed = await RankedBattle.#claim(user.id, match);
+        const glad = await Gladiator.findOwned(claimed.gladiator, user.id);
+        if (glad.version !== VERSION) throw new CustomError(409, 'Save the gladiator on the current version first.', 'GLADIATOR_OUTDATED');
 
-        const ids = [...payload.opponents, payload.gladiator];
+        const ids = [...claimed.opponents, glad.cod];
         const battle = await new Battle({ origin: 'ranked' }).addGladiators(ids);
         const { log, simulation, error } = await battle.run();
         if (!log) return { hash: null, error };
 
-        await RankedBattle.#applyResults(user.id, battle, simulation, log.id);
-        await Stats.record(simulation, log.id, ids);
-        return { hash: log.hash, error: '', summary: await RankedBattle.#summary(user.id, payload.gladiator) };
+        await RankedBattle.#applyResults(user.id, battle, simulation, log.id, ids);
+        return { hash: log.hash, error: '', summary: await RankedBattle.#summary(user.id, glad.cod) };
     }
 
     /**
-     * Flags crashed gladiators, moves renown, pays the master and writes everyone's report.
+     * Takes a match off the table, so two requests with the same match never both fight it.
+     *
+     * @param {number} userId
+     * @param {string} match
+     * @returns {Promise<{ gladiator: number, opponents: number[] }>}
+     * @throws {CustomError} 400 `MATCH_INVALID`.
+     */
+    static async #claim(userId, match) {
+        return Mysql.withTransaction(async context => {
+            const [row] = await Mysql.select(
+                'SELECT gladiator, opponents FROM ranked_matches WHERE id = ? AND user = ? AND expires > NOW() FOR UPDATE',
+                [match, userId],
+                context,
+            );
+            if (!row) throw new CustomError(400, 'Find opponents again.', 'MATCH_INVALID');
+            await Mysql.delete('ranked_matches', { id: match }, context);
+            return { gladiator: row.gladiator, opponents: JSON.parse(row.opponents) };
+        });
+    }
+
+    /**
+     * Flags crashed gladiators, moves renown, pays the master, writes everyone's report and the
+     * battle's stats, all or nothing.
      *
      * @param {number} userId The master who started the battle.
      * @param {Battle} battle
      * @param {Array<{ glads: Array<Record<string, any>> }>} simulation
      * @param {number} logId
+     * @param {number[]} gladiatorIds Every gladiator in the battle.
      */
-    static async #applyResults(userId, battle, simulation, logId) {
+    static async #applyResults(userId, battle, simulation, logId, gladiatorIds) {
         const logGlads = simulation[0].glads;
         const placed = deathOrder(simulation)
             .map(entry => ({ ...entry, saved: battle.savedGladiator(entry.name, entry.user) }))
@@ -131,6 +162,7 @@ export class RankedBattle {
             await Mysql.insert('reports', glads.map((glad, index) => ({
                 log: logId, gladiator: glad.cod, reward: rewards[index], started: Number(glad.master === userId),
             })), context);
+            await Stats.record(simulation, logId, gladiatorIds, context);
         });
     }
 

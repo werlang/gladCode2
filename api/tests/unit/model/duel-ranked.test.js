@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('../../../helpers/mysql.js', () => ({
-    Mysql: { select: vi.fn(), findOne: vi.fn(), count: vi.fn(), insert: vi.fn(), update: vi.fn(), delete: vi.fn(), raw: sql => ({ toSqlString: () => sql }) },
+    Mysql: { select: vi.fn(), findOne: vi.fn(), count: vi.fn(), insert: vi.fn(), update: vi.fn(), delete: vi.fn(), raw: sql => ({ toSqlString: () => sql }), withTransaction: vi.fn(operation => operation({ connection: 'tx' })) },
 }));
 vi.mock('../../../helpers/email.js', () => ({ sendMail: vi.fn() }));
 const run = vi.fn();
@@ -10,14 +10,17 @@ vi.mock('../../../model/battle.js', () => ({
         constructor(options) { this.options = options; }
         async addGladiators(ids) { this.ids = ids; return this; }
         run() { return run(this); }
+        savedGladiator(name) { return { Zed: { id: 20 }, Max: { id: 4 } }[name]; }
     },
 }));
+vi.mock('../../../model/stats.js', () => ({ Stats: { record: vi.fn() } }));
 vi.mock('../../../model/gladiator.js', () => ({ Gladiator: { findOwned: vi.fn(async (id, master) => ({ cod: id, master, version: 'current', mmr: 1000 })) } }));
 vi.mock('../../../helpers/version.js', () => ({ VERSION: 'current' }));
 
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { sendMail } = await import('../../../helpers/email.js');
-const { signJwt } = await import('../../../helpers/jwt.js');
+const { Gladiator } = await import('../../../model/gladiator.js');
+const { Stats } = await import('../../../model/stats.js');
 const { Duel } = await import('../../../model/duel.js');
 const { RankedBattle } = await import('../../../model/ranked-battle.js');
 
@@ -61,27 +64,74 @@ describe('duels', () => {
 describe('ranked battles', () => {
     beforeEach(() => vi.clearAllMocks());
 
-    test('a match lists the opponents and signs who fights whom', async () => {
+    test('a match lists the opponents and is kept on the server for ten minutes', async () => {
         Mysql.select.mockResolvedValueOnce([{ cod: 20, name: 'Zed', apelido: 'Bo', skin: '[]', vstr: 1, vagi: 1, vint: 1, mmr: 1200.7 }]);
         const { opponents, match } = await RankedBattle.match({ id: 7 }, 4);
         expect(opponents).toEqual([{ name: 'Zed', master: 'Bo', skin: '[]', vstr: 1, vagi: 1, vint: 1, mmr: 1200 }]);
-        expect(typeof match).toBe('string');
+        expect(match).toMatch(/^[a-f0-9]{32}$/);
+        const [table, row] = Mysql.insert.mock.calls[0];
+        expect(table).toBe('ranked_matches');
+        expect(row).toMatchObject({ id: match, user: 7, gladiator: 4, opponents: '[20]' });
+        expect(row.expires.toSqlString()).toBe('NOW() + INTERVAL 600 SECOND');
     });
 
-    test('a match only fights for the master it was made for', async () => {
-        const match = await signJwt({ kind: 'ranked-match', user: 8, gladiator: 4, opponents: [20] }, { expiresInSeconds: 60 });
-        await expect(RankedBattle.fight({ id: 7 }, match)).rejects.toMatchObject({ code: 'MATCH_INVALID' });
-        await expect(RankedBattle.fight({ id: 7 }, 'forged')).rejects.toMatchObject({ code: 'MATCH_INVALID' });
-        const session = await signJwt({ id: 7 });
-        await expect(RankedBattle.fight({ id: 7 }, session)).rejects.toMatchObject({ code: 'MATCH_INVALID' });
+    test('a match needs opponents on the current version', async () => {
+        Mysql.select.mockResolvedValueOnce([]);
+        await expect(RankedBattle.match({ id: 7 }, 4)).rejects.toMatchObject({ status: 409, code: 'NO_OPPONENTS' });
+        expect(Mysql.insert).not.toHaveBeenCalled();
+    });
+
+    test('a match is claimed under a lock, only by its master, and only once', async () => {
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, opponents: '[20,21]' }]);
+        run.mockResolvedValueOnce({ log: null, simulation: null, error: 'NO_OUTPUT' });
+        await RankedBattle.fight({ id: 7 }, 'a'.repeat(32));
+        const [sql, values, context] = Mysql.select.mock.calls[0];
+        expect(sql).toMatch(/FROM ranked_matches WHERE id = \? AND user = \? AND expires > NOW\(\) FOR UPDATE/);
+        expect(values).toEqual(['a'.repeat(32), 7]);
+        expect(Mysql.delete).toHaveBeenCalledWith('ranked_matches', { id: 'a'.repeat(32) }, context);
+
+        // the row is gone: the same match again (or someone else's) finds nothing
+        Mysql.select.mockResolvedValueOnce([]);
+        await expect(RankedBattle.fight({ id: 7 }, 'a'.repeat(32))).rejects.toMatchObject({ status: 400, code: 'MATCH_INVALID' });
+        expect(run).toHaveBeenCalledTimes(1);
+    });
+
+    test('a match whose gladiator was changed since does not run', async () => {
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, opponents: '[20]' }]);
+        Gladiator.findOwned.mockResolvedValueOnce({ cod: 4, master: 7, version: 'old', mmr: 1000 });
+        await expect(RankedBattle.fight({ id: 7 }, 'b'.repeat(32))).rejects.toMatchObject({ code: 'GLADIATOR_OUTDATED' });
         expect(run).not.toHaveBeenCalled();
     });
 
     test('a battle without a log reports its error and changes nothing', async () => {
-        const match = await signJwt({ kind: 'ranked-match', user: 7, gladiator: 4, opponents: [20, 21] }, { expiresInSeconds: 60 });
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, opponents: '[20,21]' }]);
         run.mockResolvedValueOnce({ log: null, simulation: null, error: 'NO_OUTPUT' });
-        expect(await RankedBattle.fight({ id: 7 }, match)).toEqual({ hash: null, error: 'NO_OUTPUT' });
+        expect(await RankedBattle.fight({ id: 7 }, 'c'.repeat(32))).toEqual({ hash: null, error: 'NO_OUTPUT' });
         expect(run.mock.calls[0][0].ids).toEqual([20, 21, 4]);
         expect(Mysql.update).not.toHaveBeenCalled();
+    });
+});
+
+describe('ranked rewards', () => {
+    beforeEach(() => vi.clearAllMocks());
+
+    test('rewards lock the gladiators and are written with the stats in one transaction', async () => {
+        const simulation = [
+            { simtime: 1, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }] },
+            { simtime: 30, glads: [{ name: 'Zed', user: 'Bo', hp: 0 }, { name: 'Max', user: 'Ana', hp: 4 }] },
+        ];
+        Mysql.select
+            .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20]' }])
+            .mockResolvedValueOnce([{ cod: 20, mmr: 1000, master: 8, lvl: 3, xp: 0 }, { cod: 4, mmr: 1000, master: 7, lvl: 3, xp: 0 }])
+            .mockResolvedValueOnce([{ battles: 0 }])
+            .mockResolvedValueOnce([{ lvl: 3, xp: 10, silver: 50, cod: 4, name: 'Max', skin: '', vstr: 1, vagi: 1, vint: 1, mmr: 1010 }]);
+        run.mockResolvedValueOnce({ log: { id: 9, hash: 'abc' }, simulation, error: '' });
+
+        expect((await RankedBattle.fight({ id: 7 }, 'd'.repeat(32))).hash).toBe('abc');
+        const [sql, ids, context] = Mysql.select.mock.calls[1];
+        expect(sql).toMatch(/WHERE g\.cod IN \(\?,\?\) FOR UPDATE$/);
+        expect([ids, context]).toEqual([[4, 20], { connection: 'tx' }]);
+        expect(Stats.record).toHaveBeenCalledWith(simulation, 9, [20, 4], { connection: 'tx' });
+        expect(Mysql.update).toHaveBeenCalledWith('usuarios', expect.objectContaining({ silver: { inc: expect.any(Number) } }), { id: 7 }, { connection: 'tx' });
     });
 });

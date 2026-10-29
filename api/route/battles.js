@@ -47,7 +47,7 @@ router.post('/test', auth({ optional: true }), asyncRoute(async (req, res) => {
 /**
  * POST /battles/ranked/match
  * Finds opponents for one of the master's gladiators: `{ gladiator }`. Answers `{ opponents, match }`;
- * `match` is a short-lived token the battle needs.
+ * `match` is the id the battle needs, fought once within ten minutes.
  */
 router.post('/ranked/match', auth(), asyncRoute(async (req, res) => {
     res.send(await RankedBattle.match(req.user, Validate.integer(req.body?.gladiator, 'gladiator', { min: 1 })));
@@ -59,7 +59,7 @@ router.post('/ranked/match', auth(), asyncRoute(async (req, res) => {
  * silver and their gladiator after the battle.
  */
 router.post('/ranked', auth(), asyncRoute(async (req, res) => {
-    res.send(await RankedBattle.fight(req.user, Validate.text(req.body?.match, 'match', { max: 2000 })));
+    res.send(await RankedBattle.fight(req.user, Validate.text(req.body?.match, 'match', { min: 32, max: 32, pattern: /^[a-f0-9]{32}$/ })));
 }));
 
 export { router as battlesRouter };
