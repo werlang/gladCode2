@@ -39,6 +39,10 @@ describe('User', () => {
     test('admins come from ADMIN_EMAILS, case-insensitively', () => {
         process.env.ADMIN_EMAILS = 'x@y.z, ANA@example.com';
         expect(new User(row).isAdmin).toBe(true);
+        expect(new User({ ...row, email: 'Ana@Example.COM' }).isAdmin).toBe(true);
+        expect(new User({ ...row, email: 'bo@example.com' }).isAdmin).toBe(false);
+        process.env.ADMIN_EMAILS = '';
+        expect(new User(row).isAdmin).toBe(false);
     });
 
     test('Google sign-in links an existing account found by email', async () => {

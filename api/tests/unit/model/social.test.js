@@ -13,6 +13,7 @@ const { sendMail, fillTemplate } = await import('../../../helpers/email.js');
 const { Friendship } = await import('../../../model/friendship.js');
 const { Message } = await import('../../../model/message.js');
 const { Report } = await import('../../../model/report.js');
+const { Duel } = await import('../../../model/duel.js');
 
 const ana = { id: 7, apelido: 'Ana' };
 
@@ -68,6 +69,19 @@ describe('social models', () => {
         Mysql.select.mockResolvedValue([]);
         await expect(Report.setFavorite(7, 99, true, 'mine')).rejects.toMatchObject({ status: 404, code: 'REPORT_NOT_FOUND' });
         expect(Mysql.update).not.toHaveBeenCalled();
+    });
+
+    test('masters only remove their own messages, friendships and duels', async () => {
+        Mysql.delete.mockResolvedValue(0);
+        await expect(Message.remove(7, 5)).rejects.toMatchObject({ status: 404, code: 'MESSAGE_NOT_FOUND' });
+        expect(Mysql.delete).toHaveBeenCalledWith('messages', { cod: 5, receiver: 7 });
+
+        Mysql.select.mockResolvedValue([]);
+        await expect(Friendship.remove(7, 6)).rejects.toMatchObject({ status: 404, code: 'FRIENDSHIP_NOT_FOUND' });
+        expect(Mysql.select.mock.calls.at(-1)).toEqual(['SELECT cod FROM amizade WHERE cod = ? AND (usuario1 = ? OR usuario2 = ?)', [6, 7, 7]]);
+        await expect(Duel.remove(7, 8)).rejects.toMatchObject({ status: 404, code: 'DUEL_NOT_FOUND' });
+        expect(Mysql.select.mock.calls.at(-1)).toEqual(['SELECT id FROM duels WHERE id = ? AND (user1 = ? OR user2 = ?)', [8, 7, 7]]);
+        expect(Mysql.delete).toHaveBeenCalledTimes(1);
     });
 
     test('a report page can be marked as read', async () => {

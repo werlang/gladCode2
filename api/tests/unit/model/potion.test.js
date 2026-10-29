@@ -56,6 +56,13 @@ describe('Potion', () => {
         await expect(Potion.upgradeApothecary(7)).rejects.toMatchObject({ code: 'APOTHECARY_MAX_LEVEL' });
     });
 
+    test('an apothecary upgrade locks the master and needs its whole price', async () => {
+        Mysql.findOne.mockResolvedValue({ silver: 4999, apothecary: 2 });
+        await expect(Potion.upgradeApothecary(7)).rejects.toMatchObject({ code: 'NOT_ENOUGH_SILVER' });
+        expect(Mysql.findOne.mock.calls[0][1].opt).toEqual({ forUpdate: true });
+        expect(Mysql.update).not.toHaveBeenCalled();
+    });
+
     test('only the master\'s own slot can be cancelled', async () => {
         Mysql.update.mockResolvedValue(0);
         await expect(Potion.cancel(7, 9)).rejects.toMatchObject({ status: 404, code: 'SLOT_NOT_FOUND' });

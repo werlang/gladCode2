@@ -39,6 +39,11 @@ describe('Gladiator', () => {
         await expect(Gladiator.assertSavable({ ...glad, id: 4 }, master)).resolves.toBeUndefined();
     });
 
+    test('a master only finds their own gladiators', async () => {
+        await expect(Gladiator.findOwned(4, 7)).rejects.toMatchObject({ status: 404, code: 'GLADIATOR_NOT_FOUND' });
+        expect(Mysql.findOne).toHaveBeenCalledWith('gladiators', { filter: { cod: 4, master: 7 } });
+    });
+
     test('serialises its code raw and flags other versions as outdated', () => {
         const json = new Gladiator({ cod: 4, name: 'Zed', code: 'a < b', blocks: '<xml/>', version: '1.0', mmr: 1000 }).toJSON('Bo');
         expect(json).toMatchObject({ id: 4, code: 'a < b', blocks: '<xml/>', master: 'Bo', outdated: true });

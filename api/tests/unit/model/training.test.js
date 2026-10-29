@@ -143,6 +143,7 @@ describe('training rounds', () => {
     test('groups wait for the round time, and a fighting group is left alone', async () => {
         advanceReads([{ id: 3, log: null, due: 0, busy: 0 }, { id: 4, log: null, due: null, busy: 0 }]);
         expect(await TrainingRound.advance('AB12')).toEqual({ status: 'wait' });
+        expect(Mysql.select).toHaveBeenCalledWith('SELECT id FROM training WHERE id = ? FOR UPDATE', [running.id], tx);
         advanceReads([{ id: 3, log: 30, due: 1, busy: 0 }, { id: 4, log: null, due: 1, busy: 1 }]);
         expect(await TrainingRound.advance('AB12')).toEqual({ status: 'busy' });
         expect(Mysql.update).not.toHaveBeenCalled();

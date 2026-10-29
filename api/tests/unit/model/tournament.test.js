@@ -157,6 +157,8 @@ describe('tournament rounds', () => {
         Mysql.select.mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
         run.mockResolvedValueOnce({ log: { id: 30, hash: 'abc' }, error: '' });
         expect(await TournamentRound.fight('h', 2, 7)).toEqual({ hash: 'abc', error: '' });
+        // the group is claimed under a row lock, so two managers' clicks never both fight it
+        expect(Mysql.select.mock.calls.at(-1)).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), expect.arrayContaining([2]), { connection: 'tx' }]);
         expect(run.mock.calls[0][0]).toMatchObject({ ids: [4, 5], options: { origin: 'tourn', noitems: true } });
         expect(Mysql.update).toHaveBeenCalledWith('groups', { log: 30 }, { id: 2 });
         expect(Mysql.update).toHaveBeenLastCalledWith('groups', { locked: null }, { id: 2 });
@@ -172,6 +174,7 @@ describe('tournament rounds', () => {
         Mysql.findOne.mockResolvedValueOnce(manager);
         Mysql.select.mockResolvedValueOnce([]).mockResolvedValueOnce([{ round: 1 }]).mockResolvedValueOnce([{ id: 3, log: null }]);
         expect(await TournamentRound.advance('h', 7)).toEqual({ status: 'waiting' });
+        expect(Mysql.select).toHaveBeenCalledWith('SELECT id FROM tournament WHERE id = ? FOR UPDATE', [manager.id], { connection: 'tx' });
         expect(Mysql.insert).not.toHaveBeenCalled();
     });
 

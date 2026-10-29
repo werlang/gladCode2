@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 const query = vi.fn();
+const connection = { beginTransaction: vi.fn(), commit: vi.fn(), rollback: vi.fn(async () => {}), release: vi.fn(), query: vi.fn(async () => [[]]) };
 vi.mock('mysql2/promise', () => ({
-    default: { createPool: () => ({ query, pool: { on: vi.fn() }, end: vi.fn() }) },
+    default: { createPool: () => ({ query, getConnection: async () => connection, pool: { on: vi.fn() }, end: vi.fn() }) },
 }));
 
 const { Mysql } = await import('../../../helpers/mysql.js');
@@ -23,6 +24,10 @@ describe('Mysql helper', () => {
         });
         expect(statement).toBe('`id` = ? AND `master` IN (?,?) AND `deleted` IS NULL AND `name` LIKE ? AND `mmr` >= ? AND `version` != ?');
         expect(values).toEqual([3, 1, 2, '%50\\%\\_off%', 1000, 'broken']);
+    });
+
+    test('null filters test for presence and absence', () => {
+        expect(Mysql.where({ log: null, hash: { not: null } }).statement).toBe('`log` IS NULL AND `hash` IS NOT NULL');
     });
 
     test('an empty IN list matches nothing instead of failing', () => {
@@ -67,5 +72,30 @@ describe('Mysql helper', () => {
 
     test('get throws 404 when nothing matches', async () => {
         await expect(Mysql.get('news', { id: 1 })).rejects.toMatchObject({ status: 404, code: 'RECORD_NOT_FOUND' });
+    });
+
+    describe('transactions', () => {
+        beforeEach(() => Object.values(connection).forEach(fn => fn.mockClear()));
+
+        test('commit, run on the transaction connection, and give the connection back', async () => {
+            const result = await Mysql.withTransaction(async context => {
+                await Mysql.update('usuarios', { silver: { dec: 5 } }, { id: 7 }, context);
+                return 'done';
+            });
+            expect(result).toBe('done');
+            expect(connection.query).toHaveBeenCalledWith('UPDATE `usuarios` SET `silver` = `silver` - ? WHERE `id` = ?', [5, 7]);
+            expect(query).not.toHaveBeenCalled();
+            expect(connection.commit).toHaveBeenCalledTimes(1);
+            expect(connection.rollback).not.toHaveBeenCalled();
+            expect(connection.release).toHaveBeenCalledTimes(1);
+        });
+
+        test('roll back on any error, rethrow it, and still give the connection back', async () => {
+            const failure = new Error('mid-transaction');
+            await expect(Mysql.withTransaction(async () => { throw failure; })).rejects.toBe(failure);
+            expect(connection.rollback).toHaveBeenCalledTimes(1);
+            expect(connection.commit).not.toHaveBeenCalled();
+            expect(connection.release).toHaveBeenCalledTimes(1);
+        });
     });
 });
