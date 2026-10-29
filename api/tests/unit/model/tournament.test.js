@@ -147,27 +147,39 @@ describe('tournament rounds', () => {
         expect(run).not.toHaveBeenCalled();
 
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: 30, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: 30, busy: 0 }]).mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]);
         run.mockResolvedValueOnce({ log: { id: 31, hash: 'def' }, error: '' });
         expect(await TournamentRound.fight('h', 2, 7, true)).toEqual({ hash: 'def', error: '' });
     });
 
     test('a group fights without potions under a lock it always releases', async () => {
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]).mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]);
         run.mockResolvedValueOnce({ log: { id: 30, hash: 'abc' }, error: '' });
         expect(await TournamentRound.fight('h', 2, 7)).toEqual({ hash: 'abc', error: '' });
         // the group is claimed under a row lock, so two managers' clicks never both fight it
-        expect(Mysql.select.mock.calls.at(-1)).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), expect.arrayContaining([2]), { connection: 'tx' }]);
+        expect(Mysql.select.mock.calls.at(-2)).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), expect.arrayContaining([2]), { connection: 'tx' }]);
+        // the gladiators are read again under that lock, so a late choice cannot slip in between
+        expect(Mysql.select.mock.calls.at(-1)).toEqual(['SELECT gladiator FROM group_teams WHERE groupid = ? ORDER BY id', [2], { connection: 'tx' }]);
         expect(run.mock.calls[0][0]).toMatchObject({ ids: [4, 5], options: { origin: 'tourn', noitems: true } });
         expect(Mysql.update).toHaveBeenCalledWith('groups', { log: 30 }, { id: 2 });
         expect(Mysql.update).toHaveBeenLastCalledWith('groups', { locked: null }, { id: 2 });
 
         Mysql.findOne.mockResolvedValueOnce(manager);
-        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]);
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }]).mockResolvedValueOnce([{ log: null, busy: 0 }]).mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 5 }]);
         run.mockRejectedValueOnce(new Error('runner down'));
         await expect(TournamentRound.fight('h', 2, 7)).rejects.toThrow('runner down');
         expect(Mysql.update).toHaveBeenLastCalledWith('groups', { locked: null }, { id: 2 });
+    });
+
+    test('a group fights the choices it holds under its lock', async () => {
+        Mysql.findOne.mockResolvedValueOnce(manager);
+        // a team switched to gladiator 9 between the first read and the lock
+        Mysql.select.mockResolvedValueOnce([{ gladiator: 4, round: 2 }, { gladiator: 5, round: 2 }]).mockResolvedValueOnce([{ round: 2 }])
+            .mockResolvedValueOnce([{ log: null, busy: 0 }]).mockResolvedValueOnce([{ gladiator: 4 }, { gladiator: 9 }]);
+        run.mockResolvedValueOnce({ log: { id: 30, hash: 'abc' }, error: '' });
+        await TournamentRound.fight('h', 2, 7);
+        expect(run.mock.calls[0][0].ids).toEqual([4, 9]);
     });
 
     test('a round waits for every group', async () => {

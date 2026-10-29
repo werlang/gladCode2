@@ -279,7 +279,7 @@ export class TournamentRound {
         // a later round was built from this round's results: fighting again would change nothing
         if (members[0].round !== await TournamentRound.maxRound(hash)) throw new CustomError(409, 'This round is over.', 'ROUND_OVER');
 
-        await Mysql.withTransaction(async context => {
+        const fighters = await Mysql.withTransaction(async context => {
             const [group] = await Mysql.select(
                 'SELECT log, (locked > NOW(3) - INTERVAL ? SECOND) AS busy FROM `groups` WHERE id = ? FOR UPDATE',
                 [LOCK_SECONDS, groupId],
@@ -288,11 +288,15 @@ export class TournamentRound {
             if (Number(group.busy) || (group.log !== null && !force)) {
                 throw new CustomError(409, 'The group already fought or is fighting.', 'GROUP_BUSY');
             }
+            // the choices as they stand under the lock, which choose() takes too
+            const chosen = await Mysql.select('SELECT gladiator FROM group_teams WHERE groupid = ? ORDER BY id', [groupId], context);
+            if (chosen.some(member => member.gladiator === null)) throw new CustomError(409, 'Some teams have not chosen their gladiator.', 'GROUP_NOT_READY');
             await Mysql.update('groups', { locked: Mysql.raw('NOW(3)') }, { id: groupId }, context);
+            return chosen.map(member => member.gladiator);
         });
 
         try {
-            const battle = await new Battle({ origin: 'tourn', noitems: true }).addGladiators(members.map(member => member.gladiator));
+            const battle = await new Battle({ origin: 'tourn', noitems: true }).addGladiators(fighters);
             const { log, error } = await battle.run();
             if (log) await Mysql.update('groups', { log: log.id }, { id: groupId });
             return { hash: log?.hash ?? null, error };
