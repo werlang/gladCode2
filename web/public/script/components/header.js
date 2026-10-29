@@ -98,7 +98,7 @@ export class Header extends BaseComponent {
     async #openMobileMenu() {
         const fog = createElement("<div id='fog'><div id='menu'></div></div>");
         const menu = fog.querySelector('#menu');
-        menu.innerHTML = `<a href='index'><img src='icon/logo.png' alt='gladCode'></a>${this.element.querySelector('#h-items').innerHTML}`;
+        menu.innerHTML = `<a href='/'><img src='/icon/logo.png' alt='gladCode'></a>${this.element.querySelector('#h-items').innerHTML}`;
         document.body.append(fog);
 
         fog.addEventListener('click', async () => {

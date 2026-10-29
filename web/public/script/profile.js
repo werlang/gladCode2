@@ -23,7 +23,7 @@ const NOTIFICATIONS_MS = 30000;
 async function logout() {
     GoogleLogin.removeCredential();
     await UserModel.signOut();
-    location.href = 'index';
+    location.href = '/';
 }
 
 /**

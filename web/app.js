@@ -16,18 +16,15 @@ app.use(securityHeaders);
 /** Feature gate for the Three.js Coliseu 3D renderer (`ENABLE_RENDER2`: 1/true/on/yes). */
 const render2Enabled = ['1', 'true', 'on', 'yes'].includes(String(process.env.ENABLE_RENDER2 ?? '1').trim().toLowerCase());
 
-// Maintenance mode: every page answers with the maintenance notice (assets keep working).
-if (['1', 'true', 'on', 'yes'].includes(String(process.env.MAINTENANCE || '').toLowerCase())) {
-    app.use((req, res, next) => {
-        if (/\.[a-z0-9]+$/i.test(req.path)) return next();
-        return res.status(503).sendFile(path.join(PUBLIC, 'maintenance.html'));
-    });
-}
-
 // no trailing-slash redirect: /dev-tools is a page next to the public/dev-tools/ folder
 app.use(express.static(PUBLIC, { index: false, extensions: false, redirect: false }));
 // Profile pictures uploaded through the API (shared data volume).
 app.use('/profpics', express.static(process.env.PROFPICS_DIR || '/data/profpics', { index: false }));
+
+// Maintenance mode: files keep being served above, every page answers with the notice.
+if (['1', 'true', 'on', 'yes'].includes(String(process.env.MAINTENANCE || '').toLowerCase())) {
+    app.use((req, res) => res.status(503).sendFile(path.join(PUBLIC, 'maintenance.html')));
+}
 
 // The browser talks to the API directly; the web service only renders page shells and never
 // receives the session.
@@ -77,6 +74,8 @@ page(['/function/:name', '/funcao/:name'], 'function', req => {
     return { functionName: name, codeLanguage: language, docLanguage: req.path.startsWith('/funcao/') ? 'pt' : '' };
 });
 page('/post/:hash', 'post', req => ({ postHash: req.params.hash }));
+// the old editor address took the gladiator as ?g=
+app.get('/editor', (req, res, next) => (req.query.g === undefined ? next() : res.redirect(301, legacyPageUrl('editor', req.query))));
 page('/editor', 'editor', () => ({ gladiatorId: null }));
 page('/newglad', 'editor', () => ({ gladiatorId: 0 }));
 page(/^\/glad-(\d+)$/, 'editor', req => ({ gladiatorId: Number(req.params[0]) }));
@@ -96,8 +95,9 @@ page('/profile', 'profile', req => ({ tab: text(req.query.t), subtab: text(req.q
 for (const [route, tab] of Object.entries(PROFILE_TABS)) page(`/${route}`, 'profile', () => ({ tab, subtab: '' }));
 page(/^\/battle\.([\w-]+)$/, 'profile', req => ({ tab: 'battle', subtab: req.params[0] }));
 
-// Old PHP addresses (shared battle links, bookmarks) move permanently to the new routes.
-app.get(/^\/([\w-]+)\.php$/, (req, res, next) => {
+// Old PHP addresses (shared battle links, bookmarks), with or without `.php` as Apache served
+// both, move permanently to the new routes.
+app.get(/^\/([\w-]+)(?:\.php)?$/, (req, res, next) => {
     const target = legacyPageUrl(req.params[0], req.query);
     if (!target) return next();
     return res.redirect(301, target);
