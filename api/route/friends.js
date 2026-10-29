@@ -8,16 +8,20 @@ const router = Router();
 router.use(auth());
 
 /**
- * GET /friends?filter=
- * The master's friendships: `{ pending, confirmed }`; with `filter`, `{ friends }` whose nickname
- * contains it.
+ * GET /friends
+ * The master's friendships: `{ pending, confirmed }`.
  */
 router.get('/', asyncRoute(async (req, res) => {
-    if (req.query.filter !== undefined) {
-        const text = Validate.text(req.query.filter, 'filter', { min: 0, max: 30 });
-        return res.send({ friends: await Friendship.filter(req.user.id, text) });
-    }
-    return res.send(await Friendship.list(req.user.id));
+    res.send(await Friendship.list(req.user.id));
+}));
+
+/**
+ * GET /friends/confirmed?filter=
+ * The master's friends whose nickname contains `filter` (every friend without it): `{ friends }`.
+ */
+router.get('/confirmed', asyncRoute(async (req, res) => {
+    const text = Validate.text(req.query.filter ?? '', 'filter', { min: 0, max: 30 });
+    res.send({ friends: await Friendship.filter(req.user.id, text) });
 }));
 
 /**

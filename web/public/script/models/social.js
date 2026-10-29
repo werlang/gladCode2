@@ -105,7 +105,8 @@ export class FriendModel {
      * @returns {Promise<object[]>} Matching friends.
      */
     static async filter(text) {
-        const { friends } = await api.get('friends', { filter: text });
+        // an empty filter is left out of the query, which this route reads as every friend
+        const { friends } = await api.get('friends/confirmed', { filter: text });
         return friends;
     }
 
