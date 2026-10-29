@@ -1,4 +1,4 @@
-import { api } from '../helpers/request.js';
+import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
 
 /**
  * Tournaments: their setup and teams (`/tournaments`, `/teams`) and their rounds of battles
@@ -186,7 +186,7 @@ export class TournamentModel {
      * @returns {Promise<{ hash: string|null, error: string }>}
      */
     static runGroup(hash, group, { force = false, signal } = {}) {
-        return api.post(`tournament-rounds/${hash}/groups/${group}/battle`, { force }, { signal });
+        return api.post(`tournament-rounds/${hash}/groups/${group}/battle`, { force }, { signal, timeout: BATTLE_TIMEOUT_MS });
     }
 
     /**

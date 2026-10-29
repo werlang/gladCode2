@@ -1,4 +1,4 @@
-import { api } from '../helpers/request.js';
+import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
 
 /**
  * Battle runs (`/battles`). A run answers `{ hash, error }`: the battle log hash, or null with the
@@ -14,6 +14,6 @@ export class SimulationModel {
      * @returns {Promise<{ hash: string|null, error: string }>}
      */
     static test({ source, opponents, breakpoints = [] }, { signal } = {}) {
-        return api.post('battles/test', { gladiator: { source }, opponents, breakpoints }, { signal });
+        return api.post('battles/test', { gladiator: { source }, opponents, breakpoints }, { signal, timeout: BATTLE_TIMEOUT_MS });
     }
 }

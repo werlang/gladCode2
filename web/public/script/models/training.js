@@ -1,4 +1,4 @@
-import { api } from '../helpers/request.js';
+import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
 
 /**
  * Team trainings: their setup (`/trainings`) and their rounds of battles
@@ -169,7 +169,7 @@ export class TrainingModel {
      * @returns {Promise<{ status: string, group?: number, hash?: string|null, error?: string }>}
      */
     static advance(hash, { signal } = {}) {
-        return api.post(`training-rounds/${encodeURIComponent(hash)}/advance`, undefined, { signal });
+        return api.post(`training-rounds/${encodeURIComponent(hash)}/advance`, undefined, { signal, timeout: BATTLE_TIMEOUT_MS });
     }
 
     /**

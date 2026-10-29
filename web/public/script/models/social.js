@@ -1,4 +1,4 @@
-import { api } from '../helpers/request.js';
+import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
 
 /**
  * Ranked battle reports (`/reports`). A report is `{ id, time, gladiator, read, reward, favorite,
@@ -76,7 +76,7 @@ export class DuelModel {
      * @returns {Promise<{ hash: string|null, error: string }>}
      */
     static fight(id, gladiator, { signal } = {}) {
-        return api.post(`duels/${id}/battle`, { gladiator }, { signal });
+        return api.post(`duels/${id}/battle`, { gladiator }, { signal, timeout: BATTLE_TIMEOUT_MS });
     }
 
     /**
@@ -238,6 +238,6 @@ export class RankedModel {
      * @returns {Promise<{ hash: string|null, error: string, summary?: { level: number, xp: number, silver: number, gladiator: object } }>}
      */
     static fight(match, { signal } = {}) {
-        return api.post('battles/ranked', { match }, { signal });
+        return api.post('battles/ranked', { match }, { signal, timeout: BATTLE_TIMEOUT_MS });
     }
 }

@@ -79,6 +79,13 @@ export class RequestError extends Error {
 }
 
 /**
+ * Timeout of a request that runs a battle, in ms: the API may queue it behind other battles and
+ * then waits up to 60 s for the engine, so the default timeout could give up on a battle that
+ * still counts.
+ */
+export const BATTLE_TIMEOUT_MS = 130000;
+
+/**
  * Fetch transport: JSON bodies, query-string GETs and parsed JSON answers.
  */
 export class Request {
@@ -156,7 +163,9 @@ export class Request {
     async request(method, path, data, { signal, timeout = this.timeout, onProgress } = {}) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeout);
-        signal?.addEventListener('abort', () => controller.abort(), { once: true });
+        // a signal aborted before the call never fires its event
+        if (signal?.aborted) controller.abort();
+        else signal?.addEventListener('abort', () => controller.abort(), { once: true });
         const base = this.baseURL;
         const url = base ? `${base}/${path.replace(/^\//, '')}` : path;
 

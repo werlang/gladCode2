@@ -1,4 +1,4 @@
-import { api } from '../helpers/request.js';
+import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
 
 /**
  * The signed-in master's gladiators (`/gladiators`). A gladiator is `{ id, name, vstr, vagi, vint,
@@ -41,7 +41,9 @@ export class GladiatorModel {
      *   `BANNED_FUNCTIONS` (data.functions), `GLADIATOR_TEST_FAILED` (data.error), `INVALID_*`.
      */
     static async save({ id, ...glad }) {
-        const { gladiator } = id ? await api.put(`gladiators/${id}`, glad) : await api.post('gladiators', glad);
+        // saving runs a test battle first
+        const options = { timeout: BATTLE_TIMEOUT_MS };
+        const { gladiator } = id ? await api.put(`gladiators/${id}`, glad, options) : await api.post('gladiators', glad, options);
         return gladiator;
     }
 

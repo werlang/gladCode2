@@ -101,23 +101,18 @@ export async function runSimulation(request, names = []) {
     }
 }
 
-/** Cancels the battle request of {@link runSimulation}, if one is waiting. */
-export function abortSimulation() {
-    pending?.abort();
-}
-
-/**
- * How long a battle may take before the button gives up, in ms: past the API's own 60 s runner
- * limit, so a battle the server still counts is never reported as failed here.
- */
-const PROGRESS_LIMIT_MS = 65000;
+/** How long the bar takes to fill, in ms: about a slow battle (most take a few seconds). */
+const PROGRESS_FILL_MS = 20000;
+/** Where a full bar stops until the battle answers, in %. */
+const PROGRESS_MAX = 95;
 /** How long each waiting message stays, in ms. */
 const MESSAGE_MS = 2000;
 
 /**
  * Turns a button into a progress bar while a battle runs: the bar fills over
- * {@link PROGRESS_LIMIT_MS}, the label cycles through `messages`, and a full
- * bar cancels the battle and reports a timeout.
+ * {@link PROGRESS_FILL_MS} and waits near the end, the label cycles through
+ * `messages`. Only the battle request decides when it failed (its timeout is
+ * `BATTLE_TIMEOUT_MS`): a battle may wait for others on the server and still count.
  */
 export class ProgressButton {
     #button;
@@ -138,13 +133,8 @@ export class ProgressButton {
         const start = performance.now();
         this.#timer = setInterval(() => {
             const elapsed = performance.now() - start;
-            this.#bar.style.width = `${Math.min(100, (elapsed / PROGRESS_LIMIT_MS) * 100)}%`;
+            this.#bar.style.width = `${Math.min(PROGRESS_MAX, (elapsed / PROGRESS_FILL_MS) * 100)}%`;
             this.#label.innerHTML = messages[Math.floor(elapsed / MESSAGE_MS) % messages.length];
-            if (elapsed >= PROGRESS_LIMIT_MS) {
-                this.kill();
-                showTerminal('ERRO DE CONEXÃO', 'Falha ao obter resposta do servidor dentro do tempo limite.');
-                abortSimulation();
-            }
         }, 50);
     }
 
