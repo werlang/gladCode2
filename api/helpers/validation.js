@@ -1,20 +1,27 @@
 import { CustomError } from './error.js';
 
+/** A character that takes four bytes in UTF-8, which utf8mb3 columns cannot hold. */
+const WIDE_CHARACTER = /[\u{10000}-\u{10FFFF}]/u;
+
 /**
  * Request input checks. Each returns the clean value or throws a 400 `CustomError` with a stable
  * code naming the field, so the frontend can say what was wrong.
  */
 export class Validate {
     /**
+     * Text input. Characters outside the Basic Multilingual Plane (emoji and the like) are refused
+     * unless `wide`: most tables store utf8mb3 and would fail to save them, or to compare with them.
+     *
      * @param {unknown} value
      * @param {string} field Field name used in the error code (`INVALID_<FIELD>`).
-     * @param {{ min?: number, max?: number, pattern?: RegExp, optional?: boolean }} [options]
+     * @param {{ min?: number, max?: number, pattern?: RegExp, optional?: boolean, wide?: boolean }} [options]
+     *   `wide` for text that is never stored in or compared with a utf8mb3 column.
      * @returns {string|undefined} The trimmed text; undefined when optional and absent.
      */
-    static text(value, field, { min = 1, max = 255, pattern, optional = false } = {}) {
+    static text(value, field, { min = 1, max = 255, pattern, optional = false, wide = false } = {}) {
         if (value === undefined && optional) return undefined;
         const text = typeof value === 'string' ? value.trim() : '';
-        if (text.length < min || text.length > max || (pattern && !pattern.test(text))) {
+        if (text.length < min || text.length > max || (pattern && !pattern.test(text)) || (!wide && WIDE_CHARACTER.test(text))) {
             throw Validate.error(field);
         }
         return text;

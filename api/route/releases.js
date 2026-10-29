@@ -32,7 +32,7 @@ router.post('/current/gladiators', asyncRoute(async (req, res) => {
 router.post('/current/announcement', asyncRoute(async (req, res) => {
     const body = req.body ?? {};
     const recipients = await Release.announce({
-        changes: Validate.text(body.changes, 'changes', { max: 20000 }),
+        changes: Validate.text(body.changes, 'changes', { max: 20000, wide: true }),
         postLink: Validate.text(body.postLink, 'postLink', { max: 500, pattern: /^https:\/\/[^\s"'<>]+$/ }),
     });
     res.status(202).send({ recipients });

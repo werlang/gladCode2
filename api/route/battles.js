@@ -21,7 +21,7 @@ const MAX_OPPONENTS = 4;
  */
 router.post('/test', auth({ optional: true }), asyncRoute(async (req, res) => {
     const body = req.body ?? {};
-    const source = Validate.text(body.gladiator?.source, 'source', { max: 70000 });
+    const source = Validate.text(body.gladiator?.source, 'source', { max: 70000, wide: true });
     const opponents = Array.isArray(body.opponents) ? body.opponents : [];
     if (!opponents.length || opponents.length > MAX_OPPONENTS) throw Validate.error('opponents');
     const breakpoints = Array.isArray(body.breakpoints) ? body.breakpoints.map(line => Validate.integer(line, 'breakpoints', { min: 1 })) : [];

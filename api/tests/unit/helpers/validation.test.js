@@ -19,6 +19,12 @@ describe('request validation', () => {
         expect(() => Validate.text(42, 'name')).toThrow(expect.objectContaining({ code: 'INVALID_NAME' }));
     });
 
+    test('emoji are refused where the text meets a utf8mb3 column, accented text is not', () => {
+        expect(Validate.text('Ação é ñ 中文', 'search')).toBe('Ação é ñ 中文');
+        expect(() => Validate.text('gladiador 😀', 'search')).toThrow(expect.objectContaining({ status: 400, code: 'INVALID_SEARCH' }));
+        expect(Validate.text('printf("😀");', 'source', { wide: true })).toBe('printf("😀");');
+    });
+
     test('choices and flags take only their exact values', () => {
         expect(Validate.oneOf('update', 'mode', ['create', 'update'])).toBe('update');
         expect(() => Validate.oneOf('drop', 'mode', ['create', 'update'])).toThrow(expect.objectContaining({ code: 'INVALID_MODE' }));
