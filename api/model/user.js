@@ -50,15 +50,20 @@ export class User extends Model {
 
     /**
      * Finds the account of a verified Google identity, linking it by email the first time, or
-     * creates one with a numbered nickname from the given name.
+     * creates one with a numbered nickname from the given name. An account already linked to
+     * another Google identity is never taken over by email (a recycled address, for one).
      *
      * @param {{ email: string, givenName: string, familyName: string, sub: string }} identity
      * @returns {Promise<User>}
+     * @throws {CustomError} 403 `GOOGLE_ACCOUNT_MISMATCH`.
      */
     static async signInWithGoogle({ email, givenName, familyName, sub }) {
         const rows = await Mysql.select('SELECT * FROM usuarios WHERE email = ? OR googleid = ? ORDER BY googleid = ? DESC LIMIT 1', [email, sub, sub]);
         if (rows.length) {
             const user = new User(rows[0]);
+            if (user.googleid && user.googleid !== sub) {
+                throw new CustomError(403, 'This email belongs to an account of another Google identity.', 'GOOGLE_ACCOUNT_MISMATCH');
+            }
             if (user.googleid !== sub || user.email !== email) await user.update({ googleid: sub, email });
             return user;
         }

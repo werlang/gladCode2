@@ -53,6 +53,19 @@ describe('User', () => {
         expect(Mysql.insert).not.toHaveBeenCalled();
     });
 
+    test('Google sign-in follows the Google identity when the email changed', async () => {
+        Mysql.select.mockResolvedValue([{ ...row, googleid: 'g-9' }]);
+        await User.signInWithGoogle({ email: 'new@example.com', givenName: 'Ana', familyName: '', sub: 'g-9' });
+        expect(Mysql.update).toHaveBeenCalledWith('usuarios', { googleid: 'g-9', email: 'new@example.com' }, { id: 7 }, {});
+    });
+
+    test('an account linked to another Google identity is not taken over by its email', async () => {
+        Mysql.select.mockResolvedValue([{ ...row, googleid: 'g-1' }]);
+        await expect(User.signInWithGoogle({ email: 'ana@example.com', givenName: 'Ana', familyName: '', sub: 'g-2' }))
+            .rejects.toMatchObject({ status: 403, code: 'GOOGLE_ACCOUNT_MISMATCH' });
+        expect(Mysql.update).not.toHaveBeenCalled();
+    });
+
     test('Google sign-in creates an account with a numbered nickname', async () => {
         Mysql.select.mockResolvedValue([]);
         Mysql.insert.mockResolvedValue({ insertId: 99, affectedRows: 1 });
