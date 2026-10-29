@@ -37,7 +37,7 @@ For specialized component specifications, consult these reference guides:
 
 ### Workflow 1: Debugging a Failed Simulation or Empty `simlog`
 
-1. **Read the battle's error**: battle endpoints answer `{ hash, error }`; with no log, `error` carries the compiler output (GCC errors, Python tracebacks) or an engine code (`NO_OUTPUT`, `INVALID_ATTR`, ...). Saving a gladiator that fails its test battle answers `GLADIATOR_TEST_FAILED` with the output in `data.error`.
+1. **Read the battle's error**: battle endpoints answer `{ hash, error }`; with no log, an editor test battle's `error` carries the compiler output (GCC errors, Python tracebacks) or an engine code (`INVALID_ATTR`, ...); battles that count (ranked, duel, tournament, training, `scripts/battle.js`) answer only `NO_OUTPUT` and log the output in the API logs as `battle_without_log` (`docker compose logs api`), since it quotes every gladiator's code. Saving a gladiator that fails its test battle answers `GLADIATOR_TEST_FAILED` with the output in `data.error`.
 2. **Reproduce by hand** (Workflow 2): the API removes run folders when the runner answers, so rebuild the folder and run the engine directly to read `errorc.txt` and `simlog`.
 3. **Check for Timeout or Infinite Loop**:
    - If `errorc.txt` is empty but `simlog` is missing or truncated, check if the gladiator script was stuck in an infinite loop without yielding to the C server engine (`gladCodeServerMain`).

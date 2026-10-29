@@ -45,8 +45,8 @@ From `api/route/battles.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `POST` | `/battles/test` | anyone (session optional) | The editor's test battle, in the sandbox (test-only commands allowed), open to visitors: `{ gladiator: { source }, opponents: [{ sample } \| { id }], breakpoints?: number[] }` where `source` is the full code with setup() and `id` one of the signed-in master's gladiators. Answers `{ hash, error }`: the log hash, or null with the compiler or engine error. |
-| `POST` | `/battles/ranked/match` | signed in | Finds opponents for one of the master's gladiators: `{ gladiator }`. Answers `{ opponents, match }`; `match` is a short-lived token the battle needs. |
+| `POST` | `/battles/test` | anyone (session optional) | The editor's test battle, in the sandbox (test-only commands allowed), open to visitors: `{ gladiator: { source }, opponents: [{ sample } \| { id }], breakpoints?: number[] }` where `source` is the full code with setup() and `id` one of the signed-in master's gladiators. Answers `{ hash, error }`: the log hash, or null with the compiler or engine error. One test at a time per master (or per address for visitors): 429 `BATTLE_RUNNING`. |
+| `POST` | `/battles/ranked/match` | signed in | Finds opponents for one of the master's gladiators: `{ gladiator }`. Answers `{ opponents, match }`; `match` is the id the battle needs, fought once within ten minutes. |
 | `POST` | `/battles/ranked` | signed in | Fights a match: `{ match }`. Answers `{ hash, error, summary }` with the master's level, xp and silver and their gladiator after the battle. |
 
 ## duels
@@ -67,7 +67,8 @@ From `api/route/friends.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/friends?filter=` | signed in | The master's friendships: `{ pending, confirmed }`; with `filter`, `{ friends }` whose nickname contains it. |
+| `GET` | `/friends` | signed in | The master's friendships: `{ pending, confirmed }`. |
+| `GET` | `/friends/confirmed?filter=` | signed in | The master's friends whose nickname contains `filter` (every friend without it): `{ friends }`. |
 | `GET` | `/friends/search?nick=` | signed in | Masters to befriend: `{ users: [{ user, nick }] }` (up to ten). |
 | `POST` | `/friends` | signed in | Asks a master for friendship: `{ user }`. The master is emailed unless they opted out. |
 | `PUT` | `/friends/requests/:id` | signed in | Answers a friend request: `{ accept }`. |

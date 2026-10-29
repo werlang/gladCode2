@@ -76,7 +76,7 @@ api POST battles/ranked/match '{"gladiator":<GLADIATOR_COD>}'
    ORDER BY ABS((SELECT COUNT(*) FROM gladiators g2 WHERE g2.mmr < g.mmr) - (SELECT COUNT(*) FROM gladiators WHERE mmr < ?))
    LIMIT 10
    ```
-3. Answers the opponents and `match`, a signed token (10 minutes) naming the master, their gladiator and the opponents.
+3. Stores the match in `ranked_matches` (10 minutes) and answers the opponents and `match`, its id. The battle claims the row under a lock, so each match is fought once (`MATCH_INVALID` afterwards).
 
 #### Step 2: The Battle
 ```bash

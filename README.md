@@ -100,7 +100,7 @@ See [dev-tools/README.md](dev-tools/README.md).
 ### Lint & Tests
 
 ```bash
-docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"   # lint (web + api), frontend tests
+docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"   # lint (web + api), frontend tests
 docker compose exec -T api npx vitest run                                                  # API tests
 bash tests/engine/run.sh                                                                   # engine regression battles
 ```
@@ -146,11 +146,11 @@ gladcode2/
 
 ## 🚀 Deploying
 
-`compose.yaml` builds and runs the production images; the GitHub workflow (`.github/workflows/master-deploy.yml`) pulls `main` on the server, builds, restarts with `--remove-orphans` and runs the migrations. On the server:
+`compose.yaml` builds and runs the production images; the GitHub workflow (`.github/workflows/master-deploy.yml`) pulls `main` on the server, stops when `JWT_SECRET`, `WEB_PUBLISH` or `API_PUBLISH` is missing from `.env`, moves the PHP stack's `public_html/logs` and `public_html/profpics` into `data/` (once, never overwriting), builds, restarts with `--remove-orphans` and runs the migrations. On the server:
 
 - Set `NODE_ENV=production`, `WEB_URL=https://gladcode.dev`, `WEB_PORT=443`, `API_URL=https://api.gladcode.dev`, `API_PORT=443`, `WEB_PUBLISH`/`API_PUBLISH` (for example `127.0.0.1:8085` and `127.0.0.1:8086`), `TRUST_PROXY=true`, a random `JWT_SECRET` and `ADMIN_EMAILS`.
 - Route `gladcode.dev` to the web port and `api.gladcode.dev` to the API port in the host nginx (with TLS).
-- Keep the Synty packs in `web/public/assets/synty/` and the data in `data/logs`, `data/profpics` and `data/runs`.
+- Keep the Synty packs in `web/public/assets/synty/` and the data in `data/logs`, `data/profpics` and `data/runs` (the first deploy moves the old ones there).
 - Expire old battle logs from the host crontab: `docker compose exec -T api node scripts/remove-old-battles.js`.
 
 ---

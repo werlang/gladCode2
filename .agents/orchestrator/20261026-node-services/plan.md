@@ -106,4 +106,4 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
       (`api/scripts/battle.js` replaces the arbitrary-battle curl)
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
-cookie for `localhost` (web on 8085, API on 8086, old Apache on 8087).
+cookie for `localhost` (web on 8085, API on 8086).

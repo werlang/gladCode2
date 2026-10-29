@@ -104,7 +104,7 @@ const rows = await Mysql.select('SELECT cod, name FROM gladiators WHERE master =
 - Page entries in `script/*.js`; DOM classes in `components/`; pure helpers in `helpers/`; markup strings in `templates/` (`{{key}}` escaped, `{{{key}}}` raw).
 - Only `models/` calls the API, through `helpers/request.js` (`api`); failures are `RequestError`s carrying the API's `code`.
 - Never `alert`/`confirm`/`prompt` (use `components/dialog.js`), never unescaped text in `innerHTML`, dialogs or toasts, never app data in `data-*` attributes.
-- Lint and test through Docker: `docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
+- Lint and test through Docker: `docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
 - Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards).
 
 ### Branches & Commits
@@ -121,7 +121,7 @@ User code is checked against `api/banned_functions.json`:
 
 ### Inspecting Simulation Logs
 If a battle fails or returns no log:
-1. The battle answer's `error` carries the compiler output or the engine error (`NO_OUTPUT`, `INVALID_ATTR`, ...).
+1. An editor test battle's `error` carries the compiler output or the engine error (`INVALID_ATTR`, ...); battles that count answer `NO_OUTPUT` and log the output as `battle_without_log` in `docker compose logs api`.
 2. Run a folder by hand: copy `Payload/` into `data/runs/<name>/`, add `code0.c`, then `docker run --rm -v "$PWD/data/runs/<name>":/usercode -w /usercode gladcode2-vm sh socket_compile.sh` and read `errorc.txt` / `simlog`.
 3. Check for "CLIENT TIMEOUT" errors caused by infinite loops lacking API yielding.
 

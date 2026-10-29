@@ -85,7 +85,7 @@ The render2 models, animations and textures come from Synty packs in `web/public
 ## 🗄️ Database & Configuration Standards
 
 ### Configuration
-Every setting comes from the environment (`.env`, passed through `compose.yaml`); there are no config files. `.env.example` lists them: `MYSQL_*`, `JWT_SECRET` (at least 32 random characters in production), `SESSION_TTL_DAYS`, `GOOGLE_CLIENT_ID`, `ADMIN_EMAILS`, `MAILER_*`, `WEB_URL`/`WEB_PORT` and `API_URL`/`API_PORT` (the public URLs), `WEB_PUBLISH`/`API_PUBLISH` (the host ports the containers listen on), `ENABLE_RENDER2`, `MAINTENANCE`, `TRUST_PROXY`.
+Every setting comes from the environment (`.env`, passed through `compose.yaml`); there are no config files. `.env.example` lists them: `MYSQL_*`, `JWT_SECRET` (at least 32 random characters in production), `SESSION_TTL_DAYS`, `GOOGLE_CLIENT_ID`, `ADMIN_EMAILS`, `MAILER_*`, `WEB_URL`/`WEB_PORT` and `API_URL`/`API_PORT` (the public URLs), `WEB_PUBLISH`/`API_PUBLISH` (the host ports the containers listen on), `ENABLE_RENDER2`, `MAINTENANCE`, `TRUST_PROXY`, `RUNNER_CONCURRENCY` (battles the engine runs at once, 6; the next ones wait, and editor test battles run one at a time per master or address).
 
 `compose.yaml` runs the production images. For development set `COMPOSE_FILE=compose.yaml:compose.dev.yaml` in `.env`: `compose.dev.yaml` mounts `api/` and `web/` and runs them with live reload.
 
@@ -155,7 +155,7 @@ cat data/runs/test_run/errorc.txt data/runs/test_run/simlog
 | Symptom | Cause | Solution |
 | :--- | :--- | :--- |
 | **"CLIENT TIMEOUT"** | Gladiator code stuck in infinite loop without calling API functions or socket stalled | Verify gladiator code contains valid loop calling `gladCodeAPI` actions |
-| **Empty `simlog` / `NO_OUTPUT`** | GCC compilation failed for gladiator code or C server | The battle answer carries the compiler output in `error`; run the folder by hand (Direct Simulation Debugging) for more |
+| **Empty `simlog` / `NO_OUTPUT`** | GCC compilation failed for gladiator code or C server | Editor test battles carry the compiler output in `error`; battles that count answer `NO_OUTPUT` and log it as `battle_without_log` (`docker compose logs api`, also printed by `scripts/battle.js`); run the folder by hand (Direct Simulation Debugging) for more |
 | **`NOT_SIGNED_IN` (401)** | Missing or expired `app_session` cookie, or a different `JWT_SECRET` | Sign in again; locally use `scripts/issue-session.js` |
 | **`CORS_ORIGIN_DENIED` / `CSRF_ORIGIN_DENIED` (403)** | The page's origin is not `WEB_URL:WEB_PORT` | Fix `WEB_URL`/`WEB_PORT` (public URL) in `.env`; host ports are `WEB_PUBLISH`/`API_PUBLISH` |
 | **Container Timeout** | Simulation took longer than 30s | Runner kills container via `docker kill {dirname}`. Check for blocking calls or high turn counts |
@@ -189,7 +189,7 @@ Rules for `web/public/script/` (the layout is described under [Web](#2-web-web))
 8. **Lint and test before committing** (through Docker; the root `package.json` and `eslint.config.js` hold the tooling, `node_modules/` is gitignored):
 
    ```bash
-   docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
+   docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
    docker compose exec -T api npx vitest run
    ```
 

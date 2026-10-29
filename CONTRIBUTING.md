@@ -10,7 +10,7 @@ Before merging, run the checks for what you touched:
 
 ```bash
 # lint (web/ and api/) and frontend unit tests (tests/frontend, tests/render2)
-docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
+docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
 
 # API unit tests
 docker compose exec -T api npx vitest run
