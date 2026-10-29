@@ -116,8 +116,9 @@ export class MessagesTab {
                 await MessageModel.reply(message.id, text);
             }
             catch (error) {
-                if (error.code !== 'MESSAGE_TOO_LONG') throw error;
-                showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
+                if (error.code === 'MESSAGE_TOO_LONG') showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
+                else if (error.code === 'INVALID_MESSAGE') showMessage('A resposta não pode ficar vazia nem ter emojis.');
+                else throw error;
                 return;
             }
             this.show();

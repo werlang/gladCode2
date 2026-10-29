@@ -21,8 +21,9 @@ export async function writeMessage(user, nick) {
         await MessageModel.send(user, message);
     }
     catch (error) {
-        if (error.code !== 'MESSAGE_TOO_LONG') throw error;
-        showMessage('A mensagem é longa demais. Encurte o texto e tente novamente.');
+        if (error.code === 'MESSAGE_TOO_LONG') showMessage('A mensagem é longa demais. Encurte o texto e tente novamente.');
+        else if (error.code === 'INVALID_MESSAGE') showMessage('A mensagem não pode ficar vazia nem ter emojis.');
+        else throw error;
         return;
     }
     showMessage('Mensagem enviada');
