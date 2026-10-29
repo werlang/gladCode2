@@ -34,8 +34,12 @@ const SAVE_ERRORS = {
     NAME_TAKEN: name => `O nome <span class='highlight'>${name}</span> já está sendo usado por outro gladiador`,
     GLADIATOR_LIMIT: (name, data) => `Você não pode possuir mais de <span class='highlight'>${data.limit}</span> gladiadores simultaneamente. Aumente seu nível de mestre para desbloquear mais gladiadores.`,
     BANNED_FUNCTIONS: (name, data) => `Você possui funções em seu código que são permitidas somente para teste. Remova-as e tente salvar novamente.<ul>Funções:${data.functions.map(fn => `<li><b>${fn}</b></li>`).join('')}</ul>`,
-    INVALID_NAME: () => 'O nome do gladiador só pode ter letras, números, espaços e _.',
+    INVALID_NAME: () => 'O nome do gladiador só pode ter letras, números, espaços e _, até 49 bytes (letras acentuadas contam dois).',
     INVALID_ATTRIBUTES: () => 'Os atributos do gladiador não correspondem às regras da gladCode.',
+    INVALID_CODE: () => 'O código é longo demais ou tem caracteres não suportados, como emojis.',
+    INVALID_SKIN: () => 'A aparência do gladiador não é válida. Abra o editor de aparência e salve-a novamente.',
+    BATTLE_RUNNING: () => 'Aguarde a sua outra batalha terminar e tente novamente.',
+    NOT_SIGNED_IN: () => 'Sua sessão expirou. Entre novamente para salvar o gladiador.',
 };
 
 /**
@@ -343,8 +347,7 @@ class EditorPage {
             showTerminal(problem.title, problem.message);
             return;
         }
-        const explain = SAVE_ERRORS[error.code];
-        if (!explain) throw error;
+        const explain = SAVE_ERRORS[error.code] ?? (() => 'Não foi possível gravar o gladiador. Tente novamente.');
         showMessage(explain(escapeHtml(name), error.details ?? {}));
     }
 }

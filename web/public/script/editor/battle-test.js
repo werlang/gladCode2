@@ -1,3 +1,4 @@
+import { showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
 import { ProgressButton, Simulation } from '../components/simulation.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
@@ -77,7 +78,13 @@ export async function runTestBattle(button, opponents, { source, name, breakpoin
         const data = await simulation.run();
         return data.hash || false;
     }
-    catch {
+    catch (error) {
+        // a cancelled run needs no message
+        if (!error.aborted) {
+            showMessage(error.code === 'BATTLE_RUNNING'
+                ? 'Aguarde a sua outra batalha terminar e tente novamente.'
+                : 'Não foi possível executar a batalha. Tente novamente.');
+        }
         return false;
     }
     finally {
