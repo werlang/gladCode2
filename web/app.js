@@ -10,7 +10,8 @@ const PUBLIC = path.join(import.meta.dirname, 'public');
 
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', process.env.TRUST_PROXY === 'true');
+// behind the host nginx: trust its one hop only, so a client cannot pick its own address with X-Forwarded-For
+app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
 app.use(securityHeaders);
 
 /** Feature gate for the Three.js Coliseu 3D renderer (`ENABLE_RENDER2`: 1/true/on/yes). */

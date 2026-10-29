@@ -32,7 +32,8 @@ const host = '0.0.0.0';
 
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', process.env.TRUST_PROXY === 'true');
+// behind the host nginx: trust its one hop only, so a client cannot pick its own address with X-Forwarded-For
+app.set('trust proxy', process.env.TRUST_PROXY === 'true' ? 1 : false);
 
 app.use(requestLogMiddleware);
 app.use(securityHeadersMiddleware);
