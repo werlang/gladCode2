@@ -9,11 +9,14 @@ See [README.md](README.md) for the local Docker stack and [AGENTS.md](AGENTS.md)
 Before merging, run the checks for what you touched:
 
 ```bash
-# frontend lint and unit tests (public_html/script, tests/frontend, tests/render2)
+# lint (web/ and api/) and frontend unit tests (tests/frontend, tests/render2)
 docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
 
-# PHP helpers
-for t in tests/*.test.php; do docker run --rm -v "$PWD":/w -w /w php:8-cli php "$t"; done
+# API unit tests
+docker compose exec -T api npx vitest run
+
+# after changing a route: regenerate docs/api/README.md
+docker run --rm -v "$PWD":/w -w /w node:22-alpine node api/scripts/api-docs.js
 
 # engine regression battles (needs the gladcode2-vm image)
 bash tests/engine/run.sh
@@ -38,7 +41,7 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.
 
   | Scope | Area |
   | --- | --- |
-  | `web` | PHP pages and the ES module frontend in `public_html/script/` |
+  | `web` | the web service in `web/` and the ES module frontend in `web/public/script/` |
   | `home` | the front page |
   | `editor` | the gladiator editor |
   | `profile` | the profile page and its tabs |
@@ -47,18 +50,18 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.
   | `playback` | the replay page and the classic 2D renderer |
   | `render2` | the Three.js 3D renderer in `script/render2/` |
   | `audio` | battle sound and music |
-  | `api` | `back_*.php` endpoints |
-  | `sim` | `back_simulation.php` and battle results |
+  | `api` | the REST API in `api/` |
+  | `sim` | battles and their results (`api/model/battle.js`, `api/helpers/battle-results.js`) |
   | `engine` | the C engine in `Payload/` |
   | `runner` | the runner service in `runner/` |
-  | `node` | the Socket.IO server in `node/` |
   | `db` | migrations and schema |
-  | `docker` | Dockerfiles and `compose.yaml` |
+  | `docker` | Dockerfiles, `compose.yaml` and `compose.dev.yaml` |
   | `deps` | dependency manifests and lockfiles |
-  | `config` | configuration, lint rules and ignore files |
+  | `config` | environment examples, lint rules and ignore files |
   | `ci` | GitHub Actions |
   | `agents` | `AGENTS.md`, `.agents/` and `.github/copilot-instructions.md` |
-  | `release` | version bumps |
+  | `release` | version bumps (`api/version`) |
+  | `devtools` | `dev-tools/` and the admin tools |
 
 - One logical change per commit. Keep tests with the change they cover.
 - Add a body when the reason is not obvious from the subject.

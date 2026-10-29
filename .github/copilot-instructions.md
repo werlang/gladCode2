@@ -1,6 +1,6 @@
 # gladCode Development & Copilot Guide
 
-This guide provides instructions and architectural context for GitHub Copilot and developers working on **gladCode 2**.
+This guide provides instructions and architectural context for GitHub Copilot and developers working on **gladCode 2**. [AGENTS.md](../AGENTS.md) is the full reference.
 
 ---
 
@@ -10,21 +10,22 @@ This guide provides instructions and architectural context for GitHub Copilot an
 > **NO LOCAL NODE.JS OR PYTHON ON HOST MACHINE**
 > The host machine does NOT have Node.js or Python installed natively.
 > - **DO NOT** execute `node`, `npm`, `python`, `python3`, or `gcc` directly on the host shell.
-> - **ALWAYS** use Docker Compose containers for all commands, scripts, compilation, and service control:
->   - PHP / Apache / Dev Tools: `docker compose exec apache <command>`
->   - Runner Service: `docker compose exec runner <command>`
+> - **ALWAYS** use Docker for all commands, scripts, compilation, and service control:
+>   - API: `docker compose exec api <command>`; web: `docker compose exec web <command>`; runner: `docker compose exec runner <command>`
+>   - Repository tooling: `docker run --rm -v "$PWD":/w -w /w node:22-alpine <command>`
 >   - Full environment control: `docker compose up -d`, `docker compose down`
 
 ---
 
 ## 🏛️ Architecture Overview
 
-gladCode is a web-based programming game where users code AI gladiators in C or Python that battle autonomously in an arena. The application uses a microservices architecture managed via **Docker Compose**:
+gladCode is a web-based programming game where users code AI gladiators in C or Python that battle autonomously in an arena. Docker Compose runs:
 
-- **Apache/PHP 8 Frontend (`public_html/`)**: Web UI, user management, gladiator creation, tournament routing, and database operations.
-- **Node.js WebSocket Server (`node/`)**: Real-time notifications and tournament updates via Socket.IO.
-- **Runner Service (`runner/`)**: Express API & Docker-in-Docker service executing user code in isolated containers (`gladcode2-vm`).
-- **C Simulation Engine (`payload/`)**: Multi-threaded server executing combat between gladiators via TCP sockets.
+- **Web (`web/`)**: Express + Mustache page shells and the static frontend (`web/public/`). It never sees the session.
+- **API (`api/`)**: Express REST API (routes in `route/`, models in `model/`, MySQL through `helpers/mysql.js`), documented in [docs/api/README.md](../docs/api/README.md). The browser calls it directly with the `app_session` cookie.
+- **Runner (`runner/`)**: Express & Docker-in-Docker service executing user code in isolated containers (`gladcode2-vm`).
+- **C Simulation Engine (`Payload/`)**: Multi-threaded server executing combat between gladiators via TCP sockets.
+- **MySQL 8.0**, with numbered migrations in `migrations/`.
 
 ---
 
@@ -33,61 +34,50 @@ gladCode is a web-based programming game where users code AI gladiators in C or 
 ### 1. Starting the Development Environment
 
 ```bash
+# .env: COMPOSE_FILE=compose.yaml:compose.dev.yaml (live reload), WEB_PUBLISH/API_PUBLISH for host ports
 docker compose up -d
+MAILER_USER= docker compose up -d api                          # no emails to real users while testing
+docker compose exec -T api node scripts/issue-session.js <id>  # app_session cookie for localhost
 ```
 
-Services:
-- **Apache (PHP)**: `http://localhost:80`
-- **Dev Tools Suite**: `http://localhost:80/dev-tools/`
-- **Runner API**: `http://runner:3000` (internal Docker network)
-- **MySQL Database**: `localhost:3306`
-- **Node WebSocket**: auto-started with runner stack
+- **Site**: `http://localhost:<WEB_PUBLISH>`; **API**: `http://localhost:<API_PUBLISH>`
+- **Dev tools** (accounts in `ADMIN_EMAILS`): `/dev-tools` on the site
+- **Runner**: `http://runner:3000` (internal Docker network)
 
-### 2. Database Management (`public_html/dev-tools/`)
-
-Use the dump/restore script inside the Apache container for database backups:
+### 2. Database Management
 
 ```bash
-# Dump database to public_html/dev-tools/dump_gladcode.sql
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore.sh dump"
-
-# Restore database from dump_gladcode.sql
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore.sh restore"
+./migrations/migrate.sh             # apply migrations
+dev-tools/dump_restore.sh dump      # dev-tools/dump_gladcode.sql
+dev-tools/dump_restore.sh restore
 ```
 
-Credentials are read automatically from `config/config.json` (outside web root, mounted at `/var/www/private/config.json`) / env (`MYSQL_*` in `.env`).
-
-### 3. Tournament Testing Suite (`public_html/dev-tools/`)
+### 3. Tournament Testing
 
 ```bash
-# Web Interface
-open http://localhost/dev-tools/index.html
-
-# CLI Tournament Commands (run inside apache container)
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh list"
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh create"
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh reset 12"
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh list-real 1 10"
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh reset-real 45"
+dev-tools/tournament.sh list            # test tournaments ([DEV-TEST])
+dev-tools/tournament.sh create "Cup" 8  # random full teams
+dev-tools/tournament.sh reset 12 2      # tournament 12 (id or hash) back to round 2
+dev-tools/tournament.sh list-real 1 10
+dev-tools/tournament.sh help
 ```
 
 ---
 
 ## ⚔️ How Battles Work (Critical Flow)
 
-1. User writes C or Python code in `editor.php` using visual blocks (Blockly) or text (ACE editor).
-2. Code is validated against `banned_functions.json` and saved to the `gladiators` table with attributes (STR/AGI/INT) and skin customization.
-3. Match is initiated via `back_match.php` or `back_simulation.php`:
-   - Creates temporary run directory in `public_html/runs/{hash}/`.
-   - Copies payload files (`gladCodeServerMain.c`, `gladCodeServerCore.c`, `gladCodeAPI.c`, `socket_compile.sh`, user codes as `code0.c`, `code1.c`, etc.).
-   - Sends HTTP POST request to Runner service at `http://runner:3000/{hash}`.
-4. Runner service (`runner/app.js` & `runner.js`) executes Docker container:
-   - Spawns `pswerlang/gladcode2-vm` container running `socket_compile.sh`.
-   - Compiles user C files (`gcc -o code0 code0.c -lm`) or executes Python files (`python3 code0.py`).
+1. User writes C or Python code in the editor (`/editor`) using visual blocks (Blockly) or text (ACE editor).
+2. Saving a gladiator (`POST`/`PUT /gladiators`) checks the code against `api/banned_functions.json` and runs a test battle; the code is stored as written with its attributes (STR/AGI/INT) and skin.
+3. A battle (`api/model/battle.js` `Battle`, used by editor tests, ranked battles, duels, tournaments and trainings):
+   - Creates a run folder in `data/runs/<dir>/` with the `Payload/` files and the gladiators' code (`code0.c`, `code1.py`, ...).
+   - Sends an HTTP POST to the runner at `http://runner:3000/<dir>` (`sandbox` for editor tests only, `noitems` for tournaments).
+4. The runner (`runner/app.js` & `runner.js`) executes a Docker container:
+   - Spawns `gladcode2-vm` running `socket_compile.sh`.
+   - Compiles user C files (`gcc -o code0 code0.c -lm`) or runs Python files (`python3 code0.py`).
    - Launches `gladCodeServerMain`, creating TCP sockets for each gladiator thread.
-   - User gladiators communicate with game engine via `gladCodeAPI.c` / `gladCodeAPI.py`.
-5. Simulation produces a `simlog` JSON file containing turn-by-turn combat data.
-6. `script/playback.js` expands the `simlog` into frames and replays it with the renderer the user picked: classic 2D Phaser.js (`script/render.js`) or the Three.js coliseum (`script/render2/`).
+   - User gladiators communicate with the game engine via `gladCodeAPI.c` / `gladCodeAPI.py`.
+5. The simulation produces a `simlog` JSON trace; the API stores it in `data/logs/<id>` and applies the battle's rules (`api/helpers/battle-results.js`).
+6. `web/public/script/playback.js` expands the log into frames and replays it with the renderer the user picked: classic 2D Phaser.js (`script/render.js`) or the Three.js coliseum (`script/render2/`).
 
 ### Socket IPC Architecture
 
@@ -97,35 +87,32 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
 
 ## 📐 Project Conventions
 
-### PHP Backend Structure
-- All API endpoints follow `back_*.php` naming convention and return JSON/text (no direct HTML rendering).
-- `connection.php` provides the PDO database connection singleton. Use `runQuery($sql, $params)` for queries.
-- Authentication must be checked on all endpoints via `$_SESSION['user']`.
-- Sessions are shared between PHP and Node.js via MySQL session store.
+### API (`api/`)
+- Routes compose HTTP only: validate with `Validate`, call a model, answer JSON (camelCase). Document each route with a `METHOD /path` comment and regenerate `docs/api/README.md` (`node api/scripts/api-docs.js` through Docker).
+- Models own the rules and the SQL; only models call `Mysql`, always with placeholders. Use `Mysql.withTransaction` and `SELECT ... FOR UPDATE` where two requests could race.
+- `auth()` on every route that touches a master's data, `auth({ admin: true })` for admin tools; check ownership in the model.
+- Refuse with `CustomError(status, message, CODE)`; clients branch on `code`.
+- Tests: Vitest in `api/tests/unit/` (`docker compose exec -T api npx vitest run`).
 
-### Frontend JavaScript (`public_html/script/`)
-- Native ES modules with named exports, loaded through the import map in `module_scripts.php` (`printModuleImportMap()`, `moduleSrc()`). No jQuery and no new `window` globals.
+```js
+// api/model/example.js
+const rows = await Mysql.select('SELECT cod, name FROM gladiators WHERE master = ? AND version = ?', [userId, VERSION]);
+```
+
+### Frontend JavaScript (`web/public/script/`)
+- Native ES modules with named exports, loaded through the import map the views print (`{{{importMap}}}`, `{{#module}}page.js{{/module}}`). No jQuery and no new `window` globals.
 - Page entries in `script/*.js`; DOM classes in `components/`; pure helpers in `helpers/`; markup strings in `templates/` (`{{key}}` escaped, `{{{key}}}` raw).
-- Only `models/` calls `back_*.php`, through `helpers/request.js`.
-- Never `alert`/`confirm`/`prompt` (use `components/dialog.js`), never unescaped text in `innerHTML`, never app data in `data-*` attributes.
+- Only `models/` calls the API, through `helpers/request.js` (`api`); failures are `RequestError`s carrying the API's `code`.
+- Never `alert`/`confirm`/`prompt` (use `components/dialog.js`), never unescaped text in `innerHTML`, dialogs or toasts, never app data in `data-*` attributes.
 - Lint and test through Docker: `docker run --rm -v "$PWD":/w -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
 - Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards).
 
 ### Branches & Commits
 - Follow [CONTRIBUTING.md](../CONTRIBUTING.md): work branches from `dev` named `<type>/<slug>`, Conventional Commits `<type>(<scope>): <summary>` (imperative, at most 72 characters, scopes listed there), a body only when the reason is not obvious.
 
-### Database Access Example
-```php
-include_once "connection.php";
-$stmt = runQuery("SELECT * FROM gladiators WHERE master = :master", [':master' => $user]);
-while ($row = $stmt->fetch()) {
-    // Process gladiator record
-}
-```
-
 ### Security & Banned Functions
-User code compilation enforces security policies defined in `public_html/banned_functions.json`:
-- Blocked C/Python functions: `setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`.
+User code is checked against `api/banned_functions.json`:
+- Blocked C/Python functions: `setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel` (they only work in editor test battles, which run in the engine's sandbox).
 - Docker containers run with CPU quota (`--cpu-quota=50000`) and a 30-second hard wall-clock timeout.
 
 ---
@@ -133,20 +120,20 @@ User code compilation enforces security policies defined in `public_html/banned_
 ## 🔍 Debugging & Verification
 
 ### Inspecting Simulation Logs
-If a simulation fails or returns an empty `simlog`:
-1. Check `errorc.txt` in the active run directory (`public_html/runs/{hash}/errorc.txt`).
-2. Verify GCC compilation output or Python tracebacks.
+If a battle fails or returns no log:
+1. The battle answer's `error` carries the compiler output or the engine error (`NO_OUTPUT`, `INVALID_ATTR`, ...).
+2. Run a folder by hand: copy `Payload/` into `data/runs/<name>/`, add `code0.c`, then `docker run --rm -v "$PWD/data/runs/<name>":/usercode -w /usercode gladcode2-vm sh socket_compile.sh` and read `errorc.txt` / `simlog`.
 3. Check for "CLIENT TIMEOUT" errors caused by infinite loops lacking API yielding.
 
 ---
 
 ## 📁 Key Files Reference
 
-- **`payload/gladCodeAPI.c` / `.py`**: Gladiator client API functions (movement, attack, spells).
-- **`payload/gladCodeServerMain.c`**: Multi-threaded C socket server for battles.
-- **`payload/socket_compile.sh`**: Compilation script inside `gladcode2-vm`.
-- **`public_html/back_simulation.php`**: Primary battle orchestrator.
+- **`Payload/gladCodeAPI.c` / `.py`**: Gladiator client API functions (movement, attack, spells).
+- **`Payload/gladCodeServerMain.c`**: Multi-threaded C socket server for battles.
+- **`Payload/socket_compile.sh`**: Compilation script inside `gladcode2-vm`.
+- **`api/model/battle.js`**: Battle orchestrator; **`api/helpers/battle-results.js`**: rewards and placings.
 - **`runner/runner.js`**: Docker container lifecycle manager.
-- **`public_html/script/playback.js`**: Replay loader and controls shared by both renderers.
-- **`public_html/script/render.js`** / **`render2/`**: Classic Phaser.js 2D and Three.js 3D battle renderers.
-- **`public_html/dev-tools/`**: Web and CLI tools for database and tournament management.
+- **`web/public/script/playback.js`**: Replay loader and controls shared by both renderers.
+- **`web/public/script/render.js`** / **`render2/`**: Classic Phaser.js 2D and Three.js 3D battle renderers.
+- **`dev-tools/`** and **`/dev-tools`**: CLI and web tools for database and tournament management.
