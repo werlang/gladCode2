@@ -47,6 +47,8 @@ export class RankedBattle {
         if (!rows.length) throw new CustomError(409, 'No opponents on the current version yet.', 'NO_OPPONENTS');
 
         const match = randomBytes(16).toString('hex');
+        // one pending match per master, as the PHP session kept it: a new match replaces the last
+        await Mysql.delete('ranked_matches', { user: user.id });
         await Mysql.delete('ranked_matches', { expires: { '<': Mysql.raw('NOW()') } });
         await Mysql.insert('ranked_matches', {
             id: match,

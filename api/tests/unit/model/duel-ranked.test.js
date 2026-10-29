@@ -84,6 +84,8 @@ describe('ranked battles', () => {
         expect(table).toBe('ranked_matches');
         expect(row).toMatchObject({ id: match, user: 7, gladiator: 4, opponents: '[20]' });
         expect(row.expires.toSqlString()).toBe('NOW() + INTERVAL 600 SECOND');
+        // a master keeps one pending match: a new one replaces the earlier ones
+        expect(Mysql.delete).toHaveBeenCalledWith('ranked_matches', { user: 7 });
     });
 
     test('a match needs opponents on the current version', async () => {

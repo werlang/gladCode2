@@ -59,10 +59,11 @@ router.post('/ranked/match', auth(), asyncRoute(async (req, res) => {
 /**
  * POST /battles/ranked
  * Fights a match: `{ match }`. Answers `{ hash, error, summary }` with the master's level, xp and
- * silver and their gladiator after the battle.
+ * silver and their gladiator after the battle. One battle at a time per master (429 `BATTLE_RUNNING`).
  */
 router.post('/ranked', auth(), asyncRoute(async (req, res) => {
-    res.send(await RankedBattle.fight(req.user, Validate.text(req.body?.match, 'match', { min: 32, max: 32, pattern: /^[a-f0-9]{32}$/ })));
+    const match = Validate.text(req.body?.match, 'match', { min: 32, max: 32, pattern: /^[a-f0-9]{32}$/ });
+    res.send(await oneBattlePerClient(`user:${req.user.id}`, () => RankedBattle.fight(req.user, match)));
 }));
 
 export { router as battlesRouter };
