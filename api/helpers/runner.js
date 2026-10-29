@@ -32,11 +32,12 @@ async function acquireRun() {
         return;
     }
     await new Promise((resolve, reject) => {
+        let timer = null;
         const turn = () => {
             clearTimeout(timer);
             resolve();
         };
-        const timer = setTimeout(() => {
+        timer = setTimeout(() => {
             queue.splice(queue.indexOf(turn), 1);
             reject(new CustomError(503, 'Too many battles right now. Try again shortly.', 'RUNNER_BUSY'));
         }, MAX_QUEUE_MS);
