@@ -3,9 +3,11 @@ import { CustomError } from '../helpers/error.js';
 const STATUS_TYPES = {
     400: 'Bad Request',
     401: 'Unauthorized',
+    402: 'Payment Required',
     403: 'Forbidden',
     404: 'Not Found',
     409: 'Conflict',
+    410: 'Gone',
     413: 'Payload Too Large',
     422: 'Unprocessable Entity',
     429: 'Too Many Requests',
@@ -17,9 +19,11 @@ const STATUS_TYPES = {
 const DEFAULT_CODES = {
     400: 'BAD_REQUEST',
     401: 'UNAUTHORIZED',
+    402: 'PAYMENT_REQUIRED',
     403: 'FORBIDDEN',
     404: 'NOT_FOUND',
     409: 'CONFLICT',
+    410: 'GONE',
     413: 'PAYLOAD_TOO_LARGE',
     422: 'UNPROCESSABLE',
     429: 'TOO_MANY_REQUESTS',
