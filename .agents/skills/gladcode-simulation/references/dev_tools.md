@@ -1,86 +1,60 @@
 # Dev Tools & Tournament Administration Guide
 
-This reference documents the tournament testing suite, database utilities, and administration scripts located in `public_html/dev-tools/`.
+This reference documents the tournament testing tools, database utilities, and administration scripts. The tournament tools live in the API (`api/model/dev-tournament.js`), shared by a web page and a CLI; `dev-tools/README.md` has the summary.
 
 ---
 
 ## 🧰 Dev Tools Architecture
 
-The `dev-tools` ecosystem allows developers and administrators to manage tournaments, test combat matches, reset tournament rounds, and backup/restore database state without raw SQL queries.
+```
+api/model/dev-tournament.js   # Test tournaments, reset to a round, export / import
+api/route/admin.js            # /admin/tournaments/... (auth({ admin: true }), ADMIN_EMAILS)
+api/scripts/dev-tournament.js # The same operations from the shell (no sign-in)
+web/view/dev-tools.html       # /dev-tools page (script/dev-tools.js, models/dev-tools.js)
+dev-tools/
+├── tournament.sh             # CLI wrapper: docker compose exec -T api node scripts/dev-tournament.js
+├── dump_restore.sh           # Database backup & restore through the mysql service
+├── dump_gladcode.sql         # Database dump (gitignored)
+└── news/news-<version>.sql   # Release notes to insert into the news table
+```
 
-```
-public_html/dev-tools/
-├── index.html                  # Web GUI management dashboard
-├── index.js                    # Client-side JavaScript for GUI
-├── tournament.sh               # Primary CLI management script
-├── dump_restore.sh             # Database backup & restore script
-├── dump_gladcode.sql           # Database dump file
-├── list_tournaments.php        # API: List test tournaments
-├── list_real_tournaments.php   # API: List production tournaments (paginated)
-├── reset_tournament.php        # API: Reset test or real tournament state
-├── cleanup_tournament.php      # API: Delete tournament records
-└── bootstrap_tournament.php    # API: Seed test tournament data
-```
+Test tournaments are marked `[DEV-TEST]` in their description; only they can be deleted.
 
 ---
 
 ## 🗄️ Database Backup & Restore (`dump_restore.sh`)
 
-The `dump_restore.sh` script reads database credentials from `.env`.
-
-> [!IMPORTANT]
-> Always execute scripts from inside the `apache` Docker container.
-
-### Commands
+Reads the credentials from `.env` and runs `mysqldump` / `mysql` in the `mysql` service. Run it from the host:
 
 ```bash
-# Enter Apache container
-docker compose exec apache bash
-cd /var/www/html/dev-tools
-
-# Dump current database state to dump_gladcode.sql
-./dump_restore.sh dump
-
-# Restore database state from dump_gladcode.sql
-./dump_restore.sh restore
+dev-tools/dump_restore.sh dump      # dev-tools/dump_gladcode.sql
+dev-tools/dump_restore.sh restore
 ```
 
 ---
 
 ## 🏆 Tournament CLI Management (`tournament.sh`)
 
-`tournament.sh` provides CLI administration for both test environments and production tournament data.
-
-### Test Tournament Commands
-
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| `list` | `./tournament.sh list` | List all test tournaments with their status. |
-| `create` | `./tournament.sh create` | Bootstrap a new test tournament with sample gladiators. |
-| `reset` | `./tournament.sh reset <id>` | Reset matches and scores for test tournament `<id>`. |
-| `cleanup` | `./tournament.sh cleanup <id>` | Delete test tournament `<id>` and associated records. |
-
-### Production / Real Tournament Commands
-
-| Command | Usage | Description |
-| :--- | :--- | :--- |
-| `list-real` | `./tournament.sh list-real [page] [limit]` | List production tournaments with pagination support (default: page 1, 10 per page). |
-| `reset-real` | `./tournament.sh reset-real <id>` | Reset a production tournament by ID, clearing match results. |
-| `export` | `./tournament.sh export <id>` | Export tournament data to JSON format. |
-| `import` | `./tournament.sh import <file>` | Import tournament data from JSON file. |
+| `list` | `dev-tools/tournament.sh list` | Test tournaments with teams, gladiators, round and hash. |
+| `create` | `dev-tools/tournament.sh create [name] [teams] [maxtime] [manager_email]` | Public test tournament of random full teams (three gladiators each, never the manager's); the manager defaults to the first `ADMIN_EMAILS` account. Not started. |
+| `list-real` | `dev-tools/tournament.sh list-real [page] [limit]` | Real tournaments, newest first (default: page 1, 10 per page). |
+| `reset` | `dev-tools/tournament.sh reset <id\|hash> <round>` | Takes a started tournament (test or real) back to the start of a round: later rounds and the battle logs from that round on are deleted, gladiators killed from that round on come back, the round's choices are cleared and its choosing time restarts. `reset-real` is an alias. |
+| `cleanup` | `dev-tools/tournament.sh cleanup <id>` | Deletes a test tournament with its teams, rounds and battle logs (real ones are refused). Logs another tournament still shows are kept. |
+| `cleanup-all` | `dev-tools/tournament.sh cleanup-all` | Deletes every test tournament (asks for `YES_DELETE_ALL`). |
+| `export` | `dev-tools/tournament.sh export <id\|hash> [file]` | Writes the tournament, teams, rounds, gladiators and battle logs (file contents included) to JSON; users only by id and nick. |
+| `import` | `dev-tools/tournament.sh import <file> [id]` | Creates a tournament from an export, or replaces tournament `<id>`'s teams, rounds and logs. Missing gladiators are created with their ids, logs already present (same hash) are reused, a taken hash gets a new one. Managers and masters must exist. |
 
 ---
 
-## 🌐 Web Dashboard Interface (`index.html`)
+## 🌐 Web Cockpit (`/dev-tools`)
 
-Access the visual web dashboard by navigating to:
-**[http://localhost:80/dev-tools/index.html](http://localhost:80/dev-tools/index.html)**
+Open `http://localhost:<WEB_PUBLISH>/dev-tools` signed in with an account listed in `ADMIN_EMAILS` (anyone else is sent home).
 
-Key Features:
-- **Tournament Overview**: Filter by test vs real tournaments with real-time status badges.
-- **Paginated Listing**: Handle hundreds of tournaments seamlessly with pagination controls.
-- **One-Click Resets**: Interactively reset tournament brackets or re-run rounds.
-- **SQL Backup Status**: View last database dump timestamp and trigger restores.
+- **Test Tournaments**: bootstrap, reset a round, view, export and delete.
+- **Production**: paginated real tournaments with reset (typed confirmation) and export.
+- **Export & Import**: download an export by id or hash; import a file as a new tournament or over an existing one.
 
 ---
 
@@ -88,7 +62,8 @@ Key Features:
 
 Key tables involved in tournament management:
 
-- **`tournament`**: Tournament metadata (`id`, `name`, `type`, `state`, `created_at`).
-- **`tournament_run`**: Specific round executions (`id`, `tournament_id`, `run_number`, `status`).
-- **`tourn_matches`**: Individual battle match records between gladiators (`id`, `tournament_id`, `glad1_id`, `glad2_id`, `winner_id`, `simlog_path`).
-- **`gladiators`**: Gladiator algorithms (`id`, `master`, `name`, `code`, `hp`, `ap`, `str`, `agi`, `int`).
+- **`tournament`**: `id`, `name`, `password` (empty for public), `description`, `manager`, `maxteams`, `flex`, `maxtime` (round time, `TIME`), `hash` (empty until started).
+- **`teams`**: `id`, `tournament`, `name`, `password` (the team's join word), `modified`.
+- **`gladiator_teams`**: `team`, `gladiator`, `visible` (teammates may read the code), `dead` (round it died in, 0 when alive).
+- **`groups`**: `id`, `round`, `log` (`logs.id` once fought), `deadline` (end of the choosing time, `DATETIME` without fractions), `locked` (a battle is running).
+- **`group_teams`**: `groupid`, `team`, `gladiator` (the team's pick for the round), `lasttime` (survival time, winners + 1000).

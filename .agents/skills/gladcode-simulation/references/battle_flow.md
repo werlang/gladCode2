@@ -8,33 +8,34 @@ This reference describes the step-by-step lifecycle of a gladiator battle simula
 
 ```
 [Browser Client]
-   │  1. Triggers Match/Test Battle (POST to back_simulation.php)
+   │  1. Asks the API for a battle (POST /battles/test, /battles/ranked, /duels/:id/battle,
+   │     /tournament-rounds/:hash/groups/:group/battle, /training-rounds/:hash/advance)
    ▼
-[Apache PHP Engine]
-   │  2. Creates /public_html/runs/{hash}/
-   │  3. Copies payload C files & user code (code0.c, code1.c)
-   │  4. Validates banned_functions.json
-   │  5. HTTP POST to http://runner:3000/{hash}
+[API: model/battle.js Battle]
+   │  2. Creates data/runs/{dir}/ (gladiator code checked against banned_functions.json when saved)
+   │  3. Copies Payload/ files & each gladiator's code (code0.c, code1.py, ...)
+   │  4. HTTP POST to http://runner:3000/{dir} with { sandbox?, noitems? }
    ▼
 [Runner Express Service]
-   │  6. Copies /phppayload/{hash} to /runs/{hash}
-   │  7. Spawns Docker VM: gladcode2-vm
+   │  5. Copies /requests/{dir} (data/runs on the host) to the gladcode_tmp_run volume
+   │  6. Spawns Docker VM: gladcode2-vm
    ▼
 [Docker VM (gladcode2-vm)]
-   │  8. Executes socket_compile.sh
-   │  9. Compiles gladiators: gcc -o code0 code0.c -lm
-   │ 10. Launches gladCodeServerMain with gladiator count
+   │  7. Executes socket_compile.sh
+   │  8. Compiles gladiators: gcc -o code0 code0.c -lm
+   │  9. Launches gladCodeServerMain with gladiator count
    ▼
 [C Engine (gladCodeServerMain)]
-   │ 11. Opens TCP sockets, binds threads per gladiator
-   │ 12. Executes turn loop, updates stats, writes simlog JSON
+   │ 10. Opens TCP sockets, binds threads per gladiator
+   │ 11. Executes turn loop, updates stats, writes simlog JSON
    ▼
-[Runner & PHP Response]
-   │ 13. Reads simlog JSON or errorc.txt
-   │ 14. Returns JSON payload to browser
+[Runner & API Response]
+   │ 12. Runner reads simlog JSON or errorc.txt and answers the API
+   │ 13. API stores the log (logs row + data/logs/{id}), applies the battle's rules
+   │     (helpers/battle-results.js) and answers { hash, error }
    ▼
 [Shared Playback State (script/playback.js + script/render2/battle-state.js)]
-   │ 15. Expands incremental patches into complete 100 ms frames
+   │ 14. Expands incremental patches into complete 100 ms frames
    ▼
 [Selected Renderer]
    ├── Classic 2D: Phaser.js (script/render.js)
@@ -43,18 +44,18 @@ This reference describes the step-by-step lifecycle of a gladiator battle simula
 
 ---
 
-## 📁 Temporary Run Workspace (`public_html/runs/{hash}/`)
+## 📁 Temporary Run Workspace (`data/runs/{dir}/`)
 
-When a simulation starts, `back_simulation.php` allocates a unique hash directory containing:
+When a simulation starts, the API's `Battle` (`api/model/battle.js`) allocates a unique directory, removed once the runner answers, containing:
 
 | File | Source / Role | Description |
 | :--- | :--- | :--- |
 | `code0.c` / `code0.py` | User Gladiator 1 | Source code for first combatant. |
 | `code1.c` / `code1.py` | User Gladiator 2 | Source code for second combatant. |
-| `gladCodeServerMain.c` | `payload/` | Multi-threaded C socket server. |
-| `gladCodeServerCore.c` | `payload/` | Core battle mechanics & spatial engine. |
-| `gladCodeAPI.c` / `.h` | `payload/` | Client socket library. |
-| `socket_compile.sh` | `payload/` | Compilation script for VM. |
+| `gladCodeServerMain.c` | `Payload/` | Multi-threaded C socket server. |
+| `gladCodeServerCore.c` | `Payload/` | Core battle mechanics & spatial engine. |
+| `gladCodeAPI.c` / `.h` | `Payload/` | Client socket library. |
+| `socket_compile.sh` | `Payload/` | Compilation script for VM. |
 | `errorc.txt` | Engine Generated | Compiler error log output. |
 | `simlog` | Engine Generated | Battle execution log (JSON trace). |
 
@@ -65,7 +66,7 @@ When a simulation starts, `back_simulation.php` allocates a unique hash director
 The Runner service (`runner/app.js` and `runner/runner.js`) manages execution inside isolated containers:
 
 - **Express Port**: 3000
-- **Container Image**: `gladcode2-vm` (built from `pswerlang/gladcode2-vm`)
+- **Container Image**: `gladcode2-vm` (`docker build -t gladcode2-vm Setup`)
 - **Docker Command**:
   ```bash
   docker run --rm --name {hash} \
@@ -73,7 +74,7 @@ The Runner service (`runner/app.js` and `runner/runner.js`) manages execution in
     -w /usercode/{hash} \
     --cpu-period=100000 \
     --cpu-quota=50000 \
-    gladcode2-vm sh socket_compile.sh
+    gladcode2-vm sh socket_compile.sh [sandbox] [noitems]
   ```
 - **Execution Limits**:
   - CPU quota set to 50,000 (50% of single CPU core).

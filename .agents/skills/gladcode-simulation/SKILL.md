@@ -1,21 +1,22 @@
 ---
 name: gladcode-simulation
-description: Comprehensive guide and procedural workflow for building, running, testing, debugging, and maintaining gladCode battle simulations, C/Python payload APIs, runner services, dev tools, and database state. Make sure to use this skill whenever working on gladCode battle logic, gladiator C/Python code compilation, gladCode API functions, runner service, simlog JSON traces, tournament dev-tools, or debugging simulation timeouts and errors.
+description: Comprehensive guide and procedural workflow for building, running, testing, debugging, and maintaining gladCode battle simulations, C/Python payload APIs, the API's battle runner, the runner service, dev tools, and database state. Make sure to use this skill whenever working on gladCode battle logic, gladiator C/Python code compilation, gladCode API functions, runner service, simlog JSON traces, tournament dev-tools, or debugging simulation timeouts and errors.
 ---
 
 # gladCode Battle Simulation Skill
 
-This skill provides step-by-step procedures and reference specifications for working with the **gladCode 2** battle simulation pipeline, C/Python gladiator code runtime, Express Runner microservice, Phaser.js visualizer, and dev-tools database utilities.
+This skill provides step-by-step procedures and reference specifications for working with the **gladCode 2** battle simulation pipeline: the API's `Battle` model, the Express runner service, the C engine and its C/Python gladiator runtime, the replay renderers, and the dev tools.
 
 ---
 
 ## ⚡ Host Environment Constraint
 
 > [!IMPORTANT]
-> **No Local Node.js or Python**: Node.js and Python are not installed directly on the host shell. Always execute commands, run containerized scripts, or perform database operations via **Docker Compose**:
-> - Execute inside PHP environment: `docker compose exec apache <command>`
-> - Execute inside Runner environment: `docker compose exec runner <command>`
-> - Execute MySQL commands: `docker compose exec mysql mysql -u root -p`
+> **No Local Node.js or Python**: Node.js and Python are not installed directly on the host shell. Always execute commands, run containerized scripts, or perform database operations via **Docker**:
+> - API: `docker compose exec api <command>` (tests: `docker compose exec -T api npx vitest run`)
+> - Runner: `docker compose exec runner <command>`
+> - Engine: `docker run --rm -v <run folder>:/usercode -w /usercode gladcode2-vm sh socket_compile.sh`
+> - MySQL: `docker compose exec mysql mysql -u root -p`
 
 ---
 
@@ -24,10 +25,10 @@ This skill provides step-by-step procedures and reference specifications for wor
 For specialized component specifications, consult these reference guides:
 
 - 📜 **[C & Python Gladiator API Reference](references/c_api_reference.md)**: Documentation of `gladCodeAPI.c` and `gladCodeAPI.py` functions, arguments, return values, and TCP socket messaging protocols.
-- ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: Deep dive into `back_simulation.php`, Runner API, container VM isolation, `socket_compile.sh`, `simlog` format, and Phaser.js visualization.
-- 🔬 **[Debugging & Programmatic Battles](references/debugging_and_programmatic_battles.md)**: Guide to navigating codebase architecture, calling ranked/custom battles via curl/APIs, and diagnostic procedures for battle bugs.
-- 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: Complete guide to `public_html/dev-tools/`, `tournament.sh`, and `dump_restore.sh`.
-- ⚖️ **[Balance Patch Workflow](references/balance_patch.md)**: End-to-end procedure for rebalances — tuning payload values, verifying the server compile, syncing `manual.php` + function JSONs + regenerated bundle, bumping `version`, and publishing the news post.
+- ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: The API's `Battle` model, the runner, container VM isolation, `socket_compile.sh`, the `simlog` format, and the replay.
+- 🔬 **[Debugging & Programmatic Battles](references/debugging_and_programmatic_battles.md)**: Calling test, ranked and duel battles through the API with curl, and diagnostic procedures for battle bugs.
+- 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: The `/dev-tools` page, `dev-tools/tournament.sh` and `dev-tools/dump_restore.sh`.
+- ⚖️ **[Balance Patch Workflow](references/balance_patch.md)**: End-to-end procedure for rebalances — tuning payload values, verifying the server compile, syncing the manual + function JSONs + regenerated bundle, bumping `api/version`, and publishing the news post.
 - 🗃️ **[Database Migrations](references/database_migrations.md)**: Versioned MySQL flow (`migrations/`, `db:migrate`, deploy hook) ported from node-aec.
 
 ---
@@ -36,62 +37,43 @@ For specialized component specifications, consult these reference guides:
 
 ### Workflow 1: Debugging a Failed Simulation or Empty `simlog`
 
-1. **Locate the Temporary Run Directory**:
-   Simulation runs create temporary folders in `public_html/runs/{hash}/`.
-2. **Inspect Compiler & Runtime Error Log**:
-   Read `public_html/runs/{hash}/errorc.txt`.
-   - If `errorc.txt` contains GCC error messages (e.g. `undefined reference`, `syntax error`), the gladiator C code failed to compile.
-   - If `errorc.txt` contains Python tracebacks, the gladiator Python script had a runtime exception.
+1. **Read the battle's error**: battle endpoints answer `{ hash, error }`; with no log, `error` carries the compiler output (GCC errors, Python tracebacks) or an engine code (`NO_OUTPUT`, `INVALID_ATTR`, ...). Saving a gladiator that fails its test battle answers `GLADIATOR_TEST_FAILED` with the output in `data.error`.
+2. **Reproduce by hand** (Workflow 2): the API removes run folders when the runner answers, so rebuild the folder and run the engine directly to read `errorc.txt` and `simlog`.
 3. **Check for Timeout or Infinite Loop**:
    - If `errorc.txt` is empty but `simlog` is missing or truncated, check if the gladiator script was stuck in an infinite loop without yielding to the C server engine (`gladCodeServerMain`).
    - Hard timeouts (30 seconds) trigger container termination via `docker kill {dirname}` in `runner/runner.js`.
 4. **Verify Banned Function Violations**:
-   Ensure user code does not invoke forbidden functions listed in `public_html/banned_functions.json` (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`).
+   Ensure user code does not invoke forbidden functions listed in `api/banned_functions.json` (`setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel`). They only work in editor test battles (`sandbox`).
+5. **Crashes in counted battles** are read from the simlog (`"crashed":1`, `crashedGladiators()` in `api/helpers/battle-results.js`), never from `errorc.txt`, which gladiators can write to.
 
 ---
 
 ### Workflow 2: Running a Manual Local Simulation
 
-To isolate and test battle payload binaries without going through the web UI:
+To isolate and test battle payload binaries without going through the API (same file layout `api/model/battle.js` builds; `tests/engine/run.sh` does this for its regression battles):
 
 ```bash
-# Enter apache container
-docker compose exec apache bash
+mkdir -p data/runs/debug_battle && cp Payload/* data/runs/debug_battle/
 
-# Navigate to runs directory and create isolated test directory
-cd /var/www/html/runs
-mkdir debug_battle && cp /app/payload/* debug_battle/
-cd debug_battle
-
-# Create sample gladiator code (code0.c)
-cat << 'EOF' > code0.c
-#include "gladCodeAPI.h"
-
-int main() {
-    while (1) {
-        stepForward();
-    }
-    return 0;
-}
+# Gladiator 0 (C): the setup the API generates, then the user's loop
+cat << 'EOF' > data/runs/debug_battle/code0.c
+#include "gladCodeCore.c"
+setup(){ setName("Walker@nick0"); setSTR(10); setAGI(14); setINT(9); setSlots("0,0,0,0"); }
+loop(){ stepForward(); }
 EOF
 
-# Create opponent code (code1.c)
-cat << 'EOF' > code1.c
-#include "gladCodeAPI.h"
-
-int main() {
-    while (1) {
-        turnRight();
-    }
-    return 0;
-}
+# Gladiator 1 (C)
+cat << 'EOF' > data/runs/debug_battle/code1.c
+#include "gladCodeCore.c"
+setup(){ setName("Turner@nick1"); setSTR(10); setAGI(14); setINT(9); setSlots("0,0,0,0"); }
+loop(){ turnRight(); }
 EOF
 
-# Execute compiler and engine for 2 gladiators
-sh socket_compile.sh 2
+# Compile every codeN file and run the engine (add "sandbox" or "noitems" like the runner does)
+docker run --rm -v "$PWD/data/runs/debug_battle":/usercode -w /usercode gladcode2-vm sh socket_compile.sh
 
-# Inspect resulting simlog JSON
-cat simlog
+cat data/runs/debug_battle/errorc.txt data/runs/debug_battle/simlog
+rm -rf data/runs/debug_battle
 ```
 
 ---
@@ -99,11 +81,8 @@ cat simlog
 ### Workflow 3: Backing Up and Restoring Database
 
 ```bash
-# Backup database to public_html/dev-tools/dump_gladcode.sql
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore.sh dump"
-
-# Restore database from dump_gladcode.sql
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore.sh restore"
+dev-tools/dump_restore.sh dump      # writes dev-tools/dump_gladcode.sql (gitignored)
+dev-tools/dump_restore.sh restore
 ```
 
 ---
@@ -111,17 +90,10 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./dump_restore
 ### Workflow 4: Managing Tournaments via CLI
 
 ```bash
-# List test tournaments
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh list"
-
-# Reset test tournament #5
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh reset 5"
-
-# List production tournaments (page 1, limit 10)
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh list-real 1 10"
-
-# Reset production tournament #42
-docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.sh reset-real 42"
+dev-tools/tournament.sh list            # test tournaments
+dev-tools/tournament.sh reset 5 1       # tournament 5 (id or hash) back to round 1
+dev-tools/tournament.sh list-real 1 10  # production tournaments (page 1, limit 10)
+dev-tools/tournament.sh reset 42 3      # works for real tournaments too
 ```
 
 ### Workflow 5: Shipping a Balance Patch
@@ -129,14 +101,14 @@ docker compose exec apache bash -c "cd /var/www/html/dev-tools && ./tournament.s
 Rebalances follow a fixed five-step flow — full procedure, commands, and
 pre-commit checklist in [Balance Patch Workflow](references/balance_patch.md):
 
-1. Tune values in `payload/gladCodeGlobals.c` (`abilitycost`) and
-   `payload/gladCodeServerAPI.c` (watch two-spot values like teleport range).
+1. Tune values in `Payload/gladCodeGlobals.c` (`abilitycost`) and
+   `Payload/gladCodeServerAPI.c` (watch two-spot values like teleport range).
 2. Prove the server compiles and runs (`gcc` line from `socket_compile.sh`
    plus an end-to-end sim with `while(1)` bots). No image rebuild needed.
-3. Sync `public_html/manual.php`, `public_html/script/functions/*.json`,
-   regenerate `script/functions.json` via `compress_functions.php`, bump
-   `public_html/version`.
-4. Add the patch-notes `INSERT` under `public_html/dev-tools/` and apply it
+3. Sync `web/view/manual.html`, `web/public/script/functions/*.json`,
+   regenerate the bundles with `web/scripts/compress-functions.js`, bump
+   `api/version`.
+4. Add the patch-notes `INSERT` under `dev-tools/news/` and apply it
    to the production `news` table.
 5. Check off TODO.MD and commit (simulation, docs, news/skill slices).
 
@@ -144,6 +116,7 @@ pre-commit checklist in [Balance Patch Workflow](references/balance_patch.md):
 
 ## 🛡️ Best Practices & Quality Expectations
 
-- **Sanitization**: When storing or retrieving gladiator source code, ensure string escaping (`htmlspecialchars`) is handled properly.
-- **Session Protection**: All PHP endpoints modifying database state must check `$_SESSION['user']`.
-- **Config Synchronization**: Ensure `config/config.json` (canonical, outside web root) and `node/config.json` remain identical in credentials and host settings. Env vars (`MYSQL_*`) override both. Never put secrets in `public_html/`.
+- **Code storage**: Gladiator source is stored as written; escape it where it is displayed, never before saving.
+- **Access checks**: API routes that touch a master's data use `auth()` and the models filter by the user's id; admin tools use `auth({ admin: true })`.
+- **Battles that count** (ranked, duel, tournament, training) never run in the sandbox; tournaments run with `noitems`.
+- **Configuration** comes from `.env` only; never commit secrets.

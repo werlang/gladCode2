@@ -101,7 +101,9 @@ profile, playback, tournament, training, thanks, update (+ header, footer, modul
       mounted from the host), `compose.dev.yaml` adds live reload (`COMPOSE_FILE` in the local .env);
       `WEB_PUBLISH`/`API_PUBLISH` are the host ports, `WEB_PORT`/`API_PORT` the public URL ports;
       deploy removes orphaned services
-- [ ] Docs
+- [x] Docs: generated `docs/api/README.md`, README, CONTRIBUTING, Setup/README, AGENTS.md (no more
+      PHP paths; code is stored as written and escaped on display), Copilot guide, simulation skill
+      (`api/scripts/battle.js` replaces the arbitrary-battle curl)
 
 Local testing: `docker compose exec api node scripts/issue-session.js 277` gives an `app_session`
 cookie for `localhost` (web on 8085, API on 8086, old Apache on 8087).
