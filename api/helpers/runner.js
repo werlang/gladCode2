@@ -15,13 +15,33 @@ const queue = [];
 /** Clients with a battle running, for {@link oneBattlePerClient}. */
 const clients = new Set();
 
-/** Waits for a free run, in arrival order. */
+/**
+ * Longest wait for a free run, in ms. A queued battle plus its run stays under the group locks
+ * (`LOCK_SECONDS` in the round models) and the browser's battle timeout.
+ */
+export const MAX_QUEUE_MS = 60000;
+
+/**
+ * Waits for a free run, in arrival order.
+ *
+ * @throws {CustomError} 503 `RUNNER_BUSY` after {@link MAX_QUEUE_MS}.
+ */
 async function acquireRun() {
     if (runs < MAX_RUNS) {
         runs++;
         return;
     }
-    await new Promise(resolve => queue.push(resolve));
+    await new Promise((resolve, reject) => {
+        const turn = () => {
+            clearTimeout(timer);
+            resolve();
+        };
+        const timer = setTimeout(() => {
+            queue.splice(queue.indexOf(turn), 1);
+            reject(new CustomError(503, 'Too many battles right now. Try again shortly.', 'RUNNER_BUSY'));
+        }, MAX_QUEUE_MS);
+        queue.push(turn);
+    });
 }
 
 /** Hands the run to the next battle waiting, if any. */

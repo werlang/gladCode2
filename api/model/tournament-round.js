@@ -7,8 +7,12 @@ import { Battle } from './battle.js';
 import { BattleLog } from './battle-log.js';
 import { GROUP_SIZE, createGroups } from './tournament.js';
 
-/** A group's battle holds its lock this long (the runner gives a battle 30 s). */
-const LOCK_SECONDS = 60;
+/**
+ * A group's battle holds its lock this long: up to `MAX_QUEUE_MS` (60 s) waiting for a free run
+ * plus the 60 s the API waits for the runner, with a margin.
+ */
+const LOCK_SECONDS = 150;
+
 /** Tables of a tournament round, joined from a group to its tournament. */
 const GROUP_JOIN = '`groups` gr INNER JOIN group_teams grt ON grt.groupid = gr.id INNER JOIN teams te ON te.id = grt.team INNER JOIN tournament t ON t.id = te.tournament';
 

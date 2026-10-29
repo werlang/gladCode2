@@ -273,7 +273,7 @@ describe('tournament rounds', () => {
             .mockResolvedValueOnce([{ id: 3 }])
             .mockResolvedValueOnce([{ log: null, busy: 1 }]);
         await expect(TournamentRound.choose('h', 7, 4)).rejects.toMatchObject({ status: 409, code: 'GROUP_DONE' });
-        expect(Mysql.select.mock.calls[3]).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), [60, 3], { connection: 'tx' }]);
+        expect(Mysql.select.mock.calls[3]).toEqual([expect.stringMatching(/FROM `groups` WHERE id = \? FOR UPDATE$/), [150, 3], { connection: 'tx' }]);
         expect(Mysql.update).not.toHaveBeenCalled();
 
         Mysql.select

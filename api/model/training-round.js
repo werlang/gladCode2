@@ -6,10 +6,11 @@ import { Battle } from './battle.js';
 import { BattleLog } from './battle-log.js';
 
 /**
- * A group's battle holds its lock this long (the runner gives a battle 30 s). A battle that failed
- * keeps it, so the viewers' pages retry it only after this pause.
+ * A group's battle holds its lock this long: up to `MAX_QUEUE_MS` (60 s) waiting for a free run
+ * plus the 60 s the API waits for the runner, with a margin. A battle that failed keeps it, so
+ * the viewers' pages retry it only after this pause.
  */
-const LOCK_SECONDS = 60;
+const LOCK_SECONDS = 150;
 /** Tables of a training round, joined from a master's entry to its group. */
 const ENTRY_JOIN = 'gladiator_training gt INNER JOIN training_groups tg ON tg.id = gt.groupid';
 

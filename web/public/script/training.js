@@ -346,7 +346,7 @@ class TrainingRound {
     /**
      * Asks the API to move the training on (fight the next group, or open the
      * next round), then shows where it stands. A battle that failed keeps its
-     * group busy for a minute, after which a page tries it again.
+     * group busy for a few minutes, after which a page tries it again.
      */
     async #advance() {
         if (this.#advancing) return;
