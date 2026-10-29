@@ -2,23 +2,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import Mustache from 'mustache';
 import { assetUrl, importMapTag } from '../helpers/modules.js';
+import { safeJson } from '../helpers/safe-json.js';
 
 const VIEW_PATH = path.join(import.meta.dirname, '../view');
-
-/**
- * Serialises values for a `<script type="application/json">` tag without letting them close it.
- *
- * @param {unknown} value
- * @returns {string}
- */
-export function safeJson(value) {
-    return JSON.stringify(value)
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')
-        .replace(/&/g, '\\u0026')
-        .replace(/\u2028/g, '\\u2028')
-        .replace(/\u2029/g, '\\u2029');
-}
 
 /**
  * Adds `res.page(view, vars, clientVars)`, which renders `view/<view>.html` with Mustache. Every
