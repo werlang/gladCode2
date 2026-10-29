@@ -11,7 +11,6 @@ const CREDENTIAL_KEY = 'google-credential';
  * @example
  * await GoogleLogin.init();
  * GoogleLogin.onSignIn(credential => ...); // a credential was received
- * GoogleLogin.onFail(() => ...);           // the one-tap prompt was not shown
  * GoogleLogin.prompt();                    // one-tap, resolves once signed in
  * GoogleLogin.renderButton(element);       // the "Sign in with Google" button
  */
@@ -22,7 +21,6 @@ export class GoogleLogin {
     static #signedIn = null;
     static #resolveSignedIn = null;
     static onSignInCallback = null;
-    static onFailCallback = null;
 
     /**
      * Loads the Google client once and initialises it.
@@ -33,7 +31,7 @@ export class GoogleLogin {
         GoogleLogin.#ready ??= new DynamicScript(CLIENT_URL).load().then(() => {
             google.accounts.id.initialize({
                 client_id: TemplateVar.get('googleClientId'),
-                callback: response => GoogleLogin.saveCredential(response.credential),
+                callback: response => GoogleLogin.receiveCredential(response.credential),
                 auto_select: true,
                 ux_mode: 'popup',
             });
@@ -41,11 +39,6 @@ export class GoogleLogin {
             return GoogleLogin;
         });
         return GoogleLogin.#ready;
-    }
-
-    /** @returns {boolean} Whether the client is initialised. */
-    static isLoaded() {
-        return GoogleLogin.loaded;
     }
 
     /**
@@ -74,7 +67,6 @@ export class GoogleLogin {
         return new Promise(resolve => {
             google.accounts.id.prompt(notification => {
                 if (!notification.isNotDisplayed()) return;
-                GoogleLogin.onFailCallback?.(notification);
                 resolve(false);
             });
             GoogleLogin.waitLogged().then(() => resolve(true));
@@ -91,15 +83,6 @@ export class GoogleLogin {
     }
 
     /**
-     * @param {(notification: object) => void} callback Called when the prompt is not displayed.
-     * @returns {typeof GoogleLogin}
-     */
-    static onFail(callback) {
-        GoogleLogin.onFailCallback = callback;
-        return GoogleLogin;
-    }
-
-    /**
      * @param {(credential: string) => void} callback Called when a credential arrives.
      * @returns {typeof GoogleLogin}
      */
@@ -109,23 +92,19 @@ export class GoogleLogin {
     }
 
     /**
-     * Stores a credential and notifies the sign-in listener.
+     * Hands a credential to the sign-in listener, which trades it for the API session. It is never
+     * kept: the session is the API's HttpOnly cookie, and a stored token could be lifted to sign in
+     * elsewhere.
      *
      * @param {string} credential Google ID token.
      */
-    static saveCredential(credential) {
+    static receiveCredential(credential) {
         GoogleLogin.logged = true;
-        new LocalData({ id: CREDENTIAL_KEY }).set({ data: credential });
         GoogleLogin.#resolveSignedIn?.();
         GoogleLogin.onSignInCallback?.(credential);
     }
 
-    /** @returns {string|null} The stored credential, if any. */
-    static getCredential() {
-        return new LocalData({ id: CREDENTIAL_KEY }).get() ?? null;
-    }
-
-    /** Forgets the stored credential. */
+    /** Forgets the credential earlier versions of the site kept in this browser. */
     static removeCredential() {
         new LocalData({ id: CREDENTIAL_KEY }).remove();
     }

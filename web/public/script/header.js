@@ -15,7 +15,8 @@ async function start() {
     const headerElement = document.querySelector('#header');
     if (headerElement) new Header(headerElement).showSignedIn(logged);
 
-    GoogleLogin.onFail(() => GoogleLogin.removeCredential());
+    // earlier versions kept the Google token in this browser: drop it
+    GoogleLogin.removeCredential();
     GoogleLogin.onSignIn(async credential => {
         if (!credential) return;
         try {
