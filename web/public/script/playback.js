@@ -918,7 +918,6 @@ function bindControls() {
 function start() {
     exposeLegacyGlobals();
     document.querySelector('#loadbar #status').textContent = 'Página carregada';
-    document.querySelector('#footer-wrapper')?.classList.add('white');
     bindControls();
 
     tournHash = TemplateVar.get('tournament') || null;

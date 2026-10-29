@@ -68,22 +68,6 @@ export async function slideDown(element, duration = DEFAULT_DURATION, display = 
 }
 
 /**
- * Rolls an element up, then hides it.
- *
- * @param {HTMLElement} element Element to hide.
- * @param {number} [duration] Milliseconds.
- * @returns {Promise<void>}
- */
-export async function slideUp(element, duration = DEFAULT_DURATION) {
-    if (!element) return;
-    const height = `${element.offsetHeight}px`;
-    element.style.overflow = 'hidden';
-    await run(element, [{ height }, { height: '0px' }], duration);
-    element.style.overflow = '';
-    element.style.display = 'none';
-}
-
-/**
  * Slides an element in from the left, or back out when it is visible.
  *
  * @param {HTMLElement} element Element to toggle.
