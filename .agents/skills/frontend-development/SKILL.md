@@ -12,7 +12,7 @@ Localizes the global `web-frontend` skill (with `security-defense-and-mitigation
 - `web/app.js`: `page(route, view, clientVars)` per page, static files (`redirect: false`), `/profpics`, maintenance mode after static files, the old-address redirect (`legacyPageUrl` in `web/helpers/urls.js`) registered after every page route.
 - `web/middleware/render.js`: `res.page()`; views get `{{#asset}}`/`{{#module}}` (mtime-versioned URLs), `{{{importMap}}}` and `{{{templateVars}}}` (`web/helpers/safe-json.js`). Import maps, asset URLs and the view list are cached when `NODE_ENV=production`.
 - `web/helpers/modules.js`: the import map over `MODULE_DIRS` (add new script folders there); `render2: true` adds three.js and `script/render2/`.
-- `web/view/*.html`: one Mustache view per page plus `header`, `footer`, `analytics` partials.
+- `web/view/*.html`: one Mustache view per page plus `head` (font preload, `tokens.css`, `theme-boot.js`), `header`, `footer`, `analytics` partials.
 - `web/public/script/`: page entries (`*.js`), `components/`, `helpers/` (`request.js` with `api`/`site` and `BATTLE_TIMEOUT_MS`, `html.js`, `template-var.js`, `local-data.js`), `models/` (the only callers of the API), `templates/`, `profile/`, `editor/`.
 
 ## Rules
@@ -22,6 +22,7 @@ Localizes the global `web-frontend` skill (with `security-defense-and-mitigation
 - Every API call is a method on a `models/*` class over `api.get|post|put|delete`; pass `{ timeout: BATTLE_TIMEOUT_MS }` for calls that run a battle. Pages branch on `RequestError.code`, with a message for every code the route throws and a general fallback.
 - Markup from user or server text: `renderTemplate` with `{{key}}`, `escapeHtml`, or `textContent`. Dialog and toast messages are markup: escape names inside them.
 - No new globals; `playback.js` `exposeLegacyGlobals` is the one bridge for `render.js` and `render2/`.
+- A new view includes `{{> head}}` right after its viewport meta, before any other stylesheet. The site theme goes through `helpers/theme.js` (`applyTheme`, `resolveTheme`, `storedThemeChoice`, `THEME_CHOICES`); styles follow the `css-standards` project skill.
 
 ## Deviations from `web-frontend`
 
@@ -40,4 +41,4 @@ docker run --rm -v "$PWD":/w -w /w node:22-alpine node web/scripts/compress-func
 ## Checks before finishing
 
 - Lint clean and `tests/frontend` green; a new pure helper gets a test there.
-- The page loads on http://localhost:8085 with no console errors; new error codes show a message.
+- The page loads on http://localhost:8085 with no console errors; new error codes show a message. Check it in Arena light, Arena dark and Classic.
