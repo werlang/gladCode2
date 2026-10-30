@@ -655,14 +655,6 @@ body{
 	flex-direction: column;
 }
 
-#crypto-box.size-8 {
-	width: 270px;
-}
-
-#crypto-box.size-10 {
-	width: 300px;
-}
-
 #crypto-box #close {
 	cursor: pointer;
 	background-color: #fbaeae;

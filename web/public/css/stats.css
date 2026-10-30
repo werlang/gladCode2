@@ -230,21 +230,6 @@ h2 {
     opacity: 0.5;
 }
 
-#abc {
-    margin-top: 16px;
-    margin-left: -18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #000000a8;
-    width: 50px;
-    font-family: 'Source Code Pro', monospace;
-    border-radius: 3px;
-    padding: 3px 2px;
-    line-height: 1em;
-    color: #ccecff;
-}
-
 #right-side {
     width: 100vw;
     box-sizing: border-box;
