@@ -1,7 +1,7 @@
 #side-menu {
     display: none;
     width: 340px;
-    background-color: #00638d;
+    background-color: var(--color-chrome);
     position: fixed;
     top: 0;
     left: 0;
@@ -24,7 +24,7 @@
 #side-menu #search {
     display: flex;
     align-items: center;
-    background-color: #00000026;
+    background-color: var(--color-tint);
     margin-bottom: 10px;
 }
 
@@ -35,18 +35,18 @@
     flex-grow: 1;
     height: 50px;
     font-size: 16px;
-    font-family: roboto;
-    color: white;
+    font-family: var(--font-body);
+    color: var(--color-text-on-brand);
 }
 
 #side-menu #search i {
     font-size: 20px;
     margin: 0px 10px;
-    color: white;
+    color: var(--color-text-on-brand);
 }
 
 #side-menu a {
-    color: white;
+    color: var(--color-text-on-brand);
     width: 100%;
     height: 100%;
     display: flex;
@@ -59,7 +59,7 @@
 }
 
 #side-menu li {
-    transition: 0.3s all;
+    transition: var(--duration-base) all;
     display: none;
     align-items: center;
     padding-left: 30px;
@@ -74,7 +74,7 @@
 }
 
 #side-menu ul ul a {
-    color: #ffffffcc;
+    color: var(--color-text-on-brand);
 }
 
 #side-menu ul ul ul li {
@@ -82,7 +82,7 @@
 }
 
 #side-menu ul ul ul a {
-    color: #ffffff94;
+    color: var(--color-text-on-brand);
 }
 
 #side-menu li.visible {
@@ -90,15 +90,15 @@
 }
 
 #side-menu li:hover {
-    background-color: #00000010;
+    background-color: var(--color-tint);
 }
 
 #side-menu li i {
     font-size: 1em;
-    transition: 0.3s all;
+    transition: var(--duration-base) all;
     margin-left: -25px;
     margin-right: 10px;
-    color: #b9b9b9;
+    color: var(--color-text-subtle);
 }
 
 #side-menu li i.open {
@@ -106,11 +106,11 @@
 }
 
 #side-menu li.here {
-    background-color: #00000026;
+    background-color: var(--color-tint);
 }
 
 #side-menu .here a {
-    color: white;
+    color: var(--color-text-on-brand);
 }
 
 #side-menu.mobile {

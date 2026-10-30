@@ -1,6 +1,6 @@
 body{
 	margin: 0;
-	font-family: 'Source Code Pro', monospace;
+	font-family: var(--font-mono);
 	font-size: 16px;
 }
 
@@ -11,27 +11,27 @@ body{
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0); 
+    background: transparent;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: transparent; 
-    border-radius: 2px;
+    background: transparent;
+    border-radius: var(--radius-xs);
 }
 
 /*Hover on element*/
 *:hover::-webkit-scrollbar-thumb {
-    background: #888;
+    background: var(--color-neutral);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: var(--color-neutral);
 }
 
 #header-container {
-    background-color: #00638d;
+    background-color: var(--color-header-bg);
     width: 100vw;
 	z-index: 3;
 	position: fixed;
@@ -39,15 +39,15 @@ body{
 }
 
 #header {
-	background-color: #00638d;
+	background-color: var(--color-header-bg);
 	width: 100vw;
 	height: 50px;
-	color: white;
+	color: var(--color-header-text);
 	display: flex;
 	align-items: flex-start;
 	justify-content: flex-start;
 	font-size: 1rem;
-	font-family: sans-serif;
+	font-family: var(--font-body);
 	position: fixed;
 	top: 0;
 }
@@ -63,6 +63,7 @@ body{
 #header #logo img {
 	max-height: 45px;
 	max-width: 100%;
+	filter: var(--logo-filter);
 }
 
 #header .item .hidden {
@@ -72,7 +73,7 @@ body{
 #header #search {
 	display: none;
 	font-size: 25px;
-	color: black;
+	color: var(--color-text-strong);
 	align-self: center;
 	margin-right: 10px;
 	margin-left: auto;
@@ -84,7 +85,7 @@ body{
 
 #header #h-items {
 	margin-right: 15px;
-    font-family: 'Roboto Mono', monospace;
+    font-family: var(--font-mono);
 	font-size: 1.2rem;
 	display: none;
 }
@@ -150,7 +151,7 @@ body{
 }
 
 #header #h-items .here {
-    border-top: 3px solid white;
+    border-top: 3px solid var(--color-header-text);
     box-sizing: border-box;
 }
 
@@ -162,21 +163,21 @@ body{
 	display: none;
 	position: absolute;
 	height: auto;
-	background-color: #004e6f;
+	background-color: var(--color-brand-hover);
 }
 
 #header #h-items .item-container .item:hover{
-	background-color: #1e86d8;
+	background-color: var(--color-secondary);
 }
 
 #header #h-items .item:hover {
-	background-color: #004e6f;
+	background-color: var(--color-brand-hover);
 }
 
 #header .item a {
 	padding: 0px 20px;
 	text-decoration: none;
-    color: white;
+    color: var(--color-header-text);
     height: 100%;
     width: 100%;
     display: flex;
@@ -207,7 +208,7 @@ body{
 	bottom: 0;
 	right: 0;
 	left: 0;
-	background-color: rgba(0,0,0,0.5);
+	background-color: var(--color-scrim);
 	display: flex;
     justify-content: center;
     align-items: center;
@@ -217,8 +218,8 @@ body{
 	display: none;
 	max-width: 250px;
 	height: 100%;
-	background-color: #00638d;
-	box-shadow: 1px 0px 5px rgba(0,0,0,0.5);
+	background-color: var(--color-header-bg);
+	box-shadow: 1px 0px 5px var(--color-shadow);
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -241,18 +242,18 @@ body{
 }
 
 #fog #menu .item.drop-menu .title {
-	color: #a1afb6;
-    font-family: 'Roboto Mono', monospace;
+	color: var(--color-text-muted);
+    font-family: var(--font-mono);
     font-weight: bold;
     font-size: 1.3em;
-    background-color: #08597b;
+    background-color: var(--color-brand-hover);
     padding: 5px;}
 
 #fog #menu a {
 	text-decoration: none;
-	font-family: 'Roboto Mono', monospace;
+	font-family: var(--font-mono);
 	font-size: 1.3em;
-	color: white;
+	color: var(--color-header-text);
 	font-weight: bold;
 	white-space: nowrap;
     overflow-x: hidden;
@@ -268,13 +269,13 @@ body{
 }
 
 #fog #menu a div:hover{
-	background-color: #004e6f;
+	background-color: var(--color-brand-hover);
 }
 
 #fog #menu img {
 	width: 100%;
 	padding: 10px;
-	box-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+	box-shadow: 0px 1px 0px var(--color-shadow);
 	box-sizing: border-box;
 }
 
@@ -283,12 +284,12 @@ body{
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: 'Roboto', sans-serif;
-    color: #00638d;
+    font-family: var(--font-body);
+    color: var(--color-brand-text);
     width: 100%;
     margin-top: 50px;
-    background-color: #0054780f;
-    border-top: 1px solid #00638d26;
+    background-color: color-mix(in srgb, var(--color-footer-bg) 6%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--color-border-brand) 15%, transparent);
     box-sizing: border-box;
     padding: 35px 0px;
 }

@@ -5,12 +5,12 @@
 }
 
 #dialog-box {
-	background-color: white;
-    border-radius: 3px;
+	background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
     padding: 10px 20px;
-    box-shadow: 1px 1px 5px black;
-    color: #646464;
-    font-family: 'Roboto', sans-serif;
+    box-shadow: 1px 1px 5px var(--color-shadow);
+    color: var(--color-text);
+    font-family: var(--font-body);
     font-size: 1.3em;
     min-height: 100px;
     max-width: 300px;
@@ -36,21 +36,21 @@
 
 #dialog-box .highlight,
 #dialog-box b {
-	color: #00638d;
+	color: var(--color-brand-text);
     font-weight: bold;
 }
 
 #dialog-box .button {
 	background-color: transparent;
-	color: black;
+	color: var(--color-text-strong);
     border: none;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--font-mono);
     font-size: 1em;
-    border-radius: 5px;
+    border-radius: var(--radius-md);
     width: 100%;
     margin: 10px 5px 0px;
     padding: 3px 5px;
-	transition: all 0.3s;
+	transition: all var(--duration-base);
 	cursor: pointer;
 }
 
@@ -62,31 +62,31 @@
 }
 
 #dialog-box .button:hover {
-	background-color: #00638d;
-	color: white;
+	background-color: var(--color-brand);
+	color: var(--color-text-on-brand);
 }
 
 #dialog-box .input {
     border: 0;
     outline: none;
-    border: 2px solid #c0c0c0;
-    border-radius: 5px;
-    transition: 0.5s;
-    color: #616161;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: var(--duration-slow);
+    color: var(--color-text);
     font-size: 1em;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--font-mono);
     background-color: transparent;
 	padding: 2px 10px;
 }
 
 #dialog-box .input:focus {
-    border: 2px solid #00638d;
+    border: 2px solid var(--color-border-brand);
 }
 
 #dialog-box textarea.input {
 	height: 120px;
 	font-size: 0.8em;
-	font-family: 'Roboto', sans-serif;
+	font-family: var(--font-body);
 }
 
 #dialog-box #charcount {
@@ -96,60 +96,60 @@
 }
 
 #dialog-box #charcount.alert {
-	color: red;
+	color: var(--color-danger);
 }
 
 #dialog-box textarea.input.alert {
-	border-color: red;
+	border-color: var(--color-danger);
 }
 
 #terminal {
-	background-color: black;
-	color:	#00ff00;
-	border: 1px solid #00638d;
-	border-radius: 3px;
-	box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+	background-color: var(--color-terminal-bg);
+	color:	var(--color-success);
+	border: 1px solid var(--color-border-brand);
+	border-radius: var(--radius-sm);
+	box-shadow: 1px 1px 2px var(--color-shadow);
 	max-height: 100%;
 	width: 600px;
 	max-width: 100%;
 }
 
 #terminal #title {
-    background-color: #00638d;
+    background-color: var(--color-brand);
 	width: 100%;
 	height: 25px;
-	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
+	border-top-left-radius: var(--radius-sm);
+	border-top-right-radius: var(--radius-sm);
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
 }
 
 #terminal #title span {
-    color: white;
+    color: var(--color-text-on-brand);
     font-size: 1.1em;
     width: 100%;
     margin-left: 20px;
-    text-shadow: 1px 1px 2px black;
+    text-shadow: 1px 1px 2px var(--color-shadow);
 }
 
 #terminal #close {
 	width: 30px;
 	height: 100%;
-	background-color: rgba(0,0,0,0.2);
+	background-color: var(--color-shade);
 	background-image: url('../icon/close_x.png');
 	background-size: 15px;
     background-position: center;
 	background-repeat: no-repeat;
-	transition: 0.3s all;
+	transition: var(--duration-base) all;
 }
 
 #terminal #close:hover {
-	background-color: rgba(255,0,0,0.5);
+	background-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
 }
 
 #terminal pre {
-	padding: 20px 10px;	
+	padding: 20px 10px;
 	margin: 0;
 	white-space: pre-wrap;
 	overflow-y: auto;
@@ -157,7 +157,7 @@
 }
 
 #terminal pre span {
-	color: #86c5e0;
+	color: var(--color-text-on-brand-muted);
 }
 
 .toast {
@@ -166,16 +166,16 @@
     right: 0;
     margin-right: 20px;
     margin-bottom: 80px;
-    border-radius: 5px;
+    border-radius: var(--radius-md);
 	box-sizing: border-box;
 	z-index: 6;
 	padding: 10px 20px;
-	color: white;
-	font-family: 'Roboto', sans-serif;
+	color: var(--color-text-on-brand);
+	font-family: var(--font-body);
 	display: flex;
 	align-items: center;
-	text-shadow: 0px 0px 3px #000000a3;
-    box-shadow: 1px 1px 10px 0px #00000059;
+	text-shadow: 0px 0px 3px var(--color-shadow);
+    box-shadow: 1px 1px 10px 0px var(--color-shadow);
 }
 
 .toast i {
@@ -183,15 +183,15 @@
 }
 
 .toast.info {
-	background-color: #ffc500;
+	background-color: var(--color-accent);
 }
 
 .toast.error {
-	background-color: #ff6363;
+	background-color: var(--color-danger);
 }
 
 .toast.success {
-	background-color: #5db55d;
+	background-color: var(--color-success);
 }
 
 .toast i {
@@ -200,19 +200,19 @@
 
 body .ui-tooltip {
 	position: absolute;
-    background-color: #000000bd;
-    border-radius: 3px;
-    color: white;
+    background-color: var(--color-scrim);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-on-brand);
     padding: 3px 8px;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
 	font-size: 0.9rem;
-	border: 1px solid #ffffff96;
+	border: 1px solid var(--color-text-on-brand);
 	cursor: default;
 	user-select: none;
 	pointer-events: none;
 	text-align: justify;
 	box-shadow: none;
-	z-index: 9999;
+	z-index: var(--z-dialog);
 }
 #dialog-box .google-login {
 	display: flex;

@@ -5,7 +5,7 @@
 .slider::-webkit-slider-runnable-track {
     width: 300px;
     height: 3px;
-    background: #00638d;
+    background: var(--color-brand);
     border: none;
 }
 
@@ -14,10 +14,10 @@
     border: none;
     height: 16px;
     width: 16px;
-    border-radius: 50%;
-    background: #00638d;
+    border-radius: var(--radius-round);
+    background: var(--color-brand);
 	margin-top: -6px;
-	transition: 0.3s;
+	transition: var(--duration-base);
 }
 
 .slider:focus {
@@ -31,5 +31,5 @@
 }
 
 .slider:focus::-webkit-slider-runnable-track {
-    background: #00638d;
+    background: var(--color-brand);
 }

@@ -1,20 +1,20 @@
 .glad-card-container {
     margin: 10px 0px 20px;
 	padding: 10px;
-    font-family: acme;
+    font-family: var(--font-game);
     display: flex;
     justify-content: space-around;
     align-items: stretch;
     box-sizing: border-box;
-	border-radius: 10px;
+	border-radius: var(--radius-lg);
     border: 3px dashed transparent;
     overflow-y: auto;
     flex-wrap: wrap;
 }
 
 .glad-card-container.dz-drag-hover {
-	border-color: #00638d;
-    background-color: #bddeed;
+	border-color: var(--color-border-brand);
+    background-color: var(--color-brand-soft);
 }
 
 .glad-card-container.dz-drag-hover .glad-preview,
@@ -26,16 +26,16 @@
 .glad-add {
 	display: flex;
     flex-direction: column;
-    background-color: #f8f8f8;
+    background-color: var(--color-surface);
     cursor: pointer;
     box-sizing: border-box;
-    box-shadow: 0px 0px 5px black;
-    border-radius: 3px;
-    transition: 0.3s all;
+    box-shadow: 0px 0px 5px var(--color-shadow);
+    border-radius: var(--radius-sm);
+    transition: var(--duration-base) all;
     margin-bottom: 10px;
     width: 165px;
     min-width: 170px;
-    transition: all 0.3s;
+    transition: all var(--duration-base);
 }
 
 .glad-preview:hover {
@@ -43,7 +43,7 @@
 }
 
 .glad-preview.selected {
-    box-shadow: 0px 0px 5px 2px #4286f4;
+    box-shadow: 0px 0px 5px 2px var(--color-glow);
     filter: brightness(85%);
 }
 
@@ -80,12 +80,12 @@
 
 .glad-add.inactive .image {
 	background-image: url('../icon/lock.png');
-	background-color: #c38686
+	background-color: var(--color-danger-soft)
 }
 
 .glad-preview.error {
-    background-color: #e2baba;
-	text-shadow: 1px 1px 2px #f8dddd;
+    background-color: var(--color-danger-soft);
+	text-shadow: 1px 1px 2px var(--color-danger);
 	flex-direction: column;
 	cursor: pointer;
 	padding: 10px 5px;
@@ -93,14 +93,14 @@
 
 
 .glad-preview.error a {
-	color: #00638d;
+	color: var(--color-brand-text);
 }
 
 .glad-preview .row{
 	width: 100%;
 	display: flex;
 	justify-content: flex-start;
-	color: #646464;
+	color: var(--color-text);
 }
 
 .glad-preview .row.code {
@@ -116,10 +116,10 @@
 	display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #6c97a9;
+    background-color: var(--color-brand-muted);
     height: 90px;
     padding-bottom: 20px;
-    border-radius: 3px 3px 0px 0px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
 }
 
 .glad-card-container .image canvas{
@@ -128,11 +128,11 @@
 }
 
 .glad-card-container .info{
-	color: #646464;
+	color: var(--color-text);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: 0px 0px 3px 3px;
+    border-radius: 0px 0px var(--radius-sm) var(--radius-sm);
     flex-grow: 1;
     min-height: 100px;
 }
@@ -143,7 +143,7 @@
 }
 
 .glad-card-container .file {
-	color: #7d7d7d;
+	color: var(--color-text-muted);
     display: flex;
     flex-direction: column;
     margin-bottom: 0px;
@@ -175,14 +175,14 @@
 }
 
 .glad-card-container .master {
-    color: #6c97a9;
+    color: var(--color-text-muted);
     display: flex;
     justify-content: center;
     font-size: 1em;
 }
 
 .glad-card-container .glad span{
-	color: #000;
+	color: var(--color-text-strong);
     text-align: center;
     /* height: 0; */
 }
@@ -191,13 +191,13 @@
 	justify-content: space-around;
 	font-size: 1.2em;
 	margin-bottom: 0px;
-	background-color: #c7d6dc;
+	background-color: var(--color-brand-soft);
 	flex-direction: row;
 }
 
 .glad-card-container .attr img {
-    box-shadow: 1px 1px 3px black;
-	border: 1px solid #556c77;
+    box-shadow: 1px 1px 3px var(--color-shadow);
+	border: 1px solid var(--color-border-brand-muted);
     border-radius: 25px;
     padding: 2px;
 	margin-top: -15px;
@@ -205,15 +205,15 @@
 }
 
 .glad-card-container .attr .str img{
-    background-color: #ff5050;
+    background-color: var(--color-str);
 }
 
 .glad-card-container .attr .agi img{
-    background-color: #e3e300;
+    background-color: var(--color-agi);
 }
 
 .glad-card-container .attr .int img{
-    background-color: #7c90ff;
+    background-color: var(--color-int);
 }
 
 .glad-card-container .row img {
@@ -228,7 +228,7 @@
 }
 
 .glad-card-container .attr span{
-	color: #646464;
+	color: var(--color-text);
 }
 
 .glad-preview  .delete-container {
@@ -238,7 +238,7 @@
 
 .glad-preview .delete {
     border-radius: 30px;
-    transition: background-color 0.5s;
+    transition: background-color var(--duration-slow);
     padding: 5px;
     margin: 5px 5px -40px 0px;
     box-sizing: border-box;
@@ -248,7 +248,7 @@
 }
 
 .glad-preview .delete:hover {
-    background-color: #527382;
+    background-color: var(--color-brand-muted);
 }
 
 .glad-preview .delete img {
@@ -260,28 +260,28 @@
 	border: none;
     background-color: transparent;
     font-size: 1.3em;
-    font-family: consolas, monospace;
+    font-family: var(--font-mono);
     font-weight: bold;
-    border-radius: 3px;
-    color: #00638d;
+    border-radius: var(--radius-sm);
+    color: var(--color-brand-text);
     margin-left: 10px;
     padding: 3px 10px;
     outline: none;
-    transition: all 0.3s;
+    transition: all var(--duration-base);
     cursor: pointer;
     width: auto;
     height: auto;
 }
 
 .glad-preview .button:hover {
-	background-color: #6c97a9;
-    color: white;
+	background-color: var(--color-brand-muted);
+    color: var(--color-text-on-brand);
 }
 
 .glad-preview .button:hover:disabled,
 .glad-preview .button:disabled {
     background-color: transparent;
-    color: #0000002b;
+    color: var(--color-shade);
 }
 
 .glad-preview.old,
@@ -297,12 +297,12 @@
 .glad-box {
     width: 100%;
     max-width: 600px;
-    background-color: white;
-    border-radius: 3px;
-    box-shadow: 1px 1px 5px black;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    box-shadow: 1px 1px 5px var(--color-shadow);
     max-height: 100vh;
-    color: #646464;
-    font-family: 'Acme', sans-serif;
+    color: var(--color-text);
+    font-family: var(--font-game);
 }
 
 .glad-box .glad-preview {
@@ -314,11 +314,11 @@
 }
 
 .glad-box #button-container .button {
-    background-color: #4286f4;
-    color: white;
+    background-color: var(--color-secondary);
+    color: var(--color-text-on-brand);
     outline: none;
     border: 0;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--font-mono);
     font-weight: bold;
     cursor: pointer;
     z-index: 1;
@@ -327,15 +327,15 @@
     border-radius: 0px;
     height: 50px;
     font-size: 1.3em;
-    transition: all 0.3s;
+    transition: all var(--duration-base);
 }
 
 .glad-box #button-container .button:hover {
-    background-color: #3165b9;
+    background-color: var(--color-secondary-strong);
 }
 
 .glad-box #button-container .button:disabled {
-    background-color: #8f98a3;
+    background-color: var(--color-neutral);
     cursor: not-allowed;
 }
 
@@ -345,7 +345,7 @@
 }
 
 .glad-box .highlight {
-    color: #00638d;
+    color: var(--color-brand-text);
     font-weight: bold;
 }
 
