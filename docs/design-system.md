@@ -105,6 +105,7 @@ Every theme defines the same roles:
 | Text | `text`, `text-strong`, `text-muted`, `text-subtle`, `text-on-brand`, `text-on-brand-muted`, `text-on-accent` |
 | Brand | `brand`, `brand-hover`, `brand-muted`, `brand-soft`, `brand-text` (titles), `link`, `secondary`, `secondary-strong`, `glow` |
 | Accent | `accent` (torch gold actions), `accent-strong`, `accent-hover`, `accent-text` (small gold text that must stay readable) |
+| Action | `action`, `action-hover`, `text-on-action`: the view's main action (`.button.primary`), torch gold in both Arena themes, brand blue in Classic |
 | Borders | `border`, `border-strong`, `border-brand`, `border-brand-muted` |
 | States | `danger`, `danger-soft`, `success`, `success-soft`, `warning`, `info` |
 | Code | `terminal-bg`, `terminal-text`, `code-bg` |
@@ -125,6 +126,7 @@ same everywhere:
 - Attributes: `--color-str`, `--color-agi`, `--color-int`.
 - Medals: `--color-medal-gold/silver/bronze` with `-soft`, `-strong`, `-text`.
 - Profile menu frames: `--color-cat-*`.
+- Code panels: `--color-code-panel`, `-panel-border`, `-text`, `-comment` and `--color-code-keyword/function/string/number` (the hero code panel and every Prism block, `components/code.css`).
 - Front page: `--color-band*`, `--color-text-on-band*`, `--color-code-*` (the hero code panel).
 - Blocks: `--color-block-statement`.
 - 3D replay chrome: `--color-battle-*`, `--shadow-battle`, `--radius-battle` (`playback-render2.css`).
@@ -137,6 +139,7 @@ same everywhere:
   1.6s, `-fade` 2s, `--ease-standard`. `prefers-reduced-motion` cuts every transition and animation (`tokens.css`).
 - Layers: `--z-below`, `--z-raised`, `--z-float`, `--z-dropdown`, `--z-header`, `--z-dialog`; stacking
   inside one component counts up from `--z-raised` (`calc(var(--z-raised) + 2)`).
+- Element defaults (`tokens.css`): themed links (`--color-link`, offset underline), text selection, scrollbars and `accent-color`; `.visually-hidden` keeps a control reachable by keyboard while hidden (the switches of `checkboxes.css`).
 - Focus: `:focus-visible` draws `--focus-ring-width` in `--focus-ring-color` (gold in Arena, blue
   in Classic) at `--focus-ring-offset`.
 
@@ -152,9 +155,10 @@ really differs, a scoped size.
 
 | Primitive | Markup | Behaviour | Variants and states |
 | :--- | :--- | :--- | :--- |
-| Button | `.button` on `<button>` or `<a>` (`components/button.css`) | `Button` (`components/button.js`): `new Button({ element, text, icon, title, variant })`, `click(action)` disables it with a spinner until the action settles, `disable(spin)`, `enable()`, `setText(text, icon)`, `busy` | `secondary`, `neutral`, `ghost` (dialog actions), `outline`, `danger`, `success`; `small`, `large`; `block` (a full-width 50px bar at the foot of a dialog); `:disabled`/`.disabled`, `is-loading`, `is-progress` (`ProgressButton` in `components/simulation.js`) |
+| Button | `.button` on `<button>` or `<a>` (`components/button.css`) | `Button` (`components/button.js`): `new Button({ element, text, icon, title, variant })`, `click(action)` disables it with a spinner until the action settles, `disable(spin)`, `enable()`, `setText(text, icon)`, `busy` | `primary` (the main action), `secondary`, `neutral`, `ghost` (dialog actions), `outline`, `danger`, `success`; `small`, `large`; `block` (a full-width 50px bar at the foot of a dialog); `:disabled`/`.disabled`, `is-loading`, `is-progress` (`ProgressButton` in `components/simulation.js`) |
 | Field | `.input` on `<input>`, `<select>`, `<textarea>` (`components/field.css`) | `Input` (`components/input.js`: `value`, `input(cb)`, `keyDown(cb)`), `Select` (`components/select.js`: `value`, `set(value)`, `setOptions(list)`, `change(cb)`), both on `Field` (`components/field.js`: `setError(message)`, `clearError()`, `error`) | underlined game field by default; `.boxed` (and every textarea) framed; `.error`/`aria-invalid`, `filled` |
 | Surface | `.surface-card`, `.surface-subtle`, `.surface-pill` (`components/surface.css`) | none | a raised panel (posts, dialogs, statistics, cockpit cards), a quiet inset, a chip |
+| Code panel | Prism `pre`/`code[class*=language-]` (`components/code.css`, outranks Prism's own theme) | none | dark in every theme |
 | Empty state | `templates/empty-state.js` `emptyStateTemplate` rendered with `renderTemplate` (`components/empty-state.css`) | none: callers pick `variantClass`, `icon`, `title`, `summary`, `actionHtml` | full, `compact` (inside lists and tables, `.table .row.empty`) |
 
 Modal, toast and tooltip are the existing `components/dialog.js`, `toast.js` and `tooltip.js` (the
@@ -179,6 +183,7 @@ Placement-only page rules for the primitives live in the page sheet (`#duel-box 
 
 ## 3. CSS architecture
 
+- Every local stylesheet and script in a view is linked through `{{#asset}}` (mtime-versioned): an unversioned link let browsers mix cached sheets with new tokens.
 - No build step: each page links `tokens.css` and the primitives in `css/components/` (through the
   head partial), then the shared feature sheets it uses, then its page sheet. `{{#asset}}` versions every file by mtime.
 - Page sheets are named after the page (`profile.css`, `editor.css`, ...); a shared sheet is named
