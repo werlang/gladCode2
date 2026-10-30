@@ -9,7 +9,8 @@
 # Usage: ./migrations/migrate.sh [--baseline=N]
 #   Extra arguments are forwarded to `npm run db:migrate`.
 #   DB connection comes from the environment, falling back to `.env`, then
-#   to compose defaults (host `mysql`, port 3306, user `root`, db `gladcode`).
+#   to compose defaults (host `mysql`, user `root`, db `gladcode`); the port is
+#   always 3306, the one MySQL listens on inside the compose network.
 set -eu
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -31,7 +32,8 @@ if [ -f "$ROOT/.env" ]; then
 fi
 
 MYSQL_HOST="${MYSQL_HOST:-mysql}"
-MYSQL_PORT="${MYSQL_PORT:-3306}"
+# on the compose network MySQL always listens on 3306 (MYSQL_PORT in .env is the dev host port)
+MYSQL_PORT=3306
 MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD="${MYSQL_PASSWORD:-${MYSQL_ROOT_PASSWORD:-}}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-gladcode}"

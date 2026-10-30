@@ -5,11 +5,10 @@
     "main": "app.js",
     "type": "module",
     "scripts": {
-        "start": "node app.js",
-        "dev": "nodemon app.js"
+        "production": "node app.js",
+        "development": "node --watch app.js"
     },
     "dependencies": {
-        "express": "^4.21.2",
-        "nodemon": "^3.1.9"
+        "express": "^4.21.2"
     }
 }

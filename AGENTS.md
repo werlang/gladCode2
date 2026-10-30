@@ -30,7 +30,7 @@ Browser ──> [web: Express + Mustache]   page shells, static files (web/)
    └──────> [api: Express REST API] ──> [MySQL 8.0]
                    │  (writes data/runs/<dir>, then HTTP POST /:dirname)
                    ▼
-            [runner: Express] ──> [Docker-in-Docker container (gladcode2-vm)]
+            [runner: Express] ──> [gladcode2-vm container (host Docker)]
                                           │
                                           ▼
                               [C engine (gladCodeServerMain)]
@@ -68,7 +68,8 @@ Express service rendering Mustache page shells: `app.js` declares every page wit
 - **`/dev-tools`** (`view/dev-tools.html`, `script/dev-tools.js`): the administrators' tournament cockpit on the `/admin/tournaments` API; `public/dev-tools/synty-viewer.html` is the Synty piece viewer.
 
 ### 3. Runner Service (`runner/`)
-- **`app.js`**: Express web server listening on port 3000 inside the Docker network. Accepts `POST /:dirname` from the API.
+- **`app.js`**: Express web server listening on port 3000 inside the Docker network (published on the host only by `compose.dev.yaml`). Accepts `POST /:dirname` from the API.
+- **Image** (`runner/Dockerfile`): Node plus the Docker CLI, which drives the host's Docker through the mounted socket (no daemon of its own); `production` and `development` (`node --watch`) stages like the API and web services.
 - **`runner.js`**: Docker execution manager. Copies the run folder the API prepared from `/requests` (`data/runs` on the host) to the `gladcode_tmp_run` volume, executes `docker run --rm gladcode2-vm sh socket_compile.sh` (appending `sandbox` only when the request body has `sandbox: true`, `noitems` when it has `noitems: true`), enforces the 30-second timeout, reads `errorc.txt` / `simlog`, and cleans up workspaces.
 
 ### 4. C Simulation Engine (`Payload/`)
@@ -87,7 +88,7 @@ The render2 models, animations and textures come from Synty packs in `web/public
 ### Configuration
 Every setting comes from the environment (`.env`, passed through `compose.yaml`); there are no config files. `.env.example` lists them: `MYSQL_*`, `JWT_SECRET` (at least 32 random characters in production), `SESSION_TTL_DAYS`, `GOOGLE_CLIENT_ID`, `ADMIN_EMAILS`, `MAILER_*`, `WEB_URL`/`WEB_PORT` and `API_URL`/`API_PORT` (the public URLs), `WEB_PUBLISH`/`API_PUBLISH` (the host ports the containers listen on), `ENABLE_RENDER2`, `MAINTENANCE`, `TRUST_PROXY`, `RUNNER_CONCURRENCY` (battles the engine runs at once, 6; the next ones wait, and editor test battles run one at a time per master or address).
 
-`compose.yaml` runs the production images. For development set `COMPOSE_FILE=compose.yaml:compose.dev.yaml` in `.env`: `compose.dev.yaml` mounts `api/` and `web/` and runs them with live reload.
+`compose.yaml` runs the production images. For development set `COMPOSE_FILE=compose.yaml:compose.dev.yaml` in `.env`: `compose.dev.yaml` mounts `api/`, `web/` and `runner/` and runs them with `node --watch`, and publishes MySQL (`MYSQL_PORT`) and the runner (`RUNNER_PORT`) on 127.0.0.1. Production publishes only the web and API ports; nothing installs packages at start-up or mounts source there.
 
 ### Database Access Pattern
 Only models touch the database, through `Mysql` from `api/helpers/mysql.js`, always with placeholders:

@@ -1,30 +1,14 @@
 services:
     runner:
         build:
-            context: .
-            dockerfile: Dockerfile-dind
+            context: ./runner
+            target: production
         restart: unless-stopped
+        # the API reaches it on the compose network only; battles run through the host's Docker
         volumes:
-            - ./runner:/app
-            - node_modules:/app/node_modules
             - /var/run/docker.sock:/var/run/docker.sock
             - ./data/runs:/requests
             - runs:/runs
-        ports:
-            - 127.0.0.1:${RUNNER_PORT:-3000}:3000
-        environment:
-            - MYSQL_HOST=mysql
-            - MYSQL_PORT=${MYSQL_PORT}
-            - MYSQL_USER=root
-            - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-        # Deterministic install at startup: ./runner bind-mount shadows
-        # build-time node_modules and the named volume starts empty (or
-        # half-written after a crashed install) on fresh checkouts.
-        # Always `npm ci` — a shortcut `[ -x ... ]` check can perpetually
-        # preserve a corrupt tree combined with the restart loop.
-        command: sh -c "npm ci --no-audit --no-fund && exec npm run dev"
-        # command: tail -f /dev/null #idle container
 
     web:
         build:
@@ -105,11 +89,7 @@ services:
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
         volumes:
             - mysql:/var/lib/mysql
-            - .:/app
-        ports:
-            - 127.0.0.1:${MYSQL_PORT}:3306
 volumes:
-    node_modules:
     mysql:
     runs:
         name: gladcode_tmp_run

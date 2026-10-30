@@ -23,7 +23,7 @@ gladCode is a web-based programming game where users code AI gladiators in C or 
 
 - **Web (`web/`)**: Express + Mustache page shells and the static frontend (`web/public/`). It never sees the session.
 - **API (`api/`)**: Express REST API (routes in `route/`, models in `model/`, MySQL through `helpers/mysql.js`), documented in [docs/api/README.md](../docs/api/README.md). The browser calls it directly with the `app_session` cookie.
-- **Runner (`runner/`)**: Express & Docker-in-Docker service executing user code in isolated containers (`gladcode2-vm`).
+- **Runner (`runner/`)**: Express service executing user code in isolated containers through the host Docker socket (`gladcode2-vm`).
 - **C Simulation Engine (`Payload/`)**: Multi-threaded server executing combat between gladiators via TCP sockets.
 - **MySQL 8.0**, with numbered migrations in `migrations/`.
 

@@ -31,7 +31,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- |
 | **Web** | `web/` | Node.js, Express, Mustache, native ES modules, Phaser.js, Three.js | Page shells, static files, the frontend modules and both battle renderers. Never sees the session |
 | **API** | `api/` | Node.js, Express, mysql2, jose, nodemailer, Vitest | REST API: Google sign-in, gladiators, battles, rankings, social, tournaments, trainings, admin tools ([reference](docs/api/README.md)) |
-| **Runner** | `runner/` | Node.js, Express, Docker CLI | Docker-in-Docker executor: runs each battle in an isolated `gladcode2-vm` container |
+| **Runner** | `runner/` | Node.js, Express, Docker CLI | Battle executor: starts each battle in an isolated `gladcode2-vm` container through the host's Docker socket |
 | **Simulation Engine** | `Payload/` | C (GCC, pthreads, sockets) | Multi-threaded arena server executing turn-by-turn combat between gladiator programs |
 | **Database** | `mysql` service, `migrations/` | MySQL 8.0 | Accounts, gladiators, tournaments, battle log index, stats |
 
@@ -56,7 +56,7 @@ cp .env.example .env
 Fill in the MySQL credentials, `JWT_SECRET` and `GOOGLE_CLIENT_ID`. For development add:
 
 ```bash
-COMPOSE_FILE=compose.yaml:compose.dev.yaml   # run web/ and api/ from source with live reload
+COMPOSE_FILE=compose.yaml:compose.dev.yaml   # run web/, api/ and runner/ from source with node --watch
 WEB_PUBLISH=8085                             # host ports
 API_PUBLISH=8086
 WEB_PORT=8085                                # ports in the public URLs
@@ -128,12 +128,11 @@ gladcode2/
 ├── .github/                 # Deploy workflow & Copilot instructions
 ├── AGENTS.md                # Architecture and coding rules for agents and developers
 ├── CONTRIBUTING.md          # Branches, commit messages and merging
-├── Dockerfile-dind          # Docker-in-Docker image for the runner
-├── compose.yaml             # Production services; compose.dev.yaml adds live reload
+├── compose.yaml             # Production images; compose.dev.yaml adds source mounts and node --watch
 ├── api/                     # REST API: route/, model/, helpers/, middleware/, scripts/, tests/
 ├── web/                     # Web service: app.js, view/ (Mustache), public/ (static files)
 │   └── public/script/       # ES module pages, components, models, templates; Phaser and Three.js renderers
-├── runner/                  # Express Docker execution service
+├── runner/                  # Express service that starts each battle through the host Docker (Docker CLI)
 ├── Payload/                 # C battle simulation engine & socket API source
 ├── migrations/              # Numbered SQL migrations and their runner
 ├── dev-tools/               # Tournament CLI, database dump/restore, release news SQL

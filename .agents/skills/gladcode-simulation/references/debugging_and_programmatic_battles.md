@@ -23,7 +23,7 @@ gladcode2/
 ├── web/                     # Page shells (view/) and the frontend (public/script/, Phaser render.js, Three.js render2/)
 ├── runner/                  # Express microservice inside Docker network (port 3000)
 │   ├── app.js               # POST /:dirname endpoint receiving battle execution requests
-│   └── runner.js            # Docker-in-Docker manager (runs gladcode2-vm, monitors errorc.txt & simlog)
+│   └── runner.js            # Docker manager (runs gladcode2-vm through the host Docker, monitors errorc.txt & simlog)
 ├── Payload/                 # C battle simulation engine & API bindings
 │   ├── gladCodeServerMain.c # Entrypoint socket server, spawns threads per gladiator
 │   ├── gladCodeServerCore.c # Physics, line-of-sight, turn loop, damage mechanics
