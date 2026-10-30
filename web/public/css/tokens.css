@@ -3,9 +3,10 @@
  * Every stylesheet references these with var(--...) instead of literal colours, fonts, radii,
  * shadows, durations and layers.
  *
- * Two themes map the same roles: Classic (light, the default) on :root and Arena (dark) on
- * :root.theme-arena. script/theme-boot.js sets the class before the page paints, from the
- * master's choice (cached in localStorage) or the system colour scheme.
+ * Three themes map the same roles: Arena light (the default, on :root and :root.theme-arena-light),
+ * Classic (:root.theme-classic) and Arena dark (:root.theme-arena-dark, also .tone-night regions).
+ * script/theme-boot.js sets the class before the page paints, from the master's choice (cached in
+ * localStorage) or the system colour scheme (Arena light or dark).
  */
 
 /* Self-hosted fonts (OFL, licences in /fonts). Latin subset: Portuguese and English. */
@@ -105,6 +106,101 @@
     --arena-blue-bright: #31a7c7;
     --arena-blue-light: #5cc3e0;
     --arena-green: #4fd46a;
+    /* Arena by day: sun on the sand */
+    --arena-day-page: #f7f0e1;
+    --arena-day-surface: #fffaf0;
+    --arena-day-sunken: #efe4cb;
+    --arena-day-border: #e2cfa6;
+    --arena-day-border-strong: #8a7350;
+    --arena-day-stone: #8a7a5c;
+    --arena-day-text: #1b2a35;
+    --arena-day-text-muted: #56636b;
+    --arena-day-text-subtle: #8a8170;
+    --arena-day-blue: #1f7fa0;
+    --arena-day-green: #2f9a4a;
+    --arena-day-code: #fbf5e8;
+    --arena-bronze-text: #9a6a12;
+
+    /* ---- Content colours: game state and categories, the same in every theme ---- */
+    --color-hp: #ff0000;
+    --color-hp-mid: #ff000070;
+    --color-hp-track: #6b000035;
+    --color-ap: #0000ff;
+    --color-ap-mid: #0000ff70;
+    --color-ap-track: #00007535;
+    --color-xp: #e7dd24;
+    --color-xp-track: #b5b592;
+    --color-level-up: #fff200;
+    --color-bar-danger: #f44336;
+    --color-timer-ok: #84ff8f;
+    --color-timer-warn: #f6d558;
+    --color-block-statement: #7d52a8;
+    /* gladiator attributes: strength, agility, intelligence */
+    --color-str: #ff5050;
+    --color-agi: #e3e300;
+    --color-int: #7c90ff;
+    /* profile menu icon frames, one per section */
+    --color-cat-green: #8edc96;
+    --color-cat-amber: #f4cd82;
+    --color-cat-pink: #ec95f4;
+    --color-cat-violet: #8b96e3;
+    --color-cat-yellow: #e7ef48;
+    --color-cat-rose: #f495d0;
+    --color-cat-silver: #d4d4d4;
+    --color-cat-teal: #64cccc;
+    --color-cat-red: #f28787;
+    --color-cat-grey: #4d4d4d;
+    /* the 3D replay's chrome over the arena canvas (playback-render2.css) */
+    --color-battle-ink: #15191d;
+    --color-battle-ink-soft: #252c31;
+    --color-battle-sand: #c7a66b;
+    --color-battle-bronze: #9d6b32;
+    --color-battle-blue: #00638d;
+    --color-battle-blue-bright: #31a7c7;
+    --color-battle-text: #f4f1e7;
+    --color-battle-text-muted: #b9c6ca;
+    --color-battle-hp: #d94841;
+    --color-battle-ap: #4b7bec;
+    --color-battle-success: #4fd46a;
+    --color-battle-warning: #f0c453;
+    --color-battle-panel: rgb(18 25 29 / 0.86);
+    --color-battle-border: rgb(199 166 107 / 0.36);
+    --color-battle-ink-deep: #0c1216;
+    --color-battle-leather: #110c09;
+    --color-battle-leather-light: #3a2a18;
+    --color-battle-leather-dark: #20160d;
+    --color-battle-brass: #c8913a;
+    --color-battle-gold: #d9962c;
+    --color-battle-gold-light: #ffe7a0;
+    --color-battle-glint: #ffd68c;
+    --color-battle-parchment: #f7e7c2;
+    --shadow-battle: 0 18px 50px rgb(0 0 0 / 0.42);
+    --radius-battle: 12px;
+
+    /* the front page's sand band and the code panel, the same in every theme */
+    --color-band: #f3e8d0;
+    --color-band-surface: #fffaf0;
+    --color-band-border: #e2cfa6;
+    --color-band-accent: #9a6a12;
+    --color-text-on-band: #1b2a35;
+    --color-text-on-band-muted: #56636b;
+    --color-code-keyword: #7fb7e6;
+    --color-code-function: #f2b441;
+    --color-code-string: #8fd6a8;
+    --color-code-number: #e79b7b;
+    /* tournament and ranking places */
+    --color-medal-gold: #f9e777;
+    --color-medal-gold-soft: #fff3a8;
+    --color-medal-gold-strong: #c1922a;
+    --color-medal-gold-text: #90701a;
+    --color-medal-silver: #e4e4e4;
+    --color-medal-silver-soft: #f7f7f7;
+    --color-medal-silver-strong: #9c9c9c;
+    --color-medal-silver-text: #6c6c6c;
+    --color-medal-bronze: #e1c19a;
+    --color-medal-bronze-soft: #f9e2c7;
+    --color-medal-bronze-strong: #98694d;
+    --color-medal-bronze-text: #6d4c39;
 
     /* ---- Type ---- */
     --font-body: 'Roboto', system-ui, sans-serif;
@@ -112,6 +208,9 @@
     --font-digits: 'Orbitron', var(--font-mono);
     --font-arena: 'Cinzel', Georgia, serif;
     --font-classic: 'Acme', 'Roboto', sans-serif;
+    /* the game's interface lettering (cards, profile, tournaments, the 2D replay), the same in every theme;
+       --font-display (per theme, below) is for headings only */
+    --font-game: var(--font-classic);
 
     /* ---- Radius ---- */
     --radius-xs: 2px;
@@ -143,8 +242,89 @@
     --focus-ring-offset: 2px;
 }
 
-/* ---- Classic role mapping (default) ---- */
+/* ---- Arena light role mapping (the default: the coliseum by day) ---- */
 :root,
+:root.theme-arena-light {
+    color-scheme: light;
+
+    --font-display: var(--font-arena);
+
+    --color-page: var(--arena-day-page);
+    --color-surface: var(--arena-day-surface);
+    --color-surface-alt: var(--arena-sand-light);
+    --color-surface-strong: var(--arena-sand);
+    --color-surface-sunken: var(--arena-day-sunken);
+    --color-neutral: var(--arena-day-stone);
+    --color-overlay: rgb(11 29 43 / 0.72);
+    --color-scrim: rgb(11 29 43 / 0.45);
+    --color-shade: rgb(60 40 10 / 0.14);
+    --color-tint: rgb(60 40 10 / 0.05);
+    --color-highlight: rgb(255 255 255 / 0.4);
+
+    --color-text: var(--arena-day-text);
+    --color-text-strong: var(--arena-ink-950);
+    --color-text-muted: var(--arena-day-text-muted);
+    --color-text-subtle: var(--arena-day-text-subtle);
+    --color-text-on-brand: #ffffff;
+    --color-text-on-brand-muted: var(--classic-blue-mist);
+    --color-text-on-accent: var(--arena-ink-900);
+
+    --color-brand: var(--arena-blue);
+    --color-brand-hover: var(--classic-blue-deep);
+    --color-brand-muted: var(--arena-ink-500);
+    --color-brand-soft: rgb(0 99 141 / 0.08);
+    --color-brand-text: var(--arena-ink-900);
+    --color-link: var(--arena-blue);
+    --color-secondary: var(--arena-day-blue);
+    --color-secondary-strong: var(--arena-blue);
+    --color-glow: var(--arena-blue-bright);
+
+    --color-accent: var(--arena-gold);
+    --color-accent-strong: var(--arena-gold-deep);
+    --color-accent-hover: #ffc95e;
+    --color-accent-text: var(--arena-bronze-text);
+
+    --color-border: var(--arena-day-border);
+    --color-border-strong: var(--arena-day-border-strong);
+    --color-border-brand: var(--arena-sand-dark);
+    --color-border-brand-muted: rgb(185 154 99 / 0.45);
+
+    --color-danger: var(--arena-blood);
+    --color-danger-soft: #f8e1dc;
+    --color-success: var(--arena-day-green);
+    --color-success-soft: #d5efd9;
+    --color-warning: var(--arena-gold-deep);
+    --color-info: var(--arena-day-blue);
+
+    --color-terminal-bg: var(--arena-ink-950);
+    --color-terminal-text: var(--arena-green);
+    --color-code-bg: var(--arena-day-code);
+
+    --color-header-bg: var(--arena-ink-950);
+    --color-header-text: var(--arena-sand);
+    --color-footer-bg: var(--arena-ink-950);
+    --color-chrome: var(--arena-ink-800);
+    --logo-filter: invert(1) hue-rotate(180deg);
+    --logo-filter-page: none;
+
+    --color-pick: #cceacc;
+    --color-pick-hover: #afd7af;
+    --color-pick-selected: #92c592;
+    --color-pick-item: #ccccea;
+    --color-pick-item-hover: #afafd7;
+    --color-pick-item-selected: #9292c5;
+
+    --color-shadow: rgb(60 40 10 / 0.35);
+    --shadow-sm: 0 0 3px var(--color-shadow);
+    --shadow-md: 0 2px 6px var(--color-shadow);
+    --shadow-lg: 0 14px 40px var(--color-shadow);
+    --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-glow: 0 0 6px 2px rgb(242 180 65 / 0.45);
+
+    --focus-ring-color: var(--arena-gold-deep);
+}
+
+/* ---- Classic role mapping: the blue workshop gladCode wore for years ---- */
 :root.theme-classic {
     color-scheme: light;
 
@@ -158,6 +338,9 @@
     --color-neutral: var(--classic-grey-500);
     --color-overlay: rgb(0 0 0 / 0.74);
     --color-scrim: rgb(0 0 0 / 0.5);
+    --color-shade: rgb(0 0 0 / 0.2);
+    --color-tint: rgb(0 0 0 / 0.05);
+    --color-highlight: rgb(255 255 255 / 0.15);
 
     --color-text: var(--classic-grey-700);
     --color-text-strong: var(--classic-grey-900);
@@ -179,6 +362,8 @@
 
     --color-accent: var(--classic-gold);
     --color-accent-strong: var(--classic-gold-deep);
+    --color-accent-hover: #ffd75e;
+    --color-accent-text: #9a6a12;
 
     --color-border: var(--classic-grey-300);
     --color-border-strong: var(--classic-grey-800);
@@ -198,6 +383,18 @@
 
     --color-header-bg: var(--classic-blue);
     --color-header-text: var(--classic-white);
+    --color-footer-bg: #005478;
+    --color-chrome: var(--classic-blue);
+    --logo-filter: none;
+    --logo-filter-page: none;
+
+    /* the gladiator creator's option chips: body and look options, then items */
+    --color-pick: #cceacc;
+    --color-pick-hover: #afd7af;
+    --color-pick-selected: #92c592;
+    --color-pick-item: #ccccea;
+    --color-pick-item-hover: #afafd7;
+    --color-pick-item-selected: #9292c5;
 
     --color-shadow: rgb(0 0 0 / 0.55);
     --shadow-sm: 0 0 3px var(--color-shadow);
@@ -209,8 +406,9 @@
     --focus-ring-color: var(--classic-glow);
 }
 
-/* ---- Arena role mapping ---- */
-:root.theme-arena {
+/* ---- Arena dark role mapping: the coliseum at night ---- */
+:root.theme-arena-dark,
+.tone-night {
     color-scheme: dark;
 
     --font-display: var(--font-arena);
@@ -223,6 +421,9 @@
     --color-neutral: var(--arena-stone-400);
     --color-overlay: rgb(5 13 20 / 0.82);
     --color-scrim: rgb(5 13 20 / 0.6);
+    --color-shade: rgb(0 0 0 / 0.3);
+    --color-tint: rgb(255 255 255 / 0.05);
+    --color-highlight: rgb(255 255 255 / 0.1);
 
     --color-text: var(--arena-mist-100);
     --color-text-strong: #ffffff;
@@ -244,6 +445,8 @@
 
     --color-accent: var(--arena-gold);
     --color-accent-strong: var(--arena-gold-deep);
+    --color-accent-hover: #ffc95e;
+    --color-accent-text: var(--arena-gold);
 
     --color-border: rgb(237 241 243 / 0.14);
     --color-border-strong: var(--arena-stone-400);
@@ -263,6 +466,17 @@
 
     --color-header-bg: var(--arena-ink-950);
     --color-header-text: var(--arena-sand);
+    --color-footer-bg: var(--arena-ink-950);
+    --color-chrome: var(--arena-ink-950);
+    --logo-filter: invert(1) hue-rotate(180deg);
+    --logo-filter-page: invert(1) hue-rotate(180deg);
+
+    --color-pick: rgb(79 212 106 / 0.14);
+    --color-pick-hover: rgb(79 212 106 / 0.26);
+    --color-pick-selected: rgb(79 212 106 / 0.42);
+    --color-pick-item: rgb(124 144 255 / 0.14);
+    --color-pick-item-hover: rgb(124 144 255 / 0.26);
+    --color-pick-item-selected: rgb(124 144 255 / 0.42);
 
     --color-shadow: rgb(0 0 0 / 0.6);
     --shadow-sm: 0 0 3px var(--color-shadow);
@@ -272,6 +486,12 @@
     --shadow-glow: 0 0 6px 2px rgb(49 167 199 / 0.45);
 
     --focus-ring-color: var(--arena-gold);
+}
+
+/* A region that stays dark in every theme (the front page hero, code panels): the Arena dark roles
+   above apply inside it, and its text takes them */
+.tone-night {
+    color: var(--color-text);
 }
 
 /* Element defaults every page shares */

@@ -101,7 +101,7 @@ export class User extends Model {
     /**
      * Applies profile changes. Only the fields present are changed.
      *
-     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'arena'|'classic' }} changes
+     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'classic'|'arena-light'|'arena-dark' }} changes
      *   Already validated values; `picture` is the stored picture URL; `theme` `system` clears the choice.
      * @returns {Promise<User>}
      * @throws {CustomError} 409 `NICKNAME_TAKEN` when another account uses the nickname.

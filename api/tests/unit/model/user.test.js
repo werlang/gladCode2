@@ -90,8 +90,8 @@ describe('User', () => {
     });
 
     test('the site theme is saved on the account, and `system` clears the choice', async () => {
-        await new User(row).saveProfile({ theme: 'arena' });
-        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { site_theme: 'arena' }, { id: 7 }, {});
+        await new User(row).saveProfile({ theme: 'arena-dark' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { site_theme: 'arena-dark' }, { id: 7 }, {});
         await new User(row).saveProfile({ theme: 'system' });
         expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { site_theme: null }, { id: 7 }, {});
         expect(new User(row).toJSON().theme).toBe('system');
