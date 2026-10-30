@@ -2,6 +2,8 @@
 
 This document serves as the authoritative guide for AI coding agents (Antigravity, Gemini, GitHub Copilot) and developers modifying or extending the **gladCode 2** repository.
 
+Layer-by-layer project skills (API, models, MySQL, frontend, CSS, tests, docs, simulation) live in [`.agents/skills/`](.agents/skills/README.md); load the one for the layer you touch.
+
 ---
 
 ## ⛔ CRITICAL EXECUTION RULES
