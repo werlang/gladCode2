@@ -17,7 +17,7 @@ const FADE_MS = 3000;
  */
 function stackToasts() {
     document.querySelectorAll('.toast').forEach((toast, index) => {
-        toast.style.bottom = `calc(${index * 1.5}em + ${index * 20}px)`;
+        toast.style.bottom = `calc(${index} * (1.5em + var(--space-5)))`;
     });
 }
 

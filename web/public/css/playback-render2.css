@@ -79,8 +79,8 @@
         left: 10px;
         width: auto;
         margin: 0;
-        padding: 0 4px;
-        gap: 4px;
+        padding: 0 var(--space-2);
+        gap: var(--space-2);
         flex-direction: column;
         isolation: isolate;
         /* Same gold Synty frame as the canvas HUD; the backing sits under the frame's bevel. */
@@ -94,7 +94,7 @@
 
         &::before {
             position: absolute;
-            z-index: -1;
+            z-index: var(--z-below);
             inset: -9px;
             content: '';
             background:
@@ -109,7 +109,7 @@
         }
 
         .row {
-            gap: 4px;
+            gap: var(--space-2);
             justify-content: center;
         }
 
@@ -118,9 +118,9 @@
             min-width: 42px;
             height: 38px;
             margin: 0;
-            padding: 7px;
+            padding: var(--space-2);
             border: 1px solid transparent;
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
             color: var(--color-battle-text);
             background-color: color-mix(in srgb, var(--color-battle-text) 4%, transparent);
             transition:
@@ -171,13 +171,13 @@
         #time {
             height: 6px;
             border: 1px solid color-mix(in srgb, var(--color-battle-brass) 75%, transparent);
-            border-radius: 3px;
+            border-radius: var(--radius-sm);
             background: var(--color-scrim);
 
             .ui-slider-range {
                 height: 4px;
                 margin: 0;
-                border-radius: 2px;
+                border-radius: var(--radius-xs);
                 background: linear-gradient(180deg, var(--color-battle-gold-light), var(--color-battle-gold));
             }
 
@@ -186,7 +186,7 @@
                 top: -9px;
                 width: 22px;
                 height: 22px;
-                margin-left: -11px;
+                margin-left: calc(-1 * var(--space-3));
                 border: 0;
                 background: var(--battle-gem) center / contain no-repeat, radial-gradient(circle, var(--color-battle-warning) 0 5px, transparent 6px);
                 filter: drop-shadow(0 2px 3px var(--color-shadow));
@@ -261,25 +261,25 @@
 .renderer-choice {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin: 0 0 16px;
-    padding: 12px;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3);
     border: 1px solid var(--color-border-strong);
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
 
     legend {
-        padding: 0 6px;
-        font-size: 1.05em;
+        padding: 0 var(--space-2);
+        font-size: var(--text-base);
     }
 
     .renderer-option {
         display: flex;
         align-items: flex-start;
-        gap: 8px;
+        gap: var(--space-3);
         min-width: 0;
-        padding: 10px;
+        padding: var(--space-3);
         border: 1px solid var(--color-border);
-        border-radius: 8px;
+        border-radius: var(--radius-lg);
         background: var(--color-tint);
         cursor: pointer;
 
@@ -294,7 +294,7 @@
         }
 
         input {
-            margin: 3px 0 0;
+            margin: var(--space-1) 0 0;
             accent-color: var(--color-secondary);
         }
 
@@ -302,7 +302,7 @@
             display: flex;
             min-width: 0;
             flex-direction: column;
-            gap: 2px;
+            gap: var(--space-1);
         }
 
         strong,
@@ -317,9 +317,9 @@
 
     & > p {
         grid-column: 1 / -1;
-        margin: 2px 0 0;
+        margin: var(--space-1) 0 0;
         color: var(--color-text-muted);
-        font-size: 0.8em;
+        font-size: var(--text-xs);
     }
 }
 
@@ -342,15 +342,15 @@
 
 /* Graphics quality of the 3D arena, per device (settings window). */
 #quality-container {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 
     & h3 {
-        margin-bottom: 10px;
+        margin-bottom: var(--space-3);
     }
 
     & select {
         width: 100%;
-        padding: 6px 8px;
+        padding: var(--space-2) var(--space-3);
         border: 1px solid var(--color-border-strong);
         border-radius: var(--radius-sm);
         background-color: var(--color-surface);
@@ -359,8 +359,8 @@
     }
 
     & p {
-        margin: 6px 0 0 5px;
-        font-size: 0.85em;
+        margin: var(--space-2) 0 0 var(--space-2);
+        font-size: var(--text-sm);
         opacity: 0.8;
     }
 }
@@ -370,8 +370,8 @@
     .renderer-three *::before,
     .renderer-three *::after {
         scroll-behavior: auto;
-        transition-duration: 0.01ms;
-        animation-duration: 0.01ms;
+        transition-duration: var(--duration-fast);
+        animation-duration: var(--duration-fast);
         animation-iteration-count: 1;
     }
 }

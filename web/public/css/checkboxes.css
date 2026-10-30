@@ -4,12 +4,12 @@
 	border-radius: var(--radius-xl);
 	background-color: var(--color-danger-soft);
 	border: 1px solid var(--color-border);
-	box-shadow: 0px 0px 2px 0px var(--color-shadow) inset;
+	box-shadow: var(--shadow-inset);
 	cursor: pointer;
 	transition: var(--duration-base) all;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 5px 10px;
+	margin: var(--space-2) var(--space-3);
 }
 .checkslider.thumb {
 	width: 1.4em;
@@ -17,12 +17,12 @@
 	border-radius: var(--radius-xl);
 	background: radial-gradient(var(--color-danger-soft), var(--color-surface-strong));
 	border: 1px solid var(--color-border);
-	box-shadow: 0px 0px 1px 1px var(--color-shadow);
+	box-shadow: var(--shadow-xs);
 	transition: var(--duration-base) all
 }
 .checkslider:checked + .trail {
 	background-color: var(--color-success);
 }
 .checkslider:checked + .trail .thumb {
-	margin-left: 1.5em;
+	margin-left: var(--space-6);
 }

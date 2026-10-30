@@ -50,9 +50,9 @@ function showBlocks(xml) {
 function flashTestButton() {
     const icon = document.querySelector('#test i');
     if (!icon) return;
-    Object.assign(icon.style, { color: 'red', transition: '1s all', fontSize: '40px' });
-    setTimeout(() => Object.assign(icon.style, { color: 'white', transition: '0.5s all', fontSize: '30px' }), 1500);
-    setTimeout(() => icon.removeAttribute('style'), 2500);
+    icon.classList.add('flash');
+    setTimeout(() => icon.classList.replace('flash', 'flash-settle'), 1500);
+    setTimeout(() => icon.classList.remove('flash-settle'), 2500);
 }
 
 /** Makes the line numbers blink so the user finds where breakpoints go. */

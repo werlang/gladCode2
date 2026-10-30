@@ -9,8 +9,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 120px 16px 40px;
+    gap: var(--space-4);
+    padding: 120px var(--space-4) var(--space-8);
     text-align: center;
 }
 
@@ -26,7 +26,7 @@ body {
 }
 
 #notfound .button {
-    padding: 10px 20px;
+    padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-sm);
     background-color: var(--color-brand);
     color: var(--color-text-on-brand);

@@ -7,7 +7,7 @@ body {
 	display: flex;
 	flex-direction: column;
     align-items: center;
-    padding-top: 50px;
+    padding-top: var(--space-9);
     height: calc(100vh - 50px);
     overflow: auto;
 }
@@ -26,7 +26,7 @@ body {
 #content-box {
     width: 100%;
     max-width: 900px;
-    z-index: 1;
+    z-index: var(--z-raised);
     font-family: var(--font-game);
 	color: var(--color-text);
 }
@@ -57,18 +57,18 @@ body {
 }
 
 h1, h3 {
-    margin-left: 15px;
+    margin-left: var(--space-4);
 }
 
 h3#tourn-desc {
-    margin-left: 25px;
+    margin-left: var(--space-6);
 }
 
 #group-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-	margin-bottom: 15px;
+	margin-bottom: var(--space-4);
 	width: 100%;
 }
 
@@ -78,14 +78,14 @@ h3#tourn-desc {
     background-color: var(--color-surface);
     cursor: default;
     box-sizing: border-box;
-    box-shadow: 0px 0px 5px var(--color-shadow);
+    box-shadow: var(--shadow-md);
     border-radius: var(--radius-sm);
 	font-family: var(--font-game);
-    font-size: 1.2em;
-	margin: 10px;
+    font-size: var(--text-lg);
+	margin: var(--space-3);
     width: 100%;
     /* padding-bottom: 2px; */
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
 }
 
 #group-container .group .head {
@@ -93,29 +93,29 @@ h3#tourn-desc {
     justify-content: space-between;
     align-items: center;
     background-color: var(--color-brand-muted);
-    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
-	font-size: 1.4em;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+	font-size: var(--text-xl);
     color: var(--color-text-on-brand);
     text-shadow: 1px 1px 3px var(--color-shadow);
-	padding: 5px 0px;
-	margin-bottom: 2px;
+	padding: var(--space-2) 0;
+	margin-bottom: var(--space-1);
 }
 
 #group-container .group .head .title{
 	text-align: center;
 	flex-grow: 1;
-	margin-left: 45px;
+	margin-left: var(--space-8);
 }
 
 #group-container .group .head .title span{
-    font-size: 0.8em;
+    font-size: var(--text-lg);
     color: var(--color-text-on-brand-muted);
 }
 
 #group-container .group .head .icons{
 	display: flex;
     align-items: center;
-    margin-right: 10px;
+    margin-right: var(--space-3);
 }
 
 #group-container .group .head .icons img{
@@ -123,12 +123,12 @@ h3#tourn-desc {
 }
 
 #group-container .group .head .icons .fa-star{
-	font-size: 25px;
+	font-size: var(--text-xl);
     color: var(--color-accent);
 }
 
 #group-container .group .head .icons .fa-clock{
-	font-size: 25px;
+	font-size: var(--text-xl);
     color: var(--color-success);
 }
 
@@ -142,8 +142,8 @@ h3#tourn-desc {
     color: var(--color-text);
     display: flex;
     border: 1px solid var(--color-border);
-    border-radius: 50px var(--radius-sm) var(--radius-sm) 50px;
-    margin: 2px 5px 2px 5px;
+    border-radius: var(--radius-pill) var(--radius-sm) var(--radius-sm) var(--radius-pill);
+    margin: var(--space-1) var(--space-2) var(--space-1) var(--space-2);
     background-color: var(--color-surface-alt);
     align-items: center;
     justify-content: space-between;
@@ -161,12 +161,12 @@ h3#tourn-desc {
 
 #group-container .group .team .icon {
     background-color: var(--color-surface-strong);
-    border-radius: 50px;
-    padding: 2px;
+    border-radius: var(--radius-pill);
+    padding: var(--space-1);
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 3px 5px 3px 3px;
+    margin: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
 }
 
 #group-container .group .team .icon i {
@@ -176,8 +176,8 @@ h3#tourn-desc {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 15px;
-    transition: 2s all;
+    font-size: var(--text-sm);
+    transition: var(--duration-fade) all;
 }
 
 #group-container .group .team:hover .icon {
@@ -208,13 +208,13 @@ h3#tourn-desc {
 #group-container .group .team .info .glad,
 #group-container .group .team .info .time {
     color: var(--color-text-muted);
-    margin-right: 5px;
+    margin-right: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--color-surface);
     border-radius: var(--radius-sm);
-    padding: 1px 2px;
+    padding: var(--space-hairline) var(--space-1);
     width: 30px;
 	box-sizing: border-box;
 }
@@ -222,14 +222,14 @@ h3#tourn-desc {
 #group-container .group .team .info .glad,
 #group-container .head .icons .glad {
     width: 35px;
-    margin-right: 5px;
+    margin-right: var(--space-2);
 }
 
 #group-container .group .team .info .glad .g-bar{
 	background-color: var(--color-surface-strong);
 	width: 7px;
     height: 20px;
-    margin: 0px 1px;
+    margin: 0 var(--space-hairline);
     border-radius: var(--radius-sm);
     transition: all var(--duration-slower);
 }
@@ -250,7 +250,7 @@ h3#tourn-desc {
 #group-container .group .team .info .time,
 #group-container .head .icons .time {
     width: 50px;
-	font-size: 0.9em;
+	font-size: var(--text-md);
 }
 
 .float-box #button-container {
@@ -260,7 +260,7 @@ h3#tourn-desc {
 #content-box #button-container {
 	display: flex;
     justify-content: space-between;
-    margin-bottom: 50px;
+    margin-bottom: var(--space-9);
     align-items: center;
 }
 
@@ -271,14 +271,14 @@ h3#tourn-desc {
 }
 
 #content-box #button-container .button {
-    margin: 10px 5px;
+    margin: var(--space-3) var(--space-2);
 }
 
 .button {
-	font-size: 1.2em;
+	font-size: var(--text-lg);
     font-family: var(--font-mono);
     border: none;
-    padding: 5px 0px;
+    padding: var(--space-2) 0;
     outline: none;
     color: var(--color-text-on-brand);
     background-color: var(--color-brand);
@@ -307,7 +307,7 @@ h3#tourn-desc {
 	max-width: 100%;
 	width: 600px;
 	border-radius: var(--radius-sm);
-	padding: 30px 20px;
+	padding: var(--space-7) var(--space-5);
 	font-family: var(--font-game);
 	color: var(--color-text);
 	max-height: 98vh;
@@ -322,13 +322,13 @@ h3#tourn-desc {
 }
 
 .float-box #text {
-    font-size: 1.5em;
+    font-size: var(--text-xl);
     text-align: justify;
 }
 
 .float-box #button-container {
-    margin: 10px -20px -30px;
-    border-radius: 0px 0px var(--radius-sm) var(--radius-sm);
+    margin: var(--space-3) calc(-1 * var(--space-5)) calc(-1 * var(--space-7));
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
     background-color: var(--color-brand);
 }
 
@@ -341,22 +341,22 @@ h3#tourn-desc {
 }
 
 .glad-preview.selected{
-    box-shadow: 0px 0px 5px 2px var(--color-glow);
+    box-shadow: var(--shadow-glow);
     filter: brightness(85%);
 }
 
 #fog.code pre {
-    margin: -30px -20px -10px;
+    margin: calc(-1 * var(--space-7)) calc(-1 * var(--space-5)) calc(-1 * var(--space-3));
     overflow: hidden;
-    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     max-width: 600px;
     max-height: calc(98vh - 50px);
 }
 
 #fog.code #code-ws {
-    margin: -30px -20px -10px;
+    margin: calc(-1 * var(--space-7)) calc(-1 * var(--space-5)) calc(-1 * var(--space-3));
     overflow: hidden;
-    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     max-width: 600px;
     height: calc(98vh - 50px);
 }
@@ -366,11 +366,11 @@ h3#tourn-desc {
     width: 100%;
     max-width: none;
     box-sizing: border-box;
-    border-radius: 0px 0px var(--radius-sm) var(--radius-sm);
-    margin-bottom: -2px;
-    margin-top: 2px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    margin-bottom: calc(-1 * var(--space-1));
+    margin-top: var(--space-1);
     transition: var(--duration-slower) all;
-    font-size: 1em;
+    font-size: var(--text-base);
 }
 
 #group-container .foot .button.one .plural {
@@ -381,19 +381,19 @@ h3#tourn-desc {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 #ranking-container .team {
     display: flex;
-    border-radius: 50px var(--radius-lg) var(--radius-lg) 50px;
+    border-radius: var(--radius-pill) var(--radius-lg) var(--radius-lg) var(--radius-pill);
     border: 2px solid var(--color-border);
     background-color: var(--color-surface-alt);
     color: var(--color-text);
-    margin-bottom: 5px;
-    margin-left: 15px;
-    margin-right: 15px;
-    font-size: 1.3rem;
+    margin-bottom: var(--space-2);
+    margin-left: var(--space-4);
+    margin-right: var(--space-4);
+    font-size: var(--text-lg);
     cursor: default;
     transition: var(--duration-base) all;
 }
@@ -412,7 +412,7 @@ h3#tourn-desc {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 3px;
+    margin: var(--space-1);
 }
 
 #ranking-container .team .name {
@@ -464,7 +464,7 @@ h3#tourn-desc {
 
 .timeleft {
     font-family: var(--font-digits);
-    font-size: 1rem;
+    font-size: var(--text-base);
     color: var(--color-text-strong);
     display: flex;
     flex-direction: column;
@@ -477,7 +477,7 @@ h3#tourn-desc {
 .timeleft #time {
     display: flex;
     align-items: center;
-    font-size: 2rem;
+    font-size: var(--text-2xl);
     justify-content: center;
 }
 
@@ -497,10 +497,10 @@ h3#tourn-desc {
     justify-content: center;
     align-items: center;
     width: 1.3em;
-    margin: 0px 2px;
-    font-size: 1.5rem;
+    margin: 0 var(--space-1);
+    font-size: var(--text-xl);
     border-radius: var(--radius-sm);
-    transition: var(--duration-base) background-color, color 3s;
+    transition: var(--duration-base) background-color, color var(--duration-fade);
 }
 
 .timeleft.yellow #time span {
@@ -518,7 +518,7 @@ h3#tourn-desc {
 .timeleft #text {
     display: flex;
     justify-content: space-around;
-    font-size: 0.8em;
+    font-size: var(--text-xs);
 }
 
 #button-container .arrow {
@@ -532,10 +532,10 @@ h3#tourn-desc {
 
 @media only screen and (min-width: 600px) {
     #button-container .arrow.nobutton {
-        margin: -90px 120px 0px
+        margin: calc(-1 * var(--space-11)) 120px 0
     }
     #button-container .arrow {
-        margin-top: -65px;
+        margin-top: calc(-1 * var(--space-10));
     }
 }
 
@@ -549,11 +549,11 @@ h3#tourn-desc {
 }
 
 #button-container .arrow i {
-    font-size: 5rem;
+    font-size: var(--text-5xl);
     color: var(--color-text-on-brand-muted);
     text-shadow: 1px 1px 6px var(--color-glow);
     transition: var(--duration-base) all;
-    margin: 30px;
+    margin: var(--space-7);
 }
 
 #button-container .arrow:disabled i {

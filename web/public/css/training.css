@@ -4,16 +4,16 @@
 
 #dialog-box .ui-slider {
 	height: 15px;
-    box-shadow: 0px 0px 2px var(--color-shadow) inset;
+    box-shadow: var(--shadow-inset);
 	box-sizing: border-box;
     background-color: var(--color-surface-alt);
-    margin-bottom: 15px;
-    margin-top: 10px;
+    margin-bottom: var(--space-4);
+    margin-top: var(--space-3);
 }
 
 #dialog-box .ui-slider-range {
 	background-color: var(--color-brand-muted);
-	box-shadow: 0px 0px 3px var(--color-shadow) inset
+	box-shadow: var(--shadow-inset)
 }
 
 #dialog-box .ui-slider-handle {
@@ -28,15 +28,15 @@
     border-radius: var(--radius-sm);
     line-height: 1em;
     color: var(--color-text-on-brand-muted);
-    margin-top: 24px;
-	margin-left: -25px;
+    margin-top: var(--space-6);
+	margin-left: calc(-1 * var(--space-6));
 	z-index: 0;
 }
 
 #dialog-box .ui-slider-handle:before {
 	content: "";
     position: absolute;
-    margin-top: -17px;
+    margin-top: calc(-1 * var(--space-4));
     border: solid transparent;
     border-bottom-color: var(--color-border-strong);
 	border-width: 5px 5px;
@@ -55,8 +55,8 @@
 
 .timeleft .title {
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 @media only screen and (min-width: 600px) {
@@ -64,7 +64,7 @@
         flex-direction: row;
     }
     #button-container.train .arrow {
-        margin-top: 0px;
+        margin-top: 0;
     }
 }
 
@@ -75,7 +75,7 @@
     justify-content: center;
     align-items: center;
     align-self: center;
-    margin-right: 10px;
+    margin-right: var(--space-3);
     border-radius: var(--radius-sm);
     background-color: var(--color-surface);
 }
@@ -83,16 +83,16 @@
 #group-container .group .team .score {
     background-color: var(--color-surface-strong);
     color: var(--color-accent);
-    border-radius: 50px;
-    padding: 2px;
+    border-radius: var(--radius-pill);
+    padding: var(--space-1);
     height: 25px;
     width: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 3px 5px 3px 3px;
+    margin: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
     text-shadow: 1px 1px 2px var(--color-shadow);
-    box-shadow: 0px 0px 3px var(--color-shadow) inset;
+    box-shadow: var(--shadow-inset);
 }
 
 #ranking-container .team.gold .score,
@@ -104,32 +104,32 @@
 #ranking-container .head {
     display: flex;
     justify-content: flex-end;
-    padding-right: 5px;
+    padding-right: var(--space-2);
 }
 
 #ranking-container .head .score,
 #group-container .group .head .icons .fa-star{
-	font-size: 25px;
+	font-size: var(--text-xl);
     color: var(--color-accent);
 }
 
 #ranking-container .head .time,
 #group-container .group .head .icons .fa-clock{
-	font-size: 25px;
+	font-size: var(--text-xl);
     color: var(--color-success);
 }
 
 #group-container .group .head .icons .fa-trophy{
-	font-size: 25px;
+	font-size: var(--text-xl);
     color: var(--color-accent);
-    margin-left: 8px;
+    margin-left: var(--space-3);
 }
 
 #ranking-container .head .score,
 #ranking-container .head .time {
     width: 50px;
     width: 50px;
-    margin-right: 10px;
+    margin-right: var(--space-3);
 }
 
 #group-container .foot {
@@ -146,7 +146,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: -50px;
+    margin-left: calc(-1 * var(--space-9));
     height: 1.8em;
     color: var(--color-text-on-brand);
     cursor: pointer;

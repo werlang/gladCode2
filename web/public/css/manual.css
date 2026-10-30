@@ -11,7 +11,7 @@ html {
 	display: flex;
 	justify-content: center;
 	box-sizing: border-box;
-	margin-top: 50px;
+	margin-top: var(--space-9);
 }
 
 #content-box {
@@ -19,17 +19,17 @@ html {
 	flex-direction: column;
     align-items: flex-start;
     background-color: var(--color-surface);
-    padding: 20px 15px;
+    padding: var(--space-5) var(--space-4);
 	max-width: 900px;
 	box-sizing: border-box;
 	font-family: var(--font-body);
-	margin-top: 5px;
+	margin-top: var(--space-2);
 	min-height: 100vh;
 }
 
 pre {
 	width: 100%;
-	margin-bottom: 15px;
+	margin-bottom: var(--space-4);
     margin-top: 0;
 }
 
@@ -39,7 +39,7 @@ pre {
 
 @media only screen and (min-width: 800px) {
 	#content-box {
-		padding: 80px 30px 200px;
+		padding: var(--space-11) var(--space-7) 200px;
 	}
 	pre {
 		max-width: calc(100vw - 400px);
@@ -52,38 +52,38 @@ a {
 }
 
 h1 {
-	margin: 0px 0px 30px 0px;
+	margin: 0 0 var(--space-7) 0;
 	color: var(--color-brand-text);
 	text-align: center;
 	width: 100%;
-	font-size: 2.5em;
+	font-size: var(--text-3xl);
 }
 
 h2 {
-	margin: 0px 0px 30px 0px;
+	margin: 0 0 var(--space-7) 0;
 	color: var(--color-brand-text);
 }
 
 p,ul {
-	margin: 0px 0px 20px 0px;
+	margin: 0 0 var(--space-5) 0;
 	text-align: justify;
 	width: 100%;
 }
 
 ul {
-	padding-left: 15px;
+	padding-left: var(--space-4);
 	box-sizing: border-box;
 }
 
 li {
-	margin-bottom: 10px;
+	margin-bottom: var(--space-3);
 }
 
 .video {
 	width: 100%;
     height: 300px;
 	text-align: center;
-	margin-bottom: 20px;
+	margin-bottom: var(--space-5);
 }
 
 .video iframe {
@@ -94,20 +94,20 @@ li {
 
 .nav {
     border-left: 5px solid var(--color-border-brand);
-    padding-left: 20px;
-    margin: 20px 0px 40px;
+    padding-left: var(--space-5);
+    margin: var(--space-5) 0 var(--space-8);
 }
 
 .nav a {
     display: block;
     text-decoration: none;
     color: var(--color-brand-text);
-    margin-bottom: 12px;
-    font-size: 1.2em;
+    margin-bottom: var(--space-3);
+    font-size: var(--text-lg);
 }
 
 .nav a:last-child {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 .table-wrapper {
@@ -118,7 +118,7 @@ li {
 
 #content-box img {
 	width: 100%;
-	margin-bottom: 40px;
+	margin-bottom: var(--space-8);
 }
 
 #img-coords {
@@ -137,11 +137,11 @@ li {
 #point-cost td {
 	width: 32px;
 	text-align: right;
-	padding: 0px;
+	padding: 0;
 }
 
 #xp-table {
-	margin-left: 20px;
+	margin-left: var(--space-5);
 }
 
 #xp-table td {
@@ -157,7 +157,7 @@ li {
 #point-cost th{
 	width: 60px;
 	text-align: left;
-	padding-left: 15px;
+	padding-left: var(--space-4);
 }
 
 #xp-table th {
@@ -180,7 +180,7 @@ li {
 
 @media only screen and (min-width: 900px) {
 ul {
-	padding-left: 30px;
+	padding-left: var(--space-7);
 }
 
 .col-2 {
@@ -189,12 +189,12 @@ ul {
 }
 
 .col-2 .img-container {
-	margin: 0 20px;
+	margin: 0 var(--space-5);
 }
 
 #habilidades {
 	width: 100vw;
-    margin-left: -15px;
+    margin-left: calc(-1 * var(--space-4));
 }
 
 #habilidades tr {
@@ -204,7 +204,7 @@ ul {
 
 #habilidades td,
 #habilidades th {
-	padding: 0px 10px;
+	padding: 0 var(--space-3);
 	width: 50%;
 	box-sizing: border-box;
 	text-align: left;
@@ -219,17 +219,17 @@ ul {
 	max-width: 650px;
 	line-height: normal;
 	text-align: justify;
-	padding: 5px 10px;
+	padding: var(--space-2) var(--space-3);
 }
 
 #status td:last-child {
 	line-height: normal;
 	text-align: justify;
-	padding: 5px 10px;
+	padding: var(--space-2) var(--space-3);
 }
 
 #status td:first-child {
-	font-size: 1.2em;
+	font-size: var(--text-lg);
 }
 
 @media only screen and (min-width: 600px) {
@@ -242,7 +242,7 @@ ul {
 
 	#habilidades {
 		width: 100%;
-		margin-left: 0px;
+		margin-left: 0;
 	}
 
 	#habilidades td,
@@ -275,7 +275,7 @@ ul {
 
 @media only screen and (min-width: 600px) {
 	#right-side {
-		margin-left: 340px;
+		margin-left: var(--layout-side-menu);
 	}
 }
 
@@ -289,7 +289,7 @@ ul {
 
 .block-container {
 	width: 100%;
-	margin-bottom: 15px;
+	margin-bottom: var(--space-4);
 }
 
 .block-container .block {
@@ -298,13 +298,13 @@ ul {
 }
 
 .silver {
-	margin: 0 5px;
+	margin: 0 var(--space-2);
 	color: var(--color-text-subtle);
 	text-shadow: 1px 1px 2px var(--color-shadow);
 }
 
 #tsilver, #tapot {
-	margin: 0 20px;
+	margin: 0 var(--space-5);
 	text-align: center;
 }
 
@@ -315,7 +315,7 @@ ul {
 
 #tsilver th,
 #tapot th {
-	padding: 0 10px;
+	padding: 0 var(--space-3);
 }
 
 #tpotions{

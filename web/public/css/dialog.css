@@ -7,11 +7,11 @@
 #dialog-box {
 	background-color: var(--color-surface);
     border-radius: var(--radius-sm);
-    padding: 10px 20px;
-    box-shadow: 1px 1px 5px var(--color-shadow);
+    padding: var(--space-3) var(--space-5);
+    box-shadow: var(--shadow-md);
     color: var(--color-text);
     font-family: var(--font-body);
-    font-size: 1.3em;
+    font-size: var(--text-lg);
     min-height: 100px;
     max-width: 300px;
     display: flex;
@@ -30,7 +30,7 @@
 }
 
 #dialog-box #message {
-	margin: 10px 0px;
+	margin: var(--space-3) 0;
 	cursor: default;
 }
 
@@ -45,20 +45,20 @@
 	color: var(--color-text-strong);
     border: none;
     font-family: var(--font-mono);
-    font-size: 1em;
+    font-size: var(--text-lg);
     border-radius: var(--radius-md);
     width: 100%;
-    margin: 10px 5px 0px;
-    padding: 3px 5px;
+    margin: var(--space-3) var(--space-2) 0;
+    padding: var(--space-1) var(--space-2);
 	transition: all var(--duration-base);
 	cursor: pointer;
 }
 
 #dialog-box #title {
 	display: block;
-	font-size: 1.5em;
+	font-size: var(--text-2xl);
 	font-weight: bold;
-	margin: 10px 0 20px 0;
+	margin: var(--space-3) 0 var(--space-5) 0;
 }
 
 #dialog-box .button:hover {
@@ -73,10 +73,10 @@
     border-radius: var(--radius-md);
     transition: var(--duration-slow);
     color: var(--color-text);
-    font-size: 1em;
+    font-size: var(--text-lg);
     font-family: var(--font-mono);
     background-color: transparent;
-	padding: 2px 10px;
+	padding: var(--space-1) var(--space-3);
 }
 
 #dialog-box .input:focus {
@@ -85,14 +85,14 @@
 
 #dialog-box textarea.input {
 	height: 120px;
-	font-size: 0.8em;
+	font-size: var(--text-base);
 	font-family: var(--font-body);
 }
 
 #dialog-box #charcount {
-	font-size: 0.8em;
-    margin-top: 5px;
-    margin-left: 10px;
+	font-size: var(--text-base);
+    margin-top: var(--space-2);
+    margin-left: var(--space-3);
 }
 
 #dialog-box #charcount.alert {
@@ -108,7 +108,7 @@
 	color:	var(--color-success);
 	border: 1px solid var(--color-border-brand);
 	border-radius: var(--radius-sm);
-	box-shadow: 1px 1px 2px var(--color-shadow);
+	box-shadow: var(--shadow-xs);
 	max-height: 100%;
 	width: 600px;
 	max-width: 100%;
@@ -127,9 +127,9 @@
 
 #terminal #title span {
     color: var(--color-text-on-brand);
-    font-size: 1.1em;
+    font-size: var(--text-md);
     width: 100%;
-    margin-left: 20px;
+    margin-left: var(--space-5);
     text-shadow: 1px 1px 2px var(--color-shadow);
 }
 
@@ -149,7 +149,7 @@
 }
 
 #terminal pre {
-	padding: 20px 10px;
+	padding: var(--space-5) var(--space-3);
 	margin: 0;
 	white-space: pre-wrap;
 	overflow-y: auto;
@@ -164,22 +164,22 @@
 	position: fixed;
     bottom: 0;
     right: 0;
-    margin-right: 20px;
-    margin-bottom: 80px;
+    margin-right: var(--space-5);
+    margin-bottom: var(--space-11);
     border-radius: var(--radius-md);
 	box-sizing: border-box;
-	z-index: 6;
-	padding: 10px 20px;
+	z-index: calc(var(--z-raised) + 5);
+	padding: var(--space-3) var(--space-5);
 	color: var(--color-text-on-brand);
 	font-family: var(--font-body);
 	display: flex;
 	align-items: center;
 	text-shadow: 0px 0px 3px var(--color-shadow);
-    box-shadow: 1px 1px 10px 0px var(--color-shadow);
+    box-shadow: var(--shadow-md);
 }
 
 .toast i {
-	font-size: 1.3em;
+	font-size: var(--text-lg);
 }
 
 .toast.info {
@@ -195,7 +195,7 @@
 }
 
 .toast i {
-	margin-right: 10px;
+	margin-right: var(--space-3);
 }
 
 body .ui-tooltip {
@@ -203,9 +203,9 @@ body .ui-tooltip {
     background-color: var(--color-scrim);
     border-radius: var(--radius-sm);
     color: var(--color-text-on-brand);
-    padding: 3px 8px;
+    padding: var(--space-1) var(--space-3);
     font-family: var(--font-body);
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	border: 1px solid var(--color-text-on-brand);
 	cursor: default;
 	user-select: none;

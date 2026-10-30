@@ -1,12 +1,12 @@
 body{
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 16px;
+    font-size: var(--text-base);
 }
 
 h1 {
     color: var(--color-brand-text);
-    margin-bottom: 50px;
+    margin-bottom: var(--space-9);
     width: 100%;
     text-align: center;
 }
@@ -34,7 +34,7 @@ h2 {
     display: flex;
     justify-content: center;
     box-sizing: border-box;
-    margin-top: 50px;
+    margin-top: var(--space-9);
 }
 
 #content-box {
@@ -42,8 +42,8 @@ h2 {
     flex-direction: column;
     align-items: flex-start;
     background-color: var(--color-surface);
-    border-radius: 0px;
-    padding: 20px 15px;
+    border-radius: 0;
+    padding: var(--space-5) var(--space-4);
     width: 100%;
     max-width: 600px;
     box-sizing: border-box;
@@ -53,18 +53,18 @@ h2 {
 
 @media only screen and (min-width: 800px) {
     #frame {
-        padding-top: 65px;
+        padding-top: var(--space-10);
     }
 
     #content-box {
-        padding: 20px 0px 60px 0px;
+        padding: var(--space-5) 0 var(--space-10) 0;
     }
 }
 
 .table {
     width: 100%;
     cursor: default;
-    box-shadow: 0px 0px 3px var(--color-shadow);
+    box-shadow: var(--shadow-sm);
 }
 
 .table tr {
@@ -82,13 +82,13 @@ h2 {
 
 .table th {
     background-color: var(--color-brand-muted);
-    padding-left: 15px;
+    padding-left: var(--space-4);
     text-align: left;
     color: var(--color-text-on-brand-muted);
 }
 
 .table td {
-    padding-left: 15px;
+    padding-left: var(--space-4);
 }
 
 .input {
@@ -97,48 +97,48 @@ h2 {
     border-bottom: 2px solid var(--color-border);
     transition: var(--duration-slow);
     color: var(--color-text);
-    font-size: 1em;
+    font-size: var(--text-md);
     background-color: transparent;
     transition: border var(--duration-slow);
     color: var(--color-brand-text);
     width: 100px;
     text-align: center;
-    margin: 0px 10px;
+    margin: 0 var(--space-3);
 }
 .input:focus {
     border-bottom: 2px solid var(--color-border-brand);
 }
 
 #search-container {
-    margin-bottom: 35px;
+    margin-bottom: var(--space-7);
     display: flex;
     flex-direction: column;
     align-items: center;
     align-self: center;
-    font-size: 1.1em;
+    font-size: var(--text-md);
 }
 
 #search-container #mmr-container {
-    margin-top: 20px;
+    margin-top: var(--space-5);
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
 #search-container #mmr-container span {
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 #search-container .ui-slider {
     height: 15px;
-    box-shadow: 0px 0px 2px var(--color-shadow) inset;
+    box-shadow: var(--shadow-inset);
     box-sizing: border-box;
     background-color: var(--color-surface-alt);
 }
 
 #search-container .ui-slider-range {
     background-color: var(--color-brand-muted);
-    box-shadow: 0px 0px 3px var(--color-shadow) inset
+    box-shadow: var(--shadow-inset)
 }
 
 #search-container .ui-slider-handle {
@@ -153,15 +153,15 @@ h2 {
     border-radius: var(--radius-sm);
     line-height: 1em;
     color: var(--color-text-on-brand-muted);
-    margin-top: 24px;
-    margin-left: -25px;
+    margin-top: var(--space-6);
+    margin-left: calc(-1 * var(--space-6));
     z-index: 0;
 }
 
 #search-container .ui-slider-handle:before {
     content: "";
     position: absolute;
-    margin-top: -15px;
+    margin-top: calc(-1 * var(--space-4));
     border: solid transparent;
     border-bottom-color: var(--color-border-strong);
     border-width: 5px 5px;
@@ -178,7 +178,7 @@ h2 {
     text-align: center;
     background-color: var(--color-brand-muted);
     border-radius: var(--radius-sm);
-    box-shadow: 0px 0px 3px var(--color-shadow);
+    box-shadow: var(--shadow-sm);
     color: var(--color-text-on-brand);
     cursor: default;
 }
@@ -197,8 +197,8 @@ h2 {
     background-color: var(--color-surface);
     color: var(--color-text);
     font-weight: bold;
-    border-radius: 0px 0px 4px 4px;
-    font-size: 1.4em;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    font-size: var(--text-xl);
 }
 
 #single-stats #low-battles {
@@ -206,11 +206,11 @@ h2 {
     background-color: var(--color-danger-soft);
     border-radius: var(--radius-round);
     position: absolute;
-    box-shadow: 0px 0px 3px var(--color-shadow);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: var(--duration-base) all;
     margin-left: 149px;
-    margin-top: -4px;
+    margin-top: calc(-1 * var(--space-2));
     display: flex;
 }
 
@@ -224,8 +224,8 @@ h2 {
 }
 
 .table .info {
-    font-size: 0.8em;
-    margin-left: 2px;
+    font-size: var(--text-xs);
+    margin-left: var(--space-1);
     cursor: pointer;
     opacity: 0.5;
 }
@@ -240,7 +240,7 @@ h2 {
 
 @media only screen and (min-width: 600px) {
     #right-side {
-        margin-left: 340px;
+        margin-left: var(--layout-side-menu);
     }
 }
 
@@ -254,11 +254,11 @@ h2 {
 #t-pot th:first-child,
 #t-pot td:first-child{
     text-align: left;
-    padding-left: 15px;
+    padding-left: var(--space-4);
 }
 
 #t-pot td:last-child{
-    padding-right: 15px;
+    padding-right: var(--space-4);
 }
 
 #t-pot div {
@@ -273,16 +273,16 @@ h2 {
 }
 
 #t-pot .up {
-    margin-top: -15px;
-    margin-left: -10px;
-    font-size: 0.8em;
+    margin-top: calc(-1 * var(--space-4));
+    margin-left: calc(-1 * var(--space-3));
+    font-size: var(--text-xs);
     color: var(--color-text);
 }
 
 #t-pot .down {
-    margin-top: 15px;
-    margin-right: -10px;
-    font-size: 0.8em;
+    margin-top: var(--space-4);
+    margin-right: calc(-1 * var(--space-3));
+    font-size: var(--text-xs);
     color: var(--color-text);
 }
 

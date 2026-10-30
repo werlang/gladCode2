@@ -1,7 +1,7 @@
 body{
 	margin: 0;
 	font-family: var(--font-mono);
-	font-size: 16px;
+	font-size: var(--text-base);
 }
 
 /* width */
@@ -33,7 +33,7 @@ body{
 #header-container {
     background-color: var(--color-header-bg);
     width: 100vw;
-	z-index: 3;
+	z-index: calc(var(--z-raised) + 2);
 	position: fixed;
 	top: 0;
 }
@@ -46,7 +46,7 @@ body{
 	display: flex;
 	align-items: flex-start;
 	justify-content: flex-start;
-	font-size: 1rem;
+	font-size: var(--text-base);
 	font-family: var(--font-body);
 	position: fixed;
 	top: 0;
@@ -54,7 +54,7 @@ body{
 
 #header #logo {
 	margin-left: 0;
-	margin-right: 20px;
+	margin-right: var(--space-5);
 	height: 100%;
 	display: flex;
     align-items: center;
@@ -72,10 +72,10 @@ body{
 
 #header #search {
 	display: none;
-	font-size: 25px;
+	font-size: var(--text-xl);
 	color: var(--color-text-strong);
 	align-self: center;
-	margin-right: 10px;
+	margin-right: var(--space-3);
 	margin-left: auto;
 }
 
@@ -84,9 +84,9 @@ body{
 }
 
 #header #h-items {
-	margin-right: 15px;
+	margin-right: var(--space-4);
     font-family: var(--font-mono);
-	font-size: 1.2rem;
+	font-size: var(--text-lg);
 	display: none;
 }
 
@@ -98,7 +98,7 @@ body{
     height: 35px;
     width: 35px;
 	align-self: center;
-    margin: 0px 20px;
+    margin: 0 var(--space-5);
 }
 
 @media only screen and (min-width: 800px) {
@@ -130,7 +130,7 @@ body{
 	}
 
 	#header #logo img {
-		margin-left: 15px;
+		margin-left: var(--space-4);
 		max-height: 40px;
 	}
 
@@ -156,7 +156,7 @@ body{
 }
 
 #header #h-items .item .title {
-	padding: 0px 10px;
+	padding: 0 var(--space-3);
 }
 
 #header #h-items .item-container {
@@ -175,7 +175,7 @@ body{
 }
 
 #header .item a {
-	padding: 0px 20px;
+	padding: 0 var(--space-5);
 	text-decoration: none;
     color: var(--color-header-text);
     height: 100%;
@@ -203,7 +203,7 @@ body{
 
 #fog {
 	position: fixed;
-	z-index: 5;
+	z-index: calc(var(--z-raised) + 4);
 	top: 0;
 	bottom: 0;
 	right: 0;
@@ -219,7 +219,7 @@ body{
 	max-width: 250px;
 	height: 100%;
 	background-color: var(--color-header-bg);
-	box-shadow: 1px 0px 5px var(--color-shadow);
+	box-shadow: var(--shadow-md);
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -238,21 +238,21 @@ body{
 }
 
 #fog #menu .item-container {
-	margin-left: 10px;
+	margin-left: var(--space-3);
 }
 
 #fog #menu .item.drop-menu .title {
 	color: var(--color-text-muted);
     font-family: var(--font-mono);
     font-weight: bold;
-    font-size: 1.3em;
+    font-size: var(--text-lg);
     background-color: var(--color-brand-hover);
-    padding: 5px;}
+    padding: var(--space-2);}
 
 #fog #menu a {
 	text-decoration: none;
 	font-family: var(--font-mono);
-	font-size: 1.3em;
+	font-size: var(--text-lg);
 	color: var(--color-header-text);
 	font-weight: bold;
 	white-space: nowrap;
@@ -265,7 +265,7 @@ body{
 	height: 50px;
     display: flex;
     align-items: center;
-	padding-left: 15px;
+	padding-left: var(--space-4);
 }
 
 #fog #menu a div:hover{
@@ -274,33 +274,33 @@ body{
 
 #fog #menu img {
 	width: 100%;
-	padding: 10px;
+	padding: var(--space-3);
 	box-shadow: 0px 1px 0px var(--color-shadow);
 	box-sizing: border-box;
 }
 
 #footer {
-    font-size: 1rem;
+    font-size: var(--text-base);
     display: flex;
     flex-direction: column;
     align-items: center;
     font-family: var(--font-body);
     color: var(--color-brand-text);
     width: 100%;
-    margin-top: 50px;
+    margin-top: var(--space-9);
     background-color: color-mix(in srgb, var(--color-footer-bg) 6%, transparent);
     border-top: 1px solid color-mix(in srgb, var(--color-border-brand) 15%, transparent);
     box-sizing: border-box;
-    padding: 35px 0px;
+    padding: var(--space-7) 0;
 }
 
 #footer #img-container {
-	margin-bottom: 15px;
+	margin-bottom: var(--space-4);
 }
 
 #footer img {
 	height: 20px;
-	margin: 0px 10px;
+	margin: 0 var(--space-3);
 	filter: brightness(0) saturate(1) invert(18%) sepia(91%) saturate(2679%) hue-rotate(181deg) brightness(97%) contrast(101%);
 }
 
@@ -308,10 +308,10 @@ body{
 }
 
 #header #h-items .item #language{
-	font-size: 0.9em;
+	font-size: var(--text-md);
     font-weight: normal;
 }
 
 #google-login {
-	margin-top: 25px;
+	margin-top: var(--space-6);
 }

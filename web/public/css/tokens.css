@@ -212,12 +212,45 @@
        --font-display (per theme, below) is for headings only */
     --font-game: var(--font-classic);
 
+    /* ---- Type scale: node-aec's names on the sizes gladCode uses (10 to 64px), in px because
+       the 2D replay scales its root font size (rem would shrink there); larger glyphs multiply
+       --text-base ---- */
+    --text-2xs: 10px;
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-md: 18px;
+    --text-lg: 20px;
+    --text-xl: 24px;
+    --text-2xl: 32px;
+    --text-3xl: 40px;
+    --text-4xl: 48px;
+    --text-5xl: 64px;
+
+    /* ---- Space: gladCode's 5px rhythm (margins, paddings, gaps) ---- */
+    --space-hairline: 1px;
+    --space-1: 2px;
+    --space-2: 5px;
+    --space-3: 10px;
+    --space-4: 15px;
+    --space-5: 20px;
+    --space-6: 25px;
+    --space-7: 30px;
+    --space-8: 40px;
+    --space-9: 50px;
+    --space-10: 60px;
+    --space-11: 80px;
+
+    /* ---- Layout: dimensions several sheets share ---- */
+    --layout-side-menu: 340px;
+
     /* ---- Radius ---- */
     --radius-xs: 2px;
     --radius-sm: 3px;
     --radius-md: 5px;
     --radius-lg: 10px;
     --radius-xl: 20px;
+    --radius-2xl: 32px;
     --radius-round: 50%;
     --radius-pill: 999px;
 
@@ -227,6 +260,8 @@
     --duration-base: 0.3s;
     --duration-slow: 0.5s;
     --duration-slower: 1s;
+    --duration-pulse: 1.6s;
+    --duration-fade: 2s;
     --ease-standard: ease;
 
     /* ---- Layers ---- */
@@ -315,10 +350,12 @@
     --color-pick-item-selected: #9292c5;
 
     --color-shadow: rgb(60 40 10 / 0.35);
+    --shadow-xs: 0 0 2px var(--color-shadow);
     --shadow-sm: 0 0 3px var(--color-shadow);
     --shadow-md: 0 2px 6px var(--color-shadow);
     --shadow-lg: 0 14px 40px var(--color-shadow);
     --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-halo: 0 0 5px 2px var(--color-shadow);
     --shadow-glow: 0 0 6px 2px rgb(242 180 65 / 0.45);
 
     --focus-ring-color: var(--arena-gold-deep);
@@ -397,10 +434,12 @@
     --color-pick-item-selected: #9292c5;
 
     --color-shadow: rgb(0 0 0 / 0.55);
+    --shadow-xs: 0 0 2px var(--color-shadow);
     --shadow-sm: 0 0 3px var(--color-shadow);
     --shadow-md: 1px 1px 5px var(--color-shadow);
     --shadow-lg: 3px 3px 15px -1px var(--color-shadow);
     --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-halo: 0 0 5px 2px var(--color-shadow);
     --shadow-glow: 0 0 5px 2px var(--color-glow);
 
     --focus-ring-color: var(--classic-glow);
@@ -479,10 +518,12 @@
     --color-pick-item-selected: rgb(124 144 255 / 0.42);
 
     --color-shadow: rgb(0 0 0 / 0.6);
+    --shadow-xs: 0 0 2px var(--color-shadow);
     --shadow-sm: 0 0 3px var(--color-shadow);
     --shadow-md: 0 2px 8px var(--color-shadow);
     --shadow-lg: 0 18px 50px var(--color-shadow);
     --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-halo: 0 0 5px 2px var(--color-shadow);
     --shadow-glow: 0 0 6px 2px rgb(49 167 199 / 0.45);
 
     --focus-ring-color: var(--arena-gold);

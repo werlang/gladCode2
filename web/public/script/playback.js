@@ -592,7 +592,7 @@ function createDetailedWindow() {
     fadeIn(details);
     makeDraggable(details, details.querySelector('#title'));
     details.querySelector('#minimize').addEventListener('click', () => {
-        details.style.transition = 'top 0.4s, left 0.4s';
+        details.style.transition = 'top var(--duration-slow), left var(--duration-slow)';
         details.style.top = `${window.innerHeight - 33}px`;
         details.style.left = `${window.innerWidth - 350}px`;
         setTimeout(() => {

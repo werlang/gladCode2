@@ -10,13 +10,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 60px;
-    margin-bottom: 90px;
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-11);
 }
 #content-box {
     width: 100%;
     max-width: 600px;
-    margin: 0px 20px;
+    margin: 0 var(--space-5);
     text-align: justify;
     font-family: var(--font-body);
     color: var(--color-text);
@@ -25,7 +25,7 @@ h1, h2, h3 {
     color: var(--color-brand-text);
 }
 h2 {
-    margin-top: 30px;
+    margin-top: var(--space-7);
 }
 a {
     color: var(--color-link);
@@ -34,31 +34,31 @@ a {
 #post {
     display: flex;
     flex-direction: column;
-    padding: 20px 10px;
+    padding: var(--space-5) var(--space-3);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
 	background-color: var(--color-surface);
 	box-sizing: border-box;
 	font-family: var(--font-body);
 	margin: 0;
-    box-shadow: 1px 1px 5px 0px var(--color-shadow);
+    box-shadow: var(--shadow-md);
     width: 100%;
     max-width: 600px;
 }
 
 #post .title {
-	font-size: 1.7em;
+	font-size: var(--text-xl);
 	font-weight: bold;
-	margin-bottom: 15px;
+	margin-bottom: var(--space-4);
 	color: var(--color-brand-text);
 }
 
 #post .time {
 	color: var(--color-text-muted);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-3);
 	border-bottom: 1px solid;
-	font-size: 0.9em;
+	font-size: var(--text-sm);
 }
 
 #post .body {
@@ -74,8 +74,8 @@ a {
 
 @media only screen and (min-width: 600px) {
     #post{
-        margin: 20px 10px;
-        padding: 20px 30px;
+        margin: var(--space-5) var(--space-3);
+        padding: var(--space-5) var(--space-7);
         max-width: 900px;
     }
 }
@@ -85,26 +85,26 @@ a {
     display: flex;
     justify-content: space-around;
     max-width: 600px;
-    font-size: 0.7rem;
-    margin-top: 20px;
+    font-size: var(--text-xs);
+    margin-top: var(--space-5);
 }
 
 #button-container a {
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-size: 1.3em;
+    font-size: var(--text-lg);
     border-radius: var(--radius-sm);
     transition: var(--duration-base) all;
 }
 
 #button-container span {
-    margin: 0px 20px;
+    margin: 0 var(--space-5);
 }
 
 #button-container i {
-    font-size: 2em;
-    margin: 10px 20px;
+    font-size: var(--text-3xl);
+    margin: var(--space-3) var(--space-5);
 }
 
 #button-container a:hover {
@@ -120,6 +120,6 @@ a {
 
 @media only screen and (min-width: 600px) {
     #button-container {
-        font-size: 1rem;
+        font-size: var(--text-base);
     }
 }
