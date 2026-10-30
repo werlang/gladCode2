@@ -192,6 +192,7 @@ Rules for `web/public/script/` (the layout is described under [Web](#2-web-web))
    docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
    docker compose exec -T api npx vitest run
    docker compose exec -T web npm test        # page routes and old-address redirects
+   docker run --rm -v "$PWD":/w -v /w/migrations/node_modules -w /w/migrations node:22-alpine sh -c "npm ci && npm test"   # migration runner
    ```
 
    `npm run lint` covers `web/` and `api/` and must report no errors: modules get `no-undef`, `no-var`, `no-redeclare`, `no-use-before-define` and `prefer-const`; the classic `render.js` and `floatingText.js` only get the correctness rules until they are rewritten. `npm test` runs `tests/frontend/` and `tests/render2/`; new pure helpers get a test there.

@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
+import { readdirSync } from 'node:fs';
 import test from 'node:test';
 
 import { migrate, splitSqlStatements } from '../../migrations/scripts/migrate.js';
+
+/** Every migration file, as the runner records it: `[version, name]`, in order. */
+const MIGRATIONS = readdirSync(new URL('../../migrations/', import.meta.url))
+    .filter(name => /^\d+_.*\.sql$/.test(name))
+    .sort()
+    .map(name => [Number.parseInt(name, 10), name]);
 
 /**
  * Builds an in-memory fake of the Mysql helper contract ({ connect, query,
@@ -65,7 +72,7 @@ test('keeps dashes inside string literals and HTML bodies intact', () => {
 });
 
 test('acquires lock, bootstraps tracking table, skips applied versions, releases lock', async () => {
-    const db = makeFakeDb({ applied: [1, 2, 3] });
+    const db = makeFakeDb({ applied: MIGRATIONS.map(([version]) => version) });
     await migrate({ db });
 
     const poolCalls = db.calls.filter(call => call.scope === 'pool');
@@ -116,13 +123,11 @@ test('carries current-version gladiators forward once the baseline applied', asy
         .join('\n');
     assert.match(txSql, /UPDATE `gladiators` SET `version` = '2\.9\.3' WHERE `version` = '2\.9\.2'/);
     assert.match(txSql, /UPDATE `gladiators` SET `version` = '2\.10\.0' WHERE `version` = '2\.9\.3'/);
-    assert.ok(!txSql.includes('CREATE TABLE'));
+    // the baseline schema is not run again
+    assert.doesNotMatch(txSql, /CREATE TABLE `amizade`/);
 
     const records = db.calls.filter(call => call.sql.startsWith('INSERT INTO schema_migrations'));
-    assert.deepEqual(records.map(r => r.params), [
-        [2, '002_bump_gladiators_to_2_9_3.sql'],
-        [3, '003_bump_gladiators_to_2_10_0.sql'],
-    ]);
+    assert.deepEqual(records.map(r => r.params), MIGRATIONS.slice(1));
 });
 
 test('baseline records old files without executing them, then migrates forward', async () => {
@@ -133,15 +138,11 @@ test('baseline records old files without executing them, then migrates forward',
         .filter(call => call.scope === 'tx')
         .map(call => call.sql)
         .join('\n');
-    assert.ok(!txSql.includes('CREATE TABLE'));
+    assert.doesNotMatch(txSql, /CREATE TABLE `amizade`/);
     assert.match(txSql, /UPDATE `gladiators`/);
 
     const records = db.calls
         .filter(call => call.sql.startsWith('INSERT INTO schema_migrations'))
         .map(call => call.params);
-    assert.deepEqual(records, [
-        [1, '001_initial_schema.sql'],
-        [2, '002_bump_gladiators_to_2_9_3.sql'],
-        [3, '003_bump_gladiators_to_2_10_0.sql'],
-    ]);
+    assert.deepEqual(records, MIGRATIONS);
 });

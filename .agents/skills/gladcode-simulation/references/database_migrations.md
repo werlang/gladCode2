@@ -21,7 +21,7 @@ named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 - `migrations/helpers/mysql.js` — shared driver helper (env-configured pool,
   `{ rows }` result normalization, `withTransaction`). Models are the only
   normal production callers.
-- `tests/migrations/migrate.test.mjs` — `node:test` coverage for the splitter
+- `tests/migrations/migrate.test.mjs` — `node:test` coverage for the splitter (run it from `migrations/`: `npm ci && npm test`)
   and the runner (fake-DB injected, no live database needed).
 
 ## How it works

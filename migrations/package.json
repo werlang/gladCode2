@@ -4,7 +4,8 @@
     "description": "Versioned MySQL migrations for gladcode2",
     "type": "module",
     "scripts": {
-        "db:migrate": "node scripts/migrate.js"
+        "db:migrate": "node scripts/migrate.js",
+        "test": "node --test ../tests/migrations/*.test.mjs"
     },
     "dependencies": {
         "mysql2": "^3.24.3"

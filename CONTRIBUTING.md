@@ -15,6 +15,7 @@ docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm 
 # API unit tests
 docker compose exec -T api npx vitest run
 docker compose exec -T web npm test
+docker run --rm -v "$PWD":/w -v /w/migrations/node_modules -w /w/migrations node:22-alpine sh -c "npm ci && npm test"
 
 # after changing a route: regenerate docs/api/README.md
 docker run --rm -v "$PWD":/w -w /w node:22-alpine node api/scripts/api-docs.js
