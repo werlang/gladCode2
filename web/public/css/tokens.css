@@ -1,0 +1,299 @@
+/*
+ * gladCode design tokens: the single source of shared values (docs/design-system.md).
+ * Every stylesheet references these with var(--...) instead of literal colours, fonts, radii,
+ * shadows, durations and layers.
+ *
+ * Two themes map the same roles: Classic (light, the default) on :root and Arena (dark) on
+ * :root.theme-arena. script/theme-boot.js sets the class before the page paints, from the
+ * master's choice (cached in localStorage) or the system colour scheme.
+ */
+
+/* Self-hosted fonts (OFL, licences in /fonts). Latin subset: Portuguese and English. */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/roboto.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('/fonts/source-code-pro.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Acme';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/acme.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Cinzel';
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url('/fonts/cinzel.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Orbitron';
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url('/fonts/orbitron.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+    /* ---- Raw palettes: never referenced outside this file ---- */
+
+    /* Classic: the light pages, built on the brand blue */
+    --classic-white: #ffffff;
+    --classic-page: #edf1f3;
+    --classic-grey-50: #fafafa;
+    --classic-grey-100: #eeeeee;
+    --classic-grey-200: #e0e0e0;
+    --classic-grey-300: #d4d4d4;
+    --classic-grey-400: #bcbcbc;
+    --classic-grey-500: #8f98a3;
+    --classic-grey-600: #7d7d7d;
+    --classic-grey-700: #646464;
+    --classic-grey-800: #575757;
+    --classic-grey-900: #1b2a35;
+    --classic-blue: #00638d;
+    --classic-blue-deep: #004e6f;
+    --classic-blue-muted: #6c97a9;
+    --classic-blue-tint: #eefaff;
+    --classic-blue-mist: #cee1e8;
+    --classic-sky: #1e86d8;
+    --classic-royal: #3165b9;
+    --classic-glow: #4286f4;
+    --classic-gold: #ffca28;
+    --classic-gold-deep: #c1922a;
+    --classic-red: #e53935;
+    --classic-red-tint: #fdeaea;
+    --classic-green: #27a844;
+    --classic-green-tint: #a4e6a6;
+    --classic-amber: #f59e0b;
+
+    /* Arena: the coliseum at night, from the front page and the 3D replay */
+    --arena-ink-950: #08151f;
+    --arena-ink-900: #0b1d2b;
+    --arena-ink-800: #10283a;
+    --arena-ink-700: #173650;
+    --arena-ink-600: #1f4664;
+    --arena-ink-500: #2d5470;
+    --arena-stone-400: #4d6273;
+    --arena-stone-300: #6f8798;
+    --arena-mist-200: #9db2c1;
+    --arena-mist-100: #edf1f3;
+    --arena-sand: #e9d6ad;
+    --arena-sand-light: #f3e8d0;
+    --arena-sand-dark: #b99a63;
+    --arena-bronze: #9d6b32;
+    --arena-gold: #f2b441;
+    --arena-gold-deep: #c98918;
+    --arena-blood: #c4412f;
+    --arena-blood-bright: #e2604f;
+    --arena-blue: #00638d;
+    --arena-blue-bright: #31a7c7;
+    --arena-blue-light: #5cc3e0;
+    --arena-green: #4fd46a;
+
+    /* ---- Type ---- */
+    --font-body: 'Roboto', system-ui, sans-serif;
+    --font-mono: 'Source Code Pro', ui-monospace, Consolas, monospace;
+    --font-digits: 'Orbitron', var(--font-mono);
+    --font-arena: 'Cinzel', Georgia, serif;
+    --font-classic: 'Acme', 'Roboto', sans-serif;
+
+    /* ---- Radius ---- */
+    --radius-xs: 2px;
+    --radius-sm: 3px;
+    --radius-md: 5px;
+    --radius-lg: 10px;
+    --radius-xl: 20px;
+    --radius-round: 50%;
+    --radius-pill: 999px;
+
+    /* ---- Motion ---- */
+    --duration-fast: 0.15s;
+    --duration-quick: 0.2s;
+    --duration-base: 0.3s;
+    --duration-slow: 0.5s;
+    --duration-slower: 1s;
+    --ease-standard: ease;
+
+    /* ---- Layers ---- */
+    --z-below: -1;
+    --z-raised: 1;
+    --z-float: 10;
+    --z-dropdown: 20;
+    --z-header: 100;
+    --z-dialog: 9999;
+
+    /* ---- Focus ---- */
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+}
+
+/* ---- Classic role mapping (default) ---- */
+:root,
+:root.theme-classic {
+    color-scheme: light;
+
+    --font-display: var(--font-classic);
+
+    --color-page: var(--classic-page);
+    --color-surface: var(--classic-white);
+    --color-surface-alt: var(--classic-grey-100);
+    --color-surface-strong: var(--classic-grey-300);
+    --color-surface-sunken: var(--classic-grey-50);
+    --color-neutral: var(--classic-grey-500);
+    --color-overlay: rgb(0 0 0 / 0.74);
+    --color-scrim: rgb(0 0 0 / 0.5);
+
+    --color-text: var(--classic-grey-700);
+    --color-text-strong: var(--classic-grey-900);
+    --color-text-muted: var(--classic-grey-600);
+    --color-text-subtle: var(--classic-grey-400);
+    --color-text-on-brand: var(--classic-white);
+    --color-text-on-brand-muted: var(--classic-blue-mist);
+    --color-text-on-accent: var(--classic-grey-900);
+
+    --color-brand: var(--classic-blue);
+    --color-brand-hover: var(--classic-blue-deep);
+    --color-brand-muted: var(--classic-blue-muted);
+    --color-brand-soft: var(--classic-blue-tint);
+    --color-brand-text: var(--classic-blue);
+    --color-link: var(--classic-blue);
+    --color-secondary: var(--classic-sky);
+    --color-secondary-strong: var(--classic-royal);
+    --color-glow: var(--classic-glow);
+
+    --color-accent: var(--classic-gold);
+    --color-accent-strong: var(--classic-gold-deep);
+
+    --color-border: var(--classic-grey-300);
+    --color-border-strong: var(--classic-grey-800);
+    --color-border-brand: var(--classic-blue);
+    --color-border-brand-muted: var(--classic-blue-muted);
+
+    --color-danger: var(--classic-red);
+    --color-danger-soft: var(--classic-red-tint);
+    --color-success: var(--classic-green);
+    --color-success-soft: var(--classic-green-tint);
+    --color-warning: var(--classic-amber);
+    --color-info: var(--classic-sky);
+
+    --color-terminal-bg: #000000;
+    --color-terminal-text: #00ff00;
+    --color-code-bg: var(--classic-grey-50);
+
+    --color-header-bg: var(--classic-blue);
+    --color-header-text: var(--classic-white);
+
+    --color-shadow: rgb(0 0 0 / 0.55);
+    --shadow-sm: 0 0 3px var(--color-shadow);
+    --shadow-md: 1px 1px 5px var(--color-shadow);
+    --shadow-lg: 3px 3px 15px -1px var(--color-shadow);
+    --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-glow: 0 0 5px 2px var(--color-glow);
+
+    --focus-ring-color: var(--classic-glow);
+}
+
+/* ---- Arena role mapping ---- */
+:root.theme-arena {
+    color-scheme: dark;
+
+    --font-display: var(--font-arena);
+
+    --color-page: var(--arena-ink-900);
+    --color-surface: var(--arena-ink-800);
+    --color-surface-alt: var(--arena-ink-700);
+    --color-surface-strong: var(--arena-ink-600);
+    --color-surface-sunken: var(--arena-ink-950);
+    --color-neutral: var(--arena-stone-400);
+    --color-overlay: rgb(5 13 20 / 0.82);
+    --color-scrim: rgb(5 13 20 / 0.6);
+
+    --color-text: var(--arena-mist-100);
+    --color-text-strong: #ffffff;
+    --color-text-muted: var(--arena-mist-200);
+    --color-text-subtle: var(--arena-stone-300);
+    --color-text-on-brand: #ffffff;
+    --color-text-on-brand-muted: var(--arena-mist-200);
+    --color-text-on-accent: var(--arena-ink-900);
+
+    --color-brand: var(--arena-blue);
+    --color-brand-hover: #0a78a6;
+    --color-brand-muted: var(--arena-ink-500);
+    --color-brand-soft: rgb(49 167 199 / 0.14);
+    --color-brand-text: var(--arena-sand);
+    --color-link: var(--arena-blue-light);
+    --color-secondary: var(--arena-blue-bright);
+    --color-secondary-strong: var(--arena-blue-light);
+    --color-glow: var(--arena-blue-bright);
+
+    --color-accent: var(--arena-gold);
+    --color-accent-strong: var(--arena-gold-deep);
+
+    --color-border: rgb(237 241 243 / 0.14);
+    --color-border-strong: var(--arena-stone-400);
+    --color-border-brand: var(--arena-sand-dark);
+    --color-border-brand-muted: rgb(185 154 99 / 0.45);
+
+    --color-danger: var(--arena-blood-bright);
+    --color-danger-soft: rgb(196 65 47 / 0.22);
+    --color-success: var(--arena-green);
+    --color-success-soft: rgb(79 212 106 / 0.18);
+    --color-warning: var(--arena-gold);
+    --color-info: var(--arena-blue-bright);
+
+    --color-terminal-bg: var(--arena-ink-950);
+    --color-terminal-text: var(--arena-green);
+    --color-code-bg: var(--arena-ink-950);
+
+    --color-header-bg: var(--arena-ink-950);
+    --color-header-text: var(--arena-sand);
+
+    --color-shadow: rgb(0 0 0 / 0.6);
+    --shadow-sm: 0 0 3px var(--color-shadow);
+    --shadow-md: 0 2px 8px var(--color-shadow);
+    --shadow-lg: 0 18px 50px var(--color-shadow);
+    --shadow-inset: inset 0 0 3px var(--color-shadow);
+    --shadow-glow: 0 0 6px 2px rgb(49 167 199 / 0.45);
+
+    --focus-ring-color: var(--arena-gold);
+}
+
+/* Element defaults every page shares */
+html {
+    background-color: var(--color-page);
+}
+
+body {
+    color: var(--color-text);
+    font-family: var(--font-body);
+}
+
+:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
