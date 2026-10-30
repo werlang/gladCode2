@@ -1,0 +1,43 @@
+---
+name: frontend-development
+description: Build or change gladCode's web service and browser code — web/app.js page routes and old-address redirects, Mustache views in web/view, the render middleware and import map, and the ES modules in web/public/script (page entries, components, helpers, models, templates, profile, editor). Use for any page, frontend module or API call from the browser. Excludes the 3D renderer internals (render2/), which AGENTS.md documents in full.
+---
+
+# gladCode frontend development
+
+Localizes the global `web-frontend` skill (with `security-defense-and-mitigation` for escaping): follow it for the method; this file holds what is true in gladCode. On project facts, this file wins. The full rule list is AGENTS.md → [Frontend Standards](../../../AGENTS.md#frontend-standards).
+
+## Where
+
+- `web/app.js`: `page(route, view, clientVars)` per page, static files (`redirect: false`), `/profpics`, maintenance mode after static files, the old-address redirect (`legacyPageUrl` in `web/helpers/urls.js`) registered after every page route.
+- `web/middleware/render.js`: `res.page()`; views get `{{#asset}}`/`{{#module}}` (mtime-versioned URLs), `{{{importMap}}}` and `{{{templateVars}}}` (`web/helpers/safe-json.js`). Import maps, asset URLs and the view list are cached when `NODE_ENV=production`.
+- `web/helpers/modules.js`: the import map over `MODULE_DIRS` (add new script folders there); `render2: true` adds three.js and `script/render2/`.
+- `web/view/*.html`: one Mustache view per page plus `header`, `footer`, `analytics` partials.
+- `web/public/script/`: page entries (`*.js`), `components/`, `helpers/` (`request.js` with `api`/`site` and `BATTLE_TIMEOUT_MS`, `html.js`, `template-var.js`, `local-data.js`), `models/` (the only callers of the API), `templates/`, `profile/`, `editor/`.
+
+## Rules
+
+- A new page: a view in `web/view/`, a `page()` line in `web/app.js` before the legacy redirect, an entry module loaded with `{{#module}}name.js{{/module}}` after `{{{importMap}}}`.
+- Route values the script needs go through `clientVars` and are read with `TemplateVar.get()`; the web service never sees the session, so nothing private goes there.
+- Every API call is a method on a `models/*` class over `api.get|post|put|delete`; pass `{ timeout: BATTLE_TIMEOUT_MS }` for calls that run a battle. Pages branch on `RequestError.code`, with a message for every code the route throws and a general fallback.
+- Markup from user or server text: `renderTemplate` with `{{key}}`, `escapeHtml`, or `textContent`. Dialog and toast messages are markup: escape names inside them.
+- No new globals; `playback.js` `exposeLegacyGlobals` is the one bridge for `render.js` and `render2/`.
+
+## Deviations from `web-frontend`
+
+- Scripts live in `web/public/script/`, not `src/js/`, and there is no bundler: native ES modules with an mtime import map, so a deploy busts caches without a build.
+- Templates are markup-string modules in `templates/`, besides the server-side Mustache views.
+- The classic Phaser renderer (`render.js`, `floatingText.js`) and vendored `phaser.js`/`croppie.js` stay classic scripts.
+
+## Commands
+
+```bash
+docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
+docker compose exec -T web npm test                          # page routes and redirects
+docker run --rm -v "$PWD":/w -w /w node:22-alpine node web/scripts/compress-functions.js   # after editing script/functions/
+```
+
+## Checks before finishing
+
+- Lint clean and `tests/frontend` green; a new pure helper gets a test there.
+- The page loads on http://localhost:8085 with no console errors; new error codes show a message.
