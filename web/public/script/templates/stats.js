@@ -6,7 +6,7 @@ export const abilityRowTemplate = `
     <td>{{win}}%</td>
 </tr>`;
 
-export const emptyAbilitiesTemplate = `<tr><td colspan=4>Nenhuma batalha encontrada</td></tr>`;
+export const emptyAbilitiesTemplate = `<tr><td colspan=4>{{{emptyState}}}</td></tr>`;
 
 export const attributeCellsTemplate = `<td>{{average}}</td><td>{{winner}}</td>`;
 

@@ -155,66 +155,11 @@ body {
     gap: var(--space-3);
 }
 
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+/* Buttons: the shared .button (css/components/button.css), denser in the cockpit */
+.button {
     gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-sm);
     font-size: var(--text-sm);
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all var(--duration-quick) var(--ease-standard);
-    text-decoration: none;
     white-space: nowrap;
-}
-
-.btn-primary {
-    background: var(--color-brand);
-    color: var(--color-text-on-brand);
-    box-shadow: var(--shadow-glow);
-}
-
-.btn-primary:hover {
-    background: var(--color-brand-hover);
-    transform: translateY(-1px);
-}
-
-.btn-secondary {
-    background-color: var(--color-tint);
-    border-color: var(--color-border);
-    color: var(--color-text);
-}
-
-.btn-secondary:hover {
-    background-color: var(--color-highlight);
-    border-color: var(--color-border-strong);
-}
-
-.btn-danger {
-    background-color: var(--color-danger-soft);
-    border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
-    color: var(--color-danger);
-}
-
-.btn-danger:hover {
-    background-color: var(--color-danger);
-    color: var(--color-text-on-brand);
-}
-
-.btn-lg {
-    padding: var(--space-3) var(--space-6);
-    font-size: var(--text-base);
-    border-radius: var(--radius-md);
-}
-
-.btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none !important;
 }
 
 .w-full {
@@ -223,11 +168,7 @@ body {
 
 /* Cards & Grid Layout */
 .card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
     padding: var(--space-5);
-    box-shadow: var(--shadow-md);
     transition: border-color var(--duration-quick) var(--ease-standard);
 }
 
@@ -273,16 +214,13 @@ body {
 }
 
 .tournament-card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
     padding: var(--space-5);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: var(--space-4);
     transition: all var(--duration-quick) var(--ease-standard);
-    box-shadow: var(--shadow-md);
+
 }
 
 .tournament-card:hover {
@@ -430,26 +368,12 @@ label {
     color: var(--color-text-muted);
 }
 
-input[type="text"],
-input[type="number"],
-input[type="email"],
-select {
+/* Fields: the shared .input.boxed, denser in the cockpit */
+.input {
     width: 100%;
-    padding: var(--space-3) var(--space-3);
-    background-color: var(--color-surface-sunken);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text);
+    padding: var(--space-3);
     font-family: inherit;
     font-size: var(--text-sm);
-    transition: all var(--duration-quick) var(--ease-standard);
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: var(--focus-ring-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 25%, transparent);
 }
 
 small {

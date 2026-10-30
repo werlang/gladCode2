@@ -9,7 +9,7 @@ const ICONS = {
 
 /** A tournament card: `{{{actions}}}` holds the action buttons below. */
 export const tournamentCardTemplate = `
-<div class="tournament-card">
+<div class="tournament-card surface-card">
     <div class="tournament-card-header">
         <div>
             <h3>{{name}}</h3>
@@ -34,10 +34,10 @@ export const hashItemTemplate = `
     <div class="meta-value-copy"><code>{{hash}}</code><button class="copy-btn copy" title="Copy hash">${ICONS.copy}</button></div>
 </div>`;
 
-export const resetButtonTemplate = `<button class="btn {{style}} reset">${ICONS.reset} Reset Round</button>`;
-export const viewLinkTemplate = `<a href="tourn/{{hash}}/0" target="_blank" rel="noopener" class="btn btn-secondary">${ICONS.view} View</a>`;
-export const exportButtonTemplate = `<button class="btn btn-secondary export">${ICONS.export} Export</button>`;
-export const removeButtonTemplate = `<button class="btn btn-danger remove">${ICONS.remove} Cleanup</button>`;
+export const resetButtonTemplate = `<button class="button {{style}} reset">${ICONS.reset} Reset Round</button>`;
+export const viewLinkTemplate = `<a href="tourn/{{hash}}/0" target="_blank" rel="noopener" class="button outline">${ICONS.view} View</a>`;
+export const exportButtonTemplate = `<button class="button outline export">${ICONS.export} Export</button>`;
+export const removeButtonTemplate = `<button class="button danger remove">${ICONS.remove} Cleanup</button>`;
 
 export const emptyListTemplate = `
 <div class="empty-list">

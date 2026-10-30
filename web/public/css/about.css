@@ -357,27 +357,12 @@ body{
 
 #know .button,
 #contact .button {
-    padding: var(--space-3) var(--space-5);
-    background-color: var(--color-secondary);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-mono);
-    font-size: var(--text-xl);
-    color: var(--color-text-on-brand);
-    font-weight: bold;
-    cursor: pointer;
-    transition: var(--duration-base) all;
-    margin: var(--space-3) var(--space-5);
-    text-decoration: none;
-    outline: none;
     display: flex;
-    justify-content: center;
+    margin: var(--space-3) var(--space-5);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-xl);
+    font-weight: bold;
     white-space: nowrap;
-}
-
-#contact .button:hover,
-#know .button:hover {
-        background-color: var(--color-secondary-strong);
 }
 
 #contact {
@@ -771,19 +756,11 @@ body{
 }
 
 #plans #button-container .button {
-    background-color: var(--color-brand);
-    color: var(--color-text-on-brand);
-    padding: var(--space-2) var(--space-6);
-    outline: none;
-    box-sizing: border-box;
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
-    cursor: pointer;
-    border: none;
-    font-weight: bold;
-    font-family: var(--font-mono);
-    font-size: var(--text-lg);
-    transition: var(--duration-base);
     width: 260px;
+    padding: var(--space-2) var(--space-6);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    font-size: var(--text-lg);
+    font-weight: bold;
 }
 
 #plans #button-container .button:hover {

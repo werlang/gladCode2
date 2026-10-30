@@ -1,5 +1,5 @@
 export const newsPostTemplate = `
-<div class='post'>
+<div class='post surface-card'>
     <div class='share' title='Compartilhar' role='button' tabindex='0'><i class='fas fa-share-alt'></i></div>
     <div class='title'>{{{title}}}</div>
     <div class='time'>Publicado em {{time}}</div>
@@ -38,7 +38,7 @@ export const duelBoxTemplate = `
         <div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>{{nick}}</span> em nome da sua honra</div>
         <div class='glad-card-container'></div>
         <div id='button-container'>
-            <button id='cancel' class='button'>Cancelar</button><button id='confirm' class='button' disabled>{{action}}</button>
+            <button id='cancel' class='button secondary block'>Cancelar</button><button id='confirm' class='button secondary block' disabled>{{action}}</button>
         </div>
     </div>
 </div>`;

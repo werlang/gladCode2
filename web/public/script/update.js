@@ -1,9 +1,11 @@
+import { Button } from './components/button.js';
 import { showDialog, showMessage } from './components/dialog.js';
 import { createToast } from './components/toast.js';
+import { escapeHtml } from './helpers/html.js';
 import { ReleaseModel } from './models/release.js';
 
 const panel = document.querySelector('#content-box');
-const send = panel.querySelector('#send');
+const send = new Button({ element: panel.querySelector('#send') });
 /** Version masters' gladiators fall to when their client crashed in a ranked battle. */
 const BROKEN = 'broken';
 
@@ -25,17 +27,14 @@ function versionRow({ version, count }, current) {
     row.append(name, total);
 
     if (version !== current && version !== BROKEN) {
-        const button = document.createElement('button');
-        button.className = 'button';
-        button.textContent = `Atualizar para ${current}`;
-        button.addEventListener('click', async () => {
-            const question = `Mover os gladiadores da versão ${version} para a ${current}? Faça isso só quando a nova versão não muda o que o código deles faz.`;
+        const button = new Button({ text: `Atualizar para ${escapeHtml(current)}`, variant: 'small' }).click(async () => {
+            const question = `Mover os gladiadores da versão ${escapeHtml(version)} para a ${escapeHtml(current)}? Faça isso só quando a nova versão não muda o que o código deles faz.`;
             if (await showDialog(question, ['Sim', 'Não']) !== 'Sim') return;
             const { moved } = await ReleaseModel.carryForward(version);
             createToast(`${moved} gladiadores atualizados`, 'success');
             load();
         });
-        row.append(button);
+        row.append(button.element);
     }
     return row;
 }
@@ -54,7 +53,7 @@ async function load() {
     }
     panel.querySelector('#version #current').textContent = release.version;
     panel.querySelector('#gladiators .list').replaceChildren(...release.gladiators.map(entry => versionRow(entry, release.version)));
-    send.disabled = release.announcing;
+    send.element.disabled = release.announcing;
 }
 
 /** E-mails the release to the users who asked for update news. */
@@ -68,18 +67,20 @@ async function announce() {
     }
     if (await showDialog('Enviar o anúncio da versão por e-mail?', ['Sim', 'Não']) !== 'Sim') return;
 
-    send.disabled = true;
+    send.disable();
     try {
         const { recipients } = await ReleaseModel.announce({ changes, postLink });
+        send.enable();
+        send.element.disabled = true;
         showMessage(recipients ? `Enviando o anúncio para ${recipients} usuários` : 'Todos já receberam o anúncio desta versão');
     }
     catch (error) {
-        send.disabled = false;
+        send.enable();
         if (error.code === 'ANNOUNCEMENT_RUNNING') showMessage('O anúncio ainda está sendo enviado');
         else if (error.code === 'INVALID_POST_LINK') showMessage('Link do post inválido');
         else throw error;
     }
 }
 
-send.addEventListener('click', announce);
+send.element.addEventListener('click', announce);
 load();

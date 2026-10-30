@@ -68,4 +68,4 @@ export const cancelDuelTemplate = `<div class='remove' title='Cancelar desafio' 
 
 export const duelsEmptyRowTemplate = `<div class='row'><div class='cell glad'></div><div class='cell enemy'></div><div class='cell'></div><div class='cell time'></div></div>`;
 
-export const noRowsTemplate = `<div class='row'><div class='cell'><h3>{{message}}</h3></div></div>`;
+export const noRowsTemplate = `<div class='row empty'><div class='cell'>{{{emptyState}}}</div></div>`;

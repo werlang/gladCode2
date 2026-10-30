@@ -20,7 +20,7 @@
     {{{templateVars}}}
 	{{> header}}
 	<div id='frame'>
-		<div id='content-box'>
+		<div id='content-box' class='surface-card'>
 			<div id='version'>
 				<div>Versão atual: <span id='current'></span></div>
 				<p class='hint'>A versão é o arquivo <code>api/version</code>: altere-o num commit e publique a API.</p>
@@ -31,11 +31,11 @@
 			</div>
 			<div id='changes'>
 				<p>Sumário de mudanças</p>
-				<textarea></textarea>
+				<textarea class='input'></textarea>
 			</div>
 			<div id='postlink'>
 				<p>Link para o post completo</p>
-				<input type='url' placeholder='https://gladcode.dev/post/...'>
+				<input type='url' class='input boxed' placeholder='https://gladcode.dev/post/...'>
 			</div>
 			<button id='send' class='button'>Enviar anúncio por e-mail</button>
 		</div>

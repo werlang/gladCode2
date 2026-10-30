@@ -2,7 +2,7 @@ export const savingTemplate = `
 <div id='fog'>
     <div id='save-box' role='dialog' aria-modal='true'>
         <div id='message'>Gravando alterações no gladiador <span class='highlight'>{{name}}</span>. Aguarde...</div>
-        <div id='button-container'><button class='button'>OK</button></div>
+        <div id='button-container'><button class='button neutral'>OK</button></div>
     </div>
 </div>`;
 
@@ -32,7 +32,7 @@ export const settingsTemplate = `
             </div>
             <div id='sample'><h3>Visualização</h3><pre id='code-sample'></pre></div>
         </div>
-        <div id='button-container'><button class='button' id='cancel'>Cancelar</button><button class='button' id='change'>ALTERAR</button></div>
+        <div id='button-container'><button class='button block' id='cancel'>Cancelar</button><button class='button block' id='change'>ALTERAR</button></div>
     </div>
 </div>`;
 

@@ -180,15 +180,6 @@ body{
 	display: flex;
 }
 
-#fog-battle #button-container .button,
-#fog-glads .button {
-    width: 100%;
-    border-radius: 0;
-    height: 50px;
-    font-size: var(--text-lg);
-	transition: all var(--duration-base);
-}
-
 #fog-glads .glad-card-container {
 	flex-wrap: wrap;
 	overflow-y: auto;
@@ -449,17 +440,12 @@ body{
 }
 
 #help-window .button {
-    background-color: var(--color-brand-muted);
-    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    margin: 0;
-    color: var(--color-text-on-brand);
-	width: 100%;
-	height: 35px;
-	margin-top: var(--space-hairline);
-	text-decoration: none;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    height: 35px;
+    margin: var(--space-hairline) 0 0;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    background-color: var(--color-brand-muted);
 }
 
 #help-window .button:hover {
@@ -504,6 +490,11 @@ body{
     height: 30px;
     width: 50px;
     margin: 0 var(--space-2);
+    padding: var(--space-1);
+}
+
+#settings-window #font-size .button img {
+    height: 100%;
 }
 
 @media only screen and (min-width: 600px) {
@@ -529,11 +520,8 @@ body{
 	margin-top: var(--space-4);
 }
 
-#settings-window #button-container .button{
+#settings-window #button-container .button {
 	width: 50%;
-	border-radius: 0;
-	height: 50px;
-	font-size: var(--text-lg);
 }
 
 #code-box {
@@ -566,21 +554,11 @@ body{
 }
 
 #code-box .button {
-    font-size: var(--text-lg);
-    font-family: var(--font-body);
-    border: none;
-    padding: var(--space-2) 0;
-    outline: none;
-    color: var(--color-text-on-brand);
-    background-color: var(--color-brand);
     width: 100%;
+    padding: var(--space-2) 0;
     border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--duration-base);
-}
-
-#code-box .button:hover {
-    background-color: var(--color-secondary);
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
 }
 
 body #fog {
@@ -623,19 +601,11 @@ body #fog {
 }
 
 #save-box .button {
-    background-color: transparent;
-	color: var(--color-text-on-brand);
-	background-color: var(--color-neutral);
-    border: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-base);
-    border-radius: var(--radius-md);
-	width: 100%;
-	height: 50px;
+    width: 100%;
+    height: 50px;
     margin: var(--space-3) var(--space-2) 0;
     padding: var(--space-1) var(--space-2);
-    transition: all var(--duration-base);
-    cursor: pointer;
+    border-radius: var(--radius-md);
 }
 
 .ace_gutter-cell.ace_breakpoint{

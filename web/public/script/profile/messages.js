@@ -3,6 +3,7 @@ import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
 import { MessageModel } from '../models/social.js';
+import { emptyStateTemplate } from '../templates/empty-state.js';
 import { fullMessageTemplate, messageRowTemplate, replyTemplate } from '../templates/profile.js';
 
 /** Tallest the reply box grows, in px. */
@@ -36,7 +37,9 @@ export class MessagesTab {
 
         const { meta, messages: info } = await MessageModel.list(this.#page);
         if (meta.total == 0) {
-            table.textContent = 'Você ainda não possui mensagens';
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact', icon: 'envelope-open', title: 'Você ainda não possui mensagens', summary: '', actionHtml: '',
+            });
             return;
         }
 

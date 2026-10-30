@@ -3,6 +3,7 @@ import { decorateRadios } from '../components/form-controls.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { renderTemplate } from '../helpers/html.js';
 import { DuelModel, ReportModel } from '../models/social.js';
+import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
     battleRowTemplate,
     battlesEmptyRowTemplate,
@@ -34,7 +35,7 @@ const VIEWS = {
         head: battlesHeadTemplate,
         placeholder: battlesPlaceholderTemplate,
         emptyRow: battlesEmptyRowTemplate,
-        none: 'Nenhuma batalha para mostrar',
+        empty: { icon: 'scroll', title: 'Nenhuma batalha para mostrar', summary: '' },
         load: ({ offset, unread }) => ReportModel.battles({ offset, unreadOnly: unread }),
         rows: data => data.reports,
     },
@@ -42,7 +43,11 @@ const VIEWS = {
         head: favoritesHeadTemplate,
         placeholder: favoritesPlaceholderTemplate,
         emptyRow: favoritesEmptyRowTemplate,
-        none: 'Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas',
+        empty: {
+            icon: 'star',
+            title: 'Nenhuma batalha favorita',
+            summary: 'Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas',
+        },
         load: ({ offset }) => ReportModel.favorites({ offset }),
         rows: data => data.reports,
     },
@@ -50,7 +55,7 @@ const VIEWS = {
         head: duelsHeadTemplate,
         placeholder: duelsPlaceholderTemplate,
         emptyRow: duelsEmptyRowTemplate,
-        none: 'Você ainda não possui duelos',
+        empty: { icon: 'shield-halved', title: 'Você ainda não possui duelos', summary: '' },
         load: ({ offset }) => DuelModel.reports({ offset }),
         rows: data => data.duels,
     },
@@ -146,7 +151,8 @@ export class ReportsTab {
         const rows = view.rows(data) ?? [];
         this.#table.innerHTML = view.head;
         if (total === 0) {
-            this.#table.insertAdjacentHTML('beforeend', renderTemplate(noRowsTemplate, { message: view.none }));
+            const emptyState = renderTemplate(emptyStateTemplate, { variantClass: 'compact', actionHtml: '', ...view.empty });
+            this.#table.insertAdjacentHTML('beforeend', renderTemplate(noRowsTemplate, { emptyState }));
         }
         for (let index = total === 0 ? 1 : 0; index < PAGE_SIZE; index++) {
             const row = offset + index < total ? rows[index] : null;

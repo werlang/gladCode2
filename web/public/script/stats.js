@@ -3,6 +3,7 @@ import { Slider } from './components/slider.js';
 import { renderTemplate } from './helpers/html.js';
 import { PotionModel } from './models/potion.js';
 import { StatsModel } from './models/stats.js';
+import { emptyStateTemplate } from './templates/empty-state.js';
 import {
     abilityRowTemplate,
     attributeCellsTemplate,
@@ -44,7 +45,11 @@ function renderAbilities(data) {
             average: data.average[name].toFixed(1),
             win: data.winRate[name].toFixed(1),
         })).join('')
-        : emptyAbilitiesTemplate;
+        : renderTemplate(emptyAbilitiesTemplate, {
+            emptyState: renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact', icon: 'chart-simple', title: 'Nenhuma batalha encontrada', summary: '', actionHtml: '',
+            }),
+        });
 }
 
 /**

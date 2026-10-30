@@ -56,26 +56,10 @@ body{
     background-color: var(--color-scrim);
 }
 
+/* the replay sizes its buttons in its own scaled units, not the primitive's px */
 .button {
-    background-color: var(--color-brand);
-    border: 0;
-    color: var(--color-text-on-brand);
-    border-radius: var(--radius-sm);
-	font-size: 1.3rem;
-    font-family: var(--font-mono);
-	outline: none;
-	cursor: pointer;
-    transition: background-color var(--duration-slow);
+    padding: 0;
     font-size: 1em;
-}
-
-.button:hover {
-	background-color: var(--color-secondary);
-}
-
-.button:disabled {
-	background-color: var(--color-neutral);
-	cursor: not-allowed;
 }
 
 #canvas-container {

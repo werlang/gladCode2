@@ -140,27 +140,13 @@ export class ProgressButton {
 
     #render() {
         this.#button.disabled = true;
-        this.#button.style.padding = '0';
-        this.#button.style.position = 'relative';
+        this.#button.classList.add('is-progress');
         this.#button.innerHTML = '';
 
         this.#bar = document.createElement('div');
-        this.#bar.id = 'bar';
-        Object.assign(this.#bar.style, {
-            backgroundColor: 'var(--color-brand)',
-            width: '0%',
-            height: '100%',
-            borderRadius: '3px',
-        });
+        this.#bar.className = 'progress-bar';
         this.#label = document.createElement('div');
-        this.#label.id = 'oldcontent';
-        Object.assign(this.#label.style, {
-            position: 'absolute',
-            inset: '0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-        });
+        this.#label.className = 'progress-label';
         this.#button.append(this.#bar, this.#label);
     }
 
@@ -180,8 +166,7 @@ export class ProgressButton {
     kill() {
         clearInterval(this.#timer);
         this.#button.innerHTML = this.#html;
-        this.#button.style.padding = '';
-        this.#button.style.position = '';
+        this.#button.classList.remove('is-progress');
         this.#button.disabled = false;
     }
 

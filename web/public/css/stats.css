@@ -91,22 +91,15 @@ h2 {
     padding-left: var(--space-4);
 }
 
+/* the search fields are short and centred, in the page's reading font */
 .input {
-    border: 0;
-    outline: none;
-    border-bottom: 2px solid var(--color-border);
-    transition: var(--duration-slow);
-    color: var(--color-text);
-    font-size: var(--text-md);
-    background-color: transparent;
-    transition: border var(--duration-slow);
-    color: var(--color-brand-text);
     width: 100px;
-    text-align: center;
     margin: 0 var(--space-3);
-}
-.input:focus {
-    border-bottom: 2px solid var(--color-border-brand);
+    padding: 0;
+    border-bottom-width: 2px;
+    font-family: inherit;
+    font-size: var(--text-md);
+    text-align: center;
 }
 
 #search-container {

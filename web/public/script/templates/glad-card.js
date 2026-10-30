@@ -23,7 +23,7 @@ export const codeBlocksModalTemplate = `
 <div id='fog' class='code'>
     <div class='float-box'>
         <div id='code-ws'></div>
-        <div id='button-container'><button class='button'>FECHAR</button></div>
+        <div id='button-container'><button class='button secondary block'>FECHAR</button></div>
     </div>
 </div>`;
 
@@ -31,6 +31,6 @@ export const codeModalTemplate = `
 <div id='fog' class='code'>
     <div class='float-box'>
         <pre id='code' class='line-numbers language-{{language}}'><code class='language-{{language}}'>{{code}}</code></pre>
-        <div id='button-container'><button class='button'>FECHAR</button></div>
+        <div id='button-container'><button class='button secondary block'>FECHAR</button></div>
     </div>
 </div>`;

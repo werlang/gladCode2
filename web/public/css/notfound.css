@@ -25,14 +25,7 @@ body {
     color: var(--color-brand-text);
 }
 
+
 #notfound .button {
     padding: var(--space-3) var(--space-5);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-brand);
-    color: var(--color-text-on-brand);
-    text-decoration: none;
-}
-
-#notfound .button:hover {
-    background-color: var(--color-secondary);
 }

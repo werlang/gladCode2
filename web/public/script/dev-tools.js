@@ -129,7 +129,7 @@ class DevCockpit {
     #card(tournament, production) {
         const actions = [];
         if (tournament.started) {
-            actions.push(renderTemplate(resetButtonTemplate, { style: production ? 'btn-danger' : 'btn-secondary' }));
+            actions.push(renderTemplate(resetButtonTemplate, { style: production ? 'danger' : 'outline' }));
             actions.push(renderTemplate(viewLinkTemplate, { hash: tournament.hash }));
         }
         actions.push(exportButtonTemplate);

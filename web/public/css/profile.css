@@ -358,20 +358,11 @@ body {
   justify-content: center;
 }
 #code-box .button {
-  font-size: var(--text-lg);
-  font-family: var(--font-body);
-  border: none;
-  padding: var(--space-2) 0;
-  outline: none;
-  color: var(--color-text-on-brand);
-  background-color: var(--color-brand);
   width: 100%;
+  padding: var(--space-2) 0;
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--duration-base);
-}
-#code-box .button:hover {
-  background-color: var(--color-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
 }
 #profile-panel {
   padding: var(--space-5);
@@ -407,34 +398,14 @@ body {
   }
 }
 #profile-panel :is(#language, #site-theme) select {
-  max-width: 100%;
   justify-self: center;
-  border: none;
-  border-bottom: 3px solid var(--color-border);
-  outline: none;
-  background-color: transparent;
-  font-family: var(--font-game);
-  font-size: var(--text-xl);
-  color: var(--color-brand-text);
   max-width: 220px;
   padding: var(--space-2) var(--space-4);
 }
 .content .input {
-  outline: none;
-  border-width: 0px 0px 3px 0px;
-  border-color: var(--color-border);
-  font-family: var(--font-game);
-  font-size: var(--text-lg);
-  padding: var(--space-2) var(--space-3) 0;
   width: 100%;
   margin: auto;
   text-align: center;
-  transition: all var(--duration-base);
-  color: var(--color-brand-text);
-  font-size: var(--text-xl);
-}
-.content .input:focus {
-  border-color: var(--color-border-brand);
 }
 #profile-panel h2 {
   margin: 0 var(--space-3);
@@ -461,27 +432,14 @@ body {
 #profile-panel #save {
   padding: var(--space-2) var(--space-8);
 }
+/* profile buttons take a larger label and are sized by their containers */
 .button {
-  outline: none;
-  background-color: var(--color-brand);
-  color: var(--color-text-on-brand);
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-  border: none;
-  border-radius: var(--radius-sm);
   padding: 0;
-  cursor: pointer;
+  font-size: var(--text-lg);
 }
 #profile-panel .button {
   width: 300px;
   font-size: var(--text-xl);
-}
-.button:hover {
-  background-color: var(--color-secondary);
-}
-.button:disabled {
-  cursor: not-allowed;
-  background-color: var(--color-surface-strong);
 }
 #img-upload {
   border: 4px dashed var(--color-border-brand);
@@ -823,7 +781,6 @@ body {
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  transition: var(--duration-base) all;
 }
 #battle-container #battle-mode .button img {
   width: 70px;
@@ -1314,6 +1271,9 @@ body {
 #bhist-container .table .row {
   height: 35px;
 }
+#bhist-container .table .row.empty {
+  height: auto;
+}
 #bhist-container .table .row:hover .playback {
   display: flex;
 }
@@ -1441,27 +1401,7 @@ body {
   display: flex;
 }
 #duel-box .button {
-  background-color: var(--color-secondary);
-  color: var(--color-text-on-brand);
-  outline: none;
-  border: 0;
-  font-family: var(--font-mono);
   font-weight: bold;
-  cursor: pointer;
-  z-index: var(--z-raised);
-  padding: 0;
-  width: 100%;
-  border-radius: 0;
-  height: 50px;
-  font-size: var(--text-lg);
-  transition: all var(--duration-base);
-}
-#duel-box .button:hover {
-  background-color: var(--color-secondary-strong);
-}
-#duel-box .button:disabled {
-  background-color: var(--color-neutral);
-  cursor: not-allowed;
 }
 #duel-box #title {
   margin: var(--space-4) var(--space-5);
@@ -1646,7 +1586,6 @@ body {
   max-width: 100%;
   height: 50px;
   margin-bottom: var(--space-4);
-  transition: var(--duration-base) all;
 }
 #train.wrapper .table .row,
 #tourn.wrapper .table .row {
@@ -1716,32 +1655,18 @@ body {
   align-items: flex-end;
 }
 .window .input {
-  outline: none;
-  border-width: 0px 0px 3px 0px;
-  border-color: var(--color-border);
-  font-family: var(--font-game);
-  font-size: var(--text-lg);
-  padding: var(--space-2) var(--space-3) 0;
   width: 100%;
-  transition: all var(--duration-base);
-  color: var(--color-brand-text);
-  font-size: var(--text-xl);
   margin-bottom: var(--space-4);
-  box-sizing: border-box;
 }
+/* window text areas keep the game lettering inside a thick frame */
 .window textarea.input {
+  height: 120px;
   border-width: 3px;
   border-radius: var(--radius-sm);
-  resize: none;
-  height: 120px;
+  color: var(--color-brand-text);
+  font-family: var(--font-game);
   font-size: var(--text-lg);
-}
-.window .input:focus {
-  border-color: var(--color-border-brand);
-}
-.window .input.error {
-  border-color: var(--color-danger);
-  background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  resize: none;
 }
 .window .tip {
   color: var(--color-danger);
@@ -1757,7 +1682,6 @@ body {
 .window .button {
   height: 50px;
   width: 50%;
-  transition: var(--duration-base) background;
 }
 .window #start.button {
   box-shadow: 0px 0px 25px 10px var(--color-glow) inset;
@@ -1836,16 +1760,9 @@ body {
   background-color: transparent;
 }
 #tourn-message .button {
-  background-color: transparent;
-  color: var(--color-text-strong);
   border-radius: var(--radius-md);
   height: auto;
   width: 100%;
-  transition: var(--duration-base) all;
-}
-#tourn-message .button:hover {
-  background-color: var(--color-brand);
-  color: var(--color-text-on-brand);
 }
 .window .row {
   min-height: 35px;
@@ -2016,13 +1933,9 @@ body {
   display: flex;
   flex-direction: column;
   padding: var(--space-5) var(--space-7);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  box-sizing: border-box;
   font-family: var(--font-body);
   margin: var(--space-5) var(--space-3);
-  box-shadow: var(--shadow-md);
+
 }
 #panel .post .title {
   font-size: var(--text-xl);
@@ -2215,7 +2128,6 @@ body {
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   width: calc(100% + 40px);
   padding: var(--space-3);
-  transition: var(--duration-base) all;
 }
 #fog.black {
   background-color: var(--color-terminal-bg);

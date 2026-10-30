@@ -43,6 +43,17 @@
   font-weight: bold;
 }
 
+/* a row holding an empty state (components/empty-state.css) lets its text wrap */
+.table .row.empty {
+  &:hover {
+    background-color: var(--color-surface);
+  }
+
+  .cell {
+    white-space: normal;
+  }
+}
+
 .table .row.dummy .dummy-text {
     background-color: var(--color-tint);
     color: transparent;

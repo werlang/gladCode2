@@ -256,21 +256,16 @@
     height: 25px;
 }
 
+/* the card's code button: a bold glyph on the card, filled on hover */
 .glad-preview .button {
-	border: none;
-    background-color: transparent;
-    font-size: var(--text-lg);
-    font-family: var(--font-mono);
-    font-weight: bold;
-    border-radius: var(--radius-sm);
-    color: var(--color-brand-text);
-    margin-left: var(--space-3);
-    padding: var(--space-1) var(--space-3);
-    outline: none;
-    transition: all var(--duration-base);
-    cursor: pointer;
     width: auto;
     height: auto;
+    margin-left: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    background-color: transparent;
+    color: var(--color-brand-text);
+    font-size: var(--text-lg);
+    font-weight: bold;
 }
 
 .glad-preview .button:hover {
@@ -314,29 +309,7 @@
 }
 
 .glad-box #button-container .button {
-    background-color: var(--color-secondary);
-    color: var(--color-text-on-brand);
-    outline: none;
-    border: 0;
-    font-family: var(--font-mono);
     font-weight: bold;
-    cursor: pointer;
-    z-index: var(--z-raised);
-    padding: 0;
-    width: 100%;
-    border-radius: 0;
-    height: 50px;
-    font-size: var(--text-lg);
-    transition: all var(--duration-base);
-}
-
-.glad-box #button-container .button:hover {
-    background-color: var(--color-secondary-strong);
-}
-
-.glad-box #button-container .button:disabled {
-    background-color: var(--color-neutral);
-    cursor: not-allowed;
 }
 
 .glad-box #title{

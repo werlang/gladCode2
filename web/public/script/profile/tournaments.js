@@ -4,6 +4,7 @@ import { showDialog, showInput, showMessage } from '../components/dialog.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TournamentModel } from '../models/tournament.js';
+import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
     addGladTemplate,
     chooseGladTemplate,
@@ -329,7 +330,9 @@ class TournamentWindow {
         const table = this.window.querySelector('.table');
         const count = this.window.querySelector('h3 #count');
         if (!teams.length) {
-            table.innerHTML = "<div class='row'>Nenhuma equipe inscrita</div>";
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact', icon: 'users', title: 'Nenhuma equipe inscrita', summary: '', actionHtml: '',
+            });
             count.textContent = '';
         }
         else {

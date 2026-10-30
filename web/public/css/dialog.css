@@ -5,11 +5,7 @@
 }
 
 #dialog-box {
-	background-color: var(--color-surface);
-    border-radius: var(--radius-sm);
     padding: var(--space-3) var(--space-5);
-    box-shadow: var(--shadow-md);
-    color: var(--color-text);
     font-family: var(--font-body);
     font-size: var(--text-lg);
     min-height: 100px;
@@ -41,17 +37,11 @@
 }
 
 #dialog-box .button {
-	background-color: transparent;
-	color: var(--color-text-strong);
-    border: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-lg);
-    border-radius: var(--radius-md);
     width: 100%;
     margin: var(--space-3) var(--space-2) 0;
     padding: var(--space-1) var(--space-2);
-	transition: all var(--duration-base);
-	cursor: pointer;
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
 }
 
 #dialog-box #title {
@@ -61,32 +51,8 @@
 	margin: var(--space-3) 0 var(--space-5) 0;
 }
 
-#dialog-box .button:hover {
-	background-color: var(--color-brand);
-	color: var(--color-text-on-brand);
-}
-
-#dialog-box .input {
-    border: 0;
-    outline: none;
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    transition: var(--duration-slow);
-    color: var(--color-text);
-    font-size: var(--text-lg);
-    font-family: var(--font-mono);
-    background-color: transparent;
-	padding: var(--space-1) var(--space-3);
-}
-
-#dialog-box .input:focus {
-    border: 2px solid var(--color-border-brand);
-}
-
 #dialog-box textarea.input {
 	height: 120px;
-	font-size: var(--text-base);
-	font-family: var(--font-body);
 }
 
 #dialog-box #charcount {

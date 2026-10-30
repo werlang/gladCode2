@@ -6,6 +6,7 @@ import { copyText } from '../helpers/clipboard.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
+import { emptyStateTemplate } from '../templates/empty-state.js';
 import { profile } from './session.js';
 import { showNoCredit } from './tutor.js';
 import {
@@ -398,7 +399,9 @@ class TrainingRoom {
         const count = data.gladiators.length;
 
         if (count === 0) {
-            table.innerHTML = "<div class='row'>Nenhum participante</div>";
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact', icon: 'user-group', title: 'Nenhum participante', summary: '', actionHtml: '',
+            });
             window_.querySelector('h3 #count').textContent = '';
             if (this.manager) {
                 hide(start);

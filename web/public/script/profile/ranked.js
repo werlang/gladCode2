@@ -51,7 +51,7 @@ function showPreBattle(glads, button) {
     const started = Date.now();
     let lastTip = started;
     const timer = setInterval(() => {
-        const bar = button.querySelector('#bar');
+        const bar = button.querySelector('.progress-bar');
         const ratio = bar ? parseFloat(bar.style.width) / 100 || 0 : 1;
         const size = show.offsetHeight * ratio;
         progress.style.height = `${size}px`;

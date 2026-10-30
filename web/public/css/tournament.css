@@ -274,27 +274,11 @@ h3#tourn-desc {
     margin: var(--space-3) var(--space-2);
 }
 
+/* tournament and training buttons fill their column */
 .button {
-	font-size: var(--text-lg);
-    font-family: var(--font-mono);
-    border: none;
-    padding: var(--space-2) 0;
-    outline: none;
-    color: var(--color-text-on-brand);
-    background-color: var(--color-brand);
     width: 100%;
-    cursor: pointer;
-    transition: all var(--duration-base);
-    border-radius: var(--radius-sm);
-}
-
-.button:hover {
-	background-color: var(--color-secondary);
-}
-
-.button:disabled {
-    background-color: var(--color-neutral);
-    cursor: not-allowed;
+    padding: var(--space-2) 0;
+    font-size: var(--text-lg);
 }
 
 #content-box .button {
@@ -365,11 +349,9 @@ h3#tourn-desc {
     height: auto;
     width: 100%;
     max-width: none;
-    box-sizing: border-box;
     border-radius: 0 0 var(--radius-sm) var(--radius-sm);
     margin-bottom: calc(-1 * var(--space-1));
     margin-top: var(--space-1);
-    transition: var(--duration-slower) all;
     font-size: var(--text-base);
 }
 

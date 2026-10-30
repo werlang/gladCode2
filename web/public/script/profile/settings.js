@@ -1,5 +1,8 @@
+import { Button } from '../components/button.js';
 import { showMessage } from '../components/dialog.js';
 import { decorateCheckSliders } from '../components/form-controls.js';
+import { Input } from '../components/input.js';
+import { Select } from '../components/select.js';
 import { fadeIn, hide } from '../helpers/animate.js';
 import { applyTheme } from '../helpers/theme.js';
 import { UserModel } from '../models/user.js';
@@ -37,23 +40,24 @@ export class SettingsTab {
     #panel = document.querySelector('#profile-panel');
     /** A new crop to save, as a data URL; null keeps the current picture. */
     #picture = null;
+    #nickname = new Input(this.#panel.querySelector('#nickname .input'));
+    #language = new Select(this.#panel.querySelector('#language select'));
+    #theme = new Select(this.#panel.querySelector('#site-theme select'));
 
     /** Binds the form. */
     init() {
         decorateCheckSliders(this.#panel);
-        this.#panel.querySelector('#language select').value = profile.user.language;
-        const theme = this.#panel.querySelector('#site-theme select');
-        theme.value = profile.user.theme;
+        this.#language.set(profile.user.language);
         // preview at once; GRAVAR saves it on the account
-        theme.addEventListener('change', () => applyTheme(theme.value));
+        this.#theme.set(profile.user.theme).change((event, value) => applyTheme(value));
         this.#bindPicture();
-        this.#panel.querySelector('#save').addEventListener('click', () => this.#save());
+        new Button({ element: this.#panel.querySelector('#save') }).click(() => this.#save());
     }
 
     /** Fills the form with the current settings. */
     show() {
         this.#picture = null;
-        this.#panel.querySelector('#nickname .input').value = profile.user.nickname;
+        this.#nickname.value = profile.user.nickname;
         PREFERENCES.forEach(name => {
             this.#switch(name).checked = profile.user.preferences[name];
         });
@@ -131,14 +135,11 @@ export class SettingsTab {
     }
 
     async #save() {
-        const button = this.#panel.querySelector('#save');
-        button.disabled = true;
-        const field = this.#panel.querySelector('#nickname .input');
         const changes = {
-            nickname: field.value,
+            nickname: this.#nickname.value,
             preferences: Object.fromEntries(PREFERENCES.map(name => [name, this.#switch(name).checked])),
-            language: this.#panel.querySelector('#language select').value,
-            theme: this.#panel.querySelector('#site-theme select').value,
+            language: this.#language.value,
+            theme: this.#theme.value,
         };
         if (this.#picture) changes.picture = this.#picture;
 
@@ -154,12 +155,9 @@ export class SettingsTab {
             if (!problem) throw error;
             await showMessage(problem);
             if (error.code !== 'INVALID_PICTURE') {
-                field.focus();
-                field.select();
+                this.#nickname.setError(problem);
+                this.#nickname.element.select();
             }
-        }
-        finally {
-            button.disabled = false;
         }
     }
 }

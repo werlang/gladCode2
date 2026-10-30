@@ -35,7 +35,7 @@ export const createdTemplate = `
     <div id='tourn-message' class='tourn window' role='dialog' aria-modal='true'>
         <h2>Torneio registrado</h2>
         {{{content}}}
-        <div id='button-container'><button class='button'>OK</button></div>
+        <div id='button-container'><button class='button ghost'>OK</button></div>
     </div>
 </div>`;
 
@@ -70,7 +70,7 @@ export const teamCreatedTemplate = `
         <h2>Equipe <span>{{name}}</span> registrada</h2>
         <p>Os mestres deverão informar a seguinte senha para ingressar nesta equipe:</p>
         <div>Senha: <span>{{word}}</span></div>
-        <div id='button-container'><button class='button'>OK</button></div>
+        <div id='button-container'><button class='button ghost'>OK</button></div>
     </div>
 </div>`;
 
@@ -100,6 +100,6 @@ export const chooseGladTemplate = `
         <div id='title'>Escolha o gladiador que irá lhe representar no torneio</div>
         <div class='glad-card-container'></div>
         <div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div>
-        <div id='button-container'><button id='cancel' class='button'>Cancelar</button><button id='choose' class='button' disabled>ESCOLHER</button></div>
+        <div id='button-container'><button id='cancel' class='button secondary block'>Cancelar</button><button id='choose' class='button secondary block' disabled>ESCOLHER</button></div>
     </div>
 </div>`;
