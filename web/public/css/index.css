@@ -1,32 +1,14 @@
 /* Front page. Night over the arena: header blue deepened to ink, sand from
    the arena floor, torch gold for actions. Pixel sprites stay crisp. */
-:root {
-	--ink: #0b1d2b;
-	--ink-2: #10283a;
-	--ink-3: #173650;
-	--brand: #00638d;
-	--sand: #e9d6ad;
-	--sand-light: #f3e8d0;
-	--sand-dark: #b99a63;
-	--gold: #f2b441;
-	--gold-deep: #c98918;
-	--blood: #c4412f;
-	--text: #edf1f3;
-	--muted: #9db2c1;
-	--ink-text: #1b2a35;
-	--ink-muted: #56636b;
-	--font-display: 'Cinzel', Georgia, serif;
-	--font-body: 'Roboto', system-ui, sans-serif;
-	--font-mono: 'Source Code Pro', ui-monospace, monospace;
-	--radius: 10px;
+.home {
 	--gutter: clamp(16px, 4vw, 48px);
 	--max: 1200px;
 }
 
 body.home {
 	margin: 0;
-	background-color: var(--ink);
-	color: var(--text);
+	background-color: var(--color-page);
+	color: var(--color-text);
 	font-family: var(--font-body);
 	font-size: 16px;
 	line-height: 1.55;
@@ -51,7 +33,7 @@ body.home #header #menu-button {
 
 .home a:focus-visible,
 .home button:focus-visible {
-	outline: 2px solid var(--gold);
+	outline: 2px solid var(--color-accent);
 	outline-offset: 3px;
 }
 
@@ -62,7 +44,7 @@ body.home #header #menu-button {
 	font-weight: 600;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: var(--gold);
+	color: var(--color-accent-text);
 }
 
 .home h1,
@@ -87,47 +69,47 @@ body.home #header #menu-button {
 	justify-content: center;
 	min-height: 48px;
 	padding: 0 24px;
-	border-radius: 6px;
+	border-radius: var(--radius-md);
 	border: 2px solid transparent;
 	font-family: var(--font-body);
 	font-size: 1rem;
 	font-weight: 700;
 	text-decoration: none;
 	cursor: pointer;
-	transition: background-color .2s, border-color .2s, color .2s, transform .2s;
+	transition: background-color var(--duration-quick), border-color var(--duration-quick), color var(--duration-quick), transform var(--duration-quick);
 }
 
 .home .btn.primary {
-	background-color: var(--gold);
-	color: #241703;
-	box-shadow: 0 3px 0 var(--gold-deep);
+	background-color: var(--color-accent);
+	color: var(--color-text-on-accent);
+	box-shadow: 0 3px 0 var(--color-accent-strong);
 }
 
 .home .btn.primary:hover {
-	background-color: #ffc95e;
+	background-color: var(--color-accent-hover);
 	transform: translateY(-1px);
 }
 
 .home .btn.primary:active {
 	transform: translateY(2px);
-	box-shadow: 0 1px 0 var(--gold-deep);
+	box-shadow: 0 1px 0 var(--color-accent-strong);
 }
 
 .home .btn.ghost {
-	border-color: rgba(237, 241, 243, 0.35);
-	color: var(--text);
+	border-color: color-mix(in srgb, var(--color-text) 35%, transparent);
+	color: var(--color-text);
 }
 
 .home .btn.ghost:hover {
-	border-color: var(--text);
-	background-color: rgba(237, 241, 243, 0.08);
+	border-color: var(--color-text);
+	background-color: var(--color-highlight);
 }
 
 /* Hero: a real replay filmed in the 3D coliseum runs behind the copy and the code that drives it */
 #hero {
 	position: relative;
 	isolation: isolate;
-	background-color: var(--ink);
+	background-color: var(--color-page);
 }
 
 .hero-media {
@@ -136,7 +118,7 @@ body.home #header #menu-button {
 	max-height: 62vh;
 	width: 100%;
 	overflow: hidden;
-	background: var(--ink) url('../image/home/arena-3d.jpg') center / cover no-repeat;
+	background: var(--color-page) url('../image/home/arena-3d.jpg') center / cover no-repeat;
 }
 
 .hero-media video {
@@ -157,7 +139,7 @@ body.home #header #menu-button {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(180deg, transparent 55%, var(--ink) 100%);
+	background: linear-gradient(180deg, transparent 55%, var(--color-page) 100%);
 	pointer-events: none;
 }
 
@@ -171,10 +153,10 @@ body.home #header #menu-button {
 	gap: 8px;
 	margin: 0;
 	padding: 6px 12px;
-	border-radius: 999px;
-	background-color: rgba(8, 21, 31, 0.7);
+	border-radius: var(--radius-pill);
+	background-color: color-mix(in srgb, var(--color-surface-sunken) 70%, transparent);
 	backdrop-filter: blur(6px);
-	color: var(--sand-light);
+	color: var(--color-band);
 	font-family: var(--font-mono);
 	font-size: 0.72rem;
 }
@@ -182,9 +164,9 @@ body.home #header #menu-button {
 .hero-caption .live {
 	width: 8px;
 	height: 8px;
-	border-radius: 50%;
-	background-color: var(--blood);
-	box-shadow: 0 0 0 3px rgba(196, 65, 47, 0.3);
+	border-radius: var(--radius-round);
+	background-color: var(--color-danger);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 30%, transparent);
 	animation: home-pulse 1.6s ease-in-out infinite;
 }
 
@@ -206,19 +188,19 @@ body.home #header #menu-button {
 #hero h1 {
 	font-size: clamp(2.2rem, 4vw, 3.25rem);
 	letter-spacing: -0.01em;
-	color: var(--text);
-	text-shadow: 0 2px 24px rgba(5, 13, 20, 0.6);
+	color: var(--color-text);
+	text-shadow: 0 2px 24px var(--color-scrim);
 }
 
 #hero h1 span {
-	color: var(--gold);
+	color: var(--color-accent);
 }
 
 #hero .lead {
 	max-width: 34em;
 	margin: 22px 0 32px;
 	font-size: 1.125rem;
-	color: #d3dee5;
+	color: var(--color-text);
 }
 
 #hero .facts {
@@ -230,7 +212,7 @@ body.home #header #menu-button {
 	list-style: none;
 	font-family: var(--font-mono);
 	font-size: 0.85rem;
-	color: var(--muted);
+	color: var(--color-text-muted);
 }
 
 #hero .facts li::before {
@@ -240,7 +222,7 @@ body.home #header #menu-button {
 	height: 6px;
 	margin-right: 9px;
 	vertical-align: middle;
-	background-color: var(--gold);
+	background-color: var(--color-accent);
 }
 
 /* Wide screens: the arena fills the hero, the copy reads over its darkened left side */
@@ -260,8 +242,8 @@ body.home #header #menu-button {
 
 	.hero-media::after {
 		background:
-			linear-gradient(90deg, rgba(11, 29, 43, 0.94) 0%, rgba(11, 29, 43, 0.72) 34%, rgba(11, 29, 43, 0) 60%),
-			linear-gradient(180deg, rgba(11, 29, 43, 0.35) 0%, transparent 22%, transparent 70%, var(--ink) 100%);
+			linear-gradient(90deg, color-mix(in srgb, var(--color-page) 94%, transparent) 0%, color-mix(in srgb, var(--color-page) 72%, transparent) 34%, transparent 60%),
+			linear-gradient(180deg, color-mix(in srgb, var(--color-page) 35%, transparent) 0%, transparent 22%, transparent 70%, var(--color-page) 100%);
 	}
 
 	.hero-caption {
@@ -286,12 +268,12 @@ body.home #header #menu-button {
 	}
 
 	.code-panel {
-		background-color: rgba(8, 21, 31, 0.78);
+		background-color: color-mix(in srgb, var(--color-surface-sunken) 78%, transparent);
 		backdrop-filter: blur(10px);
 	}
 
 	.code-bar {
-		background-color: rgba(14, 34, 50, 0.85);
+		background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
 	}
 
 	.code-panel .code {
@@ -305,10 +287,10 @@ body.home #header #menu-button {
 	z-index: 1;
 	min-width: 0;
 	margin: 0;
-	background-color: #08151f;
-	border: 1px solid #23435c;
-	border-radius: var(--radius);
-	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+	background-color: var(--color-surface-sunken);
+	border: 1px solid var(--color-border-strong);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 24px 60px var(--color-shadow);
 	overflow: hidden;
 }
 
@@ -316,8 +298,8 @@ body.home #header #menu-button {
 	display: flex;
 	align-items: center;
 	padding: 0 8px;
-	background-color: #0e2232;
-	border-bottom: 1px solid #23435c;
+	background-color: var(--color-surface);
+	border-bottom: 1px solid var(--color-border-strong);
 }
 
 .code-bar .tabs {
@@ -329,19 +311,19 @@ body.home #header #menu-button {
 	border: 0;
 	border-bottom: 2px solid transparent;
 	background: none;
-	color: var(--muted);
+	color: var(--color-text-muted);
 	font-family: var(--font-mono);
 	font-size: 0.8rem;
 	cursor: pointer;
 }
 
 .code-bar button[aria-selected='true'] {
-	color: var(--text);
-	border-bottom-color: var(--gold);
+	color: var(--color-text);
+	border-bottom-color: var(--color-accent);
 }
 
 .code-bar button:hover {
-	color: var(--text);
+	color: var(--color-text);
 }
 
 .code-panel .code code {
@@ -357,7 +339,7 @@ body.home #header #menu-button {
 	font-family: var(--font-mono);
 	font-size: clamp(0.7rem, 2.6vw, 0.8rem);
 	line-height: 1.6;
-	color: #d5dee5;
+	color: var(--color-text);
 	overflow-x: auto;
 	counter-reset: line;
 }
@@ -377,18 +359,18 @@ body.home #header #menu-button {
 	width: 2.4em;
 	margin-right: 14px;
 	text-align: right;
-	color: #3f5b70;
+	color: var(--color-text-subtle);
 }
 
 .code-panel .code .l.run {
-	background-color: rgba(242, 180, 65, 0.12);
-	border-left-color: var(--gold);
+	background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+	border-left-color: var(--color-accent);
 }
 
-.code .k { color: #7fb7e6; }
-.code .f { color: #f2b441; }
-.code .a { color: #8fd6a8; }
-.code .n { color: #e79b7b; }
+.code .k { color: var(--color-code-keyword); }
+.code .f { color: var(--color-code-function); }
+.code .a { color: var(--color-code-string); }
+.code .n { color: var(--color-code-number); }
 
 /* Section headings */
 .home .section-head {
@@ -404,8 +386,8 @@ body.home #header #menu-button {
 #steps {
 	position: relative;
 	padding: 88px var(--gutter);
-	background-color: var(--sand-light);
-	color: var(--ink-text);
+	background-color: var(--color-band);
+	color: var(--color-text-on-band);
 }
 
 /* A crenellated wall line where the night meets the sand */
@@ -416,11 +398,11 @@ body.home #header #menu-button {
 	right: 0;
 	top: -12px;
 	height: 12px;
-	background: linear-gradient(90deg, var(--sand-light) 50%, transparent 0) 0 0 / 32px 12px repeat-x;
+	background: linear-gradient(90deg, var(--color-band) 50%, transparent 0) 0 0 / 32px 12px repeat-x;
 }
 
 #steps .eyebrow {
-	color: #9a6a12;
+	color: var(--color-band-accent);
 }
 
 .step-list {
@@ -439,10 +421,10 @@ body.home #header #menu-button {
 	display: flex;
 	flex-direction: column;
 	padding: 28px 26px 26px;
-	background-color: #fffaf0;
-	border: 1px solid #e2cfa6;
-	border-radius: var(--radius);
-	box-shadow: 0 2px 0 #e2cfa6;
+	background-color: var(--color-band-surface);
+	border: 1px solid var(--color-band-border);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 2px 0 var(--color-band-border);
 	counter-increment: step;
 }
 
@@ -455,7 +437,7 @@ body.home #header #menu-button {
 	font-size: 3rem;
 	font-weight: 800;
 	line-height: 1;
-	color: #ecdcb7;
+	color: var(--color-band-border);
 }
 
 /* The 3D fighters step out over the top edge of their card */
@@ -467,7 +449,7 @@ body.home #header #menu-button {
 	object-fit: contain;
 	object-position: left bottom;
 	margin: -130px 0 16px -6px;
-	filter: drop-shadow(0 10px 8px rgba(60, 40, 10, 0.25));
+	filter: drop-shadow(0 10px 8px var(--color-shadow));
 	transition: transform .3s;
 }
 
@@ -477,21 +459,21 @@ body.home #header #menu-button {
 
 .step h3 {
 	font-size: 1.35rem;
-	color: var(--ink);
+	color: var(--color-text-on-band);
 }
 
 .step p {
 	flex-grow: 1;
 	margin: 12px 0 18px;
-	color: var(--ink-muted);
+	color: var(--color-text-on-band-muted);
 }
 
 .step a {
 	align-self: flex-start;
 	font-weight: 700;
-	color: var(--brand);
+	color: var(--color-brand);
 	text-decoration: none;
-	border-bottom: 2px solid rgba(0, 99, 141, 0.3);
+	border-bottom: 2px solid color-mix(in srgb, var(--color-brand) 30%, transparent);
 	transition: border-color .2s;
 }
 
@@ -500,7 +482,7 @@ body.home #header #menu-button {
 }
 
 .step a:hover {
-	border-bottom-color: var(--brand);
+	border-bottom-color: var(--color-brand);
 }
 
 @media only screen and (min-width: 860px) {
@@ -513,7 +495,7 @@ body.home #header #menu-button {
 /* Videos */
 #videos {
 	padding: 88px var(--gutter);
-	background-color: var(--ink-2);
+	background-color: var(--color-surface);
 }
 
 .video-grid {
@@ -551,9 +533,9 @@ body.home #header #menu-button {
 .video .thumb {
 	position: relative;
 	display: block;
-	border-radius: 8px;
+	border-radius: var(--radius-lg);
 	overflow: hidden;
-	background-color: #000;
+	background-color: var(--color-terminal-bg);
 	aspect-ratio: 16 / 9;
 }
 
@@ -573,9 +555,9 @@ body.home #header #menu-button {
 	width: 52px;
 	height: 52px;
 	margin: -26px 0 0 -26px;
-	border-radius: 50%;
-	background-color: rgba(11, 29, 43, 0.75);
-	border: 2px solid var(--gold);
+	border-radius: var(--radius-round);
+	background-color: color-mix(in srgb, var(--color-page) 75%, transparent);
+	border: 2px solid var(--color-accent);
 	transition: background-color .25s, transform .25s;
 }
 
@@ -586,7 +568,7 @@ body.home #header #menu-button {
 	top: 15px;
 	border-style: solid;
 	border-width: 9px 0 9px 15px;
-	border-color: transparent transparent transparent var(--gold);
+	border-color: transparent transparent transparent var(--color-accent);
 }
 
 .video:hover .thumb img {
@@ -595,12 +577,12 @@ body.home #header #menu-button {
 }
 
 .video:hover .play {
-	background-color: var(--gold);
+	background-color: var(--color-accent);
 	transform: scale(1.08);
 }
 
 .video:hover .play::after {
-	border-left-color: var(--ink);
+	border-left-color: var(--color-page);
 }
 
 .video .title {
@@ -613,7 +595,7 @@ body.home #header #menu-button {
 .video .desc {
 	margin-top: 4px;
 	font-size: 0.92rem;
-	color: var(--muted);
+	color: var(--color-text-muted);
 }
 
 /* Join */
@@ -629,11 +611,11 @@ body.home #header #menu-button {
 	margin: 0 auto;
 	padding: clamp(28px, 5vw, 48px);
 	box-sizing: border-box;
-	border-radius: 14px;
-	border: 1px solid #2c4b63;
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--color-border-strong);
 	background:
-		radial-gradient(80% 120% at 0% 0%, rgba(242, 180, 65, 0.12), transparent 60%),
-		var(--ink-3);
+		radial-gradient(80% 120% at 0% 0%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 60%),
+		var(--color-surface-alt);
 }
 
 .join-fighters {
@@ -647,7 +629,7 @@ body.home #header #menu-button {
 .join-fighters img {
 	height: 190px;
 	width: auto;
-	filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+	filter: drop-shadow(0 12px 10px var(--color-shadow));
 }
 
 @media only screen and (min-width: 900px) {
@@ -667,12 +649,12 @@ body.home #header #menu-button {
 .join-copy p {
 	max-width: 32em;
 	margin: 14px 0 24px;
-	color: #c7d4dd;
+	color: var(--color-text-muted);
 }
 
 .join-contact {
 	padding-top: 24px;
-	border-top: 1px solid #2c4b63;
+	border-top: 1px solid var(--color-border-strong);
 }
 
 .join-contact h3 {
@@ -682,7 +664,7 @@ body.home #header #menu-button {
 .join-contact p {
 	margin: 8px 0 14px;
 	font-size: 0.95rem;
-	color: var(--muted);
+	color: var(--color-text-muted);
 }
 
 .join-contact .mail {
@@ -692,17 +674,17 @@ body.home #header #menu-button {
 	padding: 9px 16px;
 	font-family: var(--font-mono);
 	overflow-wrap: anywhere;
-	border-radius: 999px;
-	border: 1px solid #3c5f7a;
-	color: var(--text);
+	border-radius: var(--radius-pill);
+	border: 1px solid var(--color-border-strong);
+	color: var(--color-text);
 	font-size: 0.9rem;
 	text-decoration: none;
 	transition: border-color .2s, background-color .2s;
 }
 
 .join-contact .mail:hover {
-	border-color: var(--gold);
-	background-color: rgba(242, 180, 65, 0.1);
+	border-color: var(--color-accent);
+	background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 @media only screen and (min-width: 900px) {
@@ -715,7 +697,7 @@ body.home #header #menu-button {
 	.join-contact {
 		padding: 0 0 0 40px;
 		border-top: 0;
-		border-left: 1px solid #2c4b63;
+		border-left: 1px solid var(--color-border-strong);
 	}
 }
 
@@ -730,9 +712,9 @@ body.home #header #menu-button {
 	margin: 0 auto;
 	padding: 28px var(--gutter) 40px;
 	box-sizing: border-box;
-	border-top: 1px solid #1d3a50;
+	border-top: 1px solid var(--color-border-strong);
 	font-size: 0.85rem;
-	color: var(--muted);
+	color: var(--color-text-muted);
 }
 
 #site-footer nav {
@@ -742,12 +724,12 @@ body.home #header #menu-button {
 }
 
 #site-footer a {
-	color: var(--muted);
+	color: var(--color-text-muted);
 	text-decoration: none;
 }
 
 #site-footer a:hover {
-	color: var(--text);
+	color: var(--color-text);
 }
 
 /* Video lightbox (the fog itself comes from dialog.css) */
@@ -757,16 +739,16 @@ body #fog {
 	display: flex;
 	padding: 16px;
 	box-sizing: border-box;
-	background-color: rgba(5, 13, 20, 0.88);
+	background-color: var(--color-overlay);
 }
 
 #fog #video-container {
 	position: relative;
 	width: min(960px, 100%);
 	aspect-ratio: 16 / 9;
-	background-color: #000;
-	border-radius: 8px;
-	box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+	background-color: var(--color-terminal-bg);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 24px 80px var(--color-shadow);
 }
 
 #fog #video-container iframe {
@@ -774,7 +756,7 @@ body #fog {
 	width: 100%;
 	height: 100%;
 	border: 0;
-	border-radius: 8px;
+	border-radius: var(--radius-lg);
 }
 
 #fog #video-container #remove {
@@ -784,10 +766,10 @@ body #fog {
 	width: 36px;
 	height: 36px;
 	border: 0;
-	border-radius: 50%;
-	background: var(--gold) url('../icon/close_x.png') center / 14px no-repeat;
+	border-radius: var(--radius-round);
+	background: var(--color-accent) url('../icon/close_x.png') center / 14px no-repeat;
 	cursor: pointer;
-	filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow(0 2px 6px var(--color-shadow));
 }
 
 @media (prefers-reduced-motion: reduce) {
