@@ -39,3 +39,15 @@ export function setBadge(badge, count) {
     badge.textContent = count;
     badge.classList.toggle('empty', !(count > 0));
 }
+
+/**
+ * The profile tab a menu request opens: the requested one when its menu entry exists and is
+ * enabled, the settings tab otherwise (an unknown `?t=`, or battles before the first gladiator).
+ *
+ * @param {string|undefined} requested Tab id from the address.
+ * @param {Iterable<string>} enabled Ids of the enabled menu entries.
+ * @returns {string}
+ */
+export function openableTab(requested, enabled) {
+    return requested && [...enabled].includes(requested) ? requested : 'profile';
+}

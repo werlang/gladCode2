@@ -13,7 +13,7 @@ import { checkNotifications } from './profile/notifications.js';
 import { PotionsTab } from './profile/potions.js';
 import { RankingTab } from './profile/ranking.js';
 import { ReportsTab } from './profile/reports.js';
-import { profile } from './profile/session.js';
+import { openableTab, profile } from './profile/session.js';
 import { SettingsTab } from './profile/settings.js';
 
 /** How often the menu counters refresh, in ms (there is no push channel). */
@@ -71,9 +71,10 @@ async function start() {
     tabs.potions.init();
 
     const items = document.querySelectorAll('#menu .item');
-    const open = id => {
+    const enabled = () => [...items].filter(item => !item.classList.contains('disabled')).map(item => item.id);
+    const open = requested => {
+        const id = openableTab(requested, enabled());
         const item = document.querySelector(`#menu #${CSS.escape(id)}.item`);
-        if (!item || item.classList.contains('disabled')) return;
         if (id === 'logout') {
             logout();
             return;
@@ -84,7 +85,9 @@ async function start() {
         items.forEach(other => other.classList.toggle('here', other === item));
         tabs[id]?.show();
     };
-    items.forEach(item => item.addEventListener('click', () => open(item.id)));
+    items.forEach(item => item.addEventListener('click', () => {
+        if (!item.classList.contains('disabled')) open(item.id);
+    }));
 
     const glads = await GladiatorModel.list();
     if (!glads.length) {
