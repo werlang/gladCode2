@@ -88,4 +88,13 @@ describe('User', () => {
         await new User(row).saveProfile({ language: 'c', preferences: { friend: true, tourn: false }, showTutorial: false, editorFont: 20 });
         expect(Mysql.update).toHaveBeenCalledWith('usuarios', { pref_language: 'c', editor_font: 20, showTutorial: 0, pref_friend: 1, pref_tourn: 0 }, { id: 7 }, {});
     });
+
+    test('the site theme is saved on the account, and `system` clears the choice', async () => {
+        await new User(row).saveProfile({ theme: 'arena' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { site_theme: 'arena' }, { id: 7 }, {});
+        await new User(row).saveProfile({ theme: 'system' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { site_theme: null }, { id: 7 }, {});
+        expect(new User(row).toJSON().theme).toBe('system');
+        expect(new User({ ...row, site_theme: 'classic' }).toJSON().theme).toBe('classic');
+    });
 });

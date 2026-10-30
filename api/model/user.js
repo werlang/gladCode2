@@ -30,7 +30,7 @@ export class User extends Model {
             fields,
             insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'foto'],
             allowUpdate: [
-                'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font',
+                'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font', 'site_theme',
                 ...Object.values(PREFERENCES), 'pref_language', 'silver', 'credits', 'apothecary', 'lvl', 'xp',
             ],
         });
@@ -101,12 +101,12 @@ export class User extends Model {
     /**
      * Applies profile changes. Only the fields present are changed.
      *
-     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string }} changes
-     *   Already validated values; `picture` is the stored picture URL.
+     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'arena'|'classic' }} changes
+     *   Already validated values; `picture` is the stored picture URL; `theme` `system` clears the choice.
      * @returns {Promise<User>}
      * @throws {CustomError} 409 `NICKNAME_TAKEN` when another account uses the nickname.
      */
-    async saveProfile({ nickname, language, preferences, editorTheme, editorFont, showTutorial, picture }) {
+    async saveProfile({ nickname, language, preferences, editorTheme, editorFont, showTutorial, picture, theme }) {
         if (nickname !== undefined && nickname !== this.apelido) {
             const taken = await Mysql.findOne('usuarios', { filter: { apelido: nickname, id: { not: this.id } }, view: ['id'] });
             if (taken) throw new CustomError(409, 'Este nome já está em uso.', 'NICKNAME_TAKEN');
@@ -119,6 +119,7 @@ export class User extends Model {
             editor_font: editorFont,
             showTutorial: showTutorial === undefined ? undefined : Number(showTutorial),
             foto: picture,
+            site_theme: theme === undefined ? undefined : (theme === 'system' ? null : theme),
         };
         for (const [name, column] of Object.entries(PREFERENCES)) {
             if (preferences?.[name] !== undefined) changes[column] = Number(Boolean(preferences[name]));
@@ -145,6 +146,7 @@ export class User extends Model {
             showTutorial: Boolean(Number(this.showTutorial)),
             editorTheme: this.editor_theme,
             editorFont: this.editor_font,
+            theme: this.site_theme || 'system',
             preferences: Object.fromEntries(Object.entries(PREFERENCES).map(([name, column]) => [name, Boolean(Number(this[column]))])),
             isAdmin: this.isAdmin,
         };

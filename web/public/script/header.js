@@ -2,6 +2,7 @@ import { showMessage } from './components/dialog.js';
 import { Header } from './components/header.js';
 import { Tooltip } from './components/tooltip.js';
 import { GoogleLogin } from './helpers/google-login.js';
+import { applyTheme, storedThemeChoice } from './helpers/theme.js';
 import { UserModel } from './models/user.js';
 
 /**
@@ -12,6 +13,8 @@ async function start() {
     Tooltip.install();
     const user = await UserModel.current().catch(() => null);
     const logged = UserModel.isLogged(user);
+    // the account's theme wins over this browser's cached copy (chosen on another device, say)
+    if (logged && user.theme && user.theme !== storedThemeChoice()) applyTheme(user.theme);
     const headerElement = document.querySelector('#header');
     if (headerElement) new Header(headerElement).showSignedIn(logged);
 

@@ -4,9 +4,9 @@
 <head>
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{> head}}
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Perfil</title>
-    <link href="https://fonts.googleapis.com/css?family=Acme|Roboto|Source+Code+Pro&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
@@ -98,6 +98,14 @@
                             <option value='c'>C</option>
                             <option value='python'>Python</option>
                             <option value='blocks'>Blocos</option>
+                        </select>
+                    </div>
+                    <div id='site-theme'>
+                        <h3>Tema do site</h3>
+                        <select aria-label='Tema do site'>
+                            <option value='system'>Seguir o sistema</option>
+                            <option value='arena'>Arena (escuro)</option>
+                            <option value='classic'>Clássico (claro)</option>
                         </select>
                     </div>
                     <div id='email'>

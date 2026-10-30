@@ -1,6 +1,7 @@
 import { showMessage } from '../components/dialog.js';
 import { decorateCheckSliders } from '../components/form-controls.js';
 import { fadeIn, hide } from '../helpers/animate.js';
+import { applyTheme } from '../helpers/theme.js';
 import { UserModel } from '../models/user.js';
 import { profile } from './session.js';
 
@@ -30,7 +31,7 @@ function readImage(file) {
 
 /**
  * The PERFIL tab: nickname, picture (cropped in the browser), preferred
- * programming language and e-mail preferences.
+ * programming language, site theme and e-mail preferences.
  */
 export class SettingsTab {
     #panel = document.querySelector('#profile-panel');
@@ -41,6 +42,10 @@ export class SettingsTab {
     init() {
         decorateCheckSliders(this.#panel);
         this.#panel.querySelector('#language select').value = profile.user.language;
+        const theme = this.#panel.querySelector('#site-theme select');
+        theme.value = profile.user.theme;
+        // preview at once; GRAVAR saves it on the account
+        theme.addEventListener('change', () => applyTheme(theme.value));
         this.#bindPicture();
         this.#panel.querySelector('#save').addEventListener('click', () => this.#save());
     }
@@ -133,6 +138,7 @@ export class SettingsTab {
             nickname: field.value,
             preferences: Object.fromEntries(PREFERENCES.map(name => [name, this.#switch(name).checked])),
             language: this.#panel.querySelector('#language select').value,
+            theme: this.#panel.querySelector('#site-theme select').value,
         };
         if (this.#picture) changes.picture = this.#picture;
 

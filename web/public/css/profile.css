@@ -395,18 +395,18 @@ body {
   align-items: center;
   margin-left: 20px;
 }
-#profile-panel #language {
+#profile-panel :is(#language, #site-theme) {
   display: grid;
   margin-bottom: 30px;
   grid-auto-flow: row;
   align-items: center;
 }
 @media only screen and (min-width: 900px) {
-  #profile-panel #language {
+  #profile-panel :is(#language, #site-theme) {
     grid-auto-flow: column;
   }
 }
-#profile-panel #language select {
+#profile-panel :is(#language, #site-theme) select {
   max-width: 100%;
   justify-self: center;
   border: none;
