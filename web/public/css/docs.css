@@ -57,7 +57,7 @@ h2 {
 
 p {
 	margin: 0 0 var(--space-5) 0;
-	text-align: justify;
+	text-align: start;
 	line-height: 1.5;
 }
 

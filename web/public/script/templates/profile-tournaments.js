@@ -100,6 +100,6 @@ export const chooseGladTemplate = `
         <div id='title'>Escolha o gladiador que irá lhe representar no torneio</div>
         <div class='glad-card-container'></div>
         <div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div>
-        <div id='button-container'><button id='cancel' class='button secondary block'>Cancelar</button><button id='choose' class='button secondary block' disabled>ESCOLHER</button></div>
+        <div id='button-container'><button id='cancel' class='button ghost block'>Cancelar</button><button id='choose' class='button primary block' disabled>ESCOLHER</button></div>
     </div>
 </div>`;

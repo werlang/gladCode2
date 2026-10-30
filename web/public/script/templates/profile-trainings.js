@@ -79,8 +79,8 @@ export const chooseGladTemplate = `
         <div id='title'>Escolha o gladiador que participará do treino</div>
         <div class='glad-card-container'></div>
         <div id='button-container'>
-            <button id='cancel' class='button secondary block'>Cancelar</button>
-            <button id='select' class='button secondary block' disabled>SELECIONAR</button>
+            <button id='cancel' class='button ghost block'>Cancelar</button>
+            <button id='select' class='button primary block' disabled>SELECIONAR</button>
         </div>
     </div>
 </div>`;

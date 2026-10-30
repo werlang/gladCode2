@@ -307,7 +307,7 @@ h3#tourn-desc {
 
 .float-box #text {
     font-size: var(--text-xl);
-    text-align: justify;
+    text-align: start;
 }
 
 .float-box #button-container {

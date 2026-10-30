@@ -36,8 +36,19 @@ export function setSilver(silver) {
  */
 export function setBadge(badge, count) {
     if (!badge) return;
-    badge.textContent = count;
+    badge.textContent = badgeLabel(count);
+    badge.title = count > 99 ? String(count) : '';
     badge.classList.toggle('empty', !(count > 0));
+}
+
+/**
+ * What a menu badge shows: the count up to 99, then `99+` so the badge keeps its size.
+ *
+ * @param {number} count
+ * @returns {string}
+ */
+export function badgeLabel(count) {
+    return count > 99 ? '99+' : String(count);
 }
 
 /**

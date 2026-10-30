@@ -176,7 +176,7 @@ body .ui-tooltip {
 	cursor: default;
 	user-select: none;
 	pointer-events: none;
-	text-align: justify;
+	text-align: start;
 	box-shadow: none;
 	z-index: var(--z-dialog);
 }

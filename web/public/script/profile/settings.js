@@ -58,6 +58,10 @@ export class SettingsTab {
     show() {
         this.#picture = null;
         this.#nickname.value = profile.user.nickname;
+        // the slot shows the current picture until a new crop replaces it
+        const area = this.#panel.querySelector('#img-upload');
+        area.style.backgroundImage = `url(${JSON.stringify(profile.user.picture)})`;
+        area.classList.add('has-picture');
         PREFERENCES.forEach(name => {
             this.#switch(name).checked = profile.user.preferences[name];
         });
@@ -126,8 +130,8 @@ export class SettingsTab {
         container.querySelector('#crop-image').addEventListener('click', async () => {
             const cropped = await croppie.result('base64');
             const area = this.#panel.querySelector('#img-upload');
-            area.style.backgroundImage = `url(${cropped})`;
-            area.style.backgroundSize = 'cover';
+            area.style.backgroundImage = `url(${JSON.stringify(cropped)})`;
+            area.classList.add('has-picture');
             this.#picture = cropped;
             croppie.destroy();
             hide(container);

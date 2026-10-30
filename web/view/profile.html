@@ -10,16 +10,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
-    <link rel='stylesheet' href="css/profile.css"/>
-    <link rel='stylesheet' href="css/glad-card.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/croppie.css"/>
-    <link rel='stylesheet' href="css/slider.css"/>
-    <link rel='stylesheet' href="css/ui-slider.css"/>
-    <link rel='stylesheet' href="css/radio.css"/>
-    <link rel='stylesheet' href="css/checkboxes.css"/>
-    <link rel='stylesheet' href="css/table2.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/glad-card.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/dialog.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/croppie.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/slider.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/ui-slider.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/radio.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/checkboxes.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/table2.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/header.css{{/asset}}"/>
     
     {{{importMap}}}
     <script type="module" src="{{#module}}header.js{{/module}}"></script>
@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/blockly@3.20200123.1/python.js"></script>
     
     
-    <script src="script/croppie.js"></script>
+    <script src="{{#asset}}script/croppie.js{{/asset}}"></script>
     
     
     </head>
@@ -59,15 +59,15 @@
                 <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
             </div>
             <div id='menu-buttons'>
-                <div id='news' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
+                <div id='news' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
                 <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
-                <div id='glads' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/face.png'></div><span>GLADIADORES</span></div>
-                <div id='potions' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
-                <div id='battle' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
-                <div id='report' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
+                <div id='glads' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/face.png'></div><span>GLADIADORES</span></div>
+                <div id='potions' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
+                <div id='battle' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
+                <div id='report' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/message.png'></div><span>MESSAGENS</span></div>
-                <div id='friends' class='item'><div class='notification empty'></div><div class='icon-frame'><img src='icon/friends.png'></div><span>AMIGOS</span></div>
+                <div id='messages' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/message.png'></div><span>MESSAGENS</span></div>
+                <div id='friends' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/friends.png'></div><span>AMIGOS</span></div>
                 <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
             <div id='footer'>{{> footer}}</div>
@@ -79,47 +79,48 @@
             </div></div>
             <div class='content' data-menu='profile'>
                 <div id='profile-panel'>
-                    <div id='nickname'>
+                    <section id='nickname' class='setting'>
                         <h2>Apelido</h2>
-                        <h3>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</h3>
-                        <input type='text' class='input' placeholder='apelido'>
-                    </div>
-                    <div id='picture'>
+                        <p class='hint'>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</p>
+                        <input type='text' class='input' placeholder='apelido' aria-label='Apelido'>
+                    </section>
+                    <section id='picture' class='setting'>
                         <h2>Foto de perfil</h2>
-                        <h3>Escolha uma foto apropriada para um grande mestre de gladiadores</h3>
-                        <div id='img-upload'></div>
+                        <p class='hint'>Escolha uma foto apropriada para um grande mestre de gladiadores</p>
+                        <div id='img-upload'><span class='prompt'><i class='fa-solid fa-camera' aria-hidden='true'></i>Trocar foto</span></div>
                         <div id='img-preview-container'></div>
-                        <img id='img-result'>
-                        
-                    </div>
-                    <div id='language'>
-                        <h3>Linguagem de programação preferencial</h3>
-                        <select class='input'>
-                            <option value='c'>C</option>
-                            <option value='python'>Python</option>
-                            <option value='blocks'>Blocos</option>
-                        </select>
-                    </div>
-                    <div id='site-theme'>
-                        <h3>Tema do site</h3>
-                        <select class='input' aria-label='Tema do site'>
-                            <option value='system'>Seguir o sistema</option>
-                            <option value='arena-light'>Arena claro</option>
-                            <option value='arena-dark'>Arena escuro</option>
-                            <option value='classic'>Clássico</option>
-                        </select>
-                    </div>
-                    <div id='email'>
+                        <img id='img-result' alt=''>
+                    </section>
+                    <section class='setting'>
+                        <label id='language' class='setting-row'>
+                            <span>Linguagem de programação preferencial</span>
+                            <select class='input'>
+                                <option value='c'>C</option>
+                                <option value='python'>Python</option>
+                                <option value='blocks'>Blocos</option>
+                            </select>
+                        </label>
+                        <label id='site-theme' class='setting-row'>
+                            <span>Tema do site</span>
+                            <select class='input'>
+                                <option value='system'>Seguir o sistema</option>
+                                <option value='arena-light'>Arena claro</option>
+                                <option value='arena-dark'>Arena escuro</option>
+                                <option value='classic'>Clássico</option>
+                            </select>
+                        </label>
+                    </section>
+                    <section id='email' class='setting'>
                         <h2>Preferências de email</h2>
-                        <h3>Desejo receber um email quando:</h3>
+                        <p class='hint'>Desejo receber um email quando:</p>
                         <div id='pref-friend'><label><input type='checkbox' class='checkslider'>Outro usuário me enviar uma solicitação de amizade</label></div>
                         <div id='pref-message'><label><input type='checkbox' class='checkslider'>Outro usuário me enviar uma mensagem</label></div>
                         <div id='pref-update'><label><input type='checkbox' class='checkslider'>A gladCode receber uma atualização</label></div>
                         <div id='pref-duel'><label><input type='checkbox' class='checkslider'>Um amigo enviar um desafio para um duelo</label></div>
                         <div id='pref-tourn'><label><input type='checkbox' class='checkslider'>Começar um nova rodada de um torneio que participo</label></div>
-                    </div>
+                    </section>
                     <div id='button-container'>
-                        <button class='button' id='save'>GRAVAR</button>
+                        <button class='button primary large' id='save'>GRAVAR</button>
                     </div>
                 </div>
             </div>
@@ -270,10 +271,10 @@
                 <div id='message-panel'>
                     <h2>Mensagens</h2>
                     <div class='table'></div>
-                    <div id='page-title'>
-                        <button id='prev'></button>
+                    <div id='page-title' class='page-nav'>
                         <span></span> - <span></span> de <span></span>
-                        <button id='next'></button>
+                        <button id='prev' aria-label='Página anterior'><i class='fas fa-chevron-left'></i></button>
+                        <button id='next' aria-label='Próxima página'><i class='fas fa-chevron-right'></i></button>
                     </div>
                 </div>
             </div>

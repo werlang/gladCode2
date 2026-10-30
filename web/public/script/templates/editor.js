@@ -32,7 +32,7 @@ export const settingsTemplate = `
             </div>
             <div id='sample'><h3>Visualização</h3><pre id='code-sample'></pre></div>
         </div>
-        <div id='button-container'><button class='button block' id='cancel'>Cancelar</button><button class='button block' id='change'>ALTERAR</button></div>
+        <div id='button-container'><button class='button ghost block' id='cancel'>Cancelar</button><button class='button primary block' id='change'>ALTERAR</button></div>
     </div>
 </div>`;
 

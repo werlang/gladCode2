@@ -345,7 +345,7 @@ body{
 #know .text {
     line-height: 1.6em;
     margin-bottom: var(--space-9);
-    text-align: justify;
+    text-align: start;
 }
 
 #know .button-container {
@@ -441,7 +441,7 @@ body{
 
 #plans .text,
 #support .text {
-    text-align: justify;
+    text-align: start;
 }
 
 #support #icons {
@@ -460,7 +460,7 @@ body{
 #plans .text p,
 #support .text p {
     margin: 0 0 var(--space-3) 0;
-    text-align: justify;
+    text-align: start;
 }
 
 #support .question {

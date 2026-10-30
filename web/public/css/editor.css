@@ -229,7 +229,31 @@ body{
 
 #fog-glads #message,
 #fog-battle #message {
-		margin: 0 var(--space-7);
+	margin: 0;
+	padding: var(--space-6) var(--space-7) var(--space-2);
+}
+
+/* dialog titles: the heading in the display face, its instruction quieter below */
+:is(#fog-glads, #fog-battle) #message h2,
+#settings-window #title h2 {
+	margin: 0 0 var(--space-1);
+	color: var(--color-brand-text);
+	font-family: var(--font-display);
+	font-size: var(--text-xl);
+	font-weight: normal;
+}
+
+:is(#fog-glads, #fog-battle) #message h3 {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: var(--text-base);
+	font-weight: normal;
+}
+
+/* dialog footers: a hairline above the cancel and main actions */
+:is(#fog-glads, #fog-battle, #settings-window) #button-container {
+	margin-top: var(--space-4);
+	border-top: var(--space-hairline) solid var(--color-border);
 }
 
 #fog-battle #selection-container {

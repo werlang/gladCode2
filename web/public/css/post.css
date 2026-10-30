@@ -17,7 +17,7 @@ body {
     width: 100%;
     max-width: 600px;
     margin: 0 var(--space-5);
-    text-align: justify;
+    text-align: start;
     font-family: var(--font-body);
     color: var(--color-text);
 }
@@ -57,7 +57,7 @@ a {
 }
 
 #post .body {
-	text-align: justify;
+	text-align: start;
 }
 
 #post .body img {

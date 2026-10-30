@@ -9,12 +9,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/themes/prism-coy.min.css" rel="stylesheet" type="text/css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
-    <link rel='stylesheet' href="css/sprite.css"/>
-    <link rel='stylesheet' href="css/slider.css"/>
-    <link rel='stylesheet' href="css/glad-card.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/header.css"/>
-    <link rel='stylesheet' href="css/editor.css"/>
+    <link rel='stylesheet' href="{{#asset}}css/sprite.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/slider.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/glad-card.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/dialog.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/header.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/editor.css{{/asset}}"/>
     
     {{{importMap}}}
     <script type="module" src="{{#module}}header.js{{/module}}"></script>
@@ -89,8 +89,8 @@
             </div>
             <div class='glad-card-container'></div>
             <div id='button-container'>
-                <button id='btn-glad-cancel' class='button block'>CANCELAR</button>
-                <button id='btn-glad-open' class='button block' disabled>ABRIR</button>
+                <button id='btn-glad-cancel' class='button ghost block'>CANCELAR</button>
+                <button id='btn-glad-open' class='button primary block' disabled>ABRIR</button>
             </div>
         </div>
     </div>
@@ -109,8 +109,8 @@
                 </div>
             </div>
             <div id='button-container'>
-                <button id='btn-cancel' class='button block'>CANCELAR</button>
-                <button id='btn-battle' class='button block' disabled>BATALHA</button>
+                <button id='btn-cancel' class='button ghost block'>CANCELAR</button>
+                <button id='btn-battle' class='button primary block' disabled>BATALHA</button>
             </div>
         </div>
     </div>
