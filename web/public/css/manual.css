@@ -1,5 +1,5 @@
 body{
-	color: #616161;
+	color: var(--color-text);
 }
 
 html {
@@ -18,11 +18,11 @@ html {
     display: flex;
 	flex-direction: column;
     align-items: flex-start;
-    background-color: white;
+    background-color: var(--color-surface);
     padding: 20px 15px;
 	max-width: 900px;
 	box-sizing: border-box;
-	font-family: 'Roboto', sans-serif;
+	font-family: var(--font-body);
 	margin-top: 5px;
 	min-height: 100vh;
 }
@@ -47,13 +47,13 @@ pre {
 }
 
 a {
-	color: #00638d;
+	color: var(--color-brand-text);
 	text-decoration: none;
 }
 
 h1 {
 	margin: 0px 0px 30px 0px;
-	color: #00638d;
+	color: var(--color-brand-text);
 	text-align: center;
 	width: 100%;
 	font-size: 2.5em;
@@ -61,7 +61,7 @@ h1 {
 
 h2 {
 	margin: 0px 0px 30px 0px;
-	color: #00638d;
+	color: var(--color-brand-text);
 }
 
 p,ul {
@@ -93,7 +93,7 @@ li {
 }
 
 .nav {
-    border-left: 5px solid #00638d;
+    border-left: 5px solid var(--color-border-brand);
     padding-left: 20px;
     margin: 20px 0px 40px;
 }
@@ -101,7 +101,7 @@ li {
 .nav a {
     display: block;
     text-decoration: none;
-    color: #00638d;
+    color: var(--color-brand-text);
     margin-bottom: 12px;
     font-size: 1.2em;
 }
@@ -299,8 +299,8 @@ ul {
 
 .silver {
 	margin: 0 5px;
-	color: silver;
-	text-shadow: 1px 1px 2px black;
+	color: var(--color-text-subtle);
+	text-shadow: 1px 1px 2px var(--color-shadow);
 }
 
 #tsilver, #tapot {

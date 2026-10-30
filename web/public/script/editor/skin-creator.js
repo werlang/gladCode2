@@ -493,7 +493,7 @@ export class SkinCreator {
         const button = this.#find('#get-code');
         button.disabled = spent !== ATTRIBUTE_POINTS;
         if (spent === ATTRIBUTE_POINTS) button.textContent = 'GERAR CÓDIGO';
-        remaining.style.color = spent === ATTRIBUTE_POINTS ? '#4caf50' : spent > ATTRIBUTE_POINTS ? '#f44336' : 'black';
+        remaining.style.color = spent === ATTRIBUTE_POINTS ? 'var(--color-success)' : spent > ATTRIBUTE_POINTS ? 'var(--color-danger)' : 'var(--color-text-strong)';
     }
 
     /** "PRONTO": from the appearance to the name and attributes. */

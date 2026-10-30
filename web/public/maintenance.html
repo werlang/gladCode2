@@ -5,24 +5,26 @@
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>gladCode - Manutenção</title>
+	<link rel="stylesheet" href="/css/tokens.css">
+	<script src="/script/theme-boot.js"></script>
 
 	<style>
 		body {
 			margin: 0;
-			background-color: #edf1f3;
-			font-family: consolas, sans-serif;
+			background-color: var(--color-page);
+			font-family: var(--font-mono);
 			font-size: 2em;
 			display: flex;
 			flex-direction: column;
 			height: 100vh;
 		}
 		#head {
-			background-color: #00638d;
+			background-color: var(--color-header-bg);
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			color: white;
+			color: var(--color-header-text);
 			padding-bottom: 50px;
 		}
 		#head img {
@@ -34,16 +36,16 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			color: #616161;
+			color: var(--color-text);
 			flex-grow: 1;
 			font-size: 0.8em;
 		}
 		#reload-p {
 			font-size: 0.7em;
-			color: #adadad;
+			color: var(--color-text-subtle);
 		}
 		#reload {
-			color: #616161;
+			color: var(--color-text);
 		}
 	</style>
 	<script>
@@ -54,7 +56,7 @@
 				timeleft--;
 				document.getElementById("reload").innerHTML = timeleft;
 				if (timeleft <= 0){
-					window.location.href = "index"; 
+					window.location.href = "index";
 				}
 			}, 1000);
 		}

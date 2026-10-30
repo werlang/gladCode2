@@ -147,7 +147,7 @@ export class ProgressButton {
         this.#bar = document.createElement('div');
         this.#bar.id = 'bar';
         Object.assign(this.#bar.style, {
-            backgroundColor: '#00638d',
+            backgroundColor: 'var(--color-brand)',
             width: '0%',
             height: '100%',
             borderRadius: '3px',

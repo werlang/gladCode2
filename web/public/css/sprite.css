@@ -10,11 +10,11 @@ canvas {
     max-width: 650px;
 	width: 100%;
 	box-sizing: border-box;
-    border: 1px solid black;
-    border-radius: 3px;
-    box-shadow: 1px 1px 5px black;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    box-shadow: 1px 1px 5px var(--color-shadow);
     padding: 5px;
-    background-color: #f5f5f5;
+    background-color: var(--color-surface);
 	z-index: 1;
 	display: flex;
 	flex-direction: column;
@@ -48,13 +48,13 @@ canvas {
 }
 
 .button {
-	background-color: #4286f4;
-	border-radius: 3px;
-	color: white;
+	background-color: var(--color-secondary);
+	border-radius: var(--radius-sm);
+	color: var(--color-text-on-brand);
 	outline: none;
 	border: 0;
 	font-size: 1em;
-	font-family: consolas, monospace;
+	font-family: var(--font-mono);
 	font-weight: bold;
 	cursor: pointer;
 	z-index: 1;
@@ -62,7 +62,7 @@ canvas {
 }
 
 .button:hover {
-    background-color: #3165b9;
+    background-color: var(--color-secondary-strong);
 }
 
 .button img {
@@ -70,7 +70,7 @@ canvas {
 }
 
 .button:disabled {
-	background-color: #8f98a3;
+	background-color: var(--color-neutral);
 	cursor: not-allowed;
 }
 
@@ -117,20 +117,20 @@ canvas {
 }
 
 .img-button.cat {
-    background-color: #cceacc;
+    background-color: var(--color-pick);
 }
 
 .img-button.cat:hover {
-    background-color: #afd7af;
+    background-color: var(--color-pick-hover);
 }
 
 .img-button.cat.selected {
-	background-color: #92c592;
+	background-color: var(--color-pick-selected);
 }
 
 .img-button.sub {
-    background-color: #cceacc;
-    transition: all 0.2s, opacity 0.5s;
+    background-color: var(--color-pick);
+    transition: all var(--duration-quick), opacity var(--duration-slow);
     margin-left: 2px;
     z-index: 0;
 	width: 55px;
@@ -138,15 +138,15 @@ canvas {
 }
 
 .img-button.sub:hover {
-    background-color: #afd7af;
+    background-color: var(--color-pick-hover);
 }
 
 .img-button.sub.selected {
-	background-color: #92c592;
+	background-color: var(--color-pick-selected);
 }
 
 .img-button.sub.n-av {
-	background-color: #c8c8c8;
+	background-color: var(--color-surface-strong);
 }
 
 .img-button.sub.hidden {
@@ -159,16 +159,16 @@ canvas {
 }
 
 .img-button.item {
-	background-color: #ccccea;
-    transition: opacity 1s;
+	background-color: var(--color-pick-item);
+    transition: opacity var(--duration-slower);
 }
 
 .img-button.item:hover {
-    background-color: #afafd7;
+    background-color: var(--color-pick-item-hover);
 }
 
 .img-button.item.selected {
-    background-color: #9292c5;
+    background-color: var(--color-pick-item-selected);
 }
 
 .img-button.item.hidden {
@@ -210,7 +210,7 @@ canvas {
 	width: 100%;
 	display: block;
 }
-	
+
 #right-container {
     box-sizing: border-box;
     display: flex;
@@ -261,16 +261,16 @@ canvas {
 .input {
 	border: 0;
     outline: none;
-    border: 2px solid #c0c0c0;
-	border-radius: 5px;
-	transition: 0.5s;
-	color: #616161;
+    border: 2px solid var(--color-border);
+	border-radius: var(--radius-md);
+	transition: var(--duration-slow);
+	color: var(--color-text);
     font-size: 1em;
-	font-family: consolas, monospace;
+	font-family: var(--font-mono);
 	background-color: transparent;
 }
 .input:focus {
-    border: 2px solid #00638d;
+    border: 2px solid var(--color-border-brand);
 }
 
 .slider-input {
@@ -284,11 +284,11 @@ canvas {
 	flex-direction: column;
 	width: 650px;
 	max-width: 100%;
-    background-color: #f5f5f5;
-    border-radius: 3px;
-    border: 1px solid black;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
 	box-sizing: border-box;
-    box-shadow: 1px 1px 5px black;
+    box-shadow: 1px 1px 5px var(--color-shadow);
     padding: 5px;
 	z-index: 1;
 	overflow: hidden auto;
@@ -311,7 +311,7 @@ canvas {
 	line-height: 2em;
 	display: flex;
 	align-items: center;
-	flex-direction: row;	
+	flex-direction: row;
 }
 
 #distribuicao .attr {
@@ -334,7 +334,7 @@ canvas {
 #distribuicao .button {
 	height: 35px;
     width: 100%;
-    margin: 10px 10px 5px 10px;	
+    margin: 10px 10px 5px 10px;
 }
 
 #distribuicao #nome {
@@ -342,14 +342,14 @@ canvas {
     margin: auto;
     margin-bottom: 10px;
 	font-size: 1.2em;
-	color: #00638d;
+	color: var(--color-brand-text);
     font-weight: bold;
 	margin-right: 10%;
 }
 
 #distribuicao #nome.error {
-    border-color: #f47a7a;
-    background-color: #ffdbdb;
+    border-color: var(--color-danger);
+    background-color: var(--color-danger-soft);
 }
 
 #distribuicao #remaining {
@@ -365,10 +365,10 @@ canvas {
 }
 
 #info {
-	font-family: roboto, helvetica, arial;
-    background-color: #e8e8e8;
-    border-radius: 5px;
-	box-shadow: 0px 0px 6px black inset;
+	font-family: var(--font-body);
+    background-color: var(--color-surface-alt);
+    border-radius: var(--radius-md);
+	box-shadow: 0px 0px 6px var(--color-shadow) inset;
 	width: 100%;
 }
 
@@ -395,10 +395,10 @@ canvas {
     align-items: center;
     font-size: 1.3em;
     font-weight: bold;
-    background-color: #adcaf3;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-	box-shadow: 0px 0px 6px black inset;
+    background-color: var(--color-brand-soft);
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+	box-shadow: 0px 0px 6px var(--color-shadow) inset;
 }
 
 #info img {
@@ -437,16 +437,16 @@ canvas {
 #info li {
     display: flex;
     margin-bottom: 5px;
-    background-color: #d7dee8;
-    border-radius: 5px;
+    background-color: var(--color-brand-soft);
+    border-radius: var(--radius-md);
 	font-size: 0.9rem;
 }
 
 #info li .img-container {
-	background-color: #adcaf3;
+	background-color: var(--color-brand-soft);
 	display: flex;
 	align-items: center;
-	border-radius: 5px;
+	border-radius: var(--radius-md);
 }
 
 #info ul img {
@@ -466,25 +466,25 @@ canvas {
 }
 
 #close-container .close:hover {
-    background-color: #ff8585;
+    background-color: var(--color-danger);
 }
 
 #close-container .close {
     width: 25px;
     height: 25px;
-    background-color: #fbaeae;
+    background-color: var(--color-danger-soft);
     border-radius: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 1px 1px 3px black;
-    border: 1px solid #000000;
+    box-shadow: 1px 1px 3px var(--color-shadow);
+    border: 1px solid var(--color-border-strong);
     margin-top: -10px;
     margin-right: -10px;
     z-index: 2;
     cursor: pointer;
-    font-family: acme;
+    font-family: var(--font-game);
     font-size: 1.3em;
-	transition: all 0.3s;
-	color: #785656;
+	transition: all var(--duration-base);
+	color: var(--color-danger);
 }

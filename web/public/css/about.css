@@ -1,7 +1,7 @@
 body{
     margin: 0;
-    background-color: #edf1f3;
-    font-family: 'Source Code Pro', monospace;
+    background-color: var(--color-page);
+    font-family: var(--font-mono);
     font-size: 16px;
 }
 
@@ -11,12 +11,12 @@ body{
     align-items: center;
     flex-direction: column;
     padding-top: 50px;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
 }
 
 #mission-container {
     width: 100%;
-    background-color: #00638d;
+    background-color: var(--color-brand);
     display: flex;
     justify-content: center;
     padding-top: 80px;
@@ -24,9 +24,9 @@ body{
 }
 
 #mission {
-    color: white;
+    color: var(--color-text-on-brand);
     z-index: 1;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
     font-size: 3em;
     margin-bottom: 70px;
     text-align: center;
@@ -34,7 +34,7 @@ body{
 
 #mission #line2{
     font-size: 0.5em;
-    color: #beecff;
+    color: var(--color-text-on-brand-muted);
     margin: 15px;
     max-width: 1200px;
 }
@@ -49,8 +49,8 @@ body{
     align-items: center;
     display: flex;
     box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-    color: #616161;
+    font-family: var(--font-body);
+    color: var(--color-text);
     width: 100%;
 }
 
@@ -66,7 +66,7 @@ body{
     font-size: 1.3em;
     display: flex;
     justify-content: center;
-    color: #b6b6b6;
+    color: var(--color-text-subtle);
 }
 
 #author #myself {
@@ -79,8 +79,8 @@ body{
 #author #myself .image{
     width: 200px;
     height: 200px;
-    border-radius: 50%;
-    box-shadow: 0px 0px 5px 2px black;
+    border-radius: var(--radius-round);
+    box-shadow: 0px 0px 5px 2px var(--color-shadow);
     margin: 20px;
 }
 
@@ -99,23 +99,23 @@ body{
 #author .feats img {
     height: 50px;
     width: 50px;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     padding: 5px;
     box-sizing: border-box;
     margin-right: 15px;
-    box-shadow: 0px 0px 5px black;
+    box-shadow: 0px 0px 5px var(--color-shadow);
 }
 
 #author .feats:nth-child(1) img {
-    background-color: #ff5050;
+    background-color: var(--color-str);
 }
 
 #author .feats:nth-child(2) img {
-    background-color: #e3e300;
+    background-color: var(--color-agi);
 }
 
 #author .feats:nth-child(3) img {
-    background-color: #7c90ff;
+    background-color: var(--color-int);
 }
 
 #author .feats:nth-child(odd) {
@@ -124,9 +124,9 @@ body{
 
 #author .feats a {
     font-size: 1.2em;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
     text-decoration: none;
-    color: #646464;
+    color: var(--color-text);
 }
 
 #author #name {
@@ -153,7 +153,7 @@ body{
 
 #author #social a {
     margin-top: 10px;
-    color: #00638d;
+    color: var(--color-brand-text);
     font-size: 1.2em;
     text-decoration: none;
     display: flex;
@@ -161,13 +161,13 @@ body{
 }
 
 #author a:hover {
-    text-shadow: 0px 0px 3px #00000050;
+    text-shadow: 0px 0px 3px var(--color-shadow);
 }
 
 #timeline {
-    background-color: #6c97a9;
+    background-color: var(--color-brand-muted);
     width: 100%;
-    color: #e2f6ff;
+    color: var(--color-text-on-brand-muted);
     flex-direction: column;
     padding-bottom: 40px;
     font-size: 1.2em;
@@ -184,23 +184,23 @@ body{
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    position: relative; 
+    position: relative;
     padding: 0px 10px;
 }
 
 #timeline a {
-    color: #7cd4f9;
+    color: var(--color-text-on-brand-muted);
     text-decoration: none;
 }
 
 .discontinued {
-    color: #7cd4f9;
+    color: var(--color-text-on-brand-muted);
     text-decoration: line-through;
     cursor: pointer;
 }
 
 #timeline a:hover {
-    color: #5ac1ec;
+    color: var(--color-text-on-brand-muted);
 }
 
 #timeline .row:nth-child(even) {
@@ -267,7 +267,7 @@ body{
     #timeline .row {
         flex-direction: row;
         width: 50%;
-        border: 0px solid #648492;
+        border: 0px solid var(--color-border-brand-muted);
         padding: 0;
     }
 
@@ -288,12 +288,12 @@ body{
         display: block;
         width: 40px;
         height: 40px;
-        background-color: #648492;
+        background-color: var(--color-brand-muted);
         padding: 5px;
-        border-radius: 50%;
+        border-radius: var(--radius-round);
         box-sizing: border-box;
         margin: 0px 10px;
-        border: 3px solid #6c97a9;
+        border: 3px solid var(--color-border-brand-muted);
     }
     #timeline .row:nth-child(even) {
         margin-left: 2px;
@@ -311,13 +311,13 @@ body{
 }
 #know {
     width: 100%;
-    background-color: #000;
+    background-color: var(--color-terminal-bg);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    color: #9cb5bf;
+    color: var(--color-text-muted);
     font-size: 1.2em;
 }
 
@@ -358,15 +358,15 @@ body{
 #know .button,
 #contact .button {
     padding: 10px 20px;
-    background-color: #4286f4;
+    background-color: var(--color-secondary);
     border: none;
-    border-radius: 3px;
-    font-family: 'Source Code Pro', monospace;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
     font-size: 1.2em;
-    color: white;
+    color: var(--color-text-on-brand);
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s all;
+    transition: var(--duration-base) all;
     margin: 10px 20px;
     text-decoration: none;
     outline: none;
@@ -377,12 +377,12 @@ body{
 
 #contact .button:hover,
 #know .button:hover {
-        background-color: #3165b9;
+        background-color: var(--color-secondary-strong);
 }
 
 #contact {
     width: 100%;
-    background-color: #d1d5d6;
+    background-color: var(--color-surface-strong);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -390,8 +390,8 @@ body{
     padding: 40px 20px;
     box-sizing: border-box;
     font-size: 1.3em;
-    font-family: 'Roboto', sans-serif;
-    color: #00638d;
+    font-family: var(--font-body);
+    color: var(--color-brand-text);
 }
 
 #contact .title {
@@ -400,7 +400,7 @@ body{
 }
 
 #contact .subtitle {
-    color: #1e83af;
+    color: var(--color-brand-text);
     font-size: 1.2em;
 }
 
@@ -421,21 +421,21 @@ body{
 #plans,
 #support {
     width: 100%;
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
     font-size: 1.3em;
     box-sizing: border-box;
     display: flex;
-    background-color: #edf1f3;
-    color: #616161;
+    background-color: var(--color-surface-alt);
+    color: var(--color-text);
     justify-content: center;
 }
 
 #support .video {
     flex-grow: 1;
     display: none;
-    border: 2px solid black;
-    box-shadow: 0px 0px 5px 2px black;
-    border-radius: 0px 0px 3px 0px;
+    border: 2px solid var(--color-border-strong);
+    box-shadow: 0px 0px 5px 2px var(--color-shadow);
+    border-radius: 0px 0px var(--radius-sm) 0px;
 }
 
 #plans .title,
@@ -511,11 +511,11 @@ body{
     justify-content: space-around;
     padding: 50px 0;
     flex-direction: column;
-    background-color: #c9dbec;
+    background-color: var(--color-brand-soft);
 }
 
 #plans a {
-    color: #00638d;
+    color: var(--color-brand-text);
 }
 
 #plans #img-rank {
@@ -541,7 +541,7 @@ body{
     height: 40px;
 }
 
-@media only screen and (min-width: 600px) {    
+@media only screen and (min-width: 600px) {
     #know .button {
         display: inline;
     }
@@ -549,7 +549,7 @@ body{
     #know .button-container {
         flex-direction: row;
     }
-    
+
     #support .video{
         display: flex;
     }
@@ -558,7 +558,7 @@ body{
         height: 60px;
         margin: 40px 25px;
     }
-    
+
 }
 
 @media only screen and (min-width: 900px) {
@@ -584,14 +584,14 @@ body{
     display: flex;
     justify-content: flex-end;
 	align-items: center;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 	margin-top: 5px;
 	height: 30px;
 	padding: 0px 1px;
 	box-sizing: border-box;
-	border: 1px solid black;
-	background-color: #eeeeee;
-	box-shadow: 0px 0px 3px black;
+	border: 1px solid var(--color-border-strong);
+	background-color: var(--color-surface-alt);
+	box-shadow: 0px 0px 3px var(--color-shadow);
 	cursor: pointer;
 }
 
@@ -603,11 +603,11 @@ body{
 .donate span {
 	flex-grow: 1;
     font-style: italic;
-    font-family: arial;
+    font-family: var(--font-body);
     font-weight: bold;
     font-size: 0.8em;
 	text-align: center;
-	color: #646464;
+	color: var(--color-text);
 }
 
 .donate:hover span{
@@ -615,21 +615,21 @@ body{
 }
 
 .donate:hover .inner-box{
-	background-color: white;
+	background-color: var(--color-surface);
 }
 
 .donate .inner-box {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: #e0e0e0;
-	border-radius: 3px;
+	background-color: var(--color-surface-alt);
+	border-radius: var(--radius-sm);
 	width: 100px;
 	height: 26px;
-	box-shadow: 1px 1px 2px 0px black inset;
+	box-shadow: 1px 1px 2px 0px var(--color-shadow) inset;
 	box-sizing: border-box;
 	padding: 3px 5px;
-	transition: 0.3s all;
+	transition: var(--duration-base) all;
 }
 
 .donate.small .inner-box {
@@ -645,11 +645,11 @@ body{
 }
 
 #crypto-box {
-    background-color: white;
-    border-radius: 3px;
-    box-shadow: 1px 1px 5px black;
-    color: #646464;
-	font-family: 'Roboto', sans-serif;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    box-shadow: 1px 1px 5px var(--color-shadow);
+    color: var(--color-text);
+	font-family: var(--font-body);
 	cursor: default;
 	display: flex;
 	flex-direction: column;
@@ -657,35 +657,35 @@ body{
 
 #crypto-box #close {
 	cursor: pointer;
-	background-color: #fbaeae;
-	font-family: sans-serif;
+	background-color: var(--color-danger-soft);
+	font-family: var(--font-body);
 	font-weight: bold;
-	color: white;
+	color: var(--color-text-on-brand);
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border-radius: 20px;
-	border: 1px solid black;
+	border-radius: var(--radius-xl);
+	border: 1px solid var(--color-border-strong);
 	width: 25px;
 	height: 25px;
 	margin-bottom: -22px;
     margin-left: calc(100% - 20px);
 	margin-top: -5px;
-	transition: all 0.3s;
-	color: #785656;
+	transition: all var(--duration-base);
+	color: var(--color-danger);
 	z-index: 1;
 }
 
 #crypto-box #close:hover {
-	background-color: #ff8585;
+	background-color: var(--color-danger);
 }
 
 #crypto-box #wallet {
     padding: 50px 0px 10px;
     margin-top: -40px;
-    font-family: 'Roboto Mono', monospace;
+    font-family: var(--font-mono);
     text-align: center;
-    background-color: #6c97a9;
+    background-color: var(--color-brand-muted);
     font-weight: bold;
 	display: flex;
 	align-items: center;
@@ -694,28 +694,28 @@ body{
 }
 
 #crypto-box #wallet span {
-    color: white;
-    text-shadow: 0px 0px 3px black;
+    color: var(--color-text-on-brand);
+    text-shadow: 0px 0px 3px var(--color-shadow);
     font-style: normal;
-    border: 1px solid #88adbd;
-    border-radius: 5px;
+    border: 1px solid var(--color-border-brand-muted);
+    border-radius: var(--radius-md);
     margin-right: 20px;
     margin-left: -15px;
     padding-left: 10px;
-	background-color: #7a9dac;
+	background-color: var(--color-brand-muted);
 	height: 60px;
 	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: background-color 0.3s, text-shadow 0.3s, color 0.3s;
+	transition: background-color var(--duration-base), text-shadow var(--duration-base), color var(--duration-base);
 }
 
 #crypto-box #wallet img {
 	width: 35px;
     margin-left: 10px;
 	z-index: 1;
-	transition: transform 0.3s;
+	transition: transform var(--duration-base);
 }
 
 #crypto-box #wallet.copied img {
@@ -723,8 +723,8 @@ body{
 }
 
 #crypto-box #wallet:hover span {
-	color: #ffffff29;
-	background-color: #00638d;
+	color: var(--color-highlight);
+	background-color: var(--color-brand);
 	text-shadow: none;
 	background-image: url('../icon/copy.png');
 	background-position: center;
@@ -733,16 +733,16 @@ body{
 }
 
 #crypto-box #wallet.copied span {
-    color: white;
-    text-shadow: 0px 0px 3px black;
+    color: var(--color-text-on-brand);
+    text-shadow: 0px 0px 3px var(--color-shadow);
     font-style: normal;
-	background-color: #db9696;
+	background-color: var(--color-danger-soft);
 	background-image: none;
 }
 
 #crypto-box #title {
 	font-size: 1.5em;
-    background-color: #c7d6dc;
+    background-color: var(--color-brand-soft);
     padding: 15px 20px 55px;
 }
 
@@ -756,10 +756,10 @@ body{
 #crypto-box #qrcode img{
 	width: 200px;
     height: 200px;
-    box-shadow: 0px 0px 3px black;
+    box-shadow: 0px 0px 3px var(--color-shadow);
     padding: 5px;
-    border-radius: 3px;
-    background-color: #fff;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
 }
 
 #plans #button-container {
@@ -771,35 +771,35 @@ body{
 }
 
 #plans #button-container .button {
-    background-color: #00638d;
-    color: white;
+    background-color: var(--color-brand);
+    color: var(--color-text-on-brand);
     padding: 5px 25px;
     outline: none;
     box-sizing: border-box;
-    border-radius: 0 0 5px 5px;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
     cursor: pointer;
     border: none;
     font-weight: bold;
-    font-family: 'Source Code Pro', sans-serif;
+    font-family: var(--font-mono);
     font-size: 1em;
-    transition: 0.3s;
+    transition: var(--duration-base);
     width: 260px;
 }
 
 #plans #button-container .button:hover {
-    background-color: #3165b9;
+    background-color: var(--color-secondary-strong);
 }
 
 #plans #premium-frame {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 4px solid #00638d;
+    border: 4px solid var(--color-border-brand);
     border-bottom: none;
-    border-radius: 5px 5px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     padding: 10px 30px;
     width: 260px;
-    background-color: #ffffff9c;
+    background-color: var(--color-text-on-brand);
     box-sizing: border-box;
     margin-bottom: -2px;
     text-align: center;
@@ -822,12 +822,12 @@ body{
     margin-left: 10px;
     font-weight: bold;
     font-size: 2.5em;
-    color: #00638d;
+    color: var(--color-brand-text);
 }
 
 #about-footer {
-    background-color: black;
-    color: #9ec5ce;
+    background-color: var(--color-terminal-bg);
+    color: var(--color-text-muted);
     height: 50px;
     width: 100%;
     display: flex;

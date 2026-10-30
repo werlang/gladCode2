@@ -1,19 +1,19 @@
 #fog.black {
-    background-color: black;
+    background-color: var(--color-terminal-bg);
 }
 
 #dialog-box .ui-slider {
 	height: 15px;
-    box-shadow: 0px 0px 2px #00000069 inset;
+    box-shadow: 0px 0px 2px var(--color-shadow) inset;
 	box-sizing: border-box;
-    background-color: #eeeeee;
+    background-color: var(--color-surface-alt);
     margin-bottom: 15px;
     margin-top: 10px;
 }
 
 #dialog-box .ui-slider-range {
-	background-color: #6c97a9;
-	box-shadow: 0px 0px 3px #0000005e inset
+	background-color: var(--color-brand-muted);
+	box-shadow: 0px 0px 3px var(--color-shadow) inset
 }
 
 #dialog-box .ui-slider-handle {
@@ -22,12 +22,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #575757;
+    background-color: var(--color-neutral);
     width: 50px;
-    font-family: 'Source Code Pro', monospace;
-    border-radius: 3px;
+    font-family: var(--font-mono);
+    border-radius: var(--radius-sm);
     line-height: 1em;
-    color: #ccecff;
+    color: var(--color-text-on-brand-muted);
     margin-top: 24px;
 	margin-left: -25px;
 	z-index: 0;
@@ -38,7 +38,7 @@
     position: absolute;
     margin-top: -17px;
     border: solid transparent;
-    border-bottom-color: #575757;
+    border-bottom-color: var(--color-border-strong);
 	border-width: 5px 5px;
 }
 
@@ -76,13 +76,13 @@
     align-items: center;
     align-self: center;
     margin-right: 10px;
-    border-radius: 3px;
-    background-color: #fafafa;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
 }
 
 #group-container .group .team .score {
-    background-color: #bcbcbc;
-    color: #ffe594;
+    background-color: var(--color-surface-strong);
+    color: var(--color-accent);
     border-radius: 50px;
     padding: 2px;
     height: 25px;
@@ -91,14 +91,14 @@
     justify-content: center;
     align-items: center;
     margin: 3px 5px 3px 3px;
-    text-shadow: 1px 1px 2px black;
-    box-shadow: 0px 0px 3px #000000a8 inset;
+    text-shadow: 1px 1px 2px var(--color-shadow);
+    box-shadow: 0px 0px 3px var(--color-shadow) inset;
 }
 
 #ranking-container .team.gold .score,
 #ranking-container .team.silver .score,
 #ranking-container .team.bronze .score {
-    background-color: #ffffffa3;
+    background-color: var(--color-text-on-brand);
 }
 
 #ranking-container .head {
@@ -110,18 +110,18 @@
 #ranking-container .head .score,
 #group-container .group .head .icons .fa-star{
 	font-size: 25px;
-    color: #FFCA28;
+    color: var(--color-accent);
 }
 
 #ranking-container .head .time,
 #group-container .group .head .icons .fa-clock{
 	font-size: 25px;
-    color: #34e442;
+    color: var(--color-success);
 }
 
 #group-container .group .head .icons .fa-trophy{
 	font-size: 25px;
-    color: #FFCA28;
+    color: var(--color-accent);
     margin-left: 8px;
 }
 
@@ -148,7 +148,7 @@
     justify-content: center;
     margin-left: -50px;
     height: 1.8em;
-    color: white;
+    color: var(--color-text-on-brand);
     cursor: pointer;
 }
 

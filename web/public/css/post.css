@@ -4,7 +4,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     justify-content: space-between;
-    background-color: #f1f1f1;
+    background-color: var(--color-page);
 }
 #frame {
     display: flex;
@@ -18,30 +18,30 @@ body {
     max-width: 600px;
     margin: 0px 20px;
     text-align: justify;
-    font-family: 'Roboto', sans-serif;
-    color: #646464;
+    font-family: var(--font-body);
+    color: var(--color-text);
 }
 h1, h2, h3 {
-    color: #00638d;
+    color: var(--color-brand-text);
 }
 h2 {
     margin-top: 30px;
 }
 a {
-    color: #0685bb;
+    color: var(--color-link);
 }
 
 #post {
     display: flex;
     flex-direction: column;
     padding: 20px 10px;
-    border-radius: 5px;
-    border: 1px solid #dedede;
-	background-color: #ffffff;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+	background-color: var(--color-surface);
 	box-sizing: border-box;
-	font-family: 'Roboto', sans-serif;
+	font-family: var(--font-body);
 	margin: 0;
-    box-shadow: 1px 1px 5px 0px #00000038;
+    box-shadow: 1px 1px 5px 0px var(--color-shadow);
     width: 100%;
     max-width: 600px;
 }
@@ -50,11 +50,11 @@ a {
 	font-size: 1.7em;
 	font-weight: bold;
 	margin-bottom: 15px;
-	color: #00638d;
+	color: var(--color-brand-text);
 }
 
 #post .time {
-	color: #aaaaaa;
+	color: var(--color-text-muted);
     padding-bottom: 10px;
     margin-bottom: 10px;
 	border-bottom: 1px solid;
@@ -67,7 +67,7 @@ a {
 
 #post .body img {
     max-width: 100%;
-	border-radius: 2px;
+	border-radius: var(--radius-xs);
 	margin: auto;
     display: block;
 }
@@ -94,8 +94,8 @@ a {
     align-items: center;
     text-decoration: none;
     font-size: 1.3em;
-    border-radius: 3px;
-    transition: 0.3s all;    
+    border-radius: var(--radius-sm);
+    transition: var(--duration-base) all;
 }
 
 #button-container span {
@@ -108,12 +108,12 @@ a {
 }
 
 #button-container a:hover {
-    background-color: #00638d;
-    color: white;
+    background-color: var(--color-brand);
+    color: var(--color-text-on-brand);
 }
 
 #button-container a.disabled {
-    color: #bfbfbf;
+    color: var(--color-text-subtle);
     cursor: not-allowed;
     background-color: transparent;
 }

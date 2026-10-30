@@ -8,7 +8,6 @@ body {
 	flex-direction: column;
     align-items: center;
     padding-top: 50px;
-    /* background-color: #f7f7f7; */
     height: calc(100vh - 50px);
     overflow: auto;
 }
@@ -18,8 +17,6 @@ body {
     max-width: 900px;
     display: flex;
     justify-content: center;
-    /* background-color: white; */
-    /* border-right: 1px solid #e6e6e6; */
     box-sizing: border-box;
     /* overflow-y: auto; */
     flex-direction: column;
@@ -30,8 +27,8 @@ body {
     width: 100%;
     max-width: 900px;
     z-index: 1;
-    font-family: 'Acme', sans-serif;
-	color: #646464;
+    font-family: var(--font-game);
+	color: var(--color-text);
 }
 
 @media only screen and (min-width: 900px) {
@@ -56,7 +53,7 @@ body {
 }
 
 #tourn-name {
-    color: #00638d;
+    color: var(--color-brand-text);
 }
 
 h1, h3 {
@@ -78,12 +75,12 @@ h3#tourn-desc {
 #group-container .group {
 	/* display: flex; */
     flex-direction: column;
-    background-color: #f8f8f8;
+    background-color: var(--color-surface);
     cursor: default;
     box-sizing: border-box;
-    box-shadow: 0px 0px 5px black;
-    border-radius: 3px;
-	font-family: 'Acme', sans-serif;
+    box-shadow: 0px 0px 5px var(--color-shadow);
+    border-radius: var(--radius-sm);
+	font-family: var(--font-game);
     font-size: 1.2em;
 	margin: 10px;
     width: 100%;
@@ -95,11 +92,11 @@ h3#tourn-desc {
 	display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #6c97a9;
-    border-radius: 3px 3px 0px 0px;
+    background-color: var(--color-brand-muted);
+    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
 	font-size: 1.4em;
-    color: white;
-    text-shadow: 1px 1px 3px black;
+    color: var(--color-text-on-brand);
+    text-shadow: 1px 1px 3px var(--color-shadow);
 	padding: 5px 0px;
 	margin-bottom: 2px;
 }
@@ -112,7 +109,7 @@ h3#tourn-desc {
 
 #group-container .group .head .title span{
     font-size: 0.8em;
-    color: rgb(233, 233, 233);
+    color: var(--color-text-on-brand-muted);
 }
 
 #group-container .group .head .icons{
@@ -127,12 +124,12 @@ h3#tourn-desc {
 
 #group-container .group .head .icons .fa-star{
 	font-size: 25px;
-    color: #FFCA28;
+    color: var(--color-accent);
 }
 
 #group-container .group .head .icons .fa-clock{
 	font-size: 25px;
-    color: #34e442;
+    color: var(--color-success);
 }
 
 #group-container .group .head .icons div {
@@ -142,28 +139,28 @@ h3#tourn-desc {
 }
 
 #group-container .group .team {
-    color: #646464;
+    color: var(--color-text);
     display: flex;
-    border: 1px solid #d7d7d7;
-    border-radius: 50px 3px 3px 50px;
+    border: 1px solid var(--color-border);
+    border-radius: 50px var(--radius-sm) var(--radius-sm) 50px;
     margin: 2px 5px 2px 5px;
-    background-color: #e2e2e2;
+    background-color: var(--color-surface-alt);
     align-items: center;
     justify-content: space-between;
-    transition: 0.3s all;
+    transition: var(--duration-base) all;
 }
 
 #group-container .group .team:hover {
-    background-color: #d5d5d5;
+    background-color: var(--color-surface-strong);
 }
 
 #group-container .group .team.myteam {
-	color: #00638d;
-	background-color: #bed9e6;
+	color: var(--color-brand-text);
+	background-color: var(--color-brand-soft);
 }
 
 #group-container .group .team .icon {
-    background-color: #bcbcbc;
+    background-color: var(--color-surface-strong);
     border-radius: 50px;
     padding: 2px;
     display: flex;
@@ -173,7 +170,7 @@ h3#tourn-desc {
 }
 
 #group-container .group .team .icon i {
-    color: white;
+    color: var(--color-text-on-brand);
     width: 25px;
     height: 25px;
     display: flex;
@@ -188,9 +185,9 @@ h3#tourn-desc {
 }
 
 #group-container .group .team .icon i.green {
-    background-color: #77bb77;
-    box-shadow: 0px 0px 8px 4px #77bb77;
-    border-radius: 100%;
+    background-color: var(--color-success);
+    box-shadow: 0px 0px 8px 4px var(--color-success);
+    border-radius: var(--radius-round);
 }
 
 #group-container .group .team .time .win {
@@ -210,13 +207,13 @@ h3#tourn-desc {
 
 #group-container .group .team .info .glad,
 #group-container .group .team .info .time {
-    color: #a4a4a4;
+    color: var(--color-text-muted);
     margin-right: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f4f4f4;
-    border-radius: 3px;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
     padding: 1px 2px;
     width: 30px;
 	box-sizing: border-box;
@@ -229,25 +226,25 @@ h3#tourn-desc {
 }
 
 #group-container .group .team .info .glad .g-bar{
-	background-color: #d5d5d5;
+	background-color: var(--color-surface-strong);
 	width: 7px;
     height: 20px;
     margin: 0px 1px;
-    border-radius: 3px;
-    transition: all 1s;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-slower);
 }
 
 #group-container .group .team .info .glad.three .g-bar{
-	background-color: #4caf50;
+	background-color: var(--color-success);
 }
 
 #group-container .group .team .info .glad.two .g-bar:nth-child(2),
 #group-container .group .team .info .glad.two .g-bar:nth-child(3){
-	background-color: #ffc107;
+	background-color: var(--color-accent);
 }
 
 #group-container .group .team .info .glad.one .g-bar:nth-child(3){
-	background-color: #f44336
+	background-color: var(--color-bar-danger)
 }
 
 #group-container .group .team .info .time,
@@ -279,24 +276,24 @@ h3#tourn-desc {
 
 .button {
 	font-size: 1.2em;
-    font-family: 'Source Code Pro', monospace;
+    font-family: var(--font-mono);
     border: none;
     padding: 5px 0px;
     outline: none;
-    color: white;
-    background-color: #00638d;
+    color: var(--color-text-on-brand);
+    background-color: var(--color-brand);
     width: 100%;
     cursor: pointer;
-    transition: all 0.3s;
-    border-radius: 3px;
+    transition: all var(--duration-base);
+    border-radius: var(--radius-sm);
 }
 
 .button:hover {
-	background-color: #1e86d8;
+	background-color: var(--color-secondary);
 }
 
 .button:disabled {
-    background-color: #8f98a3;
+    background-color: var(--color-neutral);
     cursor: not-allowed;
 }
 
@@ -306,13 +303,13 @@ h3#tourn-desc {
 }
 
 .float-box {
-	background-color: white;
+	background-color: var(--color-surface);
 	max-width: 100%;
 	width: 600px;
-	border-radius: 3px;
+	border-radius: var(--radius-sm);
 	padding: 30px 20px;
-	font-family: 'Acme', sans-serif;
-	color: #646464;
+	font-family: var(--font-game);
+	color: var(--color-text);
 	max-height: 98vh;
 	box-sizing: border-box;
 	display: flex;
@@ -320,7 +317,7 @@ h3#tourn-desc {
 }
 
 .highlight {
-    color: #00638d;
+    color: var(--color-brand-text);
     font-weight: bold;
 }
 
@@ -331,8 +328,8 @@ h3#tourn-desc {
 
 .float-box #button-container {
     margin: 10px -20px -30px;
-    border-radius: 0px 0px 3px 3px;
-    background-color: #00638d;
+    border-radius: 0px 0px var(--radius-sm) var(--radius-sm);
+    background-color: var(--color-brand);
 }
 
 .float-box #button-container .button {
@@ -344,14 +341,14 @@ h3#tourn-desc {
 }
 
 .glad-preview.selected{
-    box-shadow: 0px 0px 5px 2px #4286f4;
+    box-shadow: 0px 0px 5px 2px var(--color-glow);
     filter: brightness(85%);
 }
 
 #fog.code pre {
     margin: -30px -20px -10px;
     overflow: hidden;
-    border-radius: 3px 3px 0px 0px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
     max-width: 600px;
     max-height: calc(98vh - 50px);
 }
@@ -359,7 +356,7 @@ h3#tourn-desc {
 #fog.code #code-ws {
     margin: -30px -20px -10px;
     overflow: hidden;
-    border-radius: 3px 3px 0px 0px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0px 0px;
     max-width: 600px;
     height: calc(98vh - 50px);
 }
@@ -369,10 +366,10 @@ h3#tourn-desc {
     width: 100%;
     max-width: none;
     box-sizing: border-box;
-    border-radius: 0px 0px 3px 3px;
+    border-radius: 0px 0px var(--radius-sm) var(--radius-sm);
     margin-bottom: -2px;
     margin-top: 2px;
-    transition: 1s all;
+    transition: var(--duration-slower) all;
     font-size: 1em;
 }
 
@@ -389,16 +386,16 @@ h3#tourn-desc {
 
 #ranking-container .team {
     display: flex;
-    border-radius: 50px 10px 10px 50px;
-    border: 2px solid #d7d7d7;
-    background-color: #e2e2e2;
-    color: #646464;
+    border-radius: 50px var(--radius-lg) var(--radius-lg) 50px;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-surface-alt);
+    color: var(--color-text);
     margin-bottom: 5px;
     margin-left: 15px;
     margin-right: 15px;
     font-size: 1.3rem;
     cursor: default;
-    transition: 0.3s all;
+    transition: var(--duration-base) all;
 }
 
 #ranking-container .team:hover {
@@ -409,9 +406,9 @@ h3#tourn-desc {
     width: 40px;
     height: 40px;
     box-sizing: border-box;
-    border-radius: 100%;
-    background-color: white;
-    border: 2px solid #d7d7d7;
+    border-radius: var(--radius-round);
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-border);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -428,36 +425,36 @@ h3#tourn-desc {
 }
 
 #ranking-container .team.gold {
-    color: #90701a;
-    background-image: linear-gradient(to bottom,#c1922a,#f9e777,#c1922a);
+    color: var(--color-medal-gold-text);
+    background-image: linear-gradient(to bottom,var(--color-medal-gold-strong),var(--color-medal-gold),var(--color-medal-gold-strong));
     border: none;
 }
 
 #ranking-container .team.silver {
-    color: #6c6c6c;
-    background-image: linear-gradient(to bottom,#9c9c9c,#e4e4e4,#9c9c9c);
+    color: var(--color-medal-silver-text);
+    background-image: linear-gradient(to bottom,var(--color-medal-silver-strong),var(--color-medal-silver),var(--color-medal-silver-strong));
     border: none;
 }
 
 #ranking-container .team.bronze {
-    color: #6d4c39;
-    background-image: linear-gradient(to bottom,#98694d,#e1c19a,#98694d);
+    color: var(--color-medal-bronze-text);
+    background-image: linear-gradient(to bottom,var(--color-medal-bronze-strong),var(--color-medal-bronze),var(--color-medal-bronze-strong));
     border: none;
 }
 
 #ranking-container .team.gold .ordinal {
-    background-color: #fff3a8;
-    border: 2px solid #c1922a;
+    background-color: var(--color-medal-gold-soft);
+    border: 2px solid var(--color-medal-gold-strong);
 }
 
 #ranking-container .team.silver .ordinal {
-    background-color: #f7f7f7;
-    border: 2px solid #9c9c9c;
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-medal-silver-strong);
 }
 
 #ranking-container .team.bronze .ordinal {
-    background-color: #f9e2c7;
-    border: 2px solid #98694d;
+    background-color: var(--color-medal-bronze-soft);
+    border: 2px solid var(--color-medal-bronze-strong);
 }
 
 #ranking-container .team .icon {
@@ -466,9 +463,9 @@ h3#tourn-desc {
 }
 
 .timeleft {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--font-digits);
     font-size: 1rem;
-    color: black;
+    color: var(--color-text-strong);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -489,12 +486,12 @@ h3#tourn-desc {
 }
 
 .timeleft #time .numbers:hover span {
-    background-color: #000000;
+    background-color: var(--color-terminal-bg);
 }
 
 .timeleft #time span {
-    color: white;
-    background-color: #000000b0;
+    color: var(--color-text-on-brand);
+    background-color: var(--color-scrim);
     height: 1.8em;
     display: flex;
     justify-content: center;
@@ -502,20 +499,20 @@ h3#tourn-desc {
     width: 1.3em;
     margin: 0px 2px;
     font-size: 1.5rem;
-    border-radius: 3px;
-    transition: 0.3s background-color, color 3s;
+    border-radius: var(--radius-sm);
+    transition: var(--duration-base) background-color, color 3s;
 }
 
 .timeleft.yellow #time span {
-    color: #f6d558
+    color: var(--color-timer-warn)
 }
 
 .timeleft.red #time span {
-    color: #ff6c6c;
+    color: var(--color-danger);
 }
 
 .timeleft.green #time span {
-    color: #84ff8f;
+    color: var(--color-timer-ok);
 }
 
 .timeleft #text {
@@ -536,15 +533,15 @@ h3#tourn-desc {
 @media only screen and (min-width: 600px) {
     #button-container .arrow.nobutton {
         margin: -90px 120px 0px
-    }    
+    }
     #button-container .arrow {
         margin-top: -65px;
     }
 }
 
 #button-container .arrow:hover i {
-    color: #00638d;
-    text-shadow: 1px 1px 6px black;
+    color: var(--color-brand-text);
+    text-shadow: 1px 1px 6px var(--color-shadow);
 }
 
 #button-container .arrow:disabled {
@@ -553,13 +550,13 @@ h3#tourn-desc {
 
 #button-container .arrow i {
     font-size: 5rem;
-    color: #bed9e6;
-    text-shadow: 1px 1px 6px #00638d;
-    transition: 0.3s all;
+    color: var(--color-text-on-brand-muted);
+    text-shadow: 1px 1px 6px var(--color-glow);
+    transition: var(--duration-base) all;
     margin: 30px;
 }
 
 #button-container .arrow:disabled i {
-    color: #fafafa;
-    text-shadow: 1px 1px 6px #00000033;
+    color: var(--color-text-on-brand);
+    text-shadow: 1px 1px 6px var(--color-shadow);
 }
