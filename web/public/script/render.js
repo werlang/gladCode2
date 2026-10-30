@@ -59,7 +59,6 @@ function uiFade(element, visible, display){
 var tileD = 32; //size of a single tile
 var screenW = tileD * 42; //how many tiles there is in the entire image
 var screenH = tileD * 49;
-var screenRatio = screenW/screenH;
 var arenaX1 = tileD * 8; //how many tiles until the start of the arena
 var arenaY1 = tileD * 14;
 var arenaD = screenW - (2 * arenaX1); //tiles not valid in the left and right side
@@ -69,7 +68,6 @@ var json, loadglads = false, startsim = false;
 var loadCache = false;
 var stab, gender;
 var simtimenow;
-var dt = 0;
 var prefs = {
     bars: true,
     frames: true,
@@ -218,7 +216,6 @@ var layers = [];
 var sprite = new Array();
 var sproj = new Array();
 var gladArray = new Array();
-var projArray = new Array();
 var music, ending, victory;
 var clones = new Array();
 
@@ -404,27 +401,6 @@ function create() {
     });
 
     changeCrowd(prefs.crowd);
-}
-
-//function created to debug code. pass argument 's' when you want to start measure and 'e' when to end.
-//it gives the average time per second the code takes to execute
-var mt, ma = null, ta=0, tc=0;
-function measureTime(m){
-    if (!ma)
-        ma = new Date();
-
-    if (m == 's')
-        mt = new Date();
-    else if (m == 'e'){
-        ta += new Date() - mt;
-        tc++;
-        if (new Date() - ma >= 1000){
-            console.log(ta/tc);
-            ma = null;
-            tc = 0;
-            ta = 0;
-        }
-    }
 }
 
 var gasld = 4; //gas layer depth
