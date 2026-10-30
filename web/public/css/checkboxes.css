@@ -1,28 +1,41 @@
+/* The sliding switch drawn after an `input.checkslider` (components/form-controls.js): a quiet
+   track with a solid knob, filled with the success colour when on. */
 .checkslider.trail {
-	width: 3em;
-	height: 1.5em;
-	border-radius: var(--radius-xl);
-	background-color: var(--color-danger-soft);
-	border: 1px solid var(--color-border);
-	box-shadow: var(--shadow-inset);
-	cursor: pointer;
-	transition: var(--duration-base) all;
-	display: inline-block;
-	vertical-align: middle;
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	width: 40px;
+	height: 22px;
+	box-sizing: border-box;
 	margin: var(--space-2) var(--space-3);
+	padding: var(--space-1);
+	border: var(--space-hairline) solid var(--color-border-strong);
+	border-radius: var(--radius-pill);
+	background-color: var(--color-surface-strong);
+	vertical-align: middle;
+	cursor: pointer;
+	transition: background-color var(--duration-base), border-color var(--duration-base);
 }
+
 .checkslider.thumb {
-	width: 1.4em;
-	height: 1.4em;
-	border-radius: var(--radius-xl);
-	background: radial-gradient(var(--color-danger-soft), var(--color-surface-strong));
-	border: 1px solid var(--color-border);
+	width: 16px;
+	height: 16px;
+	border-radius: var(--radius-round);
+	background-color: var(--color-text-on-brand);
 	box-shadow: var(--shadow-xs);
-	transition: var(--duration-base) all
+	transition: transform var(--duration-base);
 }
+
 .checkslider:checked + .trail {
+	border-color: var(--color-success);
 	background-color: var(--color-success);
 }
+
 .checkslider:checked + .trail .thumb {
-	margin-left: var(--space-6);
+	transform: translateX(16px);
+}
+
+.checkslider:focus-visible + .trail {
+	outline: var(--focus-ring-width) solid var(--focus-ring-color);
+	outline-offset: var(--focus-ring-offset);
 }

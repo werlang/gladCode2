@@ -188,6 +188,10 @@
     --color-code-function: #f2b441;
     --color-code-string: #8fd6a8;
     --color-code-number: #e79b7b;
+    --color-code-panel: #0b1d2b;
+    --color-code-panel-border: #1f4664;
+    --color-code-text: #edf1f3;
+    --color-code-comment: #8197a6;
     /* tournament and ranking places */
     --color-medal-gold: #f9e777;
     --color-medal-gold-soft: #fff3a8;
@@ -319,6 +323,11 @@
     --color-accent-hover: #ffc95e;
     --color-accent-text: var(--arena-bronze-text);
 
+    /* the main action of a view (GRAVAR, ABRIR): torch gold in the Arena */
+    --color-action: var(--arena-gold);
+    --color-action-hover: #ffc95e;
+    --color-text-on-action: var(--arena-ink-900);
+
     --color-border: var(--arena-day-border);
     --color-border-strong: var(--arena-day-border-strong);
     --color-border-brand: var(--arena-sand-dark);
@@ -401,6 +410,10 @@
     --color-accent-strong: var(--classic-gold-deep);
     --color-accent-hover: #ffd75e;
     --color-accent-text: #9a6a12;
+
+    --color-action: var(--classic-blue);
+    --color-action-hover: var(--classic-blue-deep);
+    --color-text-on-action: var(--classic-white);
 
     --color-border: var(--classic-grey-300);
     --color-border-strong: var(--classic-grey-800);
@@ -487,6 +500,10 @@
     --color-accent-hover: #ffc95e;
     --color-accent-text: var(--arena-gold);
 
+    --color-action: var(--arena-gold);
+    --color-action-hover: #ffc95e;
+    --color-text-on-action: var(--arena-ink-900);
+
     --color-border: rgb(237 241 243 / 0.14);
     --color-border-strong: var(--arena-stone-400);
     --color-border-brand: var(--arena-sand-dark);
@@ -535,14 +552,37 @@
     color: var(--color-text);
 }
 
-/* Element defaults every page shares */
+/* Element defaults every page shares, browser surfaces included */
 html {
     background-color: var(--color-page);
+    accent-color: var(--color-brand);
+    scrollbar-color: var(--color-neutral) transparent;
 }
 
 body {
     color: var(--color-text);
     font-family: var(--font-body);
+}
+
+a {
+    color: var(--color-link);
+    text-decoration-thickness: from-font;
+    text-underline-offset: 0.18em;
+}
+
+::selection {
+    background-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+    color: inherit;
+}
+
+/* hidden on screen, still reachable by keyboard and screen readers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 :focus-visible {

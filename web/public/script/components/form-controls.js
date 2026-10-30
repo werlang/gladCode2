@@ -29,6 +29,6 @@ export function decorateCheckSliders(root = document) {
     root.querySelectorAll('input.checkslider').forEach(input => {
         if (input.nextElementSibling?.classList.contains('trail')) return;
         input.insertAdjacentHTML('afterend', "<div class='checkslider trail'><div class='checkslider thumb'></div></div>");
-        input.style.display = 'none';
+        input.classList.add('visually-hidden');
     });
 }

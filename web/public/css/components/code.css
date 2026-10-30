@@ -1,0 +1,71 @@
+/*
+ * Code panels: Prism blocks in the docs, the manual and the function reference stay dark in every
+ * theme (DESIGN.md), with the front page's code colours. Prism's own sheet loads after this one,
+ * so every rule starts at `:root` to outrank it.
+ */
+:root :is(pre, code)[class*='language-'] {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-code-text);
+    text-shadow: none;
+}
+
+:root pre[class*='language-'] {
+    margin: var(--space-3) 0 var(--space-5);
+    border: var(--space-hairline) solid var(--color-code-panel-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-code-panel);
+    box-shadow: var(--shadow-sm);
+    overflow: auto;
+
+    &::before,
+    &::after {
+        display: none;
+    }
+
+    > code {
+        padding: var(--space-4) var(--space-5);
+        border: 0;
+        box-shadow: none;
+        background: none;
+    }
+}
+
+/* code inside running text */
+:root :not(pre) > code[class*='language-'] {
+    padding: var(--space-hairline) var(--space-2);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-code-panel);
+    color: var(--color-code-text);
+}
+
+:root .token.token {
+    background: none;
+
+    &:is(.comment, .block-comment, .prolog, .doctype, .cdata) {
+        color: var(--color-code-comment);
+        font-style: italic;
+    }
+
+    &:is(.keyword, .atrule, .attr-value, .class-name) {
+        color: var(--color-code-keyword);
+    }
+
+    &:is(.function, .function-name, .builtin, .selector) {
+        color: var(--color-code-function);
+    }
+
+    &:is(.string, .char, .attr-name, .inserted) {
+        color: var(--color-code-string);
+    }
+
+    &:is(.number, .boolean, .constant, .symbol, .deleted, .property, .tag) {
+        color: var(--color-code-number);
+    }
+
+    &:is(.punctuation, .operator, .entity, .url, .variable) {
+        color: var(--color-code-text);
+    }
+}

@@ -1,6 +1,7 @@
 /*
  * The site's button (components/button.js drives its loading state): brand fill, monospace
- * label, a lighter blue on hover. Variant classes change the colour (`secondary`, `neutral`,
+ * label, a lighter blue on hover. Variant classes change the colour (`primary` for the view's main
+ * action, `secondary`, `neutral`,
  * `ghost`, `outline`, `danger`, `success`), the size (`small`, `large`) or the layout (`block`:
  * a full-width 50px bar, as at the foot of dialogs). Pages only add placement (width, margins).
  */
@@ -30,6 +31,18 @@
 
     &[hidden] {
         display: none;
+    }
+
+    /* the view's main action: torch gold in the Arena, brand blue in Classic */
+    &.primary {
+        background-color: var(--color-action);
+        color: var(--color-text-on-action);
+        font-weight: bold;
+
+        &:hover:not(:disabled, .disabled) {
+            background-color: var(--color-action-hover);
+            color: var(--color-text-on-action);
+        }
     }
 
     &.secondary {
@@ -131,10 +144,10 @@
 
 /* Disabled keeps the geometry and drops the colour; the `:is()` list lifts it above every
    variant without `!important`. */
-.button:is(:disabled, .disabled):is(*, .secondary, .neutral, .ghost, .outline, .danger, .success) {
-    background-color: var(--color-neutral);
+.button:is(:disabled, .disabled):is(*, .primary, .secondary, .neutral, .ghost, .outline, .danger, .success) {
+    background-color: var(--color-surface-strong);
     box-shadow: none;
-    color: var(--color-text-on-brand);
+    color: var(--color-text-muted);
     cursor: not-allowed;
 }
 
