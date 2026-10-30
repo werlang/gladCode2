@@ -8,19 +8,19 @@
     <link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
     <title>gladCode - Visualizar batalha</title>
     <script>window.__RENDER2_ENABLED__ = {{render2}};</script>
-    <script src="script/battle-renderer-preference.js"></script>
+    <script src="{{#asset}}script/battle-renderer-preference.js{{/asset}}"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
 
-    <link rel='stylesheet' href="css/checkboxes.css"/>
-    <link rel='stylesheet' href="css/dialog.css"/>
-    <link rel='stylesheet' href="css/ui-slider.css"/>
+    <link rel='stylesheet' href="{{#asset}}css/checkboxes.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/dialog.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/ui-slider.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/playback.css{{/asset}}"/>
 {{#render2}}
     <link rel='stylesheet' href="{{#asset}}css/playback-render2.css{{/asset}}"/>
 {{/render2}}
     
-    <script src="script/phaser.js"></script>
-    <script src="script/floatingText.js"></script>
+    <script src="{{#asset}}script/phaser.js{{/asset}}"></script>
+    <script src="{{#asset}}script/floatingText.js{{/asset}}"></script>
     <script src="{{#asset}}script/render.js{{/asset}}"></script>
     {{{importMap}}}
 {{#render2}}

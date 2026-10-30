@@ -6,7 +6,7 @@
     {{> head}}
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Obrigado</title>
-	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
+	<link type='text/css' rel='stylesheet' href="{{#asset}}css/header.css{{/asset}}"/>
 	{{{importMap}}}
 	<script type="module" src="{{#module}}header.js{{/module}}"></script>
 
@@ -50,7 +50,7 @@
 		}
 		h2, h3 {
 			margin-left: 20px;
-		}	
+		}
 		#footer-wrapper {
 			position: relative;
 		}

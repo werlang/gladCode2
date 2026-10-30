@@ -8,13 +8,13 @@
     {{> head}}
 	<link rel="icon" type="image/gif" href="icon/gladcode_icon.png" />
 	<title>gladCode - Atualização</title>
-	<link type='text/css' rel='stylesheet' href='css/update.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/dialog.css'/> 
-	<link type='text/css' rel='stylesheet' href='css/header.css'/> 
+	<link type='text/css' rel='stylesheet' href="{{#asset}}css/update.css{{/asset}}"/>
+	<link type='text/css' rel='stylesheet' href="{{#asset}}css/dialog.css{{/asset}}"/>
+	<link type='text/css' rel='stylesheet' href="{{#asset}}css/header.css{{/asset}}"/>
 	{{{importMap}}}
 	<script type="module" src="{{#module}}header.js{{/module}}"></script>
 	<script type="module" src="{{#module}}update.js{{/module}}"></script>
-	
+
 </head>
 <body>
     {{{templateVars}}}
