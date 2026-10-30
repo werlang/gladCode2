@@ -1,0 +1,59 @@
+/*
+ * Text fields (components/input.js, components/select.js): `.input` is the underlined game field
+ * of the profile, statistics and tournament windows; `.input.boxed` (and every textarea) is the
+ * framed field of dialogs. `.error`/`aria-invalid` mark a wrong value. Pages only add placement.
+ */
+.input {
+    box-sizing: border-box;
+    padding: var(--space-2) var(--space-3) 0;
+    border: 0;
+    border-bottom: 3px solid var(--color-border);
+    border-radius: 0;
+    outline: none;
+    background-color: transparent;
+    color: var(--color-brand-text);
+    font-family: var(--font-game);
+    font-size: var(--text-xl);
+    transition: border-color var(--duration-base), background-color var(--duration-base);
+
+    &::placeholder {
+        color: var(--color-text-subtle);
+    }
+
+    &:focus {
+        border-color: var(--color-border-brand);
+    }
+
+    &:is(.error, [aria-invalid='true']) {
+        border-color: var(--color-danger);
+        background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
+    }
+
+    &:disabled {
+        color: var(--color-text-subtle);
+        cursor: not-allowed;
+    }
+
+    &:is(.boxed, textarea) {
+        padding: var(--space-1) var(--space-3);
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text);
+        font-family: var(--font-mono);
+        font-size: var(--text-lg);
+
+        &:focus {
+            border-color: var(--color-border-brand);
+        }
+
+        &:is(.error, [aria-invalid='true']) {
+            border-color: var(--color-danger);
+        }
+    }
+
+    &:is(textarea) {
+        font-family: var(--font-body);
+        font-size: var(--text-base);
+        resize: vertical;
+    }
+}
