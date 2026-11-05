@@ -1,5 +1,6 @@
 import { site } from '../helpers/request.js';
-import { availableMoves, nextMoveIndex, previewMode } from '../helpers/skin-preview.js';
+import { battleRenderer } from '../helpers/renderer-preference.js';
+import { availableMoves, nextMoveIndex } from '../helpers/skin-preview.js';
 import { getImage, images } from '../helpers/sprite-catalog.js';
 import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
 import { ATTRIBUTE_POINTS, attributeCost, validGladName } from './attributes.js';
@@ -138,7 +139,7 @@ export class SkinCreator {
         this.#bindMenus();
         this.#bindPreview();
         this.#bindAttributes();
-        if (previewMode(window.BattleRendererPreference) === 'three') await this.#mount3d();
+        if (battleRenderer() === 'three') await this.#mount3d();
         this.reload();
         setInterval(() => this.#renderFrame(), 100);
     }
@@ -147,7 +148,9 @@ export class SkinCreator {
     async #mount3d() {
         try {
             const { SkinPreview3D } = await import('./skin-preview-3d.js');
-            this.#preview3d = new SkinPreview3D(this.#find('#middle-container'));
+            // the rows of buttons and items that the layout runs over the preview (they differ on a phone and a desktop)
+            const controls = [...this.#root.querySelectorAll('#top-container, #left-container, #sub-container, #right-container, #bottom-container')];
+            this.#preview3d = new SkinPreview3D(this.#find('#middle-container'), { controls });
             this.#preview3d.setMove(MOVES[this.#move].name);
             this.#preview3d.setPlaying(this.#playing);
         }

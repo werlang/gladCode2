@@ -60,25 +60,31 @@ async function appWithRender2(flag) {
     };
 }
 
+/** @param {string} html A page. @returns {Record<string, unknown>} Its template vars (`#template-vars`). */
+const templateVars = html => JSON.parse(/<script id="template-vars" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
+
 test('the editor tells the gladiator creator whether the 3D renderer is on, and maps three only then', async () => {
     const on = await appWithRender2('1');
     const off = await appWithRender2('0');
     try {
         for (const path of ['/editor', '/newglad', '/glad-3']) {
             const enabled = await on.page(path);
-            assert.match(enabled, /window\.__RENDER2_ENABLED__ = true;/, path);
-            assert.match(enabled, /script\/battle-renderer-preference\.js\?v=\d+/, path);
+            assert.equal(templateVars(enabled).render2, true, path);
             assert.match(enabled, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@/, path);
             assert.match(enabled, /"\/script\/render2\/creator-stage\.js":/, path);
-            // the preference is set before any module runs
-            assert.ok(enabled.indexOf('battle-renderer-preference.js') < enabled.indexOf('editor.js?v='), path);
+            // modules only: no page globals and no classic preference script tag on the editor (every import map lists the file)
+            assert.doesNotMatch(enabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
 
             const disabled = await off.page(path);
-            assert.match(disabled, /window\.__RENDER2_ENABLED__ = false;/, path);
-            assert.match(disabled, /script\/battle-renderer-preference\.js\?v=\d+/, path);
+            assert.equal(templateVars(disabled).render2, false, path);
             assert.doesNotMatch(disabled, /"three":/, path);
             assert.doesNotMatch(disabled, /render2\/creator-stage\.js/, path);
+            assert.doesNotMatch(disabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
         }
+        // the replay page keeps its classic preference script, set before its renderers load
+        const replay = await on.page('/play/abc');
+        assert.match(replay, /<script>window\.__RENDER2_ENABLED__ = true;<\/script>\s*<script src="\/script\/battle-renderer-preference\.js\?v=\d+"><\/script>/);
+        assert.match(await off.page('/play/abc'), /window\.__RENDER2_ENABLED__ = false;/);
     }
     finally {
         on.close();

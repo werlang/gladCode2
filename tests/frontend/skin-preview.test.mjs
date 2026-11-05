@@ -2,23 +2,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { availableMoves, nextMoveIndex, previewMode } from '../../web/public/script/helpers/skin-preview.js';
+import { availableMoves, nextMoveIndex } from '../../web/public/script/helpers/skin-preview.js';
 import { getImage } from '../../web/public/script/helpers/sprite-catalog.js';
 
 /** The creator's animation button order. */
 const MOVES = ['walk', 'cast', 'thrust', 'slash', 'shoot'];
-const preference = (renderer, enabled = true) => ({ ENABLED: enabled, CLASSIC: 'classic', THREE: 'three', get: () => renderer });
 const worn = (...ids) => ids.map(id => getImage(id));
-
-test('the creator shows the 3D gladiator only for the enabled 3D battle renderer', () => {
-    assert.equal(previewMode(preference('three')), 'three');
-    assert.equal(previewMode(preference('classic')), 'sprite');
-    // the server turned render2 off: whatever the stored choice, the sprite
-    assert.equal(previewMode(preference('three', false)), 'sprite');
-    // a page without the preference script
-    assert.equal(previewMode(undefined), 'sprite');
-    assert.equal(previewMode({ ENABLED: true }), 'sprite');
-});
 
 test('walking and casting are always there; the rest come with the weapon that does them', () => {
     assert.deepEqual([...availableMoves(worn('male', 'male-light'))].sort(), ['cast', 'walk']);

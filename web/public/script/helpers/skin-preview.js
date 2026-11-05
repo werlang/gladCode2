@@ -6,19 +6,6 @@
 const ALWAYS_AVAILABLE = ['walk', 'cast'];
 
 /**
- * Which view the creator shows: the 3D gladiator when the battle renderer preference is the 3D one and this server
- * enables it (`battle-renderer-preference.js`), otherwise the sprite. A page without the preference script gets the
- * sprite.
- *
- * @param {{ ENABLED?: boolean, THREE?: string, get?: () => string }|undefined|null} preference `window.BattleRendererPreference`.
- * @returns {'three'|'sprite'}
- */
-export function previewMode(preference) {
-    if (!preference?.ENABLED || typeof preference.get !== 'function') return 'sprite';
-    return preference.get() === preference.THREE ? 'three' : 'sprite';
-}
-
-/**
  * The animations a worn outfit can play: walking and casting always; thrust, slash and shoot only while a layer
  * that brings them is worn (a spear thrusts, a sword slashes, a bow shoots).
  *

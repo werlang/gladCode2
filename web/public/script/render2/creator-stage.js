@@ -14,6 +14,8 @@ const EASE_RATE = 10;
 /** Height of the top of the head over the `Head` bone, as a share of the bone's height; and the height assumed before measuring. */
 const HEAD_TOP = 1.18;
 const DEFAULT_HEIGHT = 0.85;
+/** Outer radius of what a Fighter lays on the ground: the team ring and the contact shadow (fighter.js `#build`). */
+const RING_RADIUS = 0.55;
 /** Context attributes: a transparent canvas over the creator's themed surface. */
 const CONTEXT_ATTRIBUTES = Object.freeze({ alpha: true, depth: true, stencil: false, premultipliedAlpha: true, powerPreference: 'low-power' });
 
@@ -45,6 +47,8 @@ export class CreatorStage {
     #zoom = ZOOM.min;
     #targetZoom = ZOOM.min;
     #height = DEFAULT_HEIGHT;
+    /** Shares of the view's height that the creator's controls cover at the top and bottom (see `setInsets`). */
+    #insets = { top: 0, bottom: 0 };
     #pixelRatio;
     #running = false;
     #last = 0;
@@ -187,6 +191,18 @@ export class CreatorStage {
         this.zoomTo(this.#targetZoom + step);
     }
 
+    /**
+     * Keeps the gladiator clear of the controls that run over the view.
+     *
+     * @param {{ top: number, bottom: number }} insets Shares of the view's height covered at the top and the bottom
+     *   (`creator-view.js` `viewInsets`).
+     */
+    setInsets({ top, bottom }) {
+        if (top === this.#insets.top && bottom === this.#insets.bottom) return;
+        this.#insets = { top, bottom };
+        this.#dirty = true;
+    }
+
     /** Starts the render loop (the creator is on screen). */
     start() {
         if (this.#running || this.#disposed) return;
@@ -287,10 +303,12 @@ export class CreatorStage {
         return this.#yaw !== this.#targetYaw || this.#zoom !== this.#targetZoom;
     }
 
-    /** Frames the gladiator for the current zoom, looking slightly down on it. */
+    /** Frames the gladiator for the current zoom, looking slightly down on it, inside the band the controls leave. */
     #placeCamera() {
         const ground = this.#fighter?.root.position.y ?? 0;
-        const { distance, targetY } = framing(this.#zoom, { height: this.#height, fov: FOV });
+        const { distance, targetY } = framing(this.#zoom, {
+            height: this.#height, fov: FOV, pitch: PITCH, ring: RING_RADIUS, aspect: this.#camera.aspect, insets: this.#insets,
+        });
         const y = ground + targetY;
         this.#camera.position.set(0, y + Math.sin(PITCH) * distance, Math.cos(PITCH) * distance);
         this.#camera.lookAt(0, y, 0);
