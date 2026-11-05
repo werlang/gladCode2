@@ -35,3 +35,16 @@ test('every old address lands on a page that does not redirect again', async () 
 test('unknown addresses are not found, whatever their form', async () => {
     for (const path of ['/nope', '/nope.php', '/code.php']) assert.equal((await get(path)).status, 404, path);
 });
+
+test('the creator pages carry the renderer gate, and the 3D import map when ENABLE_RENDER2 is on', async () => {
+    // the same reading as app.js `render2Enabled`: unset means on
+    const enabled = ['1', 'true', 'on', 'yes'].includes(String(process.env.ENABLE_RENDER2 ?? '1').trim().toLowerCase());
+    for (const path of ['/editor', '/newglad', '/glad-5']) {
+        const response = await get(path);
+        assert.equal(response.status, 200, path);
+        const html = await response.text();
+        assert.ok(html.includes(`window.__RENDER2_ENABLED__ = ${enabled};`), path);
+        assert.ok(html.includes('battle-renderer-preference.js'), path);
+        assert.equal(html.includes('"three":"https://cdn.jsdelivr.net/npm/three@'), enabled, path);
+    }
+});

@@ -179,6 +179,8 @@ canvas {
 #middle-container {
     flex: 1;
     display: flex;
+	/* the 3D status line takes a row of its own under the model */
+	flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 	margin-left: 0;
@@ -193,6 +195,45 @@ canvas {
 	max-height: 340px;
 	width: 100%;
 	display: block;
+}
+
+/* the sprite and the 3D view share the preview area; only one is shown */
+#middle-container .is-hidden {
+	display: none;
+}
+
+/* the 3D gladiator: a square WebGL canvas that drags to turn and zooms (see editor/glad-preview-3d.js) */
+.glad-3d {
+	width: 100%;
+	max-width: 340px;
+}
+
+.glad-3d canvas {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1 / 1;
+	/* a finger drag turns the model instead of scrolling the creator */
+	touch-action: none;
+	cursor: grab;
+}
+
+.glad-3d canvas:active {
+	cursor: grabbing;
+}
+
+.glad-3d-status {
+	flex-basis: 100%;
+	margin: 0;
+	padding: var(--space-2) var(--space-3);
+	text-align: center;
+	font-family: var(--font-game);
+	font-size: var(--text-sm);
+	color: var(--color-text-muted);
+}
+
+.glad-3d-status:empty {
+	display: none;
 }
 
 #right-container {
