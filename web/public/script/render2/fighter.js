@@ -189,13 +189,15 @@ export class Fighter {
     #anchor;
 
     /**
-     * @param {{ THREE: typeof import('three'), gladiator: Record<string, unknown>, index: number, shadowTexture: import('three').Texture, colors?: Map<string, number> }} options Fighter dependencies.
+     * @param {{ THREE: typeof import('three'), gladiator: Record<string, unknown>, index: number, shadowTexture: import('three').Texture, colors?: Map<string, number>, createModel: Function, catalog?: Array<Record<string, unknown>> }} options
+     *   Fighter dependencies. `catalog` is the sprite catalogue that resolves skin tokens to slots; the replay page
+     *   leaves it out (palette.js reads the one it publishes), the gladiator creator passes it.
      */
-    constructor({ THREE, gladiator, index, shadowTexture, colors, createModel }) {
+    constructor({ THREE, gladiator, index, shadowTexture, colors, createModel, catalog }) {
         this.#THREE = THREE;
         this.index = index;
         this.state = gladiator;
-        this.#appearance = getAppearance(gladiator.skin, index, colors);
+        this.#appearance = getAppearance(gladiator.skin, index, colors, catalog);
         this.#anchor = new THREE.Vector3();
         this.root = new THREE.Group();
         this.root.name = `gladiator-${index}`;

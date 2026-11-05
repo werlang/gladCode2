@@ -36,15 +36,58 @@ test('unknown addresses are not found, whatever their form', async () => {
     for (const path of ['/nope', '/nope.php', '/code.php']) assert.equal((await get(path)).status, 404, path);
 });
 
-test('the creator pages carry the renderer gate, and the 3D import map when ENABLE_RENDER2 is on', async () => {
-    // the same reading as app.js `render2Enabled`: unset means on
-    const enabled = ['1', 'true', 'on', 'yes'].includes(String(process.env.ENABLE_RENDER2 ?? '1').trim().toLowerCase());
-    for (const path of ['/editor', '/newglad', '/glad-5']) {
-        const response = await get(path);
-        assert.equal(response.status, 200, path);
-        const html = await response.text();
-        assert.ok(html.includes(`window.__RENDER2_ENABLED__ = ${enabled};`), path);
-        assert.ok(html.includes('battle-renderer-preference.js'), path);
-        assert.equal(html.includes('"three":"https://cdn.jsdelivr.net/npm/three@'), enabled, path);
+/**
+ * Serves one fresh copy of the app with `ENABLE_RENDER2` set as given (the flag is read when app.js loads).
+ *
+ * @param {string} flag Value of ENABLE_RENDER2.
+ * @returns {Promise<{ page: (path: string) => Promise<string>, close: () => void }>}
+ */
+async function appWithRender2(flag) {
+    const previous = process.env.ENABLE_RENDER2;
+    process.env.ENABLE_RENDER2 = flag;
+    const { app: fresh } = await import(`../app.js?render2=${flag}`);
+    if (previous === undefined) delete process.env.ENABLE_RENDER2;
+    else process.env.ENABLE_RENDER2 = previous;
+    const listener = fresh.listen(0);
+    const origin = `http://127.0.0.1:${listener.address().port}`;
+    return {
+        page: async path => {
+            const response = await fetch(`${origin}${path}`);
+            assert.equal(response.status, 200, path);
+            return response.text();
+        },
+        close: () => listener.close(),
+    };
+}
+
+/** @param {string} html A page. @returns {Record<string, unknown>} Its template vars (`#template-vars`). */
+const templateVars = html => JSON.parse(/<script id="template-vars" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
+
+test('the editor tells the gladiator creator whether the 3D renderer is on, and maps three only then', async () => {
+    const on = await appWithRender2('1');
+    const off = await appWithRender2('0');
+    try {
+        for (const path of ['/editor', '/newglad', '/glad-3']) {
+            const enabled = await on.page(path);
+            assert.equal(templateVars(enabled).render2, true, path);
+            assert.match(enabled, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@/, path);
+            assert.match(enabled, /"\/script\/render2\/creator-stage\.js":/, path);
+            // modules only: no page globals and no classic preference script tag on the editor (every import map lists the file)
+            assert.doesNotMatch(enabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
+
+            const disabled = await off.page(path);
+            assert.equal(templateVars(disabled).render2, false, path);
+            assert.doesNotMatch(disabled, /"three":/, path);
+            assert.doesNotMatch(disabled, /render2\/creator-stage\.js/, path);
+            assert.doesNotMatch(disabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
+        }
+        // the replay page keeps its classic preference script, set before its renderers load
+        const replay = await on.page('/play/abc');
+        assert.match(replay, /<script>window\.__RENDER2_ENABLED__ = true;<\/script>\s*<script src="\/script\/battle-renderer-preference\.js\?v=\d+"><\/script>/);
+        assert.match(await off.page('/play/abc'), /window\.__RENDER2_ENABLED__ = false;/);
+    }
+    finally {
+        on.close();
+        off.close();
     }
 });

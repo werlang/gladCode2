@@ -179,8 +179,6 @@ canvas {
 #middle-container {
     flex: 1;
     display: flex;
-	/* the 3D status line takes a row of its own under the model */
-	flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 	margin-left: 0;
@@ -188,6 +186,7 @@ canvas {
 	margin-bottom: calc(-1 * var(--space-9));
 	z-index: var(--z-below);
 	height: 300px;
+	position: relative;
 }
 
 #middle-container canvas {
@@ -197,42 +196,64 @@ canvas {
 	display: block;
 }
 
-/* the sprite and the 3D view share the preview area; only one is shown */
-#middle-container .is-hidden {
+/*
+ * the 3D gladiator (editor/skin-preview-3d.js) takes the sprite's square once it is ready; it is dragged, so it
+ * leaves the layer under the row (where no pointer reaches) for the row's own flow, still under every button
+ * (they are stacked at z-index 0 and up; a positioned container would be stacked with them, after them)
+ */
+#middle-container.is-3d {
+	z-index: auto;
+	position: static;
+}
+
+#middle-container.is-3d > canvas {
 	display: none;
 }
 
-/* the 3D gladiator: a square WebGL canvas that drags to turn and zooms (see editor/glad-preview-3d.js) */
-.glad-3d {
+.skin-3d {
+	display: none;
 	width: 100%;
 	max-width: 340px;
-}
-
-.glad-3d canvas {
-	display: block;
-	width: 100%;
-	height: auto;
-	aspect-ratio: 1 / 1;
-	/* a finger drag turns the model instead of scrolling the creator */
-	touch-action: none;
+	aspect-ratio: 1;
+	/* a sideways drag turns the gladiator; an up-down swipe still scrolls the creator on a phone */
+	touch-action: pan-y;
 	cursor: grab;
 }
 
-.glad-3d canvas:active {
+#middle-container.is-3d .skin-3d {
+	display: block;
+}
+
+.skin-3d.dragging {
 	cursor: grabbing;
 }
 
-.glad-3d-status {
-	flex-basis: 100%;
-	margin: 0;
-	padding: var(--space-2) var(--space-3);
-	text-align: center;
-	font-family: var(--font-game);
-	font-size: var(--text-sm);
-	color: var(--color-text-muted);
+.skin-3d canvas {
+	height: 100%;
+	border-radius: var(--radius-md);
 }
 
-.glad-3d-status:empty {
+/* above the strip the PRONTO button (desktop) or the item list (phone) overlaps */
+.skin-3d-status {
+	position: absolute;
+	left: 50%;
+	bottom: var(--space-10);
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: 90%;
+	margin: 0;
+	padding: var(--space-1) var(--space-3);
+	border-radius: var(--radius-pill);
+	background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+	box-shadow: var(--shadow-sm);
+	color: var(--color-text-muted);
+	font-family: var(--font-body);
+	font-size: var(--text-xs);
+	text-align: center;
+	pointer-events: none;
+}
+
+.skin-3d-status:empty {
 	display: none;
 }
 

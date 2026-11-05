@@ -64,5 +64,12 @@ export const videoTemplate = `
     </div>
 </div>`;
 
+/** The creator's 3D view (its canvas is made when the view loads) and the line that tells how it is doing. */
+export const skinStageTemplate = `<div class='skin-3d' title='Arraste para girar; role ou pince para aproximar'></div>`;
+
+export const skinStageCanvasTemplate = `<canvas tabindex='0' role='img' aria-label='Gladiador em 3D. Arraste ou use as setas para girar, + e - para aproximar.'></canvas>`;
+
+export const skinStatusTemplate = `<p class='skin-3d-status' role='status' aria-live='polite'></p>`;
+
 /** The sample program of the settings preview. */
 export const sampleCode = 'int start = 1;\n\nloop(){\n    upgradeSTR(5);\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}';
