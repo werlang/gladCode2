@@ -7,6 +7,8 @@
     // is off, the 3D option is hidden and any stored/?renderer=three value is
     // ignored so the page always runs the classic renderer. Defaults to
     // enabled when the flag is absent (e.g. direct script use outside playback).
+    // Module pages read the same key and aliases through helpers/renderer-preference.js; keep
+    // the two lists in step (tests/frontend/renderer-preference.test.mjs runs this script).
     const ENABLED = window.__RENDER2_ENABLED__ !== false;
 
     /**

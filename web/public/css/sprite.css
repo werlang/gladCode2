@@ -186,6 +186,7 @@ canvas {
 	margin-bottom: calc(-1 * var(--space-9));
 	z-index: var(--z-below);
 	height: 300px;
+	position: relative;
 }
 
 #middle-container canvas {
@@ -193,6 +194,67 @@ canvas {
 	max-height: 340px;
 	width: 100%;
 	display: block;
+}
+
+/*
+ * the 3D gladiator (editor/skin-preview-3d.js) takes the sprite's square once it is ready; it is dragged, so it
+ * leaves the layer under the row (where no pointer reaches) for the row's own flow, still under every button
+ * (they are stacked at z-index 0 and up; a positioned container would be stacked with them, after them)
+ */
+#middle-container.is-3d {
+	z-index: auto;
+	position: static;
+}
+
+#middle-container.is-3d > canvas {
+	display: none;
+}
+
+.skin-3d {
+	display: none;
+	width: 100%;
+	max-width: 340px;
+	aspect-ratio: 1;
+	/* a sideways drag turns the gladiator; an up-down swipe still scrolls the creator on a phone */
+	touch-action: pan-y;
+	cursor: grab;
+}
+
+#middle-container.is-3d .skin-3d {
+	display: block;
+}
+
+.skin-3d.dragging {
+	cursor: grabbing;
+}
+
+.skin-3d canvas {
+	height: 100%;
+	border-radius: var(--radius-md);
+}
+
+/* above the strip the PRONTO button (desktop) or the item list (phone) overlaps */
+.skin-3d-status {
+	position: absolute;
+	left: 50%;
+	bottom: var(--space-10);
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: 90%;
+	margin: 0;
+	padding: var(--space-1) var(--space-3);
+	border-radius: var(--radius-pill);
+	background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+	box-shadow: var(--shadow-sm);
+	color: var(--color-text-muted);
+	font-family: var(--font-body);
+	font-size: var(--text-xs);
+	text-align: center;
+	pointer-events: none;
+}
+
+.skin-3d-status:empty {
+	display: none;
 }
 
 #right-container {
