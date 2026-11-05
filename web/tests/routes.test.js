@@ -35,3 +35,53 @@ test('every old address lands on a page that does not redirect again', async () 
 test('unknown addresses are not found, whatever their form', async () => {
     for (const path of ['/nope', '/nope.php', '/code.php']) assert.equal((await get(path)).status, 404, path);
 });
+
+/**
+ * Serves one fresh copy of the app with `ENABLE_RENDER2` set as given (the flag is read when app.js loads).
+ *
+ * @param {string} flag Value of ENABLE_RENDER2.
+ * @returns {Promise<{ page: (path: string) => Promise<string>, close: () => void }>}
+ */
+async function appWithRender2(flag) {
+    const previous = process.env.ENABLE_RENDER2;
+    process.env.ENABLE_RENDER2 = flag;
+    const { app: fresh } = await import(`../app.js?render2=${flag}`);
+    if (previous === undefined) delete process.env.ENABLE_RENDER2;
+    else process.env.ENABLE_RENDER2 = previous;
+    const listener = fresh.listen(0);
+    const origin = `http://127.0.0.1:${listener.address().port}`;
+    return {
+        page: async path => {
+            const response = await fetch(`${origin}${path}`);
+            assert.equal(response.status, 200, path);
+            return response.text();
+        },
+        close: () => listener.close(),
+    };
+}
+
+test('the editor tells the gladiator creator whether the 3D renderer is on, and maps three only then', async () => {
+    const on = await appWithRender2('1');
+    const off = await appWithRender2('0');
+    try {
+        for (const path of ['/editor', '/newglad', '/glad-3']) {
+            const enabled = await on.page(path);
+            assert.match(enabled, /window\.__RENDER2_ENABLED__ = true;/, path);
+            assert.match(enabled, /script\/battle-renderer-preference\.js\?v=\d+/, path);
+            assert.match(enabled, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@/, path);
+            assert.match(enabled, /"\/script\/render2\/creator-stage\.js":/, path);
+            // the preference is set before any module runs
+            assert.ok(enabled.indexOf('battle-renderer-preference.js') < enabled.indexOf('editor.js?v='), path);
+
+            const disabled = await off.page(path);
+            assert.match(disabled, /window\.__RENDER2_ENABLED__ = false;/, path);
+            assert.match(disabled, /script\/battle-renderer-preference\.js\?v=\d+/, path);
+            assert.doesNotMatch(disabled, /"three":/, path);
+            assert.doesNotMatch(disabled, /render2\/creator-stage\.js/, path);
+        }
+    }
+    finally {
+        on.close();
+        off.close();
+    }
+});

@@ -1,5 +1,7 @@
 import { site } from '../helpers/request.js';
+import { availableMoves, nextMoveIndex, previewMode } from '../helpers/skin-preview.js';
 import { getImage, images } from '../helpers/sprite-catalog.js';
+import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
 import { ATTRIBUTE_POINTS, attributeCost, validGladName } from './attributes.js';
 
 /** Sub-menus shown by each category button. */
@@ -88,6 +90,11 @@ function loadImage(src) {
 /**
  * The gladiator creator (glad-create.html): appearance layers with a live
  * animated preview, then name and attributes.
+ *
+ * The preview is the LPC sprite, or the 3D gladiator of the battle renderer
+ * when that is the player's battle renderer preference (`SkinPreview3D`,
+ * loaded only then). Both follow the same buttons and wardrobe rules; the
+ * sprite sheet is composed either way, as the fallback of the 3D view.
  */
 export class SkinCreator {
     /** Layers worn, by id. */
@@ -104,6 +111,8 @@ export class SkinCreator {
     #frame = 0;
     #lastColor = 'black';
     #drawing = 0;
+    /** @type {import('./skin-preview-3d.js').SkinPreview3D|null} The 3D view, in 3D mode only. */
+    #preview3d = null;
 
     /**
      * @param {HTMLElement} root The `#fog-skin` overlay.
@@ -119,7 +128,7 @@ export class SkinCreator {
         this.#sheet.height = BIG_CELL * 21;
     }
 
-    /** Loads glad-create.html and binds it. */
+    /** Loads glad-create.html and binds it; in 3D mode also mounts the 3D view (which loads once shown). */
     async init() {
         const markup = await site.get('glad-create.html');
         this.#root.innerHTML = typeof markup === 'string' ? markup : '';
@@ -129,8 +138,22 @@ export class SkinCreator {
         this.#bindMenus();
         this.#bindPreview();
         this.#bindAttributes();
+        if (previewMode(window.BattleRendererPreference) === 'three') await this.#mount3d();
         this.reload();
         setInterval(() => this.#renderFrame(), 100);
+    }
+
+    /** Mounts the 3D view; the sprite simply stays if its module cannot be loaded. */
+    async #mount3d() {
+        try {
+            const { SkinPreview3D } = await import('./skin-preview-3d.js');
+            this.#preview3d = new SkinPreview3D(this.#find('#middle-container'));
+            this.#preview3d.setMove(MOVES[this.#move].name);
+            this.#preview3d.setPlaying(this.#playing);
+        }
+        catch (error) {
+            console.warn('Visual 3D do criador indisponível; exibindo o sprite.', error);
+        }
     }
 
     /** @param {string} selector Selector inside the creator. */
@@ -220,15 +243,32 @@ export class SkinCreator {
         this.#find('#get-code').addEventListener('click', () => this.#finish());
     }
 
+    /**
+     * The preview buttons. Turn and zoom act on the 3D view while it is on screen and on the sprite otherwise;
+     * play/pause and the animation are shared, so either view (and the sprite a failed 3D view falls back to)
+     * shows the same animation.
+     */
     #bindPreview() {
         this.#find('#turn').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.turn();
+                return;
+            }
             this.#direction = (this.#direction + 1) % 4;
             this.#draw();
         });
         this.#find('#down-scale').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.zoomBy(-0.5);
+                return;
+            }
             if (this.#scale > 1) this.#scale -= 0.5;
         });
         this.#find('#up-scale').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.zoomBy(0.5);
+                return;
+            }
             if (this.#scale < 3.5) this.#scale += 0.5;
         });
         const play = this.#find('#play-pause');
@@ -236,26 +276,25 @@ export class SkinCreator {
             this.#playing = !this.#playing;
             if (!this.#playing) this.#frame = 0;
             play.querySelector('img').src = `${ICON_ROOT}${this.#playing ? 'pause' : 'play'}.png`;
+            this.#preview3d?.setPlaying(this.#playing);
         });
         this.#find('#animation').addEventListener('click', () => {
-            const available = { walk: true, cast: true, thrust: false, slash: false, shoot: false };
-            Object.values(this.selected).forEach(image => {
-                if (image.move) available[image.move] = true;
-            });
-            do {
-                this.#move = (this.#move + 1) % MOVES.length;
-            } while (!available[MOVES[this.#move].name]);
+            const available = availableMoves(Object.values(this.selected));
+            this.#setMove(nextMoveIndex(this.#move, MOVES.map(move => move.name), available));
             this.#frame = 0;
-            this.#showMoveIcon();
         });
     }
 
-    #showMoveIcon() {
+    /** @param {number} index Preview animation (index in `MOVES`), shown on the button and played by the 3D view. */
+    #setMove(index) {
+        this.#move = index;
         this.#find('#animation img').src = `${ICON_ROOT}${MOVES[this.#move].image}.png`;
+        this.#preview3d?.setMove(MOVES[this.#move].name);
     }
 
-    /** Draws the current frame of the preview. */
+    /** Draws the current frame of the sprite preview (nothing while the 3D view replaces it). */
     #renderFrame() {
+        if (this.#preview3d?.active) return;
         const context = this.#canvas.getContext('2d');
         context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         if (this.#playing) this.#frame++;
@@ -316,7 +355,7 @@ export class SkinCreator {
     /**
      * Applies the wardrobe rules (requirements, matching colours, blocked
      * menus) and redraws: the items of the open sub-menu (unless `keepItems`)
-     * and the preview.
+     * and the preview (the sprite sheet, and the 3D gladiator in 3D mode).
      *
      * @param {boolean} [keepItems] Keep the item list as it is.
      */
@@ -376,6 +415,7 @@ export class SkinCreator {
         this.#markUnavailable();
         if (!keepItems) Object.values(visible).forEach(image => this.#addItem(image));
         this.#draw();
+        this.#preview3d?.setSkin(Object.keys(this.selected));
     }
 
     /** Greys out the menus the worn layers rule out, dropping their layers. */
@@ -390,8 +430,7 @@ export class SkinCreator {
         Object.values(this.selected).forEach(image => {
             [].concat(image.block ?? []).forEach(block);
             if (image.move && parentsOf(image).some(parent => this.#subButton(parent)?.classList.contains('selected'))) {
-                this.#move = MOVE_INDEX[image.move];
-                this.#showMoveIcon();
+                this.#setMove(MOVE_INDEX[image.move]);
             }
         });
 
@@ -503,7 +542,8 @@ export class SkinCreator {
         attributes.style.display = 'flex';
         attributes.style.height = `${appearance.offsetHeight}px`;
         appearance.style.display = 'none';
-        this.#find('#cv').replaceChildren(this.thumbnail());
+        if (this.#preview3d) this.#cardPicture().then(picture => this.#find('#cv').replaceChildren(picture));
+        else this.#find('#cv').replaceChildren(this.thumbnail());
     }
 
     /** Back to the appearance. */
@@ -512,13 +552,27 @@ export class SkinCreator {
         this.#find('#skin-container').style.display = '';
     }
 
-    /** @returns {HTMLCanvasElement} A 64 px picture of the gladiator facing down. */
+    /**
+     * @returns {HTMLCanvasElement} A 64 px picture of the gladiator facing down: the sprite preview's, or in 3D mode
+     *   the first walking frame of the composed sheet (the 3D view does not move the sprite).
+     */
     thumbnail() {
+        if (this.#preview3d) return getSpriteThumb(this.#sheet, 'walk', 'down');
         const thumb = document.createElement('canvas');
         thumb.width = CELL;
         thumb.height = CELL;
         thumb.getContext('2d').drawImage(this.#canvas, CELL, CELL, CELL, CELL, 0, 0, CELL, CELL);
         return thumb;
+    }
+
+    /**
+     * The 64 px sprite the gladiator's card shows once saved (`glad-card.js` and the editor build it from the skin
+     * the same way), so the card made in 3D mode never changes picture on the next visit.
+     *
+     * @returns {Promise<HTMLCanvasElement>}
+     */
+    async #cardPicture() {
+        return getSpriteThumb(await fetchSpritesheet(this.values().skin), 'walk', 'down');
     }
 
     #reset() {
@@ -534,8 +588,8 @@ export class SkinCreator {
         this.showAppearance();
     }
 
-    /** "GERAR CÓDIGO": validates the name and hands the gladiator over. */
-    #finish() {
+    /** "GERAR CÓDIGO": validates the name and hands the gladiator over (in 3D mode with its card's sprite). */
+    async #finish() {
         const field = this.#find('#distribuicao #nome');
         if (!validGladName(field.value)) {
             field.classList.add('error');
@@ -543,6 +597,11 @@ export class SkinCreator {
             return;
         }
         field.classList.remove('error');
+        if (this.#preview3d) {
+            const values = this.values();
+            this.onReady({ ...values, image: await this.#cardPicture() });
+            return;
+        }
         this.onReady({ ...this.values(), image: this.thumbnail() });
     }
 }

@@ -77,9 +77,10 @@ page(['/function/:name', '/funcao/:name'], 'function', req => {
 page('/post/:hash', 'post', req => ({ postHash: req.params.hash }));
 // the old editor address took the gladiator as ?g=
 app.get('/editor', (req, res, next) => (req.query.g === undefined ? next() : res.redirect(301, legacyPageUrl('editor', req.query))));
-page('/editor', 'editor', () => ({ gladiatorId: null }));
-page('/newglad', 'editor', () => ({ gladiatorId: 0 }));
-page(/^\/glad-(\d+)$/, 'editor', req => ({ gladiatorId: Number(req.params[0]) }));
+// the editor's gladiator creator shows the 3D gladiator for players who chose the 3D battle renderer
+page('/editor', 'editor', () => ({ gladiatorId: null }), { render2: render2Enabled });
+page('/newglad', 'editor', () => ({ gladiatorId: 0 }), { render2: render2Enabled });
+page(/^\/glad-(\d+)$/, 'editor', req => ({ gladiatorId: Number(req.params[0]) }), { render2: render2Enabled });
 page('/play/:hash', 'playback', req => ({ logHash: req.params.hash, tournament: text(req.query.t) }), { render2: render2Enabled });
 
 // A tournament or training link without a round opens round 0.
