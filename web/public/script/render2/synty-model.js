@@ -696,6 +696,11 @@ export class SyntyModel {
     #arrowGeometries = [];
     #arrowMaterials = null;
     #arrowWorld = null;
+    /**
+     * Skeletons this model made: one per body part bound to the hero bones, and the one of its cloned bow. The
+     * renderer gives each a bone texture, so they are disposed with the model; the assets' own skeletons are not.
+     */
+    #skeletons = [];
 
     /** Fighter hands the death over to the clip instead of tipping the figure over. */
     animatesDeath = true;
@@ -750,7 +755,9 @@ export class SyntyModel {
             mesh.frustumCulled = false;
             content.add(mesh);
             this.#bodyMeshes.push(mesh);
-            mesh.bind(new THREE.Skeleton(bones, inverses), new THREE.Matrix4());
+            const partSkeleton = new THREE.Skeleton(bones, inverses);
+            this.#skeletons.push(partSkeleton);
+            mesh.bind(partSkeleton, new THREE.Matrix4());
         };
         for (const body of assets.bodies.get(outfit.body) ?? []) {
             const bodyMaterial = body.material.clone();
@@ -873,6 +880,10 @@ export class SyntyModel {
         // Each fighter needs its own bow skeleton to pull the string.
         const bowSource = this.#assets.weapons.get(outfit.bow) ?? this.#assets.weapons.get('bow');
         const bowFrame = tint(this.#assets.cloneSkinned(bowSource));
+        // SkeletonUtils gives the clone skeletons of its own (the source bow's stay with the assets)
+        bowFrame.traverse((node) => {
+            if (node.isSkinnedMesh) this.#skeletons.push(node.skeleton);
+        });
         const string = bowSource.userData.string ? bowFrame.getObjectByName(bowSource.userData.string) : null;
         this.#string = string ? { bone: string, rest: string.position.clone() } : null;
         bowFrame.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(
@@ -1651,11 +1662,16 @@ export class SyntyModel {
         }
     }
 
-    /** Releases the per-fighter materials; geometry, textures and clips are shared and live as long as the renderer. */
+    /**
+     * Releases what this fighter owns: its materials, the flask and arrow geometry and its skeletons (with their bone
+     * textures); part geometry, atlases and clips are the assets' and live as long as the renderer.
+     */
     dispose() {
         this.#mixer.stopAllAction();
         this.#materials.forEach((material) => material.dispose());
         this.#flaskGeometry?.dispose();
         this.#arrowGeometries.forEach((geometry) => geometry.dispose());
+        this.#skeletons.forEach((skeleton) => skeleton.dispose());
+        this.#skeletons = [];
     }
 }
