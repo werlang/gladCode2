@@ -157,93 +157,202 @@ function boneKey(bone) {
 }
 
 /**
- * Loads the Synty FBX assets once and returns the model factory used by Fighter.
+ * What a set of fighters needs from the Synty packs: the weapon, bow, shield, head prop and body models their outfits
+ * name (the default sword and bow always, as fallbacks), the atlases those models use, and the genders whose
+ * locomotion clips must be loaded (masculine when there is no look at all).
  *
- * @param {typeof import('three')} THREE Three namespace.
- * @param {Array<Record<string, any>>} looks Appearances of the fighters, used to preload only the needed weapons.
- * @returns {Promise<(options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel>} Model factory.
+ * @param {Array<Record<string, any>>} looks Appearances from `palette.getAppearance`.
+ * @returns {{ kinds: string[], shields: string[], props: string[], bodies: string[], atlases: string[], genders: Array<'Masc'|'Femn'> }}
+ *   Keys of `WEAPON_MODELS`, `SHIELD_MODELS`, `PROPS`, `BODIES` and `ATLASES`, without repeats.
  */
-export async function loadSynty(THREE, looks = [], manager = null) {
-    const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
-    const { clone: cloneSkinned } = await import('three/addons/utils/SkeletonUtils.js');
-    if (!manager) {
-        manager = new THREE.LoadingManager();
-        // Skip the stale texture references inside the FBX files; materials are replaced with the shared atlases.
-        manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
-    }
-    const fbx = new FBXLoader(manager);
-    const loadFbx = (url) => new Promise((resolve, reject) => fbx.load(url, resolve, undefined, reject));
-    // FBX UVs put v = 0 at the bottom of the image, which is three's default texture orientation (flipY).
-    const loadTexture = async (url) => {
-        manager.itemStart(url);
-        try {
-            const texture = await loadImageTexture(THREE, url);
-            manager.itemEnd(url);
-            return texture;
-        } catch (error) {
-            manager.itemError(url);
-            throw error;
-        }
-    };
-
-    // Only the gear and props these fighters wear are fetched; the default sword and bow always are, as fallbacks.
+export function syntyNeeds(looks) {
     const outfits = looks.map((look) => syntyOutfit(look));
-    const kinds = new Set(['sword', 'bow', ...outfits.flatMap((outfit) => [outfit.weapon, outfit.bow])]);
-    const shields = new Set(outfits.map((outfit) => outfit.shield).filter(Boolean));
-    const propIds = new Set(outfits.flatMap((outfit) => outfit.props.map((prop) => prop.id)));
-    const bodies = new Set(outfits.map((outfit) => outfit.body).filter((body) => BODIES[body]));
-    const atlasNames = [...new Set([
-        ...[...kinds].map((kind) => WEAPON_MODELS[kind].atlas),
-        ...[...shields].map((key) => SHIELD_MODELS[key].atlas),
-        ...[...bodies].map((key) => BODIES[key].atlas),
+    const kinds = [...new Set(['sword', 'bow', ...outfits.flatMap((outfit) => [outfit.weapon, outfit.bow])])];
+    const shields = [...new Set(outfits.map((outfit) => outfit.shield).filter(Boolean))];
+    const props = [...new Set(outfits.flatMap((outfit) => outfit.props.map((prop) => prop.id)))];
+    const bodies = [...new Set(outfits.map((outfit) => outfit.body).filter((body) => BODIES[body]))];
+    const atlases = [...new Set([
+        ...kinds.map((kind) => WEAPON_MODELS[kind].atlas),
+        ...shields.map((key) => SHIELD_MODELS[key].atlas),
+        ...bodies.map((key) => BODIES[key].atlas),
     ])];
-    const genders = new Set(looks.map((look) => (look.female ? 'Femn' : 'Masc')));
-    if (!genders.size) genders.add('Masc');
-    const clipFiles = new Map();
+    const genders = [...new Set(looks.map((look) => (look.female ? 'Femn' : 'Masc')))];
+    if (!genders.length) genders.push('Masc');
+    return { kinds, shields, props, bodies, atlases, genders };
+}
+
+/**
+ * The clip files a set of genders plays: each gender's locomotion (keyed `<gender>:<clip>`), then the shared sword
+ * combat clips. The first entry's FBX also gives the animation skeleton (see `SyntyLibrary#loadBase`).
+ *
+ * @param {Array<'Masc'|'Femn'>} genders Genders to load locomotion for.
+ * @returns {Map<string, string>} Clip name to file URL.
+ */
+function clipFiles(genders) {
+    const files = new Map();
     for (const gender of genders) {
         const folder = gender === 'Femn' ? 'Feminine' : 'Masculine';
         for (const [name, file] of Object.entries(LOCOMOTION_CLIPS)) {
             const dir = file.slice(0, file.lastIndexOf('/') + 1);
-            clipFiles.set(`${gender}:${name}`, `${LOCOMOTION_ROOT}${folder}/${dir}${file.slice(dir.length)}_${gender}.fbx`);
+            files.set(`${gender}:${name}`, `${LOCOMOTION_ROOT}${folder}/${dir}${file.slice(dir.length)}_${gender}.fbx`);
         }
     }
-    for (const [name, file] of Object.entries(STATE_CLIPS)) clipFiles.set(name, `${COMBAT_ROOT}${file}.fbx`);
-    for (const [name, { file }] of Object.entries(ATTACK_CLIPS)) clipFiles.set(name, `${COMBAT_ROOT}${file}.fbx`);
+    for (const [name, file] of Object.entries(STATE_CLIPS)) files.set(name, `${COMBAT_ROOT}${file}.fbx`);
+    for (const [name, { file }] of Object.entries(ATTACK_CLIPS)) files.set(name, `${COMBAT_ROOT}${file}.fbx`);
+    return files;
+}
 
-    // Optional pieces (one fighter's gear, props, bodies) may be missing from a partial asset install: the
-    // fighter then falls back to the default sword/bow or simply goes without.
-    const optional = (key, url) => loadFbx(url).then((source) => [key, source], (error) => {
-        console.warn(`Synty asset unavailable: ${url}`, error);
-        return [key, null];
-    });
-    const [character, animationCharacter, heroAtlas, atlases, weapons, shieldSources, propSources, bodySources, clips] = await Promise.all([
-        loadFbx(CHARACTER_FBX),
-        loadFbx(ANIMATION_CHARACTER_FBX),
-        loadTexture(ROOT + ATLASES.heroes),
-        Promise.all(atlasNames.map(async (name) => [name, await loadTexture(ROOT + ATLASES[name]).catch(() => null)])),
-        Promise.all([...kinds].map((kind) => optional(kind, ROOT + WEAPON_MODELS[kind].file))),
-        Promise.all([...shields].map((key) => optional(key, ROOT + SHIELD_MODELS[key].file))),
-        Promise.all([...propIds].map((key) => optional(key, ROOT + PROPS[key].file))),
-        Promise.all([...bodies].map((key) => optional(key, ROOT + BODIES[key].file))),
-        Promise.all([...clipFiles].map(async ([name, url]) => [name, await loadFbx(url)])),
-    ]);
+/**
+ * Synty assets loaded on demand and kept: the first {@link SyntyLibrary#prepare} fetches the hero parts, the
+ * animation character, the hero atlas and the clips; every later call fetches only the gear, head props, bodies and
+ * gendered locomotion that its looks add. The battle prepares every fighter at once (through {@link loadSynty}); the
+ * gladiator creator keeps one library while the player tries outfits on, so a new weapon costs one file instead of
+ * parsing the 200k-triangle hero again.
+ *
+ * Gear is fetched and normalised once per catalogue key (`addWeapon` re-parents its source, so two keys that share a
+ * file get two parsed copies, as before); a file that fails stays failed for the library's lifetime.
+ */
+export class SyntyLibrary {
+    #THREE;
+    #manager;
+    /** @type {Promise<{ loadFbx: Function, loadTexture: Function, cloneSkinned: Function }>|null} Loaders, set up on the first call. */
+    #loaders = null;
+    /** @type {Promise<SyntyAssets>|null} The hero, the animation rig and the hero atlas. */
+    #assets = null;
+    /** Loads already started, by key (`clip:Masc:idle`, `weapon:spear`, `atlas:viking`...). */
+    #tasks = new Map();
 
-    const assets = new SyntyAssets(THREE, character, animationCharacter, heroAtlas, clips[0][1].children.find((node) => node.name === 'Root'));
-    assets.cloneSkinned = cloneSkinned;
-    for (const [name, source] of clips) {
-        const clip = source.animations[0];
-        // Root motion is applied by the fighter itself; the clips only animate the body in place.
-        clip.tracks = clip.tracks.filter((track) => !track.name.startsWith('Root.'));
-        clip.name = name;
-        assets.clips.set(name, clip);
+    /**
+     * @param {typeof import('three')} THREE Three namespace.
+     * @param {import('three').LoadingManager|null} [manager] Manager whose progress the caller follows; by default one
+     *   that blanks the stale texture paths inside the FBX files (materials are rebuilt on the pack atlases).
+     */
+    constructor(THREE, manager = null) {
+        this.#THREE = THREE;
+        if (!manager) {
+            manager = new THREE.LoadingManager();
+            manager.setURLModifier((url) => (IMAGE_URL.test(url) ? EMPTY_PIXEL : url));
+        }
+        this.#manager = manager;
     }
-    const atlasByName = new Map(atlases);
-    for (const [kind, source] of weapons) if (source) assets.addWeapon(kind, source, WEAPON_MODELS[kind], atlasByName.get(WEAPON_MODELS[kind].atlas));
-    if (!assets.weapons.has('sword') || !assets.weapons.has('bow')) throw new Error('Synty default sword or bow missing');
-    for (const [key, source] of shieldSources) if (source) assets.addShield(key, source, SHIELD_MODELS[key], atlasByName.get(SHIELD_MODELS[key].atlas));
-    for (const [key, source] of propSources) if (source) assets.addProp(key, source, PROPS[key]);
-    for (const [key, source] of bodySources) if (source) assets.addBody(key, source, atlasByName.get(BODIES[key].atlas));
-    return (options) => new SyntyModel({ ...options, assets });
+
+    /**
+     * Loads whatever these looks need that the library does not hold yet, and returns the model factory.
+     *
+     * @param {Array<Record<string, any>>} looks Appearances of the fighters to build (`palette.getAppearance`).
+     * @returns {Promise<(options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel>} Model factory.
+     * @throws {Error} When a required file (hero, rig, hero atlas, clip, default sword or bow) cannot be loaded.
+     */
+    async prepare(looks = []) {
+        this.#loaders ??= this.#createLoaders();
+        const { loadFbx } = await this.#loaders;
+        const needs = syntyNeeds(looks);
+        const clips = clipFiles(needs.genders);
+        const [[, firstClip]] = clips;
+        this.#assets ??= this.#loadBase(firstClip);
+
+        // Optional pieces (one fighter's gear, props, bodies) may be missing from a partial asset install: the
+        // fighter then falls back to the default sword/bow or simply goes without.
+        const optional = (url) => loadFbx(url).catch((error) => {
+            console.warn(`Synty asset unavailable: ${url}`, error);
+            return null;
+        });
+        // Every fetch starts now, in parallel with the hero; each piece is added once the hero is parsed.
+        const piece = (key, url, atlas, add) => this.#once(key, async () => {
+            const [source, texture, assets] = await Promise.all([optional(url), atlas ? this.#atlas(atlas) : null, this.#assets]);
+            if (source) add(assets, source, texture);
+        });
+        await Promise.all([
+            ...[...clips].map(([name, url]) => this.#once(`clip:${name}`, async () => {
+                const [source, assets] = await Promise.all([this.#clipSource(url), this.#assets]);
+                const clip = source.animations[0];
+                // Root motion is applied by the fighter itself; the clips only animate the body in place.
+                clip.tracks = clip.tracks.filter((track) => !track.name.startsWith('Root.'));
+                clip.name = name;
+                assets.clips.set(name, clip);
+            })),
+            ...needs.kinds.map((kind) => piece(`weapon:${kind}`, ROOT + WEAPON_MODELS[kind].file, WEAPON_MODELS[kind].atlas,
+                (assets, source, atlas) => assets.addWeapon(kind, source, WEAPON_MODELS[kind], atlas))),
+            ...needs.shields.map((key) => piece(`shield:${key}`, ROOT + SHIELD_MODELS[key].file, SHIELD_MODELS[key].atlas,
+                (assets, source, atlas) => assets.addShield(key, source, SHIELD_MODELS[key], atlas))),
+            ...needs.props.map((key) => piece(`prop:${key}`, ROOT + PROPS[key].file, null,
+                (assets, source) => assets.addProp(key, source, PROPS[key]))),
+            ...needs.bodies.map((key) => piece(`body:${key}`, ROOT + BODIES[key].file, BODIES[key].atlas,
+                (assets, source, atlas) => assets.addBody(key, source, atlas))),
+        ]);
+        const assets = await this.#assets;
+        if (!assets.weapons.has('sword') || !assets.weapons.has('bow')) throw new Error('Synty default sword or bow missing');
+        return (options) => new SyntyModel({ ...options, assets });
+    }
+
+    /** Runs `task` the first time `key` is asked for; later calls share its promise. */
+    #once(key, task) {
+        if (!this.#tasks.has(key)) this.#tasks.set(key, task());
+        return this.#tasks.get(key);
+    }
+
+    /** The parsed FBX of a clip file (shared by the clip and, for the first clip, the animation skeleton). */
+    #clipSource(url) {
+        return this.#once(`fbx:${url}`, async () => (await this.#loaders).loadFbx(url));
+    }
+
+    /** A pack atlas, or null when it cannot be loaded (the pieces then go untextured). */
+    #atlas(name) {
+        return this.#once(`atlas:${name}`, async () => (await this.#loaders).loadTexture(ROOT + ATLASES[name]).catch(() => null));
+    }
+
+    /** The hero parts, the animation character, the hero atlas and the animation skeleton of the first clip. */
+    async #loadBase(clipUrl) {
+        const { loadFbx, loadTexture, cloneSkinned } = await this.#loaders;
+        const [character, animationCharacter, heroAtlas, clipSource] = await Promise.all([
+            loadFbx(CHARACTER_FBX),
+            loadFbx(ANIMATION_CHARACTER_FBX),
+            loadTexture(ROOT + ATLASES.heroes),
+            this.#clipSource(clipUrl),
+        ]);
+        const assets = new SyntyAssets(this.#THREE, character, animationCharacter, heroAtlas, clipSource.children.find((node) => node.name === 'Root'));
+        assets.cloneSkinned = cloneSkinned;
+        return assets;
+    }
+
+    /** Imports the FBX loader and the skinned-mesh cloner, and wraps the texture loader in the manager's progress. */
+    async #createLoaders() {
+        const THREE = this.#THREE;
+        const manager = this.#manager;
+        const [{ FBXLoader }, { clone: cloneSkinned }] = await Promise.all([
+            import('three/addons/loaders/FBXLoader.js'),
+            import('three/addons/utils/SkeletonUtils.js'),
+        ]);
+        const fbx = new FBXLoader(manager);
+        return {
+            cloneSkinned,
+            loadFbx: (url) => new Promise((resolve, reject) => fbx.load(url, resolve, undefined, reject)),
+            // FBX UVs put v = 0 at the bottom of the image, which is three's default texture orientation (flipY).
+            loadTexture: async (url) => {
+                manager.itemStart(url);
+                try {
+                    const texture = await loadImageTexture(THREE, url);
+                    manager.itemEnd(url);
+                    return texture;
+                } catch (error) {
+                    manager.itemError(url);
+                    throw error;
+                }
+            },
+        };
+    }
+}
+
+/**
+ * Loads the Synty FBX assets every fighter of a battle needs and returns the model factory used by Fighter.
+ *
+ * @param {typeof import('three')} THREE Three namespace.
+ * @param {Array<Record<string, any>>} looks Appearances of the fighters, used to preload only the needed weapons.
+ * @param {import('three').LoadingManager|null} [manager] Manager whose progress the caller follows.
+ * @returns {Promise<(options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel>} Model factory.
+ */
+export function loadSynty(THREE, looks = [], manager = null) {
+    return new SyntyLibrary(THREE, manager).prepare(looks);
 }
 
 /** Parsed Synty assets: character part geometry bound to one canonical skeleton, plus normalised weapons. */
@@ -520,6 +629,12 @@ const GAIT_CM_PER_SECOND = {
     run: CYCLE_CM.run / CYCLE_SECONDS.run,
     sprint: CYCLE_CM.sprint / CYCLE_SECONDS.sprint,
 };
+
+/**
+ * The walk clip as authored: the ground speed (world units per second) up to which the locomotion blend is a pure
+ * walk, and the seconds of one cycle. The gladiator creator walks in place with these.
+ */
+export const WALK_GAIT = Object.freeze({ speed: GAIT_CM_PER_SECOND.walk * WORLD_PER_CM, seconds: CYCLE_SECONDS.walk });
 
 /**
  * Body made of the Synty modular hero parts, skinned to the animation skeleton. Locomotion, sword attacks,
