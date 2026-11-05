@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "eslint": "9.39.1",
-    "globals": "15.15.0"
+    "globals": "15.15.0",
+    "three": "0.185.1"
   }
 }
