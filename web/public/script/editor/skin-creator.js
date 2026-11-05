@@ -1,6 +1,8 @@
+import { availableMoves, nextAvailableMove, stepZoom, usesThreePreview } from '../helpers/glad-preview.js';
 import { site } from '../helpers/request.js';
 import { getImage, images } from '../helpers/sprite-catalog.js';
 import { ATTRIBUTE_POINTS, attributeCost, validGladName } from './attributes.js';
+import { GladPreview3D } from './glad-preview-3d.js';
 
 /** Sub-menus shown by each category button. */
 const MENUS = {
@@ -20,6 +22,7 @@ const MOVES = [
     { name: 'shoot', sprites: 13, line: 16, image: 'arrows' },
 ];
 const MOVE_INDEX = Object.fromEntries(MOVES.map((move, index) => [move.name, index]));
+const MOVE_NAMES = MOVES.map(move => move.name);
 const DIRECTIONS = ['up', 'left', 'down', 'right'];
 
 const CELL = 64;
@@ -87,7 +90,9 @@ function loadImage(src) {
 
 /**
  * The gladiator creator (glad-create.html): appearance layers with a live
- * animated preview, then name and attributes.
+ * animated preview, then name and attributes. The preview is the sprite
+ * (LPC) unless the player chose the 3D renderer; then the same controls drive
+ * a 3D gladiator, and the sprite stays as the fallback if 3D cannot be shown.
  */
 export class SkinCreator {
     /** Layers worn, by id. */
@@ -97,6 +102,8 @@ export class SkinCreator {
     #tree = new Map();
     #canvas = document.createElement('canvas');
     #sheet = document.createElement('canvas');
+    /** The 3D preview, when the renderer preference is 3D; null in sprite mode. */
+    #preview = null;
     #direction = 2;
     #scale = 1;
     #playing = false;
@@ -129,8 +136,45 @@ export class SkinCreator {
         this.#bindMenus();
         this.#bindPreview();
         this.#bindAttributes();
+        this.#startPreview3d();
         this.reload();
+        // the sprite keeps animating too: it is the fallback, and the thumbnail when 3D is not ready
         setInterval(() => this.#renderFrame(), 100);
+    }
+
+    /**
+     * Shows the 3D gladiator instead of the sprite when the player's renderer preference is 3D
+     * (`window.BattleRendererPreference`, gated by ENABLE_RENDER2). The sprite stays hidden until
+     * the 3D view reports that it cannot be shown.
+     */
+    #startPreview3d() {
+        if (!usesThreePreview(window.BattleRendererPreference)) return;
+        this.#canvas.classList.add('is-hidden');
+        this.#preview = new GladPreview3D({
+            host: this.#find('#middle-container'),
+            catalog: images,
+            onFallback: () => this.#showSpriteFallback(),
+            // a pinch or the wheel moves the zoom the buttons continue from
+            onZoom: scale => {
+                this.#scale = scale;
+            },
+        });
+    }
+
+    /** The 3D view gave up for this page load: the sprite preview takes its place. */
+    #showSpriteFallback() {
+        this.#canvas.classList.remove('is-hidden');
+        this.#draw();
+    }
+
+    /**
+     * The zoom buttons, shared by the sprite and the 3D view.
+     *
+     * @param {number} direction `1` zooms in, `-1` zooms out.
+     */
+    #zoom(direction) {
+        this.#scale = stepZoom(this.#scale, direction);
+        this.#preview?.setZoom(this.#scale);
     }
 
     /** @param {string} selector Selector inside the creator. */
@@ -224,34 +268,29 @@ export class SkinCreator {
         this.#find('#turn').addEventListener('click', () => {
             this.#direction = (this.#direction + 1) % 4;
             this.#draw();
+            this.#preview?.turn();
         });
-        this.#find('#down-scale').addEventListener('click', () => {
-            if (this.#scale > 1) this.#scale -= 0.5;
-        });
-        this.#find('#up-scale').addEventListener('click', () => {
-            if (this.#scale < 3.5) this.#scale += 0.5;
-        });
+        this.#find('#down-scale').addEventListener('click', () => this.#zoom(-1));
+        this.#find('#up-scale').addEventListener('click', () => this.#zoom(1));
         const play = this.#find('#play-pause');
         play.addEventListener('click', () => {
             this.#playing = !this.#playing;
             if (!this.#playing) this.#frame = 0;
+            this.#preview?.setPlaying(this.#playing);
             play.querySelector('img').src = `${ICON_ROOT}${this.#playing ? 'pause' : 'play'}.png`;
         });
         this.#find('#animation').addEventListener('click', () => {
-            const available = { walk: true, cast: true, thrust: false, slash: false, shoot: false };
-            Object.values(this.selected).forEach(image => {
-                if (image.move) available[image.move] = true;
-            });
-            do {
-                this.#move = (this.#move + 1) % MOVES.length;
-            } while (!available[MOVES[this.#move].name]);
+            // walk and cast always; the others only when a worn layer names them (`move`)
+            this.#move = nextAvailableMove(this.#move, MOVE_NAMES, availableMoves(Object.values(this.selected)));
             this.#frame = 0;
             this.#showMoveIcon();
         });
     }
 
+    /** Shows the animation button's icon and makes the preview play the same move. */
     #showMoveIcon() {
         this.#find('#animation img').src = `${ICON_ROOT}${MOVES[this.#move].image}.png`;
+        this.#preview?.setMove(MOVES[this.#move].name);
     }
 
     /** Draws the current frame of the preview. */
@@ -376,6 +415,8 @@ export class SkinCreator {
         this.#markUnavailable();
         if (!keepItems) Object.values(visible).forEach(image => this.#addItem(image));
         this.#draw();
+        // after every rule above, so the 3D model shows the layers the sprite now wears
+        this.#preview?.update(Object.keys(this.selected));
     }
 
     /** Greys out the menus the worn layers rule out, dropping their layers. */
@@ -512,8 +553,15 @@ export class SkinCreator {
         this.#find('#skin-container').style.display = '';
     }
 
-    /** @returns {HTMLCanvasElement} A 64 px picture of the gladiator facing down. */
+    /**
+     * The gladiator's card picture. In 3D it is a snapshot of the model in its current view; while the
+     * 3D view is not ready (still building, or given up) it is the sprite frame, as before.
+     *
+     * @returns {HTMLCanvasElement} A 64 px picture of the gladiator.
+     */
     thumbnail() {
+        const view = this.#preview?.snapshot(CELL);
+        if (view) return view;
         const thumb = document.createElement('canvas');
         thumb.width = CELL;
         thumb.height = CELL;

@@ -161,7 +161,8 @@ function boneKey(bone) {
  *
  * @param {typeof import('three')} THREE Three namespace.
  * @param {Array<Record<string, any>>} looks Appearances of the fighters, used to preload only the needed weapons.
- * @returns {Promise<(options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel>} Model factory.
+ * @returns {Promise<((options: { THREE: typeof import('three'), look: Record<string, any>, index: number }) => SyntyModel) & { dispose(): void }>}
+ *   Model factory; its `dispose` frees the assets (every model built from them must be disposed first).
  */
 export async function loadSynty(THREE, looks = [], manager = null) {
     const { FBXLoader } = await import('three/addons/loaders/FBXLoader.js');
@@ -243,7 +244,8 @@ export async function loadSynty(THREE, looks = [], manager = null) {
     for (const [key, source] of shieldSources) if (source) assets.addShield(key, source, SHIELD_MODELS[key], atlasByName.get(SHIELD_MODELS[key].atlas));
     for (const [key, source] of propSources) if (source) assets.addProp(key, source, PROPS[key]);
     for (const [key, source] of bodySources) if (source) assets.addBody(key, source, atlasByName.get(BODIES[key].atlas));
-    return (options) => new SyntyModel({ ...options, assets });
+    // `dispose` releases the shared assets; the gladiator creator calls it when it replaces its gear.
+    return Object.assign((options) => new SyntyModel({ ...options, assets }), { dispose: () => assets.dispose() });
 }
 
 /** Parsed Synty assets: character part geometry bound to one canonical skeleton, plus normalised weapons. */
@@ -505,6 +507,36 @@ class SyntyAssets {
     /** Names of the character meshes matching a prefix. */
     has(name) {
         return this.parts.has(name);
+    }
+
+    /**
+     * Frees the GPU resources these assets own: part, weapon, shield, prop and body geometry, their
+     * materials and the atlas textures. Only call it once no model built from them is still drawn
+     * (the arena never calls it; the gladiator creator does when it swaps its gear).
+     */
+    dispose() {
+        const geometries = new Set();
+        const materials = new Set();
+        const textures = new Set([this.atlas]);
+        const collect = (material) => {
+            if (!material) return;
+            materials.add(material);
+            if (material.map) textures.add(material.map);
+        };
+        this.parts.forEach(({ geometry }) => geometries.add(geometry));
+        for (const holder of [...this.weapons.values(), ...this.shields.values(), ...this.props.values()]) {
+            holder.traverse((node) => {
+                if (node.geometry) geometries.add(node.geometry);
+                [node.material].flat().forEach(collect);
+            });
+        }
+        this.bodies.forEach((meshes) => meshes.forEach(({ geometry, material }) => {
+            geometries.add(geometry);
+            collect(material);
+        }));
+        geometries.forEach((geometry) => geometry.dispose());
+        materials.forEach((material) => material.dispose());
+        textures.forEach((texture) => texture?.dispose());
     }
 }
 
