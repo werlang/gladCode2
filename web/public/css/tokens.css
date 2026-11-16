@@ -230,6 +230,8 @@
     --text-3xl: 40px;
     --text-4xl: 48px;
     --text-5xl: 64px;
+    /* tight leading for one-line labels that must not grow their row */
+    --line-height-tight: 1.2;
 
     /* ---- Space: gladCode's 5px rhythm (margins, paddings, gaps) ---- */
     --space-hairline: 1px;
@@ -257,6 +259,9 @@
     --radius-2xl: 32px;
     --radius-round: 50%;
     --radius-pill: 999px;
+
+    /* ---- Blur: filter radii (a hidden card's picture) ---- */
+    --blur-card: 10px;
 
     /* ---- Motion ---- */
     --duration-fast: 0.15s;

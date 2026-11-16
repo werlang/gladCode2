@@ -16,6 +16,9 @@ export const PORTRAIT_MEMORY_LIMIT = 24;
 
 const DB_NAME = 'gladcode-portraits';
 const STORE = 'portraits';
+/** Bumped to add the `usedAt` index the trim walks without reading any picture. */
+const DB_VERSION = 2;
+const USED_AT = 'usedAt';
 
 /**
  * The LPC tokens of a persisted skin: a token array, or the JSON string the API stores.
@@ -74,10 +77,16 @@ export function evictionVictims(records, limit = PORTRAIT_CACHE_LIMIT) {
 export class Lru {
     #limit;
     #entries = new Map();
+    #onEvict;
 
-    /** @param {number} limit Entries to keep (at least one). */
-    constructor(limit) {
+    /**
+     * @param {number} limit Entries to keep (at least one).
+     * @param {{ onEvict?: (value: unknown, key: string) => void }} [options] `onEvict` sees every value the
+     *   LRU drops (overwritten, evicted or cleared), so the card service can revoke its object URLs.
+     */
+    constructor(limit, { onEvict } = {}) {
         this.#limit = Math.max(1, Math.trunc(limit));
+        this.#onEvict = onEvict ?? null;
     }
 
     /**
@@ -102,18 +111,30 @@ export class Lru {
      * @returns {unknown} The value.
      */
     set(key, value) {
-        this.#entries.delete(key);
+        if (this.#entries.has(key)) {
+            const previous = this.#entries.get(key);
+            this.#entries.delete(key);
+            if (previous !== value) this.#onEvict?.(previous, key);
+        }
         this.#entries.set(key, value);
-        while (this.#entries.size > this.#limit) this.#entries.delete(this.#entries.keys().next().value);
+        while (this.#entries.size > this.#limit) {
+            const oldest = this.#entries.keys().next().value;
+            this.#onEvict?.(this.#entries.get(oldest), oldest);
+            this.#entries.delete(oldest);
+        }
         return value;
     }
 
     /** @param {string} key */
     delete(key) {
+        if (!this.#entries.has(key)) return;
+        const previous = this.#entries.get(key);
         this.#entries.delete(key);
+        this.#onEvict?.(previous, key);
     }
 
     clear() {
+        for (const [key, value] of this.#entries) this.#onEvict?.(value, key);
         this.#entries.clear();
     }
 
@@ -209,10 +230,13 @@ export class PortraitCache {
         }
         this.#database = new Promise((resolve) => {
             try {
-                const request = this.#factory.open(this.#databaseName, 1);
+                const request = this.#factory.open(this.#databaseName, DB_VERSION);
                 request.onupgradeneeded = () => {
                     const db = request.result;
-                    if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'key' });
+                    const store = db.objectStoreNames.contains(STORE)
+                        ? request.transaction.objectStore(STORE)
+                        : db.createObjectStore(STORE, { keyPath: 'key' });
+                    if (!store.indexNames.contains(USED_AT)) store.createIndex(USED_AT, USED_AT);
                 };
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => resolve(null);
@@ -225,14 +249,24 @@ export class PortraitCache {
         return this.#database;
     }
 
-    /** Deletes the least recently used records beyond the limit. */
+    /** Deletes the least recently used records beyond the limit, walking the `usedAt` index without their pictures. */
     async #trim(db) {
         try {
             const records = await new Promise((resolve) => {
                 const tx = db.transaction(STORE, 'readonly');
-                const request = tx.objectStore(STORE).getAll();
-                request.onsuccess = () => resolve(request.result ?? []);
-                request.onerror = () => resolve([]);
+                const store = tx.objectStore(STORE);
+                const newest = [];
+                const cursor = store.index(USED_AT).openKeyCursor();
+                cursor.onsuccess = () => {
+                    const position = cursor.result;
+                    if (!position) return;
+                    // the index key is the use stamp and the primary key the portrait's key: no blob is read
+                    newest.push({ key: position.primaryKey, usedAt: Number(position.key) || 0 });
+                    position.continue();
+                };
+                tx.oncomplete = () => resolve(newest);
+                tx.onerror = () => resolve([]);
+                tx.onabort = () => resolve([]);
             });
             const victims = evictionVictims(records, PORTRAIT_CACHE_LIMIT);
             if (!victims.length) return;

@@ -15,6 +15,11 @@ const CARD_MODULES = [
     '/script/helpers/portrait-cache.js',
     '/script/components/glad-card.js',
 ];
+/** Pages with gladiator cards, and the editor whose creator mounts the 3D gladiator. */
+const CARD_AND_EDITOR_PATHS = [
+    '/', '/profile', '/glads', '/battle.ranked', '/tourn/ab12/0', '/train/ab12/0',
+    '/editor', '/newglad', '/glad-3',
+];
 
 test('three and the 3D renderer are mapped whether or not the replay gate asks for them', () => {
     for (const options of [undefined, { render2: false }, { render2: true }]) {
@@ -26,11 +31,29 @@ test('three and the 3D renderer are mapped whether or not the replay gate asks f
 });
 
 process.env.NODE_ENV = 'test';
-process.env.ENABLE_RENDER2 = '0';
-const { app } = await import('../app.js?import-map-test=render2-off');
-const server = app.listen(0);
-const base = `http://127.0.0.1:${server.address().port}`;
-test.after(() => server.close());
+
+/**
+ * Serves one fresh copy of the app with `ENABLE_RENDER2` set as given (the flag is read when app.js loads).
+ *
+ * @param {'0'|'1'} flag Value of ENABLE_RENDER2.
+ * @returns {Promise<{ base: string, close: () => void }>}
+ */
+async function appWithRender2(flag) {
+    const previous = process.env.ENABLE_RENDER2;
+    process.env.ENABLE_RENDER2 = flag;
+    const { app } = await import(`../app.js?import-map-test=render2-${flag}`);
+    if (previous === undefined) delete process.env.ENABLE_RENDER2;
+    else process.env.ENABLE_RENDER2 = previous;
+    const server = app.listen(0);
+    return { base: `http://127.0.0.1:${server.address().port}`, close: () => server.close() };
+}
+
+const off = await appWithRender2('0');
+const on = await appWithRender2('1');
+test.after(() => {
+    off.close();
+    on.close();
+});
 
 /** @param {string} html A page. @returns {Record<string, string>} Its import map. */
 function importMap(html) {
@@ -39,25 +62,32 @@ function importMap(html) {
     return JSON.parse(tag[1]).imports;
 }
 
-/** @param {string} html A page. @returns {Record<string, unknown>} Its template vars (`#template-vars`). */
-const templateVars = html => JSON.parse(/<script id="template-vars" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
+/** @param {string} base @param {string} path @returns {Promise<string>} */
+async function page(base, path) {
+    const response = await fetch(`${base}${path}`);
+    assert.equal(response.status, 200, path);
+    return response.text();
+}
 
-test('the routes with gladiator cards map three and render2 with ENABLE_RENDER2=0', async () => {
-    for (const path of ['/', '/profile', '/glads', '/battle.ranked', '/tourn/ab12/0', '/train/ab12/0', '/editor', '/glad-3']) {
-        const response = await fetch(`${base}${path}`);
-        assert.equal(response.status, 200, path);
-        const imports = importMap(await response.text());
-        assert.match(imports.three, /three@[\d.]+\/build/, path);
-        assert.ok(Object.keys(imports).some(specifier => specifier.startsWith('./render2/')), path);
-        assert.ok(imports['/script/render2/card-portrait.js'], path);
+test('card pages and the editor map three and render2 with the gate on and off', async () => {
+    for (const gate of [off, on]) {
+        for (const path of CARD_AND_EDITOR_PATHS) {
+            const imports = importMap(await page(gate.base, path));
+            assert.match(imports.three, /three@[\d.]+\/build/, path);
+            assert.ok(Object.keys(imports).some(specifier => specifier.startsWith('./render2/')), path);
+            assert.ok(imports['/script/render2/card-portrait.js'], path);
+        }
     }
 });
 
-test('the gate still keeps the replay (and the editor preview) off the 3D renderer', async () => {
-    const replay = await (await fetch(`${base}/play/abc`)).text();
-    assert.doesNotMatch(replay, /src="[^"]*script\/render2\.js/);
-    assert.match(replay, /window\.__RENDER2_ENABLED__ = false;/);
+test('the replay keeps its own renderer behind ENABLE_RENDER2 through playback.html', async () => {
+    const disabled = await page(off.base, '/play/abc');
+    assert.doesNotMatch(disabled, /<script type="module" src="[^"]*\/script\/render2\.js/);
+    assert.doesNotMatch(disabled, /css\/playback-render2\.css/);
+    // the map is printed all the same: card pages and the editor need three wherever they are
+    assert.ok(importMap(disabled).three);
 
-    const editor = await (await fetch(`${base}/editor`)).text();
-    assert.equal(templateVars(editor).render2, false);
+    const enabled = await page(on.base, '/play/abc');
+    assert.match(enabled, /<script type="module" src="[^"]*\/script\/render2\.js\?v=\d+"><\/script>/);
+    assert.match(enabled, /<link rel='stylesheet' href="[^"]*\/css\/playback-render2\.css\?v=\d+"\/>/);
 });

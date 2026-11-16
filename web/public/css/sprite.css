@@ -148,7 +148,7 @@ canvas {
 	align-items: center;
 	gap: var(--space-2);
 	width: 100%;
-	min-height: 32px;
+	min-height: calc(var(--space-7) + var(--space-1));
 	height: auto;
 	padding: var(--space-1) var(--space-2);
 	margin: var(--space-1) 0;
@@ -174,8 +174,8 @@ canvas {
 
 .img-button.item .item-icon {
 	flex: none;
-	width: 20px;
-	height: 20px;
+	width: var(--space-5);
+	height: var(--space-5);
 	object-fit: contain;
 }
 
@@ -186,15 +186,15 @@ canvas {
 	color: var(--color-text-strong);
 	font-family: var(--font-body);
 	font-size: var(--text-xs);
-	line-height: 1.2;
+	line-height: var(--line-height-tight);
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .img-button.item .item-color {
 	flex: none;
-	width: 12px;
-	height: 12px;
+	width: calc(var(--space-3) + var(--space-1));
+	height: calc(var(--space-3) + var(--space-1));
 	border: var(--space-hairline) solid var(--color-border-strong);
 	border-radius: var(--radius-round);
 	background-color: var(--color-surface-strong);
@@ -427,8 +427,20 @@ canvas {
 	flex: none;
 	align-items: center;
 	justify-content: center;
-	min-width: 64px;
-	min-height: 64px;
+	width: calc(var(--space-10) + var(--space-1) * 2);
+	height: calc(var(--space-10) + var(--space-1) * 2);
+}
+
+#distribuicao #cv img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+/* the placeholder SVG draws its outline in the theme's muted ink */
+#distribuicao #cv img.is-placeholder {
+	color: var(--color-text-subtle);
 }
 
 #distribuicao #nome.error {

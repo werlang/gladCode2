@@ -119,6 +119,8 @@ export class SkinCreator {
     #hoverTimer = 0;
     /** The tile whose hover preview is pending or showing. */
     #hoverItem = null;
+    /** Bumped by each attribute card so an older portrait answer never replaces a newer one. */
+    #portraitRequest = 0;
 
     /**
      * @param {HTMLElement} root The `#fog-skin` overlay.
@@ -521,8 +523,28 @@ export class SkinCreator {
         attributes.style.display = 'flex';
         attributes.style.height = `${appearance.offsetHeight}px`;
         appearance.style.display = 'none';
-        // the picture is the card portrait W1 draws; the creator keeps the slot empty until then
-        this.#find('#cv').replaceChildren();
+        this.#showPortrait();
+    }
+
+    /**
+     * Paints the gladiator's card portrait above its name. The slot stays empty when no portrait can be
+     * drawn (no WebGL, no Synty pack) or when the card was replaced before the answer arrived.
+     */
+    async #showPortrait() {
+        const slot = this.#find('#cv');
+        if (!slot) return;
+        const request = ++this.#portraitRequest;
+        slot.replaceChildren();
+        try {
+            const { CardPortraits } = await import('../render2/card-portrait.js');
+            const image = await CardPortraits.get(this.values().skin, { pose: 'idle' });
+            if (request !== this.#portraitRequest || !image || !slot.isConnected) return;
+            if (image.classList.contains('is-placeholder')) return;
+            slot.replaceChildren(image);
+        }
+        catch {
+            // the creator keeps working without a picture
+        }
     }
 
     /** Back to the appearance. */

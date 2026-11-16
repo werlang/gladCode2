@@ -45,6 +45,15 @@ function loadingDocument() {
     };
 }
 
+/** A canvas whose `toBlob` answers with a small WebP blob. */
+function paintingCanvas() {
+    return {
+        toBlob(callback) {
+            callback(new Blob(['portrait'], { type: 'image/webp' }));
+        },
+    };
+}
+
 /** A service that never gets a WebGL context and runs its frames on the microtask queue. */
 function brokenService() {
     return new CardPortraitService({
@@ -123,4 +132,82 @@ test('a portrait cached in IndexedDB is shown before WebGL and reused in memory'
     assert.equal(reads, 1, 'the same look is read from IndexedDB once');
     assert.equal(warn.mock.callCount(), 0);
     service.dispose();
+});
+
+/** A service whose drawing call is a test seam, so a look can fail without loading three. */
+function paintingService(render) {
+    return new CardPortraitService({
+        document: loadingDocument(),
+        getContext: () => {
+            throw new Error('the test render must not reach WebGL');
+        },
+        requestFrame: callback => {
+            queueMicrotask(() => callback(0));
+            return 0;
+        },
+        render,
+    });
+}
+
+test('a look that cannot be painted falls back alone and the other cards still render', async t => {
+    const warn = t.mock.method(console, 'warn', () => {});
+    const service = paintingService(async ({ tokens }) => {
+        if (tokens.includes('missing')) throw new Error('FBX 404');
+        return paintingCanvas();
+    });
+
+    const [failed, painted] = await Promise.all([
+        service.get(['male', 'missing']),
+        service.get(['female', 'female-light']),
+    ]);
+    assert.equal(failed.src, PLACEHOLDER_SRC);
+    assert.equal(failed.classList.contains('is-placeholder'), true, 'only that card falls back');
+    assert.match(painted.src, /^blob:/, 'the other skin is still painted');
+    assert.equal(painted.classList.contains('is-placeholder'), false);
+    assert.equal(warn.mock.callCount(), 1, 'the page warns once');
+    service.dispose();
+});
+
+test('a card removed before its turn is answered without painting it', async t => {
+    const warn = t.mock.method(console, 'warn', () => {});
+    let rendered = 0;
+    const service = paintingService(async () => {
+        rendered += 1;
+        return paintingCanvas();
+    });
+
+    const portrait = await service.get(['male'], { target: { isConnected: false } });
+    assert.equal(portrait.src, PLACEHOLDER_SRC);
+    assert.equal(rendered, 0, 'the detached card is dropped by the pump');
+    assert.equal(warn.mock.callCount(), 0);
+    service.dispose();
+});
+
+test('dispose answers a card still waiting for its portrait with the placeholder', async t => {
+    t.mock.method(console, 'warn', () => {});
+    let started;
+    const drawing = new Promise(resolve => {
+        started = resolve;
+    });
+    const service = paintingService(async () => {
+        started();
+        return new Promise(() => {});
+    });
+
+    const pending = service.get(['male', 'male-light']);
+    await drawing;
+    service.dispose();
+    const portrait = await pending;
+    assert.equal(portrait.src, PLACEHOLDER_SRC);
+    assert.equal(portrait.classList.contains('is-placeholder'), true);
+});
+
+test('dispose revokes the object URLs the cards were given', async t => {
+    const revoke = t.mock.method(URL, 'revokeObjectURL');
+    const service = paintingService(async () => paintingCanvas());
+
+    const portrait = await service.get(['male', 'male-light']);
+    assert.match(portrait.src, /^blob:/);
+    service.dispose();
+    assert.ok(revoke.mock.calls.some(call => call.arguments[0] === portrait.src), 'the memory cache hands the URL back');
 });
