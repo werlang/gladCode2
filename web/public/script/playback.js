@@ -184,8 +184,8 @@ function setFullScreen(enter) {
  * scales the camera to the arena and suggests portrait or fullscreen on phones.
  */
 function resize() {
-    if (window.battleRendererVersion === window.BattleRendererPreference?.THREE) {
-        window.threeBattleRenderer?.resize();
+    if (window.threeBattleRenderer) {
+        window.threeBattleRenderer.resize();
         return;
     }
     const { game, screenW, screenH, arenaD, arenaX1, arenaY1 } = window;
@@ -426,7 +426,7 @@ function openHelp() {
     fog.querySelector('#ok').addEventListener('click', () => fog.remove());
 }
 
-/** The preferences window: renderer, overlays, volumes, crowd and 3D quality. */
+/** The preferences window: overlays, volumes, crowd and the 3D graphics quality. */
 function openSettings() {
     const fog = createElement(settingsTemplate);
     document.body.append(fog);
@@ -475,25 +475,14 @@ function openSettings() {
         else fadeOut(frames);
     });
 
-    const preference = window.BattleRendererPreference;
-    if (preference.ENABLED === false) find('#renderer-choice').remove();
-    else find(`#renderer-choice input[value='${preference.get()}']`).checked = true;
+    // the renderer is automatic now (3D with the Phaser fallback), so its choice is never offered
+    find('#renderer-choice')?.remove();
     // graphics quality only applies to the 3D renderer, and only once it is running
     if (window.Render2Quality) find('#render-quality').value = window.Render2Quality.get();
     else find('#quality-container').remove();
     decorateCheckSliders(fog);
 
     find('#ok').addEventListener('click', async () => {
-        const selectedRenderer = find('#renderer-choice input:checked')?.value ?? preference.CLASSIC;
-        let reload = selectedRenderer !== preference.get();
-        preference.set(selectedRenderer);
-        // a new graphics quality takes a reload (anti-aliasing and the floor bake are set when the arena starts)
-        const quality = find('#render-quality')?.value;
-        if (window.Render2Quality && quality && quality !== window.Render2Quality.get()) {
-            window.Render2Quality.set(quality);
-            reload = true;
-        }
-
         await ReplayPreferences.save({
             show_bars: options.bars,
             show_frames: framesInput.checked,
@@ -504,10 +493,11 @@ function openSettings() {
             music_volume: window.music.volume,
             crowd: options.crowd,
         }).catch(() => {});
-        if (reload) {
-            const url = new URL(location.href);
-            url.searchParams.delete('renderer');
-            location.assign(url);
+        // a new graphics quality takes a reload (anti-aliasing and the floor bake are set when the arena starts)
+        const quality = find('#render-quality')?.value;
+        if (window.Render2Quality && quality && quality !== window.Render2Quality.get()) {
+            window.Render2Quality.set(quality);
+            location.reload();
             return;
         }
         fog.remove();
@@ -791,7 +781,7 @@ async function loadPreferences() {
  * keeps its DOM buttons). Speeds are simlog steps per 0.1 s; stepping always pauses first.
  */
 const Playback = {
-    get threeD() { return window.battleRendererVersion === window.BattleRendererPreference?.THREE && Boolean(window.threeBattleRenderer); },
+    get threeD() { return Boolean(window.threeBattleRenderer); },
     get paused() { return state.pausesim; },
     get speed() { return PLAYBACK_SPEEDS[playbackSpeedIndex]; },
     get speeds() { return PLAYBACK_SPEEDS; },

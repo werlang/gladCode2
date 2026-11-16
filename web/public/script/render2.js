@@ -7,15 +7,33 @@ let renderer = null;
 let rendererWasLoaded = false;
 
 /**
- * Installs the Three.js renderer behind the legacy playback adapter boundary.
+ * Whether this browser can run the 3D renderer. WebGL2 is the floor: the renderer and the Synty
+ * materials need it, and a browser without it keeps the classic Phaser replay.
+ *
+ * @returns {boolean}
+ */
+function hasWebGl2() {
+    try {
+        const context = document.createElement('canvas').getContext('webgl2');
+        if (!context) return false;
+        // the probe canvas is never drawn on: hand its context back before the arena makes its own
+        context.getExtension('WEBGL_lose_context')?.loseContext();
+        return true;
+    }
+    catch {
+        return false;
+    }
+}
+
+/**
+ * Installs the Three.js renderer behind the legacy playback adapter boundary. The replay runs it
+ * by default; the classic renderer takes over when the server gate is off, the browser has no
+ * WebGL2, or the 3D renderer cannot start.
  *
  * @returns {Promise<BattleRenderer|null>} Active renderer or null after fallback.
  */
 async function installThreeRenderer() {
-    if (window.__RENDER2_ENABLED__ === false) {
-        return null;
-    }
-    if (window.BattleRendererPreference?.get() !== window.BattleRendererPreference?.THREE) {
+    if (window.__RENDER2_ENABLED__ === false || !hasWebGl2()) {
         return null;
     }
 
@@ -55,17 +73,15 @@ async function installThreeRenderer() {
         window.changeCrowd = (density) => renderer.setCrowdDensity(density);
         // The settings window reads and stores the graphics quality of this device (see quality.js).
         window.Render2Quality = { get: storedQuality, set: storeQuality, active: () => renderer.getDebugSnapshot().timings.quality };
+        // The stylesheet and the classic renderer read this class: it hides the classic controls and shortcuts.
+        document.documentElement.classList.add('renderer-three');
         return renderer;
     }
     catch (error) {
         console.error('Não foi possível iniciar o render 3D.', error);
-        // Demote for this page load only: a transient failure (CDN hiccup,
-        // WebGL context loss) must not permanently rewrite the stored
-        // preference, or the arena would stay classic after the cause clears.
-        window.BattleRendererPreference?.setTransient(window.BattleRendererPreference?.CLASSIC ?? 'classic');
         window.load_phaser = classicLoadRenderer;
         window.phaser_update = classicUpdateRenderer;
-        if (status) status.textContent = 'Arena 3D indisponível; carregando modo clássico';
+        if (statusArena) statusArena.textContent = 'Arena 3D indisponível; carregando modo clássico';
         return null;
     }
 }
