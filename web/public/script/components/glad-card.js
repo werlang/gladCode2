@@ -1,10 +1,37 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { codeBlocksModalTemplate, codeModalTemplate, gladCardTemplate } from '../templates/glad-card.js';
 
+/** The fallback picture when a portrait cannot be drawn. */
+const PLACEHOLDER_SRC = '/image/glad-placeholder.svg';
+
 /** Gladiator shown by each card element. */
 const cardGlads = new WeakMap();
+
+/**
+ * The page's card portrait service. Imported only when the first card appears: the pages that show cards do
+ * not run the replay's 3D renderer, and a missing module must leave the cards standing.
+ *
+ * @type {Promise<import('../render2/card-portrait.js').CardPortraitService|null>|null}
+ */
+let portraits = null;
+
+/** @returns {Promise<import('../render2/card-portrait.js').CardPortraitService|null>} */
+async function cardPortraits() {
+    if (!portraits) {
+        portraits = (async () => {
+            try {
+                const module = await import('../render2/card-portrait.js');
+                return module.CardPortraits;
+            }
+            catch (error) {
+                console.warn('Gladiator card portraits are unavailable.', error);
+                return null;
+            }
+        })();
+    }
+    return portraits;
+}
 
 /**
  * The gladiator a card shows.
@@ -17,18 +44,39 @@ export function gladOfCard(card) {
 }
 
 /**
- * Draws a gladiator's sprite into the `index`-th card image of `container`.
+ * Draws a gladiator's 3D portrait into the `index`-th card image of `container`. The portrait is painted only
+ * once the card is near the viewport; a failure falls back to the placeholder picture.
  *
  * @param {ParentNode} container Holds the cards.
  * @param {number} index Card index.
- * @param {string} skin Skin JSON.
+ * @param {string} skin Persisted skin JSON (tokens).
  * @param {boolean} [dead] Show the death pose.
  * @returns {Promise<void>}
  */
 export async function setGladImage(container, index, skin, dead = false) {
-    const sheet = await fetchSpritesheet(skin);
     const image = container.querySelectorAll('.glad-preview .image')[index];
-    image?.replaceChildren(getSpriteThumb(sheet, dead ? 'die' : 'walk', 'down', 1));
+    if (!image) return;
+    const service = await cardPortraits();
+    let portrait = null;
+    if (service) {
+        try {
+            portrait = await service.get(skin, { pose: dead ? 'dead' : 'idle', target: image });
+        }
+        catch (error) {
+            console.warn('Gladiator card portrait failed.', error);
+        }
+    }
+    if (portrait) {
+        image.replaceChildren(portrait);
+        image.classList.toggle('is-placeholder', portrait.classList.contains('is-placeholder'));
+        return;
+    }
+    const fallback = document.createElement('img');
+    fallback.src = PLACEHOLDER_SRC;
+    fallback.alt = '';
+    fallback.classList.add('is-placeholder');
+    image.replaceChildren(fallback);
+    image.classList.add('is-placeholder');
 }
 
 /**
