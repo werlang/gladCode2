@@ -475,8 +475,7 @@ function openSettings() {
         else fadeOut(frames);
     });
 
-    // the renderer is automatic now (3D with the Phaser fallback), so its choice is never offered
-    find('#renderer-choice')?.remove();
+    // the renderer is automatic now (3D with the Phaser fallback), so the settings offer no choice
     // graphics quality only applies to the 3D renderer, and only once it is running
     if (window.Render2Quality) find('#render-quality').value = window.Render2Quality.get();
     else find('#quality-container').remove();

@@ -39,18 +39,6 @@ export const settingsTemplate = `
 <div id='settings-window' class='blue-window' role='dialog' aria-modal='true' aria-label='Preferências'>
     <h2>Preferências</h2>
     <div class='check-container'>
-        <fieldset id='renderer-choice' class='renderer-choice'>
-            <legend>Visual da arena</legend>
-            <label class='renderer-option'>
-                <input type='radio' name='battle-renderer' value='classic'>
-                <span><strong>Clássico 2D</strong><small>Sprites originais em Phaser</small></span>
-            </label>
-            <label class='renderer-option'>
-                <input type='radio' name='battle-renderer' value='three'>
-                <span><strong>Coliseu 3D</strong><small>Câmera top-down em Three.js</small></span>
-            </label>
-            <p>A batalha será recarregada ao trocar o visual.</p>
-        </fieldset>
         <div id='pref-bars'><label><input type='checkbox' class='checkslider'>Mostrar barras de hp e ap (B)</label></div>
         <div id='pref-frames'><label><input type='checkbox' class='checkslider'>Mostrar molduras dos gladiadores (M)</label></div>
         <div id='pref-fps'><label><input type='checkbox' class='checkslider'>Mostrar taxa de atualização da tela (FPS) (F)</label></div>
