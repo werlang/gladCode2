@@ -137,6 +137,7 @@
 
 /* a card whose portrait could not be drawn keeps a muted fallback mark */
 .glad-preview .image.is-placeholder img {
+    color: var(--color-text-subtle);
     opacity: 0.65;
 }
 

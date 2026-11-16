@@ -156,15 +156,8 @@ class EditorPage {
         this.code.value = glad.code;
         this.code.ace.gotoLine(1, 0, true);
 
-        let skin = null;
-        try {
-            skin = JSON.parse(glad.skin);
-        }
-        catch {
-            skin = null;
-        }
-        const image = skin ? await gladPortrait(skin) : null;
-        this.#showCard({ ...this.creator.values(), image });
+        // the card fills its picture slot when the portrait arrives
+        this.#showCard(this.creator.values());
         this.saved = true;
     }
 
@@ -260,17 +253,36 @@ class EditorPage {
     /**
      * Shows the gladiator's card in the corner of the editor.
      *
-     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLCanvasElement|string|null }} glad
+     * The picture slot only ever receives a real element: a portrait already drawn is inserted now, and a
+     * missing one is painted in place later, unless the card was replaced by then.
+     *
+     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLImageElement|null }} glad
      */
     #showCard(glad) {
         this.card = glad;
         const card = createElement(renderTemplate(gladCardTemplate, { name: glad.name, vstr: glad.vstr, vagi: glad.vagi, vint: glad.vint, master: '' }));
         card.querySelector('.delete-container').remove();
         card.querySelector('.code').remove();
-        const picture = glad.image ?? gladPortrait(glad.skin, 'down');
-        card.querySelector('.image').replaceChildren(...(picture ? [picture] : []));
+        const slot = card.querySelector('.image');
+        if (glad.image) slot.replaceChildren(glad.image);
+        else this.#fillCardImage(slot, glad.skin);
         document.querySelector('#float-card .glad-preview').replaceWith(card);
         document.querySelectorAll('#save, #test').forEach(button => button.classList.remove('disabled'));
+    }
+
+    /**
+     * Paints the card's portrait once the service answers, keeping the slot empty while it cannot.
+     *
+     * @param {Element} slot The card's `.image` slot.
+     * @param {string[]} skin Skin tokens.
+     */
+    #fillCardImage(slot, skin) {
+        if (!skin?.length) return;
+        gladPortrait(skin).then(image => {
+            if (image && slot.isConnected) slot.replaceChildren(image);
+        }).catch(error => {
+            console.warn('The editor card portrait is unavailable.', error);
+        });
     }
 
     /**

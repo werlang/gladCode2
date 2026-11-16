@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Gladiador">
     <!-- A neutral gladiator bust shown while a 3D portrait cannot be drawn. -->
-    <g fill="none" stroke="#9a8a68" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M28 118c0-18 16-30 36-30s36 12 36 30" fill="#cdbb95"/>
         <path d="M46 84h36" stroke="#6f6248"/>
         <path d="M64 30c-14 0-24 11-24 26v18c0 6 5 10 11 10h26c6 0 11-4 11-10V56c0-15-10-26-24-26Z" fill="#cdbb95"/>

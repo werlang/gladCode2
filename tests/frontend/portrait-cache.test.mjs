@@ -45,6 +45,21 @@ test('the LRU forgets the oldest entry first and keeps a hit alive', () => {
     assert.equal(lru.size, 3);
 });
 
+test('the LRU reports every value it drops so its object URLs can be revoked', () => {
+    const dropped = [];
+    const lru = new Lru(2, { onEvict: (value, key) => dropped.push([key, value]) });
+    lru.set('a', 'url-a');
+    lru.set('b', 'url-b');
+    lru.set('c', 'url-c');
+    assert.deepEqual(dropped, [['a', 'url-a']], 'the least recently used entry is reported');
+    lru.set('b', 'url-b2');
+    assert.deepEqual(dropped.at(-1), ['b', 'url-b'], 'an overwritten value is reported');
+    lru.set('c', 'url-c');
+    assert.equal(dropped.length, 2, 'writing the same value back revokes nothing');
+    lru.clear();
+    assert.deepEqual(dropped.slice(2), [['b', 'url-b2'], ['c', 'url-c']]);
+});
+
 test('the store evicts only the records beyond its limit, oldest use first', () => {
     const records = [
         { key: 'old', usedAt: 10 },
