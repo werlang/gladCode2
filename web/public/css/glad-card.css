@@ -127,6 +127,19 @@
     height: 100%;
 }
 
+/* the card's 3D portrait: the picture fills the image slot without stretching */
+.glad-preview .image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* a card whose portrait could not be drawn keeps a muted fallback mark */
+.glad-preview .image.is-placeholder img {
+    opacity: 0.65;
+}
+
 .glad-card-container .info{
 	color: var(--color-text);
     display: flex;
