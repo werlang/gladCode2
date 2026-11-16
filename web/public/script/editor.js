@@ -4,7 +4,6 @@ import { showLoginDialog } from './components/header.js';
 import { ProgressButton } from './components/simulation.js';
 import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
 import { simulationProblem } from './helpers/simulation-report.js';
-import { fetchSpritesheet, getSpriteThumb } from './helpers/spritesheet.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { BattleLogModel } from './models/battle-log.js';
 import { GladiatorModel } from './models/gladiator.js';
@@ -28,6 +27,18 @@ const AFTER_TEST_LESSONS = ['watchCodeMove', 'moveBackForth', 'askMoveNext', 'de
 const SAVE_TEST_NAMES = ['Archie', 'War Maker', 'Magnus', 'Rouge'];
 /** A transparent pixel, for a profile picture that fails to load. */
 const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+/**
+ * The gladiator's card portrait.
+ *
+ * @param {string[]|null} skin Skin tokens.
+ * @param {string} pose Portrait pose.
+ * @returns {HTMLCanvasElement|string|null} The portrait, or null until W1's card portraits land.
+ */
+function gladPortrait(skin, pose) {
+    // W1: CardPortraits.get(skin, { pose })
+    return null;
+}
 
 /** What to tell the player for each refused save, by API error code. */
 const SAVE_ERRORS = {
@@ -146,7 +157,7 @@ class EditorPage {
         catch {
             skin = null;
         }
-        const image = skin ? getSpriteThumb(await fetchSpritesheet(skin), 'walk', 'down') : null;
+        const image = skin ? gladPortrait(skin, 'down') : null;
         this.#showCard({ ...this.creator.values(), image });
         this.saved = true;
     }
@@ -222,7 +233,7 @@ class EditorPage {
     /**
      * The creator finished: start the code and show the gladiator's card.
      *
-     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image: HTMLCanvasElement }} glad
+     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[] }} glad
      */
     #useCreatedGladiator(glad) {
         if (tutorial.getLesson() === 'skin') tutorial.next(true);
@@ -243,14 +254,15 @@ class EditorPage {
     /**
      * Shows the gladiator's card in the corner of the editor.
      *
-     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLCanvasElement|null }} glad
+     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLCanvasElement|string|null }} glad
      */
     #showCard(glad) {
         this.card = glad;
         const card = createElement(renderTemplate(gladCardTemplate, { name: glad.name, vstr: glad.vstr, vagi: glad.vagi, vint: glad.vint, master: '' }));
         card.querySelector('.delete-container').remove();
         card.querySelector('.code').remove();
-        card.querySelector('.image').replaceChildren(glad.image ?? this.creator.thumbnail());
+        const picture = glad.image ?? gladPortrait(glad.skin, 'down');
+        card.querySelector('.image').replaceChildren(...(picture ? [picture] : []));
         document.querySelector('#float-card .glad-preview').replaceWith(card);
         document.querySelectorAll('#save, #test').forEach(button => button.classList.remove('disabled'));
     }
