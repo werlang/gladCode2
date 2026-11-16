@@ -60,31 +60,27 @@ async function appWithRender2(flag) {
     };
 }
 
-/** @param {string} html A page. @returns {Record<string, unknown>} Its template vars (`#template-vars`). */
-const templateVars = html => JSON.parse(/<script id="template-vars" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
-
-test('the editor tells the gladiator creator whether the 3D renderer is on, and maps three only then', async () => {
+test('the replay gate controls only the replay renderer: the editor is 3D and maps three either way', async () => {
     const on = await appWithRender2('1');
     const off = await appWithRender2('0');
     try {
         for (const path of ['/editor', '/newglad', '/glad-3']) {
-            const enabled = await on.page(path);
-            assert.equal(templateVars(enabled).render2, true, path);
-            assert.match(enabled, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@/, path);
-            assert.match(enabled, /"\/script\/render2\/creator-stage\.js":/, path);
-            // modules only: no page globals and no classic preference script tag on the editor (every import map lists the file)
-            assert.doesNotMatch(enabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
-
-            const disabled = await off.page(path);
-            assert.equal(templateVars(disabled).render2, false, path);
-            assert.doesNotMatch(disabled, /"three":/, path);
-            assert.doesNotMatch(disabled, /render2\/creator-stage\.js/, path);
-            assert.doesNotMatch(disabled, /__RENDER2_ENABLED__|<script src="[^"]*battle-renderer-preference\.js/, path);
+            for (const [flag, server] of [['on', on], ['off', off]]) {
+                const page = await server.page(path);
+                assert.match(page, /"three":"https:\/\/cdn\.jsdelivr\.net\/npm\/three@/, `${path} (${flag})`);
+                assert.match(page, /"\/script\/render2\/creator-stage\.js":/, `${path} (${flag})`);
+                // modules only: the editor has no replay gate script and no classic renderer
+                assert.doesNotMatch(page, /__RENDER2_ENABLED__/, `${path} (${flag})`);
+            }
         }
-        // the replay page keeps its classic preference script, set before its renderers load
-        const replay = await on.page('/play/abc');
-        assert.match(replay, /<script>window\.__RENDER2_ENABLED__ = true;<\/script>\s*<script src="\/script\/battle-renderer-preference\.js\?v=\d+"><\/script>/);
-        assert.match(await off.page('/play/abc'), /window\.__RENDER2_ENABLED__ = false;/);
+        // the gate still decides whether the replay loads the 3D renderer module
+        const replayOn = await on.page('/play/abc');
+        assert.match(replayOn, /<script>window\.__RENDER2_ENABLED__ = true;<\/script>/);
+        assert.match(replayOn, /src="\/script\/render2\.js\?v=\d+"/);
+
+        const replayOff = await off.page('/play/abc');
+        assert.match(replayOff, /<script>window\.__RENDER2_ENABLED__ = false;<\/script>/);
+        assert.doesNotMatch(replayOff, /src="[^"]*script\/render2\.js/);
     }
     finally {
         on.close();
