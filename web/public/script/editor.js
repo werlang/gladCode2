@@ -29,15 +29,21 @@ const SAVE_TEST_NAMES = ['Archie', 'War Maker', 'Magnus', 'Rouge'];
 const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 /**
- * The gladiator's card portrait.
+ * The gladiator's card portrait, drawn from the 3D models the arena uses.
  *
  * @param {string[]|null} skin Skin tokens.
- * @param {string} pose Portrait pose.
- * @returns {HTMLCanvasElement|string|null} The portrait, or null until W1's card portraits land.
+ * @param {string} [pose] Portrait pose (`idle` or `dead`).
+ * @returns {Promise<HTMLImageElement|null>} The portrait, or null when it cannot be drawn.
  */
-function gladPortrait(skin, pose) {
-    // W1: CardPortraits.get(skin, { pose })
-    return null;
+async function gladPortrait(skin, pose = 'idle') {
+    try {
+        const { CardPortraits } = await import('./render2/card-portrait.js');
+        return await CardPortraits.get(skin, { pose });
+    }
+    catch (error) {
+        console.warn('The editor card portrait is unavailable.', error);
+        return null;
+    }
 }
 
 /** What to tell the player for each refused save, by API error code. */
@@ -157,7 +163,7 @@ class EditorPage {
         catch {
             skin = null;
         }
-        const image = skin ? gladPortrait(skin, 'down') : null;
+        const image = skin ? await gladPortrait(skin) : null;
         this.#showCard({ ...this.creator.values(), image });
         this.saved = true;
     }
