@@ -143,11 +143,21 @@ canvas {
 }
 
 .img-button.item {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	width: 100%;
+	min-height: 32px;
+	height: auto;
+	padding: var(--space-1) var(--space-2);
+	margin: var(--space-1) 0;
 	background-color: var(--color-pick-item);
-    transition: opacity var(--duration-slower);
+    transition: background-color var(--duration-quick), opacity var(--duration-slower);
 }
 
-.img-button.item:hover {
+.img-button.item:hover,
+.img-button.item:focus-visible {
     background-color: var(--color-pick-item-hover);
 }
 
@@ -160,6 +170,39 @@ canvas {
 	display: block;
 	visibility: hidden;
 	position: absolute;
+}
+
+.img-button.item .item-icon {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	object-fit: contain;
+}
+
+.img-button.item .item-label {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	color: var(--color-text-strong);
+	font-family: var(--font-body);
+	font-size: var(--text-xs);
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.img-button.item .item-color {
+	flex: none;
+	width: 12px;
+	height: 12px;
+	border: var(--space-hairline) solid var(--color-border-strong);
+	border-radius: var(--radius-round);
+	background-color: var(--color-surface-strong);
+}
+
+.img-button.item .item-color.empty {
+	border-style: dashed;
+	background-color: transparent;
 }
 
 #left-container {
@@ -184,44 +227,28 @@ canvas {
 	margin-left: 0;
 	margin-top: calc(-1 * var(--space-9));
 	margin-bottom: calc(-1 * var(--space-9));
-	z-index: var(--z-below);
+	z-index: auto;
 	height: 300px;
 	position: relative;
 }
 
-#middle-container canvas {
-	max-width: 340px;
-	max-height: 340px;
-	width: 100%;
-	display: block;
-}
-
 /*
- * the 3D gladiator (editor/skin-preview-3d.js) takes the sprite's square once it is ready; it is dragged, so it
- * leaves the layer under the row (where no pointer reaches) for the row's own flow, still under every button
- * (they are stacked at z-index 0 and up; a positioned container would be stacked with them, after them)
+ * the 3D gladiator (editor/skin-preview-3d.js) is the creator's only preview; it is dragged, so the layer under it
+ * stays out of the way of the row's buttons (they are stacked at z-index 0 and up)
  */
-#middle-container.is-3d {
-	z-index: auto;
-	position: static;
-}
-
-#middle-container.is-3d > canvas {
-	display: none;
-}
-
 .skin-3d {
-	display: none;
+	display: block;
 	width: 100%;
 	max-width: 340px;
 	aspect-ratio: 1;
 	/* a sideways drag turns the gladiator; an up-down swipe still scrolls the creator on a phone */
 	touch-action: pan-y;
 	cursor: grab;
+	position: relative;
 }
 
-#middle-container.is-3d .skin-3d {
-	display: block;
+.skin-3d.unavailable {
+	cursor: default;
 }
 
 .skin-3d.dragging {
@@ -263,6 +290,7 @@ canvas {
     flex-wrap: wrap;
     justify-content: center;
 	align-items: center;
+	align-content: flex-start;
     width: 100%;
     max-height: 135px;
     overflow-y: auto;
@@ -391,6 +419,16 @@ canvas {
 	color: var(--color-brand-text);
     font-weight: bold;
 	margin-right: 10%;
+}
+
+/* the gladiator's picture above the name: the card portrait W1 draws, an empty frame until then */
+#distribuicao #cv {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	min-width: 64px;
+	min-height: 64px;
 }
 
 #distribuicao #nome.error {

@@ -9,21 +9,22 @@ import { skinStageCanvasTemplate, skinStageTemplate, skinStatusTemplate } from '
 const KEY_TURN = Math.PI / 12;
 /** Pixels per wheel line and per wheel page, for browsers that scroll in those units. */
 const WHEEL_UNITS = [1, 16, 400];
+/** The status line when the browser, the WebGL context or the stage cannot show the gladiator. */
+const UNAVAILABLE_STATUS = 'Visual 3D indisponível';
 
 /**
- * The 3D gladiator of the creator (`#middle-container`), shown instead of the sprite when the battle renderer
- * preference is the 3D one. `StageLifecycle` decides what runs when (nothing loads until the creator is on screen, the
- * render loop runs only while it is, the WebGL context is released on every failure and when the page is left; until
- * the first gladiator is ready, and for good if it never is, the sprite stays with a status line). This class gives
- * it the browser parts: the canvas and its context, three and the stage, the visibility and page events, the status
- * line, and the gestures.
+ * The 3D gladiator of the creator (`#middle-container`), the creator's only preview. `StageLifecycle` decides what
+ * runs when (nothing loads until the creator is on screen, the render loop runs only while it is, the WebGL context is
+ * released on every failure and when the page is left; until the first gladiator is ready, and for good if it never
+ * is, the status line says the 3D view is unavailable while the wardrobe keeps working). This class gives it the
+ * browser parts: the canvas and its context, three and the stage, the visibility and page events, the status line,
+ * and the gestures.
  *
  * Drag (or the arrow keys) to turn the gladiator, wheel or pinch (or + and -) to zoom; the creator's buttons call
  * {@link SkinPreview3D#turn}, {@link SkinPreview3D#zoomBy}, {@link SkinPreview3D#setPlaying} and
  * {@link SkinPreview3D#setMove}.
  */
 export class SkinPreview3D extends BaseComponent {
-    #container;
     #status;
     #controls;
     #lifecycle;
@@ -33,13 +34,12 @@ export class SkinPreview3D extends BaseComponent {
     #pinch = null;
 
     /**
-     * @param {HTMLElement} container The creator's `#middle-container`, which also holds the sprite canvas.
+     * @param {HTMLElement} container The creator's `#middle-container`, which holds the preview area.
      * @param {{ controls?: Element[] }} [options] The creator's control rows that run over the view (the view frames the
      *   gladiator clear of them).
      */
     constructor(container, { controls = [] } = {}) {
         super(createElement(skinStageTemplate));
-        this.#container = container;
         this.#controls = controls;
         this.#status = createElement(skinStatusTemplate);
         container.append(this.element, this.#status);
@@ -59,7 +59,7 @@ export class SkinPreview3D extends BaseComponent {
         });
     }
 
-    /** @returns {boolean} Whether the 3D gladiator is on screen (otherwise the creator shows the sprite). */
+    /** @returns {boolean} Whether the 3D gladiator is on screen (otherwise the status line explains why). */
     get active() {
         return this.#lifecycle.state === 'ready';
     }
@@ -124,10 +124,10 @@ export class SkinPreview3D extends BaseComponent {
         return stage;
     }
 
-    /** Shows the lifecycle's state: the 3D view replaces the sprite only when ready; the canvas goes when the stage does. */
+    /** Shows the lifecycle's state: the canvas goes when the stage does; a failed view says it is unavailable. */
     #render(state, status) {
-        this.#container.classList.toggle('is-3d', state === 'ready');
-        this.#status.textContent = status;
+        this.element.classList.toggle('unavailable', state === 'failed');
+        this.#status.textContent = state === 'failed' ? UNAVAILABLE_STATUS : status;
         if (state === 'idle' || state === 'failed') {
             this.element.replaceChildren();
             this.#pointers.clear();
