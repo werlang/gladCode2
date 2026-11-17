@@ -51,8 +51,8 @@ async function appWithRender2(flag) {
     const listener = fresh.listen(0);
     const origin = `http://127.0.0.1:${listener.address().port}`;
     return {
-        page: async path => {
-            const response = await fetch(`${origin}${path}`);
+        page: async (path, headers = {}) => {
+            const response = await fetch(`${origin}${path}`, { headers });
             assert.equal(response.status, 200, path);
             return response.text();
         },
@@ -90,12 +90,20 @@ test('the replay gate controls only the replay renderer: the editor is 3D and ma
                 assert.doesNotMatch(page, /__RENDER2_ENABLED__/, `${path} (${flag})`);
             }
         }
-        // the gate still decides whether the replay loads the 3D renderer module
+        // the gate still decides whether the replay loads the 3D renderer module, and the page
+        // carries the master's style on <html>, where the renderer boot reads it
         const replayOn = await on.page('/play/abc');
+        assert.match(replayOn, /<html data-glad-view="3d"/);
         assert.match(replayOn, /<script>window\.__RENDER2_ENABLED__ = true;<\/script>/);
         assert.match(replayOn, /src="\/script\/render2\.js\?v=\d+"/);
 
+        // a master who chose sprites still gets the module (it decides at boot) and the attribute it follows
+        const replaySprite = await on.page('/play/abc', { cookie: 'gladview=sprite' });
+        assert.match(replaySprite, /<html data-glad-view="sprite"/);
+        assert.match(replaySprite, /src="\/script\/render2\.js\?v=\d+"/);
+
         const replayOff = await off.page('/play/abc');
+        assert.match(replayOff, /<html data-glad-view="3d"/);
         assert.match(replayOff, /<script>window\.__RENDER2_ENABLED__ = false;<\/script>/);
         assert.doesNotMatch(replayOff, /src="[^"]*script\/render2\.js/);
     }
