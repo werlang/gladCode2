@@ -13,22 +13,26 @@ const WHEEL_UNITS = [1, 16, 400];
 const UNAVAILABLE_STATUS = 'Visual 3D indisponível';
 
 /**
- * The 3D gladiator of the creator (`#middle-container`), the creator's only preview. `StageLifecycle` decides what
- * runs when (nothing loads until the creator is on screen, the render loop runs only while it is, the WebGL context is
- * released on every failure and when the page is left; until the first gladiator is ready, and for good if it never
- * is, the status line says the 3D view is unavailable while the wardrobe keeps working). This class gives it the
- * browser parts: the canvas and its context, three and the stage, the visibility and page events, the status line,
+ * The 3D gladiator of the creator (`#middle-container`), the preview of the `'3d'` style. `StageLifecycle` decides
+ * what runs when (nothing loads until the creator is on screen, the render loop runs only while it is, the WebGL
+ * context is released on every failure and when the page is left; until the first gladiator is ready, and for good if
+ * it never is, the status line says the 3D view is unavailable while the wardrobe keeps working). This class gives it
+ * the browser parts: the canvas and its context, three and the stage, the visibility and page events, the status line,
  * and the gestures.
  *
  * Drag (or the arrow keys) to turn the gladiator, wheel or pinch (or + and -) to zoom; the creator's buttons call
  * {@link SkinPreview3D#turn}, {@link SkinPreview3D#zoomBy}, {@link SkinPreview3D#setPlaying} and
- * {@link SkinPreview3D#setMove}.
+ * {@link SkinPreview3D#setMove}. {@link SkinPreview3D#destroy} unmounts it and releases the WebGL context when the
+ * master switches to the sprite style.
  */
 export class SkinPreview3D extends BaseComponent {
     #status;
     #controls;
     #lifecycle;
     #visible = false;
+    #observer = null;
+    #resizeObserver = null;
+    #destroyed = false;
     /** Pointers down on the view (by id, last position) and the pinch under way. */
     #pointers = new Map();
     #pinch = null;
@@ -50,13 +54,31 @@ export class SkinPreview3D extends BaseComponent {
         });
         this.#bindGestures();
         // the overlay and the attributes screen hide the view with display: none, which ends the intersection
-        new IntersectionObserver(entries => this.#setVisible(entries[entries.length - 1].isIntersecting)).observe(container);
+        this.#observer = new IntersectionObserver(entries => this.#setVisible(entries[entries.length - 1].isIntersecting));
+        this.#observer.observe(container);
         // the layout changes between the phone and the desktop creator, and so does what covers the view
-        new ResizeObserver(() => this.#measureInsets()).observe(container);
+        this.#resizeObserver = new ResizeObserver(() => this.#measureInsets());
+        this.#resizeObserver.observe(container);
         this.on(window, 'pagehide', () => this.#lifecycle.release());
         this.on(window, 'pageshow', event => {
             if (event.persisted && this.#visible) this.#lifecycle.setVisible(true);
         });
+    }
+
+    /**
+     * Leaves the creator: stops the stage, releases the WebGL context and removes the view. The creator calls it
+     * when the master switches to the sprite style, so the 3D view never keeps a context while it is hidden.
+     */
+    destroy() {
+        if (this.#destroyed) return;
+        this.#destroyed = true;
+        this.#lifecycle.release();
+        this.#observer?.disconnect();
+        this.#observer = null;
+        this.#resizeObserver?.disconnect();
+        this.#resizeObserver = null;
+        this.#status.remove();
+        super.destroy();
     }
 
     /** @returns {boolean} Whether the 3D gladiator is on screen (otherwise the status line explains why). */
@@ -126,6 +148,8 @@ export class SkinPreview3D extends BaseComponent {
 
     /** Shows the lifecycle's state: the canvas goes when the stage does; a failed view says it is unavailable. */
     #render(state, status) {
+        // a stage that was still loading when the master switched back to the sprite style
+        if (this.#destroyed || !this.element) return;
         this.element.classList.toggle('unavailable', state === 'failed');
         this.#status.textContent = state === 'failed' ? UNAVAILABLE_STATUS : status;
         if (state === 'idle' || state === 'failed') {
@@ -138,6 +162,7 @@ export class SkinPreview3D extends BaseComponent {
 
     /** Tells the stage how much of the view the creator's controls cover (only once the view has a size). */
     #measureInsets(stage = this.#lifecycle.stage) {
+        if (this.#destroyed || !this.element) return;
         const view = this.element.getBoundingClientRect();
         if (!stage || !(view.height > 0)) return;
         stage.setInsets(viewInsets(view, this.#controls.map(control => control.getBoundingClientRect())));

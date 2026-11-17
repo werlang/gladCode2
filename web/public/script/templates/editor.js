@@ -71,5 +71,11 @@ export const skinStageCanvasTemplate = `<canvas tabindex='0' role='img' aria-lab
 
 export const skinStatusTemplate = `<p class='skin-3d-status' role='status' aria-live='polite'></p>`;
 
+/** The creator's sprite preview (the `'sprite'` style): the composed LPC sheet drawn into this canvas. */
+export const skinSpriteTemplate = `<canvas class='skin-sprite' tabindex='0' role='img' aria-label='Gladiador em sprite. Use os botões para girar, aproximar e animar.'></canvas>`;
+
+/** The card picture when no portrait can be drawn (no WebGL or no Synty pack). */
+export const gladPlaceholderTemplate = `<img src='image/glad-placeholder.svg' alt='' class='is-placeholder'>`;
+
 /** The sample program of the settings preview. */
 export const sampleCode = 'int start = 1;\n\nloop(){\n    upgradeSTR(5);\n    if (getCloseEnemy()){\n        float dist = getDist(getTargetX(), getTargetY());\n        if (dist < 0.8 && isTargetVisible()){\n            attackMelee();\n        }\n        else\n            moveToTarget();\n    }\n    else{\n        if (start){\n            if(moveTo(12.5,12.5))\n                start = 0;\n        }\n        else\n            turnLeft(50);\n    }\n}';

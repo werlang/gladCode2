@@ -205,6 +205,22 @@ canvas {
 	background-color: transparent;
 }
 
+/* the sprite style's tiles are the layer's own LPC thumbnail, as the creator listed them before the 3D view */
+.img-button.item.sprite-item {
+	display: block;
+	width: 64px;
+	height: 64px;
+	min-height: 0;
+	padding: 0;
+	margin: var(--space-1);
+}
+
+.img-button.item.sprite-item canvas {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
 #left-container {
     display: flex;
     flex-direction: row;
@@ -227,15 +243,31 @@ canvas {
 	margin-left: 0;
 	margin-top: calc(-1 * var(--space-9));
 	margin-bottom: calc(-1 * var(--space-9));
-	z-index: auto;
+	z-index: var(--z-below);
 	height: 300px;
 	position: relative;
 }
 
+/* the sprite style's preview: the composed LPC sheet, hidden while the 3D gladiator takes the same square */
+#middle-container > canvas {
+	max-width: 340px;
+	max-height: 340px;
+	width: 100%;
+	display: block;
+}
+
 /*
- * the 3D gladiator (editor/skin-preview-3d.js) is the creator's only preview; it is dragged, so the layer under it
- * stays out of the way of the row's buttons (they are stacked at z-index 0 and up)
+ * the 3D gladiator (editor/skin-preview-3d.js) replaces the sprite canvas in the `'3d'` style; it is dragged, so
+ * the layer under it stays out of the way of the row's buttons (they are stacked at z-index 0 and up)
  */
+#middle-container.is-3d {
+	z-index: auto;
+}
+
+#middle-container.is-3d > canvas {
+	display: none;
+}
+
 .skin-3d {
 	display: block;
 	width: 100%;
@@ -431,7 +463,8 @@ canvas {
 	height: calc(var(--space-10) + var(--space-1) * 2);
 }
 
-#distribuicao #cv img {
+#distribuicao #cv img,
+#distribuicao #cv canvas {
 	display: block;
 	width: 100%;
 	height: 100%;

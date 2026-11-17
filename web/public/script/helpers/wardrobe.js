@@ -245,6 +245,18 @@ function familyOf(image) {
 }
 
 /**
+ * The skin a gladiator is saved with: the worn layer ids in the order the wardrobe keeps them. It never depends
+ * on the preview style, so the sprite and the 3D creator produce the same array for the same choices (the replay
+ * and the engine's `setSpritesheet` read it the same way).
+ *
+ * @param {Record<string, object>} selected Worn layers, by id.
+ * @returns {string[]} Catalogue layer ids.
+ */
+export function skinOf(selected) {
+    return Object.keys(selected);
+}
+
+/**
  * @param {string} text Any id fragment.
  * @returns {string} The fragment with its separators turned into spaces, capitalised (never empty).
  */
