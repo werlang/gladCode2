@@ -135,6 +135,26 @@
     object-fit: contain;
 }
 
+/* the card's portraits share the slot: the 3D picture and the pixel-art frame */
+.glad-preview .image .model-3d,
+.glad-preview .image .sprite {
+    display: block;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.glad-preview .image .model-3d {
+    width: 100%;
+    object-fit: contain;
+}
+
+/* the pixel-art frame keeps its square shape and crisp pixels */
+.glad-preview .image .sprite {
+    width: auto;
+    max-width: 100%;
+    image-rendering: pixelated;
+}
+
 /* a card whose portrait could not be drawn keeps a muted fallback mark */
 .glad-preview .image.is-placeholder img {
     color: var(--color-text-subtle);

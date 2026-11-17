@@ -1897,8 +1897,9 @@ body {
 .window .blurred canvas {
   filter: blur(10px);
 }
-/* the 3D portrait takes the canvas's place on every card, blurring with the rest of a hidden gladiator */
-.window .glad-preview.blurred .image img {
+/* the card's portrait, 3D picture or sprite canvas, blurs with the rest of a hidden gladiator */
+.window .glad-preview.blurred .image img,
+.window .glad-preview.blurred .image canvas {
   filter: blur(var(--blur-card));
 }
 .window .blurred .attr span {
