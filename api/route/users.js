@@ -3,7 +3,7 @@ import { saveProfilePicture } from '../helpers/uploads.js';
 import { Validate } from '../helpers/validation.js';
 import { auth } from '../middleware/auth.js';
 import { asyncRoute } from '../middleware/error.js';
-import { LANGUAGES } from '../model/user.js';
+import { LANGUAGES, GLAD_VIEWS } from '../model/user.js';
 
 const router = Router();
 
@@ -22,8 +22,8 @@ router.get('/me', auth({ optional: true }), asyncRoute(async (req, res) => {
  * Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique),
  * `language` (`c|python|blocks`), `preferences` (`{ message, friend, update, duel, tourn }`
  * booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system|classic|arena-light|arena-dark`,
- * the site theme) and `picture` (a cropped image as a data URL). Answers `{ user }`; 409
- * `NICKNAME_TAKEN` when the nickname is in use.
+ * the site theme), `gladView` (`sprite|3d`, how gladiators are drawn; `3d` by default) and `picture`
+ * (a cropped image as a data URL). Answers `{ user }`; 409 `NICKNAME_TAKEN` when the nickname is in use.
  */
 router.put('/me', auth(), asyncRoute(async (req, res) => {
     const body = req.body ?? {};
@@ -39,6 +39,7 @@ router.put('/me', auth(), asyncRoute(async (req, res) => {
         editorFont: Validate.integer(body.editorFont, 'editorFont', { min: 8, max: 40, optional: true }),
         showTutorial: Validate.boolean(body.showTutorial, 'showTutorial', { optional: true }),
         theme: Validate.oneOf(body.theme, 'theme', ['system', 'classic', 'arena-light', 'arena-dark'], { optional: true }),
+        gladView: Validate.oneOf(body.gladView, 'gladView', GLAD_VIEWS, { optional: true }),
         preferences,
     };
     if (body.picture !== undefined) changes.picture = await saveProfilePicture(req.user.pasta, body.picture);

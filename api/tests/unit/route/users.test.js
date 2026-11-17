@@ -12,7 +12,9 @@ vi.mock('../../../middleware/auth.js', () => ({
 }));
 vi.mock('../../../helpers/uploads.js', () => ({ saveProfilePicture: vi.fn(async folder => `/profpics/${folder}.png?v=1`) }));
 vi.mock('../../../helpers/google-auth.js', () => ({ GoogleAuth: { verify: vi.fn() } }));
-vi.mock('../../../model/user.js', () => ({ LANGUAGES: ['c', 'python', 'blocks'], User: { signInWithGoogle: vi.fn() } }));
+vi.mock('../../../model/user.js', () => ({
+    LANGUAGES: ['c', 'python', 'blocks'], GLAD_VIEWS: ['sprite', '3d'], User: { signInWithGoogle: vi.fn() },
+}));
 
 const { GoogleAuth } = await import('../../../helpers/google-auth.js');
 const { User } = await import('../../../model/user.js');
@@ -70,7 +72,17 @@ describe('auth and users routes', () => {
         expect((await request(app).put('/users/me').send({ nickname: 'x' })).body.code).toBe('INVALID_NICKNAME');
         expect((await request(app).put('/users/me').send({ language: 'java' })).body.code).toBe('INVALID_LANGUAGE');
         expect((await request(app).put('/users/me').send({ preferences: { friend: 'yes' } })).body.code).toBe('INVALID_PREFERENCES');
+        // the style is case-sensitive: `3D` is not one of the choices
+        expect((await request(app).put('/users/me').send({ gladView: '3D' })).body.code).toBe('INVALID_GLAD_VIEW');
         expect(currentUser.saveProfile).not.toHaveBeenCalled();
+    });
+
+    test('the gladiator style is saved, and a profile save may omit it', async () => {
+        currentUser = player();
+        await request(app).put('/users/me').send({ gladView: 'sprite' });
+        expect(currentUser.saveProfile).toHaveBeenCalledWith(expect.objectContaining({ gladView: 'sprite' }));
+        await request(app).put('/users/me').send({ nickname: 'Ana' });
+        expect(currentUser.saveProfile).toHaveBeenLastCalledWith(expect.objectContaining({ gladView: undefined }));
     });
 
     test('a new picture is stored and its URL saved', async () => {

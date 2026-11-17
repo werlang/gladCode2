@@ -97,4 +97,20 @@ describe('User', () => {
         expect(new User(row).toJSON().theme).toBe('system');
         expect(new User({ ...row, site_theme: 'classic' }).toJSON().theme).toBe('classic');
     });
+
+    test('the gladiator style is saved on the account; the 3D coliseum is the default', async () => {
+        await new User(row).saveProfile({ gladView: 'sprite' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { glad_view: 'sprite' }, { id: 7 }, {});
+        await new User(row).saveProfile({ gladView: '3d' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { glad_view: '3d' }, { id: 7 }, {});
+        // the column is NULL until a master chooses, and NULL means the current 3D look
+        expect(new User(row).toJSON().gladView).toBe('3d');
+        expect(new User({ ...row, glad_view: 'sprite' }).toJSON().gladView).toBe('sprite');
+        expect(new User({ ...row, glad_view: '3d' }).toJSON().gladView).toBe('3d');
+    });
+
+    test('a profile save may omit the gladiator style', async () => {
+        await new User(row).saveProfile({ language: 'c' });
+        expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { pref_language: 'c' }, { id: 7 }, {});
+    });
 });

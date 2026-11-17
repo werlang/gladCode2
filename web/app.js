@@ -1,5 +1,6 @@
 import path from 'node:path';
 import express from 'express';
+import { DEFAULT_GLAD_VIEW, GLAD_VIEW_COOKIE, normalizeGladView } from './public/script/helpers/glad-view.js';
 import { buildUrl, legacyPageUrl } from './helpers/urls.js';
 import { renderMiddleware } from './middleware/render.js';
 import { securityHeaders } from './middleware/security.js';
@@ -33,6 +34,46 @@ app.use(renderMiddleware({
     apiUrl: buildUrl(process.env.API_URL, process.env.API_PORT),
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
 }, { cache: process.env.NODE_ENV === 'production' }));
+
+/**
+ * The gladiator style named on a page's root element: the browser's `gladview` cookie when it
+ * holds a choice, the 3D coliseum otherwise. The session never reaches this service, so the
+ * browser keeps its cached choice in the cookie (`helpers/glad-view.js` writes it).
+ *
+ * @param {string} [header] The request's `Cookie` header.
+ * @returns {'sprite'|'3d'}
+ */
+function gladViewOf(header = '') {
+    for (const pair of String(header).split(';')) {
+        const index = pair.indexOf('=');
+        if (index < 1 || pair.slice(0, index).trim() !== GLAD_VIEW_COOKIE) continue;
+        const value = pair.slice(index + 1).trim();
+        try {
+            return normalizeGladView(decodeURIComponent(value));
+        }
+        catch {
+            return normalizeGladView(value);
+        }
+    }
+    return DEFAULT_GLAD_VIEW;
+}
+
+// The style belongs on <html> before the first paint, so every page gets it from the cookie and
+// the page scripts read it through `currentGladView()`; it is also offered to the templates and to
+// the browser variables for pages that need it directly.
+app.use((req, res, next) => {
+    const gladView = gladViewOf(req.headers.cookie);
+    res.locals.gladView = gladView;
+
+    const page = res.page.bind(res);
+    res.page = (view, vars = {}, clientVars = {}) => page(view, { ...vars, gladView }, { ...clientVars, gladView });
+
+    const send = res.send.bind(res);
+    res.send = body => (typeof body === 'string' && body.includes('<html')
+        ? send(body.replace(/<html(?![^>]*data-glad-view)/, `<html data-glad-view="${gladView}"`))
+        : send(body));
+    next();
+});
 
 /**
  * Registers a GET route that renders a view; `clientVars(req)` picks the route values the page's

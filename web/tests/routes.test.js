@@ -60,6 +60,23 @@ async function appWithRender2(flag) {
     };
 }
 
+test('every page names the gladiator style on the root element before its scripts run', async () => {
+    const page = await (await get('/profile')).text();
+    assert.match(page, /<html data-glad-view="3d"/);
+    // the settings offer both styles, the 3D coliseum first
+    assert.match(page, /id='glad-view'/);
+    assert.match(page, /<option value='3d'>Coliseu 3D<\/option>/);
+    assert.match(page, /<option value='sprite'>Sprites<\/option>/);
+
+    // a browser that chose sprites tells the web service through its cookie
+    const sprite = await fetch(`${base}/profile`, { headers: { cookie: 'gladview=sprite' } });
+    assert.match(await sprite.text(), /<html data-glad-view="sprite"/);
+
+    // an unknown value falls back to the 3D coliseum default
+    const unknown = await fetch(`${base}/profile`, { headers: { cookie: 'gladview=3D' } });
+    assert.match(await unknown.text(), /<html data-glad-view="3d"/);
+});
+
 test('the replay gate controls only the replay renderer: the editor is 3D and maps three either way', async () => {
     const on = await appWithRender2('1');
     const off = await appWithRender2('0');

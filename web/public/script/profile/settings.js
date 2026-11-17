@@ -4,6 +4,7 @@ import { decorateCheckSliders } from '../components/form-controls.js';
 import { Input } from '../components/input.js';
 import { Select } from '../components/select.js';
 import { fadeIn, hide } from '../helpers/animate.js';
+import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
 import { applyTheme } from '../helpers/theme.js';
 import { UserModel } from '../models/user.js';
 import { profile } from './session.js';
@@ -34,7 +35,7 @@ function readImage(file) {
 
 /**
  * The PERFIL tab: nickname, picture (cropped in the browser), preferred
- * programming language, site theme and e-mail preferences.
+ * programming language, site theme, gladiator style and e-mail preferences.
  */
 export class SettingsTab {
     #panel = document.querySelector('#profile-panel');
@@ -43,6 +44,7 @@ export class SettingsTab {
     #nickname = new Input(this.#panel.querySelector('#nickname .input'));
     #language = new Select(this.#panel.querySelector('#language select'));
     #theme = new Select(this.#panel.querySelector('#site-theme select'));
+    #gladView = new Select(this.#panel.querySelector('#glad-view select'));
 
     /** Binds the form. */
     init() {
@@ -50,6 +52,11 @@ export class SettingsTab {
         this.#language.set(profile.user.language);
         // preview at once; GRAVAR saves it on the account
         this.#theme.set(profile.user.theme).change((event, value) => applyTheme(value));
+        this.#gladView
+            .set(profile.user.gladView || DEFAULT_GLAD_VIEW)
+            .change((event, value) => applyGladView(value));
+        // the account wins over this browser's cache when the profile opens, so the next pages already paint it
+        applyGladView(profile.user.gladView || DEFAULT_GLAD_VIEW);
         this.#bindPicture();
         new Button({ element: this.#panel.querySelector('#save') }).click(() => this.#save());
     }
@@ -144,6 +151,7 @@ export class SettingsTab {
             preferences: Object.fromEntries(PREFERENCES.map(name => [name, this.#switch(name).checked])),
             language: this.#language.value,
             theme: this.#theme.value,
+            gladView: this.#gladView.value,
         };
         if (this.#picture) changes.picture = this.#picture;
 

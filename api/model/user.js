@@ -5,6 +5,10 @@ import { Model } from './model.js';
 
 /** Languages a gladiator can be written in. */
 export const LANGUAGES = ['c', 'python', 'blocks'];
+/** How a master sees gladiators across the site: the pixel-art sprites or the 3D coliseum. */
+export const GLAD_VIEWS = ['sprite', '3d'];
+/** The gladiator style of a master who has not chosen one: the site's current 3D coliseum look. */
+export const DEFAULT_GLAD_VIEW = '3d';
 /** Email notification switches, by JSON name and column. */
 const PREFERENCES = { message: 'pref_message', friend: 'pref_friend', update: 'pref_update', duel: 'pref_duel', tourn: 'pref_tourn' };
 
@@ -30,7 +34,7 @@ export class User extends Model {
             fields,
             insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'foto'],
             allowUpdate: [
-                'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font', 'site_theme',
+                'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font', 'site_theme', 'glad_view',
                 ...Object.values(PREFERENCES), 'pref_language', 'silver', 'credits', 'apothecary', 'lvl', 'xp',
             ],
         });
@@ -101,12 +105,12 @@ export class User extends Model {
     /**
      * Applies profile changes. Only the fields present are changed.
      *
-     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'classic'|'arena-light'|'arena-dark' }} changes
-     *   Already validated values; `picture` is the stored picture URL; `theme` `system` clears the choice.
+     * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'classic'|'arena-light'|'arena-dark', gladView?: 'sprite'|'3d' }} changes
+     *   Already validated values; `picture` is the stored picture URL; `theme` `system` clears the choice; `gladView` is how gladiators are drawn.
      * @returns {Promise<User>}
      * @throws {CustomError} 409 `NICKNAME_TAKEN` when another account uses the nickname.
      */
-    async saveProfile({ nickname, language, preferences, editorTheme, editorFont, showTutorial, picture, theme }) {
+    async saveProfile({ nickname, language, preferences, editorTheme, editorFont, showTutorial, picture, theme, gladView }) {
         if (nickname !== undefined && nickname !== this.apelido) {
             const taken = await Mysql.findOne('usuarios', { filter: { apelido: nickname, id: { not: this.id } }, view: ['id'] });
             if (taken) throw new CustomError(409, 'Este nome já está em uso.', 'NICKNAME_TAKEN');
@@ -120,6 +124,7 @@ export class User extends Model {
             showTutorial: showTutorial === undefined ? undefined : Number(showTutorial),
             foto: picture,
             site_theme: theme === undefined ? undefined : (theme === 'system' ? null : theme),
+            glad_view: gladView,
         };
         for (const [name, column] of Object.entries(PREFERENCES)) {
             if (preferences?.[name] !== undefined) changes[column] = Number(Boolean(preferences[name]));
@@ -147,6 +152,7 @@ export class User extends Model {
             editorTheme: this.editor_theme,
             editorFont: this.editor_font,
             theme: this.site_theme || 'system',
+            gladView: GLAD_VIEWS.includes(this.glad_view) ? this.glad_view : DEFAULT_GLAD_VIEW,
             preferences: Object.fromEntries(Object.entries(PREFERENCES).map(([name, column]) => [name, Boolean(Number(this[column]))])),
             isAdmin: this.isAdmin,
         };
