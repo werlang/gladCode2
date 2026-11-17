@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { images } from '../../web/public/script/helpers/sprite-catalog.js';
-import { colorFor, labelFor } from '../../web/public/script/helpers/wardrobe.js';
+import { getImage, images } from '../../web/public/script/helpers/sprite-catalog.js';
+import { colorFor, labelFor, skinOf } from '../../web/public/script/helpers/wardrobe.js';
 
 /** Every catalogue layer that belongs to a menu (the ones the creator lists). */
 const wardrobe = images.filter(image => image.parent);
@@ -36,6 +36,15 @@ test('labels name the piece and its colour in Portuguese', () => {
     assert.equal(labelFor('female_oversize_17'), 'Lâmina 17');
     assert.equal(labelFor('male_shield_3'), 'Escudo 3');
     assert.equal(labelFor('cape_red_behind'), 'Capa · Vermelho (costas)');
+});
+
+test('the saved skin is the worn layer ids, whatever preview draws them', () => {
+    const selected = {};
+    ['male', 'male-light', 'male_longsleeve_red', 'cape_red'].forEach(id => {
+        selected[id] = getImage(id);
+    });
+    assert.deepEqual(skinOf(selected), ['male', 'male-light', 'male_longsleeve_red', 'cape_red']);
+    assert.deepEqual(skinOf({}), []);
 });
 
 test('every colour chip is a CSS colour or empty', () => {

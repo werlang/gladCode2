@@ -1,8 +1,11 @@
+import { createElement } from '../helpers/html.js';
+import { currentGladView, onGladViewChange } from '../helpers/glad-view.js';
 import { site } from '../helpers/request.js';
 import { availableMoves, nextMoveIndex } from '../helpers/skin-preview.js';
 import { getImage, images } from '../helpers/sprite-catalog.js';
-import { colorFor, labelFor } from '../helpers/wardrobe.js';
-import { sampleSkinColors } from '../render2/palette.js';
+import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
+import { colorFor, labelFor, skinOf } from '../helpers/wardrobe.js';
+import { gladPlaceholderTemplate, skinSpriteTemplate } from '../templates/editor.js';
 import { ATTRIBUTE_POINTS, attributeCost, validGladName } from './attributes.js';
 
 /** Sub-menus shown by each category button. */
@@ -14,15 +17,22 @@ const MENUS = {
     equip: ['melee', 'ranged', 'shield'],
 };
 
-/** Preview animations: button icon and stage action. */
+/** Preview animations: button icon, stage action, and the frames of the sprite sheet's animation. */
 const MOVES = [
-    { name: 'walk', image: 'walk' },
-    { name: 'cast', image: 'magic' },
-    { name: 'thrust', image: 'thrust' },
-    { name: 'slash', image: 'slash' },
-    { name: 'shoot', image: 'arrows' },
+    { name: 'walk', sprites: 9, line: 8, image: 'walk' },
+    { name: 'cast', sprites: 7, line: 0, image: 'magic' },
+    { name: 'thrust', sprites: 8, line: 4, image: 'thrust' },
+    { name: 'slash', sprites: 6, line: 12, image: 'slash' },
+    { name: 'shoot', sprites: 13, line: 16, image: 'arrows' },
 ];
 const MOVE_INDEX = Object.fromEntries(MOVES.map((move, index) => [move.name, index]));
+/** Facings of the LPC rows, in turn-button order, and the sprite sheet's cells. */
+const DIRECTIONS = ['up', 'left', 'down', 'right'];
+const CELL = 64;
+const BIG_CELL = 192;
+const SPRITE_ROOT = 'sprite/Universal-LPC-spritesheet/';
+/** How often the sprite preview advances a frame. */
+const FRAME_MS = 100;
 
 const ICON_ROOT = 'sprite/images/';
 /** The small family icon each tile wears, by the layer's first parent menu. */
@@ -99,11 +109,36 @@ function parentsOf(image) {
 }
 
 /**
- * The gladiator creator (glad-create.html): appearance layers with a live 3D gladiator, then name and attributes.
+ * @param {object} image Catalogue layer.
+ * @returns {number|null} The layer's drawing order (weapons use their facing-down order, like the replay's sheet).
+ */
+function layerOf(image) {
+    return typeof image.layer === 'object' && image.layer !== null ? image.layer.down : image.layer;
+}
+
+/**
+ * Loads an image.
  *
- * The 3D view is the only preview. The wardrobe tiles name each layer and show its colour, and hover or focus
- * previews the layer on the gladiator before the click chooses it. Without WebGL the view says so and the tiles
- * keep working.
+ * @param {string} src URL.
+ * @returns {Promise<HTMLImageElement|null>}
+ */
+function loadImage(src) {
+    return new Promise(resolve => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = src;
+    });
+}
+
+/**
+ * The gladiator creator (glad-create.html): appearance layers with a live preview, then name and attributes.
+ *
+ * The style is the master's gladiator style (`helpers/glad-view.js`): the `'3d'` one shows the 3D gladiator with
+ * wardrobe tiles that name each layer, show its colour and preview it on hover; the `'sprite'` one shows the
+ * composed LPC sheet and the layer thumbnails it has always had. `currentGladView()` picks the view at start and
+ * `onGladViewChange` swaps it on the same page, releasing the WebGL context when the 3D view goes away, without
+ * touching the choices. Without WebGL the 3D view says so and the tiles keep working.
  */
 export class SkinCreator {
     /** Layers worn, by id. */
@@ -111,11 +146,23 @@ export class SkinCreator {
     #root;
     /** Layer ids of each sub-menu. */
     #tree = new Map();
+    /** The style this creator draws (`'sprite'` or `'3d'`), and the request that mounted the current view. */
+    #view = '3d';
+    #viewRequest = 0;
+    #canvas;
+    #sheet;
+    #direction = 2;
+    #scale = 1;
     #playing = false;
     #move = 0;
+    #frame = 0;
     #lastColor = 'black';
-    /** @type {import('./skin-preview-3d.js').SkinPreview3D|null} The 3D gladiator. */
+    #drawing = 0;
+    #frameTimer = 0;
+    /** @type {import('./skin-preview-3d.js').SkinPreview3D|null} The 3D gladiator, in the `'3d'` style. */
     #preview3d = null;
+    /** The 3D palette's colour sampler, loaded only when a 3D tile asks for a sampled colour. */
+    #colorSampler = null;
     #hoverTimer = 0;
     /** The tile whose hover preview is pending or showing. */
     #hoverItem = null;
@@ -130,35 +177,105 @@ export class SkinCreator {
     constructor(root, onReady) {
         this.#root = root;
         this.onReady = onReady;
+        this.#canvas = createElement(skinSpriteTemplate);
+        this.#canvas.width = BIG_CELL;
+        this.#canvas.height = BIG_CELL;
+        this.#sheet = document.createElement('canvas');
+        this.#sheet.width = BIG_CELL * 13;
+        this.#sheet.height = BIG_CELL * 21;
     }
 
-    /** Loads glad-create.html, binds it and mounts the 3D view (which loads once shown). */
+    /** Loads glad-create.html, binds it and mounts the preview of the master's style. */
     async init() {
         const markup = await site.get('glad-create.html');
         this.#root.innerHTML = typeof markup === 'string' ? markup : '';
         this.#buildTree();
+        this.#find('#middle-container').append(this.#canvas);
         this.#root.querySelectorAll('.img-button.sub').forEach(button => button.classList.add('hidden'));
         this.#bindMenus();
         this.#bindPreview();
         this.#bindAttributes();
-        await this.#mount3d();
+        this.#view = currentGladView();
+        await this.#applyView();
+        onGladViewChange(choice => {
+            this.#view = choice;
+            void this.#applyView();
+            this.reload();
+        });
         this.reload();
     }
 
-    /** Mounts the 3D view; a browser or module that cannot show it gets the status line instead. */
-    async #mount3d() {
+    /**
+     * Mounts the preview of this style: the 3D view (releasing any previous one) or the sprite canvas. The
+     * attribute card is painted again when it is open, so it follows the new style too.
+     *
+     * @returns {Promise<void>}
+     */
+    async #applyView() {
+        const request = ++this.#viewRequest;
+        const sprite = this.#view !== '3d';
+        this.#find('#middle-container')?.classList.toggle('is-3d', !sprite);
+        if (sprite) {
+            this.#destroy3d();
+            this.#startFrames();
+            this.#draw();
+            this.#portraitIfShown();
+            return;
+        }
+        this.#stopFrames();
+        await this.#mount3d(request);
+        this.#portraitIfShown();
+    }
+
+    /**
+     * Mounts the 3D view; a browser or module that cannot show it gets the status line instead.
+     *
+     * @param {number} request The view request that asked for it.
+     */
+    async #mount3d(request) {
+        this.#destroy3d();
         try {
             const { SkinPreview3D } = await import('./skin-preview-3d.js');
+            if (request !== this.#viewRequest || this.#view !== '3d') return;
+            const container = this.#find('#middle-container');
+            if (!container) return;
             // the rows of buttons and items that the layout runs over the preview (they differ on a phone and a desktop)
             const controls = [...this.#root.querySelectorAll('#top-container, #left-container, #sub-container, #right-container, #bottom-container')];
-            this.#preview3d = new SkinPreview3D(this.#find('#middle-container'), { controls });
-            this.#preview3d.setMove(MOVES[this.#move].name);
-            this.#preview3d.setPlaying(this.#playing);
+            const preview = new SkinPreview3D(container, { controls });
+            this.#preview3d = preview;
+            preview.setMove(MOVES[this.#move].name);
+            preview.setPlaying(this.#playing);
+            preview.setSkin(skinOf(this.selected));
         }
         catch (error) {
+            if (request !== this.#viewRequest || this.#view !== '3d') return;
             console.warn('Visual 3D do criador indisponível.', error);
             this.#showUnavailable();
         }
+    }
+
+    /** Unmounts the 3D view, releasing its WebGL context, and leaves the sprite canvas in its place. */
+    #destroy3d() {
+        this.#preview3d?.destroy();
+        this.#preview3d = null;
+        this.#find('#middle-container')?.querySelectorAll('.skin-3d, .skin-3d-status').forEach(element => element.remove());
+    }
+
+    /** Starts the sprite preview's frame clock (only while that style draws). */
+    #startFrames() {
+        if (this.#frameTimer) return;
+        this.#frameTimer = setInterval(() => this.#renderFrame(), FRAME_MS);
+    }
+
+    /** Stops the sprite preview's frame clock (the 3D view animates itself). */
+    #stopFrames() {
+        clearInterval(this.#frameTimer);
+        this.#frameTimer = 0;
+    }
+
+    /** Paints the attribute card again when the attributes screen is the one on show. */
+    #portraitIfShown() {
+        if (this.#find('#distribuicao-container')?.style.display === 'flex') this.#showPortrait();
     }
 
     /** Leaves the creator a status line where the 3D gladiator would be. */
@@ -208,7 +325,7 @@ export class SkinCreator {
             vstr,
             vagi,
             vint,
-            skin: Object.keys(this.selected),
+            skin: skinOf(this.selected),
         };
     }
 
@@ -264,33 +381,110 @@ export class SkinCreator {
         this.#find('#get-code').addEventListener('click', () => this.#finish());
     }
 
-    /** The preview buttons: turn and zoom act on the 3D gladiator, play/pause and the animation drive it. */
+    /**
+     * The preview buttons. Turn and zoom act on the 3D view while it is on screen and on the sprite otherwise;
+     * play/pause and the animation are shared, so either view shows the same animation.
+     */
     #bindPreview() {
-        this.#find('#turn').addEventListener('click', () => this.#preview3d?.turn());
-        this.#find('#down-scale').addEventListener('click', () => this.#preview3d?.zoomBy(-0.5));
-        this.#find('#up-scale').addEventListener('click', () => this.#preview3d?.zoomBy(0.5));
+        this.#find('#turn').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.turn();
+                return;
+            }
+            this.#direction = (this.#direction + 1) % DIRECTIONS.length;
+            this.#renderFrame();
+        });
+        this.#find('#down-scale').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.zoomBy(-0.5);
+                return;
+            }
+            if (this.#scale > 1) this.#scale -= 0.5;
+            this.#renderFrame();
+        });
+        this.#find('#up-scale').addEventListener('click', () => {
+            if (this.#preview3d?.active) {
+                this.#preview3d.zoomBy(0.5);
+                return;
+            }
+            if (this.#scale < 3.5) this.#scale += 0.5;
+            this.#renderFrame();
+        });
         const play = this.#find('#play-pause');
         play.addEventListener('click', () => {
             this.#playing = !this.#playing;
+            if (!this.#playing) this.#frame = 0;
             play.querySelector('img').src = `${ICON_ROOT}${this.#playing ? 'pause' : 'play'}.png`;
             this.#preview3d?.setPlaying(this.#playing);
+            this.#renderFrame();
         });
         this.#find('#animation').addEventListener('click', () => {
             const available = availableMoves(Object.values(this.selected));
             this.#setMove(nextMoveIndex(this.#move, MOVES.map(move => move.name), available));
+            this.#renderFrame();
         });
     }
 
-    /** @param {number} index Preview animation (index in `MOVES`), shown on the button and played by the 3D view. */
+    /** @param {number} index Preview animation (index in `MOVES`), shown on the button and played by the visible view. */
     #setMove(index) {
         this.#move = index;
+        this.#frame = 0;
         this.#find('#animation img').src = `${ICON_ROOT}${MOVES[this.#move].image}.png`;
         this.#preview3d?.setMove(MOVES[this.#move].name);
     }
 
+    /** Draws the current frame of the sprite preview (nothing while the 3D view is the one on show). */
+    #renderFrame() {
+        if (this.#view !== 'sprite') return;
+        const context = this.#canvas.getContext('2d');
+        context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+        if (this.#playing) this.#frame++;
+        if (this.#frame >= MOVES[this.#move].sprites) this.#frame = 0;
+        const row = this.#direction + MOVES[this.#move].line;
+        const size = BIG_CELL * this.#scale;
+        context.drawImage(this.#sheet, BIG_CELL * this.#frame, BIG_CELL * row, BIG_CELL, BIG_CELL,
+            BIG_CELL / 2 - size / 2, BIG_CELL / 2 - size / 2 - 5, size, size);
+    }
+
+    /** Composes the spritesheet of the worn layers into the sprite preview's sheet. */
+    async #draw() {
+        if (this.#view !== 'sprite') return;
+        const drawing = ++this.#drawing;
+        const layers = Object.values(this.selected).sort((a, b) => (layerOf(a) ?? -1) - (layerOf(b) ?? -1));
+        const loaded = await Promise.all(layers.map(layer => (
+            layer.path && !layer.png ? loadImage(SPRITE_ROOT + layer.path) : null
+        )));
+        if (drawing !== this.#drawing || this.#view !== 'sprite') return;
+
+        const context = this.#sheet.getContext('2d');
+        context.clearRect(0, 0, this.#sheet.width, this.#sheet.height);
+        loaded.forEach((image, index) => {
+            if (!image) return;
+            const layer = layers[index];
+            if (layer.oversize) {
+                const { line, sprites } = MOVES[MOVE_INDEX[layer.move]];
+                for (let direction = 0; direction < 4; direction++) {
+                    for (let frame = 0; frame < sprites; frame++) {
+                        context.drawImage(image, frame * BIG_CELL, direction * BIG_CELL, BIG_CELL, BIG_CELL,
+                            frame * BIG_CELL, (line + direction) * BIG_CELL, BIG_CELL, BIG_CELL);
+                    }
+                }
+            }
+            else {
+                for (let row = 0; row < 21; row++) {
+                    for (let column = 0; column < 13; column++) {
+                        context.drawImage(image, column * CELL, row * CELL, CELL, CELL,
+                            CELL + 3 * column * CELL, CELL + 3 * row * CELL, CELL, CELL);
+                    }
+                }
+            }
+        });
+        this.#renderFrame();
+    }
+
     /**
      * Applies the wardrobe rules (requirements, matching colours, blocked menus) and redraws: the items of the
-     * open sub-menu (unless `keepItems`) and the 3D gladiator.
+     * open sub-menu (unless `keepItems`) and the visible preview.
      *
      * @param {boolean} [keepItems] Keep the item list as it is.
      */
@@ -353,7 +547,8 @@ export class SkinCreator {
 
         this.#markUnavailable();
         if (!keepItems) Object.values(visible).forEach(image => this.#addItem(image));
-        this.#preview3d?.setSkin(Object.keys(this.selected));
+        if (this.#view === '3d') this.#preview3d?.setSkin(skinOf(this.selected));
+        else this.#draw();
     }
 
     /** Greys out the menus the worn layers rule out, dropping their layers. */
@@ -386,8 +581,8 @@ export class SkinCreator {
     }
 
     /**
-     * Adds a layer to the item list: a family icon, its pt-BR label and its colour chip. Hovering or focusing the
-     * tile previews it on the 3D gladiator after {@link HOVER_PREVIEW_MS}; leaving the tile restores the worn look.
+     * Adds a layer to the item list in the style on show: the `'3d'` style's family icon, pt-BR label and colour
+     * chip (hovering or focusing previews it on the gladiator), or the `'sprite'` style's LPC thumbnail.
      *
      * @param {object} image Catalogue layer.
      */
@@ -401,6 +596,27 @@ export class SkinCreator {
         item.title = label;
         item.setAttribute('aria-label', label);
 
+        if (this.#view === 'sprite') {
+            item.classList.add('sprite-item');
+            this.#addSpriteThumb(item, image);
+        }
+        else {
+            this.#addLabelTile(item, image);
+        }
+
+        if (this.selected[image.id]) item.classList.add('selected');
+        this.#find('#right-container').append(item);
+        this.#bindItem(item, image);
+    }
+
+    /**
+     * Fills a `'3d'` wardrobe tile: family icon, pt-BR label and colour chip, and the hover preview on the 3D
+     * gladiator after {@link HOVER_PREVIEW_MS}.
+     *
+     * @param {HTMLElement} item The tile.
+     * @param {object} image Catalogue layer.
+     */
+    #addLabelTile(item, image) {
         const icon = document.createElement('img');
         icon.className = 'item-icon';
         icon.alt = '';
@@ -408,7 +624,7 @@ export class SkinCreator {
 
         const text = document.createElement('span');
         text.className = 'item-label';
-        text.textContent = label;
+        text.textContent = labelFor(image.id);
 
         const chip = document.createElement('span');
         chip.className = 'item-color';
@@ -418,26 +634,71 @@ export class SkinCreator {
         else chip.classList.add('empty');
 
         item.append(icon, text, chip);
-        if (this.selected[image.id]) item.classList.add('selected');
-        this.#find('#right-container').append(item);
 
         const preview = () => {
             this.#hoverItem = item;
             clearTimeout(this.#hoverTimer);
             this.#hoverTimer = setTimeout(() => {
-                if (this.#hoverItem === item) this.#preview3d?.setSkin([...Object.keys(this.selected), image.id]);
+                if (this.#hoverItem === item) this.#preview3d?.setSkin([...skinOf(this.selected), image.id]);
             }, HOVER_PREVIEW_MS);
         };
         const restore = () => {
             if (this.#hoverItem !== item) return;
             this.#hoverItem = null;
             clearTimeout(this.#hoverTimer);
-            this.#preview3d?.setSkin(Object.keys(this.selected));
+            this.#preview3d?.setSkin(skinOf(this.selected));
         };
         item.addEventListener('mouseenter', preview);
         item.addEventListener('focus', preview);
         item.addEventListener('mouseleave', restore);
         item.addEventListener('blur', restore);
+
+        this.#sampleItemColour(image, chip);
+    }
+
+    /**
+     * Draws a `'sprite'` wardrobe tile with the layer's own LPC thumbnail (the look the creator had before the 3D
+     * view, and the one the replay composes the gladiator from).
+     *
+     * @param {HTMLElement} item The tile.
+     * @param {object} image Catalogue layer.
+     */
+    #addSpriteThumb(item, image) {
+        const preview = document.createElement('canvas');
+        preview.width = CELL;
+        preview.height = CELL;
+        item.append(preview);
+        // empty slots (`hair_none`) are a blank tile
+        if (!image.path) return;
+
+        loadImage(image.png ? ICON_ROOT + image.path : SPRITE_ROOT + image.path).then(source => {
+            if (!source || !preview.isConnected) return;
+            const context = preview.getContext('2d');
+            const size = image.oversize ? BIG_CELL : CELL;
+            const line = image.line ?? 10;
+            const column = image.col ?? 0;
+            if (image.png) {
+                context.drawImage(source, 0, 0, image.width, image.height, 0, 0, CELL, CELL);
+            }
+            else if (image.scale) {
+                context.drawImage(source, column * size, line * size, size, size,
+                    size / 2 - (image.scale * size) / 2 + (image.posx ?? 0), size / 2 - (image.scale * size) / 2 + (image.posy ?? 0),
+                    CELL * image.scale, CELL * image.scale);
+            }
+            else {
+                context.drawImage(source, column * size, line * size, size, size, 0, -5, CELL, CELL);
+            }
+        });
+    }
+
+    /**
+     * Binds the click and the keyboard of a wardrobe tile: it drops the worn layers of the same menus and wears
+     * the clicked one.
+     *
+     * @param {HTMLElement} item The tile.
+     * @param {object} image Catalogue layer.
+     */
+    #bindItem(item, image) {
         item.addEventListener('keydown', event => {
             if (event.key !== 'Enter' && event.key !== ' ') return;
             event.preventDefault();
@@ -453,8 +714,6 @@ export class SkinCreator {
             item.classList.add('selected');
             this.reload(true);
         });
-
-        this.#sampleItemColour(image, chip);
     }
 
     /**
@@ -464,7 +723,8 @@ export class SkinCreator {
      * @param {HTMLElement} chip The tile's colour chip.
      */
     #sampleItemColour(image, chip) {
-        sampleSkinColors([[image.id]], images).then(colors => {
+        this.#colorSampler ??= import('../render2/palette.js').then(module => module.sampleSkinColors);
+        this.#colorSampler.then(sample => sample([[image.id]], images)).then(colors => {
             const colour = colorFor(image.id, colors);
             if (!colour || !chip.isConnected) return;
             chip.classList.remove('empty');
@@ -527,23 +787,38 @@ export class SkinCreator {
     }
 
     /**
-     * Paints the gladiator's card portrait above its name. The slot stays empty when no portrait can be
-     * drawn (no WebGL, no Synty pack) or when the card was replaced before the answer arrived.
+     * Paints the gladiator's card portrait above its name, in the style on show: the card portrait service in 3D
+     * (the placeholder picture when it cannot draw) or the sprite sheet's thumbnail. The slot stays empty only when
+     * the card was replaced before the answer arrived.
      */
     async #showPortrait() {
         const slot = this.#find('#cv');
         if (!slot) return;
         const request = ++this.#portraitRequest;
         slot.replaceChildren();
+        const image = await this.picture(skinOf(this.selected));
+        if (request !== this.#portraitRequest || !image || !slot.isConnected) return;
+        slot.replaceChildren(image);
+    }
+
+    /**
+     * The picture of a gladiator for the editor's cards, drawn the way this page draws gladiators: the 3D card
+     * portrait service (its placeholder picture when WebGL or the Synty pack is missing) in the `'3d'` style, or the
+     * sprite sheet's down-facing walking frame in the `'sprite'` one.
+     *
+     * @param {string[]} skin Catalogue layer ids.
+     * @param {'idle'|'dead'} [pose] Portrait pose (the sprite sheet has no idle; its walk frame stands in).
+     * @returns {Promise<HTMLElement|null>} The picture, or null when there is none to draw.
+     */
+    async picture(skin, pose = 'idle') {
+        if (this.#view !== '3d') return getSpriteThumb(await fetchSpritesheet(skin), pose === 'dead' ? 'die' : 'walk', 'down');
         try {
             const { CardPortraits } = await import('../render2/card-portrait.js');
-            const image = await CardPortraits.get(this.values().skin, { pose: 'idle' });
-            if (request !== this.#portraitRequest || !image || !slot.isConnected) return;
-            if (image.classList.contains('is-placeholder')) return;
-            slot.replaceChildren(image);
+            return await CardPortraits.get(skin, { pose });
         }
-        catch {
-            // the creator keeps working without a picture
+        catch (error) {
+            console.warn('O retrato 3D do card está indisponível.', error);
+            return createElement(gladPlaceholderTemplate);
         }
     }
 

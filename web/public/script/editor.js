@@ -2,6 +2,7 @@ import './blocks.js';
 import { Message, showDialog, showMessage, showTerminal } from './components/dialog.js';
 import { showLoginDialog } from './components/header.js';
 import { ProgressButton } from './components/simulation.js';
+import { onGladViewChange } from './helpers/glad-view.js';
 import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
 import { simulationProblem } from './helpers/simulation-report.js';
 import { TemplateVar } from './helpers/template-var.js';
@@ -27,24 +28,6 @@ const AFTER_TEST_LESSONS = ['watchCodeMove', 'moveBackForth', 'askMoveNext', 'de
 const SAVE_TEST_NAMES = ['Archie', 'War Maker', 'Magnus', 'Rouge'];
 /** A transparent pixel, for a profile picture that fails to load. */
 const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-
-/**
- * The gladiator's card portrait, drawn from the 3D models the arena uses.
- *
- * @param {string[]|null} skin Skin tokens.
- * @param {string} [pose] Portrait pose (`idle` or `dead`).
- * @returns {Promise<HTMLImageElement|null>} The portrait, or null when it cannot be drawn.
- */
-async function gladPortrait(skin, pose = 'idle') {
-    try {
-        const { CardPortraits } = await import('./render2/card-portrait.js');
-        return await CardPortraits.get(skin, { pose });
-    }
-    catch (error) {
-        console.warn('The editor card portrait is unavailable.', error);
-        return null;
-    }
-}
 
 /** What to tell the player for each refused save, by API error code. */
 const SAVE_ERRORS = {
@@ -95,6 +78,8 @@ class EditorPage {
 
         const [user] = await Promise.all([UserModel.current(), this.creator.init()]);
         this.user = UserModel.isLogged(user) ? user : null;
+        // the editor's card follows the gladiator style the creator switched to on this page
+        onGladViewChange(() => this.#showCard(this.card ?? this.creator.values()));
         attachTutorial({ editor: this.code.ace, user: user ?? {}, toggleBlocks: options => this.blocks.toggle(options) });
 
         // `/glad-<id>` opens a saved gladiator, `/newglad` (id 0) the creator, `/editor` the list
@@ -256,7 +241,7 @@ class EditorPage {
      * The picture slot only ever receives a real element: a portrait already drawn is inserted now, and a
      * missing one is painted in place later, unless the card was replaced by then.
      *
-     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLImageElement|null }} glad
+     * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string[], image?: HTMLElement|null }} glad
      */
     #showCard(glad) {
         this.card = glad;
@@ -271,17 +256,20 @@ class EditorPage {
     }
 
     /**
-     * Paints the card's portrait once the service answers, keeping the slot empty while it cannot.
+     * Asks the creator for the card's picture in the style on show: a 3D portrait (the placeholder picture when
+     * WebGL or the Synty pack is missing) or the sprite sheet's thumbnail.
      *
      * @param {Element} slot The card's `.image` slot.
      * @param {string[]} skin Skin tokens.
      */
     #fillCardImage(slot, skin) {
         if (!skin?.length) return;
-        gladPortrait(skin).then(image => {
-            if (image && slot.isConnected) slot.replaceChildren(image);
+        this.creator.picture(skin).then(image => {
+            if (!image || !slot.isConnected) return;
+            slot.replaceChildren(image);
+            slot.classList.toggle('is-placeholder', image.classList?.contains('is-placeholder') ?? false);
         }).catch(error => {
-            console.warn('The editor card portrait is unavailable.', error);
+            console.warn('The editor card picture is unavailable.', error);
         });
     }
 
