@@ -475,7 +475,7 @@ function openSettings() {
         else fadeOut(frames);
     });
 
-    // the renderer is automatic now (3D with the Phaser fallback), so the settings offer no choice
+    // the battle renderer follows the profile's gladiator style (3D coliseum or sprites), so the settings offer no choice
     // graphics quality only applies to the 3D renderer, and only once it is running
     if (window.Render2Quality) find('#render-quality').value = window.Render2Quality.get();
     else find('#quality-container').remove();
@@ -686,6 +686,18 @@ function showLoadError(message) {
 }
 
 /**
+ * Keeps `<html data-glad-view>` naming the renderer the replay actually runs. The attribute is the
+ * page's source of truth at boot, so when the decision leaves the classic renderer (the server
+ * gate, the sprite preference or a browser without WebGL2) it follows it. Choosing another style
+ * in the profile applies on the next page load; the battle never swaps renderers.
+ */
+function nameInstalledRenderer() {
+    const view = window.threeBattleRenderer ? '3d' : 'sprite';
+    const root = document.documentElement;
+    if (root.getAttribute('data-glad-view') !== view) root.setAttribute('data-glad-view', view);
+}
+
+/**
  * Starts the renderer and the replay once the gladiators' sheets are ready.
  *
  * @param {object[]} simulation Incremental simlog steps.
@@ -694,6 +706,7 @@ async function startBattle(simulation) {
     window.json = {};
     document.querySelector('#loadbar #status').textContent = 'Carregando render';
     await (window.battleRendererReady || Promise.resolve());
+    nameInstalledRenderer();
     if (!window.load_phaser()) return;
 
     const count = simulation[0].glads.length;
