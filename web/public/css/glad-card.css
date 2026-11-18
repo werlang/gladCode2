@@ -158,7 +158,7 @@
 /* a card whose portrait could not be drawn keeps a muted fallback mark; the picture is painted in currentColor,
    so `color` names its tone and the opacity token makes it stand back */
 .glad-preview .image.is-placeholder img {
-    color: var(--color-text-subtle);
+    /* the placeholder is an <img>: its own SVG document owns the colour, only the opacity applies here */
     opacity: var(--opacity-muted);
 }
 

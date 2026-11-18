@@ -201,13 +201,16 @@ test('a slow 3D portrait never overwrites the sprite drawn after the style chang
     assert.notEqual(slot.children[0], portrait);
 });
 
-test('the placeholder picture takes its tone from the page instead of hard-coded colours', () => {
+test('the placeholder carries its own tone, because an <img> cannot inherit the page colour', () => {
     const svg = readFileSync(new URL('../../web/public/image/glad-placeholder.svg', import.meta.url), 'utf8');
+    // Every shape is painted in currentColor, but the asset is loaded as an <img>: it is its own document,
+    // so it has to name that colour itself or the shapes fall back to black.
     assert.ok((svg.match(/currentColor/g) ?? []).length >= 3, 'every shape is painted in currentColor');
-    assert.doesNotMatch(svg, /#[0-9a-f]{3,8}/i, 'the asset carries no colour literal');
+    assert.match(svg, /:root\s*\{[^}]*color:\s*#[0-9a-f]{3,8}/i, 'the asset declares the tone it paints with');
 
     const css = readFileSync(new URL('../../web/public/css/glad-card.css', import.meta.url), 'utf8');
     assert.match(css, /opacity: var\(--opacity-muted\)/);
+    assert.doesNotMatch(css, /is-placeholder img\s*\{[^}]*color:/s, 'the page cannot colour an <img>');
     const tokens = readFileSync(new URL('../../web/public/css/tokens.css', import.meta.url), 'utf8');
     assert.match(tokens, /--opacity-muted: 0\.65/);
 });

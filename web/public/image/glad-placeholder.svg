@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Gladiador">
-    <!-- A neutral gladiator bust shown while a 3D portrait cannot be drawn. Every shape is painted in
-         currentColor at its own opacity, so the page's CSS token names the tone (see css/glad-card.css). -->
+    <!-- A neutral gladiator bust shown while a 3D portrait cannot be drawn. The picture is loaded as an
+         <img>, so it is its own document and cannot inherit the page's colour token: the tone below is a
+         fixed mid-value that reads on both the light and the dark card. -->
+    <style>:root { color: #9a8a68; }</style>
     <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
         <path d="M28 118c0-18 16-30 36-30s36 12 36 30" fill="currentColor" fill-opacity=".72"/>
         <path d="M46 84h36" stroke-opacity=".6"/>
