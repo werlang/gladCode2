@@ -1,10 +1,46 @@
-import { currentGladView } from './helpers/glad-view.js';
+import { applyGladView, currentGladView } from './helpers/glad-view.js';
+import { UserModel } from './models/user.js';
 import { storeQuality, storedQuality } from './render2/quality.js';
 
 const classicLoadRenderer = window.load_phaser;
 const classicUpdateRenderer = window.phaser_update;
 let renderer = null;
 let rendererWasLoaded = false;
+
+/** Longest the replay waits for the account before booting with this browser's cached gladiator style. */
+const PROFILE_TIMEOUT_MS = 1500;
+
+/**
+ * Resolves with null after `ms`, so a slow profile never holds the battle.
+ *
+ * @param {number} ms
+ * @returns {Promise<null>}
+ */
+function timeout(ms) {
+    return new Promise(resolve => {
+        const timer = setTimeout(() => resolve(null), ms);
+        // Node's test runner would otherwise wait for this timer; browsers have no unref
+        timer?.unref?.();
+    });
+}
+
+/**
+ * Puts the account's gladiator style on the page before the renderer is chosen. A browser without the
+ * `gladview` cookie would otherwise boot in 3D (downloading three and Synty) for a master who chose the
+ * sprites. The account wins over the cached choice; a profile that fails or does not arrive in time
+ * leaves `currentGladView()` (cookie or default) as it is.
+ *
+ * @returns {Promise<void>}
+ */
+async function applyAccountStyle() {
+    try {
+        const user = await Promise.race([UserModel.current().catch(() => null), timeout(PROFILE_TIMEOUT_MS)]);
+        if (UserModel.isLogged(user)) applyGladView(user.gladView);
+    }
+    catch {
+        // the cached choice (cookie or default) stands
+    }
+}
 
 /**
  * Whether this browser can run the 3D renderer. WebGL2 is the floor: the renderer and the Synty
@@ -27,27 +63,35 @@ function hasWebGl2() {
 
 /**
  * Whether the replay boots on the classic Phaser renderer, in the page's decision order: the
- * server's gate always wins, then the master's style preference (`currentGladView()`, which reads
- * the server-rendered `data-glad-view` first), then the browser's WebGL2 support. The Synty pack
- * being present never changes the answer.
+ * server's gate always wins, then the master's style preference (the account's, applied first by
+ * {@link applyAccountStyle}, then `currentGladView()`, which reads the server-rendered
+ * `data-glad-view`), then the browser's WebGL2 support. The Synty pack being present never changes
+ * the answer.
  *
+ * @param {boolean} [webgl2] The browser's WebGL2 probe, when the caller already made it.
  * @returns {boolean}
  */
-function classicRequired() {
+function classicRequired(webgl2 = hasWebGl2()) {
     return window.__RENDER2_ENABLED__ === false
         || currentGladView() === 'sprite'
-        || !hasWebGl2();
+        || !webgl2;
 }
 
 /**
  * Installs the Three.js renderer behind the legacy playback adapter boundary. The replay runs it
- * when the server gate is on, the page draws the 3D style and the browser has WebGL2; the classic
- * renderer takes over otherwise or when the 3D renderer cannot start.
+ * when the server gate is on, the page draws the 3D style (the account's choice first, then the
+ * cached one) and the browser has WebGL2; the classic renderer takes over otherwise or when the 3D
+ * renderer cannot start.
  *
  * @returns {Promise<import('./render2/renderer.js').BattleRenderer|null>} Active renderer or null after fallback.
  */
 async function installThreeRenderer() {
-    if (classicRequired()) {
+    // the gate and the browser settle the question without the profile: no 3D renderer starts either way
+    const webgl2 = hasWebGl2();
+    if (window.__RENDER2_ENABLED__ === false || !webgl2) return null;
+    // the style has to be the account's before the decision reads the cached one
+    await applyAccountStyle();
+    if (classicRequired(webgl2)) {
         return null;
     }
 

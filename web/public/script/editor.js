@@ -2,7 +2,7 @@ import './blocks.js';
 import { Message, showDialog, showMessage, showTerminal } from './components/dialog.js';
 import { showLoginDialog } from './components/header.js';
 import { ProgressButton } from './components/simulation.js';
-import { onGladViewChange } from './helpers/glad-view.js';
+import { applyGladView, onGladViewChange } from './helpers/glad-view.js';
 import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
 import { simulationProblem } from './helpers/simulation-report.js';
 import { TemplateVar } from './helpers/template-var.js';
@@ -43,6 +43,23 @@ const SAVE_ERRORS = {
 };
 
 /**
+ * Mounts the gladiator creator after resolving the account's gladiator style. The account's choice has to be
+ * on the page before the creator reads `currentGladView()`: a browser without the `gladview` cookie would
+ * otherwise build the 3D preview (and download three and Synty) for a master who chose sprites.
+ *
+ * @param {{ init: () => Promise<void> }} creator The gladiator creator to mount.
+ * @param {() => Promise<Record<string, any>|null>} [fetchUser] The signed-in account (a test seam; the page reads `UserModel`).
+ * @returns {Promise<Record<string, any>|null>} The signed-in user, or null for a visitor.
+ */
+export async function startCreator(creator, fetchUser = () => UserModel.current()) {
+    const user = await fetchUser();
+    const signedIn = UserModel.isLogged(user) ? user : null;
+    if (signedIn) applyGladView(signedIn.gladView);
+    await creator.init();
+    return signedIn;
+}
+
+/**
  * The gladiator editor page: code or blocks, appearance and attributes,
  * test battles, saving, settings, help and the tutorial.
  */
@@ -76,11 +93,11 @@ class EditorPage {
             event.returnValue = '';
         });
 
-        const [user] = await Promise.all([UserModel.current(), this.creator.init()]);
-        this.user = UserModel.isLogged(user) ? user : null;
+        // the account's style is applied before the creator mounts its preview (see `startCreator`)
+        this.user = await startCreator(this.creator);
         // the editor's card follows the gladiator style the creator switched to on this page
         onGladViewChange(() => this.#showCard(this.card ?? this.creator.values()));
-        attachTutorial({ editor: this.code.ace, user: user ?? {}, toggleBlocks: options => this.blocks.toggle(options) });
+        attachTutorial({ editor: this.code.ace, user: this.user ?? {}, toggleBlocks: options => this.blocks.toggle(options) });
 
         // `/glad-<id>` opens a saved gladiator, `/newglad` (id 0) the creator, `/editor` the list
         const gladiatorId = TemplateVar.get('gladiatorId');
@@ -370,7 +387,10 @@ class EditorPage {
     }
 }
 
-new EditorPage().start().catch(error => {
-    console.error(error);
-    new Message({ message: 'Não foi possível carregar o editor. Recarregue a página.' }).show();
-});
+// the editor's own code element starts the page; a document without it (the module is also imported by tests) stays inert
+if (document.querySelector('#code')) {
+    new EditorPage().start().catch(error => {
+        console.error(error);
+        new Message({ message: 'Não foi possível carregar o editor. Recarregue a página.' }).show();
+    });
+}

@@ -43,8 +43,12 @@ export class CardPortraitService {
     #warned = false;
     #observer = null;
     #visible = new WeakMap();
-    /** @type {Set<{ target: Element, settle: () => void }>} Cards waiting to come near the viewport. */
+    /** @type {Set<{ ref: WeakRef<Element>, settle: (visible?: boolean) => void }>} Cards waiting to come near the viewport. */
     #waiters = new Set();
+    /** Answers a card whose element was collected before it could show (see {@link #whenVisible}). */
+    #reaper = typeof globalThis.FinalizationRegistry === 'function'
+        ? new globalThis.FinalizationRegistry(waiter => waiter.settle(false))
+        : null;
     #listening = false;
     #pagehideAttached = false;
 
@@ -86,7 +90,7 @@ export class CardPortraitService {
                 const stored = await this.#cachedImage(key);
                 return stored ?? this.#placeholder();
             }
-            if (target && this.#watchable(target)) await this.#whenVisible(target);
+            if (target && this.#watchable(target) && !(await this.#whenVisible(target))) return this.#placeholder();
             if (this.#isUnavailable()) {
                 const stored = await this.#cachedImage(key);
                 return stored ?? this.#placeholder();
@@ -426,10 +430,11 @@ export class CardPortraitService {
     }
 
     /**
-     * Waits until a card image is near the viewport.
+     * Waits until a card image is near the viewport. The cards are held weakly, so a card removed before it
+     * shows is never kept alive by this queue; its promise answers the placeholder instead.
      *
      * @param {Element} target The card's `.image` slot.
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>} True when the card is near the viewport, false once it left the page.
      */
     #whenVisible(target) {
         this.#observer ??= new globalThis.IntersectionObserver((entries) => {
@@ -437,21 +442,29 @@ export class CardPortraitService {
                 const waiters = this.#visible.get(entry.target);
                 if (!waiters) continue;
                 // a card that left the page needs no picture; one that only scrolled away waits for its return
-                if (entry.isIntersecting || entry.target.isConnected === false) this.#release(entry.target, waiters);
+                if (entry.isIntersecting || entry.target.isConnected === false) {
+                    this.#release(entry.target, waiters, entry.isIntersecting);
+                }
             }
             this.#sweepWaiters();
         }, { rootMargin: VISIBLE_MARGIN });
         this.#sweepWaiters();
         return new Promise((resolve) => {
+            const ref = new WeakRef(target);
             const waiter = {
-                target,
-                settle: () => {
+                ref,
+                settle: (visible = true) => {
+                    if (waiter.settled) return;
+                    waiter.settled = true;
                     this.#waiters.delete(waiter);
-                    const group = this.#visible.get(target);
-                    if (!group) return resolve();
-                    group.delete(waiter);
-                    if (!group.size) this.#release(target, group);
-                    resolve();
+                    this.#reaper?.unregister(waiter);
+                    const card = ref.deref();
+                    const group = card ? this.#visible.get(card) : null;
+                    if (group) {
+                        group.delete(waiter);
+                        if (!group.size) this.#release(card, group, visible);
+                    }
+                    resolve(visible);
                 },
             };
             let group = this.#visible.get(target);
@@ -462,6 +475,7 @@ export class CardPortraitService {
             }
             group.add(waiter);
             this.#waiters.add(waiter);
+            this.#reaper?.register(target, waiter);
             this.#observer.observe(target);
             this.#sweepWaiters();
         });
@@ -471,18 +485,20 @@ export class CardPortraitService {
      * Answers every waiter of a card at once.
      *
      * @param {Element} target
-     * @param {Set<{ settle: () => void }>} waiters
+     * @param {Set<{ settle: (visible?: boolean) => void }>} waiters
+     * @param {boolean} visible Whether the card should still be painted.
      */
-    #release(target, waiters) {
+    #release(target, waiters, visible = true) {
         this.#visible.delete(target);
         this.#observer?.unobserve(target);
-        for (const waiter of [...waiters]) waiter.settle();
+        for (const waiter of [...waiters]) waiter.settle(visible);
     }
 
-    /** Answers the cards removed from the page before any wait of theirs could finish. */
+    /** Answers the cards removed from the page (or collected) before any wait of theirs could finish. */
     #sweepWaiters() {
         for (const waiter of [...this.#waiters]) {
-            if (waiter.target.isConnected === false) waiter.settle();
+            const target = waiter.ref.deref();
+            if (!target || target.isConnected === false) waiter.settle(false);
         }
     }
 
