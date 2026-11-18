@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Gladiador">
-    <!-- A neutral gladiator bust shown while a 3D portrait cannot be drawn. -->
+    <!-- A neutral gladiator bust shown while a 3D portrait cannot be drawn. Every shape is painted in
+         currentColor at its own opacity, so the page's CSS token names the tone (see css/glad-card.css). -->
     <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M28 118c0-18 16-30 36-30s36 12 36 30" fill="#cdbb95"/>
-        <path d="M46 84h36" stroke="#6f6248"/>
-        <path d="M64 30c-14 0-24 11-24 26v18c0 6 5 10 11 10h26c6 0 11-4 11-10V56c0-15-10-26-24-26Z" fill="#cdbb95"/>
-        <path d="M40 56h48" stroke="#6f6248"/>
-        <path d="M64 30c0-8 5-14 14-16" stroke="#b08a46"/>
-        <path d="M78 14c6 2 10 8 11 16" stroke="#b08a46"/>
-        <path d="M50 64c4 7 10 10 14 10s10-3 14-10" stroke="#6f6248"/>
-        <path d="M58 74v10M70 74v10" stroke="#6f6248"/>
+        <path d="M28 118c0-18 16-30 36-30s36 12 36 30" fill="currentColor" fill-opacity=".72"/>
+        <path d="M46 84h36" stroke-opacity=".6"/>
+        <path d="M64 30c-14 0-24 11-24 26v18c0 6 5 10 11 10h26c6 0 11-4 11-10V56c0-15-10-26-24-26Z" fill="currentColor" fill-opacity=".72"/>
+        <path d="M40 56h48" stroke-opacity=".6"/>
+        <path d="M64 30c0-8 5-14 14-16"/>
+        <path d="M78 14c6 2 10 8 11 16"/>
+        <path d="M50 64c4 7 10 10 14 10s10-3 14-10" stroke-opacity=".6"/>
+        <path d="M58 74v10M70 74v10" stroke-opacity=".6"/>
     </g>
 </svg>

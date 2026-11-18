@@ -118,12 +118,12 @@ page(['/function/:name', '/funcao/:name'], 'function', req => {
 page('/post/:hash', 'post', req => ({ postHash: req.params.hash }));
 // the old editor address took the gladiator as ?g=
 app.get('/editor', (req, res, next) => (req.query.g === undefined ? next() : res.redirect(301, legacyPageUrl('editor', req.query))));
-// the editor's gladiator creator shows the 3D gladiator for players who chose the 3D battle renderer: the page maps
-// three and render2 when the server enables it, and tells the creator through the `render2` template var
-const editorVars = { render2: render2Enabled };
-page('/editor', 'editor', () => ({ gladiatorId: null, ...editorVars }), editorVars);
-page('/newglad', 'editor', () => ({ gladiatorId: 0, ...editorVars }), editorVars);
-page(/^\/glad-(\d+)$/, 'editor', req => ({ gladiatorId: Number(req.params[0]), ...editorVars }), editorVars);
+// The editor's gladiator creator draws the master's style (sprite or 3D): the import map always offers three
+// and render2, so the page needs no gate; `ENABLE_RENDER2` below only decides the replay's renderer
+page('/editor', 'editor', () => ({ gladiatorId: null }));
+page('/newglad', 'editor', () => ({ gladiatorId: 0 }));
+page(/^\/glad-(\d+)$/, 'editor', req => ({ gladiatorId: Number(req.params[0]) }));
+// the replay reads its gate from `render2` before loading the 3D entry
 page('/play/:hash', 'playback', req => ({ logHash: req.params.hash, tournament: text(req.query.t) }), { render2: render2Enabled });
 
 // A tournament or training link without a round opens round 0.

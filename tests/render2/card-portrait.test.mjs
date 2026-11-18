@@ -149,6 +149,54 @@ function paintingService(render) {
     });
 }
 
+/** The IntersectionObserver stand-in: the test fires its entries by hand. */
+class FakeIntersectionObserver {
+    static instances = [];
+
+    constructor(callback, options) {
+        this.callback = callback;
+        this.options = options;
+        this.targets = new Set();
+        FakeIntersectionObserver.instances.push(this);
+    }
+
+    observe(target) {
+        this.targets.add(target);
+    }
+
+    unobserve(target) {
+        this.targets.delete(target);
+    }
+
+    disconnect() {
+        this.targets.clear();
+    }
+
+    /** @param {Element} target @param {boolean} isIntersecting */
+    fire(target, isIntersecting) {
+        this.callback([{ target, isIntersecting }]);
+    }
+}
+
+/**
+ * A painting service under a fake observer.
+ *
+ * @param {(job: { tokens: string[], pose: string }) => Promise<HTMLCanvasElement>} render
+ */
+function watchingService(render) {
+    const previous = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = FakeIntersectionObserver;
+    FakeIntersectionObserver.instances = [];
+    const service = paintingService(render);
+    return {
+        service,
+        observer: () => FakeIntersectionObserver.instances.at(-1),
+        restore: () => {
+            globalThis.IntersectionObserver = previous;
+        },
+    };
+}
+
 test('a look that cannot be painted falls back alone and the other cards still render', async t => {
     const warn = t.mock.method(console, 'warn', () => {});
     const service = paintingService(async ({ tokens }) => {
@@ -210,4 +258,49 @@ test('dispose revokes the object URLs the cards were given', async t => {
     assert.match(portrait.src, /^blob:/);
     service.dispose();
     assert.ok(revoke.mock.calls.some(call => call.arguments[0] === portrait.src), 'the memory cache hands the URL back');
+});
+
+test('a card in the page waits for the viewport before it is painted', async t => {
+    t.mock.method(console, 'warn', () => {});
+    let rendered = 0;
+    const setup = watchingService(async () => {
+        rendered += 1;
+        return paintingCanvas();
+    });
+    t.after(setup.restore);
+
+    const card = { isConnected: true };
+    const pending = setup.service.get(['male', 'male-light'], { target: card });
+    assert.equal(rendered, 0, 'nothing is painted before the card is near the viewport');
+    assert.equal(setup.observer().targets.has(card), true, 'the card is being watched');
+
+    setup.observer().fire(card, true);
+    const portrait = await pending;
+
+    assert.match(portrait.src, /^blob:/);
+    assert.equal(rendered, 1);
+    assert.equal(setup.observer().targets.has(card), false, 'an answered card is no longer watched');
+    setup.service.dispose();
+});
+
+test('a card removed before it shows answers the placeholder and is not painted', async t => {
+    t.mock.method(console, 'warn', () => {});
+    let rendered = 0;
+    const setup = watchingService(async () => {
+        rendered += 1;
+        return paintingCanvas();
+    });
+    t.after(setup.restore);
+
+    const card = { isConnected: true };
+    const pending = setup.service.get(['male', 'male-light'], { target: card });
+    card.isConnected = false;
+    setup.observer().fire(card, false);
+    const portrait = await pending;
+
+    assert.equal(portrait.src, PLACEHOLDER_SRC);
+    assert.equal(portrait.classList.contains('is-placeholder'), true);
+    assert.equal(rendered, 0, 'the removed card never reaches the render queue');
+    assert.equal(setup.observer().targets.has(card), false, 'the removed card is no longer watched');
+    setup.service.dispose();
 });

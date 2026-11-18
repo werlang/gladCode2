@@ -263,6 +263,9 @@
     /* ---- Blur: filter radii (a hidden card's picture) ---- */
     --blur-card: 10px;
 
+    /* ---- Opacity: surfaces that stand back (the card's fallback portrait) ---- */
+    --opacity-muted: 0.65;
+
     /* ---- Motion ---- */
     --duration-fast: 0.15s;
     --duration-quick: 0.2s;

@@ -1,5 +1,6 @@
 // Run: docker run --rm -v "$PWD":/w -w /w node:22-alpine node --test tests/frontend/glad-card.test.mjs
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import { GladCardPainter } from '../../web/public/script/components/glad-card.js';
@@ -198,4 +199,15 @@ test('a slow 3D portrait never overwrites the sprite drawn after the style chang
 
     assert.equal(slot.children[0].classList.contains('sprite'), true, 'the stale portrait was dropped');
     assert.notEqual(slot.children[0], portrait);
+});
+
+test('the placeholder picture takes its tone from the page instead of hard-coded colours', () => {
+    const svg = readFileSync(new URL('../../web/public/image/glad-placeholder.svg', import.meta.url), 'utf8');
+    assert.ok((svg.match(/currentColor/g) ?? []).length >= 3, 'every shape is painted in currentColor');
+    assert.doesNotMatch(svg, /#[0-9a-f]{3,8}/i, 'the asset carries no colour literal');
+
+    const css = readFileSync(new URL('../../web/public/css/glad-card.css', import.meta.url), 'utf8');
+    assert.match(css, /opacity: var\(--opacity-muted\)/);
+    const tokens = readFileSync(new URL('../../web/public/css/tokens.css', import.meta.url), 'utf8');
+    assert.match(tokens, /--opacity-muted: 0\.65/);
 });
