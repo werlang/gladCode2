@@ -275,7 +275,9 @@ h3#tourn-desc {
 }
 
 /* tournament and training buttons fill their column */
-.button {
+#content-box .button,
+.float-box .button,
+.window .button {
     width: 100%;
     padding: var(--space-2) 0;
     font-size: var(--text-lg);

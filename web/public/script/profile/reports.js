@@ -154,15 +154,12 @@ export class ReportsTab {
             const emptyState = renderTemplate(emptyStateTemplate, { variantClass: 'compact', actionHtml: '', ...view.empty });
             this.#table.insertAdjacentHTML('beforeend', renderTemplate(noRowsTemplate, { emptyState }));
         }
-        for (let index = total === 0 ? 1 : 0; index < PAGE_SIZE; index++) {
-            const row = offset + index < total ? rows[index] : null;
-            if (!row) {
-                this.#table.insertAdjacentHTML('beforeend', view.emptyRow);
-                continue;
-            }
-            this.#table.append(this.#row(id, row));
+        else {
+            rows.forEach(row => this.#table.append(this.#row(id, row)));
         }
 
+        const nav = this.#panel.querySelector('.page-nav');
+        if (nav) nav.hidden = total === 0;
         const counters = this.#panel.querySelectorAll('.page-nav span');
         counters[0].textContent = total === 0 ? 0 : offset + 1;
         counters[1].textContent = Math.min(offset + PAGE_SIZE, total);

@@ -27,24 +27,26 @@
 	display: flex;
     flex-direction: column;
     background-color: var(--color-surface);
+    border: var(--space-hairline) solid var(--color-border);
     cursor: pointer;
     box-sizing: border-box;
     box-shadow: var(--shadow-md);
-    border-radius: var(--radius-sm);
-    transition: var(--duration-base) all;
+    border-radius: var(--radius-md);
     margin-bottom: var(--space-3);
     width: 165px;
     min-width: 170px;
-    transition: all var(--duration-base);
+    transition: transform var(--duration-fast), box-shadow var(--duration-fast), border-color var(--duration-fast);
 }
 
 .glad-preview:hover {
-    filter: brightness(92%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-border-strong);
 }
 
 .glad-preview.selected {
-    box-shadow: var(--shadow-glow);
-    filter: brightness(85%);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px var(--color-accent), var(--shadow-md);
 }
 
 @media only screen and (min-width: 600px) {
@@ -76,11 +78,12 @@
 
 .glad-add.inactive{
 	cursor: default;
+	opacity: 0.72;
 }
 
 .glad-add.inactive .image {
 	background-image: url('../icon/lock.png');
-	background-color: var(--color-danger-soft)
+	background-color: var(--color-surface-sunken);
 }
 
 .glad-preview.error {
@@ -175,6 +178,11 @@
 .glad-add .info {
 	padding: var(--space-3);
 	justify-content: center;
+	font-family: var(--font-body);
+	font-size: var(--text-sm);
+	line-height: 1.45;
+	color: var(--color-text-muted);
+	text-align: center;
 }
 
 .glad-card-container .file {
@@ -291,20 +299,27 @@
     height: 25px;
 }
 
-/* the card's code button: a bold glyph on the card, filled on hover */
+/* the card's code button: a subtle pill button on the card */
 .glad-preview .button {
     width: auto;
     height: auto;
+    min-height: 26px;
     margin-left: var(--space-3);
-    padding: var(--space-1) var(--space-3);
-    background-color: transparent;
+    margin-bottom: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border: var(--space-hairline) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-alt);
     color: var(--color-brand-text);
-    font-size: var(--text-lg);
-    font-weight: bold;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    box-shadow: none;
 }
 
 .glad-preview .button:hover {
-	background-color: var(--color-brand-muted);
+	background-color: var(--color-brand);
+	border-color: var(--color-brand);
     color: var(--color-text-on-brand);
 }
 

@@ -296,17 +296,17 @@
 
     --font-display: var(--font-arena);
 
-    --color-page: var(--arena-day-page);
-    --color-surface: var(--arena-day-surface);
-    --color-surface-alt: var(--arena-sand-light);
-    --color-surface-strong: var(--arena-sand);
-    --color-surface-sunken: var(--arena-day-sunken);
+    --color-page: #f5efe2;
+    --color-surface: #fffdf8;
+    --color-surface-alt: #f0e6d2;
+    --color-surface-strong: #e3d3b4;
+    --color-surface-sunken: #ebe0c9;
     --color-neutral: var(--arena-day-stone);
     --color-overlay: rgb(11 29 43 / 0.72);
     --color-scrim: rgb(11 29 43 / 0.45);
     --color-shade: rgb(60 40 10 / 0.14);
-    --color-tint: rgb(60 40 10 / 0.05);
-    --color-highlight: rgb(255 255 255 / 0.4);
+    --color-tint: rgb(60 40 10 / 0.06);
+    --color-highlight: rgb(255 255 255 / 0.45);
 
     --color-text: var(--arena-day-text);
     --color-text-strong: var(--arena-ink-950);
@@ -318,9 +318,9 @@
 
     --color-brand: var(--arena-blue);
     --color-brand-hover: var(--classic-blue-deep);
-    --color-brand-muted: var(--arena-ink-500);
-    --color-brand-soft: rgb(0 99 141 / 0.08);
-    --color-brand-text: var(--arena-ink-900);
+    --color-brand-muted: #264863;
+    --color-brand-soft: rgb(0 99 141 / 0.09);
+    --color-brand-text: #00587d;
     --color-link: var(--arena-blue);
     --color-secondary: var(--arena-day-blue);
     --color-secondary-strong: var(--arena-blue);
@@ -329,17 +329,17 @@
     --color-accent: var(--arena-gold);
     --color-accent-strong: var(--arena-gold-deep);
     --color-accent-hover: #ffc95e;
-    --color-accent-text: var(--arena-bronze-text);
+    --color-accent-text: #8c5d0b;
 
     /* the main action of a view (GRAVAR, ABRIR): torch gold in the Arena */
     --color-action: var(--arena-gold);
     --color-action-hover: #ffc95e;
     --color-text-on-action: var(--arena-ink-900);
 
-    --color-border: var(--arena-day-border);
-    --color-border-strong: var(--arena-day-border-strong);
-    --color-border-brand: var(--arena-sand-dark);
-    --color-border-brand-muted: rgb(185 154 99 / 0.45);
+    --color-border: #dfd0b2;
+    --color-border-strong: #9f8964;
+    --color-border-brand: var(--arena-blue);
+    --color-border-brand-muted: rgb(157 128 79 / 0.45);
 
     --color-danger: var(--arena-blood);
     --color-danger-soft: #f8e1dc;
@@ -355,16 +355,16 @@
     --color-header-bg: var(--arena-ink-950);
     --color-header-text: var(--arena-sand);
     --color-footer-bg: var(--arena-ink-950);
-    --color-chrome: var(--arena-ink-800);
-    --logo-filter: invert(1) hue-rotate(180deg);
+    --color-chrome: var(--arena-ink-900);
+    --logo-filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1);
     --logo-filter-page: none;
 
-    --color-pick: #cceacc;
-    --color-pick-hover: #afd7af;
-    --color-pick-selected: #92c592;
-    --color-pick-item: #ccccea;
-    --color-pick-item-hover: #afafd7;
-    --color-pick-item-selected: #9292c5;
+    --color-pick: #e4e9d6;
+    --color-pick-hover: #d3dcbe;
+    --color-pick-selected: #b8c998;
+    --color-pick-item: #dde3ea;
+    --color-pick-item-hover: #c5d1de;
+    --color-pick-item-selected: #a3b8cf;
 
     --color-shadow: rgb(60 40 10 / 0.35);
     --shadow-xs: 0 0 2px var(--color-shadow);
@@ -473,29 +473,29 @@
 
     --font-display: var(--font-arena);
 
-    --color-page: var(--arena-ink-900);
-    --color-surface: var(--arena-ink-800);
-    --color-surface-alt: var(--arena-ink-700);
-    --color-surface-strong: var(--arena-ink-600);
-    --color-surface-sunken: var(--arena-ink-950);
+    --color-page: #091722;
+    --color-surface: #0f2334;
+    --color-surface-alt: #163046;
+    --color-surface-strong: #1f415e;
+    --color-surface-sunken: #061019;
     --color-neutral: var(--arena-stone-400);
     --color-overlay: rgb(5 13 20 / 0.82);
-    --color-scrim: rgb(5 13 20 / 0.6);
-    --color-shade: rgb(0 0 0 / 0.3);
-    --color-tint: rgb(255 255 255 / 0.05);
-    --color-highlight: rgb(255 255 255 / 0.1);
+    --color-scrim: rgb(5 13 20 / 0.65);
+    --color-shade: rgb(0 0 0 / 0.35);
+    --color-tint: rgb(255 255 255 / 0.06);
+    --color-highlight: rgb(255 255 255 / 0.12);
 
     --color-text: var(--arena-mist-100);
     --color-text-strong: #ffffff;
     --color-text-muted: var(--arena-mist-200);
-    --color-text-subtle: var(--arena-stone-300);
+    --color-text-subtle: #8ba3b5;
     --color-text-on-brand: #ffffff;
     --color-text-on-brand-muted: var(--arena-mist-200);
     --color-text-on-accent: var(--arena-ink-900);
 
     --color-brand: var(--arena-blue);
     --color-brand-hover: #0a78a6;
-    --color-brand-muted: var(--arena-ink-500);
+    --color-brand-muted: #244966;
     --color-brand-soft: rgb(49 167 199 / 0.14);
     --color-brand-text: var(--arena-sand);
     --color-link: var(--arena-blue-light);
@@ -512,13 +512,13 @@
     --color-action-hover: #ffc95e;
     --color-text-on-action: var(--arena-ink-900);
 
-    --color-border: rgb(237 241 243 / 0.14);
-    --color-border-strong: var(--arena-stone-400);
+    --color-border: rgb(233 214 173 / 0.16);
+    --color-border-strong: #587285;
     --color-border-brand: var(--arena-sand-dark);
     --color-border-brand-muted: rgb(185 154 99 / 0.45);
 
     --color-danger: var(--arena-blood-bright);
-    --color-danger-soft: rgb(196 65 47 / 0.22);
+    --color-danger-soft: rgb(196 65 47 / 0.24);
     --color-success: var(--arena-green);
     --color-success-soft: rgb(79 212 106 / 0.18);
     --color-warning: var(--arena-gold);
@@ -528,12 +528,12 @@
     --color-terminal-text: var(--arena-green);
     --color-code-bg: var(--arena-ink-950);
 
-    --color-header-bg: var(--arena-ink-950);
+    --color-header-bg: #050f17;
     --color-header-text: var(--arena-sand);
-    --color-footer-bg: var(--arena-ink-950);
-    --color-chrome: var(--arena-ink-950);
-    --logo-filter: invert(1) hue-rotate(180deg);
-    --logo-filter-page: invert(1) hue-rotate(180deg);
+    --color-footer-bg: #050f17;
+    --color-chrome: #091824;
+    --logo-filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1);
+    --logo-filter-page: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1);
 
     --color-pick: rgb(79 212 106 / 0.14);
     --color-pick-hover: rgb(79 212 106 / 0.26);

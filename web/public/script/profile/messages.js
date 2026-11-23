@@ -36,12 +36,15 @@ export class MessagesTab {
         show(table);
 
         const { meta, messages: info } = await MessageModel.list(this.#page);
+        const pageNav = this.#panel.querySelector('#page-title');
         if (meta.total == 0) {
+            pageNav.hidden = true;
             table.innerHTML = renderTemplate(emptyStateTemplate, {
                 variantClass: 'compact', icon: 'envelope-open', title: 'Você ainda não possui mensagens', summary: '', actionHtml: '',
             });
             return;
         }
+        pageNav.hidden = false;
 
         const counters = this.#panel.querySelectorAll('#page-title span');
         counters[0].textContent = meta.start;

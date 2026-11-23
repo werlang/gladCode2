@@ -117,8 +117,16 @@ body{
 	height: 35px;
 }
 
+#profile-icon {
+	display: flex;
+	justify-content: center;
+}
+
 #profile-icon img {
 	border-radius: var(--radius-round);
+	background-color: var(--color-surface);
+	padding: var(--space-1);
+	box-sizing: border-box;
 }
 
 .mrow:hover {
@@ -138,11 +146,11 @@ body{
 
 #float-card{
 	position: fixed;
-    top: 40px;
-    right: 0;
+    top: 62px;
+    right: 12px;
     z-index: calc(var(--z-raised) + 1);
-    opacity: 0.6;
-	transition: all var(--duration-base), margin var(--duration-fast);
+    opacity: 0.92;
+	transition: opacity var(--duration-base), transform var(--duration-fast);
 	display: none;
 }
 
@@ -209,17 +217,19 @@ body{
 #fog-glads #open-glad,
 #fog #settings-window,
 #fog-battle #battle-window {
-	width: 600px;
+	width: min(620px, calc(100vw - 24px));
     background-color: var(--color-surface);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-md);
+    border: var(--space-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
 	font-family: var(--font-body);
 	color: var(--color-text);
 	box-sizing: border-box;
-	max-height: calc(100% - 50px);
+	max-height: calc(100vh - 76px);
 	display: flex;
 	flex-direction: column;
-	margin-top: var(--space-9);
+	margin-top: var(--space-7);
+	overflow: hidden;
 }
 
 #fog-battle h3 span {
@@ -233,14 +243,14 @@ body{
 	padding: var(--space-6) var(--space-7) var(--space-2);
 }
 
-/* dialog titles: the heading in the display face, its instruction quieter below */
+/* dialog titles: clear heading, quieter instruction below */
 :is(#fog-glads, #fog-battle) #message h2,
 #settings-window #title h2 {
 	margin: 0 0 var(--space-1);
-	color: var(--color-brand-text);
-	font-family: var(--font-display);
+	color: var(--color-text-strong);
+	font-family: var(--font-body);
 	font-size: var(--text-xl);
-	font-weight: normal;
+	font-weight: 700;
 }
 
 :is(#fog-glads, #fog-battle) #message h3 {
@@ -494,6 +504,7 @@ body{
 
 #settings-window #sample {
 	flex-grow: 1;
+	min-width: 0;
 	display: flex;
 	flex-direction: column;
 }
@@ -503,6 +514,8 @@ body{
 	width: 100%;
 	margin: 0;
 	min-height: 30vh;
+	border-radius: var(--radius-md);
+	border: var(--space-hairline) solid var(--color-border);
 }
 
 #settings-window #font-size {

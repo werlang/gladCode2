@@ -5,7 +5,6 @@ import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
 import { showNoCredit, showTutorPitch } from './tutor.js';
 import {
-    emptyRowTemplate,
     generalHeadTemplate,
     generalPlaceholderTemplate,
     generalRowTemplate,
@@ -202,12 +201,12 @@ export class RankingTab {
             return;
         }
 
-        const rows = Array.from({ length: PAGE_SIZE }, (_, index) => {
-            const row = general ? (offset + index < total ? data.ranking[index] : null) : data.ranking[offset + index];
-            if (!row) return emptyRowTemplate;
+        const list = Array.from({ length: Math.min(PAGE_SIZE, Math.max(0, total - (general ? offset : 0))) }, (_, index) => {
+            const row = general ? data.ranking[index] : data.ranking[offset + index];
+            if (!row) return '';
             return general ? this.#generalRow(row) : this.#hashtagRow(row);
-        });
-        this.#table.innerHTML = head + rows.join('');
+        }).filter(Boolean);
+        this.#table.innerHTML = head + list.join('');
 
         const counters = this.#panel.querySelectorAll('.page-nav span');
         counters[0].textContent = total === 0 ? 0 : offset + 1;

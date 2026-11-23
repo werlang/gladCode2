@@ -98,7 +98,8 @@
 #ranking-container .team.gold .score,
 #ranking-container .team.silver .score,
 #ranking-container .team.bronze .score {
-    background-color: var(--color-text-on-brand);
+    background-color: var(--color-surface);
+    color: var(--color-text-strong);
 }
 
 #ranking-container .head {

@@ -5,29 +5,36 @@
 }
 
 #dialog-box {
-    padding: var(--space-3) var(--space-5);
+    padding: var(--space-5) var(--space-6);
     font-family: var(--font-body);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
+    line-height: 1.5;
     min-height: 100px;
-    max-width: 300px;
+    width: min(400px, calc(100vw - 32px));
+    max-width: 420px;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
+    gap: var(--space-3);
 }
 
 #dialog-box.large {
-	max-width: 400px;
+	max-width: 460px;
 }
 
 #dialog-box #button-container {
 	width: 100%;
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
 }
 
 #dialog-box #message {
-	margin: var(--space-3) 0;
+	margin: 0;
 	cursor: default;
+	color: var(--color-text);
 }
 
 #dialog-box .highlight,
@@ -37,11 +44,13 @@
 }
 
 #dialog-box .button {
-    width: 100%;
-    margin: var(--space-3) var(--space-2) 0;
-    padding: var(--space-1) var(--space-2);
+    width: auto;
+    min-width: 76px;
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-md);
-    font-size: var(--text-lg);
+    font-size: var(--text-sm);
+    white-space: nowrap;
 }
 
 #dialog-box #title {
@@ -150,6 +159,8 @@
 
 .toast.info {
 	background-color: var(--color-accent);
+	color: var(--color-text-on-accent);
+	text-shadow: none;
 }
 
 .toast.error {

@@ -1,6 +1,6 @@
 body{
 	margin: 0;
-	font-family: var(--font-mono);
+	font-family: var(--font-body);
 	font-size: var(--text-base);
 }
 
@@ -73,10 +73,11 @@ body{
 #header #search {
 	display: none;
 	font-size: var(--text-xl);
-	color: var(--color-text-strong);
+	color: var(--color-header-text);
 	align-self: center;
 	margin-right: var(--space-3);
 	margin-left: auto;
+	cursor: pointer;
 }
 
 #header #search.visible {
@@ -85,8 +86,9 @@ body{
 
 #header #h-items {
 	margin-right: var(--space-4);
-    font-family: var(--font-mono);
-	font-size: var(--text-lg);
+    font-family: var(--font-body);
+	font-size: var(--text-sm);
+	letter-spacing: 0.05em;
 	display: none;
 }
 
@@ -95,10 +97,12 @@ body{
     background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 0;
-    height: 35px;
-    width: 35px;
+    height: 30px;
+    width: 30px;
 	align-self: center;
-    margin: 0 var(--space-5);
+    margin: 0 var(--space-4);
+    filter: var(--logo-filter);
+    cursor: pointer;
 }
 
 @media only screen and (min-width: 800px) {
@@ -163,15 +167,18 @@ body{
 	display: none;
 	position: absolute;
 	height: auto;
-	background-color: var(--color-brand-hover);
+	background-color: var(--color-header-bg);
+	border: var(--space-hairline) solid var(--color-border);
+	border-radius: 0 0 var(--radius-md) var(--radius-md);
+	box-shadow: var(--shadow-md);
 }
 
 #header #h-items .item-container .item:hover{
-	background-color: var(--color-secondary);
+	background-color: var(--color-highlight);
 }
 
 #header #h-items .item:hover {
-	background-color: var(--color-brand-hover);
+	background-color: var(--color-highlight);
 }
 
 #header .item a {
@@ -301,7 +308,8 @@ body{
 #footer img {
 	height: 20px;
 	margin: 0 var(--space-3);
-	filter: brightness(0) saturate(1) invert(18%) sepia(91%) saturate(2679%) hue-rotate(181deg) brightness(97%) contrast(101%);
+	filter: var(--logo-filter-page);
+	opacity: 0.75;
 }
 
 @media only screen and (min-width: 600px) {

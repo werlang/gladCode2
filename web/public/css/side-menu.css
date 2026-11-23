@@ -2,6 +2,9 @@
     display: none;
     width: var(--layout-side-menu);
     background-color: var(--color-chrome);
+    border-right: var(--space-hairline) solid var(--color-border);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
     position: fixed;
     top: 0;
     left: 0;

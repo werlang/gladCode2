@@ -7,18 +7,19 @@ canvas {
 }
 
 #skin-container {
-    max-width: 650px;
-	width: 100%;
+    max-width: 680px;
+	width: calc(100vw - 24px);
 	box-sizing: border-box;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-md);
-    padding: var(--space-2);
+    border: var(--space-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-4);
     background-color: var(--color-surface);
 	z-index: var(--z-raised);
 	display: flex;
 	flex-direction: column;
-	max-height: 100vh;
+	gap: var(--space-3);
+	max-height: 92vh;
 }
 
 #bottom-container {
@@ -32,17 +33,17 @@ canvas {
     margin-bottom: 0;
     display: flex;
     justify-content: center;
-	height: 45px;
+	height: 44px;
 	order: 1;
 }
 
 @media only screen and (min-width: 600px) {
 #top-container {
-    margin-bottom: calc(-1 * var(--space-8));
+    margin-bottom: 0;
 	order: 0;
 }
 #bottom-container {
-    margin-top: calc(-1 * var(--space-8));
+    margin-top: 0;
 	order: 0;
 }
 }
@@ -348,7 +349,8 @@ canvas {
 #right-container {
 	margin: auto;
     justify-content: flex-end;
-    width: 145px;
+    width: 175px;
+    padding: var(--space-1);
     max-height: 340px;
 	height: auto;
 }
@@ -364,23 +366,8 @@ canvas {
 	width: 100%;
 }
 
-.input {
-	border: 0;
-    outline: none;
-    border: 2px solid var(--color-border);
-	border-radius: var(--radius-md);
-	transition: var(--duration-slow);
-	color: var(--color-text);
-    font-size: var(--text-base);
-	font-family: var(--font-mono);
-	background-color: transparent;
-}
-.input:focus {
-    border: 2px solid var(--color-border-brand);
-}
-
 .slider-input {
-	width: 30px;
+	width: 42px;
     text-align: center;
 	margin-left: var(--space-2);
 }
@@ -388,14 +375,14 @@ canvas {
 #distribuicao-container {
 	display: none;
 	flex-direction: column;
-	width: 650px;
+	width: min(700px, calc(100vw - 24px));
 	max-width: 100%;
     background-color: var(--color-surface);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    border: var(--space-hairline) solid var(--color-border);
 	box-sizing: border-box;
-    box-shadow: var(--shadow-md);
-    padding: var(--space-2);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-4);
 	z-index: var(--z-raised);
 	overflow: hidden auto;
 }
@@ -404,13 +391,14 @@ canvas {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+	gap: var(--space-4);
 }
 
 #distribuicao {
     width: 100%;
-    padding: var(--space-3) var(--space-2);
+    padding: var(--space-2);
 	box-sizing: border-box;
-	padding: var(--space-3) var(--space-2);
+	min-width: 0;
 }
 
 #distribuicao .row {
@@ -418,11 +406,13 @@ canvas {
 	display: flex;
 	align-items: center;
 	flex-direction: row;
+	gap: var(--space-2);
 }
 
 #distribuicao .attr {
-	margin-left: var(--space-3);
+	margin-left: var(--space-1);
 	width: 40px;
+	font-weight: 700;
 }
 
 #distribuicao .slider-value {
@@ -434,23 +424,24 @@ canvas {
 #distribuicao #custo {
 	text-align: right;
 	flex-grow: 1;
-	margin-right: var(--space-4);
+	margin-right: var(--space-2);
+	font-size: var(--text-sm);
+	color: var(--color-text-muted);
 }
 
 #distribuicao .button {
-	height: 35px;
+	height: 38px;
     width: 100%;
-    margin: var(--space-3) var(--space-3) var(--space-2) var(--space-3);
+    margin: var(--space-2) 0 0;
 }
 
 #distribuicao #nome {
-    padding-left: var(--space-3);
-    margin: auto;
-    margin-bottom: var(--space-3);
-	font-size: var(--text-lg);
-	color: var(--color-brand-text);
-    font-weight: bold;
-	margin-right: 10%;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+	font-size: var(--text-base);
+	color: var(--color-text-strong);
+    font-weight: 600;
 }
 
 /* the gladiator's picture above the name: the card portrait W1 draws, an empty frame until then */

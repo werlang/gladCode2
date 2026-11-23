@@ -30,10 +30,10 @@
 
     .empty-state-title {
         margin: 0;
-        font-family: var(--font-display);
+        font-family: var(--font-body);
         font-size: var(--text-lg);
-        font-weight: normal;
-        color: var(--color-brand-text);
+        font-weight: 600;
+        color: var(--color-text-strong);
     }
 
     .empty-state-summary {

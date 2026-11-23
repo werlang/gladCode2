@@ -66,7 +66,7 @@
                 <div id='battle' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
                 <div id='report' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
                 <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/message.png'></div><span>MESSAGENS</span></div>
+                <div id='messages' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/message.png'></div><span>MENSAGENS</span></div>
                 <div id='friends' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/friends.png'></div><span>AMIGOS</span></div>
                 <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
             </div>
@@ -79,18 +79,19 @@
             </div></div>
             <div class='content' data-menu='profile'>
                 <div id='profile-panel'>
-                    <section id='nickname' class='setting'>
-                        <h2>Apelido</h2>
-                        <p class='hint'>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</p>
-                        <input type='text' class='input' placeholder='apelido' aria-label='Apelido'>
-                    </section>
-                    <section id='picture' class='setting'>
-                        <h2>Foto de perfil</h2>
-                        <p class='hint'>Escolha uma foto apropriada para um grande mestre de gladiadores</p>
-                        <div id='img-upload'><span class='prompt'><i class='fa-solid fa-camera' aria-hidden='true'></i>Trocar foto</span></div>
-                        <div id='img-preview-container'></div>
-                        <img id='img-result' alt=''>
-                    </section>
+                    <div class='profile-identity'>
+                        <section id='picture' class='setting'>
+                            <h2 class='visually-hidden'>Foto de perfil</h2>
+                            <div id='img-upload'><span class='prompt'><i class='fa-solid fa-camera' aria-hidden='true'></i>Trocar foto</span></div>
+                            <div id='img-preview-container'></div>
+                            <img id='img-result' alt=''>
+                        </section>
+                        <section id='nickname' class='setting'>
+                            <h2>Apelido</h2>
+                            <p class='hint'>Escolha o nome pelo qual outros mestres de gladiadores o conhecerão</p>
+                            <input type='text' class='input' placeholder='apelido' aria-label='Apelido'>
+                        </section>
+                    </div>
                     <section class='setting'>
                         <label id='language' class='setting-row'>
                             <span>Linguagem de programação preferencial</span>
@@ -159,7 +160,7 @@
                             <div class='table'></div>
                         </div>
                         <div class='container'>
-                            <h2>Amigo a ser desafido</h2>
+                            <h2>Amigo a ser desafiado</h2>
                             <input class='input' type='text' placeholder='apelido-do-usuario'>
                             <div class='table' id='table-friends'></div>
                             <div id='button-container'>

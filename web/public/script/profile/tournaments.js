@@ -536,14 +536,15 @@ export class TournamentsTab {
             this.#offsets[list] = offset;
 
             const pager = this.#wrapper.querySelector(`#offset.${list}`);
-            pager.querySelector('.start').textContent = offset + 1;
+            pager.hidden = total === 0;
+            pager.querySelector('.start').textContent = total === 0 ? 0 : offset + 1;
             pager.querySelector('.end').textContent = end;
             pager.querySelector('.total').textContent = total;
             pager.querySelector('#prev').disabled = offset === 0;
             pager.querySelector('#next').disabled = end === total;
         });
 
-        this.#drawList(this.#wrapper.querySelector('#table-open'), data.open);
+        this.#drawList(this.#wrapper.querySelector('#table-open'), data.open, 'Nenhum torneio público aberto');
         const mine = this.#wrapper.querySelector('#mytourn.title');
         mine.style.display = data.mine.length ? '' : 'none';
         if (data.mine.length) this.#drawList(this.#wrapper.querySelector('#table-mytourn'), data.mine);
@@ -552,8 +553,15 @@ export class TournamentsTab {
     /**
      * @param {HTMLElement} table List table.
      * @param {object[]} tournaments Tournaments.
+     * @param {string} [emptyTitle] Message when empty.
      */
-    #drawList(table, tournaments) {
+    #drawList(table, tournaments, emptyTitle = '') {
+        if (!tournaments.length && emptyTitle) {
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact', icon: 'trophy', title: emptyTitle, summary: '', actionHtml: '',
+            });
+            return;
+        }
         table.innerHTML = listHeadTemplate + tournaments.map(tournament => renderTemplate(listRowTemplate, {
             name: tournament.name,
             description: tournament.description,

@@ -514,6 +514,18 @@ export class TrainingsTab {
         const data = await TrainingModel.list(this.#offsets);
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
+        if (!data.manage?.length && !data.part?.length) {
+            const table = this.#wrapper.querySelector('#table-part');
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact',
+                icon: 'dumbbell',
+                title: 'Você ainda não participa de nenhum treino',
+                summary: 'Use o botão abaixo para ingressar com o código fornecido pelo tutor.',
+                actionHtml: '',
+            });
+            show(table);
+        }
+
         const room = Number(new URLSearchParams(location.search).get('room'));
         if (room) {
             history.replaceState(null, '', location.pathname);

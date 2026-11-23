@@ -1,7 +1,7 @@
 body{
     margin: 0;
     background-color: var(--color-page);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-base);
 }
 
@@ -149,6 +149,10 @@ body{
 #author #social img {
     width: 35px;
     margin-right: var(--space-3);
+}
+
+#author #social a[href*='github'] img {
+    filter: var(--logo-filter-page);
 }
 
 #author #social a {
@@ -776,7 +780,8 @@ body{
     border-radius: var(--radius-md) var(--radius-md) 0 0;
     padding: var(--space-3) var(--space-7);
     width: 260px;
-    background-color: var(--color-text-on-brand);
+    background-color: var(--color-surface);
+    color: var(--color-text);
     box-sizing: border-box;
     margin-bottom: calc(-1 * var(--space-1));
     text-align: center;
