@@ -6,13 +6,15 @@ import { api } from '../helpers/request.js';
  */
 export class NewsModel {
     /**
-     * The latest posts, five at a time; reading them clears the signed-in user's news counter.
+     * The latest posts, five at a time; reading them clears the signed-in user's news counter unless
+     * `markRead: false`.
      *
      * @param {number} [offset] Posts to skip.
+     * @param {{ markRead?: boolean }} [options]
      * @returns {Promise<Record<string, any>[]>}
      */
-    static async list(offset = 0) {
-        const { posts } = await api.get('news', { offset });
+    static async list(offset = 0, { markRead = true, signal } = {}) {
+        const { posts } = await api.get('news', { offset, markRead: markRead ? undefined : false }, { signal });
         return posts;
     }
 

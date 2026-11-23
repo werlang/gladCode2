@@ -1,0 +1,64 @@
+/* MenuItem (components/menu-item.js): one rail link with its icon tile and badge. */
+.menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-lg);
+    color: var(--color-chrome-text, var(--color-header-text));
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    box-shadow: inset 0 0 0 1px transparent;
+
+    &:hover {
+        background: color-mix(in srgb, var(--color-header-text) 7%, transparent);
+    }
+
+    &.is-active {
+        color: var(--color-text-on-brand);
+        font-weight: 600;
+        background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
+    }
+
+    &.is-disabled {
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .menu-item-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 30px;
+        height: 30px;
+        border-radius: var(--radius-md);
+        background: color-mix(in srgb, currentColor 15%, transparent);
+        color: var(--color-cat-silver);
+    }
+
+    .menu-item-label {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .menu-item-badge-slot {
+        flex: none;
+    }
+
+    &.menu-item--news .menu-item-icon { color: var(--color-cat-green); }
+    &.menu-item--glads .menu-item-icon { color: var(--color-cat-pink); }
+    &.menu-item--potions .menu-item-icon { color: var(--color-cat-violet); }
+    &.menu-item--battle .menu-item-icon { color: var(--color-cat-yellow); }
+    &.menu-item--report .menu-item-icon { color: var(--color-cat-rose); }
+    &.menu-item--ranking .menu-item-icon { color: var(--color-cat-silver); }
+    &.menu-item--messages .menu-item-icon { color: var(--color-cat-teal); }
+    &.menu-item--friends .menu-item-icon { color: var(--color-cat-red); }
+}

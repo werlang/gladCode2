@@ -16,6 +16,15 @@ export class ReportModel {
     }
 
     /**
+     * Unread ranked reports for the shell's notification panel; it does not mark them read.
+     *
+     * @returns {Promise<{ total: number, reports: object[] }>}
+     */
+    static unreadFeed({ signal } = {}) {
+        return api.get('reports', { offset: 0, unreadOnly: true }, { signal });
+    }
+
+    /**
      * A page of the favorite reports.
      *
      * @param {{ offset: number }} query
@@ -41,8 +50,8 @@ export class ReportModel {
  */
 export class DuelModel {
     /** @returns {Promise<object[]>} Challenges waiting for the signed-in master's answer. */
-    static async challenges() {
-        const { duels } = await api.get('duels');
+    static async challenges({ signal } = {}) {
+        const { duels } = await api.get('duels', {}, { signal });
         return duels;
     }
 
@@ -96,8 +105,8 @@ export class DuelModel {
  */
 export class FriendModel {
     /** @returns {Promise<{ pending: object[], confirmed: object[] }>} Requests to answer and friends. */
-    static list() {
-        return api.get('friends');
+    static list({ signal } = {}) {
+        return api.get('friends', {}, { signal });
     }
 
     /**
@@ -208,10 +217,15 @@ export class NotificationModel {
     /**
      * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ user: { level: number, xp: number, silver: number }, messages: number, friends: number,
-     *   gladiators: { remaining: number, outdated: number }, reports: { ranked: number, duel: number }, duels: number, news: number }>}
+     *   gladiators: { used: number, limit: number, remaining: number, outdated: number }, reports: { ranked: number, duel: number }, duels: number, news: number }>}
      */
     static counts({ signal } = {}) {
         return api.get('notifications', {}, { signal });
+    }
+
+    /** @returns {Promise<{ read: number, news: true }>} Marks the passive notification groups read. */
+    static markRead() {
+        return api.post('notifications/read');
     }
 }
 

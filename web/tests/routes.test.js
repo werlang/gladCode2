@@ -127,3 +127,13 @@ test('the profile page loads the toast action stylesheet it can use for logout r
     assert.equal(response.status, 200);
     assert.match(await response.text(), /css\/components\/toast\.css/);
 });
+
+test('the Painel shell and the shared header render their component roots', async () => {
+    const profile = await (await get('/profile')).text();
+    assert.match(profile, /id='painel-menu'/);
+    assert.match(profile, /id='painel-content'/);
+    assert.match(profile, /id='painel-tabs'/);
+    const manual = await (await get('/manual')).text();
+    assert.match(manual, /id='app-header'/);
+    assert.match(manual, /script\/header\.js/);
+});

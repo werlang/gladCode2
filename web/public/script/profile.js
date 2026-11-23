@@ -1,67 +1,60 @@
 import './blocks.js';
-import { showDialog } from './components/dialog.js';
 import { createToast } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
-import { TemplateVar } from './helpers/template-var.js';
-import { GladiatorModel } from './models/gladiator.js';
-import { UserModel } from './models/user.js';
+import { APP_EVENTS, events } from './helpers/event-bus.js';
+import { resolveRoute, sectionTitle, sectionUrl } from './helpers/painel-route.js';
+import { RankModel } from './models/rank.js';
 import { BattleTab } from './profile/battle.js';
 import { FriendsTab } from './profile/friends.js';
 import { GladsTab } from './profile/glads.js';
 import { MessagesTab } from './profile/messages.js';
 import { NewsTab } from './profile/news.js';
-import { checkNotifications } from './profile/notifications.js';
 import { PotionsTab } from './profile/potions.js';
 import { RankingTab } from './profile/ranking.js';
 import { ReportsTab } from './profile/reports.js';
-import { openableTab, profile } from './profile/session.js';
+import { profile } from './profile/session.js';
 import { SettingsTab } from './profile/settings.js';
 import { account } from './services/account.js';
+import { notifications } from './services/notifications.js';
+import { MobileTabBar } from './components/mobile-tab-bar.js';
+import { MoreSheet } from './components/more-sheet.js';
+import { PainelMenu } from './components/painel-menu.js';
 
-/** How often the menu counters refresh, in ms (there is no push channel). */
-const NOTIFICATIONS_MS = 30000;
-
-/** Ends the session and goes to the front page; a refusal keeps the session and offers a retry. */
-async function logout() {
+/** Ends a legacy /logout visit: refusal keeps the page and offers a retry toast. */
+async function logoutRoute() {
     try {
         await account.signOut();
     }
     catch {
         createToast('Não foi possível sair. Tente novamente.', {
             type: 'error',
-            action: { label: 'Tentar novamente', onClick: logout },
+            action: { label: 'Tentar novamente', onClick: logoutRoute },
         });
         return;
     }
     GoogleLogin.removeCredential();
-    location.href = '/';
+    location.assign('/');
 }
 
 /**
- * The profile page: a menu of tabs, each opened (and refreshed) by its entry.
+ * The Painel shell: route resolver, one content column and the rail/tab bar. The section bodies
+ * remain the existing controllers until WP4–WP8 rebuild them.
  */
 async function start() {
-    document.querySelector('#header-container')?.classList.add('small-profile');
-    document.querySelector('#header-profile')?.classList.add('here');
-
-    profile.user = await account.load();
-    if (!UserModel.isLogged(profile.user)) {
-        // the front page asks to sign in and comes back to the requested tab
-        const tab = TemplateVar.get('tab');
-        location.replace(tab ? `/?login=${encodeURIComponent(tab)}` : '/');
+    const requested = new URLSearchParams(location.search).get('t');
+    if (location.pathname === '/logout' || requested === 'logout') {
+        await logoutRoute();
         return;
     }
 
-    document.querySelector('#profile-ui #picture img').src = profile.user.picture;
-    document.querySelector('#profile-ui #nickname').textContent = profile.user.nickname;
-    // credits stay hidden until tutor accounts are on sale
-    document.querySelector('#menu #currencies #money')?.remove();
-    document.querySelector('#menu #currencies').classList.remove('hidden');
+    profile.user = await account.load();
+    if (!profile.user?.id) {
+        const route = resolveRoute(location);
+        location.replace(route ? `/?login=${encodeURIComponent(route.section)}` : '/');
+        return;
+    }
 
-    const battle = new BattleTab(() => {
-        checkNotifications({ duelChallenges: battle.challenges });
-        battle.show();
-    });
+    const battle = new BattleTab(() => notifications.refresh().catch(() => {}));
     const tabs = {
         news: new NewsTab(),
         profile: new SettingsTab(),
@@ -81,39 +74,130 @@ async function start() {
     tabs.ranking.init();
     tabs.potions.init();
 
-    const items = document.querySelectorAll('#menu .item');
-    const enabled = () => [...items].filter(item => !item.classList.contains('disabled')).map(item => item.id);
-    const open = requested => {
-        const id = openableTab(requested, enabled());
-        const item = document.querySelector(`#menu #${CSS.escape(id)}.item`);
-        if (id === 'logout') {
-            logout();
+    const menu = new PainelMenu({ element: document.querySelector('#painel-menu'), account: profile.user, counts: notifications.counts });
+    const bar = new MobileTabBar({ element: document.querySelector('#painel-tabs') });
+    const more = new MoreSheet();
+    document.querySelector('#painel-more').append(more.element);
+    bar.listen('more', () => more.open(bar.element.querySelector('[data-more]')));
+    more.setAccount(profile.user);
+    if (notifications.counts) more.setCounts(notifications.counts);
+
+    const content = document.querySelector('#painel-content');
+    const contents = [...document.querySelectorAll('#panel .content')];
+    let rankingLoaded = false;
+
+    const selectBattleMode = mode => {
+        if (!mode) return;
+        document.querySelector(`#battle-container #battle-mode #${CSS.escape(mode)}.button`)?.click();
+    };
+
+    const show = (route, { focus = false } = {}) => {
+        if (!route) return;
+        if (more.isOpen) more.close();
+        for (const panel of contents) panel.classList.toggle('open', panel.dataset.menu === route.section);
+        menu.setActive(route.section);
+        bar.setActive(route.section);
+        document.title = `gladCode - ${sectionTitle(route.section)}`;
+        Promise.resolve(tabs[route.section]?.show()).catch(() => {});
+        if (route.section === 'battle') setTimeout(() => selectBattleMode(route.subtab), 0);
+        events.emit(APP_EVENTS.navigationOpened, { section: route.section, href: sectionUrl(route) });
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        if (focus) requestAnimationFrame(() => {
+            const heading = content.querySelector('.content.open h1, .content.open h2');
+            if (!heading) return;
+            heading.tabIndex = -1;
+            heading.focus();
+        });
+    };
+
+    const navigate = (state, { push = false, replace = false, historyOnly = false, focus = true } = {}) => {
+        if (!state) return;
+        const url = sectionUrl(state);
+        if (push) history.pushState({ painel: state }, '', url);
+        else if (replace) history.replaceState({ painel: state }, '', url);
+        if (!historyOnly) show(state, { focus });
+    };
+
+    document.addEventListener('click', event => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const anchor = event.target.closest?.('a[href]');
+        if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) return;
+        const url = new URL(anchor.href, location);
+        if (url.origin !== location.origin) return;
+        const state = resolveRoute(url);
+        if (!state) return;
+        event.preventDefault();
+        navigate(state, { push: true, focus: true });
+    });
+
+    window.addEventListener('popstate', () => show(resolveRoute(location), { focus: true }));
+
+    const GO = { n: 'news', p: 'potions', b: 'battle', r: 'report', k: 'ranking', m: 'messages', a: 'friends' };
+    let goPending = false;
+    let goTimer = null;
+    const resetGo = () => {
+        goPending = false;
+        if (goTimer) clearTimeout(goTimer);
+        goTimer = null;
+        menu.element.classList.remove('is-g-pending');
+    };
+    document.addEventListener('keydown', event => {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        const letter = event.key.toLowerCase();
+        if (!goPending && letter === 'g') {
+            event.preventDefault();
+            goPending = true;
+            menu.element.classList.add('is-g-pending');
+            goTimer = setTimeout(resetGo, 1000);
             return;
         }
-        document.querySelectorAll('#panel .content').forEach(content => {
-            content.classList.toggle('open', content.dataset.menu === id);
-        });
-        items.forEach(other => other.classList.toggle('here', other === item));
-        tabs[id]?.show();
-    };
-    items.forEach(item => item.addEventListener('click', () => {
-        if (!item.classList.contains('disabled')) open(item.id);
-    }));
+        if (!goPending) return;
+        const section = GO[letter];
+        resetGo();
+        if (!section) return;
+        event.preventDefault();
+        navigate({ section, subtab: '', query: {} }, { push: true, focus: true });
+    });
 
-    const glads = await GladiatorModel.list();
-    if (!glads.length) {
-        document.querySelector('#menu #battle').classList.add('disabled');
-        showDialog('Você ainda não possui nenhum gladiador cadastrado. Deseja ir para o editor de gladiadores?', ['Sim', 'Não, obrigado'])
-            .then(answer => {
-                if (answer === 'Sim') location.href = 'editor';
-            });
+    events.on(APP_EVENTS.accountLoaded, ({ user }) => {
+        if (!user) return;
+        profile.user = user;
+        menu.setAccount(user);
+        more.setAccount(user);
+    });
+    events.on(APP_EVENTS.accountSaved, ({ user }) => {
+        profile.user = user;
+        menu.setAccount(user);
+        more.setAccount(user);
+    });
+    events.on(APP_EVENTS.accountSilver, ({ silver }) => {
+        if (profile.user) profile.user.silver = silver;
+    });
+    events.on(APP_EVENTS.notificationsCounts, counts => {
+        if (!profile.user) return;
+        profile.user.level = counts.user.level;
+        profile.user.xp = counts.user.xp;
+        profile.user.silver = counts.user.silver;
+        menu.setAccount(profile.user);
+        menu.setCounts(counts);
+        bar.setCounts(counts);
+        more.setCounts(counts);
+        if (!rankingLoaded && counts.gladiators?.used > 0) {
+            rankingLoaded = true;
+            RankModel.myBestOffset().then(offset => menu.setRanking(offset + 1)).catch(() => {});
+        }
+    });
+
+    menu.setActive(resolveRoute(location)?.section ?? 'profile');
+    bar.setActive(resolveRoute(location)?.section ?? 'profile');
+    show(resolveRoute(location), { focus: false });
+    if (notifications.counts) {
+        menu.setCounts(notifications.counts);
+        bar.setCounts(notifications.counts);
+        more.setCounts(notifications.counts);
     }
-
-    open(TemplateVar.get('tab') || 'profile');
-    checkNotifications({ duelChallenges: battle.challenges });
-    setInterval(() => {
-        if (!document.hidden) checkNotifications({ duelChallenges: battle.challenges });
-    }, NOTIFICATIONS_MS);
 }
 
 start();

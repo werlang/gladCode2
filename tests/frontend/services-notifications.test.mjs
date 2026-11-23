@@ -80,6 +80,23 @@ test('refresh() emits one joined payload; a failed slots read keeps the previous
     assert.deepEqual(bus.emitted[0], { name: 'notifications:counts', detail: first });
 });
 
+test('start() uses the global interval with the correct receiver', () => {
+    const bus = fakeBus();
+    const service = new NotificationService({
+        counts: async () => COUNTS,
+        slots: async () => ({ serverNow: '2026-01-01 10:00:00', slots: [] }),
+        bus,
+    });
+    const documentRef = { hidden: true, addEventListener: () => {}, removeEventListener: () => {} };
+    try {
+        service.start({ document: documentRef });
+    }
+    finally {
+        service.stop();
+    }
+    assert.equal(service.counts, null);
+});
+
 test('start() polls, pauses while the page is hidden, resumes on visibilitychange and stops cleanly', async () => {
     const bus = fakeBus();
     let interval = null;
@@ -118,4 +135,37 @@ test('start() polls, pauses while the page is hidden, resumes on visibilitychang
     service.stop();
     assert.equal(cleared, 7);
     assert.equal(listeners.size, 0);
+});
+
+test('feed() composes the panel rows from needs, reports and unread news', async () => {
+    const { DuelModel, FriendModel, ReportModel } = await import('../../web/public/script/models/social.js');
+    const { NewsModel } = await import('../../web/public/script/models/news.js');
+    const original = {
+        duels: DuelModel.challenges,
+        friends: FriendModel.list,
+        reports: ReportModel.unreadFeed,
+        news: NewsModel.list,
+    };
+    DuelModel.challenges = async () => [{ id: 4, time: '2026-01-01 10:00:00', nick: 'Ana' }];
+    FriendModel.list = async () => ({ pending: [{ id: 9, nick: 'Marco' }], confirmed: [] });
+    ReportModel.unreadFeed = async () => ({ total: 1, reports: [{ id: 5, time: '2026-01-01 09:00:00', gladiator: 'Magnus' }] });
+    NewsModel.list = async () => [{ hash: 'ab12', title: 'Nova arena', time: '2026-01-01 08:00:00' }];
+    try {
+        const service = new NotificationService({
+            counts: async () => COUNTS,
+            slots: async () => ({ serverNow: '2026-01-01 10:00:00', slots: [] }),
+            bus: fakeBus(),
+        });
+        await service.refresh();
+        const feed = await service.feed();
+        assert.deepEqual(feed.needs.map(item => item.id), ['duel-4', 'friend-9']);
+        assert.deepEqual(feed.news.map(item => item.id), ['report-5', 'news-ab12']);
+        assert.match(feed.needs[0].text, /Ana desafiou/);
+    }
+    finally {
+        DuelModel.challenges = original.duels;
+        FriendModel.list = original.friends;
+        ReportModel.unreadFeed = original.reports;
+        NewsModel.list = original.news;
+    }
 });

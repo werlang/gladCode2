@@ -6,6 +6,7 @@ const { badgeText } = await import('../../web/public/script/components/badge.js'
 const { initials } = await import('../../web/public/script/components/avatar.js');
 const { pageList, parsePosition, paginationFocusSelector } = await import('../../web/public/script/components/pagination.js');
 const { nextTabIndex, tabPanelIds } = await import('../../web/public/script/components/tabs.js');
+const { potionTime, xpToNextLevel } = await import('../../web/public/script/components/painel-menu.js');
 const { nextOptionIndex } = await import('../../web/public/script/components/segmented-control.js');
 const { toastOptions } = await import('../../web/public/script/components/toast.js');
 const { searchQuery } = await import('../../web/public/script/components/search-field.js');
@@ -106,6 +107,13 @@ test('the empty state template escapes its text and inserts a caller-built actio
     assert.match(html, /&lt;Nada&gt;/);
     assert.match(html, /Nenhum &amp; nenhuma/);
     assert.match(html, /<button class='button'>Criar<\/button>/);
+});
+
+test('the rail formats the master XP rule and the potion countdown', () => {
+    assert.equal(Math.round(xpToNextLevel(12)), 3094);
+    assert.equal(potionTime({ serverNow: '2026-01-01 10:00:00', nextExpiry: '2026-01-01 13:00:00' }), '3 h');
+    assert.equal(potionTime({ serverNow: '2026-01-01 10:00:00', nextExpiry: '2026-01-01 10:12:00' }), '12 min');
+    assert.equal(potionTime({ serverNow: '2026-01-01 10:00:00', nextExpiry: null }), '');
 });
 
 test('page changes focus the equivalent control or the new current page', () => {

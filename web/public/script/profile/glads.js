@@ -63,7 +63,7 @@ export class GladsTab {
     async show() {
         const glads = await GladiatorModel.list();
         this.#container.replaceChildren();
-        if (glads.length) document.querySelector('#menu #battle').classList.remove('disabled');
+        if (glads.length) document.querySelector('#menu #battle')?.classList.remove('disabled');
 
         const cards = await loadGladCards(this.#container, {
             glads,

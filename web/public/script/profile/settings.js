@@ -4,6 +4,7 @@ import { decorateCheckSliders } from '../components/form-controls.js';
 import { Input } from '../components/input.js';
 import { Select } from '../components/select.js';
 import { fadeIn, hide } from '../helpers/animate.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
 import { applyTheme } from '../helpers/theme.js';
 import { UserModel } from '../models/user.js';
@@ -158,8 +159,13 @@ export class SettingsTab {
         try {
             profile.user = await UserModel.update(changes);
             this.#picture = null;
+            events.emit(APP_EVENTS.accountSaved, { user: profile.user, changed: Object.keys(changes) });
             document.querySelector('#profile-ui #nickname').textContent = profile.user.nickname;
-            document.querySelector('#profile-ui #picture img').src = profile.user.picture;
+            const avatar = document.querySelector('#profile-ui .avatar-image');
+            if (avatar) {
+                avatar.src = profile.user.picture;
+                avatar.hidden = false;
+            }
             showMessage('Informações atualizadas');
         }
         catch (error) {

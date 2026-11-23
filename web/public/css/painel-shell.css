@@ -1,0 +1,107 @@
+/* Painel shell (web/view/profile.html): rail + one content column, phone tab bar and More sheet. */
+#painel {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    align-items: start;
+    min-height: calc(100vh - var(--layout-header-height));
+    background: var(--color-page);
+}
+
+#painel-menu {
+    position: sticky;
+    top: var(--layout-header-height);
+    align-self: start;
+    height: calc(100vh - var(--layout-header-height));
+    overflow-y: auto;
+    background: var(--color-chrome);
+}
+
+#painel-content {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-9) var(--space-10);
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+body:has(#painel) {
+    overflow: auto;
+    padding-top: var(--layout-header-height);
+}
+
+#painel-content > #panel {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    background: transparent;
+}
+
+#painel-content #panel .content {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+#painel-content h1,
+#painel-content h2 {
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+}
+
+#painel-content h2 {
+    margin-top: 0;
+}
+
+.painel-skip {
+    position: absolute;
+    top: -100px;
+    left: var(--space-3);
+    z-index: calc(var(--z-header) + 20);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-strong);
+    text-decoration: none;
+
+    &:focus {
+        top: var(--space-2);
+    }
+}
+
+#painel-tabs {
+    display: none;
+}
+
+#painel-more {
+    display: block;
+}
+
+@media only screen and (max-width: 899px) {
+    #painel {
+        grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    #painel-content {
+        padding: var(--space-7) var(--space-6) var(--space-9);
+    }
+}
+
+@media only screen and (max-width: 599px) {
+    #painel {
+        display: block;
+        min-height: calc(100vh - var(--layout-header-height));
+    }
+
+    #painel-menu {
+        display: none;
+    }
+
+    #painel-content {
+        padding: var(--space-5) var(--space-4) calc(78px + env(safe-area-inset-bottom) + var(--space-5));
+    }
+
+    #painel-tabs {
+        display: grid;
+    }
+}

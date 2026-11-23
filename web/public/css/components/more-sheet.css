@@ -1,0 +1,186 @@
+/* MoreSheet (components/more-sheet.js): the phone “Mais” bottom sheet. */
+.more-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-header) + 10);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    &[hidden] {
+        display: none;
+    }
+
+    .more-sheet-scrim {
+        position: absolute;
+        inset: 0;
+        background: var(--color-scrim);
+    }
+
+    .more-sheet-panel {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        width: 100%;
+        max-height: calc(100vh - 60px);
+        padding: var(--space-2) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+        box-sizing: border-box;
+        border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+        background: var(--color-chrome);
+        color: var(--color-header-text);
+        overflow-y: auto;
+    }
+
+    .more-sheet-handle {
+        align-self: center;
+        width: 40px;
+        height: 5px;
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--color-header-text) 24%, transparent);
+    }
+
+    .more-sheet-identity {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        border-radius: var(--radius-xl);
+        background: color-mix(in srgb, var(--color-header-text) 6%, transparent);
+        color: var(--color-text-on-brand);
+        text-decoration: none;
+    }
+
+    .more-sheet-avatar-slot .avatar {
+        --avatar-size: 44px;
+    }
+
+    .more-sheet-who {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        min-width: 0;
+        flex: 1;
+    }
+
+    .more-sheet-name {
+        color: var(--color-text-on-brand);
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .more-sheet-level {
+        color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        font-size: var(--text-xs);
+    }
+
+    .more-sheet-xp {
+        display: block;
+        height: 5px;
+        overflow: hidden;
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--color-header-text) 10%, transparent);
+
+        span {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--color-xp);
+        }
+    }
+
+    .more-sheet-profile {
+        color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        font-size: var(--text-xs);
+    }
+
+    .more-sheet-tiles {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-2);
+    }
+
+    .more-sheet-tile {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        min-height: 84px;
+        border-radius: var(--radius-xl);
+        background: color-mix(in srgb, var(--color-header-text) 5%, transparent);
+        color: var(--color-header-text);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .more-sheet-tile-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius-lg);
+        background: color-mix(in srgb, currentColor 15%, transparent);
+    }
+
+    .more-sheet-tile-icon--potions { color: var(--color-cat-violet); }
+    .more-sheet-tile-icon--ranking { color: var(--color-cat-silver); }
+    .more-sheet-tile-icon--messages { color: var(--color-cat-teal); }
+    .more-sheet-tile-icon--friends { color: var(--color-cat-red); }
+    .more-sheet-tile-icon--news { color: var(--color-cat-green); }
+    .more-sheet-tile-icon--profile { color: var(--color-cat-amber); }
+
+    .more-sheet-tile-badge {
+        position: absolute;
+        top: var(--space-2);
+        right: var(--space-3);
+        min-width: 18px;
+        height: 18px;
+        padding: 0 var(--space-1);
+        box-sizing: border-box;
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--color-header-text) 18%, transparent);
+        color: var(--color-text-on-brand);
+        font: 700 var(--text-2xs) var(--font-body);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.action {
+            background: var(--color-accent);
+            color: var(--color-text-on-accent);
+        }
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .more-sheet-links {
+        display: flex;
+        gap: var(--space-2);
+
+        a {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            border: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 20%, transparent);
+            border-radius: var(--radius-lg);
+            color: var(--color-header-text);
+            font-size: var(--text-sm);
+            text-decoration: none;
+        }
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .more-sheet {
+        display: none;
+    }
+}

@@ -1,3 +1,5 @@
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
+
 /**
  * The signed-in user as the profile page sees it: loaded once, then kept up
  * to date as battles, purchases and notifications change level, xp and silver.
@@ -18,14 +20,13 @@ export function xpToNextLevel(level) {
 }
 
 /**
- * Updates the user's silver and the counter in the menu.
+ * Updates the user's silver and publishes the fact the shell and account menu read.
  *
  * @param {number|string} silver New amount.
  */
 export function setSilver(silver) {
     profile.user.silver = parseInt(silver, 10);
-    const counter = document.querySelector('#menu #currencies #silver span');
-    if (counter) counter.textContent = profile.user.silver;
+    events.emit(APP_EVENTS.accountSilver, { silver: profile.user.silver });
 }
 
 /**

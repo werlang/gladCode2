@@ -1,0 +1,105 @@
+/* MobileTabBar (components/mobile-tab-bar.js): the phone bottom navigation. */
+.mobile-tab-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--z-header) + 5);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: start;
+    height: 78px;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    background: var(--color-chrome);
+    border-top: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 12%, transparent);
+    font-family: var(--font-body);
+
+    .mobile-tab {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-1);
+        min-height: 44px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        font-size: var(--text-2xs);
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+
+        &.is-active {
+            color: var(--color-accent);
+        }
+    }
+
+    .mobile-tab--battle {
+        justify-content: flex-end;
+        color: var(--color-text-on-accent);
+        font-size: var(--text-2xs);
+        font-weight: 700;
+    }
+
+    .mobile-tab-battle-button {
+        position: absolute;
+        top: -22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        border-radius: var(--radius-round);
+        background: var(--color-accent);
+        color: var(--color-text-on-accent);
+        box-shadow: 0 0 0 5px var(--color-chrome);
+    }
+
+    .mobile-tab-badge {
+        position: absolute;
+        top: 2px;
+        left: 50%;
+        margin-left: 8px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 var(--space-1);
+        box-sizing: border-box;
+        border-radius: var(--radius-pill);
+        background: var(--color-accent);
+        color: var(--color-text-on-accent);
+        font: 700 var(--text-2xs) var(--font-body);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.is-dot {
+            width: 8px;
+            min-width: 0;
+            height: 8px;
+            padding: 0;
+            border-radius: var(--radius-round);
+        }
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .mobile-tab--battle .mobile-tab-badge {
+        top: -22px;
+        right: 18px;
+        left: auto;
+        margin-left: 0;
+        background: var(--color-surface);
+        color: var(--color-chrome);
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .mobile-tab-bar {
+        display: none;
+    }
+}

@@ -1,0 +1,211 @@
+/* PainelMenu (components/painel-menu.js): the 264 px rail over the chrome. */
+.painel-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    width: 264px;
+    min-height: 100%;
+    padding: var(--space-5) var(--space-4) var(--space-4);
+    box-sizing: border-box;
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+    font-family: var(--font-body);
+
+    .painel-menu-identity {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+        padding: var(--space-3);
+        border-radius: var(--radius-xl);
+        background: color-mix(in srgb, var(--color-header-text) 4%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 22%, transparent);
+        color: var(--color-text-on-brand);
+        text-decoration: none;
+
+        &.is-active {
+            background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+        }
+    }
+
+    .painel-menu-person {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+
+        > svg {
+            flex: none;
+            color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        }
+    }
+
+    .painel-menu-avatar-slot {
+        flex: none;
+
+        .avatar {
+            --avatar-size: 48px;
+        }
+    }
+
+    .painel-menu-who {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        min-width: 0;
+        flex: 1;
+    }
+
+    .painel-menu-name {
+        color: var(--color-text-on-brand);
+        font-size: var(--text-base);
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .painel-menu-level {
+        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        font-size: var(--text-xs);
+    }
+
+    .painel-menu-xp {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+
+    .painel-menu-xp-track {
+        display: block;
+        height: 6px;
+        overflow: hidden;
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--color-header-text) 10%, transparent);
+
+        #filled {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--color-xp);
+            transition: width var(--duration-fast);
+        }
+    }
+
+    .painel-menu-xp-values {
+        display: flex;
+        justify-content: space-between;
+        color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        font: 500 var(--text-2xs) var(--font-mono);
+    }
+
+    .painel-menu-groups {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+
+    .painel-menu-group-label {
+        margin: var(--space-4) var(--space-3) var(--space-1);
+        color: color-mix(in srgb, var(--color-header-text) 52%, transparent);
+        font: 600 var(--text-2xs) var(--font-body);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .painel-menu-new {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        min-height: 44px;
+        margin-top: auto;
+        border: var(--space-hairline) dashed color-mix(in srgb, var(--color-header-text) 32%, transparent);
+        border-radius: var(--radius-lg);
+        color: var(--color-text-on-brand);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .painel-menu-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-2) 0;
+        color: color-mix(in srgb, var(--color-header-text) 52%, transparent);
+        font-size: var(--text-2xs);
+
+        kbd {
+            color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+            font: 600 var(--text-2xs) var(--font-mono);
+        }
+    }
+
+    &.is-g-pending .painel-menu-foot kbd {
+        padding: 0 var(--space-1);
+        border-radius: var(--radius-xs);
+        background: var(--color-accent);
+        color: var(--color-text-on-accent);
+    }
+
+    .painel-menu-engine {
+        font-family: var(--font-mono);
+    }
+}
+
+@media only screen and (max-width: 899px) {
+    .painel-menu {
+        width: 72px;
+        padding: var(--space-4) var(--space-2);
+
+        .painel-menu-identity {
+            padding: var(--space-1);
+            align-items: center;
+        }
+
+        .painel-menu-person {
+            justify-content: center;
+        }
+
+        .painel-menu-avatar-slot .avatar {
+            --avatar-size: 44px;
+        }
+
+        .painel-menu-who,
+        .painel-menu-xp,
+        .painel-menu-person > svg,
+        .painel-menu-group-label,
+        .painel-menu-label,
+        .painel-menu-foot,
+        .painel-menu-new span {
+            display: none;
+        }
+
+        .menu-item {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .menu-item-label {
+            display: none;
+        }
+
+        .menu-item-badge-slot .badge {
+            position: absolute;
+            margin: -22px 0 0 22px;
+        }
+
+        .painel-menu-new {
+            width: 44px;
+            align-self: center;
+            font-size: 0;
+        }
+    }
+}
+
+@media only screen and (max-width: 599px) {
+    .painel-menu {
+        display: none;
+    }
+}

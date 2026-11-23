@@ -21,6 +21,11 @@
     <link rel='stylesheet' href="{{#asset}}css/checkboxes.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/table2.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/header.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/painel-shell.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/painel-menu.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/menu-item.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/mobile-tab-bar.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/more-sheet.css{{/asset}}"/>
     
     {{{importMap}}}
     <script type="module" src="{{#module}}header.js{{/module}}"></script>
@@ -43,37 +48,11 @@
 <body>
     {{{templateVars}}}
     {{> header}}
-    <div id='frame'>
-        <div id='menu'>
-            <div id="profile-ui">
-                <div id='picture'><img></div>
-                <div id='info'>
-                    <div id='nickname'></div>
-                    <div id='stats'>
-                        <div id='lvl'><img src='res/star.png'><span></span></div>
-                        <div id='xp'><div id='filled'></div></div>
-                    </div>
-                </div>
-            </div>	
-            <div id='currencies' class='hidden'>
-                <div class='curr' id='money' title='Créditos'><i class='fas fa-money-bill'></i><span>0,00</span></div>
-                <div class='curr' id='silver' title='Prata'><i class='fas fa-coins'></i><span>0</span></div>
-            </div>
-            <div id='menu-buttons'>
-                <div id='news' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/hand-bell.png'></div><span>NOTÍCIAS</span></div>
-                <div id='profile' class='item'><div class='icon-frame'><img src='icon/profile.png'></div><span>PERFIL</span></div>
-                <div id='glads' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/face.png'></div><span>GLADIADORES</span></div>
-                <div id='potions' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/potion-tag.png'></div><span>POÇÕES</span></div>
-                <div id='battle' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='sprite/images/swords.png'></div><span>BATALHAS</span></div>
-                <div id='report' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/scroll.png'></div><span>RELATÓRIOS</span></div>
-                <div id='ranking' class='item'><div class='icon-frame'><img src='icon/winner-icon.png'></div><span>RANKING</span></div>
-                <div id='messages' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/message.png'></div><span>MENSAGENS</span></div>
-                <div id='friends' class='item'><div class='icon-frame'><div class='notification empty'></div><img src='icon/friends.png'></div><span>AMIGOS</span></div>
-                <div id='logout' class='item'><div class='icon-frame'><img src='icon/logout.png'></div><span>LOGOUT</span></div>
-            </div>
-            <div id='footer'>{{> footer}}</div>
-        </div>
-        <div id='panel'>
+    <a class='painel-skip' href='#painel-content'>Pular para o conteúdo</a>
+    <div id='painel'>
+        <aside id='painel-menu' class='painel-menu' aria-label='Painel'></aside>
+        <main id='painel-content'>
+            <div id='panel'>
             <div class='content' data-menu='news'><div>
                 <h2>Notícias da gladCode</h2>
                 <div id='news-container'></div>
@@ -314,7 +293,9 @@
                 </div>
             </div>
         </div>
-        <div id='right-panel'></div>
+        </main>
     </div>
+    <nav id='painel-tabs' class='mobile-tab-bar' aria-label='Seções'></nav>
+    <div id='painel-more'></div>
 </body>
 </html>

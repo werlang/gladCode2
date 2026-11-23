@@ -127,7 +127,7 @@ Payload typedefs:
  * @property {number} messages Unread private messages.
  * @property {number} news Unread news posts.
  * @property {number} friends Pending friend requests.
- * @property {{ remaining: number, outdated: number }} gladiators
+ * @property {{ used: number, limit: number, remaining: number, outdated: number }} gladiators
  * @property {number} duels Pending duel challenges.
  * @property {{ ranked: number, duel: number }} reports Unread ranked and duel reports.
  * @property {{ count: number, nextExpiry: string|null, serverNow: string }} potions
@@ -211,7 +211,8 @@ sequenceDiagram
 ```
 
 The bell's `aria-label` uses `counts.bell` (“Notificações, 4 novas”); a zero count removes the badge but
-keeps the button. The menu badges use the three kinds from [components.md](components.md) (`action`,
+keeps the button. “Marcar como lidas” calls `POST /notifications/read`, which clears news, reports and
+finished duels; pending duels and friend requests stay until answered. The menu badges use the three kinds from [components.md](components.md) (`action`,
 `unread`, `info`): duels and friends are `action`, reports/news/messages are `unread`, and the counts
 without an attention meaning (`4/6`, `#128`, the potion time) are `info`. The rail's potion badge reads
 `counts.potions.count` and formats the time from `counts.potions.nextExpiry` against

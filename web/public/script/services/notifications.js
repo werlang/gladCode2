@@ -1,6 +1,8 @@
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
-import { NotificationModel } from '../models/social.js';
+import { DuelModel, FriendModel, NotificationModel, ReportModel } from '../models/social.js';
+import { NewsModel } from '../models/news.js';
 import { PotionModel } from '../models/potion.js';
+import { formatMessageTime } from '../helpers/date-format.js';
 import { formatServerDate, nextExpiry, normalizeSlots } from './potions.js';
 
 /**
@@ -80,8 +82,8 @@ export class NotificationService {
         slots = () => PotionModel.slots(),
         bus = events,
         intervalMs = 30000,
-        setInterval: setTimer = globalThis.setInterval,
-        clearInterval: clearTimer = globalThis.clearInterval,
+        setInterval: setTimer = (callback, delay) => globalThis.setInterval(callback, delay),
+        clearInterval: clearTimer = id => globalThis.clearInterval(id),
     } = {}) {
         this.#counts = counts;
         this.#slots = slots;
@@ -123,6 +125,67 @@ export class NotificationService {
         this.#document?.removeEventListener?.('visibilitychange', this.#onVisibility);
         this.#document = null;
         return this;
+    }
+
+    /**
+     * The rows of the notifications panel, loaded when it opens. Each group is best-effort: a failed
+     * request leaves that group empty instead of hiding the counters.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ needs: Array<{ id: string, text: string, where: string, href: string }>,
+     *   news: Array<{ id: string, text: string, where: string, href: string }> }>}
+     */
+    async feed({ signal } = {}) {
+        if (!this.#last) await this.refresh().catch(() => {});
+        const [duels, friends, reports, posts] = await Promise.allSettled([
+            DuelModel.challenges({ signal }),
+            FriendModel.list({ signal }),
+            ReportModel.unreadFeed({ signal }),
+            NewsModel.list(0, { markRead: false, signal }),
+        ]);
+        const list = result => (result.status === 'fulfilled' ? result.value : null);
+        const when = time => {
+            const label = formatMessageTime(time, { short: true });
+            return Number.isNaN(new Date(time).getTime()) ? '' : ` · há ${label}`;
+        };
+
+        const needs = [];
+        for (const duel of list(duels) ?? []) {
+            needs.push({
+                id: `duel-${duel.id}`,
+                text: `${duel.nick} desafiou você para um duelo`,
+                where: `Batalhas${when(duel.time)}`,
+                href: '/battle.duel',
+            });
+        }
+        for (const friend of list(friends)?.pending ?? []) {
+            needs.push({
+                id: `friend-${friend.id}`,
+                text: `${friend.nick} quer ser seu amigo`,
+                where: 'Amigos',
+                href: '/friends',
+            });
+        }
+
+        const news = [];
+        for (const report of list(reports)?.reports ?? []) {
+            news.push({
+                id: `report-${report.id}`,
+                text: `Relatório de ${report.gladiator} pronto`,
+                where: `Relatórios${when(report.time)}`,
+                href: '/reports',
+            });
+        }
+        const unreadNews = Math.max(0, Number(this.#last?.news ?? 0));
+        for (const post of (list(posts) ?? []).slice(0, unreadNews)) {
+            news.push({
+                id: `news-${post.hash}`,
+                text: post.title,
+                where: `Notícias${when(post.time)}`,
+                href: '/news',
+            });
+        }
+        return { needs, news };
     }
 
     /**

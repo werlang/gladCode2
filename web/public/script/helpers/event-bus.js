@@ -54,7 +54,7 @@
  * @property {number} messages
  * @property {number} news
  * @property {number} friends
- * @property {{ remaining: number, outdated: number }} gladiators
+ * @property {{ used: number, limit: number, remaining: number, outdated: number }} gladiators
  * @property {number} duels
  * @property {{ ranked: number, duel: number }} reports
  * @property {{ count: number, nextExpiry: string|null, serverNow: string }} potions
