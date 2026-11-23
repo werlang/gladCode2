@@ -41,8 +41,8 @@ export class SearchField extends BaseComponent {
         label = 'Buscar',
         placeholder = '',
         debounce = 300,
-        setTimer = globalThis.setTimeout,
-        clearTimer = globalThis.clearTimeout,
+        setTimer = (callback, delay) => globalThis.setTimeout(callback, delay),
+        clearTimer = id => globalThis.clearTimeout(id),
     } = {}) {
         super(element ?? createElement(renderTemplate(searchFieldTemplate, {
             variant: variant ? `search-field--${variant}` : '',
@@ -56,9 +56,13 @@ export class SearchField extends BaseComponent {
         if (placeholder) this.#input.placeholder = placeholder;
 
         this.on(this.element, 'submit', event => {
+            // the component's own `submit` CustomEvent bubbles here too; only the form's native submit counts
+            if (event instanceof CustomEvent) return;
             event.preventDefault();
             this.#cancel();
-            this.emit('submit', { value: this.value });
+            const value = searchQuery(this.value);
+            this.#lastSearched = value;
+            this.emit('submit', { value });
         });
         this.on(this.#input, 'input', () => this.#typed());
         this.on(this.#clear, 'click', () => this.clear());
