@@ -10,7 +10,8 @@ let session = 0;
  *
  * A user is `{ id, joinedAt, email, nickname, firstName, lastName, picture, language, level, xp, silver,
  * credits, premium, apothecary, showTutorial, editorTheme, editorFont, preferences, isAdmin,
- * stats: { battles, wins, renown } }`.
+ * stats: { battles, wins, known, renown } }`. `wins` counts engine-reported wins and `known` is the
+ * win-rate denominator; unknown historical results are excluded.
  */
 export class UserModel {
     /**
