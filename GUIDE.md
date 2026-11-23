@@ -18,7 +18,8 @@ messages and friendships, the 2D replay and the 3D coliseum replay, plus the adm
 tools.
 
 The Painel redesign (header, side menu, nine redesigned sections, component catalogue, event bus) is
-**planned** and delivered by WP2–WP9 of `.orchestration/PLAN.md`. Where a document describes that target,
+**planned** and delivered by WP2–WP9 of the orchestration plan (`.orchestration/PLAN.md`, local to the
+orchestration workspace and excluded from git). Where a document describes that target,
 it says so; the code today is the current page shells and tab controllers described under
 [Web service](#web-service).
 

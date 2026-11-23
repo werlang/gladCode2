@@ -37,6 +37,9 @@ The map of the repository's documents. Read the row that matches your job.
 | [docs/api/README.md](docs/api/README.md) | The REST API reference, generated from the `METHOD /path` route comments. |
 | [docs/synty-assets/README.md](docs/synty-assets/README.md) | How the Synty packs are measured and loaded (units, pivots, materials). |
 | [docs/synty-assets/INDEX.md](docs/synty-assets/INDEX.md) | The pack index; each `<pack>.tsv` lists its FBX files and `<pack>.textures.tsv` its images. |
+| [web/public/assets/README.md](web/public/assets/README.md) | The runtime Synty folder: the loaders that consume it and the licence note. |
+| [web/public/res/audio/arena/CREDITS.md](web/public/res/audio/arena/CREDITS.md) | Sources and licences of the arena sounds. |
+| [web/public/sprite/Universal-LPC-spritesheet/README.md](web/public/sprite/Universal-LPC-spritesheet/README.md) | The LPC spritesheet notice and its authors. |
 | [migrations/](migrations/) | Numbered SQL migrations and the runner (`migrations/migrate.sh`). |
 | [dev-tools/README.md](dev-tools/README.md) | The tournament CLI, database dump/restore and release news SQL. |
 | [Setup/README](Setup/README) | The `gladcode2-vm` engine image. |
@@ -54,8 +57,8 @@ The map of the repository's documents. Read the row that matches your job.
 
 | Document | What it is |
 | :--- | :--- |
-| [.orchestration/PLAN.md](.orchestration/PLAN.md) | The Painel redesign master plan (roles, work packages, gates). |
-| [.agents/orchestrator/](.agents/orchestrator/) | Earlier migration and design-system plans. |
+| `.orchestration/PLAN.md` (local, not in git) | The Painel redesign master plan (roles, work packages, gates). It is excluded from git by `.git/info/exclude` and resolves only in the orchestration workspace. |
+| [.agents/orchestrator/](.agents/orchestrator/) | Earlier migration and design-system plans (tracked). |
 
 ## Runtime layout
 
