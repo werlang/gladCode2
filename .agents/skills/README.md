@@ -9,7 +9,7 @@ Each project skill localizes one or more of the user's global skills to this cod
 | [`api-development`](api-development/SKILL.md) | `api-building`, `security-defense-and-mitigation` | Routers in `api/route`, `auth()`, `Validate`, `CustomError` codes, route docs, battle limits |
 | [`entity-models`](entity-models/SKILL.md) | `entity-models` | `api/model`: base `Model`, entity and domain models, ownership filters, row locks |
 | [`mysql-helper`](mysql-helper/SKILL.md) | `mysql-helper` | `api/helpers/mysql.js` API and rules, MySQL quirks, migrations |
-| [`frontend-development`](frontend-development/SKILL.md) | `web-frontend` | `web/app.js` pages, Mustache views, import map, ES modules in `web/public/script` |
+| [`frontend-development`](frontend-development/SKILL.md) | `web-frontend` | `web/app.js` pages, Mustache views, import map, ES modules in `web/public/script`; the full contract is `docs/frontend/` |
 | [`css-standards`](css-standards/SKILL.md) | `css-standards` | `web/public/css`: tokens and the three themes, files, breakpoints, colours, fonts, how views load styles |
 | [`test-first-delivery`](test-first-delivery/SKILL.md) | `testing` | Every suite, its Docker command, mocking conventions, sabotage, known flakes |
 | [`documentation-maintenance`](documentation-maintenance/SKILL.md) | `documentation-maintenance`, `document-touched-code` | Which document owns what, generated docs, comment rules |

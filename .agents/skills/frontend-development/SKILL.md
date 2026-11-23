@@ -1,11 +1,11 @@
 ---
 name: frontend-development
-description: Build or change gladCode's web service and browser code — web/app.js page routes and old-address redirects, Mustache views in web/view, the render middleware and import map, and the ES modules in web/public/script (page entries, components, helpers, models, templates, profile, editor). Use for any page, frontend module or API call from the browser. Excludes the 3D renderer internals (render2/), which AGENTS.md documents in full.
+description: Build or change gladCode's web service and browser code — web/app.js page routes and old-address redirects, Mustache views in web/view, the render middleware and import map, and the ES modules in web/public/script (page entries, components, helpers, models, templates, profile, editor). Use for any page, frontend module or API call from the browser. Excludes the 3D renderer internals (render2/), which GUIDE.md documents in full.
 ---
 
 # gladCode frontend development
 
-Localizes the global `web-frontend` skill (with `security-defense-and-mitigation` for escaping): follow it for the method; this file holds what is true in gladCode. On project facts, this file wins. The full rule list is AGENTS.md → [Frontend Standards](../../../AGENTS.md#frontend-standards).
+Localizes the global `web-frontend` skill (with `security-defense-and-mitigation` for escaping): follow it for the method; this file holds what is true in gladCode. On project facts, this file wins. The full contract is [`docs/frontend/`](../../../docs/frontend/README.md) (conventions, component catalogue, event bus, page shell); the agent rules are AGENTS.md → [Frontend Standards](../../../AGENTS.md#frontend-standards); the architecture is [GUIDE.md](../../../GUIDE.md).
 
 ## Where
 
@@ -13,7 +13,7 @@ Localizes the global `web-frontend` skill (with `security-defense-and-mitigation
 - `web/middleware/render.js`: `res.page()`; views get `{{#asset}}`/`{{#module}}` (mtime-versioned URLs), `{{{importMap}}}` and `{{{templateVars}}}` (`web/helpers/safe-json.js`). Import maps, asset URLs and the view list are cached when `NODE_ENV=production`.
 - `web/helpers/modules.js`: the import map over `MODULE_DIRS` (add new script folders there); `render2: true` adds three.js and `script/render2/`.
 - `web/view/*.html`: one Mustache view per page plus `head` (font preload, `tokens.css`, `theme-boot.js`), `header`, `footer`, `analytics` partials.
-- `web/public/script/`: page entries (`*.js`), `components/`, `helpers/` (`request.js` with `api`/`site` and `BATTLE_TIMEOUT_MS`, `html.js`, `template-var.js`, `local-data.js`), `models/` (the only callers of the API), `templates/`, `profile/`, `editor/`.
+- `web/public/script/`: page entries (`*.js`), `components/`, `helpers/` (`request.js` with `api`/`site` and `BATTLE_TIMEOUT_MS`, `html.js`, `template-var.js`, `local-data.js`), `models/` (the only callers of the API), `templates/`, `profile/`, `editor/`. The Painel redesign adds `services/` (DOM-free state that emits app events, WP2) and `helpers/event-bus.js`; the target layout and rules are in [`docs/frontend/`](../../../docs/frontend/README.md).
 
 ## Rules
 

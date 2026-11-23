@@ -77,7 +77,7 @@ dev-tools/tournament.sh help
    - Launches `gladCodeServerMain`, creating TCP sockets for each gladiator thread.
    - User gladiators communicate with the game engine via `gladCodeAPI.c` / `gladCodeAPI.py`.
 5. The simulation produces a `simlog` JSON trace; the API stores it in `data/logs/<id>` and applies the battle's rules (`api/helpers/battle-results.js`).
-6. `web/public/script/playback.js` expands the log into frames and replays it with the renderer the user picked: classic 2D Phaser.js (`script/render.js`) or the Three.js coliseum (`script/render2/`).
+6. `web/public/script/playback.js` expands the log into frames and runs the Three.js coliseum (`script/render2/`) by default; browsers without WebGL2, `ENABLE_RENDER2=0` or a failed 3D start fall back to the classic Phaser.js renderer (`script/render.js`). There is no player-facing renderer choice.
 
 ### Socket IPC Architecture
 
@@ -105,7 +105,7 @@ const rows = await Mysql.select('SELECT cod, name FROM gladiators WHERE master =
 - Only `models/` calls the API, through `helpers/request.js` (`api`); failures are `RequestError`s carrying the API's `code`.
 - Never `alert`/`confirm`/`prompt` (use `components/dialog.js`), never unescaped text in `innerHTML`, dialogs or toasts, never app data in `data-*` attributes.
 - Lint and test through Docker: `docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"`.
-- Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards).
+- Full rules: [Frontend Standards in AGENTS.md](../AGENTS.md#frontend-standards); the contract (conventions, component catalogue, events, page shell) is [docs/frontend/](../docs/frontend/README.md); the architecture is [GUIDE.md](../GUIDE.md).
 
 ### Branches & Commits
 - Follow [CONTRIBUTING.md](../CONTRIBUTING.md): work branches from `dev` named `<type>/<slug>`, Conventional Commits `<type>(<scope>): <summary>` (imperative, at most 72 characters, scopes listed there), a body only when the reason is not obvious.
