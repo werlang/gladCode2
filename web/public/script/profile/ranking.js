@@ -1,7 +1,7 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { renderTemplate } from '../helpers/html.js';
-import { runSectionTask, secondaryRequest, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, secondaryRequest, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
 import { showNoCredit, showTutorPitch } from './tutor.js';
@@ -38,11 +38,11 @@ export class RankingTab {
 
     /** Binds the controls; the route decides the first page and filter. */
     init() {
-        this.#panel.querySelector('#tab-general').addEventListener('click', () => this.#select(GENERAL));
+        this.#panel.querySelector('#tab-general').addEventListener('click', () => runReadTask(() => this.#select(GENERAL), this.#signal));
         this.#panel.querySelector('#add-tab').addEventListener('click', () => this.#askHashtag());
-        this.#panel.querySelector('#prev').addEventListener('click', () => this.#page(-1));
-        this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
-        this.#search.addEventListener('input', () => runSectionTask(() => this.fetch({ offset: 0, signal: this.#signal })));
+        this.#panel.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(-1), this.#signal));
+        this.#panel.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(1), this.#signal));
+        this.#search.addEventListener('input', () => runReadTask(() => this.fetch({ offset: 0, signal: this.#signal }), this.#signal));
     }
 
     /**
@@ -98,7 +98,7 @@ export class RankingTab {
             this.#pages[tag] ??= { offset: 0, total: 0 };
             add.insertAdjacentHTML('beforebegin', renderTemplate(tabTemplate, { name: tag, selected: '' }));
             const tab = add.previousElementSibling;
-            tab.addEventListener('click', () => this.#select(tag));
+            tab.addEventListener('click', () => runReadTask(() => this.#select(tag), this.#signal));
         });
         add.style.display = profile.user.premium ? '' : 'none';
         this.#markSelected();
@@ -133,12 +133,20 @@ export class RankingTab {
         new Message({
             message: `Deseja remover a aba <b>#${name}</b>`,
             buttons: { yes: 'SIM', no: 'NÃO' },
-        }).show().click('yes', () => runSectionTask(async () => {
-            await RankModel.unwatch(name);
-            createToast(`Aba #${name} removida`, 'success');
-            this.#selected = GENERAL;
-            await this.show({}, { signal: this.#signal });
-        }));
+        }).show().click('yes', () => writeThenRead(
+            async () => {
+                await RankModel.unwatch(name);
+                createToast(`Aba #${name} removida`, 'success');
+            },
+            () => {
+                this.#selected = GENERAL;
+                return this.show({}, { signal: this.#signal });
+            },
+            {
+                signal: this.#signal,
+                onWriteError: () => createToast('Não foi possível remover a aba', 'error'),
+            },
+        ));
     }
 
     #askHashtag() {
@@ -174,7 +182,7 @@ export class RankingTab {
             }
             else if (match) {
                 box.kill();
-                runSectionTask(() => this.#addHashtag(match[1]));
+                this.#addHashtag(match[1]);
             }
             else {
                 createToast('A #hashtag deve conter somente letras, números e underline', 'error');
@@ -184,22 +192,30 @@ export class RankingTab {
 
     /** @param {string} name Hashtag. */
     async #addHashtag(name) {
-        try {
-            await RankModel.watch(name);
-            createToast(`Aba #${name} criada`, 'success');
-        }
-        catch (error) {
-            if (error.code === 'TUTOR_ONLY') {
-                createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
-                profile.user.premium = false;
-            }
-            else if (error.code === 'NO_CREDITS') {
-                createToast('Você não possui créditos para utilizar essa função', 'error');
-                profile.user.credits = 0;
-            }
-            else throw error;
-        }
-        this.#drawTabs({ signal: this.#signal });
+        await writeThenRead(
+            async () => {
+                try {
+                    await RankModel.watch(name);
+                    createToast(`Aba #${name} criada`, 'success');
+                }
+                catch (error) {
+                    if (error.code === 'TUTOR_ONLY') {
+                        createToast('Esta função só pode ser usada por contas verificadas de instituições de ensino', 'error');
+                        profile.user.premium = false;
+                    }
+                    else if (error.code === 'NO_CREDITS') {
+                        createToast('Você não possui créditos para utilizar essa função', 'error');
+                        profile.user.credits = 0;
+                    }
+                    else throw error;
+                }
+            },
+            () => this.#drawTabs({ signal: this.#signal }),
+            {
+                signal: this.#signal,
+                onWriteError: () => createToast('Não foi possível criar a aba', 'error'),
+            },
+        );
     }
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */

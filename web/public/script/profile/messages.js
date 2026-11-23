@@ -1,7 +1,8 @@
 import { showMessage } from '../components/dialog.js';
+import { createToast } from '../components/toast.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, runSectionTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
 import { MessageModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -24,11 +25,11 @@ export class MessagesTab {
     init() {
         this.#panel.querySelector('#prev').addEventListener('click', () => {
             this.#page--;
-            runSectionTask(() => this.#show());
+            runReadTask(() => this.#show(), this.#signal);
         });
         this.#panel.querySelector('#next').addEventListener('click', () => {
             this.#page++;
-            runSectionTask(() => this.#show());
+            runReadTask(() => this.#show(), this.#signal);
         });
     }
 
@@ -98,16 +99,22 @@ export class MessagesTab {
         this.#panel.append(full);
         MessageModel.markRead(message.id, true);
 
-        full.querySelector('#back').addEventListener('click', () => runSectionTask(() => this.#show()));
+        full.querySelector('#back').addEventListener('click', () => runReadTask(() => this.#show(), this.#signal));
         full.querySelector('#reply').addEventListener('click', () => this.#reply(full, message));
-        full.querySelector('#unread').addEventListener('click', () => runSectionTask(async () => {
-            await MessageModel.markRead(message.id, false);
-            await this.#show();
-        }));
-        full.querySelector('#delete').addEventListener('click', () => runSectionTask(async () => {
-            await MessageModel.remove(message.id);
-            await this.#show();
-        }));
+        full.querySelector('#unread').addEventListener('click', () => {
+            writeThenRead(
+                () => MessageModel.markRead(message.id, false),
+                () => this.#show(),
+                { signal: this.#signal },
+            );
+        });
+        full.querySelector('#delete').addEventListener('click', () => {
+            writeThenRead(
+                () => MessageModel.remove(message.id),
+                () => this.#show(),
+                { signal: this.#signal },
+            );
+        });
 
         await fadeOut(this.#panel.querySelector('.table'));
         fadeIn(full);
@@ -132,19 +139,21 @@ export class MessagesTab {
             input.style.height = `${Math.min(MAX_REPLY_HEIGHT, input.scrollHeight + input.offsetHeight - input.clientHeight)}px`;
         });
 
-        reply.querySelector('#send').addEventListener('click', () => runSectionTask(async () => {
+        reply.querySelector('#send').addEventListener('click', () => {
             const text = input.value;
-            try {
-                await MessageModel.reply(message.id, text);
-            }
-            catch (error) {
-                if (error.code === 'MESSAGE_TOO_LONG') showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
-                else if (error.code === 'INVALID_MESSAGE') showMessage('A resposta não pode ficar vazia nem ter emojis.');
-                else throw error;
-                return;
-            }
-            await this.#show();
-        }));
+            writeThenRead(
+                () => MessageModel.reply(message.id, text),
+                () => this.#show(),
+                {
+                    signal: this.#signal,
+                    onWriteError: error => {
+                        if (error.code === 'MESSAGE_TOO_LONG') showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
+                        else if (error.code === 'INVALID_MESSAGE') showMessage('A resposta não pode ficar vazia nem ter emojis.');
+                        else createToast('Não foi possível enviar a resposta. Tente novamente.', 'error');
+                    },
+                },
+            );
+        });
         reply.querySelector('#cancel').addEventListener('click', () => {
             reply.remove();
             buttons.style.display = '';

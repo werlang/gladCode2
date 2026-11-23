@@ -3,7 +3,7 @@ import { createToast, isModalOpen } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { resolveRoute, SECTION_SHORTCUTS, sectionTitle, sectionUrl } from './helpers/painel-route.js';
-import { isAborted } from './helpers/section-request.js';
+import { isAborted, retryableError } from './helpers/section-request.js';
 import { RankModel } from './models/rank.js';
 import { BattleTab } from './profile/battle.js';
 import { FriendsTab } from './profile/friends.js';
@@ -110,17 +110,20 @@ async function start() {
     let currentAdapter = null;
     let controller = null;
     let generation = 0;
+    let sectionErrorToast = null;
 
-    const reportError = (error, retry) => {
+    const reportError = (error, retry, signal) => {
         if (isAborted(error)) return;
-        createToast('Não foi possível carregar esta seção. Tente novamente.', {
-            type: 'error',
-            action: retry ? { label: 'Tentar novamente', onClick: retry } : undefined,
-        });
+        sectionErrorToast?.dismiss();
+        sectionErrorToast?.remove();
+        sectionErrorToast = retryableError('Não foi possível carregar esta seção. Tente novamente.', retry, signal);
     };
 
     const show = async (route, { focus = false } = {}) => {
         if (!route) return;
+        sectionErrorToast?.dismiss();
+        sectionErrorToast?.remove();
+        sectionErrorToast = null;
         const same = currentSection === route.section;
         const token = ++generation;
         if (!same) {
@@ -141,7 +144,7 @@ async function start() {
         }
         catch (error) {
             if (!token || token !== generation || controller.signal.aborted) return;
-            reportError(error, () => show(route, { focus: false }));
+            reportError(error, () => show(route, { focus: false }), controller.signal);
             return;
         }
         if (token !== generation || controller.signal.aborted) return;

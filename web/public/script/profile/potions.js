@@ -2,7 +2,7 @@ import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { PotionModel } from '../models/potion.js';
 import { profile, setSilver } from './session.js';
 import {
@@ -181,10 +181,14 @@ export class PotionsTab {
             new Message({
                 message: 'Deseja cancelar esta encomenda?',
                 buttons: { yes: 'SIM', no: 'NÃO' },
-            }).show().click('yes', () => runSectionTask(async () => {
-                await PotionModel.cancel(item.id);
-                await this.refresh({ signal: this.#signal });
-            }));
+            }).show().click('yes', () => writeThenRead(
+                () => PotionModel.cancel(item.id),
+                () => this.refresh({ signal: this.#signal }),
+                {
+                    signal: this.#signal,
+                    onWriteError: () => createToast('Não foi possível cancelar a encomenda', 'error'),
+                },
+            ));
         });
         return slot;
     }
@@ -201,7 +205,7 @@ export class PotionsTab {
         });
         if (expired) {
             clearInterval(this.#timer);
-            runSectionTask(() => this.refresh({ signal: this.#signal }));
+            runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
         }
     }
 
@@ -296,7 +300,7 @@ export class PotionsTab {
             catch {
                 createToast('O item não pôde ser adquirido', 'error');
             }
-            runSectionTask(() => this.refresh({ signal: this.#signal }));
+            runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
         });
     }
 

@@ -1,7 +1,7 @@
 import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
 import { elapsedString } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, secondaryRequest, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, runSectionTask, secondaryRequest, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
@@ -61,7 +61,7 @@ export class FriendsTab {
         });
 
         const search = this.#panel.querySelector('#search .input');
-        search.addEventListener('input', () => runSectionTask(() => this.#search(search.value)));
+        search.addEventListener('input', () => runReadTask(() => this.#search(search.value), this.#signal));
     }
 
     /**
@@ -85,8 +85,8 @@ export class FriendsTab {
                 picture: request.picture,
                 nick: request.nick,
             }));
-            row.querySelector('.check').addEventListener('click', () => runSectionTask(() => this.#answer(request.id, true)));
-            row.querySelector('.close').addEventListener('click', () => runSectionTask(() => this.#answer(request.id, false)));
+            row.querySelector('.check').addEventListener('click', () => this.#answer(request.id, true));
+            row.querySelector('.close').addEventListener('click', () => this.#answer(request.id, false));
             requests.append(row);
         });
 
@@ -117,8 +117,11 @@ export class FriendsTab {
      * @param {boolean} accept Accept it.
      */
     async #answer(id, accept) {
-        await FriendModel.answer(id, accept);
-        await this.show({}, { signal: this.#signal });
+        return writeThenRead(
+            () => FriendModel.answer(id, accept),
+            () => this.show({}, { signal: this.#signal }),
+            { signal: this.#signal },
+        );
     }
 
     /**

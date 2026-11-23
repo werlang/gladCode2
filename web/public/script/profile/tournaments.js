@@ -2,7 +2,7 @@ import { decorateCheckSliders } from '../components/form-controls.js';
 import { loadGladCards, loadSelectableCards } from '../components/glad-card.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TournamentModel } from '../models/tournament.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -516,8 +516,8 @@ export class TournamentsTab {
         this.#wrapper.querySelector('#join').addEventListener('click', () => this.#openJoin());
         this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
             const list = pager.classList.contains('mine') ? 'mine' : 'open';
-            pager.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(list, -1)));
-            pager.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(list, 1)));
+            pager.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(list, -1), this.#signal));
+            pager.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(list, 1), this.#signal));
         });
     }
 

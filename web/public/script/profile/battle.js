@@ -1,5 +1,5 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, secondaryRequest } from '../helpers/section-request.js';
+import { runReadTask, secondaryRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, isVisible } from '../helpers/animate.js';
 import { FriendModel } from '../models/social.js';
 import { ChallengeList, challengeFriend } from './duels.js';
@@ -38,7 +38,7 @@ export class BattleTab {
         this.#panel.querySelectorAll('#battle-mode .button').forEach(button => {
             button.addEventListener('click', () => {
                 this.#selectMode(button.id);
-                runSectionTask(() => this.#loadMode(button.id));
+                runReadTask(() => this.#loadMode(button.id), this.#signal);
             });
         });
 
@@ -97,7 +97,7 @@ export class BattleTab {
         const wrapper = this.#panel.querySelector('#duel.wrapper');
         const input = wrapper.querySelector('.input');
         const challenge = wrapper.querySelector('#challenge');
-        input.addEventListener('input', () => runSectionTask(() => this.#filterFriends(input.value)));
+        input.addEventListener('input', () => runReadTask(() => this.#filterFriends(input.value), this.#signal));
         challenge.addEventListener('click', () => {
             if (this.#friend) challengeFriend(this.#friend.nick, this.#friend.user);
         });

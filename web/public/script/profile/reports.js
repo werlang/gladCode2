@@ -2,7 +2,7 @@ import { Message } from '../components/dialog.js';
 import { decorateRadios } from '../components/form-controls.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { DuelModel, ReportModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
@@ -90,12 +90,12 @@ export class ReportsTab {
     init() {
         decorateRadios(this.#panel);
         this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
-            tab.addEventListener('click', () => runSectionTask(() => this.#select(TABS[index])));
+            tab.addEventListener('click', () => runReadTask(() => this.#select(TABS[index]), this.#signal));
         });
-        this.#panel.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(-1)));
-        this.#panel.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(1)));
+        this.#panel.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(-1), this.#signal));
+        this.#panel.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(1), this.#signal));
         this.#unread.querySelector('input').addEventListener('change', () => {
-            if (this.#selected === 'battles') runSectionTask(() => this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal }));
+            if (this.#selected === 'battles') runReadTask(() => this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal }), this.#signal);
         });
     }
 
@@ -197,11 +197,14 @@ export class ReportsTab {
             element.querySelector('.favorite').addEventListener('click', () => this.#askUnfavorite(element, row.id));
         }
         else {
-            element.querySelector('.remove')?.addEventListener('click', () => runSectionTask(async () => {
-                await DuelModel.remove(row.id);
-                new Message({ message: 'Desafio cancelado' }).show();
-                await this.fetch({ offset: this.#offsets.duels, signal: this.#signal });
-            }));
+            element.querySelector('.remove')?.addEventListener('click', () => writeThenRead(
+                async () => {
+                    await DuelModel.remove(row.id);
+                    new Message({ message: 'Desafio cancelado' }).show();
+                },
+                () => this.fetch({ offset: this.#offsets.duels, signal: this.#signal }),
+                { signal: this.#signal },
+            ));
         }
         return element;
     }
@@ -289,10 +292,13 @@ export class ReportsTab {
         new Message({
             message: 'Remover esta batalha dos favoritos?',
             buttons: { yes: 'Sim', no: 'Não' },
-        }).show().click('yes', () => runSectionTask(async () => {
-            row.remove();
-            await ReportModel.setFavorite(id, false);
-            await this.fetch({ offset: this.#offsets.favorites, signal: this.#signal });
-        }));
+        }).show().click('yes', () => writeThenRead(
+            async () => {
+                row.remove();
+                await ReportModel.setFavorite(id, false);
+            },
+            () => this.fetch({ offset: this.#offsets.favorites, signal: this.#signal }),
+            { signal: this.#signal },
+        ));
     }
 }

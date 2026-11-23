@@ -4,7 +4,7 @@ import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -498,8 +498,8 @@ export class TrainingsTab {
         this.#wrapper.querySelector('#join').addEventListener('click', () => this.#join());
         this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
             const list = pager.classList.contains('manage') ? 'manage' : 'part';
-            pager.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(list, -1)));
-            pager.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(list, 1)));
+            pager.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(list, -1), this.#signal));
+            pager.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(list, 1), this.#signal));
         });
     }
 
