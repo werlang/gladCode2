@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { calcReward, crashedGladiators, deathOrder, masterRewards, placingOrder, survival, trainingScores, xpToNextLevel } from '../../../helpers/battle-results.js';
+import { calcReward, crashedGladiators, deathOrder, masterRewards, placingOrder, rankedResults, survival, trainingScores, xpToNextLevel } from '../../../helpers/battle-results.js';
 
 const glads = pairs => pairs.map(([mmr, time]) => ({ mmr, time }));
 /** A step of a group battle: each gladiator's name, master and hp. */
@@ -23,6 +23,14 @@ describe('battle results', () => {
 
     test('a complete tie moves no renown', () => {
         expect(calcReward(glads([[0, 0], [0, 0], [0, 0]]))).toEqual([0, 0, 0]);
+    });
+
+    test('the engine result makes no-survivor battles a draw and follows the equal-time win rule', () => {
+        // playback shows "Empate" when the last step has no living gladiator
+        expect(rankedResults([{ time: 90 }, { time: 50 }, { time: 10 }], false)).toEqual(['draw', 'draw', 'draw']);
+        // calcReward treats first place and anyone who lasted as long as it as winners
+        expect(rankedResults([{ time: 100 }, { time: 100 }, { time: 40 }], true)).toEqual(['win', 'win', 'loss']);
+        expect(rankedResults([{ time: 100 }, { time: 99 }, { time: 40 }], true)).toEqual(['win', 'loss', 'loss']);
     });
 
     test('survivors place first, then the latest to die', () => {

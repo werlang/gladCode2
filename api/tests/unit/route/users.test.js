@@ -36,7 +36,7 @@ function player() {
         touch: vi.fn(),
         saveProfile: vi.fn(async function (changes) { return this; }),
         toJSON() { return { id: 7 }; },
-        async profileJSON() { return { id: 7, stats: { battles: 4, wins: 3, renown: 1200 } }; },
+        async profileJSON() { return { id: 7, stats: { battles: 4, wins: 3, known: 4, renown: 1200 } }; },
     };
 }
 
@@ -52,7 +52,7 @@ describe('auth and users routes', () => {
     test('the signed-in user is returned and marked active', async () => {
         currentUser = player();
         const res = await request(app).get('/users/me');
-        expect(res.body).toEqual({ user: { id: 7, stats: { battles: 4, wins: 3, renown: 1200 } } });
+        expect(res.body).toEqual({ user: { id: 7, stats: { battles: 4, wins: 3, known: 4, renown: 1200 } } });
         expect(currentUser.touch).toHaveBeenCalled();
     });
 

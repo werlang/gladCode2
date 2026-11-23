@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { calcReward, crashedGladiators, deathOrder, masterRewards } from '../helpers/battle-results.js';
+import { calcReward, crashedGladiators, deathOrder, masterRewards, rankedResults } from '../helpers/battle-results.js';
 import { CustomError } from '../helpers/error.js';
 import { Mysql } from '../helpers/mysql.js';
 import { VERSION } from '../helpers/version.js';
@@ -111,7 +111,7 @@ export class RankedBattle {
 
     /**
      * Flags crashed gladiators, moves renown, pays the master, writes everyone's report (with the
-     * placing the win rate reads) and the battle's stats, all or nothing.
+     * engine's placing/result the win rate reads) and the battle's stats, all or nothing.
      *
      * @param {number} userId The master who started the battle.
      * @param {Battle} battle
@@ -121,8 +121,12 @@ export class RankedBattle {
      */
     static async #applyResults(userId, battle, simulation, logId, gladiatorIds) {
         const logGlads = simulation[0].glads;
-        const placed = deathOrder(simulation)
-            .map(entry => ({ ...entry, saved: battle.savedGladiator(entry.name, entry.user) }))
+        const ordered = deathOrder(simulation);
+        // A last step with nobody alive is a draw, not a win for the last gladiator to fall.
+        const anySurvivor = simulation.at(-1)?.glads?.some(glad => Number(glad?.hp) > 0) ?? false;
+        const results = rankedResults(ordered, anySurvivor);
+        const placed = ordered
+            .map((entry, index) => ({ ...entry, result: results[index], saved: battle.savedGladiator(entry.name, entry.user) }))
             .filter(entry => entry.saved);
 
         await Mysql.withTransaction(async context => {
@@ -146,7 +150,7 @@ export class RankedBattle {
                 context,
             );
             const byId = new Map(rows.map(row => [row.cod, row]));
-            const glads = placed.map(entry => ({ ...byId.get(entry.saved.id), time: entry.time }));
+            const glads = placed.map(entry => ({ ...byId.get(entry.saved.id), time: entry.time, result: entry.result }));
             const rewards = calcReward(glads);
             for (const [index, glad] of glads.entries()) {
                 await Mysql.update('gladiators', { mmr: { inc: rewards[index] } }, { cod: glad.cod }, context);
@@ -168,7 +172,7 @@ export class RankedBattle {
             }
 
             await Mysql.insert('reports', glads.map((glad, index) => ({
-                log: logId, gladiator: glad.cod, reward: rewards[index], placement: index,
+                log: logId, gladiator: glad.cod, reward: rewards[index], placement: index, result: glad.result,
                 started: Number(glad.master === userId),
             })), context);
             await Stats.record(simulation, logId, gladiatorIds, context);

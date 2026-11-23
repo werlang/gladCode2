@@ -37,11 +37,14 @@ describe('User', () => {
         expect(json.joinedAt).toBeNull();
     });
 
-    test('joinedAt is the account creation date, never the last activity', () => {
-        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: '2019-03-14 12:00:00' }).toJSON().joinedAt)
+    test('joinedAt is the account creation date only when its provenance is known', () => {
+        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: '2019-03-14 12:00:00', created_at_known: 1 }).toJSON().joinedAt)
             .toBe('2019-03-14 12:00:00');
+        // the original 009 copied activity into created_at; the provenance flag hides it
+        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: '2019-03-14 12:00:00', created_at_known: 0 }).toJSON().joinedAt)
+            .toBeNull();
         // a legacy account has no known creation date, even though it has been active since
-        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: null }).toJSON().joinedAt).toBeNull();
+        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: null, created_at_known: 0 }).toJSON().joinedAt).toBeNull();
     });
 
     test('admins come from ADMIN_EMAILS, case-insensitively', () => {
@@ -84,6 +87,7 @@ describe('User', () => {
         expect(inserted.apelido).toMatch(/^Bo\d{3}$/);
         expect(inserted.pasta).toMatch(/^[a-f0-9]{32}$/);
         expect(inserted.created_at.toSqlString()).toBe('NOW()');
+        expect(inserted.created_at_known).toBe(1);
         expect(user.id).toBe(99);
     });
 
@@ -118,12 +122,20 @@ describe('User', () => {
         expect(new User({ ...row, glad_view: '3d' }).toJSON().gladView).toBe('3d');
     });
 
-    test('the profile stats count ranked battles and first places only', async () => {
-        Mysql.select.mockResolvedValue([{ battles: 8, wins: 5, renown: 1482.4 }]);
-        await expect(User.stats(7)).resolves.toEqual({ battles: 8, wins: 5, renown: 1482 });
-        expect(Mysql.select.mock.calls[0][1]).toEqual([7, 7, 7]);
-        // a positive reward is not a win: the runner-up gains renown too
-        expect(Mysql.select.mock.calls[0][0]).toContain('r.placement = 0');
+    test('markNewsRead stores and returns the exact server marker', async () => {
+        Mysql.select.mockResolvedValue([{ marker: '2026-11-23 20:00:00.000' }]);
+        await expect(new User(row).markNewsRead()).resolves.toBe('2026-11-23 20:00:00.000');
+        expect(Mysql.update).toHaveBeenCalledWith('usuarios', { read_news: '2026-11-23 20:00:00.000' }, { id: 7 });
+    });
+
+    test('the profile stats count engine results and exclude unknown ones from the rate', async () => {
+        Mysql.select.mockResolvedValue([{ battles: 8, wins: 5, known: 6, renown: 1482.4 }]);
+        await expect(User.stats(7)).resolves.toEqual({ battles: 8, wins: 5, known: 6, renown: 1482 });
+        expect(Mysql.select.mock.calls[0][1]).toEqual([7, 7, 7, 7]);
+        // a positive reward is not a win, and a legacy unknown result is not a loss
+        expect(Mysql.select.mock.calls[0][0]).toContain("r.result = 'win'");
+        expect(Mysql.select.mock.calls[0][0]).toContain('r.result IS NOT NULL');
+        expect(Mysql.select.mock.calls[0][0]).not.toContain('r.placement = 0');
         expect(Mysql.select.mock.calls[0][0]).not.toContain('r.reward > 0');
     });
 

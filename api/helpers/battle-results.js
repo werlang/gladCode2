@@ -169,6 +169,22 @@ export function calcReward(glads) {
 }
 
 /**
+ * The authoritative ranked result of each gladiator, in placing order. The replay treats a battle
+ * with no survivor at the last step as a draw (`web/public/script/playback.js` shows "Empate"), so
+ * every entry is `draw`. With at least one survivor, {@link calcReward} says first place and anyone
+ * who lasted as long as it (`index === 0 || time === first.time`) is a winner; everyone else loses.
+ *
+ * @param {Array<{ time: number }>} placed From the winner down (see {@link deathOrder}).
+ * @param {boolean} anySurvivor Whether the last step has a gladiator with hp above zero.
+ * @returns {Array<'win'|'loss'|'draw'>}
+ */
+export function rankedResults(placed, anySurvivor) {
+    if (!anySurvivor) return placed.map(() => 'draw');
+    const winnerTime = placed[0]?.time;
+    return placed.map((entry, index) => (index === 0 || entry.time === winnerTime ? 'win' : 'loss'));
+}
+
+/**
  * Score of each gladiator of a training battle, in placing order: 10 for the winners, the others
  * by how long they lasted between the first to die and the runner-up, as back_training_run.php did.
  *

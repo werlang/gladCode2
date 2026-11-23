@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 
 import { migrate, splitSqlStatements } from '../../migrations/scripts/migrate.js';
@@ -145,4 +145,13 @@ test('baseline records old files without executing them, then migrates forward',
         .filter(call => call.sql.startsWith('INSERT INTO schema_migrations'))
         .map(call => call.params);
     assert.deepEqual(records, MIGRATIONS);
+});
+
+test('the created-at provenance migration never rewrites created_at and uses the 009 application time', () => {
+    const sql = readFileSync(new URL('../../migrations/013_user_created_at_known.sql', import.meta.url), 'utf8');
+    assert.doesNotMatch(sql, /SET\s+`?created_at`?\s*=/i);
+    assert.match(sql, /ADD COLUMN `created_at_known`/);
+    assert.match(sql, /schema_migrations/);
+    assert.match(sql, /applied_at/);
+    assert.match(sql, /version`?\s*=\s*9/);
 });

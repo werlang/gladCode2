@@ -32,7 +32,7 @@ export class User extends Model {
     constructor(fields = {}) {
         super('usuarios', {
             fields,
-            insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'created_at', 'foto'],
+            insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'created_at', 'created_at_known', 'foto'],
             allowUpdate: [
                 'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font', 'site_theme', 'glad_view',
                 ...Object.values(PREFERENCES), 'pref_language', 'silver', 'credits', 'apothecary', 'lvl', 'xp',
@@ -81,6 +81,7 @@ export class User extends Model {
             pasta: createHash('md5').update(email).digest('hex'),
             ativo: Mysql.raw('NOW()'),
             created_at: Mysql.raw('NOW()'),
+            created_at_known: 1,
             foto: defaultPicture(email),
         });
         await user.insert();
@@ -93,9 +94,15 @@ export class User extends Model {
         return admins.includes(String(this.email || '').toLowerCase());
     }
 
-    /** Records that the user read the news feed, which clears the news counter. */
+    /**
+     * Records that the user read the news feed, which clears the news counter.
+     *
+     * @returns {Promise<string>} The server marker written to `read_news`, for the caller's feed.
+     */
     async markNewsRead() {
-        await Mysql.update('usuarios', { read_news: Mysql.raw('NOW(3)') }, { id: this.id });
+        const [row] = await Mysql.select('SELECT NOW(3) AS marker');
+        await Mysql.update('usuarios', { read_news: row.marker }, { id: this.id });
+        return row.marker;
     }
 
     /** Records that the user was just active. */
@@ -146,22 +153,30 @@ export class User extends Model {
     }
 
     /**
-     * The profile hero's numbers: ranked battles, wins and the best gladiator's renown. A win is a
-     * first place (`reports.placement = 0`), not merely a gladiator that gained renown: the
-     * runner-up also gains renown in a ranked battle and is still not a win.
+     * The profile hero's numbers: ranked battles, wins, known results and the best gladiator's
+     * renown. Only the engine's reported result counts: `wins` are `result = 'win'` and `known` is
+     * every report with a result (`win`, `loss` or `draw`). Unknown historical results stay out of
+     * the win-rate denominator. A battle with no survivor is a draw, and ties for first follow
+     * `calcReward`'s equal-survival-time rule (api/helpers/battle-results.js).
      *
      * @param {number} userId
-     * @returns {Promise<{ battles: number, wins: number, renown: number }>}
+     * @returns {Promise<{ battles: number, wins: number, known: number, renown: number }>}
      */
     static async stats(userId) {
         const [row] = await Mysql.select(
             `SELECT
                 (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ?) AS battles,
-                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.placement = 0) AS wins,
+                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.result = 'win') AS wins,
+                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.result IS NOT NULL) AS known,
                 (SELECT COALESCE(MAX(mmr), 0) FROM gladiators WHERE master = ?) AS renown`,
-            [userId, userId, userId],
+            [userId, userId, userId, userId],
         );
-        return { battles: Number(row.battles), wins: Number(row.wins), renown: Math.round(Number(row.renown)) };
+        return {
+            battles: Number(row.battles),
+            wins: Number(row.wins),
+            known: Number(row.known),
+            renown: Math.round(Number(row.renown)),
+        };
     }
 
     /** @returns {Promise<Record<string, unknown>>} The account plus the profile hero's stats. */
@@ -171,9 +186,14 @@ export class User extends Model {
 
     /** @returns {Record<string, unknown>} The signed-in user's own view of the account. */
     toJSON() {
+        // Rows written before the provenance column existed are unit-test fixtures; a stored date
+        // there is treated as known. The database always sends the flag after migration 013.
+        const createdKnown = this.created_at_known === undefined
+            ? Boolean(this.created_at)
+            : Boolean(Number(this.created_at_known));
         return {
             id: this.id,
-            joinedAt: this.created_at ?? null,
+            joinedAt: createdKnown ? (this.created_at ?? null) : null,
             email: this.email,
             nickname: this.apelido,
             firstName: this.nome,
