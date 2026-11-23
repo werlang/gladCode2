@@ -1,0 +1,196 @@
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
+import { UserModel } from '../models/user.js';
+
+/**
+ * The signed-in account and the per-field autosave queue (docs/frontend/events.md, flow 2).
+ * DOM-free: the section previews a choice, this service persists it and publishes the fact.
+ */
+
+/** Profile fields the Perfil section autosaves. */
+export const ACCOUNT_FIELDS = Object.freeze(['nickname', 'picture', 'language', 'preferences', 'theme', 'gladView']);
+
+/**
+ * @typedef {object} SaveToken
+ * @property {string} field The field's queue.
+ * @property {number} rev Revision in that queue.
+ * @property {unknown} previous The value persisted before this change.
+ */
+
+/** @returns {{ promise: Promise<any>, resolve: Function, reject: Function }} */
+function deferred() {
+    let resolve;
+    let reject;
+    const promise = new Promise((onResolve, onReject) => {
+        resolve = onResolve;
+        reject = onReject;
+    });
+    return { promise, resolve, reject };
+}
+
+/**
+ * Account state and its autosave queue. One request per field is in flight; the latest intent wins,
+ * superseded responses never touch the preview, and each save's token carries its field.
+ */
+export class AccountService {
+    #model;
+    #bus;
+    #user = null;
+    #states = new Map();
+
+    /**
+     * @param {object} [options] Test seams.
+     * @param {typeof UserModel} [options.model]
+     * @param {typeof events} [options.bus]
+     */
+    constructor({ model = UserModel, bus = events } = {}) {
+        this.#model = model;
+        this.#bus = bus;
+    }
+
+    /** @returns {Record<string, any>|null} The last account the API returned. */
+    get user() {
+        return this.#user;
+    }
+
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<Record<string, any>|null>}
+     */
+    async load({ signal } = {}) {
+        const user = await this.#model.current({ signal });
+        this.#user = user ?? null;
+        this.#states.clear();
+        this.#bus.emit(APP_EVENTS.accountLoaded, { user: this.#user });
+        return this.#user;
+    }
+
+    /**
+     * The last value the API confirmed for a field (the rollback base).
+     *
+     * @param {string} field
+     * @returns {unknown}
+     */
+    confirmed(field) {
+        return this.#states.get(field)?.confirmed ?? this.#user?.[field] ?? null;
+    }
+
+    /**
+     * Whether a save token still belongs to its field's current revision.
+     *
+     * @param {SaveToken|{ field?: string, rev?: number }|null} token
+     * @returns {boolean}
+     */
+    isCurrent(token) {
+        if (!token?.field) return false;
+        return this.#states.get(token.field)?.seq === token.rev;
+    }
+
+    /**
+     * Saves one field. The promise resolves with `{ token, user }` when that revision is confirmed, or
+     * `{ token, superseded: true }` when a newer intent replaced it. A failure of the current revision
+     * rejects; a superseded failure resolves as superseded and changes nothing.
+     *
+     * @param {string} field One of {@link ACCOUNT_FIELDS}.
+     * @param {unknown} value
+     * @returns {Promise<{ token: SaveToken, user?: Record<string, any>, superseded?: boolean, error?: unknown }>}
+     */
+    save(field, value) {
+        if (!ACCOUNT_FIELDS.includes(field)) throw new TypeError(`Unknown account field "${field}".`);
+
+        const state = this.#state(field);
+        const token = { field, rev: ++state.seq, previous: state.confirmed };
+
+        if (state.pending) {
+            state.pending.waiter.resolve({ token: state.pending.token, superseded: true });
+        }
+        const waiter = deferred();
+        state.pending = { value, token, waiter };
+        if (!state.running) this.#drain(field);
+        return waiter.promise;
+    }
+
+    /**
+     * Restores the value captured before a change. The restore is itself saved through the same
+     * field's queue; a token superseded by a later change to that field is ignored.
+     *
+     * @param {SaveToken} token
+     * @returns {Promise<any>}
+     */
+    undo(token) {
+        const state = token?.field ? this.#states.get(token.field) : null;
+        if (!state || token.rev !== state.seq) return Promise.resolve({ ignored: true });
+        return this.save(token.field, token.previous);
+    }
+
+    /**
+     * @param {number} silver New balance from a confirmed mutation.
+     * @returns {this}
+     */
+    setSilver(silver) {
+        this.#user = { ...(this.#user ?? {}), silver: Number(silver) };
+        this.#bus.emit(APP_EVENTS.accountSilver, { silver: Number(silver) });
+        return this;
+    }
+
+    /** Ends the session and every field's queue. */
+    async signOut() {
+        await this.#model.signOut();
+        this.#user = null;
+        this.#states.clear();
+        this.#bus.emit(APP_EVENTS.accountSignedOut, {});
+    }
+
+    /**
+     * @param {string} field
+     * @returns {{ seq: number, confirmed: unknown, pending: object|null, running: boolean }}
+     */
+    #state(field) {
+        if (!this.#states.has(field)) {
+            this.#states.set(field, {
+                seq: 0,
+                confirmed: this.#user?.[field] ?? null,
+                pending: null,
+                running: false,
+            });
+        }
+        return this.#states.get(field);
+    }
+
+    /**
+     * Sends the pending value of one field, then the next one if a newer intent arrived meanwhile.
+     *
+     * @param {string} field
+     */
+    async #drain(field) {
+        const state = this.#state(field);
+        if (state.running || !state.pending) return;
+
+        const job = state.pending;
+        state.pending = null;
+        state.running = true;
+
+        try {
+            const user = await this.#model.update({ [field]: job.value });
+            state.confirmed = user?.[field] ?? job.value;
+            if (job.token.rev === state.seq) {
+                this.#user = user;
+                this.#bus.emit(APP_EVENTS.accountSaved, { user, changed: [field] });
+                job.waiter.resolve({ token: job.token, user });
+            }
+            else {
+                job.waiter.resolve({ token: job.token, user, superseded: true });
+            }
+        }
+        catch (error) {
+            if (job.token.rev === state.seq) job.waiter.reject(error);
+            else job.waiter.resolve({ token: job.token, error, superseded: true });
+        }
+        finally {
+            state.running = false;
+            if (state.pending) this.#drain(field);
+        }
+    }
+}
+
+/** The page's account. */
+export const account = new AccountService();

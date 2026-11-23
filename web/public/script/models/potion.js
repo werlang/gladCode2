@@ -19,21 +19,23 @@ export class PotionModel {
     }
 
     /**
-     * @returns {Promise<{ slots: Array<{ id: number, potion: string, name: string, icon: string, secondsLeft: number }>, unlockLevels: number[], level: number }>}
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ slots: Array<{ id: number, identifier: string, name: string, icon: string, expiresAt: string, seconds: number }>, serverNow: string, unlockLevels: number[], level: number }>}
      */
-    static slots() {
-        return api.get('potions/slots');
+    static slots({ signal } = {}) {
+        return api.get('potions/slots', {}, { signal });
     }
 
     /**
      * Orders a potion into a free slot.
      *
      * @param {string} potion Potion identifier.
-     * @returns {Promise<{ slotId: number, silver: number }>}
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ slotId: number, silver: number, slots?: Array<object>, serverNow?: string }>}
      * @throws {import('../helpers/request.js').RequestError} `NO_FREE_SLOT`, `APOTHECARY_LEVEL`, `NOT_ENOUGH_SILVER`.
      */
-    static buy(potion) {
-        return api.post('potions/slots', { potion });
+    static buy(potion, { signal } = {}) {
+        return api.post('potions/slots', { potion }, { signal });
     }
 
     /**

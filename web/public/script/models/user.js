@@ -13,11 +13,20 @@ export class UserModel {
     /**
      * Fetches the signed-in user once per page; later calls share the answer.
      *
-     * @param {{ refresh?: boolean }} [options] `refresh` asks the server again.
+     * @param {{ refresh?: boolean, signal?: AbortSignal }} [options] `refresh` asks the server again;
+     *   `signal` cancels the request.
      * @returns {Promise<Record<string, any>|null>} The user, or null for a visitor.
      */
-    static current({ refresh = false } = {}) {
-        if (!current || refresh) current = api.get('users/me').then(answer => answer.user);
+    static current({ refresh = false, signal } = {}) {
+        if (!current || refresh) {
+            current = api.get('users/me', {}, { signal }).then(
+                answer => answer.user,
+                error => {
+                    current = null;
+                    throw error;
+                },
+            );
+        }
         return current;
     }
 
@@ -56,13 +65,14 @@ export class UserModel {
     /**
      * Saves profile changes; only the fields given change.
      *
-     * @param {{ nickname?: string, language?: string, picture?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean }} fields
+     * @param {{ nickname?: string, language?: string, picture?: string, preferences?: Record<string, boolean>, theme?: string, gladView?: string, editorTheme?: string, editorFont?: number, showTutorial?: boolean }} fields
      *   `picture` is a new cropped image as a data URL.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<Record<string, any>>} The updated user.
      * @throws {import('../helpers/request.js').RequestError} `NICKNAME_TAKEN` when the nickname is in use.
      */
-    static async update(fields) {
-        const { user } = await api.put('users/me', fields);
+    static async update(fields, { signal } = {}) {
+        const { user } = await api.put('users/me', fields, { signal });
         current = Promise.resolve(user);
         return user;
     }

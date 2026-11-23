@@ -206,11 +206,12 @@ export class MessageModel {
  */
 export class NotificationModel {
     /**
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ user: { level: number, xp: number, silver: number }, messages: number, friends: number,
      *   gladiators: { remaining: number, outdated: number }, reports: { ranked: number, duel: number }, duels: number, news: number }>}
      */
-    static counts() {
-        return api.get('notifications');
+    static counts({ signal } = {}) {
+        return api.get('notifications', {}, { signal });
     }
 }
 

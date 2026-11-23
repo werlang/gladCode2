@@ -4,7 +4,7 @@ import path from 'node:path';
 const PUBLIC = path.join(import.meta.dirname, '../public');
 
 /** Folders under `public/script/` whose ES modules are versioned in the import map. */
-export const MODULE_DIRS = ['', 'components', 'editor', 'helpers', 'models', 'profile', 'templates'];
+export const MODULE_DIRS = ['', 'components', 'editor', 'helpers', 'models', 'profile', 'services', 'templates'];
 
 /** CDN modules of the 3D renderer. */
 const THREE_IMPORTS = {
