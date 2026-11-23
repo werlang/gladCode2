@@ -148,9 +148,9 @@ passes the counts to the header, the menu and the tab bar through their setters.
 
 ```mermaid
 sequenceDiagram
-    participant Timer as Timer / domain fact
+    participant Timer as Timer or fact
     participant Svc as NotificationService
-    participant API as GET /notifications
+    participant API
     participant Bus
     participant Header
     participant Menu as PainelMenu
@@ -176,12 +176,12 @@ switches) save immediately. The Perfil section keeps the previous value for the 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Choice as ChoiceCards / SegmentedControl / Switch / Input
+    participant Choice as ChoiceCards
     participant Section as Perfil section
     participant Svc as AccountService
+    participant API
     participant Bus
     participant Header
-    participant Cards as GladiatorCard / editor
     participant Toast
     User->>Choice: chooses Clássico
     Choice->>Section: component event 'change' { value: 'classic' }
@@ -220,11 +220,12 @@ sequenceDiagram
     participant Picker as GladiatorPicker
     participant Section as Batalhas section
     participant Panel as VersusPanel
+    participant Bus
     User->>Picker: clicks a card
     Picker->>Section: component event 'select' { gladiator }
     Section->>Picker: select(id) (the lifted state)
     Section->>Panel: setGladiator(gladiator)
-    Section->>Section: emit fact 'gladiator:chosen' { gladiator, mode: 'ranked' }
+    Section->>Bus: emit('gladiator:chosen', { gladiator, mode: 'ranked' })
     Section->>Panel: setPotions(slots) / setReward(text)
 ```
 
@@ -244,6 +245,7 @@ sequenceDiagram
     participant Section as Ranking section
     participant Table as RankingTable
     participant Page as Pagination
+    participant API
     participant Bus
     User->>Jump: clicks Magnus (#128)
     Jump->>Section: component event 'jump' { gladiator, position: 128 }
@@ -265,7 +267,7 @@ last page and says so. The table keeps the “Você” tag and the own row's con
 sequenceDiagram
     participant Section as Mensagens section
     participant Svc as MessagesService
-    participant API as PUT /messages/:id
+    participant API
     participant Bus
     participant List as ConversationList
     participant Notif as NotificationService
@@ -293,9 +295,10 @@ sequenceDiagram
     participant Banner as InviteBanner
     participant Section as Amigos section
     participant Svc as FriendsService
-    participant API as PUT /friends/requests/:id
+    participant API
     participant Bus
     participant Notif as NotificationService
+    participant Toast
     User->>Banner: Aceitar
     Banner->>Section: component event 'accept'
     Section->>Banner: setBusy(true)
@@ -320,7 +323,7 @@ sequenceDiagram
     participant Card as PotionCard
     participant Section as Poções section
     participant Svc as PotionsService
-    participant API as POST /potions/slots
+    participant API
     participant Bus
     participant Slot as PotionSlot
     participant Header
