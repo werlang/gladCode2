@@ -8,7 +8,7 @@ import { gladiatorLimit } from './gladiator.js';
 export class Notification {
     /**
      * @param {{ id: number, lvl: number, xp: number, silver: number }} user
-     * @returns {Promise<{ user: { level: number, xp: number, silver: number }, messages: number, friends: number,
+     * @returns {Promise<{ version: string, user: { level: number, xp: number, silver: number }, messages: number, friends: number,
      *   gladiators: { used: number, limit: number, remaining: number, outdated: number }, reports: { ranked: number, duel: number }, duels: number, news: number }>}
      */
     static async counts(user) {
@@ -27,6 +27,7 @@ export class Notification {
         );
         const count = name => Number(row[name]);
         return {
+            version: VERSION,
             user: { level: user.lvl, xp: user.xp, silver: user.silver },
             messages: count('messages'),
             friends: count('friends'),

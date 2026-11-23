@@ -6,6 +6,26 @@ import { Battle } from './battle.js';
 import { Friendship } from './friendship.js';
 import { Gladiator } from './gladiator.js';
 
+/**
+ * One duel row seen from the master's side; `user` is the other master's nick.
+ *
+ * @param {Record<string, any>} row
+ * @param {number} userId
+ * @returns {{ id: number, time: string, log: string, read: boolean, glad: string, enemy: string, user: string }}
+ */
+function duelJson(row, userId) {
+    const mine = row.user1 === userId;
+    return {
+        id: row.id,
+        time: row.time,
+        log: row.log,
+        read: Boolean(Number(row.isread)),
+        glad: mine ? row.glad1 : row.glad2,
+        enemy: mine ? row.glad2 : row.glad1,
+        user: mine ? row.nick2 : row.nick1,
+    };
+}
+
 /** Duels per history page. */
 export const DUELS_PAGE_SIZE = 10;
 
@@ -89,21 +109,26 @@ export class Duel {
         );
         await Mysql.update('duels', { isread: 1 }, { user1: userId, log: { not: null }, isread: 0 });
 
-        return {
-            total: Number(total),
-            duels: rows.map(row => {
-                const mine = row.user1 === userId;
-                return {
-                    id: row.id,
-                    time: row.time,
-                    log: row.log,
-                    read: Boolean(Number(row.isread)),
-                    glad: mine ? row.glad1 : row.glad2,
-                    enemy: mine ? row.glad2 : row.glad1,
-                    user: mine ? row.nick2 : row.nick1,
-                };
-            }),
-        };
+        return { total: Number(total), duels: rows.map(row => duelJson(row, userId)) };
+    }
+
+    /**
+     * Finished duels the master has not read, without marking them read. This is the bell's passive
+     * duel feed; opening a report history still marks rows read where the model already does.
+     *
+     * @param {number} userId
+     * @returns {Promise<object[]>}
+     */
+    static async unreadReports(userId) {
+        const rows = await Mysql.select(
+            `SELECT d.id, d.time, d.log, d.isread, g1.name AS glad1, g2.name AS glad2, u1.apelido AS nick1, u2.apelido AS nick2, d.user1
+            FROM duels d LEFT JOIN gladiators g1 ON g1.cod = d.gladiator1 LEFT JOIN gladiators g2 ON g2.cod = d.gladiator2
+            INNER JOIN usuarios u1 ON u1.id = d.user1 INNER JOIN usuarios u2 ON u2.id = d.user2
+            WHERE d.isread = 0 AND d.log IS NOT NULL AND (d.user1 = ? OR d.user2 = ?)
+            ORDER BY d.time DESC`,
+            [userId, userId],
+        );
+        return rows.map(row => duelJson(row, userId));
     }
 
     /**

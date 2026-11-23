@@ -4,6 +4,7 @@ vi.mock('../../../helpers/mysql.js', () => ({ Mysql: { select: vi.fn(), update: 
 
 const { Mysql } = await import('../../../helpers/mysql.js');
 const { Notification } = await import('../../../model/notification.js');
+const { VERSION } = await import('../../../helpers/version.js');
 
 describe('notification counts', () => {
     beforeEach(() => vi.resetAllMocks());
@@ -17,6 +18,7 @@ describe('notification counts', () => {
         const counts = await Notification.counts({ id: 7, lvl: 10, xp: 10, silver: 1250 });
 
         expect(counts.gladiators).toEqual({ used: 4, limit: 2, remaining: -2, outdated: 1 });
+        expect(counts.version).toBe(VERSION);
         expect(counts.bell).toBeUndefined();
         expect(counts.user).toEqual({ level: 10, xp: 10, silver: 1250 });
     });

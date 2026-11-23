@@ -60,6 +60,19 @@ describe('social models', () => {
         expect(sendMail).not.toHaveBeenCalled();
     });
 
+    test('the bell can read unread finished duels without marking them', async () => {
+        Mysql.select.mockResolvedValue([{
+            id: 3, time: '2026-01-01 10:00:00', log: 'ab12', isread: 0,
+            glad1: 'Magnus', glad2: 'Arcaness', nick1: 'Ana', nick2: 'Bo', user1: 7,
+        }]);
+        expect(await Duel.unreadReports(9)).toEqual([{
+            id: 3, time: '2026-01-01 10:00:00', log: 'ab12', read: false,
+            glad: 'Arcaness', enemy: 'Magnus', user: 'Ana',
+        }]);
+        expect(Mysql.update).not.toHaveBeenCalled();
+        expect(Mysql.select.mock.calls[0][0]).toContain('d.isread = 0');
+    });
+
     test('a reply always keeps its own text, quoting only what still fits', () => {
         // a long thread: the original already quotes an older message and fills the column
         const original = `<quote>${'o'.repeat(500)}</quote>${'a'.repeat(1530)}&#60;b&#62;`;

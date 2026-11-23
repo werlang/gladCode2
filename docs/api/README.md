@@ -57,6 +57,7 @@ From `api/route/duels.js`.
 | --- | --- | --- | --- |
 | `GET` | `/duels` | signed in | Challenges waiting for the master's answer: `{ duels }`. |
 | `GET` | `/duels/history?offset=0` | signed in | A page of the master's duels: `{ total, duels }`. |
+| `GET` | `/duels/unread` | signed in | Finished duels the master has not read: `{ duels }`. The bell uses this feed without marking them. |
 | `POST` | `/duels` | signed in | Challenges a friend: `{ friend, gladiator }`. The friend is emailed unless they opted out. |
 | `POST` | `/duels/:id/battle` | signed in | Answers a challenge with one of the master's gladiators: `{ gladiator }`. Answers `{ hash, error }`. |
 | `DELETE` | `/duels/:id` | signed in | Refuses a challenge, or withdraws one the master made. |
@@ -123,7 +124,7 @@ From `api/route/notifications.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/notifications` | signed in | The profile counters (unread messages and reports, friend requests, duels, news, gladiator places) and the master's level, xp and silver. Marks the master as active. |
+| `GET` | `/notifications` | signed in | The profile counters (unread messages and reports, friend requests, duels, news, gladiator places), the master's level, xp and silver, and the running engine `version`. Marks the master as active. |
 | `POST` | `/notifications/read` | signed in | Marks the passive groups read (news, ranked/duel reports and finished duels). Pending duels and friend requests stay until answered. Answers `{ read, news }`. |
 
 ## potions

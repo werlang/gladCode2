@@ -24,6 +24,14 @@ router.get('/history', asyncRoute(async (req, res) => {
 }));
 
 /**
+ * GET /duels/unread
+ * Finished duels the master has not read: `{ duels }`. The bell uses this feed without marking them.
+ */
+router.get('/unread', asyncRoute(async (req, res) => {
+    res.send({ duels: await Duel.unreadReports(req.user.id) });
+}));
+
+/**
  * POST /duels
  * Challenges a friend: `{ friend, gladiator }`. The friend is emailed unless they opted out.
  */
