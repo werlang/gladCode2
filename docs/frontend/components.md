@@ -504,6 +504,30 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Events:** `order` `{ potion }`.
 - **Boards:** `Pocoes.dc.html`.
 
+### RankingTable — new (WP7)
+
+- **File:** `components/ranking-table.js`; **CSS:** `css/components/ranking-table.css`.
+- **Purpose:** the ranking table: position, gladiator (with the VOCÊ tag), master, 7-day trend, renown,
+  the own row highlighted, a podium summary and the header strip “Em volta de X · posições 124–132”.
+- **Constructor:** `new RankingTable({ element })`.
+- **Methods:** `setRows(rows)`, `setContext({ around, position, page })`, `setBusy(on)`.
+- **Events:** `open-gladiator` `{ gladiator }` (a row links to the gladiator/master).
+- **ARIA:** a real `<table>` with `<th scope="col">`; the own row is marked in text (“VOCÊ”); trends read
+  “subiu 9” / “desceu 3” / “estável”.
+- **Boards:** `Ranking.dc.html`.
+
+### OwnGladiatorJump — new (WP7)
+
+- **File:** `components/own-gladiator-jump.js`; **CSS:** `css/components/own-gladiator-jump.css`.
+- **Purpose:** the “SEUS GLADIADORES” strip: one chip per own gladiator with its position and an arrow to
+  jump the table; a gladiator out of the ranking is dimmed and says why (desatualizado / com erro).
+- **Constructor:** `new OwnGladiatorJump({ element, gladiators })`.
+- **Methods:** `setGladiators(list)`, `setActive(id)`.
+- **Events:** `jump` `{ gladiator, position }`.
+- **ARIA:** each chip is a link/button with a `title` naming the destination; `aria-current="page"` on
+  the active one.
+- **Boards:** `Ranking.dc.html`.
+
 ### ConversationList — new (WP8)
 
 - **File:** `components/conversation-list.js`; **CSS:** `css/components/conversation-list.css`.
@@ -560,30 +584,6 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Events:** `accept` `{}`, `refuse` `{}`.
 - **ARIA:** `<section aria-label>` naming the invite; both actions are buttons.
 - **Boards:** `Amigos.dc.html`, `Batalhas.dc.html`.
-
-### RankingTable — new (WP7)
-
-- **File:** `components/ranking-table.js`; **CSS:** `css/components/ranking-table.css`.
-- **Purpose:** the ranking table: position, gladiator (with the VOCÊ tag), master, 7-day trend, renown,
-  the own row highlighted, a podium summary and the header strip “Em volta de X · posições 124–132”.
-- **Constructor:** `new RankingTable({ element })`.
-- **Methods:** `setRows(rows)`, `setContext({ around, position, page })`, `setBusy(on)`.
-- **Events:** `open-gladiator` `{ gladiator }` (a row links to the gladiator/master).
-- **ARIA:** a real `<table>` with `<th scope="col">`; the own row is marked in text (“VOCÊ”); trends read
-  “subiu 9” / “desceu 3” / “estável”.
-- **Boards:** `Ranking.dc.html`.
-
-### OwnGladiatorJump — new (WP7)
-
-- **File:** `components/own-gladiator-jump.js`; **CSS:** `css/components/own-gladiator-jump.css`.
-- **Purpose:** the “SEUS GLADIADORES” strip: one chip per own gladiator with its position and an arrow to
-  jump the table; a gladiator out of the ranking is dimmed and says why (desatualizado / com erro).
-- **Constructor:** `new OwnGladiatorJump({ element, gladiators })`.
-- **Methods:** `setGladiators(list)`, `setActive(id)`.
-- **Events:** `jump` `{ gladiator, position }`.
-- **ARIA:** each chip is a link/button with a `title` naming the destination; `aria-current="page"` on
-  the active one.
-- **Boards:** `Ranking.dc.html`.
 
 ## Composition map
 
