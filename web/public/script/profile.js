@@ -3,6 +3,7 @@ import { createToast, isModalOpen } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { resolveRoute, SECTION_SHORTCUTS, sectionTitle, sectionUrl } from './helpers/painel-route.js';
+import { isAborted } from './helpers/section-request.js';
 import { RankModel } from './models/rank.js';
 import { BattleTab } from './profile/battle.js';
 import { FriendsTab } from './profile/friends.js';
@@ -86,10 +87,6 @@ async function start() {
     const contents = [...document.querySelectorAll('#panel .content')];
     let rankingLoaded = false;
 
-    const selectBattleMode = mode => {
-        if (!mode) return;
-        document.querySelector(`#battle-container #battle-mode #${CSS.escape(mode)}.button`)?.click();
-    };
 
     /** One lifecycle adapter per existing controller; the old sections only need show(). */
     const adapters = Object.fromEntries(Object.entries(tabs).map(([section, tab]) => {
@@ -115,7 +112,7 @@ async function start() {
     let generation = 0;
 
     const reportError = error => {
-        if (error?.aborted) return;
+        if (isAborted(error)) return;
         createToast('Não foi possível carregar esta seção. Tente novamente.', 'error');
     };
 
@@ -145,7 +142,6 @@ async function start() {
             return;
         }
         if (token !== generation || controller.signal.aborted) return;
-        if (route.section === 'battle') setTimeout(() => selectBattleMode(route.subtab), 0);
         events.emit(APP_EVENTS.navigationOpened, { section: route.section, href: sectionUrl(route) });
         if (!same) window.scrollTo({ top: 0, behavior: 'auto' });
         if (focus && !same) requestAnimationFrame(() => {

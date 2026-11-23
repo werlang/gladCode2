@@ -1,4 +1,5 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, isVisible } from '../helpers/animate.js';
 import { FriendModel } from '../models/social.js';
 import { ChallengeList, challengeFriend } from './duels.js';
@@ -29,25 +30,15 @@ export class BattleTab {
         this.trainings = new TrainingsTab();
     }
 
-    /** Binds the modes and opens the one named in the URL (`battle.<mode>`). */
+    /** Binds the modes; the route decides which one opens and loads. */
     init() {
         this.tournaments.init();
         this.trainings.init();
 
-        const modes = {
-            ranked: () => {},
-            duel: () => {},
-            tourn: () => this.tournaments.refresh({ signal: this.#signal }),
-            train: () => this.trainings.refresh({ signal: this.#signal }),
-        };
         this.#panel.querySelectorAll('#battle-mode .button').forEach(button => {
             button.addEventListener('click', () => {
-                this.#panel.querySelectorAll('#battle-mode .button').forEach(other => other.classList.remove('selected'));
-                button.classList.add('selected');
-                this.#panel.querySelectorAll('.wrapper').forEach(wrapper => hide(wrapper));
-                const wrapper = this.#panel.querySelector(`#${button.id}.wrapper`);
-                if (!isVisible(wrapper)) fadeIn(wrapper);
-                modes[button.id]?.();
+                this.#selectMode(button.id);
+                runSectionTask(() => this.#loadMode(button.id));
             });
         });
 
@@ -55,17 +46,50 @@ export class BattleTab {
     }
 
     /**
-     * Opens the tab: the gladiators for a ranked battle and the duel challenges.
+     * Opens the mode named in the route and loads only what that mode needs.
      *
-     * @param {object} [route]
+     * @param {{ subtab?: string }} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
     show(route = {}, { signal } = {}) {
         this.#signal = signal;
-        return Promise.all([
-            this.ranked.refresh({ signal }),
-            this.challenges.refresh({ signal }),
-        ]);
+        const mode = ['ranked', 'duel', 'tourn', 'train'].includes(route.subtab) ? route.subtab : 'ranked';
+        this.#selectMode(mode);
+        return this.#loadMode(mode);
+    }
+
+    /**
+     * Marks one mode as selected and shows its panel.
+     *
+     * @param {'ranked'|'duel'|'tourn'|'train'} mode
+     */
+    #selectMode(mode) {
+        this.#panel.querySelectorAll('#battle-mode .button').forEach(button => {
+            button.classList.toggle('selected', button.id === mode);
+        });
+        this.#panel.querySelectorAll('.wrapper').forEach(wrapper => hide(wrapper));
+        const wrapper = this.#panel.querySelector(`#${mode}.wrapper`);
+        if (!isVisible(wrapper)) fadeIn(wrapper);
+    }
+
+    /**
+     * Loads the data of one mode; the other modes are not touched.
+     *
+     * @param {'ranked'|'duel'|'tourn'|'train'} mode
+     * @returns {Promise<unknown>}
+     */
+    #loadMode(mode) {
+        const signal = this.#signal;
+        if (mode === 'duel') {
+            const input = this.#panel.querySelector('#duel.wrapper .input');
+            return Promise.all([
+                this.challenges.refresh({ signal }),
+                this.#filterFriends(input.value),
+            ]);
+        }
+        if (mode === 'tourn') return this.tournaments.refresh({ signal });
+        if (mode === 'train') return this.trainings.refresh({ signal });
+        return this.ranked.refresh({ signal });
     }
 
     /** The duel part: filter friends, pick one and challenge them. */
@@ -73,19 +97,18 @@ export class BattleTab {
         const wrapper = this.#panel.querySelector('#duel.wrapper');
         const input = wrapper.querySelector('.input');
         const challenge = wrapper.querySelector('#challenge');
-        input.addEventListener('input', () => this.#filterFriends(input.value));
+        input.addEventListener('input', () => runSectionTask(() => this.#filterFriends(input.value)));
         challenge.addEventListener('click', () => {
             if (this.#friend) challengeFriend(this.#friend.nick, this.#friend.user);
         });
-        this.#filterFriends('');
     }
 
     /** @param {string} text Nickname filter. */
     async #filterFriends(text) {
         const signal = this.#signal;
         const request = ++this.#filterRequest;
-        const friends = await FriendModel.filter(text, { signal });
-        if (signal?.aborted || request !== this.#filterRequest) return;
+        const friends = await settleRequest(() => FriendModel.filter(text, { signal }), signal);
+        if (!friends || signal?.aborted || request !== this.#filterRequest) return;
         const table = this.#panel.querySelector('#duel.wrapper #table-friends');
         const challenge = this.#panel.querySelector('#duel.wrapper #challenge');
         table.replaceChildren();

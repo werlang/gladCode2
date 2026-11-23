@@ -18,7 +18,8 @@ function fakeNode(children = {}) {
     const classes = new Set();
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
-        replaced: 0, appended: 0, removed: 0, style: {},
+        replaced: 0, appended: 0, removed: 0, style: {}, offsetWidth: 0, offsetHeight: 0,
+        getClientRects: () => [],
         classList: {
             add: (...names) => names.forEach(name => classes.add(name)),
             remove: (...names) => names.forEach(name => classes.delete(name)),
@@ -252,7 +253,7 @@ test('reports keep the placeholder when the page arrives after leaving', async (
     }
 });
 
-test('battle hands the navigation signal to both of its loaders', async () => {
+test('battle loads the default ranked mode with the navigation signal', async () => {
     const panel = fakeNode();
     installDocument(new Map([
         ['#panel #battle-container', panel],
@@ -268,7 +269,47 @@ test('battle hands the navigation signal to both of its loaders', async () => {
     tab.challenges = { refresh: options => received.push(options) };
     const controller = new AbortController();
     await tab.show({}, { signal: controller.signal });
-    assert.deepEqual(received, [{ signal: controller.signal }, { signal: controller.signal }]);
+    assert.deepEqual(received, [{ signal: controller.signal }]);
+});
+
+test('tournament and training routes load only their own mode', async () => {
+    const buttons = ['ranked', 'duel', 'tourn', 'train'].map(id => {
+        const button = fakeNode();
+        button.id = id;
+        return button;
+    });
+    const wrappers = Object.fromEntries(['ranked', 'duel', 'tourn', 'train'].map(id => [id, fakeNode()]));
+    const panel = fakeNode();
+    panel.querySelectorAll = selector => {
+        if (selector === '#battle-mode .button') return buttons;
+        if (selector === '.wrapper') return Object.values(wrappers);
+        return [];
+    };
+    panel.querySelector = selector => {
+        const match = selector.match(/^#(\w+)\.wrapper$/);
+        return match ? wrappers[match[1]] : null;
+    };
+    installDocument(new Map([
+        ['#panel #battle-container', panel],
+        ['#duel-challenge', fakeNode({ '.table': fakeNode() })],
+        ['#battle-container #ranked.wrapper .glad-card-container', fakeNode()],
+        ['#battle-container #match-find', fakeNode()],
+        ['#panel #battle-container #tourn.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
+        ['#panel #battle-container #train.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
+    ]));
+    for (const mode of ['tourn', 'train']) {
+        const tab = new BattleTab(() => {});
+        const loaded = [];
+        tab.ranked = { refresh: async () => { throw new Error('ranked down'); } };
+        tab.challenges = { refresh: async () => { throw new Error('duels down'); } };
+        tab.tournaments = { refresh: async options => loaded.push(['tourn', options]) };
+        tab.trainings = { refresh: async options => loaded.push(['train', options]) };
+        const controller = new AbortController();
+        await tab.show({ subtab: mode }, { signal: controller.signal });
+        assert.deepEqual(loaded, [[mode, { signal: controller.signal }]]);
+        assert.equal(buttons.find(button => button.id === mode).classList.contains('selected'), true);
+        assert.notEqual(wrappers[mode].style.display, 'none');
+    }
 });
 
 test('battle duel challenges drop a late list', async () => {

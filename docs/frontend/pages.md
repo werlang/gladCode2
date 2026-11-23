@@ -66,6 +66,7 @@ One function, `resolveRoute(url)`, is the only place a URL becomes a shell state
 - `/news`, `/glads`, `/potion`, `/battle`, `/reports`, `/ranking`, `/messages`, `/friends` map to their
   section ids (`report` for `/reports`).
 - `/battle.<mode>` sets `subtab`; a `/profile?t=battle&s=<mode>` legacy URL resolves to the same state.
+  The routed mode is selected and loaded alone: a failure in another mode's list cannot block it.
 - `/profile?t=<tab>` resolves the section from `tab` (`report`, `potions` accepted alongside the route
   names), then `?s=` as the subtab; an unknown or disabled tab resolves to `profile`.
 - `/ranking?at=<n>` sets `query.at` (a positive integer, else ignored); `/ranking?q=` sets `query.q`.
@@ -202,7 +203,8 @@ WP3 adapts the existing controllers to this shape; WP4–WP8 rewrite them sectio
    the list loads).
 4. **Unmount.** The shell calls `unmount()` before mounting a different section: abort the controller,
    clear timers and intervals, `destroy()` the components it owns, remove its listeners, cancel the
-   countdowns. A late response after `unmount()` is ignored (`RequestError.aborted` is not shown).
+   countdowns. A late response after `unmount()` is ignored, and a cancelled load ends silently
+   (`RequestError.aborted` is not shown), including reloads started by a section control.
 5. **Navigation.** On mount the shell sets `document.title` (`gladCode - <section>`), updates the active
    entry (`navigation:opened`), scrolls the content to the top, and moves focus to the section's `<h1>`
    (`tabindex="-1"`) **only when the change came from a click, a shortcut or `popstate`** — not on the
