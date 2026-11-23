@@ -1,0 +1,156 @@
+/* AccountMenu (components/account-menu.js): the avatar popover over the chrome. */
+.account-menu {
+    position: fixed;
+    top: calc(var(--layout-header-height) - 4px);
+    right: var(--space-4);
+    z-index: calc(var(--z-header) + 4);
+    width: min(320px, calc(100vw - 24px));
+    border: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 16%, transparent);
+    border-radius: var(--radius-xl);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+
+    &[hidden] {
+        display: none;
+    }
+
+    .account-menu-panel {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .account-menu-identity {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4);
+    }
+
+    .account-menu-avatar .avatar {
+        --avatar-size: 44px;
+    }
+
+    .account-menu-who {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        min-width: 0;
+    }
+
+    .account-menu-name {
+        color: var(--color-text-on-brand);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .account-menu-level {
+        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        font-size: var(--text-xs);
+    }
+
+    .account-menu-links,
+    .account-menu-footer {
+        display: flex;
+        flex-direction: column;
+        padding: var(--space-1) var(--space-1) 0;
+        border-top: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 12%, transparent);
+    }
+
+    .account-menu-footer {
+        padding-bottom: var(--space-1);
+    }
+
+    .account-menu-link {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        width: 100%;
+        min-height: 42px;
+        padding: 0 var(--space-3);
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--color-header-text);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+
+        svg {
+            flex: none;
+            color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        }
+
+        kbd {
+            margin-left: auto;
+            font-family: var(--font-mono);
+            font-size: var(--text-2xs);
+            color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        }
+
+        &:hover {
+            background: color-mix(in srgb, var(--color-header-text) 9%, transparent);
+        }
+    }
+
+    .account-menu-theme {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4) var(--space-4);
+        border-top: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 12%, transparent);
+    }
+
+    .account-menu-label {
+        font-size: var(--text-xs);
+        color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+    }
+
+    .account-menu-themes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-1);
+    }
+
+    .account-menu-themes button {
+        min-height: 34px;
+        padding: 0 var(--space-2);
+        border: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 20%, transparent);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: color-mix(in srgb, var(--color-header-text) 82%, transparent);
+        font: var(--text-xs) var(--font-body);
+        cursor: pointer;
+
+        &[aria-pressed='true'] {
+            border-color: var(--color-accent);
+            background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+            color: var(--color-text-on-brand);
+        }
+    }
+
+    .account-menu-signout {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-height: 42px;
+        padding: 0 var(--space-3);
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--color-danger);
+        font: 500 var(--text-sm) var(--font-body);
+        text-align: left;
+        cursor: pointer;
+
+        &:hover {
+            background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+        }
+    }
+}

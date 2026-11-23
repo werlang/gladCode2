@@ -6,9 +6,9 @@
     font-family: var(--font-body);
     font-size: var(--text-sm);
     position: fixed;
-    top: 0;
+    top: var(--layout-header-height);
     left: 0;
-    height: 100vh;
+    height: calc(100vh - var(--layout-header-height));
     overflow-y: auto;
     padding: var(--space-9) 0 var(--space-6) 0;
     box-sizing: border-box;

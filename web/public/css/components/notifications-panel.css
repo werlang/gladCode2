@@ -1,0 +1,109 @@
+/* NotificationsPanel (components/notifications-panel.js): the bell popover. */
+.notifications-panel {
+    position: fixed;
+    top: calc(var(--layout-header-height) - 4px);
+    right: var(--space-4);
+    z-index: calc(var(--z-header) + 4);
+    width: min(380px, calc(100vw - 24px));
+    border: var(--space-hairline) solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+
+    &[hidden] {
+        display: none;
+    }
+
+    .notifications-panel-inner {
+        max-height: min(560px, calc(100vh - var(--layout-header-height) - 20px));
+        overflow-y: auto;
+    }
+
+    .notifications-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-4) var(--space-3);
+        border-bottom: var(--space-hairline) solid var(--color-border);
+        color: var(--color-text-strong);
+        font-size: var(--text-sm);
+    }
+
+    .notifications-panel-read {
+        border: 0;
+        background: transparent;
+        color: var(--color-brand-text);
+        font: var(--text-xs) var(--font-body);
+        cursor: pointer;
+    }
+
+    .notifications-panel-group {
+        padding: var(--space-2) 0 var(--space-1);
+    }
+
+    .notifications-panel-label {
+        display: block;
+        padding: var(--space-2) var(--space-4);
+        color: var(--color-accent-text);
+        font: 600 var(--text-2xs) var(--font-body);
+        letter-spacing: 0.12em;
+    }
+
+    .notifications-panel-group[data-group='news'] .notifications-panel-label {
+        color: var(--color-text-muted);
+    }
+
+    .notifications-panel-item {
+        display: flex;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        color: var(--color-text);
+        text-decoration: none;
+        border-left: 3px solid transparent;
+
+        &:hover,
+        &:focus-visible {
+            background: var(--color-surface-alt);
+        }
+
+        [data-group='needs'] & {
+            border-left-color: var(--color-accent);
+        }
+    }
+
+    .notifications-panel-dot {
+        flex: none;
+        width: 8px;
+        height: 8px;
+        margin-top: 6px;
+        border-radius: var(--radius-round);
+        background: var(--color-accent);
+    }
+
+    .notifications-panel-text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        font-size: var(--text-sm);
+        line-height: 1.4;
+    }
+
+    .notifications-panel-where {
+        color: var(--color-text-muted);
+        font-size: var(--text-xs);
+    }
+
+    .notifications-panel-empty {
+        padding: var(--space-5);
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+        text-align: center;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+}

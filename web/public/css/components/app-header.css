@@ -1,0 +1,409 @@
+/*
+ * AppHeader (components/app-header.js): the fixed frame of every page that uses the shared header.
+ * The 64 px (56 on phones) chrome comes from the header tokens, so Arena and Classic share the layout.
+ */
+:root {
+    --layout-header-height: 64px;
+}
+
+@media only screen and (max-width: 599px) {
+    :root {
+        --layout-header-height: 56px;
+    }
+}
+
+body:has(#app-header) {
+    padding-top: 14px;
+}
+
+body:has(#painel) {
+    padding-top: 0;
+}
+
+@media only screen and (max-width: 599px) {
+    body:has(#app-header) {
+        padding-top: 6px;
+    }
+}
+
+#header-container {
+    height: var(--layout-header-height);
+}
+
+#app-header .app-header {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    width: 100%;
+    height: var(--layout-header-height);
+    padding: 0 var(--space-5) 0 var(--space-5);
+    background-color: var(--color-header-bg);
+    color: var(--color-header-text);
+    border-bottom: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 14%, transparent);
+    font-family: var(--font-body);
+
+    .app-header-logo {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        flex: none;
+
+        img {
+            display: block;
+            height: 26px;
+            width: auto;
+            filter: var(--logo-filter);
+        }
+    }
+
+    &.is-signed-out [data-nav='painel'] {
+        display: none;
+    }
+
+    .app-header-nav {
+        display: none;
+        align-items: stretch;
+        height: 100%;
+        gap: var(--space-1);
+    }
+
+    .app-header-link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-1);
+        padding: 0 var(--space-3);
+        border: 0;
+        background: transparent;
+        color: var(--color-header-text);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &::after {
+            position: absolute;
+            right: var(--space-3);
+            bottom: 0;
+            left: var(--space-3);
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            background: transparent;
+            content: '';
+        }
+
+        &:hover,
+        &.is-active {
+            color: var(--color-text-on-brand);
+        }
+
+        &.is-active {
+            font-weight: 600;
+
+            &::after {
+                background: var(--color-accent);
+            }
+        }
+    }
+
+    .app-header-about {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .app-header-about-trigger {
+        svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    .app-header-dropdown {
+        position: absolute;
+        top: calc(100% - 1px);
+        left: 0;
+        z-index: calc(var(--z-header) + 2);
+        display: flex;
+        flex-direction: column;
+        min-width: 170px;
+        padding: var(--space-2);
+        border: var(--space-hairline) solid var(--color-border);
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        background: var(--color-header-bg);
+        box-shadow: var(--shadow-md);
+
+        &[hidden] {
+            display: none;
+        }
+
+        a {
+            display: flex;
+            align-items: center;
+            min-height: 40px;
+            padding: 0 var(--space-3);
+            border-radius: var(--radius-sm);
+            color: var(--color-header-text);
+            text-decoration: none;
+            font-size: var(--text-sm);
+
+            &:hover {
+                background-color: color-mix(in srgb, var(--color-header-text) 10%, transparent);
+            }
+        }
+    }
+
+    .app-header-search {
+        display: none;
+        align-items: center;
+        gap: var(--space-2);
+        flex: 1 1 200px;
+        max-width: 420px;
+        height: 40px;
+        margin-left: auto;
+        padding: 0 var(--space-2) 0 var(--space-3);
+        box-sizing: border-box;
+        border: var(--space-hairline) solid color-mix(in srgb, var(--color-header-text) 22%, transparent);
+        border-radius: var(--radius-lg);
+        background: color-mix(in srgb, var(--color-header-text) 8%, transparent);
+        color: color-mix(in srgb, var(--color-header-text) 72%, transparent);
+
+        svg {
+            flex: none;
+        }
+    }
+
+    .app-header-search-input {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--color-header-text);
+        font: var(--text-sm) var(--font-body);
+    }
+
+    .app-header-kbd {
+        flex: none;
+        height: 22px;
+        padding: 0 var(--space-2);
+        border: var(--space-hairline) solid color-mix(in srgb, var(--color-header-text) 22%, transparent);
+        border-radius: var(--radius-xs);
+        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        display: flex;
+        align-items: center;
+    }
+
+    .app-header-search-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin-left: auto;
+        border: 0;
+        background: transparent;
+        color: var(--color-header-text);
+        cursor: pointer;
+    }
+
+    .app-header-session {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex: none;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .app-header-battle,
+    .app-header-login {
+        &[hidden] {
+            display: none;
+        }
+
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        height: 40px;
+        padding: 0 var(--space-4) 0 var(--space-3);
+        border: 0;
+        border-radius: var(--radius-lg);
+        background: var(--color-accent);
+        color: var(--color-text-on-accent);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .app-header-silver {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        height: 40px;
+        margin-left: var(--space-1);
+        padding: 0 var(--space-3);
+        border-radius: var(--radius-lg);
+        background: color-mix(in srgb, var(--color-header-text) 7%, transparent);
+        color: var(--color-header-text);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .app-header-bell,
+    .app-header-avatar {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 0;
+        border-radius: var(--radius-lg);
+        background: transparent;
+        color: var(--color-header-text);
+        cursor: pointer;
+    }
+
+    .app-header-count {
+        position: absolute;
+        top: 4px;
+        right: 2px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 var(--space-1);
+        box-sizing: border-box;
+        border: 2px solid var(--color-header-bg);
+        border-radius: var(--radius-pill);
+        background: var(--color-accent);
+        color: var(--color-text-on-accent);
+        font-family: var(--font-body);
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .app-header-avatar-slot .avatar {
+        --avatar-size: 44px;
+    }
+
+    .app-header-login {
+        margin-left: auto;
+        padding-right: var(--space-4);
+    }
+
+    .app-header-google {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-round);
+        background: var(--color-surface);
+        color: var(--color-text);
+        font-family: var(--font-body);
+        font-size: var(--text-xs);
+        font-weight: 700;
+    }
+}
+
+#app-header .app-header-panels {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-header) + 1);
+    pointer-events: none;
+
+    > * {
+        pointer-events: auto;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    #app-header .app-header-search-button {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 899px) {
+    #app-header .app-header .app-header-battle,
+    #app-header .app-header .app-header-silver {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 900px) {
+    #app-header .app-header {
+        gap: var(--space-6);
+        padding: 0 var(--space-5) 0 var(--space-6);
+
+        .app-header-nav,
+        .app-header-search {
+            display: flex;
+        }
+
+        .app-header-search-button {
+            display: none;
+        }
+
+        .app-header-logo img {
+            height: 26px;
+        }
+    }
+}
+
+@media only screen and (max-width: 599px) {
+    #app-header .app-header {
+        gap: var(--space-2);
+        padding: 0 var(--space-2) 0 var(--space-4);
+
+        .app-header-battle,
+        .app-header-silver {
+            display: none;
+        }
+
+        .app-header-login {
+            height: 36px;
+            padding: 0 var(--space-3);
+            font-size: var(--text-xs);
+        }
+
+        .app-header-search-button {
+            margin-left: auto;
+        }
+    }
+}
+
+/* Classic keeps the brand-blue chrome; the active underline and CTA follow the board's white. */
+.theme-classic #app-header .app-header-link.is-active::after {
+    background: var(--color-header-text);
+}
+
+.theme-classic #app-header .app-header-battle,
+.theme-classic #app-header .app-header-login {
+    background: var(--color-surface);
+    color: var(--color-brand-text);
+}
+
+.theme-classic #app-header .app-header-google {
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
+}
