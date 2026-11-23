@@ -44,7 +44,7 @@ export const featuredNewsTemplate = `
     <div class='news-featured-body'>
         <div class='news-meta'>
             <span class='news-chip'>{{category}}</span>
-            <span class='news-version'>{{version}}</span>
+            {{{versionHtml}}}
             <span aria-hidden='true'>·</span>
             <time>{{date}}</time>
         </div>
@@ -53,6 +53,9 @@ export const featuredNewsTemplate = `
         <a class='news-read' href='/post/{{hash}}'>Ler notícia <span aria-hidden='true'>›</span></a>
     </div>
 </article>`;
+
+/** The engine version a post announces, when it carries one. */
+export const newsVersionTemplate = `<span class='news-version'>v{{version}}</span>`;
 
 /** One previous post row. */
 export const previousNewsTemplate = `

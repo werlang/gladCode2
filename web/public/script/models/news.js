@@ -2,7 +2,8 @@ import { api } from '../helpers/request.js';
 
 /**
  * News posts (`/news`). A post is `{ hash, title, time, body, category, excerpt, image, imageAlt,
- * version, read }`; its body is HTML written by the maintainer.
+ * version, read }`; `version` is the engine version the post announces, or null when it has none.
+ * Its body is HTML written by the maintainer.
  */
 export class NewsModel {
     /**

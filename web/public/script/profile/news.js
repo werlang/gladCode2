@@ -4,6 +4,8 @@ import { PageHeader } from '../components/page-header.js';
 import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { formatDayMonth, formatShortMonth } from '../helpers/date-format.js';
+import { NewsPager } from '../helpers/news-pager.js';
+import { potionTimeLeft } from '../helpers/potion-time.js';
 import { isAborted, runReadTask, secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { icon } from '../templates/icons.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -13,6 +15,7 @@ import {
     newsErrorTemplate,
     newsShellTemplate,
     newsTodoTemplate,
+    newsVersionTemplate,
     previousNewsTemplate,
 } from '../templates/profile-news.js';
 import { NewsModel } from '../models/news.js';
@@ -46,8 +49,7 @@ export class NewsTab {
     #countdown = null;
     #markAll = null;
     #posts = [];
-    #nextOffset = 0;
-    #hasMore = false;
+    #pager = new NewsPager();
     #signal = null;
     #route = {};
 
@@ -92,7 +94,19 @@ export class NewsTab {
         if (signal?.aborted) return;
         this.#route = route;
         this.#signal = signal;
+        this.#build();
         this.#stopCountdown();
+
+        // Build and mark the section busy before the first await, so the header and skeleton can
+        // paint while the API answers. The late response is still dropped when navigation left.
+        this.#posts = [];
+        this.#pager = new NewsPager();
+        this.#error.hidden = true;
+        this.#empty.hidden = true;
+        this.#previous.hidden = true;
+        this.#more.disabled = false;
+        this.#featured.innerHTML = "<div class='news-featured-skeleton' aria-hidden='true'></div>";
+        this.#root.setAttribute('aria-busy', 'true');
 
         let posts;
         try {
@@ -100,23 +114,12 @@ export class NewsTab {
         }
         catch (error) {
             if (signal?.aborted || isAborted(error)) return;
-            this.#build();
             this.#renderError(error, route, signal);
             return;
         }
-        if (signal?.aborted) return;
-        if (!posts) return;
-        this.#build();
-        this.#posts = [];
-        this.#nextOffset = 0;
-        this.#error.hidden = true;
-        this.#empty.hidden = true;
-        this.#previous.hidden = true;
-        this.#featured.innerHTML = "<div class='news-featured-skeleton' aria-hidden='true'></div>";
-        this.#root.setAttribute('aria-busy', 'true');
+        if (signal?.aborted || !posts) return;
         this.#posts = posts;
-        this.#nextOffset = posts.length;
-        this.#hasMore = posts.length === 5;
+        this.#pager.reset(posts.length);
         this.#root.removeAttribute('aria-busy');
         this.#renderPosts();
         await Promise.allSettled([
@@ -150,7 +153,7 @@ export class NewsTab {
             mediaClass: featured.image ? '' : 'is-fallback',
             ribbon: featured.read ? '' : "<span class='news-ribbon'>NOVA</span>",
             category: featured.category,
-            version: `v${featured.version}`,
+            versionHtml: featured.version ? renderTemplate(newsVersionTemplate, { version: featured.version }) : '',
             date: formatDayMonth(featured.time),
             title: featured.title,
             excerpt: featured.excerpt,
@@ -168,7 +171,7 @@ export class NewsTab {
             }));
         });
         this.#previous.hidden = previous.length === 0;
-        this.#more.hidden = !this.#hasMore;
+        this.#more.hidden = !this.#pager.hasMore;
     }
 
     /** @param {Error} error @param {{}} route @param {AbortSignal} signal */
@@ -185,13 +188,21 @@ export class NewsTab {
 
     /** Loads the next page of older posts and appends it. */
     async #loadMore() {
-        if (!this.#hasMore) return;
-        const posts = await settleRequest(() => NewsModel.list(this.#nextOffset, { markRead: false, signal: this.#signal }), this.#signal);
-        if (!posts || this.#signal?.aborted) return;
-        this.#nextOffset += posts.length;
-        this.#hasMore = posts.length === 5;
-        this.#posts.push(...posts);
-        this.#renderPosts();
+        const pager = this.#pager;
+        this.#more.disabled = true;
+        try {
+            const posts = await pager.next(offset => settleRequest(
+                () => NewsModel.list(offset, { markRead: false, signal: this.#signal }),
+                this.#signal,
+            ));
+            // A new navigation has its own pager; a late page must not land in it.
+            if (this.#pager !== pager || !posts || this.#signal?.aborted) return;
+            this.#posts.push(...posts);
+            this.#renderPosts();
+        }
+        finally {
+            if (this.#pager === pager) this.#more.disabled = false;
+        }
     }
 
     /** Clears the unread ribbons optimistically and rolls them back on refusal. */
@@ -245,13 +256,14 @@ export class NewsTab {
             });
         }
         if (counts?.potions?.count) {
-            const left = (new Date(counts.potions.nextExpiry) - new Date(counts.potions.serverNow)) / 3600000;
-            const hours = Math.max(1, Math.ceil(left));
+            const left = potionTimeLeft(counts.potions);
             todo.push({
                 kind: 'potions',
-                text: left > 0
-                    ? `Suas poções expiram em ${hours} hora${hours === 1 ? '' : 's'}.`
-                    : `${counts.potions.count} poç${counts.potions.count === 1 ? 'ão encomendada' : 'ões encomendadas'} no apotecário.`,
+                text: left && left.hours > 0
+                    ? `Suas poções expiram em ${left.hours} hora${left.hours === 1 ? '' : 's'}.`
+                    : left && left.minutes > 0
+                        ? `Suas poções expiram em ${left.minutes} minuto${left.minutes === 1 ? '' : 's'}.`
+                        : `${counts.potions.count} poç${counts.potions.count === 1 ? 'ão encomendada' : 'ões encomendadas'} no apotecário.`,
                 action: 'Ver poções',
                 href: '/potion',
             });

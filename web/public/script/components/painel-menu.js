@@ -2,6 +2,7 @@ import { BaseComponent } from './base-component.js';
 import { Avatar } from './avatar.js';
 import { MenuItem } from './menu-item.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
+import { potionTimeLeft } from '../helpers/potion-time.js';
 import { icon } from '../templates/icons.js';
 import { painelMenuTemplate } from '../templates/painel-menu.js';
 
@@ -37,12 +38,10 @@ export function xpToNextLevel(level) {
  * @returns {string}
  */
 export function potionTime(potions) {
-    if (!potions?.nextExpiry) return '';
-    const end = new Date(String(potions.nextExpiry).replace(' ', 'T')).getTime();
-    const start = new Date(String(potions.serverNow).replace(' ', 'T')).getTime();
-    const minutes = Math.max(0, Math.round((end - start) / 60000));
-    if (minutes >= 60) return `${Math.floor(minutes / 60)} h`;
-    return `${minutes} min`;
+    const left = potionTimeLeft(potions);
+    if (!left) return '';
+    if (left.hours >= 1) return `${left.hours} h`;
+    return `${left.minutes} min`;
 }
 
 /**

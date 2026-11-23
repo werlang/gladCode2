@@ -31,6 +31,7 @@ function fakeNode(children = {}) {
         querySelectorAll: () => [],
         replaceChildren: () => { element.replaced += 1; },
         append: () => { element.appended += 1; },
+        prepend: () => { element.appended += 1; },
         remove: () => { element.removed += 1; },
         addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
         fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
@@ -56,7 +57,13 @@ function installDocument(map) {
         removeEventListener: () => {},
         createElement: () => {
             const node = fakeNode();
-            node.content = { firstElementChild: fakeNode() };
+            node.content = {
+                firstElementChild: fakeNode({
+                    '.page-header-title': fakeNode(),
+                    '.page-header-subtitle': fakeNode(),
+                    '.page-header-actions': fakeNode(),
+                }),
+            };
             return node;
         },
         body: fakeNode(),
@@ -85,8 +92,21 @@ const { profile } = await import('../../web/public/script/profile/session.js');
 
 profile.user = { id: 1, nickname: 'Test', level: 10, premium: false, silver: 0 };
 
+/** The Notícias shell's nodes, so show() can build its loading state. */
+function newsContainer() {
+    const children = {};
+    for (const selector of [
+        '#news-featured', '#news-previous', '#news-list', '#news-more', '#news-empty', '#news-error',
+        '#news-todo-list', '#news-todo-count', '#news-todo-empty', '#news-tournament',
+        '#news-tournament-name', '#news-bracket', '#news-countdown',
+    ]) {
+        children[selector] = fakeNode();
+    }
+    return fakeNode(children);
+}
+
 test('news drops a response that arrives after the section was left', async () => {
-    const container = fakeNode();
+    const container = newsContainer();
     installDocument(new Map([['#panel #news-container', container]]));
     const original = NewsModel.list;
     const pending = deferred();
@@ -95,11 +115,14 @@ test('news drops a response that arrives after the section was left', async () =
         const tab = new NewsTab();
         const controller = new AbortController();
         const shown = tab.show({}, { signal: controller.signal });
+        // the loading shell is painted before the API answers
+        assert.match(container.innerHTML, /news-page/);
+        assert.match(container.querySelector('#news-featured').innerHTML, /news-featured-skeleton/);
         controller.abort();
         pending.resolve([{ title: 'Late', time: '2026-01-01', body: 'x', hash: 'ab' }]);
         await shown;
-        assert.equal(container.replaced, 0);
-        assert.equal(container.appended, 0);
+        // the late post never reaches the section
+        assert.doesNotMatch(container.querySelector('#news-featured').innerHTML, /Late/);
     }
     finally {
         NewsModel.list = original;
