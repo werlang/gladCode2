@@ -10,7 +10,7 @@ vi.mock('../../../model/battle.js', () => ({
         constructor(options) { this.options = options; }
         async addGladiators(ids) { this.ids = ids; return this; }
         run() { return run(this); }
-        savedGladiator(name) { return { Zed: { id: 20, master: 8 }, Max: { id: 4, master: 7 } }[name]; }
+        savedGladiator(name) { return { Zed: { id: 20, master: 8 }, Max: { id: 4, master: 7 }, Ava: { id: 5, master: 9 }, Nox: { id: 6, master: 10 } }[name]; }
     },
 }));
 vi.mock('../../../model/stats.js', () => ({ Stats: { record: vi.fn() } }));
@@ -148,5 +148,35 @@ describe('ranked rewards', () => {
         expect([ids, context]).toEqual([[4, 20], { connection: 'tx' }]);
         expect(Stats.record).toHaveBeenCalledWith(simulation, 9, [20, 4], { connection: 'tx' });
         expect(Mysql.update).toHaveBeenCalledWith('usuarios', expect.objectContaining({ silver: { inc: expect.any(Number) } }), { id: 7 }, { connection: 'tx' });
+    });
+
+    test('a runner-up that still gains renown is persisted as second place, not a win', async () => {
+        // the winner lasted to 100, the master's gladiator died at 99 (positive renown), then 10 and 0
+        const simulation = [
+            { simtime: 0, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }, { name: 'Ava', user: 'Cid', hp: 9 }, { name: 'Nox', user: 'Dia', hp: 0 }] },
+            { simtime: 10, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }, { name: 'Ava', user: 'Cid', hp: 0 }] },
+            { simtime: 99, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 0 }] },
+            { simtime: 100, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }] },
+        ];
+        Mysql.select
+            .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20,5,6]' }])
+            .mockResolvedValueOnce([{ id: 7 }, { id: 8 }, { id: 9 }, { id: 10 }])
+            .mockResolvedValueOnce([
+                { cod: 20, mmr: 1000, master: 8, lvl: 3, xp: 0 },
+                { cod: 4, mmr: 1000, master: 7, lvl: 3, xp: 0 },
+                { cod: 5, mmr: 1000, master: 9, lvl: 3, xp: 0 },
+                { cod: 6, mmr: 1000, master: 10, lvl: 3, xp: 0 },
+            ])
+            .mockResolvedValueOnce([{ battles: 0 }])
+            .mockResolvedValueOnce([{ lvl: 3, xp: 10, silver: 50, cod: 4, name: 'Max', skin: '', vstr: 1, vagi: 1, vint: 1, mmr: 1003 }]);
+        run.mockResolvedValueOnce({ log: { id: 9, hash: 'abc' }, simulation, error: '' });
+
+        await RankedBattle.fight({ id: 7 }, 'e'.repeat(32));
+
+        const [, reports] = Mysql.insert.mock.calls.find(([table]) => table === 'reports');
+        const mine = reports.find(report => report.gladiator === 4);
+        expect(mine.placement).toBe(1);
+        expect(mine.reward).toBeGreaterThan(0);
+        expect(reports.find(report => report.gladiator === 20).placement).toBe(0);
     });
 });

@@ -32,7 +32,7 @@ export class User extends Model {
     constructor(fields = {}) {
         super('usuarios', {
             fields,
-            insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'foto'],
+            insertFields: ['googleid', 'email', 'nome', 'apelido', 'sobrenome', 'pasta', 'ativo', 'created_at', 'foto'],
             allowUpdate: [
                 'googleid', 'email', 'apelido', 'foto', 'ativo', 'showTutorial', 'editor_theme', 'editor_font', 'site_theme', 'glad_view',
                 ...Object.values(PREFERENCES), 'pref_language', 'silver', 'credits', 'apothecary', 'lvl', 'xp',
@@ -80,6 +80,7 @@ export class User extends Model {
             apelido: `${givenName.slice(0, 26)}${randomInt(100, 1000)}`,
             pasta: createHash('md5').update(email).digest('hex'),
             ativo: Mysql.raw('NOW()'),
+            created_at: Mysql.raw('NOW()'),
             foto: defaultPicture(email),
         });
         await user.insert();
@@ -145,7 +146,9 @@ export class User extends Model {
     }
 
     /**
-     * The profile hero's numbers: ranked battles, wins and the best gladiator's renown.
+     * The profile hero's numbers: ranked battles, wins and the best gladiator's renown. A win is a
+     * first place (`reports.placement = 0`), not merely a gladiator that gained renown: the
+     * runner-up also gains renown in a ranked battle and is still not a win.
      *
      * @param {number} userId
      * @returns {Promise<{ battles: number, wins: number, renown: number }>}
@@ -154,7 +157,7 @@ export class User extends Model {
         const [row] = await Mysql.select(
             `SELECT
                 (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ?) AS battles,
-                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.reward > 0) AS wins,
+                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.placement = 0) AS wins,
                 (SELECT COALESCE(MAX(mmr), 0) FROM gladiators WHERE master = ?) AS renown`,
             [userId, userId, userId],
         );
@@ -170,7 +173,7 @@ export class User extends Model {
     toJSON() {
         return {
             id: this.id,
-            joinedAt: this.created_at ?? this.ativo ?? null,
+            joinedAt: this.created_at ?? null,
             email: this.email,
             nickname: this.apelido,
             firstName: this.nome,

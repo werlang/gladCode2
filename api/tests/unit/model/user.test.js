@@ -37,6 +37,13 @@ describe('User', () => {
         expect(json.joinedAt).toBeNull();
     });
 
+    test('joinedAt is the account creation date, never the last activity', () => {
+        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: '2019-03-14 12:00:00' }).toJSON().joinedAt)
+            .toBe('2019-03-14 12:00:00');
+        // a legacy account has no known creation date, even though it has been active since
+        expect(new User({ ...row, ativo: '2026-11-23 18:00:00', created_at: null }).toJSON().joinedAt).toBeNull();
+    });
+
     test('admins come from ADMIN_EMAILS, case-insensitively', () => {
         process.env.ADMIN_EMAILS = 'x@y.z, ANA@example.com';
         expect(new User(row).isAdmin).toBe(true);
@@ -76,6 +83,7 @@ describe('User', () => {
         expect(inserted).toMatchObject({ googleid: 'g-2', email: 'bo@example.com', nome: 'Bo' });
         expect(inserted.apelido).toMatch(/^Bo\d{3}$/);
         expect(inserted.pasta).toMatch(/^[a-f0-9]{32}$/);
+        expect(inserted.created_at.toSqlString()).toBe('NOW()');
         expect(user.id).toBe(99);
     });
 
@@ -110,10 +118,13 @@ describe('User', () => {
         expect(new User({ ...row, glad_view: '3d' }).toJSON().gladView).toBe('3d');
     });
 
-    test('the profile stats count ranked battles, wins and the best renown', async () => {
+    test('the profile stats count ranked battles and first places only', async () => {
         Mysql.select.mockResolvedValue([{ battles: 8, wins: 5, renown: 1482.4 }]);
         await expect(User.stats(7)).resolves.toEqual({ battles: 8, wins: 5, renown: 1482 });
         expect(Mysql.select.mock.calls[0][1]).toEqual([7, 7, 7]);
+        // a positive reward is not a win: the runner-up gains renown too
+        expect(Mysql.select.mock.calls[0][0]).toContain('r.placement = 0');
+        expect(Mysql.select.mock.calls[0][0]).not.toContain('r.reward > 0');
     });
 
     test('a profile save may omit the gladiator style', async () => {

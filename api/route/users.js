@@ -9,8 +9,10 @@ const router = Router();
 
 /**
  * GET /users/me
- * The signed-in account and its hero stats (`battles`, `wins`, `renown`), or `{ user: null }` for visitors.
- * Marks the user as active.
+ * The signed-in account and its hero stats (`battles`, `wins`, `renown`), or `{ user: null }` for
+ * visitors. `wins` counts first-place finishes only: the runner-up also gains renown and is not a
+ * win. `joinedAt` is the account creation date, or null for legacy accounts whose creation date is
+ * unknown. Marks the user as active.
  */
 router.get('/me', auth({ optional: true }), asyncRoute(async (req, res) => {
     if (!req.user) return res.send({ user: null });
@@ -33,8 +35,8 @@ router.get('/nickname', auth(), asyncRoute(async (req, res) => {
  * `language` (`c|python|blocks`), `preferences` (`{ message, friend, update, duel, tourn }`
  * booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system|classic|arena-light|arena-dark`,
  * the site theme), `gladView` (`sprite|3d`, how gladiators are drawn; `3d` by default) and `picture`
- * (a cropped image as a data URL). Answers `{ user }` with the same hero stats; 409 `NICKNAME_TAKEN`
- * when the nickname is in use.
+ * (a cropped image as a data URL). Answers `{ user }` with the same hero stats (a win is a first
+ * place); 409 `NICKNAME_TAKEN` when the nickname is in use.
  */
 router.put('/me', auth(), asyncRoute(async (req, res) => {
     const body = req.body ?? {};

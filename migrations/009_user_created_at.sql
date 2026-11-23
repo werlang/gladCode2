@@ -1,3 +1,3 @@
--- The profile hero shows when the master joined; the legacy `ativo` column is the last activity.
-ALTER TABLE `usuarios` ADD COLUMN `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `ativo`;
-UPDATE `usuarios` SET `created_at` = `ativo` WHERE `created_at` IS NULL OR `created_at` > `ativo`;
+-- The profile hero shows when the master joined. Accounts that existed before this column have no
+-- known creation date: leave it NULL. `ativo` is the last activity, never a join date.
+ALTER TABLE `usuarios` ADD COLUMN `created_at` datetime DEFAULT NULL AFTER `ativo`;

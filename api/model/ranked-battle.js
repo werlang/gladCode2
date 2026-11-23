@@ -110,8 +110,8 @@ export class RankedBattle {
     }
 
     /**
-     * Flags crashed gladiators, moves renown, pays the master, writes everyone's report and the
-     * battle's stats, all or nothing.
+     * Flags crashed gladiators, moves renown, pays the master, writes everyone's report (with the
+     * placing the win rate reads) and the battle's stats, all or nothing.
      *
      * @param {number} userId The master who started the battle.
      * @param {Battle} battle
@@ -168,7 +168,8 @@ export class RankedBattle {
             }
 
             await Mysql.insert('reports', glads.map((glad, index) => ({
-                log: logId, gladiator: glad.cod, reward: rewards[index], started: Number(glad.master === userId),
+                log: logId, gladiator: glad.cod, reward: rewards[index], placement: index,
+                started: Number(glad.master === userId),
             })), context);
             await Stats.record(simulation, logId, gladiatorIds, context);
         });
