@@ -142,7 +142,10 @@ async function start() {
         notifications.stop();
         header.setAccount(null);
     });
-    events.on(APP_EVENTS.notificationsCounts, counts => header.setCounts(counts));
+    events.on(APP_EVENTS.notificationsCounts, counts => {
+        header.setCounts(counts);
+        if (account.user) header.setAccount({ ...account.user, level: counts.user.level, xp: counts.user.xp, silver: counts.user.silver });
+    });
     events.on(APP_EVENTS.navigationOpened, () => {
         header.setActive('painel');
         header.closePanels();

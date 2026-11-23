@@ -143,6 +143,8 @@ export class AppHeader extends BaseComponent {
         this.element.querySelector('.app-header-login').hidden = signed;
         if (!signed) return this;
         this.#avatar.set({ name: user.nickname, picture: user.picture, level: user.level });
+        const xpTotal = (parseInt(user.level, 10) * 1.9 + 1) * 130;
+        this.#avatar.setRing(xpTotal ? (Number(user.xp) || 0) / xpTotal : 0);
         this.#avatarButton.setAttribute('aria-label', `Conta de ${user.nickname}, nível ${user.level}`);
         this.#accountMenu.setAccount(user);
         this.setSilver(user.silver);

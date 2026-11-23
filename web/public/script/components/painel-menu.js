@@ -113,6 +113,7 @@ export class PainelMenu extends BaseComponent {
         this.element.querySelector('.painel-menu-level-value').textContent = String(user.level ?? 0);
         const total = Math.round(xpToNextLevel(user.level));
         const xp = Number(user.xp) || 0;
+        this.#avatar.setRing(total ? xp / total : 0);
         this.element.querySelector('#xp #filled').style.width = `${Math.min(100, Math.round((xp / total) * 100))}%`;
         this.element.querySelector('.painel-menu-xp-current').textContent = `${xp} / ${total} XP`;
         this.element.querySelector('.painel-menu-xp-next').textContent = `nível ${Number(user.level || 0) + 1}`;
