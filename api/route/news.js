@@ -8,8 +8,9 @@ const router = Router();
 
 /**
  * GET /news?offset=0&markRead=false
- * The latest posts, five at a time, with their presentation fields and the reader's read state.
- * Reading the list does not advance the read marker; `markRead=true` keeps the old opt-in that does.
+ * The latest posts, five at a time, with their presentation fields (including the post's own
+ * `version` when it has one) and the reader's read state. Reading the list does not advance the
+ * read marker; `markRead=true` keeps the old opt-in that does.
  */
 router.get('/', auth({ optional: true }), asyncRoute(async (req, res) => {
     const offset = Validate.integer(req.query.offset ?? 0, 'offset', { min: 0 });

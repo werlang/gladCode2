@@ -1,6 +1,5 @@
 import { CustomError } from '../helpers/error.js';
 import { Mysql } from '../helpers/mysql.js';
-import { VERSION } from '../helpers/version.js';
 
 /** The public id of a post: the first 4 hex digits of a salted md5 of its row id (kept from PHP). */
 const HASH_SQL = "SUBSTR(MD5(CONCAT(id, 'news-post-86')), 1, 4)";
@@ -14,7 +13,8 @@ export const NEWS_PAGE_SIZE = 5;
 export class News {
     /**
      * @param {{ hash: string, title: string, time: string, post: string, category?: string,
-     *   excerpt?: string, image?: string|null, image_alt?: string, isread?: number }} row
+     *   excerpt?: string, image?: string|null, image_alt?: string, version?: string|null,
+     *   isread?: number }} row
      */
     constructor(row) {
         this.hash = row.hash;
@@ -25,6 +25,7 @@ export class News {
         this.excerpt = row.excerpt || excerptFrom(row.post);
         this.image = row.image || null;
         this.imageAlt = row.image_alt || '';
+        this.version = row.version || null;
         this.read = Boolean(Number(row.isread));
     }
 
@@ -37,7 +38,7 @@ export class News {
      */
     static async list(offset, { readBefore = null } = {}) {
         const rows = await Mysql.select(
-            `SELECT ${HASH_SQL} AS hash, title, time, post, category, excerpt, image, image_alt,
+            `SELECT ${HASH_SQL} AS hash, title, time, post, category, excerpt, image, image_alt, version,
                 (time <= COALESCE(?, '1970-01-01 00:00:00')) AS isread
             FROM news ORDER BY time DESC LIMIT ? OFFSET ?`,
             [readBefore, NEWS_PAGE_SIZE, offset],
@@ -69,7 +70,7 @@ export class News {
      * @throws {CustomError} 404 `NEWS_NOT_FOUND`.
      */
     static async findWithNeighbours(hash) {
-        const [row] = await Mysql.select(`SELECT ${HASH_SQL} AS hash, title, time, post FROM news WHERE ${HASH_SQL} = ? LIMIT 1`, [hash]);
+        const [row] = await Mysql.select(`SELECT ${HASH_SQL} AS hash, title, time, post, version FROM news WHERE ${HASH_SQL} = ? LIMIT 1`, [hash]);
         if (!row) throw new CustomError(404, 'Post not found.', 'NEWS_NOT_FOUND');
 
         const [[previous], [next]] = await Promise.all([
@@ -90,7 +91,7 @@ export class News {
             excerpt: this.excerpt,
             image: this.image,
             imageAlt: this.imageAlt,
-            version: VERSION,
+            version: this.version,
             read: this.read,
         };
     }

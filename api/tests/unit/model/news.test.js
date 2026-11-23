@@ -10,17 +10,26 @@ const { News } = await import('../../../model/news.js');
 describe('News', () => {
     beforeEach(() => vi.resetAllMocks());
 
-    test('lists presentation fields and the reader read state', async () => {
+    test('lists presentation fields, the post version and the reader read state', async () => {
         Mysql.select.mockResolvedValue([{
             hash: 'ab12', title: 'Arena 3D', time: '2026-11-20 10:00:00', post: '<p>Coliseu <b>novo</b></p>',
-            category: 'Atualização', excerpt: '', image: null, image_alt: '', isread: 1,
+            category: 'Atualização', excerpt: '', image: null, image_alt: '', version: '2.9.3', isread: 1,
         }]);
         const posts = await News.list(0, { readBefore: '2026-11-21 00:00:00' });
         expect(posts[0].toJSON()).toMatchObject({
             hash: 'ab12', category: 'Atualização', excerpt: 'Coliseu novo', image: null,
-            imageAlt: '', read: true, version: expect.any(String),
+            imageAlt: '', read: true, version: '2.9.3',
         });
         expect(Mysql.select.mock.calls[0][1][0]).toBe('2026-11-21 00:00:00');
+    });
+
+    test('a post without its own version omits it instead of borrowing the engine version', async () => {
+        Mysql.select.mockResolvedValue([{
+            hash: 'cd34', title: 'Sem versão', time: '2026-11-19 10:00:00', post: '<p>Nota</p>',
+            category: 'Regras', excerpt: '', image: null, image_alt: '', version: null, isread: 0,
+        }]);
+        const [post] = await News.list(0);
+        expect(post.toJSON().version).toBeNull();
     });
 
     test('marks every post read and answers how many were unread', async () => {
