@@ -1,3 +1,4 @@
+import { APP_EVENTS, events } from './event-bus.js';
 import { LocalData } from './local-data.js';
 
 /** The themes a master can choose; `system` picks Arena light or dark from the device's colour scheme. */
@@ -41,6 +42,7 @@ export function applyTheme(choice) {
     for (const name of THEME_CHOICES.slice(1)) root.classList.toggle(`theme-${name}`, name === theme);
     new LocalData({ id: STORAGE_ID }).set({ data: safe });
     document.dispatchEvent(new CustomEvent('themechange', { detail: { choice: safe, theme } }));
+    events.emit(APP_EVENTS.themeChanged, { choice: safe, theme });
 
     if (!watching && window.matchMedia) {
         watching = true;

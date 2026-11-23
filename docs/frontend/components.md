@@ -49,12 +49,12 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | SectionCard | exists (over `.surface-card`) | `components/section-card.js` | WP2 |
 | Tabs | exists | `components/tabs.js` | WP2 |
 | SegmentedControl | exists | `components/segmented-control.js` | WP2 |
-| ChoiceCards | new | `components/choice-cards.js` | WP4 |
+| ChoiceCards | exists | `components/choice-cards.js` | WP4 |
 | Switch | exists | `components/switch.js` | WP2 |
 | Pagination | exists | `components/pagination.js` | WP2 |
 | SearchField | exists | `components/search-field.js` | WP2 |
 | Avatar | exists | `components/avatar.js` | WP2 |
-| SaveStatus | new | `components/save-status.js` | WP4 |
+| SaveStatus | exists | `components/save-status.js` | WP4 |
 | Toast (with undo) | exists, extended | `components/toast.js` | WP2 |
 | EmptyState | exists | `templates/empty-state.js` | — |
 | GladiatorCard | exists, rebuilt as the game card | `components/glad-card.js` → `components/gladiator-card.js` | WP5 |
@@ -354,7 +354,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   does not rely on colour alone.
 - **Boards:** `Perfil.dc.html`, `Gladiadores.dc.html`, `Pocoes.dc.html`.
 
-### ChoiceCards — new (WP4)
+### ChoiceCards — exists (WP4)
 
 - **File:** `components/choice-cards.js`; **CSS:** `css/components/choice-cards.css`.
 - **Purpose:** a single choice shown as large cards: the three site themes (Arena claro, Arena escuro,
@@ -420,7 +420,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Boards:** `Header.dc.html`, `Rail.dc.html`, `Perfil.dc.html`, `Mensagens.dc.html`, `Amigos.dc.html`,
   `Ranking.dc.html`, `Mobile.dc.html`.
 
-### SaveStatus — new (WP4)
+### SaveStatus — exists (WP4)
 
 - **File:** `components/save-status.js`; **CSS:** `css/components/save-status.css`.
 - **Purpose:** the inline “Salvo”, “Salvando…”, “Disponível · salva quando você sai do campo” state of

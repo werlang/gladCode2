@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { elapsedString, formatMessageTime, splitDuration } from '../../web/public/script/helpers/date-format.js';
+import { elapsedString, formatDayMonth, formatMessageTime, formatMonthYear, formatShortMonth, splitDuration } from '../../web/public/script/helpers/date-format.js';
 import { escapeHtml, renderTemplate } from '../../web/public/script/helpers/html.js';
 import { RequestError, parseBody, toQuery } from '../../web/public/script/helpers/request.js';
 import { nameGladiators, simulationProblem } from '../../web/public/script/helpers/simulation-report.js';
@@ -59,4 +59,12 @@ test('compiler errors name the gladiators and stay text', () => {
 test('durations split into padded hours, minutes and seconds', () => {
     assert.deepEqual(splitDuration(3725000), ['01', '02', '05']);
     assert.deepEqual(splitDuration(-5000), ['00', '00', '00']);
+});
+
+test('news and profile dates use the Portuguese month names', () => {
+    const time = new Date(2026, 10, 23, 9, 0);
+    assert.equal(formatDayMonth(time), '23 de novembro');
+    assert.equal(formatShortMonth(time), 'NOV');
+    assert.equal(formatMonthYear(new Date(2019, 2, 14)), 'março de 2019');
+    assert.equal(formatMonthYear('not a date'), '');
 });

@@ -57,3 +57,36 @@ export function splitDuration(ms) {
     const pad = value => String(value).padStart(2, '0');
     return [pad(Math.floor(total / 3600)), pad(Math.floor(total / 60) % 60), pad(total % 60)];
 }
+
+/**
+ * A news date as “18 de novembro” (day and full month, no year).
+ *
+ * @param {string|number|Date} time
+ * @returns {string}
+ */
+export function formatDayMonth(time) {
+    const date = new Date(time);
+    return `${date.getDate()} de ${MONTHS[date.getMonth()].toLowerCase()}`;
+}
+
+/**
+ * A compact month label for list rows: “NOV”.
+ *
+ * @param {string|number|Date} time
+ * @returns {string}
+ */
+export function formatShortMonth(time) {
+    return MONTHS[new Date(time).getMonth()].toUpperCase().slice(0, 3);
+}
+
+/**
+ * A month and year for “na gladCode desde …”: “março de 2019”.
+ *
+ * @param {string|number|Date} time
+ * @returns {string}
+ */
+export function formatMonthYear(time) {
+    const date = new Date(time);
+    if (Number.isNaN(date.getTime())) return '';
+    return `${MONTHS[date.getMonth()].toLowerCase()} de ${date.getFullYear()}`;
+}

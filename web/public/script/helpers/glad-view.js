@@ -1,3 +1,4 @@
+import { APP_EVENTS, events } from './event-bus.js';
 import { LocalData } from './local-data.js';
 
 /** How a gladiator is drawn across the site: the pixel-art sprite, or the 3D coliseum model. */
@@ -72,6 +73,7 @@ export function applyGladView(choice) {
     document.documentElement.setAttribute('data-glad-view', safe);
     document.cookie = `${GLAD_VIEW_COOKIE}=${safe}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`;
     document.dispatchEvent(new CustomEvent('gladviewchange', { detail: { choice: safe } }));
+    events.emit(APP_EVENTS.gladViewChanged, { choice: safe });
     return safe;
 }
 

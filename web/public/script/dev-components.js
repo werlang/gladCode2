@@ -1,8 +1,10 @@
 import { Avatar } from './components/avatar.js';
 import { Badge } from './components/badge.js';
+import { ChoiceCards } from './components/choice-cards.js';
 import { PageHeader } from './components/page-header.js';
 import { Pagination } from './components/pagination.js';
 import { SearchField } from './components/search-field.js';
+import { SaveStatus } from './components/save-status.js';
 import { SectionCard } from './components/section-card.js';
 import { SegmentedControl } from './components/segmented-control.js';
 import { Switch } from './components/switch.js';
@@ -171,6 +173,37 @@ function switches() {
     container.append(on.element, off.element, disabled.element);
 }
 
+function choiceCards() {
+    const container = slot('#example-choices');
+    const theme = new ChoiceCards({ variant: 'preview', label: 'Tema do site' });
+    const preview = value => `<span class='theme-mini theme-mini--${value}'><span class='theme-mini__bar'></span><span class='theme-mini__rail'></span><span class='theme-mini__card'></span><span class='theme-mini__accent'></span></span>`;
+    theme.setOptions([
+        { value: 'arena-light', title: 'Arena claro', preview: preview('arena-light') },
+        { value: 'arena-dark', title: 'Arena escuro', preview: preview('arena-dark') },
+        { value: 'classic', title: 'Clássico', preview: preview('classic') },
+    ]);
+    theme.set('arena-light', { silent: true });
+    theme.listen('change', detail => createToast(`Tema: ${detail.value}`, 'info'));
+
+    const style = new ChoiceCards({ variant: 'icon', label: 'Visual dos gladiadores' });
+    style.setOptions([
+        { value: '3d', title: 'Coliseu 3D', description: 'Cartas, editor e replays em 3D', preview: "<span class='glad-mini glad-mini--3d'></span>" },
+        { value: 'sprite', title: 'Pixel art', description: 'O visual clássico, mais leve', preview: "<span class='glad-mini glad-mini--sprite'><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>" },
+    ]);
+    style.set('3d', { silent: true });
+    container.append(theme.element, style.element);
+}
+
+function saveStatuses() {
+    const container = slot('#example-save-status');
+    const states = [['idle', 'Disponível · salva quando você sai do campo'], ['saving', 'Salvando…'], ['saved', 'Salvo'], ['error', 'Este apelido já está em uso']];
+    for (const [state, message] of states) {
+        const status = new SaveStatus();
+        status.set(state, message);
+        container.append(status.element);
+    }
+}
+
 function search() {
     const container = slot('#example-search');
     const normal = new SearchField({ label: 'Buscar no ranking', placeholder: 'Gladiador ou mestre' });
@@ -272,6 +305,8 @@ badges();
 avatars();
 tabs();
 segmented();
+choiceCards();
+saveStatuses();
 switches();
 search();
 pagination();
