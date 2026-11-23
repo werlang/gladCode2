@@ -41,6 +41,7 @@ export class CommandPalette extends BaseComponent {
      * @returns {this}
      */
     open({ query = '' } = {}) {
+        if (!this.element.hidden) return this;
         this.#opener = document.activeElement;
         this.element.hidden = false;
         this.#input.value = query;
@@ -153,7 +154,7 @@ export class CommandPalette extends BaseComponent {
         const needle = query.trim().toLowerCase();
         const items = this.#commands
             .filter(command => !needle || [command.label, ...(command.keywords ?? '').split(' ')].join(' ').toLowerCase().includes(needle))
-            .map(command => ({ ...command, sub: '', key: '' }));
+            .map(command => ({ ...command, sub: '', key: command.key ?? '' }));
         return [{ title: 'Ir para', items }];
     }
 

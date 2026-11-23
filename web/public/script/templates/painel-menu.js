@@ -19,5 +19,5 @@ export const painelMenuTemplate = `
 <a class='painel-menu-new' href='/newglad'>{{{plusIcon}}}Novo gladiador</a>
 <div class='painel-menu-foot'>
     <span>Atalhos: <kbd>G</kbd> + inicial</span>
-    <span class='painel-menu-engine'>motor v2.6</span>
+    <span class='painel-menu-engine'>motor</span>
 </div>`;

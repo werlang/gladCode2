@@ -5,6 +5,7 @@ import test from 'node:test';
 const { NotificationService, normalizeCounts } = await import('../../web/public/script/services/notifications.js');
 
 const COUNTS = {
+    version: '2.10.0',
     user: { level: 23, xp: 120, silver: 1250 },
     messages: 2,
     friends: 1,
@@ -41,6 +42,7 @@ test('normalizeCounts joins the counters with the potion clock and computes the 
         nextExpiry: '2026-01-01 10:01:00',
         serverNow: '2026-01-01 10:00:00',
     });
+    assert.equal(counts.version, '2.10.0');
     assert.equal(counts.messages, 2);
     assert.equal(counts.reports.ranked, 2);
 });
@@ -144,11 +146,13 @@ test('feed() composes the panel rows from needs, reports and unread news', async
         duels: DuelModel.challenges,
         friends: FriendModel.list,
         reports: ReportModel.unreadFeed,
+        duelsDone: DuelModel.unreadReports,
         news: NewsModel.list,
     };
     DuelModel.challenges = async () => [{ id: 4, time: '2026-01-01 10:00:00', nick: 'Ana' }];
     FriendModel.list = async () => ({ pending: [{ id: 9, nick: 'Marco' }], confirmed: [] });
     ReportModel.unreadFeed = async () => ({ total: 1, reports: [{ id: 5, time: '2026-01-01 09:00:00', gladiator: 'Magnus' }] });
+    DuelModel.unreadReports = async () => [{ id: 6, time: '2026-01-01 09:30:00', user: 'Bo' }];
     NewsModel.list = async () => [{ hash: 'ab12', title: 'Nova arena', time: '2026-01-01 08:00:00' }];
     try {
         const service = new NotificationService({
@@ -159,13 +163,15 @@ test('feed() composes the panel rows from needs, reports and unread news', async
         await service.refresh();
         const feed = await service.feed();
         assert.deepEqual(feed.needs.map(item => item.id), ['duel-4', 'friend-9']);
-        assert.deepEqual(feed.news.map(item => item.id), ['report-5', 'news-ab12']);
+        assert.deepEqual(feed.news.map(item => item.id), ['duel-report-6', 'report-5', 'news-ab12']);
+        assert.equal(feed.news[0].href, '/reports?tab=duels');
         assert.match(feed.needs[0].text, /Ana desafiou/);
     }
     finally {
         DuelModel.challenges = original.duels;
         FriendModel.list = original.friends;
         ReportModel.unreadFeed = original.reports;
+        DuelModel.unreadReports = original.duelsDone;
         NewsModel.list = original.news;
     }
 });

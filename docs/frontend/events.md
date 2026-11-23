@@ -123,6 +123,7 @@ Payload typedefs:
  * `GET /notifications` with `GET /potions/slots`. Every listener reads the same fields.
  *
  * @typedef {object} NotificationCounts
+ * @property {string} version The running engine version from `api/version`.
  * @property {{ level: number, xp: number, silver: number }} user
  * @property {number} messages Unread private messages.
  * @property {number} news Unread news posts.

@@ -126,6 +126,7 @@ export class PainelMenu extends BaseComponent {
      */
     setCounts(counts) {
         if (!counts) return this;
+        if (counts.version) this.element.querySelector('.painel-menu-engine').textContent = `motor v${counts.version}`;
         const news = Number(counts.news || 0);
         this.#items.get('news')?.setBadge(news ? `${news} nova${news === 1 ? '' : 's'}` : '', 'unread');
         const glads = counts.gladiators ?? {};

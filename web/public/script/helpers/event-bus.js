@@ -50,6 +50,7 @@
 
 /**
  * @typedef {object} NotificationCounts
+ * @property {string} version The running engine version from `api/version`.
  * @property {{ level: number, xp: number, silver: number }} user
  * @property {number} messages
  * @property {number} news

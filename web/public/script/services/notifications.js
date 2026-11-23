@@ -38,6 +38,7 @@ export function normalizeCounts(counts, slotAnswer, previous = null, now = new D
     const duel = Number(reports.duel ?? 0);
 
     return {
+        version: counts.version ?? '',
         user: counts.user,
         messages: Number(counts.messages ?? 0),
         news,
@@ -137,10 +138,11 @@ export class NotificationService {
      */
     async feed({ signal } = {}) {
         if (!this.#last) await this.refresh().catch(() => {});
-        const [duels, friends, reports, posts] = await Promise.allSettled([
+        const [duels, friends, reports, duelsDone, posts] = await Promise.allSettled([
             DuelModel.challenges({ signal }),
             FriendModel.list({ signal }),
             ReportModel.unreadFeed({ signal }),
+            DuelModel.unreadReports({ signal }),
             NewsModel.list(0, { markRead: false, signal }),
         ]);
         const list = result => (result.status === 'fulfilled' ? result.value : null);
@@ -168,6 +170,14 @@ export class NotificationService {
         }
 
         const news = [];
+        for (const duel of list(duelsDone) ?? []) {
+            news.push({
+                id: `duel-report-${duel.id}`,
+                text: `Duelo com ${duel.user} concluído`,
+                where: `Relatórios · Duelos${when(duel.time)}`,
+                href: '/reports?tab=duels',
+            });
+        }
         for (const report of list(reports)?.reports ?? []) {
             news.push({
                 id: `report-${report.id}`,
