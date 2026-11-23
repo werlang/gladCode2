@@ -28,6 +28,14 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 
 | Component | Status | File (today → target) | WP |
 | :--- | :--- | :--- | :--- |
+| Button | exists | `components/button.js` | — |
+| Field, Input, Select | exists | `components/field.js`, `input.js`, `select.js` | — |
+| Dialog family | exists | `components/dialog.js` | — |
+| Tooltip | exists | `components/tooltip.js` | — |
+| Slider | exists | `components/slider.js` | — |
+| SideMenu | exists (docs pages) | `components/side-menu.js` | — |
+| Countdown | exists | `components/countdown.js` | — |
+| ProgressButton, Simulation | exists | `components/simulation.js` | — |
 | AppHeader | exists, rebuilt | `components/header.js` → `components/app-header.js` | WP3 |
 | AccountMenu | new | `components/account-menu.js` | WP3 |
 | NotificationsPanel | new | `components/notifications-panel.js` | WP3 |
