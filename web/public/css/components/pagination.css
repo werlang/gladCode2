@@ -1,0 +1,85 @@
+/*
+ * Page controls (components/pagination.js): a simple previous/next row or numbered pages plus the
+ * go-to-position form.
+ */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+
+    .pagination-summary {
+        white-space: nowrap;
+    }
+
+    .pagination-pages {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-1);
+    }
+
+    .pagination-button,
+    .pagination-page {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        min-width: 36px;
+        height: 36px;
+        padding: 0 var(--space-2);
+        border: var(--space-hairline) solid var(--color-border-strong);
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--color-text);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .pagination-button:hover,
+    .pagination-page:hover {
+        background-color: var(--color-tint);
+    }
+
+    .pagination-page[aria-current='page'] {
+        border-color: var(--color-text-strong);
+        background-color: var(--color-text-strong);
+        color: var(--color-page);
+    }
+
+    .pagination-gap {
+        min-width: 20px;
+        color: var(--color-text-subtle);
+        text-align: center;
+    }
+
+    .pagination-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .pagination-jump {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .pagination-jump-input {
+        width: 72px;
+        height: 36px;
+        padding: 0 var(--space-2);
+        border: var(--space-hairline) solid var(--color-border-strong);
+        border-radius: var(--radius-md);
+        background-color: var(--color-field-bg);
+        color: var(--color-text-strong);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+    }
+}

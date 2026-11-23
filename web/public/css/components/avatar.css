@@ -1,0 +1,102 @@
+/*
+ * Master picture (components/avatar.js): the image or its initials, an optional level ring and an
+ * online dot. `--avatar-size` comes from the size variant or the caller.
+ */
+.avatar {
+    --avatar-size: 44px;
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: var(--radius-round);
+    color: var(--color-text-strong);
+
+    &.avatar--sm {
+        --avatar-size: 34px;
+    }
+
+    &.avatar--lg {
+        --avatar-size: 104px;
+    }
+
+    .avatar-ring {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 2px;
+        border-radius: inherit;
+        background: conic-gradient(
+            var(--color-accent) calc(var(--avatar-ring, 0) * 1%),
+            color-mix(in srgb, var(--color-accent) 18%, transparent) 0
+        );
+    }
+
+    .avatar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: inherit;
+        background-color: var(--color-surface-alt);
+    }
+
+    .avatar-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-initials {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: var(--color-gladiator-frame-brass-light);
+        color: var(--color-gladiator-frame-brass-dark);
+        font-family: var(--font-game);
+        font-size: calc(var(--avatar-size) * 0.36);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .avatar-level {
+        position: absolute;
+        right: -4px;
+        bottom: -4px;
+        display: flex;
+        align-items: center;
+        height: 16px;
+        padding: 0 4px;
+        border: var(--space-hairline) solid var(--color-accent);
+        border-radius: var(--radius-sm);
+        background-color: var(--color-page);
+        color: var(--color-accent-text);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        font-weight: 700;
+    }
+
+    .avatar-dot {
+        position: absolute;
+        right: -1px;
+        bottom: -1px;
+        width: 12px;
+        height: 12px;
+        border: 2px solid var(--color-surface);
+        border-radius: var(--radius-round);
+        background-color: var(--color-success);
+    }
+
+    .avatar-level[hidden],
+    .avatar-dot[hidden] {
+        display: none;
+    }
+}

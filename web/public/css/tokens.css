@@ -139,6 +139,41 @@
     --color-str: #ff5050;
     --color-agi: #e3e300;
     --color-int: #7c90ff;
+    /* Painel game surfaces: the gladiator cards, their lit stage, seals and the beveled action
+       (the same in every theme, like the 3D chrome). See docs/design/painel/Gladiadores.dc.html */
+    --color-gladiator-frame-brass: #c7a66b;
+    --color-gladiator-frame-brass-light: #f3e8d0;
+    --color-gladiator-frame-brass-dark: #9d6b32;
+    --color-gladiator-frame-broken: #c4412f;
+    --color-gladiator-frame-broken-light: #ff9a86;
+    --color-gladiator-frame-broken-dark: #5c1810;
+    --color-gladiator-frame-old: #8a7a62;
+    --color-gladiator-frame-old-dark: #2d4256;
+    --color-gladiator-stage: #0d2131;
+    --color-gladiator-stage-deep: #0b1d2b;
+    --color-gladiator-stage-glow: #ffd68c;
+    --color-gladiator-ground: #9d7f4f;
+    --color-gladiator-plaque: #173650;
+    --color-gladiator-plaque-deep: #10283a;
+    --color-gladiator-plaque-border: #c7a66b;
+    --color-gladiator-text: #f3e8d0;
+    --color-gladiator-text-muted: #9fb3c2;
+    --color-gladiator-seal-ready: #4fd46a;
+    --color-gladiator-seal-ready-text: #bff3c9;
+    --color-gladiator-seal-old: #f0c453;
+    --color-gladiator-seal-old-text: #f6dc8c;
+    --color-gladiator-seal-broken: #ff6a55;
+    --color-gladiator-seal-broken-text: #ffb4a8;
+    --color-gladiator-alert-old: #f3dfa6;
+    --color-gladiator-alert-broken: #ffc2b8;
+    --color-action-bevel: #f2b441;
+    --color-action-bevel-light: #ffd27a;
+    --color-action-bevel-dark: #e0a02e;
+    --color-action-bevel-edge: #c98918;
+    --color-action-bevel-side: #b07812;
+    --color-action-bevel-text: #0b1d2b;
+    --color-attr-track: #f3e8d024;
+    --color-attr-empty: #f3e8d014;
     /* profile menu icon frames, one per section */
     --color-cat-green: #8edc96;
     --color-cat-amber: #f4cd82;

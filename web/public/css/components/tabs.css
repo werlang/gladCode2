@@ -1,0 +1,92 @@
+/*
+ * Tabs (components/tabs.js): an underline bar for content tabs, or pills for list selectors.
+ * The panel is the caller's; each tab points at it with aria-controls.
+ */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+
+    .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        min-height: 44px;
+        padding: 0 var(--space-3);
+        border: 0;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--color-text-muted);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: color var(--duration-fast), background-color var(--duration-fast);
+    }
+
+    .tab:hover {
+        color: var(--color-text-strong);
+        background-color: var(--color-tint);
+    }
+
+    .tab[aria-selected='true'] {
+        color: var(--color-text-strong);
+        font-weight: 600;
+    }
+
+    .tab-count {
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: var(--radius-pill);
+        background-color: var(--color-text);
+        color: var(--color-page);
+        font-size: var(--text-2xs);
+        font-weight: 700;
+        line-height: 20px;
+        text-align: center;
+    }
+
+    &.tabs--underline {
+        gap: var(--space-2);
+        border-bottom: var(--space-hairline) solid var(--color-border);
+
+        .tab {
+            position: relative;
+            border-radius: 0;
+        }
+
+        .tab[aria-selected='true']::after {
+            position: absolute;
+            right: var(--space-3);
+            bottom: -1px;
+            left: var(--space-3);
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            background-color: var(--color-accent);
+            content: '';
+        }
+    }
+
+    &.tabs--pill {
+        gap: 6px;
+
+        .tab {
+            min-height: 36px;
+            padding: 0 var(--space-4);
+            border: var(--space-hairline) solid var(--color-border);
+            border-radius: var(--radius-pill);
+        }
+
+        .tab[aria-selected='true'] {
+            border-color: var(--color-text-strong);
+            background-color: var(--color-text-strong);
+            color: var(--color-page);
+        }
+
+        .tab[aria-selected='true'] .tab-count {
+            background-color: var(--color-page);
+            color: var(--color-text-strong);
+        }
+    }
+}

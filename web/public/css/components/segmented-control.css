@@ -1,0 +1,49 @@
+/*
+ * A compact mutually exclusive choice (components/segmented-control.js): one bar with the options;
+ * the selected one is a raised surface, never only a colour difference.
+ */
+.segmented-control {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+    padding: 4px;
+    border: var(--space-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-sunken);
+
+    .segmented-option {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        min-height: 38px;
+        padding: 0 var(--space-3);
+        border: 0;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--color-text-muted);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+
+    .segmented-option:hover {
+        color: var(--color-text-strong);
+    }
+
+    .segmented-option[aria-pressed='true'] {
+        background-color: var(--color-surface);
+        color: var(--color-text-strong);
+        font-weight: 600;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .segmented-count {
+        color: var(--color-text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+    }
+}

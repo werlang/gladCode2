@@ -1,0 +1,29 @@
+/*
+ * Toast additions (components/toast.js): the action that makes a toast an undo/retry affordance.
+ * The toast shell itself stays in dialog.css, which every page that shows a toast already loads.
+ */
+.toast {
+    .toast-message {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .toast-action {
+        flex: none;
+        min-height: 32px;
+        margin-left: var(--space-3);
+        padding: 0 var(--space-3);
+        border: var(--space-hairline) solid currentColor;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: inherit;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .toast-action:hover {
+        background-color: color-mix(in srgb, currentColor 12%, transparent);
+    }
+}

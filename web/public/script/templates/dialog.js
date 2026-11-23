@@ -20,4 +20,4 @@ export const terminalTemplate = `
     </div>
 </div>`;
 
-export const toastTemplate = `<div class='toast {{type}}' role='status'><i class='fas fa-{{icon}}'></i><span>{{{message}}}</span></div>`;
+export const toastTemplate = `<div class='toast {{type}}' role='status'><i class='fas fa-{{icon}}'></i><span class='toast-message'>{{{message}}}</span></div>`;

@@ -1,0 +1,53 @@
+/*
+ * Section heading (components/page-header.js): the single h1, its one-line subtitle and a slot for
+ * filters, summaries or the view's main action.
+ */
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+
+    .page-header-copy {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        min-width: 0;
+    }
+
+    .page-header-title {
+        margin: 0;
+        color: var(--color-text-strong);
+        font-family: var(--font-display);
+        font-size: var(--text-2xl);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        line-height: 1.15;
+    }
+
+    .page-header-subtitle {
+        margin: 0;
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+        line-height: 1.5;
+    }
+
+    .page-header-subtitle[hidden],
+    .page-header-actions[hidden] {
+        display: none;
+    }
+
+    .page-header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    .page-header .page-header-title {
+        font-size: var(--text-3xl);
+    }
+}

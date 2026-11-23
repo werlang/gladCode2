@@ -1,0 +1,60 @@
+/*
+ * Section panel (components/section-card.js): a surface card with a title/action row, a body slot and
+ * built-in loading, empty and error states. The card itself is a `.surface-card`.
+ */
+.section-card {
+    overflow: hidden;
+
+    .section-card-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        border-bottom: var(--space-hairline) solid var(--color-border);
+    }
+
+    .section-card-title {
+        margin: 0;
+        color: var(--color-text-strong);
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        font-weight: 600;
+        line-height: 1.25;
+    }
+
+    .section-card-header[hidden] {
+        display: none;
+    }
+
+    .section-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .section-card-body {
+        padding: var(--space-5);
+    }
+
+    .section-card-body:empty {
+        display: none;
+    }
+
+    .section-card.is-busy .section-card-body {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .section-card-error {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        color: var(--color-danger);
+        font-size: var(--text-sm);
+    }
+}
