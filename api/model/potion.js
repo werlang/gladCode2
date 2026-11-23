@@ -39,16 +39,38 @@ export class Potion {
      * The master's active potions, soonest to expire first.
      *
      * @param {number} userId
-     * @returns {Promise<Array<{ id: number, potion: string, name: string, icon: string, secondsLeft: number }>>}
+     * @returns {Promise<Array<{ id: number, identifier: string, potion: string, name: string, icon: string,
+     *   expiresAt: string, seconds: number, secondsLeft: number }>>}
      */
     static async slots(userId) {
         const rows = await Mysql.select(
-            `SELECT s.id, i.identifier, i.icon, i.name, TIME_TO_SEC(TIMEDIFF(s.expire, NOW())) AS seconds
+            `SELECT s.id, i.identifier, i.icon, i.name,
+                DATE_FORMAT(s.expire, '%Y-%m-%d %H:%i:%s') AS expiresAt,
+                TIME_TO_SEC(TIMEDIFF(s.expire, NOW())) AS seconds
             FROM slots s INNER JOIN items i ON i.id = s.item
             WHERE s.user = ? AND s.expire > NOW() ORDER BY s.expire LIMIT 4`,
             [userId],
         );
-        return rows.map(row => ({ id: row.id, potion: row.identifier, name: row.name, icon: row.icon, secondsLeft: Number(row.seconds) }));
+        return rows.map(row => ({
+            id: row.id,
+            identifier: row.identifier,
+            potion: row.identifier,
+            name: row.name,
+            icon: row.icon,
+            expiresAt: row.expiresAt,
+            seconds: Number(row.seconds),
+            secondsLeft: Number(row.seconds),
+        }));
+    }
+
+    /**
+     * The database clock used by the shells to format the slot expiry.
+     *
+     * @returns {Promise<string>} `YYYY-MM-DD HH:MM:SS`.
+     */
+    static async serverNow() {
+        const [row] = await Mysql.select("SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AS serverNow");
+        return row.serverNow;
     }
 
     /**

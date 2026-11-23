@@ -15,4 +15,13 @@ router.get('/', auth(), asyncRoute(async (req, res) => {
     res.send(await Notification.counts(req.user));
 }));
 
+/**
+ * POST /notifications/read
+ * Marks the passive groups read (news, ranked/duel reports and finished duels). Pending duels and
+ * friend requests stay until answered. Answers `{ read, news }`.
+ */
+router.post('/read', auth(), asyncRoute(async (req, res) => {
+    res.send(await Notification.markRead(req.user.id));
+}));
+
 export { router as notificationsRouter };

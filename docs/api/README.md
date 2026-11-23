@@ -114,7 +114,7 @@ From `api/route/news.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/news?offset=0` | anyone (session optional) | The latest posts, five at a time. A signed-in reader's news counter is cleared. |
+| `GET` | `/news?offset=0&markRead=false` | anyone (session optional) | The latest posts, five at a time. A signed-in reader's news counter is cleared unless `markRead=false` (the shell's notification feed uses that opt-out). |
 | `GET` | `/news/:hash` | anyone | One post and the hashes of its neighbours: `{ post, previous, next }`. |
 
 ## notifications
@@ -124,6 +124,7 @@ From `api/route/notifications.js`.
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
 | `GET` | `/notifications` | signed in | The profile counters (unread messages and reports, friend requests, duels, news, gladiator places) and the master's level, xp and silver. Marks the master as active. |
+| `POST` | `/notifications/read` | signed in | Marks the passive groups read (news, ranked/duel reports and finished duels). Pending duels and friend requests stay until answered. Answers `{ read, news }`. |
 
 ## potions
 
@@ -133,7 +134,7 @@ From `api/route/potions.js`.
 | --- | --- | --- | --- |
 | `GET` | `/potions` | anyone | The potions on sale: `{ potions: { <identifier>: { id, name, price, level, description, icon } } }`. |
 | `GET` | `/potions/apothecary` | anyone | The apothecary's levels: `{ prices, hours }`, each indexed by level - 1 (`prices` is the cost of leaving that level). |
-| `GET` | `/potions/slots` | signed in | The signed-in master's potions: `{ slots, unlockLevels, level }`. |
+| `GET` | `/potions/slots` | signed in | The signed-in master's potions: `{ slots, serverNow, unlockLevels, level }`; each slot carries `expiresAt` and `seconds`. |
 | `POST` | `/potions/slots` | signed in | Orders a potion: `{ potion: <identifier> }`. Answers 201 `{ slotId, silver }`. |
 | `DELETE` | `/potions/slots/:id` | signed in | Cancels one of the master's potions. |
 | `POST` | `/potions/apothecary/upgrade` | signed in | Upgrades the master's apothecary: `{ apothecary, silver }`. |
@@ -168,6 +169,14 @@ From `api/route/reports.js`.
 | --- | --- | --- | --- |
 | `GET` | `/reports?offset=0&favorites=true&unreadOnly=true&markRead=true` | signed in | A page of the master's ranked battle reports: `{ total, reports }`. |
 | `PUT` | `/reports/:id/favorite` | signed in | Keeps a report among the favorites, with a comment: `{ favorite, comment? }`. |
+
+## search
+
+From `api/route/search.js`.
+
+| Method | Path | Access | Description |
+| --- | --- | --- | --- |
+| `GET` | `/search?q=` | anyone (session optional) | The header's global search: matching gladiators and masters, five per group. Anonymous visitors may search; the query is trimmed and capped, and every SQL value is parameterised. |
 
 ## stats
 

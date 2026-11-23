@@ -25,10 +25,12 @@ router.get('/apothecary', (req, res) => {
 
 /**
  * GET /potions/slots
- * The signed-in master's potions: `{ slots, unlockLevels, level }`.
+ * The signed-in master's potions: `{ slots, serverNow, unlockLevels, level }`; each slot carries
+ * `expiresAt` and `seconds`.
  */
 router.get('/slots', auth(), asyncRoute(async (req, res) => {
-    res.send({ slots: await Potion.slots(req.user.id), unlockLevels: SLOT_LEVELS, level: req.user.lvl });
+    const [slots, serverNow] = await Promise.all([Potion.slots(req.user.id), Potion.serverNow()]);
+    res.send({ slots, serverNow, unlockLevels: SLOT_LEVELS, level: req.user.lvl });
 }));
 
 /**

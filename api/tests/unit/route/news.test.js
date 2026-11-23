@@ -36,6 +36,13 @@ describe('news routes', () => {
         expect(currentUser.markNewsRead).toHaveBeenCalled();
     });
 
+    test('the shell feed can read posts without clearing the counter', async () => {
+        Mysql.select.mockResolvedValue([row]);
+        currentUser = { markNewsRead: vi.fn() };
+        await request(app).get('/news?markRead=false');
+        expect(currentUser.markNewsRead).not.toHaveBeenCalled();
+    });
+
     test('a post comes with its neighbours', async () => {
         Mysql.select.mockResolvedValueOnce([row]).mockResolvedValueOnce([{ hash: '0001' }]).mockResolvedValueOnce([]);
         const res = await request(app).get('/news/ab12');

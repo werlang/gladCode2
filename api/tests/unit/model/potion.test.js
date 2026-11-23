@@ -31,6 +31,19 @@ describe('Potion', () => {
         expect([1, 5, 14, 25, 60].map(unlockedSlots)).toEqual([0, 1, 1, 3, 4]);
     });
 
+    test('the slots answer carries the expiry and the database clock', async () => {
+        Mysql.select
+            .mockResolvedValueOnce([{ id: 9, identifier: 'hp-1', name: 'Vida', icon: 'hp', expiresAt: '2026-11-23 20:00:00', seconds: '3600' }])
+            .mockResolvedValueOnce([{ serverNow: '2026-11-23 19:00:00' }]);
+
+        expect(await Potion.slots(7)).toEqual([{
+            id: 9, identifier: 'hp-1', potion: 'hp-1', name: 'Vida', icon: 'hp',
+            expiresAt: '2026-11-23 20:00:00', seconds: 3600, secondsLeft: 3600,
+        }]);
+        expect(Mysql.select.mock.calls[0][0]).toContain('DATE_FORMAT');
+        expect(await Potion.serverNow()).toBe('2026-11-23 19:00:00');
+    });
+
     test('buying locks the master, spends silver and brews for the apothecary\'s time', async () => {
         given({ silver: 500, lvl: 30, apothecary: 3 }, 1);
         expect(await Potion.buy(7, 'hp-1')).toEqual({ slotId: 40, silver: 400 });
