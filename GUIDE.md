@@ -112,7 +112,7 @@ gladcode2/
 | `web/public/script/templates/` | Markup-string modules rendered with `renderTemplate`; no logic, no interpolation beyond placeholders. |
 | `web/public/script/profile/` | Section controllers of the profile/Painel shell. |
 | `web/public/script/services/` | **Planned (WP2):** DOM-free application state that owns data and emits app events, between the models and the sections. See [docs/frontend/conventions.md](docs/frontend/conventions.md). |
-| `web/public/script/editor/`, `render2/` | The editor's parts and the Three.js renderer; both are large subsystems with their own rules (see below and `AGENTS.md`). |
+| `web/public/script/editor/`, `render2/` | The editor's parts and the Three.js renderer; both are large subsystems with their own rules (see below). |
 | `api/route/` | HTTP orchestration: one router per area, `METHOD /path` doc comments, `Validate` input checks, handlers wrapped in `asyncRoute`. |
 | `api/middleware/` | `auth()` (session, optional session, administrators) and the error handler. |
 | `api/model/` | Persistence-facing entities and the game rules. Only models execute SQL, through `helpers/mysql.js`. |
@@ -232,8 +232,15 @@ version files by mtime, the import map, and `{{{templateVars}}}` (the JSON the p
   mix cached and new modules. `script/playback.js` is the replay module (loading progress, spritesheets,
   controls, preferences, incremental simlog expansion) used by both renderers. The classic renderer and
   render2 share the replay through page globals; `playback.js` `exposeLegacyGlobals` publishes them on
-  `window` in one place. The 3D renderer runs by default when WebGL2 is available; otherwise the classic
-  Phaser renderer takes over.
+  `window` in one place (`steps`, `timestep`, `pausesim`, `stepIncrement`, `hashes`, `newindex`, `uiVars`,
+  `timeSlider`, `fullscreen` as accessors, plus `Playback`, `resize`, `changeCrowd`, `changeSoundIcon`,
+  `getActionName`, `updateDetailedWindow`, `getSpriteThumb`, `images`); keep that list in step with what
+  `render.js` and `render2/` read. The 3D renderer runs by default when WebGL2 is available; otherwise the
+  classic Phaser renderer takes over (no player-facing renderer choice, query string or preference key).
+- **`script/render.js`**: the classic Phaser.js 2D renderer and the replay's automatic fallback when WebGL2
+  is missing or the 3D start fails; a classic (non-module) script that owns `prefs`, `game`, `music`,
+  `json` and the other renderer globals, uses no jQuery and moves the timeline through
+  `window.Playback.syncTimeline`.
 - **Scripts**: `web/scripts/compress-functions.js` rebuilds `public/script/functions.json` and the sample
   bundles after the API reference changes.
 

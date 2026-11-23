@@ -8,9 +8,10 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 
 - A component extends `BaseComponent` (`web/public/script/components/base-component.js`): `on(target,
   event, listener)` tracks listeners, `clearListeners()` and `destroy()` release them.
-- A **new** component's constructor takes `{ element }` (the server-rendered root, or one the component
-  creates) plus the options listed. The existing primitives keep their documented signatures (for
-  example `new Countdown(element, options)`), listed below.
+- A **new** component's constructor takes one options object `{ element, ... }`. `element` is the
+  server-rendered root when the view rendered it; when the component creates its own root, it omits it and
+  exposes `element`. The existing primitives keep their documented signatures (for example
+  `new Countdown(element, options)`), listed below.
 - A mutating method returns `this`; a method that loads something returns a promise.
 - A component **never calls a model**. Data arrives in the constructor or through a setter; it **emits a
   component event** when the user does something, and the parent decides. Two existing components break
