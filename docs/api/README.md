@@ -115,7 +115,8 @@ From `api/route/news.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/news?offset=0&markRead=false` | anyone (session optional) | The latest posts, five at a time. A signed-in reader's news counter is cleared unless `markRead=false` (the shell's notification feed uses that opt-out). |
+| `GET` | `/news?offset=0&markRead=false` | anyone (session optional) | The latest posts, five at a time, with their presentation fields and the reader's read state. Reading the list does not advance the read marker; `markRead=true` keeps the old opt-in that does. |
+| `POST` | `/news/read` | signed in | Marks every post as read for the signed-in master: `{ read, unread: 0 }`. |
 | `GET` | `/news/:hash` | anyone | One post and the hashes of its neighbours: `{ post, previous, next }`. |
 
 ## notifications
@@ -220,6 +221,7 @@ From `api/route/tournaments.js`.
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
 | `GET` | `/tournaments?mineOffset=0&openOffset=0` | signed in | The open public tournaments and the master's own: `{ open, mine, pages }`. |
+| `GET` | `/tournaments/next` | signed in | The next round the master's team is waiting for: `{ tournament: null }` or `{ tournament: { name, hash, round, deadline, now } }`. |
 | `POST` | `/tournaments` | signed in | Creates a tournament: `{ name, password, description, maxTeams, maxMinutes, flex }` (an empty password makes it public). Answers 201 `{ id }`. |
 | `POST` | `/tournaments/lookup` | signed in | Finds a tournament by `{ name, password? }`: `{ tournament: { id, name, description, password, hash } }`. |
 | `GET` | `/tournaments/:id/teams?password=` | signed in | The teams gathered so far, or `{ started: true, hash }`. |
@@ -266,5 +268,6 @@ From `api/route/users.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/users/me` | anyone (session optional) | The signed-in account, or `{ user: null }` for visitors. Marks the user as active. |
-| `PUT` | `/users/me` | signed in | Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique), `language` (`c\|python\|blocks`), `preferences` (`{ message, friend, update, duel, tourn }` booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system\|classic\|arena-light\|arena-dark`, the site theme), `gladView` (`sprite\|3d`, how gladiators are drawn; `3d` by default) and `picture` (a cropped image as a data URL). Answers `{ user }`; 409 `NICKNAME_TAKEN` when the nickname is in use. |
+| `GET` | `/users/me` | anyone (session optional) | The signed-in account and its hero stats (`battles`, `wins`, `renown`), or `{ user: null }` for visitors. Marks the user as active. |
+| `GET` | `/users/nickname?nickname=Ana` | signed in | Whether the nickname is free for the signed-in master: `{ nickname, available }`. |
+| `PUT` | `/users/me` | signed in | Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique), `language` (`c\|python\|blocks`), `preferences` (`{ message, friend, update, duel, tourn }` booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system\|classic\|arena-light\|arena-dark`, the site theme), `gladView` (`sprite\|3d`, how gladiators are drawn; `3d` by default) and `picture` (a cropped image as a data URL). Answers `{ user }` with the same hero stats; 409 `NICKNAME_TAKEN` when the nickname is in use. |

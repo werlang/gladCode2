@@ -22,7 +22,7 @@ export class Notification {
                 (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.isread = 0) AS rankedReports,
                 (SELECT COUNT(*) FROM duels WHERE isread = 0 AND log IS NOT NULL AND (user1 = ? OR user2 = ?)) AS duelReports,
                 (SELECT COUNT(*) FROM duels WHERE log IS NULL AND user2 = ?) AS duels,
-                (SELECT COUNT(*) FROM news WHERE time > (SELECT read_news FROM usuarios WHERE id = ?)) AS news`,
+                (SELECT COUNT(*) FROM news WHERE time > COALESCE((SELECT read_news FROM usuarios WHERE id = ?), '1970-01-01 00:00:00')) AS news`,
             [user.id, user.id, user.id, user.id, VERSION, user.id, user.id, user.id, user.id, user.id],
         );
         const count = name => Number(row[name]);

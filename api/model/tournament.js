@@ -80,6 +80,31 @@ export class Tournament {
     }
 
     /**
+     * The next tournament round a master's team is waiting for, with the server clock.
+     *
+     * @param {number} userId
+     * @returns {Promise<{ name: string, hash: string, round: number, deadline: string, now: string }|null>}
+     */
+    static async next(userId) {
+        const [row] = await Mysql.select(
+            `SELECT t.name, t.hash, MAX(gr.round) AS round, MIN(gr.deadline) AS deadline, NOW(3) AS now
+            FROM tournament t
+            INNER JOIN teams te ON te.tournament = t.id
+            INNER JOIN gladiator_teams gt ON gt.team = te.id
+            INNER JOIN gladiators g ON g.cod = gt.gladiator
+            INNER JOIN group_teams grt ON grt.team = te.id
+            INNER JOIN \`groups\` gr ON gr.id = grt.groupid
+            WHERE g.master = ? AND t.hash <> '' AND gr.log IS NULL
+            GROUP BY t.id
+            ORDER BY deadline ASC
+            LIMIT 1`,
+            [userId],
+        );
+        if (!row) return null;
+        return { name: row.name, hash: row.hash, round: Number(row.round), deadline: row.deadline, now: row.now };
+    }
+
+    /**
      * Finds a tournament by name and password. Without a password, the master's own (managed or
      * joined) tournament's password is used, else the empty one of public tournaments.
      *

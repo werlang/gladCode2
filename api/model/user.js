@@ -103,6 +103,18 @@ export class User extends Model {
     }
 
     /**
+     * Whether a nickname is free for this master.
+     *
+     * @param {number} userId
+     * @param {string} nickname
+     * @returns {Promise<boolean>}
+     */
+    static async nicknameAvailable(userId, nickname) {
+        const row = await Mysql.findOne('usuarios', { filter: { apelido: nickname }, view: ['id'] });
+        return !row || row.id === userId;
+    }
+
+    /**
      * Applies profile changes. Only the fields present are changed.
      *
      * @param {{ nickname?: string, language?: string, preferences?: Record<string, boolean>, editorTheme?: string, editorFont?: number, showTutorial?: boolean, picture?: string, theme?: 'system'|'classic'|'arena-light'|'arena-dark', gladView?: 'sprite'|'3d' }} changes
@@ -132,10 +144,33 @@ export class User extends Model {
         return this.update(changes);
     }
 
+    /**
+     * The profile hero's numbers: ranked battles, wins and the best gladiator's renown.
+     *
+     * @param {number} userId
+     * @returns {Promise<{ battles: number, wins: number, renown: number }>}
+     */
+    static async stats(userId) {
+        const [row] = await Mysql.select(
+            `SELECT
+                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ?) AS battles,
+                (SELECT COUNT(*) FROM reports r INNER JOIN gladiators g ON g.cod = r.gladiator WHERE g.master = ? AND r.reward > 0) AS wins,
+                (SELECT COALESCE(MAX(mmr), 0) FROM gladiators WHERE master = ?) AS renown`,
+            [userId, userId, userId],
+        );
+        return { battles: Number(row.battles), wins: Number(row.wins), renown: Math.round(Number(row.renown)) };
+    }
+
+    /** @returns {Promise<Record<string, unknown>>} The account plus the profile hero's stats. */
+    async profileJSON() {
+        return { ...this.toJSON(), stats: await User.stats(this.id) };
+    }
+
     /** @returns {Record<string, unknown>} The signed-in user's own view of the account. */
     toJSON() {
         return {
             id: this.id,
+            joinedAt: this.created_at ?? this.ativo ?? null,
             email: this.email,
             nickname: this.apelido,
             firstName: this.nome,

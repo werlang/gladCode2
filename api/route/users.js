@@ -3,18 +3,28 @@ import { saveProfilePicture } from '../helpers/uploads.js';
 import { Validate } from '../helpers/validation.js';
 import { auth } from '../middleware/auth.js';
 import { asyncRoute } from '../middleware/error.js';
-import { LANGUAGES, GLAD_VIEWS } from '../model/user.js';
+import { LANGUAGES, GLAD_VIEWS, User } from '../model/user.js';
 
 const router = Router();
 
 /**
  * GET /users/me
- * The signed-in account, or `{ user: null }` for visitors. Marks the user as active.
+ * The signed-in account and its hero stats (`battles`, `wins`, `renown`), or `{ user: null }` for visitors.
+ * Marks the user as active.
  */
 router.get('/me', auth({ optional: true }), asyncRoute(async (req, res) => {
     if (!req.user) return res.send({ user: null });
     await req.user.touch();
-    return res.send({ user: req.user });
+    return res.send({ user: await req.user.profileJSON() });
+}));
+
+/**
+ * GET /users/nickname?nickname=Ana
+ * Whether the nickname is free for the signed-in master: `{ nickname, available }`.
+ */
+router.get('/nickname', auth(), asyncRoute(async (req, res) => {
+    const nickname = Validate.text(req.query.nickname, 'nickname', { min: 2, max: 30 });
+    res.send({ nickname, available: await User.nicknameAvailable(req.user.id, nickname) });
 }));
 
 /**
@@ -23,7 +33,8 @@ router.get('/me', auth({ optional: true }), asyncRoute(async (req, res) => {
  * `language` (`c|python|blocks`), `preferences` (`{ message, friend, update, duel, tourn }`
  * booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system|classic|arena-light|arena-dark`,
  * the site theme), `gladView` (`sprite|3d`, how gladiators are drawn; `3d` by default) and `picture`
- * (a cropped image as a data URL). Answers `{ user }`; 409 `NICKNAME_TAKEN` when the nickname is in use.
+ * (a cropped image as a data URL). Answers `{ user }` with the same hero stats; 409 `NICKNAME_TAKEN`
+ * when the nickname is in use.
  */
 router.put('/me', auth(), asyncRoute(async (req, res) => {
     const body = req.body ?? {};
@@ -45,7 +56,7 @@ router.put('/me', auth(), asyncRoute(async (req, res) => {
     if (body.picture !== undefined) changes.picture = await saveProfilePicture(req.user.pasta, body.picture);
 
     const user = await req.user.saveProfile(changes);
-    res.send({ user });
+    res.send({ user: await user.profileJSON() });
 }));
 
 export { router as usersRouter };

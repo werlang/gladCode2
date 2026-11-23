@@ -22,6 +22,15 @@ router.get('/', asyncRoute(async (req, res) => {
 }));
 
 /**
+ * GET /tournaments/next
+ * The next round the master's team is waiting for: `{ tournament: null }` or
+ * `{ tournament: { name, hash, round, deadline, now } }`.
+ */
+router.get('/next', asyncRoute(async (req, res) => {
+    res.send({ tournament: await Tournament.next(req.user.id) });
+}));
+
+/**
  * POST /tournaments
  * Creates a tournament: `{ name, password, description, maxTeams, maxMinutes, flex }` (an empty
  * password makes it public). Answers 201 `{ id }`.

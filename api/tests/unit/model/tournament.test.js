@@ -57,6 +57,13 @@ describe('tournament helpers', () => {
 describe('tournaments before the start', () => {
     beforeEach(() => vi.clearAllMocks());
 
+    test('the next tournament read returns the live round with the server clock', async () => {
+        Mysql.select.mockResolvedValueOnce([{ name: 'Copa', hash: 'ab12', round: 2, deadline: '2026-01-01 10:00:00', now: '2026-01-01 08:00:00' }]);
+        expect(await Tournament.next(7)).toEqual({ name: 'Copa', hash: 'ab12', round: 2, deadline: '2026-01-01 10:00:00', now: '2026-01-01 08:00:00' });
+        Mysql.select.mockResolvedValueOnce([]);
+        expect(await Tournament.next(7)).toBeNull();
+    });
+
     test('a private tournament needs its password, except for its manager', async () => {
         Mysql.findOne.mockResolvedValueOnce({ id: 1, manager: 9, password: 'secret' });
         await expect(Tournament.access(7, 1, 'guess')).rejects.toMatchObject({ status: 404, code: 'TOURNAMENT_NOT_FOUND' });

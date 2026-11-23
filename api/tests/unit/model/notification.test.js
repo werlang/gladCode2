@@ -21,6 +21,7 @@ describe('notification counts', () => {
         expect(counts.version).toBe(VERSION);
         expect(counts.bell).toBeUndefined();
         expect(counts.user).toEqual({ level: 10, xp: 10, silver: 1250 });
+        expect(Mysql.select.mock.calls[0][0]).toContain("COALESCE((SELECT read_news FROM usuarios WHERE id = ?), '1970-01-01 00:00:00')");
     });
 
     test('marking the passive groups read clears news and finished reports/duels', async () => {

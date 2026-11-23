@@ -1,5 +1,6 @@
 import { CustomError } from '../helpers/error.js';
 import { Mysql } from '../helpers/mysql.js';
+import { VERSION } from '../helpers/version.js';
 
 /** The public id of a post: the first 4 hex digits of a salted md5 of its row id (kept from PHP). */
 const HASH_SQL = "SUBSTR(MD5(CONCAT(id, 'news-post-86')), 1, 4)";
@@ -12,24 +13,52 @@ export const NEWS_PAGE_SIZE = 5;
  */
 export class News {
     /**
-     * @param {{ hash: string, title: string, time: string, post: string }} row
+     * @param {{ hash: string, title: string, time: string, post: string, category?: string,
+     *   excerpt?: string, image?: string|null, image_alt?: string, isread?: number }} row
      */
     constructor(row) {
         this.hash = row.hash;
         this.title = row.title;
         this.time = row.time;
         this.body = row.post;
+        this.category = row.category || 'Atualização';
+        this.excerpt = row.excerpt || excerptFrom(row.post);
+        this.image = row.image || null;
+        this.imageAlt = row.image_alt || '';
+        this.read = Boolean(Number(row.isread));
     }
 
     /**
-     * Newest posts first.
+     * Newest posts first, with the reader's read state.
      *
      * @param {number} offset Posts to skip.
+     * @param {{ readBefore?: string|null }} [options] The reader's last read marker.
      * @returns {Promise<News[]>}
      */
-    static async list(offset) {
-        const rows = await Mysql.select(`SELECT ${HASH_SQL} AS hash, title, time, post FROM news ORDER BY time DESC LIMIT ? OFFSET ?`, [NEWS_PAGE_SIZE, offset]);
+    static async list(offset, { readBefore = null } = {}) {
+        const rows = await Mysql.select(
+            `SELECT ${HASH_SQL} AS hash, title, time, post, category, excerpt, image, image_alt,
+                (time <= COALESCE(?, '1970-01-01 00:00:00')) AS isread
+            FROM news ORDER BY time DESC LIMIT ? OFFSET ?`,
+            [readBefore, NEWS_PAGE_SIZE, offset],
+        );
         return rows.map(row => new News(row));
+    }
+
+    /**
+     * Marks every post as read and answers how many were unread.
+     *
+     * @param {import('./user.js').User} user
+     * @returns {Promise<{ read: number, unread: number }>}
+     */
+    static async markAllRead(user) {
+        const [row] = await Mysql.select(
+            `SELECT COUNT(*) AS unread FROM news
+            WHERE time > COALESCE((SELECT read_news FROM usuarios WHERE id = ?), '1970-01-01 00:00:00')`,
+            [user.id],
+        );
+        await user.markNewsRead();
+        return { read: Number(row.unread), unread: 0 };
     }
 
     /**
@@ -52,6 +81,31 @@ export class News {
 
 
     toJSON() {
-        return { hash: this.hash, title: this.title, time: this.time, body: this.body };
+        return {
+            hash: this.hash,
+            title: this.title,
+            time: this.time,
+            body: this.body,
+            category: this.category,
+            excerpt: this.excerpt,
+            image: this.image,
+            imageAlt: this.imageAlt,
+            version: VERSION,
+            read: this.read,
+        };
     }
+}
+
+/**
+ * A one-line excerpt from a post body when the row does not carry one.
+ *
+ * @param {string} body Trusted post HTML.
+ * @returns {string}
+ */
+function excerptFrom(body) {
+    return String(body ?? '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 180);
 }

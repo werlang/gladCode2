@@ -34,6 +34,7 @@ describe('User', () => {
         });
         expect(json).not.toHaveProperty('pasta');
         expect(json).not.toHaveProperty('googleid');
+        expect(json.joinedAt).toBeNull();
     });
 
     test('admins come from ADMIN_EMAILS, case-insensitively', () => {
@@ -107,6 +108,12 @@ describe('User', () => {
         expect(new User(row).toJSON().gladView).toBe('3d');
         expect(new User({ ...row, glad_view: 'sprite' }).toJSON().gladView).toBe('sprite');
         expect(new User({ ...row, glad_view: '3d' }).toJSON().gladView).toBe('3d');
+    });
+
+    test('the profile stats count ranked battles, wins and the best renown', async () => {
+        Mysql.select.mockResolvedValue([{ battles: 8, wins: 5, renown: 1482.4 }]);
+        await expect(User.stats(7)).resolves.toEqual({ battles: 8, wins: 5, renown: 1482 });
+        expect(Mysql.select.mock.calls[0][1]).toEqual([7, 7, 7]);
     });
 
     test('a profile save may omit the gladiator style', async () => {

@@ -13,7 +13,8 @@ vi.mock('../../../middleware/auth.js', () => ({
 vi.mock('../../../helpers/uploads.js', () => ({ saveProfilePicture: vi.fn(async folder => `/profpics/${folder}.png?v=1`) }));
 vi.mock('../../../helpers/google-auth.js', () => ({ GoogleAuth: { verify: vi.fn() } }));
 vi.mock('../../../model/user.js', () => ({
-    LANGUAGES: ['c', 'python', 'blocks'], GLAD_VIEWS: ['sprite', '3d'], User: { signInWithGoogle: vi.fn() },
+    LANGUAGES: ['c', 'python', 'blocks'], GLAD_VIEWS: ['sprite', '3d'],
+    User: { signInWithGoogle: vi.fn(), nicknameAvailable: vi.fn() },
 }));
 
 const { GoogleAuth } = await import('../../../helpers/google-auth.js');
@@ -33,8 +34,9 @@ function player() {
     return {
         id: 7, pasta: 'abc',
         touch: vi.fn(),
-        saveProfile: vi.fn(async changes => ({ id: 7, ...changes })),
+        saveProfile: vi.fn(async function (changes) { return this; }),
         toJSON() { return { id: 7 }; },
+        async profileJSON() { return { id: 7, stats: { battles: 4, wins: 3, renown: 1200 } }; },
     };
 }
 
@@ -50,7 +52,7 @@ describe('auth and users routes', () => {
     test('the signed-in user is returned and marked active', async () => {
         currentUser = player();
         const res = await request(app).get('/users/me');
-        expect(res.body).toEqual({ user: { id: 7 } });
+        expect(res.body).toEqual({ user: { id: 7, stats: { battles: 4, wins: 3, renown: 1200 } } });
         expect(currentUser.touch).toHaveBeenCalled();
     });
 
@@ -65,6 +67,15 @@ describe('auth and users routes', () => {
     test('logout clears the cookie', async () => {
         const res = await request(app).post('/auth/logout');
         expect(res.headers['set-cookie'][0]).toMatch(/^app_session=;/);
+    });
+
+    test('a nickname availability check answers for the signed-in master', async () => {
+        currentUser = player();
+        User.nicknameAvailable.mockResolvedValue(false);
+        const res = await request(app).get('/users/nickname').query({ nickname: 'Ana' });
+        expect(res.body).toEqual({ nickname: 'Ana', available: false });
+        expect(User.nicknameAvailable).toHaveBeenCalledWith(7, 'Ana');
+        expect((await request(app).get('/users/nickname').query({ nickname: 'A' })).body.code).toBe('INVALID_NICKNAME');
     });
 
     test('profile updates are validated before saving', async () => {
