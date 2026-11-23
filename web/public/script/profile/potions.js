@@ -47,21 +47,33 @@ export class PotionsTab {
     #shop = null;
     /** The current navigation signal; reloads keep using it. */
     #signal = null;
+    /** Whether the shop catalogue and apothecary metadata loaded. */
+    #ready = false;
 
-    /** Loads the catalogue and the apothecary, then the slots. */
+    /** Loads the secondary catalogue metadata and, regardless of its result, the primary slots. */
     async init() {
-        const [potions, apothecary] = await Promise.all([PotionModel.catalog(), PotionModel.apothecary()]);
-        this.#potions = potions;
-        this.#prices = apothecary.prices;
-        this.#brewHours = apothecary.hours;
-        this.#level = profile.user.apothecary;
-        this.#showApothecary();
+        const [potions, apothecary] = await Promise.allSettled([PotionModel.catalog(), PotionModel.apothecary()]);
+        if (potions.status === 'fulfilled') this.#potions = potions.value;
+        if (apothecary.status === 'fulfilled') {
+            this.#prices = apothecary.value.prices;
+            this.#brewHours = apothecary.value.hours;
+        }
+        this.#ready = potions.status === 'fulfilled' && apothecary.status === 'fulfilled';
+        this.#level = Number(profile.user.apothecary) || 0;
+        if (this.#ready) this.#showApothecary();
+        else {
+            const browse = this.#panel.querySelector('#browse');
+            if (browse) browse.disabled = true;
+            const upgrade = this.#panel.querySelector('#upgrade');
+            if (upgrade) upgrade.hidden = true;
+        }
 
-        this.#panel.querySelector('#browse').addEventListener('click', event => {
+        this.#panel.querySelector('#browse')?.addEventListener('click', event => {
             if (!event.currentTarget.disabled) this.#openShop();
         });
         this.#panel.querySelector('#upgrade')?.addEventListener('click', () => this.#askUpgrade());
-        await this.refresh();
+        // The section is still hidden here; opening it calls refresh again with the shell's retry state.
+        await this.refresh().catch(() => {});
     }
 
     /** @param {number} [level] Apothecary level (the current one by default). */
@@ -144,7 +156,7 @@ export class PotionsTab {
             container.append(slot);
         }
 
-        this.#panel.querySelector('#browse').disabled = free === 0;
+        this.#panel.querySelector('#browse').disabled = !this.#ready || free === 0;
         setSilver(profile.user.silver);
         this.#markShop();
         this.#tick();
@@ -194,6 +206,7 @@ export class PotionsTab {
     }
 
     #openShop() {
+        if (!this.#ready) return;
         const ids = Object.keys(this.#potions);
         const items = ids.map(id => {
             const potion = this.#potions[id];
@@ -288,6 +301,7 @@ export class PotionsTab {
     }
 
     #askUpgrade() {
+        if (!this.#ready) return;
         const price = this.#price();
         const affordable = price <= profile.user.silver;
         const box = new Message({

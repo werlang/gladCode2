@@ -1,7 +1,7 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runSectionTask, secondaryRequest, settleRequest } from '../helpers/section-request.js';
 import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
 import { showNoCredit, showTutorPitch } from './tutor.js';
@@ -53,7 +53,7 @@ export class RankingTab {
      */
     async #bestOffset(signal) {
         if (this.#personalOffset !== null) return this.#personalOffset;
-        const value = await settleRequest(() => RankModel.myBestOffset({ signal }), signal);
+        const value = await secondaryRequest(() => RankModel.myBestOffset({ signal }), signal);
         if (value === undefined) return 0;
         const offset = Math.floor(value / PAGE_SIZE) * PAGE_SIZE;
         this.#personalOffset = offset;
@@ -82,10 +82,16 @@ export class RankingTab {
 
     /** @param {{ signal?: AbortSignal }} [options] */
     async #drawTabs({ signal } = {}) {
-        const tags = await settleRequest(() => RankModel.tabs({ signal }), signal);
-        if (!tags || signal?.aborted) return;
+        const tags = await secondaryRequest(() => RankModel.tabs({ signal }), signal);
+        if (signal?.aborted) return;
         this.#panel.querySelectorAll('#tab-container .tab.user').forEach(tab => tab.remove());
         const add = this.#panel.querySelector('#add-tab');
+        if (!tags) {
+            if (this.#selected !== GENERAL) this.#selected = GENERAL;
+            add.style.display = 'none';
+            this.#markSelected();
+            return;
+        }
         if (!tags.includes(this.#selected) && this.#selected !== GENERAL) this.#selected = GENERAL;
 
         tags.forEach(tag => {

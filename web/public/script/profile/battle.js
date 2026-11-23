@@ -1,5 +1,5 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runSectionTask, secondaryRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, isVisible } from '../helpers/animate.js';
 import { FriendModel } from '../models/social.js';
 import { ChallengeList, challengeFriend } from './duels.js';
@@ -107,8 +107,8 @@ export class BattleTab {
     async #filterFriends(text) {
         const signal = this.#signal;
         const request = ++this.#filterRequest;
-        const friends = await settleRequest(() => FriendModel.filter(text, { signal }), signal);
-        if (!friends || signal?.aborted || request !== this.#filterRequest) return;
+        const friends = await secondaryRequest(() => FriendModel.filter(text, { signal }), signal);
+        if (signal?.aborted || request !== this.#filterRequest) return;
         const table = this.#panel.querySelector('#duel.wrapper #table-friends');
         const challenge = this.#panel.querySelector('#duel.wrapper #challenge');
         table.replaceChildren();

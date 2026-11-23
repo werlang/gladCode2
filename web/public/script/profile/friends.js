@@ -1,7 +1,7 @@
 import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
 import { elapsedString } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runSectionTask, settleRequest } from '../helpers/section-request.js';
+import { runSectionTask, secondaryRequest, settleRequest } from '../helpers/section-request.js';
 import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
@@ -159,8 +159,8 @@ export class FriendsTab {
     async #search(text) {
         const signal = this.#signal;
         const request = ++this.#searchRequest;
-        const users = await settleRequest(() => FriendModel.search(text, { signal }), signal);
-        if (!users || signal?.aborted || request !== this.#searchRequest) return;
+        const users = await secondaryRequest(() => FriendModel.search(text, { signal }), signal);
+        if (signal?.aborted || request !== this.#searchRequest) return;
         const table = this.#panel.querySelector('#search .table');
         table.replaceChildren();
         (Array.isArray(users) ? users : []).forEach(user => {

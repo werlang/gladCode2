@@ -200,7 +200,8 @@ WP3 adapts the existing controllers to this shape; WP4–WP8 rewrite them sectio
    keeps its scroll position and the components it already owns.
 3. **Load and render.** Data comes from a service; the section renders through components and templates.
    The first paint never waits for a secondary request (the page header and the section chrome show while
-   the list loads).
+   the list loads). A failed secondary read (own position, badges, counts or a side panel) degrades to its
+   own empty state; only a failed primary read shows the section error with retry.
 4. **Unmount.** The shell calls `unmount()` before mounting a different section: abort the controller,
    clear timers and intervals, `destroy()` the components it owns, remove its listeners, cancel the
    countdowns. A late response after `unmount()` is ignored, and a cancelled load ends silently

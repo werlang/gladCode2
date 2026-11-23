@@ -16,6 +16,7 @@ function deferred() {
 /** The parts of an element the section controllers touch. */
 function fakeNode(children = {}) {
     const classes = new Set();
+    const listeners = new Map();
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
         replaced: 0, appended: 0, removed: 0, style: {}, offsetWidth: 0, offsetHeight: 0,
@@ -31,7 +32,8 @@ function fakeNode(children = {}) {
         replaceChildren: () => { element.replaced += 1; },
         append: () => { element.appended += 1; },
         remove: () => { element.removed += 1; },
-        addEventListener: () => {},
+        addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
+        fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
         removeEventListener: () => {},
         insertAdjacentHTML: () => {},
         setAttribute: () => {},
@@ -52,7 +54,11 @@ function installDocument(map) {
         querySelectorAll: () => [],
         addEventListener: () => {},
         removeEventListener: () => {},
-        createElement: () => fakeNode(),
+        createElement: () => {
+            const node = fakeNode();
+            node.content = { firstElementChild: fakeNode() };
+            return node;
+        },
         body: fakeNode(),
         documentElement: fakeNode(),
         activeElement: null,
@@ -372,4 +378,114 @@ test('settings makes no changes when its navigation signal was already aborted',
     controller.abort();
     tab.show({}, { signal: controller.signal });
     assert.equal(nickname.value, 'keep');
+});
+
+test('a failed friend search clears only its side panel', async () => {
+    const options = fakeNode({ '.unfriend': fakeNode(), '.message': fakeNode(), '.duel': fakeNode() });
+    const requests = fakeNode();
+    const friendBox = fakeNode();
+    const requestTable = fakeNode();
+    const friendTable = fakeNode();
+    const searchInput = fakeNode();
+    const searchTable = fakeNode();
+    const panel = fakeNode({
+        '#friends .options': options,
+        '#request': requests,
+        '#friends': friendBox,
+        '#request .table': requestTable,
+        '#friends .table': friendTable,
+        '#search .input': searchInput,
+        '#search .table': searchTable,
+    });
+    installDocument(new Map([['#friend-panel', panel]]));
+    const original = { list: FriendModel.list, search: FriendModel.search };
+    FriendModel.list = async () => ({ pending: [], confirmed: [] });
+    FriendModel.search = async () => {
+        throw new Error('search down');
+    };
+    try {
+        const tab = new FriendsTab();
+        tab.init();
+        const controller = new AbortController();
+        await tab.show({}, { signal: controller.signal });
+        searchInput.value = 'any';
+        await searchInput.fire('input');
+        assert.equal(searchTable.replaced, 1);
+        assert.equal(requestTable.replaced, 1);
+        assert.equal(friendTable.replaced, 1);
+    }
+    finally {
+        FriendModel.list = original.list;
+        FriendModel.search = original.search;
+    }
+});
+
+test('a failed potion catalogue still loads the primary slots', async () => {
+    const container = fakeNode();
+    const browse = fakeNode();
+    const panel = fakeNode({ '#my-pots': container, '#browse': browse });
+    installDocument(new Map([
+        ['#apot-container', panel],
+        ['#apot-panel', fakeNode()],
+    ]));
+    const original = { catalog: PotionModel.catalog, apothecary: PotionModel.apothecary, slots: PotionModel.slots };
+    PotionModel.catalog = async () => {
+        throw new Error('catalogue down');
+    };
+    PotionModel.apothecary = async () => {
+        throw new Error('apothecary down');
+    };
+    let slotReads = 0;
+    PotionModel.slots = async () => {
+        slotReads += 1;
+        return { slots: [], level: 1, unlockLevels: [0, 0, 0, 0] };
+    };
+    profile.user = { ...profile.user, apothecary: 1 };
+    try {
+        const tab = new PotionsTab();
+        await tab.init();
+        assert.equal(slotReads, 1);
+        assert.equal(container.replaced, 1);
+        assert.equal(browse.disabled, true);
+        tab.unmount();
+    }
+    finally {
+        PotionModel.catalog = original.catalog;
+        PotionModel.apothecary = original.apothecary;
+        PotionModel.slots = original.slots;
+    }
+});
+
+test('a failed duel friend filter does not reject the duel mode', async () => {
+    const panel = fakeNode({
+        '#duel.wrapper .input': fakeNode(),
+        '#duel.wrapper #table-friends': fakeNode(),
+        '#duel.wrapper #challenge': fakeNode(),
+    });
+    installDocument(new Map([
+        ['#panel #battle-container', panel],
+        ['#duel-challenge', fakeNode({ '.table': fakeNode() })],
+        ['#battle-container #ranked.wrapper .glad-card-container', fakeNode()],
+        ['#battle-container #match-find', fakeNode()],
+        ['#panel #battle-container #tourn.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
+        ['#panel #battle-container #train.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
+    ]));
+    const original = FriendModel.filter;
+    FriendModel.filter = async () => {
+        throw new Error('friends down');
+    };
+    let challengeLoads = 0;
+    try {
+        const tab = new BattleTab(() => {});
+        tab.ranked = { refresh: async () => { throw new Error('ranked down'); } };
+        tab.challenges = { refresh: async () => { challengeLoads += 1; } };
+        tab.tournaments = { refresh: async () => { throw new Error('tournaments down'); } };
+        tab.trainings = { refresh: async () => { throw new Error('trainings down'); } };
+        const controller = new AbortController();
+        await tab.show({ subtab: 'duel' }, { signal: controller.signal });
+        assert.equal(challengeLoads, 1);
+    }
+    finally {
+        FriendModel.filter = original;
+    }
 });

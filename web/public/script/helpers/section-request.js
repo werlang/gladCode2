@@ -32,6 +32,25 @@ export async function settleRequest(task, signal) {
 }
 
 /**
+ * Waits for a secondary read (a position, badge, count or side panel). A failure degrades to
+ * `undefined` so the section can show its own empty state without blocking the primary content.
+ *
+ * @template T
+ * @param {() => Promise<T>} task
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<T|undefined>}
+ */
+export async function secondaryRequest(task, signal) {
+    try {
+        const value = await task();
+        return signal?.aborted ? undefined : value;
+    }
+    catch {
+        return undefined;
+    }
+}
+
+/**
  * Runs a load started by a section control. A navigation abort stays silent; another failure shows
  * the section error toast instead of becoming an unhandled rejection.
  *
@@ -43,6 +62,9 @@ export function runSectionTask(task) {
         .then(task)
         .then(() => {}, error => {
             if (isAborted(error)) return;
-            createToast('Não foi possível carregar esta seção. Tente novamente.', 'error');
+            createToast('Não foi possível carregar esta seção. Tente novamente.', {
+                type: 'error',
+                action: { label: 'Tentar novamente', onClick: () => runSectionTask(task) },
+            });
         });
 }

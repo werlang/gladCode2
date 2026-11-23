@@ -64,7 +64,7 @@ function installDocument(map) {
 const { RankingTab } = await import('../../web/public/script/profile/ranking.js');
 const { RankModel } = await import('../../web/public/script/models/rank.js');
 const { RequestError } = await import('../../web/public/script/helpers/request.js');
-const { runSectionTask, settleRequest } = await import('../../web/public/script/helpers/section-request.js');
+const { runSectionTask, secondaryRequest, settleRequest } = await import('../../web/public/script/helpers/section-request.js');
 const { profile } = await import('../../web/public/script/profile/session.js');
 
 profile.user = { id: 1, nickname: 'Test', level: 10, premium: false, silver: 0 };
@@ -221,4 +221,90 @@ test('the section request boundary recognizes abort errors and keeps other failu
     await assert.rejects(settleRequest(async () => {
         throw new Error('server down');
     }), /server down/);
+});
+
+test('a failed personal position still opens the general ranking on page zero', async () => {
+    const table = fakeNode();
+    const search = fakeNode();
+    const panel = fakeNode({
+        '.table': table,
+        '#search .input': search,
+        '#tab-general': fakeNode(),
+        '#add-tab': fakeNode(),
+        '#prev': fakeNode(),
+        '#next': fakeNode(),
+    });
+    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
+    installDocument(new Map([['#ranking-container', panel]]));
+    const original = {
+        tabs: RankModel.tabs,
+        general: RankModel.general,
+        best: RankModel.myBestOffset,
+    };
+    RankModel.tabs = async () => [];
+    RankModel.myBestOffset = async () => {
+        throw new Error('position unavailable');
+    };
+    const offsets = [];
+    RankModel.general = query => {
+        offsets.push(query.offset);
+        return Promise.resolve({ total: 0, ranking: [] });
+    };
+    try {
+        const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        assert.deepEqual(offsets, [0]);
+    }
+    finally {
+        RankModel.tabs = original.tabs;
+        RankModel.general = original.general;
+        RankModel.myBestOffset = original.best;
+    }
+});
+
+test('failed hashtag tabs do not block the general ranking list', async () => {
+    const table = fakeNode();
+    const search = fakeNode();
+    const add = fakeNode();
+    const panel = fakeNode({
+        '.table': table,
+        '#search .input': search,
+        '#tab-general': fakeNode(),
+        '#add-tab': add,
+        '#prev': fakeNode(),
+        '#next': fakeNode(),
+    });
+    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
+    installDocument(new Map([['#ranking-container', panel]]));
+    const original = {
+        tabs: RankModel.tabs,
+        general: RankModel.general,
+        best: RankModel.myBestOffset,
+    };
+    RankModel.tabs = async () => {
+        throw new Error('tabs unavailable');
+    };
+    RankModel.myBestOffset = async () => 0;
+    let listings = 0;
+    RankModel.general = async () => {
+        listings += 1;
+        return { total: 0, ranking: [] };
+    };
+    try {
+        const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        assert.equal(listings, 1);
+        assert.equal(add.style.display, 'none');
+    }
+    finally {
+        RankModel.tabs = original.tabs;
+        RankModel.general = original.general;
+        RankModel.myBestOffset = original.best;
+    }
+});
+
+test('a secondary request degrades its failure to undefined', async () => {
+    assert.equal(await secondaryRequest(async () => {
+        throw new Error('badge unavailable');
+    }), undefined);
 });

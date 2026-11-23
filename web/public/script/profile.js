@@ -111,9 +111,12 @@ async function start() {
     let controller = null;
     let generation = 0;
 
-    const reportError = error => {
+    const reportError = (error, retry) => {
         if (isAborted(error)) return;
-        createToast('Não foi possível carregar esta seção. Tente novamente.', 'error');
+        createToast('Não foi possível carregar esta seção. Tente novamente.', {
+            type: 'error',
+            action: retry ? { label: 'Tentar novamente', onClick: retry } : undefined,
+        });
     };
 
     const show = async (route, { focus = false } = {}) => {
@@ -138,7 +141,7 @@ async function start() {
         }
         catch (error) {
             if (!token || token !== generation || controller.signal.aborted) return;
-            reportError(error);
+            reportError(error, () => show(route, { focus: false }));
             return;
         }
         if (token !== generation || controller.signal.aborted) return;
