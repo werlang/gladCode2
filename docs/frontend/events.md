@@ -337,9 +337,9 @@ sequenceDiagram
 
 #### Ranking window contract (WP7)
 
-`GET /ranking/window?gladiatorId=<id>|position=<n>&size=9` — exactly one of `gladiatorId` or `position`
-is required (400 `INVALID_RANKING_WINDOW` otherwise). `size` defaults to 9, is clamped to 3–21 and is forced
-odd (`size += 1` when even). The route answers:
+`GET /ranking/window?gladiatorId=<id>&size=9` or `GET /ranking/window?position=<n>&size=9` — exactly one
+of `gladiatorId` or `position` is required (400 `INVALID_RANKING_WINDOW` otherwise). `size` defaults to 9,
+is clamped to 3–21 and is forced odd (`size += 1` when even). The route answers:
 
 ```json
 {
