@@ -10,7 +10,7 @@ import { SegmentedControl } from './components/segmented-control.js';
 import { Switch } from './components/switch.js';
 import { Tabs, tabPanelIds } from './components/tabs.js';
 import { createToast } from './components/toast.js';
-import { createElement, renderTemplate } from './helpers/html.js';
+import { createElement, escapeHtml, renderTemplate } from './helpers/html.js';
 import { applyTheme, THEME_CHOICES } from './helpers/theme.js';
 import { emptyStateTemplate } from './templates/empty-state.js';
 
@@ -125,7 +125,7 @@ function tabsWithPanels(tabs, items) {
 function tabs() {
     const container = slot('#example-tabs');
     const underline = new Tabs({ variant: 'underline', label: 'Relatórios' });
-    underline.listen('select', detail => createToast(`Aba: ${detail.id}`, 'info'));
+    underline.listen('select', detail => createToast(`Aba: ${escapeHtml(detail.id)}`, 'info'));
     const underlineWrap = tabsWithPanels(underline, [
         { id: 'ranked', label: 'Ranqueadas', count: 3, selected: true },
         { id: 'duels', label: 'Duelos' },
@@ -133,7 +133,7 @@ function tabs() {
     ]);
 
     const pill = new Tabs({ variant: 'pill', label: 'Ranking' });
-    pill.listen('select', detail => createToast(`Lista: ${detail.id}`, 'info'));
+    pill.listen('select', detail => createToast(`Lista: ${escapeHtml(detail.id)}`, 'info'));
     const pillWrap = tabsWithPanels(pill, [
         { id: 'general', label: 'Geral', selected: true },
         { id: 'friends', label: 'Amigos' },
@@ -151,7 +151,7 @@ function segmented() {
     const language = new SegmentedControl({ label: 'Linguagem padrão' });
     language.setOptions([{ value: 'c', label: 'C' }, { value: 'python', label: 'Python' }, { value: 'blocks', label: 'Blocos' }]);
     language.set('c', { silent: true });
-    language.listen('change', detail => createToast(`Linguagem: ${detail.value}`, 'info'));
+    language.listen('change', detail => createToast(`Linguagem: ${escapeHtml(detail.value)}`, 'info'));
 
     const filter = new SegmentedControl({ label: 'Filtro de gladiadores' });
     filter.setOptions([
@@ -183,7 +183,7 @@ function choiceCards() {
         { value: 'classic', title: 'Clássico', preview: preview('classic') },
     ]);
     theme.set('arena-light', { silent: true });
-    theme.listen('change', detail => createToast(`Tema: ${detail.value}`, 'info'));
+    theme.listen('change', detail => createToast(`Tema: ${escapeHtml(detail.value)}`, 'info'));
 
     const style = new ChoiceCards({ variant: 'icon', label: 'Visual dos gladiadores' });
     style.setOptions([
@@ -207,7 +207,7 @@ function saveStatuses() {
 function search() {
     const container = slot('#example-search');
     const normal = new SearchField({ label: 'Buscar no ranking', placeholder: 'Gladiador ou mestre' });
-    normal.listen('search', detail => createToast(`Busca: ${detail.value || '(vazia)'}`, 'info'));
+    normal.listen('search', detail => createToast(`Busca: ${escapeHtml(detail.value || '(vazia)')}`, 'info'));
     const dark = new SearchField({ label: 'Buscar mestres', placeholder: 'Apelido do mestre', variant: 'dark' });
     const busy = new SearchField({ label: 'Buscando', placeholder: 'Carregando…' });
     busy.setBusy(true);
@@ -218,8 +218,8 @@ function pagination() {
     const container = slot('#example-pagination');
     const numbered = new Pagination({ variant: 'numbered' });
     numbered.set({ page: 9, pages: 164, total: 1638, pageSize: 10 });
-    numbered.listen('change', detail => createToast(`Página ${detail.page}`, 'info'));
-    numbered.listen('jump', detail => createToast(`Ir para ${detail.position}`, 'info'));
+    numbered.listen('change', detail => createToast(`Página ${escapeHtml(detail.page)}`, 'info'));
+    numbered.listen('jump', detail => createToast(`Ir para ${escapeHtml(detail.position)}`, 'info'));
 
     const simple = new Pagination({ variant: 'simple' });
     simple.set({ page: 1, pages: 49, total: 482, pageSize: 10 });
