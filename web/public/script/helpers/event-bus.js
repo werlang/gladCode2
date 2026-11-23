@@ -23,6 +23,11 @@
  */
 
 /**
+ * @typedef {object} AccountSignOutFailedDetail
+ * @property {unknown} error Why the logout request failed.
+ */
+
+/**
  * @typedef {object} ThemeChangedDetail
  * @property {'system'|'classic'|'arena-light'|'arena-dark'} choice
  * @property {'classic'|'arena-light'|'arena-dark'} theme
@@ -130,6 +135,7 @@ export const APP_EVENTS = Object.freeze({
     accountSaved: 'account:saved',
     accountSilver: 'account:silver',
     accountSignedOut: 'account:signed-out',
+    accountSignOutFailed: 'account:sign-out-failed',
     themeChanged: 'theme:changed',
     gladViewChanged: 'glad-view:changed',
     notificationsCounts: 'notifications:counts',

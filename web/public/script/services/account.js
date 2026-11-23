@@ -37,6 +37,8 @@ export class AccountService {
     #user = null;
     #states = new Map();
     #epoch = 0;
+    #signingOut = false;
+    #signOut = null;
 
     /**
      * @param {object} [options] Test seams.
@@ -95,10 +97,20 @@ export class AccountService {
      *
      * @param {string} field One of {@link ACCOUNT_FIELDS}.
      * @param {unknown} value
-     * @returns {Promise<{ token: SaveToken, user?: Record<string, any>, superseded?: boolean, error?: unknown }>}
+     * @returns {Promise<{ token: SaveToken, user?: Record<string, any>, superseded?: boolean, signedOut?: boolean, error?: unknown }>}
      */
     save(field, value) {
         if (!ACCOUNT_FIELDS.includes(field)) throw new TypeError(`Unknown account field "${field}".`);
+
+        // A save that arrives while the session is closing is already outdated; it must not race
+        // the logout request or be lost in the state cleared after a confirmed sign-out.
+        if (this.#signingOut) {
+            return Promise.resolve({
+                token: { field, rev: -1, previous: this.confirmed(field) },
+                superseded: true,
+                signedOut: true,
+            });
+        }
 
         const state = this.#state(field);
         const token = { field, rev: ++state.seq, previous: state.confirmed };
@@ -135,8 +147,14 @@ export class AccountService {
         return this;
     }
 
-    /** Ends the session and every field's queue. */
-    async signOut() {
+    /**
+     * Ends the session and every field's queue. Concurrent calls share one request.
+     *
+     * @returns {Promise<void>}
+     */
+    signOut() {
+        if (this.#signOut) return this.#signOut;
+        this.#signingOut = true;
         this.#epoch += 1;
         for (const state of this.#states.values()) {
             if (state.pending) {
@@ -144,9 +162,24 @@ export class AccountService {
                 state.pending = null;
             }
         }
+        this.#signOut = this.#performSignOut();
+        return this.#signOut;
+    }
+
+    async #performSignOut() {
+        try {
+            await this.#model.signOut();
+        }
+        catch (error) {
+            this.#signingOut = false;
+            this.#signOut = null;
+            this.#bus.emit(APP_EVENTS.accountSignOutFailed, { error });
+            throw error;
+        }
         this.#user = null;
         this.#states.clear();
-        await this.#model.signOut();
+        this.#signingOut = false;
+        this.#signOut = null;
         this.#bus.emit(APP_EVENTS.accountSignedOut, {});
     }
 
@@ -203,7 +236,7 @@ export class AccountService {
         }
         finally {
             state.running = false;
-            if (epoch === this.#epoch && state.pending) this.#drain(field);
+            if (state.pending) this.#drain(field);
         }
     }
 }

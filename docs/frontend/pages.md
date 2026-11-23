@@ -41,7 +41,7 @@ module column names today's file).
 | Mensagens | `/messages`, `/messages/<userId>` | `messages` | `profile/messages.js` | `<userId>` is the other master's id; the open conversation is part of the URL (WP8). |
 | Amigos | `/friends` | `friends` | `profile/friends.js` | |
 | Any section (legacy tab) | `/profile?t=<tab>` | resolved from `t` | same as the named section | `t` names the section (`news`, `glads`, `potions`, `battle`, `report`, `ranking`, `messages`, `friends`); `?s=` sets the battle subtab. Unknown/disabled falls back to Perfil. |
-| Sair | `/logout` | — | — | Not a section: the account menu's “Sair” signs out and leaves; the old route still works. |
+| Sair | `/logout` | — | — | Not a section: the account menu's “Sair” signs out and leaves; if the logout request is refused the page stays and a toast offers “Tentar novamente”. The old route still works. |
 
 `web/app.js` `PROFILE_TABS` is the server side of this table: its **keys** are the route names (`news`,
 `glads`, `reports`, `battle`, `potion`, `ranking`, `messages`, `friends`, `logout`) and its **values** are

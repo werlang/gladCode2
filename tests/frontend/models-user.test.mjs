@@ -36,3 +36,38 @@ test('a save that settles after signOut does not restore the user cache', async 
         api.post = original.post;
     }
 });
+
+test('a refused signOut keeps the user cache and a retry clears it', async () => {
+    const original = { get: api.get, post: api.post };
+    let currentCalls = 0;
+    api.get = async () => {
+        currentCalls += 1;
+        return { user: { id: 277, nickname: 'Spartacus_C' } };
+    };
+
+    try {
+        api.post = async () => null;
+        await UserModel.signOut();
+
+        const user = await UserModel.current();
+        assert.equal(user.id, 277);
+
+        api.post = async () => { throw new Error('offline'); };
+        await assert.rejects(UserModel.signOut(), /offline/);
+        assert.equal((await UserModel.current()).id, 277);
+        assert.equal(currentCalls, 1);
+
+        api.get = async () => {
+            currentCalls += 1;
+            return { user: null };
+        };
+        api.post = async () => null;
+        await UserModel.signOut();
+        assert.equal(await UserModel.current(), null);
+        assert.equal(currentCalls, 2);
+    }
+    finally {
+        api.get = original.get;
+        api.post = original.post;
+    }
+});

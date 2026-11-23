@@ -60,10 +60,11 @@ export class UserModel {
      *
      * @returns {Promise<unknown>}
      */
-    static signOut() {
-        session += 1;
-        current = null;
-        return api.post('auth/logout');
+    static async signOut() {
+        const epoch = ++session;
+        const result = await api.post('auth/logout');
+        if (epoch === session) current = null;
+        return result;
     }
 
     /**

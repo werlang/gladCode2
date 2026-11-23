@@ -35,6 +35,10 @@ DOM-free: it imports nothing and can be tested in `tests/frontend/`.
  * @property {object} user The account as the API returned it.
  * @property {string[]} changed The fields that changed.
  */
+/**
+ * @typedef {object} AccountSignOutFailedDetail
+ * @property {unknown} error Why the logout request failed.
+ */
 // …one typedef per event…
 
 /** The only event names the bus accepts. */
@@ -43,6 +47,7 @@ export const APP_EVENTS = Object.freeze({
     accountSaved: 'account:saved',
     accountSilver: 'account:silver',
     accountSignedOut: 'account:signed-out',
+    accountSignOutFailed: 'account:sign-out-failed',
     themeChanged: 'theme:changed',
     gladViewChanged: 'glad-view:changed',
     notificationsCounts: 'notifications:counts',
@@ -89,6 +94,7 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `account:saved` | `{ user, changed: string[] }` | `AccountService.save()` | shell (header/menu identity), Settings section (`SaveStatus`), theme/glad-view helpers |
 | `account:silver` | `{ silver }` | `AccountService.setSilver()` | shell → AppHeader/AccountMenu setters |
 | `account:signed-out` | `{}` | `AccountService.signOut()` | shell (return to the visitor header), NotificationService (stop polling) |
+| `account:sign-out-failed` | `{ error }` | `AccountService.signOut()` after the model rejects | shell (error toast with a retry; keep the account state) |
 | `theme:changed` | `{ choice: 'system'\|'classic'\|'arena-light'\|'arena-dark', theme: 'classic'\|'arena-light'\|'arena-dark' }` | `helpers/theme.js` `applyTheme` | AccountMenu (pressed state), Settings section, any page that redraws on theme |
 | `glad-view:changed` | `{ choice: 'sprite'\|'3d' }` | `helpers/glad-view.js` `applyGladView` | GladiatorCard/GladCardPainter, editor creator |
 | `notifications:counts` | `NotificationCounts` (below) | `NotificationService.refresh()` | shell → AppHeader, PainelMenu, MobileTabBar, MoreSheet setters |

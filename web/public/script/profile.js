@@ -1,5 +1,6 @@
 import './blocks.js';
 import { showDialog } from './components/dialog.js';
+import { createToast } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { GladiatorModel } from './models/gladiator.js';
@@ -15,14 +16,24 @@ import { RankingTab } from './profile/ranking.js';
 import { ReportsTab } from './profile/reports.js';
 import { openableTab, profile } from './profile/session.js';
 import { SettingsTab } from './profile/settings.js';
+import { account } from './services/account.js';
 
 /** How often the menu counters refresh, in ms (there is no push channel). */
 const NOTIFICATIONS_MS = 30000;
 
-/** Ends the session and goes to the front page. */
+/** Ends the session and goes to the front page; a refusal keeps the session and offers a retry. */
 async function logout() {
+    try {
+        await account.signOut();
+    }
+    catch {
+        createToast('Não foi possível sair. Tente novamente.', {
+            type: 'error',
+            action: { label: 'Tentar novamente', onClick: logout },
+        });
+        return;
+    }
     GoogleLogin.removeCredential();
-    await UserModel.signOut();
     location.href = '/';
 }
 
@@ -33,7 +44,7 @@ async function start() {
     document.querySelector('#header-container')?.classList.add('small-profile');
     document.querySelector('#header-profile')?.classList.add('here');
 
-    profile.user = await UserModel.current();
+    profile.user = await account.load();
     if (!UserModel.isLogged(profile.user)) {
         // the front page asks to sign in and comes back to the requested tab
         const tab = TemplateVar.get('tab');

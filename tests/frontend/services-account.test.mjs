@@ -23,6 +23,8 @@ class FakeModel {
         this.gates = [];
         this.failures = [];
         this.signOutGate = null;
+        this.signOutFailure = null;
+        this.signOutCalls = 0;
     }
 
     async current() {
@@ -40,7 +42,9 @@ class FakeModel {
     }
 
     async signOut() {
+        this.signOutCalls += 1;
         if (this.signOutGate) await this.signOutGate.promise;
+        if (this.signOutFailure) throw this.signOutFailure;
         this.user = null;
     }
 }
@@ -234,5 +238,58 @@ test('signOut invalidates the queue before the session request finishes', async 
 
     signOutGate.resolve();
     await signingOut;
+    assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
+});
+
+test('a refused signOut keeps the account and a new save still drains', async () => {
+    const { service, model, bus } = make();
+    await service.load();
+    const updateGate = deferred();
+    model.gates.push(updateGate);
+    const inFlight = service.save('theme', 'classic');
+
+    model.signOutFailure = new Error('network down');
+    await assert.rejects(service.signOut(), /network down/);
+
+    assert.equal(service.user.id, 1);
+    assert.equal(model.user.id, 1);
+    assert.equal(bus.emitted.some(event => event.name === 'account:signed-out'), false);
+    assert.equal(bus.emitted.at(-1).name, 'account:sign-out-failed');
+    assert.equal(bus.emitted.at(-1).detail.error.message, 'network down');
+
+    const queued = service.save('theme', 'arena-dark');
+    updateGate.resolve();
+    const first = await inFlight;
+    const second = await queued;
+    assert.equal(first.signedOut, true);
+    assert.equal(second.user.theme, 'arena-dark');
+    assert.equal(service.user.theme, 'arena-dark');
+
+    model.signOutFailure = null;
+    await service.signOut();
+    assert.equal(service.user, null);
+    assert.equal(model.user, null);
+    assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
+});
+
+test('a save during signOut is refused and concurrent signOut calls share the request', async () => {
+    const { service, model, bus } = make();
+    await service.load();
+    const signOutGate = deferred();
+    model.signOutGate = signOutGate;
+
+    const first = service.signOut();
+    const second = service.signOut();
+    assert.equal(model.signOutCalls, 1);
+
+    const during = await service.save('theme', 'classic');
+    assert.equal(during.superseded, true);
+    assert.equal(during.signedOut, true);
+    assert.equal(model.bodies.length, 0);
+
+    signOutGate.resolve();
+    await Promise.all([first, second]);
+    assert.equal(service.user, null);
+    assert.equal(model.user, null);
     assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
 });
