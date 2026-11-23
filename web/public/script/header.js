@@ -2,11 +2,12 @@ import { showLoginDialog } from './components/header.js';
 import { CommandPalette } from './components/command-palette.js';
 import { showMessage } from './components/dialog.js';
 import { AppHeader } from './components/app-header.js';
-import { createToast } from './components/toast.js';
+import { createToast, isModalOpen } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { applyTheme, storedThemeChoice } from './helpers/theme.js';
+import { previewTheme } from './helpers/theme-preview.js';
 import { account } from './services/account.js';
 import { notifications } from './services/notifications.js';
 import { PAINEL_COMMANDS, searchShell } from './services/command-search.js';
@@ -51,7 +52,14 @@ async function start() {
         }
         return palette;
     };
+    /** Closes the header panels first, then refuses while any other modal owns the focus. */
+    const canOpenPalette = () => {
+        if (palette?.isOpen) return false;
+        header.closePanels();
+        return !isModalOpen();
+    };
     const openPalette = source => query => {
+        if (!canOpenPalette()) return;
         events.emit(APP_EVENTS.paletteOpened, { source });
         ensurePalette().open({ query });
         header.setSearching(true);
@@ -68,26 +76,40 @@ async function start() {
             header.setNotifications({ needs: [], news: [] });
         }
     });
+    let themeToast = null;
+    let themeRequest = 0;
     header.listen('theme-select', async ({ choice }) => {
-        applyTheme(choice);
-        if (!account.user) return;
-        try {
-            const saved = await account.save('theme', choice);
-            if (saved.superseded) return;
-            const previous = saved.token.previous;
-            createToast(`Tema alterado para ${choice === 'classic' ? 'Clássico' : choice === 'arena-dark' ? 'Arena escuro' : 'Arena claro'}`, {
-                action: {
-                    label: 'Desfazer',
-                    onClick: async () => {
-                        const restored = await account.undo(saved.token);
-                        if (!restored.superseded && previous) applyTheme(previous);
-                    },
+        if (!account.user) {
+            applyTheme(choice);
+            return;
+        }
+        const request = ++themeRequest;
+        themeToast?.dismiss();
+        themeToast = null;
+        const result = await previewTheme({
+            choice,
+            previous: account.confirmed('theme'),
+            fallback: storedThemeChoice,
+            apply: applyTheme,
+            save: (field, value) => account.save(field, value),
+            isCurrent: () => request === themeRequest,
+        });
+        if (result.status === 'failed') {
+            if (request === themeRequest) {
+                createToast(result.error?.code === 'NOT_SIGNED_IN' ? 'Entre para salvar o tema' : 'Não foi possível salvar o tema', 'error');
+            }
+            return;
+        }
+        if (result.status !== 'saved' || request !== themeRequest) return;
+        themeToast = createToast(`Tema alterado para ${choice === 'classic' ? 'Clássico' : choice === 'arena-dark' ? 'Arena escuro' : 'Arena claro'}`, {
+            action: {
+                label: 'Desfazer',
+                onClick: async () => {
+                    const restored = await account.undo(result.token);
+                    if (restored?.user && !restored.superseded) applyTheme(result.previous);
                 },
-            });
-        }
-        catch (error) {
-            createToast(error?.code === 'NOT_SIGNED_IN' ? 'Entre para salvar o tema' : 'Não foi possível salvar o tema', 'error');
-        }
+            },
+        });
     });
     header.listen('sign-out', async () => {
         try {
@@ -118,14 +140,18 @@ async function start() {
         const tag = document.activeElement?.tagName;
         const typing = tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+            if (!canOpenPalette()) return;
             event.preventDefault();
             openPalette('keyboard')('');
         }
         else if (event.key === '/' && !typing) {
+            if (!canOpenPalette()) return;
             event.preventDefault();
             openPalette('keyboard')('');
         }
         else if (event.key === '?' && !typing) {
+            header.closePanels();
+            if (isModalOpen()) return;
             event.preventDefault();
             showShortcuts();
         }
