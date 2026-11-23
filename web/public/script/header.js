@@ -92,6 +92,7 @@ async function start() {
             fallback: storedThemeChoice,
             apply: applyTheme,
             save: (field, value) => account.save(field, value),
+            confirmed: () => account.confirmed('theme'),
             isCurrent: () => request === themeRequest,
         });
         if (result.status === 'failed') {
