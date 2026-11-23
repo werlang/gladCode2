@@ -42,10 +42,9 @@ function count(results) {
 }
 
 const rows = await Mysql.select(
-    `SELECT r.id, r.log, r.gladiator, r.result, g.name, u.apelido
+    `SELECT r.id, r.log, r.gladiator, r.result, g.name, g.master
     FROM reports r
     INNER JOIN gladiators g ON g.cod = r.gladiator
-    INNER JOIN usuarios u ON u.id = g.master
     WHERE r.result IS NOT NULL AND r.log IS NOT NULL
     ORDER BY r.log, r.id`,
 );
@@ -61,10 +60,15 @@ for (const row of rows) {
 
 let updated = 0;
 let unchanged = 0;
-let missingLog = 0;
-let unmatched = 0;
 const before = [];
 const after = [];
+const skipped = [];
+let hardSkipped = 0;
+const skip = (report, logId, reason, hard = true) => {
+    if (hard) hardSkipped += 1;
+    skipped.push({ reportId: report.id, log: logId, master: report.master, reason });
+    console.warn(`SKIP report ${report.id} (log ${logId}, master ${report.master}): ${reason}`);
+};
 
 for (const [logId, reports] of byLog) {
     const file = path.join(logsDir(), String(logId));
@@ -73,13 +77,11 @@ for (const [logId, reports] of byLog) {
         simulation = await readSimulation(file);
     }
     catch {
-        missingLog += reports.length;
-        console.warn(`log ${logId}: file missing (${reports.length} report(s) left as they are)`);
+        for (const report of reports) skip(report, logId, 'log file missing', false);
         continue;
     }
     if (!Array.isArray(simulation) || !simulation.length) {
-        missingLog += reports.length;
-        console.warn(`log ${logId}: empty or invalid simulation (${reports.length} left as they are)`);
+        for (const report of reports) skip(report, logId, 'log file empty or invalid', false);
         continue;
     }
 
@@ -90,20 +92,36 @@ for (const [logId, reports] of byLog) {
         results = rankedResults(ordered, ordered.some(entry => entry.hp > 0));
     }
     catch {
-        missingLog += reports.length;
-        console.warn(`log ${logId}: could not derive the placing (${reports.length} left as they are)`);
+        for (const report of reports) skip(report, logId, 'could not derive the placing from the log', false);
         continue;
     }
-    const resultByName = new Map(ordered.map((entry, index) => [
-        `${engineText(entry.name)}@${engineText(entry.user)}`,
-        results[index],
-    ]));
+
+    const resultByName = new Map();
+    const duplicateLogNames = new Set();
+    ordered.forEach((entry, index) => {
+        const name = engineText(entry.name);
+        if (resultByName.has(name)) duplicateLogNames.add(name);
+        else resultByName.set(name, results[index]);
+    });
+    const reportNames = new Map();
+    for (const report of reports) {
+        const name = engineText(report.name);
+        reportNames.set(name, (reportNames.get(name) ?? 0) + 1);
+    }
 
     for (const report of reports) {
-        const result = resultByName.get(`${engineText(report.name)}@${engineText(report.apelido)}`);
+        const name = engineText(report.name);
+        if (duplicateLogNames.has(name)) {
+            skip(report, logId, `ambiguous log gladiator name "${name}"`);
+            continue;
+        }
+        if (reportNames.get(name) > 1) {
+            skip(report, logId, `duplicate report gladiator name "${name}"`);
+            continue;
+        }
+        const result = resultByName.get(name);
         if (!result) {
-            unmatched += 1;
-            console.warn(`report ${report.id} (log ${logId}, gladiator ${report.gladiator}): no engine entry`);
+            skip(report, logId, `no gladiator named "${name}" in the log`);
             continue;
         }
         before.push(report.result);
@@ -124,11 +142,13 @@ console.log(JSON.stringify({
     logs: byLog.size,
     updated,
     unchanged,
-    missingLog,
-    unmatched,
+    skipped: skipped.length,
+    hardSkipped,
+    skippedRows: skipped,
     unknownSkipped,
     before: count(before),
     after: count(after),
 }, null, 2));
+if (hardSkipped) process.exitCode = 2;
 
 await Mysql.close();
