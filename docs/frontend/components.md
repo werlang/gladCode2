@@ -117,7 +117,12 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **API:** `createToast(message, typeOrOptions)` where the second argument is the old
   `error|info|success` string or `{ type, duration, action }`; `action` is
   `{ label: 'Desfazer', onClick }`. Returns the toast element with `dismiss()`. A toast with an action
-  stays 6 s (or `duration`), the others 2 s + 3 s of fade; it is announced with `role="status"`.
+  stays 6 s (or `duration`), the others 2 s + 3 s of fade; it is announced with
+  `role="status"` and `aria-live="polite"`.
+- **Focus:** a toast never moves focus. Press **Alt+Z** to move focus to the newest live action
+  (the action also carries `aria-keyshortcuts="Alt+Z"`); the action pauses the expiry while focused
+  and returns focus to the opener after dismissal. An asynchronous confirmation therefore leaves the
+  current field or button untouched.
 - **Helpers:** `toastOptions(input)` normalises and validates the options.
 - **Events:** none; `action.onClick` is the callback.
 - **Boards:** Perfil (autosave undo), Main (mark all read).
