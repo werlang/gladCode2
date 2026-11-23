@@ -175,6 +175,30 @@ export async function optimisticWrite({ apply, rollback, write, onError = writeE
 }
 
 /**
+ * Runs an undo started by a toast action. Whether the restore succeeds or is refused, the caller's
+ * `restore` puts the controls back on the value the API confirms; a refusal is reported with the
+ * API message. The promise never rejects, so the toast action never produces an unhandled rejection.
+ *
+ * @param {() => Promise<unknown>} undo
+ * @param {{ restore?: () => void, report?: (error: Error) => void }} [options]
+ * @returns {Promise<any|null>} The undo result, or null when it was refused.
+ */
+export async function undoChange(undo, { restore, report = writeErrorToast } = {}) {
+    try {
+        const result = await undo();
+        if (result?.ignored || result?.superseded) return result;
+        restore?.();
+        return result;
+    }
+    catch (error) {
+        if (isAborted(error)) return null;
+        restore?.();
+        report(error);
+        return null;
+    }
+}
+
+/**
  * Runs an action started by a section control that may write. It only reports the failure; it never
  * offers a generic retry, because repeating a POST/PUT/DELETE is not safe.
  *

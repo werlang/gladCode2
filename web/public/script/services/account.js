@@ -95,11 +95,16 @@ export class AccountService {
      * `{ token, superseded: true }` when a newer intent replaced it. A failure of the current revision
      * rejects; a superseded failure resolves as superseded and changes nothing.
      *
+     * With `merge`, the value is a patch: consecutive patches to the same object field are folded
+     * together and applied over the value confirmed when the request runs, so changing two e-mail
+     * preferences quickly persists both instead of the second object replacing the first.
+     *
      * @param {string} field One of {@link ACCOUNT_FIELDS}.
      * @param {unknown} value
+     * @param {{ merge?: boolean }} [options]
      * @returns {Promise<{ token: SaveToken, user?: Record<string, any>, superseded?: boolean, signedOut?: boolean, error?: unknown }>}
      */
-    save(field, value) {
+    save(field, value, { merge = false } = {}) {
         if (!ACCOUNT_FIELDS.includes(field)) throw new TypeError(`Unknown account field "${field}".`);
 
         // A save that arrives while the session is closing is already outdated; it must not race
@@ -113,13 +118,25 @@ export class AccountService {
         }
 
         const state = this.#state(field);
-        const token = { field, rev: ++state.seq, previous: state.confirmed };
+        let patch = merge ? { ...(value ?? {}) } : null;
+        let previous = merge
+            ? { ...(state.confirmed ?? this.#user?.[field] ?? {}) }
+            : state.confirmed;
 
         if (state.pending) {
-            state.pending.waiter.resolve({ token: state.pending.token, superseded: true });
+            const pending = state.pending;
+            // Two patches queued before the first request runs become one write with the earliest
+            // rollback base; resolving the dropped waiter keeps its caller from hanging.
+            if (merge && pending.merge) {
+                patch = { ...pending.patch, ...patch };
+                previous = pending.token.previous;
+            }
+            pending.waiter.resolve({ token: pending.token, superseded: true });
         }
+
+        const token = { field, rev: ++state.seq, previous };
         const waiter = deferred();
-        state.pending = { value, token, waiter };
+        state.pending = { value, token, waiter, merge, patch };
         if (!state.running) this.#drain(field);
         return waiter.promise;
     }
@@ -214,12 +231,17 @@ export class AccountService {
         const epoch = this.#epoch;
 
         try {
-            const user = await this.#model.update({ [field]: job.value });
+            // A merged patch is applied when it runs, so it includes whatever an earlier write for
+            // this field confirmed in the meantime.
+            const value = job.merge
+                ? { ...(state.confirmed ?? this.#user?.[field] ?? {}), ...job.patch }
+                : job.value;
+            const user = await this.#model.update({ [field]: value });
             if (epoch !== this.#epoch) {
                 job.waiter.resolve({ token: job.token, superseded: true, signedOut: true });
                 return;
             }
-            state.confirmed = user?.[field] ?? job.value;
+            state.confirmed = user?.[field] ?? value;
             if (job.token.rev === state.seq) {
                 this.#user = user;
                 this.#bus.emit(APP_EVENTS.accountSaved, { user, changed: [field] });

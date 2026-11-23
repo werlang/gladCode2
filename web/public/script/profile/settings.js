@@ -1,5 +1,6 @@
 import { Avatar } from '../components/avatar.js';
 import { ChoiceCards } from '../components/choice-cards.js';
+import { Message } from '../components/dialog.js';
 import { Input } from '../components/input.js';
 import { SaveStatus } from '../components/save-status.js';
 import { SegmentedControl } from '../components/segmented-control.js';
@@ -9,7 +10,7 @@ import { createElement, renderTemplate } from '../helpers/html.js';
 import { formatMonthYear } from '../helpers/date-format.js';
 import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
 import { applyTheme, storedThemeChoice } from '../helpers/theme.js';
-import { isAborted, writeErrorToast } from '../helpers/section-request.js';
+import { isAborted, undoChange, writeErrorToast } from '../helpers/section-request.js';
 import { account } from '../services/account.js';
 import { profile, xpToNextLevel } from './session.js';
 import { UserModel } from '../models/user.js';
@@ -74,11 +75,16 @@ export class SettingsTab {
     #appearanceStatus = null;
     #emailStatus = null;
     #cropper = null;
-    #pictureContainer = null;
+    #cropDialog = null;
+    #cropping = false;
+    #photoButton = null;
     #picturePicker = null;
     #signal = null;
+    #lastNickname = null;
     #lastLanguage = null;
+    #lastAppearance = null;
     #lastPreference = null;
+    #nicknameToast = null;
     #languageToast = null;
     #appearanceToast = null;
     #emailToast = null;
@@ -134,10 +140,13 @@ export class SettingsTab {
         this.#languageStatus = this.#status('#identity-status');
         this.#appearanceStatus = this.#status('#appearance-status');
         this.#emailStatus = this.#status('#email-status');
-        this.#languageStatus.listen('retry', () => this.#saveLanguage(this.#language.value));
+        this.#nicknameStatus.listen('retry', () => this.#retryNickname());
+        this.#languageStatus.listen('retry', () => {
+            if (this.#lastLanguage?.field === 'language') this.#saveLanguage(this.#lastLanguage.value);
+        });
         this.#appearanceStatus.listen('retry', () => {
-            if (this.#lastLanguage?.field === 'gladView') this.#saveGladView(this.#lastLanguage.value);
-            else if (this.#lastLanguage?.field === 'theme') this.#saveTheme(this.#lastLanguage.value);
+            if (this.#lastAppearance?.field === 'gladView') this.#saveGladView(this.#lastAppearance.value);
+            else if (this.#lastAppearance?.field === 'theme') this.#saveTheme(this.#lastAppearance.value);
         });
         this.#emailStatus.listen('retry', () => {
             if (this.#lastPreference) this.#savePreference(this.#lastPreference.name, this.#lastPreference.value);
@@ -203,7 +212,9 @@ export class SettingsTab {
         const level = Number(user.level) || 1;
         const xp = Number(user.xp) || 0;
         const total = xpToNextLevel(level);
-        this.#avatar.set({ name: user.nickname, picture: user.picture, level });
+        // The hero already says “Mestre nível N”; the avatar keeps no level badge, which would sit
+        // under the camera button.
+        this.#avatar.set({ name: user.nickname, picture: user.picture, level: 0 });
         this.#avatar.setRing(total ? xp / total : 0);
         this.#avatar.setOnline(false);
         this.#root.querySelector('#profile-hero-name').textContent = user.nickname ?? '';
@@ -223,6 +234,7 @@ export class SettingsTab {
         this.#root.querySelector('#profile-nickname-example').textContent = value;
         this.#nickname.clearError();
         this.#nicknameAvailable = null;
+        this.#lastNickname = null;
         clearTimeout(this.#nicknameTimer);
         this.#nicknameController?.abort();
         if (value.length < 2) {
@@ -247,10 +259,31 @@ export class SettingsTab {
         }, 350);
     }
 
-    /** Saves the nickname on blur or Enter, after local validation. */
-    async #saveNickname() {
-        const value = this.#nickname.value.trim();
-        const confirmed = String(account.confirmed('nickname') ?? profile.user?.nickname ?? '');
+    /** @returns {string} The nickname the API currently confirms. */
+    #confirmedNickname() {
+        return String(account.confirmed('nickname') ?? profile.user?.nickname ?? '');
+    }
+
+    /**
+     * Resends the nickname a refused save still intends. The input rolled back, so the intent is
+     * kept separately; a newly typed value wins over it.
+     *
+     * @returns {void}
+     */
+    #retryNickname() {
+        const current = this.#nickname.value.trim();
+        const intent = current && current !== this.#confirmedNickname() ? current : this.#lastNickname;
+        if (intent) this.#saveNickname(intent);
+    }
+
+    /**
+     * Saves the nickname on blur or Enter, after local validation.
+     *
+     * @param {string} [intent] Value to send; defaults to the field.
+     */
+    async #saveNickname(intent = this.#nickname.value.trim()) {
+        const value = String(intent ?? '').trim();
+        const confirmed = this.#confirmedNickname();
         if (!value) {
             this.#nickname.setError('Escolha um apelido');
             return;
@@ -259,10 +292,13 @@ export class SettingsTab {
             this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
             return;
         }
-        if (this.#nicknameAvailable === false) {
+        if (this.#nicknameAvailable === false && value === this.#nickname.value.trim()) {
             this.#nickname.setError('Este apelido já está em uso');
             return;
         }
+        this.#lastNickname = value;
+        this.#nicknameToast?.dismiss();
+        this.#nicknameToast = null;
         this.#nicknameStatus.set('saving', 'Salvando…');
         try {
             const saved = await account.save('nickname', value);
@@ -271,20 +307,50 @@ export class SettingsTab {
             this.#nickname.clearError();
             this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
             this.#languageStatus.set('saved', 'Salvo');
-            this.#root.querySelector('#profile-nickname-example').textContent = saved.user?.nickname ?? value;
+            const savedName = saved.user?.nickname ?? value;
+            this.#nickname.value = savedName;
+            this.#root.querySelector('#profile-nickname-example').textContent = savedName;
             this.#renderHero(account.user ?? profile.user);
+            this.#nicknameToast = createToast(`Apelido alterado para ${savedName}`, {
+                action: {
+                    label: 'Desfazer',
+                    onClick: async () => {
+                        const result = await undoChange(() => account.undo(saved.token), {
+                            restore: () => this.#restoreNickname(),
+                            report: error => this.#reportNicknameError(error, false),
+                        });
+                        if (result?.user) this.#nicknameStatus.set('saved', 'Salvo');
+                    },
+                },
+            });
         }
         catch (error) {
-            this.#nickname.value = confirmed;
-            this.#root.querySelector('#profile-nickname-example').textContent = confirmed;
-            this.#nickname.setError(error.message || 'Não foi possível salvar o apelido');
-            this.#nicknameStatus.set('error', error.message || 'Não foi possível salvar o apelido');
+            this.#reportNicknameError(error, true);
         }
+    }
+
+    /** @param {unknown} error @param {boolean} fieldError */
+    #reportNicknameError(error, fieldError) {
+        const confirmed = this.#confirmedNickname();
+        this.#nickname.value = confirmed;
+        this.#root.querySelector('#profile-nickname-example').textContent = confirmed;
+        this.#renderHero(account.user ?? profile.user);
+        const message = error?.message || 'Não foi possível salvar o apelido';
+        if (fieldError) this.#nickname.setError(message);
+        this.#nicknameStatus.set('error', message);
+        writeErrorToast(error);
+    }
+
+    /** Puts the nickname control and hero back on the confirmed account. */
+    #restoreNickname() {
+        const confirmed = this.#confirmedNickname();
+        this.#nickname.value = confirmed;
+        this.#root.querySelector('#profile-nickname-example').textContent = confirmed;
+        this.#renderHero(account.user ?? profile.user);
     }
 
     /** @param {string} value */
     async #saveLanguage(value) {
-        const previous = account.confirmed('language') ?? profile.user?.language ?? 'c';
         this.#lastLanguage = { field: 'language', value };
         this.#languageToast?.dismiss();
         this.#languageToast = null;
@@ -292,32 +358,43 @@ export class SettingsTab {
         try {
             const saved = await account.save('language', value);
             if (saved.superseded) return;
+            const confirmed = account.confirmed('language') ?? value;
+            this.#language.set(confirmed, { silent: true });
             this.#languageStatus.set('saved', 'Salvo');
-            const label = { c: 'C', python: 'Python', blocks: 'Blocos' }[value] ?? value;
-            this.#languageToast?.dismiss();
+            const label = { c: 'C', python: 'Python', blocks: 'Blocos' }[confirmed] ?? confirmed;
             this.#languageToast = createToast(`Linguagem alterada para ${label}`, {
                 action: {
                     label: 'Desfazer',
                     onClick: async () => {
-                        const restored = await account.undo(saved.token);
-                        if (!restored?.user || restored.superseded) return;
-                        this.#language.set(account.confirmed('language') ?? previous, { silent: true });
-                        this.#languageStatus.set('saved', 'Salvo');
+                        const result = await undoChange(() => account.undo(saved.token), {
+                            restore: () => this.#restoreLanguage(),
+                            report: error => this.#reportLanguageError(error),
+                        });
+                        if (result?.user) this.#languageStatus.set('saved', 'Salvo');
                     },
                 },
             });
         }
         catch (error) {
-            this.#language.set(previous, { silent: true });
-            this.#languageStatus.set('error', error.message || 'Não foi possível salvar');
-            writeErrorToast(error);
+            this.#reportLanguageError(error);
         }
+    }
+
+    /** @param {unknown} error */
+    #reportLanguageError(error) {
+        this.#language.set(String(account.confirmed('language') ?? profile.user?.language ?? 'c'), { silent: true });
+        this.#languageStatus.set('error', error?.message || 'Não foi possível salvar');
+        writeErrorToast(error);
+    }
+
+    /** Puts the language control on the value the API confirms. */
+    #restoreLanguage() {
+        this.#language.set(String(account.confirmed('language') ?? profile.user?.language ?? 'c'), { silent: true });
     }
 
     /** @param {string} value */
     async #saveTheme(value) {
-        const previous = account.confirmed('theme') ?? storedThemeChoice();
-        this.#lastLanguage = { field: 'theme', value };
+        this.#lastAppearance = { field: 'theme', value };
         this.#appearanceToast?.dismiss();
         this.#appearanceToast = null;
         applyTheme(value);
@@ -327,28 +404,25 @@ export class SettingsTab {
         try {
             const saved = await account.save('theme', value);
             if (saved.superseded) return;
+            const choice = account.confirmed('theme') ?? value;
+            applyTheme(choice);
+            this.#setThemeCards(choice);
             this.#appearanceStatus.set('saved', 'Salvo');
-            this.#appearanceToast?.dismiss();
-            this.#appearanceToast = createToast(`Tema alterado para ${THEME_LABELS[value] ?? value}`, {
+            this.#appearanceToast = createToast(`Tema alterado para ${THEME_LABELS[choice] ?? choice}`, {
                 action: {
                     label: 'Desfazer',
                     onClick: async () => {
-                        const restored = await account.undo(saved.token);
-                        if (!restored?.user || restored.superseded) return;
-                        const choice = account.confirmed('theme') ?? previous;
-                        applyTheme(choice);
-                        this.#setThemeCards(choice);
-                        this.#appearanceStatus.set('saved', 'Salvo');
+                        const result = await undoChange(() => account.undo(saved.token), {
+                            restore: () => this.#restoreTheme(),
+                            report: error => this.#reportAppearanceError(error, 'tema'),
+                        });
+                        if (result?.user) this.#appearanceStatus.set('saved', 'Salvo');
                     },
                 },
             });
         }
         catch (error) {
-            const confirmed = account.confirmed('theme') ?? previous;
-            applyTheme(confirmed);
-            this.#setThemeCards(confirmed);
-            this.#appearanceStatus.set('error', error.message || 'Não foi possível salvar o tema');
-            writeErrorToast(error);
+            this.#reportAppearanceError(error, 'tema');
         }
     }
 
@@ -358,10 +432,24 @@ export class SettingsTab {
         else this.#theme.set(choice, { silent: true });
     }
 
+    /** Puts the theme controls and document back on the confirmed choice. */
+    #restoreTheme() {
+        const choice = account.confirmed('theme') ?? storedThemeChoice();
+        applyTheme(choice);
+        this.#setThemeCards(choice);
+    }
+
+    /** @param {unknown} error @param {string} subject */
+    #reportAppearanceError(error, subject) {
+        if (subject === 'tema') this.#restoreTheme();
+        else this.#restoreGladView();
+        this.#appearanceStatus.set('error', error?.message || `Não foi possível salvar o ${subject}`);
+        writeErrorToast(error);
+    }
+
     /** @param {string} value */
     async #saveGladView(value) {
-        const previous = account.confirmed('gladView') ?? profile.user?.gladView ?? DEFAULT_GLAD_VIEW;
-        this.#lastLanguage = { field: 'gladView', value };
+        this.#lastAppearance = { field: 'gladView', value };
         this.#appearanceToast?.dismiss();
         this.#appearanceToast = null;
         applyGladView(value);
@@ -370,74 +458,96 @@ export class SettingsTab {
         try {
             const saved = await account.save('gladView', value);
             if (saved.superseded) return;
+            const choice = account.confirmed('gladView') ?? value;
+            applyGladView(choice);
+            this.#gladView.set(choice, { silent: true });
             this.#appearanceStatus.set('saved', 'Salvo');
-            const label = value === 'sprite' ? 'Pixel art' : 'Coliseu 3D';
-            this.#appearanceToast?.dismiss();
+            const label = choice === 'sprite' ? 'Pixel art' : 'Coliseu 3D';
             this.#appearanceToast = createToast(`Visual dos gladiadores: ${label}`, {
                 action: {
                     label: 'Desfazer',
                     onClick: async () => {
-                        const restored = await account.undo(saved.token);
-                        if (!restored?.user || restored.superseded) return;
-                        const choice = account.confirmed('gladView') ?? previous;
-                        applyGladView(choice);
-                        this.#gladView.set(choice, { silent: true });
-                        this.#appearanceStatus.set('saved', 'Salvo');
+                        const result = await undoChange(() => account.undo(saved.token), {
+                            restore: () => this.#restoreGladView(),
+                            report: error => this.#reportAppearanceError(error, 'visual'),
+                        });
+                        if (result?.user) this.#appearanceStatus.set('saved', 'Salvo');
                     },
                 },
             });
         }
         catch (error) {
-            const confirmed = account.confirmed('gladView') ?? previous;
-            applyGladView(confirmed);
-            this.#gladView.set(confirmed, { silent: true });
-            this.#appearanceStatus.set('error', error.message || 'Não foi possível salvar o visual');
-            writeErrorToast(error);
+            this.#reportAppearanceError(error, 'visual');
+        }
+    }
+
+    /** Puts the gladiator-style cards back on the confirmed choice. */
+    #restoreGladView() {
+        const choice = account.confirmed('gladView') ?? profile.user?.gladView ?? DEFAULT_GLAD_VIEW;
+        applyGladView(choice);
+        this.#gladView.set(choice, { silent: true });
+    }
+
+    /** Puts every preference switch on the confirmed object. */
+    #restorePreferences() {
+        const confirmed = account.confirmed('preferences') ?? profile.user?.preferences ?? {};
+        for (const preference of PREFERENCES) {
+            this.#switches.get(preference.name)?.set(Boolean(confirmed?.[preference.name]), { silent: true });
         }
     }
 
     /** @param {string} name @param {boolean} value */
     async #savePreference(name, value) {
-        const previous = account.confirmed('preferences') ?? profile.user?.preferences ?? {};
-        const next = { ...previous, [name]: value };
         this.#lastPreference = { name, value };
         this.#emailToast?.dismiss();
         this.#emailToast = null;
         this.#emailStatus.set('saving', 'Salvando…');
         try {
-            const saved = await account.save('preferences', next);
+            // Patches merge when the request runs, so a second switch changed before the first
+            // request finishes does not replace it.
+            const saved = await account.save('preferences', { [name]: value }, { merge: true });
             if (saved.superseded) return;
+            // Only this switch is settled here; a newer patch may still be queued for another one.
+            this.#switches.get(name)?.set(Boolean(account.confirmed('preferences')?.[name]), { silent: true });
             this.#emailStatus.set('saved', 'Salvo');
             const preference = PREFERENCES.find(item => item.name === name);
             const label = preference?.label ?? 'Aviso';
-            this.#emailToast?.dismiss();
             this.#emailToast = createToast(`${label} ${value ? 'ativado' : 'desativado'}`, {
                 action: {
                     label: 'Desfazer',
                     onClick: async () => {
-                        const restored = await account.undo(saved.token);
-                        if (!restored?.user || restored.superseded) return;
-                        const confirmed = account.confirmed('preferences') ?? previous;
-                        this.#switches.get(name)?.set(Boolean(confirmed?.[name]), { silent: true });
-                        this.#emailStatus.set('saved', 'Salvo');
+                        const result = await undoChange(() => account.undo(saved.token), {
+                            restore: () => this.#restorePreferences(),
+                            report: error => this.#reportPreferenceError(error),
+                        });
+                        if (result?.user) this.#emailStatus.set('saved', 'Salvo');
                     },
                 },
             });
         }
         catch (error) {
-            const confirmed = account.confirmed('preferences') ?? previous;
-            this.#switches.get(name)?.set(Boolean(confirmed?.[name]), { silent: true });
-            this.#emailStatus.set('error', error.message || 'Não foi possível salvar');
-            writeErrorToast(error);
+            this.#reportPreferenceError(error, name);
         }
+    }
+
+    /** @param {unknown} error @param {string} [name] The switch that failed; all when omitted. */
+    #reportPreferenceError(error, name) {
+        if (name) {
+            const confirmed = account.confirmed('preferences') ?? {};
+            this.#switches.get(name)?.set(Boolean(confirmed?.[name]), { silent: true });
+        }
+        else {
+            this.#restorePreferences();
+        }
+        this.#emailStatus.set('error', error?.message || 'Não foi possível salvar');
+        writeErrorToast(error);
     }
 
     /** The hero picture button opens the picker; a drop also opens the cropper. */
     #bindPicture() {
         this.#picturePicker = this.#root.querySelector('#profile-picture-picker');
-        this.#pictureContainer = this.#root.querySelector('#profile-cropper');
-        const button = this.#root.querySelector('#profile-photo-button');
-        button.addEventListener('click', () => this.#picturePicker.click());
+        this.#photoButton = this.#root.querySelector('#profile-photo-button');
+        this.#photoButton.addEventListener('click', () => this.#picturePicker.click());
         this.#picturePicker.addEventListener('change', () => {
             if (this.#picturePicker.files[0]) this.#openCropper(this.#picturePicker.files[0]);
             this.#picturePicker.value = '';
@@ -451,42 +561,69 @@ export class SettingsTab {
         });
     }
 
-    /** @param {File} file */
+    /**
+     * Opens the shared modal dialog (focus entry, Tab trap, Esc close) with the Croppie viewport.
+     *
+     * @param {File} file
+     */
     async #openCropper(file) {
         const source = await readImage(file);
-        this.#pictureContainer.hidden = false;
-        this.#pictureContainer.innerHTML = `
-            <div class='profile-cropper-dialog' role='dialog' aria-modal='true' aria-label='Recortar foto'>
-                <div class='profile-cropper-image'><img alt='Prévia da foto'></div>
-                <div class='profile-cropper-actions'>
-                    <button type='button' class='button primary' id='profile-crop-save'>Recortar imagem</button>
-                    <button type='button' class='button ghost' id='profile-crop-cancel'>Cancelar</button>
-                </div>
-            </div>`;
-        const image = this.#pictureContainer.querySelector('img');
+        if (!this.#root?.isConnected) return;
+        this.#closeCropper();
+        const dialog = new Message({
+            message: "<div class='profile-cropper-image'><img alt='Prévia da foto'></div>",
+            buttons: { cancel: 'Cancelar', save: 'Recortar imagem' },
+            class: 'profile-cropper-dialog',
+            preventKill: true,
+        }).show();
+        this.#cropDialog = dialog;
+        const box = dialog.element.querySelector('#dialog-box');
+        box.setAttribute('aria-label', 'Recortar foto');
+        box.removeAttribute('aria-labelledby');
+        const image = dialog.element.querySelector('#message img');
         image.src = source;
         this.#cropper = new Croppie(image, { viewport: { width: 150, height: 150 }, boundary: { width: 300, height: 300 } });
-        this.#pictureContainer.querySelector('#profile-crop-cancel').addEventListener('click', () => this.#closeCropper());
-        this.#pictureContainer.querySelector('#profile-crop-save').addEventListener('click', async () => {
+        dialog.click('cancel', () => this.#closeCropper());
+        dialog.click('save', () => { this.#finishCrop(dialog); });
+    }
+
+    /**
+     * Crops and saves the chosen picture, or closes on refusal.
+     *
+     * @param {Message} dialog
+     */
+    async #finishCrop(dialog) {
+        if (this.#cropping || this.#cropDialog !== dialog || !this.#cropper) return;
+        this.#cropping = true;
+        try {
             const cropped = await this.#cropper.result('base64');
+            if (this.#cropDialog !== dialog) return;
             this.#closeCropper();
             await this.#savePicture(cropped);
-        });
+        }
+        catch (error) {
+            if (this.#cropDialog !== dialog) return;
+            this.#closeCropper();
+            writeErrorToast(error);
+        }
     }
 
     #closeCropper() {
-        if (!this.#pictureContainer) return;
         this.#cropper?.destroy();
         this.#cropper = null;
-        this.#pictureContainer.hidden = true;
-        this.#pictureContainer.replaceChildren();
+        this.#cropping = false;
+        const dialog = this.#cropDialog;
+        this.#cropDialog = null;
+        dialog?.kill();
+        // The file picker leaves focus on body; return it to the control that opened the flow.
+        if (dialog && this.#photoButton?.isConnected) this.#photoButton.focus();
     }
 
     /** @param {string} picture */
     async #savePicture(picture) {
         const user = account.user ?? profile.user;
         const previous = account.confirmed('picture') ?? user?.picture ?? '';
-        this.#avatar.set({ name: user?.nickname, picture, level: user?.level });
+        this.#avatar.set({ name: user?.nickname, picture, level: 0 });
         this.#languageStatus.set('saving', 'Salvando foto…');
         try {
             const saved = await account.save('picture', picture);
@@ -495,7 +632,7 @@ export class SettingsTab {
             this.#renderHero(account.user ?? profile.user);
         }
         catch (error) {
-            this.#avatar.set({ name: user?.nickname, picture: previous, level: user?.level });
+            this.#avatar.set({ name: user?.nickname, picture: previous, level: 0 });
             this.#languageStatus.set('error', error.message || 'Não foi possível salvar a foto');
             writeErrorToast(error);
         }

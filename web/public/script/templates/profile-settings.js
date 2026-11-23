@@ -84,8 +84,6 @@ export const profileShellTemplate = `
     <footer class='settings-footer'>
         <span><i class='fa-solid fa-cloud-arrow-up' aria-hidden='true'></i> Tudo que você muda aqui é salvo na hora.</span>
     </footer>
-
-    <div id='profile-cropper' class='profile-cropper' hidden></div>
 </div>`;
 
 /** One e-mail preference row; the switch component is appended to `{{slot}}` by the section. */

@@ -128,6 +128,31 @@ test('a superseded success updates the rollback base without emitting account:sa
     assert.equal(service.confirmed('theme'), 'arena-dark');
 });
 
+test('merged preference patches keep an earlier write for another switch', async () => {
+    const { service, model } = make({
+        id: 1,
+        preferences: { message: false, duel: false, friend: true, update: true, tourn: false },
+    });
+    await service.load();
+    const gate = deferred();
+    model.gates.push(gate);
+
+    const first = service.save('preferences', { message: true }, { merge: true });
+    const second = service.save('preferences', { duel: true }, { merge: true });
+    assert.deepEqual(model.bodies[0].preferences, { message: true, duel: false, friend: true, update: true, tourn: false });
+
+    gate.resolve();
+    const firstResult = await first;
+    await Promise.resolve();
+    assert.equal(firstResult.superseded, true);
+    assert.deepEqual(model.bodies[1].preferences, { message: true, duel: true, friend: true, update: true, tourn: false });
+    const secondResult = await second;
+    assert.equal(secondResult.user.preferences.message, true);
+    assert.equal(secondResult.user.preferences.duel, true);
+    assert.equal(service.confirmed('preferences').message, true);
+    assert.equal(service.confirmed('preferences').duel, true);
+});
+
 test('undo restores the value captured before the change and saves it through the same queue', async () => {
     const { service, model } = make({ id: 1, theme: 'system' });
     await service.load();

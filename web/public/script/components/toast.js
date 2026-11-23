@@ -145,9 +145,14 @@ export function createToast(message, typeOrOptions = 'info') {
         button.className = 'toast-action';
         button.textContent = action.label;
         button.setAttribute('aria-keyshortcuts', TOAST_ACTION_SHORTCUT);
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             try {
-                action.onClick();
+                // The action owns its feedback; awaiting it keeps a refused undo from becoming an
+                // unhandled rejection, and the toast still closes afterwards.
+                await action.onClick();
+            }
+            catch {
+                // reported by the action
             }
             finally {
                 dismiss();

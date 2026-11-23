@@ -293,42 +293,33 @@
     margin-right: var(--space-1);
 }
 
-.profile-cropper {
-    position: fixed;
-    inset: 0;
-    z-index: var(--z-dialog);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-4);
-    background: color-mix(in srgb, var(--color-chrome) 75%, transparent);
-}
-
-.profile-cropper[hidden] {
-    display: none;
-}
-
-.profile-cropper-dialog {
+/*
+ * The crop dialog reuses the shared modal (css/dialog.css) for its focus trap and focus return.
+ * Only its content is specific to the picture flow.
+ */
+#dialog-box.profile-cropper-dialog {
     width: min(360px, 100%);
     padding: var(--space-5);
-    border-radius: var(--radius-xl);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-lg);
+}
+
+#dialog-box.profile-cropper-dialog #button-container {
+    display: flex;
+    gap: var(--space-2);
+}
+
+#dialog-box.profile-cropper-dialog #button-container .button {
+    flex: 1;
+}
+
+#dialog-box.profile-cropper-dialog #dialog-button-save {
+    background: var(--color-brand);
+    color: var(--color-text-on-brand);
 }
 
 .profile-cropper-image {
     display: flex;
     justify-content: center;
     margin-bottom: var(--space-4);
-}
-
-.profile-cropper-actions {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.profile-cropper-actions .button {
-    flex: 1;
 }
 
 @media only screen and (max-width: 700px) {
