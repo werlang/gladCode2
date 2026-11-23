@@ -41,6 +41,8 @@ class FakeModel {
         return call.gate.promise.then(() => {
             if (call.failure) throw call.failure;
             this.user = applyBody(this.user, body);
+            // the API stores the picture under /profpics and returns that URL, not the data URL
+            if (body.picture) this.user = { ...this.user, picture: '/profpics/test.png?v=1' };
             return this.user;
         });
     }
@@ -143,6 +145,42 @@ test('reverting to the confirmed value while a write is in flight sends the reve
     assert.equal((await back).status, 'saved');
     assert.equal(service.confirmed('theme'), 'system');
     assert.equal(service.busy('theme'), false);
+});
+
+test('state-machine table: a revert to the confirmed value settles when the earlier write is refused', async () => {
+    const cases = [
+        { field: 'language', user: { language: 'c' }, first: 'python', second: 'c', expected: 'c' },
+        { field: 'theme', user: { theme: 'system' }, first: 'classic', second: 'system', expected: 'system' },
+        { field: 'preferences.message', user: { preferences: { message: true, friend: true, update: true, duel: true, tourn: true } }, first: false, second: true, expected: true },
+    ];
+    for (const item of cases) {
+        const { service, model } = make({ id: 1, nickname: 'Ana', ...item.user });
+        await service.load();
+        const first = service.save(item.field, item.first);
+        const second = service.save(item.field, item.second);
+        assert.equal(model.calls.length, 1, `${item.field}: only the first write is sent`);
+        await settle(model.calls[0], new Error('refused'));
+        assert.equal((await first).status, 'superseded', `${item.field}: the earlier write is superseded`);
+        const revert = await second;
+        assert.equal(revert.status, 'saved', `${item.field}: the revert settles`);
+        assert.equal(revert.unchanged, true, `${item.field}: the revert is a no-op`);
+        assert.equal(service.confirmed(item.field), item.expected);
+        assert.equal(service.busy(item.field), false, `${item.field}: no stuck pending write`);
+        assert.equal(model.calls.length, 1, `${item.field}: the revert needs no second request`);
+    }
+});
+
+test('a normalised server value (the picture URL) settles the save instead of superseding it', async () => {
+    const { service, model } = make({ id: 1, picture: 'https://www.gravatar.com/avatar/a?d=retro' });
+    await service.load();
+    const saved = service.save('picture', 'data:image/png;base64,AAAA');
+    assert.equal(model.calls.length, 1);
+    await settle(model.calls[0]);
+    const result = await saved;
+    assert.equal(result.status, 'saved');
+    assert.equal(result.value, '/profpics/test.png?v=1');
+    assert.equal(service.confirmed('picture'), '/profpics/test.png?v=1');
+    assert.equal(service.busy('picture'), false);
 });
 
 test('a refused latest intent rolls back and sends no retry', async () => {

@@ -260,6 +260,9 @@ export class AccountService {
             }
             const confirmed = confirmedFrom(user, field) ?? job.value;
             state.confirmed = confirmed;
+            // The server may normalise a value (a picture data URL becomes /profpics/...). If the
+            // user has not changed the intent since the send, the accepted value is now the intent.
+            if (state.intent === job.value) state.intent = confirmed;
             this.#applyUser(field, confirmed);
             this.#bus.emit(APP_EVENTS.accountSaved, {
                 user: this.#user, changed: [field], field, value: confirmed, before: job.before,
@@ -318,7 +321,17 @@ export class AccountService {
      */
     #advance(field) {
         const state = this.#state(field);
-        if (state.intent === state.confirmed) return;
+        if (state.intent === state.confirmed) {
+            // The user reverted to the confirmed value while the earlier request was in flight.
+            // Nothing is left to send, but the revert's waiter must settle instead of hanging.
+            if (state.waiting) {
+                state.waiting.deferred.resolve({
+                    status: 'saved', field, value: state.confirmed, before: state.waiting.before, user: this.#user, unchanged: true,
+                });
+                state.waiting = null;
+            }
+            return;
+        }
         const next = state.waiting;
         if (!next) return;
         state.waiting = null;

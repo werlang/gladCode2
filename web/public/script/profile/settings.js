@@ -5,6 +5,7 @@ import { Input } from '../components/input.js';
 import { SaveStatus } from '../components/save-status.js';
 import { SegmentedControl } from '../components/segmented-control.js';
 import { Switch } from '../components/switch.js';
+import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { formatMonthYear } from '../helpers/date-format.js';
 import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
@@ -232,6 +233,8 @@ export class SettingsTab {
             try {
                 const answer = await UserModel.nicknameAvailable(value, { signal: controller.signal });
                 if (controller.signal.aborted || value !== this.#nickname.value.trim()) return;
+                // A save/undo refusal may have set the field error while this check was running.
+                if (this.#nickname.error) return;
                 this.#nicknameAvailable = answer.available;
                 if (answer.available) this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
                 else this.#nicknameStatus.set('error', 'Este apelido já está em uso');
@@ -281,8 +284,9 @@ export class SettingsTab {
             if (draft === value) {
                 this.#nickname.value = this.#confirmedNickname();
                 this.#root.querySelector('#profile-nickname-example').textContent = this.#confirmedNickname();
-                this.#nickname.setError(message);
             }
+            // The refusal is reported under the field even when a newer draft is in the input.
+            this.#nickname.setError(message);
             this.#nicknameStatus.set('error', message);
             this.#renderHero(account.user ?? profile.user);
             writeErrorToast(result.error);
@@ -301,18 +305,38 @@ export class SettingsTab {
         undoToast.show(token, {
             field: 'nickname',
             before: result.before,
-            restore: () => this.#restoreNickname(),
+            restore: restored => this.#restoreNickname(restored),
+            report: error => this.#reportNicknameUndoError(error),
         });
     }
 
-    /** Puts the nickname control and hero back on the confirmed account. */
-    #restoreNickname() {
+    /**
+     * Puts the nickname control back on an undo value without overwriting a draft typed during the
+     * undo PUT. The input is rewritten only when it still equals the confirmed value (the preview
+     * start) or the value the undo is restoring; a different draft is left for the next save.
+     *
+     * @param {unknown} [value] The undo value; defaults to the confirmed nickname.
+     */
+    #restoreNickname(value = this.#confirmedNickname()) {
+        const target = String(value ?? '');
+        const current = this.#nickname.value.trim();
         const confirmed = this.#confirmedNickname();
-        this.#nickname.value = confirmed;
-        this.#root.querySelector('#profile-nickname-example').textContent = confirmed;
-        this.#nickname.clearError();
-        this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
+        if (current === target || current === confirmed) {
+            this.#nickname.value = target;
+            this.#root.querySelector('#profile-nickname-example').textContent = target;
+            this.#nickname.clearError();
+            this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
+        }
         this.#renderHero(account.user ?? profile.user);
+    }
+
+    /** @param {unknown} error Reports a refused nickname undo without touching a newer draft. */
+    #reportNicknameUndoError(error) {
+        const message = error?.message || 'Não foi possível desfazer o apelido';
+        this.#nickname.setError(message);
+        this.#nicknameStatus.set('error', message);
+        this.#renderHero(account.user ?? profile.user);
+        writeErrorToast(error);
     }
 
     /** @param {string} value */
@@ -533,7 +557,7 @@ export class SettingsTab {
     async #savePicture(picture) {
         const user = account.user ?? profile.user;
         const previous = account.confirmed('picture') ?? user?.picture ?? '';
-        const token = undoToast.begin();
+        undoToast.begin();
         this.#avatar.set({ name: user?.nickname, picture, level: 0 });
         this.#languageStatus.set('saving', 'Salvando foto…');
         const result = await account.save('picture', picture);
@@ -546,11 +570,10 @@ export class SettingsTab {
         }
         this.#languageStatus.set('saved', 'Salvo');
         this.#renderHero(account.user ?? profile.user);
-        undoToast.show(token, {
-            field: 'picture',
-            before: result.before,
-            restore: () => this.#renderHero(account.user ?? profile.user),
-        });
+        // The previous file is overwritten on disk and the API only accepts a data URL, so there is
+        // no reliable value to restore. The change still replaces the previous undo toast; the
+        // success is reported without a Desfazer action.
+        createToast('Foto alterada', 'success');
     }
 
     /** Clears pending checks and the cropper when the shell leaves. */

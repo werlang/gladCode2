@@ -288,7 +288,9 @@ Rules:
   already replaced. The toast names the field (`"Linguagem alterada"` etc.) and carries
   `before = confirmed` captured when the change started. Clicking “Desfazer” is a **normal change** of that
   field to `before` through the same state machine: it previews `before`, persists it, rolls back on a
-  refusal with an error toast, and never shows a new undo or a retry.
+  refusal with an error toast, and never shows a new undo or a retry. A photo save is the exception:
+  the old file is overwritten on disk and the API only accepts a new data URL, so it reports
+  “Foto alterada” without a Desfazer (and still replaces any older undo toast).
 - **Nickname drafts are kept.** A successful nickname response only rewrites the input, example and status
   when the field still contains the value that was sent. A draft typed during the PUT stays in the field;
   the hero and the persisted name update to the server value. A refusal applies the API message under the

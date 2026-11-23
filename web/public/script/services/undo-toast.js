@@ -24,9 +24,32 @@ const LABELS = {
  * “Desfazer” is a normal change of the same field back to `before`; it is not a retry and never shows
  * a new undo toast.
  */
-class UndoToast {
+export class UndoToast {
     #token = 0;
     #toast = null;
+    #create;
+    #save;
+    #confirm;
+    #report;
+
+    /**
+     * @param {object} [deps] Test seams.
+     * @param {typeof createToast} [deps.create]
+     * @param {(field: string, value: unknown) => Promise<any>} [deps.save]
+     * @param {(field: string) => unknown} [deps.confirm]
+     * @param {(error: Error) => void} [deps.report]
+     */
+    constructor({
+        create = createToast,
+        save = (field, value) => account.save(field, value),
+        confirm = field => account.confirmed(field),
+        report = writeErrorToast,
+    } = {}) {
+        this.#create = create;
+        this.#save = save;
+        this.#confirm = confirm;
+        this.#report = report;
+    }
 
     /**
      * Starts a new change: dismisses the visible undo and returns the token the eventual success must
@@ -44,14 +67,15 @@ class UndoToast {
      * Shows the undo for the latest change, if no newer change started since it was sent.
      *
      * @param {number} token The value `begin()` returned when the change started.
-     * @param {{ field: string, before: unknown, restore: (value: unknown) => void }} change
+     * @param {{ field: string, before: unknown, restore: (value: unknown) => void,
+     *   report?: (error: Error) => void }} change
      * @returns {void}
      */
-    show(token, { field, before, restore }) {
+    show(token, { field, before, restore, report = this.#report }) {
         if (token !== this.#token) return;
         this.#remove();
         const message = escapeHtml(LABELS[field] ?? 'Alteração salva');
-        this.#toast = createToast(message, {
+        this.#toast = this.#create(message, {
             type: 'success',
             action: {
                 label: 'Desfazer',
@@ -61,13 +85,13 @@ class UndoToast {
                     this.#remove();
                     this.#token += 1;
                     restore?.(before);
-                    const result = await account.save(field, before);
+                    const result = await this.#save(field, before);
                     if (result.status === 'refused') {
-                        restore?.(account.confirmed(field));
-                        writeErrorToast(result.error);
+                        restore?.(this.#confirm(field));
+                        report(result.error);
                     }
                     else if (result.status === 'saved') {
-                        restore?.(account.confirmed(field));
+                        restore?.(this.#confirm(field));
                     }
                 },
             },

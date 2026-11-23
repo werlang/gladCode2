@@ -83,7 +83,7 @@ async function start() {
             return;
         }
         const before = account.confirmed('theme');
-        if (choice === before) {
+        if (choice === before && !account.busy('theme')) {
             applyTheme(choice);
             return;
         }
