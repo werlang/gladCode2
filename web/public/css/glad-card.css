@@ -84,16 +84,18 @@
 
 .glad-add.inactive .image {
 	background-image: none;
-	background-color: var(--color-surface-alt);
+	background-color: var(--color-lock-plate);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-/* the lock follows the theme: dark ink in the light themes, light ink at night */
+/* lock.png is already white, so it sits unmodified on the dark plate in every theme */
 .glad-add.inactive .image::before {
 	content: '';
 	width: 50px;
 	height: 50px;
 	background: url('../icon/lock.png') center / contain no-repeat;
-	filter: var(--logo-filter-page);
 }
 
 .glad-preview.error {

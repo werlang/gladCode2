@@ -305,6 +305,10 @@
     --color-surface-alt: #f0e6d2;
     --color-surface-strong: #e3d3b4;
     --color-surface-sunken: #ebe0c9;
+    /* text fields stay crisp white on the day pages */
+    --color-field-bg: #ffffff;
+    /* the plate behind the white lock mark of a locked slot: dark in every theme */
+    --color-lock-plate: var(--arena-ink-600);
     --color-neutral: var(--arena-day-stone);
     --color-overlay: rgb(11 29 43 / 0.72);
     --color-scrim: rgb(11 29 43 / 0.45);
@@ -393,6 +397,10 @@
     --color-surface-alt: var(--classic-grey-100);
     --color-surface-strong: var(--classic-grey-300);
     --color-surface-sunken: var(--classic-grey-50);
+    /* text fields stay crisp white on the light pages */
+    --color-field-bg: var(--classic-white);
+    /* the plate behind the white lock mark of a locked slot: dark in every theme */
+    --color-lock-plate: var(--classic-blue-deep);
     --color-neutral: var(--classic-grey-500);
     --color-overlay: rgb(0 0 0 / 0.74);
     --color-scrim: rgb(0 0 0 / 0.5);
@@ -482,6 +490,10 @@
     --color-surface-alt: #163046;
     --color-surface-strong: #1f415e;
     --color-surface-sunken: #061019;
+    /* text fields sink below the cards at night */
+    --color-field-bg: #061019;
+    /* the plate behind the white lock mark of a locked slot: dark in every theme */
+    --color-lock-plate: var(--color-surface-sunken);
     --color-neutral: var(--arena-stone-400);
     --color-overlay: rgb(5 13 20 / 0.82);
     --color-scrim: rgb(5 13 20 / 0.65);
