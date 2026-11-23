@@ -10,7 +10,8 @@
     border: var(--space-hairline) solid var(--color-border-strong);
     border-radius: var(--radius-md);
     outline: none;
-    background-color: var(--color-surface);
+    /* a field sits on a sunken surface so it never blends into the card behind it */
+    background-color: var(--color-surface-sunken);
     color: var(--color-text-strong);
     font-family: var(--font-body);
     font-size: var(--text-base);

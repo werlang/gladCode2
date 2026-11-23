@@ -78,12 +78,22 @@
 
 .glad-add.inactive{
 	cursor: default;
-	opacity: 0.72;
+	opacity: 1;
+	border-color: var(--color-border-strong);
 }
 
 .glad-add.inactive .image {
-	background-image: url('../icon/lock.png');
-	background-color: var(--color-surface-sunken);
+	background-image: none;
+	background-color: var(--color-surface-alt);
+}
+
+/* the lock follows the theme: dark ink in the light themes, light ink at night */
+.glad-add.inactive .image::before {
+	content: '';
+	width: 50px;
+	height: 50px;
+	background: url('../icon/lock.png') center / contain no-repeat;
+	filter: var(--logo-filter-page);
 }
 
 .glad-preview.error {

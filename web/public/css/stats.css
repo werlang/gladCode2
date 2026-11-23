@@ -81,10 +81,10 @@ h2 {
 }
 
 .table th {
-    background-color: var(--color-brand-muted);
+    background-color: var(--color-brand);
     padding-left: var(--space-4);
     text-align: left;
-    color: var(--color-text-on-brand-muted);
+    color: var(--color-text-on-brand);
 }
 
 .table td {
@@ -170,11 +170,12 @@ h2 {
 #single-stats .card {
     width: 165px;
     text-align: center;
-    background-color: var(--color-brand-muted);
+    background-color: var(--color-brand);
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-sm);
     color: var(--color-text-on-brand);
     cursor: default;
+    position: relative;
 }
 
 #single-stats .title {
@@ -203,8 +204,8 @@ h2 {
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: var(--duration-base) all;
-    margin-left: 149px;
-    margin-top: calc(-1 * var(--space-2));
+    top: calc(-1 * var(--space-2));
+    right: calc(-1 * var(--space-2));
     display: flex;
 }
 

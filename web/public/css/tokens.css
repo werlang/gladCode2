@@ -249,6 +249,10 @@
 
     /* ---- Layout: dimensions several sheets share ---- */
     --layout-side-menu: 340px;
+    /* the fixed-width reward number after a battle (profile.css) */
+    --layout-reward-value: 110px;
+    /* room under the manual's reading sheet (manual.css) */
+    --layout-reading-bottom: 200px;
 
     /* ---- Radius ---- */
     --radius-xs: 2px;
@@ -443,7 +447,7 @@
     --color-header-text: var(--classic-white);
     --color-footer-bg: #005478;
     --color-chrome: var(--classic-blue);
-    --logo-filter: none;
+    --logo-filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1);
     --logo-filter-page: none;
 
     /* the gladiator creator's option chips: body and look options, then items */
