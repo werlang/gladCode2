@@ -2,6 +2,8 @@ import { api } from '../helpers/request.js';
 
 /** The signed-in user request, shared by every caller on the page. */
 let current = null;
+/** Session generation: a reply from before sign-in/sign-out must not replace the cache. */
+let session = 0;
 
 /**
  * The signed-in account (`/users/me`) and its session (`/auth`).
@@ -48,6 +50,7 @@ export class UserModel {
      */
     static async signIn(credential) {
         const { user } = await api.post('auth/google', { credential });
+        session += 1;
         current = Promise.resolve(user);
         return user;
     }
@@ -58,6 +61,7 @@ export class UserModel {
      * @returns {Promise<unknown>}
      */
     static signOut() {
+        session += 1;
         current = null;
         return api.post('auth/logout');
     }
@@ -72,8 +76,9 @@ export class UserModel {
      * @throws {import('../helpers/request.js').RequestError} `NICKNAME_TAKEN` when the nickname is in use.
      */
     static async update(fields, { signal } = {}) {
+        const epoch = session;
         const { user } = await api.put('users/me', fields, { signal });
-        current = Promise.resolve(user);
+        if (epoch === session) current = Promise.resolve(user);
         return user;
     }
 
