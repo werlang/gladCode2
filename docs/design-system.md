@@ -13,6 +13,8 @@ Single sources of truth:
 - **Component styles:** the shared sheets in [`web/public/css/`](../web/public/css/) (see the
   ownership map)
 - **Component behaviour:** [`web/public/script/components/`](../web/public/script/components/)
+- **Frontend conventions:** [`docs/frontend/`](frontend/README.md) (folder ownership, the component
+  catalogue, app events and the page shell)
 
 Anything not named here is not part of the system: extend a token or a component instead of
 inventing a parallel value. See *Governance* for the change process.
