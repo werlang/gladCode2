@@ -110,6 +110,8 @@ page('/thanks', 'thanks');
 page('/update', 'update');
 // administrators only: the API refuses everyone else and the page sends them home
 page('/dev-tools', 'dev-tools');
+// development only: the WP2 component gallery, never registered in production
+if (process.env.NODE_ENV !== 'production') page('/dev-tools/components', 'dev-components');
 app.get('/dev-tools/index.html', (req, res) => res.redirect(301, '/dev-tools'));
 page(['/function/:name', '/funcao/:name'], 'function', req => {
     const [name, language = ''] = req.params.name.split('.');

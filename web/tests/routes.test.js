@@ -112,3 +112,12 @@ test('the replay gate controls only the replay renderer: the editor is 3D and ma
         off.close();
     }
 });
+
+test('the component gallery answers outside production', async () => {
+    const response = await get('/dev-tools/components');
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /Componentes do Painel/);
+    assert.match(html, /css\/components\/badge\.css/);
+    assert.match(html, /script\/dev-components\.js/);
+});

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{> head}}
+    <title>gladCode - Componentes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{#asset}}css/dialog.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/badge.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/avatar.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/page-header.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/section-card.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/tabs.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/segmented-control.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/switch.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/search-field.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/pagination.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/components/toast.css{{/asset}}"/>
+    <link rel="stylesheet" href="{{#asset}}css/dev-components.css{{/asset}}"/>
+    {{{importMap}}}
+    <script type="module" src="{{#module}}dev-components.js{{/module}}"></script>
+</head>
+<body>
+    <div class="gallery">
+        <header class="gallery-bar">
+            <div>
+                <span class="gallery-eyebrow">gladCode · desenvolvimento</span>
+                <h1 class="gallery-title">Componentes do Painel</h1>
+            </div>
+            <div class="gallery-themes" role="group" aria-label="Tema">
+                <button type="button" class="gallery-theme" value="arena-light" aria-pressed="false">Arena claro</button>
+                <button type="button" class="gallery-theme" value="arena-dark" aria-pressed="false">Arena escuro</button>
+                <button type="button" class="gallery-theme" value="classic" aria-pressed="false">Clássico</button>
+            </div>
+        </header>
+
+        <main class="gallery-content">
+            <section class="gallery-block" data-example="page-header">
+                <h2 class="gallery-block-title">PageHeader</h2>
+                <div id="example-page-header"></div>
+            </section>
+
+            <section class="gallery-block" data-example="section-card">
+                <h2 class="gallery-block-title">SectionCard</h2>
+                <div class="gallery-grid" id="example-section-cards"></div>
+            </section>
+
+            <section class="gallery-block" data-example="badges">
+                <h2 class="gallery-block-title">Badge</h2>
+                <div class="gallery-row" id="example-badges"></div>
+            </section>
+
+            <section class="gallery-block" data-example="avatars">
+                <h2 class="gallery-block-title">Avatar</h2>
+                <div class="gallery-row gallery-row--avatars" id="example-avatars"></div>
+            </section>
+
+            <section class="gallery-block" data-example="tabs">
+                <h2 class="gallery-block-title">Tabs</h2>
+                <div id="example-tabs"></div>
+            </section>
+
+            <section class="gallery-block" data-example="segmented">
+                <h2 class="gallery-block-title">SegmentedControl</h2>
+                <div class="gallery-row" id="example-segmented"></div>
+            </section>
+
+            <section class="gallery-block" data-example="switches">
+                <h2 class="gallery-block-title">Switch</h2>
+                <div class="gallery-row" id="example-switches"></div>
+            </section>
+
+            <section class="gallery-block" data-example="search">
+                <h2 class="gallery-block-title">SearchField</h2>
+                <div class="gallery-stack" id="example-search"></div>
+            </section>
+
+            <section class="gallery-block" data-example="pagination">
+                <h2 class="gallery-block-title">Pagination</h2>
+                <div class="gallery-stack" id="example-pagination"></div>
+            </section>
+
+            <section class="gallery-block" data-example="toast">
+                <h2 class="gallery-block-title">Toast</h2>
+                <div class="gallery-row" id="example-toasts"></div>
+            </section>
+
+            <section class="gallery-block" data-example="empty">
+                <h2 class="gallery-block-title">EmptyState</h2>
+                <div class="gallery-grid" id="example-empty"></div>
+            </section>
+
+            <section class="gallery-block" data-example="primitives">
+                <h2 class="gallery-block-title">Button, Input, Select e Surface</h2>
+                <div class="gallery-row" id="example-buttons"></div>
+                <div class="gallery-row" id="example-fields"></div>
+            </section>
+        </main>
+    </div>
+    {{{templateVars}}}
+</body>
+</html>
