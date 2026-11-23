@@ -1,5 +1,5 @@
 import { BaseComponent } from './base-component.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
+import { createElement } from '../helpers/html.js';
 import { segmentedControlTemplate } from '../templates/segmented-control.js';
 
 /**

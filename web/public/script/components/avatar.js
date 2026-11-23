@@ -55,18 +55,14 @@ export class Avatar extends BaseComponent {
         const levelNode = this.element.querySelector('.avatar-level');
 
         if (picture) {
+            image.onerror = () => this.#showInitials(name);
             image.src = picture;
             image.alt = name;
             image.hidden = false;
-            initialsNode.textContent = '';
             initialsNode.hidden = true;
         }
         else {
-            image.removeAttribute('src');
-            image.alt = '';
-            image.hidden = true;
-            initialsNode.textContent = initials(name);
-            initialsNode.hidden = false;
+            this.#showInitials(name);
         }
 
         const numericLevel = Number(level) || 0;
@@ -74,6 +70,22 @@ export class Avatar extends BaseComponent {
         levelNode.hidden = numericLevel <= 0;
         this.element.setAttribute('aria-label', name ? `Conta de ${name}` : 'Conta');
         return this;
+    }
+
+    /**
+     * Hides a missing/failed picture and shows the master's initials instead.
+     *
+     * @param {string} name
+     */
+    #showInitials(name) {
+        const image = this.element.querySelector('.avatar-image');
+        const initialsNode = this.element.querySelector('.avatar-initials');
+        image.onerror = null;
+        image.removeAttribute('src');
+        image.alt = '';
+        image.hidden = true;
+        initialsNode.textContent = initials(name);
+        initialsNode.hidden = false;
     }
 
     /**

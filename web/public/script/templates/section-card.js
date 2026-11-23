@@ -14,4 +14,3 @@ export const sectionCardErrorTemplate = `
     <span>{{message}}</span>
     <button type='button' class='button secondary small' data-section-retry>Tentar novamente</button>
 </div>`;
-

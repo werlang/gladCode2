@@ -1,7 +1,7 @@
 /** Dialog shell; `#fog`, `#dialog-box` and friends are styled by css/dialog.css. */
 export const dialogTemplate = `
 <div id='fog' class='dialog-fog'>
-    <div id='dialog-box' class='surface-card {{boxClass}}' role='dialog' aria-modal='true'>
+    <div id='dialog-box' class='surface-card {{boxClass}}' role='dialog' aria-modal='true' aria-labelledby='message'>
         <div id='message'>{{{message}}}</div>
         {{{field}}}
         <div id='button-container'>{{{buttons}}}</div>
@@ -14,8 +14,8 @@ export const dialogInputTemplate = `<input type='text' class='input boxed' value
 
 export const terminalTemplate = `
 <div id='fog' class='dialog-fog'>
-    <div id='terminal' role='dialog' aria-modal='true'>
-        <div id='title'><span>{{title}}</span><div id='close' role='button' tabindex='0' aria-label='Fechar'></div></div>
+    <div id='terminal' role='dialog' aria-modal='true' aria-labelledby='terminal-title'>
+        <div id='title'><span id='terminal-title'>{{title}}</span><div id='close' role='button' tabindex='0' aria-label='Fechar'></div></div>
         <pre>{{{message}}}</pre>
     </div>
 </div>`;

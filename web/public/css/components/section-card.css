@@ -43,7 +43,7 @@
         display: none;
     }
 
-    .section-card.is-busy .section-card-body {
+    &.is-busy .section-card-body {
         opacity: 0.6;
         pointer-events: none;
     }
