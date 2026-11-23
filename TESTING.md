@@ -92,7 +92,8 @@ Synty packs.
 `docker compose exec -T web npm test` runs `web/tests`:
 
 - `routes.test.js` — every old PHP address redirects once and lands on a page that answers 200; unknown
-  addresses are 404; `ENABLE_RENDER2` gates the replay page.
+  addresses are 404; `ENABLE_RENDER2` gates only the replay's 3D script and stylesheet (the page and its
+  classic renderer always answer).
 - `import-map.test.js` — every module folder is in the import map, three and `render2` are always mapped
   (the cards and the editor import them on demand), and the versioned URLs resolve.
 

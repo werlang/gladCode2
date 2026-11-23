@@ -11,7 +11,7 @@ Localizes the global `web-frontend` skill (with `security-defense-and-mitigation
 
 - `web/app.js`: `page(route, view, clientVars)` per page, static files (`redirect: false`), `/profpics`, maintenance mode after static files, the old-address redirect (`legacyPageUrl` in `web/helpers/urls.js`) registered after every page route.
 - `web/middleware/render.js`: `res.page()`; views get `{{#asset}}`/`{{#module}}` (mtime-versioned URLs), `{{{importMap}}}` and `{{{templateVars}}}` (`web/helpers/safe-json.js`). Import maps, asset URLs and the view list are cached when `NODE_ENV=production`.
-- `web/helpers/modules.js`: the import map over `MODULE_DIRS` (add new script folders there); `render2: true` adds three.js and `script/render2/`.
+- `web/helpers/modules.js`: the import map over `MODULE_DIRS` (add new script folders there), plus three.js and `script/render2/` on every page (the cards and the editor import them on demand); `render2: true` only decides whether the replay page loads the 3D entry, not what the map contains.
 - `web/view/*.html`: one Mustache view per page plus `head` (font preload, `tokens.css`, `theme-boot.js`), `header`, `footer`, `analytics` partials.
 - `web/public/script/`: page entries (`*.js`), `components/`, `helpers/` (`request.js` with `api`/`site` and `BATTLE_TIMEOUT_MS`, `html.js`, `template-var.js`, `local-data.js`), `models/` (the only callers of the API), `templates/`, `profile/`, `editor/`. The Painel redesign adds `services/` (DOM-free state that emits app events, WP2) and `helpers/event-bus.js`; the target layout and rules are in [`docs/frontend/`](../../../docs/frontend/README.md).
 
