@@ -1,6 +1,8 @@
 # gladCode 2
 
-gladCode is a web-based programming game and arena where players code AI gladiators in C or Python to battle autonomously. The platform features selectable Phaser.js 2D and Three.js top-down 3D battle replays, visual block-based programming (Blockly), raw C/Python editing (ACE Editor), ranked battles, duels, tournaments and classroom trainings.
+gladCode is a web-based programming game and arena where players code AI gladiators in C or Python to battle autonomously. The platform replays every battle in the Three.js top-down 3D coliseum, with the Phaser.js 2D arena as the automatic fallback, and offers visual block-based programming (Blockly), raw C/Python editing (ACE Editor), ranked battles, duels, tournaments and classroom trainings.
+
+**Documentation:** [INDEX.md](INDEX.md) maps every document. Start with [GUIDE.md](GUIDE.md) for the architecture and [TESTING.md](TESTING.md) for the validation commands; [AGENTS.md](AGENTS.md) holds the rules agents follow, [CONTRIBUTING.md](CONTRIBUTING.md) the branch and commit conventions, and [docs/frontend/](docs/frontend/README.md) the frontend conventions.
 
 ---
 
@@ -105,7 +107,9 @@ docker compose exec -T api npx vitest run                                       
 bash tests/engine/run.sh                                                                   # engine regression battles
 ```
 
-Coding rules are in [AGENTS.md](AGENTS.md). Branches, commit messages and how work is merged are described in [CONTRIBUTING.md](CONTRIBUTING.md).
+Every command, what it covers and the tests that need the running stack are in [TESTING.md](TESTING.md).
+Coding rules are in [AGENTS.md](AGENTS.md); the architecture is in [GUIDE.md](GUIDE.md). Branches, commit
+messages and how work is merged are described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -117,7 +121,7 @@ Coding rules are in [AGENTS.md](AGENTS.md). Branches, commit messages and how wo
 4. **Container Isolation**: The runner spawns a `gladcode2-vm` container with restricted CPU (`--cpu-quota=50000`) and a 30-second execution deadline.
 5. **Simulation Execution**: `socket_compile.sh` compiles gladiator code, launches `gladCodeServerMain`, and manages socket IPC between gladiators and the C game engine.
 6. **Results**: The API stores the simlog in `data/logs/<id>` and applies the battle's rules (renown and silver for ranked battles, deaths and placings for tournaments, scores for trainings).
-7. **Log Replay**: `script/playback.js` expands the incremental trace into complete frames, then the saved battle setting selects either the classic Phaser renderer (`script/render.js`) or the top-down Three.js renderer (`script/render2.js`). The 3D renderer dresses each gladiator in Synty modular models mapped and recoloured from its persisted skin, walking with a distance-driven gait and playing Synty animation clips for melee, ranged, spell, block and charge actions timed on the replay clock (pausing freezes them; replay speed scales them). Both renderers use the same 100 ms simulation cadence and authoritative arena coordinates.
+7. **Log Replay**: `script/playback.js` expands the incremental trace into complete frames and runs the top-down Three.js renderer (`script/render2.js`); browsers without WebGL2, `ENABLE_RENDER2=0`, or a failed 3D start fall back to the classic Phaser renderer (`script/render.js`). The 3D renderer dresses each gladiator in Synty modular models mapped and recoloured from its persisted skin, walking with a distance-driven gait and playing Synty animation clips for melee, ranged, spell, block and charge actions timed on the replay clock (pausing freezes them; replay speed scales them). Both renderers use the same 100 ms simulation cadence and authoritative arena coordinates.
 
 ---
 
@@ -126,6 +130,10 @@ Coding rules are in [AGENTS.md](AGENTS.md). Branches, commit messages and how wo
 ```
 gladcode2/
 ├── .github/                 # Deploy workflow & Copilot instructions
+├── .agents/skills/          # Project skills for agents (indexed in .agents/skills/README.md)
+├── INDEX.md                 # Map of every document
+├── GUIDE.md                 # Architecture and ownership boundaries
+├── TESTING.md               # Validation commands and test scope
 ├── AGENTS.md                # Architecture and coding rules for agents and developers
 ├── CONTRIBUTING.md          # Branches, commit messages and merging
 ├── compose.yaml             # Production images; compose.dev.yaml adds source mounts and node --watch
@@ -136,7 +144,7 @@ gladcode2/
 ├── Payload/                 # C battle simulation engine & socket API source
 ├── migrations/              # Numbered SQL migrations and their runner
 ├── dev-tools/               # Tournament CLI, database dump/restore, release news SQL
-├── docs/                    # API reference (generated) and the Synty asset catalogue
+├── docs/                    # API reference (generated), design system, design boards, frontend conventions
 ├── tests/                   # Frontend, render2, migration and engine tests
 └── data/                    # Battle logs, run folders, profile pictures (gitignored)
 ```
