@@ -36,6 +36,7 @@ export class AccountService {
     #bus;
     #user = null;
     #states = new Map();
+    #epoch = 0;
 
     /**
      * @param {object} [options] Test seams.
@@ -57,7 +58,9 @@ export class AccountService {
      * @returns {Promise<Record<string, any>|null>}
      */
     async load({ signal } = {}) {
+        const epoch = ++this.#epoch;
         const user = await this.#model.current({ signal });
+        if (epoch !== this.#epoch) return null;
         this.#user = user ?? null;
         this.#states.clear();
         this.#bus.emit(APP_EVENTS.accountLoaded, { user: this.#user });
@@ -135,6 +138,13 @@ export class AccountService {
     /** Ends the session and every field's queue. */
     async signOut() {
         await this.#model.signOut();
+        this.#epoch += 1;
+        for (const state of this.#states.values()) {
+            if (state.pending) {
+                state.pending.waiter.resolve({ token: state.pending.token, superseded: true, signedOut: true });
+                state.pending = null;
+            }
+        }
         this.#user = null;
         this.#states.clear();
         this.#bus.emit(APP_EVENTS.accountSignedOut, {});
@@ -168,9 +178,14 @@ export class AccountService {
         const job = state.pending;
         state.pending = null;
         state.running = true;
+        const epoch = this.#epoch;
 
         try {
             const user = await this.#model.update({ [field]: job.value });
+            if (epoch !== this.#epoch) {
+                job.waiter.resolve({ token: job.token, superseded: true, signedOut: true });
+                return;
+            }
             state.confirmed = user?.[field] ?? job.value;
             if (job.token.rev === state.seq) {
                 this.#user = user;
@@ -182,12 +197,13 @@ export class AccountService {
             }
         }
         catch (error) {
-            if (job.token.rev === state.seq) job.waiter.reject(error);
+            if (epoch !== this.#epoch) job.waiter.resolve({ token: job.token, error, superseded: true, signedOut: true });
+            else if (job.token.rev === state.seq) job.waiter.reject(error);
             else job.waiter.resolve({ token: job.token, error, superseded: true });
         }
         finally {
             state.running = false;
-            if (state.pending) this.#drain(field);
+            if (epoch === this.#epoch && state.pending) this.#drain(field);
         }
     }
 }

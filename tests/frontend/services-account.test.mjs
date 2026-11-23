@@ -191,3 +191,24 @@ test('setSilver updates the account and emits the balance; signOut clears the st
     assert.equal(model.user, null);
     assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
 });
+
+test('a write that finishes after signOut cannot restore the account', async () => {
+    const { service, model, bus } = make();
+    await service.load();
+    const gate = deferred();
+    model.gates.push(gate);
+
+    const inFlight = service.save('theme', 'classic');
+    const pending = service.save('theme', 'arena-dark');
+    await service.signOut();
+    gate.resolve();
+
+    const first = await inFlight;
+    const second = await pending;
+    assert.equal(first.superseded, true);
+    assert.equal(first.signedOut, true);
+    assert.equal(second.signedOut, true);
+    assert.equal(service.user, null);
+    assert.equal(bus.emitted.filter(event => event.name === 'account:saved').length, 0);
+    assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
+});
