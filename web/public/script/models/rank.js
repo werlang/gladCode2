@@ -14,15 +14,21 @@ export class RankModel {
         return api.get('ranking', { offset, search }, { signal });
     }
 
-    /** @returns {Promise<number>} Gladiators ranked above the signed-in master's best one. */
-    static async myBestOffset() {
-        const { offset } = await api.get('ranking/me');
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<number>} Gladiators ranked above the signed-in master's best one.
+     */
+    static async myBestOffset({ signal } = {}) {
+        const { offset } = await api.get('ranking/me', {}, { signal });
         return offset;
     }
 
-    /** @returns {Promise<string[]>} The signed-in master's hashtag tabs. */
-    static async tabs() {
-        const { tags } = await api.get('ranking/tabs');
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<string[]>} The signed-in master's hashtag tabs.
+     */
+    static async tabs({ signal } = {}) {
+        const { tags } = await api.get('ranking/tabs', {}, { signal });
         return tags;
     }
 

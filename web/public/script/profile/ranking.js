@@ -30,17 +30,33 @@ export class RankingTab {
     #selected = GENERAL;
     /** Answers to older requests are dropped. */
     #request = 0;
+    /** The current navigation signal; user-triggered loads keep using it. */
+    #signal = null;
+    /** The page holding the user's best gladiator, read once and only for an unfiltered route. */
+    #personalOffset = null;
 
-    /** Binds the controls and starts the general ranking on the user's best gladiator. */
-    async init() {
+    /** Binds the controls; the route decides the first page and filter. */
+    init() {
         this.#panel.querySelector('#tab-general').addEventListener('click', () => this.#select(GENERAL));
         this.#panel.querySelector('#add-tab').addEventListener('click', () => this.#askHashtag());
         this.#panel.querySelector('#prev').addEventListener('click', () => this.#page(-1));
         this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
-        this.#search.addEventListener('input', () => this.fetch({ offset: 0 }));
+        this.#search.addEventListener('input', () => this.fetch({ offset: 0, signal: this.#signal }));
+    }
 
-        const offset = await RankModel.myBestOffset();
-        this.#pages[GENERAL].offset = Math.floor(offset / PAGE_SIZE) * PAGE_SIZE;
+    /**
+     * Reads the page holding the signed-in master's best gladiator, once.
+     *
+     * @param {AbortSignal} [signal]
+     * @returns {Promise<number>}
+     */
+    async #bestOffset(signal) {
+        if (this.#personalOffset !== null) return this.#personalOffset;
+        const offset = await RankModel.myBestOffset({ signal })
+            .then(value => Math.floor(value / PAGE_SIZE) * PAGE_SIZE)
+            .catch(() => null);
+        if (offset !== null) this.#personalOffset = offset;
+        return offset ?? 0;
     }
 
     /**
@@ -50,16 +66,23 @@ export class RankingTab {
      * @param {{ signal?: AbortSignal }} [options]
      */
     async show(route = {}, { signal } = {}) {
-        if (route.query?.q !== undefined) {
-            this.#search.value = route.query.q;
-            this.#pages[GENERAL].offset = 0;
-        }
-        await this.#drawTabs();
+        this.#signal = signal;
+        const filtered = route.query?.q !== undefined;
+        const token = ++this.#request;
+        this.#search.value = filtered ? route.query.q : '';
+        const offset = filtered ? 0 : await this.#bestOffset(signal);
+        if (signal?.aborted || token !== this.#request) return;
+        this.#pages[GENERAL].offset = offset;
+        if (filtered && this.#pages[this.#selected]) this.#pages[this.#selected].offset = 0;
+        await this.#drawTabs({ signal });
+        if (signal?.aborted || token !== this.#request) return;
         return this.fetch({ offset: this.#pages[this.#selected].offset, placeholder: true, signal });
     }
 
-    async #drawTabs() {
-        const tags = await RankModel.tabs();
+    /** @param {{ signal?: AbortSignal }} [options] */
+    async #drawTabs({ signal } = {}) {
+        const tags = await RankModel.tabs({ signal });
+        if (signal?.aborted) return;
         this.#panel.querySelectorAll('#tab-container .tab.user').forEach(tab => tab.remove());
         const add = this.#panel.querySelector('#add-tab');
         if (!tags.includes(this.#selected) && this.#selected !== GENERAL) this.#selected = GENERAL;
@@ -95,7 +118,7 @@ export class RankingTab {
         const same = id === this.#selected;
         this.#selected = id;
         this.#markSelected();
-        this.fetch({ offset: this.#pages[id].offset, placeholder: !same });
+        this.fetch({ offset: this.#pages[id].offset, placeholder: !same, signal: this.#signal });
     }
 
     /** @param {string} name Hashtag. */
@@ -107,7 +130,7 @@ export class RankingTab {
             await RankModel.unwatch(name);
             createToast(`Aba #${name} removida`, 'success');
             this.#selected = GENERAL;
-            this.show();
+            this.show({}, { signal: this.#signal });
         });
     }
 
@@ -169,12 +192,12 @@ export class RankingTab {
             }
             else throw error;
         }
-        this.#drawTabs();
+        this.#drawTabs({ signal: this.#signal });
     }
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */
     #page(direction) {
-        this.fetch({ offset: this.#pages[this.#selected].offset + direction * PAGE_SIZE });
+        this.fetch({ offset: this.#pages[this.#selected].offset + direction * PAGE_SIZE, signal: this.#signal });
     }
 
     /**
