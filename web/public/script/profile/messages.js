@@ -1,8 +1,7 @@
 import { showMessage } from '../components/dialog.js';
-import { createToast } from '../components/toast.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { runReadTask, runSectionTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { runReadTask, runSectionTask, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
 import { MessageModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -97,7 +96,7 @@ export class MessagesTab {
         }));
         full.style.display = 'none';
         this.#panel.append(full);
-        MessageModel.markRead(message.id, true);
+        MessageModel.markRead(message.id, true).catch(writeErrorToast);
 
         full.querySelector('#back').addEventListener('click', () => runReadTask(() => this.#show(), this.#signal));
         full.querySelector('#reply').addEventListener('click', () => this.#reply(full, message));
@@ -149,7 +148,7 @@ export class MessagesTab {
                     onWriteError: error => {
                         if (error.code === 'MESSAGE_TOO_LONG') showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
                         else if (error.code === 'INVALID_MESSAGE') showMessage('A resposta não pode ficar vazia nem ter emojis.');
-                        else createToast('Não foi possível enviar a resposta. Tente novamente.', 'error');
+                        else writeErrorToast(error);
                     },
                 },
             );

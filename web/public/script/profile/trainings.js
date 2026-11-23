@@ -4,7 +4,7 @@ import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -193,7 +193,10 @@ function editInPlace(element, id, field) {
         }
         catch (error) {
             element.textContent = text;
-            if (error.code !== 'INVALID_NAME') throw error;
+            if (error.code !== 'INVALID_NAME') {
+                writeErrorToast(error);
+                return;
+            }
             createToast('Nome precisa ter pelo menos 6 caracteres', 'error');
             return;
         }
@@ -268,7 +271,14 @@ class TrainingRoom {
             leave.addEventListener('click', async () => {
                 if (await showDialog(`Abandonar o treino <b>${escapeHtml(data.name)}</b>?`, ['Sim', 'Não']) !== 'Sim') return;
                 this.#left = true;
-                await TrainingModel.leave(this.id);
+                try {
+                    await TrainingModel.leave(this.id);
+                }
+                catch (error) {
+                    this.#left = false;
+                    writeErrorToast(error);
+                    return;
+                }
                 this.refresh();
             });
         }
@@ -316,8 +326,14 @@ class TrainingRoom {
             renew.innerHTML = "<i class='fas fa-redo'></i>";
             renew.addEventListener('click', async () => {
                 renew.innerHTML = "<i class='fas fa-spinner fa-pulse'></i>";
-                const { hash } = await TrainingModel.renew(this.id);
-                this.#setHash(hash);
+                try {
+                    const { hash } = await TrainingModel.renew(this.id);
+                    this.#setHash(hash);
+                }
+                catch (error) {
+                    renew.innerHTML = "<i class='fas fa-redo'></i>";
+                    writeErrorToast(error);
+                }
             });
             return;
         }
@@ -431,7 +447,13 @@ class TrainingRoom {
             start.disabled = count < this.players;
             start.onclick = () => this.#askStart();
             rows.forEach((row, index) => row.querySelector('.kick').addEventListener('click', async () => {
-                await TrainingModel.kick(this.id, data.gladiators[index].id);
+                try {
+                    await TrainingModel.kick(this.id, data.gladiators[index].id);
+                }
+                catch (error) {
+                    writeErrorToast(error);
+                    return;
+                }
                 createToast('Participante removido', 'success');
                 this.refresh();
             }));
@@ -446,8 +468,7 @@ class TrainingRoom {
                 await TrainingModel.changeGladiator(this.id, glad.id);
             }
             catch (error) {
-                if (!error.code) throw error;
-                createToast('Não foi possível alterar o gladiador', 'error');
+                writeErrorToast(error);
                 return;
             }
             createToast('Gladiador alterado', 'success');
@@ -457,16 +478,19 @@ class TrainingRoom {
 
     async #askStart() {
         if (await showDialog('Deseja iniciar o treino? Após o início, os participantes não poderão ser alterados', ['Sim', 'Não']) !== 'Sim') return;
-        this.close();
         let hash;
         try {
             ({ hash } = await TrainingModel.start(this.id));
         }
         catch (error) {
-            if (error.code !== 'FEW_PLAYERS') throw error;
+            if (error.code !== 'FEW_PLAYERS') {
+                writeErrorToast(error);
+                return;
+            }
             showMessage('O treino precisa de mais participantes');
             return;
         }
+        this.close();
         createToast('Treino iniciado', 'success');
         window.open(`train/${hash}`);
     }
@@ -474,7 +498,13 @@ class TrainingRoom {
     /** @param {string} name Training name. */
     async #askDelete(name) {
         if (await showDialog(`Deseja excluir o treino ${escapeHtml(name)}?`, ['Sim', 'Não']) !== 'Sim') return;
-        await TrainingModel.remove(this.id);
+        try {
+            await TrainingModel.remove(this.id);
+        }
+        catch (error) {
+            writeErrorToast(error);
+            return;
+        }
         this.close();
         createToast('Treino removido', 'success');
     }
@@ -607,7 +637,13 @@ export class TrainingsTab {
                     new Message({ message: 'O nome informado não confere' }).show();
                     return;
                 }
-                await TrainingModel.remove(training.id);
+                try {
+                    await TrainingModel.remove(training.id);
+                }
+                catch (error) {
+                    writeErrorToast(error);
+                    return;
+                }
                 new Message({ message: 'O treino foi removido com sucesso' }).show();
                 this.refresh();
             });
@@ -680,7 +716,10 @@ export class TrainingsTab {
                     createToast('Você não possui créditos para utilizar essa função', 'error');
                     profile.user.credits = 0;
                 }
-                else throw error;
+                else {
+                    writeErrorToast(error);
+                    return;
+                }
                 return;
             }
             fog.remove();
@@ -719,7 +758,10 @@ export class TrainingsTab {
             training = await TrainingModel.invitation(hash);
         }
         catch (error) {
-            if (!JOIN_ERRORS[error.code]) throw error;
+            if (!JOIN_ERRORS[error.code]) {
+                writeErrorToast(error);
+                return;
+            }
             showMessage(JOIN_ERRORS[error.code]);
             return;
         }
@@ -738,7 +780,10 @@ export class TrainingsTab {
                 await TrainingModel.join(hash, glad.id);
             }
             catch (error) {
-                if (!error.code) throw error;
+                if (!error.code) {
+                    writeErrorToast(error);
+                    return;
+                }
                 createToast(JOIN_ERRORS[error.code] ?? 'Erro ao ingressar, tente novamente', 'error');
                 return;
             }

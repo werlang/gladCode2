@@ -1,4 +1,5 @@
 import { createToast } from '../components/toast.js';
+import { escapeHtml } from './html.js';
 
 /**
  * Whether an error is the cancellation of work by the shell's AbortSignal.
@@ -48,6 +49,27 @@ export async function secondaryRequest(task, signal) {
     catch {
         return undefined;
     }
+}
+
+/**
+ * Reports a refused write with the API's own message. Controls keep their pre-click state; this only
+ * supplies the feedback (there is deliberately no retry).
+ *
+ * @param {unknown} error
+ * @returns {void}
+ */
+export function writeErrorMessage(error) {
+    return typeof error?.message === 'string' && error.message.trim()
+        ? escapeHtml(error.message.trim())
+        : 'Não foi possível concluir esta ação.';
+}
+
+/**
+ * @param {unknown} error
+ * @returns {void}
+ */
+export function writeErrorToast(error) {
+    createToast(writeErrorMessage(error), 'error');
 }
 
 /**
@@ -114,19 +136,42 @@ export function runReadTask(task, signal, notify = retryableError) {
  *
  * @param {() => Promise<unknown>} write
  * @param {() => Promise<unknown>} read
- * @param {{ signal?: AbortSignal, onWriteError?: (error: Error) => void, notify?: typeof retryableError }} [options]
+ * @param {{ signal?: AbortSignal, onWriteError?: (error: Error) => void, reportWrite?: (error: Error) => void,
+ *   notify?: typeof retryableError }} [options]
  * @returns {Promise<void>}
  */
-export function writeThenRead(write, read, { signal, onWriteError, notify } = {}) {
+export function writeThenRead(write, read, { signal, onWriteError, reportWrite = writeErrorToast, notify } = {}) {
     return Promise.resolve()
         .then(write)
         .then(
             () => runReadTask(read, signal, notify),
             error => {
                 if (isAborted(error) || signal?.aborted) return;
-                onWriteError?.(error);
+                (onWriteError ?? reportWrite)(error);
             },
         );
+}
+
+/**
+ * Applies an optimistic UI change, runs its write and rolls the change back with feedback on a
+ * refusal. The write is attempted once.
+ *
+ * @param {{ apply: () => void, rollback: () => void, write: () => Promise<unknown>,
+ *   onError?: (error: Error) => void }} options
+ * @returns {Promise<boolean>} Whether the write succeeded.
+ */
+export async function optimisticWrite({ apply, rollback, write, onError = writeErrorToast }) {
+    apply();
+    try {
+        await write();
+        return true;
+    }
+    catch (error) {
+        if (isAborted(error)) return false;
+        rollback();
+        onError(error);
+        return false;
+    }
 }
 
 /**
@@ -134,13 +179,14 @@ export function writeThenRead(write, read, { signal, onWriteError, notify } = {}
  * offers a generic retry, because repeating a POST/PUT/DELETE is not safe.
  *
  * @param {() => Promise<unknown>} task
+ * @param {(error: Error) => void} [reportWrite]
  * @returns {Promise<void>}
  */
-export function runSectionTask(task) {
+export function runSectionTask(task, reportWrite = writeErrorToast) {
     return Promise.resolve()
         .then(task)
         .then(() => {}, error => {
             if (isAborted(error)) return;
-            createToast('Não foi possível concluir esta ação. Tente novamente.', 'error');
+            reportWrite(error);
         });
 }

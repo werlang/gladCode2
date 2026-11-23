@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-const { retryAction, runReadTask, writeThenRead } = await import('../../web/public/script/helpers/section-request.js');
+const {
+    optimisticWrite, retryAction, runReadTask, runSectionTask, writeErrorMessage, writeThenRead,
+} = await import('../../web/public/script/helpers/section-request.js');
 
 test('a write followed by a refused read retries only the read', async () => {
     let writes = 0;
@@ -81,4 +83,58 @@ test('a refused write is never followed by a generic retry', async () => {
     assert.equal(reads, 0);
     assert.equal(writeErrors, 1);
     assert.equal(notifications, 0);
+});
+
+test('write feedback uses the escaped API message and a generic fallback', () => {
+    assert.equal(writeErrorMessage(new Error('Name <taken>')), 'Name &lt;taken&gt;');
+    assert.equal(writeErrorMessage(new Error('')), 'Não foi possível concluir esta ação.');
+    assert.equal(writeErrorMessage(null), 'Não foi possível concluir esta ação.');
+});
+
+test('a write failure reported through the default write path runs its reporter once', async () => {
+    let reports = 0;
+    let seen;
+    await writeThenRead(
+        async () => { throw new Error('write refused'); },
+        async () => {},
+        { reportWrite: error => { reports += 1; seen = error; } },
+    );
+    assert.equal(reports, 1);
+    assert.equal(seen.message, 'write refused');
+
+    let actionReports = 0;
+    await runSectionTask(async () => { throw new Error('action refused'); }, () => { actionReports += 1; });
+    assert.equal(actionReports, 1);
+});
+
+test('an optimistic write rolls the UI back with feedback on failure', async () => {
+    let applied = 0;
+    let rolledBack = 0;
+    let errors = 0;
+    let writes = 0;
+    const failed = await optimisticWrite({
+        apply: () => { applied += 1; },
+        rollback: () => { rolledBack += 1; },
+        write: async () => {
+            writes += 1;
+            throw new Error('refused');
+        },
+        onError: () => { errors += 1; },
+    });
+    assert.equal(failed, false);
+    assert.equal(applied, 1);
+    assert.equal(rolledBack, 1);
+    assert.equal(errors, 1);
+    assert.equal(writes, 1);
+
+    const ok = await optimisticWrite({
+        apply: () => { applied += 1; },
+        rollback: () => { rolledBack += 1; },
+        write: async () => { writes += 1; },
+        onError: () => { errors += 1; },
+    });
+    assert.equal(ok, true);
+    assert.equal(applied, 2);
+    assert.equal(rolledBack, 1);
+    assert.equal(errors, 1);
 });

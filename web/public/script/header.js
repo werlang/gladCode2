@@ -8,6 +8,7 @@ import { TemplateVar } from './helpers/template-var.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { applyTheme, storedThemeChoice } from './helpers/theme.js';
 import { previewTheme } from './helpers/theme-preview.js';
+import { writeErrorToast } from './helpers/section-request.js';
 import { account } from './services/account.js';
 import { notifications } from './services/notifications.js';
 import { PAINEL_COMMANDS, searchShell } from './services/command-search.js';
@@ -132,8 +133,8 @@ async function start() {
             await notifications.refresh();
             createToast('Notificações marcadas como lidas', 'success');
         }
-        catch {
-            createToast('Não foi possível marcar as notificações', 'error');
+        catch (error) {
+            writeErrorToast(error);
         }
     });
 

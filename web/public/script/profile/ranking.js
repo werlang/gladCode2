@@ -1,7 +1,7 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { renderTemplate } from '../helpers/html.js';
-import { runReadTask, secondaryRequest, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { runReadTask, secondaryRequest, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
 import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
 import { showNoCredit, showTutorPitch } from './tutor.js';
@@ -142,10 +142,7 @@ export class RankingTab {
                 this.#selected = GENERAL;
                 return this.show({}, { signal: this.#signal });
             },
-            {
-                signal: this.#signal,
-                onWriteError: () => createToast('Não foi possível remover a aba', 'error'),
-            },
+            { signal: this.#signal, onWriteError: writeErrorToast },
         ));
     }
 
@@ -211,10 +208,7 @@ export class RankingTab {
                 }
             },
             () => this.#drawTabs({ signal: this.#signal }),
-            {
-                signal: this.#signal,
-                onWriteError: () => createToast('Não foi possível criar a aba', 'error'),
-            },
+            { signal: this.#signal, onWriteError: writeErrorToast },
         );
     }
 

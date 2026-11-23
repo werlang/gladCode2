@@ -2,7 +2,7 @@ import { Message } from '../components/dialog.js';
 import { decorateRadios } from '../components/form-controls.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { renderTemplate } from '../helpers/html.js';
-import { runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { optimisticWrite, runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
 import { DuelModel, ReportModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
@@ -266,22 +266,42 @@ export class ReportsTab {
      * @param {number} id Report id.
      */
     #toggleFavorite(cell, id) {
-        const star = cell.querySelector('i');
-        if (star.classList.contains('fas')) {
-            star.classList.replace('fas', 'far');
-            cell.title = 'Guardar nos favoritos';
-            ReportModel.setFavorite(id, false);
+        if (cell.querySelector('i').classList.contains('fas')) {
+            this.#setFavorite(cell, id, false);
             return;
         }
         new Message({
             message: 'Informe um comentário sobre esta batalha',
             buttons: { ok: 'OK', cancel: 'CANCEL' },
             input: { placeholder: 'Comentário...' },
-        }).show().click('ok', ({ input }) => {
-            star.classList.replace('far', 'fas');
-            cell.title = 'Tirar dos favoritos';
-            ReportModel.setFavorite(id, true, input);
+        }).show().click('ok', ({ input }) => this.#setFavorite(cell, id, true, input));
+    }
+
+    /**
+     * Paints the star and persists the change; a refusal restores the previous star.
+     *
+     * @param {HTMLElement} cell The star cell.
+     * @param {number} id Report id.
+     * @param {boolean} favorite New state.
+     * @param {string} [comment] Favourite comment.
+     */
+    #setFavorite(cell, id, favorite, comment) {
+        return optimisticWrite({
+            apply: () => this.#paintFavorite(cell, favorite),
+            rollback: () => this.#paintFavorite(cell, !favorite),
+            write: () => ReportModel.setFavorite(id, favorite, comment),
         });
+    }
+
+    /**
+     * @param {HTMLElement} cell The star cell.
+     * @param {boolean} favorite Whether the star is filled.
+     */
+    #paintFavorite(cell, favorite) {
+        const star = cell.querySelector('i');
+        star.classList.toggle('fas', favorite);
+        star.classList.toggle('far', !favorite);
+        cell.title = favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos';
     }
 
     /**
@@ -294,8 +314,8 @@ export class ReportsTab {
             buttons: { yes: 'Sim', no: 'Não' },
         }).show().click('yes', () => writeThenRead(
             async () => {
-                row.remove();
                 await ReportModel.setFavorite(id, false);
+                row.remove();
             },
             () => this.fetch({ offset: this.#offsets.favorites, signal: this.#signal }),
             { signal: this.#signal },

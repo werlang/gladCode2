@@ -217,9 +217,11 @@ WP3 adapts the existing controllers to this shape; WP4–WP8 rewrite them sectio
    if that section chooses to cache it in its service (the news list, for instance); the default is a
    fresh mount after a section change.
 
-**Retry rule.** A generic retry action is offered only for an idempotent **read**. A write
+**Retry and write rule.** A generic retry action is offered only for an idempotent **read**. A write
 (`POST`/`PUT`/`DELETE`) is never inside a retryable task: the write is attempted once with its own error
-handling, and a re-read after it is split out and retried alone. Every retry is bound to the navigation
+handling, and a re-read after it is split out and retried alone. Every refused write reports the API
+message in an error toast and restores its control (or the optimistic UI) to the pre-click state; an
+optimistic row/star is rolled back when the server refuses it. Every retry is bound to the navigation
 signal (and shell generation) that failed; leaving the section aborts that signal, dismisses the toast
 and makes its action inert.
 

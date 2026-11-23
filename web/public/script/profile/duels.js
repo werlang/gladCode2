@@ -4,7 +4,7 @@ import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { DuelModel } from '../models/social.js';
-import { settleRequest } from '../helpers/section-request.js';
+import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { challengeRowTemplate, duelBoxTemplate } from '../templates/profile.js';
 
 /**
@@ -39,8 +39,11 @@ export function challengeFriend(nick, friend) {
             await DuelModel.challenge({ glad: glad.id, friend });
         }
         catch (error) {
+            if (error.code !== 'DUEL_EXISTS') {
+                writeErrorToast(error);
+                return;
+            }
             fog.remove();
-            if (error.code !== 'DUEL_EXISTS') throw error;
             showMessage(`Já existe um desafio de duelo contra <span class='highlight'>${name}</span> usando o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span>.`);
             return;
         }
@@ -97,7 +100,13 @@ export class ChallengeList {
      * @param {Record<string, any>} duel Challenge.
      */
     async #refuse(row, duel) {
-        await DuelModel.remove(duel.id);
+        try {
+            await DuelModel.remove(duel.id);
+        }
+        catch (error) {
+            writeErrorToast(error);
+            return;
+        }
         showMessage('Desafio recusado');
         row.remove();
         if (this.count === 0) this.#panel.classList.add('hidden');
@@ -118,7 +127,8 @@ export class ChallengeList {
                     DUEL_GLADIATOR_GONE: 'O gladiador do desafiante não existe mais',
                     GLADIATOR_OUTDATED: 'Os dois gladiadores precisam estar atualizados para duelar',
                 };
-                showMessage(problems[error.code] ?? 'Não foi possível executar o duelo');
+                if (problems[error.code]) showMessage(problems[error.code]);
+                else writeErrorToast(error);
                 log = false;
             }
             progress.kill();

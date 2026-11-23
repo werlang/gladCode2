@@ -1,7 +1,7 @@
 import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
 import { elapsedString } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, runSectionTask, secondaryRequest, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { runReadTask, runSectionTask, secondaryRequest, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
 import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
@@ -24,7 +24,9 @@ export async function writeMessage(user, nick) {
     catch (error) {
         if (error.code === 'MESSAGE_TOO_LONG') showMessage('A mensagem é longa demais. Encurte o texto e tente novamente.');
         else if (error.code === 'INVALID_MESSAGE') showMessage('A mensagem não pode ficar vazia nem ter emojis.');
-        else throw error;
+        else {
+            writeErrorToast(error);
+        }
         return;
     }
     showMessage('Mensagem enviada');
@@ -154,7 +156,13 @@ export class FriendsTab {
         const { row, friend } = this.#current;
         const answer = await showDialog(`Deseja remover <span class='highlight'>${escapeHtml(friend.nick)}</span> da sua lista de amigos?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
-        await FriendModel.remove(friend.id);
+        try {
+            await FriendModel.remove(friend.id);
+        }
+        catch (error) {
+            writeErrorToast(error);
+            return;
+        }
         row.remove();
     }
 
@@ -181,7 +189,10 @@ export class FriendsTab {
             await FriendModel.add(user.user);
         }
         catch (error) {
-            if (error.code !== 'FRIENDSHIP_EXISTS') throw error;
+            if (error.code !== 'FRIENDSHIP_EXISTS') {
+                writeErrorToast(error);
+                return;
+            }
             showMessage(`O usuário <span class='highlight'>${nick}</span> já está em sua lista de amigos`);
             return;
         }

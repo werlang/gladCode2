@@ -2,7 +2,7 @@ import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
-import { runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { runReadTask, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
 import { PotionModel } from '../models/potion.js';
 import { profile, setSilver } from './session.js';
 import {
@@ -186,7 +186,7 @@ export class PotionsTab {
                 () => this.refresh({ signal: this.#signal }),
                 {
                     signal: this.#signal,
-                    onWriteError: () => createToast('Não foi possível cancelar a encomenda', 'error'),
+                    onWriteError: writeErrorToast,
                 },
             ));
         });
@@ -291,14 +291,14 @@ export class PotionsTab {
             message: `Emcomendar <b>${potion.name}</b>?`,
             buttons: { yes: 'Sim', no: 'Não' },
         }).show().click('yes', async () => {
-            closeShop();
             try {
                 const { silver } = await PotionModel.buy(id);
                 setSilver(silver);
                 createToast(`Item ${escapeHtml(potion.name)} encomendado`, 'success');
+                closeShop();
             }
-            catch {
-                createToast('O item não pôde ser adquirido', 'error');
+            catch (error) {
+                writeErrorToast(error);
             }
             runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
         });
@@ -329,7 +329,10 @@ export class PotionsTab {
             }
             catch (error) {
                 const problem = { NOT_ENOUGH_SILVER: 'Você não possui prata suficiente', APOTHECARY_MAX_LEVEL: 'O apotecário já está no nível máximo' }[error.code];
-                if (!problem) throw error;
+                if (!problem) {
+                    writeErrorToast(error);
+                    return;
+                }
                 new Message({ message: problem }).show();
                 return;
             }

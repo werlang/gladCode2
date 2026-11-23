@@ -8,6 +8,7 @@ import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
 import { applyTheme } from '../helpers/theme.js';
 import { UserModel } from '../models/user.js';
+import { writeErrorToast } from '../helpers/section-request.js';
 import { profile } from './session.js';
 
 /** E-mail preferences, by the id suffix of their switches (`#pref-<name>`). */
@@ -176,7 +177,10 @@ export class SettingsTab {
         }
         catch (error) {
             const problem = SAVE_ERRORS[error.code];
-            if (!problem) throw error;
+            if (!problem) {
+                writeErrorToast(error);
+                return;
+            }
             await showMessage(problem);
             if (error.code !== 'INVALID_PICTURE') {
                 this.#nickname.setError(problem);

@@ -1,8 +1,8 @@
-import { showDialog, showMessage } from '../components/dialog.js';
+import { showDialog } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeOut } from '../helpers/animate.js';
-import { settleRequest } from '../helpers/section-request.js';
+import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { profile } from './session.js';
 import { codeBlockTemplate, codeBoxTemplate, gladAddTemplate } from '../templates/profile.js';
@@ -128,8 +128,8 @@ export class GladsTab {
         try {
             await GladiatorModel.remove(glad.id);
         }
-        catch {
-            showMessage('Não foi possível excluir o gladiador. Tente novamente');
+        catch (error) {
+            writeErrorToast(error);
             return;
         }
         await fadeOut(card);

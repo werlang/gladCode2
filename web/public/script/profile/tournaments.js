@@ -2,7 +2,7 @@ import { decorateCheckSliders } from '../components/form-controls.js';
 import { loadGladCards, loadSelectableCards } from '../components/glad-card.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, settleRequest } from '../helpers/section-request.js';
+import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TournamentModel } from '../models/tournament.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -226,7 +226,10 @@ class TeamWindow {
             data = await TournamentModel.removeGladiator(this.team.id, glad.id);
         }
         catch (error) {
-            if (error.code !== 'TOURNAMENT_STARTED') throw error;
+            if (error.code !== 'TOURNAMENT_STARTED') {
+                writeErrorToast(error);
+                return;
+            }
             this.#tournamentStarted();
             return;
         }
@@ -265,7 +268,10 @@ class TeamWindow {
                 data = await TournamentModel.leaveTeam(this.team.id);
             }
             catch (error) {
-                if (error.code !== 'TOURNAMENT_STARTED') throw error;
+                if (error.code !== 'TOURNAMENT_STARTED') {
+                    writeErrorToast(error);
+                    return;
+                }
                 this.#tournamentStarted();
                 return;
             }
@@ -388,14 +394,17 @@ class TournamentWindow {
     async #askStart() {
         const answer = await showDialog('Deseja iniciar o torneio? Após o início, as equipes não poderão mais ser alteradas', ['Sim', 'NÃO']);
         if (answer !== 'Sim') return;
-        this.fog.remove();
         try {
             const { hash } = await TournamentModel.start(this.tournament);
+            this.fog.remove();
             window.open(`tourn/${hash}`);
         }
         catch (error) {
             const problems = { FEW_TEAMS: 'O torneio precisa de pelo menos duas equipes', FEW_GLADIATORS: 'Todas as equipes precisam de três gladiadores' };
-            if (!problems[error.code]) throw error;
+            if (!problems[error.code]) {
+                writeErrorToast(error);
+                return;
+            }
             showMessage(problems[error.code]);
         }
     }
@@ -419,7 +428,13 @@ class TournamentWindow {
         const name = escapeHtml(team.name);
         const answer = await showDialog(`Deseja expulsar a equipe <span class='highlight'>${name}</span> do torneio?`, ['Sim', 'Não']);
         if (answer !== 'Sim') return;
-        await TournamentModel.kick(this.tournament, team.id);
+        try {
+            await TournamentModel.kick(this.tournament, team.id);
+        }
+        catch (error) {
+            writeErrorToast(error);
+            return;
+        }
         showMessage(`Equipe <span class='highlight'>${name}</span> removida do torneio`);
         this.refresh();
     }
@@ -485,7 +500,7 @@ class TournamentWindow {
             }
             else if (error.code === 'TEAM_EXISTS') tip('Esta equipe já está registrada');
             else if (messages[error.code]) showMessage(messages[error.code]);
-            else throw error;
+            else writeErrorToast(error);
             return;
         }
         {
@@ -580,7 +595,14 @@ export class TournamentsTab {
         })).join('');
         table.querySelectorAll('.row:not(.head)').forEach((row, index) => {
             row.addEventListener('click', async () => {
-                const tournament = await TournamentModel.find(tournaments[index].name);
+                let tournament;
+                try {
+                    tournament = await TournamentModel.find(tournaments[index].name);
+                }
+                catch (error) {
+                    writeErrorToast(error);
+                    return;
+                }
                 this.#openJoin({ name: tournament.name, pass: tournament.password, submit: true });
             });
         });
@@ -648,7 +670,10 @@ export class TournamentsTab {
             });
         }
         catch (error) {
-            if (error.code !== 'TOURNAMENT_EXISTS') throw error;
+            if (error.code !== 'TOURNAMENT_EXISTS') {
+                writeErrorToast(error);
+                return;
+            }
             return showTip(field('#name'), 'Um torneio com este identificador já existe');
         }
 
@@ -700,7 +725,10 @@ export class TournamentsTab {
             tournament = await TournamentModel.find(name, pass);
         }
         catch (error) {
-            if (error.code !== 'TOURNAMENT_NOT_FOUND') throw error;
+            if (error.code !== 'TOURNAMENT_NOT_FOUND') {
+                writeErrorToast(error);
+                return;
+            }
             clearTips(window_);
             ['#name', '#pass'].forEach(selector => window_.querySelector(selector).classList.add('error'));
             showTip(window_.querySelector('#name'), 'Torneio não encontrado');

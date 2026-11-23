@@ -4,7 +4,7 @@ import { ProgressButton, Simulation } from '../components/simulation.js';
 import { animateValue, fadeIn } from '../helpers/animate.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { site } from '../helpers/request.js';
-import { settleRequest } from '../helpers/section-request.js';
+import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { RankedModel } from '../models/social.js';
 import { BATTLE_TIPS } from './battle-tips.js';
@@ -207,7 +207,10 @@ export class RankedBattle {
                 showMessage('Ainda não há oponentes na versão atual. Tente novamente mais tarde.');
                 return;
             }
-            if (error.code !== 'GLADIATOR_OUTDATED') throw error;
+            if (error.code !== 'GLADIATOR_OUTDATED') {
+                writeErrorToast(error);
+                return;
+            }
             const answer = await showDialog('Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
             if (answer === 'Sim') window.open(`glad-${glad.id}`);
             return;
@@ -219,10 +222,10 @@ export class RankedBattle {
         try {
             data = await new Simulation(signal => RankedModel.fight(match.match, { signal }), { terminal: true, names: glads.map(entry => entry.name) }).run();
         }
-        catch {
+        catch (error) {
             // the pre-battle screen has no way out of its own: take it down and say why
             document.querySelectorAll('#fog').forEach(fog => fog.remove());
-            showMessage('Não foi possível concluir a batalha. Tente novamente.');
+            writeErrorToast(error);
             data = { error: true };
         }
         stopPreBattle();
