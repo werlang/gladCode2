@@ -212,8 +212,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** Ctrl K / ⌘K navigation and search: a search field in a panel, results grouped as “Ir para”,
   “Gladiadores e mestres” and “Documentação”, keyboard-first.
 - **Constructor:** `new CommandPalette({ element, commands, search })`; `commands` is the static
-  navigation list (`{ id, label, href, group, keywords }`) and `search(query, signal)` is the async data
-  lookup from the shell service.
+  navigation list (`{ id, label, href, section: SectionId|null, group, keywords }`; `section` is `null` for
+  a document page) and `search(query, signal)` is the async data lookup from the shell service.
 - **Methods:** `open({ query })`, `close()`, `setResults(groups)`, `setBusy(on)`.
 - **Events:** `navigate` `{ section: SectionId|null, href: string }` (`section` is the Painel section id, or
   `null` for a document page), `search` `{ query }` (the palette may also call `search` directly; the shell
