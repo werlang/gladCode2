@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Notícias</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="news" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+
+        <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; letter-spacing: 0.01em; color: #08151f">Notícias</h1>
+            <p style="margin: 0; font-size: 15px; color: #56636b">O que mudou na arena e o que está esperando por você.</p>
+          </div>
+          <button style="height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid #cdb98f; background: #fffdf8; color: #1b2a35; font: 500 14px Roboto, sans-serif; display: inline-flex; align-items: center; gap: 8px; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Marcar tudo como lido</button>
+        </header>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+
+          <section style="flex: 2 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 20px" aria-label="Notícias publicadas">
+            <article style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 0 rgba(60,40,10,0.06), 0 12px 32px -18px rgba(60,40,10,0.35)">
+              <div style="position: relative; height: 248px; background: #0b1d2b">
+                <img src="/_blob/d89bf1c365fdc3e2aaa68ebc54f271ea" alt="O coliseu 3D visto do alto durante uma batalha" style="width: 100%; height: 100%; object-fit: cover; display: block">
+                <span style="position: absolute; left: 20px; top: 20px; height: 26px; padding: 0 10px; border-radius: 999px; background: #f2b441; color: #0b1d2b; font: 700 12px Roboto, sans-serif; letter-spacing: 0.06em; display: inline-flex; align-items: center">NOVA</span>
+              </div>
+              <div style="padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 12px">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 13px; color: #56636b">
+                  <span style="height: 24px; padding: 0 10px; border-radius: 6px; background: rgba(0,99,141,0.09); color: #00587d; font-weight: 500; display: inline-flex; align-items: center">Atualização</span>
+                  <span style="font-family: 'Source Code Pro', monospace">v2.6</span>
+                  <span aria-hidden="true">·</span>
+                  <time>18 de novembro</time>
+                </div>
+                <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 26px; font-weight: 600; line-height: 1.25; color: #08151f">O coliseu em 3D agora está em todos os replays</h2>
+                <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #34444f; max-width: 62ch">Arqueiros com arco de verdade, gás venenoso que se fecha sobre a arena e uma plateia que se levanta a cada golpe pesado. Escolha entre pixel art e 3D nas configurações do perfil.</p>
+                <a href="#" style="align-self: flex-start; font-weight: 500; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none">Ler notícia<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
+              </div>
+            </article>
+
+            <div style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px">
+              <h2 style="margin: 0; padding: 18px 24px 6px; font: 600 13px Roboto, sans-serif; letter-spacing: 0.08em; color: #56636b">ANTERIORES</h2>
+              <sc-for list="{{posts}}" as="p" hint-placeholder-count="4">
+                <a href="#" style="display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 16px 24px; border-top: 1px solid #ece1c9; text-decoration: none; color: #1b2a35">
+                  <span style="display: flex; flex-direction: column; align-items: center; line-height: 1.1">
+                    <span style="font: 600 22px 'Source Code Pro', monospace; color: #08151f">{{p.day}}</span>
+                    <span style="font-size: 12px; letter-spacing: 0.08em; color: #56636b">{{p.month}}</span>
+                  </span>
+                  <span style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+                    <span style="font-size: 16px; font-weight: 500; color: #08151f">{{p.title}}</span>
+                    <span style="font-size: 14px; color: #56636b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.excerpt}}</span>
+                  </span>
+                  <span style="height: 24px; padding: 0 10px; border-radius: 6px; background: #f0e6d2; color: #5b4a2b; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center">{{p.tag}}</span>
+                </a>
+              </sc-for>
+            </div>
+          </section>
+
+          <aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 20px" aria-label="Aguardando você">
+            <div style="background: #0b1d2b; color: #e6edf2; border-radius: 16px; padding: 22px 22px 10px; display: flex; flex-direction: column">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+                <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #f3e8d0">Aguardando você</h2>
+                <span style="font: 600 13px 'Source Code Pro', monospace; color: #f2b441">4</span>
+              </div>
+              <sc-for list="{{todo}}" as="t" hint-placeholder-count="4">
+                <div style="display: flex; gap: 12px; align-items: flex-start; padding: 14px 0; border-top: 1px solid rgba(233,214,173,0.12)">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: {{t.tint}}; color: {{t.color}}">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px"><circle cx="12" cy="12" r="4"/></svg>
+                  </span>
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 14px; line-height: 1.45; color: #e6edf2">{{t.text}}</span>
+                    <a href="#" style="align-self: flex-start; font-size: 13px; font-weight: 600; color: #f2b441; text-decoration: none">{{t.action}}</a>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+              <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.08em; color: #56636b">PRÓXIMO TORNEIO</span>
+              <span style="font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #08151f">Copa Saturnália · Rodada 2</span>
+              <div style="display: flex; align-items: baseline; gap: 8px">
+                <span style="font: 600 28px 'Source Code Pro', monospace; color: #08151f; letter-spacing: 0.02em">02:14:33</span>
+                <span style="font-size: 13px; color: #56636b">para começar</span>
+              </div>
+              <a href="#" style="height: 40px; border-radius: 8px; background: #f2b441; color: #0b1d2b; font-weight: 600; font-size: 14px; text-decoration: none; display: flex; align-items: center; justify-content: center">Ver chaveamento</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      posts: [
+        { day: '02', month: 'NOV', title: 'Poções agora valem para todos os seus gladiadores', excerpt: 'Uma encomenda no apotecário serve a qualquer gladiador seu durante a duração dela.', tag: 'Regras' },
+        { day: '24', month: 'OUT', title: 'Treinos de equipe para turmas e professores', excerpt: 'Crie um treino, convide sua turma e acompanhe as rodadas em tempo real.', tag: 'Recurso' },
+        { day: '11', month: 'OUT', title: 'Python 3.12 no motor de batalha', excerpt: 'Gladiadores em Python ganharam uma versão nova do interpretador e mais memória.', tag: 'Motor' },
+        { day: '29', month: 'SET', title: 'Resultados da Copa Equinócio', excerpt: 'Dezesseis equipes, quarenta batalhas e uma final decidida no gás venenoso.', tag: 'Torneio' }
+      ],
+      todo: [
+        { text: 'Ana_Lux desafiou você para um duelo.', action: 'Responder ao desafio', tint: 'rgba(231,239,72,0.16)', color: '#e7ef48' },
+        { text: '3 batalhas ranqueadas novas para assistir.', action: 'Abrir relatórios', tint: 'rgba(244,149,208,0.16)', color: '#f495d0' },
+        { text: 'Suas poções expiram em 3 horas.', action: 'Renovar encomenda', tint: 'rgba(139,150,227,0.18)', color: '#8b96e3' },
+        { text: 'Marco_dev quer ser seu amigo.', action: 'Ver convite', tint: 'rgba(242,135,135,0.16)', color: '#f28787' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

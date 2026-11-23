@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Poções</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="potions" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+
+        <header style="display: flex; flex-direction: column; gap: 6px">
+          <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Poções</h1>
+          <p style="margin: 0; font-size: 15px; color: #56636b; max-width: 70ch">Uma encomenda serve a todos os seus gladiadores enquanto durar, uma vez por batalha ranqueada. Cada compartimento leva uma poção.</p>
+        </header>
+
+        <section aria-label="Apotecário" style="border-radius: 18px; background: #0b1d2b; color: #e6edf2; padding: 24px 28px; display: flex; flex-direction: column; gap: 22px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px">
+            <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 4px">
+              <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #9fb3c2">APOTECÁRIO</span>
+              <span style="font-family: Cinzel, Georgia, serif; font-size: 24px; font-weight: 600; color: #f3e8d0">Nível 3 · encomendas de 6 horas</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; padding: 8px 8px 8px 18px; border-radius: 12px; background: rgba(255,255,255,0.05)">
+              <span style="display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: #9fb3c2">
+                Nível 4: encomendas de 8 h
+                <span style="display: flex; align-items: center; gap: 6px; font: 600 15px 'Source Code Pro', monospace; color: #f3e8d0"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; color: #d4d4d4"><circle cx="9" cy="9" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.3 18"/></svg>400 prata</span>
+              </span>
+              <button style="height: 40px; padding: 0 18px; border-radius: 10px; border: 0; background: #f2b441; color: #0b1d2b; font: 700 14px Roboto, sans-serif; cursor: pointer">Aprimorar</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+            <sc-for list="{{slots}}" as="s" hint-placeholder-count="4">
+              <div style="min-height: 112px; border-radius: 14px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: {{s.bg}}; border: 1px {{s.borderStyle}} {{s.border}}">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span style="width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: {{s.tint}}; color: {{s.color}}">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><path d="M10 2v7.3"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.5 16h13"/></svg>
+                  </span>
+                  <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                    <span style="font-size: 14px; font-weight: 600; color: {{s.title}}">{{s.name}}</span>
+                    <span style="font-size: 12px; color: #9fb3c2">{{s.sub}}</span>
+                  </span>
+                </div>
+                <sc-if value="{{s.timed}}" hint-placeholder-val="{{ false }}">
+                  <span style="display: flex; align-items: center; gap: 10px; margin-top: auto">
+                    <span style="flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden; display: block"><span style="display: block; height: 100%; width: {{s.left}}; background: {{s.color}}"></span></span>
+                    <span style="font: 500 12px 'Source Code Pro', monospace; color: #f6d558">{{s.time}}</span>
+                  </span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+            <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 22px; font-weight: 600; color: #08151f">Encomendar</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <button aria-pressed="true" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #0b1d2b; background: #0b1d2b; color: #f3e8d0; font: 500 13px Roboto, sans-serif; cursor: pointer">Todas</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 13px Roboto, sans-serif; cursor: pointer">Vida</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 13px Roboto, sans-serif; cursor: pointer">Habilidade</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 13px Roboto, sans-serif; cursor: pointer">Atributos</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 13px Roboto, sans-serif; cursor: pointer">Experiência</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px">
+            <sc-for list="{{shop}}" as="p" hint-placeholder-count="6">
+              <article style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; opacity: {{p.opacity}}">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span style="width: 44px; height: 44px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: {{p.tint}}; color: {{p.ink}}">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 22px; height: 22px"><path d="M10 2v7.3"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.5 16h13"/></svg>
+                  </span>
+                  <span style="display: flex; flex-direction: column; gap: 2px">
+                    <span style="font-size: 15px; font-weight: 600; color: #08151f">{{p.name}}</span>
+                    <span style="font: 500 12px 'Source Code Pro', monospace; color: #56636b">nível {{p.lvl}} · useItem("{{p.id}}")</span>
+                  </span>
+                </div>
+                <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #34444f">{{p.desc}}</p>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 4px">
+                  <span style="display: flex; align-items: center; gap: 6px; font: 600 15px 'Source Code Pro', monospace; color: #08151f"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; color: #8c8c8c"><circle cx="9" cy="9" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.3 18"/></svg>{{p.price}}</span>
+                  <button style="height: 36px; padding: 0 14px; border-radius: 9px; border: {{p.btnBorder}}; background: {{p.btnBg}}; color: {{p.btnFg}}; font: 600 13px Roboto, sans-serif; cursor: pointer">{{p.btn}}</button>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const kinds = {
+      hp: { tint: 'rgba(217,72,65,0.14)', ink: '#b3312a', color: '#e2604f' },
+      ap: { tint: 'rgba(75,123,236,0.14)', ink: '#2b56bf', color: '#4b7bec' },
+      attr: { tint: 'rgba(201,137,24,0.16)', ink: '#8c5d0b', color: '#f2b441' },
+      xp: { tint: 'rgba(181,173,40,0.2)', ink: '#6b6610', color: '#e7dd24' }
+    };
+    const slots = [
+      Object.assign({ name: 'Poção de Vida III', sub: 'Compartimento 1', timed: true, left: '78%', time: '4:41:10', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', borderStyle: 'solid', title: '#f3e8d0' }, kinds.hp, { tint: 'rgba(226,96,79,0.18)' }),
+      Object.assign({ name: 'Poção de Habilidade II', sub: 'Compartimento 2', timed: true, left: '78%', time: '4:41:10', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.08)', borderStyle: 'solid', title: '#f3e8d0' }, kinds.ap, { tint: 'rgba(75,123,236,0.2)' }),
+      { name: 'Vazio', sub: 'Escolha uma poção abaixo', timed: false, bg: 'transparent', border: 'rgba(233,214,173,0.35)', borderStyle: 'dashed', title: '#f3e8d0', tint: 'rgba(255,255,255,0.06)', color: '#9fb3c2' },
+      { name: 'Bloqueado', sub: 'Abre no nível de mestre 30', timed: false, bg: 'rgba(0,0,0,0.18)', border: 'transparent', borderStyle: 'solid', title: '#9fb3c2', tint: 'rgba(255,255,255,0.04)', color: '#6d8496' }
+    ];
+    const shop = [
+      ['hp', 'Poção de Vida III', 'hp', 3, 'Recupera parte dos pontos de vida na hora.', '120'],
+      ['ap', 'Poção de Habilidade III', 'ap', 3, 'Recupera parte dos pontos de habilidade na hora.', '120'],
+      ['attr', 'Tônico do Atributo Forte', 'high', 2, 'Reforça o maior atributo do gladiador nesta batalha.', '180'],
+      ['attr', 'Tônico do Atributo Fraco', 'low', 2, 'Reforça o menor atributo do gladiador nesta batalha.', '180'],
+      ['xp', 'Poção de Experiência', 'xp', 2, 'Concede experiência ao gladiador na hora.', '260'],
+      ['hp', 'Poção de Vida IV', 'hp', 4, 'Recupera mais pontos de vida que a de nível III.', '200', true]
+    ];
+    return {
+      slots,
+      shop: shop.map(([k, name, id, lvl, desc, price, locked]) => Object.assign({ name, id, lvl, desc, price }, kinds[k], {
+        opacity: locked ? '0.72' : '1',
+        btn: locked ? 'Apotecário nível 4' : 'Encomendar',
+        btnBg: locked ? 'transparent' : '#0b1d2b',
+        btnFg: locked ? '#56636b' : '#f3e8d0',
+        btnBorder: locked ? '1px solid #cdb98f' : '0'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

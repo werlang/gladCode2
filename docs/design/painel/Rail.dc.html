@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Menu do painel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<nav aria-label="Painel" style="width: 264px; min-height: {{height}}px; box-sizing: border-box; padding: 20px 14px 18px; display: flex; flex-direction: column; gap: 4px; background: {{t.bg}}; font-family: Roboto, system-ui, sans-serif; color: {{t.label}}">
+
+  <a href="#" aria-current="{{s.profile.cur}}" style="display: flex; flex-direction: column; gap: 12px; padding: 14px; margin-bottom: 14px; border-radius: 14px; text-decoration: none; color: {{t.strong}}; background: {{s.profile.card}}; box-shadow: inset 0 0 0 1px {{s.profile.ring}}">
+    <span style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: #e9d6ad; flex: none; box-shadow: 0 0 0 2px {{t.bg}}, 0 0 0 4px #f4cd82">
+        <img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="" style="width: 48px; height: 96px; object-fit: cover; object-position: top; display: block">
+      </span>
+      <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1">
+        <span style="font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Spartacus_C</span>
+        <span style="font-size: 13px; color: {{t.muted}}">Mestre nível 23</span>
+      </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex: none; fill: none; stroke: {{t.muted}}; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+    </span>
+    <span style="display: flex; flex-direction: column; gap: 6px">
+      <span style="height: 6px; border-radius: 3px; background: {{t.track}}; overflow: hidden; display: block">
+        <span style="display: block; width: 62%; height: 100%; border-radius: 3px; background: #e7dd24"></span>
+      </span>
+      <span style="display: flex; justify-content: space-between; font: 500 11px 'Source Code Pro', monospace; color: {{t.muted}}">
+        <span>1.240 / 2.000 XP</span><span>nível 24</span>
+      </span>
+    </span>
+    <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Perfil</span>
+  </a>
+
+  <a href="#" aria-current="{{s.news.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.news.w}}; color: {{s.news.label}}; background: {{s.news.bg}}; box-shadow: inset 0 0 0 1px {{s.news.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(142,220,150,0.15); color: #8edc96">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg>
+    </span>
+    <span style="flex: 1">Notícias</span>
+    <span style="height: 20px; padding: 0 7px; border-radius: 10px; background: {{t.unread}}; color: {{t.strong}}; font: 600 11px Roboto, sans-serif; display: flex; align-items: center">1 nova</span>
+  </a>
+
+  <span style="margin: 18px 10px 6px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.14em; color: {{t.group}}">PREPARAÇÃO</span>
+
+  <a href="#" aria-current="{{s.glads.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.glads.w}}; color: {{s.glads.label}}; background: {{s.glads.bg}}; box-shadow: inset 0 0 0 1px {{s.glads.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(236,149,244,0.15); color: #ec95f4">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 13a8 8 0 0 1 16 0v7h-5v-5l-3-2-3 2v5H4z"/><path d="M12 5c1-2 3-3 6-3"/><path d="M9 13h6"/></svg>
+    </span>
+    <span style="flex: 1">Gladiadores</span>
+    <span style="font: 500 12px 'Source Code Pro', monospace; color: {{t.muted}}">4/6</span>
+  </a>
+
+  <a href="#" aria-current="{{s.potions.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.potions.w}}; color: {{s.potions.label}}; background: {{s.potions.bg}}; box-shadow: inset 0 0 0 1px {{s.potions.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(139,150,227,0.18); color: #a3acef">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 2v7.3"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.5 16h13"/></svg>
+    </span>
+    <span style="flex: 1">Poções</span>
+    <span style="display: flex; align-items: center; gap: 4px; font: 500 12px 'Source Code Pro', monospace; color: {{t.warn}}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>3 h
+    </span>
+  </a>
+
+  <span style="margin: 18px 10px 6px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.14em; color: {{t.group}}">ARENA</span>
+
+  <a href="#" aria-current="{{s.battle.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.battle.w}}; color: {{s.battle.label}}; background: {{s.battle.bg}}; box-shadow: inset 0 0 0 1px {{s.battle.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(231,239,72,0.14); color: #e7ef48">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg>
+    </span>
+    <span style="flex: 1">Batalhas</span>
+    <span title="1 desafio de duelo" style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #f2b441; color: #0b1d2b; font: 700 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">1</span>
+  </a>
+
+  <a href="#" aria-current="{{s.report.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.report.w}}; color: {{s.report.label}}; background: {{s.report.bg}}; box-shadow: inset 0 0 0 1px {{s.report.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(244,149,208,0.15); color: #f495d0">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
+    </span>
+    <span style="flex: 1">Relatórios</span>
+    <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: {{t.unread}}; color: {{t.strong}}; font: 600 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">3</span>
+  </a>
+
+  <a href="#" aria-current="{{s.ranking.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.ranking.w}}; color: {{s.ranking.label}}; background: {{s.ranking.bg}}; box-shadow: inset 0 0 0 1px {{s.ranking.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(212,212,212,0.14); color: #d4d4d4">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0z"/></svg>
+    </span>
+    <span style="flex: 1">Ranking</span>
+    <span style="font: 500 12px 'Source Code Pro', monospace; color: {{t.muted}}">#128</span>
+  </a>
+
+  <span style="margin: 18px 10px 6px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.14em; color: {{t.group}}">COMUNIDADE</span>
+
+  <a href="#" aria-current="{{s.messages.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.messages.w}}; color: {{s.messages.label}}; background: {{s.messages.bg}}; box-shadow: inset 0 0 0 1px {{s.messages.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(100,204,204,0.15); color: #64cccc">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </span>
+    <span style="flex: 1">Mensagens</span>
+    <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: {{t.unread}}; color: {{t.strong}}; font: 600 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">2</span>
+  </a>
+
+  <a href="#" aria-current="{{s.friends.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 10px; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: {{s.friends.w}}; color: {{s.friends.label}}; background: {{s.friends.bg}}; box-shadow: inset 0 0 0 1px {{s.friends.ring}}">
+    <span style="width: 30px; height: 30px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(242,135,135,0.15); color: #f28787">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+    </span>
+    <span style="flex: 1">Amigos</span>
+    <span title="1 convite de amizade" style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #f2b441; color: #0b1d2b; font: 700 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">1</span>
+  </a>
+
+  <div style="margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; gap: 12px">
+    <a href="#" style="height: 44px; border-radius: 10px; border: 1px dashed {{t.dash}}; color: {{t.strong}}; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px">
+      <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      Novo gladiador
+    </a>
+    <span style="display: flex; justify-content: space-between; padding: 0 6px; font-size: 12px; color: {{t.group}}">
+      <span>Atalhos: <kbd style="font: 600 11px 'Source Code Pro', monospace; color: {{t.muted}}">G</kbd> + inicial</span>
+      <span style="font-family: 'Source Code Pro', monospace">motor v2.6</span>
+    </span>
+  </div>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["profile","news","glads","potions","battle","report","ranking","messages","friends"],"default":"news"},"theme":{"editor":"enum","options":["arena","dark","classic"],"default":"arena"},"height":{"editor":"int","default":960,"min":600,"max":1400},"$preview":{"width":264,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const active = this.props.active ?? 'news';
+    const classic = (this.props.theme ?? 'arena') === 'classic';
+    const t = classic ? {
+      bg: '#004e70', label: '#e3f1f7', strong: '#ffffff', muted: '#b9dcea', group: '#a9d3e4',
+      track: 'rgba(0,0,0,0.25)', unread: 'rgba(255,255,255,0.2)', warn: '#ffe08a', dash: 'rgba(255,255,255,0.35)',
+      activeBg: 'rgba(255,255,255,0.14)', activeRing: 'rgba(255,255,255,0.5)', card: 'rgba(255,255,255,0.07)'
+    } : {
+      bg: '#0b1d2b', label: '#d3dde4', strong: '#ffffff', muted: '#9fb3c2', group: '#8399aa',
+      track: 'rgba(255,255,255,0.10)', unread: 'rgba(255,255,255,0.14)', warn: '#f6d558', dash: 'rgba(233,214,173,0.32)',
+      activeBg: 'rgba(233,214,173,0.10)', activeRing: 'rgba(242,180,65,0.45)', card: 'rgba(255,255,255,0.04)'
+    };
+    const ids = ['profile', 'news', 'glads', 'potions', 'battle', 'report', 'ranking', 'messages', 'friends'];
+    const s = {};
+    ids.forEach((id) => {
+      const on = id === active;
+      s[id] = {
+        cur: on ? 'page' : 'false',
+        w: on ? 600 : 500,
+        label: on ? t.strong : t.label,
+        bg: on ? t.activeBg : 'transparent',
+        ring: on ? t.activeRing : 'transparent',
+        card: on ? t.activeBg : t.card
+      };
+    });
+    return { t, s, height: this.props.height ?? 960 };
+  }
+}
+</script>
+</body>
+</html>

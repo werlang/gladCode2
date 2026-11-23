@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cabeçalho: temas e estados</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ece4d3}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1100px; box-sizing: border-box; background: #ece4d3; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column; gap: 22px; padding: 36px 0 40px; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <span style="padding: 0 40px; font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">ARENA CLARO E ARENA ESCURO · A MESMA MOLDURA DE TINTA</span>
+    <dc-import name="Header" active="painel" theme="arena" hint-size="100%,64px"></dc-import>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <span style="padding: 0 40px; font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">CLÁSSICO · AZUL DA MARCA</span>
+    <dc-import name="Header" active="editor" theme="classic" hint-size="100%,64px"></dc-import>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <span style="padding: 0 40px; font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">VISITANTE · SEM LOGIN</span>
+    <dc-import name="Header" active="aprender" theme="arena" signed-in="{{ false }}" hint-size="100%,64px"></dc-import>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding: 14px 40px 0; align-items: start">
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">MENU DA CONTA (AVATAR)</span>
+      <div style="width: 320px; border-radius: 16px; background: #0b1d2b; color: #e6edf2; box-shadow: 0 24px 60px -24px rgba(8,21,31,0.7); overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px">
+          <span style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: #e9d6ad; flex: none"><img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="" style="width: 44px; height: 88px; object-fit: cover; object-position: top; display: block"></span>
+          <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 15px; color: #ffffff">Spartacus_C</span><span style="font-size: 13px; color: #9fb3c2">Nível 23 · 1.250 de prata</span></span>
+        </div>
+        <div style="padding: 6px; border-top: 1px solid rgba(233,214,173,0.12); display: flex; flex-direction: column">
+          <a href="#" style="height: 42px; padding: 0 12px; border-radius: 9px; display: flex; align-items: center; gap: 12px; color: #e6edf2; text-decoration: none; font-size: 14px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: #9fb3c2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil e ajustes</a>
+          <a href="#" style="height: 42px; padding: 0 12px; border-radius: 9px; display: flex; align-items: center; gap: 12px; color: #e6edf2; text-decoration: none; font-size: 14px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color: #9fb3c2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>Atalhos do teclado<kbd style="margin-left: auto; font: 600 11px 'Source Code Pro', monospace; color: #9fb3c2">?</kbd></a>
+        </div>
+        <div style="padding: 12px 18px 16px; border-top: 1px solid rgba(233,214,173,0.12); display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 12px; color: #9fb3c2">Tema</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+            <button aria-pressed="true" style="height: 34px; border-radius: 8px; border: 1px solid #f2b441; background: rgba(242,180,65,0.12); color: #f3e8d0; font: 500 12px Roboto, sans-serif; cursor: pointer">Claro</button>
+            <button aria-pressed="false" style="height: 34px; border-radius: 8px; border: 1px solid rgba(233,214,173,0.2); background: transparent; color: #c7d3db; font: 500 12px Roboto, sans-serif; cursor: pointer">Escuro</button>
+            <button aria-pressed="false" style="height: 34px; border-radius: 8px; border: 1px solid rgba(233,214,173,0.2); background: transparent; color: #c7d3db; font: 500 12px Roboto, sans-serif; cursor: pointer">Clássico</button>
+          </div>
+        </div>
+        <div style="padding: 6px; border-top: 1px solid rgba(233,214,173,0.12)">
+          <button style="width: 100%; height: 42px; padding: 0 12px; border-radius: 9px; border: 0; background: transparent; display: flex; align-items: center; gap: 12px; color: #f28787; font: 500 14px Roboto, sans-serif; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Sair</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">NOTIFICAÇÕES (SINO)</span>
+      <div style="width: 380px; border-radius: 16px; background: #fffdf8; border: 1px solid #dfd0b2; box-shadow: 0 24px 60px -24px rgba(60,40,10,0.45); overflow: hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid #ece1c9">
+          <span style="font-weight: 600; font-size: 15px; color: #08151f">Notificações</span>
+          <a href="#" style="font-size: 13px; text-decoration: none">Marcar como lidas</a>
+        </div>
+        <span style="display: block; padding: 12px 18px 4px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.12em; color: #8c5d0b">PRECISA DE VOCÊ</span>
+        <sc-for list="{{needs}}" as="n" hint-placeholder-count="2">
+          <a href="#" style="display: flex; gap: 12px; padding: 12px 18px; text-decoration: none; color: #1b2a35; background: #fff7e3">
+            <span style="width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: #c98918; flex: none; display: block"></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; line-height: 1.4">{{n.text}}</span><span style="font-size: 12px; color: #56636b">{{n.where}}</span></span>
+          </a>
+        </sc-for>
+        <span style="display: block; padding: 14px 18px 4px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">NOVIDADES</span>
+        <sc-for list="{{news}}" as="n" hint-placeholder-count="2">
+          <a href="#" style="display: flex; gap: 12px; padding: 12px 18px; text-decoration: none; color: #1b2a35">
+            <span style="width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: #9f8964; flex: none; display: block"></span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; line-height: 1.4">{{n.text}}</span><span style="font-size: 12px; color: #56636b">{{n.where}}</span></span>
+          </a>
+        </sc-for>
+        <div style="height: 8px"></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">BUSCA GLOBAL (CTRL K)</span>
+      <div style="width: 400px; border-radius: 16px; background: #0b1d2b; color: #e6edf2; box-shadow: 0 24px 60px -24px rgba(8,21,31,0.7); overflow: hidden">
+        <label style="display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 56px; border-bottom: 1px solid rgba(233,214,173,0.12); color: #9fb3c2">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" aria-label="Buscar" value="rel" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 400 16px Roboto, sans-serif; color: #ffffff">
+          <kbd style="font: 600 11px 'Source Code Pro', monospace; color: #9fb3c2">Esc</kbd>
+        </label>
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <div style="padding: 8px 8px 4px">
+            <span style="display: block; padding: 6px 10px; font: 600 11px Roboto, sans-serif; letter-spacing: 0.12em; color: #8399aa">{{g.title}}</span>
+            <sc-for list="{{g.items}}" as="r" hint-placeholder-count="2">
+              <a href="#" style="height: 40px; padding: 0 10px; border-radius: 9px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #e6edf2; font-size: 14px; background: {{r.bg}}; box-shadow: inset 0 0 0 1px {{r.ring}}">
+                <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.label}} <span style="color: #9fb3c2">{{r.sub}}</span></span>
+                <kbd style="font: 600 11px 'Source Code Pro', monospace; color: #9fb3c2">{{r.key}}</kbd>
+              </a>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="height: 8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const plain = { bg: 'transparent', ring: 'transparent' };
+    return {
+      needs: [
+        { text: 'Ana_Lux desafiou você para um duelo', where: 'Batalhas · há 12 min' },
+        { text: 'Marco_dev quer ser seu amigo', where: 'Amigos · há 1 h' }
+      ],
+      news: [
+        { text: 'Magnus venceu uma batalha ranqueada: 1º de 5, +12 de renome', where: 'Relatórios · há 8 min' },
+        { text: 'O coliseu em 3D agora está em todos os replays', where: 'Notícias · 18 nov' }
+      ],
+      groups: [
+        { title: 'IR PARA', items: [
+          { label: 'Relatórios', sub: '', key: 'G R', bg: 'rgba(233,214,173,0.10)', ring: 'rgba(242,180,65,0.45)' }
+        ] },
+        { title: 'GLADIADORES E MESTRES', items: [
+          Object.assign({ label: 'Relâmpago', sub: 'de bytewolf · #42', key: '' }, plain),
+          Object.assign({ label: 'relic_hunter', sub: 'mestre nível 18', key: '' }, plain)
+        ] },
+        { title: 'DOCUMENTAÇÃO', items: [
+          Object.assign({ label: 'Replays e relatórios', sub: 'Manual', key: '' }, plain)
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

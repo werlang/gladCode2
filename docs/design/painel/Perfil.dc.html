@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Perfil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="profile" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 0; box-sizing: border-box; display: flex; flex-direction: column">
+      <div style="max-width: 920px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; flex: 1">
+
+        <section style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; padding: 28px; border-radius: 18px; background: #0b1d2b; color: #e6edf2">
+          <div style="position: relative; flex: none">
+            <span style="width: 104px; height: 104px; border-radius: 50%; overflow: hidden; background: #e9d6ad; display: block; box-shadow: 0 0 0 4px #0b1d2b, 0 0 0 6px #f4cd82">
+              <img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="Foto de perfil" style="width: 104px; height: 208px; object-fit: cover; object-position: top; display: block">
+            </span>
+            <button aria-label="Trocar foto" style="position: absolute; right: -4px; bottom: -4px; width: 36px; height: 36px; border-radius: 50%; border: 3px solid #0b1d2b; background: #f2b441; color: #0b1d2b; display: flex; align-items: center; justify-content: center; cursor: pointer">
+              <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </button>
+          </div>
+          <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; min-width: 0">
+            <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 30px; font-weight: 600; color: #f3e8d0">Spartacus_C</h1>
+            <span style="font-size: 14px; color: #9fb3c2">Mestre nível 23 · na gladCode desde março de 2019</span>
+            <span style="display: flex; align-items: center; gap: 12px; max-width: 420px">
+              <span style="flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; display: block"><span style="display: block; width: 62%; height: 100%; background: #e7dd24; border-radius: 4px"></span></span>
+              <span style="font: 500 12px 'Source Code Pro', monospace; color: #9fb3c2; white-space: nowrap">760 XP para o nível 24</span>
+            </span>
+          </div>
+          <dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; flex: 1 1 300px">
+            <div style="padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.05)"><dt style="font-size: 12px; color: #9fb3c2">Batalhas</dt><dd style="margin: 4px 0 0; font: 600 22px 'Source Code Pro', monospace; color: #f3e8d0">482</dd></div>
+            <div style="padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.05)"><dt style="font-size: 12px; color: #9fb3c2">Vitórias</dt><dd style="margin: 4px 0 0; font: 600 22px 'Source Code Pro', monospace; color: #f3e8d0">61%</dd></div>
+            <div style="padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.05)"><dt style="font-size: 12px; color: #9fb3c2">Renome</dt><dd style="margin: 4px 0 0; font: 600 22px 'Source Code Pro', monospace; color: #f3e8d0">1.482</dd></div>
+          </dl>
+        </section>
+
+        <section style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px">
+          <h2 style="margin: 0; padding: 20px 28px; font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #08151f; border-bottom: 1px solid #ece1c9">Identidade</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px 32px; padding: 22px 28px">
+            <div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 4px">
+              <label for="nick" style="font-weight: 500; font-size: 15px; color: #08151f">Apelido</label>
+              <span style="font-size: 13px; line-height: 1.5; color: #56636b">Aparece nas batalhas e no ranking: seus gladiadores lutam como <span style="font-family: 'Source Code Pro', monospace; color: #1b2a35">Nome@Spartacus_C</span>.</span>
+            </div>
+            <div style="flex: 2 1 320px; display: flex; flex-direction: column; gap: 6px">
+              <input id="nick" value="Spartacus_C" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #9f8964; background: #ffffff; font: 400 15px Roboto, sans-serif; color: #1b2a35; box-sizing: border-box">
+              <span style="font-size: 13px; color: #2e6b3e; display: flex; align-items: center; gap: 6px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px"><path d="M20 6 9 17l-5-5"/></svg>Disponível · salva quando você sai do campo</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px 32px; padding: 22px 28px; border-top: 1px solid #ece1c9">
+            <div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 4px">
+              <span style="font-weight: 500; font-size: 15px; color: #08151f">Linguagem padrão</span>
+              <span style="font-size: 13px; line-height: 1.5; color: #56636b">Com qual linguagem o editor abre um gladiador novo.</span>
+            </div>
+            <fieldset style="flex: 2 1 320px; margin: 0; padding: 4px; border: 1px solid #dfd0b2; border-radius: 12px; background: #f0e6d2; display: flex; gap: 4px; align-self: flex-start">
+              <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Linguagem padrão</legend>
+              <button aria-pressed="true" style="flex: 1; height: 38px; border: 0; border-radius: 9px; background: #ffffff; box-shadow: 0 1px 3px rgba(60,40,10,0.18); font: 600 14px 'Source Code Pro', monospace; color: #08151f; cursor: pointer">C</button>
+              <button aria-pressed="false" style="flex: 1; height: 38px; border: 0; border-radius: 9px; background: transparent; font: 500 14px 'Source Code Pro', monospace; color: #56636b; cursor: pointer">Python</button>
+              <button aria-pressed="false" style="flex: 1; height: 38px; border: 0; border-radius: 9px; background: transparent; font: 500 14px Roboto, sans-serif; color: #56636b; cursor: pointer">Blocos</button>
+            </fieldset>
+          </div>
+        </section>
+
+        <section style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px">
+          <h2 style="margin: 0; padding: 20px 28px; font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #08151f; border-bottom: 1px solid #ece1c9">Aparência</h2>
+          <fieldset style="margin: 0; border: 0; padding: 22px 28px; display: flex; flex-direction: column; gap: 14px; position: relative">
+            <legend style="float: left; padding: 0; font-weight: 500; font-size: 15px; color: #08151f">Tema do site</legend>
+            <span role="status" style="position: absolute; right: 28px; top: 20px; height: 24px; padding: 0 10px; border-radius: 12px; background: #e3f1e6; color: #235c33; font: 600 12px Roboto, sans-serif; display: inline-flex; align-items: center; gap: 6px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px; stroke-width: 3"><path d="M20 6 9 17l-5-5"/></svg>Salvo</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; clear: both">
+              <button aria-pressed="true" style="padding: 0; border-radius: 12px; border: 2px solid #c98918; background: #fffdf8; overflow: hidden; text-align: left; cursor: pointer; box-shadow: 0 0 0 4px rgba(242,180,65,0.22)">
+                <span style="display: block; height: 84px; background: #f5efe2; position: relative">
+                  <span style="position: absolute; inset: 0 0 auto 0; height: 14px; background: #08151f; display: block"></span>
+                  <span style="position: absolute; left: 0; top: 14px; bottom: 0; width: 34px; background: #0b1d2b; display: block"></span>
+                  <span style="position: absolute; left: 44px; top: 26px; right: 12px; height: 40px; border-radius: 6px; background: #fffdf8; border: 1px solid #dfd0b2; display: block"></span>
+                  <span style="position: absolute; right: 18px; top: 48px; width: 26px; height: 10px; border-radius: 3px; background: #f2b441; display: block"></span>
+                </span>
+                <span style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; font: 600 14px Roboto, sans-serif; color: #08151f">Arena claro<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; color: #c98918"><path d="M20 6 9 17l-5-5"/></svg></span>
+              </button>
+              <button aria-pressed="false" style="padding: 0; border-radius: 12px; border: 1px solid #dfd0b2; background: #fffdf8; overflow: hidden; text-align: left; cursor: pointer">
+                <span style="display: block; height: 84px; background: #10283a; position: relative">
+                  <span style="position: absolute; inset: 0 0 auto 0; height: 14px; background: #08151f; display: block"></span>
+                  <span style="position: absolute; left: 0; top: 14px; bottom: 0; width: 34px; background: #0b1d2b; display: block"></span>
+                  <span style="position: absolute; left: 44px; top: 26px; right: 12px; height: 40px; border-radius: 6px; background: #173650; display: block"></span>
+                  <span style="position: absolute; right: 18px; top: 48px; width: 26px; height: 10px; border-radius: 3px; background: #f2b441; display: block"></span>
+                </span>
+                <span style="display: block; padding: 10px 12px; font: 500 14px Roboto, sans-serif; color: #1b2a35">Arena escuro</span>
+              </button>
+              <button aria-pressed="false" style="padding: 0; border-radius: 12px; border: 1px solid #dfd0b2; background: #fffdf8; overflow: hidden; text-align: left; cursor: pointer">
+                <span style="display: block; height: 84px; background: #edf1f3; position: relative">
+                  <span style="position: absolute; inset: 0 0 auto 0; height: 14px; background: #00638d; display: block"></span>
+                  <span style="position: absolute; left: 0; top: 14px; bottom: 0; width: 34px; background: #004e70; display: block"></span>
+                  <span style="position: absolute; left: 44px; top: 26px; right: 12px; height: 40px; border-radius: 6px; background: #ffffff; border: 1px solid #d5dde1; display: block"></span>
+                  <span style="position: absolute; right: 18px; top: 48px; width: 26px; height: 10px; border-radius: 3px; background: #00638d; display: block"></span>
+                </span>
+                <span style="display: block; padding: 10px 12px; font: 500 14px Roboto, sans-serif; color: #1b2a35">Clássico</span>
+              </button>
+            </div>
+            <span style="font-size: 13px; color: #56636b">Enquanto você não escolher, seguimos o tema claro ou escuro do seu sistema.</span>
+          </fieldset>
+          <fieldset style="margin: 0; border: 0; border-top: 1px solid #ece1c9; padding: 22px 28px; display: flex; flex-direction: column; gap: 14px; position: relative">
+            <legend style="float: left; padding: 0; font-weight: 500; font-size: 15px; color: #08151f">Como os gladiadores aparecem</legend>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; clear: both">
+              <button aria-pressed="true" style="display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; border: 2px solid #c98918; background: #fffdf8; text-align: left; cursor: pointer; box-shadow: 0 0 0 4px rgba(242,180,65,0.22)">
+                <span style="width: 64px; height: 64px; border-radius: 10px; background: #e9d6ad; overflow: hidden; flex: none; display: flex; justify-content: center"><img src="/_blob/808e23a5fd941a8f721726e2db3a58f0" alt="" style="height: 120px; margin-top: -2px"></span>
+                <span style="display: flex; flex-direction: column; gap: 3px"><span style="font: 600 15px Roboto, sans-serif; color: #08151f">Coliseu 3D</span><span style="font-size: 13px; color: #56636b">Cartas, editor e replays em 3D</span></span>
+              </button>
+              <button aria-pressed="false" style="display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; border: 1px solid #dfd0b2; background: #fffdf8; text-align: left; cursor: pointer">
+                <span style="width: 64px; height: 64px; border-radius: 10px; background: #f0e6d2; flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 12px; box-sizing: border-box">
+                  <span style="background: #6d4c39"></span><span style="background: #c98918"></span><span style="background: #c98918"></span><span style="background: #6d4c39"></span>
+                  <span style="background: #e1c19a"></span><span style="background: #1b2a35"></span><span style="background: #1b2a35"></span><span style="background: #e1c19a"></span>
+                  <span style="background: #c4412f"></span><span style="background: #c4412f"></span><span style="background: #c4412f"></span><span style="background: #c4412f"></span>
+                  <span style="background: #5b4a2b"></span><span></span><span></span><span style="background: #5b4a2b"></span>
+                </span>
+                <span style="display: flex; flex-direction: column; gap: 3px"><span style="font: 500 15px Roboto, sans-serif; color: #1b2a35">Pixel art</span><span style="font-size: 13px; color: #56636b">O visual clássico, mais leve</span></span>
+              </button>
+            </div>
+          </fieldset>
+        </section>
+
+        <section style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px">
+          <h2 style="margin: 0; padding: 20px 28px; font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #08151f; border-bottom: 1px solid #ece1c9">Avisos por e-mail</h2>
+          <sc-for list="{{mails}}" as="m" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 16px; padding: 14px 28px; border-top: 1px solid {{m.line}}">
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 15px; color: #1b2a35">{{m.label}}</span>
+                <span style="font-size: 13px; color: #56636b">{{m.hint}}</span>
+              </span>
+              <button role="switch" aria-checked="{{m.checked}}" aria-label="{{m.label}}" style="width: 48px; height: 28px; border-radius: 14px; border: 0; padding: 3px; background: {{m.track}}; display: flex; justify-content: {{m.side}}; cursor: pointer">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: block"></span>
+              </button>
+            </div>
+          </sc-for>
+        </section>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 4px 40px">
+          <span style="font-size: 13px; color: #56636b; display: flex; align-items: center; gap: 8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/><path d="m9 14 2 2 4-4"/></svg>Tudo que você muda aqui é salvo na hora.</span>
+          <div role="status" style="display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 16px; border-radius: 12px; background: #0b1d2b; color: #e6edf2; box-shadow: 0 16px 40px -16px rgba(11,29,43,0.6); font-size: 14px">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(79,212,106,0.18); color: #8be39d; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; stroke-width: 3"><path d="M20 6 9 17l-5-5"/></svg></span>
+            Tema alterado para Arena claro
+            <button style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(233,214,173,0.3); background: transparent; color: #f2b441; font: 600 13px Roboto, sans-serif; cursor: pointer">Desfazer</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const rows = [
+      ['Mensagens recebidas', 'Quando outro mestre escrever para você', true],
+      ['Desafios de duelo', 'Quando um amigo desafiar você', true],
+      ['Convites de amizade', 'Quando alguém quiser ser seu amigo', false],
+      ['Novidades da gladCode', 'Atualizações do motor e torneios abertos', true]
+    ];
+    return {
+      mails: rows.map(([label, hint, on], i) => ({
+        label, hint,
+        checked: on ? 'true' : 'false',
+        track: on ? '#00638d' : '#b9ab8c',
+        side: on ? 'flex-end' : 'flex-start',
+        line: i === 0 ? 'transparent' : '#ece1c9'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

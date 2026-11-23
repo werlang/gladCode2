@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mensagens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="messages" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 48px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+        <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+          <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Mensagens</h1>
+          <button style="height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: #f2b441; color: #0b1d2b; font: 700 14px Roboto, sans-serif; display: flex; align-items: center; gap: 8px; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>Nova mensagem</button>
+        </header>
+
+        <div style="display: flex; flex-wrap: wrap; min-height: 780px; background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 18px; overflow: hidden">
+          <section aria-label="Conversas" style="flex: 1 1 300px; max-width: 360px; min-width: 0; border-right: 1px solid #ece1c9; display: flex; flex-direction: column">
+            <div style="padding: 16px">
+              <label style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px; background: #f0e6d2; color: #56636b">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" aria-label="Buscar conversas" placeholder="Buscar conversas" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 400 14px Roboto, sans-serif; color: #1b2a35">
+              </label>
+            </div>
+            <sc-for list="{{threads}}" as="c" hint-placeholder-count="6">
+              <a href="#" aria-current="{{c.cur}}" style="display: flex; gap: 12px; padding: 14px 16px; text-decoration: none; color: #1b2a35; background: {{c.bg}}; border-top: 1px solid #f0e6d2">
+                <span style="width: 42px; height: 42px; border-radius: 50%; flex: none; background: {{c.avBg}}; color: #0b1d2b; font: 700 15px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">{{c.ini}}</span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+                  <span style="display: flex; justify-content: space-between; gap: 8px">
+                    <span style="font-size: 15px; font-weight: {{c.weight}}; color: #08151f">{{c.name}}</span>
+                    <span style="font-size: 12px; color: #56636b; white-space: nowrap">{{c.when}}</span>
+                  </span>
+                  <span style="display: flex; justify-content: space-between; gap: 8px; align-items: center">
+                    <span style="font-size: 13px; color: {{c.snipColor}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.snip}}</span>
+                    <sc-if value="{{c.unread}}" hint-placeholder-val="{{ false }}">
+                      <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #0b1d2b; color: #ffffff; font: 600 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center; flex: none">{{c.count}}</span>
+                    </sc-if>
+                  </span>
+                </span>
+              </a>
+            </sc-for>
+          </section>
+
+          <section aria-label="Conversa com Ana_Lux" style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #ece1c9">
+              <span style="width: 40px; height: 40px; border-radius: 50%; background: #64cccc; color: #0b1d2b; font: 700 15px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">AL</span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 600; font-size: 16px; color: #08151f">Ana_Lux</span>
+                <span style="font-size: 13px; color: #235c33; display: flex; align-items: center; gap: 6px"><span style="width: 7px; height: 7px; border-radius: 50%; background: #3d9a57; display: block"></span>Online agora</span>
+              </span>
+              <a href="#" style="height: 36px; padding: 0 12px; border-radius: 9px; border: 1px solid #cdb98f; color: #1b2a35; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/></svg>Desafiar</a>
+              <button aria-label="Mais opções" style="width: 36px; height: 36px; border-radius: 9px; border: 1px solid #dfd0b2; background: transparent; color: #56636b; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+            </div>
+
+            <div style="flex: 1; padding: 24px 24px 12px; display: flex; flex-direction: column; gap: 10px; background: #fbf6ea">
+              <span style="align-self: center; font-size: 12px; color: #56636b; padding: 4px 10px; border-radius: 10px; background: #f0e6d2">Hoje</span>
+              <p style="margin: 0; align-self: flex-start; max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 14px 4px; background: #ffffff; border: 1px solid #e7dbc1; font-size: 15px; line-height: 1.5">Vi o Magnus subir no ranking! Você mudou a lógica de fuga do gás?</p>
+              <p style="margin: 0; align-self: flex-end; max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: #0b1d2b; color: #f3e8d0; font-size: 15px; line-height: 1.5">Mudei: agora ele mede a distância até o centro antes de atacar. Olha essa:</p>
+              <a href="#" style="align-self: flex-end; width: 320px; max-width: 80%; border-radius: 14px; overflow: hidden; background: #0b1d2b; color: #f3e8d0; text-decoration: none; display: flex; flex-direction: column">
+                <img src="/_blob/d89bf1c365fdc3e2aaa68ebc54f271ea" alt="Prévia do replay" style="width: 100%; height: 120px; object-fit: cover; display: block">
+                <span style="padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+                  <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Magnus · 1º de 5</span><span style="font-size: 12px; color: #9fb3c2">Batalha ranqueada · há 8 min</span></span>
+                  <span style="height: 30px; padding: 0 10px; border-radius: 8px; background: #f2b441; color: #0b1d2b; font-size: 13px; font-weight: 700; display: flex; align-items: center">Assistir</span>
+                </span>
+              </a>
+              <p style="margin: 0; align-self: flex-start; max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 14px 4px; background: #ffffff; border: 1px solid #e7dbc1; font-size: 15px; line-height: 1.5">Boa! Te mandei um desafio com a Ligeira. Quero ver ela escapar disso.</p>
+              <span style="align-self: flex-start; font-size: 12px; color: #56636b">14:32</span>
+            </div>
+
+            <form style="display: flex; align-items: flex-end; gap: 10px; padding: 14px 16px; border-top: 1px solid #ece1c9">
+              <label for="msg" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Mensagem</label>
+              <textarea id="msg" rows="2" placeholder="Escreva para Ana_Lux" style="flex: 1; resize: none; padding: 10px 14px; border-radius: 12px; border: 1px solid #9f8964; background: #ffffff; font: 400 15px Roboto, sans-serif; color: #1b2a35; box-sizing: border-box"></textarea>
+              <button type="submit" style="height: 46px; padding: 0 18px; border-radius: 12px; border: 0; background: #f2b441; color: #0b1d2b; font: 700 14px Roboto, sans-serif; display: flex; align-items: center; gap: 8px; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Enviar</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const raw = [
+      ['AL', 'Ana_Lux', 'Boa! Te mandei um desafio com a Ligeira.', '14:32', 2, true, '#64cccc'],
+      ['PH', 'Prof.Helena', 'A rodada 3 do treino começa amanhã às 10h.', '11:05', 0, false, '#f4cd82'],
+      ['MD', 'Marco_dev', 'Como você faz o arqueiro mirar no mais fraco?', 'ontem', 0, false, '#ec95f4'],
+      ['BW', 'bytewolf', 'gg, aquele fireball no final foi lindo', 'seg', 0, false, '#8edc96'],
+      ['GK', 'gutoK', 'Bora montar equipe pra Copa Saturnália?', '17 nov', 0, false, '#8b96e3'],
+      ['GC', 'gladCode', 'Bem-vindo à gladCode! Comece pelo editor.', 'mar 2019', 0, false, '#e9d6ad']
+    ];
+    return {
+      threads: raw.map(([ini, name, snip, when, count, cur, avBg], i) => ({
+        ini, name, snip, when, count, avBg,
+        unread: count > 0,
+        cur: cur ? 'page' : 'false',
+        bg: cur ? '#f0e6d2' : 'transparent',
+        weight: count > 0 ? 700 : 500,
+        snipColor: count > 0 ? '#1b2a35' : '#56636b'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

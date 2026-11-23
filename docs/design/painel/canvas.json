@@ -1,0 +1,28 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-11-23T12:00:00Z"},
+  "title": "gladCode Navigation Reimagined",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 1800, "w": 1440, "h": 1240, "title": "Notícias", "expand": "fill"},
+    "Perfil.dc.html": {"x": 1520, "y": 1800, "w": 1440, "h": 1480, "title": "Perfil", "expand": "fill"},
+    "Gladiadores.dc.html": {"x": 3040, "y": 1800, "w": 1440, "h": 1240, "title": "Gladiadores", "expand": "fill"},
+    "Pocoes.dc.html": {"x": 0, "y": 3400, "w": 1440, "h": 1240, "title": "Poções", "expand": "fill"},
+    "Batalhas.dc.html": {"x": 1520, "y": 3400, "w": 1440, "h": 1240, "title": "Batalhas", "expand": "fill"},
+    "Relatorios.dc.html": {"x": 3040, "y": 3400, "w": 1440, "h": 1240, "title": "Relatórios", "expand": "fill"},
+    "Ranking.dc.html": {"x": 0, "y": 4760, "w": 1440, "h": 1240, "title": "Ranking", "expand": "fill"},
+    "Mensagens.dc.html": {"x": 1520, "y": 4760, "w": 1440, "h": 1240, "title": "Mensagens", "expand": "fill"},
+    "Amigos.dc.html": {"x": 3040, "y": 4760, "w": 1440, "h": 1240, "title": "Amigos", "expand": "fill"},
+    "Header.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 64, "title": "Cabeçalho (componente)"},
+    "Rail.dc.html": {"x": 1520, "y": 0, "w": 264, "h": 960, "title": "Menu do painel (componente)"},
+    "Estados.dc.html": {"x": 0, "y": 184, "w": 1440, "h": 1100, "title": "Cabeçalho e menu: temas e estados"},
+    "Mobile.dc.html": {"x": 1864, "y": 0, "w": 1330, "h": 1000, "title": "Celular"}
+  },
+  "order": ["Main.dc.html", "Perfil.dc.html", "Gladiadores.dc.html", "Pocoes.dc.html", "Batalhas.dc.html", "Relatorios.dc.html", "Ranking.dc.html", "Mensagens.dc.html", "Amigos.dc.html", "Header.dc.html", "Rail.dc.html", "Estados.dc.html", "Mobile.dc.html"],
+  "notes": {
+    "t-system": {"x": 0, "y": -300, "text": "Navegação: cabeçalho e menu", "kind": "title1", "maxW": 3194},
+    "t-sections": {"x": 0, "y": 1500, "text": "As nove seções do painel", "kind": "title1", "maxW": 4480}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cabeçalho</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<header style="height: 64px; width: 100%; box-sizing: border-box; padding: 0 20px 0 24px; display: flex; align-items: center; gap: 24px; background: {{t.bg}}; border-bottom: 1px solid {{t.line}}; font-family: Roboto, system-ui, sans-serif; color: {{t.text}}">
+  <a href="#" aria-label="gladCode, página inicial" style="display: flex; align-items: center; height: 64px; flex: none">
+    <img src="/_blob/54e6f23576297d5425eec7e04d5b380b" alt="gladCode" style="height: 26px; display: block; filter: {{t.logo}}">
+  </a>
+
+  <nav aria-label="Principal" style="display: flex; align-items: stretch; height: 64px; gap: 4px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="4">
+      <a href="#" style="position: relative; display: flex; align-items: center; gap: 4px; padding: 0 12px; font-size: 15px; font-weight: {{n.weight}}; color: {{n.color}}; text-decoration: none; white-space: nowrap">
+        {{n.label}}
+        <sc-if value="{{n.chev}}" hint-placeholder-val="{{ false }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="m6 9 6 6 6-6"/></svg>
+        </sc-if>
+        <span aria-hidden="true" style="position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: {{n.bar}}"></span>
+      </a>
+    </sc-for>
+  </nav>
+
+  <label style="flex: 1 1 200px; max-width: 420px; min-width: 0; height: 40px; margin-left: auto; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 12px; border-radius: 10px; background: {{t.field}}; border: 1px solid {{t.fieldLine}}; color: {{t.muted}}; box-sizing: border-box">
+    <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar</span>
+    <input type="search" placeholder="Buscar mestres, gladiadores, funções…" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: {{t.text}}; font: 400 14px Roboto, sans-serif">
+    <kbd style="flex: none; height: 22px; padding: 0 6px; border-radius: 5px; border: 1px solid {{t.fieldLine}}; font: 500 11px 'Source Code Pro', monospace; color: {{t.muted}}; display: flex; align-items: center">Ctrl K</kbd>
+  </label>
+
+  <sc-if value="{{signed}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; align-items: center; gap: 8px; flex: none">
+      <a href="#" style="height: 40px; padding: 0 16px 0 12px; border-radius: 10px; background: {{t.cta}}; color: {{t.ctaText}}; font-weight: 700; font-size: 14px; letter-spacing: 0.02em; text-decoration: none; display: flex; align-items: center; gap: 8px">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg>
+        Batalhar
+      </a>
+      <span title="Prata" style="height: 40px; padding: 0 12px; margin-left: 4px; border-radius: 10px; background: {{t.chip}}; display: flex; align-items: center; gap: 8px; font: 600 14px 'Source Code Pro', monospace; color: {{t.text}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: none; stroke: #d4d4d4; stroke-width: 2; stroke-linecap: round"><circle cx="9" cy="9" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.3 18"/></svg>
+        1.250
+      </span>
+      <button aria-label="Notificações, 4 novas" style="position: relative; width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent; color: {{t.text}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span style="position: absolute; top: 4px; right: 3px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border-radius: 9px; background: {{t.cta}}; color: {{t.ctaText}}; border: 2px solid {{t.bg}}; font: 700 10px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">4</span>
+      </button>
+      <button aria-label="Conta de Spartacus_C, nível 23" style="position: relative; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: conic-gradient({{t.cta}} 0 62%, {{t.ring}} 62% 100%); display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <span style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #e9d6ad; border: 2px solid {{t.bg}}; box-sizing: content-box; display: block">
+          <img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="" style="width: 36px; height: 72px; object-fit: cover; object-position: top; display: block">
+        </span>
+        <span style="position: absolute; bottom: -4px; right: -6px; height: 16px; padding: 0 4px; border-radius: 5px; background: {{t.bg}}; color: {{t.cta}}; border: 1px solid {{t.cta}}; font: 700 10px 'Source Code Pro', monospace; display: flex; align-items: center">23</span>
+      </button>
+    </div>
+  </sc-if>
+  <sc-if value="{{signedOut}}" hint-placeholder-val="{{ false }}">
+    <a href="#" style="flex: none; height: 40px; padding: 0 16px; border-radius: 10px; background: {{t.cta}}; color: {{t.ctaText}}; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 10px">
+      <span style="width: 20px; height: 20px; border-radius: 50%; background: #ffffff; color: #1b2a35; font: 700 12px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">G</span>
+      Entrar com Google
+    </a>
+  </sc-if>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["painel","editor","aprender","sobre","none"],"default":"painel"},"theme":{"editor":"enum","options":["arena","dark","classic"],"default":"arena"},"signedIn":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":64}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.props.theme ?? 'arena';
+    const active = this.props.active ?? 'painel';
+    const signed = this.props.signedIn === undefined ? true : (this.props.signedIn === true || this.props.signedIn === 'true');
+    const classic = theme === 'classic';
+    const t = classic ? {
+      bg: '#00638d', line: 'rgba(255,255,255,0.16)', text: '#ffffff', muted: '#cfe6f0', dim: '#d6ecf5',
+      field: 'rgba(0,30,45,0.28)', fieldLine: 'rgba(255,255,255,0.24)', cta: '#ffffff', ctaText: '#00587d',
+      chip: 'rgba(0,30,45,0.28)', ring: 'rgba(255,255,255,0.25)', bar: '#ffffff',
+      logo: 'brightness(0) invert(1)'
+    } : {
+      bg: '#08151f', line: 'rgba(233,214,173,0.12)', text: '#eef2f5', muted: '#9fb3c2', dim: '#b8c7d2',
+      field: '#10283a', fieldLine: '#1f4664', cta: '#f2b441', ctaText: '#0b1d2b',
+      chip: 'rgba(255,255,255,0.06)', ring: 'rgba(233,214,173,0.18)', bar: '#f2b441',
+      logo: 'invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1)'
+    };
+    const items = signed
+      ? [['painel', 'Painel', false], ['editor', 'Editor', false], ['aprender', 'Aprender', false], ['sobre', 'Sobre', true]]
+      : [['editor', 'Editor', false], ['aprender', 'Aprender', false], ['sobre', 'Sobre', true]];
+    const nav = items.map(([id, label, chev]) => ({
+      label, chev,
+      color: id === active ? (classic ? '#ffffff' : '#f3e8d0') : t.dim,
+      weight: id === active ? 600 : 500,
+      bar: id === active ? t.bar : 'transparent'
+    }));
+    return { t, nav, signed, signedOut: !signed };
+  }
+}
+</script>
+</body>
+</html>

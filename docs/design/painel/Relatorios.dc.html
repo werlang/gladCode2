@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relatórios</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="report" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+
+        <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Relatórios</h1>
+            <p style="margin: 0; font-size: 15px; color: #56636b">Cada batalha que contou, com o replay e o que ela rendeu.</p>
+          </div>
+          <div style="display: flex; align-items: stretch; gap: 2px; padding: 14px 18px; border-radius: 14px; background: #fffdf8; border: 1px solid #dfd0b2; flex-wrap: wrap">
+            <span style="display: flex; flex-direction: column; gap: 6px; padding-right: 18px; border-right: 1px solid #ece1c9">
+              <span style="font-size: 12px; color: #56636b">Últimas 10 batalhas</span>
+              <span style="display: flex; gap: 4px">
+                <sc-for list="{{form}}" as="f" hint-placeholder-count="10">
+                  <span title="{{f.title}}" style="width: 20px; height: 20px; border-radius: 5px; background: {{f.bg}}; color: {{f.fg}}; font: 700 11px 'Source Code Pro', monospace; display: flex; align-items: center; justify-content: center">{{f.l}}</span>
+                </sc-for>
+              </span>
+            </span>
+            <span style="display: flex; flex-direction: column; gap: 4px; padding-left: 18px">
+              <span style="font-size: 12px; color: #56636b">Renome em 7 dias</span>
+              <span style="font: 600 20px 'Source Code Pro', monospace; color: #235c33">+46</span>
+            </span>
+          </div>
+        </header>
+
+        <section style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px; overflow: hidden">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 0 20px; border-bottom: 1px solid #ece1c9">
+            <div role="tablist" aria-label="Tipo de relatório" style="display: flex; gap: 4px">
+              <button role="tab" aria-selected="true" style="position: relative; height: 54px; padding: 0 14px; border: 0; background: transparent; font: 600 14px Roboto, sans-serif; color: #08151f; display: flex; align-items: center; gap: 8px; cursor: pointer">Ranqueadas<span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #0b1d2b; color: #ffffff; font: 600 11px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">3</span><span aria-hidden="true" style="position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: #c98918"></span></button>
+              <button role="tab" aria-selected="false" style="height: 54px; padding: 0 14px; border: 0; background: transparent; font: 500 14px Roboto, sans-serif; color: #56636b; cursor: pointer">Duelos</button>
+              <button role="tab" aria-selected="false" style="height: 54px; padding: 0 14px; border: 0; background: transparent; font: 500 14px Roboto, sans-serif; color: #56636b; cursor: pointer">Favoritas</button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #34444f">
+              <span id="unread-lbl">Só não vistas</span>
+              <button role="switch" aria-checked="false" aria-labelledby="unread-lbl" style="width: 44px; height: 26px; border-radius: 13px; border: 0; padding: 3px; background: #b9ab8c; display: flex; cursor: pointer"><span style="width: 20px; height: 20px; border-radius: 50%; background: #ffffff; display: block"></span></button>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto">
+            <table style="width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px">
+              <thead>
+                <tr style="text-align: left; color: #56636b; font-size: 12px; letter-spacing: 0.06em">
+                  <th scope="col" style="padding: 12px 8px 12px 20px; font-weight: 600">RESULTADO</th>
+                  <th scope="col" style="padding: 12px 8px; font-weight: 600">GLADIADOR</th>
+                  <th scope="col" style="padding: 12px 8px; font-weight: 600">ADVERSÁRIOS</th>
+                  <th scope="col" style="padding: 12px 8px; font-weight: 600; text-align: right">RENOME</th>
+                  <th scope="col" style="padding: 12px 8px; font-weight: 600">QUANDO</th>
+                  <th scope="col" style="padding: 12px 20px 12px 8px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+                  <tr style="border-top: 1px solid #ece1c9; background: {{r.rowBg}}">
+                    <td style="padding: 14px 8px 14px 20px">
+                      <span style="display: flex; align-items: center; gap: 10px">
+                        <span aria-label="{{r.unreadLabel}}" style="width: 8px; height: 8px; border-radius: 50%; background: {{r.dot}}; display: block; flex: none"></span>
+                        <span style="height: 28px; padding: 0 10px; border-radius: 8px; background: {{r.pillBg}}; color: {{r.pillFg}}; font: 700 13px 'Source Code Pro', monospace; display: flex; align-items: center; white-space: nowrap">{{r.place}}</span>
+                      </span>
+                    </td>
+                    <td style="padding: 14px 8px; font-weight: {{r.weight}}; color: #08151f">{{r.glad}}</td>
+                    <td style="padding: 14px 8px; color: #34444f">{{r.opps}}</td>
+                    <td style="padding: 14px 8px; text-align: right; font: 600 14px 'Source Code Pro', monospace; color: {{r.deltaColor}}">{{r.delta}}</td>
+                    <td style="padding: 14px 8px; color: #56636b; white-space: nowrap">{{r.when}}</td>
+                    <td style="padding: 10px 20px 10px 8px">
+                      <span style="display: flex; justify-content: flex-end; gap: 6px">
+                        <a href="#" style="height: 34px; padding: 0 12px; border-radius: 9px; background: {{r.watchBg}}; color: {{r.watchFg}}; font: 600 13px Roboto, sans-serif; text-decoration: none; display: flex; align-items: center; gap: 6px; white-space: nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; fill: currentColor; stroke: none"><path d="M7 4v16l13-8z"/></svg>Assistir</a>
+                        <button aria-label="Favoritar" style="width: 34px; height: 34px; border-radius: 9px; border: 1px solid #dfd0b2; background: transparent; color: {{r.star}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px; fill: {{r.starFill}}"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+                      </span>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 1px solid #ece1c9; font-size: 13px; color: #56636b">
+            <span>1–7 de 482 batalhas</span>
+            <span style="display: flex; gap: 6px">
+              <button aria-label="Página anterior" disabled style="width: 36px; height: 36px; border-radius: 9px; border: 1px solid #dfd0b2; background: transparent; color: #b9ab8c; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+              <button aria-label="Próxima página" style="width: 36px; height: 36px; border-radius: 9px; border: 1px solid #cdb98f; background: #fffdf8; color: #1b2a35; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            </span>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const formRaw = 'VVDVVVDVDV'.split('');
+    const form = formRaw.map((l) => ({
+      l, title: l === 'V' ? 'Venceu' : 'Perdeu',
+      bg: l === 'V' ? '#235c33' : '#f8e1dc',
+      fg: l === 'V' ? '#ffffff' : '#8f2717'
+    }));
+    const raw = [
+      [1, 'Magnus', 'Lâmina, Tonico, Bruta, Vesúvio', 12, 'há 8 min', true, false],
+      [3, 'Arcaness', 'Kroll, Pena, Ferro Velho, Íris', 2, 'há 40 min', true, false],
+      [5, 'Magnus', 'Ácida, Tonico, Rubro, Mel', -9, 'há 1 h', true, true],
+      [1, 'Arcaness', 'Cobalto, Uivo, Nébula, Pirata', 14, 'ontem, 21:12', false, true],
+      [2, 'Magnus', 'Vesúvio, Lince, Kroll, Ária', 6, 'ontem, 19:40', false, false],
+      [4, 'Forjador', 'Ácida, Pena, Brasa, Cobalto', -6, 'ontem, 08:03', false, false],
+      [1, 'Magnus', 'Ária, Rubro, Íris, Uivo', 13, '20 nov', false, false]
+    ];
+    const rows = raw.map(([place, glad, opps, d, when, unread, fav]) => ({
+      place: place + 'º de 5', glad, opps, when,
+      delta: (d > 0 ? '+' : '−') + Math.abs(d),
+      deltaColor: d > 0 ? '#235c33' : '#a3301f',
+      pillBg: place === 1 ? '#f9e777' : (place <= 2 ? '#e4e4e4' : (place <= 3 ? '#f9e2c7' : '#f0e6d2')),
+      pillFg: place === 1 ? '#5e4a06' : (place <= 2 ? '#3f3f3f' : (place <= 3 ? '#6d4c39' : '#56636b')),
+      dot: unread ? '#c98918' : 'transparent',
+      unreadLabel: unread ? 'Não vista' : 'Vista',
+      weight: unread ? 600 : 400,
+      rowBg: unread ? '#fffaf0' : 'transparent',
+      watchBg: unread ? '#0b1d2b' : 'transparent',
+      watchFg: unread ? '#f3e8d0' : '#00638d',
+      star: fav ? '#c98918' : '#9f8964',
+      starFill: fav ? '#f2b441' : 'none'
+    }));
+    return { form, rows };
+  }
+}
+</script>
+</body>
+</html>

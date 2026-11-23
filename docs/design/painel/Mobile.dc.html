@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Navegação no celular</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ece4d3}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="width: 1330px; height: 1000px; box-sizing: border-box; padding: 36px 40px; background: #ece4d3; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; gap: 40px">
+
+  <sc-for list="{{phones}}" as="p" hint-placeholder-count="3">
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <span style="font: 600 12px Roboto, sans-serif; letter-spacing: 0.12em; color: #56636b">{{p.label}}</span>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 36px; overflow: hidden; background: #f5efe2; box-shadow: 0 0 0 10px #08151f, 0 30px 60px -20px rgba(8,21,31,0.55); display: flex; flex-direction: column">
+
+        <header style="height: 56px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 8px 0 16px; background: #08151f">
+          <img src="/_blob/54e6f23576297d5425eec7e04d5b380b" alt="gladCode" style="height: 20px; filter: invert(1) hue-rotate(180deg) saturate(1.8) brightness(1.1)">
+          <span style="flex: 1"></span>
+          <button aria-label="Buscar" style="width: 44px; height: 44px; border: 0; background: transparent; color: #eef2f5; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+          <button aria-label="Notificações, 4 novas" style="position: relative; width: 44px; height: 44px; border: 0; background: transparent; color: #eef2f5; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span style="position: absolute; top: 8px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: #f2b441; border: 2px solid #08151f"></span></button>
+          <span style="width: 34px; height: 34px; margin-left: 4px; border-radius: 50%; overflow: hidden; background: #e9d6ad; box-shadow: 0 0 0 2px #08151f, 0 0 0 3px #f2b441"><img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="Conta" style="width: 34px; height: 68px; object-fit: cover; object-position: top; display: block"></span>
+        </header>
+
+        <div style="flex: 1; min-height: 0; overflow: hidden; position: relative">
+          <sc-if value="{{p.glads}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 20px 16px; display: flex; flex-direction: column; gap: 12px">
+              <div style="display: flex; justify-content: space-between; align-items: baseline">
+                <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 26px; font-weight: 600; color: #08151f">Gladiadores</h1>
+                <span style="font: 500 13px 'Source Code Pro', monospace; color: #56636b">4/6</span>
+              </div>
+              <sc-for list="{{glads}}" as="g" hint-placeholder-count="4">
+                <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 10px; border-radius: 14px; background: #fffdf8; border: 1px solid #dfd0b2; text-decoration: none; color: #1b2a35">
+                  <span style="width: 60px; height: 60px; border-radius: 10px; background: #e9d6ad; overflow: hidden; display: flex; justify-content: center; flex: none"><img src="{{g.img}}" alt="" style="height: 120px; margin-top: 2px"></span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+                    <span style="font-family: Cinzel, Georgia, serif; font-size: 17px; font-weight: 600; color: #08151f">{{g.name}}</span>
+                    <span style="font-size: 13px; color: {{g.noteColor}}">{{g.note}}</span>
+                  </span>
+                  <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; color: #9f8964"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{p.battle}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 20px 16px; display: flex; flex-direction: column; gap: 12px">
+              <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 26px; font-weight: 600; color: #08151f">Batalhar</h1>
+              <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; background: #fff7e3; border: 1px solid #e8c77a; text-decoration: none; color: #1b2a35">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #c98918"></span>
+                <span style="flex: 1; font-size: 14px"><strong style="font-weight: 600">Ana_Lux</strong> desafiou você</span>
+                <span style="font-size: 13px; font-weight: 700; color: #8c5d0b">Responder</span>
+              </a>
+              <sc-for list="{{modes}}" as="m" hint-placeholder-count="4">
+                <a href="#" style="display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 14px; text-decoration: none; background: {{m.bg}}; border: 1px solid {{m.border}}">
+                  <span style="display: flex; justify-content: space-between; align-items: center">
+                    <span style="font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: {{m.title}}">{{m.name}}</span>
+                    <span style="font-size: 12px; font-weight: 600; color: {{m.pillFg}}">{{m.pill}}</span>
+                  </span>
+                  <span style="font-size: 13px; line-height: 1.45; color: {{m.muted}}">{{m.desc}}</span>
+                </a>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{p.more}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; filter: blur(1px)">
+              <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 26px; font-weight: 600; color: #08151f">Notícias</h1>
+              <div style="height: 180px; border-radius: 14px; background: #d9c9a8"></div>
+              <div style="height: 90px; border-radius: 14px; background: #e7dbc1"></div>
+            </div>
+            <div style="position: absolute; inset: 0; background: rgba(11,29,43,0.55)"></div>
+            <section aria-label="Mais seções" style="position: absolute; left: 0; right: 0; bottom: 0; border-radius: 22px 22px 0 0; background: #0b1d2b; color: #e6edf2; padding: 10px 16px 18px; display: flex; flex-direction: column; gap: 14px">
+              <span style="align-self: center; width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.25)"></span>
+              <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: rgba(255,255,255,0.05); text-decoration: none; color: #ffffff">
+                <span style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: #e9d6ad; flex: none"><img src="/_blob/be063a0b1c412eb76ab9fed09d6c8dae" alt="" style="width: 44px; height: 88px; object-fit: cover; object-position: top; display: block"></span>
+                <span style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+                  <span style="font-size: 15px; font-weight: 600">Spartacus_C <span style="font-weight: 400; color: #9fb3c2">· nível 23</span></span>
+                  <span style="height: 5px; border-radius: 3px; background: rgba(255,255,255,0.1); display: block"><span style="display: block; width: 62%; height: 100%; border-radius: 3px; background: #e7dd24"></span></span>
+                </span>
+                <span style="font-size: 13px; color: #9fb3c2">Perfil</span>
+              </a>
+              <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                <sc-for list="{{tiles}}" as="t" hint-placeholder-count="6">
+                  <a href="#" style="position: relative; height: 84px; border-radius: 14px; background: rgba(255,255,255,0.05); text-decoration: none; color: #e6edf2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 500">
+                    <span style="width: 34px; height: 34px; border-radius: 10px; background: {{t.tint}}; display: flex; align-items: center; justify-content: center"><span style="width: 12px; height: 12px; border-radius: 4px; background: {{t.color}}; display: block"></span></span>
+                    {{t.label}}
+                    <sc-if value="{{t.badge}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; top: 8px; right: 10px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: {{t.badgeBg}}; color: {{t.badgeFg}}; font: 700 10px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">{{t.count}}</span></sc-if>
+                  </a>
+                </sc-for>
+              </div>
+              <div style="display: flex; gap: 8px">
+                <a href="#" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid rgba(233,214,173,0.2); color: #e6edf2; text-decoration: none; font-size: 14px; display: flex; align-items: center; justify-content: center">Editor</a>
+                <a href="#" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid rgba(233,214,173,0.2); color: #e6edf2; text-decoration: none; font-size: 14px; display: flex; align-items: center; justify-content: center">Aprender</a>
+                <a href="#" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid rgba(233,214,173,0.2); color: #e6edf2; text-decoration: none; font-size: 14px; display: flex; align-items: center; justify-content: center">Sobre</a>
+              </div>
+            </section>
+          </sc-if>
+        </div>
+
+        <nav aria-label="Seções" style="height: 78px; flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; padding: 8px 6px 0; background: #0b1d2b; border-top: 1px solid rgba(233,214,173,0.12)">
+          <a href="#" aria-current="{{p.t1.cur}}" style="position: relative; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: {{p.t1.color}}; font-size: 11px; font-weight: 500">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg>Notícias
+            <span style="position: absolute; top: 4px; left: 50%; margin-left: 8px; width: 8px; height: 8px; border-radius: 50%; background: #8edc96"></span>
+          </a>
+          <a href="#" aria-current="{{p.t2.cur}}" style="height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: {{p.t2.color}}; font-size: 11px; font-weight: 500">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0v7h-5v-5l-3-2-3 2v5H4z"/><path d="M12 5c1-2 3-3 6-3"/><path d="M9 13h6"/></svg>Gladiadores
+          </a>
+          <a href="#" aria-current="{{p.t3.cur}}" style="position: relative; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; text-decoration: none; color: {{p.t3.color}}; font-size: 11px; font-weight: 700">
+            <span style="position: absolute; top: -22px; width: 54px; height: 54px; border-radius: 50%; background: #f2b441; color: #0b1d2b; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px #0b1d2b">
+              <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 24px; height: 24px"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg>
+              <span style="position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; border-radius: 9px; background: #ffffff; color: #0b1d2b; font: 700 10px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">1</span>
+            </span>
+            Batalhar
+          </a>
+          <a href="#" aria-current="{{p.t4.cur}}" style="position: relative; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: {{p.t4.color}}; font-size: 11px; font-weight: 500">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>Relatórios
+            <span style="position: absolute; top: 0; left: 50%; margin-left: 6px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 8px; background: #ffffff; color: #0b1d2b; font: 700 10px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">3</span>
+          </a>
+          <a href="#" aria-current="{{p.t5.cur}}" style="position: relative; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: {{p.t5.color}}; font-size: 11px; font-weight: 500">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Mais
+            <span style="position: absolute; top: 4px; left: 50%; margin-left: 8px; width: 8px; height: 8px; border-radius: 50%; background: #f2b441"></span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1330,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tabs = (active) => {
+      const out = {};
+      [1, 2, 3, 4, 5].forEach((n) => {
+        const on = n === active;
+        out['t' + n] = { cur: on ? 'page' : 'false', color: on ? '#f2b441' : '#9fb3c2' };
+      });
+      return out;
+    };
+    const phones = [
+      Object.assign({ label: 'BARRA INFERIOR · GLADIADORES', glads: true }, tabs(2)),
+      Object.assign({ label: '“MAIS”: AS OUTRAS SEÇÕES', more: true }, tabs(5)),
+      Object.assign({ label: 'BATALHAR NO CENTRO DO POLEGAR', battle: true }, tabs(3))
+    ];
+    const glads = [
+      { name: 'Magnus', img: '/_blob/808e23a5fd941a8f721726e2db3a58f0', note: 'Pronto · 1.482 de renome', noteColor: '#235c33' },
+      { name: 'Arcaness', img: '/_blob/bcb0fce101505760d41fb8c4153e3001', note: 'Pronto · 1.317 de renome', noteColor: '#235c33' },
+      { name: 'Cão de Guerra', img: '/_blob/be063a0b1c412eb76ab9fed09d6c8dae', note: 'Desatualizado: grave no editor', noteColor: '#6e4d06' },
+      { name: 'Forjador', img: '/_blob/969f09ccc5bb6890ec0a9a7acb31b689', note: 'Com erro: veja o relatório', noteColor: '#8f2717' }
+    ];
+    const modes = [
+      { name: 'Ranqueada', desc: 'Um adversário do seu nível. Vale renome e prata.', pill: 'Fila aberta', bg: '#0b1d2b', border: '#0b1d2b', title: '#f3e8d0', muted: '#9fb3c2', pillFg: '#8be39d' },
+      { name: 'Duelo', desc: 'Desafie um amigo, gladiador contra gladiador.', pill: '1 desafio', bg: '#fffdf8', border: '#dfd0b2', title: '#08151f', muted: '#56636b', pillFg: '#8c5d0b' },
+      { name: 'Torneio', desc: 'Equipes em rodadas, até sobrar uma.', pill: '2 abertos', bg: '#fffdf8', border: '#dfd0b2', title: '#08151f', muted: '#56636b', pillFg: '#56636b' },
+      { name: 'Treino', desc: 'Rodadas para turmas, com placar por equipe.', pill: '1 ativo', bg: '#fffdf8', border: '#dfd0b2', title: '#08151f', muted: '#56636b', pillFg: '#56636b' }
+    ];
+    const tile = (label, color, count, gold) => ({
+      label, color, tint: 'rgba(255,255,255,0.06)',
+      badge: !!count, count: count || '',
+      badgeBg: gold ? '#f2b441' : 'rgba(255,255,255,0.18)', badgeFg: gold ? '#0b1d2b' : '#ffffff'
+    });
+    const tiles = [
+      tile('Poções', '#a3acef', 0), tile('Ranking', '#d4d4d4', 0), tile('Mensagens', '#64cccc', 2),
+      tile('Amigos', '#f28787', 1, true), tile('Notícias', '#8edc96', 1), tile('Ajustes', '#f4cd82', 0)
+    ];
+    return { phones, glads, modes, tiles };
+  }
+}
+</script>
+</body>
+</html>

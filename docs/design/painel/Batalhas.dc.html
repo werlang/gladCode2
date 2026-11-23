@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Batalhas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="battle" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+
+        <header style="display: flex; flex-direction: column; gap: 6px">
+          <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Batalhas</h1>
+          <p style="margin: 0; font-size: 15px; color: #56636b">Escolha onde seus gladiadores vão lutar.</p>
+        </header>
+
+        <section aria-label="Desafio pendente" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 16px 16px 20px; border-radius: 14px; background: #fff7e3; border: 1px solid #e8c77a">
+          <span style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #e9d6ad; flex: none"><img src="/_blob/c7481da644fd12a602dcd7cde9f7dddc" alt="" style="width: 40px; height: 80px; object-fit: cover; object-position: top; display: block"></span>
+          <span style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 15px; color: #08151f"><strong style="font-weight: 600">Ana_Lux</strong> desafiou você para um duelo</span>
+            <span style="font-size: 13px; color: #5e4206">Ela luta com Ligeira. Responda em até 2 dias.</span>
+          </span>
+          <button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 14px Roboto, sans-serif; cursor: pointer">Recusar</button>
+          <button style="height: 40px; padding: 0 18px; border-radius: 10px; border: 0; background: #0b1d2b; color: #f3e8d0; font: 600 14px Roboto, sans-serif; cursor: pointer">Escolher gladiador e aceitar</button>
+        </section>
+
+        <div role="tablist" aria-label="Modo de batalha" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+          <sc-for list="{{modes}}" as="m" hint-placeholder-count="4">
+            <button role="tab" aria-selected="{{m.sel}}" style="text-align: left; padding: 18px; border-radius: 16px; border: 1px solid {{m.border}}; background: {{m.bg}}; color: {{m.fg}}; display: flex; flex-direction: column; gap: 10px; cursor: pointer; font-family: Roboto, sans-serif">
+              <span style="display: flex; justify-content: space-between; align-items: center; width: 100%">
+                <span style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: {{m.tileBg}}; color: {{m.tileFg}}">
+                  <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg>
+                </span>
+                <span style="height: 22px; padding: 0 8px; border-radius: 11px; background: {{m.pillBg}}; color: {{m.pillFg}}; font: 600 12px Roboto, sans-serif; display: flex; align-items: center">{{m.pill}}</span>
+              </span>
+              <span style="font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: {{m.title}}">{{m.name}}</span>
+              <span style="font-size: 13px; line-height: 1.45; color: {{m.muted}}">{{m.desc}}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <section role="tabpanel" aria-label="Batalha ranqueada" style="display: flex; flex-direction: column; gap: 20px; padding: 26px; border-radius: 22px; background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(255,214,140,0.16), rgba(255,214,140,0) 70%), linear-gradient(180deg, #10283a, #0b1d2b); border: 1px solid #2d5470; box-shadow: inset 0 1px 0 rgba(243,232,208,0.12), 0 24px 48px -28px rgba(8,21,31,0.8); color: #f7e7c2">
+          <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px">
+            <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 22px; font-weight: 700; letter-spacing: 0.06em; color: #f3e8d0; text-shadow: 0 2px 0 rgba(0,0,0,0.6)">ESCOLHA SEU GLADIADOR</h2>
+            <span style="font-size: 13px; color: #9fb3c2">O adversário é sorteado entre gladiadores de renome parecido.</span>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch">
+            <div style="flex: 2 1 480px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 14px; padding-top: 10px">
+              <sc-for list="{{glads}}" as="g" hint-placeholder-count="4">
+                <button aria-pressed="{{g.sel}}" aria-disabled="{{g.offAttr}}" style="position: relative; padding: 3px; border: 0; border-radius: 16px; background: {{g.frame}}; transform: {{g.lift}}; box-shadow: {{g.shadow}}; cursor: {{g.cursor}}; text-align: center; font-family: Roboto, sans-serif">
+                  <sc-if value="{{g.selected}}" hint-placeholder-val="{{ false }}">
+                    <span style="position: absolute; top: -11px; left: 50%; transform: translateX(-50%); z-index: 2; height: 22px; padding: 0 10px; border-radius: 4px; background: linear-gradient(180deg, #f3e8d0, #f2b441); color: #0b1d2b; font: 800 10px Cinzel, Georgia, serif; letter-spacing: 0.12em; display: flex; align-items: center; box-shadow: 0 3px 0 #b07812; white-space: nowrap">ESCOLHIDO</span>
+                  </sc-if>
+                  <span style="border-radius: 13px; overflow: hidden; background: linear-gradient(180deg, #10283a, #0b1d2b); display: flex; flex-direction: column">
+                    <span style="position: relative; height: 150px; background: radial-gradient(ellipse 70% 60% at 50% 30%, {{g.glow}}, rgba(255,214,140,0) 70%), radial-gradient(ellipse 80% 26% at 50% 96%, #9d7f4f, rgba(157,127,79,0) 72%), #0d2131; display: flex; justify-content: center; align-items: flex-end; border-bottom: 1px solid rgba(199,166,107,0.5)">
+                      <img src="{{g.img}}" alt="" style="height: 124px; margin-bottom: 14px; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.55)) {{g.imgFilter}}">
+                      <sc-if value="{{g.off}}" hint-placeholder-val="{{ false }}">
+                        <span style="position: absolute; inset: 0; background: rgba(8,21,31,0.45); display: flex; align-items: center; justify-content: center">
+                          <span style="width: 44px; height: 44px; border-radius: 50%; background: rgba(8,21,31,0.85); border: 1px solid {{g.lockColor}}; color: {{g.lockColor}}; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+                        </span>
+                      </sc-if>
+                    </span>
+                    <span style="padding: 10px 8px 12px; display: flex; flex-direction: column; gap: 4px; align-items: center">
+                      <span style="font-family: Cinzel, Georgia, serif; font-size: 15px; font-weight: 700; color: {{g.nameColor}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{g.name}}</span>
+                      <span style="display: flex; align-items: center; gap: 5px; font: 700 13px 'Source Code Pro', monospace; color: {{g.mmrColor}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 13px; height: 13px; color: {{g.mmrColor}}"><path d="M11.6 3.3a.5.5 0 0 1 .8 0l3 5.6a1 1 0 0 0 1.5.3l4.3-3.7a.5.5 0 0 1 .8.5l-2.8 10.3a1 1 0 0 1-1 .7H5.8a1 1 0 0 1-1-.7L2 6a.5.5 0 0 1 .8-.5l4.3 3.7a1 1 0 0 0 1.5-.3z"/></svg>{{g.mmr}}</span>
+                      <span style="font-size: 11px; line-height: 1.35; color: {{g.noteColor}}; min-height: 15px">{{g.note}}</span>
+                    </span>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+
+            <aside style="flex: 1 1 300px; min-width: 0; border-radius: 16px; background: rgba(0,0,0,0.28); border: 1px solid rgba(199,166,107,0.35); padding: 20px; display: flex; flex-direction: column; gap: 18px">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+                <span style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+                  <span style="width: 92px; height: 92px; border-radius: 50%; padding: 3px; background: linear-gradient(155deg, #f3e8d0, #c7a66b 35%, #9d6b32 65%, #e9d6ad); box-shadow: 0 0 24px rgba(242,180,65,0.35)">
+                    <span style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 35%, #5a4024, #0d2131 70%); display: flex; justify-content: center"><img src="/_blob/808e23a5fd941a8f721726e2db3a58f0" alt="" style="height: 170px; margin-top: 4px"></span>
+                  </span>
+                  <span style="font-family: Cinzel, Georgia, serif; font-size: 16px; font-weight: 700; color: #f3e8d0">Magnus</span>
+                </span>
+                <span aria-label="contra" style="font: 800 34px Cinzel, Georgia, serif; color: #f2b441; text-shadow: 0 0 18px rgba(242,180,65,0.6), 0 3px 0 #b07812; transform: rotate(-6deg)">VS</span>
+                <span style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+                  <span style="width: 92px; height: 92px; border-radius: 50%; border: 2px dashed rgba(199,166,107,0.55); box-sizing: border-box; background: radial-gradient(circle at 50% 35%, #13304a, #0b1d2b 70%); display: flex; align-items: center; justify-content: center; font: 800 38px Cinzel, Georgia, serif; color: rgba(243,232,208,0.4)">?</span>
+                  <span style="font-family: Cinzel, Georgia, serif; font-size: 16px; font-weight: 700; color: #9fb3c2">Sorteado</span>
+                </span>
+              </div>
+              <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+                <li style="display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid rgba(199,166,107,0.25)"><span style="color: #9fb3c2">Poções levadas</span><span>Vida III, Habilidade II</span></li>
+                <li style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #9fb3c2">Recompensa</span><span>Renome e prata</span></li>
+              </ul>
+              <button style="margin-top: auto; height: 56px; border-radius: 12px; border: 1px solid #c98918; background: linear-gradient(180deg, #ffd27a 0%, #f2b441 55%, #e0a02e 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(120,70,10,0.35), 0 4px 0 #b07812, 0 12px 22px -12px rgba(242,180,65,0.6); color: #0b1d2b; font: 800 16px Cinzel, Georgia, serif; letter-spacing: 0.1em; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; stroke-width: 2.4"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/></svg>PROCURAR ADVERSÁRIOS</button>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const modes = [
+      { name: 'Ranqueada', desc: 'Um adversário do seu nível. Vale renome e prata.', pill: 'Fila aberta', sel: true },
+      { name: 'Duelo', desc: 'Desafie um amigo, gladiador contra gladiador.', pill: '1 desafio', alert: true },
+      { name: 'Torneio', desc: 'Equipes em rodadas, até sobrar uma.', pill: '2 abertos' },
+      { name: 'Treino', desc: 'Rodadas para turmas, com placar por equipe.', pill: '1 ativo' }
+    ].map((m) => Object.assign(m, m.sel ? {
+      sel: 'true', bg: '#0b1d2b', border: '#0b1d2b', fg: '#e6edf2', title: '#f3e8d0', muted: '#9fb3c2',
+      tileBg: '#f2b441', tileFg: '#0b1d2b', pillBg: 'rgba(79,212,106,0.16)', pillFg: '#8be39d'
+    } : {
+      sel: 'false', bg: '#fffdf8', border: '#dfd0b2', fg: '#1b2a35', title: '#08151f', muted: '#56636b',
+      tileBg: '#f0e6d2', tileFg: '#8c5d0b',
+      pillBg: m.alert ? '#f2b441' : '#f0e6d2', pillFg: m.alert ? '#0b1d2b' : '#5b4a2b'
+    }));
+    const BRASS = 'linear-gradient(155deg, #f3e8d0 0%, #c7a66b 35%, #9d6b32 65%, #e9d6ad 100%)';
+    const ROT = 'linear-gradient(155deg, #8a7f6e 0%, #5a4e3e 45%, #2d4256 100%)';
+    const BLOOD = 'linear-gradient(155deg, #c97a6c 0%, #7a2a1e 50%, #4a1610 100%)';
+    const glads = [
+      { name: 'Magnus', img: '/_blob/808e23a5fd941a8f721726e2db3a58f0', mmr: '1.482', note: 'C', sel: true },
+      { name: 'Arcaness', img: '/_blob/bcb0fce101505760d41fb8c4153e3001', mmr: '1.317', note: 'Python' },
+      { name: 'Cão de Guerra', img: '/_blob/be063a0b1c412eb76ab9fed09d6c8dae', mmr: '1.205', note: 'Desatualizado', off: 'old' },
+      { name: 'Forjador', img: '/_blob/969f09ccc5bb6890ec0a9a7acb31b689', mmr: '998', note: 'Com erro', off: 'broken' }
+    ].map((g) => Object.assign(g, {
+      selected: !!g.sel,
+      sel: g.sel ? 'true' : 'false',
+      off: !!g.off, offAttr: g.off ? 'true' : 'false',
+      frame: g.off ? (g.off === 'broken' ? BLOOD : ROT) : BRASS,
+      lift: g.sel ? 'translateY(-6px)' : 'none',
+      shadow: g.sel ? '0 0 0 3px rgba(242,180,65,0.4), 0 18px 30px -10px rgba(242,180,65,0.55)' : '0 10px 20px -12px rgba(0,0,0,0.8)',
+      cursor: g.off ? 'not-allowed' : 'pointer',
+      glow: g.sel ? 'rgba(255,214,140,0.4)' : (g.off ? 'rgba(200,190,170,0.08)' : 'rgba(255,214,140,0.2)'),
+      imgFilter: g.off ? 'grayscale(0.9) brightness(0.6)' : '',
+      nameColor: g.off ? '#8399aa' : '#f3e8d0',
+      mmrColor: g.off ? '#8a7f6e' : '#f2b441',
+      noteColor: g.off ? (g.off === 'broken' ? '#ff9a86' : '#f0c453') : '#9fb3c2',
+      lockColor: g.off === 'broken' ? '#ff6a55' : '#f0c453'
+    }));
+    return { modes, glads };
+  }
+}
+</script>
+</body>
+</html>

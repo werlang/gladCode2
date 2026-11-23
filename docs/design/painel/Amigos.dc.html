@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Amigos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="friends" height="976" hint-size="264px,976px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+        <header style="display: flex; flex-direction: column; gap: 6px">
+          <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Amigos</h1>
+          <p style="margin: 0; font-size: 15px; color: #56636b">Mestres com quem você troca mensagens e duelos.</p>
+        </header>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+          <div style="flex: 2 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+            <section aria-label="Convites recebidos" style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 16px 16px 18px; border-radius: 14px; background: #fff7e3; border: 1px solid #e8c77a">
+              <span style="width: 44px; height: 44px; border-radius: 50%; background: #ec95f4; color: #0b1d2b; font: 700 15px Roboto, sans-serif; display: flex; align-items: center; justify-content: center; flex: none">MD</span>
+              <span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 15px; color: #08151f"><strong style="font-weight: 600">Marco_dev</strong> quer ser seu amigo</span>
+                <span style="font-size: 13px; color: #5e4206">Mestre nível 9 · 3 amigos em comum</span>
+              </span>
+              <button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #cdb98f; background: transparent; color: #1b2a35; font: 500 14px Roboto, sans-serif; cursor: pointer">Recusar</button>
+              <button style="height: 40px; padding: 0 18px; border-radius: 10px; border: 0; background: #0b1d2b; color: #f3e8d0; font: 600 14px Roboto, sans-serif; cursor: pointer">Aceitar</button>
+            </section>
+
+            <section style="background: #fffdf8; border: 1px solid #dfd0b2; border-radius: 16px; overflow: hidden">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #ece1c9">
+                <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #08151f">Seus amigos <span style="font-weight: 400; color: #56636b">· 12</span></h2>
+                <span style="font-size: 13px; color: #235c33; display: flex; align-items: center; gap: 6px"><span style="width: 7px; height: 7px; border-radius: 50%; background: #3d9a57; display: block"></span>3 online agora</span>
+              </div>
+              <ul style="margin: 0; padding: 0; list-style: none">
+                <sc-for list="{{friends}}" as="f" hint-placeholder-count="6">
+                  <li style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 20px; border-top: 1px solid {{f.line}}">
+                    <span style="position: relative; flex: none">
+                      <span style="width: 44px; height: 44px; border-radius: 50%; background: {{f.av}}; color: #0b1d2b; font: 700 15px Roboto, sans-serif; display: flex; align-items: center; justify-content: center">{{f.ini}}</span>
+                      <span aria-label="{{f.stateLabel}}" style="position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%; background: {{f.dot}}; border: 2px solid #fffdf8; display: block"></span>
+                    </span>
+                    <span style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                      <span style="font-size: 15px; font-weight: 600; color: #08151f">{{f.name}}</span>
+                      <span style="font-size: 13px; color: #56636b">Nível {{f.lvl}} · melhor: {{f.best}} <span style="font-family: 'Source Code Pro', monospace">{{f.mmr}}</span></span>
+                    </span>
+                    <span style="display: flex; gap: 6px">
+                      <a href="#" aria-label="Mensagem para {{f.name}}" style="width: 38px; height: 38px; border-radius: 10px; border: 1px solid #dfd0b2; color: #1b2a35; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
+                      <a href="#" style="height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid #cdb98f; color: #1b2a35; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/></svg>Desafiar</a>
+                      <button aria-label="Mais opções para {{f.name}}" style="width: 38px; height: 38px; border-radius: 10px; border: 0; background: transparent; color: #56636b; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                    </span>
+                  </li>
+                </sc-for>
+              </ul>
+            </section>
+          </div>
+
+          <aside style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 16px; background: #0b1d2b; color: #e6edf2">
+            <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 18px; font-weight: 600; color: #f3e8d0">Encontrar mestres</h2>
+            <label style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-radius: 10px; background: #10283a; border: 1px solid #2d5470; color: #9fb3c2">
+              <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="search" aria-label="Apelido do mestre" value="lin" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 400 15px Roboto, sans-serif; color: #eef2f5">
+            </label>
+            <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
+              <sc-for list="{{found}}" as="u" hint-placeholder-count="3">
+                <li style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid rgba(233,214,173,0.12)">
+                  <span style="width: 36px; height: 36px; border-radius: 50%; background: {{u.av}}; color: #0b1d2b; font: 700 13px Roboto, sans-serif; display: flex; align-items: center; justify-content: center; flex: none">{{u.ini}}</span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                    <span style="font-size: 14px; font-weight: 600">{{u.name}}</span>
+                    <span style="font-size: 12px; color: #9fb3c2">Nível {{u.lvl}}</span>
+                  </span>
+                  <button style="height: 34px; padding: 0 12px; border-radius: 9px; border: {{u.border}}; background: {{u.bg}}; color: {{u.fg}}; font: 600 13px Roboto, sans-serif; cursor: pointer">{{u.btn}}</button>
+                </li>
+              </sc-for>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const raw = [
+      ['AL', 'Ana_Lux', 31, 'Ligeira', '1.902', 'on', '#64cccc'],
+      ['BW', 'bytewolf', 40, 'Lince', '2.177', 'on', '#8edc96'],
+      ['PH', 'Prof.Helena', 52, 'Íris', '2.204', 'on', '#f4cd82'],
+      ['GK', 'gutoK', 27, 'Kroll', '2.150', 'off', '#8b96e3'],
+      ['MV', 'mel.dev', 19, 'Ária', '2.141', 'off', '#f495d0'],
+      ['TN', 'tonho', 12, 'Tonico', '2.087', 'off', '#d4d4d4']
+    ];
+    const friends = raw.map(([ini, name, lvl, best, mmr, st, av], i) => ({
+      ini, name, lvl, best, mmr, av,
+      dot: st === 'on' ? '#3d9a57' : '#b9ab8c',
+      stateLabel: st === 'on' ? 'Online agora' : 'Offline',
+      line: i === 0 ? 'transparent' : '#ece1c9'
+    }));
+    const found = [
+      { ini: 'LN', name: 'linnea', lvl: 14, av: '#8edc96', btn: 'Adicionar', bg: '#f2b441', fg: '#0b1d2b', border: '0' },
+      { ini: 'LC', name: 'lince_code', lvl: 6, av: '#f28787', btn: 'Convite enviado', bg: 'transparent', fg: '#9fb3c2', border: '1px solid rgba(233,214,173,0.25)' },
+      { ini: 'ML', name: 'Merlin', lvl: 33, av: '#a3acef', btn: 'Adicionar', bg: '#f2b441', fg: '#0b1d2b', border: '0' }
+    ];
+    return { friends, found };
+  }
+}
+</script>
+</body>
+</html>

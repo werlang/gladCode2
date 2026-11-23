@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Gladiadores</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&amp;family=Roboto:wght@400;500;700&amp;family=Source+Code+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5efe2}
+a{color:#00638d}a:hover{color:#004e70}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+</style>
+</helmet>
+<div style="min-height: 1040px; background: #f5efe2; font-family: Roboto, system-ui, sans-serif; color: #1b2a35; display: flex; flex-direction: column">
+  <dc-import name="Header" active="painel" hint-size="100%,64px"></dc-import>
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <div style="flex: 0 0 264px; background: #0b1d2b">
+      <dc-import name="Rail" active="glads" height="1176" hint-size="264px,1176px"></dc-import>
+    </div>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 40px 48px 64px; box-sizing: border-box">
+      <div style="max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px">
+
+        <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h1 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 34px; font-weight: 600; color: #08151f">Gladiadores</h1>
+            <p style="margin: 0; font-size: 15px; color: #56636b">4 de 6 vagas ocupadas. Grave no editor para atualizar a versão do motor.</p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+            <div style="padding: 4px; border-radius: 12px; background: #f0e6d2; border: 1px solid #dfd0b2; display: flex; gap: 4px">
+              <button aria-pressed="true" style="height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: #ffffff; box-shadow: 0 1px 3px rgba(60,40,10,0.18); font: 600 13px Roboto, sans-serif; color: #08151f; cursor: pointer">Todos</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: transparent; font: 500 13px Roboto, sans-serif; color: #56636b; cursor: pointer">Prontos</button>
+              <button aria-pressed="false" style="height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: transparent; font: 500 13px Roboto, sans-serif; color: #56636b; cursor: pointer">Precisam de atenção · 2</button>
+            </div>
+            <a href="#" style="height: 44px; padding: 0 18px; border-radius: 10px; background: #f2b441; color: #0b1d2b; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Novo gladiador</a>
+          </div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px 24px">
+          <sc-for list="{{glads}}" as="g" hint-placeholder-count="4">
+            <article style="padding: 3px; border-radius: 20px; background: {{g.frame}}; box-shadow: 0 22px 40px -20px rgba(8,21,31,0.75), 0 2px 0 rgba(8,21,31,0.25)">
+              <div style="height: 100%; border-radius: 17px; overflow: hidden; background: linear-gradient(180deg, #10283a 0%, #0b1d2b 100%); display: flex; flex-direction: column; box-shadow: inset 0 0 0 1px rgba(243,232,208,0.12)">
+
+                <div style="position: relative; height: 236px; background: radial-gradient(ellipse 70% 60% at 50% 28%, {{g.glow}}, rgba(255,214,140,0) 70%), radial-gradient(ellipse 75% 26% at 50% 96%, #9d7f4f, rgba(157,127,79,0) 72%), #0d2131; display: flex; justify-content: center; align-items: flex-end; border-bottom: 1px solid rgba(199,166,107,0.55)">
+                  <span aria-hidden="true" style="position: absolute; bottom: 26px; left: 50%; width: 140px; height: 22px; margin-left: -70px; border-radius: 50%; background: rgba(0,0,0,0.45); display: block"></span>
+                  <img src="{{g.img}}" alt="" style="position: relative; height: 192px; margin-bottom: 30px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.55)) {{g.imgFilter}}">
+
+                  <span title="Linguagem" style="position: absolute; left: 14px; top: 14px; width: 38px; height: 42px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: linear-gradient(160deg, #f3e8d0, #c7a66b 55%, #9d6b32); display: flex; align-items: center; justify-content: center">
+                    <span style="width: 32px; height: 36px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: #10283a; color: #f2b441; font: 700 {{g.langSize}} 'Source Code Pro', monospace; display: flex; align-items: center; justify-content: center">{{g.langShort}}</span>
+                  </span>
+
+                  <span style="position: absolute; right: 14px; top: 16px; height: 26px; padding: 0 10px; border-radius: 13px; background: rgba(8,21,31,0.78); border: 1px solid {{g.statusLine}}; color: {{g.statusFg}}; font: 700 11px Roboto, sans-serif; letter-spacing: 0.1em; display: flex; align-items: center; gap: 7px">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: {{g.statusDot}}; box-shadow: 0 0 8px {{g.statusDot}}; display: block"></span>{{g.status}}
+                  </span>
+
+                  <sc-if value="{{g.stamp}}" hint-placeholder-val="{{ false }}">
+                    <span style="position: absolute; top: 92px; left: 50%; transform: translateX(-50%) rotate(-7deg); padding: 6px 14px; border: 3px double {{g.stampColor}}; border-radius: 6px; background: rgba(8,21,31,0.8); color: {{g.stampColor}}; font: 800 17px Cinzel, Georgia, serif; letter-spacing: 0.1em; white-space: nowrap">{{g.stampText}}</span>
+                  </sc-if>
+
+                  <span title="Renome" style="position: absolute; bottom: -17px; left: 50%; transform: translateX(-50%); height: 34px; padding: 0 16px 0 12px; border-radius: 17px; background: linear-gradient(180deg, #173650, #10283a); border: 1px solid #c7a66b; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(243,232,208,0.25); display: flex; align-items: center; gap: 8px; z-index: 1">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 17px; height: 17px; color: #f2b441; fill: rgba(242,180,65,0.25)"><path d="M11.6 3.3a.5.5 0 0 1 .8 0l3 5.6a1 1 0 0 0 1.5.3l4.3-3.7a.5.5 0 0 1 .8.5l-2.8 10.3a1 1 0 0 1-1 .7H5.8a1 1 0 0 1-1-.7L2 6a.5.5 0 0 1 .8-.5l4.3 3.7a1 1 0 0 0 1.5-.3z"/><path d="M5 21h14"/></svg>
+                    <span style="font: 700 15px 'Source Code Pro', monospace; color: #f3e8d0">{{g.mmr}}</span>
+                  </span>
+                </div>
+
+                <div style="padding: 30px 18px 18px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
+                    <h2 style="margin: 0; font-family: Cinzel, Georgia, serif; font-size: 23px; font-weight: 700; letter-spacing: 0.02em; color: {{g.nameColor}}; text-shadow: 0 2px 0 rgba(0,0,0,0.6)">{{g.name}}</h2>
+                    <span style="font-size: 12px; letter-spacing: 0.06em; color: #9fb3c2">{{g.record}}</span>
+                  </div>
+
+                  <dl style="margin: 0; display: flex; flex-direction: column; gap: 9px">
+                    <sc-for list="{{g.attrs}}" as="a" hint-placeholder-count="3">
+                      <div style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 26px; align-items: center; gap: 10px">
+                        <dt title="{{a.full}}" style="width: 26px; height: 26px; transform: rotate(45deg); border-radius: 5px; background: {{a.tint}}; border: 1px solid {{a.color}}; display: flex; align-items: center; justify-content: center; margin-left: 2px">
+                          <span style="transform: rotate(-45deg); font: 700 10px Roboto, sans-serif; color: {{a.color}}">{{a.short}}</span>
+                        </dt>
+                        <span aria-hidden="true" style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; height: 10px">
+                          <sc-for list="{{a.segs}}" as="s" hint-placeholder-count="10">
+                            <span style="border-radius: 2px; background: {{s.bg}}; box-shadow: {{s.glow}}; display: block"></span>
+                          </sc-for>
+                        </span>
+                        <dd style="margin: 0; text-align: right; font: 700 16px 'Source Code Pro', monospace; color: {{a.color}}">{{a.v}}</dd>
+                      </div>
+                    </sc-for>
+                  </dl>
+
+                  <sc-if value="{{g.alert}}" hint-placeholder-val="{{ false }}">
+                    <p style="margin: 0; padding: 10px 12px; border-radius: 10px; background: {{g.alertBg}}; border: 1px solid {{g.alertLine}}; color: {{g.alertFg}}; font-size: 13px; line-height: 1.45">{{g.alertText}}</p>
+                  </sc-if>
+
+                  <div style="display: flex; gap: 8px; margin-top: auto">
+                    <a href="#" style="flex: 1; height: 44px; border-radius: 10px; background: {{g.leftBg}}; border: {{g.leftBorder}}; box-shadow: {{g.leftShadow}}; color: {{g.leftFg}}; font: 700 13px Cinzel, Georgia, serif; letter-spacing: 0.06em; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>{{g.editLabel}}</a>
+                    <a href="#" aria-disabled="{{g.fightDisabled}}" style="flex: 1.25; height: 44px; border-radius: 10px; background: {{g.fightBg}}; border: {{g.fightBorder}}; box-shadow: {{g.fightShadow}}; color: {{g.fightFg}}; font: 800 14px Cinzel, Georgia, serif; letter-spacing: 0.08em; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px">
+                      <sc-if value="{{g.locked}}" hint-placeholder-val="{{ false }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 15px; height: 15px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></sc-if>
+                      <sc-if value="{{g.ready}}" hint-placeholder-val="{{ true }}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; stroke-width: 2.4"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/></svg></sc-if>
+                      BATALHAR
+                    </a>
+                    <button aria-label="Mais ações para {{g.name}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2d5470; background: #13304a; color: #c7d3db; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+
+          <a href="#" style="min-height: 520px; border-radius: 20px; border: 2px dashed #b48a4a; background: repeating-linear-gradient(135deg, rgba(180,138,74,0.06) 0 12px, rgba(180,138,74,0) 12px 24px), #efe4cc; color: #5b4a2b; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center">
+            <span style="width: 76px; height: 76px; border-radius: 50%; padding: 3px; background: linear-gradient(160deg, #f3e8d0, #c7a66b 55%, #9d6b32); box-shadow: 0 10px 20px -8px rgba(8,21,31,0.6)">
+              <span style="width: 100%; height: 100%; border-radius: 50%; background: #10283a; color: #f2b441; display: flex; align-items: center; justify-content: center"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width: 30px; height: 30px; stroke-width: 2.4"><path d="M5 12h14"/><path d="M12 5v14"/></svg></span>
+            </span>
+            <span style="font-family: Cinzel, Georgia, serif; font-size: 20px; font-weight: 700; color: #10283a">2 vagas livres</span>
+            <span style="font-size: 14px; line-height: 1.5; max-width: 26ch">Recrute um gladiador em C, Python ou blocos e treine-o no editor.</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ATTR = [
+      ['str', 'F', 'Força', '#ff5a5a', 'rgba(255,80,80,0.16)'],
+      ['agi', 'A', 'Agilidade', '#e8e23a', 'rgba(227,227,0,0.14)'],
+      ['int', 'I', 'Inteligência', '#8fa0ff', 'rgba(124,144,255,0.18)']
+    ];
+    const BRASS = 'linear-gradient(155deg, #f3e8d0 0%, #c7a66b 35%, #9d6b32 65%, #e9d6ad 100%)';
+    const ROT = 'linear-gradient(155deg, #a89a84 0%, #6f604a 40%, #2d4256 70%, #8a7a62 100%)';
+    const BLOOD = 'linear-gradient(155deg, #ff9a86 0%, #c4412f 32%, #5c1810 66%, #e2604f 100%)';
+    const GOLD_BTN = {
+      bg: 'linear-gradient(180deg, #ffd27a 0%, #f2b441 55%, #e0a02e 100%)', border: '1px solid #c98918',
+      shadow: 'inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(120,70,10,0.35), 0 3px 0 #b07812, 0 8px 16px -10px rgba(242,180,65,0.6)',
+      fg: '#0b1d2b'
+    };
+    const PLATE = { bg: 'linear-gradient(180deg, #173650, #13304a)', border: '1px solid #2d5470', shadow: 'inset 0 1px 0 rgba(243,232,208,0.15)', fg: '#f7e7c2' };
+    const LOCKED = { bg: '#1a3044', border: '1px solid #2d4256', shadow: 'none', fg: '#7d6e5a' };
+    const list = [
+      { name: 'Magnus', img: '/_blob/808e23a5fd941a8f721726e2db3a58f0', lang: 'C', mmr: '1.482', record: '128 VITÓRIAS · 86 DERROTAS', str: 8, agi: 10, int: 22, s: 'ready' },
+      { name: 'Arcaness', img: '/_blob/bcb0fce101505760d41fb8c4153e3001', lang: 'Python', mmr: '1.317', record: '97 VITÓRIAS · 74 DERROTAS', str: 10, agi: 14, int: 16, s: 'ready' },
+      { name: 'Cão de Guerra', img: '/_blob/be063a0b1c412eb76ab9fed09d6c8dae', lang: 'Blocos', mmr: '1.205', record: '61 VITÓRIAS · 70 DERROTAS', str: 20, agi: 12, int: 8, s: 'old', alert: 'Gravado no motor v2.5. Grave de novo no editor para voltar à arena.' },
+      { name: 'Forjador', img: '/_blob/969f09ccc5bb6890ec0a9a7acb31b689', lang: 'C', mmr: '998', record: '40 VITÓRIAS · 52 DERROTAS', str: 18, agi: 16, int: 6, s: 'broken', alert: 'Travou numa batalha ranqueada e saiu da fila. Veja o erro no último relatório.' }
+    ];
+    const glads = list.map((g) => {
+      const ready = g.s === 'ready';
+      const broken = g.s === 'broken';
+      const attrs = ATTR.map(([k, short, full, color, tint]) => {
+        const v = g[k];
+        const filled = Math.round(v / 3);
+        const dim = !ready;
+        const c = dim ? '#8a7f6e' : color;
+        return {
+          short, full, v, color: c, tint: dim ? 'rgba(138,127,110,0.14)' : tint,
+          segs: Array.from({ length: 10 }, (_, i) => ({
+            bg: i < filled ? c : 'rgba(243,232,208,0.08)',
+            glow: i < filled && !dim ? '0 0 4px ' + color : 'none'
+          }))
+        };
+      });
+      const left = ready ? PLATE : GOLD_BTN;
+      const fight = ready ? GOLD_BTN : LOCKED;
+      return Object.assign({}, g, {
+        attrs, ready, locked: !ready,
+        langShort: g.lang === 'Python' ? 'PY' : (g.lang === 'Blocos' ? '{ }' : 'C'),
+        langSize: g.lang === 'C' ? '16px' : '12px',
+        frame: ready ? BRASS : (broken ? BLOOD : ROT),
+        glow: ready ? 'rgba(255,214,140,0.34)' : (broken ? 'rgba(226,96,79,0.22)' : 'rgba(200,190,170,0.14)'),
+        imgFilter: ready ? '' : 'grayscale(0.85) brightness(0.7)',
+        nameColor: ready ? '#f3e8d0' : '#cdbfa6',
+        status: ready ? 'PRONTO' : (broken ? 'COM ERRO' : 'DESATUALIZADO'),
+        statusDot: ready ? '#4fd46a' : (broken ? '#ff6a55' : '#f0c453'),
+        statusFg: ready ? '#bff3c9' : (broken ? '#ffb4a8' : '#f6dc8c'),
+        statusLine: ready ? 'rgba(79,212,106,0.45)' : (broken ? 'rgba(255,106,85,0.5)' : 'rgba(240,196,83,0.45)'),
+        stamp: !ready, stampText: broken ? 'COM ERRO' : 'FORA DA ARENA', stampColor: broken ? '#ff6a55' : '#f0c453',
+        alert: !!g.alert, alertText: g.alert || '',
+        alertBg: broken ? 'rgba(196,65,47,0.14)' : 'rgba(240,196,83,0.1)',
+        alertLine: broken ? 'rgba(255,106,85,0.35)' : 'rgba(240,196,83,0.3)',
+        alertFg: broken ? '#ffc2b8' : '#f3dfa6',
+        editLabel: ready ? 'EDITAR' : 'CORRIGIR',
+        leftBg: left.bg, leftBorder: left.border, leftShadow: left.shadow, leftFg: left.fg,
+        fightBg: fight.bg, fightBorder: fight.border, fightShadow: fight.shadow, fightFg: fight.fg,
+        fightDisabled: ready ? 'false' : 'true'
+      });
+    });
+    return { glads };
+  }
+}
+</script>
+</body>
+</html>
