@@ -112,7 +112,7 @@ gladcode2/
 | `web/public/script/models/` | The **only** modules that call the API, one class per area, through `helpers/request.js`. |
 | `web/public/script/templates/` | Markup-string modules rendered with `renderTemplate`; no logic, no interpolation beyond placeholders. |
 | `web/public/script/profile/` | Section controllers of the profile/Painel shell. |
-| `web/public/script/services/` | **Planned (WP2):** DOM-free application state that owns data and emits app events, between the models and the sections. See [docs/frontend/conventions.md](docs/frontend/conventions.md). |
+| `web/public/script/services/` | DOM-free application state that owns data and emits app events, between the models and the sections. See [docs/frontend/conventions.md](docs/frontend/conventions.md). |
 | `web/public/script/editor/`, `render2/` | The editor's parts and the Three.js renderer; both are large subsystems with their own rules (see below). |
 | `api/route/` | HTTP orchestration: one router per area, `METHOD /path` doc comments, `Validate` input checks, handlers wrapped in `asyncRoute`. |
 | `api/middleware/` | `auth()` (session, optional session, administrators) and the error handler. |
@@ -127,9 +127,9 @@ gladcode2/
 ## Frontend layers
 
 The frontend is native ES modules with no bundler. `web/helpers/modules.js` builds one import map over
-`MODULE_DIRS` (`'', components, editor, helpers, models, profile, templates`) plus the `render2/` modules,
-versioned by file modification time; every view prints it once with `{{{importMap}}}` before any module
-script. Adding a new script folder means adding it to `MODULE_DIRS`.
+`MODULE_DIRS` (`'', components, editor, helpers, models, profile, services, templates`) plus the
+`render2/` modules, versioned by file modification time; every view prints it once with `{{{importMap}}}`
+before any module script. Adding a new script folder means adding it to `MODULE_DIRS`.
 
 Read [docs/frontend/](docs/frontend/README.md) for the contract. In short:
 
@@ -143,7 +143,7 @@ Read [docs/frontend/](docs/frontend/README.md) for the contract. In short:
   pre-existing DOM-touching helpers are the exception; see [docs/frontend/conventions.md](docs/frontend/conventions.md)).
 - `web/public/script/models/` — the only API callers; `helpers/request.js` exposes `api` (JSON with
   credentials, `RequestError` with the API's `code`/`details`) and `site` (same-origin files).
-- `web/public/script/services/` (**planned, WP2**) — DOM-free application state shared across sections;
+- `web/public/script/services/` — DOM-free application state shared across sections;
   calls models and emits app events ([docs/frontend/events.md](docs/frontend/events.md)).
 - `web/public/script/templates/` — markup strings for client-rendered pieces, rendered with
   `renderTemplate` (`{{key}}` escaped, `{{{key}}}` raw).

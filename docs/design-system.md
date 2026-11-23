@@ -126,6 +126,9 @@ same everywhere:
 - Bars: `--color-hp`, `-hp-mid`, `-hp-track`, `--color-ap…`, `--color-xp`, `-xp-track`,
   `--color-level-up`, `--color-bar-danger`, `--color-timer-ok/-warn`.
 - Attributes: `--color-str`, `--color-agi`, `--color-int`.
+- Painel game surfaces: `--color-gladiator-frame-*`, `-stage*`, `-ground`, `-plaque*`, `-text*`,
+  `-seal-*`, `-alert-*`, `--color-action-bevel*` and `--color-attr-*` (the card frame, lit stage, seals and
+  beveled action from `docs/design/painel/Gladiadores.dc.html`; fixed in every theme).
 - Medals: `--color-medal-gold/silver/bronze` with `-soft`, `-strong`, `-text`.
 - Profile menu frames: `--color-cat-*`.
 - Code panels: `--color-code-panel`, `-panel-border`, `-text`, `-comment` and `--color-code-keyword/function/string/number` (the hero code panel and every Prism block, `components/code.css`).
@@ -166,6 +169,12 @@ really differs, a scoped size.
 Modal, toast and tooltip are the existing `components/dialog.js`, `toast.js` and `tooltip.js` (the
 dialog box is a `surface-card` with `ghost` buttons).
 
+The Painel primitives (WP2) live beside them, one sheet and one class each: `badge`, `avatar`,
+`page-header`, `section-card`, `tabs`, `segmented-control`, `switch`, `search-field` and `pagination`
+(`css/components/*.css`, `components/*.js`, `templates/*.js`). They are loaded by the shell or the page
+that uses them, not by `head.html`, so the existing pages keep their payload; the development gallery
+(`/dev-tools/components`, non-production only) links every one in every state.
+
 ### 2.2 Feature components
 
 | Component | Styles | Behaviour |
@@ -203,6 +212,7 @@ Placement-only page rules for the primitives live in the page sheet (`#duel-box 
 | :--- | :--- |
 | Tokens, themes, fonts, element defaults (`html`, `body`, focus, reduced motion) | `tokens.css` |
 | UI primitives (button, field, surface, empty state) | `css/components/*.css`; behaviour in `components/button.js`, `field.js`, `input.js`, `select.js`; markup in `templates/empty-state.js` |
+| Painel primitives (badge, avatar, page header, section card, tabs, segmented control, switch, search field, pagination, toast action) | `css/components/*.css`; behaviour in `components/badge.js`, `avatar.js`, `page-header.js`, `section-card.js`, `tabs.js`, `segmented-control.js`, `switch.js`, `search-field.js`, `pagination.js`, `toast.js`; markup in `templates/*.js` |
 | Theme choice and cache | `theme-boot.js`, `helpers/theme.js`, `profile/settings.js`, `components/header.js` |
 | Account theme | `api/model/user.js` (`site_theme`), `PUT /users/me` |
 | Front page | `index.css` (`.home` scope, `--gutter` and `--max` are local layout variables) |

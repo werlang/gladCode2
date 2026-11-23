@@ -65,6 +65,7 @@ that section's templates, not a reusable component.
 
 | Work package | Boards |
 | :--- | :--- |
+| WP2 Platform | all boards: the shared primitives, tokens and the component gallery |
 | WP3 App shell | Header, Rail, Estados, Mobile |
 | WP4 Notícias + Perfil | Main, Perfil |
 | WP5 Gladiadores + Batalhas | Gladiadores, Batalhas |

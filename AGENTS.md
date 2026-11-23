@@ -131,7 +131,7 @@ For detailed guidance on programmatically invoking battles and triaging errors, 
 Rules for `web/public/script/` (the layers are described in [GUIDE.md → Frontend layers](GUIDE.md#frontend-layers); the full contract is [`docs/frontend/`](docs/frontend/README.md)):
 
 1. **ES modules only**: new code is a native module with named exports, loaded through the import map (`{{#module}}`), never a classic `<script>`. No jQuery, no new globals on `window` (the replay facade in `playback.js` `exposeLegacyGlobals` is the one exception and only exists for `render.js` and `render2/`).
-2. **One job per folder**: page entries only wire a page together; DOM behaviour lives in `components/` classes; DOM-free application state lives in `services/` (**planned, WP2**) and pure DOM-free logic in `helpers/` (so it can be unit tested); markup lives in `templates/`.
+2. **One job per folder**: page entries only wire a page together; DOM behaviour lives in `components/` classes; DOM-free application state lives in `services/` and pure DOM-free logic in `helpers/` (so it can be unit tested); markup lives in `templates/`.
 3. **Network through models**: only `models/` calls the API, through `helpers/request.js` (`api.get`/`post`/`put`/`delete`). Pages, components and services call model methods, never `fetch` directly, and branch on `RequestError.code`.
 4. **Escape by default**: build markup with `renderTemplate` (`{{key}}` is escaped, `{{{key}}}` is raw and only for markup the code built itself) or `textContent`; never put user or server text into `innerHTML`, dialogs or toasts unescaped.
 5. **No native dialogs**: never `alert`/`confirm`/`prompt`; use `components/dialog.js` (`showDialog`, `showInput`, `showMessage`) and `components/toast.js` (`createToast`).

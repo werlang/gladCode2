@@ -25,7 +25,7 @@ A component event is not put on the bus. An app event is not a DOM event. Nothin
 
 ## The app event bus
 
-`web/public/script/helpers/event-bus.js` (**planned, WP2**) is a single `EventTarget` wrapper. It is
+`web/public/script/helpers/event-bus.js` is a single `EventTarget` wrapper. It is
 DOM-free: it imports nothing and can be tested in `tests/frontend/`.
 
 ```js
@@ -50,6 +50,7 @@ export const APP_EVENTS = Object.freeze({
     messagesRead: 'messages:read',
     friendsAnswered: 'friends:answered',
     potionsOrdered: 'potions:ordered',
+    potionsReconciled: 'potions:reconciled',
     potionsCancelled: 'potions:cancelled',
     gladiatorChosen: 'gladiator:chosen',
     rankingJumped: 'ranking:jumped',
@@ -70,7 +71,7 @@ Contract:
 - The name must be one of `APP_EVENTS`' values. `on()` and `emit()` throw on an unknown name in
   development and in tests, so a typo fails the suite instead of silently doing nothing.
 - A handler receives the `detail` object, not the `CustomEvent`.
-- `events` is the only instance; no module constructs another.
+- `events` is the only instance application code uses; tests may construct an isolated `EventBus`.
 - **App events are consumed by services and the shell/page entry**; a component receives data through its
   setters (`setCounts`, `setSilver`, `setRows`, …). The two global preference facts (`theme:changed`,
   `glad-view:changed`) are the exception: the components that repaint on them subscribe directly. A section
@@ -95,6 +96,7 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `messages:read` | `{ userId: number, read: number, unreadTotal: number }` | `MessagesService.markRead()` | Mensagens section (updates `ConversationList`), NotificationService (refresh) |
 | `friends:answered` | `{ id: number, accepted: boolean }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
 | `potions:ordered` | `{ slots: PotionSlotView[], serverNow: string, silver: number }` | `PotionsService.order()` | Poções section (updates `PotionSlot`), NotificationService; AppHeader via `account:silver` |
+| `potions:reconciled` | `{ slots: PotionSlotView[], serverNow: string, silver: number }` | `PotionsService.reconcile()` | Poções section (ends “Atualizando…”, updates every slot); AppHeader via `account:silver` |
 | `potions:cancelled` | `{ slotId: number }` | `PotionsService.cancel()` | Poções section |
 | `gladiator:chosen` | `{ gladiator: GladiatorView, mode: 'ranked'\|'duel'\|'tournament'\|'training' }` | Batalhas section (after the picker's `select`) | Batalhas section itself for the URL, analytics |
 | `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` (`position` is the resolved window position) | Ranking section (after the table moved) | shell (URL/hash), analytics |
@@ -240,7 +242,7 @@ sequenceDiagram
     Choice->>Section: component event 'change' { value: 'classic' }
     Section->>Section: applyTheme('classic') (preview at once)
     Section->>Svc: save('theme', 'classic')
-    Svc->>Svc: token = { rev: ++seq.theme, previous: confirmed.theme } (only one request in flight)
+    Svc->>Svc: token = { field: 'theme', rev: ++seq.theme, previous: confirmed.theme } (only one request in flight)
     Svc->>API: PUT /users/me { theme: 'classic' }
     API-->>Svc: { user }
     Svc->>Svc: confirmed.theme = 'classic'; rev === seq.theme, so the toast is due
@@ -268,18 +270,22 @@ Rules:
   request. If the *current* revision fails, the field reverts to `confirmed[field]` (not to the previous
   intent) and `SaveStatus` shows its error with a retry; a superseded failure changes nothing.
 - **The token captures the value before the change.** At `save(field, value)` the service stores
-  `token = { rev, previous: confirmed[field] }`. `previous` is the value the API had persisted when the
-  change was made (if an earlier revision is still in flight and unconfirmed, it is the value before that
-  earlier change). The token is valid only while `token.rev === seq[field]`; a later change dismisses the
-  older toast and invalidates it. `undo(token)` saves `token.previous` as a **new revision through the same
-  queue**, so the restore is itself persisted and confirmed; an old toast cannot undo a newer choice.
+  `token = { field, rev, previous: confirmed[field] }`. `previous` is the value the API had persisted when
+  the change was made (if an earlier revision is still in flight and unconfirmed, it is the value before
+  that earlier change). The token targets `token.field`'s queue and is valid only while
+  `token.rev === seq[token.field]`; a later change **to the same field** dismisses the older toast and
+  invalidates it. `undo(token)` saves `token.previous` as a **new revision through the same field's
+  queue**, so the restore is itself persisted and confirmed; an old toast cannot undo a newer choice in
+  that field, and a change in another field never invalidates it.
 - **Test contract (WP4).** Start at Sistema. Change to Clássico (rev 1; token previous = Sistema), then to
   Arena escuro (rev 2; token previous = Sistema because rev 1 is not confirmed yet) with the first response
   delayed. Rev 1 succeeds: `confirmed` becomes Clássico, but no preview change and no toast. Rev 2 succeeds:
   `confirmed` becomes Arena escuro and its toast is the current one. Undo saves `token.previous` =
   Sistema as rev 3 and is confirmed. A delayed failure of rev 1 changes nothing. If the second change is
   made after rev 1 confirmed, its token previous is Clássico (the value persisted before that change) —
-  the rule is always “captured at change time”, not “the value before the first change”.
+  the rule is always “captured at change time”, not “the value before the first change”. **Two fields:** a
+  change to `theme` and a change to `gladView` both reach revision 1; each token keeps its own `field`, and
+  undoing either targets that field's queue without invalidating the other.
 - `glad-view:changed` has the same flow: `applyGladView` on change, `save('gladView', choice)`, the cards
   repaint in place (no reload, no reselection).
 - The settings footer says “Tudo que você muda aqui é salvo na hora.” and the `SaveStatus` beside each
@@ -499,12 +505,19 @@ sequenceDiagram
 The WP6 `POST /potions/slots` answer is authoritative for both the balance and the compartment list:
 `{ slotId, silver, slots, serverNow }` (the GET and POST return the same `slots`/`serverNow` shape, whose
 `expiresAt` fields ship in WP3 for the shell badge). The client applies the 201 directly — no follow-up
-read — so a confirmed purchase cannot leave a stale balance. If the 201 is lost after the server committed,
-the client **does not retry the order**: the card stays disabled with an “Atualizando…” state until the next
-`NotificationService.refresh`/`GET /potions/slots` reconciles the silver and slots, and the next refresh is
-the only recovery. A refused POST (`NO_FREE_SLOT`, not enough silver) is a different outcome: it leaves the
-card enabled and shows the API's message, and nothing changes locally. Cancelling emits
-`potions:cancelled` and refreshes the same way.
+read — so a confirmed purchase cannot leave a stale balance.
+
+**Lost 201 (recovery).** If the POST rejects with a network or timeout error (status 0 or 408, not a user
+abort), the server may have committed the purchase. `PotionsService.order()` then calls
+`GET /potions/slots` for the full compartment list and `GET /notifications` for `user.silver`, emits
+`account:silver` and `potions:reconciled { slots, serverNow, silver }`, and **never repeats the purchase**.
+The section ends its “Atualizando…” state on `potions:reconciled` and repaints every `PotionSlot`; the order
+button is re-enabled only after that event. If either recovery read fails, the service rejects with the read
+error; the section keeps “Atualizando…” with a retry that repeats **only the reads** (never the purchase).
+
+A refused POST (`NO_FREE_SLOT`, not enough silver) is a different outcome: it leaves the card enabled and
+shows the API's message, and nothing changes locally. Cancelling emits `potions:cancelled` and refreshes the
+same way.
 
 ### 8. Ctrl K → palette → navigation
 

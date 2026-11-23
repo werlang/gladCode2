@@ -15,7 +15,7 @@ view in `web/view/` follows. They are the contract WP2–WP9 implement; see
 | `web/public/script/helpers/` | Utilities with no view logic: request transport, escaping/templates, dates, local storage, theme, gladiator style, sprites, replay maths, the event bus. New helpers are DOM-free and unit-testable under Node. | Page layout, components, application state shared across sections (that is `services/`). The pre-existing DOM-touching helpers (`animate.js` animations, `google-login.js`'s GIS script, `spritesheet.js` canvases, `portrait-cache.js` IndexedDB) stay until the section that uses them is rebuilt; new code does not add another. |
 | `web/public/script/models/` | The **only** callers of the API, one class per API area, through `helpers/request.js`. | Rendering, DOM, user-facing copy beyond error codes. |
 | `web/public/script/templates/` | Markup strings with `{{key}}` placeholders, rendered with `renderTemplate`. | Logic, loops, conditionals, `${}` interpolation. |
-| `web/public/script/services/` (**planned, WP2**) | DOM-free application state shared across sections: account, notification counts, shell state. Calls models, emits app events, caches what a section needs. | Touching the DOM, owning components, deciding layout. |
+| `web/public/script/services/` | DOM-free application state shared across sections: account, notification counts, shell state. Calls models, emits app events, caches what a section needs. | Touching the DOM, owning components, deciding layout. |
 | `web/public/script/profile/` → `sections/` (**planned, WP3+**) | Section controllers of the Painel shell, one file per section. Today they live in `profile/`; each moves to `sections/` when its work package rebuilds it. | Reusable components, API transport. |
 | `web/public/script/editor/`, `web/public/script/render2/` | The editor's parts and the 3D renderer. Each has its own rules (see `GUIDE.md`). | Anything the rest of the site imports except through their documented entry module. |
 | `web/public/css/` | `tokens.css`, the primitives in `css/components/`, and one sheet per page or feature. | Values that are not tokens; a second palette. |
@@ -42,9 +42,9 @@ The services the Painel flows name (WP2–WP8; each is a module under `services/
 | Service | Owns | Public methods |
 | :--- | :--- | :--- |
 | `AccountService` | The signed-in account, the per-field autosave queue, silver, sign-out | `load({ signal })`, `save(field, value)`, `undo(token)`, `setSilver(silver)`, `signOut()` |
-| `NotificationService` | The joined counts, the 30 s poll, the notification feed | `start()`, `stop()`, `refresh()`, `feed({ signal })` |
+| `NotificationService` | The joined counts and the 30 s poll (the panel's feed lands in WP3) | `start()`, `stop()`, `refresh()`, `feed({ signal })` (WP3) |
 | `NewsService` | The news list and the explicit read marker | `list({ offset, signal })`, `markAllRead()` |
-| `PotionsService` | The apothecary, the slots and the orders | `load({ signal })`, `order(identifier)`, `cancel(slotId)` |
+| `PotionsService` | The apothecary, the slots and the orders | `load({ signal })`, `order(identifier)`, `reconcile()`, `cancel(slotId)` |
 | `RankingService` | The general page, the centred window, the own strip and the tabs | `page({ offset, search, signal })`, `window({ gladiatorId, position, size })`, `mine({ signal })` |
 | `MessagesService` | Conversations, the thread and the read receipts | `list({ signal })`, `open(userId)`, `markRead(userId)`, `send(userId, text)`, `reply(messageId, text)` |
 | `FriendsService` | Friends, pending requests and the master search | `load({ signal })`, `answer(id, accepted)`, `request(userId)`, `search(nick, { signal })` |
@@ -125,8 +125,10 @@ These are targets for new and refactored code. Existing files above them (for ex
   geometry of a single component (a width, a height, a large offset) may stay literal; a dimension two
   sheets share becomes a `--layout-*` token.
 - **One stylesheet per component** in `web/public/css/components/`, named after the component. The
-  primitives (`button`, `field`, `surface`, `empty-state`, `code`) are loaded on every page by
-  `web/view/head.html`; shell and section components are loaded by the shell or the page that uses them.
+  original primitives (`button`, `field`, `surface`, `empty-state`, `code`) are loaded on every page by
+  `web/view/head.html`; the new Painel primitives (`badge`, `avatar`, `page-header`, `section-card`,
+  `tabs`, `segmented-control`, `switch`, `search-field`, `pagination`, `toast` action) are loaded by the
+  shell or the page that uses them, so existing pages keep their payload.
 - **Page sheets add placement only.** Widths, margins and where a component sits belong to the page;
   colours, typography, hover and disabled states belong to the component or primitive.
 - **Themes.** Every role exists in Arena light, Arena dark and Classic; content colours (game bars,

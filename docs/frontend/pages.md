@@ -96,7 +96,7 @@ change came from a click, a shortcut or `popstate` — never on the first load o
 and Forward restore section, subtab and query because the resolver reads them from `location`.
 
 The shell decides the navigation kind by **where it is mounted**, not by the target alone: a page outside
-the Painel (the front page, `/manual`, `/editor`, `/play/:hash`, …) has no `#painel-content`, so a palette
+the Painel (the front page, `/manual`, `/editor`, …) has no `#painel-content`, so a palette
 result always leaves it with `location.assign(href)`. Only a palette opened on the Painel can mount a
 section in place.
 

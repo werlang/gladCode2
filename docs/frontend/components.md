@@ -42,18 +42,18 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | CommandPalette | new | `components/command-palette.js` | WP3 |
 | PainelMenu | new (replaces `#menu` markup in `view/profile.html`) | `components/painel-menu.js` | WP3 |
 | MenuItem | new | `components/menu-item.js` | WP3 |
-| Badge | new | `components/badge.js` | WP3 |
+| Badge | exists | `components/badge.js` | WP2 |
 | MobileTabBar | new | `components/mobile-tab-bar.js` | WP3 |
 | MoreSheet | new | `components/more-sheet.js` | WP3 |
-| PageHeader | new | `components/page-header.js` | WP4 |
-| SectionCard | new (over `.surface-card`) | `components/section-card.js` | WP4 |
-| Tabs | new | `components/tabs.js` | WP4 |
-| SegmentedControl | new | `components/segmented-control.js` | WP4 |
+| PageHeader | exists | `components/page-header.js` | WP2 |
+| SectionCard | exists (over `.surface-card`) | `components/section-card.js` | WP2 |
+| Tabs | exists | `components/tabs.js` | WP2 |
+| SegmentedControl | exists | `components/segmented-control.js` | WP2 |
 | ChoiceCards | new | `components/choice-cards.js` | WP4 |
-| Switch | new | `components/switch.js` | WP4 |
-| Pagination | new | `components/pagination.js` | WP4 |
-| SearchField | new | `components/search-field.js` | WP3 |
-| Avatar | new | `components/avatar.js` | WP3 |
+| Switch | exists | `components/switch.js` | WP2 |
+| Pagination | exists | `components/pagination.js` | WP2 |
+| SearchField | exists | `components/search-field.js` | WP2 |
+| Avatar | exists | `components/avatar.js` | WP2 |
 | SaveStatus | new | `components/save-status.js` | WP4 |
 | Toast (with undo) | exists, extended | `components/toast.js` | WP2 |
 | EmptyState | exists | `templates/empty-state.js` | — |
@@ -252,14 +252,15 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   at the top, composed by `PainelMenu`).
 - **Boards:** `Rail.dc.html`, `Mobile.dc.html`.
 
-### Badge — new (WP3)
+### Badge — WP2
 
 - **File:** `components/badge.js`; **CSS:** `css/components/badge.css`.
 - **Purpose:** one counter/pill with three meanings, as the boards use them: **action** (gold, “needs
   you”: a duel, a friend request), **unread** (light, a count of unread items: reports, messages) and
   **info** (muted, a state: “4/6”, “#128”, “3 h”, “1 nova”).
-- **Constructor:** `new Badge({ element, count, kind })`.
-- **Methods:** `set(count)`, `setKind(kind)`, `setLabel(text)` (for “1 nova”).
+- **Constructor:** `new Badge({ element, count, kind, label })`.
+- **Methods:** `set(count)`, `setKind(kind)`, `setLabel(text)` (for “4/6”, “#128”, “3 h”),
+  `setDescription(text)` (the accessible “1 desafio de duelo”).
 - **Events:** none.
 - **ARIA:** the text is always in the DOM; a count above 99 reads `99+`; an action badge carries a
   `title`/label saying what it is (“1 desafio de duelo”).
@@ -293,7 +294,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 
 ## Page components
 
-### PageHeader — new (WP4)
+### PageHeader — WP2
 
 - **File:** `components/page-header.js`; **CSS:** `css/components/page-header.css`.
 - **Purpose:** the section heading: `<h1>`, a one-line subtitle, and a right-hand slot for actions or a
@@ -305,7 +306,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** one `<h1>` per section; actions are real buttons/links.
 - **Boards:** every section board.
 
-### SectionCard — new (WP4)
+### SectionCard — WP2
 
 - **File:** `components/section-card.js`; **CSS:** `css/components/section-card.css` (extends
   `.surface-card`).
@@ -313,26 +314,26 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   and built-in loading, empty and error states.
 - **Constructor:** `new SectionCard({ element })`.
 - **Methods:** `setTitle(text)`, `setActions(children)`, `setBusy(on)`, `setEmpty({ icon, title, summary,
-  action })`, `setError({ message, retry })`, `setBody(children)`; `get body`.
+  actionHtml })`, `setError({ message })`, `setBody(children)`; `get body`.
 - **Events:** `retry` `{}` when the error action is pressed.
 - **ARIA:** `aria-busy` while loading; the error is `role="alert"`.
 - **Boards:** Main (articles), Perfil, Poções (apothecary), Relatórios, Ranking, Mensagens, Amigos,
   Batalhas (ranked panel).
 
-### Tabs — new (WP4)
+### Tabs — WP2
 
 - **File:** `components/tabs.js`; **CSS:** `css/components/tabs.css`.
 - **Purpose:** the underline tabs of Relatórios and the pill tabs of Ranking/Batalhas, switching real
   panels.
 - **Constructor:** `new Tabs({ element, variant })` (`underline` or `pill`).
-- **Methods:** `setItems([{ id, label, count }])`, `select(id, { silent })`, `get selected`.
+- **Methods:** `setItems([{ id, label, count, panelId, selected }])`, `select(id, { silent })`, `get selected`.
 - **Events:** `select` `{ id }`.
 - **ARIA:** `role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, panels `role="tabpanel"`;
   Left/Right/Home/End move; the count is text inside the tab.
 - **Boards:** `Relatorios.dc.html` (underline + counts), `Ranking.dc.html` (pills), `Batalhas.dc.html`
   (the mode cards are their own element; the ranked panel uses the same selection state).
 
-### SegmentedControl — new (WP4)
+### SegmentedControl — WP2
 
 - **File:** `components/segmented-control.js`; **CSS:** `css/components/segmented-control.css`.
 - **Purpose:** a small set of mutually exclusive choices shown as one bar: the language (C / Python /
@@ -360,7 +361,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   a 2 px accent ring and an `aria-checked` state, not only a colour.
 - **Boards:** `Perfil.dc.html` (theme and gladiator style), `Batalhas.dc.html` (mode cards).
 
-### Switch — new (WP4)
+### Switch — WP2
 
 - **File:** `components/switch.js`; **CSS:** `css/components/switch.css`.
 - **Purpose:** an on/off setting: the e-mail preferences and the “Só não vistas” filter.
@@ -371,7 +372,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   associated (`aria-labelledby` or a wrapping `<label>`).
 - **Boards:** `Perfil.dc.html`, `Relatorios.dc.html`.
 
-### Pagination — new (WP4)
+### Pagination — WP2
 
 - **File:** `components/pagination.js`; **CSS:** `css/components/pagination.css`.
 - **Purpose:** the page controls: the simple previous/next of Relatórios and the numbered pages of
@@ -385,7 +386,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   `disabled`, the jump form a real `<form>` with a labelled input.
 - **Boards:** `Relatorios.dc.html`, `Ranking.dc.html`.
 
-### SearchField — new (WP3)
+### SearchField — WP2
 
 - **File:** `components/search-field.js`; **CSS:** `css/components/search-field.css`.
 - **Purpose:** the one search input: the header field, the Ranking search, the conversation search and
@@ -398,7 +399,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Boards:** `Header.dc.html`, `Estados.dc.html`, `Ranking.dc.html`, `Mensagens.dc.html`,
   `Amigos.dc.html`.
 
-### Avatar — new (WP3)
+### Avatar — WP2
 
 - **File:** `components/avatar.js`; **CSS:** `css/components/avatar.css`.
 - **Purpose:** a master's picture with the fallback initials, the level ring and the online dot; used by
