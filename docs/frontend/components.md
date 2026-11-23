@@ -117,9 +117,11 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** a short corner notification, stacked from the bottom.
 - **API:** `createToast(message, typeOrOptions)` where the second argument is the old
   `error|info|success` string or `{ type, duration, action }`; `action` is
-  `{ label: 'Desfazer', onClick }`. Returns the toast element with `dismiss()`. A toast with an action
-  stays 6 s (or `duration`), the others 2 s + 3 s of fade; it is announced with
-  `role="status"` and `aria-live="polite"`.
+  `{ label: 'Desfazer', onClick }`. Returns the toast element with `dismiss()` (fade out) and
+  `dismissNow()` (remove at once, cancelling its action). A toast with an action stays 6 s (or
+  `duration`), the others 2 s + 3 s of fade; it is announced with `role="status"` and
+  `aria-live="polite"`. The Perfil autosave keeps **one** undo toast: `services/undo-toast.js` calls
+  `dismissNow()` before showing the toast of a newer change.
 - **Focus:** a toast never moves focus. Press **Alt+Z** to move focus to the newest live action
   (the action also carries `aria-keyshortcuts="Alt+Z"`); the action pauses the expiry while focused
   and returns focus to the opener after dismissal. The shortcut is inert while a modal dialog or focus
@@ -427,8 +429,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   the autosaving Perfil fields.
 - **Constructor:** `new SaveStatus({ element })`.
 - **Methods:** `set(state, message)` with `idle|saving|saved|error`.
-- **Events:** `retry` `{}` when the error state's action is pressed.
+- **Events:** none.
 - **ARIA:** `role="status"` `aria-live="polite"`; never an alert unless the save failed.
+- **Retry:** none. A refused write is attempted once and reports the API message; only reads offer a retry.
 - **Boards:** `Perfil.dc.html`.
 
 ## Game components

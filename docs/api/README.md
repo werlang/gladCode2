@@ -116,7 +116,7 @@ From `api/route/news.js`.
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
 | `GET` | `/news?offset=0&markRead=false` | anyone (session optional) | The latest posts, five at a time, with their presentation fields (including the post's own `version` when it has one) and the reader's read state. Reading the list does not advance the read marker; `markRead=true` keeps the old opt-in that does. |
-| `POST` | `/news/read` | signed in | Marks every post as read for the signed-in master: `{ read, unread: 0 }`. |
+| `POST` | `/news/read` | signed in | Marks every post as read for the signed-in master: `{ read, unread: 0, readAt }`, where `readAt` is the server marker written to the account. |
 | `GET` | `/news/:hash` | anyone | One post and the hashes of its neighbours: `{ post, previous, next }`. |
 
 ## notifications
@@ -268,6 +268,6 @@ From `api/route/users.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/users/me` | anyone (session optional) | The signed-in account and its hero stats (`battles`, `wins`, `renown`), or `{ user: null }` for visitors. `wins` counts first-place finishes only: the runner-up also gains renown and is not a win. `joinedAt` is the account creation date, or null for legacy accounts whose creation date is unknown. Marks the user as active. |
+| `GET` | `/users/me` | anyone (session optional) | The signed-in account and its hero stats (`battles`, `wins`, `known`, `renown`), or `{ user: null }` for visitors. `wins` counts only the engine's `win` results; `known` is every battle with a `win`/`loss`/`draw` result and is the win-rate denominator. A battle with no survivor is a draw, and unknown historical results are excluded rather than counted as losses. `joinedAt` is the account creation date only when its provenance is known; otherwise it is null. Marks the user as active. |
 | `GET` | `/users/nickname?nickname=Ana` | signed in | Whether the nickname is free for the signed-in master: `{ nickname, available }`. |
-| `PUT` | `/users/me` | signed in | Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique), `language` (`c\|python\|blocks`), `preferences` (`{ message, friend, update, duel, tourn }` booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system\|classic\|arena-light\|arena-dark`, the site theme), `gladView` (`sprite\|3d`, how gladiators are drawn; `3d` by default) and `picture` (a cropped image as a data URL). Answers `{ user }` with the same hero stats (a win is a first place); 409 `NICKNAME_TAKEN` when the nickname is in use. |
+| `PUT` | `/users/me` | signed in | Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique), `language` (`c\|python\|blocks`), `preferences` (`{ message, friend, update, duel, tourn }` booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system\|classic\|arena-light\|arena-dark`, the site theme), `gladView` (`sprite\|3d`, how gladiators are drawn; `3d` by default) and `picture` (a cropped image as a data URL). Answers `{ user }` with the same hero stats (wins are engine results; unknown results are excluded from the rate); 409 `NICKNAME_TAKEN` when the nickname is in use. |

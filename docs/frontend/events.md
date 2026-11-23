@@ -91,7 +91,7 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | Event | Payload | Emitted by | Listened by |
 | :--- | :--- | :--- | :--- |
 | `account:loaded` | `{ user }` | `AccountService.load()` | shell (then PainelMenu/AccountMenu setters), Settings section |
-| `account:saved` | `{ user, changed: string[] }` | `AccountService.save()` | shell (header/menu identity), Settings section (`SaveStatus`), theme/glad-view helpers |
+| `account:saved` | `{ user, changed: string[], field, value, before }` | `AccountService.save()` after a confirmed write | shell (header/menu identity), theme/glad-view helpers |
 | `account:silver` | `{ silver }` | `AccountService.setSilver()` | shell → AppHeader/AccountMenu setters |
 | `account:signed-out` | `{}` | `AccountService.signOut()` | shell (return to the visitor header), NotificationService (stop polling) |
 | `account:sign-out-failed` | `{ error }` | `AccountService.signOut()` after the model rejects | shell (error toast with a retry; keep the account state) |
@@ -229,11 +229,11 @@ composes `needs` from `GET /duels` and `GET /friends` and `news` from `GET /repo
 `GET /news?offset=0&markRead=false`. The panel's own header shows `counts.bell`; the rows carry their own
 destination.
 
-### 2. Profile setting changed → autosave → toast with undo → theme/glad-view applied everywhere
+### 2. Profile setting changed → autosave → one undo toast → theme/glad-view applied everywhere
 
 Text fields save when they lose focus or on Enter; the nickname checks availability after a short pause
-first. Choices (theme, glad view, language, switches) save immediately. Every save goes through one queue
-per field, so the last intent wins even when responses arrive out of order.
+first. Choices (theme, glad view, language, switches) save immediately. Every field has its own state
+machine, so writes in different fields never wait for or supersede each other.
 
 ```mermaid
 sequenceDiagram
@@ -245,66 +245,66 @@ sequenceDiagram
     participant Bus
     participant Shell as Page entry
     participant Header
-    participant Toast
+    participant Toast as UndoToast
     User->>Choice: chooses Clássico
     Choice->>Section: component event 'change' { value: 'classic' }
+    Section->>Toast: begin() (the previous undo is gone)
     Section->>Section: applyTheme('classic') (preview at once)
     Section->>Svc: save('theme', 'classic')
-    Svc->>Svc: token = { field: 'theme', rev: ++seq.theme, previous: confirmed.theme } (only one request in flight)
+    Svc->>Svc: intent.theme = 'classic'; confirmed.theme = 'system'; no request in flight
     Svc->>API: PUT /users/me { theme: 'classic' }
     API-->>Svc: { user }
-    Svc->>Svc: confirmed.theme = 'classic'; rev === seq.theme, so the toast is due
-    Svc->>Bus: emit('account:saved', { user, changed: ['theme'] })
-    Svc->>Bus: emit('theme:changed', { choice: 'classic', theme: 'classic' })
+    Svc->>Svc: confirmed.theme = 'classic'; emit saved
+    Svc->>Bus: emit('account:saved', { user, changed: ['theme'], field, value, before: 'system' })
+    Svc->>Bus: emit('theme:changed', { choice: 'classic' })
     Bus-->>Shell: account:saved
     Shell->>Header: setAccount(user)
-    Section->>Toast: createToast('Tema alterado para Clássico', { action: { label: 'Desfazer', onClick } })
+    Section->>Toast: show(token, { field: 'theme', before: 'system', restore })
     User->>Toast: Desfazer
-    Toast->>Section: action.onClick() (calls Svc.undo(token) with the save's revision)
-    Section->>Svc: undo(token)
-    Svc->>API: PUT /users/me { theme: token.previous } (a new revision through the same queue)
-    Svc->>Bus: emit('account:saved') / emit('theme:changed')
+    Toast->>Section: restore('system') (preview)
+    Toast->>Svc: save('theme', 'system') (a normal change through the same queue)
+    Svc->>API: PUT /users/me { theme: 'system' }
+    Svc->>Section: saved or refused; a refusal restores confirmed and shows an error toast
 ```
 
 Rules:
 
-- **One queue per field, last write wins.** `AccountService` keeps `seq[field]` (the latest intent),
-  `confirmed[field]` (the last value the API confirmed) and `pending[field]`. It allows one `PUT` per field
-  in flight; when it settles, it sends the latest pending value if it differs. A response is applied only
-  when its revision is still `seq[field]`; a delayed response or failure from an older revision never
-  changes the preview, a toast or an error. A successful superseded write still updates `confirmed[field]`,
-  because the server persisted it and it is the base for a later rollback.
+- **Each field is independent.** `AccountService` keeps `confirmed` (last value the server accepted),
+  `intent` (latest value the user wants) and `pending` (the in-flight value or null). It allows one `PUT`
+  per field; fields never share a revision counter. A change sets `intent`; if nothing is in flight it is
+  sent, otherwise it waits. On success `confirmed = sent`; if `intent !== confirmed` the intent is sent
+  next. On refusal, if the refused value is still the intent the control rolls back to `confirmed` and
+  the caller reports the error; if the user already moved on, the old refusal is dropped silently.
+- **E-mail switches are independent fields.** `preferences.message`, `preferences.duel`, etc. each have
+  their own queue and send a one-key patch (`{ preferences: { message: false } }`), so two switches changed
+  quickly persist two columns and undo only the switch named by the toast.
 - **Optimistic preview, rollback to the confirmed value.** The UI shows the chosen value before the
-  request. If the *current* revision fails, the field reverts to `confirmed[field]` (not to the previous
-  intent) and `SaveStatus` shows its error with a retry; a superseded failure changes nothing.
-- **The token captures the value before the change.** At `save(field, value)` the service stores
-  `token = { field, rev, previous: confirmed[field] }`. `previous` is the value the API had persisted when
-  the change was made (if an earlier revision is still in flight and unconfirmed, it is the value before
-  that earlier change). The token targets `token.field`'s queue and is valid only while
-  `token.rev === seq[token.field]`; a later change **to the same field** dismisses the older toast and
-  invalidates it. `undo(token)` saves `token.previous` as a **new revision through the same field's
-  queue**, so the restore is itself persisted and confirmed; an old toast cannot undo a newer choice in
-  that field, and a change in another field never invalidates it. A refused undo keeps the last confirmed
-  value on screen and reports the API's message in an error toast (`undoChange` in
-  `helpers/section-request.js`); the toast action is awaited so a refusal never becomes an unhandled
-  rejection.
-- **Object patches merge when they run.** E-mail preferences are saved with `save('preferences', patch,
-  { merge: true })`: the queued patch is applied over `confirmed.preferences` at request time, not when
-  the switch was clicked, so changing two switches in quick succession sends one object containing both.
-  A nickname retry resends the refused nickname intent, not the value the control rolled back to.
-- **Test contract (WP4).** Start at Sistema. Change to Clássico (rev 1; token previous = Sistema), then to
-  Arena escuro (rev 2; token previous = Sistema because rev 1 is not confirmed yet) with the first response
-  delayed. Rev 1 succeeds: `confirmed` becomes Clássico, but no preview change and no toast. Rev 2 succeeds:
-  `confirmed` becomes Arena escuro and its toast is the current one. Undo saves `token.previous` =
-  Sistema as rev 3 and is confirmed. A delayed failure of rev 1 changes nothing. If the second change is
-  made after rev 1 confirmed, its token previous is Clássico (the value persisted before that change) —
-  the rule is always “captured at change time”, not “the value before the first change”. **Two fields:** a
-  change to `theme` and a change to `gladView` both reach revision 1; each token keeps its own `field`, and
-  undoing either targets that field's queue without invalidating the other.
+  request. A `refused` result reverts the control to `confirmed` and shows the API message; the inline
+  `SaveStatus` reports the error without a retry action. A write is attempted once; only reads are
+  retryable.
+- **One undo toast.** A change starts with `undoToast.begin()`, which invalidates and removes the previous
+  undo. A successful change calls `show(token, { field, before, restore })`; a response from an older
+  change whose token is no longer current is ignored, so a late write cannot resurrect an undo the user
+  already replaced. The toast names the field (`"Linguagem alterada"` etc.) and carries
+  `before = confirmed` captured when the change started. Clicking “Desfazer” is a **normal change** of that
+  field to `before` through the same state machine: it previews `before`, persists it, rolls back on a
+  refusal with an error toast, and never shows a new undo or a retry.
+- **Nickname drafts are kept.** A successful nickname response only rewrites the input, example and status
+  when the field still contains the value that was sent. A draft typed during the PUT stays in the field;
+  the hero and the persisted name update to the server value. A refusal applies the API message under the
+  field and in a toast when the refused text is still the draft; a newer draft is not overwritten.
+- **Text is never markup.** Toast messages and labels are constants or `writeErrorMessage`'s escaped API
+  message; the nickname is written with `textContent`, never interpolated into a toast. A nickname such
+  as `<img src=x onerror=alert(1)>` stays literal text in the field, the hero and the header.
+- **Test contract (WP4 fix 2).** The table-driven `AccountService` tests cover two fields changed
+  quickly (both persist), undo of each field (only that field changes), refusal of the latest intent
+  (rollback to confirmed), refusal of an older intent (dropped while the newer one continues), a refused
+  undo (last confirmed value kept), and a refusal while another field is in flight (the other field still
+  succeeds). The browser pass covers the single undo toast, a nickname draft during a PUT, the escaped
+  hostile nickname, a refused undo with no retry, and the crop cancellation on navigation.
 - `glad-view:changed` has the same flow: `applyGladView` on change, `save('gladView', choice)`, the cards
-  repaint in place (no reload, no reselection).
-- The settings footer says “Tudo que você muda aqui é salvo na hora.” and the `SaveStatus` beside each
-  field says “Salvo” / “Salvando…”; there is no save button (WP4).
+  repaint in place (no reload, no reselection). The settings footer says “Tudo que você muda aqui é salvo
+  na hora.” and the `SaveStatus` beside each field says “Salvo” / “Salvando…”; there is no save button.
 
 ### 3. Gladiator chosen in Batalhas → VersusPanel
 
