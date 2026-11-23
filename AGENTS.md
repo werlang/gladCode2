@@ -4,6 +4,9 @@ This document serves as the authoritative guide for AI coding agents (Antigravit
 
 Layer-by-layer project skills (API, models, MySQL, frontend, CSS, tests, docs, simulation) live in [`.agents/skills/`](.agents/skills/README.md); load the one for the layer you touch.
 
+> [!IMPORTANT]
+> **Project skills live only in `.agents/skills/`**, never in `.claude/skills/`, `.github/` or any other agent-specific folder, so every agent shares one copy. Before working on a layer, read [`.agents/skills/README.md`](.agents/skills/README.md) and the matching `.agents/skills/<name>/SKILL.md` (plus any `references/` it points to) yourself, even if your tool only discovers skills elsewhere and does not list them. A project skill overrides the global skill it localizes on project facts. Add or change project skills there, and do not copy or symlink them into another folder.
+
 ---
 
 ## ⛔ CRITICAL EXECUTION RULES
