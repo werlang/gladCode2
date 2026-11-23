@@ -38,6 +38,10 @@ export class FriendsTab {
     #options = this.#panel.querySelector('#friends .options');
     /** Friend of the row whose options menu is open. */
     #current = null;
+    /** The current navigation signal; the search and reloads keep using it. */
+    #signal = null;
+    /** Answers to older nickname searches are dropped. */
+    #searchRequest = 0;
 
     /** Binds the options menu and the search. */
     init() {
@@ -59,9 +63,16 @@ export class FriendsTab {
         search.addEventListener('input', () => this.#search(search.value));
     }
 
-    /** Lists the requests and the friends. */
-    async show() {
-        const data = await FriendModel.list();
+    /**
+     * Lists the requests and the friends.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async show(route = {}, { signal } = {}) {
+        this.#signal = signal;
+        const data = await FriendModel.list({ signal });
+        if (signal?.aborted) return;
         this.#panel.querySelector('#request').classList.toggle('hidden', !data.pending.length);
         this.#panel.querySelector('#friends').classList.toggle('hidden', !data.confirmed.length);
 
@@ -95,13 +106,18 @@ export class FriendsTab {
         });
     }
 
+    /** Closes the row options when the shell leaves the section. */
+    unmount() {
+        this.#closeOptions();
+    }
+
     /**
      * @param {number} id Request id.
      * @param {boolean} accept Accept it.
      */
     async #answer(id, accept) {
         await FriendModel.answer(id, accept);
-        this.show();
+        this.show({}, { signal: this.#signal });
     }
 
     /**
@@ -140,7 +156,10 @@ export class FriendsTab {
 
     /** @param {string} text Nickname search. */
     async #search(text) {
-        const users = await FriendModel.search(text);
+        const signal = this.#signal;
+        const request = ++this.#searchRequest;
+        const users = await FriendModel.search(text, { signal });
+        if (signal?.aborted || request !== this.#searchRequest) return;
         const table = this.#panel.querySelector('#search .table');
         table.replaceChildren();
         (Array.isArray(users) ? users : []).forEach(user => {

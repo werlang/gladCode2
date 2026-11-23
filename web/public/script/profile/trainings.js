@@ -486,6 +486,8 @@ class TrainingRoom {
 export class TrainingsTab {
     #wrapper = document.querySelector('#panel #battle-container #train.wrapper');
     #offsets = { manage: 0, part: 0 };
+    /** The current navigation signal; the list pages keep using it. */
+    #signal = null;
 
     /** Binds the buttons; only tutors can create trainings. */
     init() {
@@ -506,12 +508,18 @@ export class TrainingsTab {
      */
     #page(list, direction) {
         this.#offsets[list] += direction * PAGE_SIZE;
-        this.refresh();
+        this.refresh({ signal: this.#signal });
     }
 
-    /** Draws both training lists, opening the one a join link pointed to (`?room=`). */
-    async refresh() {
-        const data = await TrainingModel.list(this.#offsets);
+    /**
+     * Draws both training lists, opening the one a join link pointed to (`?room=`).
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async refresh({ signal = this.#signal } = {}) {
+        this.#signal = signal;
+        const data = await TrainingModel.list(this.#offsets, { signal });
+        if (signal?.aborted) return;
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
         if (!data.manage?.length && !data.part?.length) {

@@ -122,20 +122,22 @@ export class FriendModel {
 
     /**
      * @param {string} text Part of a friend's nickname.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<object[]>} Matching friends.
      */
-    static async filter(text) {
+    static async filter(text, { signal } = {}) {
         // an empty filter is left out of the query, which this route reads as every friend
-        const { friends } = await api.get('friends/confirmed', { filter: text });
+        const { friends } = await api.get('friends/confirmed', { filter: text }, { signal });
         return friends;
     }
 
     /**
      * @param {string} text Part of a nickname.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<Array<{ user: number, nick: string }>>} Masters to befriend.
      */
-    static async search(text) {
-        const { users } = await api.get('friends/search', { nick: text });
+    static async search(text, { signal } = {}) {
+        const { users } = await api.get('friends/search', { nick: text }, { signal });
         return users;
     }
 
@@ -177,10 +179,11 @@ export class MessageModel {
      * A page of the signed-in master's inbox.
      *
      * @param {number} page Page from 1.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ meta: { total: number, start: number, end: number, page: number }, messages: object[] }>}
      */
-    static list(page) {
-        return api.get('messages', { page });
+    static list(page, { signal } = {}) {
+        return api.get('messages', { page }, { signal });
     }
 
     /**

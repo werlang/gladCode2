@@ -46,10 +46,11 @@ export class TrainingModel {
      * Pages of the trainings the user manages and takes part in.
      *
      * @param {{ manage: number, part: number }} offsets First row of each list.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ manage: object[], part: object[], pages: Record<'manage'|'part', { offset: number, total: number }> }>}
      */
-    static list({ manage, part }) {
-        return api.get('trainings', { manageOffset: manage, partOffset: part });
+    static list({ manage, part }, { signal } = {}) {
+        return api.get('trainings', { manageOffset: manage, partOffset: part }, { signal });
     }
 
     /**

@@ -62,8 +62,14 @@ export class SettingsTab {
         new Button({ element: this.#panel.querySelector('#save') }).click(() => this.#save());
     }
 
-    /** Fills the form with the current settings. */
-    show() {
+    /**
+     * Fills the form with the current settings.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    show(route = {}, { signal } = {}) {
+        if (signal?.aborted) return;
         this.#picture = null;
         this.#nickname.value = profile.user.nickname;
         // the slot shows the current picture until a new crop replaces it

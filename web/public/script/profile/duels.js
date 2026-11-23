@@ -66,9 +66,14 @@ export class ChallengeList {
         return this.#panel.querySelectorAll('.table .row').length;
     }
 
-    /** Draws the challenges. */
-    async refresh() {
-        const duels = await DuelModel.challenges();
+    /**
+     * Draws the challenges.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async refresh({ signal } = {}) {
+        const duels = await DuelModel.challenges({ signal });
+        if (signal?.aborted) return;
         const table = this.#panel.querySelector('.table');
         this.#panel.classList.toggle('hidden', duels.length === 0);
         table.replaceChildren();

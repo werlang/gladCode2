@@ -7,9 +7,12 @@ import { BATTLE_TIMEOUT_MS, api } from '../helpers/request.js';
  * current engine version.
  */
 export class GladiatorModel {
-    /** @returns {Promise<Array<Record<string, any>>>} Every gladiator of the signed-in master. */
-    static async list() {
-        const { gladiators } = await api.get('gladiators');
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<Array<Record<string, any>>>} Every gladiator of the signed-in master.
+     */
+    static async list({ signal } = {}) {
+        const { gladiators } = await api.get('gladiators', {}, { signal });
         return gladiators;
     }
 

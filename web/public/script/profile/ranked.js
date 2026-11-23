@@ -146,16 +146,22 @@ export class RankedBattle {
         this.#button.addEventListener('click', () => this.#fight());
     }
 
-    /** Draws the user's gladiators to pick one. */
-    async refresh() {
+    /**
+     * Draws the user's gladiators to pick one.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async refresh({ signal } = {}) {
         this.#button.disabled = true;
         this.#selected = null;
-        const glads = await GladiatorModel.list();
+        const glads = await GladiatorModel.list({ signal });
+        if (signal?.aborted) return;
         this.#container.replaceChildren();
         const cards = await loadGladCards(this.#container, {
             glads,
             onClick: (event, glad) => this.#pick(event.currentTarget, glad),
         });
+        if (signal?.aborted) return;
         cards.forEach((card, index) => {
             card.querySelector('.info .master').insertAdjacentHTML('afterend', renderTemplate(mmrRowTemplate, { mmr: parseInt(glads[index].mmr, 10) }));
         });

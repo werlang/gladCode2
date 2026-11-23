@@ -1,6 +1,5 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn, hide, isVisible } from '../helpers/animate.js';
-import { TemplateVar } from '../helpers/template-var.js';
 import { FriendModel } from '../models/social.js';
 import { ChallengeList, challengeFriend } from './duels.js';
 import { RankedBattle } from './ranked.js';
@@ -15,6 +14,10 @@ import { friendFilterRowTemplate } from '../templates/profile.js';
 export class BattleTab {
     #panel = document.querySelector('#panel #battle-container');
     #friend = null;
+    /** The current navigation signal; the sub-tabs and filters keep using it. */
+    #signal = null;
+    /** Answers to older friend filters are dropped. */
+    #filterRequest = 0;
 
     /**
      * @param {() => void} onBattle Called after a battle ran (to refresh counters).
@@ -34,8 +37,8 @@ export class BattleTab {
         const modes = {
             ranked: () => {},
             duel: () => {},
-            tourn: () => this.tournaments.refresh(),
-            train: () => this.trainings.refresh(),
+            tourn: () => this.tournaments.refresh({ signal: this.#signal }),
+            train: () => this.trainings.refresh({ signal: this.#signal }),
         };
         this.#panel.querySelectorAll('#battle-mode .button').forEach(button => {
             button.addEventListener('click', () => {
@@ -49,16 +52,20 @@ export class BattleTab {
         });
 
         this.#bindDuel();
-
-        // `/battle.<mode>` opens a mode directly (ranked, duel, tourn, train)
-        const mode = TemplateVar.get('subtab');
-        if (mode) this.#panel.querySelector(`#battle-mode #${CSS.escape(mode)}.button`)?.click();
     }
 
-    /** Opens the tab: the gladiators for a ranked battle and the duel challenges. */
-    show() {
-        this.ranked.refresh();
-        this.challenges.refresh();
+    /**
+     * Opens the tab: the gladiators for a ranked battle and the duel challenges.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    show(route = {}, { signal } = {}) {
+        this.#signal = signal;
+        return Promise.all([
+            this.ranked.refresh({ signal }),
+            this.challenges.refresh({ signal }),
+        ]);
     }
 
     /** The duel part: filter friends, pick one and challenge them. */
@@ -75,7 +82,10 @@ export class BattleTab {
 
     /** @param {string} text Nickname filter. */
     async #filterFriends(text) {
-        const friends = await FriendModel.filter(text);
+        const signal = this.#signal;
+        const request = ++this.#filterRequest;
+        const friends = await FriendModel.filter(text, { signal });
+        if (signal?.aborted || request !== this.#filterRequest) return;
         const table = this.#panel.querySelector('#duel.wrapper #table-friends');
         const challenge = this.#panel.querySelector('#duel.wrapper #challenge');
         table.replaceChildren();

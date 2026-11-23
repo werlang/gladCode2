@@ -16,26 +16,40 @@ const MAX_REPLY_HEIGHT = 300;
 export class MessagesTab {
     #panel = document.querySelector('#message-panel');
     #page = 1;
+    /** The current navigation signal; reloads keep using it. */
+    #signal = null;
 
     /** Binds the pages. */
     init() {
         this.#panel.querySelector('#prev').addEventListener('click', () => {
             this.#page--;
-            this.show();
+            this.#show();
         });
         this.#panel.querySelector('#next').addEventListener('click', () => {
             this.#page++;
-            this.show();
+            this.#show();
         });
     }
 
-    /** Lists a page of messages. */
-    async show() {
+    /** Reloads the current page with the mounted section's signal. */
+    #show() {
+        return this.show({}, { signal: this.#signal });
+    }
+
+    /**
+     * Lists a page of messages.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async show(route = {}, { signal } = {}) {
+        this.#signal = signal;
         this.#panel.querySelector('#full-message')?.remove();
         const table = this.#panel.querySelector('.table');
         show(table);
 
-        const { meta, messages: info } = await MessageModel.list(this.#page);
+        const { meta, messages: info } = await MessageModel.list(this.#page, { signal });
+        if (signal?.aborted) return;
         const pageNav = this.#panel.querySelector('#page-title');
         if (meta.total == 0) {
             pageNav.hidden = true;
@@ -82,15 +96,15 @@ export class MessagesTab {
         this.#panel.append(full);
         MessageModel.markRead(message.id, true);
 
-        full.querySelector('#back').addEventListener('click', () => this.show());
+        full.querySelector('#back').addEventListener('click', () => this.#show());
         full.querySelector('#reply').addEventListener('click', () => this.#reply(full, message));
         full.querySelector('#unread').addEventListener('click', async () => {
             await MessageModel.markRead(message.id, false);
-            this.show();
+            this.#show();
         });
         full.querySelector('#delete').addEventListener('click', async () => {
             await MessageModel.remove(message.id);
-            this.show();
+            this.#show();
         });
 
         await fadeOut(this.#panel.querySelector('.table'));
@@ -127,7 +141,7 @@ export class MessagesTab {
                 else throw error;
                 return;
             }
-            this.show();
+            this.#show();
         });
         reply.querySelector('#cancel').addEventListener('click', () => {
             reply.remove();

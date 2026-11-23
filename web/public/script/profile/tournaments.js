@@ -506,6 +506,8 @@ class TournamentWindow {
 export class TournamentsTab {
     #wrapper = document.querySelector('#panel #battle-container #tourn.wrapper');
     #offsets = { mine: 0, open: 0 };
+    /** The current navigation signal; the list pages keep using it. */
+    #signal = null;
 
     /** Binds the buttons and the list pages. */
     init() {
@@ -524,12 +526,18 @@ export class TournamentsTab {
      */
     #page(list, direction) {
         this.#offsets[list] += direction * PAGE_SIZE;
-        this.refresh();
+        this.refresh({ signal: this.#signal });
     }
 
-    /** Draws both tournament lists. */
-    async refresh() {
-        const data = await TournamentModel.list(this.#offsets);
+    /**
+     * Draws both tournament lists.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async refresh({ signal = this.#signal } = {}) {
+        this.#signal = signal;
+        const data = await TournamentModel.list(this.#offsets, { signal });
+        if (signal?.aborted) return;
         ['mine', 'open'].forEach(list => {
             const { offset, total } = data.pages[list];
             const end = Math.min(total, offset + PAGE_SIZE);

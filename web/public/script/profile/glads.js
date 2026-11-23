@@ -58,10 +58,19 @@ function showCode(glad) {
  */
 export class GladsTab {
     #container = document.querySelector('#glads-container .glad-card-container');
+    /** The current navigation signal; reloads keep using it. */
+    #signal = null;
 
-    /** Draws the gladiators and the free places. */
-    async show() {
-        const glads = await GladiatorModel.list();
+    /**
+     * Draws the gladiators and the free places.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async show(route = {}, { signal } = {}) {
+        this.#signal = signal;
+        const glads = await GladiatorModel.list({ signal });
+        if (signal?.aborted) return;
         this.#container.replaceChildren();
         if (glads.length) document.querySelector('#menu #battle')?.classList.remove('disabled');
 
@@ -71,6 +80,7 @@ export class GladsTab {
             remove: true,
             onCode: glad => (glad.outdated ? this.#askUpdate(glad) : showCode(glad)),
         });
+        if (signal?.aborted) return;
         cards.forEach((card, index) => {
             const glad = glads[index];
             if (glad.outdated) card.querySelector('.code .button').textContent = 'Atualizar';

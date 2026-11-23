@@ -82,6 +82,8 @@ export class ReportsTab {
     #totals = { battles: 0, duels: 0, favorites: 0 };
     #selected = 'battles';
     #request = 0;
+    /** The current navigation signal; reloads keep using it. */
+    #signal = null;
 
     /** Binds the tabs, pages and the unread filter. */
     init() {
@@ -92,7 +94,7 @@ export class ReportsTab {
         this.#panel.querySelector('#prev').addEventListener('click', () => this.#page(-1));
         this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
         this.#unread.querySelector('input').addEventListener('change', () => {
-            if (this.#selected === 'battles') this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles });
+            if (this.#selected === 'battles') this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal });
         });
     }
 
@@ -103,6 +105,7 @@ export class ReportsTab {
      * @param {{ signal?: AbortSignal }} [options]
      */
     show(route = {}, { signal } = {}) {
+        this.#signal = signal;
         const tab = route.query?.tab;
         if (tab && TABS.includes(tab)) return this.#select(tab, { signal });
         return this.fetch({ offset: this.#offsets[this.#selected], placeholder: true, signal });
@@ -114,7 +117,7 @@ export class ReportsTab {
     }
 
     /** @param {string} id Tab id. @param {{ signal?: AbortSignal }} [options] */
-    #select(id, { signal } = {}) {
+    #select(id, { signal = this.#signal } = {}) {
         const same = id === this.#selected;
         this.#selected = id;
         this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
@@ -125,7 +128,7 @@ export class ReportsTab {
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */
     #page(direction) {
-        this.fetch({ offset: this.#offsets[this.#selected] + direction * PAGE_SIZE });
+        this.fetch({ offset: this.#offsets[this.#selected] + direction * PAGE_SIZE, signal: this.#signal });
     }
 
     /**
@@ -133,7 +136,7 @@ export class ReportsTab {
      *
      * @param {{ offset?: number, placeholder?: boolean, signal?: AbortSignal }} options
      */
-    async fetch({ offset = 0, placeholder = false, signal } = {}) {
+    async fetch({ offset = 0, placeholder = false, signal = this.#signal } = {}) {
         const id = this.#selected;
         const view = VIEWS[id];
         const request = ++this.#request;

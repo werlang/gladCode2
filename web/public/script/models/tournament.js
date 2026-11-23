@@ -20,10 +20,11 @@ export class TournamentModel {
      * Pages of the open public tournaments and of the master's own.
      *
      * @param {{ mine: number, open: number }} offsets First row of each list.
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ open: object[], mine: object[], pages: Record<'mine'|'open', { offset: number, total: number }> }>}
      */
-    static list({ mine, open }) {
-        return api.get('tournaments', { mineOffset: mine, openOffset: open });
+    static list({ mine, open }, { signal } = {}) {
+        return api.get('tournaments', { mineOffset: mine, openOffset: open }, { signal });
     }
 
     /**

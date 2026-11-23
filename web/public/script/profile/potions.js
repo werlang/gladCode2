@@ -44,6 +44,8 @@ export class PotionsTab {
     #expiries = new Map();
     #timer = null;
     #shop = null;
+    /** The current navigation signal; reloads keep using it. */
+    #signal = null;
 
     /** Loads the catalogue and the apothecary, then the slots. */
     async init() {
@@ -88,14 +90,37 @@ export class PotionsTab {
         }
     }
 
-    /** Opens the tab. */
-    show() {
-        this.refresh();
+    /**
+     * Opens the tab.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    show(route = {}, { signal } = {}) {
+        this.#signal = signal;
+        return this.refresh({ signal });
     }
 
-    /** Redraws the slots from the server. */
-    async refresh() {
-        const data = await PotionModel.slots();
+    /**
+     * Stops the countdown and closes the shop when the shell leaves the section.
+     */
+    unmount() {
+        clearInterval(this.#timer);
+        this.#timer = null;
+        this.#shop?.remove();
+        this.#shop = null;
+    }
+
+    /**
+     * Redraws the slots from the server.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async refresh({ signal } = {}) {
+        clearInterval(this.#timer);
+        this.#timer = null;
+        const data = await PotionModel.slots({ signal });
+        if (signal?.aborted) return;
         const container = this.#panel.querySelector('#my-pots');
         container.replaceChildren();
         this.#expiries.clear();
@@ -145,7 +170,7 @@ export class PotionsTab {
                 buttons: { yes: 'SIM', no: 'NÃO' },
             }).show().click('yes', async () => {
                 await PotionModel.cancel(item.id);
-                this.refresh();
+                this.refresh({ signal: this.#signal });
             });
         });
         return slot;
@@ -163,7 +188,7 @@ export class PotionsTab {
         });
         if (expired) {
             clearInterval(this.#timer);
-            this.refresh();
+            this.refresh({ signal: this.#signal });
         }
     }
 
@@ -257,7 +282,7 @@ export class PotionsTab {
             catch {
                 createToast('O item não pôde ser adquirido', 'error');
             }
-            this.refresh();
+            this.refresh({ signal: this.#signal });
         });
     }
 
