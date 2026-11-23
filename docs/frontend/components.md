@@ -52,8 +52,8 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | ChoiceCards | new | `components/choice-cards.js` | WP4 |
 | Switch | new | `components/switch.js` | WP4 |
 | Pagination | new | `components/pagination.js` | WP4 |
-| SearchField | new | `components/search-field.js` | WP4 |
-| Avatar | new | `components/avatar.js` | WP4 |
+| SearchField | new | `components/search-field.js` | WP3 |
+| Avatar | new | `components/avatar.js` | WP3 |
 | SaveStatus | new | `components/save-status.js` | WP4 |
 | Toast (with undo) | exists, extended | `components/toast.js` | WP2 |
 | EmptyState | exists | `templates/empty-state.js` | — |
@@ -168,14 +168,15 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   search field/trigger, the Batalhar CTA, the silver chip, the notification bell and the account avatar;
   the visitor variant offers “Entrar com Google”.
 - **Constructor:** `new AppHeader({ element, account, counts, active })`; `account` is the signed-in
-  user or `null`, `counts` the badge view model (`{ notifications, silver, level }`) and `active` the
+  user or `null`, `counts` is the canonical `NotificationCounts` payload (events.md), and `active` the
   section id.
-- **Methods:** `setAccount(user|null)`, `setCounts(counts)`, `setActive(section)`, `setSearching(on)`,
-  `openNotifications()`, `closePanels()`.
+- **Methods:** `setAccount(user|null)`, `setCounts(counts)`, `setSilver(silver)`, `setActive(section)`,
+  `setSearching(on)`, `openNotifications()`, `closePanels()`. The bell reads `counts.bell`; the silver
+  chip reads `counts.user.silver` and then follows `account:silver`.
 - **Events:** `sign-in` `{}`, `search` `{ query }` (as the field is typed), `battle` `{}` (the CTA),
   `account` `{}` (avatar), `notifications` `{}` (bell).
 - **ARIA:** `<header>` with `<nav aria-label="Principal">`, the active entry `aria-current="page"`; the
-  bell's label carries the unread count; the avatar's label names the master and level.
+  bell's label carries `counts.bell`; the avatar's label names the master and level.
 - **Boards:** `Header.dc.html`, `Estados.dc.html`, `Mobile.dc.html`, every section board.
 
 ### AccountMenu — new (WP3)
@@ -185,7 +186,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   teclado”, the three theme choices (`Claro`, `Escuro`, `Clássico`; `Sistema` is offered in the Perfil
   section) and “Sair”.
 - **Constructor:** `new AccountMenu({ element })`; the element is the panel the view rendered (hidden).
-- **Methods:** `open(trigger)`, `close()`, `setAccount(user)`, `setTheme(choice)`.
+- **Methods:** `open(trigger)`, `close()`, `setAccount(user)`, `setSilver(silver)`, `setTheme(choice)`.
 - **Events:** `theme-select` `{ choice }`, `shortcuts` `{}`, `sign-out` `{}`, `close` `{}`.
 - **ARIA:** a non-modal menu: trigger `aria-expanded`/`aria-controls`, roving focus (arrow keys), Esc
   closes and returns focus; theme buttons use `aria-pressed`.
@@ -197,7 +198,10 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the bell panel: “Precisa de você” (pending duel, friend request) and “Novidades”
   (reports, news), each row with the destination, plus “Marcar como lidas”.
 - **Constructor:** `new NotificationsPanel({ element })`.
-- **Methods:** `open(trigger)`, `close()`, `setItems({ needs, news })`, `setCount(count)`.
+- **Methods:** `open(trigger)`, `close()`, `setItems({ needs, news })`, `setCount(counts.bell)`. The rows
+  are loaded when the panel opens by `NotificationService.feed()` (composed from `GET /duels`,
+  `GET /friends`, `GET /reports?unreadOnly=true` and `GET /news?markRead=false`); the header count comes
+  from the joined counts.
 - **Events:** `read-all` `{}`, `open-item` `{ id, href }`, `close` `{}`.
 - **ARIA:** labelled dialog/popover, focus moved to the first item, Esc closes.
 - **Boards:** `Estados.dc.html`, `Header.dc.html` (the bell).
@@ -226,8 +230,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   and the engine version.
 - **Constructor:** `new PainelMenu({ element, sections, account, counts })`; `sections` is the ordered
   group definition (id, label, icon, href, group, badge kind).
-- **Methods:** `setActive(section)`, `setAccount(user)`, `setCounts(counts)`, `open()`/`close()` for the
-  phone drawer.
+- **Methods:** `setActive(section)`, `setAccount(user)`, `setCounts(counts)` (the canonical
+  `NotificationCounts`; each badge picks its field), `open()`/`close()` for the phone drawer.
 - **Events:** `navigate` `{ section, href }` (so the shell can close the phone drawer and scroll to the
   top), `new-gladiator` `{}`.
 - **Children:** `MenuItem` + `Badge`; the identity card is `Avatar` + the XP bar.
@@ -266,7 +270,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the phone bottom bar: Notícias, Gladiadores, the raised Batalhar action, Relatórios and
   Mais; dots/badges on the entries that need attention.
 - **Constructor:** `new MobileTabBar({ element })`.
-- **Methods:** `setActive(section)`, `setCounts({ battle, reports, news, more })`.
+- **Methods:** `setActive(section)`, `setCounts(counts)` (the canonical `NotificationCounts`; the bar
+  derives its battle/reports/news/more dots from it).
 - **Events:** `navigate` `{ section }`, `more` `{}`.
 - **ARIA:** `<nav aria-label="Seções">`, each entry a link with `aria-current="page"`; the raised
   Batalhar button keeps a 44 px target despite the visual circle; badges have text.
@@ -278,7 +283,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the phone “Mais” sheet: the identity card, the six section tiles with counts (Poções,
   Ranking, Mensagens, Amigos, Notícias, Ajustes) and the Editor/Aprender/Sobre links.
 - **Constructor:** `new MoreSheet({ element })`.
-- **Methods:** `open()`, `close()`, `setAccount(user)`, `setCounts(counts)`.
+- **Methods:** `open()`, `close()`, `setAccount(user)`, `setCounts(counts)` (the canonical
+  `NotificationCounts`; the tiles reuse its fields).
 - **Events:** `navigate` `{ section, href }`, `close` `{}`.
 - **ARIA:** a modal bottom sheet: `role="dialog"` `aria-modal="true"`, labelled heading, scrim closes,
   Esc closes, focus trapped and returned.
@@ -378,7 +384,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   `disabled`, the jump form a real `<form>` with a labelled input.
 - **Boards:** `Relatorios.dc.html`, `Ranking.dc.html`.
 
-### SearchField — new (WP4)
+### SearchField — new (WP3)
 
 - **File:** `components/search-field.js`; **CSS:** `css/components/search-field.css`.
 - **Purpose:** the one search input: the header field, the Ranking search, the conversation search and
@@ -391,7 +397,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Boards:** `Header.dc.html`, `Estados.dc.html`, `Ranking.dc.html`, `Mensagens.dc.html`,
   `Amigos.dc.html`.
 
-### Avatar — new (WP4)
+### Avatar — new (WP3)
 
 - **File:** `components/avatar.js`; **CSS:** `css/components/avatar.css`.
 - **Purpose:** a master's picture with the fallback initials, the level ring and the online dot; used by
@@ -496,8 +502,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** one of the four potion compartments: a filled potion with its kind tint, a countdown bar
   and time; an empty dashed slot that points to the shop; a locked slot with its master level.
 - **Constructor:** `new PotionSlot({ element, index })`.
-- **Methods:** `setPotion(slot|null)`, `setLocked(level)`, `setEmpty()`; the countdown uses
-  `components/countdown.js` and stops when the slot leaves the DOM.
+- **Methods:** `setPotion(slot, serverNow)`, `setLocked(level)`, `setEmpty()`; the countdown is computed
+  from the slot's `expiresAt` and `serverNow` (both server time) through `components/countdown.js`, and
+  stops when the slot leaves the DOM. A locally computed duration is not accepted.
 - **Events:** `empty` `{ index }` (focus the shop), `cancel` `{ slot }` (the slot's menu).
 - **ARIA:** the countdown is text (`role="timer"` with an accessible label), not only a bar.
 - **Boards:** `Pocoes.dc.html`, `Batalhas.dc.html` (the pots carried in the versus panel).
@@ -518,7 +525,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the ranking table: position, gladiator (with the VOCÊ tag), master, 7-day trend, renown,
   the own row highlighted, a podium summary and the header strip “Em volta de X · posições 124–132”.
 - **Constructor:** `new RankingTable({ element })`.
-- **Methods:** `setRows(rows)`, `setContext({ around, position, page })`, `setBusy(on)`.
+- **Methods:** `setRows(rows)`, `setContext({ around, position, page, total, pageSize })`, `setBusy(on)`,
+  `reveal(position)` (scrolls the row into view and flashes it). It never fetches: the section gets the
+  window from `RankingService` and calls the setters.
 - **Events:** `open-gladiator` `{ gladiator }` (a row links to the gladiator/master).
 - **ARIA:** a real `<table>` with `<th scope="col">`; the own row is marked in text (“VOCÊ”); trends read
   “subiu 9” / “desceu 3” / “estável”.
@@ -530,8 +539,10 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the “SEUS GLADIADORES” strip: one chip per own gladiator with its position and an arrow to
   jump the table; a gladiator out of the ranking is dimmed and says why (desatualizado / com erro).
 - **Constructor:** `new OwnGladiatorJump({ element, gladiators })`.
-- **Methods:** `setGladiators(list)`, `setActive(id)`.
-- **Events:** `jump` `{ gladiator, position }`.
+- **Methods:** `setGladiators(list)` (each `{ id, name, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken' }`
+  from `GET /ranking/mine`), `setActive(id)`.
+- **Events:** `jump` `{ gladiator: { id, name }, position }` (`position` is the gladiator's current
+  position; the section resolves it with the ranking window).
 - **ARIA:** each chip is a link/button with a `title` naming the destination; `aria-current="page"` on
   the active one.
 - **Boards:** `Ranking.dc.html`.
@@ -542,8 +553,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the left pane of Mensagens: the conversation search and one row per master (avatar, name,
   last message, relative time, unread count), the open row highlighted.
 - **Constructor:** `new ConversationList({ element, conversations })`.
-- **Methods:** `setConversations(list)`, `select(id)`, `setFilter(text)`, `setBusy(on)`.
-- **Events:** `select` `{ id }`, `search` `{ query }`.
+- **Methods:** `setConversations(list)`, `select(userId)`, `markRead(userId)`, `setFilter(text)`,
+  `setBusy(on)`. Every row is keyed by the **other master's user id** (`userId`), never by a message id.
+- **Events:** `select` `{ userId }`, `search` `{ query }`.
 - **ARIA:** a list of links (`aria-current="page"` on the open one); unread is text in the row.
 - **Boards:** `Mensagens.dc.html`.
 
@@ -553,8 +565,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the conversation pane: header (avatar, name, online state, Desafiar, more), the day
   marker, incoming/outgoing bubbles, a shared replay card and the timestamp.
 - **Constructor:** `new MessageThread({ element })`.
-- **Methods:** `setConversation({ user, messages })`, `append(message)`, `setOnline(on)`, `scrollToEnd()`,
-  `setBusy(on)`.
+- **Methods:** `setConversation({ user, messages })` (`user.id` is the conversation key), `append(message)`,
+  `setOnline(on)`, `scrollToEnd()`, `setBusy(on)`.
 - **Events:** `challenge` `{ user }`, `open-replay` `{ hash }`, `more` `{ user }`.
 - **ARIA:** a live region for newly appended messages; each bubble is a list item with the sender named
   for screen readers.

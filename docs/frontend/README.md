@@ -27,7 +27,8 @@ mtime import map (`web/helpers/modules.js`), and styles are plain sheets loaded 
 
 The redesign keeps those foundations and adds:
 
-- a shared app shell (header, Painel menu, phone bottom bar) used by every page that shows the header;
+- a shared **header** used by every page that shows it (`{{> header}}`), and the **Painel shell**
+  (Painel menu + phone bottom bar + “Mais” sheet) used only by the nine Painel sections;
 - a component catalogue ([components.md](components.md)) with one file and one stylesheet per element;
 - a DOM-free `services/` folder for application state that survives a section change, and
   `helpers/event-bus.js` for app events ([events.md](events.md));
@@ -67,8 +68,8 @@ gladCode departs in four places, each deliberate:
 | WP | Delivers | Documents that become code |
 | :--- | :--- | :--- |
 | WP2 | Tokens for the game surfaces, UI primitives, the catalogue's shared components, `helpers/event-bus.js`, `services/`, unit tests | conventions.md, components.md (shared entries), events.md |
-| WP3 | AppHeader, AccountMenu, NotificationsPanel, CommandPalette, PainelMenu, MobileTabBar, MoreSheet, global search | components.md (shell entries), pages.md |
-| WP4 | Notícias and Perfil with autosave and the undo toast | components.md (PageHeader, SectionCard, SaveStatus), events.md flow 2 |
+| WP3 | AppHeader, AccountMenu, NotificationsPanel, CommandPalette, PainelMenu, MenuItem, Badge, MobileTabBar, MoreSheet, SearchField, Avatar, global search | components.md (shell entries), pages.md |
+| WP4 | Notícias and Perfil with autosave and the undo toast | components.md (PageHeader, SectionCard, SaveStatus), events.md flows 2 and 9 |
 | WP5 | Gladiadores and Batalhas | components.md (GladiatorCard, GladiatorPicker, VersusPanel), events.md flows 3 |
 | WP6 | Poções and Relatórios | components.md (PotionSlot, PotionCard, ResultPill, FormStreak), events.md flow 7 |
 | WP7 | Ranking | components.md (RankingTable, OwnGladiatorJump), events.md flow 4 |

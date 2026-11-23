@@ -13,9 +13,10 @@ panel. Clicking a menu entry does not change the URL.
 The target keeps the server routes and the single shell view, and changes four things:
 
 1. the shell markup is the header partial + the Painel menu + one content column (no in-menu footer);
-2. menu entries are real links; the shell intercepts same-origin section clicks, updates the URL with
-   `history.pushState`, unmounts the old section and mounts the new one (a cold load or a modified click
-   does a full navigation, so the server route is still the source of truth);
+2. menu entries are real links; the shell has **one route resolver** shared by the first load, clicks and
+   `popstate`, pushes a history entry on a section change and mounts the section from the resolved state
+   (a cold load or a modified click still does a full navigation, so the server route is the source of
+   truth);
 3. each section has one lifecycle (mount, unmount, abort) and real loading, empty and error states;
 4. the phone gets a bottom tab bar and a “Mais” sheet instead of the rail.
 
@@ -31,19 +32,67 @@ module column names today's file).
 | Section | Route(s) | Section id | Section module | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | Notícias | `/news` | `news` | `profile/news.js` | The first entry and the shell's landing section; the header's “Painel” link opens it (WP3). |
-| Perfil | `/profile`, `/profile?t=profile`, `/profile?t=<tab>` | `profile` | `profile/settings.js` | `?t=` keeps old links working; an unknown or disabled tab opens Perfil (today's `openableTab`). |
+| Perfil | `/profile`, `/profile?t=profile` | `profile` | `profile/settings.js` | Unknown or disabled tabs fall back to Perfil (today's `openableTab`). |
 | Gladiadores | `/glads` | `glads` | `profile/glads.js` | |
 | Poções | `/potion` | `potions` | `profile/potions.js` | The menu says Poções; the route keeps the old singular. |
-| Batalhas | `/battle`, `/battle.<mode>`, `/profile?t=battle&s=<mode>` | `battle` | `profile/battle.js` + `ranked.js`, `duels.js`, `tournaments.js`, `trainings.js` | `<mode>` is `ranked`, `duel`, `tourn` or `train`; `?s=` keeps old links. |
-| Relatórios | `/reports` | `report` | `profile/reports.js` | The section id is `report` (today's menu id). |
-| Ranking | `/ranking` | `ranking` | `profile/ranking.js` | |
-| Mensagens | `/messages` | `messages` | `profile/messages.js` | |
+| Batalhas | `/battle`, `/battle.<mode>` | `battle` | `profile/battle.js` + `ranked.js`, `duels.js`, `tournaments.js`, `trainings.js` | `<mode>` is `ranked`, `duel`, `tourn` or `train`. |
+| Relatórios | `/reports` | `report` | `profile/reports.js` | The section id is `report` (today's menu id); `/reports` is the canonical URL. |
+| Ranking | `/ranking`, `/ranking?at=<position>` | `ranking` | `profile/ranking.js` | `?at=` opens the ranking around a position and reveals it. |
+| Mensagens | `/messages`, `/messages/<userId>` | `messages` | `profile/messages.js` | `<userId>` is the other master's id; the open conversation is part of the URL (WP8). |
 | Amigos | `/friends` | `friends` | `profile/friends.js` | |
+| Any section (legacy tab) | `/profile?t=<tab>` | resolved from `t` | same as the named section | `t` names the section (`news`, `glads`, `potions`, `battle`, `report`, `ranking`, `messages`, `friends`); `?s=` sets the battle subtab. Unknown/disabled falls back to Perfil. |
 | Sair | `/logout` | — | — | Not a section: the account menu's “Sair” signs out and leaves; the old route still works. |
 
-`web/app.js` `PROFILE_TABS` is the server side of this table (`news`, `glads`, `reports`, `battle`,
-`potion`, `ranking`, `messages`, `friends`, `logout`). Keep it in step: a route that exists must answer the
-shell, and a section id that the menu shows must have a route.
+`web/app.js` `PROFILE_TABS` is the server side of this table: its **keys** are the route names (`news`,
+`glads`, `reports`, `battle`, `potion`, `ranking`, `messages`, `friends`, `logout`) and its **values** are
+the section ids (`news`, `glads`, `report`, `battle`, `potions`, `ranking`, `messages`, `friends`,
+`logout`). Keep it in step: a route that exists must answer the shell, and a section id that the menu shows
+must have a route. WP8 registers `/messages/:userId` as a page route before the catch-all; the resolver
+reads `userId` from the path. `/ranking?at=` needs no new route.
+
+### The route resolver (WP3)
+
+One function, `resolveRoute(url)`, is the only place a URL becomes a shell state. It returns:
+
+```js
+/**
+ * @typedef {object} PainelRoute
+ * @property {'news'|'profile'|'glads'|'potions'|'battle'|'report'|'ranking'|'messages'|'friends'} section
+ * @property {string} subtab `''` or a battle mode (`ranked`, `duel`, `tourn`, `train`).
+ * @property {{ at?: number, q?: string, userId?: number }} query The section-owned query values.
+ */
+```
+
+- `/news`, `/glads`, `/potion`, `/battle`, `/reports`, `/ranking`, `/messages`, `/friends` map to their
+  section ids (`report` for `/reports`).
+- `/battle.<mode>` sets `subtab`; a `/profile?t=battle&s=<mode>` legacy URL resolves to the same state.
+- `/profile?t=<tab>` resolves the section from `tab` (`report`, `potions` accepted alongside the route
+  names), then `?s=` as the subtab; an unknown or disabled tab resolves to `profile`.
+- `/ranking?at=<n>` sets `query.at` (a positive integer, else ignored); `/ranking?q=` sets `query.q`.
+  `/messages/<userId>` sets `query.userId` (WP8).
+- Any other path is not a Painel route; the server's own redirects (old addresses) run first, and the shell
+  only intercepts links whose resolved state has a `section`.
+
+`sectionUrl(state)` builds the canonical URL back (`/news`, `/battle.duel`, `/ranking?at=128`,
+`/messages/7`); the shell never writes a URL the resolver cannot read.
+
+**Navigation rules:**
+
+| Trigger | Behaviour |
+| :--- | :--- |
+| First load | `mount(resolveRoute(location))`; **no** `pushState`, no focus move. |
+| Left click on a same-origin section link (no modifier) | `event.preventDefault()`, `navigate(resolveRoute(href), { push: true })`. |
+| Palette result, menu, tab bar | the same `navigate(state, { push: true })`. |
+| `popstate` (Back/Forward) | `mount(resolveRoute(location))` with `{ fromHistory: true }`; **no** `pushState` and no new entry. |
+| In-section state change (filters, pagination, the ranking jump) | the section applies it and emits its fact; the shell calls `navigate(state, { historyOnly: true, replace: true })` for filters/pagination and `{ historyOnly: true, push: true }` for the ranking jump and for opening a conversation, so Back returns to the previous window without a duplicate request |
+
+`navigate(state, { push, replace, historyOnly })` calls
+`history.pushState({ painel: state }, '', sectionUrl(state))` (or `replaceState`). When `historyOnly` is
+false, it then `mount`s or `update`s the section: `mount` after a section change, `update` when only the
+subtab or the query changed. `mount` unmounts the current section, mounts the next one, sets the active menu
+entry and the title, scrolls the content to the top and moves focus to the section's `<h1>` only when the
+change came from a click, a shortcut or `popstate` — never on the first load or an in-place `update`. Back
+and Forward restore section, subtab and query because the resolver reads them from `location`.
 
 ### Old addresses
 
@@ -124,32 +173,39 @@ A section module exports a factory:
  *   element: HTMLElement,
  *   services: { account, notifications, shell },
  *   events: import('../helpers/event-bus.js').events,
- *   route: { section: string, subtab: string },
+ *   route: PainelRoute,
  * }} context
- * @returns {{ mount(): Promise<void>, unmount(): void }}
+ * @returns {{ mount(route): Promise<void>, update?(route): Promise<void>, unmount(): void }}
  */
 export function createNewsSection(context) { … }
 ```
 
 WP3 adapts the existing controllers to this shape; WP4–WP8 rewrite them section by section. The contract:
 
-1. **Mount.** The shell marks the content `aria-busy="true"`, shows the section's skeleton (or its
-   `SectionCard` in the loading state), then calls `mount()`. The section creates one
-   `AbortController`, passes its signal to every request and to `events.on`, and registers its timers.
-2. **Load and render.** Data comes from a service; the section renders through components and templates.
+1. **Mount.** The shell resolves the route, and when the section id changes it unmounts the old section and
+   calls `mount(route)`. The shell marks the content `aria-busy="true"`, shows the section's skeleton (or
+   its `SectionCard` in the loading state), and the section creates one `AbortController`, passes its
+   signal to every request and to `events.on`, and registers its timers.
+2. **Update in place.** When only the subtab or the query changes (`/battle.duel` → `/battle.ranked`,
+   `/ranking?at=128`, `/messages/7`), the shell calls the mounted section's `update(route)` instead of
+   remounting it. The section aborts the requests it no longer needs, applies the new filter/window and
+   keeps its scroll position and the components it already owns.
+3. **Load and render.** Data comes from a service; the section renders through components and templates.
    The first paint never waits for a secondary request (the page header and the section chrome show while
    the list loads).
-3. **Unmount.** The shell calls `unmount()` before mounting the next section: abort the controller, clear
-   timers and intervals, `destroy()` the components it owns, remove its listeners, cancel the countdowns.
-   A late response after `unmount()` is ignored (`RequestError.aborted` is not shown).
-4. **Navigation.** On mount the shell sets `document.title` (`gladCode - <section>`), updates the active
+4. **Unmount.** The shell calls `unmount()` before mounting a different section: abort the controller,
+   clear timers and intervals, `destroy()` the components it owns, remove its listeners, cancel the
+   countdowns. A late response after `unmount()` is ignored (`RequestError.aborted` is not shown).
+5. **Navigation.** On mount the shell sets `document.title` (`gladCode - <section>`), updates the active
    entry (`navigation:opened`), scrolls the content to the top, and moves focus to the section's `<h1>`
-   (`tabindex="-1"`) **only when the change came from a click or a shortcut** — not on the first load.
-5. **No section owns the page.** A section never reads or writes another section's DOM, never calls
-   `location.reload()` and never leaves a global behind.
-6. **One mounted section.** The shell mounts one section at a time and keeps the previous one's state only
+   (`tabindex="-1"`) **only when the change came from a click, a shortcut or `popstate`** — not on the
+   first load and not on an in-place `update`.
+6. **No section owns the page.** A section never reads or writes another section's DOM, never calls
+   `location.reload()`, never calls `history` directly (the shell owns the resolver and the history) and
+   never leaves a global behind.
+7. **One mounted section.** The shell mounts one section at a time and keeps the previous one's state only
    if that section chooses to cache it in its service (the news list, for instance); the default is a
-   fresh mount.
+   fresh mount after a section change.
 
 ## 5. States
 

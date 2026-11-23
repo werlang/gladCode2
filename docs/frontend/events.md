@@ -71,6 +71,11 @@ Contract:
   development and in tests, so a typo fails the suite instead of silently doing nothing.
 - A handler receives the `detail` object, not the `CustomEvent`.
 - `events` is the only instance; no module constructs another.
+- **App events are consumed by services and the shell/page entry**; a component receives data through its
+  setters (`setCounts`, `setSilver`, `setRows`, …). The two global preference facts (`theme:changed`,
+  `glad-view:changed`) are the exception: the components that repaint on them subscribe directly. A section
+  may subscribe when the fact belongs to it (a message read, a potion ordered) and then updates its
+  children through their setters.
 
 ### Event names, payloads, emitters and listeners
 
@@ -79,49 +84,75 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 
 | Event | Payload | Emitted by | Listened by |
 | :--- | :--- | :--- | :--- |
-| `account:loaded` | `{ user }` | `AccountService.load()` | shell, PainelMenu, AccountMenu, Settings section |
+| `account:loaded` | `{ user }` | `AccountService.load()` | shell (then PainelMenu/AccountMenu setters), Settings section |
 | `account:saved` | `{ user, changed: string[] }` | `AccountService.save()` | shell (header/menu identity), Settings section (`SaveStatus`), theme/glad-view helpers |
-| `account:silver` | `{ silver }` | `AccountService.setSilver()` | AppHeader (the silver chip), AccountMenu |
+| `account:silver` | `{ silver }` | `AccountService.setSilver()` | shell → AppHeader/AccountMenu setters |
 | `account:signed-out` | `{}` | `AccountService.signOut()` | shell (return to the visitor header), NotificationService (stop polling) |
 | `theme:changed` | `{ choice: 'system'\|'classic'\|'arena-light'\|'arena-dark', theme: 'classic'\|'arena-light'\|'arena-dark' }` | `helpers/theme.js` `applyTheme` | AccountMenu (pressed state), Settings section, any page that redraws on theme |
 | `glad-view:changed` | `{ choice: 'sprite'\|'3d' }` | `helpers/glad-view.js` `applyGladView` | GladiatorCard/GladCardPainter, editor creator |
-| `notifications:counts` | `NotificationCounts` (below) | `NotificationService.refresh()` | AppHeader (bell), PainelMenu (badges, identity), MobileTabBar, MoreSheet |
-| `navigation:opened` | `{ section: SectionId, href: string }` | shell after a section mounts | PainelMenu (active entry), MobileTabBar, analytics, the route title |
-| `messages:read` | `{ id: number, unreadTotal: number }` | `MessagesService.markRead()` | NotificationService (refresh), ConversationList |
-| `friends:answered` | `{ id: number, accepted: boolean, pendingTotal: number }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
-| `potions:ordered` | `{ slot: PotionSlotView, silver: number }` | `PotionsService.order()` | Poções section (slot), AppHeader (silver via `account:silver`), NotificationService |
+| `notifications:counts` | `NotificationCounts` (below) | `NotificationService.refresh()` | shell → AppHeader, PainelMenu, MobileTabBar, MoreSheet setters |
+| `navigation:opened` | `{ section: SectionId, href: string }` | shell after a section mounts | shell → PainelMenu/MobileTabBar setters, analytics, the route title |
+| `messages:read` | `{ userId: number, read: number, unreadTotal: number }` | `MessagesService.markRead()` | Mensagens section (updates `ConversationList`), NotificationService (refresh) |
+| `friends:answered` | `{ id: number, accepted: boolean }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
+| `potions:ordered` | `{ slot: PotionSlotView, serverNow: string, silver: number }` | `PotionsService.order()` | Poções section (updates `PotionSlot`), NotificationService; AppHeader via `account:silver` |
 | `potions:cancelled` | `{ slotId: number }` | `PotionsService.cancel()` | Poções section |
 | `gladiator:chosen` | `{ gladiator: GladiatorView, mode: 'ranked'\|'duel'\|'tournament'\|'training' }` | Batalhas section (after the picker's `select`) | Batalhas section itself for the URL, analytics |
-| `ranking:jumped` | `{ gladiatorId: number, position: number }` | Ranking section (after the table moved) | shell (URL/hash), analytics |
-| `palette:opened` | `{ source: 'keyboard'\|'button' }` | shell | analytics, the header search field (busy state) |
-| `palette:navigated` | `{ target: string, href: string }` | CommandPalette → shell | analytics, PainelMenu (pending active state) |
+| `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` | Ranking section (after the table moved) | shell (URL/hash), analytics |
+| `palette:opened` | `{ source: 'keyboard'\|'button' }` | shell | analytics, shell (header search busy state) |
+| `palette:navigated` | `{ target: string, href: string }` | CommandPalette → shell | analytics, shell (menu pending state) |
+
+Every numeric id above is the entity it names: `messages:read.userId` is **the other master's user id**
+(the conversation key), `friends:answered.id` is the pending `friends` row id, `potions:*.slotId` and
+`PotionSlotView.id` are the `slots` row id, `ranking:jumped.gladiatorId` is `gladiators.cod`, and
+`gladiator:chosen.gladiator.id` is also `gladiators.cod`. A message id (`messages.id`) never keys a
+conversation.
 
 Payload typedefs:
 
 ```js
 /**
+ * The one payload of `notifications:counts`, produced by `NotificationService` after joining
+ * `GET /notifications` with `GET /potions/slots`. Every listener reads the same fields.
+ *
  * @typedef {object} NotificationCounts
  * @property {{ level: number, xp: number, silver: number }} user
- * @property {number} messages
- * @property {number} news
- * @property {number} friends
+ * @property {number} messages Unread private messages.
+ * @property {number} news Unread news posts.
+ * @property {number} friends Pending friend requests.
  * @property {{ remaining: number, outdated: number }} gladiators
- * @property {number} duels
- * @property {{ ranked: number, duel: number }} reports
- * @property {number} potions Expiring potions (the rail's “3 h”).
+ * @property {number} duels Pending duel challenges.
+ * @property {{ ranked: number, duel: number }} reports Unread ranked and duel reports.
+ * @property {{ count: number, nextExpiry: string|null, serverNow: string }} potions
+ *   Active potion slots, the soonest `expiresAt` (or null) and the server time of that answer.
+ * @property {number} bell The bell total: `duels + friends + reports.ranked + reports.duel + news`.
  */
 
 /**
+ * One potion compartment, as `GET /potions/slots` returns it (WP6 adds `expiresAt` and `serverNow`).
+ *
  * @typedef {object} PotionSlotView
  * @property {number} id
  * @property {string} identifier
  * @property {string} name
  * @property {string} icon
- * @property {number} seconds Time left.
+ * @property {string} expiresAt Server-time timestamp (`YYYY-MM-DD HH:MM:SS`).
+ * @property {number} seconds Time left when the API answered.
  */
 
 /**
- * @typedef {'news'|'profile'|'glads'|'potions'|'battle'|'reports'|'ranking'|'messages'|'friends'} SectionId
+ * The subset of a gladiator a component or event receives; `id` is `gladiators.cod`.
+ *
+ * @typedef {object} GladiatorView
+ * @property {number} id
+ * @property {string} name
+ * @property {number} mmr
+ * @property {string} skin
+ */
+
+/**
+ * The ids `web/app.js` `PROFILE_TABS` uses. `/reports` maps to `report`; `/potion` maps to `potions`.
+ *
+ * @typedef {'news'|'profile'|'glads'|'potions'|'battle'|'report'|'ranking'|'messages'|'friends'} SectionId
  */
 ```
 
@@ -143,8 +174,9 @@ Payload typedefs:
 ### 1. Notification counts → header bell, menu badges and tab bar badges
 
 `NotificationService` is the only owner of the counts. It refreshes on load, every 30 s while the page is
-visible, and when a fact that changes a count arrives (debounced to one request per burst). The shell
-passes the counts to the header, the menu and the tab bar through their setters.
+visible, and when a fact that changes a count arrives (debounced to one request per burst). The same refresh
+joins `GET /notifications` (the counters) with `GET /potions/slots` (the potion expiry), because the
+notifications endpoint does not carry potions.
 
 ```mermaid
 sequenceDiagram
@@ -152,26 +184,44 @@ sequenceDiagram
     participant Svc as NotificationService
     participant API
     participant Bus
+    participant Shell as Page entry
     participant Header
     participant Menu as PainelMenu
     participant Bar as MobileTabBar
+    participant More as MoreSheet
     Timer->>Svc: refresh()
     Svc->>API: GET /notifications
-    API-->>Svc: counts
-    Svc->>Bus: emit('notifications:counts', { counts })
-    Bus-->>Header: setCounts(counts)
-    Bus-->>Menu: setCounts(counts)
-    Bus-->>Bar: setCounts(counts)
+    Svc->>API: GET /potions/slots (signed in)
+    API-->>Svc: counts, slots and serverNow
+    Svc->>Bus: emit('notifications:counts', counts)
+    Bus-->>Shell: counts
+    Shell->>Header: setCounts(counts)
+    Shell->>Menu: setCounts(counts)
+    Shell->>Bar: setCounts(counts)
+    Shell->>More: setCounts(counts)
 ```
 
-The bell's `aria-label` includes the count (“Notificações, 4 novas”); a zero count removes the badge but
+The bell's `aria-label` uses `counts.bell` (“Notificações, 4 novas”); a zero count removes the badge but
 keeps the button. The menu badges use the three kinds from [components.md](components.md) (`action`,
-`unread`, `info`). The 30 s poll stops on `account:signed-out`, `visibilitychange` and section unmount.
+`unread`, `info`): duels and friends are `action`, reports/news/messages are `unread`, and the counts
+without an attention meaning (`4/6`, `#128`, the potion time) are `info`. The rail's potion badge reads
+`counts.potions.count` and formats the time from `counts.potions.nextExpiry` against
+`counts.potions.serverNow`.
+
+The refresh belongs to the **shell**, not to a section: it starts when `account:loaded` reports a session,
+pauses on `document.hidden`, resumes on `visibilitychange` and stops on `account:signed-out`. Leaving a
+section never stops it, because the header, menu and tab bar are outside the section.
+
+The notification panel's rows are loaded when the panel opens, not on every poll: `NotificationService.feed()`
+composes `needs` from `GET /duels` and `GET /friends` and `news` from `GET /reports?unreadOnly=true` and
+`GET /news?offset=0&markRead=false`. The panel's own header shows `counts.bell`; the rows carry their own
+destination.
 
 ### 2. Profile setting changed → autosave → toast with undo → theme/glad-view applied everywhere
 
 Text fields save when they lose focus or after a 700 ms pause; choices (theme, glad view, language,
-switches) save immediately. The Perfil section keeps the previous value for the undo toast.
+switches) save immediately. Every save goes through one queue per field, so the last intent wins even when
+responses arrive out of order.
 
 ```mermaid
 sequenceDiagram
@@ -181,31 +231,48 @@ sequenceDiagram
     participant Svc as AccountService
     participant API
     participant Bus
+    participant Shell as Page entry
     participant Header
     participant Toast
     User->>Choice: chooses Clássico
     Choice->>Section: component event 'change' { value: 'classic' }
     Section->>Section: applyTheme('classic') (preview at once)
-    Section->>Svc: save({ theme: 'classic' })
-    Svc->>API: PUT /users/me { theme }
+    Section->>Svc: save('theme', 'classic')
+    Svc->>Svc: seq.theme += 1 (only one request in flight per field)
+    Svc->>API: PUT /users/me { theme: 'classic' }
     API-->>Svc: { user }
     Svc->>Bus: emit('account:saved', { user, changed: ['theme'] })
     Svc->>Bus: emit('theme:changed', { choice: 'classic', theme: 'classic' })
-    Bus-->>Header: identity/theme state
-    Section->>Toast: createToast('Tema alterado para Clássico', { action: Desfazer })
+    Bus-->>Shell: account:saved
+    Shell->>Header: setAccount(user)
+    Section->>Toast: createToast('Tema alterado para Clássico', { action: { label: 'Desfazer', onClick } })
     User->>Toast: Desfazer
-    Toast->>Section: action.onClick()
-    Section->>Svc: save({ theme: previous })
+    Toast->>Section: action.onClick() (calls Svc.undo(token) with the save's revision)
+    Section->>Svc: undo(token)
+    Svc->>API: PUT /users/me { theme: previousConfirmed }
     Svc->>Bus: emit('account:saved') / emit('theme:changed')
 ```
 
 Rules:
 
-- The preview happens before the request so the page does not flash; a refused save restores the previous
-  value and shows `SaveStatus` in its error state with a retry.
-- The toast action is the only undo; a second change in the same field supersedes the first toast.
-- `glad-view:changed` has the same flow: `applyGladView` on change, `save({ gladView })`, the cards repaint
-  in place (no reload, no reselection).
+- **One queue per field, last write wins.** `AccountService` keeps `seq[field]` (the latest intent),
+  `confirmed[field]` (the last value the API confirmed) and `pending[field]`. It allows one `PUT` per field
+  in flight; when it settles, it sends the latest pending value if it differs. A response is applied only
+  when its revision is still `seq[field]`; a delayed response or failure from an older revision is ignored
+  (no preview change, no toast, no error).
+- **Optimistic preview, rollback to the confirmed value.** The UI shows the chosen value before the
+  request. If the *current* revision fails, the field reverts to `confirmed[field]` (not to the previous
+  intent) and `SaveStatus` shows its error with a retry; a superseded failure changes nothing.
+- **The undo token is the confirmed revision.** The toast's token is valid only while `seq[field]` still
+  matches the revision it was created for. `undo(token)` saves `confirmed[field]` as a new revision, applies
+  it optimistically, and is itself saved and confirmed; an old toast cannot undo a newer choice. A newer
+  change in the same field dismisses the older toast and invalidates its token.
+- **Test contract (WP4).** Two rapid changes to the same field (Clássico, then Arena escuro) with the first
+  response delayed: the second value is the one persisted and shown, the first response changes nothing,
+  and an undo from the second toast restores the value confirmed before the first change. A delayed failure
+  of the first request also changes nothing.
+- `glad-view:changed` has the same flow: `applyGladView` on change, `save('gladView', choice)`, the cards
+  repaint in place (no reload, no reselection).
 - The settings footer says “Tudo que você muda aqui é salvo na hora.” and the `SaveStatus` beside each
   field says “Salvo” / “Salvando…”; there is no save button (WP4).
 
@@ -235,33 +302,85 @@ reloads, and clears the opponent when the choice changes. A locked card (outdate
 
 ### 4. Ranking jump to own gladiator
 
-The strip and the table are children of the Ranking section: the jump is a method call. The section then
-publishes the fact (for the URL and analytics).
+The Ranking **section** owns the request: `OwnGladiatorJump` and `Pagination` only emit events, and
+`RankingTable` only receives data through its setters. The section asks `RankingService` (planned WP7),
+which asks `RankModel` (the model is the only API caller).
 
 ```mermaid
 sequenceDiagram
     participant User
     participant Jump as OwnGladiatorJump
     participant Section as Ranking section
+    participant Svc as RankingService
+    participant Model as RankModel
+    participant API
     participant Table as RankingTable
     participant Page as Pagination
-    participant API
+    participant Shell
     participant Bus
-    User->>Jump: clicks Magnus (#128)
-    Jump->>Section: component event 'jump' { gladiator, position: 128 }
+    User->>Jump: clicks Magnus (id 42, position 128)
+    Jump->>Section: component event 'jump' { gladiator: { id: 42, name: 'Magnus' }, position: 128 }
     Section->>Section: abort the current table request
-    Section->>Table: jumpTo({ position: 128, around: 'Magnus' })
-    Table->>API: GET /ranking?offset=120&search=
-    API-->>Table: 9 rows around position 128
-    Section->>Page: set({ page, pages, total })
-    Table->>Table: scroll the own row into view and flash it
-    Section->>Bus: emit('ranking:jumped', { gladiatorId, position: 128 })
+    Section->>Svc: window({ gladiatorId: 42, size: 9 })
+    Svc->>Model: window({ gladiatorId: 42, size: 9 })
+    Model->>API: GET /ranking/window?gladiatorId=42&size=9
+    API-->>Model: { total, position, page, pageSize, around, rows }
+    Model-->>Svc: window
+    Svc-->>Section: window
+    Section->>Table: setRows(window.rows)
+    Section->>Table: setContext({ around: window.around, position: window.position, page: window.page, total: window.total, pageSize: window.pageSize })
+    Section->>Table: reveal(window.position)
+    Section->>Page: set({ page: window.page, pages: Math.ceil(window.total / window.pageSize), total: window.total, pageSize: window.pageSize })
+    Section->>Bus: emit('ranking:jumped', { gladiatorId: 42, position: 128 })
+    Bus-->>Shell: navigate({ section: 'ranking', query: { at: 128 } }, { historyOnly: true, push: true })
 ```
 
-“Ir para a posição” uses the same path with a typed position; a position beyond the total clamps to the
-last page and says so. The table keeps the “Você” tag and the own row's contrast in every theme.
+#### Ranking window contract (WP7)
+
+`GET /ranking/window?gladiatorId=<id>|position=<n>&size=9` — exactly one of `gladiatorId` or `position`
+is required (400 `INVALID_RANKING_WINDOW` otherwise). `size` defaults to 9, is clamped to 3–21 and is forced
+odd (`size += 1` when even). The route answers:
+
+```json
+{
+  "total": 2448,
+  "position": 128,
+  "page": 13,
+  "pageSize": 10,
+  "around": "Magnus",
+  "rows": [{ "gladiator": "Magnus", "mmr": 1482, "master": "Spartacus_C", "change24h": 9, "position": 128 }]
+}
+```
+
+- **Order and tie-break:** `ORDER BY g.mmr DESC, g.cod ASC`. A gladiator's position is 1-based by that same
+  order: `1 + COUNT(*) WHERE mmr > target.mmr OR (mmr = target.mmr AND cod < target.cod)`. This makes the
+  positions stable when renown ties and matches what the general ranking must use in WP7.
+- **Window bounds:** `start = max(1, min(position - floor(size / 2), total - size + 1))`; the window is
+  `rows[start - 1 .. start - 1 + size - 1]`, shorter only when `total < size`. At the top it starts at 1;
+  at the bottom it ends at `total`. A requested position beyond `total` clamps to the last row; with
+  `total = 0`, `{ total: 0, position: 0, page: 1, pageSize: 10, around: null, rows: [] }`.
+- **Pager:** `page = Math.ceil(position / pageSize)` with `pageSize = 10` (the existing
+  `RANKING_PAGE_SIZE`); `pages = Math.ceil(total / pageSize)`. The board's decorative “página 9 de 164” is
+  replaced by these computed values. The general `GET /ranking?offset=` keeps 10 rows per page; the around
+  window is a view, not a second pagination model.
+- **“Seus gladiadores”:** `GET /ranking/mine` (signed in) returns
+  `{ gladiators: [{ id, name, mmr, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken' }] }`.
+  `position` is present only for `state: 'ranked'`; the strip shows the state text for the others. The
+  state precedence is `broken` (`version = 'broken'`), then `outdated` (`version` ≠ `api/version`), then
+  `ranked` (has a position), then `unranked`. `OwnGladiatorJump#setGladiators(list)` receives exactly this
+  list.
+- **“Ir para a posição”:** `Pagination` emits `jump { position }`; the section calls the same
+  `RankingService.window({ position, size: 9 })`. A strip jump and a position jump both publish
+  `ranking:jumped`; the shell turns it into `pushState('/ranking?at=<position>')`, so Back returns to the
+  previous ranking window. A cold load of `/ranking?at=128` mounts the section, which calls the same window
+  and reveals the row once the data arrives. The table keeps the “Você” tag and the own row's contrast in
+  every theme; `reveal(position)` only scrolls and flashes, it never fetches.
 
 ### 5. Conversation read → Mensagens badge
+
+Conversations are keyed by **the other master's user id**. `markRead(userId)` marks every unread message
+from that master; the event carries that id, how many messages were marked and the authoritative unread
+message total.
 
 ```mermaid
 sequenceDiagram
@@ -271,21 +390,26 @@ sequenceDiagram
     participant Bus
     participant List as ConversationList
     participant Notif as NotificationService
+    participant Shell as Page entry
     participant Header
-    Section->>Svc: markRead(id)
-    Svc->>API: PUT /messages/:id { read: true }
-    API-->>Svc: { read: true }
-    Svc->>Bus: emit('messages:read', { id, unreadTotal })
-    Bus-->>List: clear the row's unread count
+    Section->>Svc: markRead(userId: 7)
+    Svc->>API: POST /conversations/7/read
+    API-->>Svc: { userId: 7, read: 2, unreadTotal: 5 }
+    Svc->>Bus: emit('messages:read', { userId: 7, read: 2, unreadTotal: 5 })
+    Bus-->>Section: messages:read
+    Section->>List: markRead(userId 7)
     Bus-->>Notif: refresh (debounced)
-    Notif->>API: GET /notifications
-    API-->>Notif: counts
-    Notif->>Bus: emit('notifications:counts', { counts })
-    Bus-->>Header: setCounts(counts)
+    Notif->>API: GET /notifications + GET /potions/slots
+    API-->>Notif: counts, slots and serverNow
+    Notif->>Bus: emit('notifications:counts', counts)
+    Bus-->>Shell: counts
+    Shell->>Header: setCounts(counts)
 ```
 
-Opening a conversation marks its unread messages read; the badge drops after the authoritative refresh,
-never by decrementing a local number.
+`POST /conversations/:userId/read` is new in WP8 (it marks every unread message from that master and answers
+`{ userId, read, unreadTotal }`). The section's existing `PUT /messages/:id` stays for a single message's
+read/unread toggle and is not the conversation flow. The badge drops only after
+`notifications:counts`, never by decrementing a local number.
 
 ### 6. Friend invite accepted or declined → Amigos badge
 
@@ -298,24 +422,35 @@ sequenceDiagram
     participant API
     participant Bus
     participant Notif as NotificationService
+    participant Shell as Page entry
+    participant Menu as PainelMenu
     participant Toast
     User->>Banner: Aceitar
     Banner->>Section: component event 'accept'
     Section->>Banner: setBusy(true)
     Section->>Svc: answer(id, true)
     Svc->>API: PUT /friends/requests/:id { accept: true }
-    API-->>Svc: { ok }
-    Svc->>Bus: emit('friends:answered', { id, accepted: true, pendingTotal })
+    API-->>Svc: { accepted: true }
+    Svc->>Bus: emit('friends:answered', { id, accepted: true })
     Bus-->>Section: remove the banner, add the FriendRow
     Bus-->>Notif: refresh (debounced)
-    Notif->>Bus: emit('notifications:counts')
+    Notif->>API: GET /notifications + GET /potions/slots
+    API-->>Notif: counts, slots and serverNow
+    Notif->>Bus: emit('notifications:counts', counts)
+    Bus-->>Shell: counts
+    Shell->>Menu: setCounts(counts)
     Section->>Toast: createToast('Agora você e Marco_dev são amigos')
 ```
 
-Declining follows the same path with `accepted: false` and a neutral toast; a failure keeps the banner and
-shows the message.
+`id` is the pending friendship id (the `PUT /friends/requests/:id` id), not a user id. The response is
+`{ accepted }`; the badge total is never computed in this flow — it comes from the authoritative
+`notifications:counts` refresh. Declining follows the same path with `accepted: false` and a neutral toast;
+a failure keeps the banner and shows the message.
 
 ### 7. Potion ordered → Poções slots and silver in the header
+
+The mutation answers only the new slot id and the new silver; the full slot (with its expiry) comes from the
+read that follows it.
 
 ```mermaid
 sequenceDiagram
@@ -325,8 +460,9 @@ sequenceDiagram
     participant Svc as PotionsService
     participant API
     participant Bus
+    participant Shell as Page entry
     participant Slot as PotionSlot
-    participant Header
+    participant Header as AppHeader
     participant Notif as NotificationService
     User->>Card: Encomendar
     Card->>Section: component event 'order' { potion }
@@ -334,16 +470,25 @@ sequenceDiagram
     Section->>Svc: order(potion.identifier)
     Svc->>API: POST /potions/slots { potion }
     API-->>Svc: { slotId, silver }
+    Svc->>API: GET /potions/slots
+    API-->>Svc: { slots, serverNow }
     Svc->>Bus: emit('account:silver', { silver })
-    Svc->>Bus: emit('potions:ordered', { slot, silver })
-    Bus-->>Slot: setPotion(slot) with its countdown
-    Bus-->>Header: setCounts({ silver })
+    Svc->>Bus: emit('potions:ordered', { slot, serverNow, silver })
+    Bus-->>Shell: account:silver
+    Shell->>Header: setSilver(silver)
+    Bus-->>Section: potions:ordered
+    Section->>Slot: setPotion(slot, serverNow) with its countdown
     Bus-->>Notif: refresh (potions badge)
+    Notif->>API: GET /notifications + GET /potions/slots
+    API-->>Notif: counts, slots and serverNow
+    Notif->>Bus: emit('notifications:counts', counts)
     Section->>Toast: createToast('Poção de Vida III encomendada')
 ```
 
-A refused order (`NO_FREE_SLOT`, not enough silver) leaves the card enabled and shows the API's message; the
-slot count and the silver never change locally before the API confirms. Cancelling emits
+`GET /potions/slots` gains `expiresAt` on each slot and a `serverNow` on the answer in WP6; the countdown
+runs from those two values (not from a locally computed duration), so a tab that was asleep still shows the
+right time. A refused order (`NO_FREE_SLOT`, not enough silver) leaves the card enabled and shows the API's
+message; the slot count and the silver never change locally before the API confirms. Cancelling emits
 `potions:cancelled` and refreshes the same way.
 
 ### 8. Ctrl K → palette → navigation
@@ -363,15 +508,52 @@ sequenceDiagram
     Palette->>Search: search('rel', signal) (returns groups)
     Search-->>Palette: { irPara, mestres, documentacao }
     User->>Palette: clicks "Relatórios"
-    Palette->>Shell: component event 'navigate' { href: '/reports' }
-    Shell->>Bus: emit('palette:navigated', { target: 'reports', href: '/reports' })
-    Shell->>Shell: location.assign('/reports') (or mounts the section)
-    Shell->>Bus: emit('navigation:opened', { section: 'reports', href })
-    Bus-->>Menu: setActive('reports')
+    Palette->>Shell: component event 'navigate' { section: 'report', href: '/reports' }
+    Shell->>Bus: emit('palette:navigated', { target: 'report', href: '/reports' })
+    Shell->>Shell: navigate(resolveRoute('/reports')) → pushState
+    Shell->>Bus: emit('navigation:opened', { section: 'report', href: '/reports' })
+    Shell->>Menu: setActive('report')
 ```
 
 The palette opens on `/` as well (the boards show the field in the header), traps focus, closes on Esc and
-returns focus to the opener. On the phone the header search button opens the same palette.
+returns focus to the opener. On the phone the header search button opens the same palette. The palette
+result carries a `section` id (`report`, never `reports`) and a canonical `href`; the shell's single route
+resolver ([pages.md](pages.md#2-routes)) turns the URL into the state it mounts.
+
+### 9. “Marcar tudo como lido” → Notícias and the bell
+
+Loading the news list must not advance the read marker, or the button would have nothing left to do. WP4
+adds `markRead=false` to `GET /news` (the default) and a `POST /news/read` mutation for the button; the
+section applies the change optimistically and rolls it back when the API refuses it.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Section as Notícias section
+    participant Svc as NewsService
+    participant API
+    participant Notif as NotificationService
+    participant Bus
+    participant Shell as Page entry
+    participant Header as AppHeader
+    participant Toast
+    User->>Section: clicks “Marcar tudo como lido” (the PageHeader action's Button#click callback)
+    Section->>Section: previousUnread = counts.news; counts.news = 0 (optimistic, button busy)
+    Section->>Svc: markAllRead()
+    Svc->>API: POST /news/read
+    API-->>Svc: { read: 4, unread: 0 }
+    Svc->>Notif: refresh()
+    Notif->>API: GET /notifications + GET /potions/slots
+    API-->>Notif: counts, slots and serverNow
+    Notif->>Bus: emit('notifications:counts', counts)
+    Bus-->>Shell: counts
+    Shell->>Header: setCounts(counts)
+    Section->>Toast: createToast('Notícias marcadas como lidas')
+```
+
+On failure the section restores `previousUnread`, clears the button's busy state and shows the API's
+message; no `notifications:counts` is emitted for a refused mutation. `POST /news/read` is new in WP4 and
+answers `{ read, unread }`; the route comment and `docs/api/README.md` are regenerated in that WP.
 
 ## Migration of the existing document events
 

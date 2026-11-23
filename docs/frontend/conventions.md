@@ -37,6 +37,21 @@ rules are:
 - the page entry creates the service (or imports its singleton) and passes it to the sections;
 - a service that loads data accepts an `AbortSignal` so a section can cancel it when it closes.
 
+The services the Painel flows name (WP2–WP8; each is a module under `services/`):
+
+| Service | Owns | Public methods |
+| :--- | :--- | :--- |
+| `AccountService` | The signed-in account, the per-field autosave queue, silver, sign-out | `load({ signal })`, `save(field, value)`, `undo(token)`, `setSilver(silver)`, `signOut()` |
+| `NotificationService` | The joined counts, the 30 s poll, the notification feed | `start()`, `stop()`, `refresh()`, `feed({ signal })` |
+| `NewsService` | The news list and the explicit read marker | `list({ offset, signal })`, `markAllRead()` |
+| `PotionsService` | The apothecary, the slots and the orders | `load({ signal })`, `order(identifier)`, `cancel(slotId)` |
+| `RankingService` | The general page, the centred window, the own strip and the tabs | `page({ offset, search, signal })`, `window({ gladiatorId, position, size })`, `mine({ signal })` |
+| `MessagesService` | Conversations, the thread and the read receipts | `list({ signal })`, `open(userId)`, `markRead(userId)`, `send(userId, text)`, `reply(messageId, text)` |
+| `FriendsService` | Friends, pending requests and the master search | `load({ signal })`, `answer(id, accepted)`, `request(userId)`, `search(nick, { signal })` |
+
+A service may have more methods than these; it may not gain a DOM dependency or an API call outside a
+model.
+
 ## 2. Modules
 
 - **Native ES modules, named exports.** No default exports, no CommonJS, no bundler. Load page entries with
@@ -161,6 +176,9 @@ These are targets for new and refactored code. Existing files above them (for ex
   fallback. `RequestError.details` carries the API's `data` payload.
 - A refused field is marked with `Input#setError`/`Select#setError`.
 - A request aborted because the section closed (`RequestError.aborted`) is not an error to show.
+- **Autosave** follows the per-field queue in [events.md](events.md): one request in flight per field, the
+  last intent wins, a superseded response (or failure) is ignored, and Undo restores the last confirmed
+  value as a new save.
 - Loading, empty and error are first-class states of every section; see [pages.md](pages.md).
 
 ## 8. How a page and a component are tested
