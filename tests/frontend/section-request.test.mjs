@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 const {
-    optimisticWrite, retryAction, runReadTask, runSectionTask, undoChange, writeErrorMessage, writeThenRead,
+    optimisticWrite, retryAction, runReadTask, runSectionTask, writeErrorMessage, writeThenRead,
 } = await import('../../web/public/script/helpers/section-request.js');
 
 test('a write followed by a refused read retries only the read', async () => {
@@ -105,38 +105,6 @@ test('a write failure reported through the default write path runs its reporter 
     let actionReports = 0;
     await runSectionTask(async () => { throw new Error('action refused'); }, () => { actionReports += 1; });
     assert.equal(actionReports, 1);
-});
-
-test('an undo restores the confirmed control state and reports a refusal instead of rejecting', async () => {
-    let restores = 0;
-    let reports = 0;
-    let reported = null;
-    const result = await undoChange(async () => ({ user: { theme: 'system' } }), {
-        restore: () => { restores += 1; },
-        report: error => { reports += 1; reported = error; },
-    });
-    assert.deepEqual(result, { user: { theme: 'system' } });
-    assert.equal(restores, 1);
-    assert.equal(reports, 0);
-
-    const refused = await undoChange(async () => { throw new Error('Gravação recusada'); }, {
-        restore: () => { restores += 1; },
-        report: error => { reports += 1; reported = error; },
-    });
-    assert.equal(refused, null);
-    assert.equal(restores, 2);
-    assert.equal(reports, 1);
-    assert.equal(reported.message, 'Gravação recusada');
-});
-
-test('an undo superseded by a newer change leaves the controls alone', async () => {
-    let restores = 0;
-    const result = await undoChange(async () => ({ superseded: true }), {
-        restore: () => { restores += 1; },
-        report: () => { throw new Error('must not report'); },
-    });
-    assert.deepEqual(result, { superseded: true });
-    assert.equal(restores, 0);
 });
 
 test('an optimistic write rolls the UI back with feedback on failure', async () => {

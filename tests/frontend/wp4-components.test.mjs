@@ -15,6 +15,7 @@ function fakeNode() {
             contains: name => classes.has(name),
         },
         querySelector: selector => {
+            if (selector === '.save-status-retry') return null;
             if (!children.has(selector)) children.set(selector, fakeNode());
             return children.get(selector);
         },
@@ -55,7 +56,7 @@ test('choice cards select, clear and expose their value', () => {
     assert.equal(cards.value, null);
 });
 
-test('save status exposes saved and error states with a retry action', () => {
+test('save status exposes saved and error states without a retry action', () => {
     const status = new SaveStatus();
     status.set('saved', 'Salvo');
     assert.equal(status.element.dataset.state, 'saved');
@@ -63,7 +64,7 @@ test('save status exposes saved and error states with a retry action', () => {
     assert.equal(status.element.hidden, false);
     status.set('error', 'Não foi possível salvar');
     assert.equal(status.element.dataset.state, 'error');
-    assert.equal(status.element.querySelector('.save-status-retry').hidden, false);
+    assert.equal(status.element.querySelector('.save-status-retry'), null);
     status.set('idle', 'Disponível · salva quando você sai do campo');
-    assert.equal(status.element.querySelector('.save-status-retry').hidden, true);
+    assert.equal(status.element.dataset.state, 'idle');
 });

@@ -1,6 +1,6 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
-import { renderTemplate } from '../helpers/html.js';
+import { escapeHtml, renderTemplate } from '../helpers/html.js';
 import { runReadTask, secondaryRequest, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
 import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
@@ -131,12 +131,12 @@ export class RankingTab {
     /** @param {string} name Hashtag. */
     #askRemove(name) {
         new Message({
-            message: `Deseja remover a aba <b>#${name}</b>`,
+            message: `Deseja remover a aba <b>#${escapeHtml(name)}</b>`,
             buttons: { yes: 'SIM', no: 'NÃO' },
         }).show().click('yes', () => writeThenRead(
             async () => {
                 await RankModel.unwatch(name);
-                createToast(`Aba #${name} removida`, 'success');
+                createToast(`Aba #${escapeHtml(name)} removida`, 'success');
             },
             () => {
                 this.#selected = GENERAL;
@@ -193,7 +193,7 @@ export class RankingTab {
             async () => {
                 try {
                     await RankModel.watch(name);
-                    createToast(`Aba #${name} criada`, 'success');
+                    createToast(`Aba #${escapeHtml(name)} criada`, 'success');
                 }
                 catch (error) {
                     if (error.code === 'TUTOR_ONLY') {

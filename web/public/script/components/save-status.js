@@ -5,8 +5,8 @@ import { saveStatusTemplate } from '../templates/save-status.js';
 const ICONS = { idle: '✓', saving: '…', saved: '✓', error: '!' };
 
 /**
- * The inline autosave state (docs/frontend/components.md): idle, saving, saved or error, with a
- * retry action only on error.
+ * The inline autosave state (docs/frontend/components.md): idle, saving, saved or error. A refused
+ * write is reported once, without a retry action; the next change starts a fresh state.
  */
 export class SaveStatus extends BaseComponent {
     /** @param {{ element?: HTMLElement }} [options] */
@@ -14,8 +14,6 @@ export class SaveStatus extends BaseComponent {
         super(element ?? createElement(saveStatusTemplate));
         this.element.setAttribute('role', 'status');
         this.element.setAttribute('aria-live', 'polite');
-        const retry = this.element.querySelector('.save-status-retry');
-        this.on(retry, 'click', () => this.emit('retry', {}));
     }
 
     /**
@@ -28,8 +26,6 @@ export class SaveStatus extends BaseComponent {
         this.element.dataset.state = safe;
         this.element.querySelector('.save-status-icon').textContent = ICONS[safe];
         this.element.querySelector('.save-status-text').textContent = message;
-        const retry = this.element.querySelector('.save-status-retry');
-        retry.hidden = safe !== 'error';
         this.element.hidden = safe === 'idle' && !message;
         if (safe === 'error') this.element.setAttribute('role', 'alert');
         else this.element.setAttribute('role', 'status');

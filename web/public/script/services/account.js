@@ -2,21 +2,47 @@ import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { UserModel } from '../models/user.js';
 
 /**
- * The signed-in account and the per-field autosave queue (docs/frontend/events.md, flow 2).
+ * The signed-in account and its per-field autosave state machine (docs/frontend/events.md, flow 2).
  * DOM-free: the section previews a choice, this service persists it and publishes the fact.
  */
 
-/** Profile fields the Perfil section autosaves. */
-export const ACCOUNT_FIELDS = Object.freeze(['nickname', 'picture', 'language', 'preferences', 'theme', 'gladView']);
+/** Profile fields the Perfil section autosaves, one independent queue each. */
+export const ACCOUNT_FIELDS = Object.freeze([
+    'nickname', 'picture', 'language', 'theme', 'gladView',
+    'preferences.message', 'preferences.friend', 'preferences.update', 'preferences.duel', 'preferences.tourn',
+]);
+
+const PREFERENCE_PREFIX = 'preferences.';
+
+/** @param {string} field @returns {string|null} */
+function preferenceKey(field) {
+    return field.startsWith(PREFERENCE_PREFIX) ? field.slice(PREFERENCE_PREFIX.length) : null;
+}
 
 /**
- * @typedef {object} SaveToken
- * @property {string} field The field's queue.
- * @property {number} rev Revision in that queue.
- * @property {unknown} previous The value persisted before this change.
+ * The API body of one field. Preferences travel as a one-key patch, so two switches saved at once
+ * update two independent columns instead of replacing the whole preference object.
+ *
+ * @param {string} field
+ * @param {unknown} value
+ * @returns {Record<string, unknown>}
  */
+function bodyFor(field, value) {
+    const key = preferenceKey(field);
+    return key ? { preferences: { [key]: value } } : { [field]: value };
+}
 
-/** @returns {{ promise: Promise<any>, resolve: Function, reject: Function }} */
+/**
+ * @param {Record<string, any>|null} user
+ * @param {string} field
+ * @returns {unknown}
+ */
+function confirmedFrom(user, field) {
+    const key = preferenceKey(field);
+    return key ? (user?.preferences?.[key] ?? null) : (user?.[field] ?? null);
+}
+
+/** @returns {{ promise: Promise<any>, resolve: (value: any) => void, reject: (error: unknown) => void }} */
 function deferred() {
     let resolve;
     let reject;
@@ -28,8 +54,15 @@ function deferred() {
 }
 
 /**
- * Account state and its autosave queue. One request per field is in flight; the latest intent wins,
- * superseded responses never touch the preview, and each save's token carries its field.
+ * The account state machine. Every field has `confirmed` (last value the server accepted), `intent`
+ * (latest value the user wants) and at most one request in flight. Fields never share a counter.
+ *
+ * A `save` resolves with `{ status, field, value, before, user?, error? }`:
+ * - `saved`: the sent value is now `confirmed`;
+ * - `superseded`: a newer intent (or navigation/sign-out) replaced it, so the caller must not touch
+ *   the control or show an error;
+ * - `refused`: the sent value was still the intent and the API refused it; the caller rolls the
+ *   control back to `confirmed` and reports `error`.
  */
 export class AccountService {
     #model;
@@ -70,88 +103,74 @@ export class AccountService {
     }
 
     /**
-     * The last value the API confirmed for a field (the rollback base).
+     * The last value the API accepted for a field.
      *
      * @param {string} field
      * @returns {unknown}
      */
     confirmed(field) {
-        return this.#states.get(field)?.confirmed ?? this.#user?.[field] ?? null;
+        return this.#state(field).confirmed;
     }
 
     /**
-     * Whether a save token still belongs to its field's current revision.
+     * Whether the field still has a request in flight or an intent waiting to be sent.
      *
-     * @param {SaveToken|{ field?: string, rev?: number }|null} token
+     * @param {string} field
      * @returns {boolean}
      */
-    isCurrent(token) {
-        if (!token?.field) return false;
-        return this.#states.get(token.field)?.seq === token.rev;
+    busy(field) {
+        const state = this.#state(field);
+        return Boolean(state.inFlight || state.waiting);
     }
 
     /**
-     * Saves one field. The promise resolves with `{ token, user }` when that revision is confirmed, or
-     * `{ token, superseded: true }` when a newer intent replaced it. A failure of the current revision
-     * rejects; a superseded failure resolves as superseded and changes nothing.
-     *
-     * With `merge`, the value is a patch: consecutive patches to the same object field are folded
-     * together and applied over the value confirmed when the request runs, so changing two e-mail
-     * preferences quickly persists both instead of the second object replacing the first.
+     * Records a new intent for one field. If no request is in flight it is sent at once; otherwise it
+     * becomes the next value, replacing any intent queued before it.
      *
      * @param {string} field One of {@link ACCOUNT_FIELDS}.
      * @param {unknown} value
-     * @param {{ merge?: boolean }} [options]
-     * @returns {Promise<{ token: SaveToken, user?: Record<string, any>, superseded?: boolean, signedOut?: boolean, error?: unknown }>}
+     * @returns {Promise<{ status: 'saved'|'superseded'|'refused', field: string, value: unknown, before: unknown, user?: Record<string, any>, error?: unknown, signedOut?: boolean, unchanged?: boolean }>}
      */
-    save(field, value, { merge = false } = {}) {
+    save(field, value) {
         if (!ACCOUNT_FIELDS.includes(field)) throw new TypeError(`Unknown account field "${field}".`);
 
-        // A save that arrives while the session is closing is already outdated; it must not race
-        // the logout request or be lost in the state cleared after a confirmed sign-out.
+        // A save while the session closes is already outdated and must not race the logout request.
         if (this.#signingOut) {
             return Promise.resolve({
-                token: { field, rev: -1, previous: this.confirmed(field) },
-                superseded: true,
-                signedOut: true,
+                status: 'superseded', field, value, before: this.confirmed(field), signedOut: true,
             });
         }
 
         const state = this.#state(field);
-        let patch = merge ? { ...(value ?? {}) } : null;
-        let previous = merge
-            ? { ...(state.confirmed ?? this.#user?.[field] ?? {}) }
-            : state.confirmed;
-
-        if (state.pending) {
-            const pending = state.pending;
-            // Two patches queued before the first request runs become one write with the earliest
-            // rollback base; resolving the dropped waiter keeps its caller from hanging.
-            if (merge && pending.merge) {
-                patch = { ...pending.patch, ...patch };
-                previous = pending.token.previous;
-            }
-            pending.waiter.resolve({ token: pending.token, superseded: true });
+        if (value === state.intent && (state.waiting || state.inFlight)) {
+            return (state.waiting ?? state.inFlight).deferred.promise;
+        }
+        if (value === state.confirmed && !state.waiting && !state.inFlight) {
+            return Promise.resolve({
+                status: 'saved', field, value: state.confirmed, before: state.confirmed, user: this.#user, unchanged: true,
+            });
         }
 
-        const token = { field, rev: ++state.seq, previous };
-        const waiter = deferred();
-        state.pending = { value, token, waiter, merge, patch };
-        if (!state.running) this.#drain(field);
-        return waiter.promise;
-    }
-
-    /**
-     * Restores the value captured before a change. The restore is itself saved through the same
-     * field's queue; a token superseded by a later change to that field is ignored.
-     *
-     * @param {SaveToken} token
-     * @returns {Promise<any>}
-     */
-    undo(token) {
-        const state = token?.field ? this.#states.get(token.field) : null;
-        if (!state || token.rev !== state.seq) return Promise.resolve({ ignored: true });
-        return this.save(token.field, token.previous);
+        const change = {
+            value,
+            before: state.confirmed,
+            deferred: deferred(),
+        };
+        state.intent = value;
+        if (state.waiting) {
+            state.waiting.deferred.resolve({
+                status: 'superseded', field, value: state.waiting.value, before: state.waiting.before, superseded: true,
+            });
+            state.waiting = null;
+        }
+        if (state.inFlight) {
+            state.waiting = change;
+        }
+        else {
+            state.inFlight = change;
+            this.#send(field);
+        }
+        return change.deferred.promise;
     }
 
     /**
@@ -173,11 +192,15 @@ export class AccountService {
         if (this.#signOut) return this.#signOut;
         this.#signingOut = true;
         this.#epoch += 1;
-        for (const state of this.#states.values()) {
-            if (state.pending) {
-                state.pending.waiter.resolve({ token: state.pending.token, superseded: true, signedOut: true });
-                state.pending = null;
+        for (const [field, state] of this.#states) {
+            for (const job of [state.inFlight, state.waiting]) {
+                job?.deferred.resolve({
+                    status: 'superseded', field, value: job.value, before: job.before, superseded: true, signedOut: true,
+                });
             }
+            state.inFlight = null;
+            state.waiting = null;
+            state.intent = state.confirmed;
         }
         this.#signOut = this.#performSignOut();
         return this.#signOut;
@@ -202,64 +225,120 @@ export class AccountService {
 
     /**
      * @param {string} field
-     * @returns {{ seq: number, confirmed: unknown, pending: object|null, running: boolean }}
+     * @returns {{ confirmed: unknown, intent: unknown, inFlight: object|null, waiting: object|null }}
      */
     #state(field) {
+        if (!ACCOUNT_FIELDS.includes(field)) throw new TypeError(`Unknown account field "${field}".`);
         if (!this.#states.has(field)) {
-            this.#states.set(field, {
-                seq: 0,
-                confirmed: this.#user?.[field] ?? null,
-                pending: null,
-                running: false,
-            });
+            const confirmed = confirmedFrom(this.#user, field);
+            this.#states.set(field, { confirmed, intent: confirmed, inFlight: null, waiting: null });
         }
         return this.#states.get(field);
     }
 
     /**
-     * Sends the pending value of one field, then the next one if a newer intent arrived meanwhile.
+     * Sends the in-flight value of one field and settles it. On success the sent value becomes
+     * `confirmed` and the next intent, if any, is sent. On refusal the caller learns whether its value
+     * was still wanted (`refused`) or already replaced (`superseded`).
      *
      * @param {string} field
+     * @returns {Promise<void>}
      */
-    async #drain(field) {
+    async #send(field) {
         const state = this.#state(field);
-        if (state.running || !state.pending) return;
-
-        const job = state.pending;
-        state.pending = null;
-        state.running = true;
+        const job = state.inFlight;
+        if (!job) return;
         const epoch = this.#epoch;
 
         try {
-            // A merged patch is applied when it runs, so it includes whatever an earlier write for
-            // this field confirmed in the meantime.
-            const value = job.merge
-                ? { ...(state.confirmed ?? this.#user?.[field] ?? {}), ...job.patch }
-                : job.value;
-            const user = await this.#model.update({ [field]: value });
+            const user = await this.#model.update(bodyFor(field, job.value));
             if (epoch !== this.#epoch) {
-                job.waiter.resolve({ token: job.token, superseded: true, signedOut: true });
+                job.deferred.resolve({
+                    status: 'superseded', field, value: job.value, before: job.before, superseded: true, signedOut: true,
+                });
                 return;
             }
-            state.confirmed = user?.[field] ?? value;
-            if (job.token.rev === state.seq) {
-                this.#user = user;
-                this.#bus.emit(APP_EVENTS.accountSaved, { user, changed: [field] });
-                job.waiter.resolve({ token: job.token, user });
+            const confirmed = confirmedFrom(user, field) ?? job.value;
+            state.confirmed = confirmed;
+            this.#applyUser(field, confirmed);
+            this.#bus.emit(APP_EVENTS.accountSaved, {
+                user: this.#user, changed: [field], field, value: confirmed, before: job.before,
+            });
+            state.inFlight = null;
+
+            if (state.intent === confirmed) {
+                if (state.waiting) {
+                    state.waiting.deferred.resolve({
+                        status: 'saved', field, value: confirmed, before: state.waiting.before, user: this.#user, unchanged: true,
+                    });
+                    state.waiting = null;
+                }
+                job.deferred.resolve({ status: 'saved', field, value: confirmed, before: job.before, user: this.#user });
             }
             else {
-                job.waiter.resolve({ token: job.token, user, superseded: true });
+                job.deferred.resolve({
+                    status: 'superseded', field, value: job.value, before: job.before, user: this.#user, superseded: true,
+                });
+                this.#advance(field);
             }
         }
         catch (error) {
-            if (epoch !== this.#epoch) job.waiter.resolve({ token: job.token, error, superseded: true, signedOut: true });
-            else if (job.token.rev === state.seq) job.waiter.reject(error);
-            else job.waiter.resolve({ token: job.token, error, superseded: true });
+            if (epoch !== this.#epoch) {
+                job.deferred.resolve({
+                    status: 'superseded', field, value: job.value, before: job.before, error, superseded: true, signedOut: true,
+                });
+                return;
+            }
+            state.inFlight = null;
+            if (state.intent === job.value) {
+                state.intent = state.confirmed;
+                if (state.waiting) {
+                    state.waiting.deferred.resolve({
+                        status: 'superseded', field, value: state.waiting.value, before: state.waiting.before, superseded: true,
+                    });
+                    state.waiting = null;
+                }
+                job.deferred.resolve({
+                    status: 'refused', field, value: job.value, before: job.before, error,
+                });
+            }
+            else {
+                job.deferred.resolve({
+                    status: 'superseded', field, value: job.value, before: job.before, error, superseded: true,
+                });
+                this.#advance(field);
+            }
         }
-        finally {
-            state.running = false;
-            if (state.pending) this.#drain(field);
-        }
+    }
+
+    /**
+     * Sends the newest queued intent after the previous request settled.
+     *
+     * @param {string} field
+     */
+    #advance(field) {
+        const state = this.#state(field);
+        if (state.intent === state.confirmed) return;
+        const next = state.waiting;
+        if (!next) return;
+        state.waiting = null;
+        state.inFlight = next;
+        this.#send(field);
+    }
+
+    /**
+     * Applies only the field this response owns, so a slower response for another field cannot
+     * overwrite a newer confirmed value in the local account.
+     *
+     * @param {string} field
+     * @param {unknown} value
+     */
+    #applyUser(field, value) {
+        const user = { ...(this.#user ?? {}) };
+        const key = preferenceKey(field);
+        if (key) user.preferences = { ...(user.preferences ?? {}), [key]: value };
+        else user[field] = value;
+        this.#user = user;
     }
 }
 

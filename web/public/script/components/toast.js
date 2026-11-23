@@ -128,14 +128,18 @@ export function createToast(message, typeOrOptions = 'info') {
         if (timer !== null) clearTimeout(timer);
         timer = null;
     };
-    dismiss = async () => {
+    const removeNow = () => {
         stopTimer();
         const hadFocus = toast.contains(document.activeElement);
-        await fadeOut(toast, FADE_MS);
         toast.remove();
         stackToasts();
         if (actionButton) liveActions.delete(actionButton);
         if (hadFocus && opener?.isConnected) opener.focus();
+    };
+    dismiss = async () => {
+        stopTimer();
+        await fadeOut(toast, FADE_MS);
+        removeNow();
     };
 
     if (action) {
@@ -168,5 +172,8 @@ export function createToast(message, typeOrOptions = 'info') {
 
     startTimer();
     toast.dismiss = dismiss;
+    // A replaceable toast (the single undo) disappears at once instead of fading while its action
+    // could still be pressed after a newer change has superseded it.
+    toast.dismissNow = removeNow;
     return toast;
 }

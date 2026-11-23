@@ -7,9 +7,9 @@ import { GoogleLogin } from './helpers/google-login.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { applyTheme, storedThemeChoice } from './helpers/theme.js';
-import { previewTheme } from './helpers/theme-preview.js';
 import { writeErrorToast } from './helpers/section-request.js';
 import { account } from './services/account.js';
+import { undoToast } from './services/undo-toast.js';
 import { notifications } from './services/notifications.js';
 import { PAINEL_COMMANDS, searchShell } from './services/command-search.js';
 import { NotificationModel } from './models/social.js';
@@ -77,40 +77,30 @@ async function start() {
             header.setNotifications({ needs: [], news: [] });
         }
     });
-    let themeToast = null;
-    let themeRequest = 0;
     header.listen('theme-select', async ({ choice }) => {
         if (!account.user) {
             applyTheme(choice);
             return;
         }
-        const request = ++themeRequest;
-        themeToast?.dismiss();
-        themeToast = null;
-        const result = await previewTheme({
-            choice,
-            previous: account.confirmed('theme'),
-            fallback: storedThemeChoice,
-            apply: applyTheme,
-            save: (field, value) => account.save(field, value),
-            confirmed: () => account.confirmed('theme'),
-            isCurrent: () => request === themeRequest,
-        });
-        if (result.status === 'failed') {
-            if (request === themeRequest) {
-                createToast(result.error?.code === 'NOT_SIGNED_IN' ? 'Entre para salvar o tema' : 'Não foi possível salvar o tema', 'error');
-            }
+        const before = account.confirmed('theme');
+        if (choice === before) {
+            applyTheme(choice);
             return;
         }
-        if (result.status !== 'saved' || request !== themeRequest) return;
-        themeToast = createToast(`Tema alterado para ${choice === 'classic' ? 'Clássico' : choice === 'arena-dark' ? 'Arena escuro' : 'Arena claro'}`, {
-            action: {
-                label: 'Desfazer',
-                onClick: async () => {
-                    const restored = await account.undo(result.token);
-                    if (restored?.user && !restored.superseded) applyTheme(result.previous);
-                },
-            },
+        const token = undoToast.begin();
+        applyTheme(choice);
+        const result = await account.save('theme', choice);
+        if (result.status === 'superseded') return;
+        if (result.status === 'refused') {
+            applyTheme(account.confirmed('theme') ?? storedThemeChoice());
+            if (result.error?.code === 'NOT_SIGNED_IN') createToast('Entre para salvar o tema', 'error');
+            else writeErrorToast(result.error);
+            return;
+        }
+        undoToast.show(token, {
+            field: 'theme',
+            before: result.before,
+            restore: restored => applyTheme(String(restored)),
         });
     });
     header.listen('sign-out', async () => {
