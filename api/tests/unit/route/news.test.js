@@ -42,9 +42,9 @@ describe('news routes', () => {
     });
 
     test('marking all read answers the count and needs a session', async () => {
-        News.markAllRead.mockResolvedValue({ read: 4, unread: 0 });
+        News.markAllRead.mockResolvedValue({ read: 4, unread: 0, readAt: '2026-11-23 20:00:00.000' });
         currentUser = { id: 7 };
-        expect((await request(app).post('/news/read')).body).toEqual({ read: 4, unread: 0 });
+        expect((await request(app).post('/news/read')).body).toEqual({ read: 4, unread: 0, readAt: '2026-11-23 20:00:00.000' });
         expect(News.markAllRead).toHaveBeenCalledWith(currentUser);
         currentUser = null;
         expect((await request(app).post('/news/read')).status).toBe(401);

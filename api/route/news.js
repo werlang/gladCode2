@@ -21,7 +21,8 @@ router.get('/', auth({ optional: true }), asyncRoute(async (req, res) => {
 
 /**
  * POST /news/read
- * Marks every post as read for the signed-in master: `{ read, unread: 0 }`.
+ * Marks every post as read for the signed-in master: `{ read, unread: 0, readAt }`, where `readAt`
+ * is the server marker written to the account.
  */
 router.post('/read', auth(), asyncRoute(async (req, res) => {
     res.send(await News.markAllRead(req.user));

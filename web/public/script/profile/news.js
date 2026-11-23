@@ -5,6 +5,7 @@ import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { formatDayMonth, formatShortMonth } from '../helpers/date-format.js';
 import { NewsPager } from '../helpers/news-pager.js';
+import { postIsRead } from '../helpers/news-read.js';
 import { potionTimeLeft } from '../helpers/potion-time.js';
 import { isAborted, runReadTask, secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { icon } from '../templates/icons.js';
@@ -50,6 +51,10 @@ export class NewsTab {
     #markAll = null;
     #posts = [];
     #pager = new NewsPager();
+    #readAt = null;
+    #optimisticRead = false;
+    #loaded = false;
+    #marking = false;
     #signal = null;
     #route = {};
 
@@ -67,6 +72,7 @@ export class NewsTab {
         const action = createElement("<button type='button' class='button secondary' id='news-mark-read'>Marcar tudo como lido</button>");
         this.#header.setActions([action]);
         this.#markAll = new Button({ element: action }).setText('Marcar tudo como lido', 'check').click(() => this.#markAllRead());
+        this.#setMarkAllEnabled(false);
 
         this.#featured = this.#root.querySelector('#news-featured');
         this.#previous = this.#root.querySelector('#news-previous');
@@ -101,6 +107,8 @@ export class NewsTab {
         // paint while the API answers. The late response is still dropped when navigation left.
         this.#posts = [];
         this.#pager = new NewsPager();
+        this.#loaded = false;
+        this.#setMarkAllEnabled(false);
         this.#error.hidden = true;
         this.#empty.hidden = true;
         this.#previous.hidden = true;
@@ -120,6 +128,8 @@ export class NewsTab {
         if (signal?.aborted || !posts) return;
         this.#posts = posts;
         this.#pager.reset(posts.length);
+        this.#loaded = true;
+        this.#setMarkAllEnabled(true);
         this.#root.removeAttribute('aria-busy');
         this.#renderPosts();
         await Promise.allSettled([
@@ -147,11 +157,12 @@ export class NewsTab {
         }
         this.#empty.hidden = true;
         const [featured, ...previous] = this.#posts;
+        const featuredRead = postIsRead(featured, this.#readAt, this.#optimisticRead);
         this.#featured.innerHTML = renderTemplate(featuredNewsTemplate, {
             image: featured.image || ARENA_IMAGE,
             imageAlt: featured.image ? (featured.imageAlt || featured.title) : ARENA_ALT,
             mediaClass: featured.image ? '' : 'is-fallback',
-            ribbon: featured.read ? '' : "<span class='news-ribbon'>NOVA</span>",
+            ribbon: featuredRead ? '' : "<span class='news-ribbon'>NOVA</span>",
             category: featured.category,
             versionHtml: featured.version ? renderTemplate(newsVersionTemplate, { version: featured.version }) : '',
             date: formatDayMonth(featured.time),
@@ -167,7 +178,7 @@ export class NewsTab {
                 title: post.title,
                 excerpt: post.excerpt,
                 category: post.category,
-                unreadClass: post.read ? '' : 'is-unread',
+                unreadClass: postIsRead(post, this.#readAt, this.#optimisticRead) ? '' : 'is-unread',
             }));
         });
         this.#previous.hidden = previous.length === 0;
@@ -205,21 +216,37 @@ export class NewsTab {
         }
     }
 
-    /** Clears the unread ribbons optimistically and rolls them back on refusal. */
+    /** Enables the mark-all action only once the first page is on screen. */
+    #setMarkAllEnabled(on) {
+        if (!this.#markAll) return;
+        this.#markAll.element.disabled = !on;
+        this.#markAll.element.setAttribute('aria-disabled', String(!on));
+    }
+
+    /**
+     * Clears the unread ribbons optimistically and rolls them back on refusal. The server marker is
+     * kept, so a feed read that started before this write cannot bring the NOVA ribbons back.
+     */
     async #markAllRead() {
-        const before = this.#posts.map(post => Boolean(post.read));
-        const unread = this.#posts.some(post => !post.read);
-        this.#posts = this.#posts.map(post => ({ ...post, read: true }));
+        if (!this.#loaded || this.#marking) return;
+        this.#marking = true;
+        this.#optimisticRead = true;
         this.#renderPosts();
         try {
-            await NewsModel.markAllRead();
+            const answer = await NewsModel.markAllRead();
+            this.#readAt = answer.readAt ?? null;
+            this.#optimisticRead = false;
+            this.#renderPosts();
             await notifications.refresh().catch(() => {});
-            if (unread) createToast('Notícias marcadas como lidas', 'success');
+            createToast('Notícias marcadas como lidas', 'success');
         }
         catch (error) {
-            this.#posts = this.#posts.map((post, index) => ({ ...post, read: before[index] }));
+            this.#optimisticRead = false;
             this.#renderPosts();
             writeErrorToast(error);
+        }
+        finally {
+            this.#marking = false;
         }
     }
 

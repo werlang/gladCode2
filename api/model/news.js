@@ -47,10 +47,12 @@ export class News {
     }
 
     /**
-     * Marks every post as read and answers how many were unread.
+     * Marks every post as read and answers how many were unread, with the server marker written to
+     * the reader's account. The marker lets a feed read that started before this write stay read in
+     * the browser instead of bringing the NOVA ribbons back.
      *
      * @param {import('./user.js').User} user
-     * @returns {Promise<{ read: number, unread: number }>}
+     * @returns {Promise<{ read: number, unread: number, readAt: string }>}
      */
     static async markAllRead(user) {
         const [row] = await Mysql.select(
@@ -58,8 +60,8 @@ export class News {
             WHERE time > COALESCE((SELECT read_news FROM usuarios WHERE id = ?), '1970-01-01 00:00:00')`,
             [user.id],
         );
-        await user.markNewsRead();
-        return { read: Number(row.unread), unread: 0 };
+        const readAt = await user.markNewsRead();
+        return { read: Number(row.unread), unread: 0, readAt };
     }
 
     /**

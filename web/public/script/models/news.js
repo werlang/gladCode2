@@ -20,9 +20,10 @@ export class NewsModel {
     }
 
     /**
-     * Marks every post as read for the signed-in master.
+     * Marks every post as read for the signed-in master. `readAt` is the server marker; a feed read
+     * started before this write must treat posts up to it as read.
      *
-     * @returns {Promise<{ read: number, unread: number }>}
+     * @returns {Promise<{ read: number, unread: number, readAt: string }>}
      */
     static markAllRead() {
         return api.post('news/read');

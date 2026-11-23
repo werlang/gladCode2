@@ -32,10 +32,12 @@ describe('News', () => {
         expect(post.toJSON().version).toBeNull();
     });
 
-    test('marks every post read and answers how many were unread', async () => {
+    test('marks every post read and answers the count with the server marker', async () => {
         Mysql.select.mockResolvedValue([{ unread: 3 }]);
-        const user = { id: 7, markNewsRead: vi.fn(async () => {}) };
-        await expect(News.markAllRead(user)).resolves.toEqual({ read: 3, unread: 0 });
+        const user = { id: 7, markNewsRead: vi.fn(async () => '2026-11-23 20:00:00.000') };
+        await expect(News.markAllRead(user)).resolves.toEqual({
+            read: 3, unread: 0, readAt: '2026-11-23 20:00:00.000',
+        });
         expect(user.markNewsRead).toHaveBeenCalledOnce();
     });
 });
