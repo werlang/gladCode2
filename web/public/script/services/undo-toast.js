@@ -67,7 +67,8 @@ export class UndoToast {
      * Shows the undo for the latest change, if no newer change started since it was sent.
      *
      * @param {number} token The value `begin()` returned when the change started.
-     * @param {{ field: string, before: unknown, restore: (value: unknown) => void,
+     * @param {{ field: string, before: unknown,
+     *   restore: (value: unknown, phase: 'preview'|'settle') => void,
      *   report?: (error: Error) => void }} change
      * @returns {void}
      */
@@ -84,14 +85,14 @@ export class UndoToast {
                     // and let the field's queue confirm or refuse it.
                     this.#remove();
                     this.#token += 1;
-                    restore?.(before);
+                    restore?.(before, { phase: 'preview' });
                     const result = await this.#save(field, before);
                     if (result.status === 'refused') {
-                        restore?.(this.#confirm(field));
+                        restore?.(this.#confirm(field), { phase: 'settle' });
                         report(result.error);
                     }
                     else if (result.status === 'saved') {
-                        restore?.(this.#confirm(field));
+                        restore?.(this.#confirm(field), { phase: 'settle' });
                     }
                 },
             },

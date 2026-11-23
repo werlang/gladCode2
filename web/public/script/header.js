@@ -7,6 +7,7 @@ import { GoogleLogin } from './helpers/google-login.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
 import { applyTheme, storedThemeChoice } from './helpers/theme.js';
+import { shouldSaveThemePick } from './helpers/profile-state.js';
 import { writeErrorToast } from './helpers/section-request.js';
 import { account } from './services/account.js';
 import { undoToast } from './services/undo-toast.js';
@@ -83,7 +84,7 @@ async function start() {
             return;
         }
         const before = account.confirmed('theme');
-        if (choice === before && !account.busy('theme')) {
+        if (!shouldSaveThemePick({ choice, confirmed: before, busy: account.busy('theme') })) {
             applyTheme(choice);
             return;
         }

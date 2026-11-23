@@ -11,6 +11,7 @@ import { formatMonthYear } from '../helpers/date-format.js';
 import { DEFAULT_GLAD_VIEW, applyGladView } from '../helpers/glad-view.js';
 import { applyTheme, storedThemeChoice } from '../helpers/theme.js';
 import { isAborted, writeErrorToast } from '../helpers/section-request.js';
+import { nicknameUndoValue } from '../helpers/profile-state.js';
 import { winRatePercent } from '../helpers/profile-stats.js';
 import { account } from '../services/account.js';
 import { undoToast } from '../services/undo-toast.js';
@@ -66,6 +67,7 @@ export class SettingsTab {
     #nicknameTimer = null;
     #nicknameAvailable = null;
     #nicknameController = null;
+    #nicknameUndoPreview = null;
     #language = null;
     #theme = null;
     #gladView = null;
@@ -258,6 +260,7 @@ export class SettingsTab {
      * @param {string} [intent] Value to send; defaults to the field.
      */
     async #saveNickname(intent = this.#nickname.value.trim()) {
+        this.#nicknameUndoPreview = null;
         const value = String(intent ?? '').trim();
         const confirmed = this.#confirmedNickname();
         if (value.length < 2) {
@@ -305,7 +308,7 @@ export class SettingsTab {
         undoToast.show(token, {
             field: 'nickname',
             before: result.before,
-            restore: restored => this.#restoreNickname(restored),
+            restore: (restored, phase) => this.#restoreNickname(restored, phase),
             report: error => this.#reportNicknameUndoError(error),
         });
     }
@@ -316,25 +319,39 @@ export class SettingsTab {
      * start) or the value the undo is restoring; a different draft is left for the next save.
      *
      * @param {unknown} [value] The undo value; defaults to the confirmed nickname.
+     * @param {{ phase?: 'preview'|'settle' }} [options]
      */
-    #restoreNickname(value = this.#confirmedNickname()) {
+    #restoreNickname(value = this.#confirmedNickname(), { phase = 'settle' } = {}) {
         const target = String(value ?? '');
         const current = this.#nickname.value.trim();
         const confirmed = this.#confirmedNickname();
-        if (current === target || current === confirmed) {
-            this.#nickname.value = target;
-            this.#root.querySelector('#profile-nickname-example').textContent = target;
+        if (phase === 'preview') this.#nicknameUndoPreview = target;
+        const next = nicknameUndoValue({
+            current, target, confirmed, preview: this.#nicknameUndoPreview, phase,
+        });
+        if (next !== null) {
+            this.#nickname.value = next;
+            this.#root.querySelector('#profile-nickname-example').textContent = next;
             this.#nickname.clearError();
             this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
         }
+        if (phase === 'settle') this.#nicknameUndoPreview = null;
         this.#renderHero(account.user ?? profile.user);
     }
 
     /** @param {unknown} error Reports a refused nickname undo without touching a newer draft. */
     #reportNicknameUndoError(error) {
         const message = error?.message || 'Não foi possível desfazer o apelido';
-        this.#nickname.setError(message);
-        this.#nicknameStatus.set('error', message);
+        // A refused undo with no newer draft leaves the confirmed nickname in the field, clean: a
+        // later blur must not resend the refused value. A newer draft keeps its own field error.
+        if (this.#nickname.value.trim() === this.#confirmedNickname()) {
+            this.#nickname.clearError();
+            this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
+        }
+        else {
+            this.#nickname.setError(message);
+            this.#nicknameStatus.set('error', message);
+        }
         this.#renderHero(account.user ?? profile.user);
         writeErrorToast(error);
     }
