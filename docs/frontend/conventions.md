@@ -177,8 +177,8 @@ These are targets for new and refactored code. Existing files above them (for ex
 - A refused field is marked with `Input#setError`/`Select#setError`.
 - A request aborted because the section closed (`RequestError.aborted`) is not an error to show.
 - **Autosave** follows the per-field queue in [events.md](events.md): one request in flight per field, the
-  last intent wins, a superseded response (or failure) is ignored, and Undo restores the last confirmed
-  value as a new save.
+  last intent wins, a superseded response (or failure) is ignored, and Undo saves the value captured before
+  the change as a new revision.
 - Loading, empty and error are first-class states of every section; see [pages.md](pages.md).
 
 ## 8. How a page and a component are tested

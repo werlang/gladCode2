@@ -215,8 +215,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   navigation list (`{ id, label, href, group, keywords }`) and `search(query, signal)` is the async data
   lookup from the shell service.
 - **Methods:** `open({ query })`, `close()`, `setResults(groups)`, `setBusy(on)`.
-- **Events:** `navigate` `{ href, target }`, `search` `{ query }` (the palette may also call `search`
-  directly; the shell owns the request), `close` `{}`.
+- **Events:** `navigate` `{ section: SectionId|null, href: string }` (`section` is the Painel section id, or
+  `null` for a document page), `search` `{ query }` (the palette may also call `search` directly; the shell
+  owns the request), `close` `{}`.
 - **ARIA:** `role="dialog"` `aria-modal="true"`, labelled by its input, `listbox`/`option` results with
   `aria-activedescendant`, Tab kept inside, Esc closes, focus returns to the opener.
 - **Boards:** `Estados.dc.html` (the search panel), `Mobile.dc.html` (search button).
@@ -503,8 +504,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   and time; an empty dashed slot that points to the shop; a locked slot with its master level.
 - **Constructor:** `new PotionSlot({ element, index })`.
 - **Methods:** `setPotion(slot, serverNow)`, `setLocked(level)`, `setEmpty()`; the countdown is computed
-  from the slot's `expiresAt` and `serverNow` (both server time) through `components/countdown.js`, and
-  stops when the slot leaves the DOM. A locally computed duration is not accepted.
+  from the slot's `expiresAt` and `serverNow` (both server time, returned from WP3) through
+  `components/countdown.js`, and stops when the slot leaves the DOM. A locally computed duration is not
+  accepted.
 - **Events:** `empty` `{ index }` (focus the shop), `cancel` `{ slot }` (the slot's menu).
 - **ARIA:** the countdown is text (`role="timer"` with an accessible label), not only a bar.
 - **Boards:** `Pocoes.dc.html`, `Batalhas.dc.html` (the pots carried in the versus panel).
@@ -541,8 +543,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Constructor:** `new OwnGladiatorJump({ element, gladiators })`.
 - **Methods:** `setGladiators(list)` (each `{ id, name, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken' }`
   from `GET /ranking/mine`), `setActive(id)`.
-- **Events:** `jump` `{ gladiator: { id, name }, position }` (`position` is the gladiator's current
-  position; the section resolves it with the ranking window).
+- **Events:** `jump` `{ gladiator: { id, name }, position }` (`position` is the gladiator's position in
+  the strip, possibly stale; the section resolves it through the ranking window and publishes the window's
+  resolved `position`).
 - **ARIA:** each chip is a link/button with a `title` naming the destination; `aria-current="page"` on
   the active one.
 - **Boards:** `Ranking.dc.html`.

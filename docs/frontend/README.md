@@ -68,8 +68,8 @@ gladCode departs in four places, each deliberate:
 | WP | Delivers | Documents that become code |
 | :--- | :--- | :--- |
 | WP2 | Tokens for the game surfaces, UI primitives, the catalogue's shared components, `helpers/event-bus.js`, `services/`, unit tests | conventions.md, components.md (shared entries), events.md |
-| WP3 | AppHeader, AccountMenu, NotificationsPanel, CommandPalette, PainelMenu, MenuItem, Badge, MobileTabBar, MoreSheet, SearchField, Avatar, global search | components.md (shell entries), pages.md |
-| WP4 | Notícias and Perfil with autosave and the undo toast | components.md (PageHeader, SectionCard, SaveStatus), events.md flows 2 and 9 |
+| WP3 | AppHeader, AccountMenu, NotificationsPanel, CommandPalette, PainelMenu, MenuItem, Badge, MobileTabBar, MoreSheet, SearchField, Avatar, global search; the shell's notification reads: `GET /news?markRead=false` (opt-in, so the bell never advances the news marker) and `GET /potions/slots` with `expiresAt`/`serverNow` | components.md (shell entries), pages.md, events.md flow 1 |
+| WP4 | Notícias and Perfil with autosave and the undo toast; `GET /news` defaults to `markRead=false` and `POST /news/read` | components.md (PageHeader, SectionCard, SaveStatus), events.md flows 2 and 9 |
 | WP5 | Gladiadores and Batalhas | components.md (GladiatorCard, GladiatorPicker, VersusPanel), events.md flows 3 |
 | WP6 | Poções and Relatórios | components.md (PotionSlot, PotionCard, ResultPill, FormStreak), events.md flow 7 |
 | WP7 | Ranking | components.md (RankingTable, OwnGladiatorJump), events.md flow 4 |

@@ -37,7 +37,7 @@ module column names today's file).
 | Poções | `/potion` | `potions` | `profile/potions.js` | The menu says Poções; the route keeps the old singular. |
 | Batalhas | `/battle`, `/battle.<mode>` | `battle` | `profile/battle.js` + `ranked.js`, `duels.js`, `tournaments.js`, `trainings.js` | `<mode>` is `ranked`, `duel`, `tourn` or `train`. |
 | Relatórios | `/reports` | `report` | `profile/reports.js` | The section id is `report` (today's menu id); `/reports` is the canonical URL. |
-| Ranking | `/ranking`, `/ranking?at=<position>` | `ranking` | `profile/ranking.js` | `?at=` opens the ranking around a position and reveals it. |
+| Ranking | `/ranking`, `/ranking?at=<position>` | `ranking` | `profile/ranking.js` | `?at=` opens the ranking around the resolved position (`window.position`) and reveals it. |
 | Mensagens | `/messages`, `/messages/<userId>` | `messages` | `profile/messages.js` | `<userId>` is the other master's id; the open conversation is part of the URL (WP8). |
 | Amigos | `/friends` | `friends` | `profile/friends.js` | |
 | Any section (legacy tab) | `/profile?t=<tab>` | resolved from `t` | same as the named section | `t` names the section (`news`, `glads`, `potions`, `battle`, `report`, `ranking`, `messages`, `friends`); `?s=` sets the battle subtab. Unknown/disabled falls back to Perfil. |
@@ -82,7 +82,8 @@ One function, `resolveRoute(url)`, is the only place a URL becomes a shell state
 | :--- | :--- |
 | First load | `mount(resolveRoute(location))`; **no** `pushState`, no focus move. |
 | Left click on a same-origin section link (no modifier) | `event.preventDefault()`, `navigate(resolveRoute(href), { push: true })`. |
-| Palette result, menu, tab bar | the same `navigate(state, { push: true })`. |
+| Menu and tab bar (always inside the Painel) | the same `navigate(state, { push: true })`. |
+| Palette result | if the current page is the Painel shell **and** the result's `section` is not null, `navigate(resolveRoute(href), { push: true })`; otherwise `location.assign(href)` — a public page or a document target has no Painel content to mount. |
 | `popstate` (Back/Forward) | `mount(resolveRoute(location))` with `{ fromHistory: true }`; **no** `pushState` and no new entry. |
 | In-section state change (filters, pagination, the ranking jump) | the section applies it and emits its fact; the shell calls `navigate(state, { historyOnly: true, replace: true })` for filters/pagination and `{ historyOnly: true, push: true }` for the ranking jump and for opening a conversation, so Back returns to the previous window without a duplicate request |
 
@@ -93,6 +94,11 @@ subtab or the query changed. `mount` unmounts the current section, mounts the ne
 entry and the title, scrolls the content to the top and moves focus to the section's `<h1>` only when the
 change came from a click, a shortcut or `popstate` — never on the first load or an in-place `update`. Back
 and Forward restore section, subtab and query because the resolver reads them from `location`.
+
+The shell decides the navigation kind by **where it is mounted**, not by the target alone: a page outside
+the Painel (the front page, `/manual`, `/editor`, `/play/:hash`, …) has no `#painel-content`, so a palette
+result always leaves it with `location.assign(href)`. Only a palette opened on the Painel can mount a
+section in place.
 
 ### Old addresses
 

@@ -94,12 +94,12 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `navigation:opened` | `{ section: SectionId, href: string }` | shell after a section mounts | shell → PainelMenu/MobileTabBar setters, analytics, the route title |
 | `messages:read` | `{ userId: number, read: number, unreadTotal: number }` | `MessagesService.markRead()` | Mensagens section (updates `ConversationList`), NotificationService (refresh) |
 | `friends:answered` | `{ id: number, accepted: boolean }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
-| `potions:ordered` | `{ slot: PotionSlotView, serverNow: string, silver: number }` | `PotionsService.order()` | Poções section (updates `PotionSlot`), NotificationService; AppHeader via `account:silver` |
+| `potions:ordered` | `{ slots: PotionSlotView[], serverNow: string, silver: number }` | `PotionsService.order()` | Poções section (updates `PotionSlot`), NotificationService; AppHeader via `account:silver` |
 | `potions:cancelled` | `{ slotId: number }` | `PotionsService.cancel()` | Poções section |
 | `gladiator:chosen` | `{ gladiator: GladiatorView, mode: 'ranked'\|'duel'\|'tournament'\|'training' }` | Batalhas section (after the picker's `select`) | Batalhas section itself for the URL, analytics |
-| `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` | Ranking section (after the table moved) | shell (URL/hash), analytics |
+| `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` (`position` is the resolved window position) | Ranking section (after the table moved) | shell (URL/hash), analytics |
 | `palette:opened` | `{ source: 'keyboard'\|'button' }` | shell | analytics, shell (header search busy state) |
-| `palette:navigated` | `{ target: string, href: string }` | CommandPalette → shell | analytics, shell (menu pending state) |
+| `palette:navigated` | `{ section: SectionId\|null, href: string }` | CommandPalette → shell | analytics, shell (menu pending state) |
 
 Every numeric id above is the entity it names: `messages:read.userId` is **the other master's user id**
 (the conversation key), `friends:answered.id` is the pending `friends` row id, `potions:*.slotId` and
@@ -128,7 +128,8 @@ Payload typedefs:
  */
 
 /**
- * One potion compartment, as `GET /potions/slots` returns it (WP6 adds `expiresAt` and `serverNow`).
+ * One potion compartment. `GET /potions/slots` returns `expiresAt` and `serverNow` from WP3 (the shell's
+ * badge needs them); the Poções section consumes them from WP6.
  *
  * @typedef {object} PotionSlotView
  * @property {number} id
@@ -239,9 +240,10 @@ sequenceDiagram
     Choice->>Section: component event 'change' { value: 'classic' }
     Section->>Section: applyTheme('classic') (preview at once)
     Section->>Svc: save('theme', 'classic')
-    Svc->>Svc: seq.theme += 1 (only one request in flight per field)
+    Svc->>Svc: token = { rev: ++seq.theme, previous: confirmed.theme } (only one request in flight)
     Svc->>API: PUT /users/me { theme: 'classic' }
     API-->>Svc: { user }
+    Svc->>Svc: confirmed.theme = 'classic'; rev === seq.theme, so the toast is due
     Svc->>Bus: emit('account:saved', { user, changed: ['theme'] })
     Svc->>Bus: emit('theme:changed', { choice: 'classic', theme: 'classic' })
     Bus-->>Shell: account:saved
@@ -250,7 +252,7 @@ sequenceDiagram
     User->>Toast: Desfazer
     Toast->>Section: action.onClick() (calls Svc.undo(token) with the save's revision)
     Section->>Svc: undo(token)
-    Svc->>API: PUT /users/me { theme: previousConfirmed }
+    Svc->>API: PUT /users/me { theme: token.previous } (a new revision through the same queue)
     Svc->>Bus: emit('account:saved') / emit('theme:changed')
 ```
 
@@ -259,19 +261,25 @@ Rules:
 - **One queue per field, last write wins.** `AccountService` keeps `seq[field]` (the latest intent),
   `confirmed[field]` (the last value the API confirmed) and `pending[field]`. It allows one `PUT` per field
   in flight; when it settles, it sends the latest pending value if it differs. A response is applied only
-  when its revision is still `seq[field]`; a delayed response or failure from an older revision is ignored
-  (no preview change, no toast, no error).
+  when its revision is still `seq[field]`; a delayed response or failure from an older revision never
+  changes the preview, a toast or an error. A successful superseded write still updates `confirmed[field]`,
+  because the server persisted it and it is the base for a later rollback.
 - **Optimistic preview, rollback to the confirmed value.** The UI shows the chosen value before the
   request. If the *current* revision fails, the field reverts to `confirmed[field]` (not to the previous
   intent) and `SaveStatus` shows its error with a retry; a superseded failure changes nothing.
-- **The undo token is the confirmed revision.** The toast's token is valid only while `seq[field]` still
-  matches the revision it was created for. `undo(token)` saves `confirmed[field]` as a new revision, applies
-  it optimistically, and is itself saved and confirmed; an old toast cannot undo a newer choice. A newer
-  change in the same field dismisses the older toast and invalidates its token.
-- **Test contract (WP4).** Two rapid changes to the same field (Clássico, then Arena escuro) with the first
-  response delayed: the second value is the one persisted and shown, the first response changes nothing,
-  and an undo from the second toast restores the value confirmed before the first change. A delayed failure
-  of the first request also changes nothing.
+- **The token captures the value before the change.** At `save(field, value)` the service stores
+  `token = { rev, previous: confirmed[field] }`. `previous` is the value the API had persisted when the
+  change was made (if an earlier revision is still in flight and unconfirmed, it is the value before that
+  earlier change). The token is valid only while `token.rev === seq[field]`; a later change dismisses the
+  older toast and invalidates it. `undo(token)` saves `token.previous` as a **new revision through the same
+  queue**, so the restore is itself persisted and confirmed; an old toast cannot undo a newer choice.
+- **Test contract (WP4).** Start at Sistema. Change to Clássico (rev 1; token previous = Sistema), then to
+  Arena escuro (rev 2; token previous = Sistema because rev 1 is not confirmed yet) with the first response
+  delayed. Rev 1 succeeds: `confirmed` becomes Clássico, but no preview change and no toast. Rev 2 succeeds:
+  `confirmed` becomes Arena escuro and its toast is the current one. Undo saves `token.previous` =
+  Sistema as rev 3 and is confirmed. A delayed failure of rev 1 changes nothing. If the second change is
+  made after rev 1 confirmed, its token previous is Clássico (the value persisted before that change) —
+  the rule is always “captured at change time”, not “the value before the first change”.
 - `glad-view:changed` has the same flow: `applyGladView` on change, `save('gladView', choice)`, the cards
   repaint in place (no reload, no reselection).
 - The settings footer says “Tudo que você muda aqui é salvo na hora.” and the `SaveStatus` beside each
@@ -332,8 +340,8 @@ sequenceDiagram
     Section->>Table: setContext({ around: window.around, position: window.position, page: window.page, total: window.total, pageSize: window.pageSize })
     Section->>Table: reveal(window.position)
     Section->>Page: set({ page: window.page, pages: Math.ceil(window.total / window.pageSize), total: window.total, pageSize: window.pageSize })
-    Section->>Bus: emit('ranking:jumped', { gladiatorId: 42, position: 128 })
-    Bus-->>Shell: navigate({ section: 'ranking', query: { at: 128 } }, { historyOnly: true, push: true })
+    Section->>Bus: emit('ranking:jumped', { gladiatorId: 42, position: window.position })
+    Bus-->>Shell: navigate({ section: 'ranking', query: { at: window.position } }, { historyOnly: true, push: true })
 ```
 
 #### Ranking window contract (WP7)
@@ -372,10 +380,13 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
   list.
 - **“Ir para a posição”:** `Pagination` emits `jump { position }`; the section calls the same
   `RankingService.window({ position, size: 9 })`. A strip jump and a position jump both publish
-  `ranking:jumped`; the shell turns it into `pushState('/ranking?at=<position>')`, so Back returns to the
-  previous ranking window. A cold load of `/ranking?at=128` mounts the section, which calls the same window
-  and reveals the row once the data arrives. The table keeps the “Você” tag and the own row's contrast in
-  every theme; `reveal(position)` only scrolls and flashes, it never fetches.
+  `ranking:jumped` with the **resolved `window.position`**, never the clicked or typed number; the shell
+  turns it into `pushState('/ranking?at=<window.position>')`, so Back returns to the previous ranking
+  window and a reload opens the window that was actually rendered. A typed position beyond `total` is
+  clamped by the server and the event carries the clamped `window.position`. A cold load of
+  `/ranking?at=128` mounts the section, which calls the same window and reveals the row once the data
+  arrives. The table keeps the “Você” tag and the own row's contrast in every theme; `reveal(position)`
+  only scrolls and flashes, it never fetches.
 
 ### 5. Conversation read → Mensagens badge
 
@@ -450,8 +461,8 @@ a failure keeps the banner and shows the message.
 
 ### 7. Potion ordered → Poções slots and silver in the header
 
-The mutation answers only the new slot id and the new silver; the full slot (with its expiry) comes from the
-read that follows it.
+The mutation answers the new slot id, the new silver balance and the new compartment list; the client
+applies them directly, with no follow-up read.
 
 ```mermaid
 sequenceDiagram
@@ -465,20 +476,19 @@ sequenceDiagram
     participant Slot as PotionSlot
     participant Header as AppHeader
     participant Notif as NotificationService
+    participant Toast
     User->>Card: Encomendar
     Card->>Section: component event 'order' { potion }
     Section->>Card: setBusy(true)
     Section->>Svc: order(potion.identifier)
     Svc->>API: POST /potions/slots { potion }
-    API-->>Svc: { slotId, silver }
-    Svc->>API: GET /potions/slots
-    API-->>Svc: { slots, serverNow }
+    API-->>Svc: { slotId, silver, slots, serverNow }
     Svc->>Bus: emit('account:silver', { silver })
-    Svc->>Bus: emit('potions:ordered', { slot, serverNow, silver })
+    Svc->>Bus: emit('potions:ordered', { slots, serverNow, silver })
     Bus-->>Shell: account:silver
     Shell->>Header: setSilver(silver)
     Bus-->>Section: potions:ordered
-    Section->>Slot: setPotion(slot, serverNow) with its countdown
+    Section->>Slot: setPotion(slot, serverNow) for each returned slot
     Bus-->>Notif: refresh (potions badge)
     Notif->>API: GET /notifications + GET /potions/slots
     API-->>Notif: counts, slots and serverNow
@@ -486,10 +496,14 @@ sequenceDiagram
     Section->>Toast: createToast('Poção de Vida III encomendada')
 ```
 
-`GET /potions/slots` gains `expiresAt` on each slot and a `serverNow` on the answer in WP6; the countdown
-runs from those two values (not from a locally computed duration), so a tab that was asleep still shows the
-right time. A refused order (`NO_FREE_SLOT`, not enough silver) leaves the card enabled and shows the API's
-message; the slot count and the silver never change locally before the API confirms. Cancelling emits
+The WP6 `POST /potions/slots` answer is authoritative for both the balance and the compartment list:
+`{ slotId, silver, slots, serverNow }` (the GET and POST return the same `slots`/`serverNow` shape, whose
+`expiresAt` fields ship in WP3 for the shell badge). The client applies the 201 directly — no follow-up
+read — so a confirmed purchase cannot leave a stale balance. If the 201 is lost after the server committed,
+the client **does not retry the order**: the card stays disabled with an “Atualizando…” state until the next
+`NotificationService.refresh`/`GET /potions/slots` reconciles the silver and slots, and the next refresh is
+the only recovery. A refused POST (`NO_FREE_SLOT`, not enough silver) is a different outcome: it leaves the
+card enabled and shows the API's message, and nothing changes locally. Cancelling emits
 `potions:cancelled` and refreshes the same way.
 
 ### 8. Ctrl K → palette → navigation
@@ -510,22 +524,32 @@ sequenceDiagram
     Search-->>Palette: { irPara, mestres, documentacao }
     User->>Palette: clicks "Relatórios"
     Palette->>Shell: component event 'navigate' { section: 'report', href: '/reports' }
-    Shell->>Bus: emit('palette:navigated', { target: 'report', href: '/reports' })
-    Shell->>Shell: navigate(resolveRoute('/reports')) → pushState
-    Shell->>Bus: emit('navigation:opened', { section: 'report', href: '/reports' })
-    Shell->>Menu: setActive('report')
+    Shell->>Bus: emit('palette:navigated', { section: 'report', href: '/reports' })
+    alt Current page is the Painel shell and section is not null
+        Shell->>Shell: navigate(resolveRoute('/reports'), { push: true })
+        Shell->>Bus: emit('navigation:opened', { section: 'report', href: '/reports' })
+        Shell->>Menu: setActive('report')
+    else Any other page, or a target outside the Painel
+        Shell->>Shell: location.assign('/reports')
+    end
 ```
 
 The palette opens on `/` as well (the boards show the field in the header), traps focus, closes on Esc and
-returns focus to the opener. On the phone the header search button opens the same palette. The palette
-result carries a `section` id (`report`, never `reports`) and a canonical `href`; the shell's single route
-resolver ([pages.md](pages.md#2-routes)) turns the URL into the state it mounts.
+returns focus to the opener. On the phone the header search button opens the same palette. The result
+carries one payload, `{ section, href }`: `section` is a Painel section id (`report`, never `reports`) or
+`null` for a document page. **`pushState` is used only when the current page is the Painel shell and the
+target is a Painel section**; every other case (a public page such as `/`, `/manual`, `/editor`; or a
+documentation target) does a full `location.assign(href)`, because a public page has no content column to
+mount a section into. The shell's single route resolver ([pages.md](pages.md#2-routes)) handles the Painel
+branch.
 
 ### 9. “Marcar tudo como lido” → Notícias and the bell
 
-Loading the news list must not advance the read marker, or the button would have nothing left to do. WP4
-adds `markRead=false` to `GET /news` (the default) and a `POST /news/read` mutation for the button; the
-section applies the change optimistically and rolls it back when the API refuses it.
+Loading the news list must not advance the read marker, or the button would have nothing left to do. WP3
+adds `markRead=false` to `GET /news` for the shell's notification feed (opt-in, so the section's current
+listing keeps its behaviour); WP4 makes `markRead=false` the default and adds the `POST /news/read`
+mutation for the button. The section applies the change optimistically and rolls it back when the API
+refuses it.
 
 ```mermaid
 sequenceDiagram
