@@ -7,11 +7,11 @@ export class RankModel {
     /**
      * A page of the gladiator ranking.
      *
-     * @param {{ offset: number, search?: string }} query
+     * @param {{ offset: number, search?: string, signal?: AbortSignal }} query
      * @returns {Promise<{ total: number, ranking: Array<{ gladiator: string, mmr: number, master: string, change24h: number, position: number }> }>}
      */
-    static general({ offset, search = '' }) {
-        return api.get('ranking', { offset, search });
+    static general({ offset, search = '', signal } = {}) {
+        return api.get('ranking', { offset, search }, { signal });
     }
 
     /** @returns {Promise<number>} Gladiators ranked above the signed-in master's best one. */
@@ -50,11 +50,11 @@ export class RankModel {
     /**
      * The masters' ranking of a hashtag.
      *
-     * @param {{ tab: string, search?: string }} query
+     * @param {{ tab: string, search?: string, signal?: AbortSignal }} query
      * @returns {Promise<Array<{ id: number, nick: string, score: number, time: number, position: number }>>}
      */
-    static async hashtag({ tab, search = '' }) {
-        const { ranking } = await api.get(`ranking/tabs/${encodeURIComponent(tab)}`, { search });
+    static async hashtag({ tab, search = '', signal } = {}) {
+        const { ranking } = await api.get(`ranking/tabs/${encodeURIComponent(tab)}`, { search }, { signal });
         return ranking;
     }
 }

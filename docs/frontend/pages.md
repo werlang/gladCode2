@@ -59,7 +59,7 @@ One function, `resolveRoute(url)`, is the only place a URL becomes a shell state
  * @typedef {object} PainelRoute
  * @property {'news'|'profile'|'glads'|'potions'|'battle'|'report'|'ranking'|'messages'|'friends'} section
  * @property {string} subtab `''` or a battle mode (`ranked`, `duel`, `tourn`, `train`).
- * @property {{ at?: number, q?: string, userId?: number }} query The section-owned query values.
+ * @property {{ at?: number, q?: string, tab?: string, userId?: number }} query The section-owned query values.
  */
 ```
 
@@ -69,6 +69,7 @@ One function, `resolveRoute(url)`, is the only place a URL becomes a shell state
 - `/profile?t=<tab>` resolves the section from `tab` (`report`, `potions` accepted alongside the route
   names), then `?s=` as the subtab; an unknown or disabled tab resolves to `profile`.
 - `/ranking?at=<n>` sets `query.at` (a positive integer, else ignored); `/ranking?q=` sets `query.q`.
+  `/reports?tab=duels` sets `query.tab` to `battles`, `duels` or `favorites`; any other value is ignored.
   `/messages/<userId>` sets `query.userId` (WP8).
 - Any other path is not a Painel route; the server's own redirects (old addresses) run first, and the shell
   only intercepts links whose resolved state has a `section`.

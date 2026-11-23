@@ -8,11 +8,11 @@ export class ReportModel {
     /**
      * A page of the signed-in master's reports, marked as read.
      *
-     * @param {{ offset: number, unreadOnly?: boolean }} query
+     * @param {{ offset: number, unreadOnly?: boolean, signal?: AbortSignal }} query
      * @returns {Promise<{ total: number, reports: object[] }>}
      */
-    static battles({ offset, unreadOnly = false }) {
-        return api.get('reports', { offset, markRead: true, unreadOnly: unreadOnly || undefined });
+    static battles({ offset, unreadOnly = false, signal } = {}) {
+        return api.get('reports', { offset, markRead: true, unreadOnly: unreadOnly || undefined }, { signal });
     }
 
     /**
@@ -27,11 +27,11 @@ export class ReportModel {
     /**
      * A page of the favorite reports.
      *
-     * @param {{ offset: number }} query
+     * @param {{ offset: number, signal?: AbortSignal }} query
      * @returns {Promise<{ total: number, reports: object[] }>}
      */
-    static favorites({ offset }) {
-        return api.get('reports', { offset, favorites: true });
+    static favorites({ offset, signal } = {}) {
+        return api.get('reports', { offset, favorites: true }, { signal });
     }
 
     /**
@@ -91,11 +91,22 @@ export class DuelModel {
     /**
      * A page of the master's duels (`{ id, time, log, read, glad, enemy, user }` each).
      *
-     * @param {{ offset: number }} query
+     * @param {{ offset: number, signal?: AbortSignal }} query
      * @returns {Promise<{ total: number, duels: object[] }>}
      */
-    static reports({ offset }) {
-        return api.get('duels/history', { offset });
+    static reports({ offset, signal } = {}) {
+        return api.get('duels/history', { offset }, { signal });
+    }
+
+    /**
+     * Finished duels the master has not read, without marking them.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<object[]>} The bell's passive duel feed.
+     */
+    static async unreadReports({ signal } = {}) {
+        const { duels } = await api.get('duels/unread', {}, { signal });
+        return duels;
     }
 }
 

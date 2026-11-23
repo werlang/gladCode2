@@ -36,7 +36,7 @@ const VIEWS = {
         placeholder: battlesPlaceholderTemplate,
         emptyRow: battlesEmptyRowTemplate,
         empty: { icon: 'scroll', title: 'Nenhuma batalha para mostrar', summary: '' },
-        load: ({ offset, unread }) => ReportModel.battles({ offset, unreadOnly: unread }),
+        load: ({ offset, unread, signal }) => ReportModel.battles({ offset, unreadOnly: unread, signal }),
         rows: data => data.reports,
     },
     favorites: {
@@ -48,7 +48,7 @@ const VIEWS = {
             title: 'Nenhuma batalha favorita',
             summary: 'Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas',
         },
-        load: ({ offset }) => ReportModel.favorites({ offset }),
+        load: ({ offset, signal }) => ReportModel.favorites({ offset, signal }),
         rows: data => data.reports,
     },
     duels: {
@@ -56,7 +56,7 @@ const VIEWS = {
         placeholder: duelsPlaceholderTemplate,
         emptyRow: duelsEmptyRowTemplate,
         empty: { icon: 'shield-halved', title: 'Você ainda não possui duelos', summary: '' },
-        load: ({ offset }) => DuelModel.reports({ offset }),
+        load: ({ offset, signal }) => DuelModel.reports({ offset, signal }),
         rows: data => data.duels,
     },
 };
@@ -96,9 +96,16 @@ export class ReportsTab {
         });
     }
 
-    /** Opens the tab on the selected report. */
-    show() {
-        this.fetch({ offset: this.#offsets[this.#selected], placeholder: true });
+    /**
+     * Opens the tab on the selected report; a `?tab=` route selects battles, duels or favorites.
+     *
+     * @param {{ query?: { tab?: string } }} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    show(route = {}, { signal } = {}) {
+        const tab = route.query?.tab;
+        if (tab && TABS.includes(tab)) return this.#select(tab, { signal });
+        return this.fetch({ offset: this.#offsets[this.#selected], placeholder: true, signal });
     }
 
     /** @returns {boolean} Whether only unread battles are asked for. */
@@ -106,14 +113,14 @@ export class ReportsTab {
         return this.#unread.querySelector('input').checked;
     }
 
-    /** @param {string} id Tab id. */
-    #select(id) {
+    /** @param {string} id Tab id. @param {{ signal?: AbortSignal }} [options] */
+    #select(id, { signal } = {}) {
         const same = id === this.#selected;
         this.#selected = id;
         this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
             tab.classList.toggle('selected', TABS[index] === id);
         });
-        this.fetch({ offset: this.#offsets[id], placeholder: !same });
+        return this.fetch({ offset: this.#offsets[id], placeholder: !same, signal });
     }
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */
@@ -124,9 +131,9 @@ export class ReportsTab {
     /**
      * Loads a page of the selected report.
      *
-     * @param {{ offset?: number, placeholder?: boolean }} options
+     * @param {{ offset?: number, placeholder?: boolean, signal?: AbortSignal }} options
      */
-    async fetch({ offset = 0, placeholder = false }) {
+    async fetch({ offset = 0, placeholder = false, signal } = {}) {
         const id = this.#selected;
         const view = VIEWS[id];
         const request = ++this.#request;
@@ -138,8 +145,8 @@ export class ReportsTab {
             button.disabled = true;
         });
 
-        const data = await view.load({ offset, unread: this.#onlyUnread() });
-        if (request !== this.#request) return;
+        const data = await view.load({ offset, unread: this.#onlyUnread(), signal });
+        if (signal?.aborted || request !== this.#request) return;
 
         const total = parseInt(data.total, 10);
         this.#totals[id] = total;

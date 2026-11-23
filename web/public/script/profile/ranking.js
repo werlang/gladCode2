@@ -43,10 +43,19 @@ export class RankingTab {
         this.#pages[GENERAL].offset = Math.floor(offset / PAGE_SIZE) * PAGE_SIZE;
     }
 
-    /** Opens the tab: draws the hashtag tabs and the selected ranking. */
-    async show() {
+    /**
+     * Opens the tab: applies the route's search term, draws the hashtag tabs and the selected ranking.
+     *
+     * @param {{ query?: { q?: string } }} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async show(route = {}, { signal } = {}) {
+        if (route.query?.q !== undefined) {
+            this.#search.value = route.query.q;
+            this.#pages[GENERAL].offset = 0;
+        }
         await this.#drawTabs();
-        this.fetch({ offset: this.#pages[this.#selected].offset, placeholder: true });
+        return this.fetch({ offset: this.#pages[this.#selected].offset, placeholder: true, signal });
     }
 
     async #drawTabs() {
@@ -171,10 +180,10 @@ export class RankingTab {
     /**
      * Loads a page of the selected ranking.
      *
-     * @param {{ offset?: number, placeholder?: boolean }} options `placeholder`
+     * @param {{ offset?: number, placeholder?: boolean, signal?: AbortSignal }} options `placeholder`
      *   shows grey rows while it loads (when switching tabs).
      */
-    async fetch({ offset = 0, placeholder = false }) {
+    async fetch({ offset = 0, placeholder = false, signal } = {}) {
         const id = this.#selected;
         const general = id === GENERAL;
         const request = ++this.#request;
@@ -190,9 +199,9 @@ export class RankingTab {
 
         const search = this.#search.value;
         const data = general
-            ? await RankModel.general({ offset, search })
-            : { ranking: await RankModel.hashtag({ tab: id, search }) };
-        if (request !== this.#request) return;
+            ? await RankModel.general({ offset, search, signal })
+            : { ranking: await RankModel.hashtag({ tab: id, search, signal }) };
+        if (signal?.aborted || request !== this.#request) return;
 
         const total = general ? data.total : data.ranking.length;
         this.#pages[id].total = total;

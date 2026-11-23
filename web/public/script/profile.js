@@ -1,8 +1,8 @@
 import './blocks.js';
-import { createToast } from './components/toast.js';
+import { createToast, isModalOpen } from './components/toast.js';
 import { GoogleLogin } from './helpers/google-login.js';
 import { APP_EVENTS, events } from './helpers/event-bus.js';
-import { resolveRoute, sectionTitle, sectionUrl } from './helpers/painel-route.js';
+import { resolveRoute, SECTION_SHORTCUTS, sectionTitle, sectionUrl } from './helpers/painel-route.js';
 import { RankModel } from './models/rank.js';
 import { BattleTab } from './profile/battle.js';
 import { FriendsTab } from './profile/friends.js';
@@ -91,18 +91,64 @@ async function start() {
         document.querySelector(`#battle-container #battle-mode #${CSS.escape(mode)}.button`)?.click();
     };
 
-    const show = (route, { focus = false } = {}) => {
+    /** One lifecycle adapter per existing controller; the old sections only need show(). */
+    const adapters = Object.fromEntries(Object.entries(tabs).map(([section, tab]) => {
+        const panel = contents.find(item => item.dataset.menu === section);
+        return [section, {
+            panel,
+            mount: (route, signal) => {
+                panel.classList.add('open');
+                return Promise.resolve(tab.show?.(route, { signal }));
+            },
+            update: (route, signal) => Promise.resolve(tab.show?.(route, { signal })),
+            unmount: () => {
+                if (typeof tab.unmount === 'function') tab.unmount();
+                else if (typeof tab.abort === 'function') tab.abort();
+                panel.classList.remove('open');
+            },
+        }];
+    }));
+
+    let currentSection = null;
+    let currentAdapter = null;
+    let controller = null;
+    let generation = 0;
+
+    const reportError = error => {
+        if (error?.aborted) return;
+        createToast('Não foi possível carregar esta seção. Tente novamente.', 'error');
+    };
+
+    const show = async (route, { focus = false } = {}) => {
         if (!route) return;
+        const same = currentSection === route.section;
+        const token = ++generation;
+        if (!same) {
+            controller?.abort();
+            currentAdapter?.unmount();
+            currentSection = route.section;
+            currentAdapter = adapters[route.section];
+        }
+        controller?.abort();
+        controller = new AbortController();
         if (more.isOpen) more.close();
-        for (const panel of contents) panel.classList.toggle('open', panel.dataset.menu === route.section);
         menu.setActive(route.section);
         bar.setActive(route.section);
         document.title = `gladCode - ${sectionTitle(route.section)}`;
-        Promise.resolve(tabs[route.section]?.show()).catch(() => {});
+        try {
+            if (same) await currentAdapter.update(route, controller.signal);
+            else await currentAdapter.mount(route, controller.signal);
+        }
+        catch (error) {
+            if (!token || token !== generation || controller.signal.aborted) return;
+            reportError(error);
+            return;
+        }
+        if (token !== generation || controller.signal.aborted) return;
         if (route.section === 'battle') setTimeout(() => selectBattleMode(route.subtab), 0);
         events.emit(APP_EVENTS.navigationOpened, { section: route.section, href: sectionUrl(route) });
-        window.scrollTo({ top: 0, behavior: 'auto' });
-        if (focus) requestAnimationFrame(() => {
+        if (!same) window.scrollTo({ top: 0, behavior: 'auto' });
+        if (focus && !same) requestAnimationFrame(() => {
             const heading = content.querySelector('.content.open h1, .content.open h2');
             if (!heading) return;
             heading.tabIndex = -1;
@@ -132,7 +178,7 @@ async function start() {
 
     window.addEventListener('popstate', () => show(resolveRoute(location), { focus: true }));
 
-    const GO = { n: 'news', p: 'potions', b: 'battle', r: 'report', k: 'ranking', m: 'messages', a: 'friends' };
+    const GO = Object.fromEntries(Object.entries(SECTION_SHORTCUTS).map(([section, letter]) => [letter, section]));
     let goPending = false;
     let goTimer = null;
     const resetGo = () => {
@@ -144,7 +190,7 @@ async function start() {
     document.addEventListener('keydown', event => {
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
-        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.ctrlKey || event.metaKey || event.altKey || isModalOpen()) return;
         const letter = event.key.toLowerCase();
         if (!goPending && letter === 'g') {
             event.preventDefault();
@@ -190,9 +236,8 @@ async function start() {
         }
     });
 
-    menu.setActive(resolveRoute(location)?.section ?? 'profile');
-    bar.setActive(resolveRoute(location)?.section ?? 'profile');
-    show(resolveRoute(location), { focus: false });
+    const initial = resolveRoute(location) ?? { section: 'news', subtab: '', query: {} };
+    await show(initial, { focus: false });
     if (notifications.counts) {
         menu.setCounts(notifications.counts);
         bar.setCounts(notifications.counts);

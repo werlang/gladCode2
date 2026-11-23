@@ -36,6 +36,12 @@ test('unknown addresses are not found, whatever their form', async () => {
     for (const path of ['/nope', '/nope.php', '/code.php']) assert.equal((await get(path)).status, 404, path);
 });
 
+test('Painel addresses keep an active section route, whatever their form', async () => {
+    for (const path of ['/news/', '/battle.unknown', '/reports?tab=duels', '/ranking?q=Magnus']) {
+        assert.equal((await get(path)).status, 200, path);
+    }
+});
+
 /**
  * Serves one fresh copy of the app with `ENABLE_RENDER2` set as given (the flag is read when app.js loads).
  *

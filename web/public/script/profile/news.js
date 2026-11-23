@@ -30,9 +30,15 @@ function sharePost(hash) {
 export class NewsTab {
     #container = document.querySelector('#panel #news-container');
 
-    /** Loads the first page of posts. */
-    async show() {
-        const posts = await NewsModel.list(0);
+    /**
+     * Loads the first page of posts.
+     *
+     * @param {object} [route]
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async show(route = {}, { signal } = {}) {
+        const posts = await NewsModel.list(0, { signal });
+        if (signal?.aborted) return;
         this.#container.replaceChildren();
         posts.forEach(post => {
             const element = createElement(renderTemplate(newsPostTemplate, {

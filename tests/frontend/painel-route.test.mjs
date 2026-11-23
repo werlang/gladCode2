@@ -12,13 +12,16 @@ test('the Painel routes resolve to one shared state', () => {
     assert.deepEqual(resolveRoute('/profile?t=battle&s=train'), { section: 'battle', subtab: 'train', query: {} });
     assert.deepEqual(resolveRoute('/ranking?at=128&q=Magnus'), { section: 'ranking', subtab: '', query: { at: 128, q: 'Magnus' } });
     assert.deepEqual(resolveRoute('/messages/7'), { section: 'messages', subtab: '', query: { userId: 7 } });
+    assert.deepEqual(resolveRoute('/news/'), { section: 'news', subtab: '', query: {} });
+    assert.deepEqual(resolveRoute('/battle.unknown'), { section: 'battle', subtab: '', query: {} });
+    assert.deepEqual(resolveRoute('/reports?tab=duels'), { section: 'report', subtab: '', query: { tab: 'duels' } });
 });
 
 test('unknown paths and tabs fall back safely', () => {
     assert.equal(resolveRoute('/editor'), null);
     assert.deepEqual(resolveRoute('/profile?t=unknown'), { section: 'profile', subtab: '', query: {} });
     assert.deepEqual(resolveRoute('/ranking?at=-4'), { section: 'ranking', subtab: '', query: {} });
-    assert.equal(resolveRoute('/battle.nope'), null);
+    assert.deepEqual(resolveRoute('/battle.nope'), { section: 'battle', subtab: '', query: {} });
 });
 
 test('sectionUrl writes only URLs the resolver reads', () => {
@@ -27,6 +30,7 @@ test('sectionUrl writes only URLs the resolver reads', () => {
         { section: 'battle', subtab: 'duel', query: {} },
         { section: 'ranking', subtab: '', query: { at: 128 } },
         { section: 'messages', subtab: '', query: { userId: 7 } },
+        { section: 'report', subtab: '', query: { tab: 'duels' } },
     ]) {
         assert.deepEqual(resolveRoute(sectionUrl(state)), state);
     }

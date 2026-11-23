@@ -24,13 +24,18 @@ const TAB_SECTIONS = {
     battle: 'battle', report: 'report', reports: 'report', ranking: 'ranking', messages: 'messages', friends: 'friends',
 };
 
-const BATTLE_MODES = ['ranked', 'duel', 'tourn', 'train'];
+export const BATTLE_MODES = Object.freeze(['ranked', 'duel', 'tourn', 'train']);
+
+/** The G + initial shortcuts the shell and the palette share. */
+export const SECTION_SHORTCUTS = Object.freeze({
+    news: 'n', potions: 'p', battle: 'b', report: 'r', ranking: 'k', messages: 'm', friends: 'a',
+});
 
 /**
  * @typedef {object} PainelRoute
  * @property {'news'|'profile'|'glads'|'potions'|'battle'|'report'|'ranking'|'messages'|'friends'} section
  * @property {string} subtab `''` or a battle mode.
- * @property {{ at?: number, q?: string, userId?: number }} query
+ * @property {{ at?: number, q?: string, tab?: string, userId?: number }} query
  */
 
 /**
@@ -41,29 +46,34 @@ const BATTLE_MODES = ['ranked', 'duel', 'tourn', 'train'];
  */
 export function resolveRoute(input) {
     const url = input instanceof URL ? input : new URL(String(input), 'http://painel.local');
-    let section = PATH_SECTIONS[url.pathname] ?? null;
+    const pathname = url.pathname.replace(/\/+$/, '') || '/';
+    let section = PATH_SECTIONS[pathname] ?? null;
     let subtab = '';
-    const messagePath = url.pathname.match(/^\/messages\/(\d+)$/);
+    const messagePath = pathname.match(/^\/messages\/(\d+)$/);
     if (messagePath) section = 'messages';
-    if (url.pathname === '/profile') {
+    if (pathname === '/profile') {
         section = TAB_SECTIONS[url.searchParams.get('t') ?? 'profile'] ?? 'profile';
     }
     if (!section) {
-        const battle = url.pathname.match(/^\/battle\.([\w-]+)$/);
-        if (!battle || !BATTLE_MODES.includes(battle[1])) return null;
+        const battle = pathname.match(/^\/battle\.([\w-]+)$/);
+        if (!battle) return null;
         section = 'battle';
-        subtab = battle[1];
+        subtab = BATTLE_MODES.includes(battle[1]) ? battle[1] : '';
     }
-    if (url.pathname === '/battle' && section === 'battle') subtab = '';
-    if (url.pathname === '/profile' && section === 'battle') subtab = url.searchParams.get('s') ?? '';
+    if (pathname === '/battle' && section === 'battle') subtab = '';
+    if (pathname === '/profile' && section === 'battle') subtab = url.searchParams.get('s') ?? '';
     if (!BATTLE_MODES.includes(subtab)) subtab = '';
     const query = {};
     const at = Number(url.searchParams.get('at'));
     if (Number.isInteger(at) && at > 0) query.at = at;
     const q = url.searchParams.get('q');
     if (q) query.q = q;
-    const message = url.pathname.match(/^\/messages\/(\d+)$/);
+    const message = pathname.match(/^\/messages\/(\d+)$/);
     if (message) query.userId = Number(message[1]);
+    if (section === 'report') {
+        const tab = url.searchParams.get('tab');
+        if (['battles', 'duels', 'favorites'].includes(tab)) query.tab = tab;
+    }
     return { section, subtab, query };
 }
 
@@ -78,6 +88,7 @@ export function sectionUrl(state) {
     let path = section === 'report' ? '/reports' : section === 'potions' ? '/potion' : `/${section}`;
     if (section === 'battle' && state.subtab) path = `/battle.${state.subtab}`;
     if (section === 'messages' && state.query?.userId) path = `/messages/${state.query.userId}`;
+    if (section === 'report' && state.query?.tab) return `/reports?tab=${encodeURIComponent(state.query.tab)}`;
     const params = new URLSearchParams();
     if (section === 'ranking' && state.query?.at) params.set('at', String(state.query.at));
     if (section === 'ranking' && state.query?.q) params.set('q', state.query.q);
