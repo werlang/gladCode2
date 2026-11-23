@@ -98,7 +98,14 @@ export class Pagination extends BaseComponent {
         const hadFocus = this.element.contains(document.activeElement);
         this.#page = next;
         this.#render();
-        if (hadFocus) this.element.querySelector(paginationFocusSelector(focus))?.focus();
+        if (hadFocus) {
+            const match = this.element.querySelector(paginationFocusSelector(focus));
+            const target = match && !match.disabled
+                ? match
+                : this.element.querySelector(paginationFocusSelector('page'))
+                    ?? this.element.querySelector('.pagination-button:not([disabled])');
+            target?.focus();
+        }
         this.emit('change', { page: next });
         return this;
     }

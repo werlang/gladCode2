@@ -57,6 +57,9 @@ function makeNode(document, tagName = 'div') {
                 if (selector === '.pagination-page[aria-current="page"]') {
                     return node.className === 'pagination-page' && node.getAttribute('aria-current') === 'page';
                 }
+                if (selector === '.pagination-button:not([disabled])') {
+                    return node.className === 'pagination-button' && !node.disabled;
+                }
                 return false;
             };
             if (matches(this)) return this;
@@ -107,6 +110,24 @@ test('a page change emits the event and keeps focus on the equivalent control', 
         assert.equal(current.className, 'pagination-page');
         assert.equal(current.getAttribute('aria-current'), 'page');
         assert.equal(current.textContent, '3');
+
+        pagination.set({ page: 2, pages: 3, total: 30, pageSize: 10 });
+        const previous = root.querySelector('[aria-label="Página anterior"]');
+        previous.focus();
+        previous.click();
+        assert.deepEqual(changes, [{ page: 2 }, { page: 3 }, { page: 1 }]);
+        const first = fakeDocument.activeElement;
+        assert.equal(first.className, 'pagination-page');
+        assert.equal(first.getAttribute('aria-current'), 'page');
+        assert.equal(first.textContent, '1');
+
+        const simpleRoot = makeNode(fakeDocument);
+        const simple = new Pagination({ element: simpleRoot, variant: 'simple' });
+        simple.set({ page: 1, pages: 2, total: 20, pageSize: 10 });
+        const simpleNext = simpleRoot.querySelector('[aria-label="Próxima página"]');
+        simpleNext.focus();
+        simpleNext.click();
+        assert.equal(fakeDocument.activeElement.getAttribute('aria-label'), 'Página anterior');
     }
     finally {
         globalThis.document = previousDocument;
