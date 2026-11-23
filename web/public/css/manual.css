@@ -23,7 +23,6 @@ html {
 	max-width: 900px;
 	box-sizing: border-box;
 	font-family: var(--font-body);
-	margin-top: var(--space-2);
 	min-height: 100vh;
 }
 
@@ -39,7 +38,7 @@ pre {
 
 @media only screen and (min-width: 800px) {
 	#content-box {
-		padding: var(--space-11) var(--space-7) 200px;
+		padding: var(--space-11) var(--space-7) var(--layout-reading-bottom);
 	}
 	pre {
 		max-width: calc(100vw - 400px);

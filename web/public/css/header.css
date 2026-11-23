@@ -50,6 +50,7 @@ body{
 	font-family: var(--font-body);
 	position: fixed;
 	top: 0;
+	border-bottom: var(--space-hairline) solid color-mix(in srgb, var(--color-text-on-brand) 14%, transparent);
 }
 
 #header #logo {

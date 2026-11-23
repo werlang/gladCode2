@@ -51,7 +51,7 @@ body {
   display: none;
   max-width: 860px;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5) var(--space-9);
+  padding: var(--space-5) var(--space-5) var(--space-9);
   box-sizing: border-box;
 }
 #panel .content.open {
@@ -422,7 +422,7 @@ body {
 #profile-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   max-width: 760px;
   margin: 0 auto;
   padding: 0;
@@ -434,7 +434,7 @@ body {
     background-color: var(--color-surface);
     border: var(--space-hairline) solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: var(--space-5);
+    padding: var(--space-4) var(--space-5);
     box-shadow: var(--shadow-xs);
   }
 
@@ -451,7 +451,7 @@ body {
     background-color: var(--color-surface);
     border: var(--space-hairline) solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: var(--space-5);
+    padding: var(--space-4) var(--space-5);
     box-shadow: var(--shadow-xs);
   }
 
@@ -564,6 +564,20 @@ body {
   #profile-panel .profile-identity {
     flex-direction: row;
     align-items: center;
+  }
+}
+
+/* the email preferences sit in two columns on desktop, keeping the whole form above the fold */
+@media only screen and (min-width: 720px) {
+  #profile-panel #email {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1) var(--space-4);
+  }
+
+  #profile-panel #email h2,
+  #profile-panel #email .hint {
+    grid-column: 1 / -1;
   }
 }
 
@@ -940,25 +954,42 @@ body {
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
+  border: var(--space-hairline) solid var(--color-border);
   border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-strong);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
   font-size: var(--text-base);
   line-height: 1.3;
 }
+/* the icons are black PNGs: dark ink on the light card, light ink at night, white on the selected brand card */
 #battle-container #battle-mode .button img {
   width: 56px;
   height: 56px;
   object-fit: contain;
-  filter: invert(100%);
+  filter: var(--logo-filter-page);
   margin-bottom: 0;
 }
 #battle-container #battle-mode .button:hover {
-  background-color: var(--color-brand);
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-strong);
 }
 #battle-container #battle-mode .button.selected {
-  background-color: var(--color-secondary);
+  background-color: var(--color-brand);
+  border-color: var(--color-accent);
+  color: var(--color-text-on-brand);
+  box-shadow: 0 0 0 2px var(--color-accent), var(--shadow-md);
+}
+#battle-container #battle-mode .button.selected img {
+  filter: invert(100%);
+}
+#battle-container #battle-mode .button.selected:hover {
+  background-color: var(--color-brand-hover);
+  color: var(--color-text-on-brand);
 }
 #battle-container .wrapper {
   display: none;
@@ -1069,7 +1100,7 @@ body {
   box-sizing: border-box;
   text-align: left;
   padding: var(--space-2) var(--space-3) var(--space-2) var(--space-8);
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface);
   color: var(--color-text-strong);
 }
 #ranking-container #search .input::placeholder {
@@ -1125,6 +1156,7 @@ body {
 }
 #ranking-container .table {
   border-top: var(--space-hairline) solid var(--color-border);
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
 }
 #ranking-container .row {
   min-height: 44px;
@@ -1389,7 +1421,7 @@ body {
   color: var(--color-text);
   font-size: var(--text-base);
   border: var(--space-hairline) solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
   overflow: hidden;
 }
 #bhist-container p {
@@ -2603,8 +2635,10 @@ body {
 #post-table #unread {
   display: flex;
   align-items: center;
-  font-size: var(--text-lg);
-  margin-left: var(--space-5);
+  margin-left: 0;
+  margin-top: var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text);
 }
 .table .cell h3 {
   margin: 0 var(--space-7);
@@ -2614,7 +2648,6 @@ body {
 }
 #ranking-container #tab-container {
   overflow-x: hidden;
-  margin-right: var(--space-8);
 }
 #after-battle {
   display: flex;
@@ -2720,8 +2753,8 @@ body {
 }
 #after-battle #renown-now .value,
 #after-battle #silver-now .value {
-  margin-left: -110px;
-  width: 110px;
+  margin-left: calc(-1 * var(--layout-reward-value));
+  width: var(--layout-reward-value);
   text-shadow: 1px 1px 3px var(--color-shadow);
 }
 #after-battle #renown-now .value.green {
@@ -2967,20 +3000,28 @@ body {
   font-size: var(--text-xs);
 }
 #panel .content #apot-container #my-pots .slot.disabled {
-  border-color: var(--color-border);
-  opacity: 0.75;
+  border-color: var(--color-border-strong);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  opacity: 1;
 }
 #panel .content #apot-container #my-pots .slot.disabled .top {
-  background-color: var(--color-surface-sunken);
+  background-color: var(--color-surface-strong);
 }
 #panel .content #apot-container #my-pots .slot.disabled .top .empty {
   background-image: url("../icon/lock.png");
   background-repeat: no-repeat;
   background-position: center;
   background-color: transparent;
+  filter: var(--logo-filter-page);
+}
+#panel .content #apot-container #my-pots .slot.empty {
+  border: 2px dashed var(--color-border-strong);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
 }
 #panel .content #apot-container #my-pots .slot.empty .top {
-  background-color: color-mix(in srgb, var(--color-brand-muted) 16%, transparent);
+  background-color: var(--color-surface-strong);
 }
 #panel .content #apot-container #my-pots .slot.empty .bot {
   display: none;
