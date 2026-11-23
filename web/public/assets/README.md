@@ -1,8 +1,9 @@
 # Synty runtime assets
 
 The Three.js replay (`web/public/script/render2/`) and the editor's gladiator creator load selected FBX
-and texture files from the Synty packs placed under this folder. The folder is gitignored; production mounts
-it into the web container from the host.
+and texture files from the Synty packs placed in `web/public/assets/synty/`. That `synty/` subfolder is
+gitignored; production mounts it into the web container from the host. This README stays tracked in
+`web/public/assets/`.
 
 **Catalogue:** [`docs/synty-assets/`](../../../docs/synty-assets/README.md) indexes every pack, FBX and
 texture (units, pivots, material lists, clips) and explains which loader uses each pack. Regenerate it with
@@ -19,9 +20,9 @@ texture (units, pivots, material lists, clips) and explains which loader uses ea
 | `render2/synty-landscape.js` | The Meadow Forest terrain, roads, trees and buildings. |
 | `render2/synty-crowd.js` | The Ancient Empire spectators and their baked animation clips. |
 
-The runtime never scans this folder: every consumed path is registered in a loader, and the catalogue is the
-reference for paths and units. `special-effects/` supplies the particle textures and
-`fantasy-warrior-hud/` the HUD sprites.
+The runtime never scans `web/public/assets/synty/`: every consumed path is registered in a loader (paths
+above are under `web/public/script/`), and the catalogue is the reference for paths and units.
+`special-effects/` supplies the particle textures and `fantasy-warrior-hud/` the HUD sprites.
 
 ## Licence
 
