@@ -137,7 +137,6 @@ export class AccountService {
 
     /** Ends the session and every field's queue. */
     async signOut() {
-        await this.#model.signOut();
         this.#epoch += 1;
         for (const state of this.#states.values()) {
             if (state.pending) {
@@ -147,6 +146,7 @@ export class AccountService {
         }
         this.#user = null;
         this.#states.clear();
+        await this.#model.signOut();
         this.#bus.emit(APP_EVENTS.accountSignedOut, {});
     }
 

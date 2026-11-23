@@ -22,6 +22,7 @@ class FakeModel {
         this.bodies = [];
         this.gates = [];
         this.failures = [];
+        this.signOutGate = null;
     }
 
     async current() {
@@ -39,6 +40,7 @@ class FakeModel {
     }
 
     async signOut() {
+        if (this.signOutGate) await this.signOutGate.promise;
         this.user = null;
     }
 }
@@ -210,5 +212,27 @@ test('a write that finishes after signOut cannot restore the account', async () 
     assert.equal(second.signedOut, true);
     assert.equal(service.user, null);
     assert.equal(bus.emitted.filter(event => event.name === 'account:saved').length, 0);
+    assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
+});
+
+test('signOut invalidates the queue before the session request finishes', async () => {
+    const { service, model, bus } = make();
+    await service.load();
+    const updateGate = deferred();
+    model.gates.push(updateGate);
+    const inFlight = service.save('theme', 'classic');
+
+    const signOutGate = deferred();
+    model.signOutGate = signOutGate;
+    const signingOut = service.signOut();
+    updateGate.resolve();
+
+    const result = await inFlight;
+    assert.equal(result.signedOut, true);
+    assert.equal(bus.emitted.filter(event => event.name === 'account:saved').length, 0);
+    assert.equal(bus.emitted.some(event => event.name === 'account:signed-out'), false);
+
+    signOutGate.resolve();
+    await signingOut;
     assert.deepEqual(bus.emitted.at(-1), { name: 'account:signed-out', detail: {} });
 });
