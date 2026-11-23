@@ -121,3 +121,9 @@ test('the component gallery answers outside production', async () => {
     assert.match(html, /css\/components\/badge\.css/);
     assert.match(html, /script\/dev-components\.js/);
 });
+
+test('the profile page loads the toast action stylesheet it can use for logout retry', async () => {
+    const response = await get('/profile');
+    assert.equal(response.status, 200);
+    assert.match(await response.text(), /css\/components\/toast\.css/);
+});

@@ -112,7 +112,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 ### Toast — exists, extended in WP2
 
 - **File:** `components/toast.js`; **CSS:** `css/dialog.css` (`.toast`) and
-  `css/components/toast.css` (the action button).
+  `css/components/toast.css` (the action button; the page that can show an action loads it — Perfil and
+  the gallery do).
 - **Purpose:** a short corner notification, stacked from the bottom.
 - **API:** `createToast(message, typeOrOptions)` where the second argument is the old
   `error|info|success` string or `{ type, duration, action }`; `action` is
@@ -121,8 +122,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   `role="status"` and `aria-live="polite"`.
 - **Focus:** a toast never moves focus. Press **Alt+Z** to move focus to the newest live action
   (the action also carries `aria-keyshortcuts="Alt+Z"`); the action pauses the expiry while focused
-  and returns focus to the opener after dismissal. An asynchronous confirmation therefore leaves the
-  current field or button untouched.
+  and returns focus to the opener after dismissal. The shortcut is inert while a modal dialog or focus
+  trap is open, so it never pulls focus out of the dialog. An asynchronous confirmation therefore leaves
+  the current field or button untouched.
 - **Helpers:** `toastOptions(input)` normalises and validates the options.
 - **Events:** none; `action.onClick` is the callback.
 - **Boards:** Perfil (autosave undo), Main (mark all read).
