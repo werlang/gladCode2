@@ -4,6 +4,7 @@ import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { DuelModel } from '../models/social.js';
+import { settleRequest } from '../helpers/section-request.js';
 import { challengeRowTemplate, duelBoxTemplate } from '../templates/profile.js';
 
 /**
@@ -72,8 +73,8 @@ export class ChallengeList {
      * @param {{ signal?: AbortSignal }} [options]
      */
     async refresh({ signal } = {}) {
-        const duels = await DuelModel.challenges({ signal });
-        if (signal?.aborted) return;
+        const duels = await settleRequest(() => DuelModel.challenges({ signal }), signal);
+        if (!duels || signal?.aborted) return;
         const table = this.#panel.querySelector('.table');
         this.#panel.classList.toggle('hidden', duels.length === 0);
         table.replaceChildren();

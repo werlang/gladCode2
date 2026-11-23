@@ -1,6 +1,7 @@
 import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
 import { elapsedString } from '../helpers/date-format.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { FriendModel, MessageModel } from '../models/social.js';
 import { challengeFriend } from './duels.js';
 import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
@@ -60,7 +61,7 @@ export class FriendsTab {
         });
 
         const search = this.#panel.querySelector('#search .input');
-        search.addEventListener('input', () => this.#search(search.value));
+        search.addEventListener('input', () => runSectionTask(() => this.#search(search.value)));
     }
 
     /**
@@ -71,8 +72,8 @@ export class FriendsTab {
      */
     async show(route = {}, { signal } = {}) {
         this.#signal = signal;
-        const data = await FriendModel.list({ signal });
-        if (signal?.aborted) return;
+        const data = await settleRequest(() => FriendModel.list({ signal }), signal);
+        if (!data || signal?.aborted) return;
         this.#panel.querySelector('#request').classList.toggle('hidden', !data.pending.length);
         this.#panel.querySelector('#friends').classList.toggle('hidden', !data.confirmed.length);
 
@@ -84,8 +85,8 @@ export class FriendsTab {
                 picture: request.picture,
                 nick: request.nick,
             }));
-            row.querySelector('.check').addEventListener('click', () => this.#answer(request.id, true));
-            row.querySelector('.close').addEventListener('click', () => this.#answer(request.id, false));
+            row.querySelector('.check').addEventListener('click', () => runSectionTask(() => this.#answer(request.id, true)));
+            row.querySelector('.close').addEventListener('click', () => runSectionTask(() => this.#answer(request.id, false)));
             requests.append(row);
         });
 
@@ -117,7 +118,7 @@ export class FriendsTab {
      */
     async #answer(id, accept) {
         await FriendModel.answer(id, accept);
-        this.show({}, { signal: this.#signal });
+        await this.show({}, { signal: this.#signal });
     }
 
     /**
@@ -158,14 +159,14 @@ export class FriendsTab {
     async #search(text) {
         const signal = this.#signal;
         const request = ++this.#searchRequest;
-        const users = await FriendModel.search(text, { signal });
-        if (signal?.aborted || request !== this.#searchRequest) return;
+        const users = await settleRequest(() => FriendModel.search(text, { signal }), signal);
+        if (!users || signal?.aborted || request !== this.#searchRequest) return;
         const table = this.#panel.querySelector('#search .table');
         table.replaceChildren();
         (Array.isArray(users) ? users : []).forEach(user => {
             const row = createElement(renderTemplate(searchRowTemplate, { nick: user.nick }));
             row.querySelector('.send-message').addEventListener('click', () => writeMessage(user.user, user.nick));
-            row.querySelector('.add-friend').addEventListener('click', () => this.#invite(user));
+            row.querySelector('.add-friend').addEventListener('click', () => runSectionTask(() => this.#invite(user)));
             table.append(row);
         });
     }

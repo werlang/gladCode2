@@ -4,6 +4,7 @@ import { ProgressButton, Simulation } from '../components/simulation.js';
 import { animateValue, fadeIn } from '../helpers/animate.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { site } from '../helpers/request.js';
+import { settleRequest } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { RankedModel } from '../models/social.js';
 import { BATTLE_TIPS } from './battle-tips.js';
@@ -154,8 +155,8 @@ export class RankedBattle {
     async refresh({ signal } = {}) {
         this.#button.disabled = true;
         this.#selected = null;
-        const glads = await GladiatorModel.list({ signal });
-        if (signal?.aborted) return;
+        const glads = await settleRequest(() => GladiatorModel.list({ signal }), signal);
+        if (!glads || signal?.aborted) return;
         this.#container.replaceChildren();
         const cards = await loadGladCards(this.#container, {
             glads,

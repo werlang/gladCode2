@@ -2,6 +2,7 @@ import { Message } from '../components/dialog.js';
 import { decorateRadios } from '../components/form-controls.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { DuelModel, ReportModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
@@ -89,12 +90,12 @@ export class ReportsTab {
     init() {
         decorateRadios(this.#panel);
         this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
-            tab.addEventListener('click', () => this.#select(TABS[index]));
+            tab.addEventListener('click', () => runSectionTask(() => this.#select(TABS[index])));
         });
-        this.#panel.querySelector('#prev').addEventListener('click', () => this.#page(-1));
-        this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
+        this.#panel.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(-1)));
+        this.#panel.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(1)));
         this.#unread.querySelector('input').addEventListener('change', () => {
-            if (this.#selected === 'battles') this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal });
+            if (this.#selected === 'battles') runSectionTask(() => this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal }));
         });
     }
 
@@ -128,7 +129,7 @@ export class ReportsTab {
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */
     #page(direction) {
-        this.fetch({ offset: this.#offsets[this.#selected] + direction * PAGE_SIZE, signal: this.#signal });
+        return this.fetch({ offset: this.#offsets[this.#selected] + direction * PAGE_SIZE, signal: this.#signal });
     }
 
     /**
@@ -148,14 +149,13 @@ export class ReportsTab {
             button.disabled = true;
         });
 
-        const data = await view.load({ offset, unread: this.#onlyUnread(), signal });
-        if (signal?.aborted || request !== this.#request) return;
+        const data = await settleRequest(() => view.load({ offset, unread: this.#onlyUnread(), signal }), signal);
+        if (!data || signal?.aborted || request !== this.#request) return;
 
         const total = parseInt(data.total, 10);
         this.#totals[id] = total;
         if (total <= offset && total > 0) {
-            this.fetch({ offset: 0 });
-            return;
+            return this.fetch({ offset: 0, signal });
         }
 
         const rows = view.rows(data) ?? [];
@@ -197,11 +197,11 @@ export class ReportsTab {
             element.querySelector('.favorite').addEventListener('click', () => this.#askUnfavorite(element, row.id));
         }
         else {
-            element.querySelector('.remove')?.addEventListener('click', async () => {
+            element.querySelector('.remove')?.addEventListener('click', () => runSectionTask(async () => {
                 await DuelModel.remove(row.id);
                 new Message({ message: 'Desafio cancelado' }).show();
-                this.fetch({ offset: this.#offsets.duels });
-            });
+                await this.fetch({ offset: this.#offsets.duels, signal: this.#signal });
+            }));
         }
         return element;
     }
@@ -289,10 +289,10 @@ export class ReportsTab {
         new Message({
             message: 'Remover esta batalha dos favoritos?',
             buttons: { yes: 'Sim', no: 'Não' },
-        }).show().click('yes', async () => {
+        }).show().click('yes', () => runSectionTask(async () => {
             row.remove();
             await ReportModel.setFavorite(id, false);
-            this.fetch({ offset: this.#offsets.favorites });
-        });
+            await this.fetch({ offset: this.#offsets.favorites, signal: this.#signal });
+        }));
     }
 }

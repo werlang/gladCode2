@@ -2,6 +2,7 @@ import { decorateCheckSliders } from '../components/form-controls.js';
 import { loadGladCards, loadSelectableCards } from '../components/glad-card.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TournamentModel } from '../models/tournament.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -515,8 +516,8 @@ export class TournamentsTab {
         this.#wrapper.querySelector('#join').addEventListener('click', () => this.#openJoin());
         this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
             const list = pager.classList.contains('mine') ? 'mine' : 'open';
-            pager.querySelector('#prev').addEventListener('click', () => this.#page(list, -1));
-            pager.querySelector('#next').addEventListener('click', () => this.#page(list, 1));
+            pager.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(list, -1)));
+            pager.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(list, 1)));
         });
     }
 
@@ -526,7 +527,7 @@ export class TournamentsTab {
      */
     #page(list, direction) {
         this.#offsets[list] += direction * PAGE_SIZE;
-        this.refresh({ signal: this.#signal });
+        return this.refresh({ signal: this.#signal });
     }
 
     /**
@@ -536,8 +537,8 @@ export class TournamentsTab {
      */
     async refresh({ signal = this.#signal } = {}) {
         this.#signal = signal;
-        const data = await TournamentModel.list(this.#offsets, { signal });
-        if (signal?.aborted) return;
+        const data = await settleRequest(() => TournamentModel.list(this.#offsets, { signal }), signal);
+        if (!data || signal?.aborted) return;
         ['mine', 'open'].forEach(list => {
             const { offset, total } = data.pages[list];
             const end = Math.min(total, offset + PAGE_SIZE);

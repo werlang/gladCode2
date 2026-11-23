@@ -2,6 +2,7 @@ import { showDialog, showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeOut } from '../helpers/animate.js';
+import { settleRequest } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { profile } from './session.js';
 import { codeBlockTemplate, codeBoxTemplate, gladAddTemplate } from '../templates/profile.js';
@@ -69,8 +70,8 @@ export class GladsTab {
      */
     async show(route = {}, { signal } = {}) {
         this.#signal = signal;
-        const glads = await GladiatorModel.list({ signal });
-        if (signal?.aborted) return;
+        const glads = await settleRequest(() => GladiatorModel.list({ signal }), signal);
+        if (!glads || signal?.aborted) return;
         this.#container.replaceChildren();
         if (glads.length) document.querySelector('#menu #battle')?.classList.remove('disabled');
 

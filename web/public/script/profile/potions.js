@@ -2,6 +2,7 @@ import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { PotionModel } from '../models/potion.js';
 import { profile, setSilver } from './session.js';
 import {
@@ -119,8 +120,8 @@ export class PotionsTab {
     async refresh({ signal } = {}) {
         clearInterval(this.#timer);
         this.#timer = null;
-        const data = await PotionModel.slots({ signal });
-        if (signal?.aborted) return;
+        const data = await settleRequest(() => PotionModel.slots({ signal }), signal);
+        if (!data || signal?.aborted) return;
         const container = this.#panel.querySelector('#my-pots');
         container.replaceChildren();
         this.#expiries.clear();
@@ -168,10 +169,10 @@ export class PotionsTab {
             new Message({
                 message: 'Deseja cancelar esta encomenda?',
                 buttons: { yes: 'SIM', no: 'NÃO' },
-            }).show().click('yes', async () => {
+            }).show().click('yes', () => runSectionTask(async () => {
                 await PotionModel.cancel(item.id);
-                this.refresh({ signal: this.#signal });
-            });
+                await this.refresh({ signal: this.#signal });
+            }));
         });
         return slot;
     }
@@ -188,7 +189,7 @@ export class PotionsTab {
         });
         if (expired) {
             clearInterval(this.#timer);
-            this.refresh({ signal: this.#signal });
+            runSectionTask(() => this.refresh({ signal: this.#signal }));
         }
     }
 
@@ -282,7 +283,7 @@ export class PotionsTab {
             catch {
                 createToast('O item não pôde ser adquirido', 'error');
             }
-            this.refresh({ signal: this.#signal });
+            runSectionTask(() => this.refresh({ signal: this.#signal }));
         });
     }
 

@@ -3,6 +3,7 @@ import { copyText } from '../helpers/clipboard.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fadeIn } from '../helpers/animate.js';
+import { settleRequest } from '../helpers/section-request.js';
 import { NewsModel } from '../models/news.js';
 import { newsPostTemplate, shareLinkTemplate } from '../templates/profile.js';
 
@@ -37,8 +38,8 @@ export class NewsTab {
      * @param {{ signal?: AbortSignal }} [options]
      */
     async show(route = {}, { signal } = {}) {
-        const posts = await NewsModel.list(0, { signal });
-        if (signal?.aborted) return;
+        const posts = await settleRequest(() => NewsModel.list(0, { signal }), signal);
+        if (!posts || signal?.aborted) return;
         this.#container.replaceChildren();
         posts.forEach(post => {
             const element = createElement(renderTemplate(newsPostTemplate, {

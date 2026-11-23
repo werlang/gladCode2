@@ -1,6 +1,7 @@
 import { Message } from '../components/dialog.js';
 import { createToast } from '../components/toast.js';
 import { renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { RankModel } from '../models/rank.js';
 import { profile } from './session.js';
 import { showNoCredit, showTutorPitch } from './tutor.js';
@@ -41,7 +42,7 @@ export class RankingTab {
         this.#panel.querySelector('#add-tab').addEventListener('click', () => this.#askHashtag());
         this.#panel.querySelector('#prev').addEventListener('click', () => this.#page(-1));
         this.#panel.querySelector('#next').addEventListener('click', () => this.#page(1));
-        this.#search.addEventListener('input', () => this.fetch({ offset: 0, signal: this.#signal }));
+        this.#search.addEventListener('input', () => runSectionTask(() => this.fetch({ offset: 0, signal: this.#signal })));
     }
 
     /**
@@ -52,11 +53,11 @@ export class RankingTab {
      */
     async #bestOffset(signal) {
         if (this.#personalOffset !== null) return this.#personalOffset;
-        const offset = await RankModel.myBestOffset({ signal })
-            .then(value => Math.floor(value / PAGE_SIZE) * PAGE_SIZE)
-            .catch(() => null);
-        if (offset !== null) this.#personalOffset = offset;
-        return offset ?? 0;
+        const value = await settleRequest(() => RankModel.myBestOffset({ signal }), signal);
+        if (value === undefined) return 0;
+        const offset = Math.floor(value / PAGE_SIZE) * PAGE_SIZE;
+        this.#personalOffset = offset;
+        return offset;
     }
 
     /**
@@ -81,8 +82,8 @@ export class RankingTab {
 
     /** @param {{ signal?: AbortSignal }} [options] */
     async #drawTabs({ signal } = {}) {
-        const tags = await RankModel.tabs({ signal });
-        if (signal?.aborted) return;
+        const tags = await settleRequest(() => RankModel.tabs({ signal }), signal);
+        if (!tags || signal?.aborted) return;
         this.#panel.querySelectorAll('#tab-container .tab.user').forEach(tab => tab.remove());
         const add = this.#panel.querySelector('#add-tab');
         if (!tags.includes(this.#selected) && this.#selected !== GENERAL) this.#selected = GENERAL;
@@ -118,7 +119,7 @@ export class RankingTab {
         const same = id === this.#selected;
         this.#selected = id;
         this.#markSelected();
-        this.fetch({ offset: this.#pages[id].offset, placeholder: !same, signal: this.#signal });
+        return this.fetch({ offset: this.#pages[id].offset, placeholder: !same, signal: this.#signal });
     }
 
     /** @param {string} name Hashtag. */
@@ -126,12 +127,12 @@ export class RankingTab {
         new Message({
             message: `Deseja remover a aba <b>#${name}</b>`,
             buttons: { yes: 'SIM', no: 'NÃO' },
-        }).show().click('yes', async () => {
+        }).show().click('yes', () => runSectionTask(async () => {
             await RankModel.unwatch(name);
             createToast(`Aba #${name} removida`, 'success');
             this.#selected = GENERAL;
-            this.show({}, { signal: this.#signal });
-        });
+            await this.show({}, { signal: this.#signal });
+        }));
     }
 
     #askHashtag() {
@@ -167,7 +168,7 @@ export class RankingTab {
             }
             else if (match) {
                 box.kill();
-                this.#addHashtag(match[1]);
+                runSectionTask(() => this.#addHashtag(match[1]));
             }
             else {
                 createToast('A #hashtag deve conter somente letras, números e underline', 'error');
@@ -197,7 +198,7 @@ export class RankingTab {
 
     /** @param {number} direction -1 for the previous page, 1 for the next. */
     #page(direction) {
-        this.fetch({ offset: this.#pages[this.#selected].offset + direction * PAGE_SIZE, signal: this.#signal });
+        return this.fetch({ offset: this.#pages[this.#selected].offset + direction * PAGE_SIZE, signal: this.#signal });
     }
 
     /**
@@ -221,16 +222,21 @@ export class RankingTab {
         });
 
         const search = this.#search.value;
-        const data = general
-            ? await RankModel.general({ offset, search, signal })
-            : { ranking: await RankModel.hashtag({ tab: id, search, signal }) };
-        if (signal?.aborted || request !== this.#request) return;
+        let data;
+        if (general) {
+            data = await settleRequest(() => RankModel.general({ offset, search, signal }), signal);
+        }
+        else {
+            const ranking = await settleRequest(() => RankModel.hashtag({ tab: id, search, signal }), signal);
+            if (!ranking) return;
+            data = { ranking };
+        }
+        if (!data || signal?.aborted || request !== this.#request) return;
 
         const total = general ? data.total : data.ranking.length;
         this.#pages[id].total = total;
         if (total < offset) {
-            this.fetch({ offset: 0 });
-            return;
+            return this.fetch({ offset: 0, signal });
         }
 
         const list = Array.from({ length: Math.min(PAGE_SIZE, Math.max(0, total - (general ? offset : 0))) }, (_, index) => {

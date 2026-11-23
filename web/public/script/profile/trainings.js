@@ -4,6 +4,7 @@ import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -497,8 +498,8 @@ export class TrainingsTab {
         this.#wrapper.querySelector('#join').addEventListener('click', () => this.#join());
         this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
             const list = pager.classList.contains('manage') ? 'manage' : 'part';
-            pager.querySelector('#prev').addEventListener('click', () => this.#page(list, -1));
-            pager.querySelector('#next').addEventListener('click', () => this.#page(list, 1));
+            pager.querySelector('#prev').addEventListener('click', () => runSectionTask(() => this.#page(list, -1)));
+            pager.querySelector('#next').addEventListener('click', () => runSectionTask(() => this.#page(list, 1)));
         });
     }
 
@@ -508,7 +509,7 @@ export class TrainingsTab {
      */
     #page(list, direction) {
         this.#offsets[list] += direction * PAGE_SIZE;
-        this.refresh({ signal: this.#signal });
+        return this.refresh({ signal: this.#signal });
     }
 
     /**
@@ -518,8 +519,8 @@ export class TrainingsTab {
      */
     async refresh({ signal = this.#signal } = {}) {
         this.#signal = signal;
-        const data = await TrainingModel.list(this.#offsets, { signal });
-        if (signal?.aborted) return;
+        const data = await settleRequest(() => TrainingModel.list(this.#offsets, { signal }), signal);
+        if (!data || signal?.aborted) return;
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
         if (!data.manage?.length && !data.part?.length) {

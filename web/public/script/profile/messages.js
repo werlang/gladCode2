@@ -1,6 +1,7 @@
 import { showMessage } from '../components/dialog.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
+import { runSectionTask, settleRequest } from '../helpers/section-request.js';
 import { fadeIn, fadeOut, show } from '../helpers/animate.js';
 import { MessageModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -23,11 +24,11 @@ export class MessagesTab {
     init() {
         this.#panel.querySelector('#prev').addEventListener('click', () => {
             this.#page--;
-            this.#show();
+            runSectionTask(() => this.#show());
         });
         this.#panel.querySelector('#next').addEventListener('click', () => {
             this.#page++;
-            this.#show();
+            runSectionTask(() => this.#show());
         });
     }
 
@@ -48,8 +49,9 @@ export class MessagesTab {
         const table = this.#panel.querySelector('.table');
         show(table);
 
-        const { meta, messages: info } = await MessageModel.list(this.#page, { signal });
-        if (signal?.aborted) return;
+        const data = await settleRequest(() => MessageModel.list(this.#page, { signal }), signal);
+        if (!data || signal?.aborted) return;
+        const { meta, messages: info } = data;
         const pageNav = this.#panel.querySelector('#page-title');
         if (meta.total == 0) {
             pageNav.hidden = true;
@@ -75,7 +77,7 @@ export class MessagesTab {
                 message: message.message,
                 elapsed: formatMessageTime(message.time, { short: true }),
             }));
-            row.addEventListener('click', () => this.#open(message));
+            row.addEventListener('click', () => runSectionTask(() => this.#open(message)));
             table.append(row);
         });
     }
@@ -96,16 +98,16 @@ export class MessagesTab {
         this.#panel.append(full);
         MessageModel.markRead(message.id, true);
 
-        full.querySelector('#back').addEventListener('click', () => this.#show());
+        full.querySelector('#back').addEventListener('click', () => runSectionTask(() => this.#show()));
         full.querySelector('#reply').addEventListener('click', () => this.#reply(full, message));
-        full.querySelector('#unread').addEventListener('click', async () => {
+        full.querySelector('#unread').addEventListener('click', () => runSectionTask(async () => {
             await MessageModel.markRead(message.id, false);
-            this.#show();
-        });
-        full.querySelector('#delete').addEventListener('click', async () => {
+            await this.#show();
+        }));
+        full.querySelector('#delete').addEventListener('click', () => runSectionTask(async () => {
             await MessageModel.remove(message.id);
-            this.#show();
-        });
+            await this.#show();
+        }));
 
         await fadeOut(this.#panel.querySelector('.table'));
         fadeIn(full);
@@ -130,7 +132,7 @@ export class MessagesTab {
             input.style.height = `${Math.min(MAX_REPLY_HEIGHT, input.scrollHeight + input.offsetHeight - input.clientHeight)}px`;
         });
 
-        reply.querySelector('#send').addEventListener('click', async () => {
+        reply.querySelector('#send').addEventListener('click', () => runSectionTask(async () => {
             const text = input.value;
             try {
                 await MessageModel.reply(message.id, text);
@@ -141,8 +143,8 @@ export class MessagesTab {
                 else throw error;
                 return;
             }
-            this.#show();
-        });
+            await this.#show();
+        }));
         reply.querySelector('#cancel').addEventListener('click', () => {
             reply.remove();
             buttons.style.display = '';
