@@ -3006,14 +3006,13 @@ body {
   opacity: 1;
 }
 #panel .content #apot-container #my-pots .slot.disabled .top {
-  background-color: var(--color-surface-strong);
+  background-color: var(--color-lock-plate);
 }
 #panel .content #apot-container #my-pots .slot.disabled .top .empty {
   background-image: url("../icon/lock.png");
   background-repeat: no-repeat;
   background-position: center;
   background-color: transparent;
-  filter: var(--logo-filter-page);
 }
 #panel .content #apot-container #my-pots .slot.empty {
   border: 2px dashed var(--color-border-strong);
