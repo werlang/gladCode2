@@ -23,6 +23,7 @@ export class Message extends BaseComponent {
     #resolve;
     #result;
     #handlers = new Map();
+    #opener = null;
 
     /**
      * @param {object} options
@@ -55,6 +56,7 @@ export class Message extends BaseComponent {
      * @returns {this}
      */
     show() {
+        this.#opener = document.activeElement;
         const buttons = Object.entries(this.buttons)
             .map(([id, label]) => renderTemplate(dialogButtonTemplate, { id, label }))
             .join('');
@@ -70,6 +72,7 @@ export class Message extends BaseComponent {
         }));
         document.body.append(this.element);
         fadeIn(this.element, undefined, 'flex');
+        this.on(this.element, 'keydown', event => this.#onKey(event));
 
         Object.keys(this.buttons).forEach(id => {
             this.on(this.getButton(id), 'click', () => this.#press(id));
@@ -122,7 +125,42 @@ export class Message extends BaseComponent {
 
     /** Closes the box. */
     kill() {
+        const opener = this.#opener;
         this.destroy();
+        this.#opener = null;
+        if (opener?.isConnected) opener.focus();
+    }
+
+    /**
+     * Esc closes the box (pressing `cancel` when it exists) and Tab stays inside the dialog.
+     *
+     * @param {KeyboardEvent} event
+     */
+    #onKey(event) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            const ids = Object.keys(this.buttons);
+            const cancelId = ['cancel', 'no'].find(id => this.getButton(id))
+                ?? ids.find(id => /^(cancelar|não|no)$/i.test(this.buttons[id]));
+            const target = cancelId ? this.getButton(cancelId) : ids.length === 1 ? this.getButton(ids[0]) : null;
+            if (target) target.click();
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const focusable = [...this.element.querySelectorAll('button, input, select, textarea, [href], [tabindex]:not([tabindex="-1"])')]
+            .filter(node => !node.disabled && node.getAttribute('aria-hidden') !== 'true');
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        }
+        else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
     }
 
     /** @returns {HTMLInputElement|null} The text field, if any. */

@@ -105,19 +105,20 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Exports:** `Message` class, `showDialog(message, buttons)`, `showMessage(message)`,
   `showInput(message, defaultValue)`, `showTextArea(message, placeholder, maxChars)`,
   `showTerminal(title, message)`.
-- **Purpose:** the only modal in the site: fog, panel, title, message, buttons, focus handling (focus is
-  moved into the box today; the focus trap, Esc close and focus return are added in WP2).
+- **Purpose:** the only modal in the site: fog, panel, title, message, buttons and focus management
+  (focus moved into the box, Tab trapped, Esc on a cancel/no action, focus returned to the opener).
 - **Boards:** confirmations everywhere; not drawn as a board.
 
 ### Toast — exists, extended in WP2
 
-- **File:** `components/toast.js`; **CSS:** `css/dialog.css` (`.toast`).
+- **File:** `components/toast.js`; **CSS:** `css/dialog.css` (`.toast`) and
+  `css/components/toast.css` (the action button).
 - **Purpose:** a short corner notification, stacked from the bottom.
-- **Today:** `createToast(message, type = 'info')` with `error|info|success`; fades after 2 s + 3 s.
-- **Target (WP2):** `createToast(message, { type, duration, action })` where `action` is
-  `{ label: 'Desfazer', onClick }`; returns a `Toast` with `dismiss()`. The string second argument keeps
-  working until its callers are rebuilt. The undo toast stays until the action is taken or the duration
-  (the boards suggest 6 s) ends, and is announced with `role="status"`.
+- **API:** `createToast(message, typeOrOptions)` where the second argument is the old
+  `error|info|success` string or `{ type, duration, action }`; `action` is
+  `{ label: 'Desfazer', onClick }`. Returns the toast element with `dismiss()`. A toast with an action
+  stays 6 s (or `duration`), the others 2 s + 3 s of fade; it is announced with `role="status"`.
+- **Helpers:** `toastOptions(input)` normalises and validates the options.
 - **Events:** none; `action.onClick` is the callback.
 - **Boards:** Perfil (autosave undo), Main (mark all read).
 

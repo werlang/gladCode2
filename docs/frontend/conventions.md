@@ -154,9 +154,8 @@ These are targets for new and refactored code. Existing files above them (for ex
   `role="tab"`, `aria-selected` and `aria-controls`; switches use `role="switch"` and `aria-checked`;
   menus/sheets set `aria-expanded` on the trigger and `aria-controls` to the panel.
 - **Dialogs, sheets and the palette** use `role="dialog"`, `aria-modal="true"`, a labelled heading, focus
-  moved into the panel, Tab kept inside it, Esc closes it and focus returns to the trigger. `dialog.js`
-  sets the role, the modal flag and the initial focus today; WP2 adds the focus trap, the Esc handler and
-  the focus return to `Message`, and the sheet and the palette follow the same contract.
+  moved into the panel, Tab kept inside it, Esc closes it when it has a cancel/no action (or a single button) and focus returns to the trigger. `dialog.js`
+  implements that for the modal box (`Message`); the sheet and the palette follow the same contract.
 - **Focus is visible** through `:focus-visible` and the focus-ring tokens; never remove an outline without
   a replacement.
 - **Live feedback.** Toasts and counters announce through `role="status"`/`aria-live="polite"`; an error
