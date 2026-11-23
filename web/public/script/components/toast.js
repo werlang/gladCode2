@@ -70,17 +70,30 @@ export function createToast(message, typeOrOptions = 'info') {
     document.body.append(toast);
     stackToasts();
 
+    const opener = document.activeElement;
     let timer = null;
-    const dismiss = async () => {
+    let actionButton = null;
+    let dismiss = null;
+    const startTimer = () => {
+        if (timer !== null) clearTimeout(timer);
+        timer = setTimeout(dismiss, duration);
+    };
+    const stopTimer = () => {
         if (timer !== null) clearTimeout(timer);
         timer = null;
+    };
+    dismiss = async () => {
+        stopTimer();
+        const hadFocus = toast.contains(document.activeElement);
         await fadeOut(toast, FADE_MS);
         toast.remove();
         stackToasts();
+        if (hadFocus && opener?.isConnected) opener.focus();
     };
 
     if (action) {
         const button = document.createElement('button');
+        actionButton = button;
         button.type = 'button';
         button.className = 'toast-action';
         button.textContent = action.label;
@@ -92,10 +105,14 @@ export function createToast(message, typeOrOptions = 'info') {
                 dismiss();
             }
         });
+        // The action is the next stop after the control that raised the toast; it stays while focused.
+        button.addEventListener('focus', stopTimer);
+        button.addEventListener('blur', startTimer);
         toast.append(button);
+        button.focus();
     }
 
-    timer = setTimeout(dismiss, duration);
+    if (!action || document.activeElement !== actionButton) startTimer();
     toast.dismiss = dismiss;
     return toast;
 }
