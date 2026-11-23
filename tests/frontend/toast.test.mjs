@@ -45,8 +45,9 @@ test('an asynchronous toast leaves focus alone until the documented shortcut is 
     const documentListeners = new Map();
     const toast = fakeNode(fakeDocument);
     let action = null;
+    let modals = [];
     fakeDocument.body = fakeNode(fakeDocument);
-    fakeDocument.querySelectorAll = () => [];
+    fakeDocument.querySelectorAll = selector => (selector.includes('dialog') || selector.includes('aria-modal') ? modals : []);
     fakeDocument.createElement = tagName => {
         if (tagName === 'template') return { innerHTML: '', content: { firstElementChild: toast } };
         if (tagName === 'button') {
@@ -88,6 +89,33 @@ test('an asynchronous toast leaves focus alone until the documented shortcut is 
             preventDefault: () => { prevented = true; },
         });
         assert.equal(prevented, true);
+        assert.equal(fakeDocument.activeElement, action);
+
+        // An open modal owns the focus trap: the global shortcut stays inert, including its Escape path.
+        const modalButton = fakeNode(fakeDocument);
+        modals = [{ offsetWidth: 1, offsetHeight: 0, getClientRects: () => [] }];
+        fakeDocument.activeElement = modalButton;
+        prevented = false;
+        fakeDocument.dispatchEvent({
+            type: 'keydown',
+            altKey: true,
+            ctrlKey: false,
+            metaKey: false,
+            key: 'z',
+            preventDefault: () => { prevented = true; },
+        });
+        assert.equal(prevented, false);
+        assert.equal(fakeDocument.activeElement, modalButton);
+
+        modals = [];
+        fakeDocument.dispatchEvent({
+            type: 'keydown',
+            altKey: true,
+            ctrlKey: false,
+            metaKey: false,
+            key: 'z',
+            preventDefault: () => { prevented = true; },
+        });
         assert.equal(fakeDocument.activeElement, action);
 
         await result.dismiss();

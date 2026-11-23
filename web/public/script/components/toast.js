@@ -1,5 +1,5 @@
 import { createElement, renderTemplate } from '../helpers/html.js';
-import { fadeOut } from '../helpers/animate.js';
+import { fadeOut, isVisible } from '../helpers/animate.js';
 import { toastTemplate } from '../templates/dialog.js';
 
 const ICONS = {
@@ -22,6 +22,19 @@ export function isToastShortcut(event) {
         && String(event.key ?? '').toLowerCase() === 'z';
 }
 
+/**
+ * Whether an open modal/dialog focus trap owns the page. A global shortcut must not pull focus out.
+ *
+ * @param {Document} [doc]
+ * @returns {boolean}
+ */
+export function isModalOpen(doc = globalThis.document) {
+    if (!doc) return false;
+    if (doc.activeElement?.closest?.('[role="dialog"]')) return true;
+    const modals = doc.querySelectorAll?.('[role="dialog"][aria-modal="true"], dialog[open]') ?? [];
+    return [...modals].some(modal => isVisible(modal));
+}
+
 /** The actions of the live toasts, newest last. */
 const liveActions = new Set();
 let shortcutBound = false;
@@ -35,7 +48,7 @@ function bindShortcut() {
     shortcutBound = true;
     document.addEventListener('keydown', event => {
         const action = [...liveActions].filter(node => node.isConnected).at(-1);
-        if (!isToastShortcut(event) || !action) return;
+        if (!isToastShortcut(event) || !action || isModalOpen()) return;
         event.preventDefault();
         action.focus();
     });
