@@ -208,9 +208,10 @@ without an attention meaning (`4/6`, `#128`, the potion time) are `info`. The ra
 `counts.potions.count` and formats the time from `counts.potions.nextExpiry` against
 `counts.potions.serverNow`.
 
-The refresh belongs to the **shell**, not to a section: it starts when `account:loaded` reports a session,
-pauses on `document.hidden`, resumes on `visibilitychange` and stops on `account:signed-out`. Leaving a
-section never stops it, because the header, menu and tab bar are outside the section.
+The poll belongs to the **shell's lifetime**, not to a section: the shell starts `NotificationService` when
+`account:loaded` reports a session, pauses it on `document.hidden`, resumes it on `visibilitychange` and
+stops it on `account:signed-out`. Leaving a section never stops it, because the header, menu and tab bar
+are outside the section.
 
 The notification panel's rows are loaded when the panel opens, not on every poll: `NotificationService.feed()`
 composes `needs` from `GET /duels` and `GET /friends` and `news` from `GET /reports?unreadOnly=true` and
