@@ -31,8 +31,8 @@ module column names today's file).
 
 | Section | Route(s) | Section id | Section module | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| Notícias | `/news` | `news` | `profile/news.js` | The first entry and the shell's landing section; the header's “Painel” link opens it (WP3). |
-| Perfil | `/profile`, `/profile?t=profile` | `profile` | `profile/settings.js` | Unknown or disabled tabs fall back to Perfil (today's `openableTab`). |
+| Notícias | `/news` | `news` | `profile/news.js` | The first entry and the shell's landing section; WP4 adds the featured post, previous list, “Aguardando você” and next-tournament asides. |
+| Perfil | `/profile`, `/profile?t=profile` | `profile` | `profile/settings.js` | The WP4 identity hero and autosaving fields (no save button); unknown or disabled tabs fall back to Perfil. |
 | Gladiadores | `/glads` | `glads` | `profile/glads.js` | |
 | Poções | `/potion` | `potions` | `profile/potions.js` | The menu says Poções; the route keeps the old singular. |
 | Batalhas | `/battle`, `/battle.<mode>` | `battle` | `profile/battle.js` + `ranked.js`, `duels.js`, `tournaments.js`, `trainings.js` | `<mode>` is `ranked`, `duel`, `tourn` or `train`. |

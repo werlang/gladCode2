@@ -69,10 +69,9 @@ async function appWithRender2(flag) {
 test('every page names the gladiator style on the root element before its scripts run', async () => {
     const page = await (await get('/profile')).text();
     assert.match(page, /<html data-glad-view="3d"/);
-    // the settings offer both styles, the 3D coliseum first
-    assert.match(page, /id='glad-view'/);
-    assert.match(page, /<option value='3d'>Coliseu 3D<\/option>/);
-    assert.match(page, /<option value='sprite'>Sprites<\/option>/);
+    // the Perfil section is rendered by the client after the account loads
+    assert.match(page, /id='profile-panel'/);
+    assert.match(page, /\/script\/profile\.js\?v=\d+/);
 
     // a browser that chose sprites tells the web service through its cookie
     const sprite = await fetch(`${base}/profile`, { headers: { cookie: 'gladview=sprite' } });

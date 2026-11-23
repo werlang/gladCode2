@@ -28,6 +28,17 @@ export class TournamentModel {
     }
 
     /**
+     * The next round the master's team is waiting for.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ name: string, hash: string, round: number, deadline: string, now: string }|null>}
+     */
+    static async next({ signal } = {}) {
+        const { tournament } = await api.get('tournaments/next', {}, { signal });
+        return tournament;
+    }
+
+    /**
      * Finds a tournament by name and password (the master's own and public ones need none).
      *
      * @param {string} name

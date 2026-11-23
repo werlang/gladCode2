@@ -8,8 +8,9 @@ let session = 0;
 /**
  * The signed-in account (`/users/me`) and its session (`/auth`).
  *
- * A user is `{ id, email, nickname, firstName, lastName, picture, language, level, xp, silver,
- * credits, premium, apothecary, showTutorial, editorTheme, editorFont, preferences, isAdmin }`.
+ * A user is `{ id, joinedAt, email, nickname, firstName, lastName, picture, language, level, xp, silver,
+ * credits, premium, apothecary, showTutorial, editorTheme, editorFont, preferences, isAdmin,
+ * stats: { battles, wins, renown } }`.
  */
 export class UserModel {
     /**
@@ -65,6 +66,17 @@ export class UserModel {
         const result = await api.post('auth/logout');
         if (epoch === session) current = null;
         return result;
+    }
+
+    /**
+     * Whether a nickname is free.
+     *
+     * @param {string} nickname
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ nickname: string, available: boolean }>}
+     */
+    static nicknameAvailable(nickname, { signal } = {}) {
+        return api.get('users/nickname', { nickname }, { signal });
     }
 
     /**

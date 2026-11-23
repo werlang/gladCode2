@@ -1,21 +1,30 @@
 import { api } from '../helpers/request.js';
 
 /**
- * News posts (`/news`). A post is `{ hash, title, time, body }`; its body is HTML written by the
- * maintainer.
+ * News posts (`/news`). A post is `{ hash, title, time, body, category, excerpt, image, imageAlt,
+ * version, read }`; its body is HTML written by the maintainer.
  */
 export class NewsModel {
     /**
-     * The latest posts, five at a time; reading them clears the signed-in user's news counter unless
-     * `markRead: false`.
+     * The latest posts, five at a time; reading them does not advance the news marker unless
+     * `markRead: true`.
      *
      * @param {number} [offset] Posts to skip.
      * @param {{ markRead?: boolean }} [options]
      * @returns {Promise<Record<string, any>[]>}
      */
-    static async list(offset = 0, { markRead = true, signal } = {}) {
+    static async list(offset = 0, { markRead = false, signal } = {}) {
         const { posts } = await api.get('news', { offset, markRead: markRead ? undefined : false }, { signal });
         return posts;
+    }
+
+    /**
+     * Marks every post as read for the signed-in master.
+     *
+     * @returns {Promise<{ read: number, unread: number }>}
+     */
+    static markAllRead() {
+        return api.post('news/read');
     }
 
     /**

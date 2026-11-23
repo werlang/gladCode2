@@ -1,0 +1,366 @@
+/* Perfil section (Perfil.dc.html): identity hero and autosaving cards. */
+#panel .content[data-menu='profile'] {
+    max-width: none;
+}
+
+#profile-panel {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.profile-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    border: 0;
+    border-radius: var(--radius-2xl);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+}
+
+.profile-hero-avatar {
+    position: relative;
+    flex: none;
+}
+
+.profile-hero-avatar .avatar {
+    --avatar-size: 104px;
+}
+
+.profile-photo-button {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--color-chrome);
+    border-radius: var(--radius-round);
+    background: var(--color-accent);
+    color: var(--color-chrome);
+    cursor: pointer;
+}
+
+.profile-hero-copy {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+#painel-content .profile-hero-name,
+.profile-hero-name {
+    margin: 0;
+    color: var(--arena-sand-light);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+.profile-hero-meta {
+    margin: 0;
+    color: color-mix(in srgb, var(--color-header-text) 64%, transparent);
+    font-size: var(--text-sm);
+}
+
+.profile-hero-xp {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: 420px;
+}
+
+.profile-hero-xp-bar {
+    display: block;
+    flex: 1;
+    height: 8px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--color-header-text) 12%, transparent);
+}
+
+.profile-hero-xp-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-cat-yellow);
+}
+
+.profile-hero-xp-label {
+    color: color-mix(in srgb, var(--color-header-text) 64%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+}
+
+.profile-hero-stats {
+    display: grid;
+    flex: 1 1 300px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+}
+
+.profile-hero-stats > div {
+    padding: var(--space-3) var(--space-3);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-header-text) 6%, transparent);
+}
+
+.profile-hero-stats dt {
+    color: color-mix(in srgb, var(--color-header-text) 62%, transparent);
+    font-size: var(--text-xs);
+}
+
+.profile-hero-stats dd {
+    margin: var(--space-1) 0 0;
+    color: var(--arena-sand-light);
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.settings-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.settings-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: var(--space-hairline) solid var(--color-border);
+}
+
+.settings-card-head h2 {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.settings-card-status {
+    display: flex;
+    align-items: center;
+}
+
+.settings-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-3) var(--space-6);
+    padding: var(--space-5) var(--space-6);
+    border-top: var(--space-hairline) solid var(--color-border);
+}
+
+.settings-card-head + .settings-row {
+    border-top: 0;
+}
+
+.settings-row--stack {
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.settings-copy {
+    display: flex;
+    flex: 1 1 220px;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.settings-copy label,
+.settings-label {
+    color: var(--color-text-strong);
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+.settings-copy p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+}
+
+.settings-code {
+    color: var(--color-text);
+    font-family: var(--font-mono);
+}
+
+.settings-field {
+    display: flex;
+    flex: 2 1 320px;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.settings-field--wide {
+    width: 100%;
+}
+
+.settings-field .input {
+    width: 100%;
+    margin: 0;
+}
+
+.settings-system-link {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-link);
+    font-size: var(--text-xs);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.settings-note {
+    margin: 0;
+    padding: 0 var(--space-6) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.preferences-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.preference-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-6);
+    border-top: var(--space-hairline) solid var(--color-border);
+}
+
+.preference-row:first-child {
+    border-top: 0;
+}
+
+.preference-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.preference-copy span {
+    color: var(--color-text);
+    font-size: var(--text-sm);
+}
+
+.preference-copy small {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.settings-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-1) var(--space-8);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.settings-footer i {
+    margin-right: var(--space-1);
+}
+
+.profile-cropper {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-dialog);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: color-mix(in srgb, var(--color-chrome) 75%, transparent);
+}
+
+.profile-cropper[hidden] {
+    display: none;
+}
+
+.profile-cropper-dialog {
+    width: min(360px, 100%);
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+}
+
+.profile-cropper-image {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+}
+
+.profile-cropper-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.profile-cropper-actions .button {
+    flex: 1;
+}
+
+@media only screen and (max-width: 700px) {
+    .settings-page {
+        max-width: none;
+    }
+
+    .profile-hero {
+        padding: var(--space-4);
+    }
+
+    .profile-hero-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+    }
+
+    .settings-card-head,
+    .settings-row,
+    .preference-row {
+        padding-right: var(--space-4);
+        padding-left: var(--space-4);
+    }
+
+    .settings-note {
+        padding-right: var(--space-4);
+        padding-left: var(--space-4);
+    }
+}
+
+/* In a stacked row, the desktop flex basis must not become a fixed height. */
+.settings-row--stack > .settings-copy,
+.settings-row--stack > .settings-field {
+    flex: none;
+    width: 100%;
+}

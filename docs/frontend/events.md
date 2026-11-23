@@ -598,8 +598,7 @@ sequenceDiagram
 ```
 
 On failure the section restores `previousUnread`, clears the button's busy state and shows the API's
-message; no `notifications:counts` is emitted for a refused mutation. `POST /news/read` is new in WP4 and
-answers `{ read, unread }`; the route comment and `docs/api/README.md` are regenerated in that WP.
+message; no `notifications:counts` is emitted for a refused mutation. `POST /news/read` answers `{ read, unread }`; the route comment and `docs/api/README.md` are regenerated in WP4.
 
 ## Migration of the existing document events
 
