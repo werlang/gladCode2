@@ -96,3 +96,16 @@ test('emitting without an element is a no-op', () => {
     const component = new BaseComponent();
     assert.doesNotThrow(() => component.emit('select', {}));
 });
+
+test('listen() ignores native events that bubble from children', () => {
+    const element = fakeElement();
+    const component = new BaseComponent(element);
+    const seen = [];
+    component.listen('change', detail => seen.push(detail));
+
+    const native = new Event('change');
+    element.dispatchEvent(native);
+    component.emit('change', { page: 2 });
+
+    assert.deepEqual(seen, [{ page: 2 }]);
+});

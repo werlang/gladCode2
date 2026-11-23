@@ -65,7 +65,10 @@ export class BaseComponent {
      * @returns {this}
      */
     listen(eventName, handler) {
-        return this.on(this.#element, eventName, event => handler(event.detail, event));
+        return this.on(this.#element, eventName, event => {
+            if (event.target !== this.#element || !(event instanceof CustomEvent)) return;
+            handler(event.detail, event);
+        });
     }
 
     /**

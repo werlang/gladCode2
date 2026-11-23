@@ -39,6 +39,18 @@ export function parsePosition(text, total) {
     return Math.min(value, Math.max(1, Math.floor(Number(total) || 0)));
 }
 
+/**
+ * The control to focus after a page change, by the control the user used.
+ *
+ * @param {'page'|'prev'|'next'} kind
+ * @returns {string} A selector inside the pagination root.
+ */
+export function paginationFocusSelector(kind) {
+    if (kind === 'prev') return '[aria-label="Página anterior"]';
+    if (kind === 'next') return '[aria-label="Próxima página"]';
+    return '.pagination-page[aria-current="page"]';
+}
+
 /** @typedef {'simple'|'numbered'} PaginationVariant */
 
 /**
@@ -77,13 +89,16 @@ export class Pagination extends BaseComponent {
 
     /**
      * @param {number} page
+     * @param {{ focus?: 'page'|'prev'|'next' }} [options] Which control keeps focus after the rerender.
      * @returns {this}
      */
-    goTo(page) {
+    goTo(page, { focus = 'page' } = {}) {
         const next = Math.max(1, Math.min(this.#pages, Math.floor(Number(page) || 1)));
         if (next === this.#page) return this;
+        const hadFocus = this.element.contains(document.activeElement);
         this.#page = next;
         this.#render();
+        if (hadFocus) this.element.querySelector(paginationFocusSelector(focus))?.focus();
         this.emit('change', { page: next });
         return this;
     }
@@ -114,7 +129,7 @@ export class Pagination extends BaseComponent {
                     button.className = 'pagination-page';
                     button.textContent = String(entry);
                     if (entry === this.#page) button.setAttribute('aria-current', 'page');
-                    button.addEventListener('click', () => this.goTo(entry));
+                    button.addEventListener('click', () => this.goTo(entry, { focus: 'page' }));
                     list.append(button);
                 }
             }
@@ -150,7 +165,7 @@ export class Pagination extends BaseComponent {
         button.setAttribute('aria-label', 'Página anterior');
         button.textContent = '‹';
         button.disabled = this.#page <= 1;
-        button.addEventListener('click', () => this.goTo(this.#page - 1));
+        button.addEventListener('click', () => this.goTo(this.#page - 1, { focus: 'prev' }));
         return button;
     }
 
@@ -161,7 +176,7 @@ export class Pagination extends BaseComponent {
         button.setAttribute('aria-label', 'Próxima página');
         button.textContent = '›';
         button.disabled = this.#page >= this.#pages;
-        button.addEventListener('click', () => this.goTo(this.#page + 1));
+        button.addEventListener('click', () => this.goTo(this.#page + 1, { focus: 'next' }));
         return button;
     }
 

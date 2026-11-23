@@ -4,8 +4,8 @@ import test from 'node:test';
 
 const { badgeText } = await import('../../web/public/script/components/badge.js');
 const { initials } = await import('../../web/public/script/components/avatar.js');
-const { pageList, parsePosition } = await import('../../web/public/script/components/pagination.js');
-const { nextTabIndex } = await import('../../web/public/script/components/tabs.js');
+const { pageList, parsePosition, paginationFocusSelector } = await import('../../web/public/script/components/pagination.js');
+const { nextTabIndex, tabPanelIds } = await import('../../web/public/script/components/tabs.js');
 const { nextOptionIndex } = await import('../../web/public/script/components/segmented-control.js');
 const { toastOptions } = await import('../../web/public/script/components/toast.js');
 const { searchQuery } = await import('../../web/public/script/components/search-field.js');
@@ -49,6 +49,16 @@ test('tab and option focus wraps at both ends', () => {
     assert.equal(nextTabIndex(0, 1, 0), -1);
 });
 
+test('tab and panel ids pair every tab with exactly one panel', () => {
+    const pairs = ['ranked', 'duels', 'favorites'].map(tabPanelIds);
+    assert.deepEqual(pairs, [
+        { tab: 'tab-ranked', panel: 'panel-ranked' },
+        { tab: 'tab-duels', panel: 'panel-duels' },
+        { tab: 'tab-favorites', panel: 'panel-favorites' },
+    ]);
+    assert.equal(new Set(pairs.flatMap(pair => [pair.tab, pair.panel])).size, 6);
+});
+
 test('toastOptions keeps the old string type and gives an action more time', () => {
     assert.deepEqual(toastOptions('success'), { type: 'success', duration: 2000, action: null });
     const action = { label: 'Desfazer', onClick: () => {} };
@@ -77,7 +87,7 @@ test('a switch starts unchecked and toggles aria-checked on click', () => {
     const switchControl = new Switch({ element, checked: false });
     const seen = [];
     element.addEventListener = (name, listener) => listeners.set(name, listener);
-    switchControl.listen('change', detail => seen.push(detail));
+    element.addEventListener('change', event => seen.push(event.detail));
 
     assert.equal(switchControl.checked, false);
     element.dispatchEvent({ type: 'click' });
@@ -96,4 +106,10 @@ test('the empty state template escapes its text and inserts a caller-built actio
     assert.match(html, /&lt;Nada&gt;/);
     assert.match(html, /Nenhum &amp; nenhuma/);
     assert.match(html, /<button class='button'>Criar<\/button>/);
+});
+
+test('page changes focus the equivalent control or the new current page', () => {
+    assert.equal(paginationFocusSelector('prev'), '[aria-label="Página anterior"]');
+    assert.equal(paginationFocusSelector('next'), '[aria-label="Próxima página"]');
+    assert.equal(paginationFocusSelector('page'), '.pagination-page[aria-current="page"]');
 });

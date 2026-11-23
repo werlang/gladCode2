@@ -6,7 +6,7 @@ import { SearchField } from './components/search-field.js';
 import { SectionCard } from './components/section-card.js';
 import { SegmentedControl } from './components/segmented-control.js';
 import { Switch } from './components/switch.js';
-import { Tabs } from './components/tabs.js';
+import { Tabs, tabPanelIds } from './components/tabs.js';
 import { createToast } from './components/toast.js';
 import { createElement, renderTemplate } from './helpers/html.js';
 import { applyTheme, THEME_CHOICES } from './helpers/theme.js';
@@ -35,8 +35,8 @@ function sectionCards() {
     const container = slot('#example-section-cards');
     const normal = new SectionCard();
     normal.setTitle('Identidade');
-    normal.setActions([createElement("<button type='button' class='button ghost small'>Acção</button>")]);
-    normal.setBody([createElement('<p>Uma secção normal, com título, ação e conteúdo.</p>')]);
+    normal.setActions([createElement("<button type='button' class='button ghost small'>Ação</button>")]);
+    normal.setBody([createElement('<p>Uma seção normal, com título, ação e conteúdo.</p>')]);
 
     const busy = new SectionCard();
     busy.setTitle('Carregando');
@@ -55,7 +55,7 @@ function sectionCards() {
     const error = new SectionCard();
     error.setTitle('Erro');
     error.setError({ message: 'Não foi possível carregar. Tente novamente.' });
-    error.listen('retry', () => createToast('Retry pedido', 'info'));
+    error.listen('retry', () => createToast('Nova tentativa solicitada', 'info'));
 
     container.append(normal.element, busy.element, empty.element, error.element);
 }
@@ -87,18 +87,52 @@ function avatars() {
     container.append(picture.element, initialsAvatar.element, small.element);
 }
 
+/**
+ * A tab set with real panels: the tab points at the panel with aria-controls, the panel is named by
+ * the tab, and selecting a tab hides the others.
+ *
+ * @param {Tabs} tabs
+ * @param {Array<{ id: string, label: string, count?: number }>} items
+ * @returns {HTMLElement}
+ */
+function tabsWithPanels(tabs, items) {
+    const wrap = document.createElement('div');
+    wrap.className = 'gallery-stack';
+    const panels = new Map();
+
+    for (const item of items) {
+        const ids = tabPanelIds(item.id);
+        const panel = document.createElement('div');
+        panel.id = ids.panel;
+        panel.className = 'gallery-panel surface-card';
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', ids.tab);
+        panel.textContent = `Conteúdo da aba ${item.label}.`;
+        panel.hidden = !item.selected;
+        panels.set(item.id, panel);
+    }
+
+    tabs.setItems(items.map(item => ({ ...item, panelId: tabPanelIds(item.id).panel })));
+    tabs.listen('select', ({ id }) => {
+        for (const [panelId, panel] of panels) panel.hidden = panelId !== id;
+    });
+    wrap.append(tabs.element, ...panels.values());
+    return wrap;
+}
+
 function tabs() {
     const container = slot('#example-tabs');
     const underline = new Tabs({ variant: 'underline', label: 'Relatórios' });
-    underline.setItems([
-        { id: 'ranked', label: 'Ranqueadas', count: 3, selected: true, panelId: 'panel-ranked' },
-        { id: 'duels', label: 'Duelos', panelId: 'panel-duels' },
-        { id: 'favorites', label: 'Favoritas', panelId: 'panel-favorites' },
-    ]);
     underline.listen('select', detail => createToast(`Aba: ${detail.id}`, 'info'));
+    const underlineWrap = tabsWithPanels(underline, [
+        { id: 'ranked', label: 'Ranqueadas', count: 3, selected: true },
+        { id: 'duels', label: 'Duelos' },
+        { id: 'favorites', label: 'Favoritas' },
+    ]);
 
     const pill = new Tabs({ variant: 'pill', label: 'Ranking' });
-    pill.setItems([
+    pill.listen('select', detail => createToast(`Lista: ${detail.id}`, 'info'));
+    const pillWrap = tabsWithPanels(pill, [
         { id: 'general', label: 'Geral', selected: true },
         { id: 'friends', label: 'Amigos' },
         { id: 'class', label: 'Turma 3B' },
@@ -106,7 +140,7 @@ function tabs() {
 
     const wrap = document.createElement('div');
     wrap.className = 'gallery-stack';
-    wrap.append(underline.element, pill.element);
+    wrap.append(underlineWrap, pillWrap);
     container.append(wrap);
 }
 
@@ -208,9 +242,9 @@ function primitives() {
     buttons.append(createElement("<button type='button' class='button primary large'>large</button>"));
 
     const fields = slot('#example-fields');
-    fields.append(createElement("<input class='input' placeholder='Apelido'>"));
-    fields.append(createElement("<input class='input boxed' value='Spartacus_C'>"));
-    fields.append(createElement("<select class='input'><option>Texto</option><option>Outro</option></select>"));
+    fields.append(createElement("<input class='input' placeholder='Apelido' aria-label='Apelido'>"));
+    fields.append(createElement("<input class='input boxed' value='Spartacus_C' aria-label='Apelido preenchido'>"));
+    fields.append(createElement("<select class='input' aria-label='Linguagem'><option>Texto</option><option>Outro</option></select>"));
     fields.append(createElement("<div class='surface-card gallery-surface'>Um surface-card</div>"));
 }
 

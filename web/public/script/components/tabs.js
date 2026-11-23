@@ -15,6 +15,16 @@ export function nextTabIndex(current, delta, length) {
     return (current + delta + length) % length;
 }
 
+/**
+ * The DOM ids that pair a tab with its panel.
+ *
+ * @param {string} id Tab id.
+ * @returns {{ tab: string, panel: string }}
+ */
+export function tabPanelIds(id) {
+    return { tab: `tab-${id}`, panel: `panel-${id}` };
+}
+
 /** @typedef {'underline'|'pill'} TabsVariant */
 
 /**
@@ -53,9 +63,10 @@ export class Tabs extends BaseComponent {
 
         for (const item of items) {
             const button = document.createElement('button');
+            const ids = tabPanelIds(item.id);
             button.type = 'button';
             button.className = 'tab';
-            button.id = `tab-${item.id}`;
+            button.id = ids.tab;
             button.setAttribute('role', 'tab');
             button.setAttribute('aria-selected', 'false');
             button.tabIndex = -1;
