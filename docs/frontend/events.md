@@ -231,9 +231,9 @@ destination.
 
 ### 2. Profile setting changed → autosave → toast with undo → theme/glad-view applied everywhere
 
-Text fields save when they lose focus or after a 700 ms pause; choices (theme, glad view, language,
-switches) save immediately. Every save goes through one queue per field, so the last intent wins even when
-responses arrive out of order.
+Text fields save when they lose focus or on Enter; the nickname checks availability after a short pause
+first. Choices (theme, glad view, language, switches) save immediately. Every save goes through one queue
+per field, so the last intent wins even when responses arrive out of order.
 
 ```mermaid
 sequenceDiagram
@@ -284,7 +284,14 @@ Rules:
   `token.rev === seq[token.field]`; a later change **to the same field** dismisses the older toast and
   invalidates it. `undo(token)` saves `token.previous` as a **new revision through the same field's
   queue**, so the restore is itself persisted and confirmed; an old toast cannot undo a newer choice in
-  that field, and a change in another field never invalidates it.
+  that field, and a change in another field never invalidates it. A refused undo keeps the last confirmed
+  value on screen and reports the API's message in an error toast (`undoChange` in
+  `helpers/section-request.js`); the toast action is awaited so a refusal never becomes an unhandled
+  rejection.
+- **Object patches merge when they run.** E-mail preferences are saved with `save('preferences', patch,
+  { merge: true })`: the queued patch is applied over `confirmed.preferences` at request time, not when
+  the switch was clicked, so changing two switches in quick succession sends one object containing both.
+  A nickname retry resends the refused nickname intent, not the value the control rolled back to.
 - **Test contract (WP4).** Start at Sistema. Change to Clássico (rev 1; token previous = Sistema), then to
   Arena escuro (rev 2; token previous = Sistema because rev 1 is not confirmed yet) with the first response
   delayed. Rev 1 succeeds: `confirmed` becomes Clássico, but no preview change and no toast. Rev 2 succeeds:
@@ -598,7 +605,8 @@ sequenceDiagram
 ```
 
 On failure the section restores `previousUnread`, clears the button's busy state and shows the API's
-message; no `notifications:counts` is emitted for a refused mutation. `POST /news/read` answers `{ read, unread }`; the route comment and `docs/api/README.md` are regenerated in WP4.
+message; no `notifications:counts` is emitted for a refused mutation. `POST /news/read` answers
+`{ read, unread }`; the route comment and `docs/api/README.md` document it.
 
 ## Migration of the existing document events
 
