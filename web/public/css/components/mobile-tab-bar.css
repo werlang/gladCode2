@@ -38,10 +38,16 @@
     }
 
     .mobile-tab--battle {
-        justify-content: flex-end;
-        color: var(--color-text-on-accent);
+        height: 62px;
+        padding-top: 34px;
+        justify-content: flex-start;
+        color: color-mix(in srgb, var(--color-header-text) 85%, transparent);
         font-size: var(--text-2xs);
         font-weight: 700;
+
+        &.is-active {
+            color: var(--color-accent);
+        }
     }
 
     .mobile-tab-battle-button {

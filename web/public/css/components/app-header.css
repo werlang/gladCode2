@@ -389,6 +389,15 @@ body:has(#painel) {
         .app-header-search-button {
             margin-left: auto;
         }
+
+        .app-header-avatar-slot .avatar {
+            --avatar-size: 34px;
+        }
+
+        .app-header-avatar-slot .avatar .avatar-level {
+            right: -3px;
+            bottom: -3px;
+        }
     }
 }
 
