@@ -122,8 +122,9 @@ export class RankedBattle {
     static async #applyResults(userId, battle, simulation, logId, gladiatorIds) {
         const logGlads = simulation[0].glads;
         const ordered = deathOrder(simulation);
-        // A last step with nobody alive is a draw, not a win for the last gladiator to fall.
-        const anySurvivor = simulation.at(-1)?.glads?.some(glad => Number(glad?.hp) > 0) ?? false;
+        // The engine log is a delta log: the winner's hp is absent from the last step when it did
+        // not change. deathOrder accumulates the last hp seen, so ask it, not the raw final step.
+        const anySurvivor = ordered.some(entry => entry.hp > 0);
         const results = rankedResults(ordered, anySurvivor);
         const placed = ordered
             .map((entry, index) => ({ ...entry, result: results[index], saved: battle.savedGladiator(entry.name, entry.user) }))

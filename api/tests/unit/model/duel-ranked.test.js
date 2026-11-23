@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('../../../helpers/mysql.js', () => ({
@@ -10,7 +11,7 @@ vi.mock('../../../model/battle.js', () => ({
         constructor(options) { this.options = options; }
         async addGladiators(ids) { this.ids = ids; return this; }
         run() { return run(this); }
-        savedGladiator(name) { return { Zed: { id: 20, master: 8 }, Max: { id: 4, master: 7 }, Ava: { id: 5, master: 9 }, Nox: { id: 6, master: 10 } }[name]; }
+        savedGladiator(name) { return { Zed: { id: 20, master: 8 }, Max: { id: 4, master: 7 }, Ava: { id: 5, master: 9 }, Nox: { id: 6, master: 10 }, G0: { id: 20, master: 8 }, G1: { id: 21, master: 9 }, G2: { id: 22, master: 10 }, G3: { id: 23, master: 11 }, G4: { id: 4, master: 7 } }[name]; }
     },
 }));
 vi.mock('../../../model/stats.js', () => ({ Stats: { record: vi.fn() } }));
@@ -132,7 +133,9 @@ describe('ranked rewards', () => {
         const simulation = [
             { simtime: 1, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }] },
             { simtime: 20, glads: [{ name: 'Zed', user: 'Bo', hp: 0 }, { name: 'Max', user: 'Ana', hp: 9 }] },
-            { simtime: 30, glads: [{}, { name: 'Max', user: 'Ana', hp: 4 }] },
+            { simtime: 25, glads: [{}, { name: 'Max', user: 'Ana', hp: 4 }] },
+            // delta log: the survivor has no hp in the final step; deathOrder keeps the 4
+            { simtime: 30, glads: [{}, {}] },
         ];
         Mysql.select
             .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20]' }])
@@ -160,7 +163,8 @@ describe('ranked rewards', () => {
             { simtime: 0, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }, { name: 'Ava', user: 'Cid', hp: 9 }, { name: 'Nox', user: 'Dia', hp: 0 }] },
             { simtime: 10, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 9 }, { name: 'Ava', user: 'Cid', hp: 0 }, {}] },
             { simtime: 99, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, { name: 'Max', user: 'Ana', hp: 0 }, {}, {}] },
-            { simtime: 100, glads: [{ name: 'Zed', user: 'Bo', hp: 9 }, {}, {}, {}] },
+            { simtime: 100, glads: [{ hp: 8 }, {}, {}, {}] },
+            { simtime: 101, glads: [{}, {}, {}, {}] },
         ];
         Mysql.select
             .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20,5,6]' }])
@@ -184,6 +188,29 @@ describe('ranked rewards', () => {
         expect(mine.result).toBe('loss');
         expect(reports.find(report => report.gladiator === 20).placement).toBe(0);
         expect(reports.find(report => report.gladiator === 20).result).toBe('win');
+    });
+
+    test('a real ranked delta log persists the survivor as a win, not a draw', async () => {
+        const simulation = JSON.parse(readFileSync(new URL('../../fixtures/simlog_ranked_delta.json', import.meta.url), 'utf8'));
+        Mysql.select
+            .mockResolvedValueOnce([{ gladiator: 4, opponents: '[20,21,22,23]' }])
+            .mockResolvedValueOnce([{ id: 7 }, { id: 8 }, { id: 9 }, { id: 10 }, { id: 11 }])
+            .mockResolvedValueOnce([
+                { cod: 20, mmr: 1000, master: 8, lvl: 3, xp: 0 },
+                { cod: 21, mmr: 1000, master: 9, lvl: 3, xp: 0 },
+                { cod: 22, mmr: 1000, master: 10, lvl: 3, xp: 0 },
+                { cod: 23, mmr: 1000, master: 11, lvl: 3, xp: 0 },
+                { cod: 4, mmr: 1000, master: 7, lvl: 3, xp: 0 },
+            ])
+            .mockResolvedValueOnce([{ battles: 0 }])
+            .mockResolvedValueOnce([{ lvl: 3, xp: 10, silver: 50, cod: 4, name: 'G4', skin: '', vstr: 1, vagi: 1, vint: 1, mmr: 1000 }]);
+        run.mockResolvedValueOnce({ log: { id: 99, hash: 'real' }, simulation, error: '' });
+
+        await RankedBattle.fight({ id: 7 }, '9'.repeat(32));
+
+        const [, reports] = Mysql.insert.mock.calls.find(([table]) => table === 'reports');
+        expect(reports.map(report => report.result)).toEqual(['win', 'loss', 'loss', 'loss', 'loss']);
+        expect(reports.find(report => report.gladiator === 4).result).toBe('win');
     });
 
     test('a battle with no survivor is a draw for every gladiator', async () => {

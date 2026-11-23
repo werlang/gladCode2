@@ -25,6 +25,25 @@ describe('battle results', () => {
         expect(calcReward(glads([[0, 0], [0, 0], [0, 0]]))).toEqual([0, 0, 0]);
     });
 
+    test('real delta logs keep the winner without hp on the last step and still produce wins', () => {
+        // Built from real `data/runs/wp4fix3_*` engine output: the engine writes hp only when it
+        // changes, so the winner has no hp in the final step. Run a 2-gladiator duel and a
+        // 5-gladiator ranked battle with `Payload/socket_compile.sh`, then trim to name/user/hp.
+        const duel = JSON.parse(readFileSync(path.join(import.meta.dirname, '../../fixtures/simlog_duel_delta.json'), 'utf8'));
+        const ranked = JSON.parse(readFileSync(path.join(import.meta.dirname, '../../fixtures/simlog_ranked_delta.json'), 'utf8'));
+        const duelOrder = deathOrder(duel);
+        const rankedOrder = deathOrder(ranked);
+        expect(duelOrder.some(entry => entry.hp > 0)).toBe(true);
+        expect(rankedOrder.some(entry => entry.hp > 0)).toBe(true);
+        // the raw last step carries no hp for the survivor(s), which is exactly the delta shape
+        const duelWinner = duel[0].glads.findIndex(glad => glad.name === 'G0');
+        const rankedWinner = ranked[0].glads.findIndex(glad => glad.name === 'G4');
+        expect(duel.at(-1).glads[duelWinner].hp).toBeUndefined();
+        expect(ranked.at(-1).glads[rankedWinner].hp).toBeUndefined();
+        expect(rankedResults(duelOrder, true)).toEqual(['win', 'loss']);
+        expect(rankedResults(rankedOrder, true)).toEqual(['win', 'loss', 'loss', 'loss', 'loss']);
+    });
+
     test('the engine result makes no-survivor battles a draw and follows the equal-time win rule', () => {
         // playback shows "Empate" when the last step has no living gladiator
         expect(rankedResults([{ time: 90 }, { time: 50 }, { time: 10 }], false)).toEqual(['draw', 'draw', 'draw']);
