@@ -29,7 +29,7 @@ A component event is not put on the bus. An app event is not a DOM event. Nothin
 DOM-free: it imports nothing and can be tested in `tests/frontend/`.
 
 ```js
-// helpers/event-bus.js (target shape)
+// helpers/event-bus.js (implemented shape)
 /**
  * @typedef {object} AccountSavedDetail
  * @property {object} user The account as the API returned it.
