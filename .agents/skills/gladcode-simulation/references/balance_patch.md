@@ -16,7 +16,7 @@ Ability tuning lives in two payload files:
   (e.g. teleport range appears in both the in-range check and the
   max-distance clamp).
 
-`ptbrFunc.c`, `gladCodeAPI.c` and `gladCodeAPI.py` are thin wrappers and do
+`ptbrFunc.c`, `gladCodeAPI.c`, `gladCodeAPI.py` and `gladCodeAPI.js` are thin wrappers and do
 not need changes for pure number tuning.
 
 ## 2. Recompile the server (verify, no image rebuild)

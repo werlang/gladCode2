@@ -13,7 +13,7 @@ This reference describes the step-by-step lifecycle of a gladiator battle simula
    ▼
 [API: model/battle.js Battle]
    │  2. Creates data/runs/{dir}/ (gladiator code checked against banned_functions.json when saved)
-   │  3. Copies Payload/ files & each gladiator's code (code0.c, code1.py, ...)
+   │  3. Copies Payload/ files & each gladiator's code (code0.c, code1.py, code2.js, ...)
    │  4. HTTP POST to http://runner:3000/{dir} with { sandbox?, noitems? }
    ▼
 [Runner Express Service]
@@ -22,7 +22,8 @@ This reference describes the step-by-step lifecycle of a gladiator battle simula
    ▼
 [Docker VM (gladcode2-vm)]
    │  7. Executes socket_compile.sh
-   │  8. Compiles gladiators: gcc -o code0 code0.c -lm
+   │  8. Compiles C gladiators (gcc -o code0 code0.c -lm), starts Python (python3 code1.py)
+   │     and JavaScript ones (node gladCodeCore.js code2.js)
    │  9. Launches gladCodeServerMain with gladiator count
    ▼
 [C Engine (gladCodeServerMain)]
@@ -50,11 +51,11 @@ When a simulation starts, the API's `Battle` (`api/model/battle.js`) allocates a
 
 | File | Source / Role | Description |
 | :--- | :--- | :--- |
-| `code0.c` / `code0.py` | User Gladiator 1 | Source code for first combatant. |
-| `code1.c` / `code1.py` | User Gladiator 2 | Source code for second combatant. |
+| `code0.c` / `code0.py` / `code0.js` | User Gladiator 1 | Source code for first combatant (`engineSource`: C gets `#include "gladCodeCore.c"`, Python its main loop, JavaScript is written as is). |
+| `code1.c` / `code1.py` / `code1.js` | User Gladiator 2 | Source code for second combatant. |
 | `gladCodeServerMain.c` | `Payload/` | Multi-threaded C socket server. |
 | `gladCodeServerCore.c` | `Payload/` | Core battle mechanics & spatial engine. |
-| `gladCodeAPI.c` / `.h` | `Payload/` | Client socket library. |
+| `gladCodeAPI.c` / `.py` / `.js`, `gladCodeCore.*` | `Payload/` | Client socket libraries (`gladCodeCore.js` runs JavaScript gladiators; `package.json` marks them CommonJS). |
 | `socket_compile.sh` | `Payload/` | Compilation script for VM. |
 | `errorc.txt` | Engine Generated | Compiler error log output. |
 | `simlog` | Engine Generated | Battle execution log (JSON trace). |

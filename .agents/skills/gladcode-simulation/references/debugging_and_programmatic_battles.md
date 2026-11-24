@@ -18,7 +18,7 @@ gladcode2/
 │   │                        #   tournament(-round).js, training(-round).js, gladiator.js, ...
 │   ├── helpers/             # mysql.js, battle-results.js, gladiator-code.js, runner.js, jwt.js, ...
 │   ├── scripts/             # issue-session.js, battle.js, dev-tournament.js, remove-old-battles.js
-│   ├── banned_functions.json# Blocked C functions policy
+│   ├── banned_functions.json# Blocked user-function policy
 │   └── version              # Current engine version (e.g. 2.10.0)
 ├── web/                     # Page shells (view/) and the frontend (public/script/, Phaser render.js, Three.js render2/)
 ├── runner/                  # Express microservice inside Docker network (port 3000)
@@ -27,8 +27,8 @@ gladcode2/
 ├── Payload/                 # C battle simulation engine & API bindings
 │   ├── gladCodeServerMain.c # Entrypoint socket server, spawns threads per gladiator
 │   ├── gladCodeServerCore.c # Physics, line-of-sight, turn loop, damage mechanics
-│   ├── gladCodeAPI.c / .py  # Gladiator client SDKs (compiled into gladiator binaries)
-│   └── socket_compile.sh    # GCC and Python invocation script executed inside gladcode2-vm
+│   ├── gladCodeAPI.c / .py / .js  # Gladiator client SDKs (gladCodeCore.js runs JavaScript gladiators)
+│   └── socket_compile.sh    # GCC, Python and Node invocation script executed inside gladcode2-vm
 ├── data/                    # runs/ (battle folders, removed after each run), logs/ (simlogs), profpics/
 ├── migrations/              # Versioned MySQL migration scripts (001_..., 002_...)
 └── dev-tools/               # Tournament CLI, dump/restore, news SQL
@@ -140,10 +140,11 @@ rm -rf data/runs/test_run
 | :--- | :--- | :--- | :--- |
 | **HTTP 500 `SQL_ERROR` / unexpected error** | A bug in a model or a query | `docker compose logs api --tail 50` (requests are logged as JSON with their status) | Fix the model; add a Vitest case |
 | **`"error": "Traceback..."`** (editor / sandbox runs only) | Python runtime exception in gladiator code | Inspect the `error` field, or run Flow D and read `errorc.txt` | Fix gladiator script syntax/scope bug (e.g. uninitialized global variable like `volta`) |
+| **`"error": "codeX.js:N ... SyntaxError / ReferenceError"`** (editor / sandbox runs only) | JavaScript syntax or runtime error; line N counts from the first user line | Inspect the `error` field, or run Flow D and read `errorc.txt` | Fix the gladiator code; `loop` must be declared as a plain function |
 | **`"error": "codeX.c:... error:"`** | GCC compilation error in gladiator code | Inspect the `error` field | Fix C syntax error, missing semicolon, or invalid function signature |
 | **`"error": "INVALID_ATTR"`** | Attribute costs do not add up to 50 points | Inspect `vstr`, `vagi`, `vint` in `gladiators` table | Ensure `attributeCost(STR) + attributeCost(AGI) + attributeCost(INT) == 50` (`api/helpers/gladiator-code.js`) |
-| **`"error": "NO_OUTPUT"` / empty `simlog`** | A C gladiator binary never appeared (compile failure, the server prints `CLIENT TIMEOUT` to its own stdout, not to the response), a Python gladiator wrote to stderr before connecting (`PYTHON ERROR`), or the `gladcode2-vm` image is missing (`docker build -t gladcode2-vm Setup`) | Run the battle via Flow D and read `errorc.txt`; `docker image ls gladcode2-vm` | Fix the compile error; saved gladiators already passed a clean test battle |
-| **Gladiator dies instantly, `"crashed":1` in `simlog`** | Its client process died mid-battle (Python exception, C segfault); the engine kills it as soon as the socket closes | Re-run it in the editor to see the traceback in `errorc.txt` | Fix the runtime error. Tournament, ranked, duel and training battles still keep the log; ranked battles also flag it `version = 'broken'` |
+| **`"error": "NO_OUTPUT"` / empty `simlog`** | A C gladiator binary never appeared (compile failure, the server prints `CLIENT TIMEOUT` to its own stdout, not to the response), a Python or JavaScript gladiator wrote to stderr before connecting (`SCRIPT ERROR`), or the `gladcode2-vm` image is missing (`docker build -t gladcode2-vm Setup`) | Run the battle via Flow D and read `errorc.txt`; `docker image ls gladcode2-vm` | Fix the compile error; saved gladiators already passed a clean test battle |
+| **Gladiator dies instantly, `"crashed":1` in `simlog`** | Its client process died mid-battle (Python or JavaScript exception, C segfault); the engine kills it as soon as the socket closes | Re-run it in the editor to see the traceback in `errorc.txt` | Fix the runtime error. Tournament, ranked, duel and training battles still keep the log; ranked battles also flag it `version = 'broken'` |
 | **Gladiator stuck in a loop without API calls** | The engine turn timeout sets its hp to 0 and prints `Gladiator X timed out` | Run gladiator isolated; check for infinite while loop missing API action call | Ensure loop calls action functions (`stepForward`, `turn`, `attack`) |
 | **30-second Runner Timeout** | Process hung or engine deadlock | `docker compose logs runner` | Runner executes `docker kill {dir}` after 30s. Check socket communication and gladiator loop |
 
@@ -180,7 +181,7 @@ When ranked matchmaking fails for a specific gladiator:
    ```
 
 4. **Engine Crash Regression Battles**:
-   After changing `Payload/` engine code, run real battles in `gladcode2-vm` (healthy, first-turn and mid-battle crashes in C and Python, forged stderr, `speak()` JSON injection). Each must produce a valid simlog flagging exactly the crashed gladiators:
+   After changing `Payload/` engine code, run real battles in `gladcode2-vm` (healthy, first-turn and mid-battle crashes in C, Python and JavaScript, forged stderr, `speak()` JSON injection, a JavaScript `setup()` override, a JavaScript syntax error). Each must produce a valid simlog flagging exactly the crashed gladiators:
    ```bash
    bash tests/engine/run.sh
    ```

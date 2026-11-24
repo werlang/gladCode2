@@ -1,11 +1,11 @@
 ---
 name: gladcode-simulation
-description: Comprehensive guide and procedural workflow for building, running, testing, debugging, and maintaining gladCode battle simulations, C/Python payload APIs, the API's battle runner, the runner service, dev tools, and database state. Make sure to use this skill whenever working on gladCode battle logic, gladiator C/Python code compilation, gladCode API functions, runner service, simlog JSON traces, tournament dev-tools, or debugging simulation timeouts and errors.
+description: Comprehensive guide and procedural workflow for building, running, testing, debugging, and maintaining gladCode battle simulations, C/Python/JavaScript payload APIs, the API's battle runner, the runner service, dev tools, and database state. Make sure to use this skill whenever working on gladCode battle logic, gladiator C/Python/JavaScript code compilation, gladCode API functions, runner service, simlog JSON traces, tournament dev-tools, or debugging simulation timeouts and errors.
 ---
 
 # gladCode Battle Simulation Skill
 
-This skill provides step-by-step procedures and reference specifications for working with the **gladCode 2** battle simulation pipeline: the API's `Battle` model, the Express runner service, the C engine and its C/Python gladiator runtime, the replay renderers, and the dev tools.
+This skill provides step-by-step procedures and reference specifications for working with the **gladCode 2** battle simulation pipeline: the API's `Battle` model, the Express runner service, the C engine and its C/Python/JavaScript gladiator runtime, the replay renderers, and the dev tools.
 
 ---
 
@@ -24,7 +24,7 @@ This skill provides step-by-step procedures and reference specifications for wor
 
 For specialized component specifications, consult these reference guides:
 
-- 📜 **[C & Python Gladiator API Reference](references/c_api_reference.md)**: Documentation of `gladCodeAPI.c` and `gladCodeAPI.py` functions, arguments, return values, and TCP socket messaging protocols.
+- 📜 **[Gladiator API Reference (C, Python, JavaScript)](references/c_api_reference.md)**: Every function in `gladCodeAPI.c`, `gladCodeAPI.py` and `gladCodeAPI.js`, the TCP socket protocol and how each client converts answers, the JavaScript client (`gladCodeCore.js`) and the steps to add a language.
 - ⚙️ **[Battle Flow & Execution Architecture](references/battle_flow.md)**: The API's `Battle` model, the runner, container VM isolation, `socket_compile.sh`, the `simlog` format, and the replay.
 - 🔬 **[Debugging & Programmatic Battles](references/debugging_and_programmatic_battles.md)**: Calling test, ranked and duel battles through the API with curl, and diagnostic procedures for battle bugs.
 - 🗄️ **[Dev Tools & Tournament Management](references/dev_tools.md)**: The `/dev-tools` page, `dev-tools/tournament.sh` and `dev-tools/dump_restore.sh`.
@@ -37,7 +37,7 @@ For specialized component specifications, consult these reference guides:
 
 ### Workflow 1: Debugging a Failed Simulation or Empty `simlog`
 
-1. **Read the battle's error**: battle endpoints answer `{ hash, error }`; with no log, an editor test battle's `error` carries the compiler output (GCC errors, Python tracebacks) or an engine code (`INVALID_ATTR`, ...); battles that count (ranked, duel, tournament, training, `scripts/battle.js`) answer only `NO_OUTPUT` and log the output in the API logs as `battle_without_log` (`docker compose logs api`), since it quotes every gladiator's code. Saving a gladiator that fails its test battle answers `GLADIATOR_TEST_FAILED` with the output in `data.error`.
+1. **Read the battle's error**: battle endpoints answer `{ hash, error }`; with no log, an editor test battle's `error` carries the compiler output (GCC errors, Python tracebacks, JavaScript errors) or an engine code (`INVALID_ATTR`, ...); battles that count (ranked, duel, tournament, training, `scripts/battle.js`) answer only `NO_OUTPUT` and log the output in the API logs as `battle_without_log` (`docker compose logs api`), since it quotes every gladiator's code. Saving a gladiator that fails its test battle answers `GLADIATOR_TEST_FAILED` with the output in `data.error`.
 2. **Reproduce by hand** (Workflow 2): the API removes run folders when the runner answers, so rebuild the folder and run the engine directly to read `errorc.txt` and `simlog`.
 3. **Check for Timeout or Infinite Loop**:
    - If `errorc.txt` is empty but `simlog` is missing or truncated, check if the gladiator script was stuck in an infinite loop without yielding to the C server engine (`gladCodeServerMain`).
