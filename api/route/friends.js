@@ -9,7 +9,8 @@ router.use(auth());
 
 /**
  * GET /friends
- * The master's friendships: `{ pending, confirmed }`.
+ * The master's friendships: `{ pending, confirmed }`. Confirmed friends carry `online`,
+ * `bestGladiator` and `bestRenown`; pending invites carry their `mutual` friend count.
  */
 router.get('/', asyncRoute(async (req, res) => {
     res.send(await Friendship.list(req.user.id));
@@ -26,7 +27,8 @@ router.get('/confirmed', asyncRoute(async (req, res) => {
 
 /**
  * GET /friends/search?nick=
- * Masters to befriend: `{ users: [{ user, nick }] }` (up to ten).
+ * Masters to befriend (up to ten): `{ users: [{ user, nick, level, picture, state }] }`, where
+ * `state` is `none`, `sent`, `incoming` or `friends`.
  */
 router.get('/search', asyncRoute(async (req, res) => {
     const nick = Validate.text(req.query.nick, 'nick', { max: 30 });

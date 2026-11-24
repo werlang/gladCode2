@@ -54,6 +54,10 @@ describe('social models', () => {
         Mysql.findOne
             .mockResolvedValueOnce({ cod: 5, sender: 9, message: 'oi &amp; tchau' })
             .mockResolvedValueOnce({ id: 9, apelido: 'Bo', email: 'bo@example.com', pref_message: 0 });
+        Mysql.insert.mockResolvedValueOnce({ insertId: 6 });
+        Mysql.select.mockResolvedValueOnce([{
+            cod: 6, sender: 7, receiver: 9, time: 't', message: '<quote>oi &amp; tchau</quote>&#60;b&#62;ok&#60;/b&#62;', isread: 0,
+        }]);
         await Message.reply(ana, 5, '<b>ok</b>');
         const [, row] = Mysql.insert.mock.calls[0];
         expect(row).toMatchObject({ sender: 7, receiver: 9, message: '<quote>oi &amp; tchau</quote>&#60;b&#62;ok&#60;/b&#62;' });
@@ -122,6 +126,43 @@ describe('social models', () => {
         await expect(Duel.remove(7, 8)).rejects.toMatchObject({ status: 404, code: 'DUEL_NOT_FOUND' });
         expect(Mysql.select.mock.calls.at(-1)).toEqual(['SELECT id FROM duels WHERE id = ? AND (user1 = ? OR user2 = ?)', [8, 7, 7]]);
         expect(Mysql.delete).toHaveBeenCalledTimes(1);
+    });
+
+    test('the friends list carries presence, best gladiator and mutual invites', async () => {
+        Mysql.select
+            .mockResolvedValueOnce([{ id: 8, user: 5000, nick: 'Mestre 01', level: 9, picture: null, idle: 0 }])
+            .mockResolvedValueOnce([
+                { id: 7, user: 1, nick: 'MestreArena', level: 23, picture: null, idle: 2 },
+                { id: 6, user: 2, nick: 'GladiadorX', level: 10, picture: null, idle: 120 },
+            ])
+            .mockResolvedValueOnce([{ friend: 1 }, { friend: 2 }])
+            .mockResolvedValueOnce([
+                { master: 1, gladiator: 'Spartacus', renown: 1420.5 },
+                { master: 2, gladiator: 'Arcanista', renown: 1310 },
+            ])
+            .mockResolvedValueOnce([{ mutual: 2 }]);
+        const friends = await Friendship.list(7);
+        expect(friends.pending[0]).toMatchObject({ id: 8, user: 5000, online: true, mutual: 2 });
+        expect(friends.confirmed[0]).toMatchObject({
+            id: 7, user: 1, online: true, bestGladiator: 'Spartacus', bestRenown: 1420.5,
+        });
+        expect(friends.confirmed[1]).toMatchObject({ user: 2, online: false, bestGladiator: 'Arcanista' });
+        expect(Mysql.select.mock.calls[2][0]).toContain('UNION SELECT usuario1 AS friend');
+    });
+
+    test('a master search names the relation the viewer already has', async () => {
+        Mysql.select.mockResolvedValueOnce([
+            { user: 1, nick: 'MestreArena', level: 23, picture: null, state: 'friends' },
+            { user: 5000, nick: 'Mestre 01', level: 9, picture: null, state: 'incoming' },
+            { user: 5001, nick: 'Mestre 02', level: 1, picture: null, state: 'none' },
+        ]);
+        await expect(Friendship.search(7, 'Mestre')).resolves.toEqual([
+            { user: 1, nick: 'MestreArena', level: 23, picture: null, state: 'friends' },
+            { user: 5000, nick: 'Mestre 01', level: 9, picture: null, state: 'incoming' },
+            { user: 5001, nick: 'Mestre 02', level: 1, picture: null, state: 'none' },
+        ]);
+        expect(Mysql.select.mock.calls[0][0]).toContain("WHEN a.usuario1 = ? THEN 'sent'");
+        expect(Mysql.select.mock.calls[0][0]).toContain("ELSE 'incoming'");
     });
 
     test('a report page can be marked as read', async () => {

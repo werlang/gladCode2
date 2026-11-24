@@ -105,9 +105,21 @@ export class User extends Model {
         return row.marker;
     }
 
-    /** Records that the user was just active. */
+    /**
+     * Records that the user was active at most once a minute. A conditional update keeps the
+     * presence timestamp accurate without writing on every notification poll; the one account
+     * that never wrote one gets it on its first poll.
+     */
     async touch() {
-        await Mysql.update('usuarios', { ativo: Mysql.raw('NOW()') }, { id: this.id });
+        if (this.ativo == null) {
+            await Mysql.update('usuarios', { ativo: Mysql.raw('NOW()') }, { id: this.id, ativo: null });
+            return;
+        }
+        await Mysql.update(
+            'usuarios',
+            { ativo: Mysql.raw('NOW()') },
+            { id: this.id, ativo: { '<': Mysql.raw('NOW() - INTERVAL 1 MINUTE') } },
+        );
     }
 
     /**

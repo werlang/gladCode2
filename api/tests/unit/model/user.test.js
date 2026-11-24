@@ -139,6 +139,26 @@ describe('User', () => {
         expect(Mysql.select.mock.calls[0][0]).not.toContain('r.reward > 0');
     });
 
+    test('presence writes at most once a minute, and seeds a missing timestamp once', async () => {
+        Mysql.update.mockResolvedValue(1);
+        await new User({ ...row, ativo: '2026-11-24 10:00:00' }).touch();
+        expect(Mysql.update).toHaveBeenCalledWith(
+            'usuarios',
+            { ativo: expect.anything() },
+            { id: 7, ativo: { '<': expect.anything() } },
+        );
+        const [, , filter] = Mysql.update.mock.calls[0];
+        expect(filter.ativo['<'].toSqlString()).toBe('NOW() - INTERVAL 1 MINUTE');
+
+        Mysql.update.mockClear();
+        await new User({ ...row, ativo: null }).touch();
+        expect(Mysql.update).toHaveBeenCalledWith(
+            'usuarios',
+            { ativo: expect.anything() },
+            { id: 7, ativo: null },
+        );
+    });
+
     test('a profile save may omit the gladiator style', async () => {
         await new User(row).saveProfile({ language: 'c' });
         expect(Mysql.update).toHaveBeenLastCalledWith('usuarios', { pref_language: 'c' }, { id: 7 }, {});

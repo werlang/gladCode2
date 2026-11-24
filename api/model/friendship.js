@@ -2,17 +2,56 @@ import { sendMail } from '../helpers/email.js';
 import { CustomError } from '../helpers/error.js';
 import { Mysql } from '../helpers/mysql.js';
 
+/** A master is online when active within this many minutes. */
+export const ONLINE_MINUTES = 5;
+
 /** Columns of a friend as the profile shows them. */
 const FRIEND_COLUMNS = 'a.cod AS id, u.id AS user, u.apelido AS nick, u.lvl AS level, u.foto AS picture';
 
 /**
  * @param {Record<string, any>} row
+ * @param {Map<number, { bestGladiator: string, bestRenown: number }>} [best]
  * @returns {Record<string, unknown>}
  */
-function friendJson(row) {
-    const friend = { id: row.id, user: row.user, nick: row.nick, level: row.level, picture: row.picture };
+function friendJson(row, best = new Map()) {
+    const friend = {
+        id: row.id,
+        user: Number(row.user),
+        nick: row.nick,
+        level: Number(row.level) || 0,
+        picture: row.picture,
+        online: row.idle !== null && row.idle !== undefined && Number(row.idle) <= ONLINE_MINUTES,
+    };
     if (row.idle !== undefined) friend.idleMinutes = Number(row.idle);
+    if (row.mutual !== undefined) friend.mutual = Number(row.mutual) || 0;
+    const gladiator = best.get(Number(row.user));
+    if (gladiator) {
+        friend.bestGladiator = gladiator.bestGladiator;
+        friend.bestRenown = gladiator.bestRenown;
+    }
     return friend;
+}
+
+/**
+ * The best gladiator of each master, by the ranking order.
+ *
+ * @param {number[]} userIds
+ * @returns {Promise<Map<number, { bestGladiator: string, bestRenown: number }>>}
+ */
+async function bestGladiators(userIds) {
+    if (!userIds.length) return new Map();
+    const rows = await Mysql.select(
+        `SELECT master, gladiator, renown FROM (
+            SELECT g.master, g.name AS gladiator, g.mmr AS renown,
+                ROW_NUMBER() OVER (PARTITION BY g.master ORDER BY g.mmr DESC, g.cod ASC) AS place
+            FROM gladiators g WHERE g.master IN (${userIds.map(() => '?').join(',')})
+        ) ranked WHERE place = 1`,
+        userIds,
+    );
+    return new Map(rows.map(row => [Number(row.master), {
+        bestGladiator: row.gladiator,
+        bestRenown: Number(row.renown) || 0,
+    }]));
 }
 
 /**
@@ -26,7 +65,8 @@ export class Friendship {
      */
     static async list(userId) {
         const pending = await Mysql.select(
-            `SELECT a.cod AS id, u.id AS user, u.apelido AS nick, u.lvl AS level, u.foto AS picture
+            `SELECT a.cod AS id, u.id AS user, u.apelido AS nick, u.lvl AS level, u.foto AS picture,
+                TIMESTAMPDIFF(MINUTE, u.ativo, NOW()) AS idle
             FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = ? AND a.pendente = 1`,
             [userId],
         );
@@ -35,7 +75,52 @@ export class Friendship {
             UNION SELECT ${FRIEND_COLUMNS}, TIMESTAMPDIFF(MINUTE, u.ativo, NOW()) AS idle FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = ? AND a.pendente = 0`,
             [userId, userId],
         );
-        return { pending: pending.map(friendJson), confirmed: confirmed.map(friendJson) };
+        const friends = await Friendship.friendIds(userId);
+        const best = await bestGladiators(confirmed.map(friend => Number(friend.user)));
+        for (const request of pending) {
+            request.mutual = await Friendship.#mutual(userId, Number(request.user), friends);
+        }
+        return {
+            pending: pending.map(request => friendJson(request)),
+            confirmed: confirmed.map(friend => friendJson(friend, best)),
+        };
+    }
+
+    /**
+     * The confirmed friend ids of one master.
+     *
+     * @param {number} userId
+     * @returns {Promise<Set<number>>}
+     */
+    static async friendIds(userId) {
+        const rows = await Mysql.select(
+            `SELECT usuario2 AS friend FROM amizade WHERE usuario1 = ? AND pendente = 0
+            UNION SELECT usuario1 AS friend FROM amizade WHERE usuario2 = ? AND pendente = 0`,
+            [userId, userId],
+        );
+        return new Set(rows.map(row => Number(row.friend)));
+    }
+
+    /**
+     * How many confirmed friends two masters share.
+     *
+     * @param {number} userId
+     * @param {number} otherId
+     * @param {Set<number>} [mine] The first master's friend ids, when already read.
+     * @returns {Promise<number>}
+     */
+    static async #mutual(userId, otherId, mine = null) {
+        const current = mine ?? await Friendship.friendIds(userId);
+        const ids = [...current];
+        if (!ids.length) return 0;
+        const [{ mutual }] = await Mysql.select(
+            `SELECT COUNT(*) AS mutual FROM (
+                SELECT usuario2 AS friend FROM amizade WHERE usuario1 = ? AND pendente = 0
+                UNION SELECT usuario1 AS friend FROM amizade WHERE usuario2 = ? AND pendente = 0
+            ) theirs WHERE theirs.friend IN (${ids.map(() => '?').join(',')})`,
+            [otherId, otherId, ...ids],
+        );
+        return Number(mutual) || 0;
     }
 
     /**
@@ -48,11 +133,12 @@ export class Friendship {
     static async filter(userId, text) {
         const like = Mysql.contains(text);
         const rows = await Mysql.select(
-            `SELECT ${FRIEND_COLUMNS} FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = ? AND a.pendente = 0 AND u.apelido LIKE ?
-            UNION SELECT ${FRIEND_COLUMNS} FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = ? AND a.pendente = 0 AND u.apelido LIKE ?`,
+            `SELECT ${FRIEND_COLUMNS}, TIMESTAMPDIFF(MINUTE, u.ativo, NOW()) AS idle FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario1 WHERE a.usuario2 = ? AND a.pendente = 0 AND u.apelido LIKE ?
+            UNION SELECT ${FRIEND_COLUMNS}, TIMESTAMPDIFF(MINUTE, u.ativo, NOW()) AS idle FROM amizade a INNER JOIN usuarios u ON u.id = a.usuario2 WHERE a.usuario1 = ? AND a.pendente = 0 AND u.apelido LIKE ?`,
             [userId, like, userId, like],
         );
-        return rows.map(friendJson);
+        const best = await bestGladiators(rows.map(friend => Number(friend.user)));
+        return rows.map(friend => friendJson(friend, best));
     }
 
     /**
@@ -63,8 +149,28 @@ export class Friendship {
      * @returns {Promise<Array<{ user: number, nick: string }>>}
      */
     static async search(userId, text) {
-        const rows = await Mysql.select('SELECT id, apelido FROM usuarios WHERE apelido LIKE ? AND id != ? LIMIT 10', [Mysql.contains(text), userId]);
-        return rows.map(row => ({ user: row.id, nick: row.apelido }));
+        const rows = await Mysql.select(
+            `SELECT u.id AS user, u.apelido AS nick, u.lvl AS level, u.foto AS picture,
+                CASE
+                    WHEN a.cod IS NULL THEN 'none'
+                    WHEN a.pendente = 0 THEN 'friends'
+                    WHEN a.usuario1 = ? THEN 'sent'
+                    ELSE 'incoming'
+                END AS state
+            FROM usuarios u
+            LEFT JOIN amizade a
+                ON (a.usuario1 = u.id AND a.usuario2 = ?) OR (a.usuario1 = ? AND a.usuario2 = u.id)
+            WHERE u.apelido LIKE ? AND u.id != ?
+            LIMIT 10`,
+            [userId, userId, userId, Mysql.contains(text), userId],
+        );
+        return rows.map(row => ({
+            user: Number(row.user),
+            nick: row.nick,
+            level: Number(row.level) || 0,
+            picture: row.picture,
+            state: row.state,
+        }));
     }
 
     /**
