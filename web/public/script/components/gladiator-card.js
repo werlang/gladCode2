@@ -65,8 +65,12 @@ export function gladiatorRecord(glad) {
     const battles = Number(glad?.battles) || 0;
     const wins = Number(glad?.wins) || 0;
     const losses = Number(glad?.losses) || 0;
-    if (wins + losses === 0) return battles > 0 ? 'SEM RESULTADOS CONHECIDOS' : 'SEM BATALHAS REGISTRADAS';
-    return `${wins} VITÓRIAS · ${losses} DERROTAS`;
+    const draws = Number(glad?.draws) || 0;
+    if (wins + losses + draws === 0) return battles > 0 ? 'SEM RESULTADOS CONHECIDOS' : 'SEM BATALHAS REGISTRADAS';
+    if (wins + losses === 0) return `${draws} ${draws === 1 ? 'EMPATE' : 'EMPATES'}`;
+    const base = `${wins} VITÓRIAS · ${losses} DERROTAS`;
+    if (draws === 0) return base;
+    return `${base} · ${draws} ${draws === 1 ? 'EMPATE' : 'EMPATES'}`;
 }
 
 /**

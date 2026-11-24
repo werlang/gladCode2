@@ -139,6 +139,9 @@
     --color-str: #ff5050;
     --color-agi: #e3e300;
     --color-int: #7c90ff;
+    --color-attr-str-text: var(--color-str);
+    --color-attr-agi-text: var(--color-agi);
+    --color-attr-int-text: var(--color-int);
     /* Painel game surfaces: the gladiator cards, their lit stage, seals and the beveled action
        (the same in every theme, like the 3D chrome). See docs/design/painel/Gladiadores.dc.html */
     --color-gladiator-frame-brass: #c7a66b;
@@ -552,6 +555,9 @@
     --color-gladiator-seal-broken-text: #8e1a17;
     --color-gladiator-alert-old: #6d4c39;
     --color-gladiator-alert-broken: #8e1a17;
+    --color-attr-str-text: #b3261e;
+    --color-attr-agi-text: #5c5c00;
+    --color-attr-int-text: #3b52b5;
     --color-action-bevel: #ffca28;
     --color-action-bevel-light: #ffe082;
     --color-action-bevel-dark: #c1922a;

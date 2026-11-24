@@ -81,7 +81,7 @@ From `api/route/gladiators.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/gladiators` | signed in | The signed-in master's gladiators, each with its battle record (total, wins and losses) and whether it is outdated or broken. |
+| `GET` | `/gladiators` | signed in | The signed-in master's gladiators, each with its battle record (total, wins, losses and draws) and whether it is outdated or broken. |
 | `GET` | `/gladiators/samples/:name` | anyone | A sample opponent with its full source (`War Maker`, `Archie`, ...). |
 | `GET` | `/gladiators/:id` | signed in | One of the master's gladiators, to edit. |
 | `POST` | `/gladiators` | signed in | Creates a gladiator: `{ name, vstr, vagi, vint, skin, code, blocks? }` where `code` is the user code without setup(). It must pass a test battle first. Answers 201 `{ gladiator }`. |

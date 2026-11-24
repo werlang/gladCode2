@@ -49,7 +49,8 @@ export class Gladiator extends Model {
             `SELECT g.*,
                 (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod) AS battles,
                 (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'win') AS wins,
-                (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'loss') AS losses
+                (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'loss') AS losses,
+                (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'draw') AS draws
             FROM gladiators g WHERE g.master = ? ORDER BY g.cod`,
             [masterId],
         );
@@ -151,6 +152,7 @@ export class Gladiator extends Model {
             battles: Number(this.battles || 0),
             wins: Number(this.wins || 0),
             losses: Number(this.losses || 0),
+            draws: Number(this.draws || 0),
         };
     }
 }
