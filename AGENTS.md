@@ -66,6 +66,7 @@ Schema changes are numbered SQL files in `migrations/` applied by `migrations/mi
 docker compose up -d
 MAILER_USER= docker compose up -d api      # never email real users while testing
 docker compose exec -T api node scripts/issue-session.js 277   # app_session cookie for localhost
+docker compose exec -T api node scripts/seed-dev-potions.js    # dev potion catalogue (refuses production)
 ```
 
 ### 2. Resetting or Backing Up Database

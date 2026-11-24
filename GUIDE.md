@@ -202,8 +202,10 @@ The generated endpoint reference is [docs/api/README.md](docs/api/README.md), bu
 - **Mail**: `helpers/email.js` `sendMail(template, …)` fills `templates/mail/mail_<name>.html` and sends
   through `MAILER_*` SMTP; without `MAILER_USER` it only logs `mail_skipped`.
 - **Scripts** (`api/scripts/`): `issue-session.js <userId>` (development sign-in cookie),
-  `battle.js <id> <id> [--keep]` (a battle between any saved gladiators, for triage), `dev-tournament.js`,
-  `remove-old-battles.js [--dry-run]` (cron) and `api-docs.js` (regenerates the reference).
+  `seed-dev-potions.js` (adds the engine potion catalogue to a development database; refuses
+  `NODE_ENV=production`), `battle.js <id> <id> [--keep]` (a battle between any saved gladiators, for
+  triage), `dev-tournament.js`, `remove-old-battles.js [--dry-run]` (cron) and `api-docs.js` (regenerates
+  the reference).
 - **Tests**: Vitest and supertest in `api/tests/unit/`; models are tested with a mocked `Mysql`.
 
 ## Web service
