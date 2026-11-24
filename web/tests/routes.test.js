@@ -37,7 +37,7 @@ test('unknown addresses are not found, whatever their form', async () => {
 });
 
 test('Painel addresses keep an active section route, whatever their form', async () => {
-    for (const path of ['/news/', '/battle.unknown', '/reports?tab=duels', '/ranking?q=Magnus']) {
+    for (const path of ['/news/', '/battle.unknown', '/reports?tab=duels', '/ranking?q=Magnus', '/messages/7']) {
         assert.equal((await get(path)).status, 200, path);
     }
 });
@@ -125,6 +125,16 @@ test('the component gallery answers outside production', async () => {
     assert.match(html, /Componentes do Painel/);
     assert.match(html, /css\/components\/badge\.css/);
     assert.match(html, /script\/dev-components\.js/);
+});
+
+test('Mensagens and Amigos carry their component roots and stylesheets', async () => {
+    const html = await (await get('/messages/7')).text();
+    assert.match(html, /id='messages-container'/);
+    assert.match(html, /id='friends-container'/);
+    assert.match(html, /css\/profile-messages\.css/);
+    assert.match(html, /css\/profile-friends\.css/);
+    assert.match(html, /css\/components\/conversation-list\.css/);
+    assert.match(html, /css\/components\/friend-row\.css/);
 });
 
 test('the profile page loads the toast action stylesheet it can use for logout retry', async () => {

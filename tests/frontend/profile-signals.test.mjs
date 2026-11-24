@@ -63,6 +63,20 @@ function fakeNode(children = {}) {
     return element;
 }
 
+
+/** The Amigos section's nodes for the section signal tests. */
+function friendsRoot() {
+    const children = {};
+    for (const selector of [
+        '#friends-header', '#friends-invites', '#friends-list', '#friends-count',
+        '#friends-online', '#friends-empty', '#friends-search-field', '#friends-search-results',
+        '#friends-search-empty',
+    ]) {
+        children[selector] = fakeNode();
+    }
+    return fakeNode(children);
+}
+
 /** Installs just enough document for the controllers to construct and render. */
 function installDocument(map) {
     globalThis.getComputedStyle = () => ({ display: 'block' });
@@ -107,7 +121,7 @@ const { BattleTab } = await import('../../web/public/script/profile/battle.js');
 const { ChallengeList } = await import('../../web/public/script/profile/duels.js');
 const { RankedBattle } = await import('../../web/public/script/profile/ranked.js');
 const { NewsModel } = await import('../../web/public/script/models/news.js');
-const { DuelModel, FriendModel, MessageModel, ReportModel } = await import('../../web/public/script/models/social.js');
+const { ConversationModel, DuelModel, FriendModel, ReportModel } = await import('../../web/public/script/models/social.js');
 const { GladiatorModel } = await import('../../web/public/script/models/gladiator.js');
 const { PotionModel } = await import('../../web/public/script/models/potion.js');
 const { RankModel } = await import('../../web/public/script/models/rank.js');
@@ -155,28 +169,15 @@ test('news drops a response that arrives after the section was left', async () =
 });
 
 test('friends ignores a reopened request that resolves out of order', async () => {
-    const options = fakeNode();
-    const requests = fakeNode();
-    const friends = fakeNode();
-    const requestTable = fakeNode();
-    const friendTable = fakeNode();
-    const searchInput = fakeNode();
-    const searchTable = fakeNode();
-    const panel = fakeNode({
-        '#friends .options': options,
-        '#request': requests,
-        '#friends': friends,
-        '#request .table': requestTable,
-        '#friends .table': friendTable,
-        '#search .input': searchInput,
-        '#search .table': searchTable,
-    });
-    installDocument(new Map([['#friend-panel', panel]]));
+    const root = friendsRoot();
+    installDocument(new Map([['#friends-container', root]]));
     const original = FriendModel.list;
     const first = deferred();
     const second = deferred();
     const calls = [first, second];
     FriendModel.list = () => calls.shift().promise;
+    const pending = { id: 3, user: 9, nick: 'Bo', level: 4, picture: '', online: true, mutual: 1 };
+    const friend = { id: 4, user: 10, nick: 'Cy', level: 6, picture: '', online: false, bestGladiator: 'Magnus', bestRenown: 900 };
     try {
         const tab = new FriendsTab();
         const firstController = new AbortController();
@@ -185,15 +186,16 @@ test('friends ignores a reopened request that resolves out of order', async () =
 
         const secondController = new AbortController();
         const secondShown = tab.show({}, { signal: secondController.signal });
-        first.resolve({ pending: [], confirmed: [] });
+        first.resolve({ pending: [pending], confirmed: [friend] });
         await firstShown;
-        assert.equal(requestTable.replaced, 0);
-        assert.equal(friendTable.replaced, 0);
+        assert.equal(root.querySelector('#friends-invites').replaced, 0);
+        assert.equal(root.querySelector('#friends-list').replaced, 0);
 
-        second.resolve({ pending: [], confirmed: [] });
+        second.resolve({ pending: [pending], confirmed: [friend] });
         await secondShown;
-        assert.equal(requestTable.replaced, 1);
-        assert.equal(friendTable.replaced, 1);
+        assert.equal(root.querySelector('#friends-invites').replaced, 1);
+        assert.equal(root.querySelector('#friends-list').replaced, 1);
+        assert.equal(root.querySelector('#friends-list').appendedNodes.length, 1);
     }
     finally {
         FriendModel.list = original;
@@ -257,31 +259,37 @@ test('gladiator cards are destroyed before a rerender and on unmount', async () 
     }
 });
 
-test('messages drop a late page and keep the previous table', async () => {
-    const table = fakeNode();
-    const pageTitle = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#page-title': pageTitle,
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
+test('messages ignore a conversation list that arrives after leaving', async () => {
+    const listPane = fakeNode();
+    const threadPane = fakeNode();
+    const root = fakeNode({
+        '#messages-header': fakeNode(),
+        '#messages-shell': fakeNode(),
+        '#messages-list-pane': listPane,
+        '#messages-thread-pane': threadPane,
     });
-    table.innerHTML = 'previous';
-    installDocument(new Map([['#message-panel', panel]]));
-    const original = MessageModel.list;
+    installDocument(new Map([['#messages-container', root]]));
+    const original = ConversationModel.list;
     const pending = deferred();
-    MessageModel.list = () => pending.promise;
+    ConversationModel.list = () => pending.promise;
     try {
         const tab = new MessagesTab();
+        tab.init();
+        const rows = listPane.appendedNodes[0].querySelector('.conversation-rows');
+        rows.replaced = 0;
         const controller = new AbortController();
         const shown = tab.show({}, { signal: controller.signal });
         controller.abort();
-        pending.resolve({ meta: { total: 0, start: 0, end: 0, page: 1 }, messages: [] });
+        pending.resolve({ conversations: [{ user: { id: 9, nick: 'Late' }, last: null, unread: 0 }] });
         await shown;
-        assert.equal(table.innerHTML, 'previous');
+        assert.equal(rows.replaced, 0);
+
+        ConversationModel.list = async () => ({ conversations: [] });
+        await tab.show({}, { signal: new AbortController().signal });
+        assert.equal(rows.replaced, 1);
     }
     finally {
-        MessageModel.list = original;
+        ConversationModel.list = original;
     }
 });
 
@@ -459,23 +467,8 @@ test('settings makes no changes when its navigation signal was already aborted',
 });
 
 test('a failed friend search clears only its side panel', async () => {
-    const options = fakeNode({ '.unfriend': fakeNode(), '.message': fakeNode(), '.duel': fakeNode() });
-    const requests = fakeNode();
-    const friendBox = fakeNode();
-    const requestTable = fakeNode();
-    const friendTable = fakeNode();
-    const searchInput = fakeNode();
-    const searchTable = fakeNode();
-    const panel = fakeNode({
-        '#friends .options': options,
-        '#request': requests,
-        '#friends': friendBox,
-        '#request .table': requestTable,
-        '#friends .table': friendTable,
-        '#search .input': searchInput,
-        '#search .table': searchTable,
-    });
-    installDocument(new Map([['#friend-panel', panel]]));
+    const root = friendsRoot();
+    installDocument(new Map([['#friends-container', root]]));
     const original = { list: FriendModel.list, search: FriendModel.search };
     FriendModel.list = async () => ({ pending: [], confirmed: [] });
     FriendModel.search = async () => {
@@ -486,11 +479,17 @@ test('a failed friend search clears only its side panel', async () => {
         tab.init();
         const controller = new AbortController();
         await tab.show({}, { signal: controller.signal });
+
+        const searchField = root.querySelector('#friends-search-field').appendedNodes[0];
+        const searchInput = searchField.querySelector('.search-field-input');
         searchInput.value = 'any';
-        await searchInput.fire('input');
-        assert.equal(searchTable.replaced, 1);
-        assert.equal(requestTable.replaced, 1);
-        assert.equal(friendTable.replaced, 1);
+        searchInput.dispatchEvent(new Event('input'));
+        await new Promise(resolve => setTimeout(resolve, 350));
+
+        assert.equal(root.querySelector('#friends-search-results').replaced, 2);
+        assert.equal(root.querySelector('#friends-invites').replaced, 1);
+        assert.equal(root.querySelector('#friends-list').replaced, 1);
+        assert.equal(root.querySelector('#friends-search-empty').hidden, false);
     }
     finally {
         FriendModel.list = original.list;

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 const { NotificationService, normalizeCounts } = await import('../../web/public/script/services/notifications.js');
+const { APP_EVENTS } = await import('../../web/public/script/helpers/event-bus.js');
 
 const COUNTS = {
     version: '2.10.0',
@@ -174,4 +175,34 @@ test('feed() composes the panel rows from needs, reports and unread news', async
         DuelModel.unreadReports = original.duelsDone;
         NewsModel.list = original.news;
     }
+});
+
+test('a read conversation or an answered invite refreshes the counters, and stop unsubscribes', async () => {
+    const bus = fakeBus();
+    const listeners = new Map();
+    let unsubscribed = 0;
+    bus.on = (name, listener) => {
+        listeners.set(name, [...(listeners.get(name) ?? []), listener]);
+        return () => { unsubscribed += 1; };
+    };
+    let calls = 0;
+    const service = new NotificationService({
+        counts: async () => { calls += 1; return COUNTS; },
+        slots: async () => ({ serverNow: '2026-01-01 10:00:00', slots: [] }),
+        bus,
+    });
+    const documentRef = { hidden: false, addEventListener: () => {}, removeEventListener: () => {} };
+    service.start({ document: documentRef });
+    await flush();
+    assert.equal(calls, 1);
+    assert.deepEqual([...listeners.keys()], [APP_EVENTS.messagesRead, APP_EVENTS.friendsAnswered]);
+
+    for (const listener of listeners.get(APP_EVENTS.messagesRead)) listener({ userId: 7, read: 1, unreadTotal: 0 });
+    await flush();
+    assert.equal(calls, 2);
+    for (const listener of listeners.get(APP_EVENTS.friendsAnswered)) listener({ id: 3, accepted: true });
+    await flush();
+    assert.equal(calls, 3);
+    service.stop();
+    assert.equal(unsubscribed, 2);
 });
