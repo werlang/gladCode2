@@ -14,7 +14,11 @@ while [ -f code$i.* ]; do
 
 	# run JavaScript file (gladCodeCore.js runs the gladiator's setup and loop)
 	if [ -f code$i.js ]; then
-		(node --no-warnings gladCodeCore.js code$i.js 2>> errorc.txt) &
+		# Report syntax errors before the engine starts; a background process may not have
+		# written stderr yet when the engine checks the shared error file.
+		if node --check code$i.js 2>> errorc.txt; then
+			(node --no-warnings gladCodeCore.js code$i.js 2>> errorc.txt) &
+		fi
 	fi
 	i=$((i + 1))
 done
