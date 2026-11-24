@@ -9,7 +9,7 @@ See [README.md](README.md) for the local Docker stack and [AGENTS.md](AGENTS.md)
 Before merging, run the checks for what you touched:
 
 ```bash
-# lint (web/ and api/) and frontend unit tests (tests/frontend, tests/render2)
+# lint (web/, api/, Payload/ and JavaScript gladiators) and frontend unit tests (tests/frontend, tests/render2)
 docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"
 
 # API unit tests

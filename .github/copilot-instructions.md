@@ -19,7 +19,7 @@ This guide provides instructions and architectural context for GitHub Copilot an
 
 ## 🏛️ Architecture Overview
 
-gladCode is a web-based programming game where users code AI gladiators in C or Python that battle autonomously in an arena. Docker Compose runs:
+gladCode is a web-based programming game where users code AI gladiators in C, Python or JavaScript that battle autonomously in an arena. Docker Compose runs:
 
 - **Web (`web/`)**: Express + Mustache page shells and the static frontend (`web/public/`). It never sees the session.
 - **API (`api/`)**: Express REST API (routes in `route/`, models in `model/`, MySQL through `helpers/mysql.js`), documented in [docs/api/README.md](../docs/api/README.md). The browser calls it directly with the `app_session` cookie.
@@ -66,16 +66,16 @@ dev-tools/tournament.sh help
 
 ## ⚔️ How Battles Work (Critical Flow)
 
-1. User writes C or Python code in the editor (`/editor`) using visual blocks (Blockly) or text (ACE editor).
+1. User writes C, Python or JavaScript code in the editor (`/editor`) using visual blocks (Blockly) or text (ACE editor).
 2. Saving a gladiator (`POST`/`PUT /gladiators`) checks the code against `api/banned_functions.json` and runs a test battle; the code is stored as written with its attributes (STR/AGI/INT) and skin.
 3. A battle (`api/model/battle.js` `Battle`, used by editor tests, ranked battles, duels, tournaments and trainings):
-   - Creates a run folder in `data/runs/<dir>/` with the `Payload/` files and the gladiators' code (`code0.c`, `code1.py`, ...).
+   - Creates a run folder in `data/runs/<dir>/` with the `Payload/` files and the gladiators' code (`code0.c`, `code1.py`, `code2.js`, ...).
    - Sends an HTTP POST to the runner at `http://runner:3000/<dir>` (`sandbox` for editor tests only, `noitems` for tournaments).
 4. The runner (`runner/app.js` & `runner.js`) executes a Docker container:
    - Spawns `gladcode2-vm` running `socket_compile.sh`.
-   - Compiles user C files (`gcc -o code0 code0.c -lm`) or runs Python files (`python3 code0.py`).
+   - Compiles user C files (`gcc -o code0 code0.c -lm`), runs Python files (`python3 code0.py`) or JavaScript files (`node gladCodeCore.js code0.js`, Node 22 in the image).
    - Launches `gladCodeServerMain`, creating TCP sockets for each gladiator thread.
-   - User gladiators communicate with the game engine via `gladCodeAPI.c` / `gladCodeAPI.py`.
+   - User gladiators communicate with the game engine via `gladCodeAPI.c` / `gladCodeAPI.py` / `gladCodeAPI.js`.
 5. The simulation produces a `simlog` JSON trace; the API stores it in `data/logs/<id>` and applies the battle's rules (`api/helpers/battle-results.js`).
 6. `web/public/script/playback.js` expands the log into frames and replays it with the renderer the user picked: classic 2D Phaser.js (`script/render.js`) or the Three.js coliseum (`script/render2/`).
 
@@ -112,7 +112,7 @@ const rows = await Mysql.select('SELECT cod, name FROM gladiators WHERE master =
 
 ### Security & Banned Functions
 User code is checked against `api/banned_functions.json`:
-- Blocked C/Python functions: `setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel` (they only work in editor test battles, which run in the engine's sandbox).
+- Blocked C/Python/JavaScript functions: `setPosition`, `setHp`, `setAp`, `lvlUp`, `mudaPosicao`, `mudaPv`, `mudaPh`, `sobeNivel` (they only work in editor test battles, which run in the engine's sandbox).
 - Docker containers run with CPU quota (`--cpu-quota=50000`) and a 30-second hard wall-clock timeout.
 
 ---
@@ -129,7 +129,7 @@ If a battle fails or returns no log:
 
 ## 📁 Key Files Reference
 
-- **`Payload/gladCodeAPI.c` / `.py`**: Gladiator client API functions (movement, attack, spells).
+- **`Payload/gladCodeAPI.c` / `.py` / `.js`**: Gladiator client API functions (movement, attack, spells); `Payload/gladCodeCore.js` runs JavaScript gladiators with synchronous calls.
 - **`Payload/gladCodeServerMain.c`**: Multi-threaded C socket server for battles.
 - **`Payload/socket_compile.sh`**: Compilation script inside `gladcode2-vm`.
 - **`api/model/battle.js`**: Battle orchestrator; **`api/helpers/battle-results.js`**: rewards and placings.

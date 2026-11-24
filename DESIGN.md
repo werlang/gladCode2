@@ -5,7 +5,7 @@ themes and the ownership rules behind this direction.
 
 ## Subject
 
-gladCode is a programming game. Masters write a gladiator's behaviour in C, Python or blocks,
+gladCode is a programming game. Masters write a gladiator's behaviour in C, Python, JavaScript or blocks,
 test it in the editor, then send it to ranked battles, duels, tournaments and classroom
 trainings; every battle is replayed in a 2D arena or the 3D coliseum. The pages serve two
 moments: building (the editor, the docs, the profile) and watching (replays, rankings, rounds).

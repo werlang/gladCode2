@@ -1,6 +1,6 @@
 # gladCode 2
 
-gladCode is a web-based programming game and arena where players code AI gladiators in C or Python to battle autonomously. The platform features selectable Phaser.js 2D and Three.js top-down 3D battle replays, visual block-based programming (Blockly), raw C/Python editing (ACE Editor), ranked battles, duels, tournaments and classroom trainings.
+gladCode is a web-based programming game and arena where players code AI gladiators in C, Python, JavaScript or blocks to battle autonomously. The platform features selectable Phaser.js 2D and Three.js top-down 3D battle replays, visual block-based programming (Blockly), raw C/Python/JavaScript editing (ACE Editor), ranked battles, duels, tournaments and classroom trainings.
 
 ---
 
@@ -16,7 +16,7 @@ flowchart TD
     API -->|writes data/runs/dir, POST /:dirname| Runner[runner: Express\nrunner/]
     Runner -->|Spawn Container| VM[gladcode2-vm Container]
     VM -->|Compile & Run| Engine[C Simulation Engine\nPayload/gladCodeServerMain]
-    Engine -->|Socket IPC| GladiatorCodes[User Gladiator Codes\ncode0.c, code1.py...]
+    Engine -->|Socket IPC| GladiatorCodes[User Gladiator Codes\ncode0.c, code1.py, code2.js...]
     Engine -->|Generates| SimLog[simlog JSON → data/logs]
     SimLog -->|Expand incremental frames| Playback[Shared Playback State\nscript/playback.js]
     Playback -->|Classic 2D| Phaser[Phaser.js Renderer\nscript/render.js]
@@ -44,7 +44,7 @@ flowchart TD
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/) (or Docker Engine + Docker Compose plugin)
-- The `gladcode2-vm` engine image: `docker build -t gladcode2-vm Setup`
+- The `gladcode2-vm` engine image: `docker build -t gladcode2-vm Setup` (gcc, Python 3 and Node 22 for the gladiators; rebuild it after `Setup/Dockerfile` changes, the deploy does)
 - The licensed Synty packs in `web/public/assets/synty/` for the 3D renderer (optional: the 2D replay works without them)
 
 ### 1. Environment
@@ -100,7 +100,7 @@ See [dev-tools/README.md](dev-tools/README.md).
 ### Lint & Tests
 
 ```bash
-docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"   # lint (web + api), frontend tests
+docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"   # lint (web, api, Payload, gladiators), frontend tests
 docker compose exec -T api npx vitest run                                                  # API tests
 bash tests/engine/run.sh                                                                   # engine regression battles
 ```
@@ -111,11 +111,11 @@ Coding rules are in [AGENTS.md](AGENTS.md). Branches, commit messages and how wo
 
 ## ⚔️ How Gladiator Battles Work
 
-1. **Code Creation**: Users write C or Python gladiator algorithms in the editor (`/editor`) using either visual blocks or text editing.
+1. **Code Creation**: Users write C, Python or JavaScript gladiator algorithms in the editor (`/editor`) using either visual blocks or text editing.
 2. **Security Verification**: When a gladiator is saved, its code is checked against `api/banned_functions.json`, and the API runs a test battle to prove it compiles and runs.
-3. **Execution Request**: The API's `model/battle.js` prepares a run folder in `data/runs/<dir>` with the `Payload/` files and each gladiator's code (`code0.c`, `code1.py`, ...), then sends an HTTP POST to `http://runner:3000/<dir>`.
+3. **Execution Request**: The API's `model/battle.js` prepares a run folder in `data/runs/<dir>` with the `Payload/` files and each gladiator's code (`code0.c`, `code1.py`, `code2.js`, ...), then sends an HTTP POST to `http://runner:3000/<dir>`.
 4. **Container Isolation**: The runner spawns a `gladcode2-vm` container with restricted CPU (`--cpu-quota=50000`) and a 30-second execution deadline.
-5. **Simulation Execution**: `socket_compile.sh` compiles gladiator code, launches `gladCodeServerMain`, and manages socket IPC between gladiators and the C game engine.
+5. **Simulation Execution**: `socket_compile.sh` compiles C gladiators (gcc), runs Python (python3) and JavaScript (Node 22, through `gladCodeCore.js`) gladiators, launches `gladCodeServerMain`, and manages socket IPC between gladiators and the C game engine.
 6. **Results**: The API stores the simlog in `data/logs/<id>` and applies the battle's rules (renown and silver for ranked battles, deaths and placings for tournaments, scores for trainings).
 7. **Log Replay**: `script/playback.js` expands the incremental trace into complete frames, then the saved battle setting selects either the classic Phaser renderer (`script/render.js`) or the top-down Three.js renderer (`script/render2.js`). The 3D renderer dresses each gladiator in Synty modular models mapped and recoloured from its persisted skin, walking with a distance-driven gait and playing Synty animation clips for melee, ranged, spell, block and charge actions timed on the replay clock (pausing freezes them; replay speed scales them). Both renderers use the same 100 ms simulation cadence and authoritative arena coordinates.
 
@@ -133,7 +133,7 @@ gladcode2/
 ├── web/                     # Web service: app.js, view/ (Mustache), public/ (static files)
 │   └── public/script/       # ES module pages, components, models, templates; Phaser and Three.js renderers
 ├── runner/                  # Express service that starts each battle through the host Docker (Docker CLI)
-├── Payload/                 # C battle simulation engine & socket API source
+├── Payload/                 # C simulation engine, C/Python/JavaScript socket clients and VM launch script
 ├── migrations/              # Numbered SQL migrations and their runner
 ├── dev-tools/               # Tournament CLI, database dump/restore, release news SQL
 ├── docs/                    # API reference (generated) and the Synty asset catalogue
@@ -156,7 +156,7 @@ gladcode2/
 
 ## 🛡️ Security & Constraints
 
-- User code runs in unprivileged Docker containers (`gladcode2-vm`).
+- User code runs in isolated Docker containers (`gladcode2-vm`) without `--privileged` or the Docker socket.
 - CPU execution capped at 50% single core per battle.
 - 30-second hard wall-clock timeout enforced by `runner/runner.js`.
 - Forbidden functions (`setPosition`, `setHp`, `setAp`, `lvlUp`, etc.) are refused when gladiators are saved and only work in editor test battles.
