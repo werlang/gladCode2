@@ -147,8 +147,10 @@ From `api/route/ranking.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/ranking?offset=0&search=` | anyone | A page of the gladiator ranking: `{ total, ranking: [{ gladiator, mmr, master, change24h, position }] }`. |
-| `GET` | `/ranking/me` | signed in | Where the signed-in master's best gladiator is: `{ offset }` (gladiators above it). |
+| `GET` | `/ranking?offset=0&search=&scope=all` | anyone (session optional) | A page of the current-version gladiator ranking: `{ total, ranking: [{ id, gladiator, mmr, master, change24h, change7d, position }] }` (the table shows the 7-day change; `change24h` stays for older clients). `scope=friends` keeps only the signed-in master's friends (positions stay global). With `position=N` the route answers the same window payload as `/ranking/window?position=N`. |
+| `GET` | `/ranking/window?gladiatorId=42&size=9 (or ?position=128&size=9)` | anyone | A window of the current-version ranking centred on a gladiator or a 1-based position; exactly one is required. Answers `{ total, position, page, pageSize, around, rows }`. |
+| `GET` | `/ranking/mine` | signed in | The signed-in master's gladiators with their position or unranked reason: `{ gladiators: [{ id, name, mmr, position, state, skin }] }`. |
+| `GET` | `/ranking/me` | signed in | Where the signed-in master's best current gladiator is: `{ offset }` (gladiators above it). |
 | `GET` | `/ranking/tabs` | signed in | The signed-in master's hashtag tabs: `{ tags }`. |
 | `PUT` | `/ranking/tabs/:tag` | signed in | Follows (`{ watch: true }`) or closes (`{ watch: false }`) a hashtag tab. Tutor accounts only. |
 | `GET` | `/ranking/tabs/:tag?search=` | anyone | The masters' ranking of a hashtag: `{ ranking: [{ id, nick, score, time, position }] }`. |

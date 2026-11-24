@@ -335,7 +335,7 @@ reloads, and clears the opponent when the choice changes. A locked card (outdate
 ### 4. Ranking jump to own gladiator
 
 The Ranking **section** owns the request: `OwnGladiatorJump` and `Pagination` only emit events, and
-`RankingTable` only receives data through its setters. The section asks `RankingService` (planned WP7),
+`RankingTable` only receives data through its setters. The section asks `RankingService`,
 which asks `RankModel` (the model is the only API caller).
 
 ```mermaid
@@ -380,13 +380,16 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
   "page": 13,
   "pageSize": 10,
   "around": "Magnus",
-  "rows": [{ "gladiator": "Magnus", "mmr": 1482, "master": "Spartacus_C", "change24h": 9, "position": 128 }]
+  "rows": [{ "id": 42, "gladiator": "Magnus", "mmr": 1482, "master": "Spartacus_C", "change24h": 9, "change7d": 14, "position": 128 }]
 }
 ```
 
-- **Order and tie-break:** `ORDER BY g.mmr DESC, g.cod ASC`. A gladiator's position is 1-based by that same
-  order: `1 + COUNT(*) WHERE mmr > target.mmr OR (mmr = target.mmr AND cod < target.cod)`. This makes the
-  positions stable when renown ties and matches what the general ranking must use in WP7.
+- **Version and order:** every query filters `gladiators.version = api/version`; an outdated or broken
+  gladiator has no position and is shown by the own strip's reason instead. Order and tie-break are
+  `ORDER BY g.mmr DESC, g.cod ASC`; a position is 1-based by that same order
+  (`1 + COUNT(*) WHERE mmr > target.mmr OR (mmr = target.mmr AND cod < target.cod)`). The general list
+  uses the same `ROW_NUMBER()` expression, so a window row and the paged row at the same position are the
+  same row. The 7-day delta comes from one grouped `reports`/`logs` derived table, not a per-row subquery.
 - **Window bounds:** `start = max(1, min(position - floor(size / 2), total - size + 1))`; the window is
   `rows[start - 1 .. start - 1 + size - 1]`, shorter only when `total < size`. At the top it starts at 1;
   at the bottom it ends at `total`. A requested position beyond `total` clamps to the last row; with
@@ -395,8 +398,12 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
   `RANKING_PAGE_SIZE`); `pages = Math.ceil(total / pageSize)`. The board's decorative “página 9 de 164” is
   replaced by these computed values. The general `GET /ranking?offset=` keeps 10 rows per page; the around
   window is a view, not a second pagination model.
+- **General and friends:** `GET /ranking?offset=0&search=&scope=all` returns the same paged shape; the
+  `friends` scope keeps only confirmed friends' gladiators while the position stays global. `position=N`
+  on this route is an alias of `/ranking/window?position=N`.
 - **“Seus gladiadores”:** `GET /ranking/mine` (signed in) returns
-  `{ gladiators: [{ id, name, mmr, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken' }] }`.
+  `{ gladiators: [{ id, name, mmr, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken',
+  skin }] }`; `skin` lets the strip paint the same portrait as the cards.
   `position` is present only for `state: 'ranked'`; the strip shows the state text for the others. The
   state precedence is `broken` (`version = 'broken'`), then `outdated` (`version` ≠ `api/version`), then
   `ranked` (has a position), then `unranked`. `OwnGladiatorJump#setGladiators(list)` receives exactly this
@@ -409,7 +416,8 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
   clamped by the server and the event carries the clamped `window.position`. A cold load of
   `/ranking?at=128` mounts the section, which calls the same window and reveals the row once the data
   arrives. The table keeps the “Você” tag and the own row's contrast in every theme; `reveal(position)`
-  only scrolls and flashes, it never fetches.
+  only scrolls and flashes, it never fetches. Typing a search leaves the window mode and asks the general
+  page at offset 0; clearing it returns to the general top.
 
 ### 5. Conversation read → Mensagens badge
 

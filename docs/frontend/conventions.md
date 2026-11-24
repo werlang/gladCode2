@@ -45,7 +45,7 @@ The services the Painel flows name (WP2–WP8; each is a module under `services/
 | `NotificationService` | The joined counts and the 30 s poll (the panel's feed lands in WP3) | `start()`, `stop()`, `refresh()`, `feed({ signal })` (WP3) |
 | `NewsService` | The news list and the explicit read marker | `list({ offset, signal })`, `markAllRead()` |
 | `PotionsService` | The apothecary, the slots and the orders | `load({ signal })`, `order(identifier)`, `reconcile()`, `cancel(slotId)` |
-| `RankingService` | The general page, the centred window, the own strip and the tabs | `page({ offset, search, signal })`, `window({ gladiatorId, position, size })`, `mine({ signal })` |
+| `RankingService` | The general/friends page, the centred window, the own strip and the tabs | `page({ offset, search, scope, signal })`, `window({ gladiatorId, position, size, signal })`, `mine({ signal })`, `tabs()`, `hashtag()`, `watch(name, watch)` |
 | `MessagesService` | Conversations, the thread and the read receipts | `list({ signal })`, `open(userId)`, `markRead(userId)`, `send(userId, text)`, `reply(messageId, text)` |
 | `FriendsService` | Friends, pending requests and the master search | `load({ signal })`, `answer(id, accepted)`, `request(userId)`, `search(nick, { signal })` |
 
