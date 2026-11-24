@@ -68,18 +68,19 @@ describe('Gladiator', () => {
     });
 
     test('serialises its code raw, results and the current version state', () => {
-        const json = new Gladiator({ cod: 4, name: 'Zed', code: 'a < b', blocks: '<xml/>', version: '1.0', mmr: 1000, wins: 8, losses: 3 }).toJSON('Bo');
-        expect(json).toMatchObject({ id: 4, code: 'a < b', blocks: '<xml/>', master: 'Bo', outdated: true, broken: false, wins: 8, losses: 3 });
+        const json = new Gladiator({ cod: 4, name: 'Zed', code: 'a < b', blocks: '<xml/>', version: '1.0', mmr: 1000, battles: 11, wins: 8, losses: 3 }).toJSON('Bo');
+        expect(json).toMatchObject({ id: 4, code: 'a < b', blocks: '<xml/>', master: 'Bo', outdated: true, broken: false, battles: 11, wins: 8, losses: 3 });
         expect(new Gladiator({ version: VERSION }).toJSON().outdated).toBe(false);
         expect(new Gladiator({ version: 'broken' }).toJSON().broken).toBe(true);
     });
 
     test('the roster read brings each gladiator win and loss record', async () => {
-        Mysql.select.mockResolvedValue([{ cod: 4, name: 'Zed', version: VERSION, wins: 8, losses: 3 }]);
+        Mysql.select.mockResolvedValue([{ cod: 4, name: 'Zed', version: VERSION, battles: 11, wins: 8, losses: 3 }]);
         const [glad] = await Gladiator.listByMaster(7);
         expect(Mysql.select.mock.calls[0][1]).toEqual([7]);
+        expect(Mysql.select.mock.calls[0][0]).toContain('AS battles');
         expect(Mysql.select.mock.calls[0][0]).toContain("r.result = 'win'");
         expect(Mysql.select.mock.calls[0][0]).toContain("r.result = 'loss'");
-        expect(glad.toJSON()).toMatchObject({ wins: 8, losses: 3 });
+        expect(glad.toJSON()).toMatchObject({ battles: 11, wins: 8, losses: 3 });
     });
 });
