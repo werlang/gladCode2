@@ -161,9 +161,15 @@ export class Pagination extends BaseComponent {
         target?.focus();
     }
 
-    /** @param {number} position */
-    #jump(position) {
-        if (position !== null) this.emit('jump', { position });
+    /** @param {string} text The raw position typed in the form. */
+    #jump(text) {
+        const value = Number.parseInt(String(text).trim(), 10);
+        const position = parsePosition(text, this.#total);
+        if (position === null || !Number.isFinite(value) || value < 1 || value > this.#total) {
+            this.emit('invalid', { value: String(text) });
+            return;
+        }
+        this.emit('jump', { position });
     }
 
     #render() {
@@ -259,7 +265,7 @@ export class Pagination extends BaseComponent {
 
         form.addEventListener('submit', event => {
             event.preventDefault();
-            this.#jump(parsePosition(input.value, this.#total));
+            this.#jump(input.value);
         });
         form.append(label, input, submit);
         return form;

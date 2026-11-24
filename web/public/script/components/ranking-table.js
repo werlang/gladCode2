@@ -39,6 +39,7 @@ export class RankingTable extends BaseComponent {
         })));
         this.element.querySelector('.ranking-top').addEventListener('click', () => {
             globalThis.scrollTo?.({ top: 0, behavior: 'smooth' });
+            this.emit('top', {});
         });
     }
 

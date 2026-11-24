@@ -40,11 +40,11 @@ function number(value) {
  * @returns {string}
  */
 function subtitle(total) {
-    return `${number(total)} ${total === 1 ? 'gladiador' : 'gladiadores'} por renome, na versão atual do motor.`;
+    return `${number(total)} ${total === 1 ? 'gladiador' : 'gladiadores'} por renome.`;
 }
 
 /**
- * The RANKING section: the current-version table, the own-gladiator strip, the centred window,
+ * The RANKING section: the all-version table, the own-gladiator strip, the centred window,
  * the general/friends tabs, custom hashtag lists and the position jump.
  */
 export class RankingTab {
@@ -71,6 +71,7 @@ export class RankingTab {
     #top = [];
     #total = 0;
     #customOffset = 0;
+    #offset = 0;
     #request = 0;
     #signal = null;
 
@@ -114,6 +115,7 @@ export class RankingTab {
         this.#add.addEventListener('click', () => this.#run(() => this.#addTab()));
 
         this.#table = new RankingTable();
+        this.#table.listen('top', () => this.#run(() => this.#goTop()));
         this.#root.querySelector('#ranking-table-host').append(this.#table.element);
         this.#customHost = this.#root.querySelector('#ranking-custom-host');
         this.#status = this.#root.querySelector('#ranking-status');
@@ -122,6 +124,11 @@ export class RankingTab {
         this.#root.querySelector('#ranking-pager').append(this.#pager.element);
         this.#pager.listen('change', ({ page }) => this.#run(() => this.#goPage(page)));
         this.#pager.listen('jump', ({ position }) => this.#run(() => this.#goPosition(position)));
+        this.#pager.listen('invalid', () => {
+            createToast(this.#total > 0
+                ? `Posição fora do ranking. Escolha de 1 a ${number(this.#total)}.`
+                : 'O ranking está vazio.', 'error');
+        });
 
         this.#renderTabs();
         this.#built = true;
@@ -273,10 +280,11 @@ export class RankingTab {
      * Loads a page of the gladiator ranking.
      *
      * @param {{ offset?: number, scope?: 'all'|'friends', search?: string, signal?: AbortSignal,
-     *   strict?: boolean }} options
+     *   strict?: boolean, token?: number }} options
      */
-    async #loadPage({ offset = 0, scope = 'all', search = this.#searchTerm, signal = this.#signal, strict = false } = {}) {
-        const token = ++this.#request;
+    async #loadPage({ offset = 0, scope = 'all', search = this.#searchTerm, signal = this.#signal, strict = false, token = null } = {}) {
+        const request = token ?? ++this.#request;
+        this.#request = request;
         this.#status.textContent = 'Carregando...';
         this.#table.setBusy(true);
         let data;
@@ -284,6 +292,7 @@ export class RankingTab {
             data = await settleRequest(() => ranking.page({ offset, search, scope, signal }), signal);
         }
         catch (error) {
+            if (request !== this.#request) return;
             this.#table.setBusy(false);
             this.#status.textContent = '';
             this.#pager.cancel();
@@ -291,15 +300,16 @@ export class RankingTab {
             if (!signal?.aborted) writeErrorToast(error);
             return;
         }
-        if (!data || signal?.aborted || token !== this.#request) return;
+        if (!data || signal?.aborted || request !== this.#request) return;
 
         const total = Number(data.total) || 0;
         if (total <= offset && total > 0) {
             this.#pager.cancel();
-            return this.#loadPage({ offset: 0, scope, search, signal, strict });
+            return this.#loadPage({ offset: 0, scope, search, signal, strict, token: request });
         }
         this.#mode = 'page';
         this.#customTag = null;
+        this.#offset = offset;
         this.#table.element.hidden = false;
         this.#customHost.hidden = true;
         this.#table.setRows(data.ranking.map(row => ({ ...row, mine: this.#ownIds.has(Number(row.id)) })));
@@ -345,6 +355,7 @@ export class RankingTab {
             }), signal);
         }
         catch (error) {
+            if (token !== this.#request) return;
             this.#table.setBusy(false);
             this.#status.textContent = '';
             this.#pager.cancel();
@@ -355,6 +366,7 @@ export class RankingTab {
         if (!window || signal?.aborted || token !== this.#request) return;
 
         this.#mode = 'window';
+        this.#offset = 0;
         this.#selected = GENERAL;
         this.#customTag = null;
         this.#tabs.select(GENERAL, { silent: true });
@@ -389,6 +401,22 @@ export class RankingTab {
         }
     }
 
+    /** Returns to the general ranking page 1 and leaves the around/search mode. */
+    async #goTop() {
+        if (this.#mode === 'page' && this.#selected === GENERAL && !this.#searchTerm && this.#offset === 0) return;
+        this.#search.set('');
+        this.#searchTerm = '';
+        this.#selected = GENERAL;
+        this.#mode = 'page';
+        this.#customTag = null;
+        this.#tabs.select(GENERAL, { silent: true });
+        this.#remove.hidden = true;
+        const token = ++this.#request;
+        await this.#loadPage({ offset: 0, strict: true, token });
+        if (token !== this.#request) return;
+        events.emit(APP_EVENTS.rankingTopped, {});
+    }
+
     /**
      * @param {{ gladiator: { id: number, name: string }, position: number }} detail
      */
@@ -405,6 +433,12 @@ export class RankingTab {
      * @param {number} position
      */
     async #goPosition(position) {
+        if (!Number.isInteger(position) || position < 1 || (this.#total > 0 && position > this.#total)) {
+            createToast(this.#total > 0
+                ? `Posição fora do ranking. Escolha de 1 a ${number(this.#total)}.`
+                : 'O ranking está vazio.', 'error');
+            return;
+        }
         this.#search.set('');
         this.#searchTerm = '';
         this.#selected = GENERAL;
@@ -439,12 +473,14 @@ export class RankingTab {
             rows = await settleRequest(() => ranking.hashtag({ tab: tag, search: this.#searchTerm, signal: this.#signal }), this.#signal);
         }
         catch (error) {
+            if (token !== this.#request) return;
             this.#status.textContent = '';
             if (!this.#signal?.aborted) writeErrorToast(error);
             return;
         }
         if (!rows || this.#signal?.aborted || token !== this.#request) return;
         this.#mode = 'custom';
+        this.#offset = 0;
         this.#customTag = tag;
         this.#customOffset = Math.min(Math.max(0, offset), Math.max(0, rows.length - 1));
         const total = rows.length;
@@ -541,7 +577,7 @@ export class RankingTab {
      * @param {number} position
      */
     #markActiveOwn(position) {
-        const own = this.#mine.find(gladiator => gladiator.state === 'ranked' && Number(gladiator.position) === Number(position));
+        const own = this.#mine.find(gladiator => Number(gladiator.position) === Number(position));
         this.#own.setActive(own ? own.id : null);
     }
 }

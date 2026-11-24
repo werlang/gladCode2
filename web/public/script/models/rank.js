@@ -16,7 +16,7 @@ export class RankModel {
     }
 
     /**
-     * A window of the current-version ranking centred on a gladiator or a position.
+     * A window of the ranking centred on a gladiator or a position.
      *
      * @param {{ gladiatorId?: number, position?: number, size?: number, signal?: AbortSignal }} query
      * @returns {Promise<{ total: number, position: number, page: number, pageSize: number,

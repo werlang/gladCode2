@@ -148,6 +148,7 @@ export const APP_EVENTS = Object.freeze({
     potionsCancelled: 'potions:cancelled',
     gladiatorChosen: 'gladiator:chosen',
     rankingJumped: 'ranking:jumped',
+    rankingTopped: 'ranking:topped',
     paletteOpened: 'palette:opened',
     paletteNavigated: 'palette:navigated',
 });

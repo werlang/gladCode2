@@ -151,6 +151,8 @@
     color: color-mix(in srgb, var(--color-header-text) 78%, transparent);
 }
 
+.ranking-grid th.ranking-trend,
+.ranking-grid th.ranking-mmr,
 .ranking-trend,
 .ranking-mmr {
     text-align: right;

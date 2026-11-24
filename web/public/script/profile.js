@@ -185,6 +185,11 @@ async function start() {
         navigate({ section: 'ranking', subtab: '', query: { at: position } }, { historyOnly: true, push: true });
     });
 
+    events.on(APP_EVENTS.rankingTopped, () => {
+        if (currentSection !== 'ranking') return;
+        navigate({ section: 'ranking', subtab: '', query: {} }, { historyOnly: true, push: true });
+    });
+
     const GO = Object.fromEntries(Object.entries(SECTION_SHORTCUTS).map(([section, letter]) => [letter, section]));
     let goPending = false;
     let goTimer = null;

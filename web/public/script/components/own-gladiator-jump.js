@@ -4,16 +4,15 @@ import { createElement, renderTemplate } from '../helpers/html.js';
 import { icon } from '../templates/icons.js';
 import { ownGladiatorChipTemplate, ownGladiatorTemplate } from '../templates/ranking.js';
 
-const STATES = {
-    ranked: { text: '', title: 'Ir para a posição de' },
-    outdated: { text: 'desatualizado', title: 'está fora do ranking: desatualizado' },
-    broken: { text: 'com erro', title: 'está fora do ranking: com erro' },
-    unranked: { text: 'sem batalhas', title: 'ainda não tem posição no ranking' },
+const STATE_TEXT = {
+    ranked: '',
+    outdated: 'desatualizado',
+    broken: 'com erro',
 };
 
 /**
- * The “SEUS GLADIADORES” strip (docs/frontend/components.md). Ranked chips are the only buttons;
- * the others show why they are outside the ranking.
+ * The “SEUS GLADIADORES” strip (docs/frontend/components.md). Every gladiator with a position is a
+ * button; outdated/broken chips keep their position and show their state beside it.
  */
 export class OwnGladiatorJump extends BaseComponent {
     #gladiators = [];
@@ -42,24 +41,28 @@ export class OwnGladiatorJump extends BaseComponent {
         list.replaceChildren();
         this.element.hidden = this.#gladiators.length === 0;
         for (const gladiator of this.#gladiators) {
-            const state = STATES[gladiator.state] ?? STATES.unranked;
-            const ranked = gladiator.state === 'ranked';
+            const state = gladiator.state in STATE_TEXT ? gladiator.state : 'ranked';
+            const suffix = STATE_TEXT[state];
+            const hasPosition = gladiator.position != null && Number.isFinite(Number(gladiator.position));
+            const position = hasPosition ? Number(gladiator.position) : null;
+            const stateText = position === null ? (suffix || 'sem posição') : (suffix ? `#${position} · ${suffix}` : `#${position}`);
+            const label = position === null
+                ? `${gladiator.name} ${suffix || 'sem posição'}`
+                : `Ir para a posição de ${gladiator.name}: ${position}º${suffix ? `, ${suffix}` : ''}`;
             const chip = createElement(renderTemplate(ownGladiatorChipTemplate, {
-                state: ranked ? 'ranked' : 'outside',
-                label: ranked
-                    ? `Ir para a posição de ${gladiator.name}: ${gladiator.position}º`
-                    : `${gladiator.name} ${state.title}`,
+                state,
+                label,
                 name: gladiator.name ?? '',
-                stateText: ranked ? `#${gladiator.position}` : state.text,
-                arrow: ranked ? icon('chevron', { size: 16, className: 'icon own-gladiator-arrow-icon' }) : '',
+                stateText,
+                arrow: hasPosition ? icon('chevron', { size: 16, className: 'icon own-gladiator-arrow-icon' }) : '',
             }));
-            chip.dataset.state = ranked ? 'ranked' : 'outside';
-            chip.disabled = !ranked;
-            if (!ranked) chip.setAttribute('aria-disabled', 'true');
-            if (ranked) {
+            chip.dataset.state = state;
+            chip.disabled = !hasPosition;
+            if (!hasPosition) chip.setAttribute('aria-disabled', 'true');
+            if (hasPosition) {
                 chip.addEventListener('click', () => this.emit('jump', {
                     gladiator: { id: gladiator.id, name: gladiator.name },
-                    position: gladiator.position,
+                    position,
                 }));
             }
             const portrait = chip.querySelector('.own-gladiator-portrait');
@@ -77,12 +80,12 @@ export class OwnGladiatorJump extends BaseComponent {
      */
     setActive(id) {
         this.#active = id == null ? null : Number(id);
-        const ranked = this.#gladiators.filter(gladiator => gladiator.state === 'ranked');
+        const ranked = this.#gladiators.filter(gladiator => gladiator.position != null);
         const active = ranked.some(gladiator => Number(gladiator.id) === this.#active)
             ? this.#active
             : Number(ranked[0]?.id);
         for (const [chipId, chip] of this.#chips) {
-            const on = chipId === active && chip.dataset.state === 'ranked';
+            const on = chipId === active;
             chip.classList.toggle('is-active', on);
             chip.setAttribute('aria-current', on ? 'page' : 'false');
             chip.tabIndex = on ? 0 : -1;
@@ -97,7 +100,7 @@ export class OwnGladiatorJump extends BaseComponent {
      */
     #onKey(event) {
         if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
-        const ranked = [...this.#chips.values()].filter(chip => chip.dataset.state === 'ranked' && !chip.disabled);
+        const ranked = [...this.#chips.values()].filter(chip => !chip.disabled);
         if (!ranked.length) return;
         const current = ranked.indexOf(document.activeElement);
         event.preventDefault();
