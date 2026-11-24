@@ -533,6 +533,8 @@ export class TournamentsTab {
     #signal = null;
     /** Answers an older page or section read after a newer one started. */
     #request = 0;
+    /** Last offsets whose data is on screen; a refused page restores both lists to them. */
+    #confirmed = { mine: 0, open: 0 };
     #openCard = null;
     #mineCard = null;
     #openRows = null;
@@ -580,20 +582,24 @@ export class TournamentsTab {
      * @param {number} page 1-based page from the Pagination component.
      */
     async #go(list, page) {
-        const pager = list === 'open' ? this.#openPager : this.#minePager;
-        const previous = this.#offsets[list];
         const request = this.#request + 1;
+        const previous = { ...this.#confirmed };
         this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
         try {
             await this.refresh({ signal: this.#signal });
             if (this.#request !== request) return;
-            if (this.#signal?.aborted) pager.cancel();
+            if (this.#signal?.aborted) {
+                this.#offsets = { ...previous };
+                this.#openPager.cancel();
+                this.#minePager.cancel();
+            }
         }
         catch (error) {
             if (this.#request !== request) return;
-            pager.cancel();
+            this.#openPager.cancel();
+            this.#minePager.cancel();
             if (isAborted(error) || this.#signal?.aborted) return;
-            this.#offsets[list] = previous;
+            this.#offsets = { ...previous };
             writeErrorToast(error);
         }
     }
@@ -614,6 +620,7 @@ export class TournamentsTab {
             this.#setPager(list === 'open' ? this.#openPager : this.#minePager, list === 'open' ? this.#openCard : this.#mineCard, { offset, total });
         });
 
+        this.#confirmed = { mine: this.#offsets.mine, open: this.#offsets.open };
         this.#drawList(this.#openRows, data.open, 'Nenhum torneio público aberto');
         this.#mineCard.element.hidden = Number(data.pages.mine.total) === 0;
         if (Number(data.pages.mine.total) > 0) this.#drawList(this.#mineRows, data.mine, 'Nenhum torneio nesta página');

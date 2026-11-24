@@ -84,6 +84,9 @@ export class Pagination extends BaseComponent {
      * @returns {this}
      */
     set({ page, pages, total, pageSize }) {
+        const focused = this.element.contains(document.activeElement)
+            ? this.#focusKind(document.activeElement)
+            : null;
         this.#pending = false;
         this.element.removeAttribute('aria-busy');
         this.#page = Math.max(1, Math.floor(Number(page) || 1));
@@ -91,6 +94,7 @@ export class Pagination extends BaseComponent {
         this.#total = Math.max(0, Math.floor(Number(total) || 0));
         this.#pageSize = Math.max(1, Math.floor(Number(pageSize) || 10));
         this.#render();
+        if (focused) this.#restoreFocus(focused);
         return this;
     }
 
@@ -132,6 +136,26 @@ export class Pagination extends BaseComponent {
         this.#pending = false;
         this.element.removeAttribute('aria-busy');
         return this;
+    }
+
+    /**
+     * @param {Element} element
+     * @returns {'prev'|'next'|'page'}
+     */
+    #focusKind(element) {
+        if (element.getAttribute('aria-label') === 'Página anterior') return 'prev';
+        if (element.getAttribute('aria-label') === 'Próxima página') return 'next';
+        return 'page';
+    }
+
+    /** @param {'prev'|'next'|'page'} kind */
+    #restoreFocus(kind) {
+        let target = this.element.querySelector(paginationFocusSelector(kind));
+        if (target?.disabled) target = null;
+        target ??= this.element.querySelector(paginationFocusSelector('page'));
+        if (target?.disabled) target = null;
+        target ??= this.element.querySelector('.pagination-button:not([disabled])');
+        target?.focus();
     }
 
     /** @param {number} position */

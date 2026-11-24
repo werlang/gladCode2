@@ -530,6 +530,8 @@ export class TrainingsTab {
     #signal = null;
     /** Answers an older page or section read after a newer one started. */
     #request = 0;
+    /** Last offsets whose data is on screen; a refused page restores both lists to them. */
+    #confirmed = { manage: 0, part: 0 };
     #manageCard = null;
     #partCard = null;
     #manageRows = null;
@@ -578,20 +580,24 @@ export class TrainingsTab {
      * @param {number} page 1-based page from the Pagination component.
      */
     async #go(list, page) {
-        const pager = list === 'manage' ? this.#managePager : this.#partPager;
-        const previous = this.#offsets[list];
         const request = this.#request + 1;
+        const previous = { ...this.#confirmed };
         this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
         try {
             await this.refresh({ signal: this.#signal });
             if (this.#request !== request) return;
-            if (this.#signal?.aborted) pager.cancel();
+            if (this.#signal?.aborted) {
+                this.#offsets = { ...previous };
+                this.#managePager.cancel();
+                this.#partPager.cancel();
+            }
         }
         catch (error) {
             if (this.#request !== request) return;
-            pager.cancel();
+            this.#managePager.cancel();
+            this.#partPager.cancel();
             if (isAborted(error) || this.#signal?.aborted) return;
-            this.#offsets[list] = previous;
+            this.#offsets = { ...previous };
             writeErrorToast(error);
         }
     }
@@ -608,6 +614,7 @@ export class TrainingsTab {
         if (!data || signal?.aborted || request !== this.#request) return;
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
+        this.#confirmed = { manage: this.#offsets.manage, part: this.#offsets.part };
         const room = Number(new URLSearchParams(location.search).get('room'));
         if (room) {
             history.replaceState(null, '', location.pathname);

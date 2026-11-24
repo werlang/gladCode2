@@ -131,6 +131,9 @@ test('a page change emits the event and keeps focus on the equivalent control', 
         simpleNext.focus();
         simpleNext.click();
         assert.equal(fakeDocument.activeElement.getAttribute('aria-label'), 'Página anterior');
+        simple.set({ page: 2, pages: 2, total: 20, pageSize: 10 });
+        assert.equal(simpleRoot.contains(fakeDocument.activeElement), true);
+        assert.equal(fakeDocument.activeElement.getAttribute('aria-label'), 'Página anterior');
     }
     finally {
         globalThis.document = previousDocument;
@@ -164,10 +167,15 @@ test('a controlled page keeps the confirmed range until set and a cancel changes
         assert.equal(root.getAttribute('aria-busy'), null);
         assert.equal(summary(), '1–10 de 20');
 
+        const next = root.querySelector('[aria-label="Próxima página"]');
+        next.focus();
         pagination.goTo(2);
+        assert.equal(fakeDocument.activeElement, next);
         pagination.set({ page: 2, pages: 2, total: 20, pageSize: 10 });
         assert.equal(summary(), '11–20 de 20');
         assert.equal(root.getAttribute('aria-busy'), null);
+        assert.equal(root.contains(fakeDocument.activeElement), true);
+        assert.equal(fakeDocument.activeElement.getAttribute('aria-label'), 'Página anterior');
     }
     finally {
         globalThis.document = previousDocument;
