@@ -13,6 +13,26 @@ Status vocabulary:
   the decisions log).
 - **fixed in WP9** — a difference found by this audit and corrected here.
 
+## Theme proof
+
+The implementation was captured in all three themes at the board size. This table links the extra
+evidence; the section tables below pair the board itself with the Arena-light implementation.
+
+| Board | Arena light | Arena dark | Classic |
+| --- | --- | --- | --- |
+| Header / Rail | [news light](../../../.orchestration/shots/WP9/impl/news-arena-light-1440.png) | [news dark](../../../.orchestration/shots/WP9/impl/news-arena-dark-1440.png) | [news classic](../../../.orchestration/shots/WP9/impl/news-classic-1440.png) |
+| Estados panels | [account](../../../.orchestration/shots/WP9/impl/estado-account-arena-light-1440.png) | [notifications](../../../.orchestration/shots/WP9/impl/estado-notifications-arena-light-1440.png) (panels use the same theme roles) | [palette](../../../.orchestration/shots/WP9/impl/estado-palette-arena-light-1440.png) |
+| Main | [light](../../../.orchestration/shots/WP9/impl/news-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/news-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/news-classic-1440.png) |
+| Perfil | [light](../../../.orchestration/shots/WP9/impl/profile-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/profile-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/profile-classic-1440.png) |
+| Gladiadores | [light](../../../.orchestration/shots/WP9/impl/glads-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/glads-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/glads-classic-1440.png) |
+| Poções | [light](../../../.orchestration/shots/WP9/impl/potions-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/potions-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/potions-classic-1440.png) |
+| Batalhas | [light](../../../.orchestration/shots/WP9/impl/battle-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/battle-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/battle-classic-1440.png) |
+| Relatórios | [light](../../../.orchestration/shots/WP9/impl/reports-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/reports-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/reports-classic-1440.png) |
+| Ranking | [light](../../../.orchestration/shots/WP9/impl/ranking-own-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/ranking-own-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/ranking-own-classic-1440.png) |
+| Mensagens | [light](../../../.orchestration/shots/WP9/impl/messages-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/messages-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/messages-classic-1440.png) |
+| Amigos | [light](../../../.orchestration/shots/WP9/impl/friends-search-arena-light-1440.png) | [dark](../../../.orchestration/shots/WP9/impl/friends-search-arena-dark-1440.png) | [classic](../../../.orchestration/shots/WP9/impl/friends-search-classic-1440.png) |
+| Mobile | [390 light](../../../.orchestration/shots/WP9/impl/glads-arena-light-390.png) | [390 dark](../../../.orchestration/shots/WP9/impl/glads-arena-dark-390.png) | [390 classic](../../../.orchestration/shots/WP9/impl/glads-classic-390.png) |
+
 The accepted differences that apply to every board are: **real data instead of the sample data**
 (names, counts, levels, prices, renown, dates, challenge/report numbers); **3D portraits fall back to
 the placeholder** because the Synty pack and WebGL2 are not available on this host; and the
