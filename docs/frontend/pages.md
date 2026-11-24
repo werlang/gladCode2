@@ -50,6 +50,14 @@ the section ids (`news`, `glads`, `report`, `battle`, `potions`, `ranking`, `mes
 must have a route. WP8 registers `/messages/:userId` as a page route before the catch-all; the resolver
 reads `userId` from the path. `/ranking?at=` needs no new route.
 
+### Presence (Mensagens and Amigos)
+
+Online is read from the existing `usuarios.ativo` timestamp, not a new column: a master is online when
+active within five minutes. `User.touch()` advances it through the notification poll and `/users/me`
+at most once a minute (a missing timestamp is seeded once), so an open tab stays online and a closed
+one goes offline on its own. Conversations and the friends list return `online`; the client never keeps
+a second presence clock.
+
 ### The route resolver (WP3)
 
 One function, `resolveRoute(url)`, is the only place a URL becomes a shell state. It returns:
