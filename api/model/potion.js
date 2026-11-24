@@ -9,8 +9,14 @@ export const BREW_HOURS = [2, 6, 12, 24, 48];
 export const UPGRADE_PRICES = [1500, 5000, 15000, 35000, 0];
 /** Highest apothecary level. */
 export const MAX_APOTHECARY = BREW_HOURS.length;
-/** Items kept in `items` that are not sold. */
-const HIDDEN_ITEMS = [11, 12, 13, 14, 15, 16, 17, 18];
+/** The kind of a potion, from its engine identifier (`pot-hp-1`, `pot-ap-2`, ...). */
+export function potionKind(identifier) {
+    const id = String(identifier ?? '');
+    if (id.startsWith('pot-ap')) return 'ap';
+    if (id.startsWith('pot-high') || id.startsWith('pot-low')) return 'attr';
+    if (id.startsWith('pot-xp')) return 'xp';
+    return 'hp';
+}
 
 /**
  * @param {number} level Master level.
@@ -25,13 +31,21 @@ export function unlockedSlots(level) {
  */
 export class Potion {
     /**
-     * @returns {Promise<Record<string, { id: number, name: string, price: number, level: number, description: string, icon: string }>>}
-     *   Potions on sale by identifier (the name used in `useItem`), cheapest first.
+     * @returns {Promise<Record<string, { id: number, identifier: string, name: string, price: number,
+     *   level: number, description: string, icon: string, kind: string }>>} Potions on sale by identifier
+     *   (the name used in `useItem`), in catalogue order.
      */
     static async catalog() {
-        const items = await Mysql.select(`SELECT * FROM items WHERE id NOT IN (${HIDDEN_ITEMS.map(() => '?').join(',')}) ORDER BY price`, HIDDEN_ITEMS);
+        const items = await Mysql.select('SELECT * FROM items ORDER BY id');
         return Object.fromEntries(items.map(item => [item.identifier, {
-            id: item.id, name: item.name, price: item.price, level: item.lvl, description: item.description, icon: item.icon,
+            id: item.id,
+            identifier: item.identifier,
+            name: item.name,
+            price: item.price,
+            level: item.lvl,
+            description: item.description,
+            icon: item.icon,
+            kind: potionKind(item.identifier),
         }]));
     }
 
@@ -39,17 +53,18 @@ export class Potion {
      * The master's active potions, soonest to expire first.
      *
      * @param {number} userId
+     * @param {Parameters<typeof Mysql.select>[2]} [context] Transaction context.
      * @returns {Promise<Array<{ id: number, identifier: string, potion: string, name: string, icon: string,
      *   expiresAt: string, seconds: number, secondsLeft: number }>>}
      */
-    static async slots(userId) {
+    static async slots(userId, context) {
         const rows = await Mysql.select(
             `SELECT s.id, i.identifier, i.icon, i.name,
                 DATE_FORMAT(s.expire, '%Y-%m-%d %H:%i:%s') AS expiresAt,
                 TIME_TO_SEC(TIMEDIFF(s.expire, NOW())) AS seconds
             FROM slots s INNER JOIN items i ON i.id = s.item
             WHERE s.user = ? AND s.expire > NOW() ORDER BY s.expire LIMIT 4`,
-            [userId],
+            [userId], context,
         );
         return rows.map(row => ({
             id: row.id,
@@ -66,10 +81,11 @@ export class Potion {
     /**
      * The database clock used by the shells to format the slot expiry.
      *
+     * @param {Parameters<typeof Mysql.select>[2]} [context] Transaction context.
      * @returns {Promise<string>} `YYYY-MM-DD HH:MM:SS`.
      */
-    static async serverNow() {
-        const [row] = await Mysql.select("SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AS serverNow");
+    static async serverNow(context) {
+        const [row] = await Mysql.select("SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AS serverNow", [], context);
         return row.serverNow;
     }
 
@@ -79,13 +95,14 @@ export class Potion {
      *
      * @param {number} userId
      * @param {string} identifier Potion identifier.
-     * @returns {Promise<{ slotId: number, silver: number }>}
+     * @returns {Promise<{ slotId: number, silver: number, slots: object[], serverNow: string,
+     *   level: number, unlockLevels: number[] }>}
      * @throws {CustomError} 404 `POTION_NOT_FOUND`, 409 `NO_FREE_SLOT`, 403 `APOTHECARY_LEVEL`, 409 `NOT_ENOUGH_SILVER`.
      */
     static async buy(userId, identifier) {
         return Mysql.withTransaction(async context => {
             const potion = await Mysql.findOne('items', { filter: { identifier } }, context);
-            if (!potion || HIDDEN_ITEMS.includes(potion.id)) throw new CustomError(404, 'Potion not found.', 'POTION_NOT_FOUND');
+            if (!potion) throw new CustomError(404, 'Potion not found.', 'POTION_NOT_FOUND');
 
             const user = await Mysql.findOne('usuarios', { filter: { id: userId }, view: ['silver', 'lvl', 'apothecary'], opt: { forUpdate: true } }, context);
             const [{ used }] = await Mysql.select('SELECT COUNT(*) AS used FROM slots WHERE user = ? AND expire > NOW()', [userId], context);
@@ -96,7 +113,16 @@ export class Potion {
             await Mysql.update('usuarios', { silver: { dec: potion.price } }, { id: userId }, context);
             const hours = BREW_HOURS[user.apothecary - 1];
             const { insertId } = await Mysql.insert('slots', { user: userId, item: potion.id, expire: Mysql.raw(`NOW() + INTERVAL ${Number(hours)} HOUR`) }, context);
-            return { slotId: insertId, silver: user.silver - potion.price };
+            const slots = await Potion.slots(userId, context);
+            const serverNow = await Potion.serverNow(context);
+            return {
+                slotId: insertId,
+                silver: user.silver - potion.price,
+                slots,
+                serverNow,
+                level: user.lvl,
+                unlockLevels: SLOT_LEVELS,
+            };
         });
     }
 

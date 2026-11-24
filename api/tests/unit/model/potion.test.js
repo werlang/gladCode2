@@ -18,7 +18,12 @@ const POTION = { id: 3, identifier: 'hp-1', lvl: 2, price: 100 };
 /** @param {Record<string, number>} user @param {number} used */
 function given(user, used = 0) {
     Mysql.findOne.mockImplementation(async table => (table === 'items' ? POTION : user));
-    Mysql.select.mockResolvedValue([{ used }]);
+    Mysql.select.mockImplementation(async sql => {
+        if (String(sql).includes('COUNT(*) AS used')) return [{ used }];
+        if (String(sql).includes('FROM slots s')) return [{ id: 9, identifier: 'hp-1', name: 'Vida', icon: 'hp', expiresAt: '2026-11-23 20:00:00', seconds: '3600' }];
+        if (String(sql).includes('serverNow')) return [{ serverNow: '2026-11-23 19:00:00' }];
+        return [{ used }];
+    });
 }
 
 describe('Potion', () => {
@@ -46,7 +51,10 @@ describe('Potion', () => {
 
     test('buying locks the master, spends silver and brews for the apothecary\'s time', async () => {
         given({ silver: 500, lvl: 30, apothecary: 3 }, 1);
-        expect(await Potion.buy(7, 'hp-1')).toEqual({ slotId: 40, silver: 400 });
+        expect(await Potion.buy(7, 'hp-1')).toMatchObject({
+            slotId: 40, silver: 400, level: 30, unlockLevels: [5, 15, 25, 35], serverNow: '2026-11-23 19:00:00',
+            slots: [{ id: 9, identifier: 'hp-1', seconds: 3600 }],
+        });
         expect(Mysql.findOne.mock.calls[1][1].opt).toEqual({ forUpdate: true });
         expect(Mysql.update).toHaveBeenCalledWith('usuarios', { silver: { dec: 100 } }, { id: 7 }, { connection: 'tx' });
         expect(Mysql.insert.mock.calls[0][1].expire.toSqlString()).toBe('NOW() + INTERVAL 12 HOUR');

@@ -22,6 +22,15 @@ router.get('/', asyncRoute(async (req, res) => {
 }));
 
 /**
+ * GET /reports/summary
+ * The report header: `{ results, renown, unread }` — the last ten known results, the renown in the
+ * last seven days and the unread ranked count.
+ */
+router.get('/summary', asyncRoute(async (req, res) => {
+    res.send(await Report.summary(req.user.id));
+}));
+
+/**
  * PUT /reports/:id/favorite
  * Keeps a report among the favorites, with a comment: `{ favorite, comment? }`.
  */

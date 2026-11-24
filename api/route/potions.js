@@ -35,7 +35,8 @@ router.get('/slots', auth(), asyncRoute(async (req, res) => {
 
 /**
  * POST /potions/slots
- * Orders a potion: `{ potion: <identifier> }`. Answers 201 `{ slotId, silver }`.
+ * Orders a potion: `{ potion: <identifier> }`. Answers 201 `{ slotId, silver, slots, serverNow, level, unlockLevels }`;
+ * the returned list is the authoritative state after the order.
  */
 router.post('/slots', auth(), asyncRoute(async (req, res) => {
     const identifier = Validate.text(req.body?.potion, 'potion', { max: 20 });
