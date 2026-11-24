@@ -16,6 +16,16 @@ export class ReportModel {
     }
 
     /**
+     * The report header: last ten known results, renown in seven days and unread ranked count.
+     *
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ results: Array<'win'|'loss'|'draw'>, renown: number, unread: number }>}
+     */
+    static summary({ signal } = {}) {
+        return api.get('reports/summary', {}, { signal });
+    }
+
+    /**
      * Unread ranked reports for the shell's notification panel; it does not mark them read.
      *
      * @returns {Promise<{ total: number, reports: object[] }>}

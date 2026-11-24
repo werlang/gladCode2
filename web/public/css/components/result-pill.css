@@ -1,0 +1,30 @@
+/* ResultPill: the placing of a battle report. */
+.result-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-alt);
+    color: var(--color-text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.result-pill[data-tone='gold'] {
+    background: var(--color-medal-gold);
+    color: var(--color-medal-gold-text);
+}
+
+.result-pill[data-tone='silver'] {
+    background: var(--color-medal-silver);
+    color: var(--color-medal-silver-text);
+}
+
+.result-pill[data-tone='bronze'] {
+    background: var(--color-medal-bronze);
+    color: var(--color-medal-bronze-text);
+}

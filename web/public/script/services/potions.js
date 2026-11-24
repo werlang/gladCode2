@@ -129,7 +129,8 @@ export class PotionsService {
      * with a read, never with a second purchase.
      *
      * @param {string} identifier Potion identifier (`useItem` name).
-     * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string, silver: number }>}
+     * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string,
+     *   silver: number, level: number, unlockLevels: number[] }>}
      * @throws {import('../helpers/request.js').RequestError} The API's refusal, or the read error when a
      *   lost 201 could not be reconciled.
      */
@@ -146,9 +147,16 @@ export class PotionsService {
         if (Array.isArray(answer.slots)) {
             const state = this.#remember(normalizeSlots(answer));
             const silver = Number(answer.silver);
+            const detail = {
+                slots: state.slots,
+                serverNow: state.serverNow,
+                silver,
+                level: state.level,
+                unlockLevels: state.unlockLevels,
+            };
             this.#bus.emit(APP_EVENTS.accountSilver, { silver });
-            this.#bus.emit(APP_EVENTS.potionsOrdered, { slots: state.slots, serverNow: state.serverNow, silver });
-            return { slots: state.slots, serverNow: state.serverNow, silver };
+            this.#bus.emit(APP_EVENTS.potionsOrdered, detail);
+            return detail;
         }
 
         // The API before WP6 answers only the slot id and the balance; the list comes from a read.
@@ -161,20 +169,24 @@ export class PotionsService {
      * `POST /potions/slots` again.
      *
      * @param {{ ordered?: boolean }} [options]
-     * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string, silver: number }>}
+     * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string,
+     *   silver: number, level: number, unlockLevels: number[] }>}
      */
     async reconcile({ ordered = false } = {}) {
         const [slotsAnswer, counts] = await Promise.all([this.#model.slots(), this.#counts()]);
         const state = this.#remember(normalizeSlots(slotsAnswer));
         const silver = Number(counts?.user?.silver ?? 0);
-
-        this.#bus.emit(APP_EVENTS.accountSilver, { silver });
-        this.#bus.emit(ordered ? APP_EVENTS.potionsOrdered : APP_EVENTS.potionsReconciled, {
+        const detail = {
             slots: state.slots,
             serverNow: state.serverNow,
             silver,
-        });
-        return { slots: state.slots, serverNow: state.serverNow, silver };
+            level: state.level,
+            unlockLevels: state.unlockLevels,
+        };
+
+        this.#bus.emit(APP_EVENTS.accountSilver, { silver });
+        this.#bus.emit(ordered ? APP_EVENTS.potionsOrdered : APP_EVENTS.potionsReconciled, detail);
+        return detail;
     }
 
     /**

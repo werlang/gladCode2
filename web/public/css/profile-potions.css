@@ -1,0 +1,179 @@
+/* Poções section (Pocoes.dc.html). */
+#panel .content[data-menu='potions'] {
+    max-width: none;
+}
+
+.potions-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.apothecary-band {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-2xl);
+    background:
+        radial-gradient(ellipse 70% 90% at 15% 0%, color-mix(in srgb, var(--color-gladiator-stage-glow) 10%, transparent), transparent 70%),
+        var(--color-chrome);
+    color: var(--color-text-on-brand);
+    box-shadow: var(--shadow-md);
+}
+
+.apothecary-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.apothecary-copy {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.apothecary-kicker {
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+}
+
+#painel-content .apothecary-title {
+    margin: 0;
+    color: var(--color-text-on-brand);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.apothecary-next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-text-on-brand) 6%, transparent);
+}
+
+.apothecary-next[hidden] {
+    display: none;
+}
+
+.apothecary-next-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.apothecary-next-duration {
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-sm);
+}
+
+.apothecary-next-price {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-on-brand);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+.apothecary-next-price .icon {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: var(--color-text-on-brand-muted);
+    stroke-width: 2;
+}
+
+.potion-slots {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+.potion-shop {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.potion-shop-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.potion-shop-head h2 {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.potion-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-4);
+}
+
+.potion-shop-empty {
+    margin: 0;
+    padding: var(--space-5);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.potion-shop-empty[hidden] {
+    display: none;
+}
+
+@media only screen and (max-width: 900px) {
+    .potion-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .apothecary-band {
+        padding: var(--space-4);
+    }
+
+    #painel-content .apothecary-title {
+        font-size: var(--text-md);
+    }
+
+    .potion-slots {
+        grid-template-columns: 1fr;
+    }
+
+    .apothecary-next {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .apothecary-next .button {
+        margin-left: auto;
+    }
+
+    .potion-cards {
+        grid-template-columns: 1fr;
+    }
+}

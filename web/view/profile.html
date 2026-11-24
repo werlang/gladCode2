@@ -15,10 +15,17 @@
     <link rel='stylesheet' href="{{#asset}}css/profile-settings.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-glads.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-battle.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile-potions.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile-reports.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/potion-slot.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/potion-card.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/result-pill.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/form-streak.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/gladiator-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/page-header.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/section-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/pagination.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/tabs.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/segmented-control.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/switch.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/choice-cards.css{{/asset}}"/>
@@ -68,56 +75,9 @@
             <div class='content' data-menu='news'><div id='news-container'><p class='news-loading'>Carregando notícias…</p></div></div>
             <div class='content' data-menu='profile'><div id='profile-panel'></div></div>
             <div class='content' data-menu='battle'><div id='battle-container'><p class='news-loading'>Carregando batalhas…</p></div></div>
-            <div class='content' data-menu='report'>
-                <div id='report-container'>
-                    <div id='bhist-container'>
-                        <h2>Histórico de batalhas</h2>
-                        <div id='tab-container'>
-                            <div id='ranked' class='tab selected'><div class='notification empty'></div><span>Batalhas</span></div>
-                            <div id='duel' class='tab'><div class='notification empty'></div><span>Duelos</span></div>
-                            <div class='tab'><span>Favoritos</span></div>
-                        </div>
-                        <div class='table'></div>
-                        <div id='post-table'>
-                            <label id='unread'><input type="checkbox" class='radio'>Somente não lidos</label>
-                            <div class='page-nav'>
-                                <span></span> - <span></span> de <span></span>
-                                <button id='prev'><i class='fas fa-chevron-left'></i></button>
-                                <button id='next'><i class='fas fa-chevron-right'></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class='content' data-menu='report'><div id='report-container'><p class='news-loading'>Carregando relatórios…</p></div></div>
             <div class='content' data-menu='glads'><div id='glads-container'><p class='news-loading'>Carregando gladiadores…</p></div></div>
-            <div class='content' data-menu='potions'>
-                <div id='apot-container'>
-                    <div id='apot-panel'>
-                        <h2>Apotecário <span class='highlight'>nível <span class='lvl'></span></span></h2>
-                        <p>Aqui você pode encomendar poções para lhe auxiliar durante as batalhas ranqueadas.</p>
-                        <p>As mercadorias encomendadas podem ser usadas por todos seus gladiadores durante <span class='highlight'><span class='duration'></span> horas</span>, uma vez por batalha.</p>
-                        <p>Cada um de seus compartimentos dá direito a levar para batalha um item encomendado. Aumente seus níveis de mestre para desbloquear mais espaços.</p>
-                        <div id='apot-info'>
-                            <div class='col'>
-                                <div class='row'>
-                                    <div>Nível do apotecário:</div><div class='lvl highlight'></div>
-                                </div>
-                                <div class='row'>
-                                    <div>Duração da encomenda:</div><div class='highlight'><span class='duration'></span>horas</div>
-                                </div>
-                                <div class='row'>
-                                    <div>Custo para aprimorar:</div><div><span class='highlight cost'></span><i class='fas fa-coins silver'></i></div>
-                                </div>
-                            </div>
-                            <div id='button-container' class='col'>
-                                <button id='upgrade'>APRIMORAR</button>
-                                <button id='browse'>VER POÇÕES</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id='my-pots'></div>
-                </div>
-            </div>
+            <div class='content' data-menu='potions'><div id='apot-container'><p class='news-loading'>Carregando poções…</p></div></div>
             <div class='content' data-menu='ranking'>
                 <div id='ranking-container'>
                     <h2>Ranking</h2>

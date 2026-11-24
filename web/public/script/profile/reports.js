@@ -1,324 +1,355 @@
-import { Message } from '../components/dialog.js';
-import { decorateRadios } from '../components/form-controls.js';
+import { PageHeader } from '../components/page-header.js';
+import { Pagination } from '../components/pagination.js';
+import { FormStreak } from '../components/form-streak.js';
+import { ResultPill } from '../components/result-pill.js';
+import { Switch } from '../components/switch.js';
+import { Tabs } from '../components/tabs.js';
+import { createToast } from '../components/toast.js';
+import { FavoriteQueue } from '../helpers/favorite-queue.js';
 import { formatMessageTime } from '../helpers/date-format.js';
-import { renderTemplate } from '../helpers/html.js';
-import { optimisticWrite, runReadTask, settleRequest, writeThenRead } from '../helpers/section-request.js';
+import { createElement, renderTemplate } from '../helpers/html.js';
+import { isAborted, secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { DuelModel, ReportModel } from '../models/social.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
-import {
-    battleRowTemplate,
-    battlesEmptyRowTemplate,
-    battlesHeadTemplate,
-    battlesPlaceholderTemplate,
-    cancelDuelTemplate,
-    duelRowTemplate,
-    duelsEmptyRowTemplate,
-    duelsHeadTemplate,
-    duelsPlaceholderTemplate,
-    favoriteRowTemplate,
-    favoritesEmptyRowTemplate,
-    favoritesHeadTemplate,
-    favoritesPlaceholderTemplate,
-    noRowsTemplate,
-    playbackTemplate,
-} from '../templates/profile-reports.js';
+import { icon } from '../templates/icons.js';
+import { pageHeaderTemplate } from '../templates/page-header.js';
+import { reportEmptyTemplate, reportRowTemplate, reportsShellTemplate, reportsSummaryTemplate } from '../templates/profile-reports.js';
 
 const PAGE_SIZE = 10;
 
-/** The report tabs, in the order of the tab buttons. */
+/** The report tabs, in card order. */
 const TABS = ['battles', 'duels', 'favorites'];
 
-/**
- * How each report tab loads and draws its rows.
- */
 const VIEWS = {
     battles: {
-        head: battlesHeadTemplate,
-        placeholder: battlesPlaceholderTemplate,
-        emptyRow: battlesEmptyRowTemplate,
-        empty: { icon: 'scroll', title: 'Nenhuma batalha para mostrar', summary: '' },
         load: ({ offset, unread, signal }) => ReportModel.battles({ offset, unreadOnly: unread, signal }),
         rows: data => data.reports,
-    },
-    favorites: {
-        head: favoritesHeadTemplate,
-        placeholder: favoritesPlaceholderTemplate,
-        emptyRow: favoritesEmptyRowTemplate,
-        empty: {
-            icon: 'star',
-            title: 'Nenhuma batalha favorita',
-            summary: 'Selecione suas batalhas favoritas para aparecer nesta tabela. Assim você também as protege de serem apagadas quando ficarem muito antigas',
-        },
-        load: ({ offset, signal }) => ReportModel.favorites({ offset, signal }),
-        rows: data => data.reports,
+        empty: { icon: 'scroll', title: 'Nenhuma batalha para mostrar', summary: 'Jogue uma batalha ranqueada para começar seu histórico.' },
     },
     duels: {
-        head: duelsHeadTemplate,
-        placeholder: duelsPlaceholderTemplate,
-        emptyRow: duelsEmptyRowTemplate,
-        empty: { icon: 'shield-halved', title: 'Você ainda não possui duelos', summary: '' },
         load: ({ offset, signal }) => DuelModel.reports({ offset, signal }),
         rows: data => data.duels,
+        empty: { icon: 'shield-halved', title: 'Você ainda não possui duelos', summary: 'Desafie um amigo na seção Batalhas.' },
+    },
+    favorites: {
+        load: ({ offset, signal }) => ReportModel.favorites({ offset, signal }),
+        rows: data => data.reports,
+        empty: { icon: 'star', title: 'Nenhuma batalha favorita', summary: 'Marque uma batalha com a estrela para guardá-la aqui.' },
     },
 };
 
-/**
- * The time cells shared by every report row.
- *
- * @param {string} time Timestamp.
- * @returns {{ date: string, elapsed: string }}
- */
-function timeCells(time) {
-    return { date: formatMessageTime(time), elapsed: formatMessageTime(time, { short: true }) };
+/** The relative time cells shared by the rows. */
+function timeCell(row) {
+    return { date: formatMessageTime(row.time), elapsed: formatMessageTime(row.time, { short: true }) };
+}
+
+/** @param {number} value @returns {string} */
+function signed(value) {
+    const number = Number(value) || 0;
+    if (number === 0) return '0';
+    return `${number > 0 ? '+' : '−'}${Math.abs(number).toFixed(1).replace('.0', '')}`;
 }
 
 /**
- * The RELATÓRIOS tab: ranked battle reports, duels and favourite battles.
+ * The RELATÓRIOS section: tabs, unread filter, form/renown summary, rows and favourites.
  */
 export class ReportsTab {
-    #panel = document.querySelector('#report-container');
-    #table = this.#panel.querySelector('#bhist-container .table');
-    #unread = this.#panel.querySelector('#unread');
+    #root = document.querySelector('#report-container');
+    #built = false;
+    #header = null;
+    #tabs = null;
+    #unread = null;
+    #pager = null;
+    #streak = null;
+    #renown = null;
+    #summaryRoot = null;
+    #body = null;
     #offsets = { battles: 0, duels: 0, favorites: 0 };
-    #totals = { battles: 0, duels: 0, favorites: 0 };
     #selected = 'battles';
     #request = 0;
-    /** The current navigation signal; reloads keep using it. */
+    #unreadCount = 0;
     #signal = null;
+    #rowElements = new Map();
+    #favorites = null;
 
-    /** Binds the tabs, pages and the unread filter. */
+    /** Builds the section, tabs, switch and pager. */
     init() {
-        decorateRadios(this.#panel);
-        this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
-            tab.addEventListener('click', () => runReadTask(() => this.#select(TABS[index]), this.#signal));
+        this.#build();
+    }
+
+    #build() {
+        if (this.#built || !this.#root) return;
+        this.#root.innerHTML = renderTemplate(reportsShellTemplate);
+        this.#rowElements.clear();
+        const header = createElement(pageHeaderTemplate);
+        this.#root.querySelector('#reports-header').append(header);
+        this.#header = new PageHeader({ element: header });
+        this.#header.set({ title: 'Relatórios', subtitle: 'Cada batalha que contou, com o replay e o que ela rendeu.' });
+
+        this.#summaryRoot = createElement(reportsSummaryTemplate);
+        const streakRoot = this.#summaryRoot.querySelector('#reports-streak');
+        this.#streak = new FormStreak();
+        streakRoot.append(this.#streak.element);
+        this.#renown = this.#summaryRoot.querySelector('#reports-renown-value');
+        this.#header.setActions([this.#summaryRoot]);
+
+        this.#tabs = new Tabs({ variant: 'underline', label: 'Tipo de relatório' });
+        this.#root.querySelector('#reports-tabs').append(this.#tabs.element);
+        this.#tabs.listen('select', ({ id }) => this.#select(id));
+
+        this.#unread = new Switch({ label: 'Só não vistas' });
+        this.#root.querySelector('#reports-unread-switch').append(this.#unread.element);
+        this.#unread.listen('change', () => {
+            if (this.#selected === 'battles') this.#run(() => this.#fetch({ offset: 0, signal: this.#signal }));
         });
-        this.#panel.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(-1), this.#signal));
-        this.#panel.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(1), this.#signal));
-        this.#unread.querySelector('input').addEventListener('change', () => {
-            if (this.#selected === 'battles') runReadTask(() => this.fetch({ offset: this.#onlyUnread() ? 0 : this.#offsets.battles, signal: this.#signal }), this.#signal);
+
+        this.#pager = new Pagination({ variant: 'simple', controlled: true, unit: 'batalhas' });
+        this.#root.querySelector('#reports-pager').append(this.#pager.element);
+        this.#pager.listen('change', ({ page }) => this.#go(page));
+
+        this.#body = this.#root.querySelector('#reports-body');
+        this.#favorites = new FavoriteQueue({
+            write: (id, favorite) => ReportModel.setFavorite(id, favorite),
+            paint: (id, favorite) => this.#paintFavorite(id, favorite),
+            report: error => writeErrorToast(error),
+            confirmed: (id, favorite) => {
+                if (this.#selected === 'favorites' && !favorite) {
+                    this.#run(() => this.#fetch({ offset: this.#offsets.favorites, signal: this.#signal }));
+                }
+            },
         });
+        this.#updateTabs();
+        this.#built = true;
     }
 
     /**
-     * Opens the tab on the selected report; a `?tab=` route selects battles, duels or favorites.
-     *
      * @param {{ query?: { tab?: string } }} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
-    show(route = {}, { signal } = {}) {
+    async show(route = {}, { signal } = {}) {
+        this.#build();
         this.#signal = signal;
-        const tab = route.query?.tab;
-        if (tab && TABS.includes(tab)) return this.#select(tab, { signal });
-        return this.fetch({ offset: this.#offsets[this.#selected], placeholder: true, signal });
+        const requested = route.query?.tab;
+        this.#selected = TABS.includes(requested) ? requested : this.#selected;
+        this.#tabs.select(this.#selected, { silent: true });
+        const summary = await secondaryRequest(() => ReportModel.summary({ signal }), signal);
+        if (signal?.aborted) return;
+        if (summary) this.#applySummary(summary);
+        await this.#fetch({ offset: this.#offsets[this.#selected], signal });
     }
 
-    /** @returns {boolean} Whether only unread battles are asked for. */
-    #onlyUnread() {
-        return this.#unread.querySelector('input').checked;
+    /** @param {{ results?: string[], renown?: number, unread?: number }} summary */
+    #applySummary(summary) {
+        this.#streak.set((summary.results ?? []).slice().reverse());
+        const renown = Number(summary.renown) || 0;
+        this.#renown.textContent = signed(renown);
+        this.#renown.dataset.sign = renown < 0 ? 'negative' : 'positive';
+        this.#unreadCount = Number(summary.unread) || 0;
+        this.#updateTabs();
     }
 
-    /** @param {string} id Tab id. @param {{ signal?: AbortSignal }} [options] */
-    #select(id, { signal = this.#signal } = {}) {
-        const same = id === this.#selected;
+    #updateTabs() {
+        this.#tabs.setItems([
+            { id: 'battles', label: 'Ranqueadas', count: this.#unreadCount },
+            { id: 'duels', label: 'Duelos' },
+            { id: 'favorites', label: 'Favoritas' },
+        ]);
+        this.#tabs.select(this.#selected, { silent: true });
+    }
+
+    /** @param {string} id */
+    #select(id) {
         this.#selected = id;
-        this.#panel.querySelectorAll('#tab-container .tab').forEach((tab, index) => {
-            tab.classList.toggle('selected', TABS[index] === id);
-        });
-        return this.fetch({ offset: this.#offsets[id], placeholder: !same, signal });
+        this.#tabs.select(id, { silent: true });
+        this.#root.querySelector('.reports-unread').hidden = id !== 'battles';
+        return this.#run(() => this.#fetch({ offset: this.#offsets[id], signal: this.#signal }));
     }
 
-    /** @param {number} direction -1 for the previous page, 1 for the next. */
-    #page(direction) {
-        return this.fetch({ offset: this.#offsets[this.#selected] + direction * PAGE_SIZE, signal: this.#signal });
+    /** Runs a tab read and reports a refusal without leaving the previous rows. */
+    async #run(task) {
+        try {
+            await task();
+        }
+        catch (error) {
+            this.#pager.cancel();
+            if (!isAborted(error) && !this.#signal?.aborted) writeErrorToast(error);
+        }
+    }
+
+    /** @param {number} page */
+    async #go(page) {
+        const previous = this.#offsets[this.#selected];
+        this.#offsets[this.#selected] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
+        try {
+            await this.#fetch({ offset: this.#offsets[this.#selected], signal: this.#signal });
+            if (this.#signal?.aborted) this.#pager.cancel();
+        }
+        catch (error) {
+            this.#pager.cancel();
+            if (isAborted(error) || this.#signal?.aborted) return;
+            this.#offsets[this.#selected] = previous;
+            writeErrorToast(error);
+        }
     }
 
     /**
-     * Loads a page of the selected report.
-     *
-     * @param {{ offset?: number, placeholder?: boolean, signal?: AbortSignal }} options
+     * @param {{ offset?: number, signal?: AbortSignal }} options
      */
-    async fetch({ offset = 0, placeholder = false, signal = this.#signal } = {}) {
+    async #fetch({ offset = 0, signal = this.#signal } = {}) {
         const id = this.#selected;
         const view = VIEWS[id];
         const request = ++this.#request;
-        this.#offsets[id] = offset;
-        this.#unread.style.display = id === 'battles' ? '' : 'none';
-
-        if (placeholder) this.#table.innerHTML = view.head + view.placeholder.repeat(PAGE_SIZE);
-        this.#panel.querySelectorAll('.page-nav button').forEach(button => {
-            button.disabled = true;
-        });
-
-        const data = await settleRequest(() => view.load({ offset, unread: this.#onlyUnread(), signal }), signal);
+        this.#root.querySelector('.reports-unread').hidden = id !== 'battles';
+        const data = await settleRequest(() => view.load({ offset, unread: this.#unread.checked, signal }), signal);
         if (!data || signal?.aborted || request !== this.#request) return;
-
-        const total = parseInt(data.total, 10);
-        this.#totals[id] = total;
+        const total = Number(data.total) || 0;
         if (total <= offset && total > 0) {
-            return this.fetch({ offset: 0, signal });
+            this.#offsets[id] = 0;
+            return this.#fetch({ offset: 0, signal });
         }
-
+        this.#offsets[id] = offset;
         const rows = view.rows(data) ?? [];
-        this.#table.innerHTML = view.head;
-        if (total === 0) {
-            const emptyState = renderTemplate(emptyStateTemplate, { variantClass: 'compact', actionHtml: '', ...view.empty });
-            this.#table.insertAdjacentHTML('beforeend', renderTemplate(noRowsTemplate, { emptyState }));
-        }
-        else {
-            rows.forEach(row => this.#table.append(this.#row(id, row)));
-        }
-
-        const nav = this.#panel.querySelector('.page-nav');
-        if (nav) nav.hidden = total === 0;
-        const counters = this.#panel.querySelectorAll('.page-nav span');
-        counters[0].textContent = total === 0 ? 0 : offset + 1;
-        counters[1].textContent = Math.min(offset + PAGE_SIZE, total);
-        counters[2].textContent = total;
-        this.#panel.querySelector('#prev').disabled = offset <= 0;
-        this.#panel.querySelector('#next').disabled = offset + PAGE_SIZE >= total;
+        this.#renderRows(id, rows, total);
+        this.#pager.element.hidden = total === 0;
+        this.#pager.set({
+            page: Math.floor(offset / PAGE_SIZE) + 1,
+            pages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+            total,
+            pageSize: PAGE_SIZE,
+        });
     }
 
     /**
      * @param {string} id Tab id.
-     * @param {Record<string, any>} row Report row.
-     * @returns {HTMLElement}
+     * @param {object[]} rows Rows from the API.
+     * @param {number} total Total rows.
      */
-    #row(id, row) {
-        const template = document.createElement('template');
-        if (id === 'battles') template.innerHTML = this.#battleRow(row);
-        else if (id === 'favorites') template.innerHTML = this.#favoriteRow(row);
-        else template.innerHTML = this.#duelRow(row);
-        const element = template.content.firstElementChild;
-
-        if (id === 'battles') {
-            element.querySelector('.favorite').addEventListener('click', event => this.#toggleFavorite(event.currentTarget, row.id));
-        }
-        else if (id === 'favorites') {
-            element.querySelector('.favorite').addEventListener('click', () => this.#askUnfavorite(element, row.id));
-        }
-        else {
-            element.querySelector('.remove')?.addEventListener('click', () => writeThenRead(
-                async () => {
-                    await DuelModel.remove(row.id);
-                    new Message({ message: 'Desafio cancelado' }).show();
-                },
-                () => this.fetch({ offset: this.#offsets.duels, signal: this.#signal }),
-                { signal: this.#signal },
-            ));
-        }
-        return element;
-    }
-
-    /** @param {Record<string, any>} row Battle report. */
-    #battleRow(row) {
-        const reward = parseFloat(row.reward);
-        return renderTemplate(battleRowTemplate, {
-            unread: row.read ? '' : 'unread',
-            starClass: row.favorite ? 'fas' : 'far',
-            starTitle: row.favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos',
-            glad: row.gladiator,
-            rewardClass: reward < 0 ? 'red' : reward > 0 ? 'green' : '',
-            reward: `${reward > 0 ? '+' : ''}${reward.toFixed(1)}`,
-            ...timeCells(row.time),
-            playback: row.expired ? '' : renderTemplate(playbackTemplate, { hash: row.hash }),
-        });
-    }
-
-    /** @param {Record<string, any>} row Favourite battle. */
-    #favoriteRow(row) {
-        return renderTemplate(favoriteRowTemplate, {
-            glad: row.gladiator,
-            comment: row.comment,
-            ...timeCells(row.time),
-            playback: renderTemplate(playbackTemplate, { hash: row.hash }),
-        });
-    }
-
-    /** @param {Record<string, any>} row Duel. */
-    #duelRow(row) {
-        let enemy = row.enemy;
-        let enemyClass = '';
-        let tail = renderTemplate(playbackTemplate, { hash: row.log });
-        if (!row.enemy && row.log) {
-            enemy = 'Gladiador Esquecido';
-            enemyClass = 'forgotten';
-        }
-        else if (!row.enemy) {
-            enemy = '???';
-            tail = cancelDuelTemplate;
-        }
-        return renderTemplate(duelRowTemplate, {
-            unread: !row.read || (!row.enemy && !row.log) ? 'unread' : '',
-            mine: row.glad || 'Gladiador Esquecido',
-            mineClass: row.glad ? '' : 'forgotten',
-            enemy,
-            enemyClass,
-            user: row.user,
-            ...timeCells(row.time),
-            tail,
-        });
-    }
-
-    /**
-     * Keeps a battle as a favourite (asking for a comment) or stops keeping it.
-     *
-     * @param {HTMLElement} cell The star cell.
-     * @param {number} id Report id.
-     */
-    #toggleFavorite(cell, id) {
-        if (cell.querySelector('i').classList.contains('fas')) {
-            this.#setFavorite(cell, id, false);
+    #renderRows(id, rows, total) {
+        this.#body.replaceChildren();
+        this.#rowElements.clear();
+        if (total === 0) {
+            this.#body.innerHTML = renderTemplate(reportEmptyTemplate, {
+                empty: renderTemplate(emptyStateTemplate, {
+                    variantClass: 'compact', actionHtml: '', ...VIEWS[id].empty,
+                }),
+            });
             return;
         }
-        new Message({
-            message: 'Informe um comentário sobre esta batalha',
-            buttons: { ok: 'OK', cancel: 'CANCEL' },
-            input: { placeholder: 'Comentário...' },
-        }).show().click('ok', ({ input }) => this.#setFavorite(cell, id, true, input));
-    }
-
-    /**
-     * Paints the star and persists the change; a refusal restores the previous star.
-     *
-     * @param {HTMLElement} cell The star cell.
-     * @param {number} id Report id.
-     * @param {boolean} favorite New state.
-     * @param {string} [comment] Favourite comment.
-     */
-    #setFavorite(cell, id, favorite, comment) {
-        return optimisticWrite({
-            apply: () => this.#paintFavorite(cell, favorite),
-            rollback: () => this.#paintFavorite(cell, !favorite),
-            write: () => ReportModel.setFavorite(id, favorite, comment),
+        rows.forEach(row => {
+            const element = createElement(renderTemplate(reportRowTemplate, { unread: row.read ? '' : 'unread' }));
+            element.dataset.unread = String(!row.read);
+            const place = element.querySelector('.report-place');
+            if (id === 'duels') {
+                const pill = document.createElement('span');
+                pill.className = 'result-pill';
+                pill.dataset.tone = 'neutral';
+                pill.textContent = 'Duelo';
+                place.querySelector('.report-pill').replaceWith(pill);
+            }
+            else {
+                const result = new ResultPill({ place: row.place, total: row.total });
+                place.querySelector('.report-pill').replaceWith(result.element);
+            }
+            place.querySelector('.report-dot').dataset.on = String(!row.read);
+            const gladiator = element.querySelector('.report-gladiator');
+            gladiator.textContent = id === 'duels' ? (row.glad ?? 'Gladiador Esquecido') : (row.gladiator ?? '—');
+            if (id === 'favorites' && row.comment) {
+                const comment = document.createElement('span');
+                comment.className = 'report-comment';
+                comment.textContent = row.comment;
+                gladiator.append(comment);
+            }
+            element.querySelector('.report-opponents').textContent = id === 'duels'
+                ? [row.enemy ?? '???', row.user].filter(Boolean).join(' · ')
+                : (row.opponents?.join(', ') || '—');
+            const renown = element.querySelector('.report-renown');
+            if (id === 'duels') renown.textContent = '—';
+            else {
+                const value = Number(row.reward) || 0;
+                renown.textContent = signed(value);
+                renown.dataset.sign = value < 0 ? 'negative' : value > 0 ? 'positive' : '';
+            }
+            const when = element.querySelector('.report-when');
+            const times = timeCell(row);
+            when.textContent = times.elapsed;
+            when.title = times.date;
+            this.#buildActions(id, row, element.querySelector('.report-actions'));
+            this.#body.append(element);
+            if (id !== 'duels') {
+                this.#rowElements.set(row.id, element);
+                this.#favorites.seed(row.id, row.favorite);
+                this.#paintFavorite(row.id, row.favorite);
+            }
         });
     }
 
     /**
-     * @param {HTMLElement} cell The star cell.
-     * @param {boolean} favorite Whether the star is filled.
+     * @param {string} id Tab id.
+     * @param {Record<string, any>} row
+     * @param {HTMLElement} cell
      */
-    #paintFavorite(cell, favorite) {
-        const star = cell.querySelector('i');
-        star.classList.toggle('fas', favorite);
-        star.classList.toggle('far', !favorite);
-        cell.title = favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos';
+    #buildActions(id, row, cell) {
+        const actions = document.createElement('span');
+        actions.className = 'report-actions-inner';
+        if (id === 'duels' && !row.log) {
+            const cancel = document.createElement('button');
+            cancel.type = 'button';
+            cancel.className = 'button neutral small';
+            cancel.textContent = 'Cancelar';
+            cancel.addEventListener('click', () => this.#cancelDuel(row.id));
+            actions.append(cancel);
+        }
+        else if (id === 'duels' ? row.log : row.hash) {
+            const hash = id === 'duels' ? row.log : row.hash;
+            const watch = document.createElement('a');
+            watch.className = 'button ghost small report-watch';
+            if (!row.read) watch.classList.add('is-unread');
+            watch.href = `play/${hash}`;
+            watch.target = '_blank';
+            watch.rel = 'noopener';
+            watch.innerHTML = `${icon('play', { size: 13, className: 'icon' })}<span>Assistir</span>`;
+            actions.append(watch);
+        }
+        else {
+            const expired = document.createElement('span');
+            expired.className = 'button ghost small report-watch is-expired';
+            expired.textContent = 'Expirada';
+            expired.setAttribute('aria-disabled', 'true');
+            actions.append(expired);
+        }
+        if (id !== 'duels') {
+            const star = document.createElement('button');
+            star.type = 'button';
+            star.className = 'report-star';
+            star.dataset.reportId = String(row.id);
+            star.innerHTML = icon('star', { size: 15, className: 'icon' });
+            star.addEventListener('click', () => {
+                this.#favorites.toggle(row.id, !this.#favorites.intent(row.id));
+            });
+            actions.append(star);
+        }
+        cell.append(actions);
     }
 
-    /**
-     * @param {HTMLElement} row Favourite row.
-     * @param {number} id Report id.
-     */
-    #askUnfavorite(row, id) {
-        new Message({
-            message: 'Remover esta batalha dos favoritos?',
-            buttons: { yes: 'Sim', no: 'Não' },
-        }).show().click('yes', () => writeThenRead(
-            async () => {
-                await ReportModel.setFavorite(id, false);
-                row.remove();
-            },
-            () => this.fetch({ offset: this.#offsets.favorites, signal: this.#signal }),
-            { signal: this.#signal },
-        ));
+    /** @param {number} id @param {boolean} favorite */
+    #paintFavorite(id, favorite) {
+        const row = this.#rowElements.get(id);
+        const star = row?.querySelector('.report-star');
+        if (!star) return;
+        star.dataset.on = String(favorite);
+        star.setAttribute('aria-pressed', String(favorite));
+        star.title = favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos';
+    }
+
+    /** @param {number} id */
+    async #cancelDuel(id) {
+        try {
+            await DuelModel.remove(id);
+            createToast('Desafio cancelado', 'success');
+            await this.#fetch({ offset: this.#offsets.duels, signal: this.#signal });
+        }
+        catch (error) {
+            writeErrorToast(error);
+        }
     }
 }

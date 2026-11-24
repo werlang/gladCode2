@@ -64,6 +64,7 @@ export class Pagination extends BaseComponent {
     #total = 0;
     #pageSize = 10;
     #controlled;
+    #unit;
     #pending = false;
 
     /**
@@ -72,11 +73,13 @@ export class Pagination extends BaseComponent {
      * @param {PaginationVariant} [options.variant]
      * @param {boolean} [options.controlled] Emit the requested page and keep the current page until
      *   `set()` confirms the new data; a refused page then never changes the displayed range.
+     * @param {string} [options.unit] What the total counts, appended to the summary (“batalhas”).
      */
-    constructor({ element, variant = 'numbered', controlled = false } = {}) {
+    constructor({ element, variant = 'numbered', controlled = false, unit = '' } = {}) {
         super(element ?? createElement(renderTemplate(paginationTemplate, { variant })));
         this.#variant = variant;
         this.#controlled = controlled;
+        this.#unit = String(unit);
     }
 
     /**
@@ -200,7 +203,7 @@ export class Pagination extends BaseComponent {
         summary.className = 'pagination-summary';
         const start = this.#total === 0 ? 0 : (this.#page - 1) * this.#pageSize + 1;
         const end = Math.min(this.#total, this.#page * this.#pageSize);
-        summary.textContent = `${start}–${end} de ${this.#total}`;
+        summary.textContent = `${start}–${end} de ${this.#total}${this.#unit ? ` ${this.#unit}` : ''}`;
 
         const row = document.createElement('span');
         row.className = 'pagination-pages';

@@ -1,345 +1,297 @@
-import { Message } from '../components/dialog.js';
+import { showDialog } from '../components/dialog.js';
+import { PageHeader } from '../components/page-header.js';
+import { PotionCard } from '../components/potion-card.js';
+import { PotionSlot } from '../components/potion-slot.js';
+import { SegmentedControl } from '../components/segmented-control.js';
 import { createToast } from '../components/toast.js';
-import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { fadeIn } from '../helpers/animate.js';
-import { runReadTask, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
+import { createElement, renderTemplate } from '../helpers/html.js';
+import { potionFilters } from '../helpers/potion-kind.js';
+import { formatRemaining } from '../helpers/potion-time.js';
+import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { PotionModel } from '../models/potion.js';
+import { potions } from '../services/potions.js';
+import { pageHeaderTemplate } from '../templates/page-header.js';
+import { potionsShellTemplate } from '../templates/profile-potions.js';
+import { icon } from '../templates/icons.js';
 import { profile, setSilver } from './session.js';
-import {
-    emptySlotTemplate,
-    filledSlotTemplate,
-    lockedSlotTemplate,
-    potionInfoTemplate,
-    shopItemTemplate,
-    shopTemplate,
-    upgradeTemplate,
-} from '../templates/profile-potions.js';
 
+export { formatRemaining };
+
+/** The number of compartments and the highest apothecary level. */
 const SLOTS = 4;
 const MAX_APOTHECARY = 5;
-
 /**
- * Remaining time as "1h 5m 30s" (hours and minutes only when non-zero).
- *
- * @param {number} seconds Seconds left.
- * @returns {string}
- */
-export function formatRemaining(seconds) {
-    const total = Math.max(0, Math.floor(seconds));
-    const hours = Math.floor(total / 3600);
-    const minutes = Math.floor(total / 60) % 60;
-    return [hours ? `${hours}h` : '', minutes || hours ? `${minutes}m` : '', `${total % 60}s`].filter(Boolean).join(' ');
-}
-
-/**
- * The POÇÕES tab: the apothecary's level and upgrade, the potion shop and
- * the user's slots with the time left on each potion.
+ * The POÇÕES section: the apothecary band, the four compartments and the potion catalogue.
  */
 export class PotionsTab {
-    #panel = document.querySelector('#apot-container');
-    #potions = {};
+    #root = document.querySelector('#apot-container');
+    #built = false;
+    #header = null;
+    #slots = [];
+    #slotComponents = [];
+    #cards = new Map();
+    #filter = null;
+    #kind = 'all';
+    #state = { slots: [], serverNow: '', level: 0, unlockLevels: [] };
+    #level = 1;
     #prices = [];
-    #brewHours = [];
-    #level = 0;
-    /** Expiry time (ms) of each filled slot, by slot index. */
-    #expiries = new Map();
-    #timer = null;
-    #shop = null;
-    /** The current navigation signal; reloads keep using it. */
-    #signal = null;
-    /** Whether the shop catalogue and apothecary metadata loaded. */
+    #hours = [];
+    #catalogue = {};
     #ready = false;
+    #ordering = false;
+    #signal = null;
+    #unsubs = [];
 
-    /** Loads the secondary catalogue metadata and, regardless of its result, the primary slots. */
+    /** Builds the section and loads the catalogue metadata and the compartments. */
     async init() {
-        const [potions, apothecary] = await Promise.allSettled([PotionModel.catalog(), PotionModel.apothecary()]);
-        if (potions.status === 'fulfilled') this.#potions = potions.value;
+        this.#build();
+        const [catalogue, apothecary, state] = await Promise.allSettled([
+            PotionModel.catalog(),
+            PotionModel.apothecary(),
+            potions.load(),
+        ]);
+        if (catalogue.status === 'fulfilled') this.#catalogue = catalogue.value;
         if (apothecary.status === 'fulfilled') {
             this.#prices = apothecary.value.prices;
-            this.#brewHours = apothecary.value.hours;
+            this.#hours = apothecary.value.hours;
         }
-        this.#ready = potions.status === 'fulfilled' && apothecary.status === 'fulfilled';
-        this.#level = Number(profile.user.apothecary) || 0;
-        if (this.#ready) this.#showApothecary();
-        else {
-            const browse = this.#panel.querySelector('#browse');
-            if (browse) browse.disabled = true;
-            const upgrade = this.#panel.querySelector('#upgrade');
-            if (upgrade) upgrade.hidden = true;
-        }
-
-        this.#panel.querySelector('#browse')?.addEventListener('click', event => {
-            if (!event.currentTarget.disabled) this.#openShop();
-        });
-        this.#panel.querySelector('#upgrade')?.addEventListener('click', () => this.#askUpgrade());
-        // The section is still hidden here; opening it calls refresh again with the shell's retry state.
-        await this.refresh().catch(() => {});
+        this.#ready = catalogue.status === 'fulfilled' && apothecary.status === 'fulfilled';
+        this.#level = Number(profile.user?.apothecary) || 1;
+        this.#renderApothecary();
+        this.#renderFilters();
+        this.#renderCards();
+        if (state.status === 'fulfilled') this.#applyState(state.value);
+        else await this.refresh().catch(() => {});
     }
 
-    /** @param {number} [level] Apothecary level (the current one by default). */
-    #price(level = this.#level) {
-        return this.#prices[level - 1];
-    }
-
-    /** @param {number} [level] Apothecary level (the current one by default). */
-    #hours(level = this.#level) {
-        return this.#brewHours[level - 1];
-    }
-
-    #showApothecary() {
-        const panel = document.querySelector('#apot-panel');
-        panel.querySelectorAll('.lvl').forEach(element => {
-            element.textContent = this.#level;
+    /** Builds the static shell once. */
+    #build() {
+        if (this.#built || !this.#root) return;
+        this.#root.innerHTML = renderTemplate(potionsShellTemplate, {
+            coin: icon('coins', { size: 15, className: 'icon' }),
         });
-        panel.querySelectorAll('.cost').forEach(element => {
-            element.textContent = this.#price();
+        const header = createElement(pageHeaderTemplate);
+        this.#root.querySelector('#potions-header').append(header);
+        this.#header = new PageHeader({ element: header });
+        this.#header.set({
+            title: 'Poções',
+            subtitle: 'Uma encomenda serve a todos os seus gladiadores enquanto durar, uma vez por batalha ranqueada. Cada compartimento leva uma poção.',
         });
-        panel.querySelectorAll('.duration').forEach(element => {
-            element.textContent = this.#hours();
+        this.#slots = this.#root.querySelector('#potion-slots');
+        this.#filter = new SegmentedControl({ label: 'Tipo de poção' });
+        this.#filter.listen('change', ({ value }) => {
+            this.#kind = value;
+            this.#filterCards();
         });
-        if (this.#level >= MAX_APOTHECARY) {
-            panel.querySelector('#apot-info .cost')?.closest('.row')?.remove();
-            panel.querySelector('#apot-info #upgrade')?.remove();
-        }
+        this.#root.querySelector('#potion-filters').append(this.#filter.element);
+        this.#root.querySelector('#upgrade').addEventListener('click', () => this.#upgrade());
+        this.#unsubs = [
+            events.on(APP_EVENTS.potionsOrdered, state => this.#applyState(state)),
+            events.on(APP_EVENTS.potionsReconciled, state => this.#applyState(state)),
+            events.on(APP_EVENTS.potionsCancelled, () => this.refresh({ signal: this.#signal }).catch(() => {})),
+        ];
+        this.#built = true;
     }
 
     /**
-     * Opens the tab.
-     *
      * @param {object} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
-    show(route = {}, { signal } = {}) {
+    async show(route = {}, { signal } = {}) {
         this.#signal = signal;
+        this.#build();
+        if (this.#ready) {
+            this.#renderApothecary();
+            this.#renderFilters();
+            this.#renderCards();
+        }
         return this.refresh({ signal });
     }
 
-    /**
-     * Stops the countdown and closes the shop when the shell leaves the section.
-     */
+    /** Stops every slot timer and releases the event subscriptions. */
     unmount() {
-        clearInterval(this.#timer);
-        this.#timer = null;
-        this.#shop?.remove();
-        this.#shop = null;
+        for (const slot of this.#slotComponents) slot.destroy();
+        this.#slotComponents = [];
+        for (const unsubscribe of this.#unsubs) unsubscribe();
+        this.#unsubs = [];
+        this.#built = false;
+        this.#header = null;
+        this.#slots = null;
+        this.#cards.clear();
+        this.#filter = null;
     }
 
     /**
-     * Redraws the slots from the server.
+     * Redraws the compartments from the server.
      *
      * @param {{ signal?: AbortSignal }} [options]
      */
-    async refresh({ signal } = {}) {
-        clearInterval(this.#timer);
-        this.#timer = null;
-        const data = await settleRequest(() => PotionModel.slots({ signal }), signal);
-        if (!data || signal?.aborted) return;
-        const container = this.#panel.querySelector('#my-pots');
+    async refresh({ signal = this.#signal } = {}) {
+        const state = await settleRequest(() => potions.load({ signal }), signal);
+        if (!state || signal?.aborted) return;
+        this.#applyState(state);
+    }
+
+    /** @param {Record<string, any>} state */
+    #applyState(state) {
+        if (!this.#slots) return;
+        this.#state = state;
+        this.#renderSlots();
+        this.#syncCards();
+    }
+
+    #renderSlots() {
+        for (const slot of this.#slotComponents) slot.destroy();
+        this.#slotComponents = [];
+        this.#slots.replaceChildren();
+        const itemAt = index => this.#state.slots[index] ?? null;
+        for (let index = 0; index < SLOTS; index += 1) {
+            const component = new PotionSlot({ index });
+            const unlockLevel = Number(this.#state.unlockLevels[index] ?? 0);
+            if (Number(this.#state.level) < unlockLevel) component.setLocked(unlockLevel);
+            else if (itemAt(index)) {
+                const hours = Number(this.#hours[this.#level - 1]) || 0;
+                component.setPotion(itemAt(index), this.#state.serverNow, hours * 3600);
+            }
+            else component.setEmpty();
+            component.listen('cancel', ({ slot }) => this.#cancel(slot));
+            component.listen('empty', () => this.#focusShop());
+            component.listen('expire', () => this.refresh({ signal: this.#signal }).catch(() => {}));
+            this.#slotComponents.push(component);
+            this.#slots.append(component.element);
+        }
+    }
+
+    #freeSlots() {
+        return this.#slotComponents.filter(slot => slot.element.dataset.state === 'empty').length;
+    }
+
+    #renderApothecary() {
+        if (!this.#built) return;
+        const hours = this.#hours[this.#level - 1] ?? 0;
+        this.#root.querySelector('.apothecary-title').textContent = `Nível ${this.#level} · encomendas de ${hours} horas`;
+        const next = this.#root.querySelector('.apothecary-next');
+        const price = this.#prices[this.#level - 1];
+        const nextHours = this.#hours[this.#level];
+        if (this.#level >= MAX_APOTHECARY || price == null) {
+            next.hidden = true;
+        }
+        else {
+            next.hidden = false;
+            next.querySelector('.apothecary-next-duration').textContent = `Nível ${this.#level + 1}: encomendas de ${nextHours} h`;
+            next.querySelector('.apothecary-next-price span').textContent = Number(price).toLocaleString('pt-BR');
+        }
+        this.#root.querySelector('#upgrade').hidden = this.#level >= MAX_APOTHECARY;
+    }
+
+    #renderFilters() {
+        if (!this.#filter) return;
+        const filters = potionFilters(Object.values(this.#catalogue));
+        this.#filter.setOptions(filters);
+        if (!filters.some(filter => filter.value === this.#kind)) this.#kind = 'all';
+        this.#filter.set(this.#kind, { silent: true });
+    }
+
+    #renderCards() {
+        const container = this.#root.querySelector('#potion-cards');
         container.replaceChildren();
-        this.#expiries.clear();
-
-        let free = 0;
-        for (let index = 0; index < SLOTS; index++) {
-            const item = data.slots[index];
-            let slot;
-            if (data.level < data.unlockLevels[index]) {
-                slot = createElement(renderTemplate(lockedSlotTemplate, { level: data.unlockLevels[index] }));
-            }
-            else if (item) {
-                slot = this.#filledSlot(item);
-                this.#expiries.set(index, Date.now() + item.secondsLeft * 1000);
-            }
-            else {
-                slot = createElement(emptySlotTemplate);
-                free++;
-            }
-            container.append(slot);
+        this.#cards.clear();
+        for (const [identifier, potion] of Object.entries(this.#catalogue)) {
+            const card = new PotionCard({ potion });
+            card.listen('order', () => this.#order(card, potion));
+            this.#cards.set(identifier, card);
+            container.append(card.element);
         }
-
-        this.#panel.querySelector('#browse').disabled = !this.#ready || free === 0;
-        setSilver(profile.user.silver);
-        this.#markShop();
-        this.#tick();
-        clearInterval(this.#timer);
-        this.#timer = setInterval(() => this.#tick(), 1000);
+        this.#filterCards();
+        this.#syncCards();
     }
 
-    /**
-     * @param {Record<string, any>} item Potion in a slot.
-     * @returns {HTMLElement}
-     */
-    #filledSlot(item) {
-        const slot = createElement(renderTemplate(filledSlotTemplate, { icon: item.icon, name: item.name }));
-        slot.addEventListener('click', () => {
-            new Message({
-                message: `Para usar este item nas batalhas, use no seu código: <code><b>useItem("${item.potion}")</b></code>`,
-                buttons: { yes: 'Ajuda', no: 'OK' },
-            }).show().click('yes', () => window.open('manual#nav-item'));
-        });
-        slot.querySelector('.remove').addEventListener('click', event => {
-            event.stopPropagation();
-            new Message({
-                message: 'Deseja cancelar esta encomenda?',
-                buttons: { yes: 'SIM', no: 'NÃO' },
-            }).show().click('yes', () => writeThenRead(
-                () => PotionModel.cancel(item.id),
-                () => this.refresh({ signal: this.#signal }),
-                {
-                    signal: this.#signal,
-                    onWriteError: writeErrorToast,
-                },
-            ));
-        });
-        return slot;
+    #filterCards() {
+        for (const [identifier, card] of this.#cards) {
+            const kind = this.#catalogue[identifier]?.kind ?? 'hp';
+            card.element.hidden = this.#kind !== 'all' && kind !== this.#kind;
+        }
+        const empty = this.#root.querySelector('#potion-empty');
+        empty.hidden = [...this.#cards.values()].some(card => !card.element.hidden);
     }
 
-    /** Updates the time left on each potion; an expired one refreshes the slots. */
-    #tick() {
-        const slots = this.#panel.querySelectorAll('#my-pots .slot');
-        let expired = false;
-        this.#expiries.forEach((expiry, index) => {
-            const left = (expiry - Date.now()) / 1000;
-            if (left < 0) expired = true;
-            const time = slots[index]?.querySelector('.time');
-            if (time) time.textContent = formatRemaining(left);
-        });
-        if (expired) {
-            clearInterval(this.#timer);
-            runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
+    #syncCards() {
+        const ready = this.#ready;
+        const free = this.#freeSlots();
+        for (const [identifier, card] of this.#cards) {
+            const potion = this.#catalogue[identifier];
+            const unlocked = ready && this.#level >= Number(potion?.level ?? 0);
+            card.setUnlocked(unlocked, Number(potion?.level ?? 0));
+            if (!unlocked) card.setUnavailable('');
+            else if (free === 0) card.setUnavailable('Sem compartimento');
+            else card.setUnavailable('');
         }
     }
 
-    #openShop() {
-        if (!this.#ready) return;
-        const ids = Object.keys(this.#potions);
-        const items = ids.map(id => {
-            const potion = this.#potions[id];
-            return renderTemplate(shopItemTemplate, {
-                icon: potion.icon,
-                level: potion.level,
-                price: potion.price,
-                name: potion.name,
-            });
-        }).join('');
-        const fog = createElement(renderTemplate(shopTemplate, { items }));
-        document.body.append(fog);
-        fadeIn(fog, undefined, 'flex');
-        this.#shop = fog;
-
-        const close = () => {
-            fog.remove();
-            this.#shop = null;
-        };
-        fog.querySelector('#close').addEventListener('click', close);
-        fog.querySelectorAll('#shop-container .slot').forEach((slot, index) => {
-            const id = ids[index];
-            slot.querySelector('.info').addEventListener('click', () => this.#showInfo(id));
-            slot.querySelector('.buy').addEventListener('click', () => this.#askBuy(id, close));
-        });
-        this.#markShop();
-    }
-
-    /** Greys out the shop items the user cannot afford or the apothecary cannot brew. */
-    #markShop() {
-        if (!this.#shop) return;
-        const ids = Object.keys(this.#potions);
-        this.#shop.querySelectorAll('#shop-container .slot').forEach((slot, index) => {
-            const potion = this.#potions[ids[index]];
-            if (profile.user.silver < potion.price) slot.classList.add('dis-price', 'disabled');
-            if (this.#level < potion.level) slot.classList.add('dis-lvl', 'disabled');
-        });
-    }
-
-    /** @param {string} id Potion identifier. */
-    #showInfo(id) {
-        const potion = this.#potions[id];
-        new Message({
-            message: renderTemplate(potionInfoTemplate, {
-                name: potion.name,
-                description: potion.description,
-                level: potion.level,
-                price: potion.price,
-            }),
-            class: 'description',
-        }).show();
-    }
-
-    /**
-     * Confirms and buys a potion into the first free slot.
-     *
-     * @param {string} id Potion identifier.
-     * @param {() => void} closeShop Closes the shop window.
-     */
-    #askBuy(id, closeShop) {
-        const potion = this.#potions[id];
-        if (!this.#panel.querySelector('#my-pots .slot.empty')) {
-            this.#panel.querySelector('#browse').disabled = true;
-            closeShop();
-            new Message({ message: 'Você não possui espaços disponíveis para adquirir este item' }).show();
-            return;
+    /** @param {PotionCard} card @param {Record<string, any>} potion */
+    async #order(card, potion) {
+        if (this.#ordering || !this.#ready) return;
+        this.#ordering = true;
+        card.setBusy(true);
+        try {
+            const state = await potions.order(potion.identifier);
+            this.#applyState(state);
+            createToast(`${potion.name} encomendada`, 'success');
         }
-        if (this.#level < potion.level) {
-            new Message({ message: `Aprimore o apotecário para o nível <b>${potion.level}</b> para poder encomendar este item` }).show();
-            return;
+        catch (error) {
+            writeErrorToast(error);
         }
-        if (profile.user.silver < potion.price) {
-            new Message({ message: "Você não possui prata <i class='fas fa-coins silver'></i> suficiente para adquirir este item" }).show();
-            return;
+        finally {
+            this.#ordering = false;
+            card.setBusy(false);
+            this.#syncCards();
         }
-
-        new Message({
-            message: `Emcomendar <b>${potion.name}</b>?`,
-            buttons: { yes: 'Sim', no: 'Não' },
-        }).show().click('yes', async () => {
-            try {
-                const { silver } = await PotionModel.buy(id);
-                setSilver(silver);
-                createToast(`Item ${escapeHtml(potion.name)} encomendado`, 'success');
-                closeShop();
-            }
-            catch (error) {
-                writeErrorToast(error);
-            }
-            runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
-        });
     }
 
-    #askUpgrade() {
-        if (!this.#ready) return;
-        const price = this.#price();
-        const affordable = price <= profile.user.silver;
-        const box = new Message({
-            message: renderTemplate(upgradeTemplate, {
-                level: this.#level,
-                nextLevel: this.#level + 1,
-                hours: this.#hours(),
-                nextHours: this.#hours(this.#level + 1),
-                price,
-                costClass: affordable ? '' : 'nomoney',
-            }),
-            buttons: { yes: 'Aprimorar', no: 'Cancelar' },
-            class: 'upgrade',
-        }).show();
-        if (!affordable) box.getButton('yes').remove();
+    /** @param {Record<string, any>} slot */
+    async #cancel(slot) {
+        const answer = await showDialog(`Cancelar a encomenda de <span class='highlight'>${escapeText(slot.name)}</span>?`, ['Sim', 'Não']);
+        if (answer !== 'Sim') return;
+        try {
+            await potions.cancel(slot.id);
+            createToast('Encomenda cancelada', 'success');
+            await this.refresh({ signal: this.#signal });
+        }
+        catch (error) {
+            writeErrorToast(error);
+        }
+    }
 
-        box.click('yes', async () => {
-            let data;
-            try {
-                data = await PotionModel.upgradeApothecary();
-            }
-            catch (error) {
-                const problem = { NOT_ENOUGH_SILVER: 'Você não possui prata suficiente', APOTHECARY_MAX_LEVEL: 'O apotecário já está no nível máximo' }[error.code];
-                if (!problem) {
-                    writeErrorToast(error);
-                    return;
-                }
-                new Message({ message: problem }).show();
-                return;
-            }
+    async #upgrade() {
+        if (!this.#ready || this.#level >= MAX_APOTHECARY) return;
+        const price = this.#prices[this.#level - 1];
+        const nextHours = this.#hours[this.#level];
+        const answer = await showDialog(
+            `Melhorar o apotecário para o nível ${this.#level + 1} por <span class='highlight'>${Number(price).toLocaleString('pt-BR')} prata</span>? As encomendas passarão a durar ${nextHours} horas.`,
+            ['Aprimorar', 'Cancelar'],
+        );
+        if (answer !== 'Aprimorar') return;
+        try {
+            const data = await PotionModel.upgradeApothecary();
             setSilver(data.silver);
             profile.user.apothecary = data.apothecary;
             this.#level = data.apothecary;
-            this.#showApothecary();
-        });
+            this.#renderApothecary();
+            this.#syncCards();
+            createToast('Apotecário aprimorado', 'success');
+        }
+        catch (error) {
+            writeErrorToast(error);
+        }
     }
+
+    #focusShop() {
+        this.#root.querySelector('#potion-filters')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+/** @param {unknown} value @returns {string} */
+function escapeText(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }

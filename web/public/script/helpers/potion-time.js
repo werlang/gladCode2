@@ -13,3 +13,17 @@ export function potionTimeLeft(potions) {
     const totalMinutes = Math.max(0, Math.round((end - start) / 60000));
     return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 };
 }
+
+
+/**
+ * Remaining time as "1h 5m 30s" (hours and minutes only when non-zero).
+ *
+ * @param {number} seconds Seconds left.
+ * @returns {string}
+ */
+export function formatRemaining(seconds) {
+    const total = Math.max(0, Math.floor(seconds));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor(total / 60) % 60;
+    return [hours ? `${hours}h` : '', minutes || hours ? `${minutes}m` : '', `${total % 60}s`].filter(Boolean).join(' ');
+}

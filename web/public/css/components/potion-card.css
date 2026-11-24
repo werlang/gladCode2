@@ -1,0 +1,119 @@
+/* PotionCard: one potion on sale. */
+.potion-card {
+    --potion-ink: var(--color-hp);
+    --potion-tint: color-mix(in srgb, var(--color-hp) 14%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-xs);
+}
+
+.potion-card[hidden] {
+    display: none;
+}
+
+.potion-card[data-unavailable='true'] {
+    opacity: 0.72;
+}
+
+.potion-card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+}
+
+.potion-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--potion-tint);
+    color: var(--potion-ink);
+}
+
+.potion-card-icon .icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.potion-card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.potion-card-name {
+    overflow: hidden;
+    color: var(--color-text-strong);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.potion-card-code {
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.potion-card-description {
+    margin: 0;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+}
+
+.potion-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-1);
+}
+
+.potion-card-price {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+.potion-card-price .icon {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: var(--color-text-subtle);
+    stroke-width: 2;
+}
+
+.potion-card-order {
+    flex: none;
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+}
+
+.potion-card-order:hover:not(:disabled, .disabled) {
+    background: color-mix(in srgb, var(--color-chrome) 82%, var(--color-brand));
+    color: var(--color-header-text);
+}
