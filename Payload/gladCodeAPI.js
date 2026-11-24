@@ -13,8 +13,8 @@ const send = message => sendMessage(message);
 const toFloat = message => parseFloat(send(message));
 /** @param {string} message @returns {number} A resposta como inteiro. */
 const toInt = message => parseInt(send(message), 10);
-/** @param {string} message @returns {boolean} A resposta (0 ou 1) como booleano. */
-const toBool = message => Boolean(parseInt(send(message), 10));
+/** @param {string} message @returns {boolean} A positive answer is true; `0` and `-1` (no target) are false. */
+const toBool = message => parseInt(send(message), 10) > 0;
 /** @param {string} message @returns {number|false} A resposta como número, ou `false` quando negativa (alvo fora de vista). */
 const toFloatOrFalse = message => {
     const value = toFloat(message);
@@ -67,7 +67,7 @@ module.exports = {
     getHighHp: () => toBool('getHighHp'),
     getTargetX: () => toFloatOrFalse('getTargetX'),
     getTargetY: () => toFloatOrFalse('getTargetY'),
-    getTargetHealth: () => toFloat('getTargetHealth'),
+    getTargetHealth: () => toFloatOrFalse('getTargetHealth'),
     getTargetSpeed: () => toFloatOrFalse('getTargetSpeed'),
     getTargetHead: () => toFloatOrFalse('getTargetHead'),
     doYouSeeMe: () => toBool('doYouSeeMe'),
@@ -95,7 +95,7 @@ module.exports = {
     getBurnTimeLeft: () => toFloat('getBurnTimeLeft'),
 
     // aparência é definida pelo editor: não faz nada
-    setSpritesheet: () => {},
+    setSpritesheet: _hash => {},
 
     isStunned: () => toBool('isStunned'),
     isBurning: () => toBool('isBurning'),

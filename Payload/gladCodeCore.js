@@ -15,16 +15,12 @@ espera cada resposta com Atomics.wait: o código do usuário é síncrono como e
 */
 
 const { Worker, isMainThread, parentPort, workerData } = require('node:worker_threads');
+const { limitMessage } = require('./gladCodeProtocol.js');
 
 const HOST = '127.0.0.1';
 const PORT = 8888;
 /** Maior resposta aceita, em bytes (o servidor responde no máximo 2000). */
 const REPLY_BYTES = 65536;
-/**
- * Maior mensagem enviada, em bytes: o servidor lê 2000 por vez, e uma mensagem maior viraria duas
- * respostas, tirando as próximas do passo (o C corta speak em 999 caracteres pelo mesmo motivo).
- */
-const MESSAGE_BYTES = 1999;
 /** Mensagem interna: a worker responde quando estiver conectada ao servidor. */
 const CONNECT = '\u0000connect';
 /** Linha que o servidor escreve antes do código do usuário (ver setupBlock em api/helpers/gladiator-code.js). */
@@ -112,18 +108,6 @@ let worker = null;
 let state = null;
 let bytes = null;
 const decoder = new TextDecoder('utf-8');
-
-/**
- * Corta uma mensagem em {@link MESSAGE_BYTES} bytes UTF-8 sem partir um caractere.
- *
- * @param {string} message
- * @returns {string}
- */
-function limitMessage(message) {
-    const data = Buffer.from(message, 'utf8');
-    if (data.length <= MESSAGE_BYTES) return message;
-    return data.subarray(0, MESSAGE_BYTES).toString('utf8').replace(/\uFFFD+$/, '');
-}
 
 /**
  * Envia uma mensagem ao servidor e espera a resposta.
