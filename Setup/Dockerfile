@@ -11,7 +11,9 @@ RUN mkdir -p /opt/node/bin /opt/node/lib /opt/node/etc \
     && cp /usr/local/bin/node /opt/node/bin/node \
     && cp /lib/ld-musl-*.so.1 /opt/node/lib/ \
     && for lib in $(ldd /usr/local/bin/node | awk '/=>/ { print $3 }'); do cp -L "$lib" /opt/node/lib/; done \
-    && echo /opt/node/lib > /opt/node/etc/ld-musl-$(uname -m).path
+    && loader=$(basename /lib/ld-musl-*.so.1) \
+    && arch=${loader#ld-musl-} \
+    && echo /opt/node/lib > "/opt/node/etc/ld-musl-${arch%.so.1}.path"
 
 FROM ubuntu:14.04
 RUN apt-get update
