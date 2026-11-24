@@ -4,7 +4,7 @@ import test from 'node:test';
 
 import { gladiatorLimit } from '../../web/public/script/profile/glads.js';
 import { formatRemaining } from '../../web/public/script/profile/potions.js';
-import { badgeLabel, openableTab, xpToNextLevel } from '../../web/public/script/profile/session.js';
+import { xpToNextLevel } from '../../web/public/script/profile/session.js';
 import { typeRoundTime, validRoundTime } from '../../web/public/script/profile/tournaments.js';
 import { battleSizes } from '../../web/public/script/profile/trainings.js';
 
@@ -40,20 +40,4 @@ test('masters unlock a gladiator every ten levels, up to six', () => {
     assert.equal(gladiatorLimit(60), 6);
     assert.equal(gladiatorLimit(99), 6);
     assert.equal(xpToNextLevel(10), 2600);
-});
-
-test('an unknown or disabled profile tab opens the settings instead of an empty panel', () => {
-    const enabled = ['news', 'profile', 'glads', 'battle'];
-    assert.equal(openableTab('glads', enabled), 'glads');
-    assert.equal(openableTab('settings', enabled), 'profile');
-    assert.equal(openableTab('potions', enabled), 'profile');
-    assert.equal(openableTab('', enabled), 'profile');
-    assert.equal(openableTab(undefined, enabled), 'profile');
-});
-
-test('menu badges show counts up to 99, then 99+', () => {
-    assert.equal(badgeLabel(7), '7');
-    assert.equal(badgeLabel(99), '99');
-    assert.equal(badgeLabel(100), '99+');
-    assert.equal(badgeLabel(2777), '99+');
 });

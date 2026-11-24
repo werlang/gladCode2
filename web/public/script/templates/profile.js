@@ -1,22 +1,3 @@
-export const newsPostTemplate = `
-<div class='post surface-card'>
-    <div class='share' title='Compartilhar' role='button' tabindex='0'><i class='fas fa-share-alt'></i></div>
-    <div class='title'>{{{title}}}</div>
-    <div class='time'>Publicado em {{time}}</div>
-    <div class='body'>{{{body}}}</div>
-</div>`;
-
-export const shareLinkTemplate = `
-<div id='fog'>
-    <div id='link-box' role='dialog' aria-modal='true' aria-label='Link da publicação'>
-        <h3>Link da publicação</h3>
-        <input value='{{link}}' readonly>
-        <button>COPIAR</button>
-    </div>
-</div>`;
-
-export const gladAddTemplate = `<div class='glad-add {{state}}' role='button' tabindex='0'><div class='image'></div><div class='info'>{{text}}</div></div>`;
-
 export const codeBoxTemplate = `
 <div id='fog'>
     <div id='code-box' role='dialog' aria-modal='true'>
@@ -28,8 +9,6 @@ export const codeBoxTemplate = `
 
 export const codeBlockTemplate = `<pre class='line-numbers language-{{language}}'><code class='language-{{language}}'>{{code}}</code></pre>`;
 
-export const mmrRowTemplate = `<div class='row mmr' title='Renome'><span>{{mmr}}</span><img src='icon/winner-icon.png' alt=''></div>`;
-
 export const friendFilterRowTemplate = `<div class='row' role='button' tabindex='0'><span class='friend-avatar'></span><span class='friend-nick'>{{nick}}</span></div>`;
 
 export const duelBoxTemplate = `
@@ -40,63 +19,6 @@ export const duelBoxTemplate = `
         <div id='button-container'>
             <button id='cancel' class='button ghost block'>Cancelar</button><button id='confirm' class='button primary block' disabled>{{action}}</button>
         </div>
-    </div>
-</div>`;
-
-
-
-export const messageRowTemplate = `<div class='row {{unread}}' role='button' tabindex='0'><div class='cell user'>{{nick}}</div><div class='cell message'>{{{message}}}</div><div class='cell time'>{{elapsed}}</div></div>`;
-
-export const fullMessageTemplate = `
-<div id='full-message'>
-    <div class='row head'><div class='image'><img src='{{picture}}' alt=''></div><div class='user'>{{nick}}</div><div class='time'>{{time}}</div></div>
-    <div class='row body'><div class='message'>{{{message}}}</div></div>
-    <div class='row buttons'>
-        <button class='button' id='back'><img src='icon/back.png' alt=''><span>Retornar</span></button>
-        <button class='button' id='reply'><img src='icon/reply.png' alt=''><span>Responder</span></button>
-        <button class='button' id='unread'><img src='icon/unread.png' alt=''><span>Marcar não lido</span></button>
-        <button class='button' id='delete'><img src='icon/delete2.png' alt=''><span>Excluir</span></button>
-    </div>
-</div>`;
-
-export const replyTemplate = `
-<div class='row reply'>
-    <textarea class='input' aria-label='Resposta' maxlength='1000'></textarea>
-    <div class='row buttons'>
-        <button class='button' id='send'><img src='icon/reply.png' alt=''><span>Enviar</span></button>
-        <button class='button' id='cancel'><img src='icon/delete2.png' alt=''><span>Descartar</span></button>
-    </div>
-</div>`;
-
-export const requestRowTemplate = `
-<div class='row'>
-    <div class='cell lvl-container'><img title='Nível' src='res/star.png' alt='Nível'><span>{{level}}</span></div>
-    <div class='cell image-container'><img src='{{picture}}' alt=''></div>
-    <div class='cell user'>{{nick}}</div>
-    <div class='button-container'>
-        <div class='check' title='Aceitar solicitação' role='button' tabindex='0'></div>
-        <div class='close' title='Recusar solicitação' role='button' tabindex='0'></div>
-    </div>
-</div>`;
-
-export const friendRowTemplate = `
-<div class='row'>
-    <div class='cell lvl-container'><img title='Nível' src='res/star.png' alt='Nível'><span>{{level}}</span></div>
-    <div class='cell image-container'><img src='{{picture}}' alt=''></div>
-    <div class='cell'>{{nick}}</div>
-    <div class='cell last-active'>
-        <span class='label'>Última atividade</span>
-        <span>{{active}}</span>
-    </div>
-    <div class='button-open' role='button' tabindex='0' aria-label='Opções'></div>
-</div>`;
-
-export const searchRowTemplate = `
-<div class='row'>
-    <div class='cell'>{{nick}}</div>
-    <div class='cell button-container'>
-        <div class='send-message' title='Enviar mensagem' role='button' tabindex='0'></div>
-        <div class='add-friend' title='Enviar convite de amizade' role='button' tabindex='0'></div>
     </div>
 </div>`;
 
