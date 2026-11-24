@@ -13,6 +13,7 @@ backup/gcloud_config.json
 !dev-tools/news/*.sql
 web/public/assets/synty
 .playwright-mcp
+.impeccable/questions
 TODO.md
 probe-anim*.png
 
