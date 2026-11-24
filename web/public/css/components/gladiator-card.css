@@ -297,7 +297,7 @@
     border: 1px solid currentColor;
     border-radius: 5px;
     background: color-mix(in srgb, currentColor 16%, transparent);
-    color: var(--color-str);
+    color: var(--color-attr-str-text);
     transform: rotate(45deg);
 }
 
@@ -357,8 +357,8 @@
     padding: 10px 12px;
     border: 1px solid color-mix(in srgb, var(--color-gladiator-seal-old) 30%, transparent);
     border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--color-warning) 10%, transparent);
-    color: var(--color-text-strong);
+    background: color-mix(in srgb, var(--color-gladiator-seal-old) 10%, transparent);
+    color: var(--color-gladiator-alert-old);
     font-size: var(--text-sm);
     line-height: 1.45;
 }
@@ -599,6 +599,14 @@
     color: var(--color-text-strong);
     font-size: var(--text-sm);
     line-height: 1.45;
+}
+
+.ranked-arena .gladiator-picker-status {
+    color: var(--color-gladiator-text);
+}
+
+.ranked-arena .gladiator-picker-status[data-tone='broken'] {
+    color: var(--color-gladiator-seal-broken-text);
 }
 
 .gladiator-picker-status[data-tone='broken'] {

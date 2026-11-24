@@ -127,6 +127,7 @@ export class GladiatorPicker extends BaseComponent {
         this.#status.textContent = text;
         this.#status.dataset.tone = tone;
         this.#status.hidden = false;
+        this.#status.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     }
 
     /** Hides the inline unavailable reason. */

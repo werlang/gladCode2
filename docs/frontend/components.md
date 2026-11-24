@@ -393,7 +393,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Constructor:** `new Pagination({ element, variant, controlled })` (`simple` or `numbered`).
 - **Methods:** `set({ page, pages, total, pageSize })`, `goTo(page)`; a `controlled` pager emits the
   requested page and keeps the confirmed one until `set()` (or `cancel()` on a refused read). `set`
-  computes the “1–7 de 482” label and the page window (`1 … 8 9 10 … 164`).
+  computes the “1–7 de 482” label and the page window (`1 … 8 9 10 … 164`) and keeps focus on the
+  equivalent control (or the nearest enabled one) when the pager was focused.
 - **Events:** `change` `{ page }`, `jump` `{ position }` (the go-to field, in gladiator position, not
   page).
 - **ARIA:** `<nav aria-label="Páginas">`, current page `aria-current="page"`, disabled arrows
@@ -489,7 +490,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   arrow-key movement between the usable cards; a disabled card is `aria-disabled` but still focusable so
   its reason can be read. `data-state` gives a locked card the ROT/BLOOD frame and the amber/red lock.
   `setDisabled(reason)` also blocks selection while a ranked battle is running, and an unavailable card
-  shows its reason inline in `.gladiator-picker-status` (`role="status"`, cleared on the next choice).
+  shows its reason inline in `.gladiator-picker-status` (`role="status"`, scrolled into view and cleared
+  on the next choice); it never stacks another modal on the picker.
 - **Boards:** `Batalhas.dc.html`, `Mobile.dc.html`.
 
 ### VersusPanel — exists (WP5)

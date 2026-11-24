@@ -50,8 +50,8 @@ export const gladiatorEmptyTemplate = `
 /** The card's portrait slot receives the 3D portrait or the sprite; its own markup is static. */
 export const gladiatorPickerTemplate = `
 <div class='gladiator-picker' role='group'>
-    <div class='gladiator-picker-grid'></div>
     <p class='gladiator-picker-status' role='status' aria-live='polite' hidden></p>
+    <div class='gladiator-picker-grid'></div>
 </div>`;
 
 /** One picker mini-card. */
