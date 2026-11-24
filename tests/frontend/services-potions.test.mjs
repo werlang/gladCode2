@@ -75,10 +75,14 @@ test('a 201 with slots applies the balance and the list directly, with no read',
     assert.equal(result.silver, 1200);
     assert.equal(result.level, 4);
     assert.deepEqual(result.unlockLevels, [1, 10, 20, 30]);
+    assert.equal(result.reconciled, false);
+    assert.equal(result.confirmed, true);
     assert.equal(service.slots.length, 3);
     assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:ordered']);
     assert.equal(bus.emitted[1].detail.slots.length, 3);
     assert.equal(bus.emitted[1].detail.level, 4);
+    assert.equal(bus.emitted[1].detail.reconciled, false);
+    assert.equal(bus.emitted[1].detail.confirmed, true);
 });
 
 test('a 201 without slots (the API before WP6) reads the full list and emits potions:ordered', async () => {
@@ -92,7 +96,10 @@ test('a 201 without slots (the API before WP6) reads the full list and emits pot
     assert.equal(result.silver, 1250);
     assert.equal(result.level, 4);
     assert.deepEqual(result.unlockLevels, [1, 10, 20, 30]);
+    assert.equal(result.reconciled, true);
+    assert.equal(result.confirmed, true);
     assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:ordered']);
+    assert.equal(bus.emitted[1].detail.confirmed, true);
 });
 
 test('a lost 201 reconciles with a read, emits potions:reconciled and never repeats the purchase', async () => {
@@ -105,8 +112,53 @@ test('a lost 201 reconciles with a read, emits potions:reconciled and never repe
     assert.equal(model.calls.buy.length, 1);
     assert.equal(model.calls.slots, 1);
     assert.equal(result.silver, 1250);
+    assert.equal(result.reconciled, true);
+    assert.equal(result.confirmed, false);
     assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:reconciled']);
     assert.equal(bus.emitted[1].detail.slots.length, 2);
+    assert.equal(bus.emitted[1].detail.confirmed, false);
+});
+
+test('a lost 201 is confirmed only when a new slot carries the ordered identifier', async () => {
+    const bus = fakeBus();
+    const model = modelWith();
+    const service = new PotionsService({ model, counts: async () => COUNTS, bus });
+    await service.load();
+    model.calls.buy = [];
+    model.buy = () => {
+        model.calls.buy.push('hp3');
+        throw new RequestError(0, 'network');
+    };
+    model.slots = async () => ({
+        ...SLOTS,
+        slots: [...SLOTS.slots, { id: 3, identifier: 'hp3', name: 'Vida III', icon: 'hp', expiresAt: '2026-01-01 10:10:00', seconds: 600 }],
+    });
+
+    const result = await service.order('hp3');
+
+    assert.equal(model.calls.buy.length, 1);
+    assert.equal(result.reconciled, true);
+    assert.equal(result.confirmed, true);
+    assert.equal(result.slots.length, 3);
+    assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:reconciled']);
+});
+
+test('a lost 201 after a snapshot without a new slot is not confirmed', async () => {
+    const bus = fakeBus();
+    const model = modelWith();
+    const service = new PotionsService({ model, counts: async () => COUNTS, bus });
+    await service.load();
+    model.calls.buy = [];
+    model.buy = () => {
+        model.calls.buy.push('hp3');
+        throw new RequestError(0, 'network');
+    };
+
+    const result = await service.order('hp3');
+
+    assert.equal(model.calls.buy.length, 1);
+    assert.equal(result.reconciled, true);
+    assert.equal(result.confirmed, false);
 });
 
 test('a lost 201 whose recovery read fails rejects without repeating the purchase', async () => {

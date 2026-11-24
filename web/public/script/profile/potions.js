@@ -40,6 +40,7 @@ export class PotionsTab {
     #catalogue = {};
     #ready = false;
     #ordering = false;
+    #upgrading = false;
     #signal = null;
     #unsubs = [];
 
@@ -180,7 +181,7 @@ export class PotionsTab {
         else {
             next.hidden = false;
             next.querySelector('.apothecary-next-duration').textContent = `Nível ${this.#level + 1}: encomendas de ${nextHours} h`;
-            next.querySelector('.apothecary-next-price span').textContent = Number(price).toLocaleString('pt-BR');
+            next.querySelector('.apothecary-next-price span').textContent = `${Number(price).toLocaleString('pt-BR')} prata`;
         }
         this.#root.querySelector('#upgrade').hidden = this.#level >= MAX_APOTHECARY;
     }
@@ -236,8 +237,12 @@ export class PotionsTab {
         card.setBusy(true);
         try {
             const state = await potions.order(potion.identifier);
-            this.#applyState(state);
-            createToast(`${potion.name} encomendada`, 'success');
+            if (state.reconciled && !state.confirmed) {
+                createToast('Encomenda não confirmada. Os compartimentos foram sincronizados.', 'info');
+            }
+            else {
+                createToast(`${potion.name} encomendada`, 'success');
+            }
         }
         catch (error) {
             writeErrorToast(error);
@@ -264,15 +269,18 @@ export class PotionsTab {
     }
 
     async #upgrade() {
-        if (!this.#ready || this.#level >= MAX_APOTHECARY) return;
-        const price = this.#prices[this.#level - 1];
-        const nextHours = this.#hours[this.#level];
-        const answer = await showDialog(
-            `Melhorar o apotecário para o nível ${this.#level + 1} por <span class='highlight'>${Number(price).toLocaleString('pt-BR')} prata</span>? As encomendas passarão a durar ${nextHours} horas.`,
-            ['Aprimorar', 'Cancelar'],
-        );
-        if (answer !== 'Aprimorar') return;
+        if (this.#upgrading || !this.#ready || this.#level >= MAX_APOTHECARY) return;
+        this.#upgrading = true;
+        const button = this.#root.querySelector('#upgrade');
+        button.disabled = true;
         try {
+            const price = this.#prices[this.#level - 1];
+            const nextHours = this.#hours[this.#level];
+            const answer = await showDialog(
+                `Melhorar o apotecário para o nível ${this.#level + 1} por <span class='highlight'>${Number(price).toLocaleString('pt-BR')} prata</span>? As encomendas passarão a durar ${nextHours} horas.`,
+                ['Aprimorar', 'Cancelar'],
+            );
+            if (answer !== 'Aprimorar') return;
             const data = await PotionModel.upgradeApothecary();
             setSilver(data.silver);
             profile.user.apothecary = data.apothecary;
@@ -283,6 +291,10 @@ export class PotionsTab {
         }
         catch (error) {
             writeErrorToast(error);
+        }
+        finally {
+            this.#upgrading = false;
+            button.disabled = false;
         }
     }
 

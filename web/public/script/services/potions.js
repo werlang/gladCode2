@@ -126,21 +126,25 @@ export class PotionsService {
 
     /**
      * Orders a potion. A received 201 is authoritative (silver and slots); a lost 201 is reconciled
-     * with a read, never with a second purchase.
+     * with a read, never with a second purchase. The read result carries `reconciled` and `confirmed`
+     * so the caller only announces success when the new compartment is actually there: a lost write
+     * that did not commit leaves `confirmed: false`.
      *
      * @param {string} identifier Potion identifier (`useItem` name).
      * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string,
-     *   silver: number, level: number, unlockLevels: number[] }>}
+     *   silver: number, level: number, unlockLevels: number[], reconciled: boolean, confirmed: boolean }>}
      * @throws {import('../helpers/request.js').RequestError} The API's refusal, or the read error when a
      *   lost 201 could not be reconciled.
      */
     async order(identifier) {
+        const before = new Set(this.#slots.map(slot => Number(slot.id)));
+        const snapshot = this.#serverNow !== '';
         let answer;
         try {
             answer = await this.#model.buy(identifier);
         }
         catch (error) {
-            if (isLostWrite(error)) return this.reconcile();
+            if (isLostWrite(error)) return this.reconcile({ expected: identifier, before, snapshot });
             throw error;
         }
 
@@ -153,6 +157,8 @@ export class PotionsService {
                 silver,
                 level: state.level,
                 unlockLevels: state.unlockLevels,
+                reconciled: false,
+                confirmed: true,
             };
             this.#bus.emit(APP_EVENTS.accountSilver, { silver });
             this.#bus.emit(APP_EVENTS.potionsOrdered, detail);
@@ -160,28 +166,37 @@ export class PotionsService {
         }
 
         // The API before WP6 answers only the slot id and the balance; the list comes from a read.
-        return this.reconcile({ ordered: true });
+        return this.reconcile({ ordered: true, expected: identifier, before, snapshot });
     }
 
     /**
      * Reads the full compartment list and the balance after a lost 201, or after a 201 without slots.
      * Emits `potions:reconciled` (lost write) or `potions:ordered` (confirmed purchase) and never calls
-     * `POST /potions/slots` again.
+     * `POST /potions/slots` again. For a lost write, `confirmed` is true only when a slot that was not
+     * present in the last snapshot now carries the ordered identifier; without a prior snapshot the
+     * purchase cannot be proven, so it stays false.
      *
-     * @param {{ ordered?: boolean }} [options]
+     * @param {{ ordered?: boolean, expected?: string, before?: Set<number>, snapshot?: boolean }} [options]
      * @returns {Promise<{ slots: import('../helpers/event-bus.js').PotionSlotView[], serverNow: string,
-     *   silver: number, level: number, unlockLevels: number[] }>}
+     *   silver: number, level: number, unlockLevels: number[], reconciled: boolean, confirmed: boolean }>}
      */
-    async reconcile({ ordered = false } = {}) {
+    async reconcile({ ordered = false, expected = '', before = new Set(), snapshot = false } = {}) {
         const [slotsAnswer, counts] = await Promise.all([this.#model.slots(), this.#counts()]);
         const state = this.#remember(normalizeSlots(slotsAnswer));
         const silver = Number(counts?.user?.silver ?? 0);
+        const confirmed = Boolean(ordered) || Boolean(
+            snapshot
+            && expected
+            && state.slots.some(slot => !before.has(Number(slot.id)) && slot.identifier === expected),
+        );
         const detail = {
             slots: state.slots,
             serverNow: state.serverNow,
             silver,
             level: state.level,
             unlockLevels: state.unlockLevels,
+            reconciled: true,
+            confirmed,
         };
 
         this.#bus.emit(APP_EVENTS.accountSilver, { silver });
