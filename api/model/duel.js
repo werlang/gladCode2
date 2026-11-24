@@ -38,15 +38,21 @@ export class Duel {
      * Challenges waiting for the master's answer.
      *
      * @param {number} userId
-     * @returns {Promise<Array<{ id: number, time: string, nick: string, level: number, picture: string }>>}
+     * @returns {Promise<Array<{ id: number, time: string, nick: string, level: number, picture: string,
+     *   gladiator: string }>>} The challenger's gladiator name travels with the challenge.
      */
     static async challenges(userId) {
         const rows = await Mysql.select(
-            `SELECT d.id, d.time, u.apelido, u.foto, u.lvl FROM duels d INNER JOIN usuarios u ON u.id = d.user1
+            `SELECT d.id, d.time, u.apelido, u.foto, u.lvl, g.name AS gladiator
+            FROM duels d
+            INNER JOIN usuarios u ON u.id = d.user1
+            LEFT JOIN gladiators g ON g.cod = d.gladiator1
             WHERE d.user2 = ? AND d.log IS NULL ORDER BY d.time DESC`,
             [userId],
         );
-        return rows.map(row => ({ id: row.id, time: row.time, nick: row.apelido, level: row.lvl, picture: row.foto }));
+        return rows.map(row => ({
+            id: row.id, time: row.time, nick: row.apelido, level: row.lvl, picture: row.foto, gladiator: row.gladiator,
+        }));
     }
 
     /**

@@ -60,6 +60,19 @@ describe('social models', () => {
         expect(sendMail).not.toHaveBeenCalled();
     });
 
+    test('a pending challenge carries the challenger gladiator name', async () => {
+        Mysql.select.mockResolvedValue([{
+            id: 3, time: '2026-01-01 10:00:00', apelido: 'Ana', foto: '/profpics/ana.png',
+            lvl: 12, gladiator: 'Magnus',
+        }]);
+        await expect(Duel.challenges(9)).resolves.toEqual([{
+            id: 3, time: '2026-01-01 10:00:00', nick: 'Ana', level: 12,
+            picture: '/profpics/ana.png', gladiator: 'Magnus',
+        }]);
+        expect(Mysql.select.mock.calls[0][0]).toContain('g.name AS gladiator');
+        expect(Mysql.select.mock.calls[0][0]).toContain('LEFT JOIN gladiators');
+    });
+
     test('the bell can read unread finished duels without marking them', async () => {
         Mysql.select.mockResolvedValue([{
             id: 3, time: '2026-01-01 10:00:00', log: 'ab12', isread: 0,

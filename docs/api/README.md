@@ -55,7 +55,7 @@ From `api/route/duels.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/duels` | signed in | Challenges waiting for the master's answer: `{ duels }`. |
+| `GET` | `/duels` | signed in | Challenges waiting for the master's answer: `{ duels }`, each with the challenger's gladiator name. |
 | `GET` | `/duels/history?offset=0` | signed in | A page of the master's duels: `{ total, duels }`. |
 | `GET` | `/duels/unread` | signed in | Finished duels the master has not read: `{ duels }`. The bell uses this feed without marking them. |
 | `POST` | `/duels` | signed in | Challenges a friend: `{ friend, gladiator }`. The friend is emailed unless they opted out. |
@@ -81,7 +81,7 @@ From `api/route/gladiators.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/gladiators` | signed in | The signed-in master's gladiators. |
+| `GET` | `/gladiators` | signed in | The signed-in master's gladiators, each with its win/loss record and whether it is outdated or broken. |
 | `GET` | `/gladiators/samples/:name` | anyone | A sample opponent with its full source (`War Maker`, `Archie`, ...). |
 | `GET` | `/gladiators/:id` | signed in | One of the master's gladiators, to edit. |
 | `POST` | `/gladiators` | signed in | Creates a gladiator: `{ name, vstr, vagi, vint, skin, code, blocks? }` where `code` is the user code without setup(). It must pass a test battle first. Answers 201 `{ gladiator }`. |

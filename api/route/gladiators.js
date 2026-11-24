@@ -47,7 +47,7 @@ async function testBeforeSaving(glad, master) {
 
 /**
  * GET /gladiators
- * The signed-in master's gladiators.
+ * The signed-in master's gladiators, each with its win/loss record and whether it is outdated or broken.
  */
 router.get('/', auth(), asyncRoute(async (req, res) => {
     const gladiators = await Gladiator.listByMaster(req.user.id);

@@ -45,7 +45,13 @@ export class Gladiator extends Model {
      * @returns {Promise<Gladiator[]>} The master's gladiators, oldest first.
      */
     static async listByMaster(masterId) {
-        const rows = await Mysql.find('gladiators', { filter: { master: masterId }, opt: { order: { cod: 1 } } });
+        const rows = await Mysql.select(
+            `SELECT g.*,
+                (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'win') AS wins,
+                (SELECT COUNT(*) FROM reports r WHERE r.gladiator = g.cod AND r.result = 'loss') AS losses
+            FROM gladiators g WHERE g.master = ? ORDER BY g.cod`,
+            [masterId],
+        );
         return rows.map(row => new Gladiator(row));
     }
 
@@ -121,6 +127,9 @@ export class Gladiator extends Model {
     }
 
     /**
+     * The public view of a gladiator, including the win/loss record of its reports and the real
+     * ready (`version === VERSION`), outdated or `broken` state.
+     *
      * @param {string} [masterNick] Shown on the gladiator's card.
      * @returns {Record<string, unknown>}
      */
@@ -137,6 +146,9 @@ export class Gladiator extends Model {
             mmr: this.mmr,
             master: masterNick,
             outdated: this.version !== VERSION,
+            broken: this.version === 'broken',
+            wins: Number(this.wins || 0),
+            losses: Number(this.losses || 0),
         };
     }
 }

@@ -9,7 +9,7 @@ router.use(auth());
 
 /**
  * GET /duels
- * Challenges waiting for the master's answer: `{ duels }`.
+ * Challenges waiting for the master's answer: `{ duels }`, each with the challenger's gladiator name.
  */
 router.get('/', asyncRoute(async (req, res) => {
     res.send({ duels: await Duel.challenges(req.user.id) });
