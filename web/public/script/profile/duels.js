@@ -2,11 +2,11 @@ import { Avatar } from '../components/avatar.js';
 import { showMessage } from '../components/dialog.js';
 import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { SectionCard } from '../components/section-card.js';
+import { Pagination } from '../components/pagination.js';
 import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { showBlockedGladiator } from './gladiator-feedback.js';
 import { DuelModel } from '../models/social.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
@@ -30,7 +30,6 @@ function openDuelBox(nick, action, onConfirm) {
         confirm.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'duel' });
     });
-    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
     fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
     confirm.addEventListener('click', () => {
@@ -72,6 +71,10 @@ export class ChallengeList {
     #panel = document.querySelector('#duel-challenge');
     #card = null;
     #list = null;
+    #pager = null;
+    #duels = [];
+    #page = 1;
+    #pageSize = 10;
 
     /**
      * @param {() => void} onDuelFought Called after a duel ran.
@@ -81,14 +84,19 @@ export class ChallengeList {
         this.#card = new SectionCard();
         this.#card.setTitle('Desafios para duelo');
         this.#list = createElement(battleRowsTemplate);
-        this.#card.setBody([this.#list]);
+        this.#pager = new Pagination({ variant: 'simple' });
+        this.#card.setBody([this.#list, this.#pager.element]);
+        this.#pager.listen('change', ({ page }) => {
+            this.#page = page;
+            this.#renderPage();
+        });
         this.#panel.append(this.#card.element);
         this.#panel.hidden = true;
     }
 
-    /** @returns {number} How many challenges are shown. */
+    /** @returns {number} How many challenges are waiting (all pages). */
     get count() {
-        return this.#list.querySelectorAll('.battle-row').length;
+        return this.#duels.length;
     }
 
     /**
@@ -99,9 +107,22 @@ export class ChallengeList {
     async refresh({ signal } = {}) {
         const duels = await settleRequest(() => DuelModel.challenges({ signal }), signal);
         if (!duels || signal?.aborted) return;
+        this.#duels = duels;
+        this.#page = Math.min(this.#page, Math.max(1, Math.ceil(duels.length / this.#pageSize)));
         this.#panel.hidden = duels.length === 0;
+        this.#renderPage();
+    }
+
+    /** Draws the current page of challenges and the shared pagination. */
+    #renderPage() {
+        const total = this.#duels.length;
+        const pages = Math.max(1, Math.ceil(total / this.#pageSize));
+        this.#page = Math.max(1, Math.min(this.#page, pages));
+        this.#pager.element.hidden = total === 0;
+        this.#pager.set({ page: this.#page, pages, total, pageSize: this.#pageSize });
         this.#list.replaceChildren();
-        duels.forEach(duel => {
+        const start = (this.#page - 1) * this.#pageSize;
+        for (const duel of this.#duels.slice(start, start + this.#pageSize)) {
             const row = createElement(renderTemplate(duelChallengeRowTemplate, {
                 level: duel.level,
                 nick: duel.nick,
@@ -115,17 +136,16 @@ export class ChallengeList {
                 picture: duel.picture,
                 level: duel.level,
             }).element);
-            row.querySelector('.refuse').addEventListener('click', () => this.#refuse(row, duel));
+            row.querySelector('.refuse').addEventListener('click', () => this.#refuse(duel));
             row.querySelector('.accept').addEventListener('click', () => this.#accept(duel));
             this.#list.append(row);
-        });
+        }
     }
 
     /**
-     * @param {HTMLElement} row Challenge row.
      * @param {Record<string, any>} duel Challenge.
      */
-    async #refuse(row, duel) {
+    async #refuse(duel) {
         try {
             await DuelModel.remove(duel.id);
         }
@@ -134,8 +154,9 @@ export class ChallengeList {
             return;
         }
         showMessage('Desafio recusado');
-        row.remove();
-        if (this.count === 0) this.#panel.hidden = true;
+        this.#duels = this.#duels.filter(item => item.id !== duel.id);
+        this.#panel.hidden = this.#duels.length === 0;
+        this.#renderPage();
     }
 
     /** @param {Record<string, any>} duel Challenge. */

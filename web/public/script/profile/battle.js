@@ -2,6 +2,7 @@ import { Avatar } from '../components/avatar.js';
 import { ChoiceCards } from '../components/choice-cards.js';
 import { InviteBanner } from '../components/invite-banner.js';
 import { PageHeader } from '../components/page-header.js';
+import { Pagination } from '../components/pagination.js';
 import { SectionCard } from '../components/section-card.js';
 import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
@@ -31,6 +32,9 @@ export class BattleTab {
     #modes = null;
     #invite = null;
     #friend = null;
+    #friends = [];
+    #friendPage = 1;
+    #friendPager = null;
     #signal = null;
     #mode = 'ranked';
     #duels = [];
@@ -113,11 +117,18 @@ export class BattleTab {
         card.setTitle('Desafiar um amigo');
         card.setBody([createElement(duelFriendsTemplate)]);
         card.setActions([createElement("<button type='button' id='challenge' class='button primary small' disabled>Desafiar</button>")]);
+        this.#friendPager = new Pagination({ variant: 'simple' });
+        this.#friendPager.listen('change', ({ page }) => {
+            this.#friendPage = page;
+            this.#renderFriends();
+        });
+        card.body.append(this.#friendPager.element);
         root.append(card.element);
     }
 
     /** @param {string} mode */
     #selectMode(mode) {
+        if (mode !== 'ranked') this.ranked?.cancelPending?.();
         this.#mode = mode;
         if (this.#modes) this.#modes.set(mode, { silent: true });
         if (!this.#root) return;
@@ -157,7 +168,7 @@ export class BattleTab {
                 picture: duel.picture,
                 name: duel.nick ?? '',
                 message: `${duel.nick ?? 'Um mestre'} desafiou você para um duelo`,
-                detail: `${duel.gladiator ? `Luta com ${duel.gladiator}. ` : ''}Responda em até 2 dias.`,
+                detail: duel.gladiator ? `Luta com ${duel.gladiator}.` : '',
                 acceptLabel: 'Escolher gladiador e aceitar',
                 refuseLabel: 'Recusar',
             });
@@ -233,11 +244,26 @@ export class BattleTab {
         const request = ++this.#filterRequest;
         const friends = await secondaryRequest(() => FriendModel.filter(text, { signal }), signal);
         if (signal?.aborted || request !== this.#filterRequest) return;
+        this.#friends = Array.isArray(friends) ? friends : [];
+        this.#friendPage = 1;
+        this.#renderFriends();
+    }
+
+    /** Draws the current page of the friend filter and its pagination. */
+    #renderFriends() {
         const table = this.#root.querySelector('#duel.wrapper #table-friends');
         const challenge = this.#root.querySelector('#duel.wrapper #challenge');
         if (!table || !challenge) return;
+        const total = this.#friends.length;
+        const pages = Math.max(1, Math.ceil(total / 10));
+        this.#friendPage = Math.max(1, Math.min(this.#friendPage, pages));
+        this.#friend = null;
+        challenge.disabled = true;
+        this.#friendPager.element.hidden = total === 0;
+        this.#friendPager.set({ page: this.#friendPage, pages, total, pageSize: 10 });
         table.replaceChildren();
-        (Array.isArray(friends) ? friends : []).forEach(friend => {
+        const start = (this.#friendPage - 1) * 10;
+        for (const friend of this.#friends.slice(start, start + 10)) {
             const row = createElement(renderTemplate(friendFilterRowTemplate, { nick: friend.nick }));
             row.querySelector('.friend-avatar').append(new Avatar({ size: 'sm', name: friend.nick, picture: friend.picture, level: friend.level }).element);
             row.addEventListener('click', () => {
@@ -247,7 +273,7 @@ export class BattleTab {
                 challenge.disabled = false;
             });
             table.append(row);
-        });
+        }
     }
 
     /** Accepts the banner's first challenge through the shared picker. */
