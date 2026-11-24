@@ -202,7 +202,7 @@ tutorial.lesson.start = async function(){
             }
         }
         if (data == "Sim"){
-            let lang = await showDialog("Qual destas linguagens você prefere utilizar?", ["C", "Python", "Blocos"])
+            let lang = await showDialog("Qual destas linguagens você prefere utilizar?", ["C", "Python", "JavaScript", "Blocos"])
 
             if (lang == 'Blocos'){
                 toggleBlocks({ask: false, active: true})
@@ -235,6 +235,7 @@ tutorial.lesson.firstStep = async function(){
     await showMessage("Cada gladiador pode executar uma ação a cada 0.1s, que é o intervalo da simulação. Na <b>função loop</b> é onde você diz o que seu gladiador deve fazer em cada intervalo de tempo da simulação")
 
     const text = {
+        javascript: `Experimente colocar a função <b>stepForward()</b> dentro das chaves da função loop. Quando terminar, clique no botão para testar seu gladiador. É o sexto botão no menu à esquerda, com o ícone de um controle de videogame`,
         c: `Experimente colocar a função <b>stepForward()</b> dentro das chaves da função loop. Quando terminar, clique no botão para testar seu gladiador. É o sexto botão no menu à esquerda, com o ícone de um controle de videogame`,
         python: `Experimente colocar a função <b>stepForward()</b> logo abaixo função loop. Quando terminar, clique no botão para testar seu gladiador. É o sexto botão no menu à esquerda, com o ícone de um controle de videogame`,
         blocks: `Experimente colocar um bloco <b>Passo para [frente]</b> dentro do bloco <b>loop</b>. Ele fica no menu de blocos gladCode > Movimentação.`
@@ -271,7 +272,7 @@ tutorial.lesson.checkStep = async function(){
     }
     else {
         let search
-        if (user.language == 'c')
+        if (user.language == 'c' || user.language == 'javascript')
             search = text.search(/[\s(=]stepForward[\s]{0,1}\(\)[);\s]/g)
         else if (user.language == 'python')
             search = text.search(/[\s(=]stepForward[\s]{0,1}\(\)[)\s]/g)
@@ -282,10 +283,12 @@ tutorial.lesson.checkStep = async function(){
                 const info = {
                     message: {
                         c: "Vou lhe mostrar. Observe o editor de texto. Cada comando fica em uma linha, e no fim da linha precisa conter o <b>;</b>. Agora clique no botão para testar o gladiador.",
+                        javascript: "Vou lhe mostrar. Observe o editor de texto. Cada comando fica em uma linha, dentro das chaves da função, e é costume terminar a linha com <b>;</b>. Agora clique no botão para testar o gladiador.",
                         python: "Vou lhe mostrar. Observe o editor de texto. Cada comando fica em uma linha, respeitando a indentação (espaços) dentro da função. Agora clique no botão para testar o gladiador."
                     },
                     code: {
                         c: 'loop(){\n    stepForward();\n}',
+                        javascript: 'function loop() {\n    stepForward();\n}',
                         python: 'def loop():\n    stepForward()\n'
                     }
                 }
@@ -323,6 +326,8 @@ tutorial.lesson.watchCodeMove = async function(){
 
         if (user.language == 'c')
             editor.setValue("// controla quando o gladiador chegou no meio da arena \nint start = 1;\n\nloop(){\n    if (start){ // se ele ainda não chegou no meio\n        moveTo(12, 12); // move em direção à posição 12,12\n        // getX e getY capturam o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) // se X e Y é 12, chegou no destino\n            start = 0; // coloca 0 em start para dizer que não quer mais caminhar\n    }\n    else // caso start já esteja em 0\n        turn(60); // fica rotacionando 60 graus\n}")
+        else if (user.language == 'javascript')
+            editor.setValue("// controla quando o gladiador chegou no meio da arena \nlet start = true;\n\nfunction loop() {\n    if (start){ // se ele ainda não chegou no meio\n        moveTo(12, 12); // move em direção à posição 12,12\n        // getX e getY capturam o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) // se X e Y é 12, chegou no destino\n            start = false; // coloca false em start para dizer que não quer mais caminhar\n    }\n    else // caso start já seja false\n        turn(60); // fica rotacionando 60 graus\n}");
         else if (user.language == 'python')
             editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\n\ndef loop():\n    global start\n    if start: # se ele ainda não chegou no meio\n        moveTo(12, 12) # move em direção à posição 12,12\n        # getX e getY capturam o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        turn(60) # fica rotacionando 60 graus")
         
@@ -345,6 +350,7 @@ tutorial.lesson.moveBackForth = async function(){
 
         const info = {
             c: ['1', '0'],
+            javascript: ['true', 'false'],
             python: ['True', 'False'],
         }
 
@@ -373,6 +379,9 @@ tutorial.lesson.showBackForth = async function(){
     }
     else if (user.language == 'c'){
         editor.setValue("//controla quando o gladiador chegou no meio da arena \nint start=1, vai=0;\n\nloop(){\n    if (start){ //se ele ainda não chegou no meio\n        moveTo(12,12); //se move em direção à posição 12,12\n        //getX e getY server para capturar o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) //se X e Y é 12, chegou no destino\n            start = 0; //coloca 0 em start para dizer que não quer mais caminhar\n    }\n    else{ //caso start já esteja em 0\n        if (vai){ //verifica se vai ou vem\n            if(moveTo(5,15)) //move e testa se chegou no ponto\n                vai = 0; //diz que é hora do vem\n        }\n        else{ //se está na etapa do vem\n            if(moveTo(20,10)) \n                vai = 1; //diz que é hora do vai\n        }\n    }\n}");
+    }
+    else if (user.language == 'javascript'){
+        editor.setValue("//controla quando o gladiador chegou no meio da arena \nlet start = true, vai = false;\n\nfunction loop() {\n    if (start){ //se ele ainda não chegou no meio\n        moveTo(12,12); //se move em direção à posição 12,12\n        //getX e getY server para capturar o X e Y do gladiador\n        if (getX() == 12 && getY() == 12) //se X e Y é 12, chegou no destino\n            start = false; //coloca false em start para dizer que não quer mais caminhar\n    }\n    else{ //caso start já seja false\n        if (vai){ //verifica se vai ou vem\n            if(moveTo(5,15)) //move e testa se chegou no ponto\n                vai = false; //diz que é hora do vem\n        }\n        else{ //se está na etapa do vem\n            if(moveTo(20,10)) \n                vai = true; //diz que é hora do vai\n        }\n    }\n}");
     }
     else if (user.language == 'python'){
         editor.setValue("# controla quando o gladiador chegou no meio da arena \nstart = True\nvai = False\n\ndef loop():\n    global start, vai\n    if start: # se ele ainda não chegou no meio\n        moveTo(12,12) # se move em direção à posição 12,12\n        # getX e getY server para capturar o X e Y do gladiador\n        if getX() == 12 and getY() == 12: # se X e Y é 12, chegou no destino\n            start = False # coloca 0 em start para dizer que não quer mais caminhar\n    else: # caso start já esteja em 0\n        if vai: # verifica se vai ou vem\n            if moveTo(5, 15): # move e testa se chegou no ponto\n                vai = False # diz que é hora do vem\n        else: # se está na etapa do vem\n            if moveTo(20, 10): \n                vai = True # diz que é hora do vai");
@@ -410,6 +419,9 @@ tutorial.lesson.detectEnemy = async function(){
         else if (user.language == 'c'){
             editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        // aqui vamos colocar o que fazer quando detectar inimigo\n    }\n}");
         }
+        else if (user.language == 'javascript'){
+            editor.setValue("let start = true;\n\nfunction loop() {\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        // aqui vamos colocar o que fazer quando detectar inimigo\n    }\n}");
+        }
         else if (user.language == 'python'){
             editor.setValue('start = True\n\ndef loop():\n    global start\n    if start:\n        moveTo(12, 12)\n        if getX() == 12 and getY() == 12:\n            start = False\n    # detecta se tem inimigo próximo, e fixa a atenção nele\n    if getCloseEnemy():\n        # aqui vamos colocar o que fazer quando detectar inimigo')
         }
@@ -424,7 +436,7 @@ tutorial.lesson.learnAttack = async function(){
 
     if (user.language == 'blocks' || user.language == 'python')
         search = text.search(/[(\s=](getCloseEnemy|getFarEnemy|getLowHp|getHighHp)[\s]{0,1}\(\)[:=!<>)\s]{0,1}/g)
-    else if (user.language == 'c')
+    else if (user.language == 'c' || user.language == 'javascript')
         search = text.search(/[(\s=](getCloseEnemy|getFarEnemy|getLowHp|getHighHp)[\s]{0,1}\(\)[=!<>;)\s]/g)
 
     if (search == -1){
@@ -469,6 +481,9 @@ tutorial.lesson.learnAttack = async function(){
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY());\n    }\n}");
             }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\n\nfunction loop() {\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY());\n    }\n}");
+            }
         }
 
         tutorial.next()
@@ -482,7 +497,7 @@ tutorial.lesson.checkAttack = async function(){
     if (user.language == 'blocks' || user.language == 'python'){
         search = text.search(/[\s]attackRanged[\s]{0,1}\(+[\s]*getTargetX[\s]{0,1}\(\)[\s]*\)*,[\s]*\(*[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)*[:\s]/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\)[\w\W]*\n[\s(]*attackRanged[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\)/g) == -1
     }
-    else if (user.language == 'c'){
+    else if (user.language == 'c' || user.language == 'javascript'){
         search = text.search(/[(=<>!\s]attackRanged[\s]{0,1}\([\s]*getTargetX[\s]{0,1}\(\)[\s]*,[\s]*getTargetY[\s]{0,1}\(\)[\s]*\)[)!=<>;\s]*/g) == -1 && text.search(/([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*([\w]+)[\s]{0,1}=[\s]{0,1}getTarget[XY][\s]{0,1}\(\);[\w\W]*\n[\s]*attackRanged[\s]{0,1}\([\s]*\1[\s]*,[\s]*\2[\s]*\);/g) == -1
     }
 
@@ -505,6 +520,9 @@ tutorial.lesson.checkAttack = async function(){
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\n\nloop(){\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY()); // Ataca o alvo no ponto informado\n    }\n}");
+            }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\n\nfunction loop() {\n    if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    // detecta se tem inimigo próximo, e fixa a atenção nele\n    if (getCloseEnemy()){\n        attackRanged(getTargetX(), getTargetY()); // Ataca o alvo no ponto informado\n    }\n}");
             }
         }
     }
@@ -560,6 +578,9 @@ tutorial.lesson.checkGetHit = async function(){
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turn(180); //vira 180g caso tenha sido ferido\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
             }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turn(180); //vira 180g caso tenha sido ferido\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
+            }
         }
     }
     else{
@@ -589,7 +610,7 @@ tutorial.lesson.checkReact = async function(){
     let search
     if (user.language == 'blocks' || user.language == 'python')
         search = text.search(/[(=]*[\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;:)][\w\W]*turnToLastHit[\s]{0,1}\(\)/g) == -1
-    else if (user.language == 'c')
+    else if (user.language == 'c' || user.language == 'javascript')
         search = text.search(/[(=][\s]*getHit[\s]{0,1}\(\)[\s]*[><!=;)][\w\W]*turnToLastHit[\s]{0,1}\(\)/g) == -1
 
     if (search){
@@ -615,6 +636,9 @@ tutorial.lesson.checkReact = async function(){
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turnToLastHit(); //vira em direção ao agressor\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
+            }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    if (getHit()) //Verifica se o gladiador foi ferido\n        turnToLastHit(); //vira em direção ao agressor\n    else if (getCloseEnemy()) //se nao foi ferido, verifica se tem inimigo próximo\n        attackRanged(getTargetX(), getTargetY()); //ataca alvo se encontrou inimigo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
             }
         }
     }
@@ -674,6 +698,9 @@ tutorial.lesson.checkSafe = async function(){
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere()) //testa se o gladiador está em cima da nuvem\n        moveTo(12.5,12.5); //foge da nuvem, em direção ao centro\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
+            }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    if (!isSafeHere()) //testa se o gladiador está em cima da nuvem\n        moveTo(12.5,12.5); //foge da nuvem, em direção ao centro\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        attackRanged(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
             }
         }
     }
@@ -740,6 +767,9 @@ tutorial.lesson.checkFireball = async function(){
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY()); //arremessa bola de fogo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}");
             }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        turnToLastHit();\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY()); //arremessa bola de fogo\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
+            }
         }
     }
     else{
@@ -799,6 +829,9 @@ tutorial.lesson.checkTeleport = async function(){
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5); //foge para posição 5,5 quando for ferido\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
+            }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5); //foge para posição 5,5 quando for ferido\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
             }
         }
     }
@@ -869,6 +902,9 @@ tutorial.lesson.checkUpgrade = async function(){
             }
             else if (user.language == 'c'){
                 editor.setValue("int start=1;\nloop(){\n    upgradeINT(5); //melhora inteligência quando subir de nível\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5);\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = 0;\n    }\n    else\n        turn(60);\n}")
+            }
+            else if (user.language == 'javascript'){
+                editor.setValue("let start = true;\nfunction loop() {\n    upgradeINT(5); //melhora inteligência quando subir de nível\n    if (!isSafeHere())\n        moveTo(12.5,12.5);\n    else if (getHit())\n        teleport(5,5);\n    else if (getCloseEnemy())\n        fireball(getTargetX(), getTargetY());\n    else if (start){\n        moveTo(12,12);\n        if (getX() == 12 && getY() == 12)\n            start = false;\n    }\n    else\n        turn(60);\n}");
             }
         }
     }
