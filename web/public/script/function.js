@@ -90,7 +90,8 @@ async function fillSample(item, reference, language) {
         showCode(target, sample[language], language);
     }
 
-    const calls = (sample.python ?? sample.c).match(/\w+\(/g) ?? [];
+    const sampleCode = language === 'blocks' ? sample.python ?? sample.c : sample[language] ?? sample.python ?? sample.c;
+    const calls = sampleCode.match(/\w+\(/g) ?? [];
     calls.map(call => call.slice(0, -1)).forEach(name => {
         if (name !== item.name.default && !item.seealso.includes(name) && !RESERVED.includes(name)) {
             item.seealso.push(name);
