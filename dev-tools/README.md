@@ -11,6 +11,9 @@ run on the API (`api/model/dev-tournament.js`), so the page and the shell share 
 | Database dump and restore | `dev-tools/dump_restore.sh` |
 | Release notes to publish as news | `dev-tools/news/news-<version>.sql` |
 | Synty piece viewer | `web/public/dev-tools/synty-viewer.html` (see `docs/synty-assets/README.md`) |
+| Static board renderer | `dev-tools/render-boards.mjs` (visual audit; writes standalone HTML) |
+| Phone/theme/axe audit | `dev-tools/ui-audit.mjs` (needs the dev stack, Chrome CDP and an axe-core file) |
+| Documentation link/path checker | `dev-tools/check-docs.mjs` |
 
 ## Access
 
