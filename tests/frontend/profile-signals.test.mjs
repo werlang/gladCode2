@@ -46,6 +46,7 @@ function fakeNode(children = {}) {
         fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
         removeEventListener: () => {},
         insertAdjacentHTML: () => {},
+        hasAttribute: () => false,
         setAttribute: () => {},
         removeAttribute: () => {},
         getAttribute: () => null,
@@ -299,31 +300,26 @@ test('potions do not draw slots from an aborted load', async () => {
     }
 });
 
-test('reports keep the placeholder when the page arrives after leaving', async () => {
-    const table = fakeNode();
-    const unread = fakeNode({ input: fakeNode() });
-    const panel = fakeNode({
-        '#bhist-container .table': table,
-        '#unread': unread,
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
-    });
+test('reports keep their rows when the page arrives after leaving', async () => {
+    const body = fakeNode();
+    const panel = fakeNode({ '#reports-body': body });
     installDocument(new Map([['#report-container', panel]]));
-    const original = ReportModel.battles;
+    const original = { battles: ReportModel.battles, summary: ReportModel.summary };
     const pending = deferred();
+    ReportModel.summary = async () => ({ results: [], renown: 0, unread: 0 });
     ReportModel.battles = () => pending.promise;
     try {
         const tab = new ReportsTab();
         const controller = new AbortController();
         const shown = tab.show({}, { signal: controller.signal });
-        const placeholder = table.innerHTML;
         controller.abort();
         pending.resolve({ total: 1, reports: [{ id: 1 }] });
         await shown;
-        assert.equal(table.innerHTML, placeholder);
+        assert.equal(body.replaced, 0);
     }
     finally {
-        ReportModel.battles = original;
+        ReportModel.battles = original.battles;
+        ReportModel.summary = original.summary;
     }
 });
 
@@ -492,13 +488,9 @@ test('a failed friend search clears only its side panel', async () => {
 });
 
 test('a failed potion catalogue still loads the primary slots', async () => {
-    const container = fakeNode();
-    const browse = fakeNode();
-    const panel = fakeNode({ '#my-pots': container, '#browse': browse });
-    installDocument(new Map([
-        ['#apot-container', panel],
-        ['#apot-panel', fakeNode()],
-    ]));
+    const slots = fakeNode();
+    const panel = fakeNode({ '#potion-slots': slots });
+    installDocument(new Map([['#apot-container', panel]]));
     const original = { catalog: PotionModel.catalog, apothecary: PotionModel.apothecary, slots: PotionModel.slots };
     PotionModel.catalog = async () => {
         throw new Error('catalogue down');
@@ -509,15 +501,14 @@ test('a failed potion catalogue still loads the primary slots', async () => {
     let slotReads = 0;
     PotionModel.slots = async () => {
         slotReads += 1;
-        return { slots: [], level: 1, unlockLevels: [0, 0, 0, 0] };
+        return { slots: [], serverNow: '2026-11-24 00:00:00', level: 1, unlockLevels: [0, 0, 0, 0] };
     };
     profile.user = { ...profile.user, apothecary: 1 };
     try {
         const tab = new PotionsTab();
         await tab.init();
         assert.equal(slotReads, 1);
-        assert.equal(container.replaced, 1);
-        assert.equal(browse.disabled, true);
+        assert.equal(slots.replaced, 1);
         tab.unmount();
     }
     finally {

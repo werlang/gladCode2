@@ -181,3 +181,25 @@ test('a controlled page keeps the confirmed range until set and a cancel changes
         globalThis.document = previousDocument;
     }
 });
+
+test('a pager can name what it counts in the summary', () => {
+    const previousDocument = globalThis.document;
+    const fakeDocument = { activeElement: null };
+    fakeDocument.createElement = tagName => makeNode(fakeDocument, tagName);
+    fakeDocument.createDocumentFragment = () => {
+        const fragment = makeNode(fakeDocument, '#fragment');
+        fragment.isFragment = true;
+        return fragment;
+    };
+    globalThis.document = fakeDocument;
+    try {
+        const root = makeNode(fakeDocument);
+        const pagination = new Pagination({ element: root, variant: 'simple', unit: 'batalhas' });
+        pagination.set({ page: 1, pages: 2, total: 20, pageSize: 10 });
+        const summary = root.children.find(child => child.className === 'pagination-summary');
+        assert.equal(summary.textContent, '1–10 de 20 batalhas');
+    }
+    finally {
+        globalThis.document = previousDocument;
+    }
+});

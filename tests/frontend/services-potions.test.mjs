@@ -60,6 +60,8 @@ test('a 201 with slots applies the balance and the list directly, with no read',
         buy: () => ({
             slotId: 3,
             silver: 1200,
+            level: 4,
+            unlockLevels: [1, 10, 20, 30],
             serverNow: '2026-01-01 10:00:00',
             slots: [...SLOTS.slots, { id: 3, identifier: 'xp2', name: 'Experiência', icon: 'xp', expiresAt: '2026-01-01 12:00:00', seconds: 7200 }],
         }),
@@ -71,9 +73,12 @@ test('a 201 with slots applies the balance and the list directly, with no read',
     assert.equal(model.calls.buy.length, 1);
     assert.equal(model.calls.slots, 0);
     assert.equal(result.silver, 1200);
+    assert.equal(result.level, 4);
+    assert.deepEqual(result.unlockLevels, [1, 10, 20, 30]);
     assert.equal(service.slots.length, 3);
     assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:ordered']);
     assert.equal(bus.emitted[1].detail.slots.length, 3);
+    assert.equal(bus.emitted[1].detail.level, 4);
 });
 
 test('a 201 without slots (the API before WP6) reads the full list and emits potions:ordered', async () => {
@@ -85,6 +90,8 @@ test('a 201 without slots (the API before WP6) reads the full list and emits pot
 
     assert.equal(model.calls.slots, 1);
     assert.equal(result.silver, 1250);
+    assert.equal(result.level, 4);
+    assert.deepEqual(result.unlockLevels, [1, 10, 20, 30]);
     assert.deepEqual(bus.emitted.map(event => event.name), ['account:silver', 'potions:ordered']);
 });
 
