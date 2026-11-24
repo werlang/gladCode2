@@ -142,6 +142,7 @@ export const APP_EVENTS = Object.freeze({
     notificationsCounts: 'notifications:counts',
     navigationOpened: 'navigation:opened',
     messagesRead: 'messages:read',
+    messagesOpened: 'messages:opened',
     friendsAnswered: 'friends:answered',
     potionsOrdered: 'potions:ordered',
     potionsReconciled: 'potions:reconciled',

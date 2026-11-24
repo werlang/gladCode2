@@ -18,6 +18,8 @@
     <link rel='stylesheet' href="{{#asset}}css/profile-potions.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-reports.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-ranking.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile-messages.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile-friends.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/potion-slot.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/potion-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/result-pill.css{{/asset}}"/>
@@ -25,6 +27,10 @@
     <link rel='stylesheet' href="{{#asset}}css/components/ranking-table.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/search-field.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/own-gladiator-jump.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/conversation-list.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/message-thread.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/composer.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/friend-row.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/gladiator-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/page-header.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/section-card.css{{/asset}}"/>
@@ -83,39 +89,8 @@
             <div class='content' data-menu='glads'><div id='glads-container'><p class='news-loading'>Carregando gladiadores…</p></div></div>
             <div class='content' data-menu='potions'><div id='apot-container'><p class='news-loading'>Carregando poções…</p></div></div>
             <div class='content' data-menu='ranking'><div id='ranking-container'><p class='news-loading'>Carregando ranking…</p></div></div>
-            <div class='content' data-menu='messages'>
-                <div id='message-panel'>
-                    <h2>Mensagens</h2>
-                    <div class='table'></div>
-                    <div id='page-title' class='page-nav'>
-                        <span></span> - <span></span> de <span></span>
-                        <button id='prev' aria-label='Página anterior'><i class='fas fa-chevron-left'></i></button>
-                        <button id='next' aria-label='Próxima página'><i class='fas fa-chevron-right'></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class='content' data-menu='friends'>
-                <div id='friend-panel'>
-                    <div id='request' class='hidden'>
-                        <h2>Convites pendentes</h2>
-                        <div class='table'></div>
-                    </div>
-                    <div id='friends' class='hidden'>
-                        <h2>Lista de amigos</h2>
-                        <div class='table'></div>
-                        <div class='options'>
-                            <div class='message'><img src='icon/message.png'><span>Enviar mensagem</span></div>
-                            <div class='duel'><img src='sprite/images/swords.png'><span>Desafiar para duelo</span></div>
-                            <div class='unfriend'><img src='icon/unfriend.png'><span>Desfazer amizade</span></div>
-                        </div>
-                    </div>
-                    <div id='search'>
-                        <h2>Busca de usuários</h2>
-                        <input type='text' class='input' placeholder='nome do usuário'>
-                        <div class='table'></div>
-                    </div>
-                </div>
-            </div>
+            <div class='content' data-menu='messages'><div id='messages-container'><p class='news-loading'>Carregando mensagens…</p></div></div>
+            <div class='content' data-menu='friends'><div id='friends-container'><p class='news-loading'>Carregando amigos…</p></div></div>
         </div>
         </main>
     </div>

@@ -1,161 +1,239 @@
-import { showMessage } from '../components/dialog.js';
-import { formatMessageTime } from '../helpers/date-format.js';
-import { createElement, renderTemplate } from '../helpers/html.js';
-import { runReadTask, runSectionTask, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
-import { fadeIn, fadeOut, show } from '../helpers/animate.js';
-import { MessageModel } from '../models/social.js';
-import { emptyStateTemplate } from '../templates/empty-state.js';
-import { fullMessageTemplate, messageRowTemplate, replyTemplate } from '../templates/profile.js';
-
-/** Tallest the reply box grows, in px. */
-const MAX_REPLY_HEIGHT = 300;
+import { Message, showDialog } from '../components/dialog.js';
+import { Avatar } from '../components/avatar.js';
+import { Composer } from '../components/composer.js';
+import { ConversationList } from '../components/conversation-list.js';
+import { MessageThread } from '../components/message-thread.js';
+import { PageHeader } from '../components/page-header.js';
+import { SearchField } from '../components/search-field.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
+import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { isAborted, secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { FriendModel } from '../models/social.js';
+import { messages } from '../services/messages.js';
+import { icon } from '../templates/icons.js';
+import { newMessageRowTemplate, newMessagePickerTemplate, messagesShellTemplate } from '../templates/messages.js';
+import { pageHeaderTemplate } from '../templates/page-header.js';
+import { challengeFriend } from './duels.js';
 
 /**
- * The MENSAGENS tab: received messages, reading, replying, marking unread
- * and deleting them.
+ * The MENSAGENS section: the conversation list, the open thread and the composer. Conversations are
+ * keyed by the other master's user id.
  */
 export class MessagesTab {
-    #panel = document.querySelector('#message-panel');
-    #page = 1;
-    /** The current navigation signal; reloads keep using it. */
+    #root = document.querySelector('#messages-container');
+    #built = false;
+    #header = null;
+    #list = null;
+    #thread = null;
+    #composer = null;
+    #newButton = null;
+    #shell = null;
+    #current = null;
     #signal = null;
+    #request = 0;
+    #sending = false;
 
-    /** Binds the pages. */
+    /** Builds the section shell. */
     init() {
-        this.#panel.querySelector('#prev').addEventListener('click', () => {
-            this.#page--;
-            runReadTask(() => this.#show(), this.#signal);
-        });
-        this.#panel.querySelector('#next').addEventListener('click', () => {
-            this.#page++;
-            runReadTask(() => this.#show(), this.#signal);
-        });
+        this.#build();
     }
 
-    /** Reloads the current page with the mounted section's signal. */
-    #show() {
-        return this.show({}, { signal: this.#signal });
+    #build() {
+        if (this.#built || !this.#root) return;
+        this.#root.innerHTML = renderTemplate(messagesShellTemplate);
+        const header = createElement(pageHeaderTemplate);
+        this.#root.querySelector('#messages-header').append(header);
+        this.#header = new PageHeader({ element: header });
+        this.#header.set({ title: 'Mensagens', subtitle: 'Conversas privadas com outros mestres.' });
+        this.#newButton = document.createElement('button');
+        this.#newButton.type = 'button';
+        this.#newButton.className = 'button primary';
+        this.#newButton.innerHTML = `${icon('messages', { size: 16, className: 'icon' })}<span>Nova mensagem</span>`;
+        this.#newButton.addEventListener('click', () => this.#run(() => this.#newMessage()));
+        this.#header.setActions([this.#newButton]);
+
+        this.#shell = this.#root.querySelector('#messages-shell');
+        this.#list = new ConversationList();
+        this.#root.querySelector('#messages-list-pane').append(this.#list.element);
+        this.#list.listen('select', ({ userId }) => this.#run(() => this.#open(userId)));
+
+        this.#thread = new MessageThread();
+        this.#root.querySelector('#messages-thread-pane').append(this.#thread.element);
+        this.#thread.listen('back', () => this.#run(() => this.#closeThread()));
+        this.#thread.listen('challenge', ({ user }) => this.#run(() => this.#challenge(user)));
+        this.#thread.listen('more', ({ user }) => this.#run(() => this.#more(user)));
+
+        this.#composer = new Composer();
+        this.#root.querySelector('#messages-thread-pane').append(this.#composer.element);
+        this.#composer.listen('send', ({ text }) => this.#run(() => this.#send(text)));
+        this.#built = true;
     }
 
     /**
-     * Lists a page of messages.
-     *
-     * @param {object} [route]
+     * @param {{ query?: { userId?: number } }} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
     async show(route = {}, { signal } = {}) {
+        this.#build();
         this.#signal = signal;
-        this.#panel.querySelector('#full-message')?.remove();
-        const table = this.#panel.querySelector('.table');
-        show(table);
+        const token = ++this.#request;
+        const conversations = await settleRequest(() => messages.list({ signal }), signal);
+        if (!conversations || signal?.aborted || token !== this.#request) return;
+        this.#list.setConversations(conversations);
+        const requested = Number(route.query?.userId) || null;
+        if (requested) return this.#open(requested, { push: false, signal });
+        if (!this.#isPhone() && conversations.length) {
+            return this.#open(Number(conversations[0].user?.id), { push: false, signal });
+        }
+        this.#closeThread({ push: false });
+    }
 
-        const data = await settleRequest(() => MessageModel.list(this.#page, { signal }), signal);
-        if (!data || signal?.aborted) return;
-        const { meta, messages: info } = data;
-        const pageNav = this.#panel.querySelector('#page-title');
-        if (meta.total == 0) {
-            pageNav.hidden = true;
-            table.innerHTML = renderTemplate(emptyStateTemplate, {
-                variantClass: 'compact', icon: 'envelope-open', title: 'Você ainda não possui mensagens', summary: '', actionHtml: '',
-            });
+    /** @returns {boolean} */
+    #isPhone() {
+        return Boolean(globalThis.matchMedia?.('(max-width: 700px)').matches);
+    }
+
+    /**
+     * Opens a conversation.
+     *
+     * @param {number} userId
+     * @param {{ push?: boolean, signal?: AbortSignal }} [options]
+     */
+    async #open(userId, { push = true, signal = this.#signal } = {}) {
+        const token = ++this.#request;
+        this.#thread.setBusy(true);
+        let data;
+        try {
+            data = await settleRequest(() => messages.open(userId, { signal }), signal);
+        }
+        catch (error) {
+            this.#thread.setBusy(false);
+            if (!isAborted(error) && !signal?.aborted) writeErrorToast(error);
             return;
         }
-        pageNav.hidden = false;
+        if (!data || signal?.aborted || token !== this.#request) return;
+        this.#current = data.user;
+        if (!this.#list.has(data.user.id)) this.#list.upsert({ user: data.user, last: null, unread: 0 });
+        this.#thread.setConversation(data);
+        this.#thread.setBusy(false);
+        this.#list.select(userId);
+        this.#composer.setPlaceholder(`Escreva para ${data.user.nick}`);
+        this.#composer.clear();
+        this.#composer.element.hidden = false;
+        this.#shell.classList.add('is-thread');
+        if (push) events.emit(APP_EVENTS.messagesOpened, { userId: Number(userId) });
+        try {
+            const read = await messages.markRead(userId);
+            this.#list.markRead(userId);
+            if (read.read) this.#thread.setBusy(false);
+        }
+        catch (error) {
+            if (!isAborted(error)) writeErrorToast(error);
+        }
+        this.#composer.focus();
+    }
 
-        const counters = this.#panel.querySelectorAll('#page-title span');
-        counters[0].textContent = meta.start;
-        counters[1].textContent = meta.end;
-        counters[2].textContent = meta.total;
-        this.#panel.querySelector('#prev').disabled = meta.page == 1;
-        this.#panel.querySelector('#next').disabled = meta.end == meta.total;
+    /** @param {{ push?: boolean }} [options] */
+    #closeThread({ push = true } = {}) {
+        this.#current = null;
+        this.#thread.clear();
+        this.#composer.clear();
+        this.#composer.element.hidden = true;
+        this.#shell.classList.remove('is-thread');
+        if (push) events.emit(APP_EVENTS.messagesOpened, { userId: null });
+    }
 
-        table.replaceChildren();
-        info.forEach(message => {
-            const row = createElement(renderTemplate(messageRowTemplate, {
-                unread: message.read ? '' : 'unread',
-                nick: message.nick,
-                message: message.message,
-                elapsed: formatMessageTime(message.time, { short: true }),
+    /** @param {string} text */
+    async #send(text) {
+        if (!this.#current || this.#sending) return;
+        const body = String(text ?? '').trim();
+        if (!body) return;
+        this.#sending = true;
+        this.#composer.setBusy(true);
+        try {
+            const message = await messages.send(this.#current.id, body);
+            this.#thread.append(message);
+            this.#list.updateLast(this.#current.id, message);
+            this.#composer.clear();
+            this.#composer.setPlaceholder(`Escreva para ${this.#current.nick}`);
+        }
+        catch (error) {
+            writeErrorToast(error);
+        }
+        finally {
+            this.#sending = false;
+            this.#composer.setBusy(false);
+            this.#composer.focus();
+        }
+    }
+
+    /** @param {{ nick: string, id: number }} user */
+    #challenge(user) {
+        challengeFriend(user.nick, user.id);
+    }
+
+    /** @param {{ nick: string, id: number }} user */
+    async #more(user) {
+        const answer = await showDialog(
+            `Conversa com <span class="highlight">${escapeHtml(user.nick)}</span>`,
+            ['Desafiar', 'Fechar'],
+        );
+        if (answer === 'Desafiar') this.#challenge(user);
+    }
+
+    /** Opens the recipient picker for a new conversation. */
+    async #newMessage() {
+        const dialog = new Message({
+            message: "<h2 class='new-message-title'>Nova mensagem</h2><div class='new-message-picker'></div>",
+            buttons: { cancel: 'CANCELAR' },
+            class: 'new-message-dialog',
+            preventKill: true,
+        }).show();
+        const picker = dialog.element.querySelector('.new-message-picker');
+        picker.innerHTML = renderTemplate(newMessagePickerTemplate);
+        const search = new SearchField({
+            label: 'Buscar mestre',
+            placeholder: 'Gladiador ou mestre',
+        });
+        picker.querySelector('.new-message-search').append(search.element);
+        const results = picker.querySelector('.new-message-results');
+        let request = 0;
+        const open = row => {
+            dialog.kill();
+            this.#run(() => this.#open(row.user, { push: true }));
+        };
+        const addRow = user => {
+            const row = createElement(renderTemplate(newMessageRowTemplate, {
+                userId: user.user ?? user.id,
+                name: user.nick,
+                level: user.level ?? 0,
             }));
-            row.addEventListener('click', () => runSectionTask(() => this.#open(message)));
-            table.append(row);
+            const avatar = new Avatar({ size: 'sm', name: user.nick, picture: user.picture });
+            row.querySelector('.new-message-avatar').append(avatar.element);
+            row.addEventListener('click', () => open(user));
+            results.append(row);
+        };
+        const friends = await secondaryRequest(() => FriendModel.list(), this.#signal);
+        (friends?.confirmed ?? []).forEach(addRow);
+        search.listen('search', ({ value }) => {
+            const token = ++request;
+            if (!value) return;
+            FriendModel.search(value, { signal: this.#signal }).then(users => {
+                if (token !== request) return;
+                results.replaceChildren();
+                (users ?? []).forEach(addRow);
+            }).catch(() => {});
         });
+        dialog.getButton('cancel')?.addEventListener('click', () => dialog.kill(), { once: true });
     }
 
-    /**
-     * Shows a message in full and marks it read.
-     *
-     * @param {Record<string, any>} message Message.
-     */
-    async #open(message) {
-        const full = createElement(renderTemplate(fullMessageTemplate, {
-            picture: message.picture,
-            nick: message.nick,
-            time: formatMessageTime(message.time),
-            message: message.message,
-        }));
-        full.style.display = 'none';
-        this.#panel.append(full);
-        MessageModel.markRead(message.id, true).catch(writeErrorToast);
-
-        full.querySelector('#back').addEventListener('click', () => runReadTask(() => this.#show(), this.#signal));
-        full.querySelector('#reply').addEventListener('click', () => this.#reply(full, message));
-        full.querySelector('#unread').addEventListener('click', () => {
-            writeThenRead(
-                () => MessageModel.markRead(message.id, false),
-                () => this.#show(),
-                { signal: this.#signal },
-            );
-        });
-        full.querySelector('#delete').addEventListener('click', () => {
-            writeThenRead(
-                () => MessageModel.remove(message.id),
-                () => this.#show(),
-                { signal: this.#signal },
-            );
-        });
-
-        await fadeOut(this.#panel.querySelector('.table'));
-        fadeIn(full);
-    }
-
-    /**
-     * Opens the reply box under a message.
-     *
-     * @param {HTMLElement} full The open message.
-     * @param {Record<string, any>} message Message.
-     */
-    #reply(full, message) {
-        const buttons = full.querySelector('.row.buttons');
-        buttons.style.display = 'none';
-        const reply = createElement(replyTemplate);
-        full.append(reply);
-        fadeIn(reply);
-        const input = reply.querySelector('.input');
-        input.focus();
-        input.addEventListener('input', () => {
-            input.style.height = 'auto';
-            input.style.height = `${Math.min(MAX_REPLY_HEIGHT, input.scrollHeight + input.offsetHeight - input.clientHeight)}px`;
-        });
-
-        reply.querySelector('#send').addEventListener('click', () => {
-            const text = input.value;
-            writeThenRead(
-                () => MessageModel.reply(message.id, text),
-                () => this.#show(),
-                {
-                    signal: this.#signal,
-                    onWriteError: error => {
-                        if (error.code === 'MESSAGE_TOO_LONG') showMessage('A resposta é longa demais. Encurte o texto e tente novamente.');
-                        else if (error.code === 'INVALID_MESSAGE') showMessage('A resposta não pode ficar vazia nem ter emojis.');
-                        else writeErrorToast(error);
-                    },
-                },
-            );
-        });
-        reply.querySelector('#cancel').addEventListener('click', () => {
-            reply.remove();
-            buttons.style.display = '';
-        });
+    /** @param {() => Promise<unknown>} task */
+    async #run(task) {
+        try {
+            await task();
+        }
+        catch (error) {
+            if (!this.#signal?.aborted) writeErrorToast(error);
+        }
     }
 }

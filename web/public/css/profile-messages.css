@@ -1,0 +1,142 @@
+/* Mensagens section (Mensagens.dc.html). */
+#panel .content[data-menu='messages'] {
+    max-width: none;
+}
+
+.messages-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.messages-shell {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    min-height: 620px;
+    overflow: hidden;
+}
+
+.messages-list-pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-right: 1px solid var(--color-border);
+}
+
+.messages-thread-pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.messages-thread-pane .composer {
+    flex: none;
+}
+
+.messages-thread-pane > .message-thread {
+    min-height: 0;
+}
+
+.messages-thread-pane .thread-challenge {
+    white-space: nowrap;
+}
+
+/* Nova mensagem dialog */
+.new-message-dialog #message {
+    min-width: min(380px, 80vw);
+}
+
+.new-message-title {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-strong);
+}
+
+.new-message-search .search-field {
+    width: 100%;
+}
+
+.new-message-results {
+    display: flex;
+    flex-direction: column;
+    max-height: 300px;
+    margin-top: var(--space-2);
+    overflow-y: auto;
+}
+
+.new-message-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2);
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.new-message-row:hover {
+    background: var(--color-tint);
+}
+
+.new-message-avatar {
+    flex: none;
+}
+
+.new-message-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.new-message-name {
+    color: var(--color-text-strong);
+    font-weight: 600;
+}
+
+.new-message-meta {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+@media only screen and (max-width: 700px) {
+    .messages-page {
+        gap: var(--space-3);
+    }
+
+    .messages-shell {
+        display: block;
+        min-height: 0;
+    }
+
+    .messages-list-pane {
+        border-right: 0;
+        min-height: 520px;
+    }
+
+    .messages-thread-pane {
+        display: none;
+        min-height: 520px;
+    }
+
+    .messages-shell.is-thread .messages-list-pane {
+        display: none;
+    }
+
+    .messages-shell.is-thread .messages-thread-pane {
+        display: flex;
+    }
+
+    .messages-thread-pane .composer {
+        padding: var(--space-2);
+    }
+}

@@ -140,6 +140,8 @@ const PROFILE_TABS = {
 };
 page('/profile', 'profile', req => ({ tab: text(req.query.t), subtab: text(req.query.s) }));
 for (const [route, tab] of Object.entries(PROFILE_TABS)) page(`/${route}`, 'profile', () => ({ tab, subtab: '' }));
+// The open conversation is part of the Mensagens URL: /messages/<other master id>.
+page(/^\/messages\/(\d+)$/, 'profile', () => ({ tab: 'messages', subtab: '' }));
 page(/^\/battle\.([\w-]+)$/, 'profile', req => ({ tab: 'battle', subtab: req.params[0] }));
 
 // Old PHP addresses (shared battle links, bookmarks), with or without `.php` as Apache served

@@ -22,11 +22,12 @@ export class InviteBanner extends BaseComponent {
 
     /**
      * @param {{ picture?: string, name: string, message: string, detail?: string,
-     *   acceptLabel?: string, refuseLabel?: string }} invite
+     *   acceptLabel?: string, refuseLabel?: string, label?: string }} invite
      * @returns {this}
      */
-    set({ picture = '', name, message, detail = '', acceptLabel = 'Aceitar', refuseLabel = 'Recusar' }) {
+    set({ picture = '', name, message, detail = '', acceptLabel = 'Aceitar', refuseLabel = 'Recusar', label = 'Convite pendente' }) {
         this.element.hidden = false;
+        this.element.setAttribute('aria-label', label);
         this.#avatar.set({ name, picture, level: 0 });
         this.element.querySelector('.invite-message').textContent = message;
         const detailNode = this.element.querySelector('.invite-detail');

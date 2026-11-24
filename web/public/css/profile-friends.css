@@ -1,0 +1,210 @@
+/* Amigos section (Amigos.dc.html). */
+#panel .content[data-menu='friends'] {
+    max-width: none;
+}
+
+.friends-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.friends-layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-5);
+}
+
+.friends-main {
+    display: flex;
+    flex: 2 1 520px;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.friends-invites {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.friends-card {
+    overflow: hidden;
+}
+
+.friends-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.friends-card-head h2 {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+.friends-card-head h2 span {
+    color: var(--color-text-muted);
+    font-weight: 400;
+}
+
+.friends-online {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.friends-online.is-online {
+    color: var(--color-success);
+}
+
+.friends-online-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-text-subtle);
+}
+
+.friends-online.is-online .friends-online-dot {
+    background: var(--color-success);
+}
+
+.friends-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.friends-empty {
+    padding: var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.friends-search-panel {
+    display: flex;
+    flex: 1 1 280px;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+    padding: var(--space-5);
+    border-radius: var(--radius-2xl);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+}
+
+#painel-content .friends-search-panel h2 {
+    margin: 0;
+    color: var(--color-header-text);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+#painel-content .friends-search-panel .search-field {
+    width: 100%;
+    border-color: var(--color-border-brand-muted);
+    background: color-mix(in srgb, var(--color-header-text) 5%, transparent);
+    color: var(--color-text-on-brand-muted);
+}
+
+#painel-content .friends-search-panel .search-field-input {
+    color: var(--color-header-text);
+}
+
+#painel-content .friends-search-panel .search-field-input::placeholder {
+    color: var(--color-text-on-brand-muted);
+}
+
+.friends-search-results {
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-search-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-header-text) 12%, transparent);
+}
+
+.friend-search-avatar {
+    flex: none;
+}
+
+.friend-search-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.friend-search-name {
+    overflow: hidden;
+    color: var(--color-header-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-search-meta {
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-xs);
+}
+
+.friend-search-action {
+    flex: none;
+}
+
+.friend-search-state {
+    flex: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-xs);
+}
+
+.friends-search-empty {
+    margin: 0;
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-xs);
+}
+
+@media only screen and (max-width: 700px) {
+    .friends-layout {
+        flex-direction: column;
+    }
+
+    .friends-main,
+    .friends-search-panel {
+        width: 100%;
+        flex-basis: auto;
+        box-sizing: border-box;
+    }
+
+    .friends-search-panel {
+        padding: var(--space-4);
+    }
+
+    .friends-card-head {
+        padding: var(--space-3);
+    }
+}

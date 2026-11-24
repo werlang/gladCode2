@@ -190,6 +190,12 @@ async function start() {
         navigate({ section: 'ranking', subtab: '', query: {} }, { historyOnly: true, push: true });
     });
 
+    events.on(APP_EVENTS.messagesOpened, ({ userId }) => {
+        const state = { section: 'messages', subtab: '', query: userId ? { userId } : {} };
+        if (!userId && currentSection !== 'messages') return;
+        navigate(state, currentSection === 'messages' ? { historyOnly: true, push: true } : { push: true, focus: true });
+    });
+
     const GO = Object.fromEntries(Object.entries(SECTION_SHORTCUTS).map(([section, letter]) => [letter, section]));
     let goPending = false;
     let goTimer = null;

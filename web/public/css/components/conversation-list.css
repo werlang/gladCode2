@@ -1,0 +1,132 @@
+/* ConversationList: the left pane of Mensagens. */
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+.conversation-search {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.conversation-search .search-field {
+    width: 100%;
+    background: var(--color-surface-alt);
+}
+
+.conversation-rows {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.conversation-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+}
+
+.conversation-row[hidden] {
+    display: none;
+}
+
+.conversation-row:hover {
+    background: var(--color-tint);
+}
+
+.conversation-row.is-current {
+    background: var(--color-surface-alt);
+}
+
+.conversation-avatar {
+    flex: none;
+}
+
+.conversation-avatar .avatar {
+    --avatar-size: 42px;
+}
+
+.conversation-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.conversation-top,
+.conversation-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.conversation-name {
+    overflow: hidden;
+    color: var(--color-text-strong);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversation-row.is-unread .conversation-name {
+    font-weight: 700;
+}
+
+.conversation-time {
+    flex: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+}
+
+.conversation-snippet {
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversation-row.is-unread .conversation-snippet {
+    color: var(--color-text);
+}
+
+.conversation-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+}
+
+.conversation-count[hidden] {
+    display: none;
+}
+
+.conversation-empty {
+    padding: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}

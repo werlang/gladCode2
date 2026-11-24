@@ -1,0 +1,257 @@
+/* MessageThread: header, day markers, bubbles and shared replay cards. */
+.message-thread {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.message-thread[hidden] {
+    display: none;
+}
+
+.thread-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.thread-back {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.thread-avatar {
+    flex: none;
+}
+
+.thread-identity {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.thread-name {
+    overflow: hidden;
+    color: var(--color-text-strong);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.thread-online {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.thread-online.is-online {
+    color: var(--color-success);
+}
+
+.thread-online-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+}
+
+.thread-online-dot[hidden] {
+    display: none;
+}
+
+.thread-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.thread-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.thread-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-5);
+    background: var(--color-surface-alt);
+}
+
+.thread-day {
+    align-self: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.thread-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    max-width: 72%;
+}
+
+.thread-message.is-mine {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.thread-sender {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.thread-bubble {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    max-width: 100%;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--text-base);
+    line-height: 1.5;
+}
+
+.thread-message.is-mine .thread-bubble {
+    border-color: transparent;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+}
+
+.thread-quote {
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-left: 3px solid var(--color-border-strong);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    white-space: pre-wrap;
+}
+
+.thread-message.is-mine .thread-quote {
+    border-left-color: color-mix(in srgb, var(--color-header-text) 35%, transparent);
+    color: var(--color-text-on-brand-muted);
+}
+
+.thread-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.thread-time {
+    align-self: flex-end;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+}
+
+.thread-message.is-mine .thread-time {
+    color: color-mix(in srgb, var(--color-header-text) 62%, transparent);
+}
+
+.thread-replay {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+    color: var(--color-text-strong);
+    text-decoration: none;
+}
+
+.thread-message.is-mine .thread-replay {
+    background: color-mix(in srgb, var(--color-accent) 22%, var(--color-chrome));
+    color: var(--color-header-text);
+}
+
+.thread-replay span {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: var(--text-xs);
+}
+
+.thread-replay small {
+    color: var(--color-accent-text);
+    font-size: var(--text-xs);
+    font-weight: 700;
+}
+
+.thread-message.is-mine .thread-replay small {
+    color: var(--color-accent-strong);
+}
+
+.thread-empty {
+    padding: var(--space-6);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+@media only screen and (max-width: 700px) {
+    .thread-back {
+        display: inline-flex;
+    }
+
+    .thread-header {
+        padding: var(--space-2) var(--space-3);
+    }
+
+    .thread-actions .thread-challenge {
+        padding: 0 var(--space-2);
+    }
+
+    .thread-actions .thread-challenge span {
+        display: none;
+    }
+
+    .thread-body {
+        padding: var(--space-3);
+    }
+
+    .thread-message {
+        max-width: 86%;
+    }
+}

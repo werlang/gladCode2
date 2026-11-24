@@ -65,6 +65,7 @@ export class NotificationService {
     #timer = null;
     #running = false;
     #last = null;
+    #subscriptions = [];
     #onVisibility = () => {
         if (!this.#document?.hidden) this.refresh().catch(() => {});
     };
@@ -111,6 +112,11 @@ export class NotificationService {
         this.#running = true;
         this.#document = documentRef;
         this.#document?.addEventListener?.('visibilitychange', this.#onVisibility);
+        const refresh = () => this.refresh().catch(() => {});
+        const unwatchMessages = this.#bus.on?.(APP_EVENTS.messagesRead, refresh);
+        const unwatchFriends = this.#bus.on?.(APP_EVENTS.friendsAnswered, refresh);
+        if (unwatchMessages) this.#subscriptions.push(unwatchMessages);
+        if (unwatchFriends) this.#subscriptions.push(unwatchFriends);
         this.refresh().catch(() => {});
         this.#timer = this.#setInterval(() => {
             if (!this.#document?.hidden) this.refresh().catch(() => {});
@@ -125,6 +131,8 @@ export class NotificationService {
         this.#timer = null;
         this.#document?.removeEventListener?.('visibilitychange', this.#onVisibility);
         this.#document = null;
+        for (const unwatch of this.#subscriptions) unwatch();
+        this.#subscriptions = [];
         return this;
     }
 

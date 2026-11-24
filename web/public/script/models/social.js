@@ -121,8 +121,8 @@ export class DuelModel {
 }
 
 /**
- * Friends and friend requests (`/friends`). A friend is `{ id, user, nick, level, picture,
- * idleMinutes? }` where `id` is the friendship and `user` the master.
+ * Friends and friend requests (`/friends`). A friend is `{ id, user, nick, level, picture, online,
+ * idleMinutes?, bestGladiator?, bestRenown? }`; a pending invite also carries `mutual`.
  */
 export class FriendModel {
     /** @returns {Promise<{ pending: object[], confirmed: object[] }>} Requests to answer and friends. */
@@ -144,7 +144,8 @@ export class FriendModel {
     /**
      * @param {string} text Part of a nickname.
      * @param {{ signal?: AbortSignal }} [options]
-     * @returns {Promise<Array<{ user: number, nick: string }>>} Masters to befriend.
+     * @returns {Promise<Array<{ user: number, nick: string, level: number, picture: string,
+     *   state: 'none'|'sent'|'incoming'|'friends' }>>} Masters to befriend and the current relation.
      */
     static async search(text, { signal } = {}) {
         const { users } = await api.get('friends/search', { nick: text }, { signal });
@@ -231,6 +232,54 @@ export class MessageModel {
      */
     static remove(id) {
         return api.delete(`messages/${id}`);
+    }
+}
+
+
+/**
+ * Conversations (`/conversations`), keyed by the other master's user id. A conversation row is
+ * `{ user, last, unread }`; the last message is `{ id, sender, mine, time, body, quote, read }`.
+ */
+export class ConversationModel {
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ conversations: object[] }>}
+     */
+    static list({ signal } = {}) {
+        return api.get('conversations', {}, { signal });
+    }
+
+    /**
+     * A page of one conversation, newest first.
+     *
+     * @param {number} userId The other master.
+     * @param {{ offset?: number, signal?: AbortSignal }} [options]
+     * @returns {Promise<{ user: object, messages: object[], total: number, offset: number, pageSize: number }>}
+     */
+    static thread(userId, { offset = 0, signal } = {}) {
+        return api.get(`conversations/${userId}`, { offset }, { signal });
+    }
+
+    /**
+     * Sends a message in a conversation.
+     *
+     * @param {number} userId The other master.
+     * @param {string} text
+     * @returns {Promise<object>} The stored message view.
+     */
+    static async send(userId, text) {
+        const { message } = await api.post(`conversations/${userId}/messages`, { message: text });
+        return message;
+    }
+
+    /**
+     * Marks every unread message from one master as read.
+     *
+     * @param {number} userId The other master.
+     * @returns {Promise<{ userId: number, read: number, unreadTotal: number }>}
+     */
+    static markRead(userId) {
+        return api.post(`conversations/${userId}/read`);
     }
 }
 

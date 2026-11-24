@@ -1,201 +1,242 @@
-import { showDialog, showMessage, showTextArea } from '../components/dialog.js';
-import { elapsedString } from '../helpers/date-format.js';
+import { showDialog } from '../components/dialog.js';
+import { Avatar } from '../components/avatar.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, runSectionTask, secondaryRequest, settleRequest, writeErrorToast, writeThenRead } from '../helpers/section-request.js';
-import { FriendModel, MessageModel } from '../models/social.js';
+import { createToast } from '../components/toast.js';
+import { InviteBanner } from '../components/invite-banner.js';
+import { FriendRow } from '../components/friend-row.js';
+import { PageHeader } from '../components/page-header.js';
+import { SearchField } from '../components/search-field.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
+import { secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { FriendModel } from '../models/social.js';
+import { friends } from '../services/friends.js';
+import { friendsShellTemplate, friendSearchRowTemplate } from '../templates/friends.js';
+import { pageHeaderTemplate } from '../templates/page-header.js';
 import { challengeFriend } from './duels.js';
-import { friendRowTemplate, requestRowTemplate, searchRowTemplate } from '../templates/profile.js';
-
-/** Longest private message, in characters (the API refuses longer ones). */
-const MAX_MESSAGE = 1000;
 
 /**
- * Writes a private message to a user (the API e-mails them about it).
- *
- * @param {number} user User id.
- * @param {string} nick Nickname.
- */
-export async function writeMessage(user, nick) {
-    const message = await showTextArea(`Mensagem para <span class='highlight'>${escapeHtml(nick)}</span>:`, 'Olá...', MAX_MESSAGE);
-    if (!message) return;
-    try {
-        await MessageModel.send(user, message);
-    }
-    catch (error) {
-        if (error.code === 'MESSAGE_TOO_LONG') showMessage('A mensagem é longa demais. Encurte o texto e tente novamente.');
-        else if (error.code === 'INVALID_MESSAGE') showMessage('A mensagem não pode ficar vazia nem ter emojis.');
-        else {
-            writeErrorToast(error);
-        }
-        return;
-    }
-    showMessage('Mensagem enviada');
-}
-
-/**
- * The AMIGOS tab: friend requests, friends with their actions (message,
- * duel, unfriend) and the user search.
+ * The AMIGOS section: pending invites, the friends list with online/best gladiator and the master
+ * search. Friend rows are keyed by the friendship id; actions use the other master's user id.
  */
 export class FriendsTab {
-    #panel = document.querySelector('#friend-panel');
-    #options = this.#panel.querySelector('#friends .options');
-    /** Friend of the row whose options menu is open. */
-    #current = null;
-    /** The current navigation signal; the search and reloads keep using it. */
+    #root = document.querySelector('#friends-container');
+    #built = false;
+    #header = null;
+    #invites = null;
+    #list = null;
+    #friendsCount = null;
+    #online = null;
+    #empty = null;
+    #search = null;
+    #results = null;
+    #searchEmpty = null;
     #signal = null;
-    /** Answers to older nickname searches are dropped. */
-    #searchRequest = 0;
+    #searchToken = 0;
+    #confirmed = [];
 
-    /** Binds the options menu and the search. */
+    /** Builds the section. */
     init() {
-        this.#panel.querySelector('#request').classList.add('hidden');
-        this.#panel.querySelector('#friends').classList.add('hidden');
+        this.#build();
+    }
 
-        document.addEventListener('click', () => {
-            if (this.#options.classList.contains('open')) this.#closeOptions();
-        });
-        this.#options.querySelector('.unfriend').addEventListener('click', () => this.#askUnfriend());
-        this.#options.querySelector('.message').addEventListener('click', () => {
-            if (this.#current) writeMessage(this.#current.friend.user, this.#current.friend.nick);
-        });
-        this.#options.querySelector('.duel').addEventListener('click', () => {
-            if (this.#current) challengeFriend(this.#current.friend.nick, this.#current.friend.user);
-        });
+    #build() {
+        if (this.#built || !this.#root) return;
+        this.#root.innerHTML = renderTemplate(friendsShellTemplate);
+        const header = createElement(pageHeaderTemplate);
+        this.#root.querySelector('#friends-header').append(header);
+        this.#header = new PageHeader({ element: header });
+        this.#header.set({ title: 'Amigos', subtitle: 'Mestres com quem você troca mensagens e duelos.' });
 
-        const search = this.#panel.querySelector('#search .input');
-        search.addEventListener('input', () => runReadTask(() => this.#search(search.value), this.#signal));
+        this.#invites = this.#root.querySelector('#friends-invites');
+        this.#list = this.#root.querySelector('#friends-list');
+        this.#friendsCount = this.#root.querySelector('#friends-count');
+        this.#online = this.#root.querySelector('#friends-online');
+        this.#empty = this.#root.querySelector('#friends-empty');
+
+        this.#search = new SearchField({
+            variant: 'dark',
+            label: 'Apelido do mestre',
+            placeholder: 'Apelido do mestre',
+        });
+        this.#root.querySelector('#friends-search-field').append(this.#search.element);
+        this.#search.listen('search', ({ value }) => this.#run(() => this.#searchMasters(value)));
+        this.#results = this.#root.querySelector('#friends-search-results');
+        this.#searchEmpty = this.#root.querySelector('#friends-search-empty');
+        this.#built = true;
     }
 
     /**
-     * Lists the requests and the friends.
-     *
      * @param {object} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
     async show(route = {}, { signal } = {}) {
+        this.#build();
         this.#signal = signal;
-        const data = await settleRequest(() => FriendModel.list({ signal }), signal);
+        this.#search.set('');
+        this.#searchMasters('', { signal });
+        return this.#load({ signal });
+    }
+
+    /** @param {{ signal?: AbortSignal }} [options] */
+    async #load({ signal = this.#signal } = {}) {
+        const data = await settleRequest(() => friends.load({ signal }), signal);
         if (!data || signal?.aborted) return;
-        this.#panel.querySelector('#request').classList.toggle('hidden', !data.pending.length);
-        this.#panel.querySelector('#friends').classList.toggle('hidden', !data.confirmed.length);
+        this.#confirmed = data.confirmed ?? [];
+        this.#renderInvites(data.pending ?? []);
+        this.#renderFriends();
+    }
 
-        const requests = this.#panel.querySelector('#request .table');
-        requests.replaceChildren();
-        data.pending.forEach(request => {
-            const row = createElement(renderTemplate(requestRowTemplate, {
-                level: request.level,
+    /** @param {object[]} pending */
+    #renderInvites(pending) {
+        this.#invites.replaceChildren();
+        for (const request of pending) {
+            const banner = new InviteBanner();
+            const detail = request.mutual
+                ? `Mestre nível ${request.level} · ${request.mutual} ${request.mutual === 1 ? 'amigo em comum' : 'amigos em comum'}`
+                : `Mestre nível ${request.level}`;
+            banner.set({
                 picture: request.picture,
-                nick: request.nick,
-            }));
-            row.querySelector('.check').addEventListener('click', () => this.#answer(request.id, true));
-            row.querySelector('.close').addEventListener('click', () => this.#answer(request.id, false));
-            requests.append(row);
-        });
-
-        const friends = this.#panel.querySelector('#friends .table');
-        friends.replaceChildren();
-        data.confirmed.forEach(friend => {
-            const row = createElement(renderTemplate(friendRowTemplate, {
-                level: friend.level,
-                picture: friend.picture,
-                nick: friend.nick,
-                active: elapsedString(friend.idleMinutes),
-            }));
-            row.querySelector('.button-open').addEventListener('click', event => {
-                event.stopPropagation();
-                this.#openOptions(event.currentTarget, row, friend);
+                name: request.nick,
+                message: `${request.nick} quer ser seu amigo`,
+                detail,
+                label: 'Convite de amizade',
             });
-            friends.append(row);
-        });
+            banner.listen('accept', () => this.#run(() => this.#answer(banner, request, true)));
+            banner.listen('refuse', () => this.#run(() => this.#answer(banner, request, false)));
+            this.#invites.append(banner.element);
+        }
     }
 
-    /** Closes the row options when the shell leaves the section. */
-    unmount() {
-        this.#closeOptions();
+    #renderFriends() {
+        this.#list.replaceChildren();
+        this.#friendsCount.textContent = `· ${this.#confirmed.length}`;
+        const online = this.#confirmed.filter(friend => friend.online).length;
+        this.#root.querySelector('.friends-online-text').textContent = online ? `${online} online agora` : 'Ninguém online';
+        this.#online.classList.toggle('is-online', online > 0);
+        this.#empty.hidden = this.#confirmed.length > 0;
+        for (const friend of this.#confirmed) {
+            const row = new FriendRow({ friend });
+            row.listen('message', () => events.emit(APP_EVENTS.messagesOpened, { userId: friend.user }));
+            row.listen('challenge', () => this.#run(() => this.#challenge(friend)));
+            row.listen('more', () => this.#run(() => this.#more(friend)));
+            this.#list.append(row.element);
+        }
     }
 
     /**
-     * @param {number} id Request id.
-     * @param {boolean} accept Accept it.
+     * @param {InviteBanner} banner
+     * @param {object} request
+     * @param {boolean} accepted
      */
-    async #answer(id, accept) {
-        return writeThenRead(
-            () => FriendModel.answer(id, accept),
-            () => this.show({}, { signal: this.#signal }),
-            { signal: this.#signal },
+    async #answer(banner, request, accepted) {
+        banner.setBusy(true);
+        try {
+            await friends.answer(request.id, accepted);
+            banner.clear();
+            createToast(accepted ? `Agora você e ${escapeHtml(request.nick)} são amigos` : 'Convite recusado', accepted ? 'success' : 'info');
+            await this.#load();
+        }
+        catch (error) {
+            banner.setBusy(false);
+            writeErrorToast(error);
+        }
+    }
+
+    /** @param {object} friend */
+    #challenge(friend) {
+        challengeFriend(friend.nick, friend.user);
+    }
+
+    /** @param {object} friend */
+    async #more(friend) {
+        const answer = await showDialog(
+            `Desfazer a amizade com <span class="highlight">${escapeHtml(friend.nick)}</span>?`,
+            ['Desfazer', 'Cancelar'],
         );
-    }
-
-    /**
-     * Unrolls the options menu beside a friend's button.
-     *
-     * @param {HTMLElement} button The row's options button.
-     * @param {HTMLElement} row Friend row.
-     * @param {Record<string, any>} friend Friend.
-     */
-    #openOptions(button, row, friend) {
-        this.#closeOptions();
-        button.classList.add('open');
-        this.#current = { row, friend };
-        const menu = this.#options;
-        menu.style.top = `${button.offsetTop}px`;
-        menu.style.display = 'block';
-        menu.style.left = `${button.offsetLeft - menu.offsetWidth + button.offsetWidth}px`;
-        menu.animate?.([{ transform: 'scale(0)', transformOrigin: 'top right' }, { transform: 'scale(1)', transformOrigin: 'top right' }], 300);
-        menu.classList.add('open');
-    }
-
-    #closeOptions() {
-        this.#panel.querySelectorAll('#friends .button-open.open').forEach(button => button.classList.remove('open'));
-        this.#options.classList.remove('open');
-        this.#options.removeAttribute('style');
-    }
-
-    async #askUnfriend() {
-        if (!this.#current) return;
-        const { row, friend } = this.#current;
-        const answer = await showDialog(`Deseja remover <span class='highlight'>${escapeHtml(friend.nick)}</span> da sua lista de amigos?`, ['Sim', 'Não']);
-        if (answer !== 'Sim') return;
+        if (answer !== 'Desfazer') return;
         try {
             await FriendModel.remove(friend.id);
+            this.#confirmed = this.#confirmed.filter(item => item.id !== friend.id);
+            this.#renderFriends();
+            createToast('Amizade desfeita', 'success');
         }
         catch (error) {
             writeErrorToast(error);
+        }
+    }
+
+    /**
+     * @param {string} text
+     * @param {{ signal?: AbortSignal }} [options]
+     */
+    async #searchMasters(text, { signal = this.#signal } = {}) {
+        const token = ++this.#searchToken;
+        if (!text.trim()) {
+            this.#results.replaceChildren();
+            this.#searchEmpty.hidden = false;
+            this.#searchEmpty.textContent = 'Digite um apelido para encontrar mestres.';
             return;
         }
-        row.remove();
-    }
-
-    /** @param {string} text Nickname search. */
-    async #search(text) {
-        const signal = this.#signal;
-        const request = ++this.#searchRequest;
         const users = await secondaryRequest(() => FriendModel.search(text, { signal }), signal);
-        if (signal?.aborted || request !== this.#searchRequest) return;
-        const table = this.#panel.querySelector('#search .table');
-        table.replaceChildren();
-        (Array.isArray(users) ? users : []).forEach(user => {
-            const row = createElement(renderTemplate(searchRowTemplate, { nick: user.nick }));
-            row.querySelector('.send-message').addEventListener('click', () => writeMessage(user.user, user.nick));
-            row.querySelector('.add-friend').addEventListener('click', () => runSectionTask(() => this.#invite(user)));
-            table.append(row);
-        });
+        if (signal?.aborted || token !== this.#searchToken) return;
+        this.#results.replaceChildren();
+        this.#searchEmpty.hidden = (users?.length ?? 0) > 0;
+        this.#searchEmpty.textContent = 'Nenhum mestre encontrado.';
+        for (const user of users ?? []) {
+            const row = createElement(renderTemplate(friendSearchRowTemplate, {
+                level: user.level ?? 0,
+                action: this.#actionLabel(user.state),
+            }));
+            const avatar = new Avatar({ size: 'sm', name: user.nick, picture: user.picture });
+            row.querySelector('.friend-search-avatar').append(avatar.element);
+            row.querySelector('.friend-search-name').textContent = user.nick;
+            const action = row.querySelector('.friend-search-action');
+            if (user.state === 'none') {
+                action.classList.add('button', 'primary', 'small');
+                action.addEventListener('click', () => this.#run(() => this.#add(user, action)));
+            }
+            else {
+                action.className = 'friend-search-state';
+                action.disabled = true;
+            }
+            this.#results.append(row);
+        }
     }
 
-    /** @param {{ user: number, nick: string }} user User to invite (the API e-mails them). */
-    async #invite(user) {
-        const nick = escapeHtml(user.nick);
+    /** @param {string} state @returns {string} */
+    #actionLabel(state) {
+        return state === 'sent' ? 'Convite enviado' : state === 'friends' ? 'Amigos' : state === 'incoming' ? 'Convite recebido' : 'Adicionar';
+    }
+
+    /**
+     * @param {object} user
+     * @param {HTMLButtonElement} button
+     */
+    async #add(user, button) {
+        button.disabled = true;
         try {
-            await FriendModel.add(user.user);
+            await friends.request(user.user);
+            button.textContent = 'Convite enviado';
+            button.className = 'friend-search-state';
+            createToast(`Convite enviado para ${escapeHtml(user.nick)}`, 'success');
         }
         catch (error) {
-            if (error.code !== 'FRIENDSHIP_EXISTS') {
-                writeErrorToast(error);
-                return;
+            button.disabled = false;
+            if (error.code === 'FRIENDSHIP_EXISTS') {
+                button.textContent = 'Convite enviado';
+                button.className = 'friend-search-state';
             }
-            showMessage(`O usuário <span class='highlight'>${nick}</span> já está em sua lista de amigos`);
-            return;
+            else writeErrorToast(error);
         }
-        showMessage(`Convite enviado para <span class='highlight'>${nick}</span>`);
+    }
+
+    /** @param {() => Promise<unknown>} task */
+    async #run(task) {
+        try {
+            await task();
+        }
+        catch (error) {
+            if (!this.#signal?.aborted) writeErrorToast(error);
+        }
     }
 }
