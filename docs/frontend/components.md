@@ -390,9 +390,10 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/pagination.js`; **CSS:** `css/components/pagination.css`.
 - **Purpose:** the page controls: the simple previous/next of Relatórios and the numbered pages of
   Ranking, plus “Ir para a posição”.
-- **Constructor:** `new Pagination({ element, variant })` (`simple` or `numbered`).
-- **Methods:** `set({ page, pages, total, pageSize })`, `goTo(page)`; `set` computes the “1–7 de 482”
-  label and the page window (`1 … 8 9 10 … 164`).
+- **Constructor:** `new Pagination({ element, variant, controlled })` (`simple` or `numbered`).
+- **Methods:** `set({ page, pages, total, pageSize })`, `goTo(page)`; a `controlled` pager emits the
+  requested page and keeps the confirmed one until `set()` (or `cancel()` on a refused read). `set`
+  computes the “1–7 de 482” label and the page window (`1 … 8 9 10 … 164`).
 - **Events:** `change` `{ page }`, `jump` `{ position }` (the go-to field, in gladiator position, not
   page).
 - **ARIA:** `<nav aria-label="Páginas">`, current page `aria-current="page"`, disabled arrows
@@ -450,8 +451,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the game card of a gladiator: brass/rot/blood frame, lit stage with the portrait (3D
   portrait or pixel-art sprite, per `glad-view`), the language crest, the status seal (PRONTO /
   DESATUALIZADO / COM ERRO), the renown plaque with the MMR, the segmented STR/AGI/INT bars, the stamped
-  state (FORA DA ARENA / COM ERRO), the alert line, the record line (`gladiatorRecord`: real wins/losses,
-  or “SEM BATALHAS REGISTRADAS” / “SEM RESULTADOS CONHECIDOS” when the stored battles have no result) and
+  state (FORA DA ARENA / COM ERRO), the alert line, the record line (`gladiatorRecord`: real wins/losses/draws, with “N EMPATES”
+  when a draw is known, or “SEM BATALHAS REGISTRADAS” / “SEM RESULTADOS CONHECIDOS” when the stored
+  battles have no result) and
   the action row. A ready card has the dark-plate EDITAR and the beveled-gold BATALHAR; an unavailable
   one has the beveled-gold CORRIGIR, the locked BATALHAR plate and the same ⋯ menu. The empty slot uses
   the full brass ring with a centred +.
@@ -486,7 +488,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** cards are buttons with `aria-pressed`, a label naming the gladiator and its state and
   arrow-key movement between the usable cards; a disabled card is `aria-disabled` but still focusable so
   its reason can be read. `data-state` gives a locked card the ROT/BLOOD frame and the amber/red lock.
-  `setDisabled(reason)` also blocks selection while a ranked battle is running.
+  `setDisabled(reason)` also blocks selection while a ranked battle is running, and an unavailable card
+  shows its reason inline in `.gladiator-picker-status` (`role="status"`, cleared on the next choice).
 - **Boards:** `Batalhas.dc.html`, `Mobile.dc.html`.
 
 ### VersusPanel — exists (WP5)
@@ -632,7 +635,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/invite-banner.js`; **CSS:** `css/components/gladiator-card.css`
   (`.invite-banner`), shared with the card for now.
 - **Purpose:** the highlighted pending invite. Batalhas uses it for the first pending duel challenge
-  (avatar, “fulano desafiou você”, the challenger's gladiator as “Luta com X.”, a transparent Recusar
+  (avatar, “fulano desafiou você”, the challenger's gladiator as “Luta com X.”, without an invented deadline, a transparent Recusar
   and the ink “Escolher gladiador e aceitar”); Amigos will reuse it for a friend request in WP8.
 - **Constructor:** `new InviteBanner({ element })`; without `element` it renders
   `templates/gladiator-card.js` (`inviteBannerTemplate`).
