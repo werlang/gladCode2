@@ -37,8 +37,14 @@ export class PotionCard extends BaseComponent {
         this.#potion = potion;
         this.element.dataset.kind = potion.kind ?? potionKind(potion.identifier);
         this.element.querySelector('.potion-card-name').textContent = potion.name ?? '';
-        this.element.querySelector('.potion-card-code').textContent = `nível ${potion.level} · useItem("${potion.identifier}")`;
-        this.element.querySelector('.potion-card-description').textContent = potion.description ?? '';
+        const level = potion.level == null ? 'nível —' : `nível ${potion.level}`;
+        const identifier = String(potion.identifier ?? '');
+        this.element.querySelector('.potion-card-code').textContent = identifier
+            ? `${level} · useItem("${identifier}")`
+            : level;
+        const description = this.element.querySelector('.potion-card-description');
+        description.textContent = potion.description ?? '';
+        description.hidden = !description.textContent;
         this.element.querySelector('.potion-card-price span').textContent = Number(potion.price || 0).toLocaleString('pt-BR');
         return this;
     }

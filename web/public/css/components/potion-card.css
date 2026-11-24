@@ -73,6 +73,10 @@
     white-space: nowrap;
 }
 
+.potion-card-description[hidden] {
+    display: none;
+}
+
 .potion-card-description {
     margin: 0;
     color: var(--color-text);

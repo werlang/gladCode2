@@ -126,6 +126,19 @@ test('an empty form streak shows a dash instead of ten false losses', () => {
     assert.equal(tiles.querySelector('.form-streak-empty').getAttribute('aria-label'), 'Nenhuma batalha registrada');
 });
 
+test('a catalogue row without a description or level still renders', () => {
+    const element = fakeNode();
+    const card = new PotionCard({ element, potion: {
+        identifier: 'pot-hp-2', name: 'Sem descrição', level: null, price: 80, kind: 'hp',
+    } });
+    const description = element.querySelector('.potion-card-description');
+
+    assert.equal(element.querySelector('.potion-card-code').textContent, 'nível — · useItem("pot-hp-2")');
+    assert.equal(description.textContent, '');
+    assert.equal(description.hidden, true);
+    assert.equal(card.potion.identifier, 'pot-hp-2');
+});
+
 test('a potion card shows the real identifier and disables the order with its reason', () => {
     const element = fakeNode();
     const card = new PotionCard({ element, potion: {
