@@ -161,7 +161,7 @@ can therefore show fewer/more rows or different labels without a layout change.
 
 | Element | Status |
 | --- | --- |
-| Pending invite: name, gladiator, “Responda em até 2 dias.”, Recusar / Escolher gladiador e aceitar | fixed in WP9: the deadline copy was missing |
+| Pending invite: name, gladiator, Recusar / Escolher gladiador e aceitar | intentional: the API does not expire duel challenges, so the board sample's “Responda em até 2 dias.” is not rendered; the invite says “Luta com <gladiator>.” only |
 | Four mode cards with title, description and live pill | match |
 | Selected mode ink fill, gold icon tile and alert pill | match |
 | Distinct icons per mode | intentional: the board repeats the swords glyph; the implementation uses duel/trophy/training icons |
@@ -265,8 +265,8 @@ can therefore show fewer/more rows or different labels without a layout change.
 
 Fixed in this package: phone back arrow; stale conversation failures; double-escaped invite toasts;
 picker placeholder/restore; content width matching the board's 1080 px column; 44 px phone targets;
-focus ring in the palette/header search; category dots in the notification panel; invite deadline
-copy; versus question-mark placeholder; replay card thumbnail; compact mobile glads and battle lists;
+focus ring in the palette/header search; category dots in the notification panel; versus question-mark
+placeholder; the invite keeps no invented deadline (WP5-r2 F7); replay card thumbnail; compact mobile glads and battle lists;
 friend result height; several theme contrast failures; and the dead profile menu, tab, message,
 friend, notification and template code removed with the obsolete PNGs.
 

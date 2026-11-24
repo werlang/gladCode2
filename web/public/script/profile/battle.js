@@ -22,6 +22,38 @@ import { TrainingsTab } from './trainings.js';
 const MODES = ['ranked', 'duel', 'tourn', 'train'];
 
 /**
+ * The invite's sub-line. The API has no expiry for a duel challenge, so the board sample's
+ * “Responda em até 2 dias.” must never be invented; only the challenger's gladiator is real data.
+ *
+ * @param {{ gladiator?: string }|null} duel
+ * @returns {string}
+ */
+export function duelInviteDetail(duel) {
+    const gladiator = String(duel?.gladiator ?? '').trim();
+    return gladiator ? `Luta com ${gladiator}.` : '';
+}
+
+/**
+ * The full payload the InviteBanner receives. Keeping it pure lets the invite contract be tested
+ * without the API or the DOM.
+ *
+ * @param {{ nick?: string, picture?: string, gladiator?: string }|null} duel
+ * @returns {{ picture?: string, name: string, message: string, detail: string,
+ *   acceptLabel: string, refuseLabel: string }}
+ */
+export function duelInviteData(duel) {
+    const nick = duel?.nick ?? '';
+    return {
+        picture: duel?.picture,
+        name: nick,
+        message: `${nick || 'Um mestre'} desafiou você para um duelo`,
+        detail: duelInviteDetail(duel),
+        acceptLabel: 'Escolher gladiador e aceitar',
+        refuseLabel: 'Recusar',
+    };
+}
+
+/**
  * The BATALHAS section: a pending duel invite, the four mode cards and the ranked character select,
  * with the existing duel, tournament and training flows kept behind their cards.
  */
@@ -164,14 +196,7 @@ export class BattleTab {
             this.#invite.clear();
         }
         else {
-            this.#invite.set({
-                picture: duel.picture,
-                name: duel.nick ?? '',
-                message: `${duel.nick ?? 'Um mestre'} desafiou você para um duelo`,
-                detail: duel.gladiator ? `Luta com ${duel.gladiator}. Responda em até 2 dias.` : 'Responda em até 2 dias.',
-                acceptLabel: 'Escolher gladiador e aceitar',
-                refuseLabel: 'Recusar',
-            });
+            this.#invite.set(duelInviteData(duel));
         }
         this.#renderModes();
     }
