@@ -343,10 +343,11 @@ export class SettingsTab {
     #reportNicknameUndoError(error) {
         const message = error?.message || 'Não foi possível desfazer o apelido';
         // A refused undo with no newer draft leaves the confirmed nickname in the field, clean: a
-        // later blur must not resend the refused value. A newer draft keeps its own field error.
+        // later blur must not resend the refused value. The chip still shows why the undo failed,
+        // because the toast fades away. A newer draft keeps its own field error.
         if (this.#nickname.value.trim() === this.#confirmedNickname()) {
             this.#nickname.clearError();
-            this.#nicknameStatus.set('idle', 'Disponível · salva quando você sai do campo');
+            this.#nicknameStatus.set('error', message);
         }
         else {
             this.#nickname.setError(message);

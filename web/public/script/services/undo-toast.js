@@ -68,7 +68,7 @@ export class UndoToast {
      *
      * @param {number} token The value `begin()` returned when the change started.
      * @param {{ field: string, before: unknown,
-     *   restore: (value: unknown, phase: 'preview'|'settle') => void,
+     *   restore: (value: unknown, options: { phase: 'preview'|'settle' }) => void,
      *   report?: (error: Error) => void }} change
      * @returns {void}
      */
