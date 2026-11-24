@@ -330,6 +330,53 @@ test('opening a conversation selects its row without reopening the thread', asyn
     }
 });
 
+test('a stale conversation failure does not clear the open thread or toast', async () => {
+    const listPane = fakeNode();
+    const root = fakeNode({
+        '#messages-header': fakeNode(),
+        '#messages-shell': fakeNode(),
+        '#messages-list-pane': listPane,
+        '#messages-thread-pane': fakeNode(),
+    });
+    installDocument(new Map([['#messages-container', root]]));
+    const original = {
+        list: ConversationModel.list,
+        thread: ConversationModel.thread,
+        markRead: ConversationModel.markRead,
+    };
+    const first = deferred();
+    const userA = { id: 9, nick: 'A', picture: '', level: 4, online: false };
+    const userB = { id: 10, nick: 'B', picture: '', level: 5, online: false };
+    ConversationModel.list = async () => ({
+        conversations: [
+            { user: userA, last: null, unread: 0 },
+            { user: userB, last: null, unread: 0 },
+        ],
+    });
+    ConversationModel.thread = userId => (userId === 9
+        ? first.promise
+        : Promise.resolve({ user: userB, messages: [], total: 0, offset: 0, pageSize: 30 }));
+    ConversationModel.markRead = async userId => ({ userId, read: 0, unreadTotal: 0 });
+    try {
+        const tab = new MessagesTab();
+        const shown = tab.show({}, { signal: new AbortController().signal });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        const rows = listPane.appendedNodes[0].querySelector('.conversation-rows').appendedNodes;
+        rows[1].dispatchEvent({ type: 'click' });
+        await new Promise(resolve => setTimeout(resolve, 10));
+        first.reject(Object.assign(new Error('stale'), { code: 'STALE' }));
+        await shown;
+        await new Promise(resolve => setTimeout(resolve, 10));
+        assert.equal(root.querySelector('#messages-thread-pane').appendedNodes[0].querySelector('.thread-name').textContent, 'B');
+        assert.equal(globalThis.document.body.appendedNodes.filter(node => node?.className?.includes('toast')).length, 0);
+    }
+    finally {
+        ConversationModel.list = original.list;
+        ConversationModel.thread = original.thread;
+        ConversationModel.markRead = original.markRead;
+    }
+});
+
 test('potions do not draw slots from an aborted load', async () => {
     const container = fakeNode();
     const browse = fakeNode();
