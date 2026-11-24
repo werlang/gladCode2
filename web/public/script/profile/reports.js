@@ -220,7 +220,7 @@ export class ReportsTab {
         const total = Number(data.total) || 0;
         if (total <= offset && total > 0) {
             this.#offsets[id] = 0;
-            return this.#fetch({ offset: 0, signal });
+            return this.#fetch({ offset: 0, signal, token });
         }
         this.#offsets[id] = offset;
         const rows = view.rows(data) ?? [];
