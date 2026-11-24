@@ -365,8 +365,9 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   (Ranqueada, Duelo, Torneio, Treino) with their description and live count pill (WP5's `mode` variant).
 - **Constructor:** `new ChoiceCards({ element, variant, label })` (`variant`: `preview`, `icon` or
   `mode`); it adds the base `choice-cards` class to an existing root.
-- **Methods:** `setOptions([{ value, title, description, preview, badge, disabled }])`, `set(value)`,
-  `clear()`, `get value`; `preview` is trusted markup built by the section (an icon or a preview).
+- **Methods:** `setOptions([{ value, title, description, preview, badge, alert, disabled }])`,
+  `set(value)`, `clear()`, `get value`; `preview` is trusted markup built by the section (an icon or a
+  preview) and `alert` makes the live pill gold (the pending-duel count).
 - **Events:** `change` `{ value }`.
 - **ARIA:** `role="radiogroup"` with a label; each card a `<button role="radio" aria-checked>` (the
   preview is decorative, the title is the label); arrow keys move, Home/End jump; the selected card keeps
@@ -449,15 +450,19 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the game card of a gladiator: brass/rot/blood frame, lit stage with the portrait (3D
   portrait or pixel-art sprite, per `glad-view`), the language crest, the status seal (PRONTO /
   DESATUALIZADO / COM ERRO), the renown plaque with the MMR, the segmented STR/AGI/INT bars, the stamped
-  state (FORA DA ARENA / COM ERRO), the alert line and the beveled BATALHAR plus the “more actions”
-  menu.
+  state (FORA DA ARENA / COM ERRO), the alert line, the record line (`gladiatorRecord`: real wins/losses,
+  or “SEM BATALHAS REGISTRADAS” / “SEM RESULTADOS CONHECIDOS” when the stored battles have no result) and
+  the action row. A ready card has the dark-plate EDITAR and the beveled-gold BATALHAR; an unavailable
+  one has the beveled-gold CORRIGIR, the locked BATALHAR plate and the same ⋯ menu. The empty slot uses
+  the full brass ring with a centred +.
 - **Constructor:** `new GladiatorCard({ element, gladiator, view })`; without `element` it renders
   `templates/gladiator-card.js`; `view` is `sprite|3d` and is only recorded (the painter reads the page
   preference).
 - **Methods:** `setGladiator(gladiator)`, `setSelected(on)`, `setDisabled(on)`, `setView(view)`,
   `setBusy(on)`; `get gladiator`. `emptyGladiatorCard(title)` builds the free-slot card.
 - **Events:** `battle` `{ gladiator }`, `edit` `{ gladiator }`, `code` `{ gladiator }`, `more`
-  `{ gladiator, anchor }`, `delete` `{ gladiator }`.
+  `{ gladiator, anchor }`, `delete` `{ gladiator }`. The root also keeps its internal layer z-indexes
+  inside `isolation: isolate`, so a stamp, crest or seal never paints over the fixed header.
 - **State:** `data-state="ready|outdated|broken"` drives the frame, seal, stamp and disabled BATALHAR;
   `data-view` and `data-glad-id` expose the drawn style and id.
 - **Portraits:** `GladCardPainter` keeps one subscription to `gladviewchange` and repaints every slot in
@@ -480,7 +485,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   (double click on the selected card).
 - **ARIA:** cards are buttons with `aria-pressed`, a label naming the gladiator and its state and
   arrow-key movement between the usable cards; a disabled card is `aria-disabled` but still focusable so
-  its reason can be read.
+  its reason can be read. `data-state` gives a locked card the ROT/BLOOD frame and the amber/red lock.
+  `setDisabled(reason)` also blocks selection while a ranked battle is running.
 - **Boards:** `Batalhas.dc.html`, `Mobile.dc.html`.
 
 ### VersusPanel — exists (WP5)
@@ -626,8 +632,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/invite-banner.js`; **CSS:** `css/components/gladiator-card.css`
   (`.invite-banner`), shared with the card for now.
 - **Purpose:** the highlighted pending invite. Batalhas uses it for the first pending duel challenge
-  (avatar, “fulano desafiou você”, the challenger's gladiator, Recusar / Escolher gladiador e aceitar);
-  Amigos will reuse it for a friend request in WP8.
+  (avatar, “fulano desafiou você”, the challenger's gladiator as “Luta com X.”, a transparent Recusar
+  and the ink “Escolher gladiador e aceitar”); Amigos will reuse it for a friend request in WP8.
 - **Constructor:** `new InviteBanner({ element })`; without `element` it renders
   `templates/gladiator-card.js` (`inviteBannerTemplate`).
 - **Methods:** `set({ picture, name, message, detail, acceptLabel, refuseLabel })`, `clear()`,
@@ -644,7 +650,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 | Perfil | AppHeader, PainelMenu, PageHeader, Avatar, Input, SegmentedControl, ChoiceCards, Switch, SaveStatus, SectionCard, Toast, Button |
 | Gladiadores | AppHeader, PainelMenu, PageHeader, SegmentedControl, GladiatorCard, Button, EmptyState |
 | Poções | AppHeader, PainelMenu, PageHeader, SectionCard, PotionSlot, PotionCard, SegmentedControl, Button, Toast |
-| Batalhas | AppHeader, PainelMenu, PageHeader, InviteBanner, ChoiceCards, GladiatorPicker, VersusPanel, SectionCard, Button |
+| Batalhas | AppHeader, PainelMenu, PageHeader, InviteBanner, ChoiceCards, GladiatorPicker, VersusPanel, SectionCard, Pagination, Button |
 | Relatórios | AppHeader, PainelMenu, PageHeader, FormStreak, Tabs, Switch, ResultPill, Pagination, EmptyState |
 | Ranking | AppHeader, PainelMenu, PageHeader, SearchField, OwnGladiatorJump, Tabs, RankingTable, Pagination |
 | Mensagens | AppHeader, PainelMenu, PageHeader, SearchField, Avatar, ConversationList, MessageThread, Composer |
