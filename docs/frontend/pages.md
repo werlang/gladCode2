@@ -168,7 +168,8 @@ would leave too little content below it (the boards' content is 1074 px wide at 
   Mensagens, Amigos, Notícias, Ajustes) with counts, and the Editor / Aprender / Sobre links. The sheet
   closes on the scrim, on Esc and on a selection.
 - A two-pane section (Mensagens) shows the list first; selecting a conversation replaces it with the
-  thread and a back button. Amigos and Ranking tables scroll inside their cards.
+  thread and a back button that returns to the list (the URL is `/messages/<userId>`, so a cold load
+  opens the thread). Amigos and Ranking tables scroll inside their cards.
 - The content column's bottom padding includes the bar height (`calc(78px + env(safe-area-inset-bottom))`).
 
 ## 4. Section lifecycle

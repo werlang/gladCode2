@@ -609,10 +609,13 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Purpose:** the left pane of Mensagens: the conversation search and one row per master (avatar, name,
   last message, relative time, unread count), the open row highlighted.
 - **Constructor:** `new ConversationList({ element, conversations })`.
-- **Methods:** `setConversations(list)`, `select(userId)`, `markRead(userId)`, `setFilter(text)`,
-  `setBusy(on)`. Every row is keyed by the **other master's user id** (`userId`), never by a message id.
+- **Methods:** `setConversations(list)`, `has(userId)`, `upsert(conversation)` (a master picked before
+  the first message exists), `select(userId)`, `markRead(userId)`, `updateLast(userId, message)`,
+  `setFilter(text)`, `setBusy(on)`. Every row is keyed by the **other master's user id** (`userId`),
+  never by a message id; an unread row is bold and carries its count as text.
 - **Events:** `select` `{ userId }`, `search` `{ query }`.
-- **ARIA:** a list of links (`aria-current="page"` on the open one); unread is text in the row.
+- **ARIA:** a list of buttons, each named by the master and snippet (`aria-current="page"` on the open row);
+  the unread count is text, and a row stays a button so Enter/Space open it.
 - **Boards:** `Mensagens.dc.html`.
 
 ### MessageThread — new (WP8)
@@ -622,17 +625,19 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   marker, incoming/outgoing bubbles, a shared replay card and the timestamp.
 - **Constructor:** `new MessageThread({ element })`.
 - **Methods:** `setConversation({ user, messages })` (`user.id` is the conversation key), `append(message)`,
-  `setOnline(on)`, `scrollToEnd()`, `setBusy(on)`.
-- **Events:** `challenge` `{ user }`, `open-replay` `{ hash }`, `more` `{ user }`.
-- **ARIA:** a live region for newly appended messages; each bubble is a list item with the sender named
-  for screen readers.
+  `clear()`, `setOnline(on)`, `scrollToEnd()`, `setBusy(on)`.
+- **Events:** `back` `{}` (the phone control), `challenge` `{ user }`, `more` `{ user }`. A shared replay
+  is an `<a href="/play/<hash>">` card built by the thread itself, not a component event.
+- **ARIA:** a live region for newly appended messages; each bubble names the sender for screen readers;
+  the replay card says “Replay compartilhado / Assistir”.
 - **Boards:** `Mensagens.dc.html`.
 
 ### Composer — new (WP8)
 
 - **File:** `components/composer.js`; **CSS:** `css/components/composer.css`.
 - **Purpose:** the message box: a labelled textarea that grows, the send button, Enter to send and
-  Shift+Enter for a new line.
+  Shift+Enter for a new line. The section enforces one send at a time and clears the draft only after
+  the API accepted it, so a refusal keeps the text.
 - **Constructor:** `new Composer({ element, placeholder })`.
 - **Methods:** `setValue(text)`, `get value`, `setBusy(on)`, `focus()`, `clear()`.
 - **Events:** `send` `{ text }`.
@@ -656,13 +661,15 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   (`.invite-banner`), shared with the card for now.
 - **Purpose:** the highlighted pending invite. Batalhas uses it for the first pending duel challenge
   (avatar, “fulano desafiou você”, the challenger's gladiator as “Luta com X.”, without an invented deadline, a transparent Recusar
-  and the ink “Escolher gladiador e aceitar”); Amigos will reuse it for a friend request in WP8.
+  and the ink “Escolher gladiador e aceitar”); Amigos reuses it for each pending friend request, with the
+  mutual-friend count as detail and the label “Convite de amizade”.
 - **Constructor:** `new InviteBanner({ element })`; without `element` it renders
   `templates/gladiator-card.js` (`inviteBannerTemplate`).
-- **Methods:** `set({ picture, name, message, detail, acceptLabel, refuseLabel })`, `clear()`,
-  `setBusy(on)`.
+- **Methods:** `set({ picture, name, message, detail, acceptLabel, refuseLabel, label })`, `clear()`,
+  `setBusy(on)`. Amigos passes `label: 'Convite de amizade'`; Batalhas keeps the duel label.
 - **Events:** `accept` `{}`, `refuse` `{}`.
-- **ARIA:** `<section aria-label>` naming the invite; both actions are buttons.
+- **ARIA:** `<section aria-label>` naming the invite (`label`, default “Convite pendente”); both actions
+  are buttons.
 - **Boards:** `Batalhas.dc.html` (WP5), `Amigos.dc.html` (WP8).
 
 ## Composition map

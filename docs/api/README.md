@@ -49,6 +49,17 @@ From `api/route/battles.js`.
 | `POST` | `/battles/ranked/match` | signed in | Finds opponents for one of the master's gladiators: `{ gladiator }`. Answers `{ opponents, match }`; `match` is the id the battle needs, fought once within ten minutes. |
 | `POST` | `/battles/ranked` | signed in | Fights a match: `{ match }`. Answers `{ hash, error, summary }` with the master's level, xp and silver and their gladiator after the battle. One battle at a time per master (429 `BATTLE_RUNNING`). |
 
+## conversations
+
+From `api/route/conversations.js`.
+
+| Method | Path | Access | Description |
+| --- | --- | --- | --- |
+| `GET` | `/conversations` | signed in | The signed-in master's conversations, keyed by the other master: `{ conversations: [{ user, last, unread }] }`. |
+| `GET` | `/conversations/:userId?offset=0` | signed in | A page of one conversation, newest first: `{ user, messages, total, offset, pageSize }`. |
+| `POST` | `/conversations/:userId/messages` | signed in | Sends a message: `{ message }`. Answers 201 `{ message: { id, sender, mine, time, body, quote, read } }`. The receiver is emailed unless they opted out; a master cannot message themselves. |
+| `POST` | `/conversations/:userId/read` | signed in | Marks every unread message from that master as read: `{ userId, read, unreadTotal }`. |
+
 ## duels
 
 From `api/route/duels.js`.
@@ -68,9 +79,9 @@ From `api/route/friends.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/friends` | signed in | The master's friendships: `{ pending, confirmed }`. |
+| `GET` | `/friends` | signed in | The master's friendships: `{ pending, confirmed }`. Confirmed friends carry `online`, `bestGladiator` and `bestRenown`; pending invites carry their `mutual` friend count. |
 | `GET` | `/friends/confirmed?filter=` | signed in | The master's friends whose nickname contains `filter` (every friend without it): `{ friends }`. |
-| `GET` | `/friends/search?nick=` | signed in | Masters to befriend: `{ users: [{ user, nick }] }` (up to ten). |
+| `GET` | `/friends/search?nick=` | signed in | Masters to befriend (up to ten): `{ users: [{ user, nick, level, picture, state }] }`, where `state` is `none`, `sent`, `incoming` or `friends`. |
 | `POST` | `/friends` | signed in | Asks a master for friendship: `{ user }`. The master is emailed unless they opted out. |
 | `PUT` | `/friends/requests/:id` | signed in | Answers a friend request: `{ accept }`. |
 | `DELETE` | `/friends/:id` | signed in | Ends a friendship (by its id). |

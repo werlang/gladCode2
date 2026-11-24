@@ -100,6 +100,7 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `notifications:counts` | `NotificationCounts` (below) | `NotificationService.refresh()` | shell → AppHeader, PainelMenu, MobileTabBar, MoreSheet setters |
 | `navigation:opened` | `{ section: SectionId, href: string }` | shell after a section mounts | shell → PainelMenu/MobileTabBar setters, analytics, the route title |
 | `messages:read` | `{ userId: number, read: number, unreadTotal: number }` | `MessagesService.markRead()` | Mensagens section (updates `ConversationList`), NotificationService (refresh) |
+| `messages:opened` | `{ userId: number\|null }` | Mensagens section after opening or closing a conversation | shell (pushes `/messages/<userId>` or `/messages`, `historyOnly`) |
 | `friends:answered` | `{ id: number, accepted: boolean }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
 | `potions:ordered` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[], reconciled: boolean, confirmed: boolean }` | `PotionsService.order()` | Poções section (updates `PotionSlot`); AppHeader via `account:silver` |
 | `potions:reconciled` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[], reconciled: true, confirmed: boolean }` | `PotionsService.reconcile()` | Poções section (repaints every slot); AppHeader via `account:silver` |
@@ -456,6 +457,11 @@ sequenceDiagram
 `{ userId, read, unreadTotal }`). The section's existing `PUT /messages/:id` stays for a single message's
 read/unread toggle and is not the conversation flow. The badge drops only after
 `notifications:counts`, never by decrementing a local number.
+
+Opening or closing the thread is URL state, not a request: the section emits `messages:opened` and the
+shell calls `navigate(..., { historyOnly: true, push: true })`, so Back returns to the previous window and
+the conversation is reloaded only when the route actually changes. A message action in Amigos emits the
+same fact with the other master's id; the shell pushes Mensagens and the section opens that thread.
 
 ### 6. Friend invite accepted or declined → Amigos badge
 
