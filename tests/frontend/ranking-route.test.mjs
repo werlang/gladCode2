@@ -2,59 +2,78 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-/** A deferred promise resolved by the test. */
-function deferred() {
-    let resolve;
-    let reject;
-    const promise = new Promise((onResolve, onReject) => {
-        resolve = onResolve;
-        reject = onReject;
-    });
-    return { promise, resolve, reject };
-}
-
-/** The parts of an element the ranking controller touches. */
+/** A small node with the parts the ranking components touch. */
 function fakeNode(children = {}) {
     const classes = new Set();
     const listeners = new Map();
+    const auto = new Map();
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
-        replaced: 0, appended: 0, removed: 0, style: {},
+        replaced: 0, appended: 0, appendedNodes: [], style: {}, dataset: {}, tabIndex: 0,
         classList: {
             add: (...names) => names.forEach(name => classes.add(name)),
             remove: (...names) => names.forEach(name => classes.delete(name)),
             toggle: (name, on) => (on ? classes.add(name) : classes.delete(name)),
             contains: name => classes.has(name),
         },
-        querySelector: selector => children[selector] ?? null,
+        querySelector: selector => {
+            if (Object.hasOwn(children, selector)) return children[selector];
+            if (!auto.has(selector)) auto.set(selector, fakeNode());
+            return auto.get(selector);
+        },
         querySelectorAll: () => [],
-        replaceChildren: () => { element.replaced += 1; },
-        append: () => { element.appended += 1; },
-        remove: () => { element.removed += 1; },
+        replaceChildren: () => { element.replaced += 1; element.textContent = ''; },
+        append: (...nodes) => {
+            element.appended += nodes.length;
+            element.appendedNodes.push(...nodes);
+            element.textContent += nodes.map(node => node.textContent ?? '').join('');
+        },
+        remove: () => {},
         addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
-        fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
         removeEventListener: () => {},
+        dispatchEvent: event => {
+            if (!event.target) Object.defineProperty(event, 'target', { value: element, configurable: true });
+            for (const listener of listeners.get(event.type) ?? []) listener(event);
+            return true;
+        },
+        fire: (name, detail) => {
+            const event = new CustomEvent(name, { detail });
+            Object.defineProperty(event, 'target', { value: element, configurable: true });
+            for (const listener of listeners.get(name) ?? []) listener(event);
+        },
+        click: () => {
+            const event = new CustomEvent('click');
+            Object.defineProperty(event, 'target', { value: element, configurable: true });
+            for (const listener of listeners.get('click') ?? []) listener(event);
+        },
+        focus: () => { globalThis.document.activeElement = element; },
+        contains: candidate => candidate === element,
+        setAttribute: (name, value) => { element[name] = value; },
+        getAttribute: name => element[name] ?? null,
+        removeAttribute: name => { delete element[name]; },
         insertAdjacentHTML: () => {},
-        setAttribute: () => {},
-        removeAttribute: () => {},
-        getAttribute: () => null,
-        focus: () => {},
-        closest: () => null,
-        animate: null,
+        scrollIntoView: () => {},
     };
     return element;
 }
 
-/** Installs just enough document for the controller to construct and render. */
 function installDocument(map) {
-    globalThis.getComputedStyle = () => ({ display: 'block' });
     globalThis.document = {
         querySelector: selector => map.get(selector) ?? null,
         querySelectorAll: () => [],
-        addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
-        fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
+        createElement: () => {
+            const node = fakeNode();
+            node.content = { firstElementChild: fakeNode() };
+            return node;
+        },
+        createTextNode: text => ({ textContent: String(text) }),
+        createDocumentFragment: () => {
+            const fragment = fakeNode();
+            fragment.isFragment = true;
+            return fragment;
+        },
+        addEventListener: () => {},
         removeEventListener: () => {},
-        createElement: () => fakeNode(),
         body: fakeNode(),
         documentElement: fakeNode(),
         activeElement: null,
@@ -62,249 +81,217 @@ function installDocument(map) {
 }
 
 const { RankingTab } = await import('../../web/public/script/profile/ranking.js');
-const { RankModel } = await import('../../web/public/script/models/rank.js');
-const { RequestError } = await import('../../web/public/script/helpers/request.js');
-const { runSectionTask, secondaryRequest, settleRequest } = await import('../../web/public/script/helpers/section-request.js');
+const { RankingService, ranking } = await import('../../web/public/script/services/ranking.js');
+const { RankingTable } = await import('../../web/public/script/components/ranking-table.js');
+const { OwnGladiatorJump } = await import('../../web/public/script/components/own-gladiator-jump.js');
 const { profile } = await import('../../web/public/script/profile/session.js');
+const { APP_EVENTS, events } = await import('../../web/public/script/helpers/event-bus.js');
 
-profile.user = { id: 1, nickname: 'Test', level: 10, premium: false, silver: 0 };
+profile.user = { id: 1, nickname: 'Test', level: 10, premium: false, silver: 0, credits: 0 };
 
-test('ranking starts a filtered route at page zero and drops the late answer', async () => {
-    const table = fakeNode();
-    const search = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#search .input': search,
-        '#tab-general': fakeNode(),
-        '#add-tab': fakeNode(),
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
+function panel() {
+    const pager = fakeNode();
+    const own = fakeNode();
+    const table = fakeNode({ '#ranking-pager': pager, '#ranking-own': own });
+    return { panel: table, pager };
+}
+
+function patchRanking(overrides) {
+    const original = {};
+    for (const [key, value] of Object.entries(overrides)) {
+        original[key] = ranking[key];
+        ranking[key] = value;
+    }
+    return () => {
+        for (const [key, value] of Object.entries(original)) ranking[key] = value;
+    };
+}
+
+test('the section opens the general ranking at offset zero', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    const calls = [];
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [] }),
+        page: async query => {
+            calls.push(query);
+            return { total: 4, ranking: [{ id: 1, gladiator: 'Aurora', master: 'ArenaIris', mmr: 1487, change7d: 3, position: 1 }] };
+        },
+        window: async () => assert.fail('the initial route is not a window'),
     });
-    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
-    installDocument(new Map([['#ranking-container', panel]]));
-    const original = {
-        tabs: RankModel.tabs,
-        general: RankModel.general,
-        best: RankModel.myBestOffset,
-    };
-    const tabs = deferred();
-    const general = deferred();
-    RankModel.tabs = () => tabs.promise;
-    RankModel.general = query => {
-        assert.equal(query.offset, 0);
-        assert.equal(query.search, 'Magnus');
-        assert.ok(query.signal);
-        return general.promise;
-    };
-    let bestCalls = 0;
-    RankModel.myBestOffset = async () => {
-        bestCalls += 1;
-        return 127;
-    };
     try {
         const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        assert.deepEqual(calls.map(call => ({ offset: call.offset, search: call.search, scope: call.scope })), [
+            { offset: 0, search: '', scope: 'all' },
+        ]);
+    }
+    finally {
+        restore();
+    }
+});
+
+test('the ranking route opens the window at the requested position', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    const calls = { page: [], window: [] };
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [] }),
+        page: async query => {
+            calls.page.push(query);
+            return { total: 4, ranking: [{ id: 1, gladiator: 'Aurora', master: 'ArenaIris', mmr: 1487, change7d: 3, position: 1 }] };
+        },
+        window: async query => {
+            calls.window.push(query);
+            return {
+                total: 4, position: 3, page: 1, pageSize: 10, around: 'Brutus',
+                rows: [{ id: 2, gladiator: 'Brutus', master: 'ArenaIris', mmr: 1362, change7d: 0, position: 3 }],
+            };
+        },
+    });
+    try {
+        const tab = new RankingTab();
+        await tab.show({ query: { at: 3 } }, { signal: new AbortController().signal });
+        assert.deepEqual(calls.page.map(call => call.offset), [0]);
+        assert.deepEqual(calls.window.map(call => ({ position: call.position, size: call.size })), [{ position: 3, size: 9 }]);
+    }
+    finally {
+        restore();
+    }
+});
+
+test('a ranked own chip jumps through the window and the shell URL event', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    const windows = [];
+    const jumped = [];
+    const unsubscribe = events.on(APP_EVENTS.rankingJumped, detail => jumped.push(detail));
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [{ id: 9, name: 'Aurora', position: 2, state: 'ranked', skin: '' }] }),
+        page: async () => ({ total: 4, ranking: [] }),
+        window: async query => {
+            windows.push(query);
+            return { total: 4, position: 2, page: 1, pageSize: 10, around: 'Aurora', rows: [] };
+        },
+    });
+    try {
+        const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        // The own component is the first appended node of #ranking-own.
+        const own = root.querySelector('#ranking-own').appendedNodes[0];
+        // Find the ranked chip rendered by the component.
+        const list = own.querySelector('.own-gladiator-list');
+        const chip = list.appendedNodes.find(node => node.dataset.state === 'ranked');
+        chip.click();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        assert.deepEqual(windows.map(query => ({ gladiatorId: query.gladiatorId })), [{ gladiatorId: 9 }]);
+        assert.deepEqual(jumped, [{ gladiatorId: 9, position: 2 }]);
+    }
+    finally {
+        unsubscribe();
+        restore();
+    }
+});
+
+test('the ranking service caches the podium from the first unfiltered page', async () => {
+    const page = {
+        total: 10,
+        ranking: [
+            { id: 1, gladiator: 'A', mmr: 3, position: 1 },
+            { id: 2, gladiator: 'B', mmr: 2, position: 2 },
+            { id: 3, gladiator: 'C', mmr: 1, position: 3 },
+        ],
+    };
+    const model = {
+        general: async () => page,
+        window: async query => ({ query }),
+        mine: async () => ({ gladiators: [] }),
+    };
+    const service = new RankingService({ model });
+    await service.page({ offset: 0 });
+    assert.equal(service.top.length, 3);
+    await service.page({ offset: 10 });
+    assert.equal(service.top.length, 3);
+    await service.page({ offset: 0, search: 'A' });
+    assert.equal(service.top.length, 3);
+    assert.deepEqual(await service.window({ position: 2 }), { query: { position: 2 } });
+});
+
+test('the table marks the own row, the trend and the context', () => {
+    const element = fakeNode();
+    const table = new RankingTable({ element });
+    table.setRows([
+        { id: 1, gladiator: 'Aurora', master: 'ArenaIris', mmr: 1487, change7d: 9, position: 1, mine: true },
+        { id: 2, gladiator: 'Brutus', master: 'ArenaIris', mmr: 1362, change7d: -3, position: 2 },
+        { id: 3, gladiator: 'Cícero', master: 'ArenaIris', mmr: 1188, change7d: 0, position: 3 },
+    ]);
+    const html = element.querySelector('tbody').innerHTML;
+    assert.match(html, /VOCÊ/);
+    assert.match(html, /is-mine/);
+    assert.match(html, /subiu 9/);
+    assert.match(html, /desceu 3/);
+    table.setContext({ around: 'Aurora', position: 1, page: 1, total: 40, pageSize: 10 });
+    assert.match(element.querySelector('.ranking-context-text').textContent, /Em volta de/);
+});
+
+test('an own strip disables the reasons and only ranked chips jump', () => {
+    const element = fakeNode();
+    const jumps = [];
+    const strip = new OwnGladiatorJump({ element, paint: () => {} });
+    strip.listen('jump', detail => jumps.push(detail));
+    strip.setGladiators([
+        { id: 1, name: 'Aurora', position: 2, state: 'ranked', skin: '' },
+        { id: 2, name: 'Cícero', position: null, state: 'outdated', skin: '' },
+        { id: 3, name: 'Ferrugem', position: null, state: 'broken', skin: '' },
+        { id: 4, name: 'Novo', position: null, state: 'unranked', skin: '' },
+    ]);
+    const chips = element.querySelector('.own-gladiator-list').appendedNodes;
+    assert.equal(chips.length, 4);
+    assert.equal(chips[0].disabled, false);
+    assert.equal(chips[0].dataset.state, 'ranked');
+    assert.equal(chips[1].disabled, true);
+    assert.equal(chips[1].dataset.state, 'outside');
+    assert.equal(chips[2].disabled, true);
+    assert.equal(chips[3].disabled, true);
+    chips[0].click();
+    assert.deepEqual(jumps, [{ gladiator: { id: 1, name: 'Aurora' }, position: 2 }]);
+});
+
+test('a search answer that arrives after leaving does not replace the table', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    let release;
+    let started;
+    const startedPromise = new Promise(resolve => { started = resolve; });
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [] }),
+        page: query => {
+            if (query.search === 'Aurora') {
+                started();
+                return new Promise(resolve => { release = () => resolve({ total: 1, ranking: [] }); });
+            }
+            return Promise.resolve({ total: 4, ranking: [] });
+        },
+        window: async () => ({ total: 4, position: 1, page: 1, pageSize: 10, around: null, rows: [] }),
+    });
+    try {
+        const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        const body = root.querySelector('#ranking-table-host').appendedNodes[0].querySelector('tbody');
+        body.innerHTML = 'previous rows';
         const controller = new AbortController();
-        const shown = tab.show({ query: { q: 'Magnus' } }, { signal: controller.signal });
-        assert.equal(bestCalls, 0);
-        assert.equal(search.value, 'Magnus');
-        tabs.resolve([]);
-        await Promise.resolve();
-        await Promise.resolve();
-        const placeholder = table.innerHTML;
+        const shown = tab.show({ query: { q: 'Aurora' } }, { signal: controller.signal });
+        await startedPromise;
         controller.abort();
-        general.resolve({ total: 1, ranking: [{ position: 1, gladiator: 'Magnus', master: 'Mestre', change24h: 0, mmr: 1400 }] });
+        release();
         await shown;
-        assert.equal(table.innerHTML, placeholder);
+        assert.equal(body.innerHTML, 'previous rows');
     }
     finally {
-        RankModel.tabs = original.tabs;
-        RankModel.general = original.general;
-        RankModel.myBestOffset = original.best;
+        restore();
     }
-});
-
-test('ranking clears the filter when the route no longer has q', async () => {
-    const table = fakeNode();
-    const search = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#search .input': search,
-        '#tab-general': fakeNode(),
-        '#add-tab': fakeNode(),
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
-    });
-    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
-    installDocument(new Map([['#ranking-container', panel]]));
-    const original = {
-        tabs: RankModel.tabs,
-        general: RankModel.general,
-        best: RankModel.myBestOffset,
-    };
-    search.value = 'Magnus';
-    const offsets = [];
-    RankModel.tabs = async () => [];
-    RankModel.general = query => {
-        offsets.push(query.offset);
-        return Promise.resolve({ total: 200, ranking: [] });
-    };
-    RankModel.myBestOffset = async () => 127;
-    try {
-        const tab = new RankingTab();
-        await tab.show({}, { signal: new AbortController().signal });
-        assert.equal(search.value, '');
-        assert.deepEqual(offsets, [120]);
-    }
-    finally {
-        RankModel.tabs = original.tabs;
-        RankModel.general = original.general;
-        RankModel.myBestOffset = original.best;
-    }
-});
-
-test('a typed search rejected by navigation is swallowed at the section boundary', async () => {
-    const table = fakeNode();
-    const search = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#search .input': search,
-        '#tab-general': fakeNode(),
-        '#add-tab': fakeNode(),
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
-    });
-    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
-    installDocument(new Map([['#ranking-container', panel]]));
-    const original = {
-        tabs: RankModel.tabs,
-        general: RankModel.general,
-        best: RankModel.myBestOffset,
-    };
-    RankModel.tabs = async () => [];
-    RankModel.myBestOffset = async () => 0;
-    RankModel.general = async () => ({ total: 200, ranking: [] });
-    try {
-        const tab = new RankingTab();
-        tab.init();
-        const controller = new AbortController();
-        await tab.show({}, { signal: controller.signal });
-
-        const aborted = () => new RequestError(0, 'Request aborted', undefined, { aborted: true });
-        RankModel.general = () => {
-            if (controller.signal.aborted) return Promise.reject(aborted());
-            return new Promise((resolve, reject) => {
-                controller.signal.addEventListener('abort', () => reject(aborted()), { once: true });
-            });
-        };
-        search.value = 'Delay';
-        const before = table.innerHTML;
-        const typed = search.fire('input');
-        controller.abort();
-        await typed;
-        assert.equal(table.innerHTML, before);
-    }
-    finally {
-        RankModel.tabs = original.tabs;
-        RankModel.general = original.general;
-        RankModel.myBestOffset = original.best;
-    }
-});
-
-test('the section request boundary recognizes abort errors and keeps other failures', async () => {
-    const aborted = new RequestError(0, 'Request aborted', undefined, { aborted: true });
-    assert.equal(await settleRequest(async () => {
-        throw aborted;
-    }), undefined);
-    await runSectionTask(async () => {
-        throw aborted;
-    });
-    await assert.rejects(settleRequest(async () => {
-        throw new Error('server down');
-    }), /server down/);
-});
-
-test('a failed personal position still opens the general ranking on page zero', async () => {
-    const table = fakeNode();
-    const search = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#search .input': search,
-        '#tab-general': fakeNode(),
-        '#add-tab': fakeNode(),
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
-    });
-    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
-    installDocument(new Map([['#ranking-container', panel]]));
-    const original = {
-        tabs: RankModel.tabs,
-        general: RankModel.general,
-        best: RankModel.myBestOffset,
-    };
-    RankModel.tabs = async () => [];
-    RankModel.myBestOffset = async () => {
-        throw new Error('position unavailable');
-    };
-    const offsets = [];
-    RankModel.general = query => {
-        offsets.push(query.offset);
-        return Promise.resolve({ total: 0, ranking: [] });
-    };
-    try {
-        const tab = new RankingTab();
-        await tab.show({}, { signal: new AbortController().signal });
-        assert.deepEqual(offsets, [0]);
-    }
-    finally {
-        RankModel.tabs = original.tabs;
-        RankModel.general = original.general;
-        RankModel.myBestOffset = original.best;
-    }
-});
-
-test('failed hashtag tabs do not block the general ranking list', async () => {
-    const table = fakeNode();
-    const search = fakeNode();
-    const add = fakeNode();
-    const panel = fakeNode({
-        '.table': table,
-        '#search .input': search,
-        '#tab-general': fakeNode(),
-        '#add-tab': add,
-        '#prev': fakeNode(),
-        '#next': fakeNode(),
-    });
-    panel.querySelectorAll = selector => (selector === '.page-nav span' ? [fakeNode(), fakeNode(), fakeNode()] : []);
-    installDocument(new Map([['#ranking-container', panel]]));
-    const original = {
-        tabs: RankModel.tabs,
-        general: RankModel.general,
-        best: RankModel.myBestOffset,
-    };
-    RankModel.tabs = async () => {
-        throw new Error('tabs unavailable');
-    };
-    RankModel.myBestOffset = async () => 0;
-    let listings = 0;
-    RankModel.general = async () => {
-        listings += 1;
-        return { total: 0, ranking: [] };
-    };
-    try {
-        const tab = new RankingTab();
-        await tab.show({}, { signal: new AbortController().signal });
-        assert.equal(listings, 1);
-        assert.equal(add.style.display, 'none');
-    }
-    finally {
-        RankModel.tabs = original.tabs;
-        RankModel.general = original.general;
-        RankModel.myBestOffset = original.best;
-    }
-});
-
-test('a secondary request degrades its failure to undefined', async () => {
-    assert.equal(await secondaryRequest(async () => {
-        throw new Error('badge unavailable');
-    }), undefined);
 });
