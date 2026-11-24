@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import { attributeCost, detectLanguage, gladiatorSource, validGladName } from '../../web/public/script/editor/attributes.js';
 import { insideFunction } from '../../web/public/script/editor/code-editor.js';
+import { STARTER_CODE } from '../../web/public/script/editor/starter-code.js';
 
 test('attribute costs grow by one point every six levels', () => {
     assert.equal(attributeCost(0), 0);
@@ -25,6 +26,13 @@ test('the language follows the code, or the blocks editor', () => {
     assert.equal(detectLanguage('def loop():\n    pass'), 'python');
     assert.equal(detectLanguage('def loop():', true), 'blocks');
     assert.equal(detectLanguage('function loop() {}'), 'javascript');
+});
+
+test('every starter declares loop() in its preferred language', () => {
+    assert.equal(detectLanguage(STARTER_CODE.c), 'c');
+    assert.equal(detectLanguage(STARTER_CODE.python), 'python');
+    assert.equal(detectLanguage(STARTER_CODE.javascript), 'javascript');
+    assert.match(STARTER_CODE.python, /\n    pass\n$/);
 });
 
 test('the gladiator source starts with its setup', () => {

@@ -14,6 +14,7 @@ import { BattleTest } from './editor/battle-test.js';
 import { BlocksEditor } from './editor/blocks-editor.js';
 import { CodeEditor } from './editor/code-editor.js';
 import { SkinCreator } from './editor/skin-creator.js';
+import { STARTER_CODE } from './editor/starter-code.js';
 import { attachTutorial, tutorial } from './editor/tutorial.js';
 import { openGladiators, openHelp, openSettings } from './editor/windows.js';
 import { savingTemplate } from './templates/editor.js';
@@ -26,12 +27,6 @@ const BEFORE_TEST_LESSONS = ['checkStep', 'oponent', 'learnAttack', 'checkAttack
 const AFTER_TEST_LESSONS = ['watchCodeMove', 'moveBackForth', 'askMoveNext', 'detectEnemy', 'getHit', 'reactHit', 'safe', 'fireball', 'teleport', 'upgrade', 'breakpoint'];
 /** The samples the server fights a gladiator against before saving it, in battle order. */
 const SAVE_TEST_NAMES = ['Archie', 'War Maker', 'Magnus', 'Rouge'];
-/** The code a new gladiator starts with, in the master's preferred language (C otherwise). */
-export const STARTER_CODE = {
-    c: 'loop(){\n    //comportamento do gladiador\n}',
-    python: 'def loop():\n    #comportamento do gladiador\n    pass\n',
-    javascript: 'function loop() {\n    // comportamento do gladiador\n}',
-};
 /** A transparent pixel, for a profile picture that fails to load. */
 const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
