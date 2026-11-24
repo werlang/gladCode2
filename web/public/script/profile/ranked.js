@@ -5,6 +5,7 @@ import { VersusPanel } from '../components/versus-panel.js';
 import { ProgressButton, Simulation } from '../components/simulation.js';
 import { animateValue, fadeIn } from '../helpers/animate.js';
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
+import { FlightGuard } from '../helpers/flight-guard.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { site } from '../helpers/request.js';
 import { secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
@@ -134,6 +135,7 @@ async function showAfterBattle(hash, data, before) {
     find('#code').addEventListener('click', () => window.open(`glad-${data.gladiator.id}`));
 }
 
+
 /**
  * The ranked part of the BATALHAS tab: the GladiatorPicker and VersusPanel, and the button that finds
  * opponents and runs the battle.
@@ -144,6 +146,7 @@ export class RankedBattle {
     #button;
     #selected = null;
     #signal = null;
+    #flight = new FlightGuard();
 
     /**
      * @param {() => void} onFought Called when the battle ended.
@@ -195,54 +198,61 @@ export class RankedBattle {
     async #fight() {
         const glad = this.#selected;
         if (!glad) return;
-        this.#versus.setBusy(true);
-        const progress = new ProgressButton(this.#button, ['Executando batalha...', 'Aguardando resposta do servidor']);
-        const before = {
-            lvl: profile.user.level,
-            xp: parseFloat(profile.user.xp),
-            xpTotal: xpToNextLevel(profile.user.level),
-            silver: parseInt(profile.user.silver, 10),
-            mmr: glad.mmr,
-        };
+        return this.#flight.run(async () => {
+            this.#picker.setDisabled('Batalha ranqueada em andamento');
+            this.#versus.setBusy(true);
+            const progress = new ProgressButton(this.#button, ['Executando batalha...', 'Aguardando resposta do servidor']);
+            const before = {
+                lvl: profile.user.level,
+                xp: parseFloat(profile.user.xp),
+                xpTotal: xpToNextLevel(profile.user.level),
+                silver: parseInt(profile.user.silver, 10),
+                mmr: glad.mmr,
+            };
 
-        let match;
-        try {
-            match = await RankedModel.match(glad.id);
-        }
-        catch (error) {
-            progress.kill();
-            this.#versus.setBusy(false);
-            if (error.code === 'NO_OPPONENTS') {
-                showMessage('Ainda não há oponentes na versão atual. Tente novamente mais tarde.');
-                return;
+            try {
+                let match;
+                try {
+                    match = await RankedModel.match(glad.id);
+                }
+                catch (error) {
+                    if (error.code === 'NO_OPPONENTS') {
+                        showMessage('Ainda não há oponentes na versão atual. Tente novamente mais tarde.');
+                        return;
+                    }
+                    if (error.code !== 'GLADIATOR_OUTDATED') {
+                        writeErrorToast(error);
+                        return;
+                    }
+                    const answer = await showDialog('Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
+                    if (answer === 'Sim') window.open(`glad-${glad.id}`);
+                    return;
+                }
+                const glads = [...match.opponents, glad];
+                const stopPreBattle = showPreBattle(glads, this.#button);
+
+                let data;
+                try {
+                    data = await new Simulation(signal => RankedModel.fight(match.match, { signal }), { terminal: true, names: glads.map(entry => entry.name) }).run();
+                }
+                catch (error) {
+                    // the pre-battle screen has no way out of its own: take it down and say why
+                    document.querySelectorAll('#fog').forEach(fog => fog.remove());
+                    writeErrorToast(error);
+                    data = { error: true };
+                }
+                stopPreBattle();
+                if (data.error || !data.hash) return;
+
+                document.querySelectorAll('#fog').forEach(fog => fog.remove());
+                this.onFought();
+                showAfterBattle(data.hash, data.summary, before);
             }
-            if (error.code !== 'GLADIATOR_OUTDATED') {
-                writeErrorToast(error);
-                return;
+            finally {
+                progress.kill();
+                this.#versus.setBusy(false);
+                this.#picker.setDisabled('');
             }
-            const answer = await showDialog('Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
-            if (answer === 'Sim') window.open(`glad-${glad.id}`);
-            return;
-        }
-        const glads = [...match.opponents, glad];
-        const stopPreBattle = showPreBattle(glads, this.#button);
-
-        let data;
-        try {
-            data = await new Simulation(signal => RankedModel.fight(match.match, { signal }), { terminal: true, names: glads.map(entry => entry.name) }).run();
-        }
-        catch (error) {
-            document.querySelectorAll('#fog').forEach(fog => fog.remove());
-            writeErrorToast(error);
-            data = { error: true };
-        }
-        stopPreBattle();
-        progress.kill();
-        this.#versus.setBusy(false);
-        if (data.error || !data.hash) return;
-
-        document.querySelectorAll('#fog').forEach(fog => fog.remove());
-        this.onFought();
-        showAfterBattle(data.hash, data.summary, before);
+        });
     }
 }

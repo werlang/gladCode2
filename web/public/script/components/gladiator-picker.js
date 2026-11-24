@@ -15,6 +15,7 @@ export class GladiatorPicker extends BaseComponent {
     #items = [];
     #selected = null;
     #gladiators = [];
+    #disabled = false;
 
     /** @param {{ element?: HTMLElement }} [options] */
     constructor({ element } = {}) {
@@ -43,6 +44,7 @@ export class GladiatorPicker extends BaseComponent {
                 crown: CROWN,
             }));
             button.dataset.gladId = String(glad.id);
+            button.dataset.state = state;
             button.setAttribute('aria-pressed', 'false');
             button.setAttribute('aria-label', `${glad.name}, ${Number(glad.mmr || 0).toLocaleString('pt-BR')} de renome, ${state === 'ready' ? 'pronto' : state === 'broken' ? 'com erro' : 'desatualizado'}`);
             button.classList.toggle('is-disabled', state !== 'ready');
@@ -52,10 +54,12 @@ export class GladiatorPicker extends BaseComponent {
             button.querySelector('.gladiator-pick-note').textContent = state === 'ready' ? gladiatorCrest(glad) : state === 'broken' ? 'Com erro' : 'Desatualizado';
             button.querySelector('.gladiator-pick-lock').hidden = state === 'ready';
             button.addEventListener('click', () => {
+                if (this.#disabled) return;
                 if (state === 'ready') this.select(glad.id);
                 else this.emit('blocked', { gladiator: glad, reason: state });
             });
             button.addEventListener('dblclick', () => {
+                if (this.#disabled) return;
                 if (state === 'ready' && this.#selected?.id === glad.id) this.emit('confirm', { gladiator: glad });
             });
             this.#items.push(button);
@@ -70,6 +74,7 @@ export class GladiatorPicker extends BaseComponent {
      * @returns {this}
      */
     select(id) {
+        if (this.#disabled) return this;
         const glad = this.#gladiators.find(item => item.id === Number(id));
         if (!glad || gladiatorState(glad) !== 'ready') return this;
         this.#selected = glad;
@@ -84,7 +89,9 @@ export class GladiatorPicker extends BaseComponent {
 
     /** @param {string} reason */
     setDisabled(reason = '') {
-        this.element.classList.toggle('is-disabled', Boolean(reason));
+        this.#disabled = Boolean(reason);
+        this.element.classList.toggle('is-disabled', this.#disabled);
+        this.element.setAttribute('aria-busy', String(this.#disabled));
         if (reason) this.element.setAttribute('aria-label', reason);
         else this.element.removeAttribute('aria-label');
         return this;
@@ -92,6 +99,7 @@ export class GladiatorPicker extends BaseComponent {
 
     /** @param {KeyboardEvent} event */
     #onKey(event) {
+        if (this.#disabled) return;
         const usable = this.#items.filter(item => item.getAttribute('aria-disabled') !== 'true');
         if (!usable.length) return;
         const current = usable.indexOf(document.activeElement);
