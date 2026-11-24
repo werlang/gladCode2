@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getLastHitAngle ( void );",
         "python": "getLastHitAngle()",
+        "javascript": "getLastHitAngle()",
         "blocks": "<block type='get_lasthit'><field name='COMPLEMENT'>Angle</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "19.c",
         "python": "19.py",
+        "javascript": "19.js",
         "blocks": "19.xml",
         "explain": "19.txt"
     },
@@ -34,6 +36,7 @@
     ],
     "snippet": {
         "c": "float ${1:hit_angle} = getLastHitAngle();",
-        "python": "${1:hit_angle} = getLastHitAngle()"
+        "python": "${1:hit_angle} = getLastHitAngle()",
+        "javascript": "let ${1:hit_angle} = getLastHitAngle();"
     }
 }

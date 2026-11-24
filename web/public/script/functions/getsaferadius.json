@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getSafeRadius ( void );",
         "python": "getSafeRadius()",
+        "javascript": "getSafeRadius()",
         "blocks": "<block type='getsaferadius'></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "21.c",
         "python": "21.py",
+        "javascript": "21.js",
         "blocks": "21.xml",
         "explain": "21.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:safe_radius} = getSafeRadius();",
-        "python": "${1:safe_radius} = getSafeRadius()"
+        "python": "${1:safe_radius} = getSafeRadius()",
+        "javascript": "let ${1:safe_radius} = getSafeRadius();"
     }
 }

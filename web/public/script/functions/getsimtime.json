@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getSimTime ( void );",
         "python": "getSimTime()",
+        "javascript": "getSimTime()",
         "blocks": "<block type='getsimtime'></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "22.c",
         "python": "22.py",
+        "javascript": "22.js",
         "blocks": "22.xml",
         "explain": "22.txt"
     },
@@ -33,6 +35,7 @@
     ],
     "snippet": {
         "c": "float ${1:sim_time} = getSimTime();",
-        "python": "${1:sim_time} = getSimTime()"
+        "python": "${1:sim_time} = getSimTime()",
+        "javascript": "let ${1:sim_time} = getSimTime();"
     }
 }

@@ -35,3 +35,11 @@ test('every old address lands on a page that does not redirect again', async () 
 test('unknown addresses are not found, whatever their form', async () => {
     for (const path of ['/nope', '/nope.php', '/code.php']) assert.equal((await get(path)).status, 404, path);
 });
+
+test('a function page takes the language from its extension, JavaScript included', async () => {
+    for (const extension of ['c', 'py', 'js', 'blk']) {
+        const res = await get(`/function/gettargetx.${extension}`);
+        assert.equal(res.status, 200, extension);
+        assert.match(await res.text(), new RegExp(`"codeLanguage":"${extension}"`), extension);
+    }
+});

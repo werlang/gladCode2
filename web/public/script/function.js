@@ -4,6 +4,7 @@
 import './blocks.js';
 import { SideMenu } from './components/side-menu.js';
 import { renderTemplate } from './helpers/html.js';
+import { translateFunctionText } from './helpers/function-reference.js';
 import { TemplateVar } from './helpers/template-var.js';
 import { FunctionDocsModel } from './models/function-docs.js';
 import { UserModel } from './models/user.js';
@@ -16,9 +17,9 @@ import {
 } from './templates/function.js';
 
 /** URL extension of each language. */
-const EXTENSIONS = { c: 'c', python: 'py', blocks: 'blk' };
+const EXTENSIONS = { c: 'c', python: 'py', javascript: 'js', blocks: 'blk' };
 /** Language of each URL extension. */
-const LANGUAGES = { c: 'c', py: 'python', blk: 'blocks' };
+const LANGUAGES = { c: 'c', py: 'python', js: 'javascript', blk: 'blocks' };
 /** Words that look like calls in a sample but are not API functions. */
 const RESERVED = ['loops', 'if', 'elif', 'while', 'for'];
 
@@ -29,10 +30,10 @@ const functionName = TemplateVar.get('functionName') ?? '';
 const dictionary = TemplateVar.get('docLanguage') ?? '';
 
 /**
- * The language to show: the one in the URL (`function/<name>.py`), else the user's, else C.
+ * The language to show: the one in the URL (`function/<name>.py`, `.js`, ...), else the user's, else C.
  *
  * @param {Record<string, any>} user Signed-in user answer.
- * @returns {'c'|'python'|'blocks'}
+ * @returns {'c'|'python'|'javascript'|'blocks'}
  */
 function chooseLanguage(user) {
     const language = LANGUAGES[TemplateVar.get('codeLanguage')];
@@ -113,11 +114,17 @@ async function fillSample(item, reference, language) {
  */
 function translateNames(names) {
     const template = content.querySelector('#template');
-    let html = template.innerHTML;
-    Object.entries(names).forEach(([name, translated]) => {
-        html = html.replace(new RegExp(`([^f=\\w])${name}([\\W])`, 'g'), `$1${translated}$2`);
+    // Prism wraps code in nested spans, so reject every text node below <code> rather than
+    // rewriting the HTML string. Portuguese aliases exist only in the C client.
+    const walker = document.createTreeWalker(template, NodeFilter.SHOW_TEXT, {
+        acceptNode: node => node.parentElement?.closest('code') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
     });
-    template.innerHTML = html.replace(/href="function\/([\w]*?)"/g, "href='funcao/$1'");
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    textNodes.forEach(node => { node.data = translateFunctionText(node.data, names); });
+    template.querySelectorAll('a[href^="function/"]').forEach(link => {
+        link.setAttribute('href', link.getAttribute('href').replace(/^function\//, 'funcao/'));
+    });
 }
 
 /**

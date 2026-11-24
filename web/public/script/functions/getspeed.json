@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getSpeed ( void );",
         "python": "getSpeed()",
+        "javascript": "getSpeed()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>Speed</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -34,6 +36,7 @@
     ],
     "snippet": {
         "c": "float ${1:speed} = getSpeed();",
-        "python": "${1:speed} = getSpeed()"
+        "python": "${1:speed} = getSpeed()",
+        "javascript": "let ${1:speed} = getSpeed();"
     }
 }

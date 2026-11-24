@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isSafeHere ( void );",
         "python": "isSafeHere()",
+        "javascript": "isSafeHere()",
         "blocks": "<block type='issafe'><field name='COMPLEMENT'>Here</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso haja gás tóxico na posição do gladiador, ou False caso contrário.",
+        "javascript": "Retorna true caso haja gás tóxico na posição do gladiador, ou false caso contrário.",
         "c": "Retorna 1 caso haja gás tóxico na posição do gladiador, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso haja gás tóxico na posição do gladiador, ou Falso caso contrário."
     },
     "sample": {
         "c": "21.c",
         "python": "21.py",
+        "javascript": "21.js",
         "blocks": "21.xml",
         "explain": "21.txt"
     },
@@ -35,6 +38,7 @@
     ],
     "snippet": {
         "c": "int ${1:safe} = isSafeHere();",
-        "python": "${1:safe} = isSafeHere()"
+        "python": "${1:safe} = isSafeHere()",
+        "javascript": "let ${1:safe} = isSafeHere();"
     }
 }

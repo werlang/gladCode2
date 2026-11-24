@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getX ( void );",
         "python": "getX()",
+        "javascript": "getX()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>X</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "25.c",
         "python": "25.py",
+        "javascript": "25.js",
         "blocks": "25.xml",
         "explain": "25.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:x} = getX();",
-        "python": "${1:x} = getX()"
+        "python": "${1:x} = getX()",
+        "javascript": "let ${1:x} = getX();"
     }
 }

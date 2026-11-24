@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int fireball ( float x, float y );",
         "python": "fireball(x, y)",
+        "javascript": "fireball(x, y)",
         "blocks": "<block type='fireball'></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso a habilidade tenha sido lançada com sucesso, caso contrário retorna False.",
+        "javascript": "Retorna true caso a habilidade tenha sido lançada com sucesso, caso contrário retorna false.",
         "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso a habilidade tenha sido lançada com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "7.c",
         "python": "7.py",
+        "javascript": "7.js",
         "blocks": "7.xml",
         "explain": "7.txt"
     },
@@ -39,6 +42,7 @@
     ],
     "snippet": {
         "c": "fireball(${1:X}, ${2:Y});",
-        "python": "fireball(${1:X}, ${2:Y})"
+        "python": "fireball(${1:X}, ${2:Y})",
+        "javascript": "fireball(${1:X}, ${2:Y});"
     }
 }

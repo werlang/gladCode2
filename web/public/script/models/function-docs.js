@@ -21,7 +21,7 @@ export class FunctionDocsModel {
      * The worked example of a function.
      *
      * @param {string} file Sample file name, e.g. `moveto.json`.
-     * @returns {Promise<{ c?: string, python?: string, blocks?: string, explain: string }>}
+     * @returns {Promise<{ c?: string, python?: string, javascript?: string, blocks?: string, explain: string }>}
      */
     static sample(file) {
         return site.get(`script/functions/samples/${file}`);

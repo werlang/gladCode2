@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int howManyEnemies ( void );",
         "python": "howManyEnemies()",
+        "javascript": "howManyEnemies()",
         "blocks": "<block type='howmanyenemies'></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "24.c",
         "python": "24.py",
+        "javascript": "24.js",
         "blocks": "24.xml",
         "explain": "24.txt"
     },
@@ -34,6 +36,7 @@
     ],
     "snippet": {
         "c": "int ${1:num_enemies} = howManyEnemies();",
-        "python": "${1:num_enemies} = howManyEnemies()"
+        "python": "${1:num_enemies} = howManyEnemies()",
+        "javascript": "let ${1:num_enemies} = howManyEnemies();"
     }
 }

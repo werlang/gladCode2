@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getHp ( void );",
         "python": "getHp()",
+        "javascript": "getHp()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>Hp</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "3.c",
         "python": "3.py",
+        "javascript": "3.js",
         "blocks": "3.xml",
         "explain": "3.txt"
     },
@@ -33,6 +35,7 @@
     ],
     "snippet": {
         "c": "float ${1:hp} = getHp();",
-        "python": "${1:hp} = getHp()"
+        "python": "${1:hp} = getHp()",
+        "javascript": "let ${1:hp} = getHp();"
     }
 }

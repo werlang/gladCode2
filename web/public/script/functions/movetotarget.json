@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int moveToTarget ( void );",
         "python": "moveToTarget()",
+        "javascript": "moveToTarget()",
         "blocks": "<block type='move'><field name='COMPLEMENT'>TARGET</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o gladiador já esteja no ponto de destino, ou False caso contrário.",
+        "javascript": "Retorna true caso o gladiador já esteja no ponto de destino, ou false caso contrário.",
         "c": "Retorna 1 caso o gladiador já esteja no ponto de destino, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso o gladiador já esteja no ponto de destino, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "moveToTarget();",
-        "python": "moveToTarget()"
+        "python": "moveToTarget()",
+        "javascript": "moveToTarget();"
     }
 }

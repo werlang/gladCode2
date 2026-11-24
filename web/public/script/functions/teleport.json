@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int teleport ( float x, float y );",
         "python": "teleport(x, y)",
+        "javascript": "teleport(x, y)",
         "blocks": "<block type='teleport'></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna False.",
+        "javascript": "Retorna true caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna false.",
         "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso e o ponto de destino foi alcançado, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso a habilidade tenha sido lançada com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "7.c",
         "python": "7.py",
+        "javascript": "7.js",
         "blocks": "7.xml",
         "explain": "7.txt"
     },
@@ -39,6 +42,7 @@
     ],
     "snippet": {
         "c": "teleport(${1:X}, ${2:Y});",
-        "python": "teleport(${1:X}, ${2:Y})"
+        "python": "teleport(${1:X}, ${2:Y})",
+        "javascript": "teleport(${1:X}, ${2:Y});"
     }
 }

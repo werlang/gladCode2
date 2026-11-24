@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int doYouSeeMe ( void );",
         "python": "doYouSeeMe()",
+        "javascript": "doYouSeeMe()",
         "blocks": "<block type='doyouseeme'></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna False.",
+        "javascript": "Retorna true caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna false.",
         "c": "Retorna 1 caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna 0.",
         "blocks": "Retorna Verdadeiro caso o gladiador esteja no campo de visão do alvo selecionado. Caso não esteja, ou o alvo selecionado não esteja no campo de visão do gladiador, retorna Falso."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
+        "javascript": "1.js",
         "blocks": "1.xml",
         "explain": "1.txt"
     },
@@ -35,6 +38,7 @@
     ],
     "snippet": {
         "c": "int ${1:seen} = doYouSeeMe();",
-        "python": "${1:seen} = doYouSeeMe()"
+        "python": "${1:seen} = doYouSeeMe()",
+        "javascript": "let ${1:seen} = doYouSeeMe();"
     }
 }

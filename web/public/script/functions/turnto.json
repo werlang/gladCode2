@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int turnTo ( float x, float y );",
         "python": "turnTo(x, y)",
+        "javascript": "turnTo(x, y)",
         "blocks": "<block type='turn'><field name='COMPLEMENT'>TO</field></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou False caso contrário.",
+        "javascript": "Retorna true caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou false caso contrário.",
         "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "45.c",
         "python": "45.py",
+        "javascript": "45.js",
         "blocks": "45.xml",
         "explain": "45.txt"
     },
@@ -43,6 +46,7 @@
     ],
     "snippet": {
         "c": "turnTo(${1:X}, ${2:Y});",
-        "python": "turnTo(${1:X}, ${2:Y})"
+        "python": "turnTo(${1:X}, ${2:Y})",
+        "javascript": "turnTo(${1:X}, ${2:Y});"
     }
 }

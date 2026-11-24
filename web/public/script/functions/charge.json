@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int charge ( void );",
         "python": "charge()",
+        "javascript": "charge()",
         "blocks": "<block type='charge'></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso a habilidade tenha sido lançada com sucesso, caso contrário retorna False.",
+        "javascript": "Retorna true caso a habilidade tenha sido lançada com sucesso, caso contrário retorna false.",
         "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso a habilidade tenha sido lançada com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "4.c",
         "python": "4.py",
+        "javascript": "4.js",
         "blocks": "4.xml",
         "explain": "4.txt"
     },
@@ -34,6 +37,7 @@
     ],
     "snippet": {
         "c": "charge();",
-        "python": "charge()"
+        "python": "charge()",
+        "javascript": "charge();"
     }
 }

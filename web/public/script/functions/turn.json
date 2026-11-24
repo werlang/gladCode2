@@ -7,6 +7,7 @@
     "syntax": {
         "c": "void turn ( float angulo );",
         "python": "turn(angulo)",
+        "javascript": "turn(angulo)",
         "blocks": "<block type='turnangle'><field name='COMPLEMENT'>TURN</field></block>"
     },
     "description": {
@@ -27,6 +28,7 @@
     "sample": {
         "c": "42.c",
         "python": "42.py",
+        "javascript": "42.js",
         "blocks": "42.xml",
         "explain": "42.txt"
     },
@@ -39,6 +41,7 @@
     ],
     "snippet": {
         "c": "turn(${1:angle});",
-        "python": "turn(${1:angle})"
+        "python": "turn(${1:angle})",
+        "javascript": "turn(${1:angle});"
     }
 }

@@ -7,6 +7,7 @@
     "syntax": {
         "c": "void speak ( char * formato, ... );",
         "python": "speak(texto)",
+        "javascript": "speak(texto)",
         "blocks": "<block type='speak'></block>"
     },
     "description": {
@@ -31,12 +32,14 @@
     "sample": {
         "c": "37.c",
         "python": "37.py",
+        "javascript": "37.js",
         "blocks": "37.xml",
         "explain": "37.txt"
     },
     "seealso": [],
     "snippet": {
         "c": "speak(\"${1:text}\");",
-        "python": "speak(\"${1:text}\")"
+        "python": "speak(\"${1:text}\")",
+        "javascript": "speak(\"${1:text}\");"
     }
 }

@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isProtected ( void );",
         "python": "isProtected()",
+        "javascript": "isProtected()",
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Protected</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna False.",
+        "javascript": "Retorna true caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna false.",
         "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador e possua o efeito proteção, caso contrário retorna Falso."
     },
     "sample": {
         "c": "28.c",
         "python": "28.py",
+        "javascript": "28.js",
         "blocks": "28.xml",
         "explain": "28.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "int ${1:protect} = isProtected();",
-        "python": "${1:protect} = isProtected()"
+        "python": "${1:protect} = isProtected()",
+        "javascript": "let ${1:protect} = isProtected();"
     }
 }

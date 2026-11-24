@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getTargetY ( void );",
         "python": "getTargetY()",
+        "javascript": "getTargetY()",
         "blocks": "<block type='get_target'><field name='COMPLEMENT'>Y</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Float contendo o valor da coordenada y do alvo, ou False caso o alvo não esteja dentro do campo de visão do gladiador.",
+        "javascript": "Float contendo o valor da coordenada y do alvo, ou false caso o alvo não esteja dentro do campo de visão do gladiador.",
         "c": "Float contendo o valor da coordenada y do alvo, ou -1 caso o alvo não esteja dentro do campo de visão do gladiador.",
         "blocks": "Número contendo o valor da coordenada y do alvo, ou Falso caso o alvo não esteja dentro do campo de visão do gladiador."
     },
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "float ${1:ty} = getTargetY();",
-        "python": "${1:ty} = getTargetY()"
+        "python": "${1:ty} = getTargetY()",
+        "javascript": "let ${1:ty} = getTargetY();"
     }
 }

@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getLastHitTime ( void );",
         "python": "getLastHitTime()",
+        "javascript": "getLastHitTime()",
         "blocks": "<block type='get_lasthit'><field name='COMPLEMENT'>Time</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "11.c",
         "python": "11.py",
+        "javascript": "11.js",
         "blocks": "11.xml",
         "explain": "11.txt"
     },
@@ -34,6 +36,7 @@
     ],
     "snippet": {
         "c": "float ${1:hit_time} = getLastHitTime();",
-        "python": "${1:hit_time} = getLastHitTime()"
+        "python": "${1:hit_time} = getLastHitTime()",
+        "javascript": "let ${1:hit_time} = getLastHitTime();"
     }
 }

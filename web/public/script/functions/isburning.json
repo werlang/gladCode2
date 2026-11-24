@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isBurning ( void );",
         "python": "isBurning()",
+        "javascript": "isBurning()",
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Burning</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito queimadura, caso contrário retorna False.",
+        "javascript": "Retorna true caso o alvo esteja no campo de visão do gladiador e possua o efeito queimadura, caso contrário retorna false.",
         "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito queimadura, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador e possua o efeito queimadura, caso contrário retorna Falso."
     },
     "sample": {
         "c": "27.c",
         "python": "27.py",
+        "javascript": "27.js",
         "blocks": "27.xml",
         "explain": "27.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "int ${1:burn} = isBurning();",
-        "python": "${1:burn} = isBurning()"
+        "python": "${1:burn} = isBurning()",
+        "javascript": "let ${1:burn} = isBurning();"
     }
 }

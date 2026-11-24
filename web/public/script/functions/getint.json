@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getINT ( void );",
         "python": "getINT()",
+        "javascript": "getINT()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>INT</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "8.c",
         "python": "8.py",
+        "javascript": "8.js",
         "blocks": "8.xml",
         "explain": "8.txt"
     },
@@ -34,6 +36,7 @@
     ],
     "snippet": {
         "c": "int ${1:myint} = getINT();",
-        "python": "${1:myint} = getINT()"
+        "python": "${1:myint} = getINT()",
+        "javascript": "let ${1:myint} = getINT();"
     }
 }

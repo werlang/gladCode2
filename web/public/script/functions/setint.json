@@ -5,7 +5,8 @@
     },
     "syntax": {
         "c": "void setINT ( int valor );",
-        "python": "setINT(valor)"
+        "python": "setINT(valor)",
+        "javascript": "setINT(valor)"
     },
     "description": {
         "long": "Atribui um valor para o atributo Inteligência (INT) do gladiador. Esta função somente pode ser chamada dentro da função setup.",
@@ -22,6 +23,7 @@
     "sample": {
         "c": "36.c",
         "python": "36.py",
+        "javascript": "36.js",
         "explain": "36.txt"
     },
     "seealso": [
@@ -31,6 +33,7 @@
     ],
     "snippet": {
         "c": "setINT(${1:value});",
-        "python": "setINT(${1:value})"
+        "python": "setINT(${1:value})",
+        "javascript": "setINT(${1:value});"
     }
 }

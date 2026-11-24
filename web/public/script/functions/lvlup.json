@@ -5,7 +5,8 @@
     },
     "syntax": {
         "c": "void lvlUp ( int valor );",
-        "python": "lvlUp(valor)"
+        "python": "lvlUp(valor)",
+        "javascript": "lvlUp(valor)"
     },
     "description": {
         "long": "Faz com que o gladiador aumente uma quantidade de níveis igual ao valor recebido por parâmetro. Ao subir de nível desta maneira, o gladiador ganha pontos de atributos da mesma maneira que ganharia ao subir pela via convencional. Outros benefícios de subir de nível, como regeneração depontos de vida e habilidade não são concedidor ao subir de nível através desta função. Os pontos de experiência do gladiador permanecer inalterados. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
@@ -22,6 +23,7 @@
     "sample": {
         "c": "33.c",
         "python": "33.py",
+        "javascript": "33.js",
         "explain": "33.txt"
     },
     "seealso": [
@@ -31,6 +33,7 @@
     ],
     "snippet": {
         "c": "lvlUp(${1:value});",
-        "python": "lvlUp(${1:value})"
+        "python": "lvlUp(${1:value})",
+        "javascript": "lvlUp(${1:value});"
     }
 }

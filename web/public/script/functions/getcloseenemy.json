@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getCloseEnemy ( void );",
         "python": "getCloseEnemy()",
+        "javascript": "getCloseEnemy()",
         "blocks": "<block type='get_enemy'><field name='COMPLEMENT'>CloseEnemy</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna False caso não haja nenhum inimigo no campo de visão, caso contrário retorna True.",
+        "javascript": "Retorna false caso não haja nenhum inimigo no campo de visão, caso contrário retorna true.",
         "c": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1.",
         "blocks": "Retorna Falso caso não haja nenhum inimigo no campo de visão, caso contrário retorna Verdadeiro. O retorno deste bloco pode ser ignorado."
     },
     "sample": {
         "c": "11.c",
         "python": "11.py",
+        "javascript": "11.js",
         "blocks": "11.xml",
         "explain": "11.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "int ${1:enemy} = getCloseEnemy();",
-        "python": "${1:enemy} = getCloseEnemy()"
+        "python": "${1:enemy} = getCloseEnemy()",
+        "javascript": "let ${1:enemy} = getCloseEnemy();"
     }
 }

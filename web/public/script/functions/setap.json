@@ -5,7 +5,8 @@
     },
     "syntax": {
         "c": "void setAp ( float valor );",
-        "python": "setAp(valor)"
+        "python": "setAp(valor)",
+        "javascript": "setAp(valor)"
     },
     "description": {
         "long": "Atribui um valor para os pontos de habilidade do gladiador. O máximo de pontos de habilidade que o gladiador pode possuir continua sendo limitado pelas restrições normais. Esta função somente pode ser usada no editor. O editor não permite que o código do gladiador seja salvo com esta função. O objetivo desta função é puramente para realização de testes.",
@@ -22,6 +23,7 @@
     "sample": {
         "c": "33.c",
         "python": "33.py",
+        "javascript": "33.js",
         "explain": "33.txt"
     },
     "seealso": [
@@ -31,6 +33,7 @@
     ],
     "snippet": {
         "c": "setAp(${1:value});",
-        "python": "setAp(${1:value})"
+        "python": "setAp(${1:value})",
+        "javascript": "setAp(${1:value});"
     }
 }

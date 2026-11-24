@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isSlowed ( void );",
         "python": "isSlowed()",
+        "javascript": "isSlowed()",
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Slowed</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja negativo, caso contrário retorna False.",
+        "javascript": "Retorna true caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja negativo, caso contrário retorna false.",
         "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja negativo, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja negativo, caso contrário retorna Falso."
     },
     "sample": {
         "c": "31.c",
         "python": "31.py",
+        "javascript": "31.js",
         "blocks": "31.xml",
         "explain": "31.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "int ${1:slowed} = isSlowed();",
-        "python": "${1:slowed} = isSlowed()"
+        "python": "${1:slowed} = isSlowed()",
+        "javascript": "let ${1:slowed} = isSlowed();"
     }
 }

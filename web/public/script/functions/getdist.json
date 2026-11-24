@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getDist ( float x, float y );",
         "python": "getDist(x, y)",
+        "javascript": "getDist(x, y)",
         "blocks": "<block type='getdist'><field name='COMPLEMENT'>POSITION</field></block>"
     },
     "description": {
@@ -30,6 +31,7 @@
     "sample": {
         "c": "12.c",
         "python": "12.py",
+        "javascript": "12.js",
         "blocks": "12.xml",
         "explain": "12.txt"
     },
@@ -39,6 +41,7 @@
     ],
     "snippet": {
         "c": "float ${1:dist} = getDist(${2:X}, ${3:Y});",
-        "python": "${1:dist} = getDist(${2:X}, ${3:Y})"
+        "python": "${1:dist} = getDist(${2:X}, ${3:Y})",
+        "javascript": "let ${1:dist} = getDist(${2:X}, ${3:Y});"
     }
 }

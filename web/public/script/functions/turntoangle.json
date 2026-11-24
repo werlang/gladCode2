@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int turnToAngle ( float angulo );",
         "python": "turnToAngle(angulo)",
+        "javascript": "turnToAngle(angulo)",
         "blocks": "<block type='turnangle'><field name='COMPLEMENT'>ANGLE</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou False caso contrário.",
+        "javascript": "Retorna true caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou false caso contrário.",
         "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso ao fim da rotação o gladiador ficou virado para o ponto informado, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "46.c",
         "python": "46.py",
+        "javascript": "46.js",
         "blocks": "46.xml",
         "explain": "46.txt"
     },
@@ -39,6 +42,7 @@
     ],
     "snippet": {
         "c": "turnToAngle(${1:angle});",
-        "python": "turnToAngle(${1:angle})"
+        "python": "turnToAngle(${1:angle})",
+        "javascript": "turnToAngle(${1:angle});"
     }
 }

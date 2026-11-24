@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float stepRight ( void );",
         "python": "stepRight()",
+        "javascript": "stepRight()",
         "blocks": "<block type='step'><field name='COMPLEMENT'>RIGHT</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "41.c",
         "python": "41.py",
+        "javascript": "41.js",
         "blocks": "41.xml",
         "explain": "41.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "stepRight();",
-        "python": "stepRight()"
+        "python": "stepRight()",
+        "javascript": "stepRight();"
     }
 }

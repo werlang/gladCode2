@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isStunned ( void );",
         "python": "isStunned()",
+        "javascript": "isStunned()",
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Stunned</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna False.",
+        "javascript": "Retorna true caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna false.",
         "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador e possua o efeito atordoado, caso contrário retorna Falso."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
+        "javascript": "1.js",
         "blocks": "1.xml",
         "explain": "1.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "int ${1:stunned} = isStunned();",
-        "python": "${1:stunned} = isStunned()"
+        "python": "${1:stunned} = isStunned()",
+        "javascript": "let ${1:stunned} = isStunned();"
     }
 }

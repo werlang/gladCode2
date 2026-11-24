@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getAmbushTimeLeft ( void );",
         "python": "getAmbushTimeLeft()",
+        "javascript": "getAmbushTimeLeft()",
         "blocks": "<block type='get_time'><field name='COMPLEMENT'>Ambush</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "1.c",
         "python": "1.py",
+        "javascript": "1.js",
         "blocks": "1.xml",
         "explain": "1.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:ambush_time} = getAmbushTimeLeft();",
-        "python": "${1:ambush_time} = getAmbushTimeLeft()"
+        "python": "${1:ambush_time} = getAmbushTimeLeft()",
+        "javascript": "let ${1:ambush_time} = getAmbushTimeLeft();"
     }
 }

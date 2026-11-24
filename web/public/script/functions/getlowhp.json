@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getLowHp ( void );",
         "python": "getLowHp()",
+        "javascript": "getLowHp()",
         "blocks": "<block type='get_enemy'><field name='COMPLEMENT'>LowHp</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna False caso não haja nenhum inimigo no campo de visão, caso contrário retorna True.",
+        "javascript": "Retorna false caso não haja nenhum inimigo no campo de visão, caso contrário retorna true.",
         "c": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1.",
         "blocks": "Retorna Falso caso não haja nenhum inimigo no campo de visão, caso contrário retorna Verdadeiro. O retorno deste bloco pode ser ignorado."
     },
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "int ${1:enemy} = getLowHp();",
-        "python": "${1:enemy} = getLowHp()"
+        "python": "${1:enemy} = getLowHp()",
+        "javascript": "let ${1:enemy} = getLowHp();"
     }
 }

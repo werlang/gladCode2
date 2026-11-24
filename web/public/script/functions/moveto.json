@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int moveTo ( float x, float y );",
         "python": "moveTo(x, y)",
+        "javascript": "moveTo(x, y)",
         "blocks": "<block type='move'><field name='COMPLEMENT'>TO</field></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o gladiador já esteja no ponto de destino, ou False caso contrário.",
+        "javascript": "Retorna true caso o gladiador já esteja no ponto de destino, ou false caso contrário.",
         "c": "Retorna 1 caso o gladiador já esteja no ponto de destino, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso o gladiador já esteja no ponto de destino, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "35.c",
         "python": "35.py",
+        "javascript": "35.js",
         "blocks": "35.xml",
         "explain": "35.txt"
     },
@@ -42,6 +45,7 @@
     ],
     "snippet": {
         "c": "moveTo(${1:X}, ${2:Y});",
-        "python": "moveTo(${1:X}, ${2:Y})"
+        "python": "moveTo(${1:X}, ${2:Y})",
+        "javascript": "moveTo(${1:X}, ${2:Y});"
     }
 }

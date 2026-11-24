@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isItemReady ( char *item );",
         "python": "isItemReady(item)",
+        "javascript": "isItemReady(item)",
         "blocks": "<block type='itemready'></block>"
     },
     "description": {
@@ -23,12 +24,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o item esteja pronto para ser usado, caso contrário retorna False.",
+        "javascript": "Retorna true caso o item esteja pronto para ser usado, caso contrário retorna false.",
         "c": "Retorna 1 caso o item esteja pronto para ser usado, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o item esteja pronto para ser usado, caso contrário retorna Falso."
     },
     "sample": {
         "c": "47.c",
         "python": "47.py",
+        "javascript": "47.js",
         "blocks": "47.xml",
         "explain": "47.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "float ${1:ready} = isItemReady(${2:item});",
-        "python": "${1:ready} = isItemReady(${2:item})"
+        "python": "${1:ready} = isItemReady(${2:item})",
+        "javascript": "let ${1:ready} = isItemReady(${2:item});"
     }
 }

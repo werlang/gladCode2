@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isSafeThere ( float x, float y );",
         "python": "isSafeThere(x, y)",
+        "javascript": "isSafeThere(x, y)",
         "blocks": "<block type='issafe'><field name='COMPLEMENT'>There</field></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso a posição do ponto esteja segura do gás tóxico, ou False caso contrário.",
+        "javascript": "Retorna true caso a posição do ponto esteja segura do gás tóxico, ou false caso contrário.",
         "c": "Retorna 1 caso a posição do ponto esteja segura do gás tóxico, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso a posição do ponto esteja segura do gás tóxico, ou Falso caso contrário."
     },
     "sample": {
         "c": "30.c",
         "python": "30.py",
+        "javascript": "30.js",
         "blocks": "30.xml",
         "explain": "30.txt"
     },
@@ -40,6 +43,7 @@
     ],
     "snippet": {
         "c": "int ${1:safe} = isSafeThere(${2:X}, ${3:Y});",
-        "python": "${1:safe} = isSafeThere(${2:X}, ${3:Y})"
+        "python": "${1:safe} = isSafeThere(${2:X}, ${3:Y})",
+        "javascript": "let ${1:safe} = isSafeThere(${2:X}, ${3:Y});"
     }
 }

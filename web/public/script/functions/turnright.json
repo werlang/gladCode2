@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float turnRight ( float angulo );",
         "python": "turnRight(angulo)",
+        "javascript": "turnRight(angulo)",
         "blocks": "<block type='turn'><field name='COMPLEMENT'>RIGHT</field></block>"
     },
     "description": {
@@ -28,6 +29,7 @@
     "sample": {
         "c": "44.c",
         "python": "44.py",
+        "javascript": "44.js",
         "blocks": "44.xml",
         "explain": "44.txt"
     },
@@ -40,6 +42,7 @@
     ],
     "snippet": {
         "c": "turnRight(${1:angle});",
-        "python": "turnRight(${1:angle})"
+        "python": "turnRight(${1:angle})",
+        "javascript": "turnRight(${1:angle});"
     }
 }

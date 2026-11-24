@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getDistToTarget ( void );",
         "python": "getDistToTarget()",
+        "javascript": "getDistToTarget()",
         "blocks": "<block type='getdist'><field name='COMPLEMENT'>TARGET</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna False.",
+        "javascript": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna false.",
         "c": "Float contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna -1.",
         "blocks": "Número contendo a distância entre o gladiador e o ponto definido pelas coordenadas x e y do alvo fixado. Caso o alvo não esteja visível, a função retorna Falso."
     },
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -34,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:dist} = getDistToTarget();",
-        "python": "${1:dist} = getDistToTarget()"
+        "python": "${1:dist} = getDistToTarget()",
+        "javascript": "let ${1:dist} = getDistToTarget();"
     }
 }

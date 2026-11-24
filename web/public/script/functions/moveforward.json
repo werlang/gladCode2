@@ -7,6 +7,7 @@
     "syntax": {
         "c": "void moveForward ( float passos );",
         "python": "moveForward(passos)",
+        "javascript": "moveForward(passos)",
         "blocks": "<block type='moveforward'></block>"
     },
     "description": {
@@ -27,6 +28,7 @@
     "sample": {
         "c": "34.c",
         "python": "34.py",
+        "javascript": "34.js",
         "blocks": "34.xml",
         "explain": "34.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "moveForward(${1:steps});",
-        "python": "moveForward(${1:steps})"
+        "python": "moveForward(${1:steps})",
+        "javascript": "moveForward(${1:steps});"
     }
 }

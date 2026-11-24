@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getBurnTimeLeft ( void );",
         "python": "getBurnTimeLeft()",
+        "javascript": "getBurnTimeLeft()",
         "blocks": "<block type='get_time'><field name='COMPLEMENT'>Burn</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "10.c",
         "python": "10.py",
+        "javascript": "10.js",
         "blocks": "10.xml",
         "explain": "10.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:burn_time} = getBurnTimeLeft();",
-        "python": "${1:burn_time} = getBurnTimeLeft()"
+        "python": "${1:burn_time} = getBurnTimeLeft()",
+        "javascript": "let ${1:burn_time} = getBurnTimeLeft();"
     }
 }

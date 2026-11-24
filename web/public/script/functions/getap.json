@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getAp ( void );",
         "python": "getAp()",
+        "javascript": "getAp()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>Ap</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "7.c",
         "python": "7.py",
+        "javascript": "7.js",
         "blocks": "7.xml",
         "explain": "7.txt"
     },
@@ -33,6 +35,7 @@
     ],
     "snippet": {
         "c": "float ${1:ap} = getAp();",
-        "python": "${1:ap} = getAp()"
+        "python": "${1:ap} = getAp()",
+        "javascript": "let ${1:ap} = getAp();"
     }
 }

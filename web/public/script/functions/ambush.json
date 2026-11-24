@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int ambush ( void );",
         "python": "ambush()",
+        "javascript": "ambush()",
         "blocks": "<block type='ambush'></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso a habilidade tenha sido lançada com sucesso, caso contrário retorna False.",
+        "javascript": "Retorna true caso a habilidade tenha sido lançada com sucesso, caso contrário retorna false.",
         "c": "Retorna 1 caso a habilidade tenha sido lançada com sucesso, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso a habilidade tenha sido lançada com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
+        "javascript": "1.js",
         "blocks": "1.xml",
         "explain": "1.txt"
     },
@@ -34,6 +37,7 @@
     ],
     "snippet": {
         "c": "ambush();",
-        "python": "ambush()"
+        "python": "ambush()",
+        "javascript": "ambush();"
     }
 }

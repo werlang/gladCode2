@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int attackRanged ( float x, float y );",
         "python": "attackRanged(x, y)",
+        "javascript": "attackRanged(x, y)",
         "blocks": "<block type='ranged'></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o ataque tenha sido realizado com sucesso, caso contrário retorna False.",
+        "javascript": "Retorna true caso o ataque tenha sido realizado com sucesso, caso contrário retorna false.",
 		"c": "Retorna 1 caso o ataque foi realizado com sucesso, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o ataque tenha sido lançada com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "3.c",
 		"python": "3.py",
+		"javascript": "3.js",
 		"blocks": "3.xml",
         "explain": "3.txt"
     },
@@ -39,6 +42,7 @@
     ],
     "snippet": {
         "c": "attackRanged(${1:X}, ${2:Y});",
-        "python": "attackRanged(${1:X}, ${2:Y})"
+        "python": "attackRanged(${1:X}, ${2:Y})",
+        "javascript": "attackRanged(${1:X}, ${2:Y});"
     }
 }

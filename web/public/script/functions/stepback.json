@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float stepBack ( void );",
         "python": "stepBack()",
+        "javascript": "stepBack()",
         "blocks": "<block type='step'><field name='COMPLEMENT'>BACK</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "38.c",
         "python": "38.py",
+        "javascript": "38.js",
         "blocks": "38.xml",
         "explain": "38.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "stepBack();",
-        "python": "stepBack()"
+        "python": "stepBack()",
+        "javascript": "stepBack();"
     }
 }

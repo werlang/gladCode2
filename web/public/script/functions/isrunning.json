@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int isRunning ( void );",
         "python": "isRunning()",
+        "javascript": "isRunning()",
         "blocks": "<block type='is_status'><field name='COMPLEMENT'>Running</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna False.",
+        "javascript": "Retorna true caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna false.",
         "c": "Retorna 1 caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o alvo esteja no campo de visão do gladiador, possua o efeito movimentação e este efeito seja positivo, caso contrário retorna Falso."
     },
     "sample": {
         "c": "29.c",
         "python": "29.py",
+        "javascript": "29.js",
         "blocks": "29.xml",
         "explain": "29.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "int ${1:running} = isRunning();",
-        "python": "${1:running} = isRunning()"
+        "python": "${1:running} = isRunning()",
+        "javascript": "let ${1:running} = isRunning();"
     }
 }

@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getAngle ( float x, float y );",
         "python": "getAngle(x, y)",
+        "javascript": "getAngle(x, y)",
         "blocks": "<block type='getangle'></block>"
     },
     "description": {
@@ -30,6 +31,7 @@
     "sample": {
         "c": "9.c",
         "python": "9.py",
+        "javascript": "9.js",
         "blocks": "9.xml",
         "explain": "9.txt"
     },
@@ -38,6 +40,7 @@
     ],
     "snippet": {
         "c": "float ${1:angle} = getAngle(${2:X}, ${3:Y});",
-        "python": "${1:angle} = getAngle(${2:X}, ${3:Y})"
+        "python": "${1:angle} = getAngle(${2:X}, ${3:Y})",
+        "javascript": "let ${1:angle} = getAngle(${2:X}, ${3:Y});"
     }
 }

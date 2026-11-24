@@ -7,6 +7,7 @@
     "syntax": {
         "c": "void attackMelee ( void );",
         "python": "attackMelee()",
+        "javascript": "attackMelee()",
         "blocks": "<block type='melee'></block>"
     },
     "description": {
@@ -24,6 +25,7 @@
     "sample": {
         "c": "2.c",
         "python": "2.py",
+        "javascript": "2.js",
         "blocks": "2.xml",
         "explain": "2.txt"
     },
@@ -32,6 +34,7 @@
     ],
     "snippet": {
         "c": "attackMelee();",
-        "python": "attackMelee()"
+        "python": "attackMelee()",
+        "javascript": "attackMelee();"
     }
 }

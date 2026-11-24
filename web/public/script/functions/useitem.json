@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int useItem ( char *item );",
         "python": "useItem(item)",
+        "javascript": "useItem(item)",
         "blocks": "<block type='useitem'></block>"
     },
     "description": {
@@ -23,12 +24,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o item tenha sido usado com sucesso, caso contrário retorna False.",
+        "javascript": "Retorna true caso o item tenha sido usado com sucesso, caso contrário retorna false.",
         "c": "Retorna 1 caso o item tenha sido usado com sucesso, caso contrário retorna 0.",
         "blocks": "Retorna Verdadeiro caso o item tenha sido usado com sucesso, caso contrário retorna Falso. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "47.c",
         "python": "47.py",
+        "javascript": "47.js",
         "blocks": "47.xml",
         "explain": "47.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "useItem(${1:item});",
-        "python": "useItem(${1:item})"
+        "python": "useItem(${1:item})",
+        "javascript": "useItem(${1:item});"
     }
 }

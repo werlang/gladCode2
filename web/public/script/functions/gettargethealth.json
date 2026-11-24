@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getTargetHealth ( void );",
         "python": "getTargetHealth()",
+        "javascript": "getTargetHealth()",
         "blocks": "<block type='get_target'><field name='COMPLEMENT'>Health</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "24.c",
         "python": "24.py",
+        "javascript": "24.js",
         "blocks": "24.xml",
         "explain": "24.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:target_health} = getTargetHealth();",
-        "python": "${1:target_health} = getTargetHealth()"
+        "python": "${1:target_health} = getTargetHealth()",
+        "javascript": "let ${1:target_health} = getTargetHealth();"
     }
 }

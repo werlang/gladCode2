@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getFarEnemy ( void );",
         "python": "getFarEnemy()",
+        "javascript": "getFarEnemy()",
         "blocks": "<block type='get_enemy'><field name='COMPLEMENT'>FarEnemy</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna False caso não haja nenhum inimigo no campo de visão, caso contrário retorna True.",
+        "javascript": "Retorna false caso não haja nenhum inimigo no campo de visão, caso contrário retorna true.",
         "c": "Retorna 0 caso não haja nenhum inimigo no campo de visão, caso contrário retorna 1.",
         "blocks": "Retorna Falso caso não haja nenhum inimigo no campo de visão, caso contrário retorna Verdadeiro. O retorno deste bloco pode ser ignorado."
     },
     "sample": {
         "c": "13.c",
         "python": "13.py",
+        "javascript": "13.js",
         "blocks": "13.xml",
         "explain": "13.txt"
     },
@@ -36,6 +39,7 @@
     ],
     "snippet": {
         "c": "int ${1:enemy} = getFarEnemy();",
-        "python": "${1:enemy} = getFarEnemy()"
+        "python": "${1:enemy} = getFarEnemy()",
+        "javascript": "let ${1:enemy} = getFarEnemy();"
     }
 }

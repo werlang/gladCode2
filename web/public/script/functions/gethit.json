@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getHit ( void );",
         "python": "getHit()",
+        "javascript": "getHit()",
         "blocks": "<block type='gethit'></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso o gladiador tenha recebido ataque desde a última chamada desta função, ou False caso contrário.",
+        "javascript": "Retorna true caso o gladiador tenha recebido ataque desde a última chamada desta função, ou false caso contrário.",
         "c": "Retorna 1 caso o gladiador tenha recebido ataque desde a última chamada desta função, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso o gladiador tenha recebido ataque desde a última vez que este bloco foi executado, ou Falso caso contrário."
     },
     "sample": {
         "c": "16.c",
         "python": "16.py",
+        "javascript": "16.js",
         "blocks": "16.xml",
         "explain": "16.txt"
     },
@@ -35,6 +38,7 @@
     ],
     "snippet": {
         "c": "int ${1:hit} = getHit();",
-        "python": "${1:hit} = getHit()"
+        "python": "${1:hit} = getHit()",
+        "javascript": "let ${1:hit} = getHit();"
     }
 }

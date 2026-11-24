@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int turnToTarget ( void );",
         "python": "turnToTarget()",
+        "javascript": "turnToTarget()",
         "blocks": "<block type='turn'><field name='COMPLEMENT'>TARGET</field></block>"
     },
     "description": {
@@ -20,12 +21,14 @@
     },
     "treturn": {
         "default": "Retorna True caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou False caso contrário.",
+        "javascript": "Retorna true caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou false caso contrário.",
         "c": "Retorna 1 caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou 0 caso contrário.",
         "blocks": "Retorna Verdadeiro caso ao fim da rotação o gladiador ficou virado para o alvo fixado, ou Falso caso contrário. Por padrão o retorno deste bloco é ignorado."
     },
     "sample": {
         "c": "1.c",
         "python": "1.py",
+        "javascript": "1.js",
         "blocks": "1.xml",
         "explain": "1.txt"
     },
@@ -38,6 +41,7 @@
     ],
     "snippet": {
         "c": "turnToTarget();",
-        "python": "turnToTarget()"
+        "python": "turnToTarget()",
+        "javascript": "turnToTarget();"
     }
 }

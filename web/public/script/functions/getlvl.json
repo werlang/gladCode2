@@ -7,6 +7,7 @@
     "syntax": {
         "c": "int getLvl ( void );",
         "python": "getLvl()",
+        "javascript": "getLvl()",
         "blocks": "<block type='get_info'><field name='COMPLEMENT'>Lvl</field></block>"
     },
     "description": {
@@ -25,12 +26,14 @@
     "sample": {
         "c": "20.c",
         "python": "20.py",
+        "javascript": "20.js",
         "blocks": "20.xml",
         "explain": "20.txt"
     },
     "seealso": [],
     "snippet": {
         "c": "int ${1:lvl} = getLvl();",
-        "python": "${1:lvl} = getLvl()"
+        "python": "${1:lvl} = getLvl()",
+        "javascript": "let ${1:lvl} = getLvl();"
     }
 }

@@ -7,6 +7,7 @@
     "syntax": {
         "c": "float getBlockTimeLeft ( void );",
         "python": "getBlockTimeLeft()",
+        "javascript": "getBlockTimeLeft()",
         "blocks": "<block type='get_time'><field name='COMPLEMENT'>Block</field></block>"
     },
     "description": {
@@ -25,6 +26,7 @@
     "sample": {
         "c": "4.c",
         "python": "4.py",
+        "javascript": "4.js",
         "blocks": "4.xml",
         "explain": "4.txt"
     },
@@ -35,6 +37,7 @@
     ],
     "snippet": {
         "c": "float ${1:block_time} = getBlockTimeLeft();",
-        "python": "${1:block_time} = getBlockTimeLeft()"
+        "python": "${1:block_time} = getBlockTimeLeft()",
+        "javascript": "let ${1:block_time} = getBlockTimeLeft();"
     }
 }
