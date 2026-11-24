@@ -100,7 +100,10 @@ export class ReportsTab {
         this.#unread = new Switch({ label: 'Só não vistas' });
         this.#root.querySelector('#reports-unread-switch').append(this.#unread.element);
         this.#unread.listen('change', () => {
-            if (this.#selected === 'battles') this.#run(() => this.#fetch({ offset: 0, signal: this.#signal }));
+            if (this.#selected !== 'battles') return;
+            const tab = this.#selected;
+            const token = ++this.#request;
+            this.#run(() => this.#fetch({ offset: 0, signal: this.#signal, token }), { tab, token });
         });
 
         this.#pager = new Pagination({ variant: 'simple', controlled: true, unit: 'batalhas' });
@@ -162,15 +165,23 @@ export class ReportsTab {
         this.#selected = id;
         this.#tabs.select(id, { silent: true });
         this.#root.querySelector('.reports-unread').hidden = id !== 'battles';
-        return this.#run(() => this.#fetch({ offset: this.#offsets[id], signal: this.#signal }));
+        const token = ++this.#request;
+        return this.#run(() => this.#fetch({ offset: this.#offsets[id], signal: this.#signal, token }), { tab: id, token });
     }
 
-    /** Runs a tab read and reports a refusal without leaving the previous rows. */
-    async #run(task) {
+    /**
+     * Runs a section read and reports a refusal without leaving the previous rows. A read that was
+     * superseded by another tab or read is discarded silently.
+     *
+     * @param {() => Promise<unknown>} task
+     * @param {{ tab?: string, token?: number }} [origin]
+     */
+    async #run(task, { tab = this.#selected, token = this.#request } = {}) {
         try {
             await task();
         }
         catch (error) {
+            if (token !== this.#request || this.#selected !== tab) return;
             this.#pager.cancel();
             if (!isAborted(error) && !this.#signal?.aborted) writeErrorToast(error);
         }
@@ -178,16 +189,20 @@ export class ReportsTab {
 
     /** @param {number} page */
     async #go(page) {
-        const previous = this.#offsets[this.#selected];
-        this.#offsets[this.#selected] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
+        const tab = this.#selected;
+        const previous = this.#offsets[tab];
+        const token = ++this.#request;
+        this.#offsets[tab] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
         try {
-            await this.#fetch({ offset: this.#offsets[this.#selected], signal: this.#signal });
+            await this.#fetch({ offset: this.#offsets[tab], signal: this.#signal, token });
+            if (token !== this.#request || this.#selected !== tab) return;
             if (this.#signal?.aborted) this.#pager.cancel();
         }
         catch (error) {
+            if (token !== this.#request || this.#selected !== tab) return;
             this.#pager.cancel();
             if (isAborted(error) || this.#signal?.aborted) return;
-            this.#offsets[this.#selected] = previous;
+            this.#offsets[tab] = previous;
             writeErrorToast(error);
         }
     }
@@ -195,13 +210,13 @@ export class ReportsTab {
     /**
      * @param {{ offset?: number, signal?: AbortSignal }} options
      */
-    async #fetch({ offset = 0, signal = this.#signal } = {}) {
+    async #fetch({ offset = 0, signal = this.#signal, token = ++this.#request } = {}) {
+        this.#request = token;
         const id = this.#selected;
         const view = VIEWS[id];
-        const request = ++this.#request;
         this.#root.querySelector('.reports-unread').hidden = id !== 'battles';
         const data = await settleRequest(() => view.load({ offset, unread: this.#unread.checked, signal }), signal);
-        if (!data || signal?.aborted || request !== this.#request) return;
+        if (!data || signal?.aborted || token !== this.#request || id !== this.#selected) return;
         const total = Number(data.total) || 0;
         if (total <= offset && total > 0) {
             this.#offsets[id] = 0;
@@ -278,7 +293,7 @@ export class ReportsTab {
             if (id !== 'duels') {
                 this.#rowElements.set(row.id, element);
                 this.#favorites.seed(row.id, row.favorite);
-                this.#paintFavorite(row.id, row.favorite);
+                this.#paintFavorite(row.id, this.#favorites.intent(row.id));
             }
         });
     }
@@ -321,7 +336,6 @@ export class ReportsTab {
             const star = document.createElement('button');
             star.type = 'button';
             star.className = 'report-star';
-            star.dataset.reportId = String(row.id);
             star.innerHTML = icon('star', { size: 15, className: 'icon' });
             star.addEventListener('click', () => {
                 this.#favorites.toggle(row.id, !this.#favorites.intent(row.id));
@@ -336,9 +350,11 @@ export class ReportsTab {
         const row = this.#rowElements.get(id);
         const star = row?.querySelector('.report-star');
         if (!star) return;
+        const label = favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos';
         star.dataset.on = String(favorite);
         star.setAttribute('aria-pressed', String(favorite));
-        star.title = favorite ? 'Tirar dos favoritos' : 'Guardar nos favoritos';
+        star.setAttribute('aria-label', label);
+        star.title = label;
     }
 
     /** @param {number} id */

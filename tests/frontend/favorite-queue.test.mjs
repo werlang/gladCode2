@@ -52,3 +52,36 @@ test('two concurrent refusals roll each row back to its confirmed state', async 
     assert.equal(queue.confirmed(2), true);
     assert.deepEqual(painted, [[1, true], [2, false], [1, false], [2, true]]);
 });
+
+test('a reload updates the confirmed and intended states when the row is idle', () => {
+    const queue = new FavoriteQueue({
+        write: async () => {},
+        paint: () => {},
+        report: () => {},
+    });
+    queue.seed(1, false);
+    queue.seed(1, true);
+
+    assert.equal(queue.confirmed(1), true);
+    assert.equal(queue.intent(1), true);
+});
+
+test('a reload never overwrites a write already in flight', async () => {
+    let release;
+    const queue = new FavoriteQueue({
+        write: () => new Promise(resolve => { release = resolve; }),
+        paint: () => {},
+        report: () => {},
+    });
+    queue.seed(1, false);
+    queue.toggle(1, true);
+    queue.seed(1, false);
+
+    assert.equal(queue.intent(1), true);
+    assert.equal(queue.confirmed(1), false);
+
+    release();
+    await new Promise(resolve => setTimeout(resolve, 20));
+    assert.equal(queue.confirmed(1), true);
+    assert.equal(queue.intent(1), true);
+});

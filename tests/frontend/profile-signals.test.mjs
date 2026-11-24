@@ -21,7 +21,7 @@ function fakeNode(children = {}) {
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
         replaced: 0, appended: 0, removed: 0, style: {}, offsetWidth: 0, offsetHeight: 0,
-        dataset: {}, isConnected: true, children: [], childElementCount: 0,
+        dataset: {}, isConnected: true, children: [], childElementCount: 0, appendedNodes: [],
         getClientRects: () => [],
         classList: {
             add: (...names) => names.forEach(name => classes.add(name)),
@@ -38,9 +38,15 @@ function fakeNode(children = {}) {
         },
         querySelectorAll: () => [],
         replaceChildren: () => { element.replaced += 1; },
-        append: () => { element.appended += 1; },
-        prepend: () => { element.appended += 1; },
+        append: (...nodes) => { element.appended += nodes.length; element.appendedNodes.push(...nodes); },
+        prepend: (...nodes) => { element.appended += nodes.length; element.appendedNodes.unshift(...nodes); },
         remove: () => { element.removed += 1; },
+        replaceWith: () => {},
+        dispatchEvent: event => {
+            if (!event.target) Object.defineProperty(event, 'target', { value: element, configurable: true });
+            for (const listener of listeners.get(event.type) ?? []) listener(event);
+            return true;
+        },
         contains: () => false,
         addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
         fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
@@ -77,6 +83,11 @@ function installDocument(map) {
             return node;
         },
         createTextNode: text => ({ textContent: String(text) }),
+        createDocumentFragment: () => {
+            const fragment = fakeNode();
+            fragment.isFragment = true;
+            return fragment;
+        },
         body: fakeNode(),
         documentElement: fakeNode(),
         activeElement: null,
@@ -557,5 +568,68 @@ test('a failed duel friend filter does not reject the duel mode', async () => {
         DuelModel.challenges = original.challenges;
         TournamentModel.list = original.tournaments;
         TrainingModel.list = original.trainings;
+    }
+});
+
+test('a stale page failure never moves the current tab or the pager', async () => {
+    const pagerRoot = fakeNode();
+    const tabsRoot = fakeNode();
+    const body = fakeNode();
+    const panel = fakeNode({
+        '#reports-pager': pagerRoot,
+        '#reports-tabs': tabsRoot,
+        '#reports-body': body,
+    });
+    installDocument(new Map([['#report-container', panel]]));
+    const original = {
+        battles: ReportModel.battles,
+        summary: ReportModel.summary,
+        duels: DuelModel.reports,
+    };
+    const pageTwo = deferred();
+    const offsets = [];
+    ReportModel.summary = async () => ({ results: [], renown: 0, unread: 0 });
+    ReportModel.battles = async ({ offset }) => {
+        offsets.push(offset);
+        if (offsets.length === 1) {
+            return {
+                total: 20,
+                reports: [{
+                    id: 1, gladiator: 'Aurora', read: false, reward: 1, place: 1, total: 3, result: 'win',
+                    opponents: [], favorite: false, comment: '', hash: 'hash', expired: false, time: '2026-11-24 10:00:00',
+                }],
+            };
+        }
+        if (offsets.length === 2) return pageTwo.promise;
+        return { total: 20, reports: [] };
+    };
+    DuelModel.reports = async () => ({ total: 0, duels: [] });
+    const tab = new ReportsTab();
+    try {
+        await tab.show({}, { signal: new AbortController().signal });
+        const pager = pagerRoot.appendedNodes[0];
+        const tabs = tabsRoot.appendedNodes[0];
+        const change = new CustomEvent('change', { detail: { page: 2 } });
+        Object.defineProperty(change, 'target', { value: pager, configurable: true });
+        pager.fire('change', change);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        const latest = id => [...tabs.appendedNodes].reverse().find(node => node.id === id);
+        latest('tab-duels').fire('click');
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        pageTwo.reject(new Error('stale page refused'));
+        await new Promise(resolve => setTimeout(resolve, 10));
+        assert.equal(document.body.appendedNodes.length, 0, 'a stale failure must not toast on the open tab');
+
+        latest('tab-battles').fire('click');
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        assert.deepEqual(offsets, [0, 10, 10]);
+    }
+    finally {
+        ReportModel.battles = original.battles;
+        ReportModel.summary = original.summary;
+        DuelModel.reports = original.duels;
     }
 });

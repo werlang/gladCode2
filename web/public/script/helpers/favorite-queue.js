@@ -33,7 +33,12 @@ export class FavoriteQueue {
      */
     seed(id, favorite) {
         const key = Number(id);
-        if (!this.#states.has(key)) this.#states.set(key, { confirmed: Boolean(favorite), intent: Boolean(favorite), running: false });
+        const state = this.#states.get(key);
+        if (!state) this.#states.set(key, { confirmed: Boolean(favorite), intent: Boolean(favorite), running: false });
+        else if (!state.running) {
+            state.confirmed = Boolean(favorite);
+            state.intent = Boolean(favorite);
+        }
         return this;
     }
 
