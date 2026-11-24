@@ -565,6 +565,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   filter chips derived from the real catalogue.
 - **Methods:** `setPotion(potion)`, `setUnlocked(on, level)`, `setUnavailable(reason)`, `setBusy(on)`.
   A locked card reads “Apotecário nível N”; a card with no free compartment reads “Sem compartimento”.
+  A catalogue row without a description hides the description line; a row with no level reads “nível —”,
+  and an empty identifier leaves only the level, so production rows with arbitrary values still render.
 - **Events:** `order` `{ potion }` (only when unlocked, available and not busy).
 - **Boards:** `Pocoes.dc.html`.
 

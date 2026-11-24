@@ -101,8 +101,8 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `navigation:opened` | `{ section: SectionId, href: string }` | shell after a section mounts | shell → PainelMenu/MobileTabBar setters, analytics, the route title |
 | `messages:read` | `{ userId: number, read: number, unreadTotal: number }` | `MessagesService.markRead()` | Mensagens section (updates `ConversationList`), NotificationService (refresh) |
 | `friends:answered` | `{ id: number, accepted: boolean }` | `FriendsService.answer()` | NotificationService (refresh), Amigos section |
-| `potions:ordered` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[] }` | `PotionsService.order()` | Poções section (updates `PotionSlot`); AppHeader via `account:silver` |
-| `potions:reconciled` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[] }` | `PotionsService.reconcile()` | Poções section (repaints every slot); AppHeader via `account:silver` |
+| `potions:ordered` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[], reconciled: boolean, confirmed: boolean }` | `PotionsService.order()` | Poções section (updates `PotionSlot`); AppHeader via `account:silver` |
+| `potions:reconciled` | `{ slots: PotionSlotView[], serverNow: string, silver: number, level: number, unlockLevels: number[], reconciled: true, confirmed: boolean }` | `PotionsService.reconcile()` | Poções section (repaints every slot); AppHeader via `account:silver` |
 | `potions:cancelled` | `{ slotId: number }` | `PotionsService.cancel()` | Poções section |
 | `gladiator:chosen` | `{ gladiator: GladiatorView, mode: 'ranked'\|'duel'\|'tournament'\|'training' }` | Batalhas section (after the picker's `select`) | Batalhas section itself for the URL, analytics |
 | `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` (`position` is the resolved window position) | Ranking section (after the table moved) | shell (URL/hash), analytics |
@@ -506,7 +506,7 @@ sequenceDiagram
     Svc->>API: POST /potions/slots { potion }
     API-->>Svc: { slotId, silver, slots, serverNow, level, unlockLevels }
     Svc->>Bus: emit('account:silver', { silver })
-    Svc->>Bus: emit('potions:ordered', { slots, serverNow, silver, level, unlockLevels })
+    Svc->>Bus: emit('potions:ordered', { slots, serverNow, silver, level, unlockLevels, reconciled: false, confirmed: true })
     Bus-->>Shell: account:silver
     Shell->>Header: setSilver(silver)
     Bus-->>Section: potions:ordered
@@ -518,16 +518,21 @@ The `POST /potions/slots` answer is authoritative for both the balance and the c
 `{ slotId, silver, slots, serverNow, level, unlockLevels }`. The GET and POST return the same
 `slots`/`serverNow` shape, so the section can redraw locked compartments from `level`/`unlockLevels`
 without a second read. The client applies the 201 directly — no follow-up read — so a confirmed purchase
-cannot leave a stale balance.
+cannot leave a stale balance. The section no longer applies the return value a second time; the event
+listener is the only painter.
 
 **Lost 201 (recovery).** If the POST rejects with a network or timeout error (status 0 or 408, not a user
 abort), the server may have committed the purchase. `PotionsService.order()` then calls
 `GET /potions/slots` for the full compartment list and `GET /notifications` for `user.silver`, emits
-`account:silver` and `potions:reconciled { slots, serverNow, silver, level, unlockLevels }`, and **never
-repeats the purchase**. The section applies that state and repaints every `PotionSlot`; the order button
-stays busy until the promise settles. If either recovery read fails, the service rejects with the read
-error, the section shows the error toast and re-enables the card; a retry repeats **only the reads** the
-user asks for, never the purchase.
+`account:silver` and `potions:reconciled { slots, serverNow, silver, level, unlockLevels, reconciled: true,
+confirmed }`, and **never repeats the purchase**. `confirmed` is true only when the last known slot ids did
+not contain a slot that now carries the ordered identifier: the service compares the reconciled list with
+the snapshot taken when the POST started. Without a prior snapshot it cannot prove the purchase, so it
+stays false. The section applies that state and repaints every `PotionSlot`; the order button stays busy
+until the promise settles. A confirmed reconciliation says “encomendada”; an unconfirmed one says
+“Encomenda não confirmada. Os compartimentos foram sincronizados.” and never repeats the write. If either
+recovery read fails, the service rejects with the read error, the section shows the error toast and
+re-enables the card; a retry repeats **only the reads** the user asks for, never the purchase.
 
 A refused POST (`NO_FREE_SLOT`, not enough silver) is a different outcome: it leaves the card enabled and
 shows the API's message, and nothing changes locally. Cancelling emits `potions:cancelled` and refreshes the
