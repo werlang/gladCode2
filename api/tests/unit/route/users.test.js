@@ -12,7 +12,7 @@ vi.mock('../../../middleware/auth.js', () => ({
 }));
 vi.mock('../../../helpers/uploads.js', () => ({ saveProfilePicture: vi.fn(async folder => `/profpics/${folder}.png?v=1`) }));
 vi.mock('../../../helpers/google-auth.js', () => ({ GoogleAuth: { verify: vi.fn() } }));
-vi.mock('../../../model/user.js', () => ({ LANGUAGES: ['c', 'python', 'blocks'], User: { signInWithGoogle: vi.fn() } }));
+vi.mock('../../../model/user.js', () => ({ LANGUAGES: ['c', 'python', 'javascript', 'blocks'], User: { signInWithGoogle: vi.fn() } }));
 
 const { GoogleAuth } = await import('../../../helpers/google-auth.js');
 const { User } = await import('../../../model/user.js');
@@ -71,6 +71,12 @@ describe('auth and users routes', () => {
         expect((await request(app).put('/users/me').send({ language: 'java' })).body.code).toBe('INVALID_LANGUAGE');
         expect((await request(app).put('/users/me').send({ preferences: { friend: 'yes' } })).body.code).toBe('INVALID_PREFERENCES');
         expect(currentUser.saveProfile).not.toHaveBeenCalled();
+    });
+
+    test('JavaScript is a preferred language', async () => {
+        currentUser = player();
+        await request(app).put('/users/me').send({ language: 'javascript' });
+        expect(currentUser.saveProfile).toHaveBeenCalledWith(expect.objectContaining({ language: 'javascript' }));
     });
 
     test('a new picture is stored and its URL saved', async () => {

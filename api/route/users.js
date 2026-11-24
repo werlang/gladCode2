@@ -20,7 +20,7 @@ router.get('/me', auth({ optional: true }), asyncRoute(async (req, res) => {
 /**
  * PUT /users/me
  * Changes the profile. Every field is optional: `nickname` (2 to 30 characters, unique),
- * `language` (`c|python|blocks`), `preferences` (`{ message, friend, update, duel, tourn }`
+ * `language` (`c|python|javascript|blocks`), `preferences` (`{ message, friend, update, duel, tourn }`
  * booleans), `editorTheme`, `editorFont` (8 to 40), `showTutorial`, `theme` (`system|classic|arena-light|arena-dark`,
  * the site theme) and `picture` (a cropped image as a data URL). Answers `{ user }`; 409
  * `NICKNAME_TAKEN` when the nickname is in use.

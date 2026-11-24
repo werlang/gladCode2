@@ -4,7 +4,7 @@ import { Mysql } from '../helpers/mysql.js';
 import { Model } from './model.js';
 
 /** Languages a gladiator can be written in. */
-export const LANGUAGES = ['c', 'python', 'blocks'];
+export const LANGUAGES = ['c', 'python', 'javascript', 'blocks'];
 /** Email notification switches, by JSON name and column. */
 const PREFERENCES = { message: 'pref_message', friend: 'pref_friend', update: 'pref_update', duel: 'pref_duel', tourn: 'pref_tourn' };
 

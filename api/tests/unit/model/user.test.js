@@ -11,7 +11,7 @@ vi.mock('../../../helpers/mysql.js', () => ({
 }));
 
 const { Mysql } = await import('../../../helpers/mysql.js');
-const { User, defaultPicture } = await import('../../../model/user.js');
+const { LANGUAGES, User, defaultPicture } = await import('../../../model/user.js');
 
 const row = {
     id: 7, email: 'ana@example.com', googleid: 'g-1', apelido: 'Ana', nome: 'Ana', sobrenome: 'Lima', foto: null,
@@ -82,6 +82,10 @@ describe('User', () => {
         Mysql.findOne.mockResolvedValue({ id: 8 });
         await expect(new User(row).saveProfile({ nickname: 'Bia' })).rejects.toMatchObject({ status: 409, code: 'NICKNAME_TAKEN' });
         expect(Mysql.update).not.toHaveBeenCalled();
+    });
+
+    test('gladiators can be written in C, Python, JavaScript or blocks', () => {
+        expect(LANGUAGES).toEqual(['c', 'python', 'javascript', 'blocks']);
     });
 
     test('profile changes map to their columns', async () => {
