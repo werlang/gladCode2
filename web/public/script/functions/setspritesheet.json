@@ -9,8 +9,8 @@
         "javascript": "setSpritesheet(hash)"
     },
     "description": {
-        "long": "Atribui uma aparência para o gladiador. A string recebida como parâmetro deverá ser uma string previamente fornecida pelo <a href='editor.php'>criador de gladiadores da gladcode</a>. Esta função somente pode ser chamada dentro da função setup. O criador de gladiadores é uma ferramenta que permite a personalização da aparência do gladiador. Após a etapa de criação da aparência, a ferramenta cadastra a folha de sprites do gladiador e fornece a <i>hash</i>, uma string que indica a folha de sprites cadastrada. Uma folha de sprites é um arquivo de imagem contendo todas as etapas de animação de um personagem, que quando executadas em sequência dão a impressão de movimento.",
-        "brief": "Atribui ao gladiador uma aparência."
+        "long": "Declara a aparência que o editor extrai e associa ao gladiador. A string recebida como parâmetro deve ser uma string previamente fornecida pelo <a href='editor.php'>criador de gladiadores da gladCode</a>. Esta função somente pode ser chamada dentro da função setup. O criador de gladiadores permite personalizar a aparência e fornece a <i>hash</i> da folha de sprites cadastrada. Os clientes da simulação não a executam: a API lê essa declaração do código salvo e a usa no registro e na reprodução da batalha.",
+        "brief": "Declara a aparência que o editor associa ao gladiador."
     },
     "param": {
         "default": [

@@ -11,7 +11,7 @@
         "blocks": "<block type='get_target'><field name='COMPLEMENT'>Health</field></block>"
     },
     "description": {
-        "long": "Retorna a vida que o alvo selecionado possui. O valor retornado não é a quantidade de pontos de vida do alvo, mas a razão entre a quantidade atual de pontos de vida e o total. Por consequência sempre será um valor entre 0 e 1. Embora não se saiba a quantidade exata de pontos de vida do alvo, pode-se ter uma noção de sua condição de saúde utilizando esta função.",
+        "long": "Retorna a vida que o alvo selecionado possui. O valor retornado não é a quantidade de pontos de vida do alvo, mas a razão entre a quantidade atual de pontos de vida e o total. Com um alvo visível, o valor fica entre 0 e 1. Sem alvo visível, C e Python retornam -1 e JavaScript retorna false. Embora não se saiba a quantidade exata de pontos de vida do alvo, pode-se ter uma noção de sua condição de saúde utilizando esta função.",
         "brief": "Retorna a vida do alvo."
     },
     "param": {
@@ -21,6 +21,7 @@
     },
     "treturn": {
         "default": "Float contendo a razão entre a vida atual e a total do alvo (entre 0 e 1).",
+        "javascript": "Número contendo a razão entre a vida atual e a total do alvo (entre 0 e 1), ou false quando não há alvo visível.",
         "blocks": "Número contendo a razão entre a vida atual e a total do alvo (entre 0 e 1)."
     },
     "sample": {

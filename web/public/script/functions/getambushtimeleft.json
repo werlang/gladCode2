@@ -20,8 +20,9 @@
         ]
     },
     "treturn": {
-        "default": "Float contendo o tempo restante até o efeito proteção expirar.",
-        "blocks": "Número contendo o tempo restante até o efeito proteção expirar."
+        "default": "Float contendo o tempo restante até o efeito invisibilidade expirar.",
+        "javascript": "Número contendo o tempo restante até o efeito invisibilidade expirar.",
+        "blocks": "Número contendo o tempo restante até o efeito invisibilidade expirar."
     },
     "sample": {
         "c": "1.c",
