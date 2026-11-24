@@ -17,9 +17,11 @@ function deferred() {
 function fakeNode(children = {}) {
     const classes = new Set();
     const listeners = new Map();
+    const auto = new Map();
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
         replaced: 0, appended: 0, removed: 0, style: {}, offsetWidth: 0, offsetHeight: 0,
+        dataset: {}, isConnected: true,
         getClientRects: () => [],
         classList: {
             add: (...names) => names.forEach(name => classes.add(name)),
@@ -27,12 +29,19 @@ function fakeNode(children = {}) {
             toggle: (name, on) => (on ? classes.add(name) : classes.delete(name)),
             contains: name => classes.has(name),
         },
-        querySelector: selector => children[selector] ?? null,
+        // Any selector the component asks for gets a stub, so a new component needing one more
+        // node does not silently crash the section signal tests.
+        querySelector: selector => {
+            if (Object.hasOwn(children, selector)) return children[selector];
+            if (!auto.has(selector)) auto.set(selector, fakeNode());
+            return auto.get(selector);
+        },
         querySelectorAll: () => [],
         replaceChildren: () => { element.replaced += 1; },
         append: () => { element.appended += 1; },
         prepend: () => { element.appended += 1; },
         remove: () => { element.removed += 1; },
+        contains: () => false,
         addEventListener: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
         fire: (name, event = {}) => Promise.all((listeners.get(name) ?? []).map(listener => listener(event))),
         removeEventListener: () => {},
@@ -50,22 +59,23 @@ function fakeNode(children = {}) {
 /** Installs just enough document for the controllers to construct and render. */
 function installDocument(map) {
     globalThis.getComputedStyle = () => ({ display: 'block' });
+    globalThis.location = { search: '' };
+    const auto = new Map();
     globalThis.document = {
-        querySelector: selector => map.get(selector) ?? null,
+        querySelector: selector => {
+            if (map.has(selector)) return map.get(selector);
+            if (!auto.has(selector)) auto.set(selector, fakeNode());
+            return auto.get(selector);
+        },
         querySelectorAll: () => [],
         addEventListener: () => {},
         removeEventListener: () => {},
         createElement: () => {
             const node = fakeNode();
-            node.content = {
-                firstElementChild: fakeNode({
-                    '.page-header-title': fakeNode(),
-                    '.page-header-subtitle': fakeNode(),
-                    '.page-header-actions': fakeNode(),
-                }),
-            };
+            node.content = { firstElementChild: fakeNode() };
             return node;
         },
+        createTextNode: text => ({ textContent: String(text) }),
         body: fakeNode(),
         documentElement: fakeNode(),
         activeElement: null,
@@ -88,6 +98,8 @@ const { DuelModel, FriendModel, MessageModel, ReportModel } = await import('../.
 const { GladiatorModel } = await import('../../web/public/script/models/gladiator.js');
 const { PotionModel } = await import('../../web/public/script/models/potion.js');
 const { RankModel } = await import('../../web/public/script/models/rank.js');
+const { TournamentModel } = await import('../../web/public/script/models/tournament.js');
+const { TrainingModel } = await import('../../web/public/script/models/training.js');
 const { profile } = await import('../../web/public/script/profile/session.js');
 
 profile.user = { id: 1, nickname: 'Test', level: 10, premium: false, silver: 0 };
@@ -176,12 +188,13 @@ test('friends ignores a reopened request that resolves out of order', async () =
 });
 
 test('gladiators drop a response that arrives after the section was left', async () => {
-    const container = fakeNode();
-    const battle = fakeNode();
-    installDocument(new Map([
-        ['#glads-container .glad-card-container', container],
-        ['#menu #battle', battle],
-    ]));
+    const grid = fakeNode();
+    const root = fakeNode({
+        '#glads-header': fakeNode(),
+        '#glads-grid': grid,
+        '#glads-empty': fakeNode(),
+    });
+    installDocument(new Map([['#glads-container', root]]));
     const original = GladiatorModel.list;
     const pending = deferred();
     GladiatorModel.list = () => pending.promise;
@@ -192,8 +205,7 @@ test('gladiators drop a response that arrives after the section was left', async
         controller.abort();
         pending.resolve([{ name: 'Late' }]);
         await shown;
-        assert.equal(container.replaced, 0);
-        assert.equal(battle.classList.contains('disabled'), false);
+        assert.equal(grid.replaced, 0);
     }
     finally {
         GladiatorModel.list = original;
@@ -283,63 +295,65 @@ test('reports keep the placeholder when the page arrives after leaving', async (
 });
 
 test('battle loads the default ranked mode with the navigation signal', async () => {
-    const panel = fakeNode();
-    installDocument(new Map([
-        ['#panel #battle-container', panel],
-        ['#duel-challenge', fakeNode({ '.table': fakeNode() })],
-        ['#battle-container #ranked.wrapper .glad-card-container', fakeNode()],
-        ['#battle-container #match-find', fakeNode()],
-        ['#panel #battle-container #tourn.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
-        ['#panel #battle-container #train.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
-    ]));
-    const tab = new BattleTab(() => {});
+    installDocument(new Map([['#panel #battle-container', fakeNode()]]));
+    const original = {
+        challenges: DuelModel.challenges,
+        tournaments: TournamentModel.list,
+        trainings: TrainingModel.list,
+    };
+    DuelModel.challenges = async () => [];
+    TournamentModel.list = async () => ({ pages: {} });
+    TrainingModel.list = async () => ({ pages: {} });
     const received = [];
-    tab.ranked = { refresh: options => received.push(options) };
-    tab.challenges = { refresh: options => received.push(options) };
-    const controller = new AbortController();
-    await tab.show({}, { signal: controller.signal });
-    assert.deepEqual(received, [{ signal: controller.signal }]);
+    try {
+        const tab = new BattleTab(() => {});
+        tab.init();
+        tab.ranked = { refresh: options => received.push(options) };
+        tab.challenges = { refresh: async () => {} };
+        const controller = new AbortController();
+        await tab.show({}, { signal: controller.signal });
+        assert.equal(tab.mode, 'ranked');
+        assert.deepEqual(received, [{ signal: controller.signal, selectId: null }]);
+    }
+    finally {
+        DuelModel.challenges = original.challenges;
+        TournamentModel.list = original.tournaments;
+        TrainingModel.list = original.trainings;
+    }
 });
 
 test('tournament and training routes load only their own mode', async () => {
-    const buttons = ['ranked', 'duel', 'tourn', 'train'].map(id => {
-        const button = fakeNode();
-        button.id = id;
-        return button;
-    });
-    const wrappers = Object.fromEntries(['ranked', 'duel', 'tourn', 'train'].map(id => [id, fakeNode()]));
-    const panel = fakeNode();
-    panel.querySelectorAll = selector => {
-        if (selector === '#battle-mode .button') return buttons;
-        if (selector === '.wrapper') return Object.values(wrappers);
-        return [];
+    installDocument(new Map([['#panel #battle-container', fakeNode()]]));
+    const original = {
+        challenges: DuelModel.challenges,
+        tournaments: TournamentModel.list,
+        trainings: TrainingModel.list,
     };
-    panel.querySelector = selector => {
-        const match = selector.match(/^#(\w+)\.wrapper$/);
-        return match ? wrappers[match[1]] : null;
-    };
-    installDocument(new Map([
-        ['#panel #battle-container', panel],
-        ['#duel-challenge', fakeNode({ '.table': fakeNode() })],
-        ['#battle-container #ranked.wrapper .glad-card-container', fakeNode()],
-        ['#battle-container #match-find', fakeNode()],
-        ['#panel #battle-container #tourn.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
-        ['#panel #battle-container #train.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
-    ]));
-    for (const mode of ['tourn', 'train']) {
-        const tab = new BattleTab(() => {});
-        const loaded = [];
-        tab.ranked = { refresh: async () => { throw new Error('ranked down'); } };
-        tab.challenges = { refresh: async () => { throw new Error('duels down'); } };
-        tab.tournaments = { refresh: async options => loaded.push(['tourn', options]) };
-        tab.trainings = { refresh: async options => loaded.push(['train', options]) };
-        const controller = new AbortController();
-        await tab.show({ subtab: mode }, { signal: controller.signal });
-        assert.deepEqual(loaded, [[mode, { signal: controller.signal }]]);
-        assert.equal(buttons.find(button => button.id === mode).classList.contains('selected'), true);
-        assert.notEqual(wrappers[mode].style.display, 'none');
+    DuelModel.challenges = async () => [];
+    TournamentModel.list = async () => ({ pages: {} });
+    TrainingModel.list = async () => ({ pages: {} });
+    try {
+        for (const mode of ['tourn', 'train']) {
+            const tab = new BattleTab(() => {});
+            tab.init();
+            const loaded = [];
+            tab.ranked = { refresh: async () => { throw new Error('ranked down'); } };
+            tab.challenges = { refresh: async () => { throw new Error('duels down'); } };
+            tab.tournaments = { refresh: async options => loaded.push(['tourn', options]) };
+            tab.trainings = { refresh: async options => loaded.push(['train', options]) };
+            const controller = new AbortController();
+            await tab.show({ subtab: mode }, { signal: controller.signal });
+            assert.equal(tab.mode, mode);
+            assert.deepEqual(loaded, [[mode, { signal: controller.signal }]]);
+        }
+    }
+    finally {
+        DuelModel.challenges = original.challenges;
+        TournamentModel.list = original.tournaments;
+        TrainingModel.list = original.trainings;
     }
 });
+
 
 test('battle duel challenges drop a late list', async () => {
     const table = fakeNode();
@@ -362,11 +376,11 @@ test('battle duel challenges drop a late list', async () => {
     }
 });
 
-test('the ranked battle cards drop a late gladiator list', async () => {
-    const container = fakeNode();
+test('the ranked picker drops a late gladiator list', async () => {
+    const picker = fakeNode();
     installDocument(new Map([
-        ['#battle-container #ranked.wrapper .glad-card-container', container],
-        ['#battle-container #match-find', fakeNode()],
+        ['#ranked-picker', picker],
+        ['#ranked-versus', fakeNode()],
     ]));
     const original = GladiatorModel.list;
     const pending = deferred();
@@ -378,12 +392,13 @@ test('the ranked battle cards drop a late gladiator list', async () => {
         controller.abort();
         pending.resolve([{ name: 'Late' }]);
         await shown;
-        assert.equal(container.replaced, 0);
+        assert.equal(picker.replaced, 0);
     }
     finally {
         GladiatorModel.list = original;
     }
 });
+
 
 test('settings makes no changes when its navigation signal was already aborted', async () => {
     const nickname = fakeNode();
@@ -488,18 +503,23 @@ test('a failed duel friend filter does not reject the duel mode', async () => {
     installDocument(new Map([
         ['#panel #battle-container', panel],
         ['#duel-challenge', fakeNode({ '.table': fakeNode() })],
-        ['#battle-container #ranked.wrapper .glad-card-container', fakeNode()],
-        ['#battle-container #match-find', fakeNode()],
-        ['#panel #battle-container #tourn.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
-        ['#panel #battle-container #train.wrapper', fakeNode({ '#create': fakeNode(), '#join': fakeNode() })],
     ]));
-    const original = FriendModel.filter;
+    const original = {
+        filter: FriendModel.filter,
+        challenges: DuelModel.challenges,
+        tournaments: TournamentModel.list,
+        trainings: TrainingModel.list,
+    };
     FriendModel.filter = async () => {
         throw new Error('friends down');
     };
+    DuelModel.challenges = async () => [];
+    TournamentModel.list = async () => ({ pages: {} });
+    TrainingModel.list = async () => ({ pages: {} });
     let challengeLoads = 0;
     try {
         const tab = new BattleTab(() => {});
+        tab.init();
         tab.ranked = { refresh: async () => { throw new Error('ranked down'); } };
         tab.challenges = { refresh: async () => { challengeLoads += 1; } };
         tab.tournaments = { refresh: async () => { throw new Error('tournaments down'); } };
@@ -509,6 +529,9 @@ test('a failed duel friend filter does not reject the duel mode', async () => {
         assert.equal(challengeLoads, 1);
     }
     finally {
-        FriendModel.filter = original;
+        FriendModel.filter = original.filter;
+        DuelModel.challenges = original.challenges;
+        TournamentModel.list = original.tournaments;
+        TrainingModel.list = original.trainings;
     }
 });

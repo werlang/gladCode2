@@ -15,8 +15,9 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 - A mutating method returns `this`; a method that loads something returns a promise.
 - A component **never calls a model**. Data arrives in the constructor or through a setter; it **emits a
   component event** when the user does something, and the parent decides. Two existing components break
-  this rule and are cleaned when their section is rebuilt: `loadGladCards` falls back to
-  `GladiatorModel.list()` when no list is passed (WP5 removes the fallback), and `SideMenu` fetches
+  this rule and are cleaned when their section is rebuilt: the legacy `loadGladCards` still falls
+  back to `GladiatorModel.list()` when no list is passed (the editor's `loadSelectableCards` relies on
+  it; the rebuilt Gladiadores/Batalhas cards always receive their list), and `SideMenu` fetches
   `side-menu.html` (outside the Painel; it stays as it is).
 - Component events are `CustomEvent`s dispatched on the component's root with `bubbles: true`; the
   `detail` payload is listed per entry. App events (a different thing) are in [events.md](events.md).
@@ -57,9 +58,9 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | SaveStatus | exists | `components/save-status.js` | WP4 |
 | Toast (with undo) | exists, extended | `components/toast.js` | WP2 |
 | EmptyState | exists | `templates/empty-state.js` | — |
-| GladiatorCard | exists, rebuilt as the game card | `components/glad-card.js` → `components/gladiator-card.js` | WP5 |
-| GladiatorPicker | new | `components/gladiator-picker.js` | WP5 |
-| VersusPanel | new | `components/versus-panel.js` | WP5 |
+| GladiatorCard | exists, rebuilt as the game card | `components/gladiator-card.js` + `components/glad-card.js` (painter) | WP5 |
+| GladiatorPicker | exists | `components/gladiator-picker.js` | WP5 |
+| VersusPanel | exists | `components/versus-panel.js` | WP5 |
 | ResultPill | new | `components/result-pill.js` | WP6 |
 | FormStreak | new | `components/form-streak.js` | WP6 |
 | PotionSlot | new | `components/potion-slot.js` | WP6 |
@@ -68,7 +69,7 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | MessageThread | new | `components/message-thread.js` | WP8 |
 | Composer | new | `components/composer.js` | WP8 |
 | FriendRow | new | `components/friend-row.js` | WP8 |
-| InviteBanner | new | `components/invite-banner.js` | WP8 |
+| InviteBanner | exists, first use in Batalhas | `components/invite-banner.js` | WP5 / WP8 |
 | RankingTable | new | `components/ranking-table.js` | WP7 |
 | OwnGladiatorJump | new | `components/own-gladiator-jump.js` | WP7 |
 
@@ -361,10 +362,11 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/choice-cards.js`; **CSS:** `css/components/choice-cards.css`.
 - **Purpose:** a single choice shown as large cards: the three site themes (Arena claro, Arena escuro,
   Clássico) with their preview, the two gladiator styles (Coliseu 3D, Pixel art), and the four battle modes
-  (Ranqueada, Duelo, Torneio, Treino) with their description and count pill.
-- **Constructor:** `new ChoiceCards({ element, variant })` (`variant`: `preview`, `icon` or `mode`).
-- **Methods:** `setOptions([{ value, title, description, icon, preview, badge, disabled }])`, `set(value)`,
-  `get value`.
+  (Ranqueada, Duelo, Torneio, Treino) with their description and live count pill (WP5's `mode` variant).
+- **Constructor:** `new ChoiceCards({ element, variant, label })` (`variant`: `preview`, `icon` or
+  `mode`); it adds the base `choice-cards` class to an existing root.
+- **Methods:** `setOptions([{ value, title, description, preview, badge, disabled }])`, `set(value)`,
+  `clear()`, `get value`; `preview` is trusted markup built by the section (an icon or a preview).
 - **Events:** `change` `{ value }`.
 - **ARIA:** `role="radiogroup"` with a label; each card a `<button role="radio" aria-checked>` (the
   preview is decorative, the title is the label); arrow keys move, Home/End jump; the selected card keeps
@@ -438,48 +440,58 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 
 ### GladiatorCard — exists, rebuilt (WP5)
 
-- **Files:** `components/glad-card.js` today (`GladCardPainter`, `loadGladCards`,
-  `loadSelectableCards`, `gladOfCard`) → `components/gladiator-card.js`; **templates:**
-  `templates/glad-card.js` → `templates/gladiator-card.js`; **CSS:** `css/glad-card.css` →
-  `css/components/gladiator-card.css`.
+- **Files:** `components/gladiator-card.js`; **template:** `templates/gladiator-card.js`; **CSS:**
+  `css/components/gladiator-card.css`. `components/glad-card.js` stays as `GladCardPainter` (the lazy
+  3D portrait and sprite cache) and the legacy card lists (`loadGladCards`, `loadSelectableCards`,
+  `gladOfCard`). The new card paints its stage through `setGladImageElement`; the legacy lists remain
+  in use by the editor's window/battle-test previews, the ranked pre-battle/after-battle dialogs, the
+  tournament team-code windows, and the standalone tournament/training pages.
 - **Purpose:** the game card of a gladiator: brass/rot/blood frame, lit stage with the portrait (3D
   portrait or pixel-art sprite, per `glad-view`), the language crest, the status seal (PRONTO /
   DESATUALIZADO / COM ERRO), the renown plaque with the MMR, the segmented STR/AGI/INT bars, the stamped
   state (FORA DA ARENA / COM ERRO), the alert line and the beveled BATALHAR plus the “more actions”
   menu.
-- **Constructor:** `new GladiatorCard({ element, gladiator, view })`; the element is the card the
-  template rendered; `view` is `sprite|3d`.
+- **Constructor:** `new GladiatorCard({ element, gladiator, view })`; without `element` it renders
+  `templates/gladiator-card.js`; `view` is `sprite|3d` and is only recorded (the painter reads the page
+  preference).
 - **Methods:** `setGladiator(gladiator)`, `setSelected(on)`, `setDisabled(on)`, `setView(view)`,
-  `setBusy(on)`; `get gladiator`.
+  `setBusy(on)`; `get gladiator`. `emptyGladiatorCard(title)` builds the free-slot card.
 - **Events:** `battle` `{ gladiator }`, `edit` `{ gladiator }`, `code` `{ gladiator }`, `more`
-  `{ gladiator, anchor }`, `select` `{ gladiator }`.
-- **Variants:** `full` (the Gladiadores grid), `compact` (the phone list), `picker` (the character
-  select), `locked` (a gladiator that cannot fight: outdated or broken).
-- **Portraits:** keep `GladCardPainter` (lazy 3D portrait, sprite cache, repaint in place on
-  `gladviewchange`); the new card reuses it. A card never loads three unless `view` is `3d`.
-- **Boards:** `Gladiadores.dc.html`, `Batalhas.dc.html`, `Mobile.dc.html`.
+  `{ gladiator, anchor }`, `delete` `{ gladiator }`.
+- **State:** `data-state="ready|outdated|broken"` drives the frame, seal, stamp and disabled BATALHAR;
+  `data-view` and `data-glad-id` expose the drawn style and id.
+- **Portraits:** `GladCardPainter` keeps one subscription to `gladviewchange` and repaints every slot in
+  place; a card never loads three unless the page style is 3D.
+- **Boards:** `Gladiadores.dc.html`, `Batalhas.dc.html`.
 
-### GladiatorPicker — new (WP5)
+### GladiatorPicker — exists (WP5)
 
-- **File:** `components/gladiator-picker.js`; **CSS:** `css/components/gladiator-picker.css`.
-- **Purpose:** the character select of Batalhas: a grid of picker cards, one chosen at a time, the
+- **File:** `components/gladiator-picker.js`; **CSS:** `css/components/gladiator-card.css`
+  (`.gladiator-picker`, `.gladiator-pick`), shared with the card.
+- **Purpose:** the character select of Batalhas and of every flow that asks for a gladiator (duel
+  accept/challenge, tournament join, training join): a grid of picker cards, one chosen at a time, the
   chosen card lifted with an “ESCOLHIDO” tag, unavailable cards dimmed with a lock and the reason
   (“Desatualizado” / “Com erro”), and a double click confirming.
-- **Constructor:** `new GladiatorPicker({ element, gladiators })`.
+- **Constructor:** `new GladiatorPicker({ element })`; without `element` it renders
+  `templates/gladiator-card.js` (`gladiatorPickerTemplate`). Sections normally append
+  `picker.element` to their container.
 - **Methods:** `setGladiators(list)`, `select(id)`, `get selected`, `setDisabled(reason)`.
-- **Events:** `select` `{ gladiator }`, `confirm` `{ gladiator }`.
-- **ARIA:** a listbox-like single choice: cards are buttons with `aria-pressed`, arrow-key movement and
-  a label naming the gladiator and its state; a disabled card is `aria-disabled` but still focusable so
+- **Events:** `select` `{ gladiator }`, `blocked` `{ gladiator, reason }`, `confirm` `{ gladiator }`
+  (double click on the selected card).
+- **ARIA:** cards are buttons with `aria-pressed`, a label naming the gladiator and its state and
+  arrow-key movement between the usable cards; a disabled card is `aria-disabled` but still focusable so
   its reason can be read.
 - **Boards:** `Batalhas.dc.html`, `Mobile.dc.html`.
 
-### VersusPanel — new (WP5)
+### VersusPanel — exists (WP5)
 
-- **File:** `components/versus-panel.js`; **CSS:** `css/components/versus-panel.css`.
+- **File:** `components/versus-panel.js`; **CSS:** `css/components/gladiator-card.css`
+  (`.versus-panel`), shared with the card.
 - **Purpose:** the ranked panel's right column: the chosen gladiator's round portrait, the “VS” mark, the
   “Sorteado” opponent placeholder (or the matched opponent's portrait and renown), the potions carried,
   the reward line and the “PROCURAR ADVERSÁRIOS” button.
-- **Constructor:** `new VersusPanel({ element })`.
+- **Constructor:** `new VersusPanel({ element })`; without `element` it renders
+  `templates/gladiator-card.js` (`versusPanelTemplate`).
 - **Methods:** `setGladiator(gladiator| null)`, `setOpponent(opponent|null)`, `setPotions(slots)`,
   `setReward(text)`, `setBusy(on)`, `setReady(on)`.
 - **Events:** `fight` `{}`.
@@ -609,16 +621,20 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** icon-only actions carry `aria-label` with the friend's name.
 - **Boards:** `Amigos.dc.html`.
 
-### InviteBanner — new (WP8)
+### InviteBanner — exists, first use in Batalhas (WP5; friend requests land in WP8)
 
-- **File:** `components/invite-banner.js`; **CSS:** `css/components/invite-banner.css`.
-- **Purpose:** the highlighted pending invite, used for a friend request (Amigos) and a duel challenge
-  (Batalhas): avatar, the message, the secondary detail and Recusar / Aceitar.
-- **Constructor:** `new InviteBanner({ element })`.
-- **Methods:** `set({ picture, name, message, detail, acceptLabel, refuseLabel })`, `setBusy(on)`.
+- **File:** `components/invite-banner.js`; **CSS:** `css/components/gladiator-card.css`
+  (`.invite-banner`), shared with the card for now.
+- **Purpose:** the highlighted pending invite. Batalhas uses it for the first pending duel challenge
+  (avatar, “fulano desafiou você”, the challenger's gladiator, Recusar / Escolher gladiador e aceitar);
+  Amigos will reuse it for a friend request in WP8.
+- **Constructor:** `new InviteBanner({ element })`; without `element` it renders
+  `templates/gladiator-card.js` (`inviteBannerTemplate`).
+- **Methods:** `set({ picture, name, message, detail, acceptLabel, refuseLabel })`, `clear()`,
+  `setBusy(on)`.
 - **Events:** `accept` `{}`, `refuse` `{}`.
 - **ARIA:** `<section aria-label>` naming the invite; both actions are buttons.
-- **Boards:** `Amigos.dc.html`, `Batalhas.dc.html`.
+- **Boards:** `Batalhas.dc.html` (WP5), `Amigos.dc.html` (WP8).
 
 ## Composition map
 
