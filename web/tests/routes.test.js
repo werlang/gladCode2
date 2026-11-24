@@ -43,3 +43,11 @@ test('a function page takes the language from its extension, JavaScript included
         assert.match(await res.text(), new RegExp(`"codeLanguage":"${extension}"`), extension);
     }
 });
+
+test('the Portuguese JavaScript reference keeps its JavaScript route', async () => {
+    const res = await get('/funcao/gettargetx.js');
+    assert.equal(res.status, 200);
+    const html = await res.text();
+    assert.match(html, /"codeLanguage":"js"/);
+    assert.match(html, /"docLanguage":"pt"/);
+});
