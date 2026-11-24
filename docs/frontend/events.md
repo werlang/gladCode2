@@ -106,6 +106,7 @@ Naming: `domain:action`. A **fact** is past tense (`account:saved`, `messages:re
 | `potions:cancelled` | `{ slotId: number }` | `PotionsService.cancel()` | Poções section |
 | `gladiator:chosen` | `{ gladiator: GladiatorView, mode: 'ranked'\|'duel'\|'tournament'\|'training' }` | Batalhas section (after the picker's `select`) | Batalhas section itself for the URL, analytics |
 | `ranking:jumped` | `{ gladiatorId: number\|null, position: number }` (`position` is the resolved window position) | Ranking section (after the table moved) | shell (URL/hash), analytics |
+| `ranking:topped` | `{}` | Ranking section (“Voltar ao topo” after loading page 1) | shell (URL to `/ranking`) |
 | `palette:opened` | `{ source: 'keyboard'\|'button' }` | shell | analytics, shell (header search busy state) |
 | `palette:navigated` | `{ section: SectionId\|null, href: string }` | CommandPalette → shell | analytics, shell (menu pending state) |
 
@@ -384,8 +385,8 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
 }
 ```
 
-- **Version and order:** every query filters `gladiators.version = api/version`; an outdated or broken
-  gladiator has no position and is shown by the own strip's reason instead. Order and tie-break are
+- **Order:** every query includes every gladiator, whatever its engine version; outdated and broken
+  gladiators keep their position and the own strip only adds their state beside it. Order and tie-break are
   `ORDER BY g.mmr DESC, g.cod ASC`; a position is 1-based by that same order
   (`1 + COUNT(*) WHERE mmr > target.mmr OR (mmr = target.mmr AND cod < target.cod)`). The general list
   uses the same `ROW_NUMBER()` expression, so a window row and the paged row at the same position are the
@@ -402,22 +403,24 @@ is clamped to 3–21 and is forced odd (`size += 1` when even). The route answer
   `friends` scope keeps only confirmed friends' gladiators while the position stays global. `position=N`
   on this route is an alias of `/ranking/window?position=N`.
 - **“Seus gladiadores”:** `GET /ranking/mine` (signed in) returns
-  `{ gladiators: [{ id, name, mmr, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken',
-  skin }] }`; `skin` lets the strip paint the same portrait as the cards.
-  `position` is present only for `state: 'ranked'`; the strip shows the state text for the others. The
-  state precedence is `broken` (`version = 'broken'`), then `outdated` (`version` ≠ `api/version`), then
-  `ranked` (has a position), then `unranked`. `OwnGladiatorJump#setGladiators(list)` receives exactly this
-  list.
-- **“Ir para a posição”:** `Pagination` emits `jump { position }`; the section calls the same
-  `RankingService.window({ position, size: 9 })`. A strip jump and a position jump both publish
-  `ranking:jumped` with the **resolved `window.position`**, never the clicked or typed number; the shell
-  turns it into `pushState('/ranking?at=<window.position>')`, so Back returns to the previous ranking
-  window and a reload opens the window that was actually rendered. A typed position beyond `total` is
-  clamped by the server and the event carries the clamped `window.position`. A cold load of
+  `{ gladiators: [{ id, name, mmr, position: number|null, state: 'ranked'|'outdated'|'broken', skin }] }`;
+  every gladiator has a position (the initial renown already ranks it), so `unranked` is not a state;
+  `skin` lets the strip paint the same portrait as the cards. The state precedence is `broken`
+  (`version = 'broken'`), then `outdated` (`version` ≠ `api/version`), then `ranked`; the position is
+  returned for every state, so outdated/broken chips show the position plus the state.
+  `OwnGladiatorJump#setGladiators(list)` receives exactly this list.
+- **“Ir para a posição”:** `Pagination` emits `jump { position }` only inside `1..total` and
+  `invalid { value }` outside it; the section shows the range error and does not request a window. The
+  section calls the same `RankingService.window({ position, size: 9 })`. A strip jump and a position jump
+  both publish `ranking:jumped` with the **resolved `window.position`**, never the clicked or typed
+  number; the shell turns it into `pushState('/ranking?at=<window.position>')`, so Back returns to the
+  previous ranking window and a reload opens the window that was actually rendered. The server still
+  clamps defensively. A cold load of
   `/ranking?at=128` mounts the section, which calls the same window and reveals the row once the data
   arrives. The table keeps the “Você” tag and the own row's contrast in every theme; `reveal(position)`
   only scrolls and flashes, it never fetches. Typing a search leaves the window mode and asks the general
-  page at offset 0; clearing it returns to the general top.
+  page at offset 0; clearing it returns to the general top. “Voltar ao topo” asks page 1, leaves the
+  window/search, emits `ranking:topped` and the shell pushes `/ranking`.
 
 ### 5. Conversation read → Mensagens badge
 

@@ -397,7 +397,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   computes the “1–7 de 482” label and the page window (`1 … 8 9 10 … 164`) and keeps focus on the
   equivalent control (or the nearest enabled one) when the pager was focused.
 - **Events:** `change` `{ page }`, `jump` `{ position }` (the go-to field, in gladiator position, not
-  page).
+  page) and `invalid` `{ value }` when the typed position is outside `1..total`; the field owner shows
+  the range error.
 - **ARIA:** `<nav aria-label="Páginas">`, current page `aria-current="page"`, disabled arrows
   `disabled`, the jump form a real `<form>` with a labelled input.
 - **Boards:** `Relatorios.dc.html`, `Ranking.dc.html`.
@@ -580,7 +581,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Methods:** `setRows(rows)` (rows may carry `mine`), `setContext({ around, position, page, total,
   pageSize, label })`, `setBusy(on)`, `reveal(position)` (scrolls the row into view and flashes it). It
   never fetches: the section gets the window from `RankingService` and calls the setters.
-- **Events:** none; rows are not links in this work package.
+- **Events:** `top` `{}` when “Voltar ao topo” is pressed (the section then loads page 1). Rows are
+  not links in this work package.
 - **ARIA:** a real `<table>` with `<th scope="col">`; the own row is marked in text (“VOCÊ”); trends read
   “subiu 9” / “desceu 3” / “estável” in the cell title.
 - **Boards:** `Ranking.dc.html`.
@@ -589,17 +591,16 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 
 - **File:** `components/own-gladiator-jump.js`; **CSS:** `css/components/own-gladiator-jump.css`.
 - **Purpose:** the “SEUS GLADIADORES” strip: one chip per own gladiator with its portrait, position and
-  an arrow to jump the table; a gladiator out of the ranking is dimmed and says why (desatualizado /
-  com erro / sem batalhas).
+  an arrow to jump the table; an outdated/broken gladiator keeps its position and is dimmed with the
+  state beside it (desatualizado / com erro).
 - **Constructor:** `new OwnGladiatorJump({ element, gladiators, paint })`; `paint` is a test/painter seam.
-- **Methods:** `setGladiators(list)` (each `{ id, name, position: number|null, state: 'ranked'|'unranked'|'outdated'|'broken', skin }`
-  from `GET /ranking/mine`), `setActive(id)`.
+- **Methods:** `setGladiators(list)` (each `{ id, name, position: number|null, state: 'ranked'|'outdated'|'broken', skin }`
+  from `GET /ranking/mine`; every state carries a position), `setActive(id)`.
 - **Events:** `jump` `{ gladiator: { id, name }, position }` (`position` is the gladiator's position in
   the strip, possibly stale; the section resolves it through the ranking window and publishes the window's
   resolved `position`).
-- **ARIA:** ranked chips are buttons with a `title` naming the destination; the others are disabled with
-  the reason in text and `aria-disabled`; `aria-current="page"` marks the active chip. Arrow/Home/End
-  move a roving tab stop.
+- **ARIA:** every chip with a position is a button with a `title` naming the destination; the state is
+  also in text, and `aria-current="page"` marks the active chip. Arrow/Home/End move a roving tab stop.
 - **Boards:** `Ranking.dc.html`.
 
 ### ConversationList — new (WP8)
