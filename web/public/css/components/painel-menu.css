@@ -128,6 +128,11 @@
         text-decoration: none;
     }
 
+    .painel-menu-new.is-disabled {
+        opacity: 0.58;
+        cursor: not-allowed;
+    }
+
     .painel-menu-foot {
         display: flex;
         justify-content: space-between;

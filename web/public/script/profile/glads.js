@@ -3,6 +3,7 @@ import { setGladImageElement } from '../components/glad-card.js';
 import { GladiatorCard, emptyGladiatorCard, gladiatorState } from '../components/gladiator-card.js';
 import { PageHeader } from '../components/page-header.js';
 import { SegmentedControl } from '../components/segmented-control.js';
+import { gladiatorSlots } from '../helpers/gladiator-slots.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
@@ -66,6 +67,7 @@ export class GladsTab {
     #root = document.querySelector('#glads-container');
     #built = false;
     #header = null;
+    #add = null;
     #filter = null;
     #grid = null;
     #phone = null;
@@ -88,8 +90,8 @@ export class GladsTab {
             this.#filterValue = value;
             this.#render();
         });
-        const add = createElement("<a class='button primary' href='/newglad'><i class='fa-solid fa-plus' aria-hidden='true'></i> Novo gladiador</a>");
-        this.#header.setActions([this.#filter.element, add]);
+        this.#add = createElement("<a class='button primary' href='/newglad'><i class='fa-solid fa-plus' aria-hidden='true'></i> Novo gladiador</a>");
+        this.#header.setActions([this.#filter.element, this.#add]);
         this.#grid = this.#root.querySelector('#glads-grid');
         this.#phone = this.#root.querySelector('#glads-phone');
         this.#empty = this.#root.querySelector('#glads-empty');
@@ -116,11 +118,9 @@ export class GladsTab {
             { value: 'attention', label: 'Precisam de atenção', count: attention },
         ]);
         this.#filter.set(this.#filterValue, { silent: true });
-        const limit = gladiatorLimit(profile.user.level);
-        this.#header.set({
-            title: 'Gladiadores',
-            subtitle: `${this.#glads.length} de ${limit} vagas ocupadas. Grave no editor para atualizar a versão do motor.`,
-        });
+        const slots = gladiatorSlots(this.#glads.length, gladiatorLimit(profile.user.level));
+        this.#header.set({ title: 'Gladiadores', subtitle: slots.subtitle });
+        this.#setAddEnabled(slots);
         this.#render();
     }
 
@@ -173,8 +173,8 @@ export class GladsTab {
             this.#grid.append(card.element);
         }
 
-        const limit = gladiatorLimit(profile.user.level);
-        const free = Math.max(0, limit - this.#glads.length);
+        const slots = gladiatorSlots(this.#glads.length, gladiatorLimit(profile.user.level));
+        const free = slots.canAdd ? slots.limit - slots.used : 0;
         if (this.#filterValue === 'all' && free > 0) {
             this.#grid.append(emptyGladiatorCard(`${free} vaga${free === 1 ? '' : 's'} livre${free === 1 ? '' : 's'}`));
             const row = createElement(renderTemplate(gladsPhoneNewTemplate, {
@@ -182,6 +182,32 @@ export class GladsTab {
                 chevron: icon('chevron', { size: 18, className: 'icon glads-phone-chevron' }),
             }));
             this.#phone.append(row);
+        }
+    }
+
+
+    /**
+     * Disables “Novo gladiador” when the master's level has no free slot. The reason is also in the
+     * header subtitle for the over-limit case and in the control's title/aria-label at the limit.
+     *
+     * @param {{ canAdd: boolean, reason: string }} slots
+     */
+    #setAddEnabled(slots) {
+        if (!this.#add) return;
+        const disabled = !slots.canAdd;
+        this.#add.classList.toggle('disabled', disabled);
+        this.#add.setAttribute('aria-disabled', String(disabled));
+        if (disabled) {
+            this.#add.removeAttribute('href');
+            this.#add.tabIndex = -1;
+            this.#add.title = slots.reason;
+            this.#add.setAttribute('aria-label', `Novo gladiador. ${slots.reason}`);
+        }
+        else {
+            this.#add.href = '/newglad';
+            this.#add.removeAttribute('title');
+            this.#add.removeAttribute('tabindex');
+            this.#add.removeAttribute('aria-label');
         }
     }
 

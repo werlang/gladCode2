@@ -129,12 +129,13 @@ can therefore show fewer/more rows or different labels without a layout change.
 
 | Element | Status |
 | --- | --- |
-| Header/subtitle (“N de M vagas ocupadas…”) and filter Todos/Prontos/Precisam de atenção | match |
-| “Novo gladiador” action | match |
+| Header/subtitle and filter Todos/Prontos/Precisam de atenção | match under/at the limit (“N de M vagas ocupadas”); over the limit the live header says “N gladiadores · seu nível permite M” because legacy accounts can own more than the level allows |
+| “Novo gladiador” action | match under the limit; disabled with the level reason at/over the limit, and the rail badge shows the plain count instead of N/M when over |
 | Card frame/stage/language crest/status seal/renown plaque/name/record/STR-AGI-INT bars/actions | match |
 | Dashed free slot | match when a slot is free; the proof account is at its limit |
 | PRONTO / DESATUALIZADO / COM ERRO states, disabled BATALHAR and “FORA DA ARENA” stamp | match |
 | Phone compact choose-list with portrait, name, state note and chevron | fixed in WP9 (`impl/glads-arena-light-390.png`); it was the full card grid |
+| Over-limit legacy account | fixed in WP9: count-only badge, over-limit subtitle, no free slot and a disabled “Novo gladiador” |
 | 3D portraits | intentional host limitation (placeholder/sprite fallback) |
 
 ## Poções
@@ -266,7 +267,8 @@ can therefore show fewer/more rows or different labels without a layout change.
 Fixed in this package: phone back arrow; stale conversation failures; double-escaped invite toasts;
 picker placeholder/restore; content width matching the board's 1080 px column; 44 px phone targets;
 focus ring in the palette/header search; category dots in the notification panel; versus question-mark
-placeholder; the invite keeps no invented deadline (WP5-r2 F7); replay card thumbnail; compact mobile glads and battle lists;
+placeholder; the invite keeps no invented deadline (WP5-r2 F7); gladiator counts above the level limit
+are no longer printed as N/M (`N gladiadores · seu nível permite M`, count-only badge, disabled add); replay card thumbnail; compact mobile glads and battle lists;
 friend result height; several theme contrast failures; and the dead profile menu, tab, message,
 friend, notification and template code removed with the obsolete PNGs.
 

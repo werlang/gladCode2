@@ -2,6 +2,7 @@ import { BaseComponent } from './base-component.js';
 import { Avatar } from './avatar.js';
 import { MenuItem } from './menu-item.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
+import { gladiatorSlots } from '../helpers/gladiator-slots.js';
 import { potionTimeLeft } from '../helpers/potion-time.js';
 import { icon } from '../templates/icons.js';
 import { painelMenuTemplate } from '../templates/painel-menu.js';
@@ -50,6 +51,7 @@ export function potionTime(potions) {
 export class PainelMenu extends BaseComponent {
     #items = new Map();
     #avatar;
+    #newGladiator;
 
     /**
      * @param {object} [options]
@@ -65,6 +67,7 @@ export class PainelMenu extends BaseComponent {
             plusIcon: icon('plus', { size: 16 }),
         });
         this.#avatar = new Avatar({ size: 'md' });
+        this.#newGladiator = this.element.querySelector('.painel-menu-new');
         this.element.querySelector('.painel-menu-avatar-slot').append(this.#avatar.element);
         this.#build(sections);
         this.setAccount(account);
@@ -129,10 +132,9 @@ export class PainelMenu extends BaseComponent {
         const news = Number(counts.news || 0);
         this.#items.get('news')?.setBadge(news ? `${news} nova${news === 1 ? '' : 's'}` : '', 'unread');
         const glads = counts.gladiators ?? {};
-        this.#items.get('glads')?.setBadge(
-            glads.limit ? `${glads.used ?? 0}/${glads.limit}` : String(glads.remaining ?? ''),
-            'info',
-        );
+        const slots = gladiatorSlots(glads.used, glads.limit);
+        this.#items.get('glads')?.setBadge(slots.limit ? slots.badge : String(glads.remaining ?? ''), 'info');
+        this.#setNewGladiator(slots);
         this.#items.get('potions')?.setBadge(potionTime(counts.potions), 'info');
         const duels = Number(counts.duels || 0);
         this.#items.get('battle')?.setBadge(duels ? String(duels) : '', 'action', `${duels} desafio${duels === 1 ? '' : 's'} de duelo`);
@@ -141,6 +143,28 @@ export class PainelMenu extends BaseComponent {
         this.#items.get('messages')?.setBadge(counts.messages ? String(counts.messages) : '', 'unread');
         const friends = Number(counts.friends || 0);
         this.#items.get('friends')?.setBadge(friends ? String(friends) : '', 'action', `${friends} convite${friends === 1 ? '' : 's'} de amizade`);
+        return this;
+    }
+
+
+    /** @param {{ canAdd: boolean, reason: string }} slots @returns {this} */
+    #setNewGladiator(slots) {
+        if (!this.#newGladiator) return this;
+        const disabled = !slots.canAdd;
+        this.#newGladiator.classList.toggle('is-disabled', disabled);
+        this.#newGladiator.setAttribute('aria-disabled', String(disabled));
+        if (disabled) {
+            this.#newGladiator.removeAttribute('href');
+            this.#newGladiator.tabIndex = -1;
+            this.#newGladiator.title = slots.reason;
+            this.#newGladiator.setAttribute('aria-label', `Novo gladiador. ${slots.reason}`);
+        }
+        else {
+            this.#newGladiator.href = '/newglad';
+            this.#newGladiator.removeAttribute('title');
+            this.#newGladiator.removeAttribute('tabindex');
+            this.#newGladiator.removeAttribute('aria-label');
+        }
         return this;
     }
 
