@@ -14,21 +14,24 @@ failed=0
 # CRLF=1 writes the JavaScript files with Windows line endings
 battle(){
     local case=$1; shift
-    local dir=$ROOT/$case i=0 f
+    local dir=$ROOT/$case i=0 f name
     rm -rf "$dir"; mkdir -p "$dir"; cp "$REPO"/Payload/* "$dir/"
     for f in "$@"; do
+        # The engine assigns IDs in connection order, which is nondeterministic for Node clients.
+        # Name each fixture by source and position so assertions never depend on accept order.
+        name=${f%.*}; name=${name//[^[:alnum:]_]/_}; name=${name}_$i
         if [[ $f == *.py ]]; then
             { printf 'from gladCodeAPI import *\n\n'
-              printf 'def setup():\n    setName("G%s@nick%s")\n    setSTR(10)\n    setAGI(14)\n    setINT(9)\n    setSlots("0,0,0,0")\n# start of user code\n' $i $i
+              printf 'def setup():\n    setName("%s@nick%s")\n    setSTR(10)\n    setAGI(14)\n    setINT(9)\n    setSlots("0,0,0,0")\n# start of user code\n' "$name" "$i"
               cat "$GLADS/$f"
               printf '\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n'; } > "$dir/code$i.py"
         elif [[ $f == *.js ]]; then
-            { printf 'function setup() {\n    setName("G%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n// start of user code\n' $i $i
+            { printf 'function setup() {\n    setName("%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n// start of user code\n' "$name" "$i"
               cat "$GLADS/$f"; } > "$dir/code$i.js"
             [ -n "$CRLF" ] && sed -i.bak 's/$/\r/' "$dir/code$i.js" && rm "$dir/code$i.js.bak"
         else
             { printf '#include "gladCodeCore.c"\n'
-              printf 'setup(){\n    setName("G%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n\n' $i $i
+              printf 'setup(){\n    setName("%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n\n' "$name" "$i"
               cat "$GLADS/$f"; } > "$dir/code$i.c"
         fi
         i=$((i+1))
@@ -96,12 +99,12 @@ battle healthy fighter.py fighter.c;                      expect healthy ""
 battle healthy5 fighter.py fighter.c fighter.py fighter.c fighter.py; expect healthy5 ""
 # crashes on the first turn used to corrupt the log only intermittently, so they run several times
 for n in 1 2 3 4 5; do
-    battle py_first_$n fighter.c pycrash_first.py;        expect py_first_$n "G1"
-    battle c_first_$n ccrash_first.c fighter.py;          expect c_first_$n "G0"
+    battle py_first_$n fighter.c pycrash_first.py;        expect py_first_$n "pycrash_first_1"
+    battle c_first_$n ccrash_first.c fighter.py;          expect c_first_$n "ccrash_first_0"
 done
-battle py_mid pycrash_mid.py fighter.c;                   expect py_mid "G0"
-battle c_mid ccrash_mid.c fighter.py;                     expect c_mid "G0"
-battle mixed5 fighter.c pycrash_mid.py fighter.py ccrash_mid.c fighter.py; expect mixed5 "G1,G3"
+battle py_mid pycrash_mid.py fighter.c;                   expect py_mid "pycrash_mid_0"
+battle c_mid ccrash_mid.c fighter.py;                     expect c_mid "ccrash_mid_0"
+battle mixed5 fighter.c pycrash_mid.py fighter.py ccrash_mid.c fighter.py; expect mixed5 "ccrash_mid_3,pycrash_mid_1"
 battle stderr_forge pyforge_mid.py fighter.c;             expect stderr_forge ""
 battle speak_inject fighter.c pyinject.py fighter.py;     expect speak_inject ""
 
@@ -109,15 +112,15 @@ battle speak_inject fighter.c pyinject.py fighter.py;     expect speak_inject ""
 battle js_healthy fighter.js fighter.c fighter.py;        expect js_healthy ""
 battle js_arrow jsarrow.js fighter.js;                    expect js_arrow ""
 for n in 1 2 3; do
-    battle js_first_$n fighter.c jscrash_first.js;        expect js_first_$n "G1"
+    battle js_first_$n fighter.c jscrash_first.js;        expect js_first_$n "jscrash_first_1"
 done
-battle js_mid jscrash_mid.js fighter.py;                  expect js_mid "G0"
-battle js_mixed5 fighter.js jscrash_mid.js fighter.py ccrash_mid.c pycrash_mid.py; expect js_mixed5 "G1,G3,G4"
+battle js_mid jscrash_mid.js fighter.py;                  expect js_mid "jscrash_mid_0"
+battle js_mixed5 fighter.js jscrash_mid.js fighter.py ccrash_mid.c pycrash_mid.py; expect js_mixed5 "ccrash_mid_3,jscrash_mid_1,pycrash_mid_4"
 battle js_stderr_forge jsforge_mid.js fighter.c;          expect js_stderr_forge ""
-battle js_speak_inject fighter.c jsinject.js fighter.js;  expect js_speak_inject ""; expect_str js_speak_inject G1 10
+battle js_speak_inject fighter.c jsinject.js fighter.js;  expect js_speak_inject ""; expect_str js_speak_inject jsinject_1 10
 battle js_syntax jssyntax.js fighter.c;                   expect_error js_syntax "SyntaxError"
 battle js_speak_long jsspeak_long.js jsarrow.js;          expect js_speak_long ""; expect_said js_speak_long depois
-CRLF=1 battle js_crlf jsinject.js fighter.c;              expect js_crlf ""; expect_str js_crlf G0 10
+CRLF=1 battle js_crlf jsinject.js fighter.c;              expect js_crlf ""; expect_str js_crlf jsinject_0 10
 
 rm -rf "$ROOT"
 echo
