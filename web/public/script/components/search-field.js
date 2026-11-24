@@ -79,6 +79,7 @@ export class SearchField extends BaseComponent {
      */
     set(value) {
         this.#input.value = value == null ? '' : String(value);
+        this.#lastSearched = null;
         this.#syncClear();
         return this;
     }

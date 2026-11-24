@@ -17,10 +17,14 @@
     <link rel='stylesheet' href="{{#asset}}css/profile-battle.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-potions.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/profile-reports.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/profile-ranking.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/potion-slot.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/potion-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/result-pill.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/form-streak.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/ranking-table.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/search-field.css{{/asset}}"/>
+    <link rel='stylesheet' href="{{#asset}}css/components/own-gladiator-jump.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/gladiator-card.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/page-header.css{{/asset}}"/>
     <link rel='stylesheet' href="{{#asset}}css/components/section-card.css{{/asset}}"/>
@@ -78,22 +82,7 @@
             <div class='content' data-menu='report'><div id='report-container'><p class='news-loading'>Carregando relatórios…</p></div></div>
             <div class='content' data-menu='glads'><div id='glads-container'><p class='news-loading'>Carregando gladiadores…</p></div></div>
             <div class='content' data-menu='potions'><div id='apot-container'><p class='news-loading'>Carregando poções…</p></div></div>
-            <div class='content' data-menu='ranking'>
-                <div id='ranking-container'>
-                    <h2>Ranking</h2>
-                    <div id='search'>
-                        <i class="fas fa-search"></i>
-                        <input type='text' class='input' placeholder='Pesquisa por gladiador ou mestre'>
-                    </div>
-                    <div id='tab-container'><div id='tab-general' class='tab selected'>Geral</div><div class='tab' id='add-tab'><i class='fas fa-plus'></i></div></div>
-                    <div class='table'></div>
-                    <div class='page-nav'>
-                        <span></span> - <span></span> de <span></span>
-                        <button id='prev'><i class='fas fa-chevron-left'></i></button>
-                        <button id='next'><i class='fas fa-chevron-right'></i></button>
-                    </div>
-                </div>
-            </div>
+            <div class='content' data-menu='ranking'><div id='ranking-container'><p class='news-loading'>Carregando ranking…</p></div></div>
             <div class='content' data-menu='messages'>
                 <div id='message-panel'>
                     <h2>Mensagens</h2>

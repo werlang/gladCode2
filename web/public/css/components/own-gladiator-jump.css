@@ -1,0 +1,137 @@
+/* OwnGladiatorJump: the signed-in master's chips above the ranking. */
+.own-gladiator-jump {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-2xl);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+}
+
+.own-gladiator-jump[hidden] {
+    display: none;
+}
+
+.own-gladiator-label {
+    padding: 0 var(--space-2) 0 var(--space-1);
+    color: var(--color-text-on-brand-muted);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+}
+
+.own-gladiator-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.own-gladiator-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 52px;
+    padding: 0 var(--space-3) 0 var(--space-1);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-header-text) 5%, transparent);
+    color: var(--color-header-text);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+}
+
+.own-gladiator-chip:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-header-text) 10%, transparent);
+}
+
+.own-gladiator-chip.is-active {
+    background: color-mix(in srgb, var(--color-header-text) 12%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.own-gladiator-chip:disabled,
+.own-gladiator-chip[data-state='outside'] {
+    background: transparent;
+    opacity: 0.6;
+    cursor: default;
+}
+
+.own-gladiator-portrait {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-alt);
+}
+
+.own-gladiator-portrait > * {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    object-fit: contain;
+}
+
+.own-gladiator-chip[data-state='outside'] .own-gladiator-portrait {
+    filter: grayscale(1);
+}
+
+.own-gladiator-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.own-gladiator-name {
+    overflow: hidden;
+    max-width: 150px;
+    color: var(--color-header-text);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.own-gladiator-chip.is-active .own-gladiator-name {
+    color: var(--color-text-on-brand);
+}
+
+.own-gladiator-state {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+.own-gladiator-chip[data-state='outside'] .own-gladiator-state {
+    color: var(--color-text-on-brand-muted);
+}
+
+.own-gladiator-arrow {
+    display: inline-flex;
+    margin-left: var(--space-1);
+    color: var(--color-accent);
+}
+
+.own-gladiator-arrow-icon {
+    transform: rotate(-90deg);
+}
+
+@media only screen and (max-width: 700px) {
+    .own-gladiator-jump {
+        padding: var(--space-2);
+    }
+
+    .own-gladiator-name {
+        max-width: 110px;
+    }
+}

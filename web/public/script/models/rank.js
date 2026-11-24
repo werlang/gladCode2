@@ -7,11 +7,36 @@ export class RankModel {
     /**
      * A page of the gladiator ranking.
      *
-     * @param {{ offset: number, search?: string, signal?: AbortSignal }} query
-     * @returns {Promise<{ total: number, ranking: Array<{ gladiator: string, mmr: number, master: string, change24h: number, position: number }> }>}
+     * @param {{ offset: number, search?: string, scope?: 'all'|'friends', signal?: AbortSignal }} query
+     * @returns {Promise<{ total: number, ranking: Array<{ id: number, gladiator: string, mmr: number,
+     *   master: string, change24h: number, change7d: number, position: number }> }>}
      */
-    static general({ offset, search = '', signal } = {}) {
-        return api.get('ranking', { offset, search }, { signal });
+    static general({ offset, search = '', scope = 'all', signal } = {}) {
+        return api.get('ranking', { offset, search, scope: scope === 'friends' ? 'friends' : undefined }, { signal });
+    }
+
+    /**
+     * A window of the current-version ranking centred on a gladiator or a position.
+     *
+     * @param {{ gladiatorId?: number, position?: number, size?: number, signal?: AbortSignal }} query
+     * @returns {Promise<{ total: number, position: number, page: number, pageSize: number,
+     *   around: string|null, rows: object[] }>}
+     */
+    static window({ gladiatorId, position, size = 9, signal } = {}) {
+        return api.get('ranking/window', {
+            gladiatorId: gladiatorId ?? undefined,
+            position: position ?? undefined,
+            size,
+        }, { signal });
+    }
+
+    /**
+     * @param {{ signal?: AbortSignal }} [options]
+     * @returns {Promise<{ gladiators: Array<{ id: number, name: string, mmr: number,
+     *   position: number|null, state: string, skin: string }> }>}
+     */
+    static mine({ signal } = {}) {
+        return api.get('ranking/mine', {}, { signal });
     }
 
     /**

@@ -1,0 +1,217 @@
+/* Ranking section (Ranking.dc.html). */
+#panel .content[data-menu='ranking'] {
+    max-width: none;
+}
+
+.ranking-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.ranking-page .page-header-actions {
+    flex: 0 1 340px;
+    width: min(340px, 100%);
+}
+
+.ranking-page .ranking-search {
+    width: 100%;
+}
+
+.ranking-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.ranking-tabs-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.ranking-tabs-wrap #ranking-tabs {
+    min-width: 0;
+}
+
+.ranking-list-add,
+.ranking-list-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.ranking-list-add:hover,
+.ranking-list-remove:hover {
+    border-color: var(--color-text-strong);
+    color: var(--color-text-strong);
+}
+
+.ranking-list-remove {
+    border-style: solid;
+    border-color: var(--color-border);
+}
+
+.ranking-list-add[hidden],
+.ranking-list-remove[hidden] {
+    display: none;
+}
+
+.ranking-podium {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ranking-podium-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 36px;
+    padding: 0 var(--space-3) 0 var(--space-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text-strong);
+    font-size: var(--text-sm);
+}
+
+.ranking-podium-item[data-place='1'] {
+    background: var(--color-medal-gold-soft);
+    border-color: var(--color-medal-gold-strong);
+    color: var(--color-medal-gold-text);
+}
+
+.ranking-podium-item[data-place='2'] {
+    background: var(--color-medal-silver-soft);
+    border-color: var(--color-medal-silver-strong);
+    color: var(--color-medal-silver-text);
+}
+
+.ranking-podium-item[data-place='3'] {
+    background: var(--color-medal-bronze-soft);
+    border-color: var(--color-medal-bronze-strong);
+    color: var(--color-medal-bronze-text);
+}
+
+.ranking-podium-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-medal-gold-strong);
+    color: var(--color-text-on-brand);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 700;
+}
+
+.ranking-podium-item[data-place='2'] .ranking-podium-rank {
+    background: var(--color-medal-silver-strong);
+}
+
+.ranking-podium-item[data-place='3'] .ranking-podium-rank {
+    background: var(--color-medal-bronze-strong);
+}
+
+.ranking-podium-name {
+    font-weight: 600;
+}
+
+.ranking-podium-mmr {
+    color: inherit;
+    font-family: var(--font-mono);
+    opacity: 0.8;
+}
+
+.ranking-card {
+    overflow: hidden;
+}
+
+.ranking-custom[hidden] {
+    display: none;
+}
+
+.ranking-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--color-border);
+}
+
+.ranking-status {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.ranking-status:empty {
+    display: none;
+}
+
+.ranking-pager {
+    display: block;
+    flex: 1 1 100%;
+    width: 100%;
+}
+
+.ranking-pager .pagination {
+    width: 100%;
+}
+
+/* The context strip already gives the visible range; the board's pager has no repeated summary. */
+.ranking-pager .pagination-summary {
+    display: none;
+}
+
+#ranking-pager[hidden] {
+    display: none;
+}
+
+@media only screen and (max-width: 700px) {
+    .ranking-page .page-header-actions {
+        width: 100%;
+    }
+
+    .ranking-page .ranking-search {
+        width: 100%;
+    }
+
+    .ranking-toolbar {
+        align-items: flex-start;
+    }
+
+    .ranking-podium {
+        order: 2;
+    }
+
+    .ranking-footer {
+        padding: var(--space-3) var(--space-3);
+    }
+
+    .ranking-pager {
+        width: 100%;
+    }
+}

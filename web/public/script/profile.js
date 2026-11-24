@@ -180,6 +180,11 @@ async function start() {
 
     window.addEventListener('popstate', () => show(resolveRoute(location), { focus: true }));
 
+    events.on(APP_EVENTS.rankingJumped, ({ position }) => {
+        if (currentSection !== 'ranking' || !position) return;
+        navigate({ section: 'ranking', subtab: '', query: { at: position } }, { historyOnly: true, push: true });
+    });
+
     const GO = Object.fromEntries(Object.entries(SECTION_SHORTCUTS).map(([section, letter]) => [letter, section]));
     let goPending = false;
     let goTimer = null;
