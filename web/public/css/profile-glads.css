@@ -1,0 +1,41 @@
+/* Gladiadores section (Gladiadores.dc.html). */
+#panel .content[data-menu='glads'] {
+    max-width: none;
+}
+
+.glads-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+#glads-header .page-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+#glads-header .segmented-control {
+    padding: 4px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-alt);
+}
+
+#glads-empty[hidden] {
+    display: none;
+}
+
+@media only screen and (max-width: 700px) {
+    #glads-header .page-header-actions {
+        width: 100%;
+    }
+
+    #glads-header .page-header-actions .button {
+        flex: 1;
+    }
+}

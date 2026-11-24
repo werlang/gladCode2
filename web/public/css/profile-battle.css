@@ -1,0 +1,261 @@
+/* Batalhas section (Batalhas.dc.html). */
+#panel .content[data-menu='battle'] {
+    max-width: none;
+}
+
+.battle-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.battle-panels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+/* The old profile stylesheet centres #battle-container and hides every .wrapper; the rebuilt page
+   owns the whole width and each panel is shown only when its mode is selected. */
+#battle-container {
+    display: block;
+}
+
+#battle-container .battle-panel,
+#battle-container .battle-panel.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 100%;
+}
+
+#battle-container .battle-panel[hidden] {
+    display: none;
+}
+
+.ranked-arena {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    border: 1px solid color-mix(in srgb, var(--color-gladiator-frame-brass) 55%, var(--color-border));
+    border-radius: var(--radius-2xl);
+    background:
+        radial-gradient(ellipse 60% 80% at 50% 0%, color-mix(in srgb, var(--color-gladiator-stage-glow) 16%, transparent), transparent 70%),
+        linear-gradient(180deg, var(--color-gladiator-stage), var(--color-gladiator-stage-deep));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-gladiator-text) 12%, transparent), 0 24px 48px -28px color-mix(in srgb, var(--color-gladiator-stage-deep) 80%, transparent);
+    color: var(--color-gladiator-text);
+}
+
+.ranked-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+#painel-content .ranked-head h2 {
+    margin: 0;
+    color: var(--color-gladiator-text);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-shadow: 0 2px 0 color-mix(in srgb, var(--color-gladiator-stage-deep) 60%, transparent);
+}
+
+.ranked-head p {
+    margin: 0;
+    color: var(--color-gladiator-text-muted);
+    font-size: var(--text-sm);
+}
+
+.ranked-layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--space-5);
+}
+
+#ranked-picker {
+    flex: 2 1 560px;
+    min-width: 0;
+}
+
+#ranked-versus {
+    flex: 1 1 300px;
+    min-width: 0;
+}
+
+.battle-list[hidden] {
+    display: none;
+}
+
+.battle-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+}
+
+.battle-list-head h2 {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.battle-list-head p {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.battle-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+#duel-friend-search .input {
+    width: 100%;
+}
+
+.friend-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.friend-list .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-border);
+    cursor: pointer;
+}
+
+.friend-list .friend-avatar {
+    display: flex;
+    flex: none;
+}
+
+.friend-list .friend-nick {
+    overflow: hidden;
+    color: var(--color-text-strong);
+    font-size: var(--text-md);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-list .row:first-child {
+    border-top: 0;
+}
+
+.friend-list .row.selected {
+    background: var(--color-brand-soft);
+}
+
+/* the legacy duel challenge and tournament/training tables sit inside the new cards */
+#duel-challenge .table,
+#tourn .table,
+#train .table {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+#tourn #offset,
+#train #offset {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+#tourn #offset[hidden],
+#train #offset[hidden] {
+    display: none;
+}
+
+#tourn #offset button,
+#train #offset button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+#tourn #offset button:disabled,
+#train #offset button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+@media only screen and (max-width: 700px) {
+    .ranked-arena {
+        padding: var(--space-4);
+    }
+
+    .ranked-layout {
+        flex-direction: column;
+    }
+
+    #ranked-picker,
+    #ranked-versus {
+        flex-basis: auto;
+        width: 100%;
+    }
+}
+
+.battle-list .title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.battle-list .title h2 {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.duel-picker {
+    max-height: 56vh;
+    overflow: auto;
+    padding: var(--space-2);
+}
+
+
+#duel-challenge .image-container .challenge-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--color-border-brand-muted);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-alt);
+    color: var(--color-text-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+}

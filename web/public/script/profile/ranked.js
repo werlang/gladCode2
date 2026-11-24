@@ -1,15 +1,19 @@
 import { showDialog, showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
+import { GladiatorPicker } from '../components/gladiator-picker.js';
+import { VersusPanel } from '../components/versus-panel.js';
 import { ProgressButton, Simulation } from '../components/simulation.js';
 import { animateValue, fadeIn } from '../helpers/animate.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { site } from '../helpers/request.js';
-import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
+import { PotionModel } from '../models/potion.js';
 import { RankedModel } from '../models/social.js';
 import { BATTLE_TIPS } from './battle-tips.js';
 import { profile, setSilver, xpToNextLevel } from './session.js';
-import { afterBattleTemplate, mmrRowTemplate, preBattleExtraTemplate, preBattleTemplate } from '../templates/profile.js';
+import { afterBattleTemplate, preBattleExtraTemplate, preBattleTemplate } from '../templates/profile.js';
 
 /** How long each tip stays while the battle runs, in ms. */
 const TIP_MS = 10000;
@@ -131,63 +135,67 @@ async function showAfterBattle(hash, data, before) {
 }
 
 /**
- * The ranked part of the BATALHAS tab: the user's gladiators with their
- * renown, and the button that finds opponents and runs the battle.
+ * The ranked part of the BATALHAS tab: the GladiatorPicker and VersusPanel, and the button that finds
+ * opponents and runs the battle.
  */
 export class RankedBattle {
-    #container = document.querySelector('#battle-container #ranked.wrapper .glad-card-container');
-    #button = document.querySelector('#battle-container #match-find');
+    #picker;
+    #versus;
+    #button;
     #selected = null;
+    #signal = null;
 
     /**
      * @param {() => void} onFought Called when the battle ended.
      */
     constructor(onFought) {
         this.onFought = onFought;
-        this.#button.addEventListener('click', () => this.#fight());
+        this.#picker = new GladiatorPicker();
+        document.querySelector('#ranked-picker').append(this.#picker.element);
+        this.#versus = new VersusPanel();
+        document.querySelector('#ranked-versus').append(this.#versus.element);
+        this.#button = this.#versus.element.querySelector('.versus-fight');
+        this.#versus.setReward('Renome e prata');
+        this.#picker.listen('select', ({ gladiator }) => {
+            this.#selected = gladiator;
+            this.#versus.setGladiator(gladiator);
+            this.#versus.setReady(true);
+            events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'ranked' });
+        });
+        this.#picker.listen('blocked', async ({ gladiator, reason }) => {
+            const answer = await showDialog(reason === 'broken'
+                ? 'Este gladiador travou na última batalha. Deseja corrigi-lo no editor?'
+                : 'Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
+            if (answer === 'Sim') window.open(`glad-${gladiator.id}`);
+        });
+        this.#picker.listen('confirm', () => this.#fight());
+        this.#versus.listen('fight', () => this.#fight());
     }
 
     /**
      * Draws the user's gladiators to pick one.
      *
-     * @param {{ signal?: AbortSignal }} [options]
+     * @param {{ signal?: AbortSignal, selectId?: number|string }} [options]
      */
-    async refresh({ signal } = {}) {
-        this.#button.disabled = true;
+    async refresh({ signal, selectId } = {}) {
+        this.#signal = signal;
         this.#selected = null;
+        this.#versus.setGladiator(null);
+        this.#versus.setBusy(false);
         const glads = await settleRequest(() => GladiatorModel.list({ signal }), signal);
         if (!glads || signal?.aborted) return;
-        this.#container.replaceChildren();
-        const cards = await loadGladCards(this.#container, {
-            glads,
-            onClick: (event, glad) => this.#pick(event.currentTarget, glad),
-        });
+        this.#picker.setGladiators(glads);
+        const slots = await secondaryRequest(() => PotionModel.slots({ signal }), signal);
         if (signal?.aborted) return;
-        cards.forEach((card, index) => {
-            card.querySelector('.info .master').insertAdjacentHTML('afterend', renderTemplate(mmrRowTemplate, { mmr: parseInt(glads[index].mmr, 10) }));
-        });
-    }
-
-    /**
-     * @param {HTMLElement} card Clicked card.
-     * @param {Record<string, any>} glad Its gladiator.
-     */
-    async #pick(card, glad) {
-        if (card.classList.contains('old')) {
-            const answer = await showDialog('Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
-            if (answer === 'Sim') window.open(`glad-${glad.id}`);
-            return;
-        }
-        this.#container.querySelectorAll('.glad-preview').forEach(other => other.classList.remove('selected'));
-        card.classList.add('selected');
-        this.#selected = glad;
-        this.#button.disabled = false;
+        if (slots?.slots) this.#versus.setPotions(slots.slots);
+        if (selectId !== undefined && selectId !== null) this.#picker.select(Number(selectId));
     }
 
     /** Finds opponents, runs the ranked battle and shows its result. */
     async #fight() {
         const glad = this.#selected;
         if (!glad) return;
+        this.#versus.setBusy(true);
         const progress = new ProgressButton(this.#button, ['Executando batalha...', 'Aguardando resposta do servidor']);
         const before = {
             lvl: profile.user.level,
@@ -203,6 +211,7 @@ export class RankedBattle {
         }
         catch (error) {
             progress.kill();
+            this.#versus.setBusy(false);
             if (error.code === 'NO_OPPONENTS') {
                 showMessage('Ainda não há oponentes na versão atual. Tente novamente mais tarde.');
                 return;
@@ -223,13 +232,13 @@ export class RankedBattle {
             data = await new Simulation(signal => RankedModel.fight(match.match, { signal }), { terminal: true, names: glads.map(entry => entry.name) }).run();
         }
         catch (error) {
-            // the pre-battle screen has no way out of its own: take it down and say why
             document.querySelectorAll('#fog').forEach(fog => fog.remove());
             writeErrorToast(error);
             data = { error: true };
         }
         stopPreBattle();
         progress.kill();
+        this.#versus.setBusy(false);
         if (data.error || !data.hash) return;
 
         document.querySelectorAll('#fog').forEach(fog => fog.remove());

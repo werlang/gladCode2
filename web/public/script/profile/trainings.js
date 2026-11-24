@@ -1,12 +1,14 @@
 import { Message, showDialog, showInput, showMessage } from '../components/dialog.js';
-import { loadSelectableCards } from '../components/glad-card.js';
+import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
+import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import { profile } from './session.js';
 import { showNoCredit } from './tutor.js';
@@ -83,15 +85,21 @@ function chooseGladiator() {
     const fog = createElement(chooseGladTemplate);
     document.body.append(fog);
     const select = fog.querySelector('#select');
-    const picked = loadSelectableCards(fog.querySelector('.glad-card-container'), select);
+    const picker = new GladiatorPicker();
+    fog.querySelector('.duel-picker').append(picker.element);
+    picker.listen('select', ({ gladiator }) => {
+        select.disabled = false;
+        events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'training' });
+    });
+    GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
         fog.querySelector('#cancel').addEventListener('click', () => {
             fog.remove();
             resolve(null);
         });
-        select.addEventListener('click', async () => {
-            const glad = (await picked)();
+        select.addEventListener('click', () => {
+            const glad = picker.selected;
             if (!glad) return;
             fog.remove();
             resolve(glad);
@@ -580,10 +588,40 @@ export class TrainingsTab {
         const table = this.#wrapper.querySelector(`#table-${list}`);
         const title = this.#wrapper.querySelector(`.title.${list}`);
         const rows = data[list];
+        const pager = this.#wrapper.querySelector(`#offset.${list}`);
         if (!rows?.length) {
-            table.replaceChildren();
-            hide(table);
-            hide(title);
+            if (pager) pager.hidden = true;
+            const card = title.closest('.battle-list');
+            if (list === 'manage') {
+                if (profile.user.premium) {
+                    show(title);
+                    table.innerHTML = renderTemplate(emptyStateTemplate, {
+                        variantClass: 'compact',
+                        icon: 'dumbbell',
+                        title: 'Nenhum treino sob sua tutela',
+                        summary: 'Crie um treino e compartilhe o código com a turma.',
+                        actionHtml: '',
+                    });
+                    show(table);
+                }
+                else if (card) {
+                    card.hidden = true;
+                }
+                else {
+                    hide(title);
+                    hide(table);
+                }
+                return;
+            }
+            show(title);
+            table.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact',
+                icon: 'dumbbell',
+                title: 'Nenhum treino em andamento',
+                summary: 'Use o botão abaixo para ingressar com o código fornecido pelo tutor.',
+                actionHtml: '',
+            });
+            show(table);
             return;
         }
         show(table);
@@ -593,7 +631,7 @@ export class TrainingsTab {
         const total = parseInt(data.pages[list].total, 10);
         const end = Math.min(total, offset + PAGE_SIZE);
         this.#offsets[list] = offset;
-        const pager = this.#wrapper.querySelector(`#offset.${list}`);
+        if (pager) pager.hidden = false;
         pager.querySelector('.start').textContent = offset + 1;
         pager.querySelector('.end').textContent = end;
         pager.querySelector('.total').textContent = total;

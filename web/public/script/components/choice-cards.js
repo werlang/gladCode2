@@ -24,7 +24,7 @@ export class ChoiceCards extends BaseComponent {
      */
     constructor({ element, variant = 'preview', label = '' } = {}) {
         super(element ?? createElement(renderTemplate(choiceCardsTemplate, { variant })));
-        this.element.classList.add(`choice-cards--${variant}`);
+        this.element.classList.add('choice-cards', `choice-cards--${variant}`);
         this.element.setAttribute('role', 'radiogroup');
         if (label) this.element.setAttribute('aria-label', label);
     }

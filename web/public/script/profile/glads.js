@@ -1,11 +1,15 @@
 import { showDialog } from '../components/dialog.js';
-import { loadGladCards } from '../components/glad-card.js';
+import { GladiatorCard, emptyGladiatorCard } from '../components/gladiator-card.js';
+import { PageHeader } from '../components/page-header.js';
+import { SegmentedControl } from '../components/segmented-control.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { fadeOut } from '../helpers/animate.js';
 import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
+import { emptyStateTemplate } from '../templates/empty-state.js';
+import { pageHeaderTemplate } from '../templates/page-header.js';
+import { gladsShellTemplate } from '../templates/profile-glads.js';
+import { codeBlockTemplate, codeBoxTemplate } from '../templates/profile.js';
 import { profile } from './session.js';
-import { codeBlockTemplate, codeBoxTemplate, gladAddTemplate } from '../templates/profile.js';
 
 /** Gladiators every master can have, one more every `PER_LEVELS` levels, up to `MAX_GLADS`. */
 const FIRST_GLADS = 1;
@@ -54,73 +58,106 @@ function showCode(glad) {
 }
 
 /**
- * The GLADIADORES tab: the user's gladiators, their code, deleting them and
- * the free places to create more.
+ * The Gladiadores section: filterable game cards, free slots and the editor/code/delete actions.
  */
 export class GladsTab {
-    #container = document.querySelector('#glads-container .glad-card-container');
-    /** The current navigation signal; reloads keep using it. */
+    #root = document.querySelector('#glads-container');
+    #built = false;
+    #header = null;
+    #filter = null;
+    #grid = null;
+    #empty = null;
+    #glads = [];
+    #filterValue = 'all';
     #signal = null;
 
+    /** Builds the section once. */
+    #build() {
+        if (this.#built || !this.#root) return;
+        this.#root.innerHTML = renderTemplate(gladsShellTemplate);
+        const headerElement = createElement(pageHeaderTemplate);
+        this.#root.querySelector('#glads-header').append(headerElement);
+        this.#header = new PageHeader({ element: headerElement });
+        this.#header.set({ title: 'Gladiadores', subtitle: 'Cada gladiador é uma peça sua na arena.' });
+        this.#filter = new SegmentedControl({ label: 'Filtrar gladiadores' });
+        this.#filter.listen('change', ({ value }) => {
+            this.#filterValue = value;
+            this.#render();
+        });
+        const add = createElement("<a class='button primary' href='/newglad'><i class='fa-solid fa-plus' aria-hidden='true'></i> Novo gladiador</a>");
+        this.#header.setActions([this.#filter.element, add]);
+        this.#grid = this.#root.querySelector('#glads-grid');
+        this.#empty = this.#root.querySelector('#glads-empty');
+        this.#built = true;
+    }
+
     /**
-     * Draws the gladiators and the free places.
+     * Opens the section.
      *
      * @param {object} [route]
      * @param {{ signal?: AbortSignal }} [options]
      */
     async show(route = {}, { signal } = {}) {
+        if (signal?.aborted) return;
+        this.#build();
         this.#signal = signal;
         const glads = await settleRequest(() => GladiatorModel.list({ signal }), signal);
         if (!glads || signal?.aborted) return;
-        this.#container.replaceChildren();
-        if (glads.length) document.querySelector('#menu #battle')?.classList.remove('disabled');
-
-        const cards = await loadGladCards(this.#container, {
-            glads,
-            code: true,
-            remove: true,
-            onCode: glad => (glad.outdated ? this.#askUpdate(glad) : showCode(glad)),
+        this.#glads = glads;
+        const attention = this.#glads.filter(glad => glad.broken || glad.outdated).length;
+        this.#filter.setOptions([
+            { value: 'all', label: `Todos`, count: this.#glads.length },
+            { value: 'ready', label: 'Prontos', count: this.#glads.length - attention },
+            { value: 'attention', label: 'Precisam de atenção', count: attention },
+        ]);
+        this.#filter.set(this.#filterValue, { silent: true });
+        const limit = gladiatorLimit(profile.user.level);
+        this.#header.set({
+            title: 'Gladiadores',
+            subtitle: `${this.#glads.length} de ${limit} vagas ocupadas. Grave no editor para atualizar a versão do motor.`,
         });
-        if (signal?.aborted) return;
-        cards.forEach((card, index) => {
-            const glad = glads[index];
-            if (glad.outdated) card.querySelector('.code .button').textContent = 'Atualizar';
-            card.querySelector('.delete').addEventListener('click', () => this.#askDelete(card, glad));
-        });
-
-        this.#drawFreePlaces(glads.length);
+        this.#render();
     }
 
-    /**
-     * @param {number} count Gladiators the user has.
-     */
-    #drawFreePlaces(count) {
-        this.#container.querySelectorAll('.glad-add').forEach(place => place.remove());
-        const limit = gladiatorLimit(profile.user.level);
-        for (let index = count; index < MAX_GLADS; index++) {
-            const open = index < limit;
-            const place = createElement(renderTemplate(gladAddTemplate, {
-                state: open ? '' : 'inactive',
-                text: open
-                    ? 'Clique para criar um novo gladiador'
-                    : `Atinja o nível ${(index - FIRST_GLADS + 1) * PER_LEVELS} de mestre para desbloquear este gladiador`,
-            }));
-            if (open) place.addEventListener('click', () => {
-                location.href = 'newglad';
+    /** Draws the filtered cards and the free places. */
+    #render() {
+        this.#grid.replaceChildren();
+        this.#empty.hidden = true;
+        const filtered = this.#glads.filter(glad => {
+            if (this.#filterValue === 'ready') return !glad.broken && !glad.outdated;
+            if (this.#filterValue === 'attention') return glad.broken || glad.outdated;
+            return true;
+        });
+
+        if (!filtered.length) {
+            this.#empty.hidden = false;
+            this.#empty.innerHTML = renderTemplate(emptyStateTemplate, {
+                variantClass: 'compact',
+                icon: 'glads',
+                title: this.#filterValue === 'attention' ? 'Nenhum gladiador precisa de atenção' : 'Nenhum gladiador aqui',
+                summary: this.#filterValue === 'all' ? 'Recrute o primeiro gladiador no editor.' : 'Troque o filtro para ver os outros.',
+                actionHtml: '',
             });
-            this.#container.append(place);
+        }
+
+        for (const glad of filtered) {
+            const card = new GladiatorCard({ gladiator: glad });
+            card.listen('battle', () => { location.href = `/battle?glad=${glad.id}`; });
+            card.listen('code', () => showCode(glad));
+            card.listen('delete', () => this.#askDelete(card, glad));
+            this.#grid.append(card.element);
+        }
+
+        const limit = gladiatorLimit(profile.user.level);
+        const free = Math.max(0, limit - this.#glads.length);
+        if (this.#filterValue === 'all' && free > 0) {
+            this.#grid.append(emptyGladiatorCard(`${free} vaga${free === 1 ? '' : 's'} livre${free === 1 ? '' : 's'}`));
         }
     }
 
-    /** @param {Record<string, any>} glad Outdated gladiator. */
-    async #askUpdate(glad) {
-        const answer = await showDialog(`A simulação da gladCode foi atualizada, e o código do gladiador <span class='highlight'>${escapeHtml(glad.name)}</span> precisa ser testado e salvo novamente para que ele volte a participar das batalhas. Clique em <span class='highlight'>OK</span> para abrir o editor`, ['Cancelar', 'OK']);
-        if (answer === 'OK') window.open(`glad-${glad.id}`);
-    }
-
     /**
-     * @param {HTMLElement} card Gladiator card.
-     * @param {Record<string, any>} glad Gladiator.
+     * @param {GladiatorCard} card
+     * @param {Record<string, any>} glad
      */
     async #askDelete(card, glad) {
         const answer = await showDialog(`Deseja excluir o gladiador <span class='highlight'>${escapeHtml(glad.name)}</span>?`, ['Sim', 'Não']);
@@ -132,8 +169,8 @@ export class GladsTab {
             writeErrorToast(error);
             return;
         }
-        await fadeOut(card);
-        card.remove();
-        this.#drawFreePlaces(this.#container.querySelectorAll('.glad-preview').length);
+        card.element.remove();
+        this.#glads = this.#glads.filter(item => item.id !== glad.id);
+        await this.show({}, { signal: this.#signal });
     }
 }

@@ -30,13 +30,13 @@ export const codeBlockTemplate = `<pre class='line-numbers language-{{language}}
 
 export const mmrRowTemplate = `<div class='row mmr' title='Renome'><span>{{mmr}}</span><img src='icon/winner-icon.png' alt=''></div>`;
 
-export const friendFilterRowTemplate = `<div class='row' role='button' tabindex='0'><div class='cell image'><img src='{{picture}}' alt=''></div><div class='cell nick'>{{nick}}</div></div>`;
+export const friendFilterRowTemplate = `<div class='row' role='button' tabindex='0'><span class='friend-avatar'></span><span class='friend-nick'>{{nick}}</span></div>`;
 
 export const duelBoxTemplate = `
 <div id='fog'>
     <div id='duel-box' role='dialog' aria-modal='true'>
         <div id='title'>Escolha o gladiador que duelará contra <span class='highlight'>{{nick}}</span> em nome da sua honra</div>
-        <div class='glad-card-container'></div>
+        <div class='duel-picker'></div>
         <div id='button-container'>
             <button id='cancel' class='button ghost block'>Cancelar</button><button id='confirm' class='button primary block' disabled>{{action}}</button>
         </div>

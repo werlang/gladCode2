@@ -1,10 +1,13 @@
 import { decorateCheckSliders } from '../components/form-controls.js';
-import { loadGladCards, loadSelectableCards } from '../components/glad-card.js';
+import { loadGladCards } from '../components/glad-card.js';
+import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TournamentModel } from '../models/tournament.js';
+import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import {
     addGladTemplate,
@@ -117,19 +120,21 @@ function chooseGladiator() {
     document.body.append(fog);
     decorateCheckSliders(fog);
     const choose = fog.querySelector('#choose');
-    const picked = loadSelectableCards(fog.querySelector('.glad-card-container'), choose);
-    picked.then(() => fog.querySelectorAll('.glad-preview').forEach(card => {
-        card.querySelector('.code')?.remove();
-        if (card.classList.contains('old')) card.title = 'Este gladiador precisa ser atualizado';
-    }));
+    const picker = new GladiatorPicker();
+    fog.querySelector('.duel-picker').append(picker.element);
+    picker.listen('select', ({ gladiator }) => {
+        choose.disabled = false;
+        events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'tournament' });
+    });
+    GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
         fog.querySelector('#cancel').addEventListener('click', () => {
             fog.remove();
             resolve(false);
         });
-        choose.addEventListener('click', async () => {
-            const glad = (await picked)();
+        choose.addEventListener('click', () => {
+            const glad = picker.selected;
             if (!glad) return;
             const showCode = fog.querySelector('#show-code input').checked;
             fog.remove();
@@ -570,7 +575,9 @@ export class TournamentsTab {
 
         this.#drawList(this.#wrapper.querySelector('#table-open'), data.open, 'Nenhum torneio público aberto');
         const mine = this.#wrapper.querySelector('#mytourn.title');
-        mine.style.display = data.mine.length ? '' : 'none';
+        const mineCard = mine.closest('.battle-list');
+        if (mineCard) mineCard.hidden = data.mine.length === 0;
+        else mine.style.display = data.mine.length ? '' : 'none';
         if (data.mine.length) this.#drawList(this.#wrapper.querySelector('#table-mytourn'), data.mine);
     }
 

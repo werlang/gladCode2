@@ -260,3 +260,116 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Battle mode cards (Batalhas.dc.html): icon, live pill, title and copy. */
+#battle-modes {
+    width: 100%;
+}
+
+.choice-cards--mode {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.choice-cards--mode .choice-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        'preview badge'
+        'copy copy';
+    gap: var(--space-3) var(--space-2);
+    padding: var(--space-4);
+    border-color: var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+.choice-cards--mode .choice-card-preview {
+    grid-area: preview;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-alt);
+    color: var(--color-border-brand);
+}
+
+.choice-cards--mode .choice-card-preview .icon,
+.choice-cards--mode .choice-card-preview svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.choice-cards--mode .choice-card-badge {
+    grid-area: badge;
+    align-self: start;
+    justify-self: end;
+    margin: 0;
+    padding: 3px var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-alt);
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+}
+
+.choice-cards--mode .choice-card-copy {
+    grid-area: copy;
+    padding: 0;
+}
+
+.choice-cards--mode .choice-card-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.choice-cards--mode .choice-card-description {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] {
+    border-color: var(--color-chrome);
+    background: var(--color-chrome);
+    color: var(--color-header-text);
+    box-shadow: none;
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] .choice-card-preview {
+    background: var(--color-accent);
+    color: var(--color-chrome);
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] .choice-card-title {
+    color: var(--color-header-text);
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] .choice-card-description {
+    color: color-mix(in srgb, var(--color-header-text) 72%, transparent);
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] .choice-card-badge {
+    background: color-mix(in srgb, var(--color-gladiator-seal-ready) 16%, transparent);
+    color: var(--color-gladiator-seal-ready-text);
+}
+
+@media only screen and (max-width: 900px) {
+    .choice-cards--mode {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .choice-cards--mode {
+        grid-template-columns: 1fr;
+    }
+}

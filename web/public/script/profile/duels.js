@@ -1,9 +1,11 @@
 import { showMessage } from '../components/dialog.js';
-import { loadSelectableCards } from '../components/glad-card.js';
+import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
+import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { DuelModel } from '../models/social.js';
+import { GladiatorModel } from '../models/gladiator.js';
 import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { challengeRowTemplate, duelBoxTemplate } from '../templates/profile.js';
 
@@ -18,10 +20,21 @@ function openDuelBox(nick, action, onConfirm) {
     const fog = createElement(renderTemplate(duelBoxTemplate, { nick, action }));
     document.body.append(fog);
     const confirm = fog.querySelector('#confirm');
-    const picked = loadSelectableCards(fog.querySelector('.glad-card-container'), confirm);
+    const picker = new GladiatorPicker();
+    fog.querySelector('.duel-picker').append(picker.element);
+    picker.listen('select', ({ gladiator }) => {
+        confirm.disabled = false;
+        events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'duel' });
+    });
+    picker.listen('blocked', ({ gladiator, reason }) => {
+        showMessage(reason === 'broken'
+            ? `O gladiador <span class='highlight'>${escapeHtml(gladiator.name)}</span> travou na última batalha. Corrija-o no editor.`
+            : `O gladiador <span class='highlight'>${escapeHtml(gladiator.name)}</span> precisa ser gravado novamente no editor.`);
+    });
+    GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
     fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
-    confirm.addEventListener('click', async () => {
-        const glad = (await picked)();
+    confirm.addEventListener('click', () => {
+        const glad = picker.selected;
         if (glad) onConfirm(glad, confirm, fog);
     });
 }
@@ -89,6 +102,13 @@ export class ChallengeList {
                 date: formatMessageTime(duel.time),
                 elapsed: formatMessageTime(duel.time, { short: true }),
             }));
+            const picture = row.querySelector('.image-container img');
+            if (!duel.picture && picture) {
+                const fallback = document.createElement('span');
+                fallback.className = 'challenge-initials';
+                fallback.textContent = String(duel.nick ?? '?').slice(0, 1).toUpperCase();
+                picture.replaceWith(fallback);
+            }
             row.querySelector('.refuse').addEventListener('click', () => this.#refuse(row, duel));
             row.querySelector('.accept').addEventListener('click', () => this.#accept(duel));
             table.append(row);
@@ -110,6 +130,11 @@ export class ChallengeList {
         showMessage('Desafio recusado');
         row.remove();
         if (this.count === 0) this.#panel.classList.add('hidden');
+    }
+
+    /** @param {Record<string, any>} duel Challenge. */
+    accept(duel) {
+        this.#accept(duel);
     }
 
     /** @param {Record<string, any>} duel Challenge. */

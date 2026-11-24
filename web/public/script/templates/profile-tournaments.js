@@ -87,7 +87,7 @@ export const teamWindowTemplate = `
     <div class='tourn window' role='dialog' aria-modal='true'>
         <div id='title'><h2>Equipe <span>{{name}}</span></h2><div id='word'>Senha<span></span></div></div>
         <h3>Gladiadores inscritos</h3>
-        <div class='glad-card-container'></div>
+        <div class='duel-picker'></div>
         <div id='button-container'><button id='back' class='button'>VOLTAR</button><button id='join-leave' class='button'>ABANDONAR</button></div>
     </div>
 </div>`;
@@ -98,7 +98,7 @@ export const chooseGladTemplate = `
 <div id='fog' class='glads'>
     <div id='duel-box' role='dialog' aria-modal='true'>
         <div id='title'>Escolha o gladiador que irá lhe representar no torneio</div>
-        <div class='glad-card-container'></div>
+        <div class='duel-picker'></div>
         <div id='show-code'><label><input type='checkbox' class='checkslider'>Permitir que minha equipe veja o código do gladiador</label></div>
         <div id='button-container'><button id='cancel' class='button ghost block'>Cancelar</button><button id='choose' class='button primary block' disabled>ESCOLHER</button></div>
     </div>

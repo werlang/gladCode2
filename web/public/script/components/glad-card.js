@@ -108,6 +108,22 @@ export class GladCardPainter {
     }
 
     /**
+     * Registers one image slot directly (the game card's stage), without the old card classes.
+     *
+     * @param {Element} image The portrait slot.
+     * @param {string} skin Persisted skin JSON.
+     * @param {boolean} [dead]
+     * @returns {Promise<void>}
+     */
+    async setElement(image, skin, dead = false) {
+        if (!image) return;
+        this.#listen();
+        this.#sweep();
+        this.#cards.set(image, { skin, dead });
+        await this.#paint(image, skin, dead);
+    }
+
+    /**
      * Redraws every card already on the page in the style now chosen, in the slots the cards already have.
      *
      * @returns {Promise<void>}
@@ -295,6 +311,18 @@ const painter = new GladCardPainter();
  */
 export async function setGladImage(container, index, skin, dead = false) {
     await painter.set(container, index, skin, dead);
+}
+
+/**
+ * Paints one portrait slot of the new game card in the master's chosen style.
+ *
+ * @param {Element} image The card's stage slot.
+ * @param {string} skin Persisted skin JSON.
+ * @param {boolean} [dead]
+ * @returns {Promise<void>}
+ */
+export async function setGladImageElement(image, skin, dead = false) {
+    await painter.setElement(image, skin, dead);
 }
 
 /**
