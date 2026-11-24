@@ -85,17 +85,7 @@ export const chooseGladTemplate = `
     </div>
 </div>`;
 
-export const listHeadTemplate = `<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Mestres</div>{{{actions}}}</div>`;
 
-export const listRowTemplate = `
-<div class='row' role='button' tabindex='0'>
-    <div class='cell' id='name'>{{name}}</div>
-    <div class='cell'>{{description}}</div>
-    <div class='cell'>{{masters}}</div>
-    {{{actions}}}
-</div>`;
-
-export const removeActionTemplate = `<div class='cell actions'><i title='Remover treino' class='remove fas fa-times' role='button' tabindex='0'></i></div>`;
 
 export const roomWindowTemplate = `
 <div id='fog'>

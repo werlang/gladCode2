@@ -2,6 +2,7 @@ import { Avatar } from '../components/avatar.js';
 import { ChoiceCards } from '../components/choice-cards.js';
 import { InviteBanner } from '../components/invite-banner.js';
 import { PageHeader } from '../components/page-header.js';
+import { SectionCard } from '../components/section-card.js';
 import { createToast } from '../components/toast.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { runReadTask, secondaryRequest, writeErrorToast } from '../helpers/section-request.js';
@@ -10,7 +11,7 @@ import { TournamentModel } from '../models/tournament.js';
 import { TrainingModel } from '../models/training.js';
 import { icon } from '../templates/icons.js';
 import { pageHeaderTemplate } from '../templates/page-header.js';
-import { battleShellTemplate } from '../templates/profile-battle.js';
+import { battleShellTemplate, duelFriendsTemplate } from '../templates/profile-battle.js';
 import { friendFilterRowTemplate } from '../templates/profile.js';
 import { ChallengeList, challengeFriend } from './duels.js';
 import { RankedBattle } from './ranked.js';
@@ -75,6 +76,7 @@ export class BattleTab {
         this.#root.querySelector('#battle-invite').append(this.#invite.element);
         this.#invite.listen('accept', () => this.#acceptInvite());
         this.#invite.listen('refuse', () => this.#refuseInvite());
+        this.#buildDuel();
 
         this.ranked = new RankedBattle(() => this.#afterBattle());
         this.challenges = new ChallengeList(() => this.#afterBattle());
@@ -102,6 +104,16 @@ export class BattleTab {
             this.#loadCounts(signal),
             this.#loadMode(mode, selectId),
         ]);
+    }
+
+    /** Builds the friend-search card of the duel mode. */
+    #buildDuel() {
+        const root = this.#root.querySelector('#duel-friends');
+        const card = new SectionCard();
+        card.setTitle('Desafiar um amigo');
+        card.setBody([createElement(duelFriendsTemplate)]);
+        card.setActions([createElement("<button type='button' id='challenge' class='button primary small' disabled>Desafiar</button>")]);
+        root.append(card.element);
     }
 
     /** @param {string} mode */
@@ -145,7 +157,7 @@ export class BattleTab {
                 picture: duel.picture,
                 name: duel.nick ?? '',
                 message: `${duel.nick ?? 'Um mestre'} desafiou você para um duelo`,
-                detail: `${duel.gladiator ? `Ele luta com ${duel.gladiator}. ` : ''}Responda em até 2 dias.`,
+                detail: `${duel.gladiator ? `Luta com ${duel.gladiator}. ` : ''}Responda em até 2 dias.`,
                 acceptLabel: 'Escolher gladiador e aceitar',
                 refuseLabel: 'Recusar',
             });
@@ -183,6 +195,7 @@ export class BattleTab {
                 description: 'Desafie um amigo, gladiador contra gladiador.',
                 preview: icon('friends', { size: 22 }),
                 badge: duelCount ? `${duelCount} desafio${duelCount === 1 ? '' : 's'}` : 'Nenhum desafio',
+                alert: duelCount > 0,
             },
             {
                 value: 'tourn',

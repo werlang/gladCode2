@@ -1,5 +1,7 @@
 import { Message, showDialog, showInput, showMessage } from '../components/dialog.js';
 import { GladiatorPicker } from '../components/gladiator-picker.js';
+import { Pagination } from '../components/pagination.js';
+import { SectionCard } from '../components/section-card.js';
 import { Slider } from '../components/slider.js';
 import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
@@ -10,7 +12,9 @@ import { fadeIn, hide, show } from '../helpers/animate.js';
 import { TrainingModel } from '../models/training.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
+import { battleRowsTemplate, trainingRowTemplate } from '../templates/profile-battle.js';
 import { profile } from './session.js';
+import { showBlockedGladiator } from './gladiator-feedback.js';
 import { showNoCredit } from './tutor.js';
 import {
     bigLinkTemplate,
@@ -18,12 +22,9 @@ import {
     chooseGladTemplate,
     createWindowTemplate,
     createdTemplate,
-    listHeadTemplate,
-    listRowTemplate,
     manualJoinTemplate,
     participantRowTemplate,
     participantsHeadTemplate,
-    removeActionTemplate,
     roomWindowTemplate,
     trainingPitchTemplate,
 } from '../templates/profile-trainings.js';
@@ -91,6 +92,7 @@ function chooseGladiator() {
         select.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'training' });
     });
+    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
@@ -523,31 +525,60 @@ class TrainingRoom {
  * takes part in, creating and joining trainings.
  */
 export class TrainingsTab {
-    #wrapper = document.querySelector('#panel #battle-container #train.wrapper');
+    #root = document.querySelector('#panel #battle-container #train.wrapper');
     #offsets = { manage: 0, part: 0 };
     /** The current navigation signal; the list pages keep using it. */
     #signal = null;
+    #manageCard = null;
+    #partCard = null;
+    #manageRows = null;
+    #partRows = null;
+    #managePager = null;
+    #partPager = null;
+    #createButton = null;
+    #joinButton = null;
+
+    /** Builds the two SectionCards and their pagination. */
+    constructor() {
+        this.#build();
+    }
+
+    #build() {
+        this.#manageCard = new SectionCard();
+        this.#manageCard.setTitle('Treinos que gerencio');
+        this.#manageRows = createElement(battleRowsTemplate);
+        this.#managePager = new Pagination({ variant: 'simple' });
+        this.#manageCard.setBody([this.#manageRows, this.#managePager.element]);
+        this.#createButton = createElement("<button type='button' class='button primary'>Novo treino</button>");
+        this.#manageCard.setActions([this.#createButton]);
+        this.#root.append(this.#manageCard.element);
+
+        this.#partCard = new SectionCard();
+        this.#partCard.setTitle('Treinos que participo');
+        this.#partRows = createElement(battleRowsTemplate);
+        this.#partPager = new Pagination({ variant: 'simple' });
+        this.#partCard.setBody([this.#partRows, this.#partPager.element]);
+        this.#joinButton = createElement("<button type='button' class='button neutral'>Participar de treino</button>");
+        this.#partCard.setActions([this.#joinButton]);
+        this.#root.append(this.#partCard.element);
+    }
 
     /** Binds the buttons; only tutors can create trainings. */
     init() {
-        const create = this.#wrapper.querySelector('#create');
-        if (!profile.user.premium) hide(create);
-        create.addEventListener('click', () => this.#openCreate());
-        this.#wrapper.querySelector('#join').addEventListener('click', () => this.#join());
-        this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
-            const list = pager.classList.contains('manage') ? 'manage' : 'part';
-            pager.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(list, -1), this.#signal));
-            pager.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(list, 1), this.#signal));
-        });
+        if (!profile.user.premium) hide(this.#createButton);
+        this.#createButton.addEventListener('click', () => this.#openCreate());
+        this.#joinButton.addEventListener('click', () => this.#join());
+        this.#managePager.listen('change', ({ page }) => this.#go('manage', page));
+        this.#partPager.listen('change', ({ page }) => this.#go('part', page));
     }
 
     /**
      * @param {'manage'|'part'} list Which list.
-     * @param {number} direction -1 or 1.
+     * @param {number} page 1-based page from the Pagination component.
      */
-    #page(list, direction) {
-        this.#offsets[list] += direction * PAGE_SIZE;
-        return this.refresh({ signal: this.#signal });
+    #go(list, page) {
+        this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
+        return runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
     }
 
     /**
@@ -561,18 +592,6 @@ export class TrainingsTab {
         if (!data || signal?.aborted) return;
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
-        if (!data.manage?.length && !data.part?.length) {
-            const table = this.#wrapper.querySelector('#table-part');
-            table.innerHTML = renderTemplate(emptyStateTemplate, {
-                variantClass: 'compact',
-                icon: 'dumbbell',
-                title: 'Você ainda não participa de nenhum treino',
-                summary: 'Use o botão abaixo para ingressar com o código fornecido pelo tutor.',
-                actionHtml: '',
-            });
-            show(table);
-        }
-
         const room = Number(new URLSearchParams(location.search).get('room'));
         if (room) {
             history.replaceState(null, '', location.pathname);
@@ -585,70 +604,56 @@ export class TrainingsTab {
      * @param {Record<string, any>} data LIST answer.
      */
     #drawList(list, data) {
-        const table = this.#wrapper.querySelector(`#table-${list}`);
-        const title = this.#wrapper.querySelector(`.title.${list}`);
+        const manage = list === 'manage';
+        const card = manage ? this.#manageCard : this.#partCard;
+        const container = manage ? this.#manageRows : this.#partRows;
+        const pager = manage ? this.#managePager : this.#partPager;
         const rows = data[list];
-        const pager = this.#wrapper.querySelector(`#offset.${list}`);
+        const { offset, total } = data.pages[list];
+        const count = Number(total) || 0;
+        this.#offsets[list] = Number(offset) || 0;
+        pager.element.hidden = count === 0;
+        pager.set({
+            page: Math.floor((Number(offset) || 0) / PAGE_SIZE) + 1,
+            pages: Math.max(1, Math.ceil(count / PAGE_SIZE)),
+            total: count,
+            pageSize: PAGE_SIZE,
+        });
+
         if (!rows?.length) {
-            if (pager) pager.hidden = true;
-            const card = title.closest('.battle-list');
-            if (list === 'manage') {
-                if (profile.user.premium) {
-                    show(title);
-                    table.innerHTML = renderTemplate(emptyStateTemplate, {
-                        variantClass: 'compact',
-                        icon: 'dumbbell',
-                        title: 'Nenhum treino sob sua tutela',
-                        summary: 'Crie um treino e compartilhe o código com a turma.',
-                        actionHtml: '',
-                    });
-                    show(table);
-                }
-                else if (card) {
-                    card.hidden = true;
-                }
-                else {
-                    hide(title);
-                    hide(table);
-                }
+            if (manage && !profile.user.premium) {
+                card.element.hidden = true;
                 return;
             }
-            show(title);
-            table.innerHTML = renderTemplate(emptyStateTemplate, {
+            card.element.hidden = false;
+            container.innerHTML = renderTemplate(emptyStateTemplate, {
                 variantClass: 'compact',
                 icon: 'dumbbell',
-                title: 'Nenhum treino em andamento',
-                summary: 'Use o botão abaixo para ingressar com o código fornecido pelo tutor.',
+                title: manage ? 'Nenhum treino sob sua tutela' : 'Você ainda não participa de nenhum treino',
+                summary: manage
+                    ? 'Crie um treino e compartilhe o código com a turma.'
+                    : 'Use o botão acima para ingressar com o código fornecido pelo tutor.',
                 actionHtml: '',
             });
-            show(table);
             return;
         }
-        show(table);
-        show(title);
 
-        const offset = parseInt(data.pages[list].offset, 10);
-        const total = parseInt(data.pages[list].total, 10);
-        const end = Math.min(total, offset + PAGE_SIZE);
-        this.#offsets[list] = offset;
-        if (pager) pager.hidden = false;
-        pager.querySelector('.start').textContent = offset + 1;
-        pager.querySelector('.end').textContent = end;
-        pager.querySelector('.total').textContent = total;
-        pager.querySelector('#prev').disabled = offset === 0;
-        pager.querySelector('#next').disabled = end === total;
-
-        const manage = list === 'manage';
-        table.innerHTML = renderTemplate(listHeadTemplate, { actions: manage ? "<div class='cell'></div>" : '' })
-            + rows.map(row => renderTemplate(listRowTemplate, {
-                name: row.name,
-                description: row.description,
-                masters: row.masters,
-                actions: manage ? removeActionTemplate : '',
-            })).join('');
-        table.querySelectorAll('.row:not(.head)').forEach((element, index) => {
+        card.element.hidden = false;
+        container.innerHTML = rows.map(row => renderTemplate(trainingRowTemplate, {
+            name: row.name,
+            description: row.description,
+            masters: row.masters,
+            actions: manage ? "<button type='button' class='button ghost small remove'>Remover</button>" : '',
+        })).join('');
+        container.querySelectorAll('.battle-row').forEach((element, index) => {
             const training = rows[index];
             element.addEventListener('click', () => new TrainingRoom(training.id).show());
+            element.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    new TrainingRoom(training.id).show();
+                }
+            });
             element.querySelector('.remove')?.addEventListener('click', event => {
                 event.stopPropagation();
                 this.#askPurge(training);

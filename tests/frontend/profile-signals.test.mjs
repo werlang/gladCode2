@@ -21,7 +21,7 @@ function fakeNode(children = {}) {
     const element = {
         innerHTML: '', textContent: '', value: '', hidden: false, disabled: false, checked: false,
         replaced: 0, appended: 0, removed: 0, style: {}, offsetWidth: 0, offsetHeight: 0,
-        dataset: {}, isConnected: true,
+        dataset: {}, isConnected: true, children: [], childElementCount: 0,
         getClientRects: () => [],
         classList: {
             add: (...names) => names.forEach(name => classes.add(name)),
@@ -85,6 +85,7 @@ function installDocument(map) {
 const { NewsTab } = await import('../../web/public/script/profile/news.js');
 const { FriendsTab } = await import('../../web/public/script/profile/friends.js');
 const { GladsTab } = await import('../../web/public/script/profile/glads.js');
+const { GladiatorCard } = await import('../../web/public/script/components/gladiator-card.js');
 const { MessagesTab } = await import('../../web/public/script/profile/messages.js');
 const { PotionsTab } = await import('../../web/public/script/profile/potions.js');
 const { RankingTab } = await import('../../web/public/script/profile/ranking.js');
@@ -209,6 +210,38 @@ test('gladiators drop a response that arrives after the section was left', async
     }
     finally {
         GladiatorModel.list = original;
+    }
+});
+
+test('gladiator cards are destroyed before a rerender and on unmount', async () => {
+    const grid = fakeNode();
+    const root = fakeNode({
+        '#glads-header': fakeNode(),
+        '#glads-grid': grid,
+        '#glads-empty': fakeNode(),
+    });
+    installDocument(new Map([['#glads-container', root]]));
+    const originalList = GladiatorModel.list;
+    const originalDestroy = GladiatorCard.prototype.destroy;
+    let destroyed = 0;
+    GladiatorModel.list = async () => [{ id: 1, name: 'Aurora', vstr: 1, vagi: 1, vint: 1, mmr: 1, skin: '' }];
+    GladiatorCard.prototype.destroy = function destroy() {
+        destroyed += 1;
+        return originalDestroy.call(this);
+    };
+    try {
+        const tab = new GladsTab();
+        const controller = new AbortController();
+        await tab.show({}, { signal: controller.signal });
+        assert.equal(destroyed, 0);
+        await tab.show({}, { signal: controller.signal });
+        assert.equal(destroyed, 1);
+        tab.unmount();
+        assert.equal(destroyed, 2);
+    }
+    finally {
+        GladiatorModel.list = originalList;
+        GladiatorCard.prototype.destroy = originalDestroy;
     }
 });
 

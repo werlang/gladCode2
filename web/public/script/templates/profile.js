@@ -43,19 +43,7 @@ export const duelBoxTemplate = `
     </div>
 </div>`;
 
-export const challengeRowTemplate = `
-<div class='row'>
-    <div class='cell lvl-container'>
-        <img src='res/star.png' title='Nível' alt='Nível'><span>{{level}}</span>
-    </div>
-    <div class='cell image-container'><img src='{{picture}}' alt=''></div>
-    <div class='cell user'>{{nick}}</div>
-    <div class='cell time' title='{{date}}'>{{elapsed}}</div>
-    <div class='button-container'>
-        <div class='accept' title='Aceitar desafio' role='button' tabindex='0'></div>
-        <div class='refuse' title='Recusar desafio' role='button' tabindex='0'></div>
-    </div>
-</div>`;
+
 
 export const messageRowTemplate = `<div class='row {{unread}}' role='button' tabindex='0'><div class='cell user'>{{nick}}</div><div class='cell message'>{{{message}}}</div><div class='cell time'>{{elapsed}}</div></div>`;
 

@@ -1,4 +1,6 @@
 import { decorateCheckSliders } from '../components/form-controls.js';
+import { Pagination } from '../components/pagination.js';
+import { SectionCard } from '../components/section-card.js';
 import { loadGladCards } from '../components/glad-card.js';
 import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
@@ -6,9 +8,11 @@ import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
+import { showBlockedGladiator } from './gladiator-feedback.js';
 import { TournamentModel } from '../models/tournament.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
+import { battleRowsTemplate, tournamentRowTemplate } from '../templates/profile-battle.js';
 import {
     addGladTemplate,
     chooseGladTemplate,
@@ -17,8 +21,6 @@ import {
     createdPublicTemplate,
     createdTemplate,
     joinWindowTemplate,
-    listHeadTemplate,
-    listRowTemplate,
     newTeamTemplate,
     teamCreatedTemplate,
     teamRowTemplate,
@@ -126,6 +128,7 @@ function chooseGladiator() {
         choose.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'tournament' });
     });
+    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
@@ -525,29 +528,59 @@ class TournamentWindow {
  * creating and joining tournaments.
  */
 export class TournamentsTab {
-    #wrapper = document.querySelector('#panel #battle-container #tourn.wrapper');
+    #root = document.querySelector('#panel #battle-container #tourn.wrapper');
     #offsets = { mine: 0, open: 0 };
     /** The current navigation signal; the list pages keep using it. */
     #signal = null;
+    #openCard = null;
+    #mineCard = null;
+    #openRows = null;
+    #mineRows = null;
+    #openPager = null;
+    #minePager = null;
+    #createButton = null;
+    #joinButton = null;
 
-    /** Binds the buttons and the list pages. */
+    /** Builds the two SectionCards and their pagination. */
+    constructor() {
+        this.#build();
+    }
+
+    #build() {
+        this.#openCard = new SectionCard();
+        this.#openCard.setTitle('Torneios públicos abertos');
+        this.#openRows = createElement(battleRowsTemplate);
+        this.#openPager = new Pagination({ variant: 'simple' });
+        this.#openCard.setBody([this.#openRows, this.#openPager.element]);
+        this.#createButton = createElement("<button type='button' class='button primary'>Criar torneio</button>");
+        this.#joinButton = createElement("<button type='button' class='button neutral'>Ingressar em um torneio</button>");
+        this.#openCard.setActions([this.#createButton, this.#joinButton]);
+        this.#root.append(this.#openCard.element);
+
+        this.#mineCard = new SectionCard();
+        this.#mineCard.setTitle('Meus torneios');
+        this.#mineRows = createElement(battleRowsTemplate);
+        this.#minePager = new Pagination({ variant: 'simple' });
+        this.#mineCard.setBody([this.#mineRows, this.#minePager.element]);
+        this.#mineCard.element.hidden = true;
+        this.#root.append(this.#mineCard.element);
+    }
+
+    /** Binds the buttons and the pagination. */
     init() {
-        this.#wrapper.querySelector('#create').addEventListener('click', () => this.#openCreate());
-        this.#wrapper.querySelector('#join').addEventListener('click', () => this.#openJoin());
-        this.#wrapper.querySelectorAll('.title #offset').forEach(pager => {
-            const list = pager.classList.contains('mine') ? 'mine' : 'open';
-            pager.querySelector('#prev').addEventListener('click', () => runReadTask(() => this.#page(list, -1), this.#signal));
-            pager.querySelector('#next').addEventListener('click', () => runReadTask(() => this.#page(list, 1), this.#signal));
-        });
+        this.#createButton.addEventListener('click', () => this.#openCreate());
+        this.#joinButton.addEventListener('click', () => this.#openJoin());
+        this.#openPager.listen('change', ({ page }) => this.#go('open', page));
+        this.#minePager.listen('change', ({ page }) => this.#go('mine', page));
     }
 
     /**
      * @param {'mine'|'open'} list Which list.
-     * @param {number} direction -1 or 1.
+     * @param {number} page 1-based page from the Pagination component.
      */
-    #page(list, direction) {
-        this.#offsets[list] += direction * PAGE_SIZE;
-        return this.refresh({ signal: this.#signal });
+    #go(list, page) {
+        this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
+        return runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
     }
 
     /**
@@ -561,56 +594,71 @@ export class TournamentsTab {
         if (!data || signal?.aborted) return;
         ['mine', 'open'].forEach(list => {
             const { offset, total } = data.pages[list];
-            const end = Math.min(total, offset + PAGE_SIZE);
             this.#offsets[list] = offset;
-
-            const pager = this.#wrapper.querySelector(`#offset.${list}`);
-            pager.hidden = total === 0;
-            pager.querySelector('.start').textContent = total === 0 ? 0 : offset + 1;
-            pager.querySelector('.end').textContent = end;
-            pager.querySelector('.total').textContent = total;
-            pager.querySelector('#prev').disabled = offset === 0;
-            pager.querySelector('#next').disabled = end === total;
+            this.#setPager(list === 'open' ? this.#openPager : this.#minePager, list === 'open' ? this.#openCard : this.#mineCard, { offset, total });
         });
 
-        this.#drawList(this.#wrapper.querySelector('#table-open'), data.open, 'Nenhum torneio público aberto');
-        const mine = this.#wrapper.querySelector('#mytourn.title');
-        const mineCard = mine.closest('.battle-list');
-        if (mineCard) mineCard.hidden = data.mine.length === 0;
-        else mine.style.display = data.mine.length ? '' : 'none';
-        if (data.mine.length) this.#drawList(this.#wrapper.querySelector('#table-mytourn'), data.mine);
+        this.#drawList(this.#openRows, data.open, 'Nenhum torneio público aberto');
+        this.#mineCard.element.hidden = Number(data.pages.mine.total) === 0;
+        if (Number(data.pages.mine.total) > 0) this.#drawList(this.#mineRows, data.mine, 'Nenhum torneio nesta página');
     }
 
     /**
-     * @param {HTMLElement} table List table.
-     * @param {object[]} tournaments Tournaments.
-     * @param {string} [emptyTitle] Message when empty.
+     * @param {Pagination} pager
+     * @param {SectionCard} card
+     * @param {{ offset: number|string, total: number|string }} pageInfo
      */
-    #drawList(table, tournaments, emptyTitle = '') {
+    #setPager(pager, card, { offset, total }) {
+        const count = Number(total) || 0;
+        const start = Number(offset) || 0;
+        pager.element.hidden = count === 0;
+        pager.set({
+            page: Math.floor(start / PAGE_SIZE) + 1,
+            pages: Math.max(1, Math.ceil(count / PAGE_SIZE)),
+            total: count,
+            pageSize: PAGE_SIZE,
+        });
+        if (card === this.#mineCard) card.element.hidden = count === 0;
+    }
+
+    /**
+     * @param {HTMLElement} container List container.
+     * @param {object[]} tournaments Tournaments.
+     * @param {string} emptyTitle Message when empty; the caller leaves it empty for no message.
+     */
+    #drawList(container, tournaments, emptyTitle = '') {
         if (!tournaments.length && emptyTitle) {
-            table.innerHTML = renderTemplate(emptyStateTemplate, {
+            container.innerHTML = renderTemplate(emptyStateTemplate, {
                 variantClass: 'compact', icon: 'trophy', title: emptyTitle, summary: '', actionHtml: '',
             });
             return;
         }
-        table.innerHTML = listHeadTemplate + tournaments.map(tournament => renderTemplate(listRowTemplate, {
+        container.innerHTML = tournaments.map(tournament => renderTemplate(tournamentRowTemplate, {
             name: tournament.name,
             description: tournament.description,
             teams: tournament.teams,
             maxteams: tournament.maxTeams,
-            flex: tournament.flex ? "<i class='fas fa-check flex'></i>" : '',
+            flex: tournament.flex ? 'Flex' : '',
         })).join('');
-        table.querySelectorAll('.row:not(.head)').forEach((row, index) => {
-            row.addEventListener('click', async () => {
-                let tournament;
+        container.querySelectorAll('.battle-row').forEach((row, index) => {
+            const tournament = tournaments[index];
+            const open = async () => {
+                let found;
                 try {
-                    tournament = await TournamentModel.find(tournaments[index].name);
+                    found = await TournamentModel.find(tournament.name);
                 }
                 catch (error) {
                     writeErrorToast(error);
                     return;
                 }
-                this.#openJoin({ name: tournament.name, pass: tournament.password, submit: true });
+                this.#openJoin({ name: found.name, pass: found.password, submit: true });
+            };
+            row.addEventListener('click', open);
+            row.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    open();
+                }
             });
         });
     }

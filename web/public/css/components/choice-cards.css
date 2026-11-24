@@ -357,9 +357,19 @@
     color: color-mix(in srgb, var(--color-header-text) 72%, transparent);
 }
 
+.choice-cards--mode .choice-card-badge.is-alert {
+    background: var(--color-action-bevel);
+    color: var(--color-action-bevel-text);
+}
+
 .choice-cards--mode .choice-card[aria-checked='true'] .choice-card-badge {
     background: color-mix(in srgb, var(--color-gladiator-seal-ready) 16%, transparent);
     color: var(--color-gladiator-seal-ready-text);
+}
+
+.choice-cards--mode .choice-card[aria-checked='true'] .choice-card-badge.is-alert {
+    background: var(--color-action-bevel);
+    color: var(--color-action-bevel-text);
 }
 
 @media only screen and (max-width: 900px) {

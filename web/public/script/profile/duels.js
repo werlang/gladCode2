@@ -1,13 +1,17 @@
+import { Avatar } from '../components/avatar.js';
 import { showMessage } from '../components/dialog.js';
 import { GladiatorPicker } from '../components/gladiator-picker.js';
+import { SectionCard } from '../components/section-card.js';
 import { ProgressButton, runSimulation } from '../components/simulation.js';
 import { formatMessageTime } from '../helpers/date-format.js';
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
+import { showBlockedGladiator } from './gladiator-feedback.js';
 import { DuelModel } from '../models/social.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
-import { challengeRowTemplate, duelBoxTemplate } from '../templates/profile.js';
+import { duelBoxTemplate } from '../templates/profile.js';
+import { battleRowsTemplate, duelChallengeRowTemplate } from '../templates/profile-battle.js';
 
 /**
  * Opens the window where the user picks a gladiator against a friend.
@@ -26,11 +30,7 @@ function openDuelBox(nick, action, onConfirm) {
         confirm.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'duel' });
     });
-    picker.listen('blocked', ({ gladiator, reason }) => {
-        showMessage(reason === 'broken'
-            ? `O gladiador <span class='highlight'>${escapeHtml(gladiator.name)}</span> travou na última batalha. Corrija-o no editor.`
-            : `O gladiador <span class='highlight'>${escapeHtml(gladiator.name)}</span> precisa ser gravado novamente no editor.`);
-    });
+    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
     fog.querySelector('#cancel').addEventListener('click', () => fog.remove());
     confirm.addEventListener('click', () => {
@@ -70,17 +70,25 @@ export function challengeFriend(nick, friend) {
  */
 export class ChallengeList {
     #panel = document.querySelector('#duel-challenge');
+    #card = null;
+    #list = null;
 
     /**
      * @param {() => void} onDuelFought Called after a duel ran.
      */
     constructor(onDuelFought) {
         this.onDuelFought = onDuelFought;
+        this.#card = new SectionCard();
+        this.#card.setTitle('Desafios para duelo');
+        this.#list = createElement(battleRowsTemplate);
+        this.#card.setBody([this.#list]);
+        this.#panel.append(this.#card.element);
+        this.#panel.hidden = true;
     }
 
     /** @returns {number} How many challenges are shown. */
     get count() {
-        return this.#panel.querySelectorAll('.table .row').length;
+        return this.#list.querySelectorAll('.battle-row').length;
     }
 
     /**
@@ -91,27 +99,25 @@ export class ChallengeList {
     async refresh({ signal } = {}) {
         const duels = await settleRequest(() => DuelModel.challenges({ signal }), signal);
         if (!duels || signal?.aborted) return;
-        const table = this.#panel.querySelector('.table');
-        this.#panel.classList.toggle('hidden', duels.length === 0);
-        table.replaceChildren();
+        this.#panel.hidden = duels.length === 0;
+        this.#list.replaceChildren();
         duels.forEach(duel => {
-            const row = createElement(renderTemplate(challengeRowTemplate, {
+            const row = createElement(renderTemplate(duelChallengeRowTemplate, {
                 level: duel.level,
-                picture: duel.picture,
                 nick: duel.nick,
+                gladiator: duel.gladiator ?? 'Gladiador removido',
                 date: formatMessageTime(duel.time),
                 elapsed: formatMessageTime(duel.time, { short: true }),
             }));
-            const picture = row.querySelector('.image-container img');
-            if (!duel.picture && picture) {
-                const fallback = document.createElement('span');
-                fallback.className = 'challenge-initials';
-                fallback.textContent = String(duel.nick ?? '?').slice(0, 1).toUpperCase();
-                picture.replaceWith(fallback);
-            }
+            row.querySelector('.battle-row-avatar').append(new Avatar({
+                size: 'sm',
+                name: duel.nick,
+                picture: duel.picture,
+                level: duel.level,
+            }).element);
             row.querySelector('.refuse').addEventListener('click', () => this.#refuse(row, duel));
             row.querySelector('.accept').addEventListener('click', () => this.#accept(duel));
-            table.append(row);
+            this.#list.append(row);
         });
     }
 
@@ -129,7 +135,7 @@ export class ChallengeList {
         }
         showMessage('Desafio recusado');
         row.remove();
-        if (this.count === 0) this.#panel.classList.add('hidden');
+        if (this.count === 0) this.#panel.hidden = true;
     }
 
     /** @param {Record<string, any>} duel Challenge. */

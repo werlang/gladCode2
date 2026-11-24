@@ -2,6 +2,10 @@
  * Page controls (components/pagination.js): a simple previous/next row or numbered pages plus the
  * go-to-position form.
  */
+.pagination[hidden] {
+    display: none;
+}
+
 .pagination {
     display: flex;
     flex-wrap: wrap;

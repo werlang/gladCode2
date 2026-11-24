@@ -52,7 +52,9 @@ export class ChoiceCards extends BaseComponent {
             button.dataset.value = option.value;
             button.disabled = Boolean(option.disabled);
             button.setAttribute('aria-checked', 'false');
-            if (option.badge) button.querySelector('.choice-card-badge').hidden = false;
+            const badge = button.querySelector('.choice-card-badge');
+            badge.hidden = !option.badge;
+            badge.classList.toggle('is-alert', Boolean(option.alert));
             button.addEventListener('click', () => this.set(option.value));
             button.addEventListener('keydown', event => this.#onKey(event, option.value));
             this.#buttons.push(button);

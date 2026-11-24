@@ -78,9 +78,6 @@ export const teamsHeadTemplate = `<div class='row head'><div class='cell'>Nome</
 
 export const teamRowTemplate = `<div class='row {{state}}' role='button' tabindex='0'><div class='cell'>{{name}}</div><div class='cell'>{{glads}}/3</div><div class='kick' title='Expulsar equipe'><i class='fas fa-times-circle'></i></div></div>`;
 
-export const listHeadTemplate = `<div class='row head'><div class='cell'>Identificador</div><div class='cell'>Descrição</div><div class='cell'>Equipes</div><div class='cell'>Flex</div></div>`;
-
-export const listRowTemplate = `<div class='row' role='button' tabindex='0'><div class='cell' id='name'>{{name}}</div><div class='cell'>{{description}}</div><div class='cell'>{{teams}}/{{maxteams}}</div><div class='cell flex'>{{{flex}}}</div></div>`;
 
 export const teamWindowTemplate = `
 <div id='fog' class='team'>

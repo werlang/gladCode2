@@ -1,5 +1,5 @@
-/** Batalhas section shell (css/profile-battle.css). The tournament/training inner markup is kept
- * because those flows keep their existing windows and tables; the ranked/duel parts are rebuilt. */
+/** Batalhas section shell (css/profile-battle.css). The list cards are built by their controllers so
+ * they can use SectionCard and Pagination while the existing windows keep their behaviour. */
 export const battleShellTemplate = `
 <div class='battle-page'>
     <div id='battle-header'></div>
@@ -20,55 +20,60 @@ export const battleShellTemplate = `
         </div>
 
         <div id='duel' class='battle-panel wrapper' hidden>
-            <section class='battle-list surface-card'>
-                <div class='battle-list-head'>
-                    <h2>Desafiar um amigo</h2>
-                    <p>Escolha um amigo e o gladiador que vai representar você.</p>
-                </div>
-                <div id='duel-friend-search'>
-                    <input class='input' type='search' placeholder='apelido-do-usuario' aria-label='Filtrar amigos'>
-                </div>
-                <div id='table-friends' class='friend-list'></div>
-                <div class='battle-list-actions'>
-                    <button id='challenge' class='button primary' disabled>DESAFIAR</button>
-                </div>
-            </section>
-            <section id='duel-challenge' class='battle-list surface-card hidden'>
-                <div class='battle-list-head'><h2>Desafios para duelo</h2></div>
-                <div class='table'></div>
-            </section>
+            <div id='duel-friends'></div>
+            <div id='duel-challenge'></div>
         </div>
 
-        <div id='tourn' class='battle-panel wrapper' hidden>
-            <section class='battle-list surface-card'>
-                <div class='title open'><h2>Torneios públicos abertos</h2><div id='offset' class='open'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev' aria-label='Anterior'><i class='fas fa-chevron-left'></i></button><button id='next' aria-label='Próxima'><i class='fas fa-chevron-right'></i></button></div></div>
-                <div id='table-open' class='table'></div>
-                <div class='battle-list-actions'>
-                    <button id='create' class='button primary'>CRIAR UM TORNEIO</button>
-                    <button id='join' class='button neutral'>INGRESSAR EM UM TORNEIO</button>
-                </div>
-            </section>
-            <section class='battle-list surface-card'>
-                <div class='title mine' id='mytourn'><h2>Meus torneios</h2><div id='offset' class='mine'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev' aria-label='Anterior'><i class='fas fa-chevron-left'></i></button><button id='next' aria-label='Próxima'><i class='fas fa-chevron-right'></i></button></div></div>
-                <div id='table-mytourn' class='table'></div>
-            </section>
-        </div>
-
-        <div id='train' class='battle-panel wrapper' hidden>
-            <section class='battle-list surface-card'>
-                <div class='title manage'><h2>Treinos que gerencio</h2><div id='offset' class='manage'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev' aria-label='Anterior'><i class='fas fa-chevron-left'></i></button><button id='next' aria-label='Próxima'><i class='fas fa-chevron-right'></i></button></div></div>
-                <div id='table-manage' class='table'></div>
-                <div class='battle-list-actions'>
-                    <button id='create' class='button primary'>NOVO TREINO</button>
-                </div>
-            </section>
-            <section class='battle-list surface-card'>
-                <div class='title part'><h2>Treinos que participo</h2><div id='offset' class='part'><span class='start'>0</span> - <span class='end'>0</span> de <span class='total'>0</span><button id='prev' aria-label='Anterior'><i class='fas fa-chevron-left'></i></button><button id='next' aria-label='Próxima'><i class='fas fa-chevron-right'></i></button></div></div>
-                <div id='table-part' class='table'></div>
-                <div class='battle-list-actions'>
-                    <button id='join' class='button neutral'>PARTICIPAR DE TREINO</button>
-                </div>
-            </section>
-        </div>
+        <div id='tourn' class='battle-panel wrapper' hidden></div>
+        <div id='train' class='battle-panel wrapper' hidden></div>
     </div>
 </div>`;
+
+/** The friend-search card of the duel mode. */
+export const duelFriendsTemplate = `
+<div class='duel-friends'>
+    <p class='battle-list-copy'>Escolha um amigo e o gladiador que vai representar você.</p>
+    <label class='field-label' for='duel-friend-filter'>Filtrar amigos</label>
+    <input id='duel-friend-filter' class='input' type='search' placeholder='apelido-do-usuario' aria-label='Filtrar amigos'>
+    <div id='table-friends' class='friend-list' role='list'></div>
+</div>`;
+
+/** One pending duel challenge; the accept/refuse buttons stay visible on phones. */
+export const duelChallengeRowTemplate = `
+<div class='battle-row' role='listitem'>
+    <span class='battle-row-avatar'></span>
+    <span class='battle-row-main'>
+        <span class='battle-row-title'>{{nick}}</span>
+        <span class='battle-row-sub'>{{gladiator}} · nível {{level}}</span>
+    </span>
+    <span class='battle-row-meta' title='{{date}}'>{{elapsed}}</span>
+    <span class='battle-row-actions'>
+        <button type='button' class='button ghost small refuse'>Recusar</button>
+        <button type='button' class='button primary small accept'>Aceitar</button>
+    </span>
+</div>`;
+
+/** One tournament row of the public or the master's list. */
+export const tournamentRowTemplate = `
+<div class='battle-row battle-row--button' role='button' tabindex='0'>
+    <span class='battle-row-main'>
+        <span class='battle-row-title'>{{name}}</span>
+        <span class='battle-row-sub'>{{description}}</span>
+    </span>
+    <span class='battle-row-meta'>{{teams}}/{{maxteams}} equipes</span>
+    <span class='battle-row-tag'>{{flex}}</span>
+</div>`;
+
+/** One training row; `actions` is markup built by the section (the manager's remove button). */
+export const trainingRowTemplate = `
+<div class='battle-row battle-row--button' role='button' tabindex='0'>
+    <span class='battle-row-main'>
+        <span class='battle-row-title'>{{name}}</span>
+        <span class='battle-row-sub'>{{description}}</span>
+    </span>
+    <span class='battle-row-meta'>{{masters}} mestres</span>
+    {{{actions}}}
+</div>`;
+
+/** A list container inside a SectionCard. */
+export const battleRowsTemplate = `<div class='battle-rows' role='list'></div>`;
