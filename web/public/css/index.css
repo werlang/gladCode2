@@ -304,6 +304,7 @@ body.home #header #menu-button {
 
 .code-bar .tabs {
 	display: flex;
+	flex-wrap: wrap;
 }
 
 .code-bar button {
