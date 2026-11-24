@@ -237,27 +237,26 @@ test('the table marks the own row, the trend and the context', () => {
     assert.match(element.querySelector('.ranking-context-text').textContent, /Em volta de/);
 });
 
-test('an own strip disables the reasons and only ranked chips jump', () => {
+test('an own strip keeps the position of outdated and broken chips', () => {
     const element = fakeNode();
     const jumps = [];
     const strip = new OwnGladiatorJump({ element, paint: () => {} });
     strip.listen('jump', detail => jumps.push(detail));
     strip.setGladiators([
         { id: 1, name: 'Aurora', position: 2, state: 'ranked', skin: '' },
-        { id: 2, name: 'Cícero', position: null, state: 'outdated', skin: '' },
-        { id: 3, name: 'Ferrugem', position: null, state: 'broken', skin: '' },
-        { id: 4, name: 'Novo', position: null, state: 'unranked', skin: '' },
+        { id: 2, name: 'Cícero', position: 220, state: 'outdated', skin: '' },
+        { id: 3, name: 'Ferrugem', position: 240, state: 'broken', skin: '' },
     ]);
     const chips = element.querySelector('.own-gladiator-list').appendedNodes;
-    assert.equal(chips.length, 4);
+    assert.equal(chips.length, 3);
     assert.equal(chips[0].disabled, false);
     assert.equal(chips[0].dataset.state, 'ranked');
-    assert.equal(chips[1].disabled, true);
-    assert.equal(chips[1].dataset.state, 'outside');
-    assert.equal(chips[2].disabled, true);
-    assert.equal(chips[3].disabled, true);
-    chips[0].click();
-    assert.deepEqual(jumps, [{ gladiator: { id: 1, name: 'Aurora' }, position: 2 }]);
+    assert.equal(chips[1].disabled, false);
+    assert.equal(chips[1].dataset.state, 'outdated');
+    assert.equal(chips[2].disabled, false);
+    assert.equal(chips[2].dataset.state, 'broken');
+    chips[1].click();
+    assert.deepEqual(jumps, [{ gladiator: { id: 2, name: 'Cícero' }, position: 220 }]);
 });
 
 test('a search answer that arrives after leaving does not replace the table', async () => {
@@ -290,6 +289,70 @@ test('a search answer that arrives after leaving does not replace the table', as
         release();
         await shown;
         assert.equal(body.innerHTML, 'previous rows');
+    }
+    finally {
+        restore();
+    }
+});
+
+test('Voltar ao topo leaves the window and reloads the general first page', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    const calls = [];
+    const topped = [];
+    const unsubscribe = events.on(APP_EVENTS.rankingTopped, detail => topped.push(detail));
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [] }),
+        page: async query => {
+            calls.push(query.offset);
+            return { total: 4, ranking: [] };
+        },
+        window: async () => ({ total: 4, position: 3, page: 1, pageSize: 10, around: 'Brutus', rows: [] }),
+    });
+    try {
+        const tab = new RankingTab();
+        await tab.show({ query: { at: 3 } }, { signal: new AbortController().signal });
+        const table = root.querySelector('#ranking-table-host').appendedNodes[0];
+        table.querySelector('.ranking-top').click();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        assert.equal(calls.at(-1), 0);
+        assert.deepEqual(topped, [{}]);
+    }
+    finally {
+        unsubscribe();
+        restore();
+    }
+});
+
+test('a stale read failure is ignored without a toast', async () => {
+    const { panel: root } = panel();
+    installDocument(new Map([['#ranking-container', root]]));
+    let failOld;
+    let started;
+    const startedPromise = new Promise(resolve => { started = resolve; });
+    const restore = patchRanking({
+        tabs: async () => [],
+        mine: async () => ({ gladiators: [] }),
+        page: query => {
+            if (query.search === 'Old') {
+                started();
+                return new Promise((resolve, reject) => { failOld = () => reject(new Error('old failure')); });
+            }
+            return Promise.resolve({ total: 4, ranking: [] });
+        },
+        window: async () => ({ total: 4, position: 1, page: 1, pageSize: 10, around: null, rows: [] }),
+    });
+    try {
+        const tab = new RankingTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        const old = tab.show({ query: { q: 'Old' } }, { signal: new AbortController().signal });
+        await startedPromise;
+        const fresh = tab.show({ query: { q: 'New' } }, { signal: new AbortController().signal });
+        await fresh;
+        failOld();
+        await old;
+        assert.equal(document.body.appendedNodes.length, 0);
     }
     finally {
         restore();

@@ -203,3 +203,36 @@ test('a pager can name what it counts in the summary', () => {
         globalThis.document = previousDocument;
     }
 });
+
+test('the go-to form reports an out-of-range position instead of clamping it', () => {
+    const previousDocument = globalThis.document;
+    const fakeDocument = { activeElement: null };
+    fakeDocument.createElement = tagName => makeNode(fakeDocument, tagName);
+    fakeDocument.createDocumentFragment = () => {
+        const fragment = makeNode(fakeDocument, '#fragment');
+        fragment.isFragment = true;
+        return fragment;
+    };
+    globalThis.document = fakeDocument;
+    try {
+        const root = makeNode(fakeDocument);
+        const pagination = new Pagination({ element: root, variant: 'numbered' });
+        pagination.set({ page: 1, pages: 2, total: 20, pageSize: 10 });
+        const jumps = [];
+        const invalid = [];
+        pagination.listen('jump', detail => jumps.push(detail));
+        pagination.listen('invalid', detail => invalid.push(detail));
+        const form = root.children.find(child => child.className === 'pagination-jump');
+        const input = form.children.find(child => child.className === 'pagination-jump-input');
+        input.value = '99';
+        form.dispatchEvent({ type: 'submit', preventDefault: () => {} });
+        assert.deepEqual(invalid, [{ value: '99' }]);
+        assert.deepEqual(jumps, []);
+        input.value = '20';
+        form.dispatchEvent({ type: 'submit', preventDefault: () => {} });
+        assert.deepEqual(jumps, [{ position: 20 }]);
+    }
+    finally {
+        globalThis.document = previousDocument;
+    }
+});
