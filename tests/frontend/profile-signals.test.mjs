@@ -293,6 +293,43 @@ test('messages ignore a conversation list that arrives after leaving', async () 
     }
 });
 
+test('opening a conversation selects its row without reopening the thread', async () => {
+    const listPane = fakeNode();
+    const root = fakeNode({
+        '#messages-header': fakeNode(),
+        '#messages-shell': fakeNode(),
+        '#messages-list-pane': listPane,
+        '#messages-thread-pane': fakeNode(),
+    });
+    installDocument(new Map([['#messages-container', root]]));
+    const original = {
+        list: ConversationModel.list,
+        thread: ConversationModel.thread,
+        markRead: ConversationModel.markRead,
+    };
+    const user = { id: 9, nick: 'Bo', picture: '', level: 4, online: false };
+    let threadCalls = 0;
+    ConversationModel.list = async () => ({
+        conversations: [{ user, last: null, unread: 0 }],
+    });
+    ConversationModel.thread = async () => {
+        threadCalls += 1;
+        return { user, messages: [], total: 0, offset: 0, pageSize: 30 };
+    };
+    ConversationModel.markRead = async userId => ({ userId, read: 0, unreadTotal: 0 });
+    try {
+        const tab = new MessagesTab();
+        await tab.show({}, { signal: new AbortController().signal });
+        await new Promise(resolve => setTimeout(resolve, 20));
+        assert.equal(threadCalls, 1);
+    }
+    finally {
+        ConversationModel.list = original.list;
+        ConversationModel.thread = original.thread;
+        ConversationModel.markRead = original.markRead;
+    }
+});
+
 test('potions do not draw slots from an aborted load', async () => {
     const container = fakeNode();
     const browse = fakeNode();

@@ -116,7 +116,7 @@ export class MessagesTab {
         if (!this.#list.has(data.user.id)) this.#list.upsert({ user: data.user, last: null, unread: 0 });
         this.#thread.setConversation(data);
         this.#thread.setBusy(false);
-        this.#list.select(userId);
+        this.#list.select(userId, { silent: true });
         this.#composer.setPlaceholder(`Escreva para ${data.user.nick}`);
         this.#composer.clear();
         this.#composer.element.hidden = false;
