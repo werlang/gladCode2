@@ -86,7 +86,7 @@ function payloadDir() {
 /**
  * Runs one battle in the sandboxed engine.
  *
- * The run folder gets the engine sources and one `code<i>.c|py` per gladiator; the runner
+ * The run folder gets the engine sources and one `code<i>.c|py|js` per gladiator; the runner
  * (`runner/`) copies it into the Docker-in-Docker volume, compiles and runs it, deletes it and
  * answers with the engine's error output and simulation log. At most `RUNNER_CONCURRENCY` (6)
  * battles run at once; the others wait.

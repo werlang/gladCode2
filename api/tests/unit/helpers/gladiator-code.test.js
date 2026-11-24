@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { runInNewContext } from 'node:vm';
 import {
     attributeCost, bannedFunctionsUsed, detectLanguage, engineSource, hasValidSetup, insertBreakpoints,
     prepareEditorSource, readDeclarations, setupBlock, stripSetup, validAttributes,
@@ -20,6 +21,22 @@ describe('gladiator code helpers', () => {
         expect(detectLanguage('loop(){}')).toBe('c');
     });
 
+    test('the language is JavaScript when the code declares or assigns loop()', () => {
+        expect(detectLanguage('function loop() {\n    stepForward();\n}')).toBe('javascript');
+        expect(detectLanguage('function  loop(){}')).toBe('javascript');
+        expect(detectLanguage('const loop = () => stepForward();')).toBe('javascript');
+        expect(detectLanguage('let loop=function () {};')).toBe('javascript');
+        expect(detectLanguage('loop = () => turn(5);')).toBe('javascript');
+        // C names, comments and strings are not JavaScript: saved C gladiators keep their language
+        expect(detectLanguage('int loops = 0;\nloop(){}')).toBe('c');
+        expect(detectLanguage('// const loop = estrategia\nloop(){\n}')).toBe('c');
+        expect(detectLanguage('/* function loop() roda a cada passo */ loop(){}')).toBe('c');
+        expect(detectLanguage('loop(){ speak("var loop = 1"); }')).toBe('c');
+        expect(detectLanguage('void loop()\n{\n}')).toBe('c');
+        expect(detectLanguage('loop()\r\n{\r\n    speak("const loop = 1");\r\n}')).toBe('c');
+        expect(detectLanguage('# function loop()\ndef loop():\n    pass')).toBe('python');
+    });
+
     test('a setup is valid only when its attributes spend the budget', () => {
         expect(hasValidSetup(`${C_SETUP}loop(){}`)).toBe(true);
         expect(hasValidSetup('setup(){ setSTR(30); }')).toBe(false);
@@ -31,6 +48,59 @@ describe('gladiator code helpers', () => {
         expect(c).toContain('setName("Zed@a\\"b\\\\c");');
         expect(c.endsWith('}\n\n')).toBe(true);
         expect(setupBlock('python', { name: 'Zed', nick: 'n', vstr: 1, vagi: 2, vint: 3, slots: '1,0,0,0' })).toContain('# start of user code\n');
+        expect(setupBlock('javascript', { name: 'Zed', nick: 'a"b', vstr: 10, vagi: 18, vint: 0, slots: '1,0,0,0' })).toBe(
+            'function setup() {\n    setName("Zed@a\\"b");\n    setSTR(10);\n    setAGI(18);\n    setINT(0);\n    setSlots("1,0,0,0");\n}\n// start of user code\n',
+        );
+    });
+
+    test('a JavaScript gladiator with a generated setup is valid, runs as is and strips back to its code', () => {
+        const code = 'function loop() {\n    stepForward();\n}';
+        const full = setupBlock('javascript', { name: 'Zed', nick: 'n', vstr: 10, vagi: 18, vint: 0, slots: '0,0,0,0' }) + code;
+        expect(detectLanguage(full)).toBe('javascript');
+        expect(hasValidSetup(full)).toBe(true);
+        expect(engineSource(full)).toEqual({ file: 'js', text: full });
+        expect(stripSetup(full)).toBe(code);
+        expect(stripSetup(code)).toBe(code);
+    });
+
+    test('JavaScript breakpoints count lines from the marker and brace one-line bodies', () => {
+        const setup = setupBlock('javascript', { name: 'Zed', nick: 'n', vstr: 10, vagi: 18, vint: 0, slots: '0,0,0,0' });
+        const result = insertBreakpoints(`${setup}function loop() {\n    if (a)\n        stepForward();\n}`, [2, 3]).split('\n');
+        expect(result).toContain('breakpoint("if (a)");');
+        expect(result).toContain('        {');
+        expect(result).toContain('            breakpoint("stepForward();");');
+        expect(result).toContain('        stepForward();');
+        expect(result).toContain('        }');
+    });
+
+    test('JavaScript breakpoints keep trailing and comment-only lines inside the condition', () => {
+        const setup = setupBlock('javascript', { name: 'Zed', nick: 'n', vstr: 10, vagi: 18, vint: 0, slots: '0,0,0,0' });
+        const cases = [
+            ['function loop() {\n    if (getHit()) // ferido\n        turn(180);\n    stepForward();\n}', [2, 3], false, [], false],
+            ['function loop() {\n    if (getHit()) // ferido\n        turn(180);\n    stepForward();\n}', [2, 3], true, ['turn:180'], true],
+            ['function loop() {\n    if (getHit())\n        // ainda ferido\n        turn(180);\n    stepForward();\n}', [3], false, [], false],
+            ['function loop() {\n    if (getHit()) turn(1);\n    else // recuperado\n        turn(180);\n}', [4], false, ['turn:180'], true],
+        ];
+        for (const [code, lines, hit, turns, paused] of cases) {
+            const instrumented = stripSetup(insertBreakpoints(setup + code, lines));
+            const calls = [];
+            const context = {
+                getHit: () => hit,
+                turn: angle => calls.push(`turn:${angle}`),
+                stepForward: () => calls.push('step'),
+                breakpoint: line => calls.push(`breakpoint:${line}`),
+            };
+            runInNewContext(`${instrumented}\nloop();`, context);
+            expect(calls.filter(call => call.startsWith('turn:'))).toEqual(turns);
+            expect(calls.includes('breakpoint:turn(180);')).toBe(paused);
+            if (code.includes('stepForward')) expect(calls).toContain('step');
+        }
+    });
+
+    test('C breakpoints keep an unbraced body conditional after a trailing comment', () => {
+        const code = `${C_SETUP}loop(){\n    if (a) // comentario\n        stepForward();\n}`;
+        const result = insertBreakpoints(code, [3]);
+        expect(result).toContain('        {\n            breakpoint("stepForward();");\n        stepForward();\n        }');
     });
 
     test('editor sources lose their skin and user calls and tag the name with the nick', () => {
@@ -45,9 +115,10 @@ describe('gladiator code helpers', () => {
     test('breakpoints go before the chosen user lines', () => {
         const code = `${C_SETUP}loop(){\n    if (a)\n        stepForward();\n}`;
         const result = insertBreakpoints(code, [2]).split('\n');
-        const at = result.indexOf('breakpoint("if (a){");');
+        const at = result.indexOf('breakpoint("if (a)");');
         expect(at).toBeGreaterThan(-1);
-        expect(result[at + 1]).toBe('    if (a){');
+        expect(result[at + 1]).toBe('    if (a)');
+        expect(result[at + 2]).toBe('        stepForward();');
 
         const python = 'def setup():\n    setSTR(1)\n# start of user code\ndef loop():\n    stepForward()\n';
         expect(insertBreakpoints(python, [2])).toContain('    breakpoint("stepForward()")\n    stepForward()');

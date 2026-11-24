@@ -10,12 +10,29 @@ export const MAX_ATTRIBUTE = 30;
 /** Gladiator names: letters, digits, `_`, spaces and accented letters. */
 export const NAME_PATTERN = /^[\w À-ú]+$/u;
 
+/** A C `loop()` definition line (`loop(){`, `void loop() {`, `loop()` with the brace below). */
+const C_LOOP = /^[ \t]*(?:void[ \t]+|int[ \t]+)?loop[ \t]*\([ \t]*(?:void[ \t]*)?\)[ \t]*(?:\{|\r?$)/m;
 /**
+ * A line that declares JavaScript's `function loop()` or assigns it (`const loop = () => ...`),
+ * at its start so comments and strings do not count.
+ */
+const JAVASCRIPT_LOOP = /^[ \t]*(?:function[ \t]+loop[ \t]*\(|(?:(?:const|let|var)[ \t]+)?loop[ \t]*=)/m;
+/** Line the server writes between a Python or JavaScript `setup()` and the user code. */
+const USER_CODE_MARKER = { python: '# start of user code', javascript: '// start of user code' };
+
+/**
+ * The language of a gladiator's code: Python defines `def loop():`, C a `loop(){` line, JavaScript
+ * a `function loop()` (or `const loop = ...`) line, anything else is C. C is checked before
+ * JavaScript so a saved C gladiator never changes language over a comment. Same rule as the
+ * editor's `web/public/script/helpers/code-language.js`.
+ *
  * @param {string} code
- * @returns {'c'|'python'}
+ * @returns {'c'|'python'|'javascript'}
  */
 export function detectLanguage(code) {
-    return code.includes('def loop():') ? 'python' : 'c';
+    if (code.includes('def loop():')) return 'python';
+    if (C_LOOP.test(code)) return 'c';
+    return JAVASCRIPT_LOOP.test(code) ? 'javascript' : 'c';
 }
 
 /**
@@ -92,7 +109,7 @@ export function bannedFunctionsUsed(code, banned) {
 }
 
 /**
- * Escapes text for a C or Python double-quoted string literal.
+ * Escapes text for a C, Python or JavaScript double-quoted string literal.
  *
  * @param {string} text
  * @returns {string}
@@ -104,15 +121,19 @@ export function quoteLiteral(text) {
 /**
  * The `setup()` the server writes in front of a saved gladiator's code.
  *
- * @param {'c'|'python'} language
+ * @param {'c'|'python'|'javascript'} language
  * @param {{ name: string, nick: string, vstr: number, vagi: number, vint: number, slots: string }} glad
  *   `slots` is the potion list, e.g. `"0,0,0,0"`.
- * @returns {string}
+ * @returns {string} Python and JavaScript setups end with the user code marker line, which
+ *   `Payload/gladCodeCore.js` splits on to run the JavaScript setup apart from the user code.
  */
 export function setupBlock(language, { name, nick, vstr, vagi, vint, slots }) {
     const fullName = quoteLiteral(`${name}@${nick}`);
     if (language === 'python') {
-        return `def setup():\n    setName("${fullName}")\n    setSTR(${vstr})\n    setAGI(${vagi})\n    setINT(${vint})\n    setSlots("${slots}")\n# start of user code\n`;
+        return `def setup():\n    setName("${fullName}")\n    setSTR(${vstr})\n    setAGI(${vagi})\n    setINT(${vint})\n    setSlots("${slots}")\n${USER_CODE_MARKER.python}\n`;
+    }
+    if (language === 'javascript') {
+        return `function setup() {\n    setName("${fullName}");\n    setSTR(${vstr});\n    setAGI(${vagi});\n    setINT(${vint});\n    setSlots("${slots}");\n}\n${USER_CODE_MARKER.javascript}\n`;
     }
     return `setup(){\n    setName("${fullName}");\n    setSTR(${vstr});\n    setAGI(${vagi});\n    setINT(${vint});\n    setSlots("${slots}");\n}\n\n`;
 }
@@ -140,18 +161,98 @@ export function prepareEditorSource(code, fallbackNick) {
     return { code: source, name, nick, skin };
 }
 
+/** A C/JavaScript control statement whose body may be the next statement. */
+const CONTROL_LINE = /^[ \t]*(?:if|for|while|else|do)\b/;
+
+/**
+ * Replaces comments and quoted text with spaces while preserving line breaks. Breakpoint
+ * instrumentation uses this to find the previous executable line without treating a comment as
+ * code; C and JavaScript share these comment and string delimiters.
+ *
+ * @param {string} code
+ * @returns {string}
+ */
+function maskCommentsAndStrings(code) {
+    let masked = '';
+    let blockComment = false;
+    let quote = '';
+    let escaped = false;
+    for (let index = 0; index < code.length; index++) {
+        const char = code[index];
+        const next = code[index + 1];
+        if (char === '\n' || char === '\r') {
+            masked += char;
+            escaped = false;
+            continue;
+        }
+        if (blockComment) {
+            masked += ' ';
+            if (char === '*' && next === '/') {
+                masked += ' ';
+                index++;
+                blockComment = false;
+            }
+            continue;
+        }
+        if (quote) {
+            masked += ' ';
+            if (escaped) escaped = false;
+            else if (char === '\\') escaped = true;
+            else if (char === quote) quote = '';
+            continue;
+        }
+        if (char === '/' && next === '*') {
+            masked += '  ';
+            index++;
+            blockComment = true;
+            continue;
+        }
+        if (char === '/' && next === '/') {
+            while (index < code.length && code[index] !== '\n') {
+                masked += ' ';
+                index++;
+            }
+            index--;
+            continue;
+        }
+        if (char === '"' || char === "'" || char === '`') {
+            quote = char;
+            masked += ' ';
+            continue;
+        }
+        masked += char;
+    }
+    return masked;
+}
+
+/**
+ * Nearest preceding line with executable code, ignoring blank and comment-only lines.
+ *
+ * @param {string[]} rows Masked source lines.
+ * @param {number} index Target line index.
+ * @returns {string|null}
+ */
+function previousCodeLine(rows, index) {
+    for (let row = index - 1; row >= 0; row--) {
+        if (rows[row].trim()) return rows[row];
+    }
+    return null;
+}
+
 /**
  * Inserts `breakpoint("<line>")` calls before the editor's breakpoint lines, so the replay pauses
- * there. Line numbers count from the first line after `setup()`.
+ * there. Line numbers count from the first line after `setup()` (after the marker line in Python
+ * and JavaScript).
  *
  * @param {string} code Full source with its `setup()`.
  * @param {number[]} lines 1-based lines of the user's code.
  * @returns {string}
  */
 export function insertBreakpoints(code, lines) {
-    if (detectLanguage(code) === 'python') {
+    const language = detectLanguage(code);
+    if (language === 'python') {
         const rows = code.split('\n');
-        const start = rows.indexOf('# start of user code') + 2;
+        const start = rows.indexOf(USER_CODE_MARKER.python) + 2;
         for (const line of lines) {
             const index = line - 2 + start;
             if (rows[index] === undefined) continue;
@@ -161,29 +262,49 @@ export function insertBreakpoints(code, lines) {
         return rows.join('\n');
     }
 
-    // one-line if/for/while/else bodies get braces, so a breakpoint between them keeps the structure
-    const braced = code.replace(/((?:if|for|while) ?\([^\n]*?\))\n(.*)|(else)\n(.*)/g,
-        (match, head = '', body = '', other = '', otherBody = '') => `${head}${other}{\n${body}${otherBody}}`);
-    const rows = braced.split('\n');
-    const start = rows.indexOf('}') + 2;
-    for (const line of lines) {
+    const rows = code.split('\n');
+    const masked = maskCommentsAndStrings(code).split('\n');
+    const start = language === 'javascript' ? rows.indexOf(USER_CODE_MARKER.javascript) + 1 : rows.indexOf('}') + 2;
+    // Work backwards so wrapping one body cannot move the line numbers of earlier breakpoints.
+    for (const line of [...new Set(lines)].sort((left, right) => right - left)) {
         const index = line - 1 + start;
         if (rows[index] === undefined) continue;
-        rows[index] = `breakpoint("${quoteLiteral(rows[index].trim())}");\n${rows[index]}`;
+        const statement = rows[index].trim();
+        const executable = masked[index].trim();
+        // A statement cannot be inserted before a closing brace, else/case label or comment.
+        if (!executable || /^[}]/.test(executable) || /^(?:else|case|default)\b/.test(executable) || executable.endsWith(':')) continue;
+
+        const previous = previousCodeLine(masked, index);
+        const isControlBody = previous !== null && CONTROL_LINE.test(previous) && !/[{};]\s*$/.test(previous);
+        // A nested control header is itself a suite, not a single statement that can be wrapped.
+        if (isControlBody && CONTROL_LINE.test(executable)) continue;
+
+        const call = `breakpoint("${quoteLiteral(statement)}");`;
+        if (!isControlBody) {
+            rows.splice(index, 0, call);
+            continue;
+        }
+
+        // A block is the unbraced control statement's body, so both the pause and the original
+        // statement stay conditional instead of turning the pause into the body by itself.
+        const indent = /^[ \t]*/.exec(rows[index])[0];
+        rows.splice(index, 1, `${indent}{`, `${indent}    ${call}`, rows[index], `${indent}}`);
     }
     return rows.join('\n');
 }
 
 /**
- * The file the engine compiles for a gladiator: C includes the core, Python gets its main loop.
+ * The file the engine compiles for a gladiator: C includes the core, Python gets its main loop,
+ * JavaScript is written as is (`socket_compile.sh` runs it through `gladCodeCore.js`).
  *
  * @param {string} code Full source.
- * @returns {{ file: string, text: string }} File name suffix (`c`/`py`) and contents.
+ * @returns {{ file: string, text: string }} File name suffix (`c`/`py`/`js`) and contents.
  */
 export function engineSource(code) {
     if (detectLanguage(code) === 'python') {
         return { file: 'py', text: `from gladCodeAPI import *\n\n${code}\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n` };
     }
+    if (detectLanguage(code) === 'javascript') return { file: 'js', text: code };
     return { file: 'c', text: `#include "gladCodeCore.c"\n${code}` };
 }
 
@@ -208,6 +329,12 @@ export function readDeclarations(code) {
  * @returns {string}
  */
 export function stripSetup(code) {
-    if (detectLanguage(code) === 'python') return code.replace(/def setup\(\)[\w\W]*?:[\w\W]*?\n# start of user code\n/, '');
+    const language = detectLanguage(code);
+    if (language === 'python') return code.replace(/def setup\(\)[\w\W]*?:[\w\W]*?\n# start of user code\n/, '');
+    if (language === 'javascript') {
+        const marker = `\n${USER_CODE_MARKER.javascript}\n`;
+        const at = code.indexOf(marker);
+        return at === -1 ? code : code.slice(at + marker.length);
+    }
     return code.replace(/setup\(\)[\w\W]*?{[\w\W]*?}\n\n/, '');
 }
