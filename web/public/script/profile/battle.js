@@ -168,7 +168,7 @@ export class BattleTab {
                 picture: duel.picture,
                 name: duel.nick ?? '',
                 message: `${duel.nick ?? 'Um mestre'} desafiou você para um duelo`,
-                detail: duel.gladiator ? `Luta com ${duel.gladiator}.` : '',
+                detail: duel.gladiator ? `Luta com ${duel.gladiator}. Responda em até 2 dias.` : 'Responda em até 2 dias.',
                 acceptLabel: 'Escolher gladiador e aceitar',
                 refuseLabel: 'Recusar',
             });

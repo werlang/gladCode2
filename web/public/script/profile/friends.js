@@ -133,7 +133,7 @@ export class FriendsTab {
         try {
             await friends.answer(request.id, accepted);
             banner.clear();
-            createToast(accepted ? `Agora você e ${escapeHtml(request.nick)} são amigos` : 'Convite recusado', accepted ? 'success' : 'info');
+            createToast(accepted ? `Agora você e ${request.nick} são amigos` : 'Convite recusado', accepted ? 'success' : 'info');
             await this.#load();
         }
         catch (error) {
@@ -218,7 +218,7 @@ export class FriendsTab {
             await friends.request(user.user);
             button.textContent = 'Convite enviado';
             button.className = 'friend-search-state';
-            createToast(`Convite enviado para ${escapeHtml(user.nick)}`, 'success');
+            createToast(`Convite enviado para ${user.nick}`, 'success');
         }
         catch (error) {
             button.disabled = false;

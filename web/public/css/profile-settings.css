@@ -76,7 +76,7 @@
 
 .profile-hero-meta {
     margin: 0;
-    color: color-mix(in srgb, var(--color-header-text) 64%, transparent);
+    color: var(--color-text-on-brand-muted);
     font-size: var(--text-sm);
 }
 
@@ -104,7 +104,7 @@
 }
 
 .profile-hero-xp-label {
-    color: color-mix(in srgb, var(--color-header-text) 64%, transparent);
+    color: var(--color-text-on-brand-muted);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     white-space: nowrap;
@@ -125,7 +125,7 @@
 }
 
 .profile-hero-stats dt {
-    color: color-mix(in srgb, var(--color-header-text) 62%, transparent);
+    color: var(--color-text-on-brand);
     font-size: var(--text-xs);
 }
 

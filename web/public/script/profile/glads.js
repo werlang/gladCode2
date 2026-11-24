@@ -1,5 +1,6 @@
 import { showDialog } from '../components/dialog.js';
-import { GladiatorCard, emptyGladiatorCard } from '../components/gladiator-card.js';
+import { setGladImageElement } from '../components/glad-card.js';
+import { GladiatorCard, emptyGladiatorCard, gladiatorState } from '../components/gladiator-card.js';
 import { PageHeader } from '../components/page-header.js';
 import { SegmentedControl } from '../components/segmented-control.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
@@ -7,8 +8,9 @@ import { settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import { pageHeaderTemplate } from '../templates/page-header.js';
-import { gladsShellTemplate } from '../templates/profile-glads.js';
+import { gladsPhoneNewTemplate, gladsPhoneRowTemplate, gladsShellTemplate } from '../templates/profile-glads.js';
 import { codeBlockTemplate, codeBoxTemplate } from '../templates/profile.js';
+import { icon } from '../templates/icons.js';
 import { profile } from './session.js';
 
 /** Gladiators every master can have, one more every `PER_LEVELS` levels, up to `MAX_GLADS`. */
@@ -66,6 +68,7 @@ export class GladsTab {
     #header = null;
     #filter = null;
     #grid = null;
+    #phone = null;
     #empty = null;
     #glads = [];
     #cards = [];
@@ -88,6 +91,7 @@ export class GladsTab {
         const add = createElement("<a class='button primary' href='/newglad'><i class='fa-solid fa-plus' aria-hidden='true'></i> Novo gladiador</a>");
         this.#header.setActions([this.#filter.element, add]);
         this.#grid = this.#root.querySelector('#glads-grid');
+        this.#phone = this.#root.querySelector('#glads-phone');
         this.#empty = this.#root.querySelector('#glads-empty');
         this.#built = true;
     }
@@ -125,6 +129,7 @@ export class GladsTab {
         for (const card of this.#cards) card.destroy();
         this.#cards = [];
         this.#grid.replaceChildren();
+        this.#phone.replaceChildren();
         this.#empty.hidden = true;
         const filtered = this.#glads.filter(glad => {
             if (this.#filterValue === 'ready') return !glad.broken && !glad.outdated;
@@ -144,6 +149,22 @@ export class GladsTab {
         }
 
         for (const glad of filtered) {
+            const state = gladiatorState(glad);
+            const note = state === 'broken'
+                ? 'Com erro: veja o relatório'
+                : state === 'outdated'
+                    ? 'Desatualizado: grave no editor'
+                    : `Pronto · ${Number(glad.mmr || 0).toLocaleString('pt-BR')} de renome`;
+            const row = createElement(renderTemplate(gladsPhoneRowTemplate, {
+                id: glad.id,
+                state,
+                name: glad.name,
+                note,
+                chevron: icon('chevron', { size: 18, className: 'icon glads-phone-chevron' }),
+            }));
+            setGladImageElement(row.querySelector('.glads-phone-thumb'), glad.skin ?? '');
+            this.#phone.append(row);
+
             const card = new GladiatorCard({ gladiator: glad });
             card.listen('battle', () => { location.href = `/battle?glad=${glad.id}`; });
             card.listen('code', () => showCode(glad));
@@ -156,6 +177,11 @@ export class GladsTab {
         const free = Math.max(0, limit - this.#glads.length);
         if (this.#filterValue === 'all' && free > 0) {
             this.#grid.append(emptyGladiatorCard(`${free} vaga${free === 1 ? '' : 's'} livre${free === 1 ? '' : 's'}`));
+            const row = createElement(renderTemplate(gladsPhoneNewTemplate, {
+                plus: icon('plus', { size: 20, className: 'icon' }),
+                chevron: icon('chevron', { size: 18, className: 'icon glads-phone-chevron' }),
+            }));
+            this.#phone.append(row);
         }
     }
 

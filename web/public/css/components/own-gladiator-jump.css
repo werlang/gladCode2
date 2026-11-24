@@ -58,12 +58,6 @@
 .own-gladiator-chip[data-state='outdated'],
 .own-gladiator-chip[data-state='broken'] {
     background: transparent;
-    opacity: 0.68;
-}
-
-.own-gladiator-chip[data-state='outdated'].is-active,
-.own-gladiator-chip[data-state='broken'].is-active {
-    opacity: 1;
 }
 
 .own-gladiator-chip:disabled {
@@ -116,21 +110,22 @@
 }
 
 .own-gladiator-state {
-    color: var(--color-accent);
+    color: var(--color-accent-on-brand);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     font-weight: 500;
 }
 
 .own-gladiator-chip[data-state='outdated'] .own-gladiator-state,
-.own-gladiator-chip[data-state='broken'] .own-gladiator-state {
-    color: var(--color-text-on-brand-muted);
+.own-gladiator-chip[data-state='broken'] .own-gladiator-state,
+.own-gladiator-chip.is-active .own-gladiator-state {
+    color: var(--color-text-on-brand);
 }
 
 .own-gladiator-arrow {
     display: inline-flex;
     margin-left: var(--space-1);
-    color: var(--color-accent);
+    color: var(--color-accent-on-brand);
 }
 
 .own-gladiator-arrow-icon {

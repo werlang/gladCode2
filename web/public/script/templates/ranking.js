@@ -28,7 +28,7 @@ export const rankingTableTemplate = `
         <span class='ranking-context-text'></span>
         <button type='button' class='ranking-top'>{{{up}}}<span>Voltar ao topo</span></button>
     </div>
-    <div class='ranking-scroll'>
+    <div class='ranking-scroll' tabindex='0' role='region' aria-label='Tabela de ranking'>
         <table class='ranking-grid'>
             <thead>
                 <tr>
@@ -88,7 +88,7 @@ export const customRankingTemplate = `
     <div class='ranking-context'>
         <span class='ranking-context-text'></span>
     </div>
-    <div class='ranking-scroll'>
+    <div class='ranking-scroll' tabindex='0' role='region' aria-label='Tabela de ranking'>
         <table class='ranking-grid ranking-grid--masters'>
             <thead>
                 <tr>

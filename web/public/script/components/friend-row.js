@@ -41,6 +41,7 @@ export class FriendRow extends BaseComponent {
     setFriend(friend) {
         this.#friend = friend;
         this.element.querySelector('.friend-name').textContent = friend.nick ?? '';
+        this.element.querySelector('.friend-challenge').setAttribute('aria-label', `Desafiar ${friend.nick ?? ''}`);
         this.element.querySelector('.friend-meta-text').textContent = `Nível ${friend.level ?? 0} · melhor: ${friend.bestGladiator ?? '—'}`;
         this.element.querySelector('.friend-mmr').textContent = friend.bestRenown != null
             ? Number(friend.bestRenown).toLocaleString('pt-BR')

@@ -83,6 +83,23 @@ async function start() {
     more.setAccount(profile.user);
     if (notifications.counts) more.setCounts(notifications.counts);
 
+    // A phone keyboard shrinks the visual viewport after the field is focused; keep the active
+    // field above the fixed bar when the viewport or the focused control changes.
+    const keepFieldVisible = field => {
+        if (!field?.matches?.('input, textarea, select')) return;
+        if (!globalThis.matchMedia?.('(max-width: 599px)').matches) return;
+        const rect = field.getBoundingClientRect();
+        const bottomLimit = innerHeight > 600 ? innerHeight - 20 : innerHeight - 120;
+        if (rect.top >= 90 && rect.bottom <= bottomLimit) return;
+        const top = rect.top < 90
+            ? window.scrollY + rect.top - 120
+            : window.scrollY + rect.bottom - innerHeight + 120;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+    };
+    document.addEventListener('focusin', event => keepFieldVisible(event.target));
+    window.addEventListener('resize', () => keepFieldVisible(document.activeElement));
+    globalThis.visualViewport?.addEventListener('resize', () => keepFieldVisible(document.activeElement));
+
     const content = document.querySelector('#painel-content');
     const contents = [...document.querySelectorAll('#panel .content')];
     let rankingLoaded = false;

@@ -1,0 +1,68 @@
+/*
+ * WP9 phone pass: every interactive control on the Painel keeps a 44 px touch target at phone
+ * widths, and focused fields clear the fixed bottom bar. Desktop sizes come from each component.
+ */
+@media only screen and (max-width: 599px) {
+    .button,
+    .button.small,
+    #painel-content .tab,
+    .invite-actions .button,
+    .painel-skip,
+    .search-field,
+    .search-field-input,
+    input.input,
+    select,
+    textarea,
+    .composer-input,
+    .news-read,
+    .news-more,
+    .news-todo-copy a,
+    .settings-system-link,
+    .report-watch,
+    .ranking-top,
+    .pagination-page,
+    .pagination-step,
+    .dialog-button {
+        min-height: 44px;
+    }
+
+    #painel-content .segmented-option {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .thread-back,
+    .thread-more,
+    .thread-challenge,
+    .friend-message,
+    .friend-more,
+    .friend-challenge,
+    .report-star,
+    .ranking-list-add,
+    .profile-photo-button,
+    .potion-slot-cancel {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .friend-message,
+    .friend-more,
+    .report-star,
+    .potion-slot-cancel {
+        width: 44px;
+        height: 44px;
+    }
+
+    .search-field,
+    .search-field-input,
+    .composer-input,
+    input.input,
+    select,
+    textarea {
+        scroll-margin-block: 120px;
+    }
+
+    .composer {
+        padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+    }
+}

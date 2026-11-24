@@ -83,6 +83,18 @@
         background: var(--color-accent);
     }
 
+    .notifications-panel-item[data-kind='friend'] .notifications-panel-dot {
+        background: var(--color-cat-red);
+    }
+
+    .notifications-panel-item[data-kind='report'] .notifications-panel-dot {
+        background: var(--color-cat-violet);
+    }
+
+    .notifications-panel-item[data-kind='news'] .notifications-panel-dot {
+        background: var(--color-brand);
+    }
+
     .notifications-panel-text {
         display: flex;
         flex-direction: column;

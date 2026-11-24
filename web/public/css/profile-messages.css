@@ -113,6 +113,18 @@
         gap: var(--space-3);
     }
 
+    .messages-page:has(.messages-shell.is-thread) #messages-header {
+        display: none;
+    }
+
+    .messages-page:has(.messages-shell.is-thread) .messages-shell,
+    .messages-shell.is-thread {
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - var(--layout-header-height) - 78px - var(--space-4));
+        min-height: 0;
+    }
+
     .messages-shell {
         display: block;
         min-height: 0;
@@ -134,6 +146,8 @@
 
     .messages-shell.is-thread .messages-thread-pane {
         display: flex;
+        flex: 1;
+        min-height: 0;
     }
 
     .messages-thread-pane .composer {

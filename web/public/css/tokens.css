@@ -63,7 +63,7 @@
     --classic-grey-300: #d4d4d4;
     --classic-grey-400: #bcbcbc;
     --classic-grey-500: #8f98a3;
-    --classic-grey-600: #7d7d7d;
+    --classic-grey-600: #666666;
     --classic-grey-700: #646464;
     --classic-grey-800: #575757;
     --classic-grey-900: #1b2a35;
@@ -241,15 +241,15 @@
     --color-medal-gold: #f9e777;
     --color-medal-gold-soft: #fff3a8;
     --color-medal-gold-strong: #c1922a;
-    --color-medal-gold-text: #90701a;
+    --color-medal-gold-text: #6b5200;
     --color-medal-silver: #e4e4e4;
     --color-medal-silver-soft: #f7f7f7;
     --color-medal-silver-strong: #9c9c9c;
-    --color-medal-silver-text: #6c6c6c;
+    --color-medal-silver-text: #555555;
     --color-medal-bronze: #e1c19a;
     --color-medal-bronze-soft: #f9e2c7;
     --color-medal-bronze-strong: #98694d;
-    --color-medal-bronze-text: #6d4c39;
+    --color-medal-bronze-text: #5b3d2d;
 
     /* ---- Type ---- */
     --font-body: 'Roboto', system-ui, sans-serif;
@@ -354,7 +354,7 @@
     --color-field-bg: #ffffff;
     /* the plate behind the white lock mark of a locked slot: dark in every theme */
     --color-lock-plate: var(--arena-ink-600);
-    --color-neutral: var(--arena-day-stone);
+    --color-neutral: #6d6049;
     --color-overlay: rgb(11 29 43 / 0.72);
     --color-scrim: rgb(11 29 43 / 0.45);
     --color-shade: rgb(60 40 10 / 0.14);
@@ -383,6 +383,7 @@
     --color-accent-strong: var(--arena-gold-deep);
     --color-accent-hover: #ffc95e;
     --color-accent-text: #8c5d0b;
+    --color-accent-on-brand: var(--color-accent);
 
     /* the main action of a view (GRAVAR, ABRIR): torch gold in the Arena */
     --color-action: var(--arena-gold);
@@ -395,8 +396,10 @@
     --color-border-brand-muted: rgb(157 128 79 / 0.45);
 
     --color-danger: var(--arena-blood);
+    --color-danger-text: #b3261e;
     --color-danger-soft: #f8e1dc;
     --color-success: var(--arena-day-green);
+    --color-success-text: #1f6f36;
     --color-success-soft: #d5efd9;
     --color-warning: var(--arena-gold-deep);
     --color-info: var(--arena-day-blue);
@@ -446,7 +449,7 @@
     --color-field-bg: var(--classic-white);
     /* the plate behind the white lock mark of a locked slot: dark in every theme */
     --color-lock-plate: var(--classic-blue-deep);
-    --color-neutral: var(--classic-grey-500);
+    --color-neutral: #5f6b77;
     --color-overlay: rgb(0 0 0 / 0.74);
     --color-scrim: rgb(0 0 0 / 0.5);
     --color-shade: rgb(0 0 0 / 0.2);
@@ -474,7 +477,8 @@
     --color-accent: var(--classic-gold);
     --color-accent-strong: var(--classic-gold-deep);
     --color-accent-hover: #ffd75e;
-    --color-accent-text: #9a6a12;
+    --color-accent-text: #80560a;
+    --color-accent-on-brand: #ffe082;
 
     --color-action: var(--classic-blue);
     --color-action-hover: var(--classic-blue-deep);
@@ -486,8 +490,10 @@
     --color-border-brand-muted: var(--classic-blue-muted);
 
     --color-danger: var(--classic-red);
+    --color-danger-text: #b71c1c;
     --color-danger-soft: var(--classic-red-tint);
     --color-success: var(--classic-green);
+    --color-success-text: #1d6b30;
     --color-success-soft: var(--classic-green-tint);
     --color-warning: var(--classic-amber);
     --color-info: var(--classic-sky);
@@ -613,6 +619,7 @@
     --color-accent-strong: var(--arena-gold-deep);
     --color-accent-hover: #ffc95e;
     --color-accent-text: var(--arena-gold);
+    --color-accent-on-brand: var(--color-accent);
 
     --color-action: var(--arena-gold);
     --color-action-hover: #ffc95e;
@@ -624,8 +631,10 @@
     --color-border-brand-muted: rgb(185 154 99 / 0.45);
 
     --color-danger: var(--arena-blood-bright);
+    --color-danger-text: #ff8a7a;
     --color-danger-soft: rgb(196 65 47 / 0.24);
     --color-success: var(--arena-green);
+    --color-success-text: var(--arena-green);
     --color-success-soft: rgb(79 212 106 / 0.18);
     --color-warning: var(--arena-gold);
     --color-info: var(--arena-blue-bright);

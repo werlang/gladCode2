@@ -79,6 +79,13 @@ export class NotificationsPanel extends BaseComponent {
             const row = document.createElement('a');
             row.className = 'notifications-panel-item';
             row.href = item.href;
+            row.dataset.kind = item.id.startsWith('duel-report-') || item.id.startsWith('report-')
+                ? 'report'
+                : item.id.startsWith('friend-')
+                    ? 'friend'
+                    : item.id.startsWith('duel-')
+                        ? 'duel'
+                        : 'news';
             row.addEventListener('click', () => this.emit('open-item', { id: item.id, href: item.href }));
             const dot = document.createElement('span');
             dot.className = 'notifications-panel-dot';

@@ -354,7 +354,7 @@
 }
 
 .choice-cards--mode .choice-card[aria-checked='true'] .choice-card-description {
-    color: color-mix(in srgb, var(--color-header-text) 72%, transparent);
+    color: var(--color-text-on-brand-muted);
 }
 
 .choice-cards--mode .choice-card-badge.is-alert {
@@ -363,8 +363,8 @@
 }
 
 .choice-cards--mode .choice-card[aria-checked='true'] .choice-card-badge {
-    background: color-mix(in srgb, var(--color-gladiator-seal-ready) 16%, transparent);
-    color: var(--color-gladiator-seal-ready-text);
+    background: color-mix(in srgb, var(--color-header-text) 14%, transparent);
+    color: var(--color-text-on-brand);
 }
 
 .choice-cards--mode .choice-card[aria-checked='true'] .choice-card-badge.is-alert {
@@ -381,5 +381,39 @@
 @media only screen and (max-width: 600px) {
     .choice-cards--mode {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Phone: the battle modes become the compact list of the Mobile board. */
+@media only screen and (max-width: 599px) {
+    .choice-cards--mode {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+
+    .choice-cards--mode .choice-card {
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        grid-template-areas: 'preview copy badge';
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        border-radius: var(--radius-lg);
+    }
+
+    .choice-cards--mode .choice-card-copy {
+        gap: 2px;
+    }
+
+    .choice-cards--mode .choice-card-title {
+        font-size: var(--text-md);
+    }
+
+    .choice-cards--mode .choice-card-description {
+        font-size: var(--text-xs);
+        line-height: 1.35;
+    }
+
+    .choice-cards--mode .choice-card-badge {
+        align-self: center;
     }
 }

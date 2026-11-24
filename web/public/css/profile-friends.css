@@ -69,7 +69,7 @@
 }
 
 .friends-online.is-online {
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .friends-online-dot {
@@ -133,6 +133,8 @@
 .friends-search-results {
     display: flex;
     flex-direction: column;
+    max-height: min(420px, 55vh);
+    overflow-y: auto;
 }
 
 .friend-search-row {

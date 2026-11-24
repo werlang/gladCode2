@@ -62,7 +62,7 @@
 }
 
 .thread-online.is-online {
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .thread-online-dot {
@@ -186,16 +186,14 @@
 }
 
 .thread-message.is-mine .thread-time {
-    color: color-mix(in srgb, var(--color-header-text) 62%, transparent);
+    color: var(--color-text-on-brand-muted);
 }
 
 .thread-replay {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
+    flex-direction: column;
     margin-top: var(--space-2);
-    padding: var(--space-2) var(--space-3);
+    overflow: hidden;
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
     color: var(--color-text-strong);
@@ -207,11 +205,32 @@
     color: var(--color-header-text);
 }
 
-.thread-replay span {
+.thread-replay-thumb {
+    display: block;
+    height: 112px;
+    overflow: hidden;
+}
+
+.thread-replay-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thread-replay-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+}
+
+.thread-replay-copy > span {
     display: flex;
     flex-direction: column;
     gap: 1px;
-    font-size: var(--text-xs);
 }
 
 .thread-replay small {

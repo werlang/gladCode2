@@ -141,7 +141,6 @@
 .ranking-podium-mmr {
     color: inherit;
     font-family: var(--font-mono);
-    opacity: 0.8;
 }
 
 .ranking-card {

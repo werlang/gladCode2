@@ -47,7 +47,7 @@ export class MessageThread extends BaseComponent {
     /** @param {{ element?: HTMLElement }} [options] */
     constructor({ element } = {}) {
         super(element ?? createElement(renderTemplate(messageThreadTemplate, {
-            back: icon('chevron', { size: 16, className: 'icon thread-back-icon' }),
+            back: icon('back', { size: 16, className: 'icon thread-back-icon' }),
             swords: icon('battle', { size: 15, className: 'icon' }),
             more: icon('dots', { size: 16, className: 'icon' }),
         })));
@@ -73,6 +73,7 @@ export class MessageThread extends BaseComponent {
         this.#messages = Array.isArray(messages) ? messages.slice().reverse() : [];
         this.element.hidden = !this.#user;
         this.element.querySelector('.thread-name').textContent = this.#user?.nick ?? '';
+        this.element.querySelector('.thread-challenge').setAttribute('aria-label', this.#user ? `Desafiar ${this.#user.nick}` : 'Desafiar');
         this.#avatar.set({
             name: this.#user?.nick ?? '',
             picture: this.#user?.picture ?? '',
@@ -171,7 +172,7 @@ export class MessageThread extends BaseComponent {
             replay.href = `/play/${hash}`;
             replay.target = '_blank';
             replay.rel = 'noopener';
-            replay.innerHTML = `${icon('play', { size: 13, className: 'icon' })}<span><strong>Replay compartilhado</strong><small>Assistir</small></span>`;
+            replay.innerHTML = `<span class='thread-replay-thumb'><img src='/image/home/arena-3d.jpg' alt=''></span><span class='thread-replay-copy'>${icon('play', { size: 13, className: 'icon' })}<span><strong>Replay compartilhado</strong><small>Assistir</small></span></span>`;
             node.querySelector('.thread-bubble').append(replay);
         }
         this.#body.append(node);

@@ -18,7 +18,7 @@
 }
 
 .potion-card[data-unavailable='true'] {
-    opacity: 0.72;
+    background: var(--color-surface-alt);
 }
 
 .potion-card-head {

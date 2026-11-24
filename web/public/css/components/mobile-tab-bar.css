@@ -26,14 +26,14 @@
         padding: 0;
         border: 0;
         background: transparent;
-        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        color: var(--color-text-on-brand-muted);
         font-size: var(--text-2xs);
         font-weight: 500;
         text-decoration: none;
         cursor: pointer;
 
         &.is-active {
-            color: var(--color-accent);
+            color: var(--color-accent-on-brand);
         }
     }
 
@@ -41,12 +41,12 @@
         height: 62px;
         padding-top: 34px;
         justify-content: flex-start;
-        color: color-mix(in srgb, var(--color-header-text) 85%, transparent);
+        color: var(--color-text-on-brand);
         font-size: var(--text-2xs);
         font-weight: 700;
 
         &.is-active {
-            color: var(--color-accent);
+            color: var(--color-accent-on-brand);
         }
     }
 

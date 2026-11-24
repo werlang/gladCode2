@@ -42,7 +42,7 @@
 }
 
 .reports-renown strong {
-    color: var(--color-success);
+    color: var(--color-success-text);
     font-family: var(--font-mono);
     font-size: var(--text-xl);
     font-weight: 600;
@@ -198,11 +198,11 @@
 }
 
 .report-renown[data-sign='positive'] {
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .report-renown[data-sign='negative'] {
-    color: var(--color-danger);
+    color: var(--color-danger-text);
 }
 
 .report-when {

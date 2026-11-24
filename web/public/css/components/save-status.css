@@ -29,12 +29,12 @@
 }
 
 .save-status[data-state='idle'] {
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .save-status[data-state='idle'] .save-status-icon {
     background: transparent;
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .save-status[data-state='saving'] .save-status-icon {
@@ -45,12 +45,12 @@
     padding: 2px var(--space-2);
     border-radius: var(--radius-pill);
     background: color-mix(in srgb, var(--color-success) 12%, transparent);
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .save-status[data-state='saved'] .save-status-icon {
     background: transparent;
-    color: var(--color-success);
+    color: var(--color-success-text);
 }
 
 .save-status[data-state='error'] {

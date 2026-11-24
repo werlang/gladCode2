@@ -39,3 +39,104 @@
         flex: 1;
     }
 }
+
+/* The Mobile board's gladiator list: a compact choose-one row per gladiator. */
+.glads-phone-list {
+    display: none;
+}
+
+@media only screen and (max-width: 599px) {
+    #glads-grid {
+        display: none;
+    }
+
+    .glads-phone-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .glads-phone-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-height: 76px;
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: var(--color-surface);
+        color: var(--color-text);
+        text-decoration: none;
+    }
+
+    .glads-phone-row:hover,
+    .glads-phone-row:focus-visible {
+        border-color: var(--color-border-strong);
+    }
+
+    .glads-phone-thumb {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        flex: none;
+        width: 60px;
+        height: 60px;
+        overflow: hidden;
+        border-radius: var(--radius-md);
+        background: var(--color-surface-alt);
+    }
+
+    .glads-phone-thumb img,
+    .glads-phone-thumb canvas,
+    .glads-phone-thumb .model-3d {
+        max-width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .glads-phone-copy {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .glads-phone-name {
+        overflow: hidden;
+        color: var(--color-text-strong);
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .glads-phone-note {
+        color: var(--color-text-muted);
+        font-size: var(--text-xs);
+    }
+
+    .glads-phone-row[data-state='outdated'] .glads-phone-note {
+        color: var(--color-accent-text);
+    }
+
+    .glads-phone-row[data-state='broken'] .glads-phone-note {
+        color: var(--color-danger-text);
+    }
+
+    .glads-phone-chevron {
+        flex: none;
+        color: var(--color-text-muted);
+        transform: rotate(-90deg);
+    }
+
+    .glads-phone-row--new {
+        border-style: dashed;
+        background: transparent;
+    }
+
+    .glads-phone-thumb--new {
+        color: var(--color-text-muted);
+    }
+}

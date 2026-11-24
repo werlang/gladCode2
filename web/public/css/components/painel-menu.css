@@ -65,7 +65,7 @@
     }
 
     .painel-menu-level {
-        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        color: var(--color-text-on-brand);
         font-size: var(--text-xs);
     }
 
@@ -95,7 +95,7 @@
     .painel-menu-xp-values {
         display: flex;
         justify-content: space-between;
-        color: color-mix(in srgb, var(--color-header-text) 65%, transparent);
+        color: var(--color-text-on-brand);
         font: 500 var(--text-2xs) var(--font-mono);
     }
 
@@ -107,7 +107,7 @@
 
     .painel-menu-group-label {
         margin: var(--space-4) var(--space-3) var(--space-1);
-        color: color-mix(in srgb, var(--color-header-text) 52%, transparent);
+        color: var(--color-text-on-brand-muted);
         font: 600 var(--text-2xs) var(--font-body);
         letter-spacing: 0.14em;
         text-transform: uppercase;
@@ -133,11 +133,11 @@
         justify-content: space-between;
         gap: var(--space-2);
         padding: var(--space-2) var(--space-2) 0;
-        color: color-mix(in srgb, var(--color-header-text) 52%, transparent);
+        color: var(--color-text-on-brand-muted);
         font-size: var(--text-2xs);
 
         kbd {
-            color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+            color: var(--color-text-on-brand-muted);
             font: 600 var(--text-2xs) var(--font-mono);
         }
     }

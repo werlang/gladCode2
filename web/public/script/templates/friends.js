@@ -33,7 +33,7 @@ export const friendRowTemplate = `
     </span>
     <span class='friend-actions'>
         <button type='button' class='friend-message' aria-label='Mensagem para {{name}}'>{{{message}}}</button>
-        <button type='button' class='button ghost small friend-challenge'>{{{swords}}}<span>Desafiar</span></button>
+        <button type='button' class='button ghost small friend-challenge' aria-label='Desafiar {{name}}'>{{{swords}}}<span>Desafiar</span></button>
         <button type='button' class='friend-more' aria-label='Mais opções para {{name}}'>{{{more}}}</button>
     </span>
 </div>`;

@@ -174,6 +174,12 @@ body:has(#painel) {
         svg {
             flex: none;
         }
+
+        &:focus-within {
+            border-color: var(--color-accent);
+            outline: var(--focus-ring-width) solid var(--focus-ring-color);
+            outline-offset: var(--focus-ring-offset);
+        }
     }
 
     .app-header-search-input {
@@ -193,7 +199,7 @@ body:has(#painel) {
         padding: 0 var(--space-2);
         border: var(--space-hairline) solid color-mix(in srgb, var(--color-header-text) 22%, transparent);
         border-radius: var(--radius-xs);
-        color: color-mix(in srgb, var(--color-header-text) 70%, transparent);
+        color: var(--color-text-on-brand);
         font-family: var(--font-mono);
         font-size: var(--text-2xs);
         display: flex;

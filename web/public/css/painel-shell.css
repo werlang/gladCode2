@@ -18,7 +18,7 @@
 
 #painel-content {
     width: 100%;
-    max-width: 1080px;
+    max-width: none;
     margin: 0 auto;
     padding: var(--space-8) var(--space-9) var(--space-10);
     box-sizing: border-box;

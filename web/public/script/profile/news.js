@@ -257,14 +257,16 @@ export class NewsTab {
         if (signal?.aborted) return;
         const counts = notifications.counts;
         const todo = [];
+        const friendRequests = [];
         for (const need of feed?.needs ?? []) {
             const duel = need.href.includes('/battle');
-            todo.push({
+            const row = {
                 kind: duel ? 'duel' : 'friend',
                 text: need.text,
                 action: duel ? 'Responder ao desafio' : 'Ver convite',
                 href: need.href,
-            });
+            };
+            (duel ? todo : friendRequests).push(row);
         }
         if (counts?.reports?.ranked) {
             todo.push({
@@ -296,6 +298,7 @@ export class NewsTab {
             });
         }
 
+        todo.push(...friendRequests);
         this.#todoCount.textContent = String(todo.length);
         this.#todoList.replaceChildren();
         todo.forEach(item => {

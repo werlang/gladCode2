@@ -74,12 +74,12 @@ export const versusPanelTemplate = `
 <aside class='versus-panel' aria-label='Batalha ranqueada'>
     <div class='versus-stage'>
         <span class='versus-side'>
-            <span class='versus-portrait versus-portrait--mine'><span class='versus-image'></span></span>
+            <span class='versus-portrait versus-portrait--mine is-empty'><span class='versus-image'></span></span>
             <span class='versus-name versus-name--mine' hidden></span>
         </span>
         <span class='versus-mark' aria-hidden='true'>VS</span>
         <span class='versus-side'>
-            <span class='versus-portrait versus-portrait--enemy'><span class='versus-image'></span></span>
+            <span class='versus-portrait versus-portrait--enemy is-empty'><span class='versus-image'></span></span>
             <span class='versus-name versus-name--enemy'>Sorteado</span>
         </span>
     </div>

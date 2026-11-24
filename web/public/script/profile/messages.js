@@ -107,8 +107,9 @@ export class MessagesTab {
             data = await settleRequest(() => messages.open(userId, { signal }), signal);
         }
         catch (error) {
+            if (token !== this.#request || signal?.aborted || isAborted(error)) return;
             this.#thread.setBusy(false);
-            if (!isAborted(error) && !signal?.aborted) writeErrorToast(error);
+            writeErrorToast(error);
             return;
         }
         if (!data || signal?.aborted || token !== this.#request) return;
@@ -123,14 +124,13 @@ export class MessagesTab {
         this.#shell.classList.add('is-thread');
         if (push) events.emit(APP_EVENTS.messagesOpened, { userId: Number(userId) });
         try {
-            const read = await messages.markRead(userId);
+            await messages.markRead(userId);
             this.#list.markRead(userId);
-            if (read.read) this.#thread.setBusy(false);
         }
         catch (error) {
-            if (!isAborted(error)) writeErrorToast(error);
+            if (token === this.#request && !signal?.aborted && !isAborted(error)) writeErrorToast(error);
         }
-        this.#composer.focus();
+        if (token === this.#request && !signal?.aborted) this.#composer.focus();
     }
 
     /** @param {{ push?: boolean }} [options] */
@@ -193,7 +193,7 @@ export class MessagesTab {
         picker.innerHTML = renderTemplate(newMessagePickerTemplate);
         const search = new SearchField({
             label: 'Buscar mestre',
-            placeholder: 'Gladiador ou mestre',
+            placeholder: 'Apelido do mestre',
         });
         picker.querySelector('.new-message-search').append(search.element);
         const results = picker.querySelector('.new-message-results');
@@ -214,11 +214,19 @@ export class MessagesTab {
             results.append(row);
         };
         const friends = await secondaryRequest(() => FriendModel.list(), this.#signal);
-        (friends?.confirmed ?? []).forEach(addRow);
+        const showFriends = () => {
+            results.replaceChildren();
+            (friends?.confirmed ?? []).forEach(addRow);
+        };
+        showFriends();
         search.listen('search', ({ value }) => {
             const token = ++request;
-            if (!value) return;
-            FriendModel.search(value, { signal: this.#signal }).then(users => {
+            const query = String(value ?? '').trim();
+            if (!query) {
+                showFriends();
+                return;
+            }
+            FriendModel.search(query, { signal: this.#signal }).then(users => {
                 if (token !== request) return;
                 results.replaceChildren();
                 (users ?? []).forEach(addRow);

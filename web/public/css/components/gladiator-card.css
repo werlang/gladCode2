@@ -1029,7 +1029,7 @@
 }
 
 .invite-detail {
-    color: color-mix(in srgb, var(--color-text-muted) 80%, var(--color-action-bevel-dark));
+    color: var(--color-text-muted);
     font-size: var(--text-sm);
 }
 

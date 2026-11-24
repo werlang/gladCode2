@@ -64,6 +64,11 @@
         font: var(--text-base) var(--font-body);
     }
 
+    .command-palette-search:focus-within {
+        outline: var(--focus-ring-width) solid var(--focus-ring-color);
+        outline-offset: calc(-1 * var(--focus-ring-width));
+    }
+
     .command-palette-results {
         min-height: 0;
         overflow-y: auto;
