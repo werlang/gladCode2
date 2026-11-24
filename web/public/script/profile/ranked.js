@@ -8,7 +8,7 @@ import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { FlightGuard } from '../helpers/flight-guard.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { site } from '../helpers/request.js';
-import { secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { isAborted, secondaryRequest, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { PotionModel } from '../models/potion.js';
 import { RankedModel } from '../models/social.js';
@@ -145,8 +145,10 @@ export class RankedBattle {
     #versus;
     #button;
     #selected = null;
+    #selectedId = null;
     #signal = null;
     #flight = new FlightGuard();
+    #pending = null;
 
     /**
      * @param {() => void} onFought Called when the battle ended.
@@ -161,15 +163,10 @@ export class RankedBattle {
         this.#versus.setReward('Renome e prata');
         this.#picker.listen('select', ({ gladiator }) => {
             this.#selected = gladiator;
+            this.#selectedId = gladiator.id;
             this.#versus.setGladiator(gladiator);
             this.#versus.setReady(true);
             events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'ranked' });
-        });
-        this.#picker.listen('blocked', async ({ gladiator, reason }) => {
-            const answer = await showDialog(reason === 'broken'
-                ? 'Este gladiador travou na última batalha. Deseja corrigi-lo no editor?'
-                : 'Este gladiador precisa ser atualizado. Deseja abri-lo no editor?', ['Sim', 'Não']);
-            if (answer === 'Sim') window.open(`glad-${gladiator.id}`);
         });
         this.#picker.listen('confirm', () => this.#fight());
         this.#versus.listen('fight', () => this.#fight());
@@ -181,23 +178,34 @@ export class RankedBattle {
      * @param {{ signal?: AbortSignal, selectId?: number|string }} [options]
      */
     async refresh({ signal, selectId } = {}) {
+        this.cancelPending();
         this.#signal = signal;
+        const keptId = this.#selectedId;
         this.#selected = null;
         this.#versus.setGladiator(null);
         this.#versus.setBusy(false);
+        this.#versus.setReady(false);
+        this.#picker.setDisabled('');
         const glads = await settleRequest(() => GladiatorModel.list({ signal }), signal);
         if (!glads || signal?.aborted) return;
         this.#picker.setGladiators(glads);
+        const wanted = selectId ?? keptId;
+        if (wanted !== undefined && wanted !== null) this.#picker.select(Number(wanted));
+        if (!this.#picker.selected) this.#selectedId = null;
         const slots = await secondaryRequest(() => PotionModel.slots({ signal }), signal);
         if (signal?.aborted) return;
         if (slots?.slots) this.#versus.setPotions(slots.slots);
-        if (selectId !== undefined && selectId !== null) this.#picker.select(Number(selectId));
     }
 
     /** Finds opponents, runs the ranked battle and shows its result. */
     async #fight() {
         const glad = this.#selected;
         if (!glad) return;
+        const controller = new AbortController();
+        this.#pending = controller;
+        const signal = this.#signal
+            ? AbortSignal.any([this.#signal, controller.signal])
+            : controller.signal;
         return this.#flight.run(async () => {
             this.#picker.setDisabled('Batalha ranqueada em andamento');
             this.#versus.setBusy(true);
@@ -213,9 +221,10 @@ export class RankedBattle {
             try {
                 let match;
                 try {
-                    match = await RankedModel.match(glad.id);
+                    match = await RankedModel.match(glad.id, { signal });
                 }
                 catch (error) {
+                    if (isAborted(error) || signal?.aborted) return;
                     if (error.code === 'NO_OPPONENTS') {
                         showMessage('Ainda não há oponentes na versão atual. Tente novamente mais tarde.');
                         return;
@@ -228,6 +237,7 @@ export class RankedBattle {
                     if (answer === 'Sim') window.open(`glad-${glad.id}`);
                     return;
                 }
+                if (signal?.aborted || this.#signal !== signal) return;
                 const glads = [...match.opponents, glad];
                 const stopPreBattle = showPreBattle(glads, this.#button);
 
@@ -242,7 +252,7 @@ export class RankedBattle {
                     data = { error: true };
                 }
                 stopPreBattle();
-                if (data.error || !data.hash) return;
+                if (signal?.aborted || this.#signal !== signal || data.error || !data.hash) return;
 
                 document.querySelectorAll('#fog').forEach(fog => fog.remove());
                 this.onFought();
@@ -252,7 +262,14 @@ export class RankedBattle {
                 progress.kill();
                 this.#versus.setBusy(false);
                 this.#picker.setDisabled('');
+                if (this.#pending === controller) this.#pending = null;
             }
         });
+    }
+
+    /** Aborts the pending matchmaking when the ranked tab or the section is left. */
+    cancelPending() {
+        this.#pending?.abort();
+        this.#pending = null;
     }
 }

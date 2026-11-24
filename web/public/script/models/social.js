@@ -251,12 +251,13 @@ export class RankedModel {
      * Finds four opponents for one of the master's gladiators.
      *
      * @param {number} gladiator
+     * @param {{ signal?: AbortSignal }} [options]
      * @returns {Promise<{ opponents: Array<{ name: string, master: string, skin: string, vstr: number, vagi: number, vint: number, mmr: number }>, match: string }>}
      *   `match` is the short-lived token {@link RankedModel.fight} needs.
      * @throws {import('../helpers/request.js').RequestError} `GLADIATOR_OUTDATED`.
      */
-    static match(gladiator) {
-        return api.post('battles/ranked/match', { gladiator });
+    static match(gladiator, { signal } = {}) {
+        return api.post('battles/ranked/match', { gladiator }, { signal });
     }
 
     /**
