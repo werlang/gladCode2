@@ -1,5 +1,6 @@
 import { showDialog, showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
+import { codeLanguage } from '../helpers/code-language.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
 import { fadeOut } from '../helpers/animate.js';
 import { GladiatorModel } from '../models/gladiator.js';
@@ -28,7 +29,7 @@ export function gladiatorLimit(level) {
  */
 function showCode(glad) {
     const blocks = Boolean(glad.blocks);
-    const language = glad.code.includes('def loop():') ? 'python' : 'c';
+    const language = codeLanguage(glad.code);
     const fog = createElement(renderTemplate(codeBoxTemplate, {
         content: blocks ? "<div id='code-ws'></div>" : renderTemplate(codeBlockTemplate, { language, code: glad.code }),
     }));

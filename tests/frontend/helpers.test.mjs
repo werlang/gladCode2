@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { ACE_MODES, codeLanguage } from '../../web/public/script/helpers/code-language.js';
 import { elapsedString, formatMessageTime, splitDuration } from '../../web/public/script/helpers/date-format.js';
+import { translateFunctionText } from '../../web/public/script/helpers/function-reference.js';
 import { escapeHtml, renderTemplate } from '../../web/public/script/helpers/html.js';
 import { RequestError, parseBody, toQuery } from '../../web/public/script/helpers/request.js';
 import { nameGladiators, simulationProblem } from '../../web/public/script/helpers/simulation-report.js';
@@ -54,6 +56,29 @@ test('compiler errors name the gladiators and stay text', () => {
     assert.equal(simulationProblem({ hash: null, error: 'NO_OUTPUT' }).title, 'ERRO NA SIMULAÇÃO');
     assert.equal(simulationProblem({ hash: 'abc', error: '' }), null);
     assert.equal(simulationProblem({ hash: null, error: 'code0.c: oops' }, ['Zed']).message, '<span>Zed</span>: oops');
+    assert.equal(nameGladiators('code0.js:3\nReferenceError: x is not defined\n    at loop (code0.js:3:5)', ['Zed']), '<span>Zed</span>:3\nReferenceError: x is not defined\n    at loop (<span>Zed</span>:3:5)');
+});
+
+test('the code language comes from how loop() is written, like the API reads it', () => {
+    assert.equal(codeLanguage('loop(){\n    stepForward();\n}'), 'c');
+    assert.equal(codeLanguage('def loop():\n    stepForward()'), 'python');
+    assert.equal(codeLanguage('function loop() {\n    stepForward();\n}'), 'javascript');
+    assert.equal(codeLanguage('let start = true;\nconst loop = () => turn(5);'), 'javascript');
+    assert.equal(codeLanguage('var loop=function(){};'), 'javascript');
+    assert.equal(codeLanguage('loop = () => turn(5);'), 'javascript');
+    assert.equal(codeLanguage('int loops = 0;\nloop(){}'), 'c');
+    // comments and strings never turn a C gladiator into JavaScript
+    assert.equal(codeLanguage('// const loop = estrategia\nloop(){\n}'), 'c');
+    assert.equal(codeLanguage('loop(){ speak("function loop() {}"); }'), 'c');
+    assert.equal(codeLanguage(undefined), 'c');
+    assert.equal(ACE_MODES[codeLanguage('function loop() {}')], 'ace/mode/javascript');
+});
+
+test('function prose translates whole API names only', () => {
+    const names = { getTargetX: 'pegaXAlvo', getX: 'pegaX' };
+    assert.equal(translateFunctionText('Use getTargetX e getX.', names), 'Use pegaXAlvo e pegaX.');
+    assert.equal(translateFunctionText('getTargetX()', names), 'pegaXAlvo()');
+    assert.equal(translateFunctionText('my_getTargetXValue', names), 'my_getTargetXValue');
 });
 
 test('durations split into padded hours, minutes and seconds', () => {

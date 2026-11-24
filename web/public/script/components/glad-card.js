@@ -1,3 +1,4 @@
+import { codeLanguage } from '../helpers/code-language.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { fetchSpritesheet, getSpriteThumb } from '../helpers/spritesheet.js';
 import { GladiatorModel } from '../models/gladiator.js';
@@ -32,7 +33,7 @@ export async function setGladImage(container, index, skin, dead = false) {
 }
 
 /**
- * Opens a window with a gladiator's code: its blocks, or C/Python
+ * Opens a window with a gladiator's code: its blocks, or C/Python/JavaScript
  * highlighted by Prism.
  *
  * @param {{ code: string, blocks?: string }} glad Gladiator; its code is escaped by the template.
@@ -46,7 +47,7 @@ function showCode({ code, blocks }) {
         Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(blocks), workspace);
     }
     else {
-        const language = code.includes('def loop():') ? 'python' : 'c';
+        const language = codeLanguage(code);
         fog = createElement(renderTemplate(codeModalTemplate, { language, code }));
         document.body.append(fog);
         Prism.highlightElement(fog.querySelector('code'));

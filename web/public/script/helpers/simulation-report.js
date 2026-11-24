@@ -1,6 +1,6 @@
 /**
- * Rewrites compiler output so it names the gladiators instead of their `code<i>.c` / `code<i>.py`
- * files. The output is text: it is escaped here, so the result is HTML.
+ * Rewrites compiler output so it names the gladiators instead of their `code<i>.c` / `code<i>.py` /
+ * `code<i>.js` files. The output is text: it is escaped here, so the result is HTML.
  *
  * @param {string} error Compiler output.
  * @param {Array<string|null|undefined>} [names] Gladiator names in battle order.
@@ -13,6 +13,7 @@ export function nameGladiators(error, names = []) {
         const label = `<span>${escapeText(name)}</span>`;
         text = text.split(`code${index}.c`).join(label);
         text = text.split(`code${index}.py`).join(label);
+        text = text.split(`code${index}.js`).join(label);
     });
     return text.replace(/\\n/g, '\n');
 }

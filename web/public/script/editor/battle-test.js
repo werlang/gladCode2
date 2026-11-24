@@ -1,6 +1,7 @@
 import { showMessage } from '../components/dialog.js';
 import { loadGladCards } from '../components/glad-card.js';
 import { ProgressButton, Simulation } from '../components/simulation.js';
+import { codeLanguage } from '../helpers/code-language.js';
 import { createElement, renderTemplate } from '../helpers/html.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { SimulationModel } from '../models/simulation.js';
@@ -31,7 +32,7 @@ const MAX_OPPONENTS = 4;
  * @param {{ code: string, blocks?: string }} glad Opponent, with its code as written.
  */
 function showCode({ code, blocks }) {
-    const language = code.includes('def loop():') ? 'python' : 'c';
+    const language = codeLanguage(code);
     const content = blocks?.length
         ? "<div id='code-ws'></div>"
         : `<pre class='line-numbers language-${language}'><code class='language-${language}'></code></pre>`;

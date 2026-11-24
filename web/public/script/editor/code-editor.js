@@ -1,4 +1,5 @@
 import { showMessage } from '../components/dialog.js';
+import { ACE_MODES } from '../helpers/code-language.js';
 import { site } from '../helpers/request.js';
 import { FunctionDocsModel } from '../models/function-docs.js';
 import { detectLanguage } from './attributes.js';
@@ -21,11 +22,12 @@ async function completions() {
 }
 
 /**
- * Whether a line is inside a function, where breakpoints are allowed.
+ * Whether a line is inside a function, where breakpoints are allowed (Python by its indentation,
+ * C and JavaScript by their braces).
  *
  * @param {string[]} lines Code lines.
  * @param {number} row Line index.
- * @param {'c'|'python'} language Language.
+ * @param {'c'|'python'|'javascript'} language Language.
  * @returns {boolean}
  */
 export function insideFunction(lines, row, language) {
@@ -82,7 +84,7 @@ export class CodeEditor {
         this.ace.setValue(code);
     }
 
-    /** @returns {'c'|'python'|'blocks'} The code's language. */
+    /** @returns {'c'|'python'|'javascript'|'blocks'} The code's language. */
     detectLanguage() {
         return detectLanguage(this.value, this.blocksActive());
     }
@@ -127,6 +129,7 @@ export class CodeEditor {
             },
             getDocTooltip: item => {
                 if (item.meta?.startsWith('gladCode') && item.syntax) {
+                    // C signatures show the types plain and the name in bold
                     const signature = this.language === 'c'
                         ? item.syntax.replace(/(int[ *]? |float[ *]? |double[ *]? |char[ *]? |void[ *]? )/g, '</b>$1<b>')
                         : item.syntax;
@@ -139,12 +142,12 @@ export class CodeEditor {
         };
     }
 
-    /** Switches the highlighting between C and Python as the code changes. */
+    /** Switches the highlighting between C, Python and JavaScript as the code changes. */
     #followLanguage() {
         const language = detectLanguage(this.value);
         if (language === this.language) return;
         this.language = language;
-        this.ace.session.setMode(language === 'python' ? 'ace/mode/python' : 'ace/mode/c_cpp');
+        this.ace.session.setMode(ACE_MODES[language]);
     }
 
     /**

@@ -1,3 +1,5 @@
+import { codeLanguage } from '../helpers/code-language.js';
+
 /** Points a gladiator spends on its three attributes. */
 export const ATTRIBUTE_POINTS = 50;
 
@@ -32,12 +34,16 @@ export function validGladName(name) {
  *
  * @param {{ name: string, vstr: number, vagi: number, vint: number, skin: string, user: string }} glad
  * @param {string} code The user's code.
- * @param {'c'|'python'|'blocks'} language Language of the code.
- * @returns {string}
+ * @param {'c'|'python'|'javascript'|'blocks'} language Language of the code.
+ * @returns {string} Python (and blocks) and JavaScript setups end with the line the server splits
+ *   the user code on (`# start of user code`, `// start of user code`).
  */
 export function gladiatorSource({ name, vstr, vagi, vint, skin, user }, code, language) {
     if (language === 'c') {
         return `setup(){\n    setName("${name}");\n    setSTR(${vstr});\n    setAGI(${vagi});\n    setINT(${vint});\n    setSkin("${skin}");\n    setUser("${user}");\n    setSlots("-1,-1,-1,-1");\n}\n\n${code}`;
+    }
+    if (language === 'javascript') {
+        return `function setup() {\n    setName("${name}");\n    setSTR(${vstr});\n    setAGI(${vagi});\n    setINT(${vint});\n    setSkin("${skin}");\n    setUser("${user}");\n    setSlots("-1,-1,-1,-1");\n}\n// start of user code\n${code}`;
     }
     return `def setup():\n    setName("${name}")\n    setSTR(${vstr})\n    setAGI(${vagi})\n    setINT(${vint})\n    setSkin("${skin}")\n    setUser("${user}")\n    setSlots("-1,-1,-1,-1")\n# start of user code\n${code}`;
 }
@@ -47,9 +53,9 @@ export function gladiatorSource({ name, vstr, vagi, vint, skin, user }, code, la
  *
  * @param {string} code Code.
  * @param {boolean} [blocks] Whether the blocks editor is active.
- * @returns {'c'|'python'|'blocks'}
+ * @returns {'c'|'python'|'javascript'|'blocks'}
  */
 export function detectLanguage(code, blocks = false) {
     if (blocks) return 'blocks';
-    return code.includes('def loop():') ? 'python' : 'c';
+    return codeLanguage(code);
 }

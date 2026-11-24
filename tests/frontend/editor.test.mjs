@@ -24,6 +24,7 @@ test('the language follows the code, or the blocks editor', () => {
     assert.equal(detectLanguage('loop(){}'), 'c');
     assert.equal(detectLanguage('def loop():\n    pass'), 'python');
     assert.equal(detectLanguage('def loop():', true), 'blocks');
+    assert.equal(detectLanguage('function loop() {}'), 'javascript');
 });
 
 test('the gladiator source starts with its setup', () => {
@@ -35,6 +36,10 @@ test('the gladiator source starts with its setup', () => {
     const python = gladiatorSource(glad, 'def loop():\n    pass', 'python');
     assert.match(python, /^def setup\(\):\n    setName\("Rex"\)/);
     assert.ok(python.endsWith('# start of user code\ndef loop():\n    pass'));
+    const javascript = gladiatorSource(glad, 'function loop() {}', 'javascript');
+    assert.match(javascript, /^function setup\(\) \{\n    setName\("Rex"\);/);
+    assert.match(javascript, /setUser\("me"\);\n    setSlots\("-1,-1,-1,-1"\);\n\}\n/);
+    assert.ok(javascript.endsWith('}\n// start of user code\nfunction loop() {}'));
 });
 
 test('breakpoints only go inside functions', () => {
@@ -44,4 +49,7 @@ test('breakpoints only go inside functions', () => {
     const python = ['x = 0', 'def loop():', '    x += 1'];
     assert.equal(insideFunction(python, 0, 'python'), false);
     assert.equal(insideFunction(python, 2, 'python'), true);
+    const javascript = ['let x = 0;', 'const loop = () => {', '    x++;', '};'];
+    assert.equal(insideFunction(javascript, 0, 'javascript'), false);
+    assert.equal(insideFunction(javascript, 2, 'javascript'), true);
 });
