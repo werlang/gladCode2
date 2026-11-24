@@ -40,6 +40,7 @@ function fakeNode() {
             for (const listener of listeners.get(event.type) ?? []) listener(event);
             return true;
         },
+        insertAdjacentHTML: () => {},
         setAttribute: () => {},
         removeAttribute: () => {},
         getAttribute: () => null,
@@ -68,6 +69,7 @@ const { GladiatorModel } = await import('../../web/public/script/models/gladiato
 const { PotionModel } = await import('../../web/public/script/models/potion.js');
 const { RankedModel } = await import('../../web/public/script/models/social.js');
 const { profile } = await import('../../web/public/script/profile/session.js');
+const { site } = await import('../../web/public/script/helpers/request.js');
 
 profile.user = { level: 10, xp: '0', silver: '0' };
 const glad = { id: 9001, name: 'Aurora', vstr: 10, vagi: 10, vint: 10, mmr: 1400, skin: '' };
@@ -133,5 +135,52 @@ test('the chosen gladiator survives leaving and returning', async () => {
     finally {
         GladiatorModel.list = original.list;
         PotionModel.slots = original.slots;
+    }
+});
+
+
+test('a successful match starts exactly one ranked battle', async () => {
+    const original = {
+        list: GladiatorModel.list,
+        slots: PotionModel.slots,
+        match: RankedModel.match,
+        fight: RankedModel.fight,
+        siteGet: site.get,
+        raf: globalThis.requestAnimationFrame,
+    };
+    GladiatorModel.list = async () => [glad];
+    PotionModel.slots = async () => ({ slots: [] });
+    RankedModel.match = async () => ({
+        opponents: [{ name: 'Brutus', master: 'GladiadorX', skin: '', vstr: 1, vagi: 1, vint: 1, mmr: 1000 }],
+        match: 'match-token',
+    });
+    let fightCalls = 0;
+    RankedModel.fight = async match => {
+        fightCalls += 1;
+        assert.equal(match, 'match-token');
+        return {
+            hash: 'abc',
+            error: '',
+            summary: { level: 10, xp: 10, silver: 20, gladiator: { id: 9001, name: 'Aurora', mmr: 1410, skin: '' } },
+        };
+    };
+    site.get = async () => '';
+    globalThis.requestAnimationFrame = callback => { callback(performance.now() + 5000); return 1; };
+    let fought = 0;
+    try {
+        const ranked = new RankedBattle(() => { fought += 1; });
+        await ranked.refresh({ signal: new AbortController().signal, selectId: 9001 });
+        versusRoot.appended.at(-1).dispatchEvent(new CustomEvent('fight'));
+        await new Promise(resolve => setTimeout(resolve, 80));
+        assert.equal(fightCalls, 1);
+        assert.equal(fought, 1);
+    }
+    finally {
+        GladiatorModel.list = original.list;
+        PotionModel.slots = original.slots;
+        RankedModel.match = original.match;
+        RankedModel.fight = original.fight;
+        site.get = original.siteGet;
+        globalThis.requestAnimationFrame = original.raf;
     }
 });

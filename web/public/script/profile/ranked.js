@@ -203,8 +203,9 @@ export class RankedBattle {
         if (!glad) return;
         const controller = new AbortController();
         this.#pending = controller;
-        const signal = this.#signal
-            ? AbortSignal.any([this.#signal, controller.signal])
+        const visit = this.#signal;
+        const signal = visit
+            ? AbortSignal.any([visit, controller.signal])
             : controller.signal;
         return this.#flight.run(async () => {
             this.#picker.setDisabled('Batalha ranqueada em andamento');
@@ -237,7 +238,7 @@ export class RankedBattle {
                     if (answer === 'Sim') window.open(`glad-${glad.id}`);
                     return;
                 }
-                if (signal?.aborted || this.#signal !== signal) return;
+                if (signal?.aborted || visit?.aborted || this.#signal !== visit) return;
                 const glads = [...match.opponents, glad];
                 const stopPreBattle = showPreBattle(glads, this.#button);
 
@@ -252,7 +253,7 @@ export class RankedBattle {
                     data = { error: true };
                 }
                 stopPreBattle();
-                if (signal?.aborted || this.#signal !== signal || data.error || !data.hash) return;
+                if (data.error || !data.hash) return;
 
                 document.querySelectorAll('#fog').forEach(fog => fog.remove());
                 this.onFought();
