@@ -11,6 +11,11 @@ while [ -f code$i.* ]; do
 	if [ -f code$i.py ]; then
 		(python3 code$i.py 2>> errorc.txt) &
 	fi
+
+	# run JavaScript file (gladCodeCore.js runs the gladiator's setup and loop)
+	if [ -f code$i.js ]; then
+		(node --no-warnings gladCodeCore.js code$i.js 2>> errorc.txt) &
+	fi
 	i=$((i + 1))
 done
 

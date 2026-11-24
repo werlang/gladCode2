@@ -53,6 +53,9 @@ jobs:
             done
             echo "[Deploy] Building images..."
             docker compose build
+            # the engine image the runner starts per battle (gcc, Python and Node for the gladiators);
+            # cached layers make this quick when Setup/ did not change
+            docker build -t gladcode2-vm Setup
             echo "[Deploy] Running database migrations in a one-shot container..."
             # before the new code starts, so it never runs against the old schema
             docker compose up -d mysql

@@ -498,10 +498,16 @@ int main(int argc , char *argv[]){
 
     for( i=0 ; i<nglad ; i++){
         char name[10];
+        //gladiadores em Python (code<i>.py) e JavaScript (code<i>.js) rodam direto, sem binario
         sprintf(name,"code%i.py",i);
+        FILE *script = fopen(name,"r");
+        if (script == NULL){
+            sprintf(name,"code%i.js",i);
+            script = fopen(name,"r");
+        }
 
         // is a C file
-        if (fopen(name,"r") == NULL) {
+        if (script == NULL) {
             sprintf(name,"code%i",i);
             FILE *f = NULL;
 
@@ -521,8 +527,9 @@ int main(int argc , char *argv[]){
             else
                 fclose(f);
         }
-        // python file
+        // python or javascript file
         else{
+            fclose(script);
             FILE *f = NULL;
             do {
                 f = fopen("errorc.txt", "r");
@@ -531,7 +538,7 @@ int main(int argc , char *argv[]){
             fgets(text, 10, f);
             if (strlen(text) > 0){
                 endsim = 1;
-                printf("PYTHON ERROR");
+                printf("SCRIPT ERROR");
                 break;
             }
         }

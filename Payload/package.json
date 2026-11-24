@@ -1,0 +1,5 @@
+{
+    "description": "Engine run folder files. The JavaScript gladiator client (gladCodeCore.js, gladCodeAPI.js) is CommonJS.",
+    "type": "commonjs",
+    "private": true
+}

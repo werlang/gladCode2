@@ -10,7 +10,8 @@ GLADS=$REPO/tests/engine/glads
 ROOT=$REPO/data/runs/engine_test
 failed=0
 
-# battle <case> <glad files...>: builds the run dir like the API's model/battle.js and runs it (60s cap)
+# battle <case> <glad files...>: builds the run dir like the API's model/battle.js and runs it (60s cap);
+# CRLF=1 writes the JavaScript files with Windows line endings
 battle(){
     local case=$1; shift
     local dir=$ROOT/$case i=0 f
@@ -21,6 +22,10 @@ battle(){
               printf 'def setup():\n    setName("G%s@nick%s")\n    setSTR(10)\n    setAGI(14)\n    setINT(9)\n    setSlots("0,0,0,0")\n# start of user code\n' $i $i
               cat "$GLADS/$f"
               printf '\n\ninitClient()\nsetup()\nif startSim():\n    while running():\n        loop()\n'; } > "$dir/code$i.py"
+        elif [[ $f == *.js ]]; then
+            { printf 'function setup() {\n    setName("G%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n// start of user code\n' $i $i
+              cat "$GLADS/$f"; } > "$dir/code$i.js"
+            [ -n "$CRLF" ] && sed -i.bak 's/$/\r/' "$dir/code$i.js" && rm "$dir/code$i.js.bak"
         else
             { printf '#include "gladCodeCore.c"\n'
               printf 'setup(){\n    setName("G%s@nick%s");\n    setSTR(10);\n    setAGI(14);\n    setINT(9);\n    setSlots("0,0,0,0");\n}\n\n' $i $i
@@ -55,6 +60,37 @@ expect(){
     fi
 }
 
+# expect_error <case> <text>: the battle wrote no log and errorc.txt names the error
+expect_error(){
+    local dir=$ROOT/$1
+    if [ ! -s "$dir/simlog" ] && grep -q "$2" "$dir/errorc.txt" 2>/dev/null; then
+        echo "[PASS] $1: no log, errorc has '$2'"
+    else
+        echo "[FAIL] $1: expected no log and '$2' in errorc.txt, got: $(head -c 300 "$dir/errorc.txt" 2>/dev/null)"
+        failed=$((failed+1))
+    fi
+}
+
+# expect_said <case> <text>: some gladiator said this (speak) in the battle
+expect_said(){
+    if grep -q "\"message\":\"$2\"" "$ROOT/$1/simlog" 2>/dev/null; then
+        echo "[PASS] $1: said '$2'"
+    else
+        echo "[FAIL] $1: nobody said '$2'"
+        failed=$((failed+1))
+    fi
+}
+
+# expect_str <case> <gladiator> <STR>: the gladiator fought with this strength (its setup() was the server's)
+expect_str(){
+    if grep -q "\"name\":\"$2\",[^{}]*\"STR\":$3," "$ROOT/$1/simlog" 2>/dev/null; then
+        echo "[PASS] $1: $2 STR=$3"
+    else
+        echo "[FAIL] $1: expected $2 with STR=$3"
+        failed=$((failed+1))
+    fi
+}
+
 echo "=== Running Engine Battle Tests ==="
 battle healthy fighter.py fighter.c;                      expect healthy ""
 battle healthy5 fighter.py fighter.c fighter.py fighter.c fighter.py; expect healthy5 ""
@@ -68,6 +104,20 @@ battle c_mid ccrash_mid.c fighter.py;                     expect c_mid "G0"
 battle mixed5 fighter.c pycrash_mid.py fighter.py ccrash_mid.c fighter.py; expect mixed5 "G1,G3"
 battle stderr_forge pyforge_mid.py fighter.c;             expect stderr_forge ""
 battle speak_inject fighter.c pyinject.py fighter.py;     expect speak_inject ""
+
+# JavaScript gladiators
+battle js_healthy fighter.js fighter.c fighter.py;        expect js_healthy ""
+battle js_arrow jsarrow.js fighter.js;                    expect js_arrow ""
+for n in 1 2 3; do
+    battle js_first_$n fighter.c jscrash_first.js;        expect js_first_$n "G1"
+done
+battle js_mid jscrash_mid.js fighter.py;                  expect js_mid "G0"
+battle js_mixed5 fighter.js jscrash_mid.js fighter.py ccrash_mid.c pycrash_mid.py; expect js_mixed5 "G1,G3,G4"
+battle js_stderr_forge jsforge_mid.js fighter.c;          expect js_stderr_forge ""
+battle js_speak_inject fighter.c jsinject.js fighter.js;  expect js_speak_inject ""; expect_str js_speak_inject G1 10
+battle js_syntax jssyntax.js fighter.c;                   expect_error js_syntax "SyntaxError"
+battle js_speak_long jsspeak_long.js jsarrow.js;          expect js_speak_long ""; expect_said js_speak_long depois
+CRLF=1 battle js_crlf jsinject.js fighter.c;              expect js_crlf ""; expect_str js_crlf G0 10
 
 rm -rf "$ROOT"
 echo
