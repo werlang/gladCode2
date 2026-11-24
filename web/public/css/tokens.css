@@ -151,6 +151,13 @@
     --color-gladiator-frame-old-dark: #2d4256;
     --color-gladiator-stage: #0d2131;
     --color-gladiator-stage-deep: #0b1d2b;
+    --color-gladiator-body: #0b1d2b;
+    --color-gladiator-plate-text: #f3e8d0;
+    --color-gladiator-mmr: #f2b441;
+    --color-gladiator-versus-bg: rgb(0 0 0 / 0.28);
+    --color-gladiator-locked-bg: #1a3044;
+    --color-gladiator-locked-border: #2d4256;
+    --color-gladiator-locked-text: #7d6e5a;
     --color-gladiator-stage-glow: #ffd68c;
     --color-gladiator-ground: #9d7f4f;
     --color-gladiator-plaque: #173650;
@@ -511,6 +518,48 @@
     --shadow-glow: 0 0 5px 2px var(--color-glow);
 
     --focus-ring-color: var(--classic-glow);
+
+    /* Classic game card: blue/white frame family, gold accent, dark ink on a light stage. */
+    --color-gladiator-frame-brass: #00638d;
+    --color-gladiator-frame-brass-light: #eefaff;
+    --color-gladiator-frame-brass-dark: #004e6f;
+    --color-gladiator-frame-broken: #e53935;
+    --color-gladiator-frame-broken-light: #ffb4ab;
+    --color-gladiator-frame-broken-dark: #7f1d1a;
+    --color-gladiator-frame-old: #6c97a9;
+    --color-gladiator-frame-old-dark: #004e6f;
+    --color-gladiator-stage: #e6f3f8;
+    --color-gladiator-stage-deep: #c9e2ec;
+    --color-gladiator-stage-glow: #ffd76a;
+    --color-gladiator-ground: #6c97a9;
+    --color-gladiator-body: #f4fbfd;
+    --color-gladiator-plaque: #00638d;
+    --color-gladiator-plaque-deep: #004e6f;
+    --color-gladiator-plaque-border: #1e86d8;
+    --color-gladiator-text: #1b2a35;
+    --color-gladiator-text-muted: #575757;
+    --color-gladiator-plate-text: #ffffff;
+    --color-gladiator-mmr: #9a6a12;
+    --color-gladiator-versus-bg: rgb(255 255 255 / 0.78);
+    --color-gladiator-locked-bg: #d4d4d4;
+    --color-gladiator-locked-border: #bcbcbc;
+    --color-gladiator-locked-text: #575757;
+    --color-gladiator-seal-ready: #27a844;
+    --color-gladiator-seal-ready-text: #0d5a23;
+    --color-gladiator-seal-old: #c1922a;
+    --color-gladiator-seal-old-text: #6d4c39;
+    --color-gladiator-seal-broken: #e53935;
+    --color-gladiator-seal-broken-text: #8e1a17;
+    --color-gladiator-alert-old: #6d4c39;
+    --color-gladiator-alert-broken: #8e1a17;
+    --color-action-bevel: #ffca28;
+    --color-action-bevel-light: #ffe082;
+    --color-action-bevel-dark: #c1922a;
+    --color-action-bevel-edge: #9a6a12;
+    --color-action-bevel-side: #7a5410;
+    --color-action-bevel-text: #1b2a35;
+    --color-attr-track: #1b2a3514;
+    --color-attr-empty: #1b2a350d;
 }
 
 /* ---- Arena dark role mapping: the coliseum at night ---- */

@@ -68,6 +68,7 @@ export class GladsTab {
     #grid = null;
     #empty = null;
     #glads = [];
+    #cards = [];
     #filterValue = 'all';
     #signal = null;
 
@@ -121,6 +122,8 @@ export class GladsTab {
 
     /** Draws the filtered cards and the free places. */
     #render() {
+        for (const card of this.#cards) card.destroy();
+        this.#cards = [];
         this.#grid.replaceChildren();
         this.#empty.hidden = true;
         const filtered = this.#glads.filter(glad => {
@@ -145,6 +148,7 @@ export class GladsTab {
             card.listen('battle', () => { location.href = `/battle?glad=${glad.id}`; });
             card.listen('code', () => showCode(glad));
             card.listen('delete', () => this.#askDelete(card, glad));
+            this.#cards.push(card);
             this.#grid.append(card.element);
         }
 
@@ -169,8 +173,20 @@ export class GladsTab {
             writeErrorToast(error);
             return;
         }
-        card.element.remove();
+        card.destroy();
+        this.#cards = this.#cards.filter(item => item !== card);
         this.#glads = this.#glads.filter(item => item.id !== glad.id);
         await this.show({}, { signal: this.#signal });
+    }
+
+    /** Releases the cards and their global listeners when the section leaves. */
+    unmount() {
+        for (const card of this.#cards) card.destroy();
+        this.#cards = [];
+        this.#built = false;
+        this.#header = null;
+        this.#filter = null;
+        this.#grid = null;
+        this.#empty = null;
     }
 }

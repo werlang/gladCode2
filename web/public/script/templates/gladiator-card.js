@@ -18,12 +18,8 @@ export const gladiatorCardTemplate = `
                 <dl class='gladiator-attrs'></dl>
                 <p class='gladiator-alert' hidden></p>
                 <div class='gladiator-actions'>
-                    <a class='gladiator-edit' href='#'>{{editLabel}}</a>
-                    <button type='button' class='gladiator-fight'>
-                        {{{swords}}}
-                        <span class='gladiator-lock' hidden>{{{lock}}}</span>
-                        <span>{{fightLabel}}</span>
-                    </button>
+                    <a class='gladiator-edit' href='#'>{{{codeIcon}}}<span class='gladiator-action-label'>{{editLabel}}</span></a>
+                    <button type='button' class='gladiator-fight'>{{{swords}}}<span class='gladiator-lock' hidden>{{{lock}}}</span><span class='gladiator-action-label'>{{fightLabel}}</span></button>
                     <button type='button' class='gladiator-more' aria-label='Mais ações' aria-expanded='false'>{{{more}}}</button>
                 </div>
                 <div class='gladiator-menu' hidden>

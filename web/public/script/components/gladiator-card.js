@@ -55,6 +55,21 @@ export function gladiatorCrest(glad) {
 }
 
 /**
+ * The card's record line: real wins/losses, or a clear note when the stored battles have no known
+ * result (older reports) or there are no battles yet. Never a false “0 VITÓRIAS · 0 DERROTAS”.
+ *
+ * @param {{ battles?: number, wins?: number, losses?: number }} glad
+ * @returns {string}
+ */
+export function gladiatorRecord(glad) {
+    const battles = Number(glad?.battles) || 0;
+    const wins = Number(glad?.wins) || 0;
+    const losses = Number(glad?.losses) || 0;
+    if (wins + losses === 0) return battles > 0 ? 'SEM RESULTADOS CONHECIDOS' : 'SEM BATALHAS REGISTRADAS';
+    return `${wins} VITÓRIAS · ${losses} DERROTAS`;
+}
+
+/**
  * How many of the ten attribute segments are lit.
  *
  * @param {unknown} value Attribute points (0–30).
@@ -80,7 +95,9 @@ export class GladiatorCard extends BaseComponent {
     constructor({ element, gladiator = null, view = null } = {}) {
         super(element ?? createElement(renderTemplate(gladiatorCardTemplate, {
             crest: 'C', status: 'PRONTO', stamp: '', mmr: '0', crown: CROWN,
-            swords: icon('battle', { size: 17 }), lock: LOCK, more: icon('more', { size: 18 }),
+            swords: icon('battle', { size: 16, className: 'icon' }), lock: LOCK,
+            more: icon('dots', { size: 18, className: 'icon' }),
+            codeIcon: icon('code', { size: 15, className: 'icon' }),
             editLabel: 'EDITAR', fightLabel: 'BATALHAR',
         })));
         this.#view = view;
@@ -130,7 +147,7 @@ export class GladiatorCard extends BaseComponent {
         this.element.querySelector('.gladiator-stamp').textContent = state === 'broken' ? 'COM ERRO' : 'FORA DA ARENA';
         this.element.querySelector('.gladiator-stamp').hidden = state === 'ready';
         this.element.querySelector('.gladiator-name').textContent = glad.name ?? '';
-        this.element.querySelector('.gladiator-record').textContent = `${Number(glad.wins) || 0} VITÓRIAS · ${Number(glad.losses) || 0} DERROTAS`;
+        this.element.querySelector('.gladiator-record').textContent = gladiatorRecord(glad);
         this.element.querySelector('.gladiator-renown span').textContent = Number(glad.mmr || 0).toLocaleString('pt-BR');
 
         const attrs = this.element.querySelector('.gladiator-attrs');
@@ -154,14 +171,17 @@ export class GladiatorCard extends BaseComponent {
 
         const edit = this.element.querySelector('.gladiator-edit');
         edit.href = `/glad-${glad.id}`;
-        edit.textContent = state === 'ready' ? 'EDITAR' : 'CORRIGIR';
+        edit.querySelector('.gladiator-action-label').textContent = state === 'ready' ? 'EDITAR' : 'CORRIGIR';
         const fight = this.element.querySelector('.gladiator-fight');
         fight.disabled = !this.#ready || this.#busy;
         fight.setAttribute('aria-disabled', String(fight.disabled));
         fight.querySelector('.gladiator-lock').hidden = this.#ready;
-        const swords = fight.firstElementChild;
-        if (swords && swords.tagName !== 'SPAN') swords.hidden = !this.#ready;
-        fight.querySelector('span:last-child').textContent = 'BATALHAR';
+        const swords = fight.querySelector('svg.icon');
+        if (swords) {
+            if (this.#ready) swords.removeAttribute('hidden');
+            else swords.setAttribute('hidden', '');
+        }
+        fight.querySelector('.gladiator-action-label').textContent = 'BATALHAR';
         this.element.classList.toggle('is-selected', false);
         this.element.querySelector('.gladiator-menu').hidden = true;
         if (this.#view) this.setView(this.#view);
@@ -218,7 +238,7 @@ export class GladiatorCard extends BaseComponent {
  * @returns {HTMLElement}
  */
 export function emptyGladiatorCard(title) {
-    return createElement(renderTemplate(gladiatorEmptyTemplate, { title, plus: icon('plus', { size: 30 }) }));
+    return createElement(renderTemplate(gladiatorEmptyTemplate, { title, plus: icon('plus', { size: 30, className: 'icon' }) }));
 }
 
 /** A new card in the master's current view. */
