@@ -34,6 +34,9 @@ function makeNode(document, tagName = 'div') {
         setAttribute(name, value) {
             this.attributes.set(name, String(value));
         },
+        removeAttribute(name) {
+            this.attributes.delete(name);
+        },
         getAttribute(name) {
             return this.attributes.get(name) ?? null;
         },
@@ -128,6 +131,43 @@ test('a page change emits the event and keeps focus on the equivalent control', 
         simpleNext.focus();
         simpleNext.click();
         assert.equal(fakeDocument.activeElement.getAttribute('aria-label'), 'Página anterior');
+    }
+    finally {
+        globalThis.document = previousDocument;
+    }
+});
+
+test('a controlled page keeps the confirmed range until set and a cancel changes nothing', () => {
+    const previousDocument = globalThis.document;
+    const fakeDocument = { activeElement: null };
+    fakeDocument.createElement = tagName => makeNode(fakeDocument, tagName);
+    fakeDocument.createDocumentFragment = () => {
+        const fragment = makeNode(fakeDocument, '#fragment');
+        fragment.isFragment = true;
+        return fragment;
+    };
+    globalThis.document = fakeDocument;
+    try {
+        const root = makeNode(fakeDocument);
+        const pagination = new Pagination({ element: root, variant: 'simple', controlled: true });
+        const changes = [];
+        pagination.listen('change', detail => changes.push(detail));
+        pagination.set({ page: 1, pages: 2, total: 20, pageSize: 10 });
+        const summary = () => root.children.find(child => child.className === 'pagination-summary').textContent;
+
+        pagination.goTo(2);
+        assert.deepEqual(changes, [{ page: 2 }]);
+        assert.equal(summary(), '1–10 de 20');
+        assert.equal(root.getAttribute('aria-busy'), 'true');
+
+        pagination.cancel();
+        assert.equal(root.getAttribute('aria-busy'), null);
+        assert.equal(summary(), '1–10 de 20');
+
+        pagination.goTo(2);
+        pagination.set({ page: 2, pages: 2, total: 20, pageSize: 10 });
+        assert.equal(summary(), '11–20 de 20');
+        assert.equal(root.getAttribute('aria-busy'), null);
     }
     finally {
         globalThis.document = previousDocument;

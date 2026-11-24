@@ -6,9 +6,9 @@ import { GladiatorPicker } from '../components/gladiator-picker.js';
 import { showDialog, showInput, showMessage } from '../components/dialog.js';
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { isAborted, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
-import { showBlockedGladiator } from './gladiator-feedback.js';
+import { isRowActivation } from '../helpers/row-activation.js';
 import { TournamentModel } from '../models/tournament.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
@@ -128,7 +128,6 @@ function chooseGladiator() {
         choose.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'tournament' });
     });
-    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
@@ -532,6 +531,8 @@ export class TournamentsTab {
     #offsets = { mine: 0, open: 0 };
     /** The current navigation signal; the list pages keep using it. */
     #signal = null;
+    /** Answers an older page or section read after a newer one started. */
+    #request = 0;
     #openCard = null;
     #mineCard = null;
     #openRows = null;
@@ -550,7 +551,7 @@ export class TournamentsTab {
         this.#openCard = new SectionCard();
         this.#openCard.setTitle('Torneios públicos abertos');
         this.#openRows = createElement(battleRowsTemplate);
-        this.#openPager = new Pagination({ variant: 'simple' });
+        this.#openPager = new Pagination({ variant: 'simple', controlled: true });
         this.#openCard.setBody([this.#openRows, this.#openPager.element]);
         this.#createButton = createElement("<button type='button' class='button primary'>Criar torneio</button>");
         this.#joinButton = createElement("<button type='button' class='button neutral'>Ingressar em um torneio</button>");
@@ -560,7 +561,7 @@ export class TournamentsTab {
         this.#mineCard = new SectionCard();
         this.#mineCard.setTitle('Meus torneios');
         this.#mineRows = createElement(battleRowsTemplate);
-        this.#minePager = new Pagination({ variant: 'simple' });
+        this.#minePager = new Pagination({ variant: 'simple', controlled: true });
         this.#mineCard.setBody([this.#mineRows, this.#minePager.element]);
         this.#mineCard.element.hidden = true;
         this.#root.append(this.#mineCard.element);
@@ -578,9 +579,23 @@ export class TournamentsTab {
      * @param {'mine'|'open'} list Which list.
      * @param {number} page 1-based page from the Pagination component.
      */
-    #go(list, page) {
+    async #go(list, page) {
+        const pager = list === 'open' ? this.#openPager : this.#minePager;
+        const previous = this.#offsets[list];
+        const request = this.#request + 1;
         this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
-        return runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
+        try {
+            await this.refresh({ signal: this.#signal });
+            if (this.#request !== request) return;
+            if (this.#signal?.aborted) pager.cancel();
+        }
+        catch (error) {
+            if (this.#request !== request) return;
+            pager.cancel();
+            if (isAborted(error) || this.#signal?.aborted) return;
+            this.#offsets[list] = previous;
+            writeErrorToast(error);
+        }
     }
 
     /**
@@ -590,8 +605,9 @@ export class TournamentsTab {
      */
     async refresh({ signal = this.#signal } = {}) {
         this.#signal = signal;
+        const request = ++this.#request;
         const data = await settleRequest(() => TournamentModel.list(this.#offsets, { signal }), signal);
-        if (!data || signal?.aborted) return;
+        if (!data || signal?.aborted || request !== this.#request) return;
         ['mine', 'open'].forEach(list => {
             const { offset, total } = data.pages[list];
             this.#offsets[list] = offset;
@@ -655,7 +671,7 @@ export class TournamentsTab {
             };
             row.addEventListener('click', open);
             row.addEventListener('keydown', event => {
-                if (event.key === 'Enter' || event.key === ' ') {
+                if (isRowActivation(event, row)) {
                     event.preventDefault();
                     open();
                 }

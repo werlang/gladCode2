@@ -6,7 +6,8 @@ const { attributeSegments, gladiatorCrest, gladiatorLanguage, gladiatorRecord, g
     '../../web/public/script/components/gladiator-card.js'
 );
 const { FlightGuard } = await import('../../web/public/script/helpers/flight-guard.js');
-const { blockedGladiatorMessage } = await import('../../web/public/script/profile/gladiator-feedback.js');
+const { isRowActivation } = await import('../../web/public/script/helpers/row-activation.js');
+const { blockedGladiatorText } = await import('../../web/public/script/components/gladiator-picker.js');
 
 test('a broken gladiator outranks the outdated state of the same record', () => {
     assert.equal(gladiatorState({}), 'ready');
@@ -43,6 +44,9 @@ test('the record line never shows a false 0–0 for older battles or a new gladi
     assert.equal(gladiatorRecord({ battles: 9, wins: 0, losses: 0 }), 'SEM RESULTADOS CONHECIDOS');
     assert.equal(gladiatorRecord({ battles: 9, wins: 5, losses: 4 }), '5 VITÓRIAS · 4 DERROTAS');
     assert.equal(gladiatorRecord({ battles: 9 }), 'SEM RESULTADOS CONHECIDOS');
+    assert.equal(gladiatorRecord({ battles: 1, draws: 1 }), '1 EMPATE');
+    assert.equal(gladiatorRecord({ battles: 3, draws: 3 }), '3 EMPATES');
+    assert.equal(gladiatorRecord({ battles: 11, wins: 5, losses: 4, draws: 2 }), '5 VITÓRIAS · 4 DERROTAS · 2 EMPATES');
 });
 
 test('a matchmaking flight guard runs one task at a time', async () => {
@@ -70,11 +74,11 @@ test('a failed matchmaking task releases the flight guard', async () => {
     await assert.doesNotReject(guard.run(async () => 'next'));
 });
 
-test('the blocked-gladiator message escapes the name', () => {
-    const message = blockedGladiatorMessage({ name: '<img src=x onerror=alert(1)>', broken: true });
+test('the blocked-gladiator reason is plain text for the picker status', () => {
+    const message = blockedGladiatorText({ name: '<img src=x onerror=alert(1)>', broken: true });
     assert.match(message, /travou/);
-    assert.doesNotMatch(message, /<img/);
-    assert.match(message, /&lt;img/);
+    assert.match(message, /^<img src=x/);
+    assert.equal(blockedGladiatorText({ name: 'Cícero' }), 'Cícero precisa ser gravado novamente no editor.');
 });
 
 test('a card destroy removes its document listener', async () => {
@@ -115,4 +119,15 @@ test('a card destroy removes its document listener', async () => {
     finally {
         delete globalThis.document;
     }
+});
+
+
+test('a control inside a row keeps its own Enter and Space activation', () => {
+    const row = {};
+    const child = {};
+    assert.equal(isRowActivation({ target: row, key: 'Enter' }, row), true);
+    assert.equal(isRowActivation({ target: row, key: ' ' }, row), true);
+    assert.equal(isRowActivation({ target: child, key: 'Enter' }, row), false);
+    assert.equal(isRowActivation({ target: child, key: ' ' }, row), false);
+    assert.equal(isRowActivation({ target: row, key: 'Escape' }, row), false);
 });

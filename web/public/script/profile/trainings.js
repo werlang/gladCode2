@@ -7,14 +7,14 @@ import { createToast } from '../components/toast.js';
 import { copyText } from '../helpers/clipboard.js';
 import { APP_EVENTS, events } from '../helpers/event-bus.js';
 import { createElement, escapeHtml, renderTemplate } from '../helpers/html.js';
-import { runReadTask, settleRequest, writeErrorToast } from '../helpers/section-request.js';
+import { isAborted, settleRequest, writeErrorToast } from '../helpers/section-request.js';
 import { fadeIn, hide, show } from '../helpers/animate.js';
+import { isRowActivation } from '../helpers/row-activation.js';
 import { TrainingModel } from '../models/training.js';
 import { GladiatorModel } from '../models/gladiator.js';
 import { emptyStateTemplate } from '../templates/empty-state.js';
 import { battleRowsTemplate, trainingRowTemplate } from '../templates/profile-battle.js';
 import { profile } from './session.js';
-import { showBlockedGladiator } from './gladiator-feedback.js';
 import { showNoCredit } from './tutor.js';
 import {
     bigLinkTemplate,
@@ -92,7 +92,6 @@ function chooseGladiator() {
         select.disabled = false;
         events.emit(APP_EVENTS.gladiatorChosen, { gladiator, mode: 'training' });
     });
-    picker.listen('blocked', ({ gladiator }) => showBlockedGladiator(gladiator));
     GladiatorModel.list().then(glads => picker.setGladiators(glads)).catch(writeErrorToast);
 
     return new Promise(resolve => {
@@ -529,6 +528,8 @@ export class TrainingsTab {
     #offsets = { manage: 0, part: 0 };
     /** The current navigation signal; the list pages keep using it. */
     #signal = null;
+    /** Answers an older page or section read after a newer one started. */
+    #request = 0;
     #manageCard = null;
     #partCard = null;
     #manageRows = null;
@@ -547,7 +548,7 @@ export class TrainingsTab {
         this.#manageCard = new SectionCard();
         this.#manageCard.setTitle('Treinos que gerencio');
         this.#manageRows = createElement(battleRowsTemplate);
-        this.#managePager = new Pagination({ variant: 'simple' });
+        this.#managePager = new Pagination({ variant: 'simple', controlled: true });
         this.#manageCard.setBody([this.#manageRows, this.#managePager.element]);
         this.#createButton = createElement("<button type='button' class='button primary'>Novo treino</button>");
         this.#manageCard.setActions([this.#createButton]);
@@ -556,7 +557,7 @@ export class TrainingsTab {
         this.#partCard = new SectionCard();
         this.#partCard.setTitle('Treinos que participo');
         this.#partRows = createElement(battleRowsTemplate);
-        this.#partPager = new Pagination({ variant: 'simple' });
+        this.#partPager = new Pagination({ variant: 'simple', controlled: true });
         this.#partCard.setBody([this.#partRows, this.#partPager.element]);
         this.#joinButton = createElement("<button type='button' class='button neutral'>Participar de treino</button>");
         this.#partCard.setActions([this.#joinButton]);
@@ -576,9 +577,23 @@ export class TrainingsTab {
      * @param {'manage'|'part'} list Which list.
      * @param {number} page 1-based page from the Pagination component.
      */
-    #go(list, page) {
+    async #go(list, page) {
+        const pager = list === 'manage' ? this.#managePager : this.#partPager;
+        const previous = this.#offsets[list];
+        const request = this.#request + 1;
         this.#offsets[list] = Math.max(0, (Number(page) - 1) * PAGE_SIZE);
-        return runReadTask(() => this.refresh({ signal: this.#signal }), this.#signal);
+        try {
+            await this.refresh({ signal: this.#signal });
+            if (this.#request !== request) return;
+            if (this.#signal?.aborted) pager.cancel();
+        }
+        catch (error) {
+            if (this.#request !== request) return;
+            pager.cancel();
+            if (isAborted(error) || this.#signal?.aborted) return;
+            this.#offsets[list] = previous;
+            writeErrorToast(error);
+        }
     }
 
     /**
@@ -588,8 +603,9 @@ export class TrainingsTab {
      */
     async refresh({ signal = this.#signal } = {}) {
         this.#signal = signal;
+        const request = ++this.#request;
         const data = await settleRequest(() => TrainingModel.list(this.#offsets, { signal }), signal);
-        if (!data || signal?.aborted) return;
+        if (!data || signal?.aborted || request !== this.#request) return;
         ['manage', 'part'].forEach(list => this.#drawList(list, data));
 
         const room = Number(new URLSearchParams(location.search).get('room'));
@@ -649,10 +665,9 @@ export class TrainingsTab {
             const training = rows[index];
             element.addEventListener('click', () => new TrainingRoom(training.id).show());
             element.addEventListener('keydown', event => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    new TrainingRoom(training.id).show();
-                }
+                if (!isRowActivation(event, element)) return;
+                event.preventDefault();
+                new TrainingRoom(training.id).show();
             });
             element.querySelector('.remove')?.addEventListener('click', event => {
                 event.stopPropagation();

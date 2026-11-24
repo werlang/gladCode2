@@ -63,15 +63,20 @@ export class Pagination extends BaseComponent {
     #pages = 1;
     #total = 0;
     #pageSize = 10;
+    #controlled;
+    #pending = false;
 
     /**
      * @param {object} [options]
      * @param {HTMLElement} [options.element]
      * @param {PaginationVariant} [options.variant]
+     * @param {boolean} [options.controlled] Emit the requested page and keep the current page until
+     *   `set()` confirms the new data; a refused page then never changes the displayed range.
      */
-    constructor({ element, variant = 'numbered' } = {}) {
+    constructor({ element, variant = 'numbered', controlled = false } = {}) {
         super(element ?? createElement(renderTemplate(paginationTemplate, { variant })));
         this.#variant = variant;
+        this.#controlled = controlled;
     }
 
     /**
@@ -79,6 +84,8 @@ export class Pagination extends BaseComponent {
      * @returns {this}
      */
     set({ page, pages, total, pageSize }) {
+        this.#pending = false;
+        this.element.removeAttribute('aria-busy');
         this.#page = Math.max(1, Math.floor(Number(page) || 1));
         this.#pages = Math.max(1, Math.floor(Number(pages) || 1));
         this.#total = Math.max(0, Math.floor(Number(total) || 0));
@@ -94,7 +101,13 @@ export class Pagination extends BaseComponent {
      */
     goTo(page, { focus = 'page' } = {}) {
         const next = Math.max(1, Math.min(this.#pages, Math.floor(Number(page) || 1)));
-        if (next === this.#page) return this;
+        if (next === this.#page || this.#pending) return this;
+        if (this.#controlled) {
+            this.#pending = true;
+            this.element.setAttribute('aria-busy', 'true');
+            this.emit('change', { page: next });
+            return this;
+        }
         const hadFocus = this.element.contains(document.activeElement);
         this.#page = next;
         this.#render();
@@ -107,6 +120,17 @@ export class Pagination extends BaseComponent {
             target?.focus();
         }
         this.emit('change', { page: next });
+        return this;
+    }
+
+    /**
+     * Releases a controlled request without changing the page (the section refused the read).
+     *
+     * @returns {this}
+     */
+    cancel() {
+        this.#pending = false;
+        this.element.removeAttribute('aria-busy');
         return this;
     }
 
