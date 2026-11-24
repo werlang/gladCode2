@@ -8,7 +8,8 @@ const router = Router();
 
 /**
  * GET /potions
- * The potions on sale: `{ potions: { <identifier>: { id, name, price, level, description, icon } } }`.
+ * The potions on sale: `{ potions: { <identifier>: { id, identifier, name, price, level, description,
+ * icon, kind } } }`, in catalogue order.
  */
 router.get('/', asyncRoute(async (req, res) => {
     res.send({ potions: await Potion.catalog() });

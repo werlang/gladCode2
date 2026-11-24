@@ -134,10 +134,10 @@ From `api/route/potions.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/potions` | anyone | The potions on sale: `{ potions: { <identifier>: { id, name, price, level, description, icon } } }`. |
+| `GET` | `/potions` | anyone | The potions on sale: `{ potions: { <identifier>: { id, identifier, name, price, level, description, icon, kind } } }`, in catalogue order. |
 | `GET` | `/potions/apothecary` | anyone | The apothecary's levels: `{ prices, hours }`, each indexed by level - 1 (`prices` is the cost of leaving that level). |
 | `GET` | `/potions/slots` | signed in | The signed-in master's potions: `{ slots, serverNow, unlockLevels, level }`; each slot carries `expiresAt` and `seconds`. |
-| `POST` | `/potions/slots` | signed in | Orders a potion: `{ potion: <identifier> }`. Answers 201 `{ slotId, silver }`. |
+| `POST` | `/potions/slots` | signed in | Orders a potion: `{ potion: <identifier> }`. Answers 201 `{ slotId, silver, slots, serverNow, level, unlockLevels }`; the returned list is the authoritative state after the order. |
 | `DELETE` | `/potions/slots/:id` | signed in | Cancels one of the master's potions. |
 | `POST` | `/potions/apothecary/upgrade` | signed in | Upgrades the master's apothecary: `{ apothecary, silver }`. |
 
@@ -169,7 +169,8 @@ From `api/route/reports.js`.
 
 | Method | Path | Access | Description |
 | --- | --- | --- | --- |
-| `GET` | `/reports?offset=0&favorites=true&unreadOnly=true&markRead=true` | signed in | A page of the master's ranked battle reports: `{ total, reports }`. |
+| `GET` | `/reports?offset=0&favorites=true&unreadOnly=true&markRead=true` | signed in | A page of the master's ranked battle reports: `{ total, reports }`; each report carries `place`, `total` (battle size), `result`, `opponents` and the favourite note. |
+| `GET` | `/reports/summary` | signed in | The report header: `{ results, renown, unread }` — the last ten known results, the renown in the last seven days and the unread ranked count. |
 | `PUT` | `/reports/:id/favorite` | signed in | Keeps a report among the favorites, with a comment: `{ favorite, comment? }`. |
 
 ## search

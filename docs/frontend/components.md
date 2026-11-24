@@ -390,7 +390,8 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/pagination.js`; **CSS:** `css/components/pagination.css`.
 - **Purpose:** the page controls: the simple previous/next of Relatórios and the numbered pages of
   Ranking, plus “Ir para a posição”.
-- **Constructor:** `new Pagination({ element, variant, controlled })` (`simple` or `numbered`).
+- **Constructor:** `new Pagination({ element, variant, controlled, unit })` (`simple` or `numbered`);
+  `unit` appends what the total counts to the summary (“batalhas” in Relatórios).
 - **Methods:** `set({ page, pages, total, pageSize })`, `goTo(page)`; a `controlled` pager emits the
   requested page and keeps the confirmed one until `set()` (or `cancel()` on a refused read). `set`
   computes the “1–7 de 482” label and the page window (`1 … 8 9 10 … 164`) and keeps focus on the
@@ -524,12 +525,15 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 ### FormStreak — new (WP6)
 
 - **File:** `components/form-streak.js`; **CSS:** `css/components/form-streak.css`.
-- **Purpose:** the last ten results as a row of V/D tiles with a “Últimas 10 batalhas” label, beside the
-  7-day renown total.
-- **Constructor:** `new FormStreak({ element, results })` where a result is `{ won, title }`.
+- **Purpose:** the last ten authoritative results as V/D/E tiles with a “Últimas 10 batalhas” label,
+  beside the 7-day renown total. Draws get their own `E` tile; the section reads them oldest first from
+  `GET /reports/summary`.
+- **Constructor:** `new FormStreak({ element, results })`; a result is `'win' | 'loss' | 'draw'`, or
+  `{ result }` / `{ won }` from an older caller.
 - **Methods:** `set(results)`.
 - **Events:** none.
-- **ARIA:** each tile has a `title`/`aria-label` (“Venceu” / “Perdeu”); the row has a summary label.
+- **ARIA:** each tile has a `title`/`aria-label` (“Venceu” / “Perdeu” / “Empate”); an empty history shows
+  one “—” tile labelled “Nenhuma batalha registrada” instead of ten false losses.
 - **Boards:** `Relatorios.dc.html`.
 
 ### PotionSlot — new (WP6)
@@ -537,13 +541,17 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/potion-slot.js`; **CSS:** `css/components/potion-slot.css`.
 - **Purpose:** one of the four potion compartments: a filled potion with its kind tint, a countdown bar
   and time; an empty dashed slot that points to the shop; a locked slot with its master level.
-- **Constructor:** `new PotionSlot({ element, index })`.
-- **Methods:** `setPotion(slot, serverNow)`, `setLocked(level)`, `setEmpty()`; the countdown is computed
-  from the slot's `expiresAt` and `serverNow` (both server time, returned from WP3) through
-  `components/countdown.js`, and stops when the slot leaves the DOM. A locally computed duration is not
-  accepted.
-- **Events:** `empty` `{ index }` (focus the shop), `cancel` `{ slot }` (the slot's menu).
-- **ARIA:** the countdown is text (`role="timer"` with an accessible label), not only a bar.
+- **Constructor:** `new PotionSlot({ element, index })`. Both the filled and the locked state carry the
+  real master level from `GET /potions/slots` (`unlockLevels`), and the empty slot is the only one that
+  emits `empty`.
+- **Methods:** `setPotion(slot, serverNow)`, `setLocked(level)`, `setEmpty()`. The countdown is computed
+  from the slot's `expiresAt` and the server's `serverNow` through `components/countdown.js`; it stops
+  when the slot leaves the DOM, and it calls `onEnd` so the section refreshes the compartment list.
+  A locally computed duration is not accepted.
+- **Events:** `empty` `{ index }` (points at the shop), `cancel` `{ slot }` (the cancel button), `expire`
+  `{ slot }` (the countdown reached zero; the section refreshes).
+- **ARIA:** the countdown is text (`role="timer"` with an accessible label), not only a bar; the empty
+  slot is clickable, the locked one is not.
 - **Boards:** `Pocoes.dc.html`, `Batalhas.dc.html` (the pots carried in the versus panel).
 
 ### PotionCard — new (WP6)
@@ -551,9 +559,13 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **File:** `components/potion-card.js`; **CSS:** `css/components/potion-card.css`.
 - **Purpose:** one potion on sale: kind icon/tint, name, level and `useItem` id, description, price and
   the order button (or “Apotecário nível 4” when locked).
-- **Constructor:** `new PotionCard({ element, potion, unlocked })`.
-- **Methods:** `setPotion(potion)`, `setUnlocked(on)`, `setBusy(on)`.
-- **Events:** `order` `{ potion }`.
+- **Constructor:** `new PotionCard({ element, potion, unlocked })`; the potion carries the engine's
+  `identifier` (`pot-hp-3`), which the card prints verbatim as `useItem("pot-hp-3")`, and its `kind`
+  (`hp`, `ap`, `attr`, `xp`) for the icon tint. `helpers/potion-kind.js` holds the same fallback and the
+  filter chips derived from the real catalogue.
+- **Methods:** `setPotion(potion)`, `setUnlocked(on, level)`, `setUnavailable(reason)`, `setBusy(on)`.
+  A locked card reads “Apotecário nível N”; a card with no free compartment reads “Sem compartimento”.
+- **Events:** `order` `{ potion }` (only when unlocked, available and not busy).
 - **Boards:** `Pocoes.dc.html`.
 
 ### RankingTable — new (WP7)

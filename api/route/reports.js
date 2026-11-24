@@ -9,7 +9,8 @@ router.use(auth());
 
 /**
  * GET /reports?offset=0&favorites=true&unreadOnly=true&markRead=true
- * A page of the master's ranked battle reports: `{ total, reports }`.
+ * A page of the master's ranked battle reports: `{ total, reports }`; each report carries `place`,
+ * `total` (battle size), `result`, `opponents` and the favourite note.
  */
 router.get('/', asyncRoute(async (req, res) => {
     const flag = name => req.query[name] === 'true';
