@@ -10,7 +10,7 @@ const TAG = /^[a-z0-9_]{1,50}$/;
 
 /**
  * GET /ranking?offset=0&search=&scope=all
- * A page of the current-version gladiator ranking:
+ * A page of the gladiator ranking:
  * `{ total, ranking: [{ id, gladiator, mmr, master, change24h, change7d, position }] }` (the table
  * shows the 7-day change; `change24h` stays for older clients).
  * `scope=friends` keeps only the signed-in master's friends (positions stay global). With
@@ -32,7 +32,7 @@ router.get('/', auth({ optional: true }), asyncRoute(async (req, res) => {
 
 /**
  * GET /ranking/window?gladiatorId=42&size=9 (or ?position=128&size=9)
- * A window of the current-version ranking centred on a gladiator or a 1-based position; exactly one
+ * A window of the ranking centred on a gladiator or a 1-based position; exactly one
  * is required. Answers `{ total, position, page, pageSize, around, rows }`.
  */
 router.get('/window', asyncRoute(async (req, res) => {
@@ -56,7 +56,7 @@ router.get('/window', asyncRoute(async (req, res) => {
 
 /**
  * GET /ranking/mine
- * The signed-in master's gladiators with their position or unranked reason:
+ * The signed-in master's gladiators with their position and engine state:
  * `{ gladiators: [{ id, name, mmr, position, state, skin }] }`.
  */
 router.get('/mine', auth(), asyncRoute(async (req, res) => {

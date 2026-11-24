@@ -38,13 +38,13 @@ describe('Ranking', () => {
             ranking: [{ id: 4, gladiator: 'Magnus', mmr: 1482, master: 'Spartacus_C', change24h: 3, change7d: 9, position: 128 }],
         });
         const [countSql, countValues] = Mysql.select.mock.calls[0];
-        expect(countSql).toContain('g.version = ?');
-        expect(countValues).toEqual([VERSION, '%Mag%', '%Mag%', 7, 7]);
+        expect(countSql).not.toContain('g.version');
+        expect(countValues).toEqual(['%Mag%', '%Mag%', 7, 7]);
         const [rowsSql, rowsValues] = Mysql.select.mock.calls[1];
         expect(rowsSql).toContain('ROW_NUMBER() OVER (ORDER BY g.mmr DESC, g.cod ASC)');
-        expect(rowsSql).toContain('WHERE g.version = ?');
+        expect(rowsSql).not.toContain('g.version');
         expect(rowsSql).toContain('ranked.position');
-        expect(rowsValues).toEqual([VERSION, '%Mag%', '%Mag%', 7, 7, 10, 0]);
+        expect(rowsValues).toEqual(['%Mag%', '%Mag%', 7, 7, 10, 0]);
     });
 
     test('a gladiator window resolves its position and returns the centred rows', async () => {
@@ -60,8 +60,8 @@ describe('Ranking', () => {
 
         expect(window).toMatchObject({ total: 20, position: 5, page: 1, pageSize: 10, around: 'Magnus' });
         expect(window.rows[0]).toMatchObject({ id: 4, position: 5, change7d: 9 });
-        expect(Mysql.select.mock.calls[2][1]).toEqual([VERSION, 1482, 1482, 4]);
-        expect(Mysql.select.mock.calls[3][1]).toEqual([VERSION, 1, 9]);
+        expect(Mysql.select.mock.calls[2][1]).toEqual([1482, 1482, 4]);
+        expect(Mysql.select.mock.calls[3][1]).toEqual([1, 9]);
     });
 
     test('a position window clamps to the last row and a missing gladiator is refused', async () => {
@@ -70,7 +70,7 @@ describe('Ranking', () => {
             .mockResolvedValueOnce([{ id: 20, gladiator: 'Last', mmr: 1000, master: 'M', change24h: 0, change7d: 0, position: 20 }]);
         const bottom = await Ranking.window({ position: 99, size: 9 });
         expect(bottom).toMatchObject({ position: 20, around: 'Last' });
-        expect(Mysql.select.mock.calls[1][1]).toEqual([VERSION, 12, 20]);
+        expect(Mysql.select.mock.calls[1][1]).toEqual([12, 20]);
 
         Mysql.select.mockReset();
         Mysql.select.mockResolvedValueOnce([{ total: 20 }]).mockResolvedValueOnce([]);
@@ -86,17 +86,16 @@ describe('Ranking', () => {
     test('my gladiators carry the reason they are outside the current ranking', async () => {
         Mysql.select.mockResolvedValueOnce([
             { id: 1, name: 'Aurora', mmr: 1487, version: VERSION, skin: 's1', position: 2 },
-            { id: 2, name: 'Old', mmr: 900, version: '2.9.0', skin: '', position: null },
-            { id: 3, name: 'Broken', mmr: 800, version: 'broken', skin: '', position: null },
-            { id: 4, name: 'No battle', mmr: 0, version: VERSION, skin: '', position: null },
+            { id: 2, name: 'Old', mmr: 900, version: '2.9.0', skin: '', position: 220 },
+            { id: 3, name: 'Broken', mmr: 800, version: 'broken', skin: '', position: 240 },
         ]);
         expect((await Ranking.mine(7)).gladiators).toEqual([
             { id: 1, name: 'Aurora', mmr: 1487, position: 2, state: 'ranked', skin: 's1' },
-            { id: 2, name: 'Old', mmr: 900, position: null, state: 'outdated', skin: '' },
-            { id: 3, name: 'Broken', mmr: 800, position: null, state: 'broken', skin: '' },
-            { id: 4, name: 'No battle', mmr: 0, position: null, state: 'unranked', skin: '' },
+            { id: 2, name: 'Old', mmr: 900, position: 220, state: 'outdated', skin: '' },
+            { id: 3, name: 'Broken', mmr: 800, position: 240, state: 'broken', skin: '' },
         ]);
-        expect(Mysql.select.mock.calls[0][1]).toEqual([VERSION, 7]);
+        expect(Mysql.select.mock.calls[0][1]).toEqual([7]);
+        expect(Mysql.select.mock.calls[0][0]).not.toContain('WHERE version');
     });
 
     test('the best current offset uses the ranking tie-break', async () => {
@@ -104,7 +103,7 @@ describe('Ranking', () => {
             .mockResolvedValueOnce([{ mmr: 1482, cod: 4 }])
             .mockResolvedValueOnce([{ above: 3 }]);
         expect(await Ranking.bestOffset(7)).toBe(3);
-        expect(Mysql.select.mock.calls[1][1]).toEqual([VERSION, 1482, 1482, 4]);
+        expect(Mysql.select.mock.calls[1][1]).toEqual([1482, 1482, 4]);
         Mysql.select.mockReset();
         Mysql.select.mockResolvedValueOnce([]);
         expect(await Ranking.bestOffset(7)).toBe(0);

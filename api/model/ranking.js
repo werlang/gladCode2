@@ -48,7 +48,7 @@ export function windowBounds(total, position, size) {
     return { position: clamped, start, last: Math.min(total, start + size - 1) };
 }
 
-/** The current-version ranking rows with their position and 1/7-day renown change. */
+/** The ranking rows with their position and 1/7-day renown change. */
 const RANKED_SQL = `(
     SELECT g.cod AS id, g.name AS gladiator, g.mmr, g.master AS masterId, u.apelido AS master,
         ROW_NUMBER() OVER (ORDER BY g.mmr DESC, g.cod ASC) AS position,
@@ -64,7 +64,6 @@ const RANKED_SQL = `(
         WHERE l.time > NOW() - INTERVAL 7 DAY
         GROUP BY r.gladiator
     ) d ON d.gladiator = g.cod
-    WHERE g.version = ?
 ) ranked`;
 
 /**
@@ -90,7 +89,7 @@ function generalRow(row) {
  */
 export class Ranking {
     /**
-     * A page of the gladiator ranking, strongest first. Positions are computed over every current
+     * A page of the gladiator ranking, strongest first. Positions are computed over every
      * gladiator, so a search or the friends scope keeps the global position.
      *
      * @param {{ offset: number, search?: string, scope?: 'all'|'friends', userId?: number|null }} query
@@ -98,8 +97,8 @@ export class Ranking {
      *   master: string, change24h: number, change7d: number, position: number }> }>}
      */
     static async general({ offset, search = '', scope = 'all', userId = null }) {
-        const conditions = ['g.version = ?'];
-        const values = [VERSION];
+        const conditions = [];
+        const values = [];
         if (search) {
             conditions.push('(g.name LIKE ? OR u.apelido LIKE ?)');
             values.push(Mysql.contains(search), Mysql.contains(search));
@@ -113,7 +112,7 @@ export class Ranking {
         }
         const where = conditions.join(' AND ');
         const [{ total }] = await Mysql.select(
-            `SELECT COUNT(*) AS total FROM gladiators g INNER JOIN usuarios u ON u.id = g.master WHERE ${where}`,
+            `SELECT COUNT(*) AS total FROM gladiators g INNER JOIN usuarios u ON u.id = g.master ${where ? `WHERE ${where}` : ''}`,
             values,
         );
 
@@ -137,22 +136,22 @@ export class Ranking {
             ${outer.length ? `WHERE ${outer.join(' AND ')}` : ''}
             ORDER BY ranked.position
             LIMIT ? OFFSET ?`,
-            [VERSION, ...outerValues, RANKING_PAGE_SIZE, Math.max(0, offset)],
+            [...outerValues, RANKING_PAGE_SIZE, Math.max(0, offset)],
         );
         return { total: Number(total), ranking: rows.map(generalRow) };
     }
 
     /**
-     * A window of the current-version ranking centred on a gladiator or a position.
+     * A window of the ranking centred on a gladiator or a position.
      *
      * @param {{ gladiatorId?: number, position?: number, size?: number }} query Exactly one of
      *   `gladiatorId` or `position`.
      * @returns {Promise<{ total: number, position: number, page: number, pageSize: number,
      *   around: string|null, rows: object[] }>}
-     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND` when the gladiator is not in the current ranking.
+     * @throws {CustomError} 404 `GLADIATOR_NOT_FOUND` when the gladiator does not exist.
      */
     static async window({ gladiatorId = undefined, position = undefined, size = RANKING_WINDOW_SIZE } = {}) {
-        const [{ total }] = await Mysql.select('SELECT COUNT(*) AS total FROM gladiators WHERE version = ?', [VERSION]);
+        const [{ total }] = await Mysql.select('SELECT COUNT(*) AS total FROM gladiators');
         const count = Number(total);
         const rows = windowSize(size);
 
@@ -160,14 +159,14 @@ export class Ranking {
         let requested = position;
         if (gladiatorId !== undefined) {
             [target] = await Mysql.select(
-                'SELECT cod AS id, name, mmr FROM gladiators WHERE cod = ? AND version = ?',
-                [gladiatorId, VERSION],
+                'SELECT cod AS id, name, mmr FROM gladiators WHERE cod = ?',
+                [gladiatorId],
             );
-            if (!target) throw new CustomError(404, 'Gladiator not found in the current ranking.', 'GLADIATOR_NOT_FOUND');
+            if (!target) throw new CustomError(404, 'Gladiator not found.', 'GLADIATOR_NOT_FOUND');
             const [{ above }] = await Mysql.select(
                 `SELECT COUNT(*) AS above FROM gladiators g
-                WHERE g.version = ? AND (g.mmr > ? OR (g.mmr = ? AND g.cod < ?))`,
-                [VERSION, target.mmr, target.mmr, target.id],
+                WHERE g.mmr > ? OR (g.mmr = ? AND g.cod < ?)`,
+                [target.mmr, target.mmr, target.id],
             );
             requested = Number(above) + 1;
         }
@@ -182,7 +181,7 @@ export class Ranking {
             FROM ${RANKED_SQL}
             WHERE ranked.position BETWEEN ? AND ?
             ORDER BY ranked.position`,
-            [VERSION, bounds.start, bounds.last],
+            [bounds.start, bounds.last],
         );
         const mapped = result.map(generalRow);
         const around = target?.name ?? mapped.find(row => row.position === bounds.position)?.gladiator ?? null;
@@ -197,12 +196,12 @@ export class Ranking {
     }
 
     /**
-     * The signed-in master's gladiators with their current-ranking position or the reason they are
-     * outside it. `skin` travels so the own strip can paint the same card portrait.
+     * The signed-in master's gladiators with their position and engine state. Outdated/broken
+     * gladiators keep the position; `skin` travels so the own strip paints the card portrait.
      *
      * @param {number} userId
-     * @returns {Promise<{ gladiators: Array<{ id: number, name: string, mmr: number, position: number|null,
-     *   state: 'ranked'|'unranked'|'outdated'|'broken', skin: string }> }>}
+     * @returns {Promise<{ gladiators: Array<{ id: number, name: string, mmr: number,
+     *   position: number|null, state: 'ranked'|'outdated'|'broken', skin: string }> }>}
      */
     static async mine(userId) {
         const rows = await Mysql.select(
@@ -210,23 +209,22 @@ export class Ranking {
             FROM gladiators g
             LEFT JOIN (
                 SELECT cod, ROW_NUMBER() OVER (ORDER BY mmr DESC, cod ASC) AS position
-                FROM gladiators WHERE version = ?
+                FROM gladiators
             ) ranked ON ranked.cod = g.cod
             WHERE g.master = ?
-            ORDER BY ranked.position IS NULL, ranked.position, g.name`,
-            [VERSION, userId],
+            ORDER BY ranked.position, g.name`,
+            [userId],
         );
         return {
             gladiators: rows.map(row => {
                 const broken = row.version === 'broken';
                 const outdated = !broken && row.version !== VERSION;
-                const state = broken ? 'broken' : outdated ? 'outdated' : row.position == null ? 'unranked' : 'ranked';
                 return {
                     id: Number(row.id),
                     name: row.name,
                     mmr: Math.trunc(row.mmr),
-                    position: state === 'ranked' ? Number(row.position) : null,
-                    state,
+                    position: row.position == null ? null : Number(row.position),
+                    state: broken ? 'broken' : outdated ? 'outdated' : 'ranked',
                     skin: row.skin ?? '',
                 };
             }),
@@ -235,18 +233,18 @@ export class Ranking {
 
     /**
      * @param {number} userId
-     * @returns {Promise<number>} How many current gladiators rank above the master's best one.
+     * @returns {Promise<number>} How many gladiators rank above the master's best one.
      */
     static async bestOffset(userId) {
         const [best] = await Mysql.select(
-            'SELECT mmr, cod FROM gladiators WHERE master = ? AND version = ? ORDER BY mmr DESC, cod ASC LIMIT 1',
-            [userId, VERSION],
+            'SELECT mmr, cod FROM gladiators WHERE master = ? ORDER BY mmr DESC, cod ASC LIMIT 1',
+            [userId],
         );
         if (!best) return 0;
         const [{ above }] = await Mysql.select(
             `SELECT COUNT(*) AS above FROM gladiators g
-            WHERE g.version = ? AND (g.mmr > ? OR (g.mmr = ? AND g.cod < ?))`,
-            [VERSION, best.mmr, best.mmr, best.cod],
+            WHERE g.mmr > ? OR (g.mmr = ? AND g.cod < ?)`,
+            [best.mmr, best.mmr, best.cod],
         );
         return Number(above);
     }
