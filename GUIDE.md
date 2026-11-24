@@ -17,11 +17,10 @@ battles, duels, tournaments, classroom trainings, potions, news, rankings and st
 messages and friendships, the 2D replay and the 3D coliseum replay, plus the administrators' tournament
 tools.
 
-The Painel redesign (header, side menu, nine redesigned sections, component catalogue, event bus) is
-**planned** and delivered by WP2–WP9 of the orchestration plan (`.orchestration/PLAN.md`, local to the
-orchestration workspace and excluded from git). Where a document describes that target,
-it says so; the code today is the current page shells and tab controllers described under
-[Web service](#web-service).
+The Painel redesign (shared header, side menu and phone bar, nine rebuilt sections, component
+catalogue and event bus) is delivered. The sections share the Painel shell (`web/view/profile.html`),
+the component catalogue in [docs/frontend/](docs/frontend/README.md) and the app events described
+there; the board-by-board audit is [docs/design/painel/FIDELITY.md](docs/design/painel/FIDELITY.md).
 
 ## Services
 
@@ -149,10 +148,11 @@ Read [docs/frontend/](docs/frontend/README.md) for the contract. In short:
   `renderTemplate` (`{{key}}` escaped, `{{{key}}}` raw).
 - `web/public/css/` — tokens first, primitives in `css/components/`, then feature and page sheets.
 
-The profile (the future Painel) is one shell view (`web/view/profile.html`) with all nine sections in the
-markup; `web/public/script/profile.js` mounts them and `web/public/script/profile/*.js` hold one controller
-per section. The Painel redesign keeps this shape and replaces the markup and controllers section by
-section; the controllers move to `sections/` as each one is rebuilt.
+The Painel is one shell view (`web/view/profile.html`) with all nine sections in the markup;
+`web/public/script/profile.js` mounts the shared shell, and `web/public/script/profile/*.js` hold one
+controller per section. The delivered redesign keeps this shape and the controllers in `profile/`;
+the shared components are in `components/`, the app state in `services/` and the routes in
+`web/app.js` (`/messages/<userId>` opens a conversation).
 
 ### Editor and gladiator creator
 
@@ -327,5 +327,6 @@ the development database.
 
 Start at [INDEX.md](INDEX.md). The agent rule book is [AGENTS.md](AGENTS.md), the validation commands are
 in [TESTING.md](TESTING.md), the design direction and contract are [DESIGN.md](DESIGN.md) and
-[docs/design-system.md](docs/design-system.md), the Painel target is [docs/design/painel/](docs/design/painel/README.md)
-and the frontend conventions are [docs/frontend/](docs/frontend/README.md).
+[docs/design-system.md](docs/design-system.md), the Painel boards, the board-by-board audit and the visual target are
+[docs/design/painel/](docs/design/painel/README.md), and the frontend conventions are
+[docs/frontend/](docs/frontend/README.md).

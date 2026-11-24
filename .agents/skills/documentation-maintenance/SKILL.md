@@ -15,6 +15,7 @@ Localizes the global `documentation-maintenance` and `document-touched-code` ski
 | Rules for agents and developers, quickstart commands, diagnostics | `AGENTS.md` (authoritative) |
 | Frontend conventions, the component catalogue, app events, the page shell | `docs/frontend/` |
 | Painel design boards and their route/component/API map | `docs/design/painel/` |
+| Board fidelity audit (WP9) | `docs/design/painel/FIDELITY.md` |
 | Setup, run, deploy, project tree | `README.md` |
 | Branches, commit types and scopes | `CONTRIBUTING.md` |
 | Short agent summary | `.github/copilot-instructions.md` |

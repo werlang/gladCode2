@@ -2,7 +2,7 @@
 
 gladCode is a web-based programming game and arena where players code AI gladiators in C or Python to battle autonomously. The platform replays every battle in the Three.js top-down 3D coliseum, with the Phaser.js 2D arena as the automatic fallback, and offers visual block-based programming (Blockly), raw C/Python editing (ACE Editor), ranked battles, duels, tournaments and classroom trainings.
 
-**Documentation:** [INDEX.md](INDEX.md) maps every document. Start with [GUIDE.md](GUIDE.md) for the architecture and [TESTING.md](TESTING.md) for the validation commands; [AGENTS.md](AGENTS.md) holds the rules agents follow, [CONTRIBUTING.md](CONTRIBUTING.md) the branch and commit conventions, and [docs/frontend/](docs/frontend/README.md) the frontend conventions.
+**Documentation:** [INDEX.md](INDEX.md) maps every document. Start with [GUIDE.md](GUIDE.md) for the architecture and [TESTING.md](TESTING.md) for the validation commands; [AGENTS.md](AGENTS.md) holds the rules agents follow, [CONTRIBUTING.md](CONTRIBUTING.md) the branch and commit conventions, and [docs/frontend/](docs/frontend/README.md) the frontend conventions. The Painel redesign is delivered; its board-by-board audit is [docs/design/painel/FIDELITY.md](docs/design/painel/FIDELITY.md).
 
 ---
 

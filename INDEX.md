@@ -18,7 +18,8 @@ The map of the repository's documents. Read the row that matches your job.
 | :--- | :--- |
 | [DESIGN.md](DESIGN.md) | The visual direction: three themes, composition, voice, anti-goals. |
 | [docs/design-system.md](docs/design-system.md) | The implementation contract: tokens, themes, primitives, CSS architecture, ownership, governance. |
-| [docs/design/painel/README.md](docs/design/painel/README.md) | The Painel redesign boards (`*.dc.html`), their route/view/entry/component/API mapping, and how Arena dark and Classic map. Live canvas: <https://claude.ai/artifact/3ZpFREySqX238vTF3ER3fn>. |
+| [docs/design/painel/README.md](docs/design/painel/README.md) | The Painel boards (`*.dc.html`), their route/view/entry/component/API mapping, and how Arena dark and Classic map. Live canvas: <https://claude.ai/artifact/3ZpFREySqX238vTF3ER3fn>. |
+| [docs/design/painel/FIDELITY.md](docs/design/painel/FIDELITY.md) | The board-by-board WP9 audit: side-by-side evidence, every element's status and the intentional differences. |
 
 ## Frontend
 
@@ -41,7 +42,7 @@ The map of the repository's documents. Read the row that matches your job.
 | [web/public/res/audio/arena/CREDITS.md](web/public/res/audio/arena/CREDITS.md) | Sources and licences of the arena sounds. |
 | [web/public/sprite/Universal-LPC-spritesheet/README.md](web/public/sprite/Universal-LPC-spritesheet/README.md) | The LPC spritesheet notice and its authors. |
 | [migrations/](migrations/) | Numbered SQL migrations and the runner (`migrations/migrate.sh`). |
-| [dev-tools/README.md](dev-tools/README.md) | The tournament CLI, database dump/restore and release news SQL. |
+| [dev-tools/README.md](dev-tools/README.md) | The tournament CLI, database dump/restore, release news SQL, board renderer, documentation checker and phone/theme/axe audit. |
 | [Setup/README](Setup/README) | The `gladcode2-vm` engine image. |
 | [backup/README.md](backup/README.md) | The database backup helper. |
 

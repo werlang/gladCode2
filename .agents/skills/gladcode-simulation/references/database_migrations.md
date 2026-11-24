@@ -1,7 +1,7 @@
 # Database Migrations
 
 Versioned MySQL migrations ported from the node-aec `db:migrate` flow
-(`api/scripts/migrate.js` + `api/migrations/` there). MySQL adaptations:
+(`migrations/scripts/migrate.js` + `migrations/` here). MySQL adaptations:
 named `GET_LOCK()` instead of `pg_advisory_lock`, `?` placeholders,
 `TIMESTAMP` instead of `TIMESTAMPTZ`.
 

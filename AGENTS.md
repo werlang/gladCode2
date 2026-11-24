@@ -29,7 +29,7 @@ Layer-by-layer project skills (API, models, MySQL, frontend, CSS, tests, docs, s
 
 [`GUIDE.md`](GUIDE.md) owns the system description: the services and their data flow, the repository map, the ownership boundaries of `api/`, `web/`, `runner/`, `Payload/` and `migrations/`, the frontend layers, the 3D renderer notes, the Synty asset rules and the configuration. Read it before changing a subsystem; this file keeps only the rules an agent must follow.
 
-The layer skills in [`.agents/skills/`](.agents/skills/README.md) carry the layer-specific facts (API, models, MySQL, frontend, CSS, tests, docs, simulation). The frontend contract for the Painel redesign is [`docs/frontend/`](docs/frontend/README.md); the design boards are [`docs/design/painel/`](docs/design/painel/README.md); the validation commands are in [`TESTING.md`](TESTING.md).
+The layer skills in [`.agents/skills/`](.agents/skills/README.md) carry the layer-specific facts (API, models, MySQL, frontend, CSS, tests, docs, simulation). The frontend contract is [`docs/frontend/`](docs/frontend/README.md); the design boards and their board-by-board audit are [`docs/design/painel/`](docs/design/painel/README.md); the validation commands are in [`TESTING.md`](TESTING.md).
 
 ---
 
@@ -139,7 +139,8 @@ Rules for `web/public/script/` (the layers are described in [GUIDE.md → Fronte
 6. **No data in the DOM**: keep app data out of `data-*` attributes; map elements to data with a `Map`/`WeakMap` or class fields.
 7. **Document what you touch**: JSDoc on exported classes and functions, matching the surrounding code.
 8. **Styles from tokens**: colours, fonts, sizes, spacing, radii, shadows, durations and layers come from `public/css/tokens.css` (`var(--color-…)` roles for anything that follows the theme, content tokens for game colours), in CSS, inline styles and JavaScript alike; check pages in Arena light, Arena dark and Classic. The project `css-standards` skill has the details.
-9. **Lint and test before committing** (through Docker; the root `package.json` and `eslint.config.js` hold the tooling, `node_modules/` is gitignored):
+9. **Phone and accessibility**: keep 44 px touch targets at phone widths, no horizontal page scroll, safe-area insets on the fixed bar/sheet, labelled icon controls and `aria-current` on the active section; keyboard focus must stay visible and dialogs, sheets and the palette must trap and restore it. Check the board-by-board audit in [`docs/design/painel/FIDELITY.md`](docs/design/painel/FIDELITY.md).
+10. **Lint and test before committing** (through Docker; the root `package.json` and `eslint.config.js` hold the tooling, `node_modules/` is gitignored):
 
    ```bash
    docker run --rm -v "$PWD":/w -v /w/node_modules -w /w node:22-alpine sh -c "npm ci && npm run lint && npm test"

@@ -1,8 +1,8 @@
 # Frontend conventions
 
 The rules every frontend module in `web/public/script/`, every stylesheet in `web/public/css/` and every
-view in `web/view/` follows. They are the contract WP2–WP9 implement; see
-[README.md](README.md) for the current/planned split.
+view in `web/view/` follows. They are the contract the delivered Painel redesign follows; see
+[README.md](README.md) for the delivery summary.
 
 ## 1. Folders and their single job
 
@@ -16,7 +16,7 @@ view in `web/view/` follows. They are the contract WP2–WP9 implement; see
 | `web/public/script/models/` | The **only** callers of the API, one class per API area, through `helpers/request.js`. | Rendering, DOM, user-facing copy beyond error codes. |
 | `web/public/script/templates/` | Markup strings with `{{key}}` placeholders, rendered with `renderTemplate`. | Logic, loops, conditionals, `${}` interpolation. |
 | `web/public/script/services/` | DOM-free application state shared across sections: account, notification counts, shell state. Calls models, emits app events, caches what a section needs. | Touching the DOM, owning components, deciding layout. |
-| `web/public/script/profile/` → `sections/` (**planned, WP3+**) | Section controllers of the Painel shell, one file per section. Today they live in `profile/`; each moves to `sections/` when its work package rebuilds it. | Reusable components, API transport. |
+| `web/public/script/profile/` | Section controllers of the Painel shell, one file per section (the earlier `sections/` proposal was not adopted; the delivered layout keeps `profile/`). | Reusable components, API transport. |
 | `web/public/script/editor/`, `web/public/script/render2/` | The editor's parts and the 3D renderer. Each has its own rules (see `GUIDE.md`). | Anything the rest of the site imports except through their documented entry module. |
 | `web/public/css/` | `tokens.css`, the primitives in `css/components/`, and one sheet per page or feature. | Values that are not tokens; a second palette. |
 
@@ -37,12 +37,12 @@ rules are:
 - the page entry creates the service (or imports its singleton) and passes it to the sections;
 - a service that loads data accepts an `AbortSignal` so a section can cancel it when it closes.
 
-The services the Painel flows name (WP2–WP8; each is a module under `services/`):
+The services the Painel flows use (each is a module under `services/`):
 
 | Service | Owns | Public methods |
 | :--- | :--- | :--- |
 | `AccountService` | The signed-in account, the per-field autosave queue, silver, sign-out | `load({ signal })`, `save(field, value)`, `undo(token)`, `setSilver(silver)`, `signOut()` |
-| `NotificationService` | The joined counts and the 30 s poll (the panel's feed lands in WP3) | `start()`, `stop()`, `refresh()`, `feed({ signal })` (WP3) |
+| `NotificationService` | The joined counts, the 30 s poll and the panel feed | `start()`, `stop()`, `refresh()`, `feed({ signal })` |
 | `NewsService` | The news list and the explicit read marker | `list({ offset, signal })`, `markAllRead()` |
 | `PotionsService` | The apothecary, the slots and the orders | `load({ signal })`, `order(identifier)`, `reconcile()`, `cancel(slotId)` |
 | `RankingService` | The general/friends page, the centred window, the own strip and the tabs | `page({ offset, search, scope, signal })`, `window({ gladiatorId, position, size, signal })`, `mine({ signal })`, `tabs()`, `hashtag()`, `watch(name, watch)` |
@@ -163,7 +163,7 @@ These are targets for new and refactored code. Existing files above them (for ex
 - **Reduced motion.** `tokens.css` cuts transitions and animations under `prefers-reduced-motion`; a new
   animation must be a CSS transition/animation (so the rule catches it) or check the media query.
 - **Icons** are decorative (`aria-hidden="true"`) when the label is visible; an icon-only button carries
-  an `aria-label` and a `title` (promoted to a tooltip by `components/tooltip.js`).
+  an `aria-label` and a `title` (the native tooltip is enough).
 - **Forms**: every field has a `<label for>` (or `aria-label` when the visual label is elsewhere); an
   invalid field is `aria-invalid` with the error text next to it — the section renders the text,
   `Field#setError` keeps the message and moves focus.

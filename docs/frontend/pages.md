@@ -1,16 +1,16 @@
 # Pages and the Painel shell
 
 How a page is put together, how the nine Painel sections are routed and mounted, and what happens on a
-phone. This is the contract WP3–WP9 implement; today's code is named where it differs.
+phone. This is the contract the delivered Painel shell and its nine sections follow.
 
-## 1. Today and the target
+## 1. The implemented shape
 
 Today every route renders its own Mustache view and loads its own entry module. The profile is one view
 (`web/view/profile.html`) containing all nine sections; `web/public/script/profile.js` mounts one
 controller per section from `web/public/script/profile/` and toggles `.content.open` on the matching
 panel. Clicking a menu entry does not change the URL.
 
-The target keeps the server routes and the single shell view, and changes four things:
+The implemented shell keeps the server routes and the single shell view, and changes four things:
 
 1. the shell markup is the header partial + the Painel menu + one content column (no in-menu footer);
 2. menu entries are real links; the shell has **one route resolver** shared by the first load, clicks and
@@ -26,13 +26,13 @@ the page entry after it. No section renders its own `<html>` shell.
 ## 2. Routes
 
 The Painel sections keep their addresses; the shell maps a route to a section id. The section modules live
-in `profile/` today; the target is `sections/`, and each one moves when its work package rebuilds it (the
-module column names today's file).
+in `profile/` (the earlier `sections/` proposal was not adopted; the delivered layout keeps one controller
+per section in `profile/`).
 
 | Section | Route(s) | Section id | Section module | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| Notícias | `/news` | `news` | `profile/news.js` | The first entry and the shell's landing section; WP4 adds the featured post, previous list, “Aguardando você” and next-tournament asides. |
-| Perfil | `/profile`, `/profile?t=profile` | `profile` | `profile/settings.js` | The WP4 identity hero and autosaving fields (no save button); unknown or disabled tabs fall back to Perfil. |
+| Notícias | `/news` | `news` | `profile/news.js` | The first entry and the shell's landing section, with the featured post, previous list, “Aguardando você” and next-tournament asides. |
+| Perfil | `/profile`, `/profile?t=profile` | `profile` | `profile/settings.js` | The identity hero and autosaving fields (no save button); unknown or disabled tabs fall back to Perfil. |
 | Gladiadores | `/glads` | `glads` | `profile/glads.js` | |
 | Poções | `/potion` | `potions` | `profile/potions.js` | The menu says Poções; the route keeps the old singular. |
 | Batalhas | `/battle`, `/battle.<mode>` | `battle` | `profile/battle.js` + `ranked.js`, `duels.js`, `tournaments.js`, `trainings.js` | `<mode>` is `ranked`, `duel`, `tourn` or `train`. |
@@ -197,7 +197,7 @@ A section module exports a factory:
 export function createNewsSection(context) { … }
 ```
 
-WP3 adapts the existing controllers to this shape; WP4–WP8 rewrite them section by section. The contract:
+The shipped controllers follow this shape. The contract:
 
 1. **Mount.** The shell resolves the route, and when the section id changes it unmounts the old section and
    calls `mount(route)`. The shell marks the content `aria-busy="true"`, shows the section's skeleton (or

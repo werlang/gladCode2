@@ -27,25 +27,24 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 
 ## Status at a glance
 
-| Component | Status | File (today → target) | WP |
+| Component | Status | File | WP |
 | :--- | :--- | :--- | :--- |
 | Button | exists | `components/button.js` | — |
 | Field, Input, Select | exists | `components/field.js`, `input.js`, `select.js` | — |
 | Dialog family | exists | `components/dialog.js` | — |
-| Tooltip | exists | `components/tooltip.js` | — |
 | Slider | exists | `components/slider.js` | — |
 | SideMenu | exists (docs pages) | `components/side-menu.js` | — |
 | Countdown | exists | `components/countdown.js` | — |
 | ProgressButton, Simulation | exists | `components/simulation.js` | — |
-| AppHeader | exists, rebuilt | `components/header.js` → `components/app-header.js` | WP3 |
-| AccountMenu | new | `components/account-menu.js` | WP3 |
-| NotificationsPanel | new | `components/notifications-panel.js` | WP3 |
-| CommandPalette | new | `components/command-palette.js` | WP3 |
-| PainelMenu | new (replaces `#menu` markup in `view/profile.html`) | `components/painel-menu.js` | WP3 |
-| MenuItem | new | `components/menu-item.js` | WP3 |
+| AppHeader | exists, rebuilt | `components/app-header.js` | WP3 |
+| AccountMenu | exists | `components/account-menu.js` | WP3 |
+| NotificationsPanel | exists | `components/notifications-panel.js` | WP3 |
+| CommandPalette | exists | `components/command-palette.js` | WP3 |
+| PainelMenu | exists (replaces `#menu` markup in `view/profile.html`) | `components/painel-menu.js` | WP3 |
+| MenuItem | exists | `components/menu-item.js` | WP3 |
 | Badge | exists | `components/badge.js` | WP2 |
-| MobileTabBar | new | `components/mobile-tab-bar.js` | WP3 |
-| MoreSheet | new | `components/more-sheet.js` | WP3 |
+| MobileTabBar | exists | `components/mobile-tab-bar.js` | WP3 |
+| MoreSheet | exists | `components/more-sheet.js` | WP3 |
 | PageHeader | exists | `components/page-header.js` | WP2 |
 | SectionCard | exists (over `.surface-card`) | `components/section-card.js` | WP2 |
 | Tabs | exists | `components/tabs.js` | WP2 |
@@ -61,21 +60,21 @@ Read [conventions.md](conventions.md) first. The shared rules for every entry:
 | GladiatorCard | exists, rebuilt as the game card | `components/gladiator-card.js` + `components/glad-card.js` (painter) | WP5 |
 | GladiatorPicker | exists | `components/gladiator-picker.js` | WP5 |
 | VersusPanel | exists | `components/versus-panel.js` | WP5 |
-| ResultPill | new | `components/result-pill.js` | WP6 |
-| FormStreak | new | `components/form-streak.js` | WP6 |
-| PotionSlot | new | `components/potion-slot.js` | WP6 |
-| PotionCard | new | `components/potion-card.js` | WP6 |
-| ConversationList | new | `components/conversation-list.js` | WP8 |
-| MessageThread | new | `components/message-thread.js` | WP8 |
-| Composer | new | `components/composer.js` | WP8 |
-| FriendRow | new | `components/friend-row.js` | WP8 |
+| ResultPill | exists | `components/result-pill.js` | WP6 |
+| FormStreak | exists | `components/form-streak.js` | WP6 |
+| PotionSlot | exists | `components/potion-slot.js` | WP6 |
+| PotionCard | exists | `components/potion-card.js` | WP6 |
+| ConversationList | exists | `components/conversation-list.js` | WP8 |
+| MessageThread | exists | `components/message-thread.js` | WP8 |
+| Composer | exists | `components/composer.js` | WP8 |
+| FriendRow | exists | `components/friend-row.js` | WP8 |
 | InviteBanner | exists, first use in Batalhas | `components/invite-banner.js` | WP5 / WP8 |
-| RankingTable | new | `components/ranking-table.js` | WP7 |
-| OwnGladiatorJump | new | `components/own-gladiator-jump.js` | WP7 |
+| RankingTable | exists | `components/ranking-table.js` | WP7 |
+| OwnGladiatorJump | exists | `components/own-gladiator-jump.js` | WP7 |
 
 ## Existing primitives
 
-These exist today, are loaded by `web/view/head.html` on every page and are the base every new component
+These are loaded by `web/view/head.html` on every page and are the base every new component
 composes. Their contracts are settled; the Painel only adds variants where the boards need one.
 
 ### Button — exists
@@ -132,11 +131,6 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Events:** none; `action.onClick` is the callback.
 - **Boards:** Perfil (autosave undo), Main (mark all read).
 
-### Tooltip — exists
-
-- **File:** `components/tooltip.js`; **CSS:** `css/dialog.css` (`.ui-tooltip`).
-- **Purpose:** promotes `title` attributes on the page to styled tooltips; no markup needed.
-- **Boards:** all icon buttons.
 
 ### Slider — exists
 
@@ -173,8 +167,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 
 ### AppHeader — exists, rebuilt (WP3)
 
-- **File:** `components/app-header.js` (today `components/header.js` `Header`); **CSS:**
-  `css/components/app-header.css` (today `css/header.css`); **view:** `web/view/header.html`.
+- **File:** `components/app-header.js`; **CSS:** `css/components/app-header.css`; **view:** `web/view/header.html`.
 - **Purpose:** the fixed frame of every page: logo, primary nav (Painel, Editor, Aprender, Sobre), the
   search field/trigger, the Batalhar CTA, the silver chip, the notification bell and the account avatar;
   the visitor variant offers “Entrar com Google”.
@@ -190,7 +183,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   bell's label carries `counts.bell`; the avatar's label names the master and level.
 - **Boards:** `Header.dc.html`, `Estados.dc.html`, `Mobile.dc.html`, every section board.
 
-### AccountMenu — new (WP3)
+### AccountMenu — exists (WP3)
 
 - **File:** `components/account-menu.js`; **CSS:** `css/components/account-menu.css`.
 - **Purpose:** the avatar popover: identity (name, level, silver), “Perfil e ajustes”, “Atalhos do
@@ -203,7 +196,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   closes and returns focus; theme buttons use `aria-pressed`.
 - **Boards:** `Estados.dc.html`.
 
-### NotificationsPanel — new (WP3)
+### NotificationsPanel — exists (WP3)
 
 - **File:** `components/notifications-panel.js`; **CSS:** `css/components/notifications-panel.css`.
 - **Purpose:** the bell panel: “Precisa de você” (pending duel, friend request) and “Novidades”
@@ -217,7 +210,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** labelled dialog/popover, focus moved to the first item, Esc closes.
 - **Boards:** `Estados.dc.html`, `Header.dc.html` (the bell).
 
-### CommandPalette — new (WP3)
+### CommandPalette — exists (WP3)
 
 - **File:** `components/command-palette.js`; **CSS:** `css/components/command-palette.css`.
 - **Purpose:** Ctrl K / ⌘K navigation and search: a search field in a panel, results grouped as “Ir para”,
@@ -233,7 +226,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   `aria-activedescendant`, Tab kept inside, Esc closes, focus returns to the opener.
 - **Boards:** `Estados.dc.html` (the search panel), `Mobile.dc.html` (search button).
 
-### PainelMenu — new (WP3)
+### PainelMenu — exists (WP3)
 
 - **File:** `components/painel-menu.js` (replaces the `#menu` markup of `view/profile.html`); **CSS:**
   `css/components/painel-menu.css`.
@@ -252,7 +245,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Boards:** `Rail.dc.html` and every section board; the identity card also appears in the `Mobile.dc.html`
   “Mais” sheet.
 
-### MenuItem — new (WP3)
+### MenuItem — exists (WP3)
 
 - **File:** `components/menu-item.js`; **CSS:** `css/components/menu-item.css`.
 - **Purpose:** one menu entry: a 30 px icon tile, the label and an optional badge (“4/6”, “3 h”, “1”).
@@ -277,7 +270,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   `title`/label saying what it is (“1 desafio de duelo”).
 - **Boards:** `Rail.dc.html`, `Header.dc.html`, `Mobile.dc.html`, `Mensagens.dc.html`, `Amigos.dc.html`.
 
-### MobileTabBar — new (WP3)
+### MobileTabBar — exists (WP3)
 
 - **File:** `components/mobile-tab-bar.js`; **CSS:** `css/components/mobile-tab-bar.css`.
 - **Purpose:** the phone bottom bar: Notícias, Gladiadores, the raised Batalhar action, Relatórios and
@@ -290,7 +283,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   Batalhar button keeps a 44 px target despite the visual circle; badges have text.
 - **Boards:** `Mobile.dc.html`.
 
-### MoreSheet — new (WP3)
+### MoreSheet — exists (WP3)
 
 - **File:** `components/more-sheet.js`; **CSS:** `css/components/more-sheet.css`.
 - **Purpose:** the phone “Mais” sheet: the identity card, the six section tiles with counts (Poções,
@@ -512,7 +505,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   says “Sorteado” in text.
 - **Boards:** `Batalhas.dc.html`.
 
-### ResultPill — new (WP6)
+### ResultPill — exists (WP6)
 
 - **File:** `components/result-pill.js`; **CSS:** `css/components/result-pill.css`.
 - **Purpose:** the placing of a report, “1º de 5”, coloured by medal for 1st/2nd/3rd and neutral
@@ -523,7 +516,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** the full text, never only colour.
 - **Boards:** `Relatorios.dc.html`.
 
-### FormStreak — new (WP6)
+### FormStreak — exists (WP6)
 
 - **File:** `components/form-streak.js`; **CSS:** `css/components/form-streak.css`.
 - **Purpose:** the last ten authoritative results as V/D/E tiles with a “Últimas 10 batalhas” label,
@@ -537,7 +530,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   one “—” tile labelled “Nenhuma batalha registrada” instead of ten false losses.
 - **Boards:** `Relatorios.dc.html`.
 
-### PotionSlot — new (WP6)
+### PotionSlot — exists (WP6)
 
 - **File:** `components/potion-slot.js`; **CSS:** `css/components/potion-slot.css`.
 - **Purpose:** one of the four potion compartments: a filled potion with its kind tint, a countdown bar
@@ -555,7 +548,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   slot is clickable, the locked one is not.
 - **Boards:** `Pocoes.dc.html`, `Batalhas.dc.html` (the pots carried in the versus panel).
 
-### PotionCard — new (WP6)
+### PotionCard — exists (WP6)
 
 - **File:** `components/potion-card.js`; **CSS:** `css/components/potion-card.css`.
 - **Purpose:** one potion on sale: kind icon/tint, name, level and `useItem` id, description, price and
@@ -571,7 +564,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **Events:** `order` `{ potion }` (only when unlocked, available and not busy).
 - **Boards:** `Pocoes.dc.html`.
 
-### RankingTable — new (WP7)
+### RankingTable — exists (WP7)
 
 - **File:** `components/ranking-table.js`; **CSS:** `css/components/ranking-table.css`.
 - **Purpose:** the ranking table: position, gladiator (with the VOCÊ tag), master, 7-day trend, renown,
@@ -587,7 +580,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   “subiu 9” / “desceu 3” / “estável” in the cell title.
 - **Boards:** `Ranking.dc.html`.
 
-### OwnGladiatorJump — new (WP7)
+### OwnGladiatorJump — exists (WP7)
 
 - **File:** `components/own-gladiator-jump.js`; **CSS:** `css/components/own-gladiator-jump.css`.
 - **Purpose:** the “SEUS GLADIADORES” strip: one chip per own gladiator with its portrait, position and
@@ -603,7 +596,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   also in text, and `aria-current="page"` marks the active chip. Arrow/Home/End move a roving tab stop.
 - **Boards:** `Ranking.dc.html`.
 
-### ConversationList — new (WP8)
+### ConversationList — exists (WP8)
 
 - **File:** `components/conversation-list.js`; **CSS:** `css/components/conversation-list.css`.
 - **Purpose:** the left pane of Mensagens: the conversation search and one row per master (avatar, name,
@@ -618,7 +611,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   the unread count is text, and a row stays a button so Enter/Space open it.
 - **Boards:** `Mensagens.dc.html`.
 
-### MessageThread — new (WP8)
+### MessageThread — exists (WP8)
 
 - **File:** `components/message-thread.js`; **CSS:** `css/components/message-thread.css`.
 - **Purpose:** the conversation pane: header (avatar, name, online state, Desafiar, more), the day
@@ -632,7 +625,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
   the replay card says “Replay compartilhado / Assistir”.
 - **Boards:** `Mensagens.dc.html`.
 
-### Composer — new (WP8)
+### Composer — exists (WP8)
 
 - **File:** `components/composer.js`; **CSS:** `css/components/composer.css`.
 - **Purpose:** the message box: a labelled textarea that grows, the send button, Enter to send and
@@ -644,7 +637,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** a labelled textarea; the send button is disabled while empty; a failed send keeps the text.
 - **Boards:** `Mensagens.dc.html`.
 
-### FriendRow — new (WP8)
+### FriendRow — exists (WP8)
 
 - **File:** `components/friend-row.js`; **CSS:** `css/components/friend-row.css`.
 - **Purpose:** one row of the friends list: avatar with the online dot, name, level and best gladiator
@@ -655,7 +648,7 @@ composes. Their contracts are settled; the Painel only adds variants where the b
 - **ARIA:** icon-only actions carry `aria-label` with the friend's name.
 - **Boards:** `Amigos.dc.html`.
 
-### InviteBanner — exists, first use in Batalhas (WP5; friend requests land in WP8)
+### InviteBanner — exists, used in Batalhas and Amigos (WP5/WP8)
 
 - **File:** `components/invite-banner.js`; **CSS:** `css/components/gladiator-card.css`
   (`.invite-banner`), shared with the card for now.

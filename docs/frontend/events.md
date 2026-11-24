@@ -454,7 +454,7 @@ sequenceDiagram
     Shell->>Header: setCounts(counts)
 ```
 
-`POST /conversations/:userId/read` is new in WP8 (it marks every unread message from that master and answers
+`POST /conversations/:userId/read` (delivered in WP8) marks every unread message from that master and answers
 `{ userId, read, unreadTotal }`). The section's existing `PUT /messages/:id` stays for a single message's
 read/unread toggle and is not the conversation flow. The badge drops only after
 `notifications:counts`, never by decrementing a local number.
@@ -595,11 +595,10 @@ branch.
 
 ### 9. “Marcar tudo como lido” → Notícias and the bell
 
-Loading the news list must not advance the read marker, or the button would have nothing left to do. WP3
-adds `markRead=false` to `GET /news` for the shell's notification feed (opt-in, so the section's current
-listing keeps its behaviour); WP4 makes `markRead=false` the default and adds the `POST /news/read`
-mutation for the button. The section applies the change optimistically and rolls it back when the API
-refuses it.
+Loading the news list must not advance the read marker, or the button would have nothing left to do.
+`GET /news?markRead=false` is the shell notification feed (opt-in), the listing keeps its behaviour and
+`POST /news/read` is the button's mutation. The section applies the change optimistically and rolls it
+back when the API refuses it.
 
 ```mermaid
 sequenceDiagram
@@ -632,8 +631,7 @@ message; no `notifications:counts` is emitted for a refused mutation. `POST /new
 
 ## Migration of the existing document events
 
-Today `helpers/theme.js` dispatches `themechange` on `document` and `helpers/glad-view.js` dispatches
-`gladviewchange`, with `onGladViewChange` as the subscription helper. WP2 adds the bus names above; WP3
-moves the last consumers (`GladiatorCard`, the header, the settings section) to `events.on` and deletes the
-document events and `onGladViewChange`. Until then both paths exist, but **new code listens only to the
-bus**.
+`helpers/theme.js` dispatches `themechange` on `document` and `helpers/glad-view.js` dispatches
+`gladviewchange`, with `onGladViewChange` as the subscription helper for the editor/glad-card painter.
+The app bus is the path for new code (`theme:changed` and `glad-view:changed`); the helpers keep the
+document events in sync for the classic consumers.

@@ -50,9 +50,9 @@ The file has three layers:
 - **Before paint:** `theme-boot.js` is a blocking classic script right after `tokens.css`. It reads
   the cache and sets `theme-<name>` on `<html>`; `system` resolves to Arena dark or light from
   `prefers-color-scheme`.
-- **After load:** `components/header.js` applies the account's choice when it differs from the
-  cache (another device changed it); `applyTheme` follows live system changes while the choice is
-  `system` and fires `themechange` on `document`.
+- **After load:** `script/header.js` applies the account's choice when it differs from the cache
+  (another device changed it); `applyTheme` follows live system changes while the choice is `system`
+  and fires `themechange` on `document`.
 - **`tone-night`:** a region that stays dark in every theme (the front page hero over the arena
   video, code panels). The class applies the Arena dark roles to that subtree and sets its text
   colour.
@@ -166,8 +166,8 @@ really differs, a scoped size.
 | Code panel | Prism `pre`/`code[class*=language-]` (`components/code.css`, outranks Prism's own theme) | none | dark in every theme |
 | Empty state | `templates/empty-state.js` `emptyStateTemplate` rendered with `renderTemplate` (`components/empty-state.css`) | none: callers pick `variantClass`, `icon`, `title`, `summary`, `actionHtml` | full, `compact` (inside lists and tables, `.table .row.empty`) |
 
-Modal, toast and tooltip are the existing `components/dialog.js`, `toast.js` and `tooltip.js` (the
-dialog box is a `surface-card` with `ghost` buttons).
+Modal and toast are the existing `components/dialog.js` and `toast.js` (the dialog box is a
+`surface-card` with `ghost` buttons). Native `title` text and `aria-label` cover icon tooltips.
 
 The Painel primitives (WP2) live beside them, one sheet and one class each: `badge`, `avatar`,
 `page-header`, `section-card`, `tabs`, `segmented-control`, `switch`, `search-field` and `pagination`
@@ -180,8 +180,8 @@ that uses them, not by `head.html`, so the existing pages keep their payload; th
 | Component | Styles | Behaviour |
 | :--- | :--- | :--- |
 | Fog, dialog box, terminal, toast | `dialog.css` (`#fog`, `#dialog-box`, `#terminal`, `.toast`) | `components/dialog.js`, `components/toast.js` |
-| Tooltip | `dialog.css` (`.ui-tooltip`) | `components/tooltip.js` |
-| Header and footer | `header.css` | `components/header.js` |
+
+| Header and footer | `components/app-header.css`, `header.css` (public shell) | `components/app-header.js`, `script/header.js` |
 | Side menu (docs) | `side-menu.css` | `components/side-menu.js` |
 | Gladiator card | `glad-card.css` | `components/glad-card.js` |
 | Slider | `ui-slider.css` (base), `slider.css` (editor and profile look) | `components/slider.js` |
@@ -213,7 +213,7 @@ Placement-only page rules for the primitives live in the page sheet (`#duel-box 
 | Tokens, themes, fonts, element defaults (`html`, `body`, focus, reduced motion) | `tokens.css` |
 | UI primitives (button, field, surface, empty state) | `css/components/*.css`; behaviour in `components/button.js`, `field.js`, `input.js`, `select.js`; markup in `templates/empty-state.js` |
 | Painel primitives (badge, avatar, page header, section card, tabs, segmented control, switch, search field, pagination, toast action) | `css/components/*.css`; behaviour in `components/badge.js`, `avatar.js`, `page-header.js`, `section-card.js`, `tabs.js`, `segmented-control.js`, `switch.js`, `search-field.js`, `pagination.js`, `toast.js`; markup in `templates/*.js` |
-| Theme choice and cache | `theme-boot.js`, `helpers/theme.js`, `profile/settings.js`, `components/header.js` |
+| Theme choice and cache | `theme-boot.js`, `helpers/theme.js`, `profile/settings.js`, `script/header.js` |
 | Account theme | `api/model/user.js` (`site_theme`), `PUT /users/me` |
 | Front page | `index.css` (`.home` scope, `--gutter` and `--max` are local layout variables) |
 | 2D replay | `playback.css`; canvas colours in `render.js` are not themed |

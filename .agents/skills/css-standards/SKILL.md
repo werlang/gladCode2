@@ -11,7 +11,7 @@ Localizes the global `css-standards` skill: follow it for the method; this file 
 
 - `web/public/css/tokens.css`: every shared value (colour roles per theme, content colours, fonts, the type and space scales, layout widths, radii, shadows, durations, layers, focus) and the self-hosted `@font-face` rules. Loaded first on every page by the head partial `web/view/head.html` (`{{> head}}` right after the viewport meta), together with the blocking `script/theme-boot.js`; `web/public/maintenance.html` links both directly.
 - `web/public/css/components/`: the UI primitives (`button.css`, `field.css`, `surface.css`, `empty-state.css`), also linked by the head partial on every page; their behaviour is `script/components/button.js`, `input.js`, `select.js` (on `field.js`) and `templates/empty-state.js`.
-- One stylesheet per page (`index.css`, `profile.css`, `editor.css`, `tournament.css`, ...) plus shared feature sheets: `header.css`, `dialog.css` (fog, dialog box, terminal, toast, tooltip), `side-menu.css`, `glad-card.css`, `table.css`, `table2.css`, `slider.css` over `ui-slider.css`, `radio.css`, `checkboxes.css`, `docs.css`. The ownership map is in the design-system doc.
+- One stylesheet per page (`index.css`, `profile.css`, `editor.css`, `tournament.css`, ...) plus shared feature sheets: `header.css`, `dialog.css` (fog, dialog box, terminal, toast), `side-menu.css`, `glad-card.css`, `table.css`, `table2.css`, `slider.css` over `ui-slider.css`, `radio.css`, `checkboxes.css`, `docs.css`. The ownership map is in the design-system doc.
 - Vendored, not to edit: `croppie.css`.
 - Views link styles with `{{#asset}}css/<file>.css{{/asset}}`, which versions the URL by mtime.
 
@@ -31,7 +31,7 @@ Localizes the global `css-standards` skill: follow it for the method; this file 
 
 ## Deviations from `css-standards`
 
-- No `web/src/css/` and no build: files are served as is; each page links `tokens.css` and the primitives (via the head partial), its shared feature sheets, then its own sheet. Component sheets use native nesting; older page sheets are flat.
+- No separate CSS source layer and no build: files are served as is; each page links `tokens.css` and the primitives (via the head partial), its shared feature sheets, then its own sheet. Component sheets use native nesting; older page sheets are flat.
 - The type scale is in px (the 2D replay scales its root font size) and the space scale follows the site's 5px rhythm rather than a 4px grid. `playback.css` keeps its own rem/em sizes for the replay chrome.
 - The breakpoint scale is this project's (600/800/900 px), not the global default.
 

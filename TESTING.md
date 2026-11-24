@@ -43,6 +43,9 @@ It does two things:
 | `docker run --rm -v "$PWD":/w -w /w gladcode2-vm sh -c "gcc -o /tmp/engine_test tests/engine/engine_test.c -lm -lpthread && /tmp/engine_test"` | The C engine's unit tests (damage, movement, line of sight, …). | The `gladcode2-vm` image |
 | `bash tests/engine/run.sh` | Real regression battles in `gladcode2-vm`: healthy battles and crashing C/Python gladiators, checked through `api/helpers/battle-results.js`. | The `gladcode2-vm` image and Docker |
 | `docker run --rm -v "$PWD":/w -w /w node:22-alpine node api/scripts/api-docs.js` | Not a test: regenerates `docs/api/README.md` after changing a route. | Docker only |
+| `docker run --rm --network host -v "$PWD":/w -v /tmp/opencode:/tmp node:22-alpine node dev-tools/ui-audit.mjs --base http://localhost:8085 --cookie "$COOKIE" --axe /path/axe.min.js` | Not a test: the phone/theme/accessibility audit (horizontal scroll, 44 px targets, unlabelled icon buttons, axe serious/critical) and optional screenshots. | The dev stack, Chrome CDP on `:9222` and axe-core |
+| `docker run --rm -v "$PWD":/w -w /w node:22-alpine node dev-tools/render-boards.mjs /tmp/boards` | Not a test: renders the static `docs/design/painel/*.dc.html` boards for the visual audit. | Docker only |
+| `docker run --rm -v "$PWD":/w -w /w node:22-alpine node dev-tools/check-docs.mjs` | Not a test: checks every relative Markdown link and the repository paths named in the docs. | Docker only |
 | `docker run --rm -v "$PWD":/w -w /w node:22-alpine node web/scripts/compress-functions.js` | Not a test: rebuilds `script/functions.json` and the sample bundles after editing `web/public/script/functions/`. | Docker only |
 | `git diff --check` | No trailing whitespace or whitespace errors. | Git |
 
@@ -58,8 +61,7 @@ It does two things:
   `tokens.css` for every theme.
 - `glad-card.test.mjs` — the card painter: sprite/3D style switching, death pose, placeholder fallbacks,
   a slow paint never overwriting a newer one.
-- `profile.test.mjs` — potion countdown, round-time typing, training groups, the gladiator limit, which
-  profile tab opens, badge labels.
+- `profile.test.mjs` — potion countdown, round-time typing, training groups and the gladiator limit.
 - `editor.test.mjs` — attribute costs, name rules, language detection, the setup block, breakpoints, the
   creator gate.
 - `web-server.test.mjs` — template variables cannot close their script tag, old PHP addresses redirect,
@@ -72,6 +74,15 @@ It does two things:
 `touch`, `crowd`, `coliseum`, `landscape`, `creator`, `card-portrait`, `audio` and `synty-library` (the
 last runs the real library and model with the FBX/image loads stubbed). None of them needs WebGL or the
 Synty packs.
+
+### Visual and accessibility audit
+
+The board audit is [docs/design/painel/FIDELITY.md](docs/design/painel/FIDELITY.md). Its evidence lives
+under `.orchestration/shots/WP9/` (local to the orchestration workspace) and was produced by the two
+scripts above plus Chrome's DevTools protocol. `dev-tools/ui-audit.mjs` checks every section at
+1440×900, 390×844 and 360×740 in Arena light, Arena dark and Classic. It needs a signed-in
+`app_session` cookie (`api/scripts/issue-session.js`) and a local axe-core build; the summary of the
+last run and every accepted difference are in the WP9 report.
 
 ### API tests
 
